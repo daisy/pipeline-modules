@@ -4,7 +4,7 @@
     xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:cx="http://xmlcalabash.com/ns/extensions"
     xmlns:cxo="http://xmlcalabash.com/ns/extensions/osutils"
     xmlns:p2util="http://pipeline.daisy.org/ns/utilities/" exclude-inline-prefixes="cx"
-    type="p2util:generate-metadata">
+    type="p2util:metadata-generator">
     
     <p:input port="source" primary="true"/>
     <p:input port="parameters" kind="parameter"/>
