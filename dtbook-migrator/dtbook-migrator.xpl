@@ -20,8 +20,9 @@
     <p:input port="source" primary="true"/>
     <p:input port="parameters" kind="parameter"/>
     <p:output port="result">
-        <p:pipe port="result" step="main"/>
+        <p:pipe port="result" step="validate-dtbook"/>
     </p:output>
+    
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
     
     <p:variable name="version" select="dtb:dtbook/@version"/>
@@ -86,9 +87,14 @@
         </p:otherwise>
     </p:choose>
     
+    
+    
     <p:validate-with-relax-ng name="validate-dtbook">
+        <p:input port="source">
+            <p:pipe port="result" step="main"/>
+        </p:input>
         <p:input port="schema">
-            <p:document href="./schema/dtbook-2005-3.rng"/>
+            <p:document href="schema/dtbook-2005-3.rng"/>
         </p:input>
     </p:validate-with-relax-ng>
     
