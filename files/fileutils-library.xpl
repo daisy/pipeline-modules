@@ -1,6 +1,5 @@
 <p:library version="1.0" xmlns:p="http://www.w3.org/ns/xproc"
     xmlns:cxf="http://xmlcalabash.com/ns/extensions/fileutils"
-    xmlns:ml="http://xmlcalabash.com/ns/extensions/marklogic"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">

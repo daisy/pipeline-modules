@@ -60,32 +60,40 @@
         <p:output port="result"/>
         <p:wrap-sequence wrapper="c:manifest"/>
         <p:unwrap match="/c:manifest/c:manifest"/>
-        <p:label-elements match="c:entry" attribute="href" label="resolve-uri(@href,base-uri())"
-            replace="true"/>
-        <p:label-elements match="c:manifest" attribute="xml:base"
-            label="
-            (
-            for $pref in
-                reverse(
-                    for $uri in //@href
-                    return
-                        for $i in 1 to count(tokenize($uri,'/'))
-                        return concat(string-join(
-                            for $p in 1 to $i return tokenize($uri,'/')[$p]
-                        ,'/'),'/')
-                )
-            return
-                if (every $h in //@href satisfies starts-with($h,$pref)) then $pref else ()
-            )[1]
-            "
-            replace="true"/>
-        <p:label-elements match="c:entry" attribute="xml:base" label="/*/@xml:base" replace="true"/>
-        <p:label-elements match="c:entry" attribute="href"
-            label="if (starts-with(@href,base-uri())) then substring-after(@href,base-uri()) else @href"
-            replace="true"/>
-        <p:add-xml-base/>
+        <p:choose>
+            <p:when test="//c:entry">
+                <p:label-elements match="c:entry" attribute="href"
+                    label="resolve-uri(@href,base-uri())" replace="true"/>
+                <p:label-elements match="c:manifest" attribute="xml:base"
+                    label="
+                   (
+                   for $pref in
+                       reverse(
+                           for $uri in //@href
+                           return
+                               for $i in 1 to count(tokenize($uri,'/'))
+                               return concat(string-join(
+                                   for $p in 1 to $i return tokenize($uri,'/')[$p]
+                               ,'/'),'/')
+                       )
+                   return
+                       if (every $h in //@href satisfies starts-with($h,$pref)) then $pref else ()
+                   )[1]
+                   "
+                    replace="true"/>
+                <p:label-elements match="c:entry" attribute="xml:base" label="/*/@xml:base"
+                    replace="true"/>
+                <p:label-elements match="c:entry" attribute="href"
+                    label="if (starts-with(@href,base-uri())) then substring-after(@href,base-uri()) else @href"
+                    replace="true"/>
+                <p:add-xml-base/>
+            </p:when>
+            <p:otherwise>
+                <p:identity/>
+            </p:otherwise>
+        </p:choose>
     </p:declare-step>
-    
+
     <p:declare-step type="px:to-zip-manifest" name="to-zip-manifest">
         <p:input port="source"/>
         <p:output port="result"/>
