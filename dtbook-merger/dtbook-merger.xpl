@@ -26,6 +26,8 @@
 
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
     
+    <cx:message message="Merging DTBook documents"/>
+    
     <p:for-each name="validate-input">
         <p:output port="result">
             <p:pipe step="ident" port="result"/>
