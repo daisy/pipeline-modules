@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:px="http://pipeline.daisy.org/ns/" xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    exclude-result-prefixes="#all" version="1.0">
+    xmlns:pf="http://www.daisy.org/ns/pipeline/functions" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    exclude-result-prefixes="#all" version="2.0">
     
-    <xsl:function name="px:clockValToSeconds" as="xs:double">
+    <xsl:function name="pf:clockValToSeconds" as="xs:double">
         <xsl:param name="string" as="xs:string"/>
         <xsl:variable name="stringTokenized"
             select="reverse(
@@ -22,12 +22,12 @@
         <xsl:value-of select="$number"/>
     </xsl:function>
 
-    <xsl:function name="px:secondsToTimecount" as="xs:string">
+    <xsl:function name="pf:secondsToTimecount" as="xs:string">
         <xsl:param name="number" as="xs:double"/>
         <xsl:value-of select="concat(string($number),'s')"/>
     </xsl:function>
 
-    <xsl:function name="px:secondsToFullClockVal" as="xs:string">
+    <xsl:function name="pf:secondsToFullClockVal" as="xs:string">
         <xsl:param name="number" as="xs:double"/>
         <xsl:variable name="HH"
             select="concat(if (($number div 3600) &lt; 10) then '0' else '', string(floor($number div 3600)))"/>

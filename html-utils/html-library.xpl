@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:library xmlns:p="http://www.w3.org/ns/xproc" xmlns:c="http://www.w3.org/ns/xproc-step"
-    xmlns:px="http://pipeline.daisy.org/ns/" version="1.0">
+    xmlns:px="http://www.daisy.org/ns/pipeline/xproc" version="1.0">
 
     <p:declare-step type="px:load-html">
         <p:documentation><![CDATA[
