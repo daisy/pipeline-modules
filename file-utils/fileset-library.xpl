@@ -1,5 +1,5 @@
 <p:library version="1.0" xmlns:p="http://www.w3.org/ns/xproc"
-    xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:px="http://pipeline.daisy.org/ns/">
+    xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:px="http://www.daisy.org/ns/pipeline/xproc">
 
     <p:declare-step type="px:add-manifest-entry" name="add-manifest-entry">
         <p:input port="source"/>
