@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<p:declare-step version="1.0" name="metadata-generator" xmlns:p="http://www.w3.org/ns/xproc"
-    xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:cx="http://xmlcalabash.com/ns/extensions"
+<p:declare-step version="1.0" name="generate-metadata" 
+    xmlns:p="http://www.w3.org/ns/xproc"
+    xmlns:c="http://www.w3.org/ns/xproc-step" 
+    xmlns:cx="http://xmlcalabash.com/ns/extensions"
     xmlns:cxo="http://xmlcalabash.com/ns/extensions/osutils"
-    xmlns:p2util="http://pipeline.daisy.org/ns/utilities/" exclude-inline-prefixes="cx"
-    type="p2util:metadata-generator">
+    xmlns:px="http://www.daisy.org/ns/pipeline/xproc/generate-metadata" 
+    exclude-inline-prefixes="cx"
+    type="px:generate-metadata">
     
     <p:input port="source" primary="true"/>
     <p:input port="parameters" kind="parameter"/>
@@ -21,7 +24,7 @@
         else tokenize(base-uri(/),'/')[last()],'-mods.xml')
         else if (ends-with($output,'.xml')) then $output 
         else concat($output,'.xml'), base-uri(/))">
-        <p:pipe step="metadata-generator" port="source"/>
+        <p:pipe step="generate-metadata" port="source"/>
         
     </p:variable>
     
@@ -45,7 +48,7 @@
     </p:xslt>
     
     <!-- write the MODS metadata record -->
-    <p:store>
+    <p:store name="store-mods-file">
         <p:input port="source">
             <p:pipe step="create-mods" port="result"/>
         </p:input>
