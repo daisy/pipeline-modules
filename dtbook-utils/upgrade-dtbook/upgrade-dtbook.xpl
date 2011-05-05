@@ -5,7 +5,7 @@
     xmlns:cx="http://xmlcalabash.com/ns/extensions"
     xmlns:cxo="http://xmlcalabash.com/ns/extensions/osutils"
     xmlns:dtb="http://www.daisy.org/z3986/2005/dtbook/"
-    xmlns:px="http://www.daisy.org/ns/pipeline/xproc/upgrade-dtbook" 
+    xmlns:px="http://www.daisy.org/ns/pipeline/xproc" 
     xmlns:dc="http://purl.org/dc/terms/"
     exclude-inline-prefixes="cx">
     <!-- 

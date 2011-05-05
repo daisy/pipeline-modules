@@ -5,7 +5,7 @@
     xmlns:cx="http://xmlcalabash.com/ns/extensions"
     xmlns:cxo="http://xmlcalabash.com/ns/extensions/osutils"
     xmlns:dtb="http://www.daisy.org/z3986/2005/dtbook/"
-    xmlns:px="http://www.daisy.org/ns/pipeline/xproc/merge-dtbook-files" 
+    xmlns:px="http://www.daisy.org/ns/pipeline/xproc" 
     exclude-inline-prefixes="cx">
     <!-- 
         Merges two or more DTBook files.  This is part of the utilities module.
