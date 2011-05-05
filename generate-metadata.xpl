@@ -5,7 +5,7 @@
     xmlns:c="http://www.w3.org/ns/xproc-step" 
     xmlns:cx="http://xmlcalabash.com/ns/extensions"
     xmlns:cxo="http://xmlcalabash.com/ns/extensions/osutils"
-    xmlns:px="http://www.daisy.org/ns/pipeline/xproc/generate-metadata" 
+    xmlns:px="http://www.daisy.org/ns/pipeline/xproc" 
     exclude-inline-prefixes="cx"
     type="px:generate-metadata">
     
