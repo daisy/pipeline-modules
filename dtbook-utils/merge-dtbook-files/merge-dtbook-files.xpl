@@ -21,8 +21,6 @@
         <p:pipe port="result" step="validate-zedai"/>
     </p:output>
     
-    <p:option name="output" select="''"/>
-
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
     
     <cx:message message="Merging DTBook documents"/>
