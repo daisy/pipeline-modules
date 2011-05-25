@@ -7,16 +7,24 @@
     xmlns:dtb="http://www.daisy.org/z3986/2005/dtbook/"
     xmlns:px="http://www.daisy.org/ns/pipeline/xproc" 
     xmlns:dc="http://purl.org/dc/terms/"
+    xmlns:xd="http://www.daisy.org/ns/pipeline/doc"
     exclude-inline-prefixes="cx">
     <!-- 
-        
-        Upgrades a DTBook file from version 1.1.0, 2005-1, or 2005-2 to 2005-3.  This is part of the utilities module.
-        This was ported from the Pipeline 1.  It has a simpler interface, being only concerned with 2005-3 output.
-        
         TODO: 
         * copy referenced resources (such as images)
     -->
-    
+    <p:documentation>
+        <xd:short>Upgrade a DTBook document from version 1.1.0, 2005-1, or 2005-2 to version 2005-3. This module was imported from the Pipeline 1.</xd:short>
+        <xd:author>
+            <xd:name>Marisa DeMeglio</xd:name>
+            <xd:mailto>marisa.demeglio@gmail.com</xd:mailto>
+            <xd:organization>DAISY</xd:organization>
+        </xd:author>
+        <xd:maintainer>Marisa DeMeglio</xd:maintainer>
+        <xd:input port="source">DTBook 1.1.0, 2005-1, or 2005-2 document.</xd:input>
+        <xd:output port="result">DTBook 2005-3 document.</xd:output>
+    </p:documentation>
+
     <p:input port="source" primary="true"/>
     <p:input port="parameters" kind="parameter"/>
     <p:output port="result">

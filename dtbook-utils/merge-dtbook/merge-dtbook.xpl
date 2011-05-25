@@ -1,15 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step version="1.0" name="merge-dtbook-files" type="px:merge-dtbook-files"
+<p:declare-step version="1.0" name="merge-dtbook" type="px:merge-dtbook"
     xmlns:p="http://www.w3.org/ns/xproc"
     xmlns:c="http://www.w3.org/ns/xproc-step" 
     xmlns:cx="http://xmlcalabash.com/ns/extensions"
     xmlns:cxo="http://xmlcalabash.com/ns/extensions/osutils"
     xmlns:dtb="http://www.daisy.org/z3986/2005/dtbook/"
     xmlns:px="http://www.daisy.org/ns/pipeline/xproc" 
+    xmlns:xd="http://www.daisy.org/ns/pipeline/doc"
     exclude-inline-prefixes="cx">
+    
+    <p:documentation>
+        <xd:short>Merge 2 or more DTBook documents.</xd:short>
+        <xd:author>
+            <xd:name>Marisa DeMeglio</xd:name>
+            <xd:mailto>marisa.demeglio@gmail.com</xd:mailto>
+            <xd:organization>DAISY</xd:organization>
+        </xd:author>
+        <xd:maintainer>Marisa DeMeglio</xd:maintainer>
+        <xd:input port="source">Sequence of DTBook documents. Versions supported: 2005-3. </xd:input>
+        <xd:output port="result">Merged DTBook document.</xd:output>
+    </p:documentation>
     <!-- 
-        Merges two or more DTBook files.  This is part of the utilities module.
-        
         TODO: 
          * copy referenced resources (such as images)
          * deal with xml:lang (either copy once and put in dtbook/@xml:lang or, if different languages are used, copy the @xml:lang attr into the respective sections.
@@ -34,7 +45,7 @@
 
         <p:validate-with-relax-ng>
             <p:input port="schema">
-                <p:document href="./schema/dtbook-2005-3.rng"/>
+                <p:document href="schema/dtbook-2005-3.rng"/>
             </p:input>
         </p:validate-with-relax-ng>
 
