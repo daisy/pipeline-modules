@@ -1,0 +1,9 @@
+<package name="org.daisy.pipeline.fileset-utils" xmlns="http://expath.org/ns/pkg">
+	<module version="1.0.0" name="fileset-utils">
+		<title>File Set Utilities</title>
+		<xproc>
+			<import-uri>http://www.daisy.org/fileset-utils/fileset-library.xpl</import-uri>
+			<file>xproc/fileset-library.xpl</file>
+		</xproc>
+	</module>
+</package>
