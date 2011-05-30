@@ -1,9 +1,9 @@
 <package name="org.daisy.pipeline.zip-utils" xmlns="http://expath.org/ns/pkg">
 	<module version="1.0.0" name="zip-utils">
 		<title>ZIP Utilities</title>
-		<xslt>
+		<xproc>
 			<import-uri>http://www.daisy.org/zip-utils/zip-library.xpl</import-uri>
 			<file>src/xproc/zip-library.xpl</file>
-		</xslt>
+		</xproc>
 	</module>
 </package>
