@@ -2,8 +2,8 @@
 	<module version="1.0.0" name="zip-utils">
 		<title>ZIP Utilities</title>
 		<xproc>
-			<import-uri>http://www.daisy.org/zip-utils/zip-library.xpl</import-uri>
-			<file>src/xproc/zip-library.xpl</file>
+			<import-uri>http://www.daisy.org/pipeline/modules/zip-utils/xproc/zip-library.xpl</import-uri>
+			<file>xproc/zip-library.xpl</file>
 		</xproc>
 	</module>
 </package>
