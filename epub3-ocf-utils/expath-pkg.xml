@@ -1,0 +1,9 @@
+<package name="org.daisy.pipeline.epub3-ocf-utils" xmlns="http://expath.org/ns/pkg">
+	<module version="1.0.0" name="epub3-ocf-utils">
+		<title>EPUB 3 Container Format Utilities</title>
+		<xproc>
+			<import-uri>http://www.daisy.org/epub3-ocf-utils/epub3-ocf-library.xpl</import-uri>
+			<file>src/xproc/epub3-ocf-library.xpl</file>
+		</xproc>
+	</module>
+</package>
