@@ -1,5 +1,6 @@
 <p:library version="1.0" xmlns:p="http://www.w3.org/ns/xproc"
-    xmlns:pxf="http://exproc.org/proposed/steps/file" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+    xmlns:pxf="http://exproc.org/proposed/steps/file">
 
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
         <div>
@@ -11,7 +12,6 @@
                 which they are specified.</p>
         </div>
     </p:documentation>
-
 
     <!-- ============================================================ -->
 
@@ -158,5 +158,7 @@
     </p:declare-step>
 
     <!-- ============================================================ -->
+
+    <p:import href="recursive-directory-list.xpl"/>
 
 </p:library>
