@@ -19,6 +19,14 @@
         <xd:maintainer>Marisa DeMeglio</xd:maintainer>
         <xd:input port="source">Sequence of DTBook documents. Versions supported: 2005-3. </xd:input>
         <xd:output port="result">Merged DTBook document.</xd:output>
+        
+        <cd:converter name="merge-dtbook" version="1.0" xmlns:cd="http://www.daisy.org/ns/pipeline/merge-dtbook">
+            <cd:description>Merge 2 or more DTBook documents.</cd:description>  
+            <cd:arg  name="in"  type="input" port="source" desc="Sequence of DTBook files" optional="false"/>         
+            <cd:arg  name="out"  type="output" port="result" desc="The result"/>       
+        </cd:converter>     
+        
+        
     </p:documentation>
     <!-- 
         TODO: 
