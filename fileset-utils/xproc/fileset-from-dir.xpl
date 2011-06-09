@@ -8,7 +8,7 @@
   <p:option name="include-filter"/>
   <p:option name="exclude-filter"/>
 
-  <p:import href="http://www.daisy.org/pipeline/modules/file-utils/file-library.xpl"/>
+  <p:import href="http://www.daisy.org/pipeline/modules/file-utils/xproc/file-library.xpl"/>
   <p:import href="fileset-from-dir-list.xpl"/>
 
   <p:choose>
