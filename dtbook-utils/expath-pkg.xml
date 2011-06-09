@@ -1,0 +1,9 @@
+<package name="http://www.daisy.org/ns/pipeline/module/dtbook-utils" xmlns="http://expath.org/ns/pkg">
+    <module version="1.0.0" name="dtbook-utils">
+        <title>DTBook Utils</title>
+        <xslt>
+            <import-uri>http://www.daisy.org/ns/pipeline/module/dtbook-utils/dtbook-utils-library.xpl</import-uri>
+            <file>dtbook-utils-library.xpl</file>
+        </xslt>
+    </module>
+</package>
