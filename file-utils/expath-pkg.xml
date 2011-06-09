@@ -2,7 +2,7 @@
 	<module version="1.0.0" name="file-utils">
 		<title>File Utilities</title>
 		<xproc>
-			<import-uri>http://www.daisy.org/pipeline/modules/file-utils/file-library.xpl</import-uri>
+			<import-uri>http://www.daisy.org/pipeline/modules/file-utils/xproc/file-library.xpl</import-uri>
 			<file>xproc/file-library.xpl</file>
 		</xproc>
 	</module>

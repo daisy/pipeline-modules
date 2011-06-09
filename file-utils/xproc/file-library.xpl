@@ -1,6 +1,5 @@
 <p:library version="1.0" xmlns:p="http://www.w3.org/ns/xproc"
-    xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-    xmlns:pxf="http://exproc.org/proposed/steps/file">
+    xmlns:px="http://www.daisy.org/ns/pipeline/xproc">
 
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
         <div>
@@ -21,7 +20,7 @@
             copied to the specified target.</p>
     </p:documentation>
 
-    <p:declare-step type="pxf:copy">
+    <p:declare-step type="px:copy">
         <p:output port="result" primary="false"/>
         <p:option name="href" required="true"/>
         <p:option name="target" required="true"/>
@@ -35,7 +34,7 @@
             step fails if the file does not exist or if it cannot be deleted.</p>
     </p:documentation>
 
-    <p:declare-step type="pxf:delete">
+    <p:declare-step type="px:delete">
         <p:output port="result" primary="false"/>
         <p:option name="href" required="true"/>
     </p:declare-step>
@@ -57,7 +56,7 @@
             size.</p>
     </p:documentation>
 
-    <p:declare-step type="pxf:info">
+    <p:declare-step type="px:info">
         <p:output port="result" sequence="true"/>
         <p:option name="href" required="true"/>
     </p:declare-step>
@@ -73,7 +72,7 @@
             true; otherwise, the step returns a <code>c:error</code> element which may contain
             additional, implementation-defined information about the nature of the error.</p>
     </p:documentation>
-    <p:declare-step type="pxf:head">
+    <p:declare-step type="px:head">
         <p:output port="result"/>
         <p:option name="href" required="true"/>
         <p:option name="count" required="true"/>
@@ -90,7 +89,7 @@
             directory cannot be created.</p>
     </p:documentation>
 
-    <p:declare-step type="pxf:mkdir">
+    <p:declare-step type="px:mkdir">
         <p:output port="result" primary="false"/>
         <p:option name="href" required="true"/>
     </p:declare-step>
@@ -103,7 +102,7 @@
             copied to the specified target; the source file is deleted if the copy succeeds.</p>
     </p:documentation>
 
-    <p:declare-step type="pxf:move">
+    <p:declare-step type="px:move">
         <p:output port="result" primary="false"/>
         <p:option name="href" required="true"/>
         <p:option name="target" required="true"/>
@@ -121,7 +120,7 @@
             true; otherwise, the step returns a <code>c:error</code> element which may contain
             additional, implementation-defined information about the nature of the error.</p>
     </p:documentation>
-    <p:declare-step type="pxf:tail">
+    <p:declare-step type="px:tail">
         <p:output port="result"/>
         <p:option name="href" required="true"/>
         <p:option name="count" required="true"/>
@@ -139,7 +138,7 @@
             will automatically be deleted when the processor terminates.</p>
     </p:documentation>
 
-    <p:declare-step type="pxf:tempfile">
+    <p:declare-step type="px:tempfile">
         <p:output port="result" primary="false"/>
         <p:option name="href" required="true"/>
         <p:option name="delete-on-exit"/>
@@ -152,7 +151,7 @@
             step fails if the file does not exist and cannot be created.</p>
     </p:documentation>
 
-    <p:declare-step type="pxf:touch">
+    <p:declare-step type="px:touch">
         <p:output port="result" primary="false"/>
         <p:option name="href" required="true"/>
     </p:declare-step>
