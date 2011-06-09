@@ -2,7 +2,7 @@
 	<module version="1.0.0" name="fileset-utils">
 		<title>File Set Utilities</title>
 		<xproc>
-			<import-uri>http://www.daisy.org/pipeline/modules/fileset-utils/fileset-library.xpl</import-uri>
+			<import-uri>http://www.daisy.org/pipeline/modules/fileset-utils/xproc/fileset-library.xpl</import-uri>
 			<file>xproc/fileset-library.xpl</file>
 		</xproc>
 	</module>
