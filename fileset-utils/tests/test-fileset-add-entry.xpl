@@ -47,7 +47,6 @@
 
     <p:group name="add-entry-first">
         <px:fileset-add-entry href="doc.html" first="true">
-            <p:log port="result"></p:log>
             <p:input port="source">
                 <p:inline>
                     <d:fileset xml:base="file:/users/me/dir/">
