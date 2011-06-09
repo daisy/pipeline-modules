@@ -2,21 +2,10 @@
     xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:cx="http://xmlcalabash.com/ns/extensions"
     xmlns:err="http://www.w3.org/ns/xproc-error" 
     xmlns:d="http://www.daisy.org/ns/pipeline/data"
-    xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-    xmlns:pxf="http://exproc.org/proposed/steps/file" type="px:fileset-copy"
-    exclude-inline-prefixes="err px pxf">
+    xmlns:px="http://www.daisy.org/ns/pipeline/xproc" type="px:fileset-copy"
+    exclude-inline-prefixes="#all">
     
-    <p:input port="source">
-        <p:inline>
-            <d:fileset
-                xml:base="file:/Users/Romain/Documents/Work/daisy-pipeline/modules/utilities/fileset-utils/tests/samples/fileset/">
-                <d:file href="dir/file.txt"/>
-                <d:file href="test.txt"/>
-                <d:file href="test.xml"/>
-                <d:file href="http://www.example.org/style.css"/>
-            </d:fileset>
-        </p:inline>
-    </p:input>
+    <p:input port="source"/>
     <p:output port="result" primary="true"/>
     <p:option name="target"
         select="'file:/Users/Romain/Documents/Work/daisy-pipeline/modules/utilities/fileset-utils/tests/samples/out/'"/>
@@ -33,15 +22,15 @@
             <p:group name="checkdir">
                 <!--Get file system info on the directory-->
                 <!--Note: we wrap the result since an empty sequence is returned when the file does not exist-->
-                <pxf:info>
+                <px:info>
                     <p:with-option name="href" select="$target"/>
-                </pxf:info>
+                </px:info>
                 <p:wrap-sequence wrapper="info"/>
                 <p:choose>
                     <p:when test="empty(/info/*)">
-                        <pxf:mkdir>
+                        <px:mkdir>
                             <p:with-option name="href" select="$target"/>
-                        </pxf:mkdir>
+                        </px:mkdir>
                     </p:when>
                     <p:when test="not(/info/c:directory)">
                         <!--TODO rename the error-->
@@ -80,14 +69,14 @@
                     <p:variable name="href" select="p:resolve-uri(*/@href, concat(base-uri(),'/'))"/>
                     <p:variable name="target-file"
                         select="p:resolve-uri(*/@href, concat($target,'/'))"/>
-                    <pxf:mkdir name="mkdir">
+                    <px:mkdir name="mkdir">
                         <p:with-option name="href" select="replace($target-file,'[^/]+$','')"/>
-                    </pxf:mkdir>
-                    <pxf:copy name="copy" cx:depends-on="mkdir">
+                    </px:mkdir>
+                    <px:copy name="copy" cx:depends-on="mkdir">
                         <p:with-option name="href" select="$href"/>
                         <p:with-option name="target" select="$target-file"/>
                         <p:with-option name="fail-on-error" select="$fail-on-error"/>
-                    </pxf:copy>
+                    </px:copy>
                     <p:identity cx:depends-on="copy">
                         <p:input port="source">
                             <p:pipe port="current" step="handle-inner-file"/>

@@ -1,8 +1,7 @@
 <p:declare-step version="1.0" xmlns:p="http://www.w3.org/ns/xproc"
     xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:cx="http://xmlcalabash.com/ns/extensions"
     xmlns:d="http://www.daisy.org/ns/pipeline/data"
-    xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-    xmlns:pxf="http://exproc.org/proposed/steps/file" exclude-inline-prefixes="#all">
+    xmlns:px="http://www.daisy.org/ns/pipeline/xproc" exclude-inline-prefixes="#all">
 
     <p:import href="../xproc/fileset-copy.xpl"/>
     <p:import href="compare.xpl"/>
