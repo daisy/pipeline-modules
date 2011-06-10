@@ -5,5 +5,9 @@
 			<import-uri>http://www.daisy.org/pipeline/modules/fileset-utils/xproc/fileset-library.xpl</import-uri>
 			<file>xproc/fileset-library.xpl</file>
 		</xproc>
+		<xslt>
+			<import-uri>http://www.daisy.org/pipeline/modules/fileset-utils/xslt/fileset-to-odf-manifest.xsl</import-uri>
+			<file>xslt/fileset-to-odf-manifest.xsl</file>
+		</xslt>
 	</module>
 </package>
