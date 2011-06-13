@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step type="px:epub3-ocf-finalize" name="main" xmlns:p="http://www.w3.org/ns/xproc"
-    xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:err="http://www.w3.org/ns/xproc-error"
+<p:declare-step type="px:epub3-ocf-finalize" name="main" 
+    xmlns:p="http://www.w3.org/ns/xproc"
+    xmlns:c="http://www.w3.org/ns/xproc-step"
+    xmlns:err="http://www.w3.org/ns/xproc-error"
     xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-    xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc-internal" version="1.0">
+    xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc-internal"
+    version="1.0">
     
     <p:input port="source" primary="true"/>
     <p:input port="metadata" sequence="true">
