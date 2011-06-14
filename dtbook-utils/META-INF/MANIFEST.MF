@@ -3,3 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: dtbook-utils
 Bundle-SymbolicName: dtbook-utils
 Bundle-Version: 1.0.0.qualifier
+Require-Bundle: converter-registry,
+ module-common;bundle-version="1.0.0"
+Service-Component: OSGI-INF/merge-dtbook.xml,OSGI-INF/upgrade-dtbook.xml
+
