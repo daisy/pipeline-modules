@@ -1,0 +1,118 @@
+<?xml version='1.0' encoding='utf-8'?>
+<?oxygen RNGSchema="utfx_tests.rnc" type="compact"?>
+<utfx:tests xmlns="http://www.w3.org/1999/xhtml" xmlns:utfx="http://utfx.org/test-definition"
+	xmlns:epub="http://www.idpf.org/2007/ops">
+	<utfx:stylesheet src="../../xslt/html5-to-page-list.xsl"/>
+
+	<utfx:test>
+		<utfx:name>basic</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<body>
+					<span id="page1" epub:type="pagebreak">1</span>
+				</body>
+			</utfx:source>
+			<utfx:expected>
+				<ol>
+					<li><a href="#page1">1</a></li>
+				</ol>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+	<utfx:test>
+		<utfx:name>no ID</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<body>
+					<span epub:type="pagebreak">1</span>
+				</body>
+			</utfx:source>
+			<utfx:expected>
+				<ol/>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+	<utfx:test>
+		<utfx:name>title attribute</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<body>
+					<span id="page1" epub:type="pagebreak" title="1">some text</span>
+				</body>
+			</utfx:source>
+			<utfx:expected>
+				<ol>
+					<li><a href="#page1">1</a></li>
+				</ol>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+	<utfx:test>
+		<utfx:name>title attribute on empty element</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<body>
+					<span id="page1" epub:type="pagebreak" title="1"/>
+				</body>
+			</utfx:source>
+			<utfx:expected>
+				<ol>
+					<li><a href="#page1">1</a></li>
+				</ol>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+	<utfx:test>
+		<utfx:name>several pages</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<body>
+					<span id="page1" epub:type="pagebreak" title="1"/>
+					<div>
+						<span id="page2" epub:type="pagebreak" title="2"/>
+					</div>
+				</body>
+			</utfx:source>
+			<utfx:expected>
+				<ol>
+					<li><a href="#page1">1</a></li>
+					<li><a href="#page2">2</a></li>
+				</ol>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+	<utfx:test>
+		<utfx:name>nested pages</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<body>
+					<div  id="page1" epub:type="pagebreak" title="1">
+						<span id="page2" epub:type="pagebreak" title="2"/>						
+					</div>
+				</body>
+			</utfx:source>
+			<utfx:expected>
+				<ol>
+					<li><a href="#page1">1</a></li>
+					<li><a href="#page2">2</a></li>
+				</ol>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+	<utfx:test>
+		<utfx:name>rich content</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<body>
+					<span id="page1" epub:type="pagebreak">page <em>1</em></span>
+				</body>
+			</utfx:source>
+			<utfx:expected>
+				<ol>
+					<li><a href="#page1">page <em>1</em></a></li>
+				</ol>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+
+</utfx:tests>
