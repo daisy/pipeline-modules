@@ -23,6 +23,13 @@
         <xd:maintainer>Marisa DeMeglio</xd:maintainer>
         <xd:input port="source">DTBook 1.1.0, 2005-1, or 2005-2 document.</xd:input>
         <xd:output port="result">DTBook 2005-3 document.</xd:output>
+        
+        <cd:converter name="upgrade-dtbook" version="1.0" xmlns:cd="http://www.daisy.org/ns/pipeline/upgrade-dtbook">
+            <cd:description>Upgrade to DTBook 2005-3.</cd:description>  
+            <cd:arg  name="in"  type="input" port="source" desc="Single DTBook file" optional="false"/>         
+            <cd:arg  name="out"  type="output" port="result" desc="The result"/>       
+        </cd:converter> 
+        
     </p:documentation>
 
     <p:input port="source" primary="true"/>
