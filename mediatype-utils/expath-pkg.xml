@@ -1,0 +1,9 @@
+<package name="http://www.daisy.org/ns/pipeline/mediatype-utils" xmlns="http://expath.org/ns/pkg">
+    <module version="1.0.0" name="mediatype-utils">
+        <title>Media Type Utilities</title>
+        <xslt>
+            <import-uri>http://www.daisy.org/ns/pipeline/utilities/mediatype-utils/mediatype.xpl</import-uri>
+            <file>mediatype.xpl</file>
+        </xslt>
+    </module>
+</package>
