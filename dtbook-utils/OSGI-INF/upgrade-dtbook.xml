@@ -1,0 +1,9 @@
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="upgrade-dtbook">
+    <implementation class="org.daisy.converter.registry.OSGIConverterDescriptor"/>
+    <service>
+        <provide interface="org.daisy.pipeline.modules.converter.ConverterDescriptor"/>
+    </service>
+    <property name="converter.name" type="String" value="upgrade-dtbook"/>
+    <property name="converter.description" type="String" value="DTBook utility for upgrading to DTBook 2005-3."/>
+    <property name="converter.url" type="String" value="http://www.daisy.org/ns/pipeline/module/dtbook-utils/upgrade-dtbook/upgrade-dtbook.xpl"/>
+</scr:component>
