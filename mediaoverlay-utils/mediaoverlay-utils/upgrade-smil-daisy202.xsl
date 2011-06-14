@@ -3,8 +3,6 @@
     xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:smil="http://www.w3.org/ns/SMIL"
     xmlns:opf="http://www.idpf.org/2007/opf" exclude-result-prefixes="#all" version="2.0">
 
-    <xsl:param name="language" required="yes"/>
-
     <xsl:template match="@*|node()">
         <xsl:choose>
             <xsl:when test="self::*">
@@ -22,7 +20,7 @@
 
     <xsl:template match="/*">
         <smil xmlns="http://www.w3.org/ns/SMIL" version="3.0"
-            profile="http://www.idpf.org/epub/30/profile/content/" xml:lang="{$language}">
+            profile="http://www.idpf.org/epub/30/profile/content/">
             <xsl:apply-templates/>
         </smil>
     </xsl:template>
