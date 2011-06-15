@@ -7,7 +7,7 @@
         </xslt>
         <xslt>
             <import-uri>http://www.daisy.org/ns/pipeline/module/dtbook-utils/upgrade-dtbook/upgrade-dtbook.xpl</import-uri>
-            <file>merge-dtbook/upgrade-dtbook.xpl</file>
+            <file>upgrade-dtbook/upgrade-dtbook.xpl</file>
         </xslt>
         <xslt>
             <import-uri>http://www.daisy.org/ns/pipeline/module/dtbook-utils/dtbook-utils-library.xpl</import-uri>
