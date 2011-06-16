@@ -6,8 +6,8 @@
                         <file>html-library.xpl</file>
                 </xslt>
                 <xslt>
-                        <import-uri>http://www.daisy.org/ns/pipeline/utilities/html-utils/html5outliner.xsl</import-uri>
-                        <file>html5outliner.xsl</file>
+                        <import-uri>http://www.daisy.org/ns/pipeline/utilities/html-utils/html5-outliner.xsl</import-uri>
+                        <file>html5-outliner.xsl</file>
                 </xslt>
         </module>
 </package>
