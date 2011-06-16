@@ -2,10 +2,12 @@
 <?xml-model href="utfx_tests.rnc" type="application/relax-ng-compact-syntax"?>
 <utfx:tests xmlns:utfx="http://utfx.org/test-definition">
 	<utfx:stylesheet src="html5outliner.xsl"/>
-
-	<!-- the first heading element in sectioning content is the section heading-->
+	
+	<!-- ========================================================================== -->
+	<!-- the first heading element in sectioning content is the section heading     -->
+	<!-- ========================================================================== -->
 	<utfx:test>
-		<utfx:name>tbd</utfx:name>
+		<utfx:name>section heading: basic</utfx:name>
 		<utfx:assert-equal normalise-internal-whitespace="yes">
 			<utfx:source>
 				<body id="body">
@@ -21,7 +23,7 @@
 	</utfx:test>
 	<!-- the first heading element in sectioning content is the section heading-->
 	<utfx:test>
-		<utfx:name>tbd</utfx:name>
+		<utfx:name>section heading: not first child</utfx:name>
 		<utfx:assert-equal normalise-internal-whitespace="yes">
 			<utfx:source>
 				<body id="body">
@@ -38,7 +40,7 @@
 	</utfx:test>
 	<!-- the first heading element in sectioning content is the section heading-->
 	<utfx:test>
-		<utfx:name>tbd</utfx:name>
+		<utfx:name>section heading: after subsection</utfx:name>
 		<utfx:assert-equal normalise-internal-whitespace="yes">
 			<utfx:source>
 				<body id="body">
@@ -60,15 +62,29 @@
 		</utfx:assert-equal>
 	</utfx:test>
 
+	<!-- ========================================================================== -->
 	<!-- sectioning content elements are always considered subsections -->
-	<!-- subsequent headings of equal or higher rank start new (implied) sections -->
-	<!-- headings of lower rank start implied subsections -->
-	<!-- user agents should provide default headings -->	
+	<!-- ========================================================================== -->
 	
-	<!-- sectioning root 'blockquote' should not contribute to the ancestor outline -->
-	<!-- sectioning root 'details' should not contribute to the ancestor outline -->
-	<!-- sectioning root 'fieldset' should not contribute to the ancestor outline -->
-	<!-- sectioning root 'figure' should not contribute to the ancestor outline -->
-	<!-- sectioning root 'td' should not contribute to the ancestor outline -->
+	<!-- ========================================================================== -->
+	<!-- subsequent headings of equal or higher rank start new (implied) sections -->
+	<!-- ========================================================================== -->
+	
+	<!-- ========================================================================== -->
+	<!-- headings of lower rank start implied subsections -->
+	<!-- ========================================================================== -->
+	
+	<!-- ========================================================================== -->
+	<!-- user agents should provide default headings -->	
+	<!-- ========================================================================== -->
+	
+	<!-- ========================================================================== -->
+	<!-- sectioning root should not contribute to the ancestor outline              -->
+	<!-- ========================================================================== -->
+	<!-- blockquote -->
+	<!-- details -->
+	<!-- fieldset -->
+	<!-- figure -->
+	<!-- td -->
 
 </utfx:tests>
