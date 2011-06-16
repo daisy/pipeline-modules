@@ -110,6 +110,32 @@
 			</utfx:expected>
 		</utfx:assert-equal>
 	</utfx:test>
+	<utfx:test>
+		<utfx:name>section heading: between subsections</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<body id="body">
+					<section id="section1">
+						<h1 id="h11">h11</h1>
+					</section>
+					<h1 id="h12">h12</h1>
+					<section id="section2">
+						<h1 id="h13">h13</h1>
+					</section>
+				</body>
+			</utfx:source>
+			<utfx:expected>
+				<ol>
+					<li><a href="#body">h12</a>
+						<ol>
+							<li><a href="#section1">h11</a></li>
+							<li><a href="#section2">h13</a></li>
+						</ol>
+					</li>
+				</ol>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
 
 	<!-- ========================================================================== -->
 	<!-- sectioning content elements are always considered subsections -->
