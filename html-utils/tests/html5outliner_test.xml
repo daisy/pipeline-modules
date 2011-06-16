@@ -2,7 +2,7 @@
 
 <!DOCTYPE utfx:tests PUBLIC "-//UTF-X//DTD utfx-tests 1.0//EN" "utfx_tests.dtd">
 <utfx:tests xmlns:utfx="http://utfx.org/test-definition">
-  <utfx:stylesheet src="html5outliner.xsl"/>
+  <utfx:stylesheet src="html-utils/html5outliner.xsl"/>
 
   <utfx:test>
     <utfx:name>html 5 outliner basic</utfx:name>
