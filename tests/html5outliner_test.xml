@@ -1,49 +1,74 @@
 <?xml version='1.0' encoding='utf-8'?>
-
-<!DOCTYPE utfx:tests PUBLIC "-//UTF-X//DTD utfx-tests 1.0//EN" "utfx_tests.dtd">
+<?xml-model href="utfx_tests.rnc" type="application/relax-ng-compact-syntax"?>
 <utfx:tests xmlns:utfx="http://utfx.org/test-definition">
-  <utfx:stylesheet src="html5outliner.xsl"/>
+	<utfx:stylesheet src="html5outliner.xsl"/>
 
-  <utfx:test>
-    <utfx:name>html 5 outliner basic</utfx:name>
-    <utfx:stylesheet-params>
-      <utfx:with-param name="depth" select="2"/>
-      <utfx:with-param name="visible-depth" select="2"/>
-    </utfx:stylesheet-params>
-    <utfx:assert-equal normalise-internal-whitespace="yes">
-      <utfx:source>
-				<html>
-					<body>
-					 <h1>Foo</h1>
-					 <h2>Bar</h2>
-					 <blockquote>
-						<h3>Bla</h3>
-					 </blockquote>
-					 <p>Baz</p>
-					 <h2>Quux</h2>
-					 <section>
-						<h3>Thud</h3>
-					 </section>
-					 <p>Grunt</p>
-					</body>
-				</html>
-      </utfx:source>
-      <utfx:expected>
-				<html>
-					<body>
-					 <h1>Outline</h1>
-					 <ol>
-						 <li>Foo</li>
-						 <ol>
-							 <li>Bar</li>
-							 <li>Quux</li>
-							 <li>Thuud</li>
-						 </ol>
-					 </ol>
-					</body>
-				</html>
+	<!-- the first heading element in sectioning content is the section heading-->
+	<utfx:test>
+		<utfx:name>tbd</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<body id="body">
+					<h1 id="h1">heading</h1>
+				</body>
+			</utfx:source>
+			<utfx:expected>
+				<ol>
+					<li><a href="#body">heading</a></li>
+				</ol>
 			</utfx:expected>
-    </utfx:assert-equal>
-  </utfx:test>
+		</utfx:assert-equal>
+	</utfx:test>
+	<!-- the first heading element in sectioning content is the section heading-->
+	<utfx:test>
+		<utfx:name>tbd</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<body id="body">
+					<p>paragraph</p>
+					<h1 id="h1">heading</h1>
+				</body>
+			</utfx:source>
+			<utfx:expected>
+				<ol>
+					<li><a href="#body">heading</a></li>
+				</ol>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+	<!-- the first heading element in sectioning content is the section heading-->
+	<utfx:test>
+		<utfx:name>tbd</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<body id="body">
+					<section id="section">
+						<h1 id="h11">h11</h1>
+					</section>
+					<h1 id="h12">h12</h1>
+				</body>
+			</utfx:source>
+			<utfx:expected>
+				<ol>
+					<li><a href="#body">h12</a>
+						<ol>
+							<li><a href="#section">h11</a></li>
+						</ol>
+					</li>
+				</ol>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+
+	<!-- sectioning content elements are always considered subsections -->
+	<!-- subsequent headings of equal or higher rank start new (implied) sections -->
+	<!-- headings of lower rank start implied subsections -->
+	<!-- user agents should provide default headings -->	
+	
+	<!-- sectioning root 'blockquote' should not contribute to the ancestor outline -->
+	<!-- sectioning root 'details' should not contribute to the ancestor outline -->
+	<!-- sectioning root 'fieldset' should not contribute to the ancestor outline -->
+	<!-- sectioning root 'figure' should not contribute to the ancestor outline -->
+	<!-- sectioning root 'td' should not contribute to the ancestor outline -->
 
 </utfx:tests>
