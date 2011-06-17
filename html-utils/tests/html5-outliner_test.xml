@@ -384,7 +384,7 @@
 				<html>
 					<body id="body">
 						<h1 id="h1">h1</h1>
-						<h3 id="h2">h3</h3>
+						<h3 id="h3">h3</h3>
 					</body>
 				</html>
 			</utfx:source>
@@ -783,7 +783,7 @@
 				<ol>
 					<li><a href="#body">h1</a>
 						<ol>
-							<li><a href="#section">Sidebar</a></li>
+							<li><a href="#aside">Sidebar</a></li>
 						</ol>
 					</li>
 				</ol>
@@ -921,4 +921,261 @@
 		</utfx:assert-equal>
 	</utfx:test>
 
+
+	<!-- ========================================================================== -->
+	<!-- complex documents                                                          -->
+	<!-- ========================================================================== -->
+	<utfx:test>
+		<utfx:name>complex 1</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<html>
+					<body id="body">
+						<h1 id="foo">Foo</h1>
+						<h2 id="bar">Bar</h2>
+						<blockquote id="blockquote">
+							<h3 id="bla">Bla</h3>
+						</blockquote>
+						<p>Baz</p>
+						<h2 id="quux">Quux</h2>
+						<section id="section">
+							<h3 id="thud">Thud</h3>
+						</section>
+						<p>Grunt</p>
+					</body>
+				</html>
+			</utfx:source>
+			<utfx:expected>
+				<ol>
+					<li><a href="#body">Foo</a>
+						<ol>
+							<li><a href="#bar">Bar</a></li>
+							<li><a href="#quux">Quux</a></li>
+							<li><a href="#section">Thud</a></li>
+						</ol>
+					</li>
+				</ol>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+	<utfx:test>
+		<utfx:name>complex 2</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<html>
+					<body id="body">
+						<section id="section1">
+							<h3>Thud</h3>
+						</section>
+						<h1 id="foo">Foo</h1>
+						<h1 id="bar">Bar</h1>
+						<h2 id="quux">Quux</h2>
+						<section id="section2">
+							<h3>Thud</h3>
+						</section>
+					</body>
+				</html>
+			</utfx:source>
+			<utfx:expected>
+				<ol>
+					<li><a href="#body">Foo</a>
+						<ol>
+							<li><a href="#section1">Thud</a></li>
+						</ol>
+					</li>
+					<li><a href="#bar">Bar</a>
+						<ol>
+							<li><a href="#quux">Quux</a></li>
+							<li><a href="#section2">Thud</a></li>
+						</ol>
+					</li>
+				</ol>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+	<utfx:test>
+		<utfx:name>complex 3</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<html>
+					<body id="body">
+						<section id="section1">
+							<h3>Thud</h3>
+						</section>
+						<h3 id="foo">Foo</h3>
+						<h2 id="bar1">Bar</h2>
+						<section id="section2">
+							<h3>Thud</h3>
+						</section>
+						<h2 id="bar2">Bar</h2>
+						<h3 id="quux">Quux</h3>
+						<section id="section3">
+							<h3>Thud</h3>
+						</section>
+					</body>
+				</html>
+			</utfx:source>
+			<utfx:expected>
+				<ol>
+					<li><a href="#body">Foo</a>
+						<ol>
+							<li><a href="#section1">Thud</a></li>
+						</ol>
+					</li>
+					<li><a href="#bar1">Bar</a>
+						<ol>
+							<li><a href="#section2">Thud</a></li>
+						</ol>
+					</li>
+					<li><a href="#bar2">Bar</a>
+						<ol>
+							<li><a href="#quux">Quux</a></li>
+							<li><a href="#section3">Thud</a></li>
+						</ol>
+					</li>
+				</ol>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+	<utfx:test>
+		<utfx:name>complex 4</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<html>
+					<body id="body">
+						<h1 id="h11">h1</h1>
+						<h1 id="h12">h1</h1>
+						<h2 id="h21">h2</h2>
+						<h3 id="h31">h3</h3>
+						<section id="section">
+							<h1>h1</h1>
+						</section>
+						<h3 id="h32">h3</h3>
+						<h2 id="h22">h2</h2>
+					</body>
+				</html>
+			</utfx:source>
+			<utfx:expected>
+				<ol>
+					<li><a href="#body">h1</a></li>
+					<li><a href="#h12">h1</a>
+						<ol>
+							<li><a href="#h21">h2</a>
+								<ol>
+									<li><a href="#h31">h3</a></li>
+								</ol>
+							</li>
+							<li><a href="#section">h1</a></li>
+							<li><a href="#h32">h3</a></li>
+							<li><a href="#h22">h2</a></li>
+						</ol>
+					</li>
+				</ol>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+	<utfx:test>
+		<utfx:name>complex 5</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<html>
+					<body id="body">
+						<h1 id="h11">h1</h1>
+						<h1 id="h12">h1</h1>
+						<section id="section">
+							<h1>h1</h1>
+						</section>
+						<h3 id="h31">h3</h3>
+						<h2 id="h21">h2</h2>
+						<h3 id="h32">h3</h3>
+					</body>
+				</html>
+			</utfx:source>
+			<utfx:expected>
+				<ol>
+					<li><a href="#body">h1</a></li>
+					<li><a href="#h12">h1</a>
+						<ol>
+							<li><a href="#section">h1</a></li>
+							<li><a href="#h31">h3</a></li>
+							<li><a href="#h21">h2</a>
+								<ol>
+									<li><a href="#h32">h3</a></li>
+								</ol>
+							</li>
+						</ol>
+					</li>
+				</ol>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+	<utfx:test>
+		<utfx:name>complex 6</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<html>
+					<body id="body">
+						<section id="section">
+							<h1>h1</h1>
+						</section>
+						<h2 id="h21">h2</h2>
+						<h3 id="h31">h3</h3>
+						<h2 id="h22">h2</h2>
+						<h3 id="h32">h3</h3>
+					</body>
+				</html>
+			</utfx:source>
+			<utfx:expected>
+				<ol>
+					<li><a href="#body">h2</a>
+						<ol>
+							<li><a href="#section">h1</a></li>
+							<li><a href="#h31">h3</a></li>
+						</ol>
+					</li>
+					<li><a href="#h22">h2</a>
+						<ol>
+							<li><a href="#h32">h3</a></li>
+						</ol>
+					</li>
+				</ol>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+	<utfx:test>
+		<utfx:name>complex 7</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<html>
+					<body id="body">
+						<h1 id="h1">h1</h1>
+						<h2 id="h2">h2</h2>
+						<h3 id="h31">h3</h3>
+						<h3 id="h32">h3</h3>
+						<h4 id="h41">h4</h4>
+						<h4 id="h42">h4</h4>
+					</body>
+				</html>
+			</utfx:source>
+			<utfx:expected>
+				<ol>
+					<li><a href="#body">h1</a>
+						<ol>
+							<li><a href="#h2">h2</a>
+								<ol>
+									<li><a href="#h31">h3</a></li>
+									<li><a href="#h32">h3</a>
+										<ol>
+											<li><a href="#h41">h4</a></li>
+											<li><a href="#h42">h4</a></li>
+										</ol>
+									</li>
+								</ol>
+							</li>
+						</ol>
+					</li>
+				</ol>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
 </utfx:tests>
