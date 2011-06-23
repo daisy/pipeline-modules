@@ -8,7 +8,7 @@
     <p:output port="result"/>
 
     <p:for-each>
-        <p:add-xml-base/>
+        <p:add-xml-base all="true" relative="false"/>
         <p:xslt>
             <p:with-param name="id-prefix" select="concat('mo',p:iteration-position(),'_')"/>
             <p:input port="stylesheet">
@@ -24,20 +24,39 @@
                             </xsl:copy>
                         </xsl:template>
                         <xsl:template match="mo:body">
-                            <seq xmlns="http://www.w3.org/ns/SMIL">
-                                <xsl:apply-templates select="@*"/>
-                                <xsl:attribute name="xml:base" select="$xml-base"/>
-                                <xsl:apply-templates select="node()"/>
-                            </seq>
+                            <xsl:choose>
+                                <xsl:when test="@epub:textref">
+                                    <seq xmlns="http://www.w3.org/ns/SMIL">
+                                        <xsl:apply-templates select="@*"/>
+                                        <xsl:attribute name="xml:base" select="$xml-base"/>
+                                        <xsl:if test="@id">
+                                            <xsl:attribute name="id" select="concat($id-prefix,@id)"
+                                            />
+                                        </xsl:if>
+                                        <xsl:if test="@epub:textref">
+                                            <xsl:attribute name="epub:textref"
+                                                select="resolve-uri(@epub:textref,$xml-base)"/>
+                                        </xsl:if>
+                                        <xsl:apply-templates select="node()"/>
+                                    </seq>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:apply-templates select="node()"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
                         </xsl:template>
-                        <xsl:template match="*[@id and ancestor::mo:body]">
+                        <xsl:template match="*[ancestor::mo:body]">
                             <xsl:copy>
                                 <xsl:apply-templates select="@*"/>
-                                <xsl:attribute name="id" select="concat($id-prefix,@id)"/>
-                                <xsl:if test="self::mo:text">
-                                    <xsl:attribute name="src"
-                                        select="concat(resolve-uri(tokenize(@src,'#')[1],$xml-base),'#',tokenize(@src,'#')[last()])"
-                                    />
+                                <xsl:if test="@id">
+                                    <xsl:attribute name="id" select="concat($id-prefix,@id)"/>
+                                </xsl:if>
+                                <xsl:if test="@src">
+                                    <xsl:attribute name="src" select="resolve-uri(@src,$xml-base)"/>
+                                </xsl:if>
+                                <xsl:if test="@epub:textref">
+                                    <xsl:attribute name="epub:textref"
+                                        select="resolve-uri(@epub:textref,$xml-base)"/>
                                 </xsl:if>
                                 <xsl:apply-templates select="node()"/>
                             </xsl:copy>
@@ -85,12 +104,16 @@
                             <xsl:apply-templates select="node()"/>
                         </xsl:copy>
                     </xsl:template>
-                    <xsl:template match="mo:text">
+                    <xsl:template match="*[@src or @epub:textref]">
                         <xsl:copy>
                             <xsl:apply-templates select="@*"/>
-                            <!-- TODO: handle @textrefs for seqs and bodys and @src for audio like in rearrange.xpl -->
-                            <xsl:attribute name="src"
-                                select="concat(f:relative-to(tokenize(@src,'#')[1],$base),'#',tokenize(@src,'#')[last()])"/>
+                            <xsl:if test="@src">
+                                <xsl:attribute name="src" select="f:relative-to(@src,$base)"/>
+                            </xsl:if>
+                            <xsl:if test="@epub:textref">
+                                <xsl:attribute name="epub:textref"
+                                    select="f:relative-to(@epub:textref,$base)"/>
+                            </xsl:if>
                             <xsl:apply-templates select="node()"/>
                         </xsl:copy>
                     </xsl:template>
