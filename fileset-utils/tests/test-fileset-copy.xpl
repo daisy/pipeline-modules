@@ -3,7 +3,7 @@
     xmlns:d="http://www.daisy.org/ns/pipeline/data"
     xmlns:px="http://www.daisy.org/ns/pipeline/xproc" exclude-inline-prefixes="#all">
 
-    <p:import href="../xproc/fileset-copy.xpl"/>
+    <p:import href="../fileset-utils/xproc/fileset-copy.xpl"/>
     <p:import href="compare.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/xproc/file-library.xpl"/>
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
