@@ -1,4 +1,4 @@
-<package name="org.daisy.pipeline.epub3-pub-utils" xmlns="http://expath.org/ns/pkg">
+<package name="org.daisy.pipeline.modules.epub3-pub-utils" xmlns="http://expath.org/ns/pkg">
 	<module version="1.0.0" name="epub3-pub-utils">
 		<title>EPUB 3 Container Format Utilities</title>
 		<xproc>
