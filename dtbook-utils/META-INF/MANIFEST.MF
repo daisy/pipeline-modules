@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: dtbook-utils
-Bundle-SymbolicName: org.daisy.pipeline.dtbook-utils
+Bundle-SymbolicName: org.daisy.pipeline.modules.dtbook-utils
 Bundle-Version: 1.0.0.qualifier
 Require-Bundle: converter-registry,
  module-common;bundle-version="1.0.0"

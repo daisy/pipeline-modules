@@ -5,5 +5,5 @@
     </service>
     <property name="converter.name" type="String" value="upgrade-dtbook"/>
     <property name="converter.description" type="String" value="DTBook utility for upgrading to DTBook 2005-3."/>
-    <property name="converter.url" type="String" value="http://www.daisy.org/ns/pipeline/module/dtbook-utils/upgrade-dtbook/upgrade-dtbook.xpl"/>
+    <property name="converter.url" type="String" value="http://www.daisy.org/pipeline/modules/dtbook-utils/upgrade-dtbook/upgrade-dtbook.xpl"/>
 </scr:component>
