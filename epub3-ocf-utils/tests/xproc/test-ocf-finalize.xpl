@@ -2,7 +2,7 @@
     xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:d="http://www.daisy.org/ns/pipeline/data"
     xmlns:px="http://www.daisy.org/ns/pipeline/xproc" exclude-inline-prefixes="px">
 
-    <p:import href="../../xproc/ocf-finalize.xpl"/>
+    <p:import href="../../epub3-ocf-utils/xproc/ocf-finalize.xpl"/>
     <p:import href="compare.xpl"/>
 
     <p:group name="test-default">
