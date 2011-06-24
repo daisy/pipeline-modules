@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE catalog
+  PUBLIC "-//OASIS/DTD Entity Resolution XML Catalog V1.0//EN" "http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd">
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+   <uri name="http://www.daisy.org/pipeline/modules/dtbook-utils/merge-dtbook/merge-dtbook.xpl"
+        uri="../dtbook-utils/merge-dtbook/merge-dtbook.xpl"/>
+   <uri name="http://www.daisy.org/pipeline/modules/dtbook-utils/upgrade-dtbook/upgrade-dtbook.xpl"
+        uri="../dtbook-utils/upgrade-dtbook/upgrade-dtbook.xpl"/>
+   <uri name="http://www.daisy.org/pipeline/modules/dtbook-utils/dtbook-utils-library.xpl"
+        uri="../dtbook-utils/dtbook-utils-library.xpl"/>
+</catalog>
