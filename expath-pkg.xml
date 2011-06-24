@@ -1,8 +1,8 @@
-<package name="http://www.daisy.org/ns/pipeline/module/metadata-utils" xmlns="http://expath.org/ns/pkg">
+<package name="org.daisy.pipeline.modules.metadata-utils" xmlns="http://expath.org/ns/pkg">
     <module version="1.0.0" name="metadata-utils">
         <title>Metadata Utils</title>
         <xslt>
-            <import-uri>http://www.daisy.org/ns/pipeline/module/metadata-utils/metadata-utils-library.xpl</import-uri>
+            <import-uri>http://www.daisy.org/pipeline/modules/metadata-utils/metadata-utils-library.xpl</import-uri>
             <file>metadata-utils-library.xpl</file>
         </xslt>
     </module>
