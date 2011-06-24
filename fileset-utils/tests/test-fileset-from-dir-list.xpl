@@ -3,7 +3,7 @@
     xmlns:d="http://www.daisy.org/ns/pipeline/data"
     xmlns:px="http://www.daisy.org/ns/pipeline/xproc" exclude-inline-prefixes="px">
 
-    <p:import href="../xproc/fileset-from-dir-list.xpl"/>
+    <p:import href="../fileset-utils/xproc/fileset-from-dir-list.xpl"/>
     <p:import href="compare.xpl"/>
 
     <p:group name="test">

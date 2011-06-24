@@ -2,7 +2,7 @@
     xmlns:d="http://www.daisy.org/ns/pipeline/data"
     xmlns:px="http://www.daisy.org/ns/pipeline/xproc" exclude-inline-prefixes="px">
 
-    <p:import href="../xproc/fileset-create.xpl"/>
+    <p:import href="../fileset-utils/xproc/fileset-create.xpl"/>
     <p:import href="compare.xpl"/>
 
     <p:group name="absolute-base">

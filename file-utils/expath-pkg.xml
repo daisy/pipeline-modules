@@ -1,4 +1,4 @@
-<package name="org.daisy.pipeline.file-utils" xmlns="http://expath.org/ns/pkg">
+<package name="org.daisy.pipeline.modules.file-utils" xmlns="http://expath.org/ns/pkg">
 	<module version="1.0.0" name="file-utils">
 		<title>File Utilities</title>
 		<xproc>
