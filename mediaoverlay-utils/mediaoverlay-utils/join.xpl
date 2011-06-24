@@ -3,7 +3,7 @@
     xmlns:pf="http://www.daisy.org/ns/pipeline/functions" xmlns:xs="http://www.w3.org/2001/XMLSchema"
     exclude-result-prefixes="#all" version="2.0">
 
-    <xsl:import href="http://www.daisy.org/ns/pipeline/utilities/mediaoverlay-utils/mediaoverlay-library.xsl"/>
+    <xsl:import href="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/mediaoverlay-library.xsl"/>
 
     <xsl:template match="@*|node()">
         <xsl:copy>
