@@ -2,8 +2,8 @@
 <!DOCTYPE catalog
   PUBLIC "-//OASIS/DTD Entity Resolution XML Catalog V1.0//EN" "http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd">
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
-   <uri name="http://www.daisy.org/ns/pipeline/utilities/html-utils/html-library.xpl"
+   <uri name="org.daisy.pipeline.modules.html-utils/html-library.xpl"
         uri="../html-utils/html-library.xpl"/>
-   <uri name="http://www.daisy.org/ns/pipeline/utilities/html-utils/html5-outliner.xsl"
+   <uri name="org.daisy.pipeline.modules.html-utils/html5-outliner.xsl"
         uri="../html-utils/html5-outliner.xsl"/>
 </catalog>
