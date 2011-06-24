@@ -1,4 +1,4 @@
-<package name="org.daisy.pipeline.zip-utils" xmlns="http://expath.org/ns/pkg">
+<package name="org.daisy.pipeline.modules.zip-utils" xmlns="http://expath.org/ns/pkg">
 	<module version="1.0.0" name="zip-utils">
 		<title>ZIP Utilities</title>
 		<xproc>

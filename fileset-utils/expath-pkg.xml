@@ -1,4 +1,4 @@
-<package name="org.daisy.pipeline.fileset-utils" xmlns="http://expath.org/ns/pkg">
+<package name="org.daisy.pipeline.modules.fileset-utils" xmlns="http://expath.org/ns/pkg">
 	<module version="1.0.0" name="fileset-utils">
 		<title>File Set Utilities</title>
 		<xproc>
