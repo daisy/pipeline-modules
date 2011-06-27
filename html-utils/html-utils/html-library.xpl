@@ -11,14 +11,14 @@
             XHTML namespace.</p:documentation>
         <p:output port="result"/>
         <p:option name="href" required="true"/>
-        <p:try>
+        <!--p:try>
             <p:group>
                 <p:load>
                     <p:with-option name="href" select="$href"/>
                 </p:load>
                 <p:add-xml-base/>
             </p:group>
-            <p:catch>
+            <p:catch-->
                 <p:identity>
                     <p:input port="source">
                         <p:inline>
@@ -84,8 +84,8 @@
                         </p:inline>
                     </p:with-option>
                 </p:add-attribute>
-            </p:catch>
-        </p:try>
+            <!--/p:catch>
+        </p:try-->
     </p:declare-step>
 
 </p:library>
