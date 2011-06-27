@@ -38,10 +38,10 @@
                 <xsl:value-of select="concat(string($number * 1000),'ms')"/>
             </xsl:when>
             <xsl:when test="$metric='min'">
-                <xsl:value-of select="concat(string($number div 60),'min')"/>
+                <xsl:value-of select="concat(string(round(($number div 60)*1000) div 1000),'min')"/>
             </xsl:when>
             <xsl:when test="$metric='h'">
-                <xsl:value-of select="concat(string($number div 3600),'h')"/>
+                <xsl:value-of select="concat(string(round(($number div 3600)*1000) div 1000),'h')"/>
             </xsl:when>
             <xsl:otherwise>
                 <!-- TODO: throw either warning or error about the invalid metric -->
@@ -57,7 +57,7 @@
         <xsl:variable name="MM"
             select="concat(if ((($number mod 3600) div 60) &lt; 10) then '0' else '', string(floor(($number mod 3600) div 60)))"/>
         <xsl:variable name="SS"
-            select="concat(if (($number mod 60) &lt; 10) then '0' else '', string($number mod 60))"/>
+            select="concat(if (($number mod 60) &lt; 10) then '0' else '', string(round(($number mod 60)*1000) div 1000))"/>
         <xsl:value-of select="concat($HH,':',$MM,':',$SS)"/>
     </xsl:function>
 
@@ -67,7 +67,7 @@
         <xsl:variable name="MM"
             select="concat(if (($number div 60) &lt; 10) then '0' else '', string(floor($number div 60)))"/>
         <xsl:variable name="SS"
-            select="concat(if (($number mod 60) &lt; 10) then '0' else '', string($number mod 60))"/>
+            select="concat(if (($number mod 60) &lt; 10) then '0' else '', string(round(($number mod 60)*1000) div 1000))"/>
         <xsl:value-of select="concat($MM,':',$SS)"/>
     </xsl:function>
 

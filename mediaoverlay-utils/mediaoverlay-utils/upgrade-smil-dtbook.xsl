@@ -81,9 +81,13 @@
                     <xsl:variable name="clipEnd"
                         select="pf:mediaoverlay-clock-value-to-seconds($audio[@src=$audio[1]/@src][last()]/@clipEnd)"/>
                     <xsl:attribute name="clipBegin"
-                        select="if ($clipBegin &lt; 60) then pf:mediaoverlay-seconds-to-timecount($clipBegin) else pf:mediaoverlay-seconds-to-full-clock-value($clipBegin)"/>
+                        select="if ($clipBegin &lt; 60) then pf:mediaoverlay-seconds-to-timecount($clipBegin)
+                                else if ($clipBegin &lt; 3600) then pf:mediaoverlay-seconds-to-partial-clock-value($clipBegin)
+                                else pf:mediaoverlay-seconds-to-full-clock-value($clipBegin)"/>
                     <xsl:attribute name="clipEnd"
-                        select="if ($clipEnd &lt; 60) then pf:mediaoverlay-seconds-to-timecount($clipEnd) else pf:mediaoverlay-seconds-to-full-clock-value($clipEnd)"
+                        select="if ($clipEnd &lt; 60) then pf:mediaoverlay-seconds-to-timecount($clipEnd)
+                                else if ($clipEnd &lt; 3600) then pf:mediaoverlay-seconds-to-partial-clock-value($clipEnd)
+                                else pf:mediaoverlay-seconds-to-full-clock-value($clipEnd)"
                     />
                 </audio>
             </xsl:if>

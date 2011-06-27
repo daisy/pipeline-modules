@@ -91,7 +91,7 @@
             <p:inline>
                 <xsl:stylesheet exclude-result-prefixes="#all" version="2.0"
                     xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-                    <xsl:variable name="base" select="f:longest-common-uri(//@xml:base)"/>
+                    <xsl:variable name="base" select="f:longest-common-uri(distinct-values(//@xml:base/replace(.,'^(.*/)[^/]*$','$1')))"/>
                     <xsl:template match="@*|node()">
                         <xsl:copy>
                             <xsl:apply-templates select="@*|node()"/>
