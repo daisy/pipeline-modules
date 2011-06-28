@@ -5,7 +5,8 @@
     xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions"
     xmlns:mo="http://www.w3.org/ns/SMIL" xmlns:p="http://www.w3.org/ns/xproc"
     xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-    xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal" xmlns:di="http://www.daisy.org/ns/pipeline/tmp">
+    xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
+    xmlns:di="http://www.daisy.org/ns/pipeline/tmp">
 
     <p:input port="mediaoverlay" primary="true" sequence="true"/>
     <p:input port="content" sequence="true"/>
@@ -18,7 +19,8 @@
     <p:add-xml-base all="true" relative="false"/>
     <p:viewport match="//mo:text" name="rearrange.mediaoverlay-annotated">
         <p:add-attribute attribute-name="fragment" match="/*">
-            <p:with-option name="attribute-value" select="if (contains(/*/@src,'#')) then tokenize(/*/@src,'#')[last()] else ''"/>
+            <p:with-option name="attribute-value"
+                select="if (contains(/*/@src,'#')) then tokenize(/*/@src,'#')[last()] else ''"/>
         </p:add-attribute>
         <p:add-attribute attribute-name="src" match="/*">
             <p:with-option name="attribute-value"
@@ -32,18 +34,22 @@
         <p:iteration-source>
             <p:pipe port="content" step="rearrange"/>
         </p:iteration-source>
-        
-        <p:add-xml-base all="true" relative="false"/>
-        <pxi:mediaoverlay-internal-rearrange-subcontent>
-            <p:input port="mediaoverlay">
+
+        <p:add-xml-base all="true" relative="false" name="rearrange.for-each.content"/>
+        <p:wrap-sequence wrapper="di:content-and-mediaoverlay">
+            <p:input port="source">
+                <p:pipe port="result" step="rearrange.for-each.content"/>
                 <p:pipe port="result" step="rearrange.mediaoverlay-annotated"/>
             </p:input>
-        </pxi:mediaoverlay-internal-rearrange-subcontent>
-        <p:wrap-sequence wrapper="body" wrapper-namespace="http://www.w3.org/ns/SMIL"/>
-        <p:wrap match="/*" wrapper="smil" wrapper-namespace="http://www.w3.org/ns/SMIL"/>
-        <p:add-attribute match="/*" attribute-name="profile" attribute-value="http://www.idpf.org/epub/30/profile/content/"/>
-        <p:add-attribute match="/*" attribute-name="version" attribute-value="3.0"/>
-        
+        </p:wrap-sequence>
+        <p:xslt>
+            <p:input port="parameters">
+                <p:empty/>
+            </p:input>
+            <p:input port="stylesheet">
+                <p:document href="rearrange.xsl"/>
+            </p:input>
+        </p:xslt>
         <p:delete match="//mo:seq[not(descendant::mo:par)]"/>
 
         <p:documentation>generate ids</p:documentation>
@@ -106,7 +112,8 @@
                 <p:inline>
                     <xsl:stylesheet exclude-result-prefixes="#all" version="2.0"
                         xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-                        <xsl:variable name="base" select="f:longest-common-uri(distinct-values(//@src/replace(.,'^(.*/)[^/]*$','$1')))"/>
+                        <xsl:variable name="base"
+                            select="f:longest-common-uri(distinct-values(//@src/replace(.,'^(.*/)[^/]*$','$1')))"/>
                         <xsl:template match="@*|node()">
                             <xsl:copy>
                                 <xsl:apply-templates select="@*|node()"/>
@@ -178,7 +185,8 @@
             </p:input>
         </p:xslt>
 
-        <p:documentation>if there is only one top-level seq; turn it into a body element</p:documentation>
+        <p:documentation>if there is only one top-level seq; turn it into a body
+            element</p:documentation>
         <p:xslt>
             <p:input port="parameters">
                 <p:empty/>

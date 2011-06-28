@@ -19,11 +19,12 @@
         <p:for-each name="rearrange.subcontent.recursion">
             <p:output port="result" sequence="true"/>
             <p:iteration-source select="/*/*"/>
-            <pxi:mediaoverlay-internal-rearrange-subcontent>
+            <!--pxi:mediaoverlay-internal-rearrange-subcontent>
                 <p:input port="mediaoverlay">
                     <p:pipe port="mediaoverlay" step="rearrange.subcontent"/>
                 </p:input>
-            </pxi:mediaoverlay-internal-rearrange-subcontent>
+                </pxi:mediaoverlay-internal-rearrange-subcontent-->
+            <p:identity/>
         </p:for-each>
         <p:sink/>
 
