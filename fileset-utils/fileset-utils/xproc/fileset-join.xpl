@@ -33,7 +33,8 @@
           <xsl:template match="d:file">
             <xsl:copy>
               <xsl:apply-templates select="@*"/>
-              <xsl:attribute name="href" select="f:relative-to(resolve-uri(@href,parent::*/@xml:base),$base)"/>
+              <xsl:attribute name="href"
+                select="f:relative-to(resolve-uri(@href,parent::*/@xml:base),$base)"/>
               <xsl:apply-templates select="node()"/>
             </xsl:copy>
           </xsl:template>
@@ -69,5 +70,6 @@
     </p:input>
   </p:xslt>
   <p:unwrap match="/d:fileset/d:fileset"/>
+  <p:delete match="//d:file[@href=preceding::d:file/@href]"/>
 
 </p:declare-step>

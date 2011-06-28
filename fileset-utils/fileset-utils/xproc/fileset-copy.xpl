@@ -10,8 +10,7 @@
     <p:option name="target" required="true"/>
     <p:option name="fail-on-error" select="'false'"/>
     
-    <!--p:import href="http://www.daisy.org/pipeline/modules/file-utils/xproc/file-library.xpl"/-->
-    <p:import href="../../../file-utils/file-utils/xproc/file-library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/xproc/file-library.xpl"/>
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
     
     <p:try>
