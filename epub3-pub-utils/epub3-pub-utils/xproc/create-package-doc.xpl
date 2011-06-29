@@ -12,6 +12,7 @@
     <p:output port="result"/>
 
     <p:group name="create-metadata">
+        <p:output port="result"/>
         <!--TODO what format is the input metadata ?-->
         <p:identity>
             <p:input port="source">
@@ -23,9 +24,10 @@
         <!--TODO make sure file set entries have a @media-type-->
         <!--TODO handle fallbacks-->
         <!--TODO identify properties: cover-image, mathml, nav, remote-resources, scripted, svg, switch-->
+        <p:output port="result"/>
         <p:xslt>
             <p:input port="source">
-                <p:pipe port="filest" step="main"/>
+                <p:pipe port="fileset" step="main"/>
             </p:input>
             <p:input port="stylesheet">
                 <p:document href="../xslt/fileset-to-manifest.xsl"/>
@@ -36,6 +38,7 @@
         </p:xslt>
     </p:group>
     <p:group name="create-spine">
+        <p:output port="result"/>
         <p:wrap-sequence wrapper="wrapper">
             <p:input port="source">
                 <p:pipe port="spine" step="main"/>
@@ -67,7 +70,9 @@
             <p:pipe port="result" step="create-spine"/>
         </p:input>
     </p:insert>
+    <!--TODO FIXME define/set the unique ID -->
     <p:add-attribute attribute-name="unique-identifier" match="/*" attribute-value="pub-id"/>
+    <!--TODO FIXME define/set the language -->
     <p:add-attribute attribute-name="xml:lang" match="/*">
         <p:with-option name="attribute-value"
             select="/opf:package/opf:metadata/opf:meta[@property='dcterms:language']"/>
