@@ -5,7 +5,8 @@
 
     <xsl:template match="d:fileset">
         <c:zip-manifest>
-            <xsl:apply-templates select="@* | node()"/>
+            <xsl:copy-of select="@xml:base"/>
+            <xsl:apply-templates select="*"/>
         </c:zip-manifest>
     </xsl:template>
     
