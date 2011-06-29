@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" type="px:epub3-nav-create-page-list"
+    xmlns:h="http://www.w3.org/1999/xhtml"
     xmlns:px="http://www.daisy.org/ns/pipeline/xproc" version="1.0">
 
 
