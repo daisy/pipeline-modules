@@ -1,10 +1,10 @@
 <package name="org.daisy.pipeline.modules.html-utils" xmlns="http://expath.org/ns/pkg">
         <module version="1.0.0" name="html-utils">
                 <title>HTML Utilities</title>
-                <xslt>
+                <xproc>
                         <import-uri>http://www.daisy.org/pipeline/modules/html-utils/html-library.xpl</import-uri>
                         <file>html-library.xpl</file>
-                </xslt>
+                </xproc>
                 <xslt>
                         <import-uri>http://www.daisy.org/pipeline/modules/html-utils/html5-outliner.xsl</import-uri>
                         <file>html5-outliner.xsl</file>
