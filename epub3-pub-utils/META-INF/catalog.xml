@@ -4,4 +4,10 @@
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
    <uri name="http://www.daisy.org/pipeline/modules/epub3-pub-utils/xproc/epub3-pub-library.xpl"
         uri="../epub3-pub-utils/xproc/epub3-pub-library.xpl"/>
+   <uri name="http://www.daisy.org/pipeline/modules/epub3-pub-utils/xslt/fileset-to-manifest.xsl"
+        uri="../epub3-pub-utils/xslt/fileset-to-manifest.xsl"/>
+   <uri name="http://www.daisy.org/pipeline/modules/epub3-pub-utils/xslt/fileset-to-spine.xsl"
+        uri="../epub3-pub-utils/xslt/fileset-to-spine.xsl"/>
+   <uri name="http://www.daisy.org/pipeline/modules/epub3-pub-utils/xslt/manifest-to-spine.xsl"
+        uri="../epub3-pub-utils/xslt/manifest-to-spine.xsl"/>
 </catalog>
