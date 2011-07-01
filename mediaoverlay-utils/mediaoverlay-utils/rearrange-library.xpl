@@ -68,23 +68,7 @@
                     <p:with-param name="src" select="$src"/>
                     <p:with-param name="fragment" select="$id"/>
                     <p:input port="stylesheet">
-                        <p:inline>
-                            <xsl:stylesheet exclude-result-prefixes="#all" version="2.0"
-                                xmlns:mo="http://www.w3.org/ns/SMIL"
-                                xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-                                <xsl:param name="src" required="yes"/>
-                                <xsl:param name="fragment" required="yes"/>
-                                <xsl:template match="/*">
-                                    <xsl:for-each
-                                        select="(//*[@fragment=$fragment and @src=$src]/parent::*/child::audio)[1]"
-                                        xpath-default-namespace="http://www.w3.org/ns/SMIL">
-                                        <audio xmlns="http://www.w3.org/ns/SMIL"
-                                            clipBegin="{@clipBegin}" clipEnd="{@clipEnd}"
-                                            src="{resolve-uri(@src,@xml:base)}"/>
-                                    </xsl:for-each>
-                                </xsl:template>
-                            </xsl:stylesheet>
-                        </p:inline>
+                        <p:document href="get-audioclip-by-href.xsl"/>
                     </p:input>
                 </p:xslt>
                 <p:identity name="rearrange.subcontent.audio"/>
