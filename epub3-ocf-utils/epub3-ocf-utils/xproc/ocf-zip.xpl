@@ -19,6 +19,6 @@
         <p:input port="manifest">
             <p:pipe port="result" step="manifest"/>
         </p:input>
-        <p:with-option name="href" select="$target"/>
+        <p:with-option name="href" select="replace($target,'^[^:]+:(.*)$','$1')"/>
     </px:zip>
 </p:declare-step>
