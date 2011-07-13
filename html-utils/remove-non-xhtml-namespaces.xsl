@@ -18,7 +18,7 @@
                     <xsl:copy-of select="."/>
                 </xsl:when>
                 <xsl:when test="self::*">
-                    <xsl:element name="{name()}" namespace="http://www.w3.org/1999/xhtml">
+                    <xsl:element name="{local-name()}" namespace="http://www.w3.org/1999/xhtml">
                         <xsl:for-each select="@*">
                             <xsl:copy-of select="."/>
                         </xsl:for-each>
