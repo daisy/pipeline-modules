@@ -1,21 +1,33 @@
 <package name="org.daisy.pipeline.modules.mediaoverlay-utils" xmlns="http://expath.org/ns/pkg">
         <module version="1.0.0" name="mediaoverlay-utils">
                 <title>Media Overlay Utilities</title>
-                <xslt>
+                <xproc>
                         <import-uri>http://www.daisy.org/pipeline/modules/mediaoverlay-utils/join.xpl</import-uri>
                         <file>join.xpl</file>
-                </xslt>
-                <xslt>
+                </xproc>
+                <xproc>
                         <import-uri>http://www.daisy.org/pipeline/modules/mediaoverlay-utils/upgrade-smil.xpl</import-uri>
                         <file>upgrade-smil.xpl</file>
-                </xslt>
-                <xslt>
+                </xproc>
+                <xproc>
                         <import-uri>http://www.daisy.org/pipeline/modules/mediaoverlay-utils/rearrange.xpl</import-uri>
                         <file>rearrange.xpl</file>
-                </xslt>
-                <xslt>
+                </xproc>
+                <xproc>
                         <import-uri>http://www.daisy.org/pipeline/modules/mediaoverlay-utils/rearrange-content.xpl</import-uri>
                         <file>rearrange-content.xpl</file>
+                </xproc>
+                <xslt>
+                        <import-uri>http://www.daisy.org/pipeline/modules/mediaoverlay-utils/smil-to-text-fileset.xsl</import-uri>
+                        <file>smil-to-text-fileset.xsl</file>
+                </xslt>
+                <xslt>
+                        <import-uri>http://www.daisy.org/pipeline/modules/mediaoverlay-utils/smil-to-audio-fileset.xsl</import-uri>
+                        <file>smil-to-audio-fileset.xsl</file>
+                </xslt>
+                <xslt>
+                        <import-uri>http://www.daisy.org/pipeline/modules/mediaoverlay-utils/clock-functions.xsl</import-uri>
+                        <file>clock-functions.xsl</file>
                 </xslt>
         </module>
 </package>

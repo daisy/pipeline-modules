@@ -10,4 +10,8 @@
         uri="../mediaoverlay-utils/rearrange.xpl"/>
    <uri name="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/rearrange-content.xpl"
         uri="../mediaoverlay-utils/rearrange-content.xpl"/>
+   <uri name="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/smil-to-text-fileset.xsl"
+        uri="../mediaoverlay-utils/smil-to-text-fileset.xsl"/>
+   <uri name="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/smil-to-audio-fileset.xsl"
+        uri="../mediaoverlay-utils/smil-to-audio-fileset.xsl"/>
 </catalog>

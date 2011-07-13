@@ -2,7 +2,7 @@
 <?oxygen RNGSchema="utfx_tests.rnc" type="compact"?>
 <utfx:tests xmlns="http://www.w3.org/1999/xhtml" xmlns:utfx="http://utfx.org/test-definition"
 	xmlns:epub="http://www.idpf.org/2007/ops">
-	<utfx:stylesheet src="../../epub3-nav-utils/xslt/html5-to-page-list.xsl"/>
+	<utfx:stylesheet src="../epub3-nav-utils/xslt/html5-to-page-list.xsl"/>
 
 	<utfx:test>
 		<utfx:name>basic</utfx:name>

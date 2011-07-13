@@ -1,0 +1,2076 @@
+<?xml version='1.0' encoding='utf-8'?>
+<?xml-model href="utfx_tests.rnc" type="application/relax-ng-compact-syntax"?>
+<utfx:tests xmlns="http://www.w3.org/1999/xhtml" xmlns:utfx="http://utfx.org/test-definition" xmlns:epub="http://www.idpf.org/2007/ops">
+	<utfx:stylesheet src="../epub3-nav-utils/xslt/nav-to-ncx.xsl"/>
+
+	<utfx:test>
+		<utfx:name>html - ncx</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<html/>
+			</utfx:source>
+			<utfx:expected>
+				<ncx version="2005-1" xmlns="http://www.daisy.org/z3986/2005/ncx/"/>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+
+	<!-- ############################# <head/> ############################ -->
+	<utfx:test>
+		<utfx:name>head - head</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<head/>
+			</utfx:source>
+			<utfx:expected>
+				<head xmlns="http://www.daisy.org/z3986/2005/ncx/">
+					<meta name="dtb:uid" content=""/>
+					<meta name="dtb:depth" content=""/>
+					<meta name="dtb:generator" content="Pipeline 2"/>
+					<meta name="dtb:totalPageCount" content="0"/>
+					<meta name="dtb:maxPageNumber" content="0"/>
+				</head>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+
+	<utfx:test>
+		<utfx:name>meta/@dc:identifier - meta/@dtb:uid</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<html>
+					<head>
+						<meta name="dc:identifier">identifier</meta>
+					</head>
+				</html>
+			</utfx:source>
+			<utfx:expected>
+				<ncx version="2005-1" xmlns="http://www.daisy.org/z3986/2005/ncx/">
+					<head>
+						<meta name="dtb:uid" content="identifier"/>
+						<meta name="dtb:depth" content=""/>
+						<meta name="dtb:generator" content="Pipeline 2"/>
+						<meta name="dtb:totalPageCount" content="0"/>
+						<meta name="dtb:maxPageNumber" content="0"/>
+					</head>
+				</ncx>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+
+	<utfx:test>
+		<utfx:name>meta/@dtb:depth</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<html>
+					<head/>
+					<body>
+						<nav epub:type="toc" id="toc">
+							<h1>Table of contents</h1>
+							<ol>
+								<li>
+									<a href="chap1.xhtml#ch_1">Chapter 1</a>
+								</li>
+							</ol>
+						</nav>
+					</body>
+				</html>
+			</utfx:source>
+			<utfx:expected>
+				<ncx version="2005-1" xmlns="http://www.daisy.org/z3986/2005/ncx/">
+					<head>
+						<meta name="dtb:uid" content=""/>
+						<meta name="dtb:depth" content="1"/>
+						<meta name="dtb:generator" content="Pipeline 2"/>
+						<meta name="dtb:totalPageCount" content="0"/>
+						<meta name="dtb:maxPageNumber" content="0"/>
+					</head>
+					<navMap>
+						<navLabel><text>Table of contents</text></navLabel>
+						<navPoint id="navPoint-1">
+							<navLabel>
+								<text>Chapter 1</text>
+							</navLabel>
+							<content src="chap1.xhtml#ch_1"/>
+						</navPoint>
+					</navMap>
+				</ncx>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+
+	<utfx:test>
+		<utfx:name>meta/@dtb:totalPageCount and meta/@dtb:maxPageNumber</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<html>
+					<head/>
+					<body>
+						<nav epub:type="page-list" hidden="">
+							<h2>Pagebreaks of the print version, third edition</h2>
+							<ol>
+								<li><a href="frontmatter.xhtml#pi">I</a></li>
+								<li><a href="frontmatter.xhtml#pii">II</a></li>
+								<li><a href="chap1.xhtml#p1">1</a></li>
+								<li><a href="chap1.xhtml#p2">2</a></li>
+							</ol>
+						</nav>
+					</body>
+				</html>
+			</utfx:source>
+			<utfx:expected>
+				<ncx version="2005-1">
+					<head>
+						<meta name="dtb:uid" content=""/>
+						<meta name="dtb:depth" content="1"/>
+						<meta name="dtb:generator" content="Pipeline 2"/>
+						<meta name="dtb:totalPageCount" content="4"/>
+						<meta name="dtb:maxPageNumber" content="2"/>
+					</head>
+					<pageList>
+						<navLabel>
+							<text>Pagebreaks of the print version, third edition</text>
+						</navLabel>
+						<pageTarget id="pageTarget-1">
+							<navLabel>
+								<text>I</text>
+							</navLabel>
+							<content src="frontmatter.xhtml#pi"/>
+						</pageTarget>
+						<pageTarget id="pageTarget-2">
+							<navLabel>
+								<text>II</text>
+							</navLabel>
+							<content src="frontmatter.xhtml#pii"/>
+						</pageTarget>
+						<pageTarget id="pageTarget-3">
+							<navLabel>
+								<text>1</text>
+							</navLabel>
+							<content src="chap1.xhtml#p1"/>
+						</pageTarget>
+						<pageTarget id="pageTarget-4">
+							<navLabel>
+								<text>2</text>
+							</navLabel>
+							<content src="chap1.xhtml#p2"/>
+						</pageTarget>
+					</pageList>
+				</ncx>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+
+	<utfx:test>
+		<utfx:name>title</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<html>
+					<head>
+						<title>Title</title>
+					</head>
+				</html>
+			</utfx:source>
+			<utfx:expected>
+				<ncx version="2005-1" xmlns="http://www.daisy.org/z3986/2005/ncx/">
+					<head>
+						<meta name="dtb:uid" content=""/>
+						<meta name="dtb:depth" content=""/>
+						<meta name="dtb:generator" content="Pipeline 2"/>
+						<meta name="dtb:totalPageCount" content="0"/>
+						<meta name="dtb:maxPageNumber" content="0"/>
+					</head>
+					<docTitle>
+						<text>Title</text>
+					</docTitle>
+				</ncx>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+
+	<utfx:test>
+		<utfx:name>resolve internal link using xml:base</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<html xml:base="http://example.net/navigation.xhtml">
+					<body>
+						<nav xmlns:epub="http://www.idpf.org/2007/ops" epub:type="landmarks" id="guide">
+							<ol>
+								<li>
+									<a epub:type="toc" href="#toc">Table of Contents</a>
+								</li>
+							</ol>
+						</nav>
+					</body>
+				</html>
+			</utfx:source>
+			<utfx:expected>
+				<ncx version="2005-1" xmlns="http://www.daisy.org/z3986/2005/ncx/">
+					<navList xmlns="http://www.daisy.org/z3986/2005/ncx/">
+						<navTarget id="navTarget-1">
+							<navLabel>
+								<text>Table of Contents</text>
+							</navLabel>
+							<content src="navigation.xhtml#toc"/>
+						</navTarget>
+					</navList>
+				</ncx>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+
+	<!-- ####################### <body/> / <nav/> ######################### -->
+	<utfx:test>
+		<utfx:name>nav - navList</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<nav/>
+			</utfx:source>
+			<utfx:expected>
+				<navList xmlns="http://www.daisy.org/z3986/2005/ncx/"/>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+
+	<utfx:test>
+		<utfx:name>h1,h2,h3,h4,h5,h6 - navLabel</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<html>
+					<body>
+						<nav epub:type="toc" id="toc">
+							<h1>Headline #1</h1>
+							<ol>
+								<li><h2>Headline #2</h2></li>
+								<li><h3>Headline #3</h3></li>
+								<li><h4>Headline #4</h4></li>
+								<li><h5>Headline #5</h5></li>
+								<li><h6>Headline #6</h6></li>
+							</ol>
+						</nav>
+					</body>
+				</html>
+			</utfx:source>
+			<utfx:expected>
+				<ncx version="2005-1">
+					<navMap xmlns="http://www.daisy.org/z3986/2005/ncx/">
+						<navLabel><text>Headline #1</text></navLabel>
+						<navPoint id="navPoint-1"><navLabel><text>Headline #2</text></navLabel></navPoint>
+						<navPoint id="navPoint-2"><navLabel><text>Headline #3</text></navLabel></navPoint>
+						<navPoint id="navPoint-3"><navLabel><text>Headline #4</text></navLabel></navPoint>
+						<navPoint id="navPoint-4"><navLabel><text>Headline #5</text></navLabel></navPoint>
+						<navPoint id="navPoint-5"><navLabel><text>Headline #6</text></navLabel></navPoint>
+					</navMap>
+				</ncx>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+
+	<utfx:test>
+		<utfx:name>hgroup - navLabel</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<nav>
+					<hgroup>
+						<h1>Headline #1</h1>
+					</hgroup>
+					<ol>
+						<li><hgroup>Headline #2</hgroup></li>
+						<li><hgroup><h1>Headline #3</h1><h2>Headline #4</h2></hgroup></li>
+					</ol>
+				</nav>
+			</utfx:source>
+			<utfx:expected>
+				<navList xmlns="http://www.daisy.org/z3986/2005/ncx/">
+					<navLabel><text>Headline #1</text></navLabel>
+					<navTarget id="navTarget-1"><navLabel><text>Headline #2</text></navLabel></navTarget>
+					<navTarget id="navTarget-2"><navLabel><text>Headline #3 Headline #4</text></navLabel></navTarget>
+				</navList>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+
+	<utfx:test>
+		<utfx:name>span - navLabel</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<nav>
+					<span>Headline #1</span>
+				</nav>
+			</utfx:source>
+			<utfx:expected>
+				<navList xmlns="http://www.daisy.org/z3986/2005/ncx/">
+					<navLabel><text>Headline #1</text></navLabel>
+				</navList>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+
+	<utfx:test>
+		<utfx:name>a - navLabel+content</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<nav>
+					<a href="content.xml#fragment">Headline #1</a>
+				</nav>
+			</utfx:source>
+			<utfx:expected>
+				<navList xmlns="http://www.daisy.org/z3986/2005/ncx/">
+					<navLabel><text>Headline #1</text></navLabel>
+					<content src="content.xml#fragment"/>
+				</navList>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+
+	<utfx:test>
+		<utfx:name>nav - flatten generic</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<nav>
+					<h1>Headline #1</h1>
+					<ol>
+						<li>
+							<h2>Headline #2</h2>
+							<ol>
+								<li><h3>Headline #3</h3></li>
+							</ol>
+						</li>
+					</ol>
+				</nav>
+			</utfx:source>
+			<utfx:expected>
+				<navList xmlns="http://www.daisy.org/z3986/2005/ncx/">
+					<navLabel><text>Headline #1</text></navLabel>
+					<navTarget id="navTarget-1"><navLabel><text>Headline #2</text></navLabel></navTarget>
+					<navTarget id="navTarget-2"><navLabel><text>Headline #3</text></navLabel></navTarget>
+				</navList>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+
+	<utfx:test>
+		<utfx:name>nav - unique IDs</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<nav>
+					<h1>Headline #1</h1>
+					<ol>
+						<li>
+							<h2>Headline #2</h2>
+						</li>
+					</ol>
+				</nav>
+				<nav>
+					<h1>Headline #3</h1>
+					<ol>
+						<li>
+							<h2>Headline #4</h2>
+						</li>
+					</ol>
+				</nav>
+			</utfx:source>
+			<utfx:expected>
+				<navList xmlns="http://www.daisy.org/z3986/2005/ncx/">
+					<navLabel><text>Headline #1</text></navLabel>
+					<navTarget id="navTarget-1"><navLabel><text>Headline #2</text></navLabel></navTarget>
+				</navList>
+				<navList xmlns="http://www.daisy.org/z3986/2005/ncx/">
+					<navLabel><text>Headline #3</text></navLabel>
+					<navTarget id="navTarget-2"><navLabel><text>Headline #4</text></navLabel></navTarget>
+				</navList>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+
+	<utfx:test>
+		<utfx:name>nav - complete generic nav example</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<nav epub:type="lot">
+					<h2>List of tables, broken down into individual groups, one per major section of the publication content</h2>
+					<ol>
+						<li><span>Tables in Chapter 1</span>
+							<ol>
+								<li><a href="chap1.xhtml#table-1.1">Table 1.1</a>
+								</li>
+								<li><a href="chap1.xhtml#table-1.2">Table 1.2</a></li>
+							</ol>
+						</li>
+						<li><span>Tables in Chapter 2</span>
+							<ol>
+								<li><a href="chap2.xhtml#table-2.1">Table 2.1</a>
+								</li>
+								<li><a href="chap2.xhtml#table-2.2">Table 2.2</a></li>
+								<li><a href="chap2.xhtml#table-2.3">Table 2.3</a></li>
+							</ol>
+						</li> ... <li><span>Tables in Appendix</span>
+							<ol>
+								<li><a href="appendix.xhtml#table-a.1">Table A.1</a>
+								</li>
+								<li><a href="appendix.xhtml#table-a.2">Table B.2</a></li>
+							</ol>
+						</li>
+					</ol>
+				</nav>
+			</utfx:source>
+			<utfx:expected>
+				<navList>
+					<navLabel><text>List of tables, broken down into individual groups, one per major section of the publication content</text></navLabel>
+					<navTarget id="navTarget-1">
+						<navLabel><text>Tables in Chapter 1</text></navLabel>
+					</navTarget>
+					<navTarget id="navTarget-2">
+						<navLabel><text>Table 1.1</text></navLabel>
+						<content src="chap1.xhtml#table-1.1"/>
+					</navTarget>
+					<navTarget id="navTarget-3">
+						<navLabel><text>Table 1.2</text></navLabel>
+						<content src="chap1.xhtml#table-1.2"/>
+					</navTarget>
+					<navTarget id="navTarget-4">
+						<navLabel><text>Tables in Chapter 2</text></navLabel>
+					</navTarget>
+					<navTarget id="navTarget-5">
+						<navLabel><text>Table 2.1</text></navLabel>
+						<content src="chap2.xhtml#table-2.1"/>
+					</navTarget>
+					<navTarget id="navTarget-6">
+						<navLabel><text>Table 2.2</text></navLabel>
+						<content src="chap2.xhtml#table-2.2"/>
+					</navTarget>
+					<navTarget id="navTarget-7">
+						<navLabel><text>Table 2.3</text></navLabel>
+						<content src="chap2.xhtml#table-2.3"/>
+					</navTarget>
+					<navTarget id="navTarget-8">
+						<navLabel><text>Tables in Appendix</text></navLabel>
+					</navTarget>
+					<navTarget id="navTarget-9">
+						<navLabel><text>Table A.1</text></navLabel>
+						<content src="appendix.xhtml#table-a.1"/>
+					</navTarget>
+					<navTarget id="navTarget-10">
+						<navLabel><text>Table B.2</text></navLabel>
+						<content src="appendix.xhtml#table-a.2"/>
+					</navTarget>
+				</navList>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+
+	<!-- ############################# <nav #toc/> ######################## -->
+	<utfx:test>
+		<utfx:name>nav#toc</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<nav epub:type="toc"/>
+			</utfx:source>
+			<utfx:expected>
+				<navMap xmlns="http://www.daisy.org/z3986/2005/ncx/"/>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+
+	<utfx:test>
+		<utfx:name>nav#toc - don't flatten</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<nav epub:type="toc">
+					<h1>Headline #1</h1>
+					<ol>
+						<li>
+							<h2>Headline #2</h2>
+							<ol>
+								<li><h3>Headline #3</h3></li>
+							</ol>
+						</li>
+					</ol>
+				</nav>
+			</utfx:source>
+			<utfx:expected>
+				<navMap xmlns="http://www.daisy.org/z3986/2005/ncx/">
+					<navLabel><text>Headline #1</text></navLabel>
+					<navPoint id="navPoint-1">
+						<navLabel><text>Headline #2</text></navLabel>
+						<navPoint id="navPoint-2">
+							<navLabel><text>Headline #3</text></navLabel>
+						</navPoint>
+					</navPoint>
+				</navMap>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+
+	<utfx:test>
+		<utfx:name>nav#toc - complete toc nav example #1</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<nav epub:type="toc" id="toc">
+					<h1>Table of contents</h1>
+					<ol>
+						<li>
+							<a href="chap1.xhtml">Chapter 1</a>
+							<ol>
+								<li>
+									<a href="chap1.xhtml#sec-1.1">Chapter 1.1</a>
+									<ol hidden="">
+										<li>
+											<a href="chap1.xhtml#sec-1.1.1">Section 1.1.1</a>
+										</li>
+										<li>
+											<a href="chap1.xhtml#sec-1.1.2">Section 1.1.2</a>
+										</li>
+									</ol>
+								</li>
+								<li>
+									<a href="chap1.xhtml#sec-1.2">Chapter 1.2</a>
+								</li>
+							</ol>
+						</li>
+						<li>
+							<a href="chap2.xhtml">Chapter 2</a>
+						</li>
+					</ol>
+				</nav>
+			</utfx:source>
+			<utfx:expected>
+				<navMap>
+					<navLabel><text>Table of contents</text></navLabel>
+					<navPoint id="navPoint-1">
+						<navLabel><text>Chapter 1</text></navLabel>
+						<content src="chap1.xhtml"> </content>
+						<navPoint id="navPoint-2">
+							<navLabel><text>Chapter 1.1</text></navLabel>
+							<content src="chap1.xhtml#sec-1.1"/>
+							<navPoint id="navPoint-3">
+								<navLabel><text>Section 1.1.1</text></navLabel>
+								<content src="chap1.xhtml#sec-1.1.1"/>
+							</navPoint>
+							<navPoint id="navPoint-4">
+								<navLabel><text>Section 1.1.2</text></navLabel>
+								<content src="chap1.xhtml#sec-1.1.2"/>
+							</navPoint>
+						</navPoint>
+						<navPoint id="navPoint-5">
+							<navLabel><text>Chapter 1.2</text></navLabel>
+							<content src="chap1.xhtml#sec-1.2"/>
+						</navPoint>
+					</navPoint>
+					<navPoint id="navPoint-6">
+						<navLabel><text>Chapter 2</text></navLabel>
+						<content src="chap2.xhtml"/>
+					</navPoint>
+				</navMap>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+
+	<utfx:test>
+		<utfx:name>nav#toc - complete toc nav example #2</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<html xmlns="http://www.w3.org/1999/xhtml" profile="http://www.idpf.org/epub/30/profile/content/">
+					<head xmlns:c="http://www.w3.org/ns/xproc-step">
+						<title>Aftenposten</title>
+					</head>
+					<body>
+						<nav xmlns:epub="http://www.idpf.org/2011/epub" epub:type="toc" id="toc">
+							<ol>
+								<li>
+									<a href="Content/content.xhtml#h1classtitle" id="d4e15">Aftenposten 04.07.2011</a>
+								</li>
+								<li>
+									<a href="Content/content.xhtml#dtb2" id="d4e27">Om lydavisen</a>
+								</li>
+								<li>
+									<a href="Content/content.xhtml#dtb10" id="d4e81">Aftenposten</a>
+									<ol>
+										<li>
+											<a href="Content/content.xhtml#dtb11" id="d4e89">Innenriks</a>
+											<ol>
+												<li>
+													<a href="Content/content.xhtml#dtb12" id="d4e97">Barneombudet vil sparke rektorer</a>
+												</li>
+												<li>
+													<a href="Content/content.xhtml#dtb28" id="d4e215">90-åring funnet i god behold</a>
+												</li>
+											</ol>
+										</li>
+									</ol>
+								</li>
+							</ol>
+						</nav>
+					</body>
+				</html>
+			</utfx:source>
+			<utfx:expected>
+				<ncx version="2005-1">
+					<head>
+						<meta content="" name="dtb:uid"/>
+						<meta content="3" name="dtb:depth"/>
+						<meta content="Pipeline 2" name="dtb:generator"/>
+						<meta content="0" name="dtb:totalPageCount"/>
+						<meta content="0" name="dtb:maxPageNumber"/>
+					</head>
+					<docTitle>
+						<text>Aftenposten</text>
+					</docTitle>
+					<navMap>
+						<navPoint id="navPoint-1">
+							<navLabel>
+								<text>Aftenposten 04.07.2011</text>
+							</navLabel>
+							<content src="Content/content.xhtml#h1classtitle"/>
+						</navPoint>
+						<navPoint id="navPoint-2">
+							<navLabel>
+								<text>Om lydavisen</text>
+							</navLabel>
+							<content src="Content/content.xhtml#dtb2"/>
+						</navPoint>
+						<navPoint id="navPoint-3">
+							<navLabel>
+								<text>Aftenposten</text>
+							</navLabel>
+							<content src="Content/content.xhtml#dtb10"/>
+							<navPoint id="navPoint-4">
+								<navLabel>
+									<text>Innenriks</text>
+								</navLabel>
+								<content src="Content/content.xhtml#dtb11"/>
+								<navPoint id="navPoint-5">
+									<navLabel>
+										<text>Barneombudet vil sparke rektorer</text>
+									</navLabel>
+									<content src="Content/content.xhtml#dtb12"/>
+								</navPoint>
+								<navPoint id="navPoint-6">
+									<navLabel>
+										<text>90-åring funnet i god behold</text>
+									</navLabel>
+									<content src="Content/content.xhtml#dtb28"/>
+								</navPoint>
+							</navPoint>
+						</navPoint>
+					</navMap>
+				</ncx>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+
+	<!-- ######################### <nav #page-list/> ###################### -->
+	<utfx:test>
+		<utfx:name>nav#page-list</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<nav epub:type="page-list"/>
+			</utfx:source>
+			<utfx:expected>
+				<pageList xmlns="http://www.daisy.org/z3986/2005/ncx/"/>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+
+	<utfx:test>
+		<utfx:name>nav#page-list - complete pagelist nav example</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<nav epub:type="page-list" hidden="">
+					<h2>Pagebreaks of the print version, third edition</h2>
+					<ol>
+						<li><a href="frontmatter.xhtml#pi">I</a></li>
+						<li><a href="frontmatter.xhtml#pii">II</a></li>
+						<li><a href="chap1.xhtml#p1">1</a></li>
+						<li><a href="chap1.xhtml#p2">2</a></li>
+					</ol>
+				</nav>
+			</utfx:source>
+			<utfx:expected>
+				<pageList>
+					<navLabel><text>Pagebreaks of the print version, third edition</text></navLabel>
+					<pageTarget id="pageTarget-1">
+						<navLabel><text>I</text></navLabel>
+						<content src="frontmatter.xhtml#pi"/>
+					</pageTarget>
+					<pageTarget id="pageTarget-2">
+						<navLabel><text>II</text></navLabel>
+						<content src="frontmatter.xhtml#pii"/>
+					</pageTarget>
+					<pageTarget id="pageTarget-3">
+						<navLabel><text>1</text></navLabel>
+						<content src="chap1.xhtml#p1"/>
+					</pageTarget>
+					<pageTarget id="pageTarget-4">
+						<navLabel><text>2</text></navLabel>
+						<content src="chap1.xhtml#p2"/>
+					</pageTarget>
+				</pageList>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+
+	<!-- ######################## <nav #landmarks/> ####################### -->
+	<utfx:test>
+		<utfx:name>nav#landmarks</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<nav epub:type="landmarks"/>
+			</utfx:source>
+			<utfx:expected>
+				<navList xmlns="http://www.daisy.org/z3986/2005/ncx/"/>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+
+	<!-- ########################### Moby-Dick ########################## -->
+	<utfx:test>
+		<utfx:name>Moby-Dick</utfx:name>
+		<utfx:assert-equal normalise-internal-whitespace="yes">
+			<utfx:source>
+				<html xmlns="http://www.w3.org/1999/xhtml" profile="http://www.idpf.org/epub/30/profile/content/">
+					<head>
+						<title>Moby-Dick</title>
+						<link rel="stylesheet" href="css/stylesheet.css" type="text/css"/>
+						<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+					</head>
+					<body>
+						<section class="frontmatter TableOfContents">
+							<header>
+								<h1>Contents</h1>
+							</header>
+							<nav xmlns:epub="http://www.idpf.org/2007/ops" epub:type="toc" id="toc">
+								<ol>
+									<li class="toc-BookTitlePage-rw" id="toc-titlepage">
+										<a href="titlepage.xhtml">Moby-Dick</a>
+									</li>
+									<li class="toc-Preface-rw" id="toc-preface_001">
+										<a href="preface_001.xhtml">Original Transcriber’s Notes:</a>
+									</li>
+									<li class="toc-Introduction-rw" id="toc-introduction_001">
+										<a href="introduction_001.xhtml">ETYMOLOGY.</a>
+									</li>
+									<li class="toc-Epigraph-rw" id="toc-epigraph_001">
+										<a href="epigraph_001.xhtml">EXTRACTS (Supplied by a Sub-Sub-Librarian).</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_001">
+										<a href="chapter_001.xhtml">Chapter 1. Loomings.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_002">
+										<a href="chapter_002.xhtml">Chapter 2. The Carpet-Bag.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_003">
+										<a href="chapter_003.xhtml">Chapter 3. The Spouter-Inn.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_004">
+										<a href="chapter_004.xhtml">Chapter 4. The Counterpane.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_005">
+										<a href="chapter_005.xhtml">Chapter 5. Breakfast.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_006">
+										<a href="chapter_006.xhtml">Chapter 6. The Street.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_007">
+										<a href="chapter_007.xhtml">Chapter 7. The Chapel.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_008">
+										<a href="chapter_008.xhtml">Chapter 8. The Pulpit.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_009">
+										<a href="chapter_009.xhtml">Chapter 9. The Sermon.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_010">
+										<a href="chapter_010.xhtml">Chapter 10. A Bosom Friend.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_011">
+										<a href="chapter_011.xhtml">Chapter 11. Nightgown.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_012">
+										<a href="chapter_012.xhtml">Chapter 12. Biographical.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_013">
+										<a href="chapter_013.xhtml">Chapter 13. Wheelbarrow.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_014">
+										<a href="chapter_014.xhtml">Chapter 14. Nantucket.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_015">
+										<a href="chapter_015.xhtml">Chapter 15. Chowder.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_016">
+										<a href="chapter_016.xhtml">Chapter 16. The Ship.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_017">
+										<a href="chapter_017.xhtml">Chapter 17. The Ramadan.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_018">
+										<a href="chapter_018.xhtml">Chapter 18. His Mark.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_019">
+										<a href="chapter_019.xhtml">Chapter 19. The Prophet.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_020">
+										<a href="chapter_020.xhtml">Chapter 20. All Astir.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_021">
+										<a href="chapter_021.xhtml">Chapter 21. Going Aboard.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_022">
+										<a href="chapter_022.xhtml">Chapter 22. Merry Christmas.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_023">
+										<a href="chapter_023.xhtml">Chapter 23. The Lee Shore.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_024">
+										<a href="chapter_024.xhtml">Chapter 24. The Advocate.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_025">
+										<a href="chapter_025.xhtml">Chapter 25. Postscript.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_026">
+										<a href="chapter_026.xhtml">Chapter 26. Knights and Squires.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_027">
+										<a href="chapter_027.xhtml">Chapter 27. Knights and Squires.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_028">
+										<a href="chapter_028.xhtml">Chapter 28. Ahab.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_029">
+										<a href="chapter_029.xhtml">Chapter 29. Enter Ahab; to Him, Stubb.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_030">
+										<a href="chapter_030.xhtml">Chapter 30. The Pipe.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_031">
+										<a href="chapter_031.xhtml">Chapter 31. Queen Mab.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_032">
+										<a href="chapter_032.xhtml">Chapter 32. Cetology.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_033">
+										<a href="chapter_033.xhtml">Chapter 33. The Specksnyder.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_034">
+										<a href="chapter_034.xhtml">Chapter 34. The Cabin-Table.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_035">
+										<a href="chapter_035.xhtml">Chapter 35. The Mast-Head.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_036">
+										<a href="chapter_036.xhtml">Chapter 36. The Quarter-Deck.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_037">
+										<a href="chapter_037.xhtml">Chapter 37. Sunset.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_038">
+										<a href="chapter_038.xhtml">Chapter 38. Dusk.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_039">
+										<a href="chapter_039.xhtml">Chapter 39. First Night Watch.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_040">
+										<a href="chapter_040.xhtml">Chapter 40. Midnight, Forecastle.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_041">
+										<a href="chapter_041.xhtml">Chapter 41. Moby Dick.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_042">
+										<a href="chapter_042.xhtml">Chapter 42. The Whiteness of The Whale.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_043">
+										<a href="chapter_043.xhtml">Chapter 43. Hark!</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_044">
+										<a href="chapter_044.xhtml">Chapter 44. The Chart.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_045">
+										<a href="chapter_045.xhtml">Chapter 45. The Affidavit.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_046">
+										<a href="chapter_046.xhtml">Chapter 46. Surmises.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_047">
+										<a href="chapter_047.xhtml">Chapter 47. The Mat-Maker.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_048">
+										<a href="chapter_048.xhtml">Chapter 48. The First Lowering.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_049">
+										<a href="chapter_049.xhtml">Chapter 49. The Hyena.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_050">
+										<a href="chapter_050.xhtml">Chapter 50. Ahab’s Boat and Crew. Fedallah.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_051">
+										<a href="chapter_051.xhtml">Chapter 51. The Spirit-Spout.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_052">
+										<a href="chapter_052.xhtml">Chapter 52. The Albatross.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_053">
+										<a href="chapter_053.xhtml">Chapter 53. The Gam.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_054">
+										<a href="chapter_054.xhtml">Chapter 54. The Town-Ho’s Story.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_055">
+										<a href="chapter_055.xhtml">Chapter 55. Of the Monstrous Pictures of Whales.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_056">
+										<a href="chapter_056.xhtml">Chapter 56. Of the Less Erroneous Pictures of Whales, and the True</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_057">
+										<a href="chapter_057.xhtml">Chapter 57. Of Whales in Paint; in Teeth; in Wood; in Sheet-Iron; in</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_058">
+										<a href="chapter_058.xhtml">Chapter 58. Brit.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_059">
+										<a href="chapter_059.xhtml">Chapter 59. Squid.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_060">
+										<a href="chapter_060.xhtml">Chapter 60. The Line.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_061">
+										<a href="chapter_061.xhtml">Chapter 61. Stubb Kills a Whale.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_062">
+										<a href="chapter_062.xhtml">Chapter 62. The Dart.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_063">
+										<a href="chapter_063.xhtml">Chapter 63. The Crotch.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_064">
+										<a href="chapter_064.xhtml">Chapter 64. Stubb’s Supper.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_065">
+										<a href="chapter_065.xhtml">Chapter 65. The Whale as a Dish.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_066">
+										<a href="chapter_066.xhtml">Chapter 66. The Shark Massacre.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_067">
+										<a href="chapter_067.xhtml">Chapter 67. Cutting In.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_068">
+										<a href="chapter_068.xhtml">Chapter 68. The Blanket.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_069">
+										<a href="chapter_069.xhtml">Chapter 69. The Funeral.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_070">
+										<a href="chapter_070.xhtml">Chapter 70. The Sphynx.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_071">
+										<a href="chapter_071.xhtml">Chapter 71. The Jeroboam’s Story.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_072">
+										<a href="chapter_072.xhtml">Chapter 72. The Monkey-Rope.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_073">
+										<a href="chapter_073.xhtml">Chapter 73. Stubb and Flask Kill a Right Whale; and Then Have a Talk</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_074">
+										<a href="chapter_074.xhtml">Chapter 74. The Sperm Whale’s Head—Contrasted View.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_075">
+										<a href="chapter_075.xhtml">Chapter 75. The Right Whale’s Head—Contrasted View.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_076">
+										<a href="chapter_076.xhtml">Chapter 76. The Battering-Ram.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_077">
+										<a href="chapter_077.xhtml">Chapter 77. The Great Heidelburgh Tun.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_078">
+										<a href="chapter_078.xhtml">Chapter 78. Cistern and Buckets.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_079">
+										<a href="chapter_079.xhtml">Chapter 79. The Prairie.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_080">
+										<a href="chapter_080.xhtml">Chapter 80. The Nut.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_081">
+										<a href="chapter_081.xhtml">Chapter 81. The Pequod Meets The Virgin.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_082">
+										<a href="chapter_082.xhtml">Chapter 82. The Honour and Glory of Whaling.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_083">
+										<a href="chapter_083.xhtml">Chapter 83. Jonah Historically Regarded.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_084">
+										<a href="chapter_084.xhtml">Chapter 84. Pitchpoling.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_085">
+										<a href="chapter_085.xhtml">Chapter 85. The Fountain.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_086">
+										<a href="chapter_086.xhtml">Chapter 86. The Tail.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_087">
+										<a href="chapter_087.xhtml">Chapter 87. The Grand Armada.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_088">
+										<a href="chapter_088.xhtml">Chapter 88. Schools and Schoolmasters.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_089">
+										<a href="chapter_089.xhtml">Chapter 89. Fast-Fish and Loose-Fish.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_090">
+										<a href="chapter_090.xhtml">Chapter 90. Heads or Tails.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_091">
+										<a href="chapter_091.xhtml">Chapter 91. The Pequod Meets The Rose-Bud.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_092">
+										<a href="chapter_092.xhtml">Chapter 92. Ambergris.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_093">
+										<a href="chapter_093.xhtml">Chapter 93. The Castaway.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_094">
+										<a href="chapter_094.xhtml">Chapter 94. A Squeeze of the Hand.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_095">
+										<a href="chapter_095.xhtml">Chapter 95. The Cassock.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_096">
+										<a href="chapter_096.xhtml">Chapter 96. The Try-Works.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_097">
+										<a href="chapter_097.xhtml">Chapter 97. The Lamp.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_098">
+										<a href="chapter_098.xhtml">Chapter 98. Stowing Down and Clearing Up.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_099">
+										<a href="chapter_099.xhtml">Chapter 99. The Doubloon.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_100">
+										<a href="chapter_100.xhtml">Chapter 100. Leg and Arm.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_101">
+										<a href="chapter_101.xhtml">Chapter 101. The Decanter.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_102">
+										<a href="chapter_102.xhtml">Chapter 102. A Bower in the Arsacides.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_103">
+										<a href="chapter_103.xhtml">Chapter 103. Measurement of The Whale’s Skeleton.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_104">
+										<a href="chapter_104.xhtml">Chapter 104. The Fossil Whale.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_105">
+										<a href="chapter_105.xhtml">Chapter 105. Does the Whale’s Magnitude Diminish?—Will He Perish?</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_106">
+										<a href="chapter_106.xhtml">Chapter 106. Ahab’s Leg.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_107">
+										<a href="chapter_107.xhtml">Chapter 107. The Carpenter.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_108">
+										<a href="chapter_108.xhtml">Chapter 108. Ahab and the Carpenter.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_109">
+										<a href="chapter_109.xhtml">Chapter 109. Ahab and Starbuck in the Cabin.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_110">
+										<a href="chapter_110.xhtml">Chapter 110. Queequeg in His Coffin.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_111">
+										<a href="chapter_111.xhtml">Chapter 111. The Pacific.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_112">
+										<a href="chapter_112.xhtml">Chapter 112. The Blacksmith.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_113">
+										<a href="chapter_113.xhtml">Chapter 113. The Forge.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_114">
+										<a href="chapter_114.xhtml">Chapter 114. The Gilder.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_115">
+										<a href="chapter_115.xhtml">Chapter 115. The Pequod Meets The Bachelor.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_116">
+										<a href="chapter_116.xhtml">Chapter 116. The Dying Whale.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_117">
+										<a href="chapter_117.xhtml">Chapter 117. The Whale Watch.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_118">
+										<a href="chapter_118.xhtml">Chapter 118. The Quadrant.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_119">
+										<a href="chapter_119.xhtml">Chapter 119. The Candles.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_120">
+										<a href="chapter_120.xhtml">Chapter 120. The Deck Towards the End of the First Night Watch.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_121">
+										<a href="chapter_121.xhtml">Chapter 121. Midnight.—The Forecastle Bulwarks.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_122">
+										<a href="chapter_122.xhtml">Chapter 122. Midnight Aloft.—Thunder and Lightning.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_123">
+										<a href="chapter_123.xhtml">Chapter 123. The Musket.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_124">
+										<a href="chapter_124.xhtml">Chapter 124. The Needle.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_125">
+										<a href="chapter_125.xhtml">Chapter 125. The Log and Line.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_126">
+										<a href="chapter_126.xhtml">Chapter 126. The Life-Buoy.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_127">
+										<a href="chapter_127.xhtml">Chapter 127. The Deck.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_128">
+										<a href="chapter_128.xhtml">Chapter 128. The Pequod Meets The Rachel.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_129">
+										<a href="chapter_129.xhtml">Chapter 129. The Cabin.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_130">
+										<a href="chapter_130.xhtml">Chapter 130. The Hat.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_131">
+										<a href="chapter_131.xhtml">Chapter 131. The Pequod Meets The Delight.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_132">
+										<a href="chapter_132.xhtml">Chapter 132. The Symphony.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_133">
+										<a href="chapter_133.xhtml">Chapter 133. The Chase—First Day.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_134">
+										<a href="chapter_134.xhtml">Chapter 134. The Chase—Second Day.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_135">
+										<a href="chapter_135.xhtml">Chapter 135. The Chase.—Third Day.</a>
+									</li>
+									<li class="toc-Chapter-rw" id="toc-chapter_136">
+										<a href="chapter_136.xhtml">Epilogue</a>
+									</li>
+									<li>
+										<a href="copyright.xhtml">Copyright Page</a>
+									</li>
+								</ol>
+							</nav>
+							<nav xmlns:epub="http://www.idpf.org/2007/ops" epub:type="landmarks" id="guide">
+								<h2>Guide</h2>
+								<ol>
+									<li>
+										<a epub:type="toc" href="#toc">Table of Contents</a>
+									</li>
+									<li>
+										<a epub:type="bodymatter" href="chapter_001.xhtml">Begin Reading</a>
+									</li>
+									<li>
+										<a epub:type="copyright-page" href="copyright.xhtml">Copyright Page</a>
+									</li>
+								</ol>
+							</nav>
+						</section>
+					</body>
+				</html>
+			</utfx:source>
+			<utfx:expected>
+				<ncx version="2005-1">
+					<head>
+						<meta content="" name="dtb:uid"> </meta>
+						<meta content="1" name="dtb:depth"> </meta>
+						<meta content="Pipeline 2" name="dtb:generator"> </meta>
+						<meta content="0" name="dtb:totalPageCount"> </meta>
+						<meta content="0" name="dtb:maxPageNumber"> </meta>
+					</head>
+					<docTitle>
+						<text>Moby-Dick</text>
+					</docTitle>
+					<navMap>
+						<navPoint id="navPoint-1">
+							<navLabel>
+								<text>Moby-Dick</text>
+							</navLabel>
+							<content src="titlepage.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-2">
+							<navLabel>
+								<text>Original Transcriber’s Notes:</text>
+							</navLabel>
+							<content src="preface_001.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-3">
+							<navLabel>
+								<text>ETYMOLOGY.</text>
+							</navLabel>
+							<content src="introduction_001.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-4">
+							<navLabel>
+								<text>EXTRACTS (Supplied by a Sub-Sub-Librarian).</text>
+							</navLabel>
+							<content src="epigraph_001.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-5">
+							<navLabel>
+								<text>Chapter 1. Loomings.</text>
+							</navLabel>
+							<content src="chapter_001.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-6">
+							<navLabel>
+								<text>Chapter 2. The Carpet-Bag.</text>
+							</navLabel>
+							<content src="chapter_002.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-7">
+							<navLabel>
+								<text>Chapter 3. The Spouter-Inn.</text>
+							</navLabel>
+							<content src="chapter_003.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-8">
+							<navLabel>
+								<text>Chapter 4. The Counterpane.</text>
+							</navLabel>
+							<content src="chapter_004.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-9">
+							<navLabel>
+								<text>Chapter 5. Breakfast.</text>
+							</navLabel>
+							<content src="chapter_005.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-10">
+							<navLabel>
+								<text>Chapter 6. The Street.</text>
+							</navLabel>
+							<content src="chapter_006.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-11">
+							<navLabel>
+								<text>Chapter 7. The Chapel.</text>
+							</navLabel>
+							<content src="chapter_007.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-12">
+							<navLabel>
+								<text>Chapter 8. The Pulpit.</text>
+							</navLabel>
+							<content src="chapter_008.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-13">
+							<navLabel>
+								<text>Chapter 9. The Sermon.</text>
+							</navLabel>
+							<content src="chapter_009.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-14">
+							<navLabel>
+								<text>Chapter 10. A Bosom Friend.</text>
+							</navLabel>
+							<content src="chapter_010.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-15">
+							<navLabel>
+								<text>Chapter 11. Nightgown.</text>
+							</navLabel>
+							<content src="chapter_011.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-16">
+							<navLabel>
+								<text>Chapter 12. Biographical.</text>
+							</navLabel>
+							<content src="chapter_012.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-17">
+							<navLabel>
+								<text>Chapter 13. Wheelbarrow.</text>
+							</navLabel>
+							<content src="chapter_013.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-18">
+							<navLabel>
+								<text>Chapter 14. Nantucket.</text>
+							</navLabel>
+							<content src="chapter_014.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-19">
+							<navLabel>
+								<text>Chapter 15. Chowder.</text>
+							</navLabel>
+							<content src="chapter_015.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-20">
+							<navLabel>
+								<text>Chapter 16. The Ship.</text>
+							</navLabel>
+							<content src="chapter_016.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-21">
+							<navLabel>
+								<text>Chapter 17. The Ramadan.</text>
+							</navLabel>
+							<content src="chapter_017.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-22">
+							<navLabel>
+								<text>Chapter 18. His Mark.</text>
+							</navLabel>
+							<content src="chapter_018.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-23">
+							<navLabel>
+								<text>Chapter 19. The Prophet.</text>
+							</navLabel>
+							<content src="chapter_019.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-24">
+							<navLabel>
+								<text>Chapter 20. All Astir.</text>
+							</navLabel>
+							<content src="chapter_020.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-25">
+							<navLabel>
+								<text>Chapter 21. Going Aboard.</text>
+							</navLabel>
+							<content src="chapter_021.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-26">
+							<navLabel>
+								<text>Chapter 22. Merry Christmas.</text>
+							</navLabel>
+							<content src="chapter_022.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-27">
+							<navLabel>
+								<text>Chapter 23. The Lee Shore.</text>
+							</navLabel>
+							<content src="chapter_023.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-28">
+							<navLabel>
+								<text>Chapter 24. The Advocate.</text>
+							</navLabel>
+							<content src="chapter_024.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-29">
+							<navLabel>
+								<text>Chapter 25. Postscript.</text>
+							</navLabel>
+							<content src="chapter_025.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-30">
+							<navLabel>
+								<text>Chapter 26. Knights and Squires.</text>
+							</navLabel>
+							<content src="chapter_026.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-31">
+							<navLabel>
+								<text>Chapter 27. Knights and Squires.</text>
+							</navLabel>
+							<content src="chapter_027.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-32">
+							<navLabel>
+								<text>Chapter 28. Ahab.</text>
+							</navLabel>
+							<content src="chapter_028.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-33">
+							<navLabel>
+								<text>Chapter 29. Enter Ahab; to Him, Stubb.</text>
+							</navLabel>
+							<content src="chapter_029.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-34">
+							<navLabel>
+								<text>Chapter 30. The Pipe.</text>
+							</navLabel>
+							<content src="chapter_030.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-35">
+							<navLabel>
+								<text>Chapter 31. Queen Mab.</text>
+							</navLabel>
+							<content src="chapter_031.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-36">
+							<navLabel>
+								<text>Chapter 32. Cetology.</text>
+							</navLabel>
+							<content src="chapter_032.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-37">
+							<navLabel>
+								<text>Chapter 33. The Specksnyder.</text>
+							</navLabel>
+							<content src="chapter_033.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-38">
+							<navLabel>
+								<text>Chapter 34. The Cabin-Table.</text>
+							</navLabel>
+							<content src="chapter_034.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-39">
+							<navLabel>
+								<text>Chapter 35. The Mast-Head.</text>
+							</navLabel>
+							<content src="chapter_035.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-40">
+							<navLabel>
+								<text>Chapter 36. The Quarter-Deck.</text>
+							</navLabel>
+							<content src="chapter_036.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-41">
+							<navLabel>
+								<text>Chapter 37. Sunset.</text>
+							</navLabel>
+							<content src="chapter_037.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-42">
+							<navLabel>
+								<text>Chapter 38. Dusk.</text>
+							</navLabel>
+							<content src="chapter_038.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-43">
+							<navLabel>
+								<text>Chapter 39. First Night Watch.</text>
+							</navLabel>
+							<content src="chapter_039.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-44">
+							<navLabel>
+								<text>Chapter 40. Midnight, Forecastle.</text>
+							</navLabel>
+							<content src="chapter_040.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-45">
+							<navLabel>
+								<text>Chapter 41. Moby Dick.</text>
+							</navLabel>
+							<content src="chapter_041.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-46">
+							<navLabel>
+								<text>Chapter 42. The Whiteness of The Whale.</text>
+							</navLabel>
+							<content src="chapter_042.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-47">
+							<navLabel>
+								<text>Chapter 43. Hark!</text>
+							</navLabel>
+							<content src="chapter_043.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-48">
+							<navLabel>
+								<text>Chapter 44. The Chart.</text>
+							</navLabel>
+							<content src="chapter_044.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-49">
+							<navLabel>
+								<text>Chapter 45. The Affidavit.</text>
+							</navLabel>
+							<content src="chapter_045.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-50">
+							<navLabel>
+								<text>Chapter 46. Surmises.</text>
+							</navLabel>
+							<content src="chapter_046.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-51">
+							<navLabel>
+								<text>Chapter 47. The Mat-Maker.</text>
+							</navLabel>
+							<content src="chapter_047.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-52">
+							<navLabel>
+								<text>Chapter 48. The First Lowering.</text>
+							</navLabel>
+							<content src="chapter_048.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-53">
+							<navLabel>
+								<text>Chapter 49. The Hyena.</text>
+							</navLabel>
+							<content src="chapter_049.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-54">
+							<navLabel>
+								<text>Chapter 50. Ahab’s Boat and Crew. Fedallah.</text>
+							</navLabel>
+							<content src="chapter_050.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-55">
+							<navLabel>
+								<text>Chapter 51. The Spirit-Spout.</text>
+							</navLabel>
+							<content src="chapter_051.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-56">
+							<navLabel>
+								<text>Chapter 52. The Albatross.</text>
+							</navLabel>
+							<content src="chapter_052.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-57">
+							<navLabel>
+								<text>Chapter 53. The Gam.</text>
+							</navLabel>
+							<content src="chapter_053.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-58">
+							<navLabel>
+								<text>Chapter 54. The Town-Ho’s Story.</text>
+							</navLabel>
+							<content src="chapter_054.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-59">
+							<navLabel>
+								<text>Chapter 55. Of the Monstrous Pictures of Whales.</text>
+							</navLabel>
+							<content src="chapter_055.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-60">
+							<navLabel>
+								<text>Chapter 56. Of the Less Erroneous Pictures of Whales, and the True</text>
+							</navLabel>
+							<content src="chapter_056.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-61">
+							<navLabel>
+								<text>Chapter 57. Of Whales in Paint; in Teeth; in Wood; in Sheet-Iron; in</text>
+							</navLabel>
+							<content src="chapter_057.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-62">
+							<navLabel>
+								<text>Chapter 58. Brit.</text>
+							</navLabel>
+							<content src="chapter_058.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-63">
+							<navLabel>
+								<text>Chapter 59. Squid.</text>
+							</navLabel>
+							<content src="chapter_059.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-64">
+							<navLabel>
+								<text>Chapter 60. The Line.</text>
+							</navLabel>
+							<content src="chapter_060.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-65">
+							<navLabel>
+								<text>Chapter 61. Stubb Kills a Whale.</text>
+							</navLabel>
+							<content src="chapter_061.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-66">
+							<navLabel>
+								<text>Chapter 62. The Dart.</text>
+							</navLabel>
+							<content src="chapter_062.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-67">
+							<navLabel>
+								<text>Chapter 63. The Crotch.</text>
+							</navLabel>
+							<content src="chapter_063.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-68">
+							<navLabel>
+								<text>Chapter 64. Stubb’s Supper.</text>
+							</navLabel>
+							<content src="chapter_064.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-69">
+							<navLabel>
+								<text>Chapter 65. The Whale as a Dish.</text>
+							</navLabel>
+							<content src="chapter_065.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-70">
+							<navLabel>
+								<text>Chapter 66. The Shark Massacre.</text>
+							</navLabel>
+							<content src="chapter_066.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-71">
+							<navLabel>
+								<text>Chapter 67. Cutting In.</text>
+							</navLabel>
+							<content src="chapter_067.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-72">
+							<navLabel>
+								<text>Chapter 68. The Blanket.</text>
+							</navLabel>
+							<content src="chapter_068.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-73">
+							<navLabel>
+								<text>Chapter 69. The Funeral.</text>
+							</navLabel>
+							<content src="chapter_069.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-74">
+							<navLabel>
+								<text>Chapter 70. The Sphynx.</text>
+							</navLabel>
+							<content src="chapter_070.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-75">
+							<navLabel>
+								<text>Chapter 71. The Jeroboam’s Story.</text>
+							</navLabel>
+							<content src="chapter_071.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-76">
+							<navLabel>
+								<text>Chapter 72. The Monkey-Rope.</text>
+							</navLabel>
+							<content src="chapter_072.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-77">
+							<navLabel>
+								<text>Chapter 73. Stubb and Flask Kill a Right Whale; and Then Have a Talk</text>
+							</navLabel>
+							<content src="chapter_073.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-78">
+							<navLabel>
+								<text>Chapter 74. The Sperm Whale’s Head—Contrasted View.</text>
+							</navLabel>
+							<content src="chapter_074.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-79">
+							<navLabel>
+								<text>Chapter 75. The Right Whale’s Head—Contrasted View.</text>
+							</navLabel>
+							<content src="chapter_075.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-80">
+							<navLabel>
+								<text>Chapter 76. The Battering-Ram.</text>
+							</navLabel>
+							<content src="chapter_076.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-81">
+							<navLabel>
+								<text>Chapter 77. The Great Heidelburgh Tun.</text>
+							</navLabel>
+							<content src="chapter_077.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-82">
+							<navLabel>
+								<text>Chapter 78. Cistern and Buckets.</text>
+							</navLabel>
+							<content src="chapter_078.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-83">
+							<navLabel>
+								<text>Chapter 79. The Prairie.</text>
+							</navLabel>
+							<content src="chapter_079.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-84">
+							<navLabel>
+								<text>Chapter 80. The Nut.</text>
+							</navLabel>
+							<content src="chapter_080.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-85">
+							<navLabel>
+								<text>Chapter 81. The Pequod Meets The Virgin.</text>
+							</navLabel>
+							<content src="chapter_081.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-86">
+							<navLabel>
+								<text>Chapter 82. The Honour and Glory of Whaling.</text>
+							</navLabel>
+							<content src="chapter_082.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-87">
+							<navLabel>
+								<text>Chapter 83. Jonah Historically Regarded.</text>
+							</navLabel>
+							<content src="chapter_083.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-88">
+							<navLabel>
+								<text>Chapter 84. Pitchpoling.</text>
+							</navLabel>
+							<content src="chapter_084.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-89">
+							<navLabel>
+								<text>Chapter 85. The Fountain.</text>
+							</navLabel>
+							<content src="chapter_085.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-90">
+							<navLabel>
+								<text>Chapter 86. The Tail.</text>
+							</navLabel>
+							<content src="chapter_086.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-91">
+							<navLabel>
+								<text>Chapter 87. The Grand Armada.</text>
+							</navLabel>
+							<content src="chapter_087.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-92">
+							<navLabel>
+								<text>Chapter 88. Schools and Schoolmasters.</text>
+							</navLabel>
+							<content src="chapter_088.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-93">
+							<navLabel>
+								<text>Chapter 89. Fast-Fish and Loose-Fish.</text>
+							</navLabel>
+							<content src="chapter_089.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-94">
+							<navLabel>
+								<text>Chapter 90. Heads or Tails.</text>
+							</navLabel>
+							<content src="chapter_090.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-95">
+							<navLabel>
+								<text>Chapter 91. The Pequod Meets The Rose-Bud.</text>
+							</navLabel>
+							<content src="chapter_091.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-96">
+							<navLabel>
+								<text>Chapter 92. Ambergris.</text>
+							</navLabel>
+							<content src="chapter_092.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-97">
+							<navLabel>
+								<text>Chapter 93. The Castaway.</text>
+							</navLabel>
+							<content src="chapter_093.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-98">
+							<navLabel>
+								<text>Chapter 94. A Squeeze of the Hand.</text>
+							</navLabel>
+							<content src="chapter_094.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-99">
+							<navLabel>
+								<text>Chapter 95. The Cassock.</text>
+							</navLabel>
+							<content src="chapter_095.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-100">
+							<navLabel>
+								<text>Chapter 96. The Try-Works.</text>
+							</navLabel>
+							<content src="chapter_096.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-101">
+							<navLabel>
+								<text>Chapter 97. The Lamp.</text>
+							</navLabel>
+							<content src="chapter_097.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-102">
+							<navLabel>
+								<text>Chapter 98. Stowing Down and Clearing Up.</text>
+							</navLabel>
+							<content src="chapter_098.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-103">
+							<navLabel>
+								<text>Chapter 99. The Doubloon.</text>
+							</navLabel>
+							<content src="chapter_099.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-104">
+							<navLabel>
+								<text>Chapter 100. Leg and Arm.</text>
+							</navLabel>
+							<content src="chapter_100.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-105">
+							<navLabel>
+								<text>Chapter 101. The Decanter.</text>
+							</navLabel>
+							<content src="chapter_101.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-106">
+							<navLabel>
+								<text>Chapter 102. A Bower in the Arsacides.</text>
+							</navLabel>
+							<content src="chapter_102.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-107">
+							<navLabel>
+								<text>Chapter 103. Measurement of The Whale’s Skeleton.</text>
+							</navLabel>
+							<content src="chapter_103.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-108">
+							<navLabel>
+								<text>Chapter 104. The Fossil Whale.</text>
+							</navLabel>
+							<content src="chapter_104.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-109">
+							<navLabel>
+								<text>Chapter 105. Does the Whale’s Magnitude Diminish?—Will He Perish?</text>
+							</navLabel>
+							<content src="chapter_105.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-110">
+							<navLabel>
+								<text>Chapter 106. Ahab’s Leg.</text>
+							</navLabel>
+							<content src="chapter_106.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-111">
+							<navLabel>
+								<text>Chapter 107. The Carpenter.</text>
+							</navLabel>
+							<content src="chapter_107.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-112">
+							<navLabel>
+								<text>Chapter 108. Ahab and the Carpenter.</text>
+							</navLabel>
+							<content src="chapter_108.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-113">
+							<navLabel>
+								<text>Chapter 109. Ahab and Starbuck in the Cabin.</text>
+							</navLabel>
+							<content src="chapter_109.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-114">
+							<navLabel>
+								<text>Chapter 110. Queequeg in His Coffin.</text>
+							</navLabel>
+							<content src="chapter_110.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-115">
+							<navLabel>
+								<text>Chapter 111. The Pacific.</text>
+							</navLabel>
+							<content src="chapter_111.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-116">
+							<navLabel>
+								<text>Chapter 112. The Blacksmith.</text>
+							</navLabel>
+							<content src="chapter_112.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-117">
+							<navLabel>
+								<text>Chapter 113. The Forge.</text>
+							</navLabel>
+							<content src="chapter_113.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-118">
+							<navLabel>
+								<text>Chapter 114. The Gilder.</text>
+							</navLabel>
+							<content src="chapter_114.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-119">
+							<navLabel>
+								<text>Chapter 115. The Pequod Meets The Bachelor.</text>
+							</navLabel>
+							<content src="chapter_115.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-120">
+							<navLabel>
+								<text>Chapter 116. The Dying Whale.</text>
+							</navLabel>
+							<content src="chapter_116.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-121">
+							<navLabel>
+								<text>Chapter 117. The Whale Watch.</text>
+							</navLabel>
+							<content src="chapter_117.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-122">
+							<navLabel>
+								<text>Chapter 118. The Quadrant.</text>
+							</navLabel>
+							<content src="chapter_118.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-123">
+							<navLabel>
+								<text>Chapter 119. The Candles.</text>
+							</navLabel>
+							<content src="chapter_119.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-124">
+							<navLabel>
+								<text>Chapter 120. The Deck Towards the End of the First Night Watch.</text>
+							</navLabel>
+							<content src="chapter_120.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-125">
+							<navLabel>
+								<text>Chapter 121. Midnight.—The Forecastle Bulwarks.</text>
+							</navLabel>
+							<content src="chapter_121.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-126">
+							<navLabel>
+								<text>Chapter 122. Midnight Aloft.—Thunder and Lightning.</text>
+							</navLabel>
+							<content src="chapter_122.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-127">
+							<navLabel>
+								<text>Chapter 123. The Musket.</text>
+							</navLabel>
+							<content src="chapter_123.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-128">
+							<navLabel>
+								<text>Chapter 124. The Needle.</text>
+							</navLabel>
+							<content src="chapter_124.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-129">
+							<navLabel>
+								<text>Chapter 125. The Log and Line.</text>
+							</navLabel>
+							<content src="chapter_125.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-130">
+							<navLabel>
+								<text>Chapter 126. The Life-Buoy.</text>
+							</navLabel>
+							<content src="chapter_126.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-131">
+							<navLabel>
+								<text>Chapter 127. The Deck.</text>
+							</navLabel>
+							<content src="chapter_127.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-132">
+							<navLabel>
+								<text>Chapter 128. The Pequod Meets The Rachel.</text>
+							</navLabel>
+							<content src="chapter_128.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-133">
+							<navLabel>
+								<text>Chapter 129. The Cabin.</text>
+							</navLabel>
+							<content src="chapter_129.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-134">
+							<navLabel>
+								<text>Chapter 130. The Hat.</text>
+							</navLabel>
+							<content src="chapter_130.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-135">
+							<navLabel>
+								<text>Chapter 131. The Pequod Meets The Delight.</text>
+							</navLabel>
+							<content src="chapter_131.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-136">
+							<navLabel>
+								<text>Chapter 132. The Symphony.</text>
+							</navLabel>
+							<content src="chapter_132.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-137">
+							<navLabel>
+								<text>Chapter 133. The Chase—First Day.</text>
+							</navLabel>
+							<content src="chapter_133.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-138">
+							<navLabel>
+								<text>Chapter 134. The Chase—Second Day.</text>
+							</navLabel>
+							<content src="chapter_134.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-139">
+							<navLabel>
+								<text>Chapter 135. The Chase.—Third Day.</text>
+							</navLabel>
+							<content src="chapter_135.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-140">
+							<navLabel>
+								<text>Epilogue</text>
+							</navLabel>
+							<content src="chapter_136.xhtml"> </content>
+						</navPoint>
+						<navPoint id="navPoint-141">
+							<navLabel>
+								<text>Copyright Page</text>
+							</navLabel>
+							<content src="copyright.xhtml"> </content>
+						</navPoint>
+					</navMap>
+					<navList>
+						<navLabel>
+							<text>Guide</text>
+						</navLabel>
+						<navTarget id="navTarget-142">
+							<navLabel>
+								<text>Table of Contents</text>
+							</navLabel>
+							<content src="#toc"> </content>
+						</navTarget>
+						<navTarget id="navTarget-143">
+							<navLabel>
+								<text>Begin Reading</text>
+							</navLabel>
+							<content src="chapter_001.xhtml"> </content>
+						</navTarget>
+						<navTarget id="navTarget-144">
+							<navLabel>
+								<text>Copyright Page</text>
+							</navLabel>
+							<content src="copyright.xhtml"> </content>
+						</navTarget>
+					</navList>
+				</ncx>
+			</utfx:expected>
+		</utfx:assert-equal>
+	</utfx:test>
+
+
+</utfx:tests>

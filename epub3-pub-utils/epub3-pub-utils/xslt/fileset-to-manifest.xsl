@@ -12,6 +12,15 @@
     </xsl:template>
     
     <xsl:template match="d:file">
+	<!--
+	TODO:
+		- The EPUB3 Navigation Document can be part of the spine, in which case it may have a media-overlay.
+		- The EPUB3 Navigation Document doesn't have to be named 'navigation.xhtml'. Get filename as parameter?
+	NOTE:
+		- This transform assumes that the media overlays were generated based on the content documents;
+		  i.e. they have the same names and are located in the same directories:
+		  ([./doc.xhtml,./doc.smil], [./Content/frontmatter.xhtml,./Content/frontmatter.smil] etc.
+	 -->
         <item href="{@href}" media-type="{@media-type}" id="{concat('item_',position())}">
             <xsl:if
                 test="@media-type='application/xhtml+xml' and not(tokenize(@href,'/')[last()]='navigation.xhtml')">
@@ -21,9 +30,6 @@
                 />
             </xsl:if>
         </item>
-        <!-- NOTE: this assumes that the media overlays were generated based on the content documents
-            (i.e. they have the same names and are located in the same directories;
-            ([./doc.xhtml,./doc.smil], [./Content/frontmatter.xhtml,./Content/frontmatter.smil] etc.) -->
     </xsl:template>
 
 </xsl:stylesheet>
