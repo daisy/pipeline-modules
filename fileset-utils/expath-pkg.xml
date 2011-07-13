@@ -9,5 +9,9 @@
 			<import-uri>http://www.daisy.org/pipeline/modules/fileset-utils/xslt/fileset-to-odf-manifest.xsl</import-uri>
 			<file>xslt/fileset-to-odf-manifest.xsl</file>
 		</xslt>
+		<xslt>
+			<import-uri>http://www.daisy.org/pipeline/modules/fileset-utils/xslt/fileset-resolve-dot-segments.xsl</import-uri>
+			<file>xslt/fileset-resolve-dot-segments.xsl</file>
+		</xslt>
 	</module>
 </package>

@@ -6,4 +6,6 @@
         uri="../fileset-utils/xproc/fileset-library.xpl"/>
    <uri name="http://www.daisy.org/pipeline/modules/fileset-utils/xslt/fileset-to-odf-manifest.xsl"
         uri="../fileset-utils/xslt/fileset-to-odf-manifest.xsl"/>
+   <uri name="http://www.daisy.org/pipeline/modules/fileset-utils/xslt/fileset-resolve-dot-segments.xsl"
+        uri="../fileset-utils/xslt/fileset-resolve-dot-segments.xsl"/>
 </catalog>
