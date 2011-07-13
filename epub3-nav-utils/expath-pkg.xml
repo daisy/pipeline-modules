@@ -5,5 +5,9 @@
 			<import-uri>http://www.daisy.org/pipeline/modules/epub3-nav-utils/epub3-nav-library.xpl</import-uri>
 			<file>xproc/epub3-nav-library.xpl</file>
 		</xproc>
+		<xslt>
+			<import-uri>http://www.daisy.org/pipeline/modules/epub3-nav-utils/nav-to-ncx.xsl</import-uri>
+			<file>xslt/nav-to-ncx.xsl</file>
+		</xslt>
 	</module>
 </package>

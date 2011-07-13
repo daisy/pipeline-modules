@@ -3,7 +3,7 @@
     exclude-result-prefixes="#all" version="2.0">
 
     <!-- Creates a text-only NCX based on a EPUB3 Navigation Document -->
-    
+
     <xsl:output indent="yes"/>
 
     <xsl:template match="@*|node()">
@@ -73,20 +73,39 @@
     <xsl:template match="html:li">
         <xsl:choose>
             <xsl:when test="ancestor::html:nav/@*[name()='epub:type']='toc'">
-                <navPoint id="navPoint-{count(preceding::html:li | ancestor::html:li)+1}">
-                    <xsl:call-template name="make-label"/>
-                    <xsl:apply-templates/>
-                </navPoint>
+                <xsl:choose>
+                    <xsl:when test="html:a">
+                        <navPoint id="navPoint-{count(preceding::html:li | ancestor::html:li)+1}">
+                            <xsl:call-template name="make-label"/>
+                            <xsl:call-template name="make-content"/>
+                            <xsl:apply-templates/>
+                        </navPoint>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:apply-templates/>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:when>
             <xsl:when test="ancestor::html:nav/@*[name()='epub:type']='page-list'">
                 <pageTarget id="pageTarget-{count(preceding::html:li | ancestor::html:li)+1}">
+                    <xsl:choose>
+                        <xsl:when test="string(number(.))=normalize-space(.)">
+                            <xsl:attribute name="type" select="'normal'"/>
+                        </xsl:when>
+                        <!-- TODO: detect roman numerals -->
+                        <xsl:otherwise>
+                            <xsl:attribute name="type" select="'special'"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
                     <xsl:call-template name="make-label"/>
+                    <xsl:call-template name="make-content"/>
                 </pageTarget>
                 <xsl:apply-templates/>
             </xsl:when>
             <xsl:otherwise>
                 <navTarget id="navTarget-{count(preceding::html:li | ancestor::html:li)+1}">
                     <xsl:call-template name="make-label"/>
+                    <xsl:call-template name="make-content"/>
                 </navTarget>
                 <xsl:apply-templates/>
             </xsl:otherwise>
@@ -97,10 +116,13 @@
         <xsl:if test="html:a | html:span | html:hgroup | html:h1 | html:h2 | html:h3 | html:h3 | html:h4 | html:h5 | html:h6">
             <navLabel>
                 <text>
-                    <xsl:value-of select="string-join((html:hgroup | html:h1 | html:h2 | html:h3 | html:h3 | html:h4 | html:h5 | html:h6 | html:span | html:a)/descendant::text(),' ')"/>
+                    <xsl:value-of select="normalize-space(string-join((html:a | html:span | html:hgroup | html:h1 | html:h2 | html:h3 | html:h3 | html:h4 | html:h5 | html:h6)/descendant::text(),' '))"/>
                 </text>
             </navLabel>
         </xsl:if>
+    </xsl:template>
+
+    <xsl:template name="make-content">
         <xsl:if test="html:a">
             <content src="{if (starts-with(html:a/@href,'#')) then concat(replace(/*/@xml:base,'^.*/([^/]*)$','$1'),html:a/@href) else html:a/@href}"/>
         </xsl:if>

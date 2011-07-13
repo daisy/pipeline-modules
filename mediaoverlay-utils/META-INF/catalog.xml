@@ -14,4 +14,6 @@
         uri="../mediaoverlay-utils/smil-to-text-fileset.xsl"/>
    <uri name="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/smil-to-audio-fileset.xsl"
         uri="../mediaoverlay-utils/smil-to-audio-fileset.xsl"/>
+   <uri name="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/clock-functions.xsl"
+        uri="../mediaoverlay-utils/clock-functions.xsl"/>
 </catalog>
