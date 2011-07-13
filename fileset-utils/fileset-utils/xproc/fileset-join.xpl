@@ -2,7 +2,7 @@
 <p:declare-step version="1.0" type="px:fileset-join" xmlns:p="http://www.w3.org/ns/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:px="http://www.daisy.org/ns/pipeline/xproc">
 
   <p:input port="source" sequence="true"/>
-  <p:output port="result"/>
+  <p:output port="result" primary="true"/>
 
   <p:for-each>
     <p:xslt>
@@ -12,7 +12,8 @@
       <p:input port="stylesheet">
         <p:document href="fileset-join-resolve-dot-segments.xsl"/>
       </p:input>
-    </p:xslt>
+      </p:xslt>
+    <p:identity/>
   </p:for-each>
   <p:wrap-sequence wrapper="d:fileset"/>
   <p:xslt>

@@ -6,7 +6,7 @@
             <xsl:variable name="xml-base" select="f:resolve-dot-segments(resolve-uri(replace(replace(/*/@xml:base,'^(\w:)','file:/$1'),'\\','/')))"/>
             <xsl:attribute name="xml:base" select="$xml-base"/>
             <xsl:apply-templates select="node()">
-                <xsl:with-param name="xml-base" tunnel="yes"/>
+                <xsl:with-param name="xml-base" select="$xml-base" tunnel="yes"/>
             </xsl:apply-templates>
         </xsl:copy>
     </xsl:template>

@@ -158,6 +158,13 @@
 
     <!-- ============================================================ -->
 
+    <p:documentation xmlns="http://www.w3.org/1999/xhtml">TODO</p:documentation>
+    <p:declare-step type="px:cwd">
+        <p:output port="result" sequence="true"/>
+    </p:declare-step>
+
+    <!-- ============================================================ -->
+
     <p:import href="recursive-directory-list.xpl"/>
 
 </p:library>
