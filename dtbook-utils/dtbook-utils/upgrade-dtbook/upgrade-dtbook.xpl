@@ -14,7 +14,8 @@
         * copy referenced resources (such as images)
     -->
     <p:documentation>
-        <xd:short>Upgrade a DTBook document from version 1.1.0, 2005-1, or 2005-2 to version 2005-3. This module was imported from the Pipeline 1.</xd:short>
+    	<xd:short>upgrade-dtbook</xd:short>
+        <xd:detail>Upgrade a DTBook document from version 1.1.0, 2005-1, or 2005-2 to version 2005-3. This module was imported from the Pipeline 1.</xd:detail>
         <xd:author>
             <xd:name>Marisa DeMeglio</xd:name>
             <xd:mailto>marisa.demeglio@gmail.com</xd:mailto>
@@ -24,17 +25,22 @@
         <xd:input port="source">DTBook 1.1.0, 2005-1, or 2005-2 document.</xd:input>
         <xd:output port="result">DTBook 2005-3 document.</xd:output>
         
-        <cd:converter name="upgrade-dtbook" version="1.0" xmlns:cd="http://www.daisy.org/ns/pipeline/converter">
-            <cd:description>Upgrade to DTBook 2005-3.</cd:description>  
-            <cd:arg  name="in"  type="input" port="source" desc="Single DTBook file" optional="false"/>         
-            <cd:arg  name="out"  type="output" port="result" desc="The result"/>       
-        </cd:converter> 
+        
         
     </p:documentation>
 
-    <p:input port="source" primary="true"/>
+    <p:input port="source" primary="true" px:name="in" px:media-type="application/x-dtbook+xml">
+    	<p:documentation>
+        	<xd:short>in</xd:short>
+        	<xd:detail>Single DTBook file</xd:detail>
+        </p:documentation>
+    </p:input>
     <p:input port="parameters" kind="parameter"/>
     <p:output port="result">
+    <p:documentation>
+        	<xd:short>out</xd:short>
+        	<xd:detail>The result</xd:detail>
+        </p:documentation>
         <p:pipe port="result" step="validate-dtbook"/>
     </p:output>
     

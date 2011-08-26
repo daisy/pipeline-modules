@@ -1,9 +1,9 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="merge-dtbook">
-    <implementation class="org.daisy.converter.registry.OSGIConverterDescriptor"/>
+    <implementation class="org.daisy.pipeline.script.XProcScriptService"/>
     <service>
-        <provide interface="org.daisy.pipeline.modules.converter.ConverterDescriptor"/>
+        <provide interface="org.daisy.pipeline.script.XProcScriptService"/>
     </service>
-    <property name="converter.name" type="String" value="merge-dtbook"/>
-    <property name="converter.description" type="String" value="DTBook utility for merging two or more files."/>
-    <property name="converter.url" type="String" value="http://www.daisy.org/pipeline/modules/dtbook-utils/merge-dtbook/merge-dtbook.xpl"/>
+    <property name="script.name" type="String" value="merge-dtbook"/>
+    <property name="script.description" type="String" value="DTBook utility for merging two or more files."/>
+    <property name="script.url" type="String" value="http://www.daisy.org/pipeline/modules/dtbook-utils/merge-dtbook/merge-dtbook.xpl"/>
 </scr:component>
