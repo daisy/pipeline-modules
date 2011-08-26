@@ -1,4 +1,4 @@
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="upgrade-dtbook">
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="upgrade-dtbook">
     <implementation class="org.daisy.pipeline.script.XProcScriptService"/>
     <service>
         <provide interface="org.daisy.pipeline.script.XProcScriptService"/>
