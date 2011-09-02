@@ -18,7 +18,7 @@
             <p:output port="result" primary="true"/>
             
             <!-- Check the existence of the directory -->
-            <p:group name="checkdir">
+            <p:group name="check-dir">
                 <!--Get file system info on the directory-->
                 <!--Note: we wrap the result since an empty sequence is returned when the file does not exist-->
                 <px:info>
