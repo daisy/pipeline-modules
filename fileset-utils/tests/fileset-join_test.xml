@@ -118,11 +118,11 @@
    </utfx:test>
    
    <utfx:test>
-      <utfx:name>First fileset defines base protocol/domain</utfx:name>
+      <utfx:name>First fileset defines base protocol/domain/number of slashes</utfx:name>
       <utfx:assert-equal>
          <utfx:source>
             <d:fileset>
-               <d:fileset xml:base="http://example.net/dir/">
+               <d:fileset xml:base="http:///example.net/dir/">
                   <d:file href="image.png"/>
                </d:fileset>
                <d:fileset xml:base="http://example.net/">
@@ -134,7 +134,7 @@
             </d:fileset>
          </utfx:source>
          <utfx:expected>
-            <d:fileset xml:base="http://example.net/">
+            <d:fileset xml:base="http:///example.net/">
                <d:file href="dir/image.png"/>
                <d:file href="favicon.ico"/>
                <d:file href="file:/Users/me/dir/document.xhtml"/>

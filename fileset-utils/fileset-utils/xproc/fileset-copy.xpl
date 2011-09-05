@@ -18,7 +18,7 @@
             <p:output port="result" primary="true"/>
             
             <!-- Check the existence of the directory -->
-            <p:group name="check-dir">
+            <p:group name="checkdir">
                 <!--Get file system info on the directory-->
                 <!--Note: we wrap the result since an empty sequence is returned when the file does not exist-->
                 <px:info>
@@ -49,7 +49,7 @@
                 </p:choose>
             </p:group>
             
-            <p:group cx:depends-on="check-dir">
+            <p:group cx:depends-on="checkdir">
                 <p:identity>
                     <p:input port="source">
                         <p:pipe port="source" step="main"/>

@@ -12,8 +12,7 @@
       <p:input port="stylesheet">
         <p:document href="fileset-join-resolve-dot-segments.xsl"/>
       </p:input>
-      </p:xslt>
-    <p:identity/>
+    </p:xslt>
   </p:for-each>
   <p:wrap-sequence wrapper="d:fileset"/>
   <p:xslt>

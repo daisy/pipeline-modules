@@ -31,29 +31,31 @@
                 <xsl:value-of select="replace($uris[1],'^(.+/)[^/]*$','$1')"/>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:variable name="a" select="replace($uris[1],'/+','/')"/>
-                <xsl:variable name="b" select="replace($uris[2],'/+','/')"/>
-                <xsl:variable name="a-start" select="if (starts-with($uris[1],'file:')) then replace($uris[1],'^([^/]+/+)[^/].*$','$1') else replace($uris[1],'^([^/]+/+[^/]+/).*$','$1')"/>
-                <xsl:variable name="b-start" select="if (starts-with($uris[2],'file:')) then replace($uris[2],'^([^/]+/+)[^/].*$','$1') else replace($uris[2],'^([^/]+/+[^/]+/).*$','$1')"/>
+                <xsl:variable name="uri-a" select="if (count($uris) &gt; 2) then f:longest-common-uri(subsequence($uris,1,round(count($uris) div 2))) else replace($uris[1],'^(.+/)[^/]*$','$1')"/>
+                <xsl:variable name="uri-b" select="if (count($uris) &gt; 3) then f:longest-common-uri(subsequence($uris,(round(count($uris)) div 2)+1)) else replace($uris[last()],'^(.+/)[^/]*$','$1')"/>
+                <xsl:variable name="a" select="replace($uri-a,'/+','/')"/>
+                <xsl:variable name="b" select="replace($uri-b,'/+','/')"/>
+                <xsl:variable name="a-start" select="if (starts-with($uri-a,'file:')) then replace($uri-a,'^([^/]+/+)[^/].*$','$1') else replace($uri-a,'^([^/]+/+[^/]+/).*$','$1')"/>
+                <xsl:variable name="b-start" select="if (starts-with($uri-b,'file:')) then replace($uri-b,'^([^/]+/+)[^/].*$','$1') else replace($uri-b,'^([^/]+/+[^/]+/).*$','$1')"/>
                 <xsl:variable name="a-canonicalStart" select="replace($a-start,'/+','/')"/>
                 <xsl:variable name="b-canonicalStart" select="replace($b-start,'/+','/')"/>
                 <xsl:variable name="a-trail" select="substring-after(replace($a,'^(.*/)[^/]*$','$1'),$a-canonicalStart)"/>
                 <xsl:variable name="b-trail" select="substring-after(replace($b,'^(.*/)[^/]*$','$1'),$b-canonicalStart)"/>
                 <xsl:choose>
                     <xsl:when test="not($a-canonicalStart=$b-canonicalStart)">
-                        <xsl:value-of select="f:longest-common-uri(insert-before(subsequence($uris,3),0,$uris[1]))"/>
+                        <xsl:value-of select="$uri-a"/>
                     </xsl:when>
                     <xsl:when test="starts-with($b-trail,$a-trail)">
-                        <xsl:value-of select="f:longest-common-uri(insert-before(subsequence($uris,3),0,$uris[1]))"/>
+                        <xsl:value-of select="$uri-a"/>
                     </xsl:when>
                     <xsl:when test="starts-with($a-trail,$b-trail)">
-                        <xsl:value-of select="f:longest-common-uri(insert-before(subsequence($uris,3),0,$uris[2]))"/>
+                        <xsl:value-of select="concat($a-start,$b-trail)"/>
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:variable name="a-parts" select="tokenize($a-trail,'/+')"/>
                         <xsl:variable name="b-parts" select="tokenize($b-trail,'/+')"/>
                         <xsl:variable name="longest" select="f:longest-common($a-parts,$b-parts)"/>
-                        <xsl:value-of select="f:longest-common-uri(insert-before(subsequence($uris,3),0,concat($a-start,$longest)))"/>
+                        <xsl:value-of select="concat($a-start,$longest)"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:otherwise>
