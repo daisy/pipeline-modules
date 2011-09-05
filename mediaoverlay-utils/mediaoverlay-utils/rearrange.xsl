@@ -25,18 +25,20 @@
         <xsl:variable name="id" select="@id"/>
         <xsl:variable name="src" select="@xml:base"/>
         <xsl:variable name="type" select="@epub:type"/>
+        
+        <xsl:variable name="smil-element" select="(/*/*[2]/descendant::*[@fragment=$id and @src=$src])[1]"/>
 
         <xsl:choose>
             <xsl:when
-                test="string-length($id) &gt; 0 and string-length($src) &gt; 0 and /*/*[2]/descendant::*[@fragment=$id and @src=$src]">
+                test="$id and $src and $smil-element/@id">
                 <par xmlns="http://www.w3.org/ns/SMIL">
-                    <text xmlns="http://www.w3.org/ns/SMIL" src="{$src}" id="{$id}">
-                        <xsl:if test="string-length($type) &gt; 0">
+                    <text xmlns="http://www.w3.org/ns/SMIL" src="{$src}#{$id}" id="{$smil-element/@id}">
+                        <xsl:if test="$type">
                             <xsl:attribute name="epub:type" select="$type"/>
                         </xsl:if>
                     </text>
                     <xsl:for-each
-                        select="(/*/*[2]/descendant::*[@fragment=$id and @src=$src]/parent::*/child::mo:audio)[1]">
+                        select="($smil-element/parent::*/child::mo:audio)[1]">
                         <audio xmlns="http://www.w3.org/ns/SMIL" clipBegin="{@clipBegin}"
                             clipEnd="{@clipEnd}" src="{resolve-uri(@src,@xml:base)}"/>
                     </xsl:for-each>
@@ -54,7 +56,7 @@
                 <xsl:apply-templates select="*"/>
             </xsl:otherwise>
         </xsl:choose>
-        <xsl:apply-templates select="*"/>
+        <!--<xsl:apply-templates select="*"/>-->
     </xsl:template>
 
 </xsl:stylesheet>

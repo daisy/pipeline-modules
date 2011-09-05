@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step type="px:epub3-ocf-finalize" name="main" 
-    xmlns:p="http://www.w3.org/ns/xproc"
-    xmlns:c="http://www.w3.org/ns/xproc-step"
-    xmlns:err="http://www.w3.org/ns/xproc-error"
-    xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-    xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc-internal"
-    version="1.0">
-    
+<p:declare-step type="px:epub3-ocf-finalize" name="main" xmlns:p="http://www.w3.org/ns/xproc" xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:err="http://www.w3.org/ns/xproc-error"
+    xmlns:px="http://www.daisy.org/ns/pipeline/xproc" xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc-internal" version="1.0">
+
     <p:input port="source" primary="true"/>
     <p:input port="metadata" sequence="true">
         <p:empty/>
@@ -71,7 +66,7 @@
                         </p:store>
                         <px:fileset-add-entry>
                             <p:with-option name="href" select="$path"/>
-                            <p:with-option name="first" select="$path='mimetype'"/>
+                            <p:with-option name="first" select="if ($path='mimetype') then true() else false()"/>
                             <p:with-option name="media-type" select="$media-type"/>
                             <p:input port="source">
                                 <p:pipe port="fileset" step="store-in-ocf"/>
@@ -87,7 +82,7 @@
                         </p:store>
                         <px:fileset-add-entry>
                             <p:with-option name="href" select="$path"/>
-                            <p:with-option name="first" select="$path='mimetype'"/>
+                            <p:with-option name="first" select="if ($path='mimetype') then true() else false()"/>
                             <p:input port="source">
                                 <p:pipe port="fileset" step="store-in-ocf"/>
                             </p:input>
@@ -99,11 +94,11 @@
     </p:declare-step>
 
     <p:wrap-sequence name="opf-files" wrapper="wrapper">
-        <p:input port="source"
-            select="//*[@media-type='application/oebps-package+xml' or ends-with(@href,'.opf')]">
+        <p:input port="source" select="//*[@media-type='application/oebps-package+xml' or ends-with(@href,'.opf')]">
             <p:pipe port="source" step="main"/>
         </p:input>
     </p:wrap-sequence>
+    <p:sink/>
 
     <p:group name="create-mimetype">
         <p:output port="result"/>
@@ -116,6 +111,7 @@
             </p:input>
         </p:string-replace>
     </p:group>
+    <p:sink/>
 
     <p:group name="create-container-descriptor">
         <p:output port="result"/>
@@ -125,9 +121,7 @@
             </p:input>
             <p:input port="stylesheet">
                 <p:inline>
-                    <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                        xmlns:d="http://www.daisy.org/ns/pipeline/data"
-                        xmlns="urn:oasis:names:tc:opendocument:xmlns:container" 
+                    <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns="urn:oasis:names:tc:opendocument:xmlns:container"
                         exclude-result-prefixes="#all" version="2.0">
                         <xsl:template match="wrapper">
                             <container version="1.0">
@@ -137,8 +131,7 @@
                             </container>
                         </xsl:template>
                         <xsl:template match="d:file">
-                            <rootfile full-path="{@href}" media-type="application/oebps-package+xml"
-                            />
+                            <rootfile full-path="{@href}" media-type="application/oebps-package+xml"/>
                         </xsl:template>
                     </xsl:stylesheet>
                 </p:inline>
@@ -148,6 +141,7 @@
             </p:input>
         </p:xslt>
     </p:group>
+    <p:sink/>
 
     <p:group name="create-odf-manifest"
         xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">
