@@ -406,6 +406,7 @@
     </p:group>
     <p:sink/>
 
+    <p:documentation>If the navigation document contains landmarks and compatibility-mode is enabled; generate the guide element based on the landmarks.</p:documentation>
     <p:group name="guide">
         <p:output port="result" sequence="true"/>
         <p:identity>
@@ -441,7 +442,7 @@
                         <p:empty/>
                     </p:input>
                     <p:input port="stylesheet">
-                        <p:document href="create-package-doc.nav-to-guide.xsl"/>
+                        <p:document href="http://www.daisy.org/pipeline/modules/epub3-nav-utils/nav-to-guide.xsl"/>
                     </p:input>
                 </p:xslt>
             </p:otherwise>

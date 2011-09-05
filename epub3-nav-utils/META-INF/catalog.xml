@@ -6,4 +6,6 @@
         uri="../epub3-nav-utils/xproc/epub3-nav-library.xpl"/>
    <uri name="http://www.daisy.org/pipeline/modules/epub3-nav-utils/nav-to-ncx.xsl"
         uri="../epub3-nav-utils/xslt/nav-to-ncx.xsl"/>
+   <uri name="http://www.daisy.org/pipeline/modules/epub3-nav-utils/nav-to-guide.xsl"
+        uri="../epub3-nav-utils/xslt/nav-to-guide.xsl"/>
 </catalog>

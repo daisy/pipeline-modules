@@ -9,5 +9,9 @@
 			<import-uri>http://www.daisy.org/pipeline/modules/epub3-nav-utils/nav-to-ncx.xsl</import-uri>
 			<file>xslt/nav-to-ncx.xsl</file>
 		</xslt>
+		<xslt>
+			<import-uri>http://www.daisy.org/pipeline/modules/epub3-nav-utils/nav-to-guide.xsl</import-uri>
+			<file>xslt/nav-to-guide.xsl</file>
+		</xslt>
 	</module>
 </package>
