@@ -22,7 +22,7 @@
     <p:option name="nav-uri" select="''"/>
     <p:option name="cover-image" required="false" select="''"/>
     <p:option name="compatibility-mode" required="false" select="'true'"/>
-    <p:option name="detect-scripting" required="false" select="'true'"/>
+    <p:option name="detect-properties" required="false" select="'true'"/>
     <p:option name="result-uri" required="true"/>
     <p:output port="result" primary="true" sequence="true"/>
     <p:output port="dbg" sequence="true">
@@ -236,6 +236,7 @@
                 <p:pipe port="content-docs" step="main"/>
             </p:iteration-source>
             <p:variable name="doc-base" select="/*/@xml:base"/>
+            <p:identity name="manifest.content-docs.current"/>
             <px:fileset-create>
                 <p:with-option name="base" select="$result-uri"/>
             </px:fileset-create>
@@ -243,6 +244,58 @@
                 <p:with-option name="href" select="$doc-base"/>
                 <p:with-option name="media-type" select="'application/xhtml+xml'"/>
             </px:fileset-add-entry>
+            <p:choose>
+                <p:when test="$detect-properties='true'">
+                    <p:add-attribute attribute-name="mathml" match="/*/*">
+                        <p:with-option name="attribute-value" select="distinct-values(//namespace::*)='http://www.w3.org/1998/Math/MathML'">
+                            <p:pipe port="result" step="manifest.content-docs.current"/>
+                        </p:with-option>
+                    </p:add-attribute>
+                    <p:add-attribute attribute-name="svg" match="/*/*">
+                        <p:with-option name="attribute-value"
+                            select="(//html:embed|//html:iframe)/@src/ends-with(.,'.svg') or (//html:embed|//html:object)/@type='image/svg+xml' or distinct-values(//namespace::*)='http://www.w3.org/2000/svg'">
+                            <p:pipe port="result" step="manifest.content-docs.current"/>
+                        </p:with-option>
+                    </p:add-attribute>
+                    <p:add-attribute attribute-name="scripted" match="/*/*">
+                        <p:with-option name="attribute-value"
+                            select="
+                                              count(//*/@href[starts-with(.,'javascript:')]) &gt; 0 or
+                                              //html:script/@type=('','text/javascript','text/ecmascript','text/javascript1.0','text/javascript1.1',
+                                                                  'text/javascript1.2','text/javascript1.3','text/javascript1.4','text/javascript1.5',
+                                                                  'text/jscript','text/livescript','text/x-javascript','text/x-ecmascript',
+                                                                  'application/x-javascript','application/x-ecmascript','application/javascript',
+                                                                  'application/ecmascript') or
+                                              //*/@*/name()=('onabort','onafterprint','onbeforeprint','onbeforeunload','onblur','oncanplay','oncanplaythrough','onchange','onclick','oncontextmenu',
+                                                              'oncuechange','ondblclick','ondrag','ondragend','ondragenter','ondragleave','ondragover','ondragstart','ondrop','ondurationchange',
+                                                              'onemptied','onended','onerror','onfocus','onhashchange','oninput','oninvalid','onkeydown','onkeypress','onkeyup','onload','onloadeddata',
+                                                              'onloadedmetadata','onloadstart','onmessage','onmousedown','onmousemove','onmouseout','onmouseover','onmouseup','onmousewheel','onoffline',
+                                                              'ononline','onpagehide','onpageshow','onpause','onplay','onplaying','onpopstate','onprogress','onratechange','onreset','onresize','onscroll',
+                                                              'onseeked','onseeking','onselect','onshow','onstalled','onstorage','onsubmit','onsuspend','ontimeupdate','onunload','onvolumechange','onwaiting')
+                                            ">
+                            <p:pipe port="result" step="manifest.content-docs.current"/>
+                        </p:with-option>
+                    </p:add-attribute>
+                    <p:add-attribute attribute-name="switch" match="/*/*">
+                        <p:with-option name="attribute-value" select="count(//epub:switch) &gt; 0">
+                            <p:pipe port="result" step="manifest.content-docs.current"/>
+                        </p:with-option>
+                    </p:add-attribute>
+                    <p:add-attribute attribute-name="remote-resources" match="/*/*">
+                        <p:with-option name="attribute-value" select="count((//*/@src|//*/@href)[contains(tokenize(.,'/')[1],':')][1]) &gt; 0">
+                            <p:pipe port="result" step="manifest.content-docs.current"/>
+                        </p:with-option>
+                    </p:add-attribute>
+                    <p:add-attribute attribute-name="nav" match="/*/*">
+                        <p:with-option name="attribute-value" select="/*/@xml:base=$doc-base">
+                            <p:pipe port="result" step="nav-doc"/>
+                        </p:with-option>
+                    </p:add-attribute>
+                </p:when>
+                <p:otherwise>
+                    <p:identity/>
+                </p:otherwise>
+            </p:choose>
         </p:for-each>
         <p:sink/>
 
@@ -261,15 +314,14 @@
             </px:fileset-create>
             <px:fileset-add-entry>
                 <p:with-option name="href" select="$doc-base"/>
-                <p:with-option name="media-type" select="concat('[ ',string-join(/*/@*/concat(name(),'=',.),' '),' ]')"/>
-                <!--<p:with-option name="media-type" select="'application/smil+xml'"/>-->
+                <p:with-option name="media-type" select="'application/smil+xml'"/>
             </px:fileset-add-entry>
         </p:for-each>
         <p:sink/>
 
         <px:fileset-join>
             <p:input port="source">
-                <!-- TODO: test if the resulting URIs turns out as relative to $result-uri -->
+                <!-- TODO: test to make sure that the resulting URIs turns out as relative to $result-uri -->
                 <p:pipe port="result" step="manifest.content-docs"/>
                 <p:pipe port="spine-filesets" step="main"/>
                 <p:pipe port="result" step="manifest.mediaoverlays"/>
@@ -277,14 +329,21 @@
                 <p:pipe port="result" step="manifest.bindings"/>
             </p:input>
         </px:fileset-join>
-        <p:xslt name="manifest.nav-and-ids">
-            <p:with-param name="nav-doc-uri" select="/*/@xml:base">
-                <p:pipe port="result" step="nav-doc"/>
-            </p:with-param>
-            <p:input port="stylesheet">
-                <p:document href="create-package-doc.manifest-ids.xsl"/>
-            </p:input>
-        </p:xslt>
+        <p:group name="manifest.ids">
+            <p:output port="result"/>
+            <p:variable name="manifest-uri" select="/*/@xml:base"/>
+            <p:viewport match="d:file">
+                <p:add-attribute match="/*" attribute-name="href">
+                    <p:with-option name="attribute-value" select="p:resolve-uri(/*/@href,$manifest-uri)"/>
+                </p:add-attribute>
+                <p:add-attribute match="/*" attribute-name="id">
+                    <p:with-option name="attribute-value" select="concat('item_',p:iteration-position())"/>
+                </p:add-attribute>
+                <p:add-attribute match="/*" attribute-name="cover-image">
+                    <p:with-option name="attribute-value" select="p:resolve-uri(/*/@href,$manifest-uri)=p:resolve-uri($cover-image,$result-uri)"/>
+                </p:add-attribute>
+            </p:viewport>
+        </p:group>
         <p:sink/>
 
         <p:wrap-sequence wrapper="fallback">
@@ -302,7 +361,7 @@
         </p:xslt>
         <p:insert match="/*" position="first-child">
             <p:input port="insertion">
-                <p:pipe port="result" step="manifest.nav-and-ids"/>
+                <p:pipe port="result" step="manifest.ids"/>
             </p:input>
         </p:insert>
         <p:xslt name="manifest.fallbacks">
@@ -317,7 +376,7 @@
 
         <px:fileset-join>
             <p:input port="source">
-                <p:pipe port="result" step="manifest.nav-and-ids"/>
+                <p:pipe port="result" step="manifest.ids"/>
             </p:input>
         </px:fileset-join>
         <p:group name="manifest.out">

@@ -20,7 +20,7 @@
                     </text>
                 </docTitle>
             </xsl:if>
-            <!-- TODO: docAuthor from metadata? -->
+            <!-- NOTE: docAuthor should be added afterwards, since it usually isn't available from the Navigation Document, and there can be mulitple authors. -->
             <xsl:apply-templates select="html:body"/>
         </ncx>
     </xsl:template>

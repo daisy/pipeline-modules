@@ -12,13 +12,23 @@
         <opf:manifest>
             <xsl:for-each select="*">
                 <opf:item>
-                    <xsl:copy-of select="@*"/>
+                    <xsl:copy-of select="@href|@media-type|@id"/>
                     <xsl:variable name="item-uri-head"
                         select="if (starts-with(resolve-uri(@href,/*/@xml:base),'file:/')) then 'file:' else replace(replace(resolve-uri(@href,/*/@xml:base),'^([^/]+/+[^/]+)/.*$','$1'),'/+','/')"/>
                     <xsl:variable name="item-uri-tail"
                         select="replace(if (starts-with(resolve-uri(@href,/*/@xml:base),'file:/')) then replace(resolve-uri(@href,/*/@xml:base),'^file:/+','') else replace(resolve-uri(@href,/*/@xml:base),'^[^/]+/+[^/]+/+',''),'/+','/')"/>
                     <xsl:if test="$item-uri-head=$result-uri-head">
                         <xsl:attribute name="href" select="f:relative-to(tokenize(concat($result-uri-head,'/',$result-uri-tail),'/+'),tokenize(concat($item-uri-head,'/',$item-uri-tail),'/+'),'')"/>
+                    </xsl:if>
+                    <xsl:variable name="cover-image" select="if (@cover-image='true') then 'cover-image' else ''"/>
+                    <xsl:variable name="mathml" select="if (@mathml='true') then concat($cover-image,' mathml') else $cover-image"/>
+                    <xsl:variable name="nav" select="if (@nav='true') then concat($mathml,' nav') else $mathml"/>
+                    <xsl:variable name="remote-resources" select="if (@remote-resources='true') then concat($nav,' remote-resources') else $nav"/>
+                    <xsl:variable name="scripted" select="if (@scripted='true') then concat($remote-resources,' scripted') else $remote-resources"/>
+                    <xsl:variable name="svg" select="if (@svg='true') then concat($scripted,' svg') else $scripted"/>
+                    <xsl:variable name="switch" select="if (@switch='true') then concat($svg,' switch') else $svg"/>
+                    <xsl:if test="string-length($switch) &gt; 0">
+                        <xsl:attribute name="properties" select="normalize-space($switch)"/>
                     </xsl:if>
                 </opf:item>
             </xsl:for-each>
