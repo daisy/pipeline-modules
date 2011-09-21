@@ -91,6 +91,14 @@
                 <p:add-attribute match="/opf:metadata/dc:identifier" attribute-name="id" attribute-value="pub-id"/>
             </p:otherwise>
         </p:choose>
+        <p:xslt>
+            <p:input port="parameters">
+                <p:empty/>
+            </p:input>
+            <p:input port="stylesheet">
+                <p:document href="create-package-doc.generate-dcterms-modified.xsl"/>
+            </p:input>
+        </p:xslt>
         <p:delete match="opf:meta[@property='media:duration']"/>
         <p:identity name="metadata.without-duration"/>
         <p:sink/>
