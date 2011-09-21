@@ -14,8 +14,7 @@
             <!--TODO add stylesheet-->
             <!--TODO add language attribute-->
             <p:inline exclude-inline-prefixes="#all">
-                <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops"
-                    profile="http://www.idpf.org/epub/30/profile/content/">
+                <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
                     <head>
                         <title>Navigation Document</title>
                     </head>
