@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:mo="http://www.w3.org/ns/SMIL" xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
-    exclude-result-prefixes="#all" version="2.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:mo="http://www.w3.org/ns/SMIL" xmlns:pf="http://www.daisy.org/ns/pipeline/functions" exclude-result-prefixes="#all" version="2.0">
     <xsl:output encoding="UTF-8" method="xml" indent="yes"/>
     <xsl:include href="clock-functions.xsl"/>
     <xsl:template match="@*|node()">
@@ -10,8 +8,7 @@
         </xsl:copy>
     </xsl:template>
     <xsl:template match="/*">
-        <smil xmlns="http://www.w3.org/ns/SMIL"
-            profile="http://www.idpf.org/epub/30/profile/content/" version="3.0">
+        <smil xmlns="http://www.w3.org/ns/SMIL" version="3.0">
             <xsl:apply-templates/>
         </smil>
     </xsl:template>
@@ -25,8 +22,7 @@
             <xsl:apply-templates select="*[self::seq or self::par]"/>
         </body>
     </xsl:template>
-    <xsl:template
-        match="seq[not(parent::body) and (not(descendant::text) or not(descendant::audio))]"/>
+    <xsl:template match="seq[not(parent::body) and (not(descendant::text) or not(descendant::audio))]"/>
     <xsl:template match="seq">
         <seq xmlns="http://www.w3.org/ns/SMIL">
             <xsl:apply-templates select="@id"/>
@@ -40,10 +36,8 @@
             <xsl:variable name="audio" select="descendant::audio"/>
             <audio xmlns="http://www.w3.org/ns/SMIL" src="{$audio[1]/@src}">
                 <xsl:apply-templates select="$audio[1]/@id"/>
-                <xsl:variable name="clip-begin"
-                    select="pf:mediaoverlay-clock-value-to-seconds($audio[1]/@clip-begin)"/>
-                <xsl:variable name="clip-end"
-                    select="pf:mediaoverlay-clock-value-to-seconds($audio[@src=$audio[1]/@src][last()]/@clip-end)"/>
+                <xsl:variable name="clip-begin" select="pf:mediaoverlay-clock-value-to-seconds($audio[1]/@clip-begin)"/>
+                <xsl:variable name="clip-end" select="pf:mediaoverlay-clock-value-to-seconds($audio[@src=$audio[1]/@src][last()]/@clip-end)"/>
                 <xsl:attribute name="clipBegin"
                     select="if ($clip-begin &lt; 60) then pf:mediaoverlay-seconds-to-timecount($clip-begin)
                                 else if ($clip-begin &lt; 3600) then pf:mediaoverlay-seconds-to-partial-clock-value($clip-begin)

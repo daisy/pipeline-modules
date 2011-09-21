@@ -29,8 +29,6 @@
             <p:identity/>
         </p:otherwise>
     </p:choose>
-    <p:add-attribute attribute-name="profile"
-        attribute-value="http://www.idpf.org/epub/30/profile/content/" match="/*"/>
     <p:add-attribute attribute-name="version" attribute-value="3.0" match="/*"/>
     <p:unwrap match="/*/*/*"/>
     <p:xslt>

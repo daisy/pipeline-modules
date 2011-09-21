@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" xmlns:c="http://www.w3.org/ns/xproc-step"
-    xmlns:err="http://www.w3.org/ns/xproc-error" xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:err="http://www.w3.org/ns/xproc-error" xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
     type="px:mediaoverlay-upgrade-smil" version="1.0">
 
     <p:output port="result"/>
     <p:input port="source"/>
 
     <p:choose>
-        <p:when
-            test="local-name(/*)='smil' and namespace-uri(/*)='http://www.w3.org/ns/SMIL' and /*/@profile='http://www.idpf.org/epub/30/profile/content/'">
+        <p:when test="local-name(/*)='smil' and namespace-uri(/*)='http://www.w3.org/ns/SMIL' and /*/@version='3.0'">
             <!-- EPUB3 Media Overlay; pass right through. -->
             <p:identity/>
         </p:when>

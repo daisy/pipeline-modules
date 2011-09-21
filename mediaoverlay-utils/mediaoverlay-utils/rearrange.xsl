@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:di="http://www.daisy.org/ns/pipeline/tmp" xmlns:epub="http://www.idpf.org/2007/ops"
-    xmlns:mo="http://www.w3.org/ns/SMIL" exclude-result-prefixes="#all" version="2.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:di="http://www.daisy.org/ns/pipeline/tmp" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:mo="http://www.w3.org/ns/SMIL"
+    exclude-result-prefixes="#all" version="2.0">
 
     <xsl:output indent="yes"/>
 
@@ -12,8 +11,7 @@
     </xsl:template>
 
     <xsl:template match="/*">
-        <smil xmlns="http://www.w3.org/ns/SMIL"
-            profile="http://www.idpf.org/epub/30/profile/content/" version="3.0">
+        <smil xmlns="http://www.w3.org/ns/SMIL" version="3.0">
             <body xmlns="http://www.w3.org/ns/SMIL">
                 <xsl:apply-templates select="*[1]"/>
             </body>
@@ -25,22 +23,18 @@
         <xsl:variable name="id" select="@id"/>
         <xsl:variable name="src" select="@xml:base"/>
         <xsl:variable name="type" select="@epub:type"/>
-        
+
         <xsl:variable name="smil-element" select="(/*/*[2]/descendant::*[@fragment=$id and @src=$src])[1]"/>
 
         <xsl:choose>
-            <xsl:when
-                test="$id and $src and $smil-element/@id">
+            <xsl:when test="$id and $src and $smil-element/@id">
                 <par xmlns="http://www.w3.org/ns/SMIL">
-                    <text xmlns="http://www.w3.org/ns/SMIL" src="{$src}#{$id}" id="{$smil-element/@id}">
-                        <xsl:if test="$type">
-                            <xsl:attribute name="epub:type" select="$type"/>
-                        </xsl:if>
-                    </text>
-                    <xsl:for-each
-                        select="($smil-element/parent::*/child::mo:audio)[1]">
-                        <audio xmlns="http://www.w3.org/ns/SMIL" clipBegin="{@clipBegin}"
-                            clipEnd="{@clipEnd}" src="{resolve-uri(@src,@xml:base)}"/>
+                    <xsl:if test="$type">
+                        <xsl:attribute name="epub:type" select="$type"/>
+                    </xsl:if>
+                    <text xmlns="http://www.w3.org/ns/SMIL" src="{$src}#{$id}" id="{$smil-element/@id}"/>
+                    <xsl:for-each select="($smil-element/parent::*/child::mo:audio)[1]">
+                        <audio xmlns="http://www.w3.org/ns/SMIL" clipBegin="{@clipBegin}" clipEnd="{@clipEnd}" src="{resolve-uri(@src,@xml:base)}"/>
                     </xsl:for-each>
                 </par>
             </xsl:when>

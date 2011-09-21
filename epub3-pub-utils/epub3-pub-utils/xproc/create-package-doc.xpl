@@ -286,16 +286,16 @@
                             <p:pipe port="result" step="manifest.content-docs.current"/>
                         </p:with-option>
                     </p:add-attribute>
-                    <p:add-attribute attribute-name="nav" match="/*/*">
-                        <p:with-option name="attribute-value" select="/*/@xml:base=$doc-base">
-                            <p:pipe port="result" step="nav-doc"/>
-                        </p:with-option>
-                    </p:add-attribute>
                 </p:when>
                 <p:otherwise>
                     <p:identity/>
                 </p:otherwise>
             </p:choose>
+            <p:add-attribute attribute-name="nav" match="/*/*">
+                <p:with-option name="attribute-value" select="/*/@xml:base=$doc-base">
+                    <p:pipe port="result" step="nav-doc"/>
+                </p:with-option>
+            </p:add-attribute>
         </p:for-each>
         <p:sink/>
 
