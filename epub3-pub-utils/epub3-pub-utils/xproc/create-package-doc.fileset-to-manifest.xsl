@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0" xmlns:opf="http://www.idpf.org/2007/opf" xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0" xmlns="http://www.idpf.org/2007/opf" xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions">
     <xsl:output indent="yes"/>
     <xsl:param name="result-uri"/>
 
@@ -9,9 +9,9 @@
         select="replace(replace(if (starts-with($result-uri,'file:/')) then replace($result-uri,'^file:/+','') else replace($result-uri,'^[^/]+/+[^/]+/+',''),'[^/]+$',''),'/+','/')"/>
 
     <xsl:template match="/*">
-        <opf:manifest>
+        <manifest>
             <xsl:for-each select="*">
-                <opf:item>
+                <item>
                     <xsl:copy-of select="@href|@media-type|@id"/>
                     <xsl:variable name="item-uri-head"
                         select="if (starts-with(resolve-uri(@href,/*/@xml:base),'file:/')) then 'file:' else replace(replace(resolve-uri(@href,/*/@xml:base),'^([^/]+/+[^/]+)/.*$','$1'),'/+','/')"/>
@@ -30,9 +30,9 @@
                     <xsl:if test="string-length($switch) &gt; 0">
                         <xsl:attribute name="properties" select="normalize-space($switch)"/>
                     </xsl:if>
-                </opf:item>
+                </item>
             </xsl:for-each>
-        </opf:manifest>
+        </manifest>
     </xsl:template>
     <xsl:function name="f:relative-to">
         <xsl:param name="from"/>
