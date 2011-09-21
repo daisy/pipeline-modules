@@ -4,4 +4,6 @@
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
    <uri name="http://www.daisy.org/pipeline/modules/file-utils/xproc/file-library.xpl"
         uri="../file-utils/xproc/file-library.xpl"/>
+   <uri name="http://www.daisy.org/pipeline/modules/file-utils/xslt/relative-uri.xsl"
+        uri="../file-utils/xslt/relative-uri.xsl"/>
 </catalog>

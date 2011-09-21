@@ -3,7 +3,8 @@
 
   <p:input port="source" sequence="true"/>
   <p:output port="result" primary="true"/>
-
+  
+  <!-- TODO: make use of relative-uri.xsl to reduce code duplication -->
   <p:for-each>
     <p:xslt>
       <p:input port="parameters">

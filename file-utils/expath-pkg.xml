@@ -5,5 +5,9 @@
 			<import-uri>http://www.daisy.org/pipeline/modules/file-utils/xproc/file-library.xpl</import-uri>
 			<file>xproc/file-library.xpl</file>
 		</xproc>
+		<xslt>
+			<import-uri>http://www.daisy.org/pipeline/modules/file-utils/xslt/relative-uri.xsl</import-uri>
+			<file>xslt/relative-uri.xsl</file>
+		</xslt>
 	</module>
 </package>
