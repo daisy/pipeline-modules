@@ -4,7 +4,7 @@
     xmlns:epub="http://www.idpf.org/2007/ops" xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions" version="1.0">
 
     <!-- Note: all URIs in options and xml:base attributes must be absolute. -->
-
+    <p:log port="result" href="file:/tmp/xproc/opf.xml"/>
     <p:input port="spine-filesets" sequence="true" primary="true"/>
     <p:input port="publication-resources">
         <p:inline>
@@ -91,6 +91,14 @@
                 <p:add-attribute match="/opf:metadata/dc:identifier" attribute-name="id" attribute-value="pub-id"/>
             </p:otherwise>
         </p:choose>
+        <p:xslt>
+            <p:input port="parameters">
+                <p:empty/>
+            </p:input>
+            <p:input port="stylesheet">
+                <p:document href="create-package-doc.generate-dcterms-modified.xsl"/>
+            </p:input>
+        </p:xslt>
         <p:delete match="opf:meta[@property='media:duration']"/>
         <p:identity name="metadata.without-duration"/>
         <p:sink/>
@@ -235,7 +243,7 @@
             <p:iteration-source>
                 <p:pipe port="content-docs" step="main"/>
             </p:iteration-source>
-            <p:variable name="doc-base" select="/*/@xml:base"/>
+            <p:variable name="doc-base" select="p:base-uri(/*)"/>
             <p:identity name="manifest.content-docs.current"/>
             <px:fileset-create>
                 <p:with-option name="base" select="$result-uri"/>
@@ -557,7 +565,7 @@
     <p:insert match="/*" position="last-child">
         <p:input port="source">
             <p:inline exclude-inline-prefixes="#all">
-                <opf:package version="3.0"/>
+                <package xmlns="http://www.idpf.org/2007/opf" version="3.0"/>
             </p:inline>
         </p:input>
         <p:input port="insertion">
