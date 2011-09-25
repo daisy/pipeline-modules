@@ -4,7 +4,6 @@
     xmlns:epub="http://www.idpf.org/2007/ops" xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions" version="1.0">
 
     <!-- Note: all URIs in options and xml:base attributes must be absolute. -->
-    <p:log port="result" href="file:/tmp/xproc/opf.xml"/>
     <p:input port="spine-filesets" sequence="true" primary="true"/>
     <p:input port="publication-resources">
         <p:inline>
@@ -73,6 +72,21 @@
                 <p:pipe port="metadata" step="main"/>
             </p:input>
         </p:identity>
+        <p:choose>
+            <p:when test="empty(/opf:metadata/dc:identifier)">
+                <p:insert match="opf:metadata" position="first-child">
+                    <p:input port="insertion">
+                        <p:inline>
+                            <dc:identifier id="pub-id">@@</dc:identifier>
+                        </p:inline>
+                        <p:inline>
+                            <meta xmlns="http://www.idpf.org/2007/opf" refines="#pub-id" property="identifier-type" scheme="xsd:string">uuid</meta>
+                        </p:inline>
+                    </p:input>
+                </p:insert>
+                <p:uuid match="dc:identifier/text()"/>
+            </p:when>
+        </p:choose>
         <p:choose>
             <p:when test="/opf:metadata/dc:identifier/@id">
                 <p:identity/>
