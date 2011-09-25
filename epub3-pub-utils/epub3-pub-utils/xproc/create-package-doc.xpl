@@ -86,6 +86,9 @@
                 </p:insert>
                 <p:uuid match="dc:identifier/text()"/>
             </p:when>
+            <p:otherwise>
+                <p:identity/>
+            </p:otherwise>
         </p:choose>
         <p:choose>
             <p:when test="/opf:metadata/dc:identifier/@id">
