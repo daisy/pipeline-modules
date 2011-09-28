@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step version="1.0" name="merge-dtbook" type="px:merge-dtbook"
-    xmlns:p="http://www.w3.org/ns/xproc"
-    xmlns:c="http://www.w3.org/ns/xproc-step" 
+    xmlns:p="http://www.w3.org/ns/xproc" xmlns:c="http://www.w3.org/ns/xproc-step"
     xmlns:cx="http://xmlcalabash.com/ns/extensions"
     xmlns:cxo="http://xmlcalabash.com/ns/extensions/osutils"
     xmlns:dtb="http://www.daisy.org/z3986/2005/dtbook/"
-    xmlns:px="http://www.daisy.org/ns/pipeline/xproc" 
-    xmlns:xd="http://www.daisy.org/ns/pipeline/doc"
-    exclude-inline-prefixes="cx">
-    
+    xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+    xmlns:xd="http://www.daisy.org/ns/pipeline/doc" exclude-inline-prefixes="cx">
+
     <p:documentation>
         <xd:short>merge-dtbook</xd:short>
         <xd:detail>Merge 2 or more DTBook documents.</xd:detail>
@@ -20,10 +18,6 @@
         <xd:maintainer>Marisa DeMeglio</xd:maintainer>
         <xd:input port="source">Sequence of DTBook documents. Versions supported: 2005-3. </xd:input>
         <xd:output port="result">Merged DTBook document.</xd:output>
-        
-    
-        
-        
     </p:documentation>
     <!-- 
         TODO: 
@@ -31,25 +25,25 @@
          * deal with xml:lang (either copy once and put in dtbook/@xml:lang or, if different languages are used, copy the @xml:lang attr into the respective sections.
     -->
 
-    <p:input port="source" primary="true" sequence="true" px:name="in" px:media-type="application/x-dtbook+xml">
-    	<p:documentation>
-        	<xd:short>in</xd:short>
-        	<xd:detail>Sequence of DTBook files</xd:detail>
+    <p:input port="source" primary="true" sequence="true" px:name="in"
+        px:media-type="application/x-dtbook+xml">
+        <p:documentation>
+            <xd:short>in</xd:short>
+            <xd:detail>Sequence of DTBook files</xd:detail>
         </p:documentation>
     </p:input>
     <p:input port="parameters" kind="parameter"/>
     <p:output port="result" primary="true">
-    	<p:documentation>
-        	<xd:short>out</xd:short>
-        	<xd:detail>The result</xd:detail>
+        <p:documentation>
+            <xd:short>out</xd:short>
+            <xd:detail>The result</xd:detail>
         </p:documentation>
-        <p:pipe port="result" step="validate-zedai"/>
     </p:output>
-    
+
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
-    
+
     <cx:message message="Merging DTBook documents"/>
-    
+
     <p:for-each name="validate-input">
         <p:output port="result">
             <p:pipe step="ident" port="result"/>
@@ -129,7 +123,7 @@
     </p:wrap-sequence>
 
     <p:wrap-sequence wrapper="dtbook" wrapper-namespace="http://www.daisy.org/z3986/2005/dtbook/">
-        
+
         <p:input port="source">
             <p:pipe step="wrap-head" port="result"/>
             <p:pipe step="wrap-frontmatter" port="result"/>
@@ -139,7 +133,7 @@
     </p:wrap-sequence>
 
     <p:add-attribute match="/dtb:dtbook" attribute-name="version" attribute-value="2005-3"/>
-    
+
     <p:xslt>
         <p:input port="stylesheet">
             <p:document href="remove-duplicates.xsl"/>
@@ -151,5 +145,5 @@
             <p:document href="./schema/dtbook-2005-3.rng"/>
         </p:input>
     </p:validate-with-relax-ng>
-    
+
 </p:declare-step>
