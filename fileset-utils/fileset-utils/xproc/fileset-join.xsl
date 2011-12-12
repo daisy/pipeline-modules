@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet exclude-result-prefixes="#all" version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions"
+<xsl:stylesheet exclude-result-prefixes="#all" version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions" xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
     xmlns:d="http://www.daisy.org/ns/pipeline/data">
-    <xsl:variable name="base" select="f:longest-common-uri(distinct-values(//@xml:base/replace(.,'^(.*/)[^/]*$','$1')))"/>
+
+    <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/xslt/uri-functions.xsl"/>
+
+    <xsl:variable name="base" select="f:longest-common-uri(distinct-values(/*/*/@xml:base/replace(.,'^(.*/)[^/]*$','$1')))"/>
     <xsl:template match="@*|node()">
         <xsl:copy>
             <xsl:apply-templates select="@*|node()"/>
@@ -20,7 +24,7 @@
     <xsl:template match="d:file">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
-            <xsl:attribute name="href" select="f:relative-to(resolve-uri(@href,parent::*/@xml:base),$base)"/>
+            <xsl:attribute name="href" select="pf:file-resolve-relative-uri(if (parent::*/@xml:base) then resolve-uri(@href,parent::*/@xml:base) else @href,$base)"/>
             <xsl:apply-templates select="node()"/>
         </xsl:copy>
     </xsl:template>
@@ -31,12 +35,16 @@
                 <xsl:value-of select="replace($uris[1],'^(.+/)[^/]*$','$1')"/>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:variable name="uri-a" select="if (count($uris) &gt; 2) then f:longest-common-uri(subsequence($uris,1,round(count($uris) div 2))) else replace($uris[1],'^(.+/)[^/]*$','$1')"/>
-                <xsl:variable name="uri-b" select="if (count($uris) &gt; 3) then f:longest-common-uri(subsequence($uris,(round(count($uris)) div 2)+1)) else replace($uris[last()],'^(.+/)[^/]*$','$1')"/>
+                <xsl:variable name="uri-a"
+                    select="if (count($uris) &gt; 2) then f:longest-common-uri(subsequence($uris,1,round(count($uris) div 2))) else replace($uris[1],'^(.+/)[^/]*$','$1')"/>
+                <xsl:variable name="uri-b"
+                    select="if (count($uris) &gt; 3) then f:longest-common-uri(subsequence($uris,(round(count($uris)) div 2)+1)) else replace($uris[last()],'^(.+/)[^/]*$','$1')"/>
                 <xsl:variable name="a" select="replace($uri-a,'/+','/')"/>
                 <xsl:variable name="b" select="replace($uri-b,'/+','/')"/>
-                <xsl:variable name="a-start" select="if (starts-with($uri-a,'file:')) then replace($uri-a,'^([^/]+/+)[^/].*$','$1') else replace($uri-a,'^([^/]+/+[^/]+/).*$','$1')"/>
-                <xsl:variable name="b-start" select="if (starts-with($uri-b,'file:')) then replace($uri-b,'^([^/]+/+)[^/].*$','$1') else replace($uri-b,'^([^/]+/+[^/]+/).*$','$1')"/>
+                <xsl:variable name="a-start"
+                    select="if (starts-with($uri-a,'file:')) then replace($uri-a,'^([^/]+/+)[^/].*$','$1') else replace($uri-a,'^([^/]+/+[^/]+/).*$','$1')"/>
+                <xsl:variable name="b-start"
+                    select="if (starts-with($uri-b,'file:')) then replace($uri-b,'^([^/]+/+)[^/].*$','$1') else replace($uri-b,'^([^/]+/+[^/]+/).*$','$1')"/>
                 <xsl:variable name="a-canonicalStart" select="replace($a-start,'/+','/')"/>
                 <xsl:variable name="b-canonicalStart" select="replace($b-start,'/+','/')"/>
                 <xsl:variable name="a-trail" select="substring-after(replace($a,'^(.*/)[^/]*$','$1'),$a-canonicalStart)"/>
@@ -79,21 +87,6 @@
             </xsl:when>
             <xsl:otherwise>
                 <xsl:value-of select="concat($a[1],'/')"/>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:function>
-    <xsl:function name="f:relative-to">
-        <xsl:param name="uri"/>
-        <xsl:param name="base"/>
-        <xsl:variable name="basedir" select="if (starts-with($base,'file:')) then replace(replace($base,'/+','/'),'^(.+/)[^/]*$','$1') else replace(replace($base,'/+','/'),'^([^/]+/[^/]+/)[^/]*$','$1')"/>
-        <xsl:variable name="canonicalUri" select="replace($uri,'/+','/')"/>
-        <xsl:variable name="relative" select="substring($canonicalUri,string-length($basedir)+1)"/>
-        <xsl:choose>
-            <xsl:when test="starts-with($canonicalUri,$basedir)">
-                <xsl:value-of select="$relative"/>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="$uri"/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:function>

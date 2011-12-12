@@ -72,4 +72,28 @@
         </px:compare>
     </p:group>
     
+    <p:group name="longest-common-base">
+        <px:fileset-join>
+            <p:input port="source">
+                <p:inline>
+                    <d:fileset xml:base="file:/home/user/">
+                        <d:file href="common/uncommon-1/doc1.html"/>
+                        <d:file href="common/uncommon-2/doc2.html"/>
+                    </d:fileset>
+                </p:inline>
+            </p:input>
+        </px:fileset-join>
+        <px:compare>
+            <p:log port="result"/>
+            <p:input port="alternate">
+                <p:inline>
+                    <d:fileset xml:base="file:/home/user/common/">
+                        <d:file href="uncommon-1/doc1.html"/>
+                        <d:file href="uncommon-2/doc2.html"/>
+                    </d:fileset>
+                </p:inline>
+            </p:input>
+        </px:compare>
+    </p:group>
+    
 </p:declare-step>
