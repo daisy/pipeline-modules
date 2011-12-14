@@ -24,10 +24,6 @@
     <p:option name="detect-properties" required="false" select="'true'"/>
     <p:option name="result-uri" required="true"/>
     <p:output port="result" primary="true" sequence="true"/>
-    <p:output port="dbg" sequence="true">
-        <p:pipe port="dbg" step="manifest"/>
-        <p:pipe port="mediaoverlays" step="main"/>
-    </p:output>
 
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/xproc/fileset-library.xpl"/>
 
@@ -211,9 +207,6 @@
         <p:output port="manifest">
             <p:pipe port="manifest" step="manifest.out"/>
         </p:output>
-        <p:output port="dbg" sequence="true">
-            <p:pipe port="dbg" step="manifest.mediaoverlays"/>
-        </p:output>
 
         <p:group name="manifest.bindings">
             <p:output port="result" sequence="true"/>
@@ -326,14 +319,10 @@
 
         <p:for-each name="manifest.mediaoverlays">
             <p:output port="result" sequence="true" primary="true"/>
-            <p:output port="dbg" sequence="true">
-                <p:pipe port="result" step="dbg-2"/>
-            </p:output>
             <p:iteration-source>
                 <p:pipe port="mediaoverlays" step="main"/>
             </p:iteration-source>
             <p:variable name="doc-base" select="/*/@xml:base"/>
-            <p:identity name="dbg-2"/>
             <px:fileset-create>
                 <p:with-option name="base" select="$result-uri"/>
             </px:fileset-create>
