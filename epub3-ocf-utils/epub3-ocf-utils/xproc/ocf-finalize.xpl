@@ -120,21 +120,7 @@
                 <p:pipe port="result" step="opf-files"/>
             </p:input>
             <p:input port="stylesheet">
-                <p:inline>
-                    <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns="urn:oasis:names:tc:opendocument:xmlns:container"
-                        exclude-result-prefixes="#all" version="2.0">
-                        <xsl:template match="wrapper">
-                            <container version="1.0">
-                                <rootfiles>
-                                    <xsl:apply-templates/>
-                                </rootfiles>
-                            </container>
-                        </xsl:template>
-                        <xsl:template match="d:file">
-                            <rootfile full-path="{@href}" media-type="application/oebps-package+xml"/>
-                        </xsl:template>
-                    </xsl:stylesheet>
-                </p:inline>
+                <p:document href="ocf-finalize.create-container-descriptor.xsl"/>
             </p:input>
             <p:input port="parameters">
                 <p:empty/>
