@@ -5,20 +5,21 @@
     <xsl:function name="pf:file-resolve-relative-uri" as="xs:string">
         <xsl:param name="to" as="xs:string"/>
         <xsl:param name="from" as="xs:string"/>
-        <xsl:variable name="to-filesystem" select="if (starts-with($to,'file:')) then 'file:/' else replace(replace($to,'/+','/'),'^([^:]+:/[^/]+/).*$','$1')"/>
-        <xsl:variable name="from-filesystem"
-            select="if (starts-with($from,'file:')) then 'file:/' else replace(replace($from,'/+','/'),'^([^:]+:/[^/]+/).*$','$1')"/>
+        <xsl:variable name="to-uri" select="pf:file-uri-ify($to)"/>
+        <xsl:variable name="from-uri" select="pf:file-uri-ify($from)"/>
+        <xsl:variable name="to-filesystem" select="if (starts-with($to-uri,'file:')) then 'file:/' else replace($to-uri,'^([^:]+:/[^/]+/).*$','$1')"/>
+        <xsl:variable name="from-filesystem" select="if (starts-with($from-uri,'file:')) then 'file:/' else replace($from-uri,'^([^:]+:/[^/]+/).*$','$1')"/>
         <xsl:choose>
             <xsl:when test="$to-filesystem = $from-filesystem">
                 <xsl:value-of
-                    select="concat(f:file-resolve-relative-uri(tokenize(replace(pf:file-resolve-dot-segments($from),'[^/]+$',''),'/+'),
-                                                               tokenize(replace(pf:file-resolve-dot-segments($to),'#.+$',''),'/+'),
+                    select="concat(f:file-resolve-relative-uri(tokenize(replace($from-uri,'[^/]+$',''),'/'),
+                                                               tokenize(replace($to-uri,'#.+$',''),'/'),
                                                                ''),
-                                   if (contains($to,'#')) then concat('#',tokenize($to,'#')[2]) else '')"
+                                   if (contains($to-uri,'#')) then concat('#',tokenize($to-uri,'#')[2]) else '')"
                 />
             </xsl:when>
             <xsl:otherwise>
-                <xsl:value-of select="$to"/>
+                <xsl:value-of select="$to-uri"/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:function>
@@ -40,11 +41,11 @@
         />
     </xsl:function>
 
-    <!-- Attempts to make a Linux / OSX / Windows file path into a file:// URI. Will also call pf:file-resolve-dot-segments on the resulting URI for convenience. -->
+    <!-- Attempts to detect absolute Linux / OSX / Windows file paths, and makes them into proper URIs. -->
     <xsl:function name="pf:file-uri-ify">
         <xsl:param name="uri"/>
         <xsl:value-of
-            select="pf:file-resolve-dot-segments(concat(if (matches($uri,'^\w:')) then 'file:///' else if (matches($uri,'^/[^/]')) then 'file://' else '', replace($uri, '\\', '/')))"
+            select="pf:file-resolve-dot-segments(replace(concat(if (matches($uri,'^\w:') or matches($uri,'^/[^/]')) then 'file:/' else '', replace($uri, '\\', '/')),'/+','/'))"
         />
     </xsl:function>
 
@@ -112,12 +113,12 @@
                 <xsl:value-of
                     select="pf:file-resolve-relative-uri('file:/home/otheruser/../otherotheruser/subdir/../../awesomeuser/file.xml','file:/home/user/dir/')"/>
             </test>
-            <test to="http://example.net/file.xml" from="file:/home/user/dir/" relative="http://example.net/file.xml"
-                result="{if (pf:file-resolve-relative-uri('http://example.net/file.xml','file:/home/user/dir/')='http://example.net/file.xml') then 'SUCCESS' else 'FAILED'}">
+            <test to="http://example.net/file.xml" from="file:/home/user/dir/" relative="http:/example.net/file.xml"
+                result="{if (pf:file-resolve-relative-uri('http://example.net/file.xml','file:/home/user/dir/')='http:/example.net/file.xml') then 'SUCCESS' else 'FAILED'}">
                 <xsl:value-of select="pf:file-resolve-relative-uri('http://example.net/file.xml','file:/home/user/dir/')"/>
             </test>
-            <test to="http://example.net/file.xml" from="http://example.org/" relative="http://example.net/file.xml"
-                result="{if (pf:file-resolve-relative-uri('http://example.net/file.xml','http://example.org/')='http://example.net/file.xml') then 'SUCCESS' else 'FAILED'}">
+            <test to="http://example.net/file.xml" from="http://example.org/" relative="http:/example.net/file.xml"
+                result="{if (pf:file-resolve-relative-uri('http://example.net/file.xml','http://example.org/')='http:/example.net/file.xml') then 'SUCCESS' else 'FAILED'}">
                 <xsl:value-of select="pf:file-resolve-relative-uri('http://example.net/file.xml','http://example.org/')"/>
             </test>
             <test to="file:/home/user/dir/file.xml" from="../notabsolute/" relative="file:/home/user/dir/file.xml"
@@ -142,23 +143,24 @@
             <test path="not\absolute" result="{if (pf:file-uri-ify('not\absolute')='not/absolute') then 'SUCCESS' else 'FAILED'}" expected="not/absolute">
                 <xsl:value-of select="pf:file-uri-ify('not\absolute')"/>
             </test>
-            <test path="/unix/style/path" result="{if (pf:file-uri-ify('/unix/style/path')='file:///unix/style/path') then 'SUCCESS' else 'FAILED'}" expected="file:///unix/style/path">
+            <test path="/unix/style/path" result="{if (pf:file-uri-ify('/unix/style/path')='file:/unix/style/path') then 'SUCCESS' else 'FAILED'}"
+                expected="file:/unix/style/path">
                 <xsl:value-of select="pf:file-uri-ify('/unix/style/path')"/>
             </test>
             <test path="C:\windows\style\path"
-                result="{if (pf:file-uri-ify('C:\windows\style\path')='file:///C:/windows/style/path') then 'SUCCESS' else 'FAILED'}" expected="file:///C:/windows/style/path">
+                result="{if (pf:file-uri-ify('C:\windows\style\path')='file:/C:/windows/style/path') then 'SUCCESS' else 'FAILED'}"
+                expected="file:/C:/windows/style/path">
                 <xsl:value-of select="pf:file-uri-ify('C:\windows\style\path')"/>
             </test>
             <test path="this//is/relative/../with/./dots"
-                result="{if (pf:file-uri-ify('this//is/relative/../with/./dots')='this/is/with/dots') then 'SUCCESS' else 'FAILED'}" expected="this/is/with/dots">
+                result="{if (pf:file-uri-ify('this//is/relative/../with/./dots')='this/is/with/dots') then 'SUCCESS' else 'FAILED'}"
+                expected="this/is/with/dots">
                 <xsl:value-of select="pf:file-uri-ify('this//is/relative/../with/./dots')"/>
             </test>
-            <test path="first/../dots"
-                result="{if (pf:file-uri-ify('first/../dots')='dots') then 'SUCCESS' else 'FAILED'}" expected="dots">
+            <test path="first/../dots" result="{if (pf:file-uri-ify('first/../dots')='dots') then 'SUCCESS' else 'FAILED'}" expected="dots">
                 <xsl:value-of select="pf:file-uri-ify('first/../dots')"/>
             </test>
-            <test path="last/dots/.."
-                result="{if (pf:file-uri-ify('last/dots/..')='last/') then 'SUCCESS' else 'FAILED'}" expected="last/">
+            <test path="last/dots/.." result="{if (pf:file-uri-ify('last/dots/..')='last/') then 'SUCCESS' else 'FAILED'}" expected="last/">
                 <xsl:value-of select="pf:file-uri-ify('last/dots/..')"/>
             </test>
         </tests>

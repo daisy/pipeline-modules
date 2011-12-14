@@ -5,7 +5,7 @@
 
     <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/xslt/uri-functions.xsl"/>
 
-    <xsl:variable name="base" select="f:longest-common-uri(distinct-values(/*/*/@xml:base/replace(.,'^(.*/)[^/]*$','$1')))"/>
+    <xsl:variable name="base" select="f:longest-common-uri(distinct-values(/*/*/@xml:base))"/>
     <xsl:template match="@*|node()">
         <xsl:copy>
             <xsl:apply-templates select="@*|node()"/>

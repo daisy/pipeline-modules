@@ -12,7 +12,7 @@
         <p:empty/>
       </p:input>
       <p:input port="stylesheet">
-        <p:document href="fileset-join-canonicalize.xsl"/>
+        <p:document href="fileset-join.canonicalize.xsl"/>
       </p:input>
     </p:xslt>
   </p:for-each>
