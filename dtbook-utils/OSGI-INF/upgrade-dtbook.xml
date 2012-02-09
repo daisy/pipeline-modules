@@ -1,9 +1,0 @@
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="upgrade-dtbook">
-    <implementation class="org.daisy.pipeline.script.XProcScriptService"/>
-    <service>
-        <provide interface="org.daisy.pipeline.script.XProcScriptService"/>
-    </service>
-    <property name="script.name" type="String" value="upgrade-dtbook"/>
-    <property name="script.description" type="String" value="DTBook utility for upgrading to DTBook 2005-3."/>
-    <property name="script.url" type="String" value="http://www.daisy.org/pipeline/modules/dtbook-utils/upgrade-dtbook/upgrade-dtbook.xpl"/>
-</scr:component>
