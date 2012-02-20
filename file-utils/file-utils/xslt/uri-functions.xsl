@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0" xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions"
     xmlns:pf="http://www.daisy.org/ns/pipeline/functions" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-
+    
+    <!--<xsl:output indent="yes"/>-->
+    
     <xsl:function name="pf:file-resolve-relative-uri" as="xs:string">
+        <!-- TODO: Deprecated. Use pf:relativize-uri instead. Keeping this alias here for a little while until we're sure that we've updated everything depending on it. -->
+        <xsl:param name="to" as="xs:string"/>
+        <xsl:param name="from" as="xs:string"/>
+        <xsl:value-of select="pf:relativize-uri($to,$from)"/>
+    </xsl:function>
+    
+    <xsl:function name="pf:relativize-uri" as="xs:string">
         <xsl:param name="to" as="xs:string"/>
         <xsl:param name="from" as="xs:string"/>
         <xsl:variable name="to-uri" select="pf:file-uri-ify($to)"/>
@@ -135,6 +144,9 @@
             </test>
             <test to="" from="" relative="" result="{if (pf:file-resolve-relative-uri('','')='') then 'SUCCESS' else 'FAILED'}">
                 <xsl:value-of select="pf:file-resolve-relative-uri('','')"/>
+            </test>
+            <test to="file:/file.xml#id" from="file:/file.xml" relative="" result="{if (pf:file-resolve-relative-uri('file:/file.xml#id','file:/file.xml')='#id') then 'SUCCESS' else 'FAILED'}">
+                <xsl:value-of select="pf:file-resolve-relative-uri('file:/file.xml#id','file:/file.xml')"/>
             </test>
 
             <test path="not/absolute" result="{if (pf:file-uri-ify('not/absolute')='not/absolute') then 'SUCCESS' else 'FAILED'}" expected="not/absolute">
