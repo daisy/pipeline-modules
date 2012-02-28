@@ -24,6 +24,7 @@
             <p:with-option name="attribute-value" select="resolve-uri(tokenize(/*/@src,'#')[1],/*/@xml:base)"/>
         </p:add-attribute>
     </p:viewport>
+    <cx:message message="created annotated mediaoverlay"/>
     <p:sink/>
 
     <p:for-each name="rearrange.for-each">

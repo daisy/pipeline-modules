@@ -22,11 +22,11 @@
                     <xsl:when test="self::*">
                         <xsl:variable name="new-id"
                             select="concat($id,
-                                                                if (self::mo:seq)
-                                                                    then (
-                                                                        if (ancestor::mo:seq) then '-' else '_seq'
-                                                                    ) else
-                                                                        concat('_',local-name()),
+                                                if (self::mo:seq)
+                                                    then (
+                                                        if (ancestor::mo:seq) then '-' else '_seq'
+                                                    ) else
+                                                        concat('_',local-name()),
                                                 if (self::mo:text or self::mo:audio) then '' else (count(preceding-sibling::*)+1))"/>
                         <xsl:call-template name="add-id">
                             <xsl:with-param name="id" select="$new-id"/>
