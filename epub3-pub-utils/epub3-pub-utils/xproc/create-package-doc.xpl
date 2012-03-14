@@ -575,6 +575,7 @@
             </p:inline>
         </p:input>
         <p:input port="insertion">
+            <!-- TODO declare @prefix --> 
             <p:pipe port="result" step="metadata"/>
             <p:pipe port="manifest" step="manifest"/>
             <p:pipe port="result" step="spine"/>
@@ -585,6 +586,17 @@
     <p:add-attribute match="/*" attribute-name="unique-identifier">
         <p:with-option name="attribute-value" select="/opf:package/opf:metadata/dc:identifier/@id"/>
     </p:add-attribute>
+    <p:choose>
+        <p:when test="/opf:package/opf:metadata/@prefix">
+            <p:add-attribute attribute-name="prefix" match="/*">
+                <p:with-option name="attribute-value" select="/opf:package/opf:metadata/@prefix"/>
+            </p:add-attribute>
+            <p:delete match="/opf:package/opf:metadata/@prefix"/>
+        </p:when>
+        <p:otherwise>
+            <p:identity/>
+        </p:otherwise>
+    </p:choose>
     <p:xslt>
         <p:input port="parameters">
             <p:empty/>
