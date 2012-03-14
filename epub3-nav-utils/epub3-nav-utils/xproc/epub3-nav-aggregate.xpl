@@ -13,7 +13,7 @@
             <p:inline exclude-inline-prefixes="#all">
                 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
                     <head>
-                        <meta http-equiv="content-type" content="application/xhtml+xml; charset=UTF-8"/>
+                        <meta charset="UTF-8"/>
                         <title>Navigation Document</title>
                     </head>
                     <body/>
