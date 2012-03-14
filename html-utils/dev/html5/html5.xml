@@ -1,0 +1,936 @@
+<html5 xmlns="http://www.daisy.org/ns/pipeline/data">
+    <attribute-set name="global">
+        <attribute name="accesskey"/>
+        <attribute name="contenteditable"/>
+        <attribute name="contextmenu"/>
+        <attribute name="dir"/>
+        <attribute name="draggable"/>
+        <attribute name="dropzone"/>
+        <attribute name="hidden"/>
+        <attribute name="id"/>
+        <attribute name="lang"/>
+        <attribute name="spellcheck"/>
+        <attribute name="style"/>
+        <attribute name="tabindex"/>
+        <attribute name="title"/>
+        <attribute name="translate"/>
+        <attribute name="onabort"/>
+        <attribute name="onblur"/>
+        <attribute name="oncanplay"/>
+        <attribute name="oncanplaythrough"/>
+        <attribute name="onchange"/>
+        <attribute name="onclick"/>
+        <attribute name="oncontextmenu"/>
+        <attribute name="oncuechange"/>
+        <attribute name="ondblclick"/>
+        <attribute name="ondrag"/>
+        <attribute name="ondragend"/>
+        <attribute name="ondragenter"/>
+        <attribute name="ondragleave"/>
+        <attribute name="ondragover"/>
+        <attribute name="ondragstart"/>
+        <attribute name="ondrop"/>
+        <attribute name="ondurationchange"/>
+        <attribute name="onemptied"/>
+        <attribute name="onended"/>
+        <attribute name="onerror"/>
+        <attribute name="onfocus"/>
+        <attribute name="oninput"/>
+        <attribute name="oninvalid"/>
+        <attribute name="onkeydown"/>
+        <attribute name="onkeypress"/>
+        <attribute name="onkeyup"/>
+        <attribute name="onload"/>
+        <attribute name="onloadeddata"/>
+        <attribute name="onloadedmetadata"/>
+        <attribute name="onloadstart"/>
+        <attribute name="onmousedown"/>
+        <attribute name="onmousemove"/>
+        <attribute name="onmouseout"/>
+        <attribute name="onmouseover"/>
+        <attribute name="onmouseup"/>
+        <attribute name="onmousewheel"/>
+        <attribute name="onpause"/>
+        <attribute name="onplay"/>
+        <attribute name="onplaying"/>
+        <attribute name="onprogress"/>
+        <attribute name="onratechange"/>
+        <attribute name="onreset"/>
+        <attribute name="onscroll"/>
+        <attribute name="onseeked"/>
+        <attribute name="onseeking"/>
+        <attribute name="onselect"/>
+        <attribute name="onshow"/>
+        <attribute name="onstalled"/>
+        <attribute name="onsubmit"/>
+        <attribute name="onsuspend"/>
+        <attribute name="ontimeupdate"/>
+        <attribute name="onvolumechange"/>
+        <attribute name="onwaiting"/>
+    </attribute-set>
+    <element name="html">
+        <element name="head"/>
+        <element name="body"/>
+        <attribute ref="global"/>
+        <attribute name="manifest"/>
+    </element>
+    <element name="head">
+        <element ref="metadata"/>
+        <element name="title"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="title">
+        <element ref="text"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="base">
+        <attribute ref="global"/>
+        <attribute name="href"/>
+        <attribute name="target"/>
+    </element>
+    <element name="link">
+        <attribute ref="global"/>
+        <attribute name="href"/>
+        <attribute name="rel"/>
+        <attribute name="media"/>
+        <attribute name="hreflang"/>
+        <attribute name="type"/>
+        <attribute name="sizes"/>
+        <attribute name="title"/>
+    </element>
+    <element name="meta">
+        <attribute ref="global"/>
+        <attribute name="name"/>
+        <attribute name="http-equiv"/>
+        <attribute name="content"/>
+        <attribute name="charset"/>
+    </element>
+    <element name="style">
+        <attribute name="type"/>
+        <attribute ref="global"/>
+        <attribute name="media"/>
+        <attribute name="type"/>
+        <attribute name="scoped"/>
+        <attribute name="title"/>
+    </element>
+    <element name="script">
+        <attribute name="src"/>
+        <attribute name="type"/>
+        <attribute ref="global"/>
+        <attribute name="src"/>
+        <attribute name="async"/>
+        <attribute name="defer"/>
+        <attribute name="type"/>
+        <attribute name="charset"/>
+    </element>
+    <element name="noscript">
+        <element name="head"/>
+        <element name="link"/>
+        <element name="style"/>
+        <element name="meta"/>
+        <element name="noscript"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="body">
+        <element ref="flow"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="section">
+        <element ref="flow"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="nav">
+        <element ref="flow"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="article">
+        <element ref="flow"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="aside">
+        <element ref="flow"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="hgroup">
+        <attribute ref="global"/>
+    </element>
+    <element name="header">
+        <element ref="flow"/>
+        <element name="header"/>
+        <element name="footer"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="footer">
+        <element ref="flow"/>
+        <element name="header"/>
+        <element name="footer"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="address">
+        <element ref="flow"/>
+        <element ref="heading"/>
+        <element ref="sectioning"/>
+        <element name="header"/>
+        <element name="footer"/>
+        <element name="address"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="p">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="hr">
+        <attribute ref="global"/>
+    </element>
+    <element name="pre">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="blockquote">
+        <element ref="flow"/>
+        <attribute ref="global"/>
+        <attribute name="cite"/>
+    </element>
+    <element name="ol">
+        <element name="li"/>
+        <attribute ref="global"/>
+        <attribute name="reversed"/>
+        <attribute name="start"/>
+        <attribute name="type"/>
+    </element>
+    <element name="ul">
+        <element name="li"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="li">
+        <element ref="flow"/>
+        <attribute ref="global"/>
+        <element name="ol"/>
+        <attribute name="value"/>
+    </element>
+    <element name="dl">
+        <element name="dt"/>
+        <element name="dd"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="dt">
+        <element ref="flow"/>
+        <element name="header"/>
+        <element name="footer"/>
+        <element ref="sectioning"/>
+        <element ref="heading"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="dd">
+        <element ref="flow"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="figure">
+        <element name="figcaption"/>
+        <element ref="flow"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="figcaption">
+        <element ref="flow"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="div">
+        <element ref="flow"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="a">
+        <element ref="interactive"/>
+        <attribute ref="global"/>
+        <attribute name="href"/>
+        <attribute name="target"/>
+        <attribute name="rel"/>
+        <attribute name="media"/>
+        <attribute name="hreflang"/>
+        <attribute name="type"/>
+    </element>
+    <element name="em">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="strong">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="small">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="s">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="cite">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="q">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+        <attribute name="cite"/>
+    </element>
+    <element name="dfn">
+        <element ref="phrasing"/>
+        <element name="dfn"/>
+        <attribute ref="global"/>
+        <attribute name="title"/>
+    </element>
+    <element name="abbr">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+        <attribute name="title"/>
+    </element>
+    <element name="time">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+        <attribute name="datetime"/>
+    </element>
+    <element name="code">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="var">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="samp">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="kbd">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="i">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="b">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="u">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="mark">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="ruby">
+        <element ref="phrasing"/>
+        <element name="rt"/>
+        <element name="rp"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="rt">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="rp">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="bdi">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="bdo">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="span">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="br">
+        <attribute ref="global"/>
+    </element>
+    <element name="wbr">
+        <attribute ref="global"/>
+    </element>
+    <element name="ins">
+        <attribute ref="global"/>
+        <attribute name="cite"/>
+        <attribute name="datetime"/>
+    </element>
+    <element name="del">
+        <attribute ref="global"/>
+        <attribute name="cite"/>
+        <attribute name="datetime"/>
+    </element>
+    <element name="img">
+        <attribute ref="global"/>
+        <attribute name="alt"/>
+        <attribute name="src"/>
+        <attribute name="crossorigin"/>
+        <attribute name="usemap"/>
+        <attribute name="ismap"/>
+        <attribute name="width"/>
+        <attribute name="height"/>
+    </element>
+    <element name="iframe">
+        <attribute ref="global"/>
+        <attribute name="src"/>
+        <attribute name="srcdoc"/>
+        <attribute name="name"/>
+        <attribute name="sandbox"/>
+        <attribute name="seamless"/>
+        <attribute name="width"/>
+        <attribute name="height"/>
+    </element>
+    <element name="embed">
+        <attribute ref="global"/>
+        <attribute name="src"/>
+        <attribute name="type"/>
+        <attribute name="width"/>
+        <attribute name="height"/>
+    </element>
+    <element name="object">
+        <element name="param"/>
+        <attribute ref="global"/>
+        <attribute name="data"/>
+        <attribute name="type"/>
+        <attribute name="typemustmatch"/>
+        <attribute name="name"/>
+        <attribute name="usemap"/>
+        <attribute name="form"/>
+        <attribute name="width"/>
+        <attribute name="height"/>
+    </element>
+    <element name="param">
+        <attribute ref="global"/>
+        <attribute name="name"/>
+        <attribute name="value"/>
+    </element>
+    <element name="video">
+        <attribute name="src"/>
+        <element name="track"/>
+        <element name="source"/>
+        <attribute ref="global"/>
+        <attribute name="src"/>
+        <attribute name="crossorigin"/>
+        <attribute name="poster"/>
+        <attribute name="preload"/>
+        <attribute name="autoplay"/>
+        <attribute name="mediagroup"/>
+        <attribute name="loop"/>
+        <attribute name="muted"/>
+        <attribute name="controls"/>
+        <attribute name="width"/>
+        <attribute name="height"/>
+    </element>
+    <element name="audio">
+        <attribute name="src"/>
+        <element name="track"/>
+        <element name="source"/>
+        <attribute ref="global"/>
+        <attribute name="src"/>
+        <attribute name="crossorigin"/>
+        <attribute name="preload"/>
+        <attribute name="autoplay"/>
+        <attribute name="mediagroup"/>
+        <attribute name="loop"/>
+        <attribute name="muted"/>
+        <attribute name="controls"/>
+    </element>
+    <element name="source">
+        <attribute ref="global"/>
+        <attribute name="src"/>
+        <attribute name="type"/>
+        <attribute name="media"/>
+    </element>
+    <element name="track">
+        <attribute ref="global"/>
+        <attribute name="kind"/>
+        <attribute name="src"/>
+        <attribute name="srclang"/>
+        <attribute name="label"/>
+        <attribute name="default"/>
+    </element>
+    <element name="canvas">
+        <attribute ref="global"/>
+        <attribute name="width"/>
+        <attribute name="height"/>
+    </element>
+    <element name="map">
+        <attribute ref="global"/>
+        <attribute name="name"/>
+    </element>
+    <element name="area">
+        <attribute ref="global"/>
+        <attribute name="alt"/>
+        <attribute name="coords"/>
+        <attribute name="shape"/>
+        <attribute name="href"/>
+        <attribute name="target"/>
+        <attribute name="rel"/>
+        <attribute name="media"/>
+        <attribute name="hreflang"/>
+        <attribute name="type"/>
+    </element>
+    <element name="table">
+        <element name="caption"/>
+        <element name="colgroup"/>
+        <element name="thead"/>
+        <element name="tfoot"/>
+        <element name="tbody"/>
+        <element name="tr"/>
+        <attribute ref="global"/>
+        <attribute name="border"/>
+    </element>
+    <element name="caption">
+        <element ref="flow"/>
+        <element name="table"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="colgroup">
+        <attribute name="span"/>
+        <element name="col"/>
+        <attribute ref="global"/>
+        <attribute name="span"/>
+    </element>
+    <element name="col">
+        <attribute ref="global"/>
+        <attribute name="span"/>
+    </element>
+    <element name="tbody">
+        <element name="tr"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="thead">
+        <element name="tr"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="tfoot">
+        <element name="tr"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="tr">
+        <element name="td"/>
+        <element name="th"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="td">
+        <element ref="flow"/>
+        <attribute ref="global"/>
+        <attribute name="colspan"/>
+        <attribute name="rowspan"/>
+        <attribute name="headers"/>
+    </element>
+    <element name="th">
+        <element ref="flow"/>
+        <element name="header"/>
+        <element name="footer"/>
+        <element ref="sectioning"/>
+        <element ref="heading"/>
+        <attribute ref="global"/>
+        <attribute name="colspan"/>
+        <attribute name="rowspan"/>
+        <attribute name="headers"/>
+        <attribute name="scope"/>
+    </element>
+    <element name="form">
+        <element ref="flow"/>
+        <element name="form"/>
+        <attribute ref="global"/>
+        <attribute name="accept-charset"/>
+        <attribute name="action"/>
+        <attribute name="autocomplete"/>
+        <attribute name="enctype"/>
+        <attribute name="method"/>
+        <attribute name="name"/>
+        <attribute name="novalidate"/>
+        <attribute name="target"/>
+    </element>
+    <element name="fieldset">
+        <element name="legend"/>
+        <element ref="flow"/>
+        <attribute ref="global"/>
+        <attribute name="disabled"/>
+        <attribute name="form"/>
+        <attribute name="name"/>
+    </element>
+    <element name="legend">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="label">
+        <element ref="phrasing"/>
+        <element name="label"/>
+        <attribute ref="global"/>
+        <attribute name="form"/>
+        <attribute name="for"/>
+    </element>
+    <element name="input">
+        <attribute ref="global"/>
+        <attribute name="accept"/>
+        <attribute name="alt"/>
+        <attribute name="autocomplete"/>
+        <attribute name="autofocus"/>
+        <attribute name="checked"/>
+        <attribute name="dirname"/>
+        <attribute name="disabled"/>
+        <attribute name="form"/>
+        <attribute name="formaction"/>
+        <attribute name="formenctype"/>
+        <attribute name="formmethod"/>
+        <attribute name="formnovalidate"/>
+        <attribute name="formtarget"/>
+        <attribute name="height"/>
+        <attribute name="list"/>
+        <attribute name="max"/>
+        <attribute name="maxlength"/>
+        <attribute name="min"/>
+        <attribute name="multiple"/>
+        <attribute name="name"/>
+        <attribute name="pattern"/>
+        <attribute name="placeholder"/>
+        <attribute name="readonly"/>
+        <attribute name="required"/>
+        <attribute name="size"/>
+        <attribute name="src"/>
+        <attribute name="step"/>
+        <attribute name="type"/>
+        <attribute name="value"/>
+        <attribute name="width"/>
+    </element>
+    <element name="button">
+        <element ref="phrasing"/>
+        <element ref="interactive"/>
+        <attribute ref="global"/>
+        <attribute name="autofocus"/>
+        <attribute name="disabled"/>
+        <attribute name="form"/>
+        <attribute name="formaction"/>
+        <attribute name="formenctype"/>
+        <attribute name="formmethod"/>
+        <attribute name="formnovalidate"/>
+        <attribute name="formtarget"/>
+        <attribute name="name"/>
+        <attribute name="type"/>
+        <attribute name="value"/>
+    </element>
+    <element name="select">
+        <element name="option"/>
+        <element name="optgroup"/>
+        <attribute ref="global"/>
+        <attribute name="autofocus"/>
+        <attribute name="disabled"/>
+        <attribute name="form"/>
+        <attribute name="multiple"/>
+        <attribute name="name"/>
+        <attribute name="required"/>
+        <attribute name="size"/>
+    </element>
+    <element name="datalist">
+        <element ref="phrasing"/>
+        <element name="option"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="optgroup">
+        <element name="option"/>
+        <attribute ref="global"/>
+        <attribute name="disabled"/>
+        <attribute name="label"/>
+    </element>
+    <element name="option">
+        <element ref="text"/>
+        <attribute ref="global"/>
+        <attribute name="disabled"/>
+        <attribute name="label"/>
+        <attribute name="selected"/>
+        <attribute name="value"/>
+    </element>
+    <element name="textarea">
+        <element ref="text"/>
+        <attribute ref="global"/>
+        <attribute name="autofocus"/>
+        <attribute name="cols"/>
+        <attribute name="dirname"/>
+        <attribute name="disabled"/>
+        <attribute name="form"/>
+        <attribute name="maxlength"/>
+        <attribute name="name"/>
+        <attribute name="placeholder"/>
+        <attribute name="readonly"/>
+        <attribute name="required"/>
+        <attribute name="rows"/>
+        <attribute name="wrap"/>
+    </element>
+    <element name="keygen">
+        <attribute ref="global"/>
+        <attribute name="autofocus"/>
+        <attribute name="challenge"/>
+        <attribute name="disabled"/>
+        <attribute name="form"/>
+        <attribute name="keytype"/>
+        <attribute name="name"/>
+    </element>
+    <element name="output">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+        <attribute name="for"/>
+        <attribute name="form"/>
+        <attribute name="name"/>
+    </element>
+    <element name="progress">
+        <element ref="phrasing"/>
+        <element name="progress"/>
+        <attribute ref="global"/>
+        <attribute name="value"/>
+        <attribute name="max"/>
+    </element>
+    <element name="meter">
+        <element ref="phrasing"/>
+        <element name="meter"/>
+        <attribute ref="global"/>
+        <attribute name="value"/>
+        <attribute name="min"/>
+        <attribute name="max"/>
+        <attribute name="low"/>
+        <attribute name="high"/>
+        <attribute name="optimum"/>
+    </element>
+    <element name="details">
+        <element name="summary"/>
+        <element ref="flow"/>
+        <attribute ref="global"/>
+        <attribute name="open"/>
+    </element>
+    <element name="summary">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="command">
+        <attribute ref="global"/>
+        <attribute name="type"/>
+        <attribute name="label"/>
+        <attribute name="icon"/>
+        <attribute name="disabled"/>
+        <attribute name="checked"/>
+        <attribute name="radiogroup"/>
+        <attribute name="command"/>
+        <attribute name="title"/>
+    </element>
+    <element name="menu">
+        <element name="li"/>
+        <element ref="flow"/>
+        <attribute ref="global"/>
+        <attribute name="type"/>
+        <attribute name="label"/>
+    </element>
+    <content name="metadata">
+        <element name="base"/>
+        <element name="command"/>
+        <element name="link"/>
+        <element name="meta"/>
+        <element name="noscript"/>
+        <element name="script"/>
+        <element name="style"/>
+        <element name="title"/>
+    </content>
+    <content name="text">
+        <element name="a"/>
+        <element name="abbr"/>
+        <element name="area"/>
+        <element name="map"/>
+        <element name="audio"/>
+        <element name="b"/>
+        <element name="bdi"/>
+        <element name="bdo"/>
+        <element name="br"/>
+        <element name="button"/>
+        <element name="canvas"/>
+        <element name="cite"/>
+        <element name="code"/>
+        <element name="command"/>
+        <element name="datalist"/>
+        <element name="del"/>
+        <element name="dfn"/>
+        <element name="em"/>
+        <element name="embed"/>
+        <element name="i"/>
+        <element name="iframe"/>
+        <element name="img"/>
+        <element name="input"/>
+        <element name="ins"/>
+        <element name="kbd"/>
+        <element name="keygen"/>
+        <element name="label"/>
+        <element name="mark"/>
+        <element name="meter"/>
+        <element name="noscript"/>
+        <element name="object"/>
+        <element name="output"/>
+        <element name="progress"/>
+        <element name="q"/>
+        <element name="ruby"/>
+        <element name="s"/>
+        <element name="samp"/>
+        <element name="script"/>
+        <element name="select"/>
+        <element name="small"/>
+        <element name="span"/>
+        <element name="strong"/>
+        <element name="textarea"/>
+        <element name="time"/>
+        <element name="u"/>
+        <element name="var"/>
+        <element name="video"/>
+        <element name="wbr"/>
+    </content>
+    <content name="flow">
+        <element name="a"/>
+        <element name="abbr"/>
+        <element name="address"/>
+        <element name="area"/>
+        <element name="map"/>
+        <element name="article"/>
+        <element name="aside"/>
+        <element name="audio"/>
+        <element name="b"/>
+        <element name="bdi"/>
+        <element name="bdo"/>
+        <element name="blockquote"/>
+        <element name="br"/>
+        <element name="button"/>
+        <element name="canvas"/>
+        <element name="cite"/>
+        <element name="code"/>
+        <element name="command"/>
+        <element name="datalist"/>
+        <element name="del"/>
+        <element name="details"/>
+        <element name="dfn"/>
+        <element name="div"/>
+        <element name="dl"/>
+        <element name="em"/>
+        <element name="embed"/>
+        <element name="fieldset"/>
+        <element name="figure"/>
+        <element name="footer"/>
+        <element name="form"/>
+        <element name="header"/>
+        <element name="hgroup"/>
+        <element name="hr"/>
+        <element name="i"/>
+        <element name="iframe"/>
+        <element name="img"/>
+        <element name="input"/>
+        <element name="ins"/>
+        <element name="kbd"/>
+        <element name="keygen"/>
+        <element name="label"/>
+        <element name="mark"/>
+        <element name="menu"/>
+        <element name="meter"/>
+        <element name="nav"/>
+        <element name="noscript"/>
+        <element name="object"/>
+        <element name="ol"/>
+        <element name="output"/>
+        <element name="p"/>
+        <element name="pre"/>
+        <element name="progress"/>
+        <element name="q"/>
+        <element name="ruby"/>
+        <element name="s"/>
+        <element name="samp"/>
+        <element name="script"/>
+        <element name="section"/>
+        <element name="select"/>
+        <element name="small"/>
+        <element name="span"/>
+        <element name="strong"/>
+        <element name="style"/>
+        <element name="table"/>
+        <element name="textarea"/>
+        <element name="time"/>
+        <element name="u"/>
+        <element name="ul"/>
+        <element name="var"/>
+        <element name="video"/>
+        <element name="wbr"/>
+    </content>
+    <content name="heading">
+        <element name="hgroup"/>
+    </content>
+    <content name="sectioning">
+        <element name="article"/>
+        <element name="aside"/>
+        <element name="nav"/>
+        <element name="section"/>
+    </content>
+    <content name="phrasing">
+        <element name="a"/>
+        <element name="abbr"/>
+        <element name="area"/>
+        <element name="map"/>
+        <element name="audio"/>
+        <element name="b"/>
+        <element name="bdi"/>
+        <element name="bdo"/>
+        <element name="br"/>
+        <element name="button"/>
+        <element name="canvas"/>
+        <element name="cite"/>
+        <element name="code"/>
+        <element name="command"/>
+        <element name="datalist"/>
+        <element name="del"/>
+        <element name="dfn"/>
+        <element name="em"/>
+        <element name="embed"/>
+        <element name="i"/>
+        <element name="iframe"/>
+        <element name="img"/>
+        <element name="input"/>
+        <element name="ins"/>
+        <element name="kbd"/>
+        <element name="keygen"/>
+        <element name="label"/>
+        <element name="mark"/>
+        <element name="meter"/>
+        <element name="noscript"/>
+        <element name="object"/>
+        <element name="output"/>
+        <element name="progress"/>
+        <element name="q"/>
+        <element name="ruby"/>
+        <element name="s"/>
+        <element name="samp"/>
+        <element name="script"/>
+        <element name="select"/>
+        <element name="small"/>
+        <element name="span"/>
+        <element name="strong"/>
+        <element name="textarea"/>
+        <element name="time"/>
+        <element name="u"/>
+        <element name="var"/>
+        <element name="video"/>
+        <element name="wbr"/>
+    </content>
+    <content name="interactive">
+        <element name="a"/>
+        <element name="audio"/>
+        <element name="button"/>
+        <element name="details"/>
+        <element name="embed"/>
+        <element name="iframe"/>
+        <element name="img"/>
+        <element name="input"/>
+        <element name="keygen"/>
+        <element name="label"/>
+        <element name="menu"/>
+        <element name="object"/>
+        <element name="select"/>
+        <element name="textarea"/>
+        <element name="video"/>
+    </content>
+</html5>
