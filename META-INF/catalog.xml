@@ -6,6 +6,6 @@
         uri="../html-utils/html-library.xpl"/>
    <uri name="http://www.daisy.org/pipeline/modules/html-utils/html5-outliner.xsl"
         uri="../html-utils/html5-outliner.xsl"/>
-   <uri name="http://www.daisy.org/pipeline/modules/html-utils/html-cleanup.xsl"
+   <uri name="http://www.daisy.org/pipeline/modules/html-utils/html5-upgrade.xsl"
         uri="../html-utils/html5-upgrade.xsl"/>
 </catalog>
