@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:dtb="http://www.daisy.org/z3986/2005/dtbook/" 
-    xmlns="http://www.daisy.org/ns/z3986/authoring/"
+    xmlns="http://www.daisy.org/ns/z3998/authoring/"
     version="2.0" exclude-result-prefixes="dtb">
     
     <xsl:output indent="yes" method="xml"/>
@@ -11,9 +11,6 @@
             <xsl:choose>
                 <xsl:when test="@name = 'dc:Title'">
                     <meta property="dcterms:title" content="{@content}"/>
-                </xsl:when>
-                <xsl:when test="@name = 'dc:Identifier'">
-                    <meta property="dcterms:identifier" content="{@content}"/>
                 </xsl:when>
                 <xsl:when test="@name = 'dc:Creator'">
                     <meta property="dcterms:creator" content="{@content}"/>
