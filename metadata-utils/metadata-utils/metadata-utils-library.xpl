@@ -33,6 +33,11 @@
                 <p:document href="dtbook-to-mods-meta.xsl"/>
             </p:input>
         </p:xslt>
+        <p:validate-with-xml-schema name="validate-mods-output">
+            <p:input port="schema">
+                <p:document href="schema/mods-3-3.xsd"/>
+            </p:input>
+        </p:validate-with-xml-schema>
     </p:declare-step>
     
     <p:documentation>Generate ZedAI inline metadata from a DTBook 2005-3 document.</p:documentation>
