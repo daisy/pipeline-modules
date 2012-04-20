@@ -153,6 +153,12 @@
     </element>
     <element name="hgroup">
         <attribute ref="global"/>
+        <element name="h1"/>
+        <element name="h2"/>
+        <element name="h3"/>
+        <element name="h4"/>
+        <element name="h5"/>
+        <element name="h6"/>
     </element>
     <element name="header">
         <element ref="flow"/>
@@ -856,6 +862,12 @@
         <element name="var"/>
         <element name="video"/>
         <element name="wbr"/>
+        <element name="h1"/>
+        <element name="h2"/>
+        <element name="h3"/>
+        <element name="h4"/>
+        <element name="h5"/>
+        <element name="h6"/>
     </content>
     <content name="heading">
         <element name="hgroup"/>
@@ -933,4 +945,40 @@
         <element name="textarea"/>
         <element name="video"/>
     </content>
+    <element name="h1">
+        <element ref="flow"/>
+        <element ref="heading"/>
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="h2">
+        <element ref="flow"/>
+        <element ref="heading"/>
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="h3">
+        <element ref="flow"/>
+        <element ref="heading"/>
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="h4">
+        <element ref="flow"/>
+        <element ref="heading"/>
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="h5">
+        <element ref="flow"/>
+        <element ref="heading"/>
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="h6">
+        <element ref="flow"/>
+        <element ref="heading"/>
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
 </html5>
