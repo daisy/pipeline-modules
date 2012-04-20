@@ -166,7 +166,7 @@
         <p:rename match="/*" new-name="d:content"/>
     </p:for-each>
     <p:identity name="contents"/>
-    
+
     <p:for-each>
         <p:output port="result" sequence="true"/>
         <p:iteration-source select="//d:attribute[string-length(@ref) &gt; 0 and not(@ref=preceding::d:attribute/@ref)]">
@@ -221,7 +221,7 @@
         <p:rename match="/*" new-name="d:attribute-set"/>
     </p:for-each>
     <p:identity name="attribute-sets"/>
-    
+
     <p:wrap-sequence wrapper="d:html5">
         <p:input port="source">
             <p:pipe port="result" step="attribute-sets"/>
@@ -259,7 +259,82 @@
             </p:inline>
         </p:input>
     </p:xslt>
+
+    <p:insert match="/*" position="last-child">
+        <p:input port="insertion" select="/*/*">
+            <p:inline exclude-inline-prefixes="#all">
+                <wrapper xmlns="http://www.daisy.org/ns/pipeline/data">
+                    <element name="h1">
+                        <element ref="flow"/>
+                        <element ref="heading"/>
+                        <element ref="phrasing"/>
+                        <attribute ref="global"/>
+                    </element>
+                    <element name="h2">
+                        <element ref="flow"/>
+                        <element ref="heading"/>
+                        <element ref="phrasing"/>
+                        <attribute ref="global"/>
+                    </element>
+                    <element name="h3">
+                        <element ref="flow"/>
+                        <element ref="heading"/>
+                        <element ref="phrasing"/>
+                        <attribute ref="global"/>
+                    </element>
+                    <element name="h4">
+                        <element ref="flow"/>
+                        <element ref="heading"/>
+                        <element ref="phrasing"/>
+                        <attribute ref="global"/>
+                    </element>
+                    <element name="h5">
+                        <element ref="flow"/>
+                        <element ref="heading"/>
+                        <element ref="phrasing"/>
+                        <attribute ref="global"/>
+                    </element>
+                    <element name="h6">
+                        <element ref="flow"/>
+                        <element ref="heading"/>
+                        <element ref="phrasing"/>
+                        <attribute ref="global"/>
+                    </element>
+                </wrapper>
+            </p:inline>
+        </p:input>
+    </p:insert>
+
+    <p:insert match="/*/*[@name='hgroup']" position="last-child">
+        <p:input port="insertion" select="/*/*">
+            <p:inline exclude-inline-prefixes="#all">
+                <wrapper xmlns="http://www.daisy.org/ns/pipeline/data">
+                    <element name="h1"/>
+                    <element name="h2"/>
+                    <element name="h3"/>
+                    <element name="h4"/>
+                    <element name="h5"/>
+                    <element name="h6"/>
+                </wrapper>
+            </p:inline>
+        </p:input>
+    </p:insert>
     
+    <p:insert match="/*/*[@name='flow']" position="last-child">
+        <p:input port="insertion" select="/*/*">
+            <p:inline exclude-inline-prefixes="#all">
+                <wrapper xmlns="http://www.daisy.org/ns/pipeline/data">
+                    <element name="h1"/>
+                    <element name="h2"/>
+                    <element name="h3"/>
+                    <element name="h4"/>
+                    <element name="h5"/>
+                    <element name="h6"/>
+                </wrapper>
+            </p:inline>
+        </p:input>
+    </p:insert>
+
     <p:store href="html5.xml"/>
 
 </p:declare-step>
