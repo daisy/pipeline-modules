@@ -4,7 +4,6 @@
     xmlns:err="http://www.w3.org/ns/xproc-error" version="1.0">
 
     <p:input port="package" primary="true"/>
-    <p:input port="content" sequence="true"/>
     <p:input port="media-overlay" sequence="true"/>
     <p:output port="result" sequence="true"/>
     <p:option name="package-uri" required="false" select="''"/>

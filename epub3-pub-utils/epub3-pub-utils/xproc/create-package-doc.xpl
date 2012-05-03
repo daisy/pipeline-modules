@@ -599,9 +599,6 @@
         </p:otherwise>
     </p:choose>
     <px:epub3-pub-assign-media-overlays>
-        <p:input port="content">
-            <p:pipe port="content-docs" step="main"/>
-        </p:input>
         <p:input port="media-overlay">
             <p:pipe port="mediaoverlays" step="main"/>
         </p:input>
