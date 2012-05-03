@@ -26,6 +26,7 @@
     <p:output port="result" primary="true" sequence="true"/>
 
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/xproc/fileset-library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/epub3-pub-utils/xproc/epub3-pub-library.xpl"/>
 
     <p:group name="nav-doc">
         <p:output port="result"/>
@@ -597,6 +598,15 @@
             <p:identity/>
         </p:otherwise>
     </p:choose>
+    <px:epub3-pub-assign-media-overlays>
+        <p:input port="content">
+            <p:pipe port="content-docs" step="main"/>
+        </p:input>
+        <p:input port="media-overlay">
+            <p:pipe port="mediaoverlays" step="main"/>
+        </p:input>
+        <p:with-option name="package-uri" select="$result-uri"/>
+    </px:epub3-pub-assign-media-overlays>
     <p:xslt>
         <p:input port="parameters">
             <p:empty/>
