@@ -334,6 +334,14 @@
             </p:inline>
         </p:input>
     </p:insert>
+    
+    <p:insert match="/*/*[@name='global']" position="first-child">
+        <p:input port="insertion" select="/*">
+            <p:inline exclude-inline-prefixes="#all">
+                <attribute name="class" xmlns="http://www.daisy.org/ns/pipeline/data"/>
+            </p:inline>
+        </p:input>
+    </p:insert>
 
     <p:store href="html5.xml"/>
 

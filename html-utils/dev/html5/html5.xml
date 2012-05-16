@@ -1,5 +1,6 @@
 <html5 xmlns="http://www.daisy.org/ns/pipeline/data">
     <attribute-set name="global">
+        <attribute name="class"/>
         <attribute name="accesskey"/>
         <attribute name="contenteditable"/>
         <attribute name="contextmenu"/>
