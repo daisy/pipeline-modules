@@ -5,7 +5,7 @@
     xmlns:cxo="http://xmlcalabash.com/ns/extensions/osutils"
     xmlns:dtb="http://www.daisy.org/z3986/2005/dtbook/"
     xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-    xmlns:xd="http://www.daisy.org/ns/pipeline/doc" exclude-inline-prefixes="cx">
+    exclude-inline-prefixes="cx">
 
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
         <h1 px:role="name">Merge DTBook</h1>

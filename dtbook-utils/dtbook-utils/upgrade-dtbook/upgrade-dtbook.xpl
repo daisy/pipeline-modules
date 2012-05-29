@@ -7,7 +7,6 @@
     xmlns:dtb="http://www.daisy.org/z3986/2005/dtbook/"
     xmlns:px="http://www.daisy.org/ns/pipeline/xproc" 
     xmlns:dc="http://purl.org/dc/terms/"
-    xmlns:xd="http://www.daisy.org/ns/pipeline/doc"
     exclude-inline-prefixes="cx">
     <!-- 
         TODO: 
