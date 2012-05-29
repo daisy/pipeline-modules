@@ -8,13 +8,12 @@
     exclude-inline-prefixes="dtb tmp p c px xd">
 
     <p:documentation>
-        <xd:short>Metadata Utilities Library</xd:short>
-        <xd:author>
-            <xd:name>Marisa DeMeglio</xd:name>
-            <xd:mailto>marisa.demeglio@gmail.com</xd:mailto>
-            <xd:organization>DAISY</xd:organization>
-        </xd:author>
-        <xd:maintainer>Marisa DeMeglio</xd:maintainer>
+        <h1 px:role="name">Metadata Utilities Library</h1>
+        <div px:role="author maintainer">
+            <p px:role="name">Marisa DeMeglio</p>
+            <a px:role="contact" href="mailto:marisa.demeglio@gmail.com">marisa.demeglio@gmail.com</a>
+            <p px:role="organization">DAISY Consortium</p>
+        </div>
     </p:documentation>
     
     

@@ -2,15 +2,15 @@
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
     xmlns:xd="http://www.daisy.org/ns/pipeline/doc" exclude-inline-prefixes="#all" version="1.0" type="px:mediatype-detect">
 
-    <p:documentation xd:target="parent">
-        <xd:short>Determine the media type of a file.</xd:short>
-        <xd:author>
-            <xd:name>Jostein Austvik Jacobsen</xd:name>
-            <xd:mailto>josteinaj@gmail.com</xd:mailto>
-            <xd:organization>NLB</xd:organization>
-        </xd:author>
+    <p:documentation xd:target="parent" xmlns="http://www.w3.org/1999/xhtml">
+        <h1 px:role="name">Media type detect</h1>
+        <p px:role="desc">Determine the media type of a file.</p>
+        <div px:role="author maintainer">
+            <p px:role="name">Jostein Austvik Jacobsen</p>
+            <a href="mailto:josteinaj@gmail.com" px:role="contact">josteinaj@gmail.com</a>
+            <p px:role="organization">NLB</p>
+        </div>
         <xd:version>1.0.0.0</xd:version>
-        <xd:maintainer>Jostein Austvik Jacobsen</xd:maintainer>
         <xd:option name="href">URI to the file you want to know the media type of.</xd:option>
         <xd:input port="source">A d:fileset.</xd:input>
         <xd:output port="result">The same d:fileset that arrived on the input port, but with "media-type"-attributes added to all d:entry elements.</xd:output>
