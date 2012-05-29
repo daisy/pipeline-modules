@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-    xmlns:xd="http://www.daisy.org/ns/pipeline/doc" exclude-inline-prefixes="#all" version="1.0" type="px:mediatype-detect">
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:px="http://www.daisy.org/ns/pipeline/xproc" exclude-inline-prefixes="#all" version="1.0" type="px:mediatype-detect">
 
-    <p:documentation xd:target="parent" xmlns="http://www.w3.org/1999/xhtml">
+    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
         <h1 px:role="name">Media type detect</h1>
         <p px:role="desc">Determine the media type of a file.</p>
         <div px:role="author maintainer">
@@ -10,19 +9,25 @@
             <a href="mailto:josteinaj@gmail.com" px:role="contact">josteinaj@gmail.com</a>
             <p px:role="organization">NLB</p>
         </div>
-        <xd:version>1.0.0.0</xd:version>
-        <xd:option name="href">URI to the file you want to know the media type of.</xd:option>
-        <xd:input port="source">A d:fileset.</xd:input>
-        <xd:output port="result">The same d:fileset that arrived on the input port, but with "media-type"-attributes added to all d:entry elements.</xd:output>
     </p:documentation>
 
-    <p:input port="source" sequence="true"/>
-    <p:output port="result" sequence="true"/>
+    <p:input port="source" sequence="true">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <h2 px:role="name">Fileset</h2>
+            <p px:role="desc">A DAISY Pipeline 2 fileset document as described on <a href="http://code.google.com/p/daisy-pipeline/wiki/FileSetDocument">http://code.google.com/p/daisy-pipeline/wiki/FileSetDocument</a>.</p>
+        </p:documentation>
+    </p:input>
+    <p:output port="result" sequence="true">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <h2 px:role="name">Result fileset</h2>
+            <p px:role="desc">The same d:fileset that arrived on the input port, but with "media-type"-attributes added to all d:file elements.</p>
+        </p:documentation>
+    </p:output>
 
     <p:for-each>
         <p:viewport match="//d:file">
             <p:variable name="ext" select="lower-case(replace(/*/@href,'^.+?([^/\.]+)$','$1'))"/>
-
+            
             <p:choose>
                 <p:when test="/*/@media-type">
                     <p:identity/>
