@@ -2,10 +2,9 @@
     xmlns:p="http://www.w3.org/ns/xproc"
     xmlns:c="http://www.w3.org/ns/xproc-step" 
     xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-    xmlns:xd="http://www.daisy.org/ns/pipeline/doc"
     xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp"
     xmlns:dtb="http://www.daisy.org/z3986/2005/dtbook/"
-    exclude-inline-prefixes="dtb tmp p c px xd">
+    exclude-inline-prefixes="dtb tmp p c px">
 
     <p:documentation>
         <h1 px:role="name">Metadata Utilities Library</h1>
