@@ -7,17 +7,14 @@
     xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
     xmlns:xd="http://www.daisy.org/ns/pipeline/doc" exclude-inline-prefixes="cx">
 
-    <p:documentation>
-        <xd:short>merge-dtbook</xd:short>
-        <xd:detail>Merge 2 or more DTBook documents.</xd:detail>
-        <xd:author>
-            <xd:name>Marisa DeMeglio</xd:name>
-            <xd:mailto>marisa.demeglio@gmail.com</xd:mailto>
-            <xd:organization>DAISY</xd:organization>
-        </xd:author>
-        <xd:maintainer>Marisa DeMeglio</xd:maintainer>
-        <xd:input port="source">Sequence of DTBook documents. Versions supported: 2005-3. </xd:input>
-        <xd:output port="result">Merged DTBook document.</xd:output>
+    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+        <h1 px:role="name">Merge DTBook</h1>
+        <p px:role="desc">Merge 2 or more DTBook documents.</p>
+        <div px:role="author maintainer">
+            <p px:role="name">Marisa DeMeglio</p>
+            <a href="mailto:marisa.demeglio@gmail.com" px:role="contact">marisa.demeglio@gmail.com</a>
+            <p px:role="organization">DAISY Consortium</p>
+        </div>
     </p:documentation>
     <!-- 
         TODO: 
@@ -27,16 +24,16 @@
 
     <p:input port="source" primary="true" sequence="true" px:name="in"
         px:media-type="application/x-dtbook+xml">
-        <p:documentation>
-            <xd:short>in</xd:short>
-            <xd:detail>Sequence of DTBook files</xd:detail>
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <h2 px:role="name">in</h2>
+            <p px:role="desc">Sequence of DTBook files</p>
         </p:documentation>
     </p:input>
     <p:input port="parameters" kind="parameter"/>
     <p:output port="result" primary="true">
-        <p:documentation>
-            <xd:short>out</xd:short>
-            <xd:detail>The result</xd:detail>
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <h2 px:role="name">out</h2>
+            <p px:role="desc">The result</p>
         </p:documentation>
     </p:output>
 

@@ -13,33 +13,27 @@
         TODO: 
         * copy referenced resources (such as images)
     -->
-    <p:documentation>
-    	<xd:short>upgrade-dtbook</xd:short>
-        <xd:detail>Upgrade a DTBook document from version 1.1.0, 2005-1, or 2005-2 to version 2005-3. This module was imported from the Pipeline 1.</xd:detail>
-        <xd:author>
-            <xd:name>Marisa DeMeglio</xd:name>
-            <xd:mailto>marisa.demeglio@gmail.com</xd:mailto>
-            <xd:organization>DAISY</xd:organization>
-        </xd:author>
-        <xd:maintainer>Marisa DeMeglio</xd:maintainer>
-        <xd:input port="source">DTBook 1.1.0, 2005-1, or 2005-2 document.</xd:input>
-        <xd:output port="result">DTBook 2005-3 document.</xd:output>
-        
-        
-        
+    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+    	<h1 px:role="name">Upgrade DTBook</h1>
+        <p px:role="desc">Upgrade a DTBook document from version 1.1.0, 2005-1, or 2005-2 to version 2005-3. This module was imported from the Pipeline 1.</p>
+        <div px:role="author maintainer">
+            <p px:role="name">Marisa DeMeglio</p>
+            <a px:role="contact" href="mailto:marisa.demeglio@gmail.com">marisa.demeglio@gmail.com</a>
+            <p px:role="organization">DAISY Consortium</p>
+        </div>
     </p:documentation>
 
     <p:input port="source" primary="true" px:name="in" px:media-type="application/x-dtbook+xml">
-    	<p:documentation>
-        	<xd:short>in</xd:short>
-        	<xd:detail>Single DTBook file</xd:detail>
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+        	<h2 px:role="name">in</h2>
+        	<p px:role="desc">Single DTBook file</p>
         </p:documentation>
     </p:input>
     <p:input port="parameters" kind="parameter"/>
     <p:output port="result">
-    <p:documentation>
-        	<xd:short>out</xd:short>
-        	<xd:detail>The result</xd:detail>
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+        	<h2 px:role="name">out</h2>
+        	<p px:role="desc">The result</p>
         </p:documentation>
         <p:pipe port="result" step="validate-dtbook"/>
     </p:output>
