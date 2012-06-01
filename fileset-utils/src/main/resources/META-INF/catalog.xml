@@ -3,9 +3,10 @@
   PUBLIC "-//OASIS/DTD Entity Resolution XML Catalog V1.0//EN" "http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd">
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
    <uri name="http://www.daisy.org/pipeline/modules/fileset-utils/xproc/fileset-library.xpl"
-        uri="../fileset-utils/xproc/fileset-library.xpl"/>
+        uri="../xml/xproc/fileset-library.xpl"/>
    <uri name="http://www.daisy.org/pipeline/modules/fileset-utils/xslt/fileset-to-odf-manifest.xsl"
-        uri="../fileset-utils/xslt/fileset-to-odf-manifest.xsl"/>
+        uri="../xml/xslt/fileset-to-odf-manifest.xsl"/>
    <uri name="http://www.daisy.org/pipeline/modules/fileset-utils/xslt/fileset-resolve-dot-segments.xsl"
-        uri="../fileset-utils/xslt/fileset-resolve-dot-segments.xsl"/>
+        uri="../xml/xslt/fileset-resolve-dot-segments.xsl"/>
+  <nextCatalog catalog="org:daisy:pipeline:modules:file-utils"/>
 </catalog>

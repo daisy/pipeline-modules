@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.daisy.pipeline.modules</groupId>
+  <artifactId>modules-utilities-aggregator</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>DAISY Pipeline 2 :: Utility Modules Aggregator POM</name>
+  <description>Aggregator POM to build the DAISY Pipeline 2 utility modules.</description>
+
+  <modules>
+    <module>dtbook-utils</module>
+    <module>epub3-nav-utils</module>
+    <module>epub3-ocf-utils</module>
+    <module>epub3-pub-utils</module>
+    <module>file-utils</module>
+    <module>fileset-utils</module>
+    <module>html-utils</module>
+    <module>mediaoverlay-utils</module>
+    <module>mediatype-utils</module>
+    <module>metadata-utils</module>
+    <module>zip-utils</module>
+  </modules>
+
+</project>

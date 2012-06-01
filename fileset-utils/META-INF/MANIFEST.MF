@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: File Set Utilities
-Bundle-SymbolicName: org.daisy.pipeline.modules.fileset-utils
-Bundle-Version: 1.0.0.qualifier
-Bundle-Vendor: DAISY Consortium
-Require-Bundle: org.daisy.pipeline.modules.file-utils;bundle-version="[1.0.0,2.0.0)"
