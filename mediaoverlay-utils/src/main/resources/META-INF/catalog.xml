@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE catalog
+  PUBLIC "-//OASIS/DTD Entity Resolution XML Catalog V1.0//EN" "http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd">
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+   <uri name="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/join.xpl"
+        uri="../xml/join.xpl"/>
+   <uri name="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/upgrade-smil.xpl"
+        uri="../xml/upgrade-smil.xpl"/>
+   <uri name="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/rearrange.xpl"
+        uri="../xml/rearrange.xpl"/>
+   <uri name="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/rearrange-content.xpl"
+        uri="../xml/rearrange-content.xpl"/>
+   <uri name="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/smil-to-text-fileset.xsl"
+        uri="../xml/smil-to-text-fileset.xsl"/>
+   <uri name="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/smil-to-audio-fileset.xsl"
+        uri="../xml/smil-to-audio-fileset.xsl"/>
+   <uri name="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/clock-functions.xsl"
+        uri="../xml/clock-functions.xsl"/>
+</catalog>
