@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step name="rearrange" type="px:mediaoverlay-rearrange" version="1.0" xmlns:c="http://www.w3.org/ns/xproc-step"
-    xmlns:epub="http://www.idpf.org/2007/ops" xmlns:err="http://www.w3.org/ns/xproc-error" xmlns:mo="http://www.w3.org/ns/SMIL"
-    xmlns:p="http://www.w3.org/ns/xproc" xmlns:px="http://www.daisy.org/ns/pipeline/xproc" xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
-    xmlns:di="http://www.daisy.org/ns/pipeline/tmp" xmlns:cx="http://xmlcalabash.com/ns/extensions">
+<p:declare-step name="rearrange" type="px:mediaoverlay-rearrange" version="1.0" xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:err="http://www.w3.org/ns/xproc-error" xmlns:mo="http://www.w3.org/ns/SMIL"
+    xmlns:p="http://www.w3.org/ns/xproc" xmlns:px="http://www.daisy.org/ns/pipeline/xproc" xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal" xmlns:cx="http://xmlcalabash.com/ns/extensions">
 
     <p:input port="mediaoverlay" primary="true" sequence="true"/>
     <p:input port="content" sequence="true"/>
@@ -14,17 +12,31 @@
     <p:import href="rearrange-library.xpl"/>
     <p:import href="join.xpl"/>
 
-    <px:mediaoverlay-join/>
-    <p:add-xml-base all="true" relative="false"/>
-    <p:viewport match="//mo:text" name="rearrange.mediaoverlay-annotated">
-        <p:add-attribute attribute-name="fragment" match="/*">
-            <p:with-option name="attribute-value" select="if (contains(/*/@src,'#')) then tokenize(/*/@src,'#')[last()] else ''"/>
-        </p:add-attribute>
-        <p:add-attribute attribute-name="src" match="/*">
-            <p:with-option name="attribute-value" select="resolve-uri(tokenize(/*/@src,'#')[1],/*/@xml:base)"/>
-        </p:add-attribute>
-    </p:viewport>
-    <cx:message message="created annotated mediaoverlay"/>
+    <p:group name="rearrange.mediaoverlay-map">
+        <p:output port="result"/>
+        <!--<px:mediaoverlay-join/>-->
+        <p:for-each>
+            <p:add-xml-base all="true" relative="false"/>
+        </p:for-each>
+        <p:wrap-sequence wrapper="smil-map" wrapper-namespace="http://www.daisy.org/ns/pipeline/tmp"/>
+        <p:viewport match="//mo:text" name="rearrange.mediaoverlay-annotated">
+            <p:add-attribute attribute-name="fragment" match="/*">
+                <p:with-option name="attribute-value" select="if (contains(/*/@src,'#')) then tokenize(/*/@src,'#')[last()] else ''"/>
+            </p:add-attribute>
+            <p:add-attribute attribute-name="src" match="/*">
+                <p:with-option name="attribute-value" select="resolve-uri(tokenize(/*/@src,'#')[1],/*/@xml:base)"/>
+            </p:add-attribute>
+        </p:viewport>
+        <p:xslt>
+            <p:input port="parameters">
+                <p:empty/>
+            </p:input>
+            <p:input port="stylesheet">
+                <p:document href="rearrange.prepare.xsl"/>
+            </p:input>
+        </p:xslt>
+        <cx:message message="created annotated mediaoverlay"/>
+    </p:group>
     <p:sink/>
 
     <p:for-each name="rearrange.for-each">
@@ -37,10 +49,10 @@
         <p:add-attribute match="//*" attribute-name="xml:base" name="rearrange.for-each.content">
             <p:with-option name="attribute-value" select="/*/@xml:base"/>
         </p:add-attribute>
-        <p:wrap-sequence wrapper="di:content-and-mediaoverlay">
+        <p:wrap-sequence wrapper="content-and-mediaoverlay" wrapper-namespace="http://www.daisy.org/ns/pipeline/tmp">
             <p:input port="source">
                 <p:pipe port="result" step="rearrange.for-each.content"/>
-                <p:pipe port="result" step="rearrange.mediaoverlay-annotated"/>
+                <p:pipe port="result" step="rearrange.mediaoverlay-map"/>
             </p:input>
         </p:wrap-sequence>
         <p:xslt>
@@ -80,7 +92,7 @@
                 <p:document href="conditionally-join-toplevel-seq-with-body.xsl"/>
             </p:input>
         </p:xslt>
-        
+
         <cx:message>
             <p:with-option name="message" select="concat('created media overlay for ',$content-base)"/>
         </cx:message>
