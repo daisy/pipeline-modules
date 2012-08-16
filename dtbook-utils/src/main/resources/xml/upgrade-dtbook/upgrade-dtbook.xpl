@@ -34,7 +34,6 @@
         	<h2 px:role="name">out</h2>
         	<p px:role="desc">The result</p>
         </p:documentation>
-        <p:pipe port="result" step="validate-dtbook"/>
     </p:output>
     
     <p:option name="assert-valid" required="false" px:type="boolean" select="'true'">
@@ -113,12 +112,7 @@
         </p:otherwise>
     </p:choose>
     
-    
-    
     <px:validate-with-relax-ng-and-report name="validate-dtbook">
-        <p:input port="source">
-            <p:pipe port="result" step="main"/>
-        </p:input>
         <p:input port="schema">
             <p:document href="schema/dtbook-2005-3.rng"/>
         </p:input>
