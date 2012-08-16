@@ -36,8 +36,20 @@
             <p px:role="desc">The result</p>
         </p:documentation>
     </p:output>
+    
+    <p:option name="assert-valid" required="false" px:type="boolean" select="'true'">
+        <p:documentation>
+            Whether to stop processing and raise an error on validation issues.
+        </p:documentation>
+    </p:option>
 
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
+    
+    <p:import href="http://www.daisy.org/pipeline/modules/validation-utils/validation-utils-library.xpl">
+        <p:documentation>
+            Collection of utilities for validation and reporting.
+        </p:documentation>
+    </p:import>
 
     <cx:message message="Merging DTBook documents"/>
 
@@ -48,11 +60,12 @@
 
         <p:iteration-source select="/"/>
 
-        <p:validate-with-relax-ng>
+        <px:validate-with-relax-ng-and-report>
             <p:input port="schema">
                 <p:document href="schema/dtbook-2005-3.rng"/>
             </p:input>
-        </p:validate-with-relax-ng>
+            <p:with-option name="assert-valid" select="$assert-valid"/>
+        </px:validate-with-relax-ng-and-report>
 
         <p:identity name="ident"/>
 
@@ -137,10 +150,11 @@
         </p:input>
     </p:xslt>
 
-    <p:validate-with-relax-ng name="validate-dtbook">
+    <px:validate-with-relax-ng-and-report name="validate-dtbook">
         <p:input port="schema">
             <p:document href="./schema/dtbook-2005-3.rng"/>
         </p:input>
-    </p:validate-with-relax-ng>
+        <p:with-option name="assert-valid" select="$assert-valid"/>
+    </px:validate-with-relax-ng-and-report>
 
 </p:declare-step>
