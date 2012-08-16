@@ -15,17 +15,28 @@
         </div>
     </p:documentation>
     
+    <p:import href="http://www.daisy.org/pipeline/modules/validation-utils/validation-utils-library.xpl">
+        <p:documentation>
+            Collection of utilities for validation and reporting.
+        </p:documentation>
+    </p:import>
     
     <p:documentation>Generate a MODS metadata record from a DTBook 2005-3 document.</p:documentation>
     <p:declare-step name="dtbook-to-mods-meta" type="px:dtbook-to-mods-meta">
         <p:input port="source"/>
         <p:output port="result"/>
         <p:input port="parameters" kind="parameter"/>
-        <p:validate-with-relax-ng name="validate-dtbook-input">
+        <p:option name="assert-valid" required="false" px:type="boolean" select="'true'">
+            <p:documentation>
+                Whether to stop processing and raise an error on validation issues.
+            </p:documentation>
+        </p:option>
+        <px:validate-with-relax-ng-and-report name="validate-dtbook-input">
             <p:input port="schema">
                 <p:document href="schema/dtbook-2005-3.rng"/>
             </p:input>
-        </p:validate-with-relax-ng>
+            <p:with-option name="assert-valid" select="$assert-valid"/>
+        </px:validate-with-relax-ng-and-report>
         <p:xslt name="generate-mods">
             <p:input port="stylesheet">
                 <p:document href="dtbook-to-mods-meta.xsl"/>
@@ -43,11 +54,17 @@
         <p:input port="source"/>
         <p:output port="result"/>
         <p:input port="parameters" kind="parameter"/>
-        <p:validate-with-relax-ng name="validate-dtbook-input">
+        <p:option name="assert-valid" required="false" px:type="boolean" select="'true'">
+            <p:documentation>
+                Whether to stop processing and raise an error on validation issues.
+            </p:documentation>
+        </p:option>
+        <px:validate-with-relax-ng-and-report name="validate-dtbook-input">
             <p:input port="schema">
                 <p:document href="schema/dtbook-2005-3.rng"/>
             </p:input>
-        </p:validate-with-relax-ng>
+            <p:with-option name="assert-valid" select="$assert-valid"/>
+        </px:validate-with-relax-ng-and-report>
         <p:xslt name="generate-zedai-meta">
             <p:input port="stylesheet">
                 <p:inline>

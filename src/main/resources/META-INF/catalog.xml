@@ -2,4 +2,5 @@
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
    <uri name="http://www.daisy.org/pipeline/modules/metadata-utils/metadata-utils-library.xpl"
         uri="../xml/metadata-utils-library.xpl"/>
+   <nextCatalog catalog="org:daisy:pipeline:modules:validation-utils"/>
 </catalog>
