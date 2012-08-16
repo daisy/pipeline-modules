@@ -19,7 +19,7 @@
         <p:variable name="mo-base" select="/*/@xml:base"/>
         <p:for-each>
             <p:iteration-source select="//mo:text"/>
-            <p:variable name="mo-src" select="p:resolve-uri(tokenize(/*/@src,'#')[1],$mo-base)"/>
+            <p:variable name="mo-src" select="resolve-uri(tokenize(/*/@src,'#')[1],$mo-base)"/>
             <p:add-attribute match="/*" attribute-name="href">
                 <p:input port="source">
                     <p:inline exclude-inline-prefixes="#all">

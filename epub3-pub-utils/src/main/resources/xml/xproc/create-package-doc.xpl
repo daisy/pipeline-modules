@@ -32,7 +32,7 @@
         <p:output port="result"/>
         <p:split-sequence>
             <p:with-option name="test"
-                select="if (not($nav-uri='')) then concat('/*/@xml:base=&quot;',p:resolve-uri($nav-uri),'&quot;') else '//html:nav/@*[name()=&quot;epub:type&quot;]=&quot;toc&quot;'">
+                select="if (not($nav-uri='')) then concat('/*/@xml:base=&quot;',resolve-uri($nav-uri),'&quot;') else '//html:nav/@*[name()=&quot;epub:type&quot;]=&quot;toc&quot;'">
                 <p:empty/>
             </p:with-option>
             <p:input port="source">
@@ -349,13 +349,13 @@
             <p:variable name="manifest-uri" select="/*/@xml:base"/>
             <p:viewport match="d:file">
                 <p:add-attribute match="/*" attribute-name="href">
-                    <p:with-option name="attribute-value" select="p:resolve-uri(/*/@href,$manifest-uri)"/>
+                    <p:with-option name="attribute-value" select="resolve-uri(/*/@href,$manifest-uri)"/>
                 </p:add-attribute>
                 <p:add-attribute match="/*" attribute-name="id">
                     <p:with-option name="attribute-value" select="concat('item_',p:iteration-position())"/>
                 </p:add-attribute>
                 <p:add-attribute match="/*" attribute-name="cover-image">
-                    <p:with-option name="attribute-value" select="p:resolve-uri(/*/@href,$manifest-uri)=p:resolve-uri($cover-image,$result-uri)"/>
+                    <p:with-option name="attribute-value" select="resolve-uri(/*/@href,$manifest-uri)=resolve-uri($cover-image,$result-uri)"/>
                 </p:add-attribute>
             </p:viewport>
         </p:group>
