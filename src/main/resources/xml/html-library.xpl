@@ -44,7 +44,7 @@
                     </p:input>
                 </p:xslt>
                 <p:add-attribute match="/*" attribute-name="xml:base">
-                    <p:with-option name="attribute-value" select="p:resolve-uri($href)">
+                    <p:with-option name="attribute-value" select="resolve-uri($href)">
                         <p:inline>
                             <irrelevant/>
                         </p:inline>
