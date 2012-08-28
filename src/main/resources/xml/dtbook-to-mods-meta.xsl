@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:dtb="http://www.daisy.org/z3986/2005/dtbook/" xmlns="http://www.loc.gov/mods/v3"
+    xmlns:dcterms="http://purl.org/dc/terms/"
     version="2.0" exclude-result-prefixes="dtb">
 
     <xsl:output indent="yes" method="xml"/>
@@ -129,9 +130,35 @@
     </xsl:template>
 
     <xsl:template match="dtb:meta[@name = 'dc:Type']">
-        <typeOfResource>
-            <xsl:value-of select="@content"/>
-        </typeOfResource>
+        <xsl:choose>
+            <xsl:when test="lower-case(@content) = 'text'">
+                <typeOfResource>text</typeOfResource>
+            </xsl:when>
+            <xsl:when test="lower-case(@content) = 'sound'">
+                <typeOfResource>sound recording</typeOfResource>
+            </xsl:when>
+            <xsl:when test="lower-case(@content) = 'image' or lower-case(@content) = 'stillimage'">
+                <typeOfResource>still image</typeOfResource>
+            </xsl:when>
+            <xsl:when test="lower-case(@content) = 'movingimage'">
+                <typeOfResource>moving image</typeOfResource>
+            </xsl:when>
+            <xsl:when test="lower-case(@content) = 'software'">
+                <typeOfResource>software, multimedia</typeOfResource>
+            </xsl:when>
+            <xsl:when test="empty(@content)">
+                <!-- empty values are permitted -->
+                <typeOfResource/>
+            </xsl:when>
+            <xsl:otherwise>
+                <!-- use the extension element to hold the dc:Type data -->
+                <xsl:element name="extension" namespace="dcterms">
+                    <dcterms:Type>
+                        <xsl:value-of select="@content"/>
+                    </dcterms:Type>
+                </xsl:element>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
     <xsl:template match="dtb:meta[@name = 'dc:Source' and @scheme = 'isbn']">
