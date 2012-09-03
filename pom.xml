@@ -19,6 +19,7 @@
   <description>Aggregator POM to build the DAISY Pipeline 2 utility modules.</description>
 
   <modules>
+    <module>common-utils</module>
     <module>dtbook-utils</module>
     <module>epub3-nav-utils</module>
     <module>epub3-ocf-utils</module>
