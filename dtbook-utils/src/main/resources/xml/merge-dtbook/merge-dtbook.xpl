@@ -50,15 +50,18 @@
             Collection of utilities for validation and reporting.
         </p:documentation>
     </p:import>
-
+    
+    <!--Store the first DTBook for later reference-->    
+    <p:split-sequence name="first-dtbook" initial-only="true" test="position()=1"/>
     <cx:message message="Merging DTBook documents"/>
+    <p:sink/>
 
     <p:for-each name="validate-input">
-        <p:output port="result">
-            <p:pipe step="ident" port="result"/>
-        </p:output>
+        <p:output port="result"/>
 
-        <p:iteration-source select="/"/>
+        <p:iteration-source>
+            <p:pipe port="source" step="merge-dtbook"/>
+        </p:iteration-source>
 
         <px:validate-with-relax-ng-and-report>
             <p:input port="schema">
@@ -67,89 +70,17 @@
             <p:with-option name="assert-valid" select="$assert-valid"/>
         </px:validate-with-relax-ng-and-report>
 
-        <p:identity name="ident"/>
-
     </p:for-each>
-
-    <p:for-each name="for-each-head">
-        <p:iteration-source select="//dtb:dtbook/dtb:head/*">
-            <p:pipe port="result" step="validate-input"/>
-        </p:iteration-source>
-        <p:output port="result"/>
-
-        <p:identity/>
-    </p:for-each>
-
-    <p:wrap-sequence name="wrap-head" wrapper="head"
-        wrapper-namespace="http://www.daisy.org/z3986/2005/dtbook/">
-        <p:input port="source">
-            <p:pipe step="for-each-head" port="result"/>
-        </p:input>
-    </p:wrap-sequence>
-
-    <p:for-each name="for-each-frontmatter">
-        <p:output port="result"/>
-        <p:iteration-source select="//dtb:dtbook/dtb:book/dtb:frontmatter/*">
-            <p:pipe port="result" step="validate-input"/>
-        </p:iteration-source>
-        <p:identity/>
-    </p:for-each>
-
-    <p:wrap-sequence name="wrap-frontmatter" wrapper="frontmatter"
-        wrapper-namespace="http://www.daisy.org/z3986/2005/dtbook/">
-        <p:input port="source">
-            <p:pipe step="for-each-frontmatter" port="result"/>
-        </p:input>
-    </p:wrap-sequence>
-
-    <p:for-each name="for-each-bodymatter">
-        <p:output port="result"/>
-        <p:iteration-source select="//dtb:dtbook/dtb:book/dtb:bodymatter/*">
-            <p:pipe port="result" step="validate-input"/>
-        </p:iteration-source>
-        <p:identity/>
-    </p:for-each>
-
-    <p:wrap-sequence name="wrap-bodymatter" wrapper="bodymatter"
-        wrapper-namespace="http://www.daisy.org/z3986/2005/dtbook/">
-        <p:input port="source">
-            <p:pipe step="for-each-bodymatter" port="result"/>
-        </p:input>
-    </p:wrap-sequence>
-
-    <p:for-each name="for-each-rearmatter">
-        <p:output port="result"/>
-        <p:iteration-source select="//dtb:dtbook/dtb:book/dtb:rearmatter/*">
-            <p:pipe port="result" step="validate-input"/>
-        </p:iteration-source>
-        <p:identity/>
-    </p:for-each>
-
-    <p:wrap-sequence name="wrap-rearmatter" wrapper="rearmatter"
-        wrapper-namespace="http://www.daisy.org/z3986/2005/dtbook/">
-        <p:input port="source">
-            <p:pipe step="for-each-rearmatter" port="result"/>
-        </p:input>
-    </p:wrap-sequence>
-
-    <p:wrap-sequence wrapper="dtbook" wrapper-namespace="http://www.daisy.org/z3986/2005/dtbook/">
-
-        <p:input port="source">
-            <p:pipe step="wrap-head" port="result"/>
-            <p:pipe step="wrap-frontmatter" port="result"/>
-            <p:pipe step="wrap-bodymatter" port="result"/>
-            <p:pipe step="wrap-rearmatter" port="result"/>
-        </p:input>
-    </p:wrap-sequence>
-
-    <p:add-attribute match="/dtb:dtbook" attribute-name="version" attribute-value="2005-3"/>
-
-    <p:xslt>
+    
+    <p:xslt template-name="merge">
         <p:input port="stylesheet">
-            <p:document href="remove-duplicates.xsl"/>
+            <p:document href="merge-dtbook.xsl"/>
         </p:input>
+        <p:with-option name="output-base-uri" select="base-uri()">
+            <p:pipe port="matched" step="first-dtbook"/>
+        </p:with-option>
     </p:xslt>
-
+    
     <px:validate-with-relax-ng-and-report name="validate-dtbook">
         <p:input port="schema">
             <p:document href="./schema/dtbook-2005-3.rng"/>
