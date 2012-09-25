@@ -31,6 +31,7 @@
     <module>mediatype-utils</module>
     <module>metadata-utils</module>
     <module>validation-utils</module>
+    <module>zedai-utils</module>
     <module>zip-utils</module>
   </modules>
 
