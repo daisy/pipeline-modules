@@ -5,7 +5,7 @@
 
     <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/xslt/uri-functions.xsl"/>
 
-    <xsl:variable name="base" select="f:longest-common-uri(distinct-values(/*/*/@xml:base))"/>
+    <xsl:variable name="base" select="f:longest-common-uri(distinct-values(/*//*/base-uri(.)))"/>
     <xsl:template match="@*|node()">
         <xsl:copy>
             <xsl:apply-templates select="@*|node()"/>
@@ -24,7 +24,7 @@
     <xsl:template match="d:file">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
-            <xsl:attribute name="href" select="pf:file-resolve-relative-uri(if (parent::*/@xml:base) then resolve-uri(@href,parent::*/@xml:base) else @href,$base)"/>
+            <xsl:attribute name="href" select="pf:relativize-uri(resolve-uri(@href,base-uri(.)),$base)"/>
             <xsl:apply-templates select="node()"/>
         </xsl:copy>
     </xsl:template>

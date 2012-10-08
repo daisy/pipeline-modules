@@ -5,7 +5,7 @@
     <xsl:template match="/*">
         <xsl:copy>
             <xsl:copy-of select="@*"/>
-            <xsl:variable name="xml-base" select="replace(pf:file-uri-ify(/*/@xml:base),'[^/]+$','')"/>
+            <xsl:variable name="xml-base" select="replace(pf:file-uri-ify(base-uri(/*)),'[^/]+$','')"/>
             <xsl:attribute name="xml:base" select="$xml-base"/>
             <xsl:apply-templates select="node()">
                 <xsl:with-param name="xml-base" select="$xml-base" tunnel="yes"/>

@@ -29,5 +29,5 @@
   </p:xslt>
   <p:unwrap match="/d:fileset/d:fileset"/>
   <p:delete match="//d:file[@href=preceding::d:file/@href]"/>
-
+  
 </p:declare-step>

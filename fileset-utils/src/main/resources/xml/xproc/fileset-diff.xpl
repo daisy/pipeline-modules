@@ -12,12 +12,12 @@
 
 
   <p:viewport match="d:file">
-    <p:variable name="href" select="resolve-uri(*/@href,base-uri())"/>
+    <p:variable name="href" select="*/resolve-uri(@href,base-uri(.))"/>
     <p:choose>
       <p:xpath-context>
         <p:pipe port="secondary" step="main"/>
       </p:xpath-context>
-      <p:when test="//d:file[resolve-uri(@href,base-uri())=$href]">
+      <p:when test="//d:file[resolve-uri(@href,base-uri(.))=$href]">
         <p:delete match="*"/>
       </p:when>
       <p:otherwise>

@@ -11,9 +11,10 @@
 
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
 
+<!--TODO awkward, add the entry with XProc, then perform URI cleanup-->
   <p:xslt name="href-uri">
     <p:with-param name="to" select="$href"/>
-    <p:with-param name="from" select="/*/@xml:base"/>
+    <p:with-param name="from" select="base-uri(/*)"/>
     <p:input port="stylesheet">
       <p:document href="fileset-add-entry.uri-ify.xsl"/>
     </p:input>
@@ -55,10 +56,16 @@
       <p:add-attribute match="/*" attribute-name="href">
         <p:with-option name="attribute-value" select="$href-uri-ified"/>
       </p:add-attribute>
+      <p:add-attribute match="/*" attribute-name="xml:base">
+        <p:with-option name="attribute-value" select="base-uri(/*)">
+          <p:pipe port="source" step="main"/>
+        </p:with-option>
+      </p:add-attribute>
+      <p:delete match="@xml:base"/>
       <!--Clean-up the media-type-->
       <p:delete match="@media-type[not(normalize-space())]"/>
     </p:group>
-
+    
     <!--Insert the entry as the last or first child of the file set-->
     <p:insert match="/*">
       <p:input port="source">
