@@ -4,7 +4,7 @@
     xmlns:epub="http://www.idpf.org/2007/ops"
     xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions">
     <xsl:variable name="base"
-        select="f:longest-common-uri(distinct-values(//@xml:base/replace(.,'^(.*/)[^/]*$','$1')))"/>
+        select="f:longest-common-uri(distinct-values(//*/replace(base-uri(.),'^(.*/)[^/]*$','$1')))"/>
     <xsl:template match="@*|node()">
         <xsl:copy>
             <xsl:apply-templates select="@*|node()"/>

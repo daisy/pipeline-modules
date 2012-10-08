@@ -7,7 +7,7 @@
     <p:input port="media-overlay" sequence="true"/>
     <p:output port="result" sequence="true"/>
     <p:option name="package-uri" required="false" select="''"/>
-    <p:variable name="packageUri" select="if ($package-uri='') then /*/@xml:base else $package-uri">
+    <p:variable name="packageUri" select="if ($package-uri='') then base-uri(/*) else $package-uri">
         <p:pipe port="package" step="main"/>
     </p:variable>
     
@@ -16,7 +16,7 @@
             <p:pipe port="media-overlay" step="main"/>
         </p:iteration-source>
         
-        <p:variable name="mo-base" select="/*/@xml:base"/>
+        <p:variable name="mo-base" select="base-uri(/*)"/>
         <p:for-each>
             <p:iteration-source select="//mo:text"/>
             <p:variable name="mo-src" select="resolve-uri(tokenize(/*/@src,'#')[1],$mo-base)"/>

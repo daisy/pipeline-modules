@@ -3,7 +3,7 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:mo="http://www.w3.org/ns/SMIL"
     xmlns:epub="http://www.idpf.org/2007/ops">
     <xsl:param name="id-prefix" required="yes"/>
-    <xsl:variable name="xml-base" select="replace(/*/@xml:base,'^(.+/)[^/]*$','$1')"/>
+    <xsl:variable name="xml-base" select="replace(base-uri(/*),'^(.+/)[^/]*$','$1')"/>
     <xsl:template match="@*|node()">
         <xsl:copy>
             <xsl:apply-templates select="@*|node()"/>

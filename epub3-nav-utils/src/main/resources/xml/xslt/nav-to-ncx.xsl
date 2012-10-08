@@ -130,7 +130,7 @@
 
     <xsl:template name="make-content">
         <xsl:if test="html:a">
-            <content src="{if (starts-with(html:a/@href,'#')) then concat(replace(/*/@xml:base,'^.*/([^/]*)$','$1'),html:a/@href) else html:a/@href}"/>
+            <content src="{if (starts-with(html:a/@href,'#')) then concat(replace(base-uri(/*),'^.*/([^/]*)$','$1'),html:a/@href) else html:a/@href}"/>
         </xsl:if>
     </xsl:template>
 

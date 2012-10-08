@@ -13,7 +13,7 @@
 
         <p:variable name="name" select="name(/*)"/>
         <p:variable name="id" select="/*/@id"/>
-        <p:variable name="src" select="/*/@xml:base"/>
+        <p:variable name="src" select="base-uri(/*)"/>
         <p:variable name="type" select="/*/@epub:type"/>
 
         <p:for-each name="rearrange.subcontent.recursion">

@@ -7,7 +7,7 @@
         <xsl:for-each select="(//*[@fragment=$fragment and @src=$src]/parent::*/child::audio)[1]"
             xpath-default-namespace="http://www.w3.org/ns/SMIL">
             <audio xmlns="http://www.w3.org/ns/SMIL" clipBegin="{@clipBegin}" clipEnd="{@clipEnd}"
-                src="{resolve-uri(@src,@xml:base)}"/>
+                src="{resolve-uri(@src,base-uri(.))}"/>
         </xsl:for-each>
     </xsl:template>
 </xsl:stylesheet>

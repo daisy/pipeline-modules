@@ -11,7 +11,8 @@
     
     <xsl:template match="d:*"/>
     
-    <xsl:template match="opf:item[@media-type='application/xhtml+xml']">
+    <!--FIXME-->
+    <!--<xsl:template match="opf:item[@media-type='application/xhtml+xml']">
         <xsl:copy>
             <xsl:copy-of select="@*"/>
             <xsl:variable name="href" select="resolve-uri(@href,$package-uri)"/>
@@ -19,6 +20,6 @@
                 <xsl:attribute name="media-overlay" select="//opf:item[resolve-uri(@href,$package-uri) = //d:mo[d:content/@href=$href]/@href]/@id"/>
             </xsl:if>
         </xsl:copy>
-    </xsl:template>
+    </xsl:template>-->
 
 </xsl:stylesheet>

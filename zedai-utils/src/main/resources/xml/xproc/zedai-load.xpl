@@ -37,7 +37,7 @@
 
     <p:group name="fileset">
         <p:output port="result"/>
-        <p:variable name="zedai-href" select="/*/@xml:base"/>
+        <p:variable name="zedai-href" select="base-uri(/*)"/>
         <p:variable name="fileset-base" select="replace($zedai-href,'[^/]+$','')"/>
         <p:for-each>
             <p:iteration-source select="//z:object[@src]"/>

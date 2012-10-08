@@ -32,7 +32,7 @@
         <p:output port="result"/>
         <p:split-sequence>
             <p:with-option name="test"
-                select="if (not($nav-uri='')) then concat('/*/@xml:base=&quot;',resolve-uri($nav-uri),'&quot;') else '//html:nav/@*[name()=&quot;epub:type&quot;]=&quot;toc&quot;'">
+                select="if (not($nav-uri='')) then concat('base-uri(/*)=&quot;',resolve-uri($nav-uri),'&quot;') else '//html:nav/@*[name()=&quot;epub:type&quot;]=&quot;toc&quot;'">
                 <p:empty/>
             </p:with-option>
             <p:input port="source">
@@ -122,7 +122,7 @@
             <p:iteration-source>
                 <p:pipe port="mediaoverlays" step="main"/>
             </p:iteration-source>
-            <p:variable name="base" select="/*/@xml:base"/>
+            <p:variable name="base" select="base-uri(/*)"/>
             <p:xslt>
                 <p:input port="parameters">
                     <p:empty/>
@@ -132,7 +132,7 @@
                 </p:input>
             </p:xslt>
             <p:add-attribute match="/*" attribute-name="refines">
-                <p:with-option name="attribute-value" select="concat('#',/*/d:file[replace(resolve-uri(@href,/*/@xml:base),'/+','/') = replace($base,'/+','/')]/@id)">
+                <p:with-option name="attribute-value" select="concat('#',/*/d:file[replace(resolve-uri(@href,base-uri(.)),'/+','/') = replace($base,'/+','/')]/@id)">
                     <p:pipe port="fileset" step="manifest"/>
                 </p:with-option>
             </p:add-attribute>
@@ -311,7 +311,7 @@
                 </p:otherwise>
             </p:choose>
             <p:add-attribute attribute-name="nav" match="/*/*">
-                <p:with-option name="attribute-value" select="/*/@xml:base=$doc-base">
+                <p:with-option name="attribute-value" select="base-uri(/*)=$doc-base">
                     <p:pipe port="result" step="nav-doc"/>
                 </p:with-option>
             </p:add-attribute>
@@ -323,7 +323,7 @@
             <p:iteration-source>
                 <p:pipe port="mediaoverlays" step="main"/>
             </p:iteration-source>
-            <p:variable name="doc-base" select="/*/@xml:base"/>
+            <p:variable name="doc-base" select="base-uri(/*)"/>
             <px:fileset-create>
                 <p:with-option name="base" select="$result-uri"/>
             </px:fileset-create>
@@ -346,16 +346,16 @@
         </px:fileset-join>
         <p:group name="manifest.ids">
             <p:output port="result"/>
-            <p:variable name="manifest-uri" select="/*/@xml:base"/>
+<!--            <p:variable name="manifest-uri" select="base-uri(/*)"/>-->
             <p:viewport match="d:file">
                 <p:add-attribute match="/*" attribute-name="href">
-                    <p:with-option name="attribute-value" select="resolve-uri(/*/@href,$manifest-uri)"/>
+                    <p:with-option name="attribute-value" select="/*/resolve-uri(@href,base-uri(.))"/>
                 </p:add-attribute>
                 <p:add-attribute match="/*" attribute-name="id">
                     <p:with-option name="attribute-value" select="concat('item_',p:iteration-position())"/>
                 </p:add-attribute>
                 <p:add-attribute match="/*" attribute-name="cover-image">
-                    <p:with-option name="attribute-value" select="resolve-uri(/*/@href,$manifest-uri)=resolve-uri($cover-image,$result-uri)"/>
+                    <p:with-option name="attribute-value" select="/*/resolve-uri(@href,base-uri(.))=resolve-uri($cover-image,$result-uri)"/>
                 </p:add-attribute>
             </p:viewport>
         </p:group>
@@ -401,7 +401,7 @@
             <p:output port="manifest">
                 <p:pipe port="result" step="manifest.out.manifest"/>
             </p:output>
-            <p:variable name="manifest-base" select="/*/@xml:base"/>
+            <p:variable name="manifest-base" select="base-uri(/*)"/>
             <p:viewport match="//d:file" name="manifest.out.fileset">
                 <p:output port="result"/>
                 <p:variable name="href" select="resolve-uri(/*/@href,$manifest-base)"/>
@@ -409,9 +409,9 @@
                     <p:xpath-context>
                         <p:pipe port="result" step="manifest.fallbacks"/>
                     </p:xpath-context>
-                    <p:when test="/*/d:file[resolve-uri(@href,/*/@xml:base)=$href]/@fallback">
+                    <p:when test="/*/d:file[resolve-uri(@href,base-uri(.))=$href]/@fallback">
                         <p:add-attribute match="/*" attribute-name="fallback">
-                            <p:with-option name="attribute-value" select="/*/d:file[resolve-uri(@href,/*/@xml:base)=$href]/@fallback">
+                            <p:with-option name="attribute-value" select="/*/d:file[resolve-uri(@href,base-uri(.))=$href]/@fallback">
                                 <p:pipe port="result" step="manifest.fallbacks"/>
                             </p:with-option>
                         </p:add-attribute>
@@ -444,11 +444,10 @@
         </p:for-each>
         <px:fileset-join/>
         <p:group>
-            <p:variable name="base" select="/*/@xml:base"/>
             <p:viewport match="/*/d:file">
-                <p:variable name="file-uri" select="resolve-uri(/*/@href,$base)"/>
+                <p:variable name="file-uri" select="/*/resolve-uri(@href,base-uri(.))"/>
                 <p:add-attribute match="/*" attribute-name="idref">
-                    <p:with-option name="attribute-value" select="/*/d:file[replace(resolve-uri(@href,/*/@xml:base),'/+','/') = replace($file-uri,'/+','/')]/@id">
+                    <p:with-option name="attribute-value" select="/*/d:file[replace(resolve-uri(@href,base-uri(.)),'/+','/') = replace($file-uri,'/+','/')]/@id">
                         <p:pipe port="fileset" step="manifest"/>
                     </p:with-option>
                 </p:add-attribute>
@@ -546,11 +545,10 @@
                     </p:input>
                 </p:identity>
                 <p:group>
-                    <p:variable name="base" select="/*/@xml:base"/>
                     <p:viewport match="/*/d:file">
-                        <p:variable name="file-uri" select="resolve-uri(/*/@href,$base)"/>
+                        <p:variable name="file-uri" select="/*/resolve-uri(@href,base-uri(.))"/>
                         <p:add-attribute match="/*" attribute-name="handler">
-                            <p:with-option name="attribute-value" select="concat('#',/*/d:file[replace(resolve-uri(@href,/*/@xml:base),'/+','/') = replace($file-uri,'/+','/')]/@id)">
+                            <p:with-option name="attribute-value" select="concat('#',/*/d:file[replace(resolve-uri(@href,base-uri(.)),'/+','/') = replace($file-uri,'/+','/')]/@id)">
                                 <p:pipe port="fileset" step="manifest"/>
                             </p:with-option>
                         </p:add-attribute>

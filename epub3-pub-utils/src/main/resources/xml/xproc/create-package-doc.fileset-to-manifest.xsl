@@ -14,9 +14,9 @@
                 <item>
                     <xsl:copy-of select="@href|@media-type|@id"/>
                     <xsl:variable name="item-uri-head"
-                        select="if (starts-with(resolve-uri(@href,/*/@xml:base),'file:/')) then 'file:' else replace(replace(resolve-uri(@href,/*/@xml:base),'^([^/]+/+[^/]+)/.*$','$1'),'/+','/')"/>
+                        select="if (starts-with(resolve-uri(@href,base-uri(.)),'file:/')) then 'file:' else replace(replace(resolve-uri(@href,base-uri(.)),'^([^/]+/+[^/]+)/.*$','$1'),'/+','/')"/>
                     <xsl:variable name="item-uri-tail"
-                        select="replace(if (starts-with(resolve-uri(@href,/*/@xml:base),'file:/')) then replace(resolve-uri(@href,/*/@xml:base),'^file:/+','') else replace(resolve-uri(@href,/*/@xml:base),'^[^/]+/+[^/]+/+',''),'/+','/')"/>
+                        select="replace(if (starts-with(resolve-uri(@href,base-uri(.)),'file:/')) then replace(resolve-uri(@href,base-uri(.)),'^file:/+','') else replace(resolve-uri(@href,base-uri(.)),'^[^/]+/+[^/]+/+',''),'/+','/')"/>
                     <xsl:if test="$item-uri-head=$result-uri-head">
                         <xsl:attribute name="href" select="f:relative-to(tokenize(concat($result-uri-head,'/',$result-uri-tail),'/+'),tokenize(concat($item-uri-head,'/',$item-uri-tail),'/+'),'')"/>
                     </xsl:if>

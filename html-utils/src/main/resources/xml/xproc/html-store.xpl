@@ -36,11 +36,9 @@
         <p:documentation>For manipulating files.</p:documentation>
     </p:import>
 
-    <p:variable name="fileset-base" select="/*/@xml:base"/>
+    <p:variable name="fileset-base" select="base-uri(/*)"/>
 
-    <cx:message message="Storing HTML fileset.">
-        <!--<p:log port="result" href="file:/tmp/out/log-fileset-in.xml"/>-->
-    </cx:message>
+    <cx:message message="Storing HTML fileset."/>
     <p:sink/>
 
     <p:for-each>
@@ -53,13 +51,11 @@
                     <d:file/>
                 </p:inline>
             </p:input>
-            <p:with-option name="attribute-value" select="resolve-uri(/*/@xml:base)"/>
+            <p:with-option name="attribute-value" select="resolve-uri(base-uri(/*))"/>
         </p:add-attribute>
     </p:for-each>
     <p:wrap-sequence wrapper="d:fileset"/>
-    <px:fileset-join name="fileset.in-memory">
-        <!--<p:log port="result" href="file:/tmp/out/log-fileset-mem.xml"/>-->
-    </px:fileset-join>
+    <px:fileset-join name="fileset.in-memory"/>
 
 
     <p:documentation>Store files and filters out missing files in the result fileset.</p:documentation>
@@ -83,7 +79,7 @@
                 </cx:message>
                 <p:split-sequence>
                     <p:with-option name="test"
-                        select="concat('/*/@xml:base=&quot;',$target,'&quot;')"/>
+                        select="concat('base-uri(/*)=&quot;',$target,'&quot;')"/>
                     <p:input port="source">
                         <p:pipe port="in-memory.in" step="main"/>
                     </p:input>

@@ -24,7 +24,7 @@
                 <p:with-option name="attribute-value" select="if (contains(/*/@src,'#')) then tokenize(/*/@src,'#')[last()] else ''"/>
             </p:add-attribute>
             <p:add-attribute attribute-name="src" match="/*">
-                <p:with-option name="attribute-value" select="resolve-uri(tokenize(/*/@src,'#')[1],/*/@xml:base)"/>
+                <p:with-option name="attribute-value" select="/*/resolve-uri(tokenize(@src,'#')[1],base-uri(.))"/>
             </p:add-attribute>
         </p:viewport>
         <p:xslt>
@@ -44,10 +44,10 @@
         <p:iteration-source>
             <p:pipe port="content" step="rearrange"/>
         </p:iteration-source>
-        <p:variable name="content-base" select="/*/@xml:base"/>
+        <p:variable name="content-base" select="base-uri(/*)"/>
 
         <p:add-attribute match="//*" attribute-name="xml:base" name="rearrange.for-each.content">
-            <p:with-option name="attribute-value" select="/*/@xml:base"/>
+            <p:with-option name="attribute-value" select="base-uri(/*)"/>
         </p:add-attribute>
         <p:wrap-sequence wrapper="content-and-mediaoverlay" wrapper-namespace="http://www.daisy.org/ns/pipeline/tmp">
             <p:input port="source">

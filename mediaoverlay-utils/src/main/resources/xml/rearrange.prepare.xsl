@@ -8,7 +8,7 @@
                 <xsl:variable name="src" select="."/>
                 <content xmlns="http://www.daisy.org/ns/pipeline/tmp" src="{$src}">
                     <xsl:for-each select="$document//mo:text[@src=$src]">
-                        <xsl:variable name="base" select="@xml:base"/>
+                        <xsl:variable name="base" select="base-uri(.)"/>
                         <text xmlns="http://www.daisy.org/ns/pipeline/tmp" smil-id="{@id}" src-fragment="{@fragment}" xml:base="{$base}">
                             <xsl:for-each select="../mo:audio">
                                 <audio xmlns="http://www.w3.org/ns/SMIL" src="{resolve-uri(@src,$base)}" id="{@id}" clipBegin="{@clipBegin}" clipEnd="{@clipEnd}"/>
