@@ -36,25 +36,21 @@
         <p:documentation>For manipulating files.</p:documentation>
     </p:import>
 
-    <p:variable name="fileset-base" select="base-uri(/*)"/>
-
     <cx:message message="Storing HTML fileset."/>
     <p:sink/>
 
+    <px:fileset-create name="fileset.in-memory-base" base="/"/>
     <p:for-each>
         <p:iteration-source>
             <p:pipe port="in-memory.in" step="main"/>
         </p:iteration-source>
-        <p:add-attribute attribute-name="href" match="/*">
+        <px:fileset-add-entry>
+            <p:with-option name="href" select="resolve-uri(base-uri(/*))"/>
             <p:input port="source">
-                <p:inline>
-                    <d:file/>
-                </p:inline>
+                <p:pipe port="result" step="fileset.in-memory-base"/>
             </p:input>
-            <p:with-option name="attribute-value" select="resolve-uri(base-uri(/*))"/>
-        </p:add-attribute>
+        </px:fileset-add-entry>
     </p:for-each>
-    <p:wrap-sequence wrapper="d:fileset"/>
     <px:fileset-join name="fileset.in-memory"/>
 
 
@@ -65,13 +61,13 @@
             <p:pipe port="fileset.in" step="main"/>
         </p:viewport-source>
         <p:variable name="on-disk" select="(/*/@original-href, '')[1]"/>
-        <p:variable name="target" select="resolve-uri(/*/@href, $fileset-base)"/>
+        <p:variable name="target" select="/*/resolve-uri(@href, base-uri(.))"/>
         <p:variable name="media-type" select="/*/@media-type"/>
         <p:choose>
             <p:xpath-context>
                 <p:pipe port="result" step="fileset.in-memory"/>
             </p:xpath-context>
-            <p:when test="//d:file[@href=$target]">
+            <p:when test="//d:file[resolve-uri(@href,base-uri(.))=$target]">
                 <p:documentation>File is in memory.</p:documentation>
                 <cx:message>
                     <p:with-option name="message" select="concat('Writing in-memory document to ',$target)"
