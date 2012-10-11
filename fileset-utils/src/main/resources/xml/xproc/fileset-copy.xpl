@@ -65,7 +65,7 @@
                 <!-- Handle relative resources in the base directory -->
                 <p:viewport name="handle-inner-file"
                     match="//d:file[not(matches(@href,'^[^/]+:')) and not(starts-with(@href,'..'))]">
-                    <p:variable name="href" select="resolve-uri(*/@href, concat(base-uri(),'/'))"/>
+                    <p:variable name="href" select="*/resolve-uri(@href, base-uri(.)))"/>
                     <p:variable name="target-file"
                         select="resolve-uri(*/@href, concat($target,'/'))"/>
                     <px:mkdir name="mkdir">
