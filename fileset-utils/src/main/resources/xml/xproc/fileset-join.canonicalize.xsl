@@ -5,18 +5,14 @@
     <xsl:template match="/*">
         <xsl:copy>
             <xsl:copy-of select="@*"/>
-            <xsl:variable name="xml-base" select="replace(pf:normalize-uri(base-uri(/*)),'[^/]+$','')"/>
-            <xsl:attribute name="xml:base" select="$xml-base"/>
-            <xsl:apply-templates select="node()">
-                <xsl:with-param name="xml-base" select="$xml-base" tunnel="yes"/>
-            </xsl:apply-templates>
+            <xsl:attribute name="xml:base" select="replace(pf:normalize-uri(base-uri(/*)),'[^/]+$','')"/>
+            <xsl:apply-templates/>
         </xsl:copy>
     </xsl:template>
     <xsl:template match="d:file">
-        <xsl:param name="xml-base" tunnel="yes"/>
         <xsl:copy>
             <xsl:copy-of select="@*"/>
-            <xsl:attribute name="href" select="resolve-uri(pf:normalize-uri(@href),$xml-base)"/>
+            <xsl:attribute name="href" select="pf:relativize-uri(pf:normalize-uri(@href),base-uri(.))"/>
         </xsl:copy>
     </xsl:template>
 </xsl:stylesheet>
