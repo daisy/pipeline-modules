@@ -610,5 +610,9 @@
             <p:document href="create-package-doc.remove-unused-namespaces.xsl"/>
         </p:input>
     </p:xslt>
+    <p:add-attribute match="/*" attribute-name="xml:base">
+        <p:with-option name="attribute-value" select="$result-uri"/>
+    </p:add-attribute>
+    <p:delete match="/*/@xml:base"/>
 
 </p:declare-step>
