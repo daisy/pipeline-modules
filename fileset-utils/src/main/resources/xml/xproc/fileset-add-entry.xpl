@@ -13,10 +13,22 @@
 
 <!--TODO awkward, add the entry with XProc, then perform URI cleanup-->
   <p:xslt name="href-uri">
-    <p:with-param name="to" select="$href"/>
-    <p:with-param name="from" select="base-uri(/*)"/>
+    <p:with-param name="uri" select="$href"/>
+    <p:with-param name="base" select="base-uri(/*)"/>
     <p:input port="stylesheet">
-      <p:document href="fileset-add-entry.uri-ify.xsl"/>
+      <p:inline>
+        <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
+          version="2.0" exclude-result-prefixes="#all">
+          <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/xslt/uri-functions.xsl"/>
+          <xsl:param name="uri" required="yes"/>
+          <xsl:param name="base" required="yes"/>
+          <xsl:template match="/*">
+            <d:file>
+              <xsl:attribute name="href" select="pf:relativize-uri($uri,$base)"/>
+            </d:file>
+          </xsl:template>
+        </xsl:stylesheet>
+      </p:inline>
     </p:input>
   </p:xslt>
   <p:sink/>
