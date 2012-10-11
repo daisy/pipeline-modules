@@ -76,7 +76,7 @@
         <p:input port="stylesheet">
             <p:document href="merge-dtbook.xsl"/>
         </p:input>
-        <p:with-option name="output-base-uri" select="base-uri()">
+        <p:with-option name="output-base-uri" select="base-uri(/*)">
             <p:pipe port="matched" step="first-dtbook"/>
         </p:with-option>
     </p:xslt>
