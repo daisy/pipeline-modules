@@ -30,7 +30,7 @@
     <xsl:template name="make-structure">
         <xsl:variable name="name" select="name()"/>
         <xsl:variable name="id" select="@id"/>
-        <xsl:variable name="src" select="base-uri(/*)"/>
+        <xsl:variable name="src" select="@xml:base"/>
         <xsl:variable name="type" select="@epub:type"/>
 
         <xsl:choose>
