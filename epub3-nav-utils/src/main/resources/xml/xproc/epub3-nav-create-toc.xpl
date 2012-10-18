@@ -8,11 +8,11 @@
     <p:option name="base-dir" select="''"/>
 
     <!--TODO honnor the 'untitled' option-->
-    <p:option name="untitled" select="'excluded'"/>
-    <!-- "visible" | "hidden" | "excluded" -->
+    <p:option name="untitled" select="'unwrap'"/>
+    <!-- "unwrap" (default) | "include" | "exclude" | "hide" -->
     <!--TODO honnor the 'sidebar' option-->
-    <p:option name="sidebars" select="'excluded'"/>
-    <!-- "visible" | "hidden" | "excluded" -->
+    <p:option name="sidebars" select="'exclude'"/>
+    <!-- "include" | "exclude" (default) | "hide" -->
     <!--TODO honnor the 'visible-depth' option-->
     <p:option name="visible-depth" select="-1"/>
     <!-- integer -->
@@ -32,10 +32,10 @@
                 <p:empty/>
             </p:input>
         </p:xslt>
+        <p:filter select="/h:ol/h:li[1]"/>
         <p:string-replace match="//@href">
             <p:with-option name="replace" select="concat('concat(&quot;',$base-ref,'&quot;,.)')"/>
         </p:string-replace>
-        <p:filter select="(//h:ol)[1]"/>
     </p:for-each>
 
     <p:insert match="/h:nav/h:ol" position="first-child">
@@ -49,8 +49,13 @@
             </p:inline>
         </p:input>
     </p:insert>
-
-    <p:unwrap match="/h:nav/h:ol/h:ol"/>
+    
+    <p:xslt>
+        <p:input port="stylesheet">
+            <p:document href="../xslt/nav-fixer.xsl"/>
+        </p:input>
+        <p:with-param name="untitled" select="$untitled"/>
+    </p:xslt>
 
     <!--TODO better handling of duplicate IDs-->
     <p:delete match="@xml:id|@id"/>
