@@ -18,8 +18,8 @@
 
     <xsl:template match="body|article|aside|nav|section">
         <xsl:variable name="id" select="@id"/>
-        <xsl:variable name="heading" select="(h1|h2|h3|h4|h5|h6|hgroup)[1]"/>
-        <xsl:variable name="heading-content" select="f:heading-content($heading,.)"/>
+        <xsl:variable name="heading" select="(h1|h2|h3|h4|h5|h6|hgroup)[1]" as="element()?"/>
+        <xsl:variable name="heading-content" select="f:heading-content($heading,.)" as="item()*"/>
         <xsl:variable name="children-doc">
             <xsl:copy-of select="* except $heading"/>
         </xsl:variable>
@@ -30,6 +30,9 @@
                 test="empty($children) or $children[1][f:is-heading(.) and f:rank(.) >= f:rank($heading)]">
                 <!--                <xsl:message select="concat('heading only: ',$heading)"/>-->
                 <li>
+                    <xsl:if test="empty($heading)">
+                        <xsl:attribute name="data-generated" select="'true'"/>
+                    </xsl:if>
                     <a href="#{$id}">
                         <xsl:copy-of select="$heading-content"/>
                     </a>
@@ -43,6 +46,9 @@
                     test="position()=1 and not(f:is-heading(.) and f:rank(.) ge f:rank($heading))">
                     <!--                    <xsl:message select="concat('heading and subsections: ',$heading)"/>-->
                     <li>
+                        <xsl:if test="empty($heading)">
+                            <xsl:attribute name="data-generated" select="'true'"/>
+                        </xsl:if>
                         <a href="#{$id}">
                             <xsl:copy-of select="$heading-content"/>
                         </a>
@@ -71,6 +77,9 @@
         <xsl:variable name="children" select="$children-doc/*" as="element()*"/>
         <!--        <xsl:message select="concat('implicit section ',$elems[1])"/>-->
         <li>
+            <xsl:if test="$elems[1]/empty(self::h1|self::h2|self::h3|self::h4|self::h5|self::h6|self::hgroup)">
+                <xsl:attribute name="data-generated" select="'true'"/>
+            </xsl:if>
             <a href="#{$elems[1]/@id}">
                 <xsl:copy-of select="f:heading-content($elems[1],())"/>
             </a>
