@@ -301,7 +301,7 @@
                         </p:with-option>
                     </p:add-attribute>
                     <p:add-attribute attribute-name="remote-resources" match="/*/*">
-                        <p:with-option name="attribute-value" select="count((//*/@src|//*/@href)[contains(tokenize(.,'/')[1],':')][1]) &gt; 0">
+                        <p:with-option name="attribute-value" select="count(//*/@src[contains(tokenize(.,'/')[1],':')][1]) &gt; 0">
                             <p:pipe port="result" step="manifest.content-docs.current"/>
                         </p:with-option>
                     </p:add-attribute>
