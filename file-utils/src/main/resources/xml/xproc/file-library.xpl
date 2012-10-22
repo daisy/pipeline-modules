@@ -142,6 +142,7 @@
         <p:output port="result" primary="false"/>
         <p:option name="href" required="true"/>
         <p:option name="delete-on-exit"/>
+        <p:option name="suffix"/>
     </p:declare-step>
 
     <!-- ============================================================ -->
