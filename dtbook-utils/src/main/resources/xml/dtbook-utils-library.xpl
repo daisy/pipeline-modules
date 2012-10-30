@@ -11,6 +11,10 @@
         </div>
     </p:documentation>
     
+    <p:import href="dtbook-load.xpl"/>
+    <p:import href="dtbook-store.xpl"/>
+    <p:import href="dtbook-fileset.xpl"/>
+    
     <p:import href="upgrade-dtbook/upgrade-dtbook.xpl"/>
     <p:import href="merge-dtbook/merge-dtbook.xpl"/>
     

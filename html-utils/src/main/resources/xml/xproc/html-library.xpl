@@ -40,16 +40,16 @@
                         <p:empty/>
                     </p:input>
                     <p:input port="stylesheet">
-                        <p:document href="remove-non-xhtml-namespaces.xsl"/>
+                        <p:document href="../xslt/remove-non-xhtml-namespaces.xsl"/>
                     </p:input>
                 </p:xslt>
-                <p:add-attribute match="/*" attribute-name="xml:base">
+                <!--<p:add-attribute match="/*" attribute-name="xml:base">
                     <p:with-option name="attribute-value" select="resolve-uri($href)">
                         <p:inline>
                             <irrelevant/>
                         </p:inline>
                     </p:with-option>
-                </p:add-attribute>
+                </p:add-attribute>-->
             </p:catch>
         </p:try>
     </p:declare-step>

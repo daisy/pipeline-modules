@@ -6,6 +6,10 @@
         uri="../xml/upgrade-dtbook/upgrade-dtbook.xpl"/>
    <uri name="http://www.daisy.org/pipeline/modules/dtbook-utils/dtbook-load.xpl"
         uri="../xml/dtbook-load.xpl"/>
+   <uri name="http://www.daisy.org/pipeline/modules/dtbook-utils/dtbook-store.xpl"
+        uri="../xml/dtbook-store.xpl"/>
+   <uri name="http://www.daisy.org/pipeline/modules/dtbook-utils/dtbook-fileset.xpl"
+        uri="../xml/dtbook-resources.xpl"/>
    <uri name="http://www.daisy.org/pipeline/modules/dtbook-utils/dtbook-utils-library.xpl"
         uri="../xml/dtbook-utils-library.xpl"/>
    <nextCatalog catalog="org:daisy:pipeline:modules:fileset-utils"/>
