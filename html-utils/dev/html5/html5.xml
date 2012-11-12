@@ -17,10 +17,12 @@
         <attribute name="translate"/>
         <attribute name="onabort"/>
         <attribute name="onblur"/>
+        <attribute name="oncancel"/>
         <attribute name="oncanplay"/>
         <attribute name="oncanplaythrough"/>
         <attribute name="onchange"/>
         <attribute name="onclick"/>
+        <attribute name="onclose"/>
         <attribute name="oncontextmenu"/>
         <attribute name="oncuechange"/>
         <attribute name="ondblclick"/>
@@ -116,7 +118,6 @@
     </element>
     <element name="script">
         <attribute name="src"/>
-        <attribute name="type"/>
         <attribute ref="global"/>
         <attribute name="src"/>
         <attribute name="async"/>
@@ -129,10 +130,14 @@
         <element name="link"/>
         <element name="style"/>
         <element name="meta"/>
-        <element name="noscript"/>
+        <element ref="transparent"/>
         <attribute ref="global"/>
     </element>
     <element name="body">
+        <element ref="flow"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="article">
         <element ref="flow"/>
         <attribute ref="global"/>
     </element>
@@ -144,42 +149,53 @@
         <element ref="flow"/>
         <attribute ref="global"/>
     </element>
-    <element name="article">
-        <element ref="flow"/>
-        <attribute ref="global"/>
-    </element>
     <element name="aside">
         <element ref="flow"/>
         <attribute ref="global"/>
     </element>
-    <element name="hgroup">
+    <element name="h1" matched="">
+        <element ref="phrasing"/>
         <attribute ref="global"/>
+    </element>
+    <element name="h2" matched="">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="h3" matched="">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="h4" matched="">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="h5" matched="">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="h6" matched="">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="hgroup">
         <element name="h1"/>
         <element name="h2"/>
         <element name="h3"/>
         <element name="h4"/>
         <element name="h5"/>
         <element name="h6"/>
+        <attribute ref="global"/>
     </element>
     <element name="header">
         <element ref="flow"/>
-        <element name="header"/>
-        <element name="footer"/>
         <attribute ref="global"/>
     </element>
     <element name="footer">
         <element ref="flow"/>
-        <element name="header"/>
-        <element name="footer"/>
         <attribute ref="global"/>
     </element>
     <element name="address">
         <element ref="flow"/>
-        <element ref="heading"/>
-        <element ref="sectioning"/>
-        <element name="header"/>
-        <element name="footer"/>
-        <element name="address"/>
         <attribute ref="global"/>
     </element>
     <element name="p">
@@ -222,10 +238,6 @@
     </element>
     <element name="dt">
         <element ref="flow"/>
-        <element name="header"/>
-        <element name="footer"/>
-        <element ref="sectioning"/>
-        <element ref="heading"/>
         <attribute ref="global"/>
     </element>
     <element name="dd">
@@ -246,7 +258,7 @@
         <attribute ref="global"/>
     </element>
     <element name="a">
-        <element ref="interactive"/>
+        <element ref="transparent"/>
         <attribute ref="global"/>
         <attribute name="href"/>
         <attribute name="target"/>
@@ -282,7 +294,6 @@
     </element>
     <element name="dfn">
         <element ref="phrasing"/>
-        <element name="dfn"/>
         <attribute ref="global"/>
         <attribute name="title"/>
     </element>
@@ -312,6 +323,14 @@
         <element ref="phrasing"/>
         <attribute ref="global"/>
     </element>
+    <element name="sub" matched="">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
+    <element name="sup" matched="">
+        <element ref="phrasing"/>
+        <attribute ref="global"/>
+    </element>
     <element name="i">
         <element ref="phrasing"/>
         <attribute ref="global"/>
@@ -329,9 +348,6 @@
         <attribute ref="global"/>
     </element>
     <element name="ruby">
-        <element ref="phrasing"/>
-        <element name="rt"/>
-        <element name="rp"/>
         <attribute ref="global"/>
     </element>
     <element name="rt">
@@ -361,11 +377,13 @@
         <attribute ref="global"/>
     </element>
     <element name="ins">
+        <element ref="transparent"/>
         <attribute ref="global"/>
         <attribute name="cite"/>
         <attribute name="datetime"/>
     </element>
     <element name="del">
+        <element ref="transparent"/>
         <attribute ref="global"/>
         <attribute name="cite"/>
         <attribute name="datetime"/>
@@ -399,6 +417,8 @@
     </element>
     <element name="object">
         <element name="param"/>
+        <element ref="flow"/>
+        <element ref="interactive"/>
         <attribute ref="global"/>
         <attribute name="data"/>
         <attribute name="type"/>
@@ -417,6 +437,7 @@
     <element name="video">
         <attribute name="src"/>
         <element name="track"/>
+        <element ref="transparent"/>
         <element name="source"/>
         <attribute ref="global"/>
         <attribute name="src"/>
@@ -434,6 +455,7 @@
     <element name="audio">
         <attribute name="src"/>
         <element name="track"/>
+        <element ref="transparent"/>
         <element name="source"/>
         <attribute ref="global"/>
         <attribute name="src"/>
@@ -460,11 +482,13 @@
         <attribute name="default"/>
     </element>
     <element name="canvas">
+        <element ref="transparent"/>
         <attribute ref="global"/>
         <attribute name="width"/>
         <attribute name="height"/>
     </element>
     <element name="map">
+        <element ref="transparent"/>
         <attribute ref="global"/>
         <attribute name="name"/>
     </element>
@@ -492,7 +516,6 @@
     </element>
     <element name="caption">
         <element ref="flow"/>
-        <element name="table"/>
         <attribute ref="global"/>
     </element>
     <element name="colgroup">
@@ -531,19 +554,15 @@
     </element>
     <element name="th">
         <element ref="flow"/>
-        <element name="header"/>
-        <element name="footer"/>
-        <element ref="sectioning"/>
-        <element ref="heading"/>
         <attribute ref="global"/>
         <attribute name="colspan"/>
         <attribute name="rowspan"/>
         <attribute name="headers"/>
         <attribute name="scope"/>
+        <attribute name="abbr"/>
     </element>
     <element name="form">
         <element ref="flow"/>
-        <element name="form"/>
         <attribute ref="global"/>
         <attribute name="accept-charset"/>
         <attribute name="action"/>
@@ -568,7 +587,6 @@
     </element>
     <element name="label">
         <element ref="phrasing"/>
-        <element name="label"/>
         <attribute ref="global"/>
         <attribute name="form"/>
         <attribute name="for"/>
@@ -608,7 +626,6 @@
     </element>
     <element name="button">
         <element ref="phrasing"/>
-        <element ref="interactive"/>
         <attribute ref="global"/>
         <attribute name="autofocus"/>
         <attribute name="disabled"/>
@@ -687,14 +704,12 @@
     </element>
     <element name="progress">
         <element ref="phrasing"/>
-        <element name="progress"/>
         <attribute ref="global"/>
         <attribute name="value"/>
         <attribute name="max"/>
     </element>
     <element name="meter">
         <element ref="phrasing"/>
-        <element name="meter"/>
         <attribute ref="global"/>
         <attribute name="value"/>
         <attribute name="min"/>
@@ -730,6 +745,11 @@
         <attribute ref="global"/>
         <attribute name="type"/>
         <attribute name="label"/>
+    </element>
+    <element name="dialog">
+        <element ref="flow"/>
+        <attribute ref="global"/>
+        <attribute name="open"/>
     </element>
     <content name="metadata">
         <element name="base"/>
@@ -784,6 +804,8 @@
         <element name="small"/>
         <element name="span"/>
         <element name="strong"/>
+        <element name="sub"/>
+        <element name="sup"/>
         <element name="textarea"/>
         <element name="time"/>
         <element name="u"/>
@@ -814,6 +836,7 @@
         <element name="del"/>
         <element name="details"/>
         <element name="dfn"/>
+        <element name="dialog"/>
         <element name="div"/>
         <element name="dl"/>
         <element name="em"/>
@@ -822,6 +845,12 @@
         <element name="figure"/>
         <element name="footer"/>
         <element name="form"/>
+        <element name="h1"/>
+        <element name="h2"/>
+        <element name="h3"/>
+        <element name="h4"/>
+        <element name="h5"/>
+        <element name="h6"/>
         <element name="header"/>
         <element name="hgroup"/>
         <element name="hr"/>
@@ -855,6 +884,8 @@
         <element name="span"/>
         <element name="strong"/>
         <element name="style"/>
+        <element name="sub"/>
+        <element name="sup"/>
         <element name="table"/>
         <element name="textarea"/>
         <element name="time"/>
@@ -863,21 +894,6 @@
         <element name="var"/>
         <element name="video"/>
         <element name="wbr"/>
-        <element name="h1"/>
-        <element name="h2"/>
-        <element name="h3"/>
-        <element name="h4"/>
-        <element name="h5"/>
-        <element name="h6"/>
-    </content>
-    <content name="heading">
-        <element name="hgroup"/>
-    </content>
-    <content name="sectioning">
-        <element name="article"/>
-        <element name="aside"/>
-        <element name="nav"/>
-        <element name="section"/>
     </content>
     <content name="phrasing">
         <element name="a"/>
@@ -922,6 +938,8 @@
         <element name="small"/>
         <element name="span"/>
         <element name="strong"/>
+        <element name="sub"/>
+        <element name="sup"/>
         <element name="textarea"/>
         <element name="time"/>
         <element name="u"/>
@@ -946,40 +964,4 @@
         <element name="textarea"/>
         <element name="video"/>
     </content>
-    <element name="h1">
-        <element ref="flow"/>
-        <element ref="heading"/>
-        <element ref="phrasing"/>
-        <attribute ref="global"/>
-    </element>
-    <element name="h2">
-        <element ref="flow"/>
-        <element ref="heading"/>
-        <element ref="phrasing"/>
-        <attribute ref="global"/>
-    </element>
-    <element name="h3">
-        <element ref="flow"/>
-        <element ref="heading"/>
-        <element ref="phrasing"/>
-        <attribute ref="global"/>
-    </element>
-    <element name="h4">
-        <element ref="flow"/>
-        <element ref="heading"/>
-        <element ref="phrasing"/>
-        <attribute ref="global"/>
-    </element>
-    <element name="h5">
-        <element ref="flow"/>
-        <element ref="heading"/>
-        <element ref="phrasing"/>
-        <attribute ref="global"/>
-    </element>
-    <element name="h6">
-        <element ref="flow"/>
-        <element ref="heading"/>
-        <element ref="phrasing"/>
-        <attribute ref="global"/>
-    </element>
 </html5>

@@ -119,12 +119,18 @@
                 <p:wrap-sequence wrapper="info"/>
                 <p:choose name="mkdir">
                     <p:when test="empty(/info/*)">
+                        <cx:message>
+                            <p:with-option name="message" select="concat('Making directory: ',$target-dir)"/>
+                        </cx:message>
                         <px:mkdir>
                             <p:with-option name="href" select="$target-dir"/>
                         </px:mkdir>
                     </p:when>
                     <p:when test="not(/info/c:directory)">
                         <!--TODO rename the error-->
+                        <cx:message>
+                            <p:with-option name="message" select="concat('The target is not a directory: ',$target)"/>
+                        </cx:message>
                         <p:error code="err:file">
                             <p:input port="source">
                                 <p:inline exclude-inline-prefixes="d">
@@ -146,11 +152,32 @@
                             <p:with-option name="href" select="$on-disk"/>
                             <p:with-option name="target" select="$target"/>
                         </px:copy>
+
+                        <p:group name="dbg">
+                            <p:identity>
+                                <p:input port="source">
+                                    <p:inline>
+                                        <c:request method="GET" override-content-type="text/plain"/>
+                                    </p:inline>
+                                </p:input>
+                            </p:identity>
+                            <p:add-attribute match="/*" attribute-name="href">
+                                <p:with-option name="attribute-value" select="$on-disk"/>
+                            </p:add-attribute>
+                            <p:http-request>
+                                <p:log port="result" href="file:/home/jostein/Skrivebord/dtbook-store.http-request.log.xml"/>
+                            </p:http-request>
+                            <p:sink/>
+                        </p:group>
+
                         <p:identity>
                             <p:input port="source">
                                 <p:pipe port="current" step="store"/>
                             </p:input>
                         </p:identity>
+                        <cx:message>
+                            <p:with-option name="message" select="concat('Copied from ',$on-disk,' to ',$target)"/>
+                        </cx:message>
                     </p:group>
                     <p:catch name="store.copy.catch">
                         <p:output port="result"/>

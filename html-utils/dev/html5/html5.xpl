@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns:px="http://www.daisy.org/ns/pipeline/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:h="http://www.w3.org/1999/xhtml" version="1.0" exclude-inline-prefixes="px">
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns:px="http://www.daisy.org/ns/pipeline/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:h="http://www.w3.org/1999/xhtml"
+    version="1.0" exclude-inline-prefixes="px">
 
+    <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/html-utils/html-library.xpl"/>
 
-    <!--<px:html-load href="http://dev.w3.org/html5/spec/Overview.html"/>
+    <!--<px:html-load href="http://dev.w3.org/html5/spec/single-page.html"/>
     <p:store href="HTML5.xhtml"/>-->
     <p:load href="HTML5.xhtml" name="input"/>
 
@@ -35,14 +37,18 @@
             </p:inline>
         </p:input>
     </p:xslt>
+    <p:viewport match="//h:dd">
+        <p:delete match="h:a[matches(string-join(preceding::text(),' '),' no ')]"/>
+    </p:viewport>
     <p:identity name="h4-groups"/>
 
     <p:delete match="text()"/>
-    <p:delete match="/*/*[not(self::h:section and matches(h:h4/@id,'^the-.*-element$'))]"/>
+    <p:delete match="/*/*[not(self::h:section and matches(h:h4/@id,'^the-.*-element[-\ds]*$'))]"/>
     <p:delete match="//h:section/*[not(self::h:h1 or self::h:h2 or self::h:h3 or self::h:h4 or self::h:h5 or self::h:h6 or self::h:dl[@class='element'])]"/>
     <p:for-each>
         <p:iteration-source select="/*/*"/>
-        <p:variable name="element" select="/*/*[self::h:h1 or self::h:h2 or self::h:h3 or self::h:h4 or self::h:h5 or self::h:h6]/replace(@id,'^the-(.*)-element$','$1')"/>
+        <p:variable name="element" select="/*/*[self::h:h1 or self::h:h2 or self::h:h3 or self::h:h4 or self::h:h5 or self::h:h6]/replace(@id,'^the-(.*)-element[-\ds]*$','$1')"/>
+        <!--<p:variable name="element" select="if (starts-with($element1,'h1,')) then 'h1' else $element1"/>-->
         <p:delete match="/*/*[self::h:h1 or self::h:h2 or self::h:h3 or self::h:h4 or self::h:h5 or self::h:h6]"/>
         <p:xslt>
             <p:input port="parameters">
@@ -71,6 +77,43 @@
         <p:add-attribute match="/*" attribute-name="name">
             <p:with-option name="attribute-value" select="$element"/>
         </p:add-attribute>
+        
+        <p:choose>
+            <p:when test="matches(/*/@name,'[,-]')">
+                <p:xslt>
+                    <p:input port="parameters">
+                        <p:empty/>
+                    </p:input>
+                    <p:input port="stylesheet">
+                        <p:inline>
+                            <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0">
+                                <xsl:template match="/*">
+                                    <xsl:variable name="element" select="/*"/>
+                                    <wrapper>
+                                        <xsl:for-each select="if (matches(@name,',')) then tokenize(replace(replace(@name,'-and-','-'),'-',''),',') else tokenize(replace(replace(@name,'-and-','-'),',',''),'-')">
+                                            <d:element name="{.}" matched="">
+                                                <xsl:copy-of select="$element/node()"/>
+                                            </d:element>
+                                        </xsl:for-each>
+                                    </wrapper>
+                                </xsl:template>
+                            </xsl:stylesheet>
+                        </p:inline>
+                    </p:input>
+                </p:xslt>
+                <p:for-each>
+                    <p:iteration-source select="/*/*"/>
+                    <p:identity/>
+                </p:for-each>
+            </p:when>
+            <p:otherwise>
+                <p:identity/>
+            </p:otherwise>
+        </p:choose>
+        <p:identity/>
+    </p:for-each>
+    
+    <p:for-each>
         <p:viewport match="//d:dfn">
             <p:variable name="dfn-name" select="(/*/*[1]//h:a[starts-with(@href,'#element-dfn-')])[1]/replace(@href,'#element-dfn-','')"/>
             <p:rename match="/*">
@@ -78,8 +121,8 @@
             </p:rename>
             <p:delete match="h:dt"/>
             <p:unwrap match="/*//*[not(self::h:a)]"/>
-            <p:delete match="//h:a//node()"/>
             <p:viewport match="//h:a">
+                <p:output port="result" sequence="true"/>
                 <p:variable name="href" select="/*/@href"/>
                 <p:delete match="/*/@*[not(local-name()='href')]"/>
                 <p:choose>
@@ -90,26 +133,60 @@
                             <p:with-option name="attribute-value" select="replace($href,'^#attr-.*?-(.*)$','$1')"/>
                         </p:add-attribute>
                     </p:when>
-                    <p:when test="matches($href,'^#.*?-attributes$')">
+                    <p:when test="matches($href,'^#.*?-attributes[-\d]*$')">
                         <p:delete match="/*/@href"/>
                         <p:rename match="/*" new-name="d:attribute"/>
                         <p:add-attribute match="/*" attribute-name="ref">
-                            <p:with-option name="attribute-value" select="replace($href,'^#(.*?)-attributes$','$1')"/>
+                            <p:with-option name="attribute-value" select="replace($href,'^#(.*?)-attributes[-\d]*$','$1')"/>
                         </p:add-attribute>
                     </p:when>
-                    <p:when test="matches($href,'^#the-.*-element$')">
+                    <p:when test="matches($href,'^#the-.*-element[-\ds]*$')">
                         <p:delete match="/*/@href"/>
                         <p:rename match="/*" new-name="d:element"/>
                         <p:add-attribute match="/*" attribute-name="name">
-                            <p:with-option name="attribute-value" select="replace($href,'^#the-(.*)-element$','$1')"/>
+                            <p:with-option name="attribute-value" select="replace($href,'^#the-(.*)-element[-\ds]*$','$1')"/>
                         </p:add-attribute>
+                        <p:choose>
+                            <p:when test="matches(/*/@name,'[,-]')">
+                                <p:xslt>
+                                    <p:input port="parameters">
+                                        <p:empty/>
+                                    </p:input>
+                                    <p:input port="stylesheet">
+                                        <p:inline>
+                                            <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0">
+                                                <xsl:template match="/*">
+                                                    <wrapper>
+                                                        <xsl:for-each select="if (matches(@name,',')) then tokenize(replace(replace(@name,'-and-','-'),'-',''),',') else tokenize(replace(replace(@name,'-and-','-'),',',''),'-')">
+                                                            <d:element name="{.}"/>
+                                                        </xsl:for-each>
+                                                    </wrapper>
+                                                </xsl:template>
+                                            </xsl:stylesheet>
+                                        </p:inline>
+                                    </p:input>
+                                </p:xslt>
+                                <p:for-each>
+                                    <p:iteration-source select="/*/*"/>
+                                    <p:identity/>
+                                </p:for-each>
+                            </p:when>
+                            <p:otherwise>
+                                <p:identity/>
+                            </p:otherwise>
+                        </p:choose>
                     </p:when>
-                    <p:when test="matches($href,'^#.*-content$')">
+                    <p:when test="matches($href,'^#.*-content[-\d]*$')">
                         <p:delete match="/*/@href"/>
                         <p:rename match="/*" new-name="d:element"/>
                         <p:add-attribute match="/*" attribute-name="ref">
-                            <p:with-option name="attribute-value" select="replace($href,'^#(.*)-content$','$1')"/>
+                            <p:with-option name="attribute-value" select="replace($href,'^#(.*)-content[-\d]*$','$1')"/>
                         </p:add-attribute>
+                    </p:when>
+                    <p:when test="matches($href,'^#transparent$')">
+                        <p:delete match="/*/@href"/>
+                        <p:rename match="/*" new-name="d:element"/>
+                        <p:add-attribute match="/*" attribute-name="ref" attribute-value="transparent"/>
                     </p:when>
                     <p:otherwise>
                         <p:identity/>
@@ -128,7 +205,7 @@
 
     <p:for-each>
         <p:output port="result" sequence="true"/>
-        <p:iteration-source select="//d:element[string-length(@ref) &gt; 0 and not(@ref=preceding::d:element/@ref)]">
+        <p:iteration-source select="//d:element[string-length(@ref) &gt; 0 and not(@ref=preceding::d:element/@ref) and not(@ref='transparent')]">
             <p:pipe port="result" step="elements-and-attributes"/>
         </p:iteration-source>
         <p:variable name="ref" select="/*/@ref"/>
@@ -137,6 +214,9 @@
                 <p:pipe step="h4-groups" port="result"/>
             </p:input>
         </p:identity>
+        <cx:message>
+            <p:with-option name="message" select="concat('parsing content model: ',$ref)"/>
+        </cx:message>
         <p:filter>
             <p:with-option name="select" select="concat('//h:section[.//*[@id=concat(&quot;',$ref,'&quot;,&quot;-content&quot;)]]')"/>
         </p:filter>
@@ -149,11 +229,11 @@
         <p:viewport match="//h:a">
             <p:variable name="href" select="/*/@href"/>
             <p:choose>
-                <p:when test="matches($href,'^#the-.*-element$')">
+                <p:when test="matches($href,'^#the-.*-element[-\ds]*$')">
                     <p:delete match="/*/@*"/>
                     <p:rename match="/*" new-name="d:element"/>
                     <p:add-attribute match="/*" attribute-name="name">
-                        <p:with-option name="attribute-value" select="replace($href,'^#the-(.*)-element$','$1')"/>
+                        <p:with-option name="attribute-value" select="replace($href,'^#the-(.*)-element[-\ds]*$','$1')"/>
                     </p:add-attribute>
                 </p:when>
                 <p:otherwise>
@@ -164,6 +244,38 @@
         <p:delete match="d:element[@name=preceding-sibling::d:element/@name or @ref=preceding-sibling::d:element/@ref]"/>
         <p:delete match="h:a"/>
         <p:rename match="/*" new-name="d:content"/>
+        
+        <p:viewport match="/*/d:element">
+            <p:choose>
+                <p:when test="matches(/*/@name,'[,-]')">
+                    <p:xslt>
+                        <p:input port="parameters">
+                            <p:empty/>
+                        </p:input>
+                        <p:input port="stylesheet">
+                            <p:inline>
+                                <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0">
+                                    <xsl:template match="/*">
+                                        <wrapper>
+                                            <xsl:for-each select="if (matches(@name,',')) then tokenize(replace(replace(@name,'-and-','-'),'-',''),',') else tokenize(replace(replace(@name,'-and-','-'),',',''),'-')">
+                                                <d:element name="{.}"/>
+                                            </xsl:for-each>
+                                        </wrapper>
+                                    </xsl:template>
+                                </xsl:stylesheet>
+                            </p:inline>
+                        </p:input>
+                    </p:xslt>
+                    <p:for-each>
+                        <p:iteration-source select="/*/*"/>
+                        <p:identity/>
+                    </p:for-each>
+                </p:when>
+                <p:otherwise>
+                    <p:identity/>
+                </p:otherwise>
+            </p:choose>
+        </p:viewport>
     </p:for-each>
     <p:identity name="contents"/>
 
@@ -197,11 +309,11 @@
                         <p:with-option name="attribute-value" select="replace($href,'^#attr-(.*)$','$1')"/>
                     </p:add-attribute>
                 </p:when>
-                <p:when test="matches($href,'^#the-.*-attribute$')">
+                <p:when test="matches($href,'^#the-.*-attribute[-\d]*$')">
                     <p:delete match="/*/@href"/>
                     <p:rename match="/*" new-name="d:attribute"/>
                     <p:add-attribute match="/*" attribute-name="name">
-                        <p:with-option name="attribute-value" select="replace($href,'^#the-(.*)-attribute$','$1')"/>
+                        <p:with-option name="attribute-value" select="replace($href,'^#the-(.*)-attribute[-\d]*$','$1')"/>
                     </p:add-attribute>
                 </p:when>
                 <p:when test="matches($href,'^#handler-.*$')">
@@ -260,7 +372,7 @@
         </p:input>
     </p:xslt>
 
-    <p:insert match="/*" position="last-child">
+    <!--<p:insert match="/*" position="last-child">
         <p:input port="insertion" select="/*/*">
             <p:inline exclude-inline-prefixes="#all">
                 <wrapper xmlns="http://www.daisy.org/ns/pipeline/data">
@@ -333,8 +445,8 @@
                 </wrapper>
             </p:inline>
         </p:input>
-    </p:insert>
-    
+    </p:insert>-->
+
     <p:insert match="/*/*[@name='global']" position="first-child">
         <p:input port="insertion" select="/*">
             <p:inline exclude-inline-prefixes="#all">
