@@ -39,5 +39,5 @@
             <p:document href="join.xsl"/>
         </p:input>
     </p:xslt>
-    <p:delete match="/*/descendant::*/@xml:base"/>
+    <p:delete match="/*//*/@xml:base"/>
 </p:declare-step>

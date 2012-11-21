@@ -19,14 +19,6 @@
         </smil>
     </xsl:template>
 
-    <!--<di:smil-map>
-        <di:content src="file:/media/500GB/minishare/minifrontpage/fp2003_frontmatter.html">
-            <di:text smil-id="mo1_mo1_tx0001" src-fragment="cn0001" xml:base="file:/media/500GB/minishare/minifrontpage/s0001.smil">
-                <audio src="001_microsoft_office_frontpage_2003__inside_out.mp3" id="mo1_mo1_rgn_aud_0001_0001" clipBegin="0s" clipEnd="5.399s"/>
-            </di:text>
-        </di:content>
-    </di:smil-map>-->
-
     <xsl:template name="make-structure">
         <xsl:variable name="name" select="name()"/>
         <xsl:variable name="id" select="@id"/>
