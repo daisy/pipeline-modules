@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<utfx:tests xmlns:utfx="http://utfx.org/test-definition"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<utfx:tests xmlns:utfx="http://utfx.org/test-definition" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
     <utfx:stylesheet src="utfx/uri-functions-tester.xsl"/>
 
@@ -9,26 +8,26 @@
         <utfx:assert-equal>
             <utfx:source>
                 <tests>
-                    <test function="relativize" uri="file:/dir/file.xml" base="file:/dir/" expected="file.xml"/>
-                    <test function="relativize" uri="file:/dir/file.xml" base="file:/dir/otherfile.xml" expected="file.xml"/>
-                    <test function="relativize" uri="file:/dir/file.xml" base="file:/dir/otherfile.xml#fragment" expected="file.xml"/>
-                    <test function="relativize" uri="file:/dir/file.xml" base="file:/dir/file.xml" expected="file.xml"/>
-                    <test function="relativize" uri="file:/dir/file.xml#fragment" base="file:/dir/" expected="file.xml#fragment"/>
-                    <test function="relativize" uri="file:/dir/file.xml" base="file:/dir" expected="dir/file.xml"/>
-                    <test function="relativize" uri="file:/dir/file.xml" base="file:/" expected="dir/file.xml"/>
-                    <test function="relativize" uri="file:/file.xml" base="file:/" expected="file.xml"/>
-                    <test function="relativize" uri="file:/dir/file.xml" base="file:/dir/sub/" expected="../file.xml"/>
-                    <test function="relativize" uri="file:/dir/sub/file.xml" base="file:/dir/other/other/" expected="../../sub/file.xml"/>
-                    <test function="relativize" uri="file:/dir/sub/file.xml" base="file:/dir/other/other/file.xml" expected="../../sub/file.xml"/>
-                    <test function="relativize" uri="file:/dir/sub/file.xml" base="file:/dir/" expected="sub/file.xml"/>
-                    <test function="relativize" uri="file:/dir/anydir/../anyother/sub/../../thedir/file.xml" base="file:/dir/sub/sub/" expected="../../thedir/file.xml"/>
-                    <test function="relativize" uri="http://example.org/file.xml" base="file:/dir/" expected="http://example.org/file.xml"/>
-                    <test function="relativize" uri="http://example.org/file.xml" base="http://example.net/" expected="http://example.org/file.xml"/>
-                    <test function="relativize" uri="file:/dir/file.xml" base="relative/" expected="file:/dir/file.xml"/>
-                    <test function="relativize" uri="relative/file.xml" base="file:/home/user/dir/" expected="relative/file.xml"/>
-                    <test function="relativize" uri="../relative/file.xml" base="file:/home/user/dir/" expected="../relative/file.xml"/>
-                    <test function="relativize" uri="" base="file:/dir/" expected=""/>
-                    <test function="relativize" uri="" base="" expected=""/>
+                    <test function="relativize-uri" uri="file:/dir/file.xml" base="file:/dir/" expected="file.xml"/>
+                    <test function="relativize-uri" uri="file:/dir/file.xml" base="file:/dir/otherfile.xml" expected="file.xml"/>
+                    <test function="relativize-uri" uri="file:/dir/file.xml" base="file:/dir/otherfile.xml#fragment" expected="file.xml"/>
+                    <test function="relativize-uri" uri="file:/dir/file.xml" base="file:/dir/file.xml" expected="file.xml"/>
+                    <test function="relativize-uri" uri="file:/dir/file.xml#fragment" base="file:/dir/" expected="file.xml#fragment"/>
+                    <test function="relativize-uri" uri="file:/dir/file.xml" base="file:/dir" expected="dir/file.xml"/>
+                    <test function="relativize-uri" uri="file:/dir/file.xml" base="file:/" expected="dir/file.xml"/>
+                    <test function="relativize-uri" uri="file:/file.xml" base="file:/" expected="file.xml"/>
+                    <test function="relativize-uri" uri="file:/dir/file.xml" base="file:/dir/sub/" expected="../file.xml"/>
+                    <test function="relativize-uri" uri="file:/dir/sub/file.xml" base="file:/dir/other/other/" expected="../../sub/file.xml"/>
+                    <test function="relativize-uri" uri="file:/dir/sub/file.xml" base="file:/dir/other/other/file.xml" expected="../../sub/file.xml"/>
+                    <test function="relativize-uri" uri="file:/dir/sub/file.xml" base="file:/dir/" expected="sub/file.xml"/>
+                    <test function="relativize-uri" uri="file:/dir/anydir/../anyother/sub/../../thedir/file.xml" base="file:/dir/sub/sub/" expected="../../thedir/file.xml"/>
+                    <test function="relativize-uri" uri="http://example.org/file.xml" base="file:/dir/" expected="http://example.org/file.xml"/>
+                    <test function="relativize-uri" uri="http://example.org/file.xml" base="http://example.net/" expected="http://example.org/file.xml"/>
+                    <test function="relativize-uri" uri="file:/dir/file.xml" base="relative/" expected="file:/dir/file.xml"/>
+                    <test function="relativize-uri" uri="relative/file.xml" base="file:/home/user/dir/" expected="relative/file.xml"/>
+                    <test function="relativize-uri" uri="../relative/file.xml" base="file:/home/user/dir/" expected="../relative/file.xml"/>
+                    <test function="relativize-uri" uri="" base="file:/dir/" expected=""/>
+                    <test function="relativize-uri" uri="" base="" expected=""/>
                 </tests>
             </utfx:source>
             <utfx:expected>
@@ -36,50 +35,74 @@
             </utfx:expected>
         </utfx:assert-equal>
     </utfx:test>
+    
     <utfx:test>
         <utfx:name>normalize-uri</utfx:name>
         <utfx:assert-equal>
             <utfx:source>
                 <tests>
-                    <test function="normalize" uri="" expected=""/>
+                    <test function="normalize-uri" uri="" expected=""/>
                     <!-- URI components are kept -->
-                    <test function="normalize" uri="file.xml?q=a#id" expected="file.xml?q=a#id"/>
-                    <test function="normalize" uri="mailto:johndoe@example.org" expected="mailto:johndoe@example.org"/>
-                    <test function="normalize" uri="http://www.google.com" expected="http://www.google.com"/>
-                    <test function="normalize" uri="http://www.google.com/" expected="http://www.google.com/"/>
+                    <test function="normalize-uri" uri="file.xml?q=a#id" expected="file.xml?q=a#id"/>
+                    <test function="normalize-uri" uri="mailto:johndoe@example.org" expected="mailto:johndoe@example.org"/>
+                    <test function="normalize-uri" uri="http://www.google.com" expected="http://www.google.com"/>
+                    <test function="normalize-uri" uri="http://www.google.com/" expected="http://www.google.com/"/>
                     <!-- empty authority is removed -->
-                    <test function="normalize" uri="file:///" expected="file:/"/>
-                    <test function="normalize" uri="file:///dir/" expected="file:/dir/"/>
+                    <test function="normalize-uri" uri="file:///" expected="file:/"/>
+                    <test function="normalize-uri" uri="file:///dir/" expected="file:/dir/"/>
                     <!-- '/' normalization -->
-                    <test function="normalize" uri="////dir////sub///" expected="/dir/sub/"/>
+                    <test function="normalize-uri" uri="////dir////sub///" expected="/dir/sub/"/>
                     <!-- '.' normalization -->
-                    <test function="normalize" uri="." expected=""/>
-                    <test function="normalize" uri="./dir" expected="dir"/>
-                    <test function="normalize" uri="././dir" expected="dir"/>
-                    <test function="normalize" uri="/." expected="/"/>
-                    <test function="normalize" uri="dir/." expected="dir/"/>
-                    <test function="normalize" uri="dir/./." expected="dir/"/>
-                    <test function="normalize" uri="dir/./././sub/" expected="dir/sub/"/>
+                    <test function="normalize-uri" uri="." expected=""/>
+                    <test function="normalize-uri" uri="./dir" expected="dir"/>
+                    <test function="normalize-uri" uri="././dir" expected="dir"/>
+                    <test function="normalize-uri" uri="/." expected="/"/>
+                    <test function="normalize-uri" uri="dir/." expected="dir/"/>
+                    <test function="normalize-uri" uri="dir/./." expected="dir/"/>
+                    <test function="normalize-uri" uri="dir/./././sub/" expected="dir/sub/"/>
                     <!-- '..' normalization -->
-                    <test function="normalize" uri="dir/.../sub" expected="dir/.../sub"/>
-                    <test function="normalize" uri="..." expected="..."/>
-                    <test function="normalize" uri=".." expected="../"/>
-                    <test function="normalize" uri="./.." expected="../"/>
-                    <test function="normalize" uri="../." expected="../"/>
-                    <test function="normalize" uri=".../.." expected=""/>
-                    <test function="normalize" uri="dir/.." expected=""/>
-                    <test function="normalize" uri="dir/sub/.." expected="dir/"/>
-                    <test function="normalize" uri="dir/../other/" expected="other/"/>
-                    <test function="normalize" uri="dir/dir/../../other/" expected="other/"/>
-                    <test function="normalize" uri="dir/sub/sub/../.." expected="dir/"/>
-                    <test function="normalize" uri="dir/sub/../" expected="dir/"/>
-                    <test function="normalize" uri="dir/sub/./../" expected="dir/"/>
-                    <test function="normalize" uri="dir/sub/.././../" expected=""/>
-                    <test function="normalize" uri="dir/../.." expected="../"/>
-                    <test function="normalize" uri="/.." expected="/"/>
-                    <test function="normalize" uri="/dir/../.." expected="/"/>
+                    <test function="normalize-uri" uri="dir/.../sub" expected="dir/.../sub"/>
+                    <test function="normalize-uri" uri="..." expected="..."/>
+                    <test function="normalize-uri" uri=".." expected="../"/>
+                    <test function="normalize-uri" uri="./.." expected="../"/>
+                    <test function="normalize-uri" uri="../." expected="../"/>
+                    <test function="normalize-uri" uri=".../.." expected=""/>
+                    <test function="normalize-uri" uri="dir/.." expected=""/>
+                    <test function="normalize-uri" uri="dir/sub/.." expected="dir/"/>
+                    <test function="normalize-uri" uri="dir/../other/" expected="other/"/>
+                    <test function="normalize-uri" uri="dir/dir/../../other/" expected="other/"/>
+                    <test function="normalize-uri" uri="dir/sub/sub/../.." expected="dir/"/>
+                    <test function="normalize-uri" uri="dir/sub/../" expected="dir/"/>
+                    <test function="normalize-uri" uri="dir/sub/./../" expected="dir/"/>
+                    <test function="normalize-uri" uri="dir/sub/.././../" expected=""/>
+                    <test function="normalize-uri" uri="dir/../.." expected="../"/>
+                    <test function="normalize-uri" uri="/.." expected="/"/>
+                    <test function="normalize-uri" uri="/dir/../.." expected="/"/>
                     <!-- normalization combined -->
-                    <test function="normalize" uri="///././//dir////sub///" expected="/dir/sub/"/>
+                    <test function="normalize-uri" uri="///././//dir////sub///" expected="/dir/sub/"/>
+                </tests>
+            </utfx:source>
+            <utfx:expected>
+                <tests/>
+            </utfx:expected>
+        </utfx:assert-equal>
+    </utfx:test>
+    
+    <utfx:test>
+        <utfx:name>longest-common-uri</utfx:name>
+        <utfx:assert-equal>
+            <utfx:source>
+                <tests>
+                    <test function="longest-common-uri" uris="file:/tmp/home/user/dir1/dir2/file.xml file:/tmp/home/user/dir3/dir4" expected="file:/tmp/home/user/"/>
+                    <test function="longest-common-uri" uris="file:/tmp/home/user/dir1/dir2/file.xml file:/tmp/home/user/dir1/dir2/file.xml" expected="file:/tmp/home/user/dir1/dir2/file.xml"/>
+                    <test function="longest-common-uri" uris="dir1/dir2/file.xml dir1/dir4" expected="dir1/"/>
+                    <test function="longest-common-uri" uris="dir1/dir2/file.xml dir3/dir4" expected=""/>
+                    <test function="longest-common-uri" uris="dir1/dir2/file.xml dir1/dir2/file.xml" expected="dir1/dir2/file.xml"/>
+                    <test function="longest-common-uri" uris="http://www.example.com/ file:/tmp/home/user/" expected=""/>
+                    <test function="longest-common-uri" uris="http://www.example.com/ http://www.example.com/" expected="http://www.example.com/"/>
+                    <test function="longest-common-uri" uris="http:///www.example.com/ http://///www.example.com//" expected="http://www.example.com/"/>
+                    <test function="longest-common-uri" uris="file:/tmp/home/user/dir1 file://tmp/home/user/dir2" expected="file:/tmp/home/user/"/>
+                    <test function="longest-common-uri" uris="file:/tmp/home/user/dir1/dir2/file.xml file:/tmp/home/user/dir2/dir3 file:/tmp/home/user/dir4/dir5" expected="file:/tmp/home/user/"/>
                 </tests>
             </utfx:source>
             <utfx:expected>

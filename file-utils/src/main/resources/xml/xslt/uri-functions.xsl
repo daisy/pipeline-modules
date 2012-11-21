@@ -122,5 +122,22 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:function>
+    
+    <xsl:function name="pf:longest-common-uri">
+        <xsl:param name="uris"/>
+        <xsl:choose>
+            <xsl:when test="count($uris)=1">
+                <xsl:value-of select="$uris"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:variable name="a" select="for $part in tokenize(pf:normalize-uri(replace($uris[1],'/+','SLASH|/')),'/') return replace($part,'SLASH\|$','/')"/>
+                <xsl:variable name="b" select="for $part in tokenize(pf:normalize-uri(replace($uris[2],'/+','SLASH|/')),'/') return replace($part,'SLASH\|$','/')"/>
+                <xsl:variable name="longest-common" select="for $i in 1 to count($a) return if ($a[$i]=$b[$i]) then $a[$i] else '	'"/>
+                <xsl:variable name="longest-common" select="for $i in 1 to count($a) return if ($longest-common[position()&lt;=$i]='	') then () else $longest-common[$i]"/>
+                <xsl:variable name="longest-common" select="concat($longest-common[1],if (matches($longest-common[1],'^\w+:/$') and not(matches($longest-common[1],'^file:/'))) then '/' else '',string-join($longest-common[position()&gt;1],''))"/>
+                <xsl:value-of select="string-join($longest-common,' | ')"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:function>
 
 </xsl:stylesheet>
