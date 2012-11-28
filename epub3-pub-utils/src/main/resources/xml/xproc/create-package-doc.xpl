@@ -23,10 +23,9 @@
     <p:option name="compatibility-mode" required="false" select="'true'"/>
     <p:option name="detect-properties" required="false" select="'true'"/>
     <p:option name="result-uri" required="true"/>
-    <p:output port="result" primary="true" sequence="true"/>
+    <p:output port="result" primary="true"/>
 
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/xproc/fileset-library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/epub3-pub-utils/xproc/epub3-pub-library.xpl"/>
 
     <p:group name="nav-doc">
         <p:output port="result"/>
@@ -73,11 +72,11 @@
             <p:when test="empty(/opf:metadata/dc:identifier)">
                 <p:insert match="opf:metadata" position="first-child">
                     <p:input port="insertion">
-                        <p:inline>
+                        <p:inline exclude-inline-prefixes="#all">
                             <dc:identifier id="pub-id">@@</dc:identifier>
                         </p:inline>
-                        <p:inline>
-                            <meta xmlns="http://www.idpf.org/2007/opf" refines="#pub-id" property="identifier-type" scheme="xsd:string">uuid</meta>
+                        <p:inline xmlns="http://www.idpf.org/2007/opf" exclude-inline-prefixes="#all">
+                            <meta refines="#pub-id" property="identifier-type" scheme="xsd:string">uuid</meta>
                         </p:inline>
                     </p:input>
                 </p:insert>
@@ -440,7 +439,7 @@
             </p:input>
         </p:identity>
         <p:for-each>
-            <p:delete match="/*/*[position() &gt; 1]"/>
+            <p:delete match="/d:fileset/d:file[not(@media-type='application/xhtml+xml')]"/>
         </p:for-each>
         <px:fileset-join/>
         <p:group>
@@ -596,23 +595,23 @@
             <p:identity/>
         </p:otherwise>
     </p:choose>
-    <px:epub3-pub-assign-media-overlays>
-        <p:input port="media-overlay">
+    <!--hack to set the base URI-->
+    <p:add-attribute match="*" attribute-name="xml:base">
+        <p:with-option name="attribute-value" select="$result-uri"/>
+    </p:add-attribute>
+    <p:identity name="package-without-mo"/>
+    <p:xslt>
+        <p:input port="stylesheet">
+            <p:document href="assign-media-overlays.xsl"/>
+        </p:input>
+        <p:input port="source">
+            <p:pipe port="result" step="package-without-mo"></p:pipe>
             <p:pipe port="mediaoverlays" step="main"/>
         </p:input>
-        <p:with-option name="package-uri" select="$result-uri"/>
-    </px:epub3-pub-assign-media-overlays>
-    <p:xslt>
         <p:input port="parameters">
             <p:empty/>
         </p:input>
-        <p:input port="stylesheet">
-            <p:document href="create-package-doc.remove-unused-namespaces.xsl"/>
-        </p:input>
     </p:xslt>
-    <p:add-attribute match="/*" attribute-name="xml:base">
-        <p:with-option name="attribute-value" select="$result-uri"/>
-    </p:add-attribute>
-    <p:delete match="/*/@xml:base"/>
+    <p:delete match="@xml:base"/>
 
 </p:declare-step>
