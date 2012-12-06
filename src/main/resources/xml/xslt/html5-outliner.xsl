@@ -156,7 +156,7 @@
         <xsl:choose>
             <xsl:when
                 test="$node[self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6]">
-                <xsl:sequence select="$node/(*|text())"/>
+                <xsl:apply-templates select="$node/(*|text())" mode="heading-content"/>
             </xsl:when>
             <xsl:when test="$node[self::hgroup]">
                 <xsl:variable name="rank" select="f:rank($node)"/>
@@ -179,4 +179,17 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:function>
+    
+    <xsl:template match="a" mode="heading-content">
+        <span>
+            <xsl:copy-of select="@class|@dir|@lang|@title"/>
+            <xsl:apply-templates mode="heading-content"/>
+        </span>
+    </xsl:template>
+    <xsl:template match="node() | @*" mode="heading-content">
+        <xsl:copy>
+            <xsl:apply-templates select="node() | @*" mode="heading-content"/>
+        </xsl:copy>
+    </xsl:template>
+    
 </xsl:stylesheet>
