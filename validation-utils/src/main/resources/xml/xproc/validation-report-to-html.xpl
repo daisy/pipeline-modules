@@ -59,7 +59,7 @@
         
     </p:for-each>
     
-    <p:wrap-sequence name="combine-reports" wrapper="div" wrapper-namespace="http://www.w3.org/1999/xhtml"/>
+    <!--<p:wrap-sequence name="combine-reports" wrapper="div" wrapper-namespace="http://www.w3.org/1999/xhtml"/>-->
         
     
     <p:insert position="last-child" match="//xhtml:body" name="assemble-html-report">
@@ -98,13 +98,13 @@
                         </style>
                     </head>
                     <body>
-                        <div id="header">Validation Results</div>
+                        <div id="header"><h1>Validation Results</h1></div>
                     </body>
                 </html>
             </p:inline>
         </p:input>
         <p:input port="insertion">
-            <p:pipe port="result" step="combine-reports"/>
+            <p:pipe port="result" step="convert-to-html"/>
         </p:input>
     </p:insert>    
 </p:declare-step>
