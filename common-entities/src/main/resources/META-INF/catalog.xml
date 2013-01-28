@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" xml:base="../xml/">
+	
+	<public publicId='-//NISO//DTD dtbook 2005-1//EN' uri='dtbook-2005-1.dtd'/>
+	<system systemId='http://www.daisy.org/z3986/2005/dtbook-2005-1.dtd' uri='dtbook-2005-1.dtd'/>
+
+	<public publicId='-//NISO//DTD dtbook 2005-2//EN' uri='dtbook-2005-2.dtd'/>
+	<system systemId='http://www.daisy.org/z3986/2005/dtbook-2005-2.dtd' uri='dtbook-2005-2.dtd'/>
+
+	<public publicId='-//NISO//DTD dtbook 2005-3//EN' uri='dtbook-2005-3.dtd'/>
+	<system systemId='http://www.daisy.org/z3986/2005/dtbook-2005-3.dtd' uri='dtbook-2005-3.dtd'/>
+
+	<public publicId='-//W3C//DTD SMIL 1.0//EN' uri='SMIL10.dtd'/>
+	<system systemId='http://www.w3.org/TR/REC-smil/SMIL10.dtd' uri='SMIL10.dtd'/>
+
+	<public publicId='-//W3C//DTD XHTML 1.0 Frameset//EN' uri='xhtml1-frameset.dtd'/>
+	<system systemId='http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd' uri='xhtml1-frameset.dtd'/>
+
+	<public publicId='-//W3C//DTD XHTML 1.0 Strict//EN' uri='xhtml1-strict.dtd'/>
+	<system systemId='http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd' uri='xhtml1-strict.dtd'/>
+
+	<public publicId='-//W3C//DTD XHTML 1.0 Transitional//EN' uri='xhtml1-transitional.dtd'/>
+	<system systemId='http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd' uri='xhtml1-transitional.dtd'/>
+
+	<public publicId='-//W3C//ENTITIES Latin 1 for XHTML//EN' uri='xhtml-lat1.ent'/>
+	<system systemId='http://www.w3.org/TR/xhtml1/DTD/xhtml-lat1.ent' uri='xhtml-lat1.ent'/>
+
+	<public publicId='-//W3C//ENTITIES Special for XHTML//EN"' uri='xhtml-special.ent'/>
+	<system systemId='http://www.w3.org/TR/xhtml1/DTD/xhtml-special.ent' uri='xhtml-special.ent'/>
+
+	<public publicId='-//W3C//ENTITIES Symbols for XHTML//EN' uri='xhtml-symbol.ent'/>
+	<system systemId='http://www.w3.org/TR/xhtml1/DTD/xhtml-symbol.ent' uri='xhtml-symbol.ent'/>
+</catalog>
