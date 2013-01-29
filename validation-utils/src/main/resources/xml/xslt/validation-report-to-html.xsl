@@ -8,7 +8,17 @@
     <xsl:output xml:space="default" media-type="text/html" indent="yes"/>
     <xsl:template match="/">
         <div class="document-validation-report">
-            <xsl:apply-templates/>
+            <xsl:apply-templates select="d:document-info"/>
+            <xsl:choose>
+                <xsl:when test="count(descendant::svrl:failed-assert) = 0 and
+                    count(descendant::svrl:successful-report) = 0 and 
+                    count(descendant::c:error) = 0">
+                    <p>No errors found.</p>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:apply-templates/>
+                </xsl:otherwise>
+            </xsl:choose>
         </div>
     </xsl:template>
     

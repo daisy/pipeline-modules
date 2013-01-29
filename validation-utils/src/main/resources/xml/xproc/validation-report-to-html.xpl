@@ -59,9 +59,6 @@
         
     </p:for-each>
     
-    <!--<p:wrap-sequence name="combine-reports" wrapper="div" wrapper-namespace="http://www.w3.org/1999/xhtml"/>-->
-        
-    
     <p:insert position="last-child" match="//xhtml:body" name="assemble-html-report">
         <p:input port="source">
             <p:inline>
