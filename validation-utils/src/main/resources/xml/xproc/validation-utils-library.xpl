@@ -17,8 +17,13 @@
     
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
     
-    <p:import href="create-validation-report-wrapper.xpl"/>
-    <p:import href="validation-report-to-html.xpl"/>
+    <p:import href="create-validation-report-wrapper.xpl">
+        <p:documentation>Utility step that creates an XML wrapper for validation reports.</p:documentation>
+    </p:import>
+    
+    <p:import href="validation-report-to-html.xpl">
+        <p:documentation>Step that converts a series of reports or wrapped reports (see above) into one HTML report.</p:documentation>
+    </p:import>
     
     <p:documentation>Performs RELAX NG validation, returning two results: the source document (validated, if validation succeeds) and a report of the validation errors (if any). This step comes from the XProc.org library.</p:documentation>
     <p:declare-step name="main" type="l:relax-ng-report">
