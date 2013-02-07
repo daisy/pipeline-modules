@@ -1,0 +1,643 @@
+
+<d:document-validation-report xmlns:d="http://www.daisy.org/ns/pipeline/data">
+    <d:document-info>
+        <d:document-name>dtbook.xml</d:document-name>
+
+        <d:document-type>DTBook 2005-3</d:document-type>
+
+        <d:document-path>file:/Users/marisa/Projects/pipeline2/pipeline-scripts/nimas-fileset-validator/src/test/greatpainters-text-files-only/dtbook.xml</d:document-path>
+    </d:document-info>
+    <d:reports>
+        <svrl:schematron-output xmlns:svrl="http://purl.oclc.org/dsdl/svrl"
+            xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:saxon="http://saxon.sf.net/" xmlns:schold="http://www.ascc.net/xml/schematron"
+            xmlns:iso="http://purl.oclc.org/dsdl/schematron"
+            xmlns:xhtml="http://www.w3.org/1999/xhtml"
+            xmlns:dtb="http://www.daisy.org/z3986/2005/dtbook/"
+            xmlns:m="http://www.w3.org/1998/Math/MathML" title="" schemaVersion="">
+            <!--   
+		   
+		   
+		 -->
+            <svrl:ns-prefix-in-attribute-values uri="http://www.daisy.org/z3986/2005/dtbook/"
+                prefix="dtb"/>
+            <svrl:ns-prefix-in-attribute-values uri="http://www.w3.org/1998/Math/MathML" prefix="m"/>
+            <svrl:active-pattern
+                document="file:/Users/marisa/Projects/pipeline2/pipeline-scripts/nimas-fileset-validator/src/test/greatpainters-text-files-only/dtbook.xml"
+                id="id-unique" name="id-unique"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:fired-rule context="*[@id]"/>
+            <svrl:active-pattern
+                document="file:/Users/marisa/Projects/pipeline2/pipeline-scripts/nimas-fileset-validator/src/test/greatpainters-text-files-only/dtbook.xml"
+                id="dtbook_MetaUid" name="dtbook_MetaUid"/>
+            <svrl:fired-rule context="dtb:head"/>
+            <svrl:fired-rule context="dtb:meta[@name='dtb:uid']"/>
+            <svrl:active-pattern
+                document="file:/Users/marisa/Projects/pipeline2/pipeline-scripts/nimas-fileset-validator/src/test/greatpainters-text-files-only/dtbook.xml"
+                id="dtbook_MetaTitle" name="dtbook_MetaTitle"/>
+            <svrl:fired-rule context="dtb:head"/>
+            <svrl:fired-rule context="dtb:meta[@name='dc:Title']"/>
+            <svrl:active-pattern
+                document="file:/Users/marisa/Projects/pipeline2/pipeline-scripts/nimas-fileset-validator/src/test/greatpainters-text-files-only/dtbook.xml"
+                id="dtbook_idrefNote" name="dtbook_idrefNote"/>
+            <svrl:fired-rule context="dtb:noteref"/>
+            <svrl:fired-rule context="dtb:noteref"/>
+            <svrl:fired-rule context="dtb:noteref"/>
+            <svrl:fired-rule context="dtb:noteref"/>
+            <svrl:fired-rule context="dtb:noteref"/>
+            <svrl:fired-rule context="dtb:noteref"/>
+            <svrl:fired-rule context="dtb:noteref"/>
+            <svrl:fired-rule context="dtb:noteref"/>
+            <svrl:fired-rule context="dtb:noteref"/>
+            <svrl:fired-rule context="dtb:noteref"/>
+            <svrl:active-pattern
+                document="file:/Users/marisa/Projects/pipeline2/pipeline-scripts/nimas-fileset-validator/src/test/greatpainters-text-files-only/dtbook.xml"
+                id="dtbook_idrefAnnotation" name="dtbook_idrefAnnotation"/>
+            <svrl:active-pattern
+                document="file:/Users/marisa/Projects/pipeline2/pipeline-scripts/nimas-fileset-validator/src/test/greatpainters-text-files-only/dtbook.xml"
+                id="dtbook_internalLinks" name="dtbook_internalLinks"/>
+            <svrl:active-pattern
+                document="file:/Users/marisa/Projects/pipeline2/pipeline-scripts/nimas-fileset-validator/src/test/greatpainters-text-files-only/dtbook.xml"
+                id="dtbook_enumAttrInList" name="dtbook_enumAttrInList"/>
+            <svrl:active-pattern
+                document="file:/Users/marisa/Projects/pipeline2/pipeline-scripts/nimas-fileset-validator/src/test/greatpainters-text-files-only/dtbook.xml"
+                id="dtbook_depthList" name="dtbook_depthList"/>
+            <svrl:active-pattern
+                document="file:/Users/marisa/Projects/pipeline2/pipeline-scripts/nimas-fileset-validator/src/test/greatpainters-text-files-only/dtbook.xml"
+                id="dtbook_headersThTd" name="dtbook_headersThTd"/>
+            <svrl:active-pattern
+                document="file:/Users/marisa/Projects/pipeline2/pipeline-scripts/nimas-fileset-validator/src/test/greatpainters-text-files-only/dtbook.xml"
+                id="dtbook_imgrefProdnote" name="dtbook_imgrefProdnote"/>
+            <svrl:active-pattern
+                document="file:/Users/marisa/Projects/pipeline2/pipeline-scripts/nimas-fileset-validator/src/test/greatpainters-text-files-only/dtbook.xml"
+                id="dtbook_imgrefCaption" name="dtbook_imgrefCaption"/>
+            <svrl:fired-rule context="dtb:caption[@imgref]"/>
+            <svrl:fired-rule context="dtb:caption[@imgref]"/>
+            <svrl:fired-rule context="dtb:caption[@imgref]"/>
+            <svrl:fired-rule context="dtb:caption[@imgref]"/>
+            <svrl:fired-rule context="dtb:caption[@imgref]"/>
+            <svrl:active-pattern
+                document="file:/Users/marisa/Projects/pipeline2/pipeline-scripts/nimas-fileset-validator/src/test/greatpainters-text-files-only/dtbook.xml"
+                id="dtbook_accesskeyTabindex" name="dtbook_accesskeyTabindex"/>
+            <svrl:active-pattern
+                document="file:/Users/marisa/Projects/pipeline2/pipeline-scripts/nimas-fileset-validator/src/test/greatpainters-text-files-only/dtbook.xml"
+                id="dtbook_charAttribute" name="dtbook_charAttribute"/>
+            <svrl:active-pattern
+                document="file:/Users/marisa/Projects/pipeline2/pipeline-scripts/nimas-fileset-validator/src/test/greatpainters-text-files-only/dtbook.xml"
+                id="dtbook_imgWidthHeight" name="dtbook_imgWidthHeight"/>
+            <svrl:fired-rule context="dtb:img"/>
+            <svrl:fired-rule context="dtb:img"/>
+            <svrl:fired-rule context="dtb:img"/>
+            <svrl:fired-rule context="dtb:img"/>
+            <svrl:fired-rule context="dtb:img"/>
+            <svrl:active-pattern
+                document="file:/Users/marisa/Projects/pipeline2/pipeline-scripts/nimas-fileset-validator/src/test/greatpainters-text-files-only/dtbook.xml"
+                id="dtbook_tableAttributes" name="dtbook_tableAttributes"/>
+            <svrl:active-pattern
+                document="file:/Users/marisa/Projects/pipeline2/pipeline-scripts/nimas-fileset-validator/src/test/greatpainters-text-files-only/dtbook.xml"
+                id="dtbook_startAttrInList" name="dtbook_startAttrInList"/>
+            <svrl:active-pattern
+                document="file:/Users/marisa/Projects/pipeline2/pipeline-scripts/nimas-fileset-validator/src/test/greatpainters-text-files-only/dtbook.xml"
+                id="dtbook_dcMetadata" name="dtbook_dcMetadata"/>
+            <svrl:fired-rule context="dtb:meta"/>
+            <svrl:fired-rule context="dtb:meta"/>
+            <svrl:fired-rule context="dtb:meta"/>
+            <svrl:fired-rule context="dtb:meta"/>
+            <svrl:fired-rule context="dtb:meta"/>
+            <svrl:fired-rule context="dtb:meta"/>
+            <svrl:fired-rule context="dtb:meta"/>
+            <svrl:fired-rule context="dtb:meta"/>
+            <svrl:active-pattern
+                document="file:/Users/marisa/Projects/pipeline2/pipeline-scripts/nimas-fileset-validator/src/test/greatpainters-text-files-only/dtbook.xml"
+                id="dtbook_spanColColgroup" name="dtbook_spanColColgroup"/>
+            <svrl:active-pattern
+                document="file:/Users/marisa/Projects/pipeline2/pipeline-scripts/nimas-fileset-validator/src/test/greatpainters-text-files-only/dtbook.xml"/>
+            <svrl:active-pattern
+                document="file:/Users/marisa/Projects/pipeline2/pipeline-scripts/nimas-fileset-validator/src/test/greatpainters-text-files-only/dtbook.xml"
+                id="dtbook_levelDepth" name="dtbook_levelDepth"/>
+            <svrl:active-pattern
+                document="file:/Users/marisa/Projects/pipeline2/pipeline-scripts/nimas-fileset-validator/src/test/greatpainters-text-files-only/dtbook.xml"/>
+            <svrl:active-pattern
+                document="file:/Users/marisa/Projects/pipeline2/pipeline-scripts/nimas-fileset-validator/src/test/greatpainters-text-files-only/dtbook.xml"
+                id="xref" name="xref"/>
+            <svrl:active-pattern
+                document="file:/Users/marisa/Projects/pipeline2/pipeline-scripts/nimas-fileset-validator/src/test/greatpainters-text-files-only/dtbook.xml"
+                id="annotation" name="annotation"/>
+            <svrl:active-pattern
+                document="file:/Users/marisa/Projects/pipeline2/pipeline-scripts/nimas-fileset-validator/src/test/greatpainters-text-files-only/dtbook.xml"
+            />
+        </svrl:schematron-output>
+        <d:errors/>
+    </d:reports>
+</d:document-validation-report>

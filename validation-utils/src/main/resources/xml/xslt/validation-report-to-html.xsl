@@ -5,13 +5,13 @@
     <xsl:output xml:space="default" media-type="text/html" indent="yes"/>
     <xsl:template match="/">
         <div class="document-validation-report">
-            <xsl:apply-templates select="d:document-info"/>
             <xsl:choose>
                 <xsl:when
                     test="count(descendant::svrl:failed-assert) = 0 and
                     count(descendant::svrl:successful-report) = 0 and 
                     count(descendant::c:error) = 0 and
                     count(descendant::d:error) = 0">
+                    <xsl:apply-templates select="descendant::d:document-info"/>
                     <p>No errors found.</p>
                 </xsl:when>
                 <xsl:otherwise>
@@ -21,6 +21,9 @@
         </div>
     </xsl:template>
 
+    <xsl:template match="*">
+        <xsl:apply-templates/>
+    </xsl:template>
     <xsl:template match="d:document-info">
         <div class="document-info">
             <xsl:apply-templates/>
@@ -91,5 +94,14 @@
             </xsl:if>
         </li>
     </xsl:template>
-
+    
+    <!-- things to ignore.there are probably more than just these-->
+    <xsl:template match="svrl:schematron-output">
+        <xsl:apply-templates/>
+    </xsl:template>
+    <xsl:template match="svrl:ns-prefix-in-attribute-values | svrl:active-pattern | svrl:fired-rule"/>
+    <xsl:template match="text()"/>
+    
+        
+    
 </xsl:stylesheet>
