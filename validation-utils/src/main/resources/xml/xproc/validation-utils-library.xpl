@@ -25,6 +25,11 @@
         <p:documentation>Step that converts a series of reports or wrapped reports (see above) into one HTML report.</p:documentation>
     </p:import>
     
+    <p:import href="check-files-exist.xpl">
+        <p:documentation>Step that, given a list of files, reports whether each exists on disk or not.</p:documentation>
+    </p:import>
+    
+    
     <p:documentation>Performs RELAX NG validation, returning two results: the source document (validated, if validation succeeds) and a report of the validation errors (if any). This step comes from the XProc.org library.</p:documentation>
     <p:declare-step name="main" type="l:relax-ng-report">
         <p:input port="source" primary="true"/>

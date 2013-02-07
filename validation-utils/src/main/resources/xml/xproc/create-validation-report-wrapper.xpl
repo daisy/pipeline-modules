@@ -74,7 +74,11 @@
             </p:string-replace>
         </p:when>
         <p:otherwise>
-            <p:identity/>
+            <p:identity>
+                <p:input port="source">
+                    <p:empty/>
+                </p:input>
+            </p:identity>
         </p:otherwise>
     </p:choose>
     
@@ -92,7 +96,11 @@
             </p:string-replace>
         </p:when>
         <p:otherwise>
-            <p:identity/>
+            <p:identity>
+                <p:input port="source">
+                    <p:empty/>
+                </p:input>
+            </p:identity>
         </p:otherwise>
     </p:choose>
     
@@ -110,7 +118,11 @@
             </p:string-replace>
         </p:when>
         <p:otherwise>
-            <p:identity/>
+            <p:identity>
+                <p:input port="source">
+                    <p:empty/>
+                </p:input>
+            </p:identity>
         </p:otherwise>
     </p:choose>
     
