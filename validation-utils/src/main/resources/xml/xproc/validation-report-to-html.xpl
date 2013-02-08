@@ -16,16 +16,7 @@
     </p:documentation>
 
     <!-- 
-    the document(s) on this port can be in several different formats:
-    
-    * RNG validation result: <c:errors/>
-    
-    * Schematron validation result: <svrl:schematron-output/>
-    
-    * wrapped together, with optional info about the file the report(s) represent
-    
-    to create this wrapper, use create-validation-report-wrapper.xpl 
-    
+    input format:
     <d:document-validation-report>
         <d:document-info>
             <d:document-name>display name</d:document-name>
@@ -33,8 +24,15 @@
             <d:document-type>description of what the document was validated against</d:document-type>
         </d:document-info>
         <d:reports>
-            <svrl:schematron-output/>
-            <c:errors/>
+            <d:report type="relaxng">
+                <c:errors/>
+            </d:report>
+            <d:report type="schematron">
+                <svrl:schematron-output/>
+            </d:report>
+            <d:report type="filecheck">
+                <d:errors/>
+            </d:report>
         </d:reports>
     </d:document-validation-report>
             

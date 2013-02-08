@@ -44,6 +44,39 @@
     </p:option>
     
     <p:output port="result" primary="true"/>
+    <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
+    <!-- iterate through the documents on the source port -->
+    <p:for-each>
+        <p:variable name="root-element-name" select="*/name()"/>
+        <p:wrap match="/" wrapper="report" wrapper-prefix="d" wrapper-namespace="http://www.daisy.org/ns/pipeline/data"/>
+        
+        <p:choose>
+            <p:when test="$root-element-name = 'c:errors'">
+                <p:add-attribute match="d:report">
+                    <p:with-option name="attribute-name" select="'type'"/>
+                    <p:with-option name="attribute-value" select="'relaxng'"/>
+                </p:add-attribute>
+            </p:when>
+            <p:when test="$root-element-name = 'd:errors'">
+                <p:add-attribute match="d:report">
+                    <p:with-option name="attribute-name" select="'type'"/>
+                    <p:with-option name="attribute-value" select="'filecheck'"/>
+                </p:add-attribute>
+            </p:when>
+            <p:when test="$root-element-name = 'svrl:schematron-output'">
+                <p:add-attribute match="d:report">
+                    <p:with-option name="attribute-name" select="'type'"/>
+                    <p:with-option name="attribute-value" select="'schematron'"/>
+                </p:add-attribute>
+            </p:when>
+            <p:otherwise>
+                <p:add-attribute match="d:report">
+                    <p:with-option name="attribute-name" select="'type'"/>
+                    <p:with-option name="attribute-value" select="'unknown'"/>
+                </p:add-attribute>
+            </p:otherwise>
+        </p:choose>
+    </p:for-each>
     
     <p:wrap-sequence name="combine-reports" wrapper="reports" wrapper-namespace="http://www.daisy.org/ns/pipeline/data" wrapper-prefix="d"/>
     
