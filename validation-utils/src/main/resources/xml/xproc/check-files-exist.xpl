@@ -22,37 +22,14 @@
     <p:input port="source" primary="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h1 px:role="name">source</h1>
-            <p px:role="desc">A list of files, formatted as
-                <pre>
-                    &lt;d:files&gt;
-                        &lt;d:file path=&quot;file:/full/path.jpg&quot; ref=&quot;file:/full/path/to/referring-doc.xml#ID&quot;/&gt;
-                        ...
-                    &lt;/d:files&gt;
-                </pre>
-            </p>
+            <p px:role="desc">A list of files, formatted as described at http://code.google.com/p/daisy-pipeline/wiki/ValidationReportXML#Files_List</p>
         </p:documentation>
     </p:input>
     
-    <!--
-        format of input:
-        <d:files>
-            <d:file path="file:/full/path.jpg" ref="file:/full/path/to/referring-doc.xml#ID"/>
-            ...
-        </d:files>
-        
-        format of output: 
-        <d:errors>
-            <d:error type="file-not-found">
-                <d:desc>File not found</d:desc>
-                <d:file>file:/path/to/file.jpg</d:file>
-                <d:ref>file:/path/to/referring-document.xml#ID</d:ref>
-            </d:error>
-        </d:errors>
-    -->    
     <p:output port="result" sequence="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h1 px:role="name">result</h1>
-            <p px:role="desc">List of missing files, or an empty d:errors element if nothing is missing.</p>
+            <p px:role="desc">List of missing files, formatted as &lt;d:error&gt; elements, or an empty d:errors element if nothing is missing.</p>
         </p:documentation>
     </p:output>
     
@@ -63,6 +40,13 @@
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/xproc/file-library.xpl">
         <p:documentation>For manipulating files.</p:documentation>
     </p:import>
+    
+    <!-- validate the input document -->
+    <p:validate-with-relax-ng name="v-rng" assert-valid="true">
+        <p:input port="schema">
+            <p:document href="../schema/files.rng"/>
+        </p:input>
+    </p:validate-with-relax-ng>
     
     <p:for-each name="check-each-file">
         <p:iteration-source select="//d:file"/>
@@ -96,12 +80,12 @@
                             <d:error type="file-not-found">
                                 <d:desc>File not found</d:desc>
                                 <d:file>@@</d:file>
-                                <d:ref>@@</d:ref>
+                                <d:location href="@@"/>
                             </d:error>
                         </p:inline>
                     </p:input>
                 </p:string-replace>
-                <p:string-replace match="//d:ref/text()">
+                <p:string-replace match="//d:location/@href">
                     <p:with-option name="replace" select="concat('&quot;', $ref, '&quot;')"/>
                 </p:string-replace>    
             </p:when>

@@ -17,12 +17,12 @@
     
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
     
-    <p:import href="create-validation-report-wrapper.xpl">
-        <p:documentation>Utility step that creates an XML wrapper for validation reports.</p:documentation>
+    <p:import href="combine-validation-reports.xpl">
+        <p:documentation>Utility step that combines many validation reports into one XML document.</p:documentation>
     </p:import>
     
     <p:import href="validation-report-to-html.xpl">
-        <p:documentation>Step that converts a series of reports or wrapped reports (see above) into one HTML report.</p:documentation>
+        <p:documentation>Step that converts one or more validation reports (created by the above step) into one HTML report.</p:documentation>
     </p:import>
     
     <p:import href="check-files-exist.xpl">

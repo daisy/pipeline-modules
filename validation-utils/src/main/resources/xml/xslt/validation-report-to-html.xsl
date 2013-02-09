@@ -9,7 +9,6 @@
                 <xsl:when
                     test="count(descendant::svrl:failed-assert) = 0 and
                     count(descendant::svrl:successful-report) = 0 and 
-                    count(descendant::c:error) = 0 and
                     count(descendant::d:error) = 0">
                     <xsl:apply-templates select="descendant::d:document-info"/>
                     <p>No errors found.</p>
@@ -67,31 +66,27 @@
         </li>
     </xsl:template>
 
-    <!-- note that below, &#160; = &nbsp; -->
-    <xsl:template match="c:error">
-        <li class="error">
-            <p>
-                <xsl:value-of select="./text()"/>
-            </p>
-            <div>
-                <h3>Location</h3>
-                <pre><em>Line <xsl:value-of select="@line"/>, Column <xsl:value-of select="@column"/></em></pre>
-            </div>
-        </li>
-    </xsl:template>
-
     <xsl:template match="d:error">
         <li class="error">
             <p>
                 <xsl:value-of select="./d:desc"/>
             </p>
-            <pre><xsl:value-of select="./d:file"/></pre>
-            <xsl:if test="string-length(./d:ref/text()) > 0">
-                <div>
-                    <h3>Location</h3>
-                    <pre><xsl:value-of select="./d:ref"/></pre>
-                </div>
+            <xsl:if test="./d:file">
+                <pre><xsl:value-of select="./d:file"/></pre>    
             </xsl:if>
+            <div>
+                <h3>Location</h3>
+                <pre>
+                    <xsl:choose>
+                        <xsl:when test="./d:location/@href">
+                            <xsl:value-of select="./d:location/@href"/>    
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <em>Line <xsl:value-of select="./d:location/@line"/>, Column <xsl:value-of select="./d:location/@column"/></em>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </pre>
+            </div>
         </li>
     </xsl:template>
     

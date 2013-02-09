@@ -16,29 +16,11 @@
     </p:documentation>
 
     <!-- 
-    input format:
-    <d:document-validation-report>
-        <d:document-info>
-            <d:document-name>display name</d:document-name>
-            <d:document-path>filepath</d:document-path>
-            <d:document-type>description of what the document was validated against</d:document-type>
-        </d:document-info>
-        <d:reports>
-            <d:report type="relaxng">
-                <c:errors/>
-            </d:report>
-            <d:report type="schematron">
-                <svrl:schematron-output/>
-            </d:report>
-            <d:report type="filecheck">
-                <d:errors/>
-            </d:report>
-        </d:reports>
-    </d:document-validation-report>
-            
+    input format is a sequence of these documents:
+    http://code.google.com/p/daisy-pipeline/wiki/ValidationReportXML
     -->
     <p:input port="source" primary="true" sequence="true"/>
-    <p:output port="result" primary="true" sequence="true"/>
+    <p:output port="result" primary="true"/>
 
     <p:for-each name="convert-to-html">
         <p:output port="result" sequence="true"/>
@@ -101,5 +83,7 @@
         <p:input port="insertion">
             <p:pipe port="result" step="convert-to-html"/>
         </p:input>
-    </p:insert>    
+    </p:insert>
+
+
 </p:declare-step>

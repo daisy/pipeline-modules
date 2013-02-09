@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar ns="http://www.daisy.org/ns/pipeline/data" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <start>
+    <ref name="document-validation-report"/>
+  </start>
+  <define name="document-validation-report">
+    <element name="document-validation-report">
+      <ref name="document-info"/>
+      <ref name="reports"/>
+    </element>
+  </define>
+  <define name="document-info">
+    <element name="document-info">
+      <interleave>
+        <element name="document-name">
+          <text/>
+        </element>
+        <element name="document-type">
+          <text/>
+        </element>
+        <element name="document-path">
+          <data type="anyURI"/>
+        </element>
+      </interleave>  
+    </element>
+  </define>
+  <define name="reports">
+    <element name="reports">
+      <oneOrMore>
+        <ref name="report"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="report">
+    <element name="report">
+      <interleave>
+        <attribute name="type">
+          <ref name="report.type"/>
+        </attribute>
+        <oneOrMore>
+          <choice>
+            <ref name="errors-report"/>
+            <ref name="svrl-report"/>
+          </choice>
+        </oneOrMore>
+      </interleave>
+    </element>
+  </define>
+  <define name="errors-report">
+    <element name="errors">
+      <zeroOrMore>
+        <ref name="error"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="error">
+    <element name="error">
+      <interleave>
+        <attribute name="type">
+          <ref name="error.type"/>
+        </attribute>
+        <element name="desc">
+          <text/>
+        </element>
+        <optional>
+          <element name="file">
+            <data type="anyURI"/>
+          </element>
+        </optional>
+        <element name="location">
+          <choice>
+            <interleave>
+              <attribute name="line">
+                <data type="integer"/>
+              </attribute>
+              <attribute name="column">
+                <data type="integer"/>
+              </attribute>
+            </interleave>
+            <attribute name="href">
+              <data type="anyURI"/>
+            </attribute>
+          </choice>
+        </element>
+      </interleave>
+    </element>
+  </define>
+  <define name="svrl-report">
+    <ref name="anyElement"/>
+  </define>
+  <define name="anyElement">
+    <element>
+      <anyName/>
+      <zeroOrMore>
+        <choice>
+          <attribute>
+            <anyName/>
+          </attribute>
+          <text/>
+          <ref name="anyElement"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="report.type">
+    <choice>
+      <value>relaxng</value>
+      <value>schematron</value>
+      <value>filecheck</value>
+    </choice>
+  </define>
+  <define name="error.type">
+    <choice>
+      <value>relaxng</value>
+      <value>file-not-found</value>
+    </choice>
+  </define>
+</grammar>
