@@ -4,7 +4,7 @@
     exclude-result-prefixes="#all">
     <xsl:output xml:space="default" media-type="text/html" indent="yes"/>
     <xsl:template match="/">
-        <div class="document-validation-report">
+        <div class="document-validation-report" id="{generate-id()}">
             <xsl:choose>
                 <xsl:when
                     test="count(descendant::svrl:failed-assert) = 0 and

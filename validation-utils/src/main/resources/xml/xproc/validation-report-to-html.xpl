@@ -21,7 +21,9 @@
     -->
     <p:input port="source" primary="true" sequence="true"/>
     <p:output port="result" primary="true"/>
-
+    <p:option name="toc" required="false" select="'false'"/>
+    
+    <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
     <p:for-each name="convert-to-html">
         <p:output port="result" sequence="true"/>
         <p:iteration-source>
@@ -75,7 +77,7 @@
                         </style>
                     </head>
                     <body>
-                        <div id="header"><h1>Validation Results</h1></div>
+                        <div id="header"><h1>Validation Results</h1><ul id="document-index"/></div>
                     </body>
                 </html>
             </p:inline>
@@ -84,6 +86,51 @@
             <p:pipe port="result" step="convert-to-html"/>
         </p:input>
     </p:insert>
-
-
+    
+    <p:choose>
+        <p:when test="$toc eq 'true'">
+            <p:for-each name="generate-document-index">
+                <p:output port="result"/>
+                
+                <p:iteration-source select="//xhtml:div[@class='document-validation-report']"/>
+                
+                <p:variable name="section-id" select="*/@id"/>
+                <p:variable name="document-name" select="*/xhtml:div[@class='document-info']/xhtml:h2"/>
+                
+                <p:identity>
+                    <p:input port="source">
+                        <p:inline>
+                            <li xmlns="http://www.w3.org/1999/xhtml">
+                                <a href="@@">@@</a>
+                            </li>
+                        </p:inline>
+                    </p:input>
+                </p:identity>
+                
+                <p:string-replace match="xhtml:a/@href">
+                    <p:with-option name="replace" select="concat('&quot;', '#', $section-id, '&quot;')"/>
+                </p:string-replace>
+                
+                <p:string-replace match="xhtml:a/text()">
+                    <p:with-option name="replace" select="concat('&quot;', $document-name, '&quot;')"/>
+                </p:string-replace>
+                
+                
+            </p:for-each>   
+            
+            <p:insert match="xhtml:ul[@id='document-index']" position="first-child">
+                <p:input port="source">
+                    <p:pipe port="result" step="assemble-html-report"/>
+                </p:input>
+                <p:input port="insertion">
+                    <p:pipe port="result" step="generate-document-index"/>
+                </p:input>
+            </p:insert>
+            
+        </p:when>
+        <p:otherwise>
+            <p:delete match="xhtml:ul[@id='document-index']"></p:delete>
+        </p:otherwise>
+    </p:choose>
+        
 </p:declare-step>
