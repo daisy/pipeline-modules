@@ -28,6 +28,7 @@
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/xproc/fileset-library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/mediatype-utils/mediatype.xpl"/>
     
+    <px:fileset-join/>
     <px:mediatype-detect name="spine-filesets-with-mediatypes">
         <p:input port="in-memory">
             <p:pipe port="content-docs" step="main"/>
@@ -442,7 +443,6 @@
     <p:group name="spine">
         <p:output port="result"/>
         <p:identity>
-            <p:log port="result" href="file:/tmp/spine-1.xml"/>
             <p:input port="source">
                 <p:pipe port="result" step="spine-filesets-with-mediatypes"/>
             </p:input>
