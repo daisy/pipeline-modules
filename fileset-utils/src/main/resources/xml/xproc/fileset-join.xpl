@@ -28,6 +28,13 @@
     </p:input>
   </p:xslt>
   <p:unwrap match="/d:fileset/d:fileset"/>
-  <p:delete match="//d:file[@href=preceding::d:file/@href]"/>
+  <p:xslt>
+    <p:input port="parameters">
+      <p:empty/>
+    </p:input>
+    <p:input port="stylesheet">
+      <p:document href="fileset-join.merge-duplicates.xsl"/>
+    </p:input>
+  </p:xslt>
   
 </p:declare-step>

@@ -10,7 +10,9 @@
 
   <p:option name="href" select="''"/>
   <p:option name="media-types" select="''"/>
+  <p:option name="not-media-types" select="''"/>
   <p:option name="fail-on-not-found" select="'false'"/>
+  <p:option name="load-if-not-in-memory" select="'true'"/>
 
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
   <p:import href="http://www.daisy.org/pipeline/modules/html-utils/html-library.xpl"/>
@@ -49,21 +51,28 @@
     <p:http-request/>
   </p:declare-step>
 
-  <p:variable name="resolved-href" select="resolve-uri($href,base-uri(/*))">
-    <p:pipe port="fileset" step="main"/>
-  </p:variable>
+  <p:add-attribute match="/*" attribute-name="href">
+    <p:with-option name="attribute-value" select="$href"/>
+  </p:add-attribute>
+  <p:add-attribute match="/*" attribute-name="media-types">
+    <p:with-option name="attribute-value" select="$media-types"/>
+  </p:add-attribute>
+  <p:add-attribute match="/*" attribute-name="not-media-types">
+    <p:with-option name="attribute-value" select="$not-media-types"/>
+  </p:add-attribute>
 
-  <!--<p:choose>
-    <p:when test="$href='' and $media-types=''">
+  <p:choose>
+    <p:when test="$href='' and $media-types='' and $not-media-types=''">
       <p:identity/>
     </p:when>
     <p:otherwise>
       <px:fileset-filter>
         <p:with-option name="href" select="$href"/>
         <p:with-option name="media-types" select="$media-types"/>
+        <p:with-option name="not-media-types" select="$not-media-types"/>
       </px:fileset-filter>
     </p:otherwise>
-  </p:choose>-->
+  </p:choose>
 
   <p:for-each name="load">
     <p:output port="result" sequence="true"/>
@@ -88,6 +97,16 @@
             <p:pipe port="in-memory" step="main"/>
           </p:input>
         </p:split-sequence>
+      </p:when>
+      
+      <!-- not in memory, but don't load it from disk -->
+      <p:when test="not($load-if-not-in-memory = 'true')">
+        <p:sink/>
+        <p:identity>
+          <p:input port="source">
+            <p:empty/>
+          </p:input>
+        </p:identity>
       </p:when>
 
       <!-- load file into memory (from disk, HTTP, etc) -->
@@ -143,7 +162,7 @@
                   <p:with-option name="href" select="$on-disk"/>
                 </pxi:load-binary>
               </p:otherwise>
-              
+
             </p:choose>
           </p:group>
           <p:catch>

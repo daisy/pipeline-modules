@@ -2,7 +2,7 @@
 <p:declare-step version="1.0" type="px:directory-list" xmlns:c="http://www.w3.org/ns/xproc-step"
     xmlns:p="http://www.w3.org/ns/xproc" xmlns:px="http://www.daisy.org/ns/pipeline/xproc">
 
-    <p:documentation> see http://xprocbook.com/book/refentry-61.html </p:documentation>
+    <p:documentation>The p:directory-list step will return the contents of a single directory. The px:directory-list step will process a directory and it's subdirectories recursively. See also: http://xproc.org/library/#recursive-directory-list.</p:documentation>
 
     <p:output port="result"/>
     <p:option name="path" required="true"/>
