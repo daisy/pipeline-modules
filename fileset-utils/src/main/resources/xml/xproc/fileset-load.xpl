@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step version="1.0" type="px:fileset-load" name="main" xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns:p="http://www.w3.org/ns/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
   xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal/fileset-load" xmlns:c="http://www.w3.org/ns/xproc-step" exclude-inline-prefixes="cx px">
-
+  
   <p:input port="fileset" primary="true"/>
   <p:input port="in-memory" sequence="true"/>
   <p:output port="result" sequence="true">
@@ -60,7 +60,7 @@
   <p:add-attribute match="/*" attribute-name="not-media-types">
     <p:with-option name="attribute-value" select="$not-media-types"/>
   </p:add-attribute>
-
+  
   <p:choose>
     <p:when test="$href='' and $media-types='' and $not-media-types=''">
       <p:identity/>
@@ -73,7 +73,7 @@
       </px:fileset-filter>
     </p:otherwise>
   </p:choose>
-
+  
   <p:for-each name="load">
     <p:output port="result" sequence="true"/>
     <p:iteration-source select="//d:file"/>
@@ -202,9 +202,10 @@
       </p:otherwise>
     </p:choose>
   </p:for-each>
-
+  <p:sink/>
 
   <px:fileset-create name="fileset.in-memory-base" base="/"/>
+  <p:sink/>
   <p:for-each>
     <p:iteration-source>
       <p:pipe port="in-memory" step="main"/>

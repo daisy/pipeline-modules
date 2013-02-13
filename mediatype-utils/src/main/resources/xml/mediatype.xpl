@@ -30,7 +30,9 @@
             <p px:role="desc">The same d:fileset that arrived on the input port, but with "media-type"-attributes added to all d:file elements.</p>
         </p:documentation>
     </p:output>
-
+    
+    <!-- TODO: crashes on big filesets (>1000 files) - investigate! -->
+    
     <p:option name="load-if-not-in-memory" select="'false'"/>
 
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
@@ -666,6 +668,12 @@
             </p:when>
             <p:when test="$ext = 'xof'">
                 <p:add-attribute match="/*" attribute-name="media-type" attribute-value="x-world/x-vrml"/>
+            </p:when>
+            <p:when test="$ext = 'gitignore'">
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="text/plain"/>
+            </p:when>
+            <p:when test="$ext = 'hgignore'">
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="text/plain"/>
             </p:when>
             <p:otherwise>
                 <!-- XML or unknown binary filetype -->
