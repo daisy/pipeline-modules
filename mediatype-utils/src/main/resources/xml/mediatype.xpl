@@ -31,8 +31,6 @@
         </p:documentation>
     </p:output>
     
-    <!-- TODO: crashes on big filesets (>1000 files) - investigate! -->
-    
     <p:option name="load-if-not-in-memory" select="'false'"/>
 
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
