@@ -2,7 +2,7 @@
     xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:px="http://www.daisy.org/ns/pipeline/xproc">
 
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-        <h1 px:role="name">DAISY 2 Utilities</h1>
+        <h1 px:role="name">DAISY 2.02 Utilities</h1>
         <p px:role="desc">A collection of utilities for DAISY 2 filesets.</p>
         <div px:role="author maintainer">
             <p px:role="name">Jostein Austvik Jacobsen</p>
