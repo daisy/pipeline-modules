@@ -30,4 +30,11 @@
 
 	<public publicId='-//W3C//ENTITIES Symbols for XHTML//EN' uri='xhtml-symbol.ent'/>
 	<system systemId='http://www.w3.org/TR/xhtml1/DTD/xhtml-symbol.ent' uri='xhtml-symbol.ent'/>
+    
+	<public publicId='+//ISBN 0-9673008-1-9//DTD OEB 1.2 Package//EN' uri='oebpkg12.dtd'/>
+	<system systemId='http://openebook.org/dtds/oeb-1.2/oebpkg12.dtd' uri='oebpkg12.dtd'/>
+    
+	<public publicId='+//ISBN 0-9673008-1-9//DTD OEB 1.2 Entities//EN' uri='oeb12.ent'/>
+	<system systemId='http://openebook.org/dtds/oeb-1.2/oeb12.ent' uri='oeb12.ent'/>
+    
 </catalog>
