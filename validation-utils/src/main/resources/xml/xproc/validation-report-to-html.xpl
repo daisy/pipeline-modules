@@ -77,7 +77,11 @@
                         </style>
                     </head>
                     <body>
-                        <div id="header"><h1>Validation Results</h1><ul id="document-index"/></div>
+                        <div id="header">
+                            <h1>Validation Results</h1>
+                            <p id="datetime">@@</p>
+                            <ul id="document-index"/>
+                        </div>
                     </body>
                 </html>
             </p:inline>
@@ -132,5 +136,13 @@
             <p:delete match="xhtml:ul[@id='document-index']"></p:delete>
         </p:otherwise>
     </p:choose>
+    
+    <p:string-replace match="//*[@id='datetime']/text()">
+        <p:with-option name="replace"
+            select="concat('&quot;Generated on ', current-date(), ' at ', current-time(), '&quot;')"
+        />
+    </p:string-replace>
+    
+    
         
 </p:declare-step>

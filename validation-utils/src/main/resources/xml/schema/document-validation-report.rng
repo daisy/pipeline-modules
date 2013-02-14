@@ -5,6 +5,9 @@
   </start>
   <define name="document-validation-report">
     <element name="document-validation-report">
+      <optional>
+        <attribute name="extra"/>
+      </optional>
       <ref name="document-info"/>
       <ref name="reports"/>
     </element>
