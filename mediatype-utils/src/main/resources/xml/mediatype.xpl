@@ -675,17 +675,10 @@
             <p:when test="$ext = 'hgignore'">
                 <p:add-attribute match="/*" attribute-name="media-type" attribute-value="text/plain"/>
             </p:when>
-            <p:otherwise>
-                <!-- XML or unknown binary filetype -->
-                <p:identity/>
-            </p:otherwise>
-        </p:choose>
-
-        <p:choose>
-            <p:when test="/*/@media-type">
-                <p:identity/>
-            </p:when>
-            <p:otherwise>
+            <p:when test="$ext = 'xml'">
+                
+                <!-- TODO: an improvement on this would be to read only the start tag of the root element instead of loading the entire XML into memory -->
+                
                 <px:fileset-load name="file.load">
                     <p:with-option name="load-if-not-in-memory" select="$load-if-not-in-memory"/>
                     <p:with-option name="href" select="resolve-uri(/*/@href,base-uri(/*))"/>
@@ -808,12 +801,19 @@
                             <p:when test="$ns = 'http://www.w3.org/ns/xproc-step'">
                                 <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/xproc+xml"/>
                             </p:when>
+                            <p:when test="$ns = 'urn:oasis:names:tc:entity:xmlns:xml:catalog'">
+                                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/xml"/>
+                            </p:when>
                             <p:otherwise>
                                 <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/xml"/>
                             </p:otherwise>
                         </p:choose>
                     </p:otherwise>
                 </p:choose>
+            </p:when>
+            <p:otherwise>
+                <!-- unknown binary filetype -->
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/octet-stream"/>
             </p:otherwise>
         </p:choose>
 
