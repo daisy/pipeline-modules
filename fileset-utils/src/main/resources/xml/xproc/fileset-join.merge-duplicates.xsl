@@ -6,11 +6,6 @@
             <xsl:apply-templates select="@*|node()"/>
         </xsl:copy>
     </xsl:template>
-    <xsl:template match="/*">
-        <xsl:copy>
-            <xsl:apply-templates select="@*|node()"/>
-        </xsl:copy>
-    </xsl:template>
     <xsl:template match="d:file">
         <xsl:variable name="href" select="@href"/>
         <xsl:if test="not(preceding::d:file/@href=$href)">
