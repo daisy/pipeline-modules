@@ -10,10 +10,10 @@
     <relativePath/>
   </parent>
 
-  <artifactId>daisy2-utils</artifactId>
+  <artifactId>daisy202-utils</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>bundle</packaging>
 
-  <name>DAISY Pipeline 2 module :: DAISY 2 Utils</name>
+  <name>DAISY Pipeline 2 module :: DAISY 2.02 Utils</name>
 
 </project>

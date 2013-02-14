@@ -28,7 +28,7 @@
     <module>html-utils</module>
     <module>mediaoverlay-utils</module>
     <module>zedai-utils</module>
-    <module>daisy2-utils</module>
+    <module>daisy202-utils</module>
   </modules>
 
   <!-- BoM of the default script modules (for use in assemblies) -->
@@ -76,7 +76,7 @@
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
-        <artifactId>daisy2-utils</artifactId>
+        <artifactId>daisy202-utils</artifactId>
         <version>1.0.0-SNAPSHOT</version>
       </dependency>
     </dependencies>
