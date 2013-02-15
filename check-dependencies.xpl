@@ -51,12 +51,12 @@
 
             <px:fileset-filter media-types="application/xproc+xml application/xslt+xml"/>
 
-            <p:viewport match="/*/d:file[@media-type='application/xproc+xml']" name="iterate-xproc">
+            <p:viewport match="/*/d:file" name="iterate">
                 <p:load>
                     <p:with-option name="href" select="resolve-uri(/*/@href,base-uri(/*))"/>
                 </p:load>
                 <p:for-each>
-                    <p:iteration-source select="//p:import | //p:document | //p:load[@href]"/>
+                    <p:iteration-source select="//p:import | //p:document | //p:load[@href] | //xsl:import[@href] | //xsl:include[@href]"/>
                     <p:add-attribute match="/*" attribute-name="href">
                         <p:with-option name="attribute-value" select="/*/@href"/>
                         <p:input port="source">
@@ -68,30 +68,7 @@
                 </p:for-each>
                 <p:insert match="/*" position="first-child">
                     <p:input port="source">
-                        <p:pipe port="current" step="iterate-xproc"/>
-                    </p:input>
-                </p:insert>
-                <p:delete match="/*/d:ref[not(matches(@href,'^[^/]+:'))]"/>
-            </p:viewport>
-
-            <p:viewport match="/*/d:file[@media-type='application/xslt+xml']" name="iterate-xslt">
-                <p:load>
-                    <p:with-option name="href" select="resolve-uri(/*/@href,base-uri(/*))"/>
-                </p:load>
-                <p:for-each>
-                    <p:iteration-source select="(//xsl:import | //xsl:include)[@href]"/>
-                    <p:add-attribute match="/*" attribute-name="href">
-                        <p:with-option name="attribute-value" select="/*/@href"/>
-                        <p:input port="source">
-                            <p:inline exclude-inline-prefixes="#all">
-                                <d:ref/>
-                            </p:inline>
-                        </p:input>
-                    </p:add-attribute>
-                </p:for-each>
-                <p:insert match="/*" position="first-child">
-                    <p:input port="source">
-                        <p:pipe port="current" step="iterate-xslt"/>
+                        <p:pipe port="current" step="iterate"/>
                     </p:input>
                 </p:insert>
                 <p:delete match="/*/d:ref[not(matches(@href,'^[^/]+:'))]"/>

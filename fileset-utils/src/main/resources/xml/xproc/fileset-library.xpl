@@ -11,5 +11,6 @@
     <p:import href="fileset-filter.xpl"/>
     <p:import href="fileset-load.xpl"/>
     <p:import href="fileset-store.xpl"/>
+    <p:import href="fileset-add-ref.xpl"/>
 
 </p:library>
