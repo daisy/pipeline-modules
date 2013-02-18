@@ -12,7 +12,6 @@
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
 
     <!--TODO awkward, add the entry with XProc, then perform URI cleanup-->
-    <p:add-xml-base all="true" relative="false"/>
     <p:xslt name="href-uri">
         <p:with-param name="href" select="$href"/>
         <p:with-param name="ref" select="$ref"/>
@@ -24,8 +23,8 @@
                     <xsl:param name="ref" required="yes"/>
                     <xsl:template match="/*">
                         <d:ref>
-                            <xsl:for-each select="d:file[pf:normalize-uri(resolve-uri(@href,@xml:base)) = pf:normalize-uri(resolve-uri($href,@xml:base))][1]">
-                                <xsl:attribute name="href" select="pf:normalize-uri(resolve-uri($ref,resolve-uri(@href,@xml:base)))"/>
+                            <xsl:for-each select="d:file[pf:normalize-uri(resolve-uri(@href,base-uri(.))) = pf:normalize-uri(resolve-uri($href,base-uri(.)))][1]">
+                                <xsl:attribute name="href" select="pf:normalize-uri(resolve-uri($ref,resolve-uri(@href,base-uri(.))))"/>
                                 <xsl:attribute name="parent-href" select="@href"/>
                             </xsl:for-each>
                         </d:ref>
@@ -37,11 +36,20 @@
 
     <p:choose>
         <p:when test="not(/*/@href)">
+            <p:variable name="niceHref" select="if (starts-with($href,/*/@xml:base)) then replace($href,/*/@xml:base,'') else if (matches($href,'^[^/]+:')) then replace($href,'^.+/','') else $href">
+                <p:pipe port="source" step="main"/>
+            </p:variable>
+            <p:variable name="niceRef" select="if (starts-with($ref,/*/@xml:base)) then replace($ref,/*/@xml:base,'') else if (matches($ref,'^[^/]+:')) then replace($ref,'^.+/','') else $ref">
+                <p:pipe port="source" step="main"/>
+            </p:variable>
             <p:identity>
                 <p:input port="source">
                     <p:pipe port="source" step="main"/>
                 </p:input>
             </p:identity>
+            <cx:message>
+                <p:with-option name="message" select="concat('The file ',$niceHref,' referenced from ',$niceRef,' is not in the fileset.')"/>
+            </cx:message>
         </p:when>
         <p:otherwise>
             <p:variable name="href-uri-ified" select="/*/@href">
@@ -53,7 +61,7 @@
 
             <p:delete match="//@parent-href"/>
 
-            <!--Insert the entry as the last or first child of the file set-->
+            <!--Insert the entry as the last or first child of the file-->
             <p:insert>
                 <p:with-option name="match" select="concat(&quot;//d:file[@href='&quot;,$file-href,&quot;']&quot;)"/>
                 <p:with-option name="position" select="if ($first='true') then 'first-child' else 'last-child'"/>
