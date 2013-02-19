@@ -1,30 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step version="1.0" type="px:fileset-add-entry" name="main" xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns:p="http://www.w3.org/ns/xproc"
-  xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:px="http://www.daisy.org/ns/pipeline/xproc" exclude-inline-prefixes="cx px">
+<p:declare-step version="1.0" type="px:fileset-add-entry" name="main" xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns:p="http://www.w3.org/ns/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data"
+  xmlns:px="http://www.daisy.org/ns/pipeline/xproc" exclude-inline-prefixes="cx px">
 
   <p:input port="source"/>
   <p:output port="result"/>
 
   <p:option name="href" required="true"/>
   <p:option name="media-type" select="''"/>
+  <p:option name="ref" select="''"><!-- if relative; will be resolved relative to the file --></p:option>
+  <p:option name="original-href" select="''"><!-- if relative; will be resolved relative to the file --></p:option>
   <p:option name="first" select="'false'"/>
 
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
 
-<!--TODO awkward, add the entry with XProc, then perform URI cleanup-->
+  <!--TODO awkward, add the entry with XProc, then perform URI cleanup-->
   <p:xslt name="href-uri">
-    <p:with-param name="uri" select="$href"/>
+    <p:with-param name="href" select="$href"/>
+    <p:with-param name="original-href" select="$original-href"/>
     <p:with-param name="base" select="base-uri(/*)"/>
     <p:input port="stylesheet">
       <p:inline>
-        <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
-          version="2.0" exclude-result-prefixes="#all">
+        <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pf="http://www.daisy.org/ns/pipeline/functions" version="2.0" exclude-result-prefixes="#all">
           <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/xslt/uri-functions.xsl"/>
-          <xsl:param name="uri" required="yes"/>
+          <xsl:param name="href" required="yes"/>
+          <xsl:param name="original-href" required="yes"/>
           <xsl:param name="base" required="yes"/>
           <xsl:template match="/*">
             <d:file>
-              <xsl:attribute name="href" select="pf:relativize-uri($uri,$base)"/>
+              <xsl:attribute name="href" select="pf:relativize-uri($href,$base)"/>
+              <xsl:if test="not($original-href='')">
+                <xsl:attribute name="original-href" select="pf:normalize-uri(resolve-uri($original-href,$base))"/>
+              </xsl:if>
             </d:file>
           </xsl:template>
         </xsl:stylesheet>
@@ -68,16 +74,22 @@
       <p:add-attribute match="/*" attribute-name="href">
         <p:with-option name="attribute-value" select="$href-uri-ified"/>
       </p:add-attribute>
+      <p:add-attribute match="/*" attribute-name="original-href">
+        <p:with-option name="attribute-value" select="/*/@original-href">
+          <p:pipe port="result" step="href-uri"/>
+        </p:with-option>
+      </p:add-attribute>
       <p:add-attribute match="/*" attribute-name="xml:base">
         <p:with-option name="attribute-value" select="base-uri(/*)">
           <p:pipe port="source" step="main"/>
         </p:with-option>
       </p:add-attribute>
       <p:delete match="@xml:base"/>
-      <!--Clean-up the media-type-->
+      <!--Clean-up the optional attributes-->
       <p:delete match="@media-type[not(normalize-space())]"/>
+      <p:delete match="@original-href[not(normalize-space())]"/>
     </p:group>
-    
+
     <!--Insert the entry as the last or first child of the file set-->
     <p:insert match="/*">
       <p:input port="source">
@@ -88,6 +100,18 @@
       </p:input>
       <p:with-option name="position" select="if ($first='true') then 'first-child' else 'last-child'"/>
     </p:insert>
+
+    <p:choose>
+      <p:when test="$ref=''">
+        <p:identity/>
+      </p:when>
+      <p:otherwise>
+        <px:fileset-add-ref>
+          <p:with-option name="href" select="$href-uri-ified"/>
+          <p:with-option name="ref" select="$ref"/>
+        </px:fileset-add-ref>
+      </p:otherwise>
+    </p:choose>
 
   </p:group>
 
