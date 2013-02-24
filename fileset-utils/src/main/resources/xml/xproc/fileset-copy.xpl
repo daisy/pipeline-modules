@@ -1,29 +1,37 @@
-<p:declare-step version="1.0" name="main" xmlns:p="http://www.w3.org/ns/xproc"
-    xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:cx="http://xmlcalabash.com/ns/extensions"
-    xmlns:err="http://www.w3.org/ns/xproc-error" 
-    xmlns:d="http://www.daisy.org/ns/pipeline/data"
-    xmlns:px="http://www.daisy.org/ns/pipeline/xproc" type="px:fileset-copy"
-    exclude-inline-prefixes="#all">
-    
+<p:declare-step version="1.0" name="main" xmlns:p="http://www.w3.org/ns/xproc" xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns:err="http://www.w3.org/ns/xproc-error"
+    xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:px="http://www.daisy.org/ns/pipeline/xproc" type="px:fileset-copy" exclude-inline-prefixes="#all">
+
     <p:input port="source"/>
     <p:output port="result" primary="true"/>
     <p:option name="target" required="true"/>
     <p:option name="fail-on-error" select="'false'"/>
-    
+
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/xproc/file-library.xpl"/>
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
-    
+
     <p:try>
         <p:group>
             <p:output port="result" primary="true"/>
-            
+
             <!-- Check the existence of the directory -->
             <p:group name="checkdir">
                 <!--Get file system info on the directory-->
                 <!--Note: we wrap the result since an empty sequence is returned when the file does not exist-->
-                <px:info>
-                    <p:with-option name="href" select="$target"/>
-                </px:info>
+                <p:try>
+                    <p:group>
+                        <px:info>
+                            <p:with-option name="href" select="$target"/>
+                        </px:info>
+                    </p:group>
+                    <p:catch>
+                        <!-- err:FU01 - Occurs if the file named in href cannot be read (i.e. the directory does not exist). -->
+                        <p:identity>
+                            <p:input port="source">
+                                <p:empty/>
+                            </p:input>
+                        </p:identity>
+                    </p:catch>
+                </p:try>
                 <p:wrap-sequence wrapper="info"/>
                 <p:choose>
                     <p:when test="empty(/info/*)">
@@ -48,7 +56,7 @@
                     </p:otherwise>
                 </p:choose>
             </p:group>
-            
+
             <p:group cx:depends-on="checkdir">
                 <p:identity>
                     <p:input port="source">
@@ -56,18 +64,15 @@
                     </p:input>
                 </p:identity>
                 <!-- Handle relative resources outside of the base directory -->
-                <p:viewport name="handle-outer-file"
-                    match="/d:fileset/d:file[not(matches(@href,'^[^/]+:')) and starts-with(@href,'..')]">
+                <p:viewport name="handle-outer-file" match="/d:fileset/d:file[not(matches(@href,'^[^/]+:')) and starts-with(@href,'..')]">
                     <!--TODO: extract XPath functions in uri-utils -->
                     <p:label-elements attribute="href" label="@href"/>
                 </p:viewport>
-                
+
                 <!-- Handle relative resources in the base directory -->
-                <p:viewport name="handle-inner-file"
-                    match="//d:file[not(matches(@href,'^[^/]+:')) and not(starts-with(@href,'..'))]">
+                <p:viewport name="handle-inner-file" match="//d:file[not(matches(@href,'^[^/]+:')) and not(starts-with(@href,'..'))]">
                     <p:variable name="href" select="*/resolve-uri(@href, base-uri(.))"/>
-                    <p:variable name="target-file"
-                        select="resolve-uri(*/@href, concat($target,'/'))"/>
+                    <p:variable name="target-file" select="resolve-uri(*/@href, concat($target,'/'))"/>
                     <px:mkdir name="mkdir">
                         <p:with-option name="href" select="replace($target-file,'[^/]+$','')"/>
                     </px:mkdir>
@@ -83,12 +88,12 @@
                     </p:identity>
                 </p:viewport>
             </p:group>
-            
+
             <!--Set the base directory to the target directory-->
             <p:add-attribute attribute-name="xml:base" match="/*">
                 <p:with-option name="attribute-value" select="$target"/>
             </p:add-attribute>
-            
+
         </p:group>
         <p:catch name="catch">
             <p:output port="result" primary="true"/>
@@ -114,5 +119,5 @@
             </p:choose>
         </p:catch>
     </p:try>
-    
+
 </p:declare-step>
