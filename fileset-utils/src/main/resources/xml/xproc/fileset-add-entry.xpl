@@ -12,6 +12,7 @@
   <p:option name="first" select="'false'"/>
 
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
+  <p:import href="fileset-add-ref.xpl"/>
 
   <!--TODO awkward, add the entry with XProc, then perform URI cleanup-->
   <p:xslt name="href-uri">

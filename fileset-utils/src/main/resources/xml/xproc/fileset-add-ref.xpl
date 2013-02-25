@@ -24,7 +24,7 @@
                     <xsl:template match="/*">
                         <d:ref>
                             <xsl:for-each select="d:file[pf:normalize-uri(resolve-uri(@href,base-uri(.))) = pf:normalize-uri(resolve-uri($href,base-uri(.)))][1]">
-                                <xsl:attribute name="href" select="pf:normalize-uri(resolve-uri($ref,resolve-uri(@href,base-uri(.))))"/>
+                                <xsl:attribute name="href" select="pf:relativize-uri($ref,base-uri(.))"/>
                                 <xsl:attribute name="parent-href" select="@href"/>
                             </xsl:for-each>
                         </d:ref>
