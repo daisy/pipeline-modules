@@ -5,9 +5,6 @@
   </start>
   <define name="document-validation-report">
     <element name="document-validation-report">
-      <optional>
-        <attribute name="extra"/>
-      </optional>
       <ref name="document-info"/>
       <ref name="reports"/>
     </element>
@@ -24,6 +21,14 @@
         <element name="document-path">
           <data type="anyURI"/>
         </element>
+        <element name="error-count">
+          <data type="nonNegativeInteger"/>
+        </element>
+        <optional>
+          <element name="report-path">
+            <data type="anyURI"/>
+          </element>
+        </optional>
       </interleave>  
     </element>
   </define>
