@@ -51,7 +51,7 @@
     </xsl:template>
 
     <xsl:template match="item">
-        <d:file href="{@href}" media-type="{@media-type}"/>
+        <d:file href="{@href}" media-type="{if(@media-type='application/smil') then 'application/smil+xml' else @media-type}"/>
     </xsl:template>
 
     <xsl:template match="text()"/>
