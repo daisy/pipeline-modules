@@ -88,6 +88,7 @@
                         <d:document-name>{string(/*/@name)}</d:document-name>
                         <d:document-type>XProc Unit Test</d:document-type>
                         <d:document-path>{$script-uri}</d:document-path>
+                        <d:error-count>{string(count(/*/*[@result='false']))}</d:error-count>
                     </d:document-info>
                 </p:inline>
             </p:input>

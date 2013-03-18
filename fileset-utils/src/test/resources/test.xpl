@@ -52,9 +52,6 @@
         <p:variable name="script-uri" select="/*/@script-uri"/>
         <p:variable name="test-group-name" select="/*/@name"/>
         <p:delete match="/*/c:result[@result='true']"/>
-        <!--<p:identity>
-            <p:log port="result"/>
-        </p:identity>-->
         <p:viewport match="/*/c:result" name="test.viewport">
             <p:in-scope-names name="test.viewport.vars"/>
             <p:template>
@@ -118,6 +115,7 @@
                         <d:document-name>{string(/*/@name)}</d:document-name>
                         <d:document-type>XProc Unit Test</d:document-type>
                         <d:document-path>{$script-uri}</d:document-path>
+                        <d:error-count>{string(count(/*/*[@result='false']))}</d:error-count>
                     </d:document-info>
                 </p:inline>
             </p:input>
@@ -126,7 +124,7 @@
             </p:input>
         </p:template>
     </p:for-each>
-
+    
     <px:validation-report-to-html name="result"/>
     <p:store href="file:/tmp/report.html"/>
 
