@@ -30,6 +30,10 @@
             <p:pipe port="source" step="validation-report-to-html"/>
         </p:iteration-source>
         
+        <p:viewport match="d:expected | d:was">
+            <p:escape-markup method="xml"/>
+            <p:string-replace match="/*/text()" replace="replace(/*,'(\n)[\s\n]+\n','$1')"/>
+        </p:viewport>
         <p:xslt name="htmlify-validation-report">
             <p:input port="parameters">
                 <p:empty/>
@@ -51,7 +55,7 @@
                             body { 
                             font-family: helvetica; 
                             } 
-                            pre { 
+                            pre.box { 
                             white-space: pre-wrap; /* css-3 */ 
                             white-space: -moz-pre-wrap; /*Mozilla, since 1999 */ 
                             white-space: -pre-wrap; /* Opera 4-6 */
@@ -68,7 +72,7 @@
                             padding-right: 10px; 
                             font-size: smaller; 
                             } 
-                            li.error div pre { 
+                            li.error div pre.box { 
                             display: table-cell; 
                             } 
                             li { 
@@ -88,6 +92,9 @@
         </p:input>
         <p:input port="insertion">
             <p:pipe port="result" step="convert-to-html"/>
+            <p:inline xmlns="http://www.w3.org/1999/xhtml">
+                <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"> </script>
+            </p:inline>
         </p:input>
     </p:insert>
     

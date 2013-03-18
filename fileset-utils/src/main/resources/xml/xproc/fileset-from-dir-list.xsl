@@ -17,7 +17,7 @@
     </xsl:template>
     
     <xsl:template match="c:file">
-        <d:file href="{substring-after(resolve-uri(@name,base-uri()),base-uri(/*))}">
+        <d:file href="{substring-after(resolve-uri(encode-for-uri(@name),base-uri()),base-uri(/*))}">
             <xsl:apply-templates select="node() | @*[not(name()='name')]"/>
         </d:file>
     </xsl:template>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step version="1.0" type="px:fileset-load" name="main" xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns:p="http://www.w3.org/ns/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
   xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal/fileset-load" xmlns:c="http://www.w3.org/ns/xproc-step" exclude-inline-prefixes="cx px">
-  
+
   <p:input port="fileset" primary="true"/>
   <p:input port="in-memory" sequence="true"/>
   <p:output port="result" sequence="true">
@@ -13,6 +13,7 @@
   <p:option name="not-media-types" select="''"/>
   <p:option name="fail-on-not-found" select="'false'"/>
   <p:option name="load-if-not-in-memory" select="'true'"/>
+  <p:option name="method" select="''"/>
 
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
   <p:import href="http://www.daisy.org/pipeline/modules/html-utils/html-library.xpl"/>
@@ -60,7 +61,7 @@
   <p:add-attribute match="/*" attribute-name="not-media-types">
     <p:with-option name="attribute-value" select="$not-media-types"/>
   </p:add-attribute>
-  
+
   <p:choose>
     <p:when test="$href='' and $media-types='' and $not-media-types=''">
       <p:identity/>
@@ -73,135 +74,246 @@
       </px:fileset-filter>
     </p:otherwise>
   </p:choose>
+  <p:identity name="filtered"/>
+  <p:for-each>
+    <p:iteration-source select="/*/*"/>
+    <p:identity/>
+  </p:for-each>
+  <p:count limit="1" name="filtered.count"/>
+  <p:identity>
+    <p:input port="source">
+      <p:pipe port="result" step="filtered"/>
+    </p:input>
+  </p:identity>
   
-  <p:for-each name="load">
-    <p:output port="result" sequence="true"/>
-    <p:iteration-source select="//d:file"/>
-    <p:variable name="on-disk-attribute" select="/*/@original-href"/>
-    <p:variable name="target" select="/*/resolve-uri(@href, base-uri(.))"/>
-    <p:variable name="media-type" select="/*/@media-type"/>
-
-    <p:choose>
+  <p:choose name="load">
+    <p:when test="number(/*)&gt;0">
+      <p:output port="result" sequence="true"/>
       <p:xpath-context>
-        <p:pipe port="result" step="fileset.in-memory"/>
+        <p:pipe port="result" step="filtered.count"/>
       </p:xpath-context>
-
-      <!-- from memory -->
-      <p:when test="$target = //d:file/resolve-uri(@href,base-uri(.))">
-        <cx:message>
-          <p:with-option name="message" select="concat('processing file from memory: ',$target)"/>
-        </cx:message>
-        <p:split-sequence>
-          <p:with-option name="test" select="concat('base-uri(/*)=&quot;',$target,'&quot;')"/>
-          <p:input port="source">
-            <p:pipe port="in-memory" step="main"/>
-          </p:input>
-        </p:split-sequence>
-      </p:when>
-      
-      <!-- not in memory, but don't load it from disk -->
-      <p:when test="not($load-if-not-in-memory = 'true')">
-        <p:sink/>
-        <p:identity>
-          <p:input port="source">
-            <p:empty/>
-          </p:input>
-        </p:identity>
-      </p:when>
-
-      <!-- load file into memory (from disk, HTTP, etc) -->
-      <p:otherwise>
-        <p:try>
-          <p:group>
-            <p:variable name="on-disk" select="if ($on-disk-attribute='') then $target else $on-disk-attribute"/>
+      <p:for-each>
+        <p:output port="result" sequence="true"/>
+        <p:iteration-source select="//d:file"/>
+        <p:variable name="on-disk-attribute" select="/*/@original-href"/>
+        <p:variable name="target" select="/*/resolve-uri(@href, base-uri(.))"/>
+        <p:variable name="media-type" select="/*/@media-type"/>
+        
+        <p:choose>
+          <p:xpath-context>
+            <p:pipe port="result" step="fileset.in-memory"/>
+          </p:xpath-context>
+          
+          <!-- from memory -->
+          <p:when test="$target = //d:file/resolve-uri(@href,base-uri(.))">
             <cx:message>
-              <p:with-option name="message" select="concat('loading ',$target,' from disk: ',$on-disk)"/>
+              <p:with-option name="message" select="concat('processing file from memory: ',$target)"/>
             </cx:message>
+            <p:split-sequence>
+              <p:with-option name="test" select="concat('base-uri(/*)=&quot;',$target,'&quot;')"/>
+              <p:input port="source">
+                <p:pipe port="in-memory" step="main"/>
+              </p:input>
+            </p:split-sequence>
+          </p:when>
+          
+          <!-- not in memory, but don't load it from disk -->
+          <p:when test="not($load-if-not-in-memory = 'true')">
             <p:sink/>
-
-            <p:choose>
-              <!-- HTML -->
-              <p:when test="$media-type='text/html' or $media-type='application/xhtml+xml'">
-                <px:html-load>
-                  <p:with-option name="href" select="$on-disk"/>
-                </px:html-load>
-              </p:when>
-
-              <!-- XML -->
-              <p:when test="$media-type='application/xml' or matches($media-type,'.*\+xml$')">
-                <p:try>
-                  <p:group>
-                    <p:load>
-                      <p:with-option name="href" select="$on-disk"/>
-                    </p:load>
-                  </p:group>
-                  <p:catch>
-                    <cx:message>
-                      <p:input port="source">
-                        <p:empty/>
-                      </p:input>
-                      <p:with-option name="message" select="concat('unable to load ',$on-disk,' as XML; trying as text...')"/>
-                    </cx:message>
-                    <pxi:load-text>
-                      <p:with-option name="href" select="$on-disk"/>
-                    </pxi:load-text>
-                  </p:catch>
-                </p:try>
-              </p:when>
-
-              <!-- text -->
-              <p:when test="matches($media-type,'^text/')">
-                <pxi:load-text>
-                  <p:with-option name="href" select="$on-disk"/>
-                </pxi:load-text>
-              </p:when>
-
-              <!-- binary -->
-              <p:otherwise>
-                <pxi:load-binary>
-                  <p:with-option name="href" select="$on-disk"/>
-                </pxi:load-binary>
-              </p:otherwise>
-
-            </p:choose>
-          </p:group>
-          <p:catch>
-            <!-- could not retrieve file from neither memory nor disk -->
-            <p:variable name="file-not-found-message" select="concat('Could neither retrieve file from memory nor disk: ',$target)"/>
-            <p:choose>
-              <p:when test="$fail-on-not-found='true'">
-                <p:in-scope-names name="vars"/>
-                <p:template>
-                  <p:input port="template">
-                    <p:inline>
-                      <c:message><![CDATA[]]>{$file-not-found-message}<![CDATA[]]></c:message>
-                    </p:inline>
-                  </p:input>
-                  <p:input port="source">
-                    <p:empty/>
-                  </p:input>
-                  <p:input port="parameters">
-                    <p:pipe step="vars" port="result"/>
-                  </p:input>
-                </p:template>
-                <p:error code="PEZE00"/>
-              </p:when>
-              <p:otherwise>
-                <cx:message>
-                  <p:with-option name="message" select="$file-not-found-message"/>
-                </cx:message>
-              </p:otherwise>
-            </p:choose>
             <p:identity>
               <p:input port="source">
                 <p:empty/>
               </p:input>
             </p:identity>
-          </p:catch>
-        </p:try>
-      </p:otherwise>
-    </p:choose>
-  </p:for-each>
+          </p:when>
+          
+          <!-- load file into memory (from disk, HTTP, etc) -->
+          <p:otherwise>
+            <p:try>
+              <p:group>
+                <p:variable name="on-disk" select="if ($on-disk-attribute='') then $target else $on-disk-attribute"/>
+                <cx:message>
+                  <p:with-option name="message" select="concat('loading ',$target,' from disk: ',$on-disk)"/>
+                </cx:message>
+                <p:sink/>
+                
+                <px:info>
+                  <p:with-option name="href" select="resolve-uri($on-disk,base-uri())">
+                    <p:inline>
+                      <doc/>
+                    </p:inline>
+                  </p:with-option>
+                </px:info>
+                <p:count name="file-exists"/>
+                
+                <p:choose>
+                  <p:when test="number(.)=0 and starts-with($on-disk,'file:')">
+                    <p:error code="XC0011">
+                      <p:input port="source">
+                        <p:inline>
+                          <c:message>File not found.</c:message>
+                        </p:inline>
+                      </p:input>
+                    </p:error>
+                  </p:when>
+                  
+                  <!-- Force HTML -->
+                  <p:when test="$method='html'">
+                    <px:html-load>
+                      <p:with-option name="href" select="$on-disk"/>
+                    </px:html-load>
+                  </p:when>
+                  
+                  <!-- Force XML -->
+                  <p:when test="$method='xml'">
+                    <p:try>
+                      <p:group>
+                        <p:load>
+                          <p:with-option name="href" select="$on-disk"/>
+                        </p:load>
+                      </p:group>
+                      <p:catch>
+                        <cx:message>
+                          <p:input port="source">
+                            <p:empty/>
+                          </p:input>
+                          <p:with-option name="message" select="concat('unable to load ',$on-disk,' as XML')"/>
+                        </cx:message>
+                      </p:catch>
+                    </p:try>
+                  </p:when>
+                  
+                  <!-- Force text -->
+                  <p:when test="$method='text'">
+                    <pxi:load-text>
+                      <p:with-option name="href" select="$on-disk"/>
+                    </pxi:load-text>
+                  </p:when>
+                  
+                  <!-- Force binary -->
+                  <p:when test="$method='binary'">
+                    <pxi:load-binary>
+                      <p:with-option name="href" select="$on-disk"/>
+                    </pxi:load-binary>
+                  </p:when>
+                  
+                  <!-- HTML -->
+                  <p:when test="$media-type='text/html' or $media-type='application/xhtml+xml'">
+                    <px:html-load>
+                      <p:with-option name="href" select="$on-disk"/>
+                    </px:html-load>
+                  </p:when>
+                  
+                  <!-- XML -->
+                  <p:when test="$media-type='application/xml' or matches($media-type,'.*\+xml$')">
+                    <p:try>
+                      <p:group>
+                        <p:load>
+                          <p:with-option name="href" select="$on-disk"/>
+                        </p:load>
+                      </p:group>
+                      <p:catch>
+                        <cx:message>
+                          <p:input port="source">
+                            <p:empty/>
+                          </p:input>
+                          <p:with-option name="message" select="concat('unable to load ',$on-disk,' as XML; trying as text...')"/>
+                        </cx:message>
+                        <pxi:load-text>
+                          <p:with-option name="href" select="$on-disk"/>
+                        </pxi:load-text>
+                      </p:catch>
+                    </p:try>
+                  </p:when>
+                  
+                  <!-- text -->
+                  <p:when test="matches($media-type,'^text/')">
+                    <pxi:load-text>
+                      <p:with-option name="href" select="$on-disk"/>
+                    </pxi:load-text>
+                  </p:when>
+                  
+                  <!-- binary -->
+                  <p:otherwise>
+                    <pxi:load-binary>
+                      <p:with-option name="href" select="$on-disk"/>
+                    </pxi:load-binary>
+                  </p:otherwise>
+                  
+                </p:choose>
+              </p:group>
+              <p:catch>
+                <!-- could not retrieve file from neither memory nor disk -->
+                <p:variable name="file-not-found-message" select="concat('Could neither retrieve file from memory nor disk: ',$target)"/>
+                <p:choose>
+                  <p:when test="$fail-on-not-found='true'">
+                    <p:in-scope-names name="vars"/>
+                    <p:template>
+                      <p:input port="template">
+                        <p:inline>
+                          <c:message><![CDATA[]]>{$file-not-found-message}<![CDATA[]]></c:message>
+                        </p:inline>
+                      </p:input>
+                      <p:input port="source">
+                        <p:empty/>
+                      </p:input>
+                      <p:input port="parameters">
+                        <p:pipe step="vars" port="result"/>
+                      </p:input>
+                    </p:template>
+                    <p:error code="PEZE00"/>
+                  </p:when>
+                  <p:otherwise>
+                    <cx:message>
+                      <p:with-option name="message" select="$file-not-found-message"/>
+                    </cx:message>
+                  </p:otherwise>
+                </p:choose>
+                <p:identity>
+                  <p:input port="source">
+                    <p:empty/>
+                  </p:input>
+                </p:identity>
+              </p:catch>
+            </p:try>
+          </p:otherwise>
+        </p:choose>
+      </p:for-each>
+      
+    </p:when>
+    <p:otherwise>
+      <p:output port="result" sequence="true"/>
+      <!-- no files matched filter criteria (or fileset empty) -->
+      <p:variable name="file-not-found-message" select="if (not($href='')) then concat('File is not part of fileset: ',$href) else 'Fileset empty or no files matched filter criteria. No files loaded.'"/>
+      <p:choose>
+        <p:when test="not($href='') and $fail-on-not-found='true'">
+          <p:in-scope-names name="vars"/>
+          <p:template>
+            <p:input port="template">
+              <p:inline>
+                <c:message><![CDATA[]]>{$file-not-found-message}<![CDATA[]]></c:message>
+              </p:inline>
+            </p:input>
+            <p:input port="source">
+              <p:empty/>
+            </p:input>
+            <p:input port="parameters">
+              <p:pipe step="vars" port="result"/>
+            </p:input>
+          </p:template>
+          <p:error code="PEZE00"/>
+        </p:when>
+        <p:otherwise>
+          <p:identity/>
+        </p:otherwise>
+      </p:choose>
+      <p:identity>
+        <p:input port="source">
+          <p:empty/>
+        </p:input>
+      </p:identity>
+    </p:otherwise>
+  </p:choose>
   <p:sink/>
 
   <px:fileset-create name="fileset.in-memory-base" base="/"/>
