@@ -4,11 +4,9 @@
     <xsl:template match="/">
         <div class="document-validation-report" id="{generate-id()}">
             <xsl:choose>
-                <xsl:when test="count(descendant::svrl:failed-assert) = 0 and
-                    count(descendant::svrl:successful-report) = 0 and 
-                    count(descendant::d:error) = 0">
-                    <xsl:apply-templates select="descendant::d:document-info"/>
-                    <p>No errors found.</p>
+                <xsl:when
+                    test="d:document-info/d:error-count/text() = '0'">
+                    <xsl:apply-templates select="d:document-info"/>
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:apply-templates/>
@@ -21,9 +19,21 @@
         <xsl:apply-templates/>
     </xsl:template>
     <xsl:template match="d:document-info">
+        <xsl:element name="d:data" namespace="http://www.daisy.org/ns/pipeline/data">
+            <xsl:copy-of select="."/>
+        </xsl:element>
         <div class="document-info">
             <xsl:apply-templates/>
+            <xsl:choose>
+                <xsl:when test="d:error-count/text() = '1'">
+                    <p>1 issue found.</p>
+                </xsl:when>
+                <xsl:otherwise>
+                    <p><xsl:value-of select="d:error-count/text()"/> issues found.</p>
+                </xsl:otherwise>
+            </xsl:choose>
         </div>
+        
     </xsl:template>
 
     <!-- document info -->

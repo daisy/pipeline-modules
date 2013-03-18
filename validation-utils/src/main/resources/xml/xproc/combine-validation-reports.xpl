@@ -11,6 +11,7 @@
     xmlns:xhtml="http://www.w3.org/1999/xhtml" 
     xmlns:dtb="http://www.daisy.org/z3986/2005/dtbook/"
     xmlns:m="http://www.w3.org/1998/Math/MathML"
+    xmlns:svrl="http://purl.oclc.org/dsdl/svrl"
     exclude-inline-prefixes="#all">
     
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -40,6 +41,12 @@
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h1 px:role="name">document-path</h1>
             <p px:role="desc">The full path to the document, if available.</p>
+        </p:documentation>
+    </p:option>
+    <p:option name="report-path" required="false" select="''">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <h1 px:role="name">report-path</h1>
+            <p px:role="desc">The path to the validation report XML, if available.</p>
         </p:documentation>
     </p:option>
     
@@ -109,11 +116,7 @@
                 </p:string-replace>
             </p:when>
             <p:otherwise>
-                <p:identity>
-                    <p:input port="source">
-                        <p:empty/>
-                    </p:input>
-                </p:identity>
+                <p:identity/>
             </p:otherwise>
         </p:choose>
         
@@ -131,11 +134,7 @@
                 </p:string-replace>
             </p:when>
             <p:otherwise>
-                <p:identity>
-                    <p:input port="source">
-                        <p:empty/>
-                    </p:input>
-                </p:identity>
+                <p:identity/>
             </p:otherwise>
         </p:choose>
         
@@ -153,11 +152,25 @@
                 </p:string-replace>
             </p:when>
             <p:otherwise>
-                <p:identity>
-                    <p:input port="source">
-                        <p:empty/>
+                <p:identity/>
+            </p:otherwise>
+        </p:choose>
+        
+        <p:choose>
+            <p:when test="string-length($report-path) > 0">
+                <p:insert match="d:document-validation-report/d:document-info" position="last-child">
+                    <p:input port="insertion">
+                        <p:inline>
+                            <d:report-path>@@</d:report-path>
+                        </p:inline>
                     </p:input>
-                </p:identity>
+                </p:insert>
+                <p:string-replace match="//d:report-path/text()">
+                    <p:with-option name="replace" select="concat('&quot;', $report-path, '&quot;')"/>
+                </p:string-replace>
+            </p:when>
+            <p:otherwise>
+                <p:identity/>
             </p:otherwise>
         </p:choose>
     </p:group>
@@ -184,6 +197,20 @@
                 <p:pipe port="result" step="add-document-metadata"/>
             </p:input>
         </p:replace>
+    </p:group>
+    
+    <p:group name="add-error-count">
+        <p:variable name="error-count" select="count(//d:error) + count(//svrl:failed-assert) + count(//svrl:successful-report)"/>
+        <p:insert match="d:document-validation-report/d:document-info" position="last-child">
+            <p:input port="insertion">
+                <p:inline>
+                    <d:error-count>@@</d:error-count>
+                </p:inline>
+            </p:input>
+        </p:insert>
+        <p:string-replace match="//d:error-count/text()">
+            <p:with-option name="replace" select="concat('&quot;', $error-count, '&quot;')"/>
+        </p:string-replace>
     </p:group>
     
     <p:validate-with-relax-ng assert-valid="true">

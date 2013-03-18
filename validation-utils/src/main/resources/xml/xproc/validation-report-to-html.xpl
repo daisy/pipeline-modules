@@ -26,6 +26,7 @@
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
     <p:for-each name="convert-to-html">
         <p:output port="result" sequence="true"/>
+        
         <p:iteration-source>
             <p:pipe port="source" step="validation-report-to-html"/>
         </p:iteration-source>
@@ -78,13 +79,47 @@
                             li { 
                             padding-bottom: 15px; 
                             } 
+                            #toc {
+                            border-spacing: 0px;
+                            }
+                            #toc th, #toc td {
+                            padding: 5px 30px 5px 10px;
+                            border-spacing: 0px;
+                            font-size: 90%;
+                            margin: 0px;
+                            }
+                            #toc th, #toc td {
+                            text-align: left;
+                            border-top: 1px solid #f1f8fe;
+                            border-bottom: 1px solid #cbd2d8;
+                            border-right: 1px solid #cbd2d8;
+                            }
+                            
+                            #toc tr:nth-child(odd) {
+                            background-color: #e0e9f0;
+                            }
+                            #toc tr:nth-child(even), #toc thead th {
+                            background-color: #e8eff5; !important;
+                            }
+                            
                         </style>
                     </head>
                     <body>
                         <div id="header">
                             <h1>Validation Results</h1>
                             <p id="datetime">@@</p>
-                            <ul id="document-index"/>
+                            <table id="toc">
+                                <thead>
+                                    <tr>
+                                        <th>File name</th>
+                                        <th>Validation results</th>
+                                        <th>Type</th>
+                                        <th>Link to XML report</th>
+                                        <th>Link to Document</th>
+                                    </tr>
+                                </thead>
+                                <tbody/>
+                            </table>
                         </div>
                     </body>
                 </html>
@@ -106,30 +141,62 @@
                 <p:iteration-source select="//xhtml:div[@class='document-validation-report']"/>
                 
                 <p:variable name="section-id" select="*/@id"/>
-                <p:variable name="document-name" select="*/xhtml:div[@class='document-info']/xhtml:h2"/>
-                
+                <p:variable name="document-name" select="*/d:data/d:document-info/d:document-name/text()"/>
+                <p:variable name="document-type" select="*/d:data/d:document-info/d:document-type/text()"/>
+                <p:variable name="document-path" select="*/d:data/d:document-info/d:document-path/text()"/>
+                <p:variable name="report-path" select="*/d:data/d:document-info/d:report-path/text()"/>
+                <p:variable name="error-count" select="*/d:data/d:document-info/d:error-count/text()"/>
                 <p:identity>
                     <p:input port="source">
                         <p:inline>
-                            <li xmlns="http://www.w3.org/1999/xhtml">
-                                <a href="@@">@@</a>
-                            </li>
+                            <tr xmlns="http://www.w3.org/1999/xhtml">
+                                <td class="filename">@@</td>
+                                <td class="issues"><a href="@@"><span>@@</span> found</a></td>
+                                <td class="filetype">@@</td>
+                                <td class="reportpath"><a href="@@">XML report</a></td>
+                                <td class="filepath"><a href="@@">Document</a></td>
+                            </tr>
                         </p:inline>
                     </p:input>
                 </p:identity>
                 
-                <p:string-replace match="xhtml:a/@href">
-                    <p:with-option name="replace" select="concat('&quot;', '#', $section-id, '&quot;')"/>
-                </p:string-replace>
-                
-                <p:string-replace match="xhtml:a/text()">
+                <p:string-replace match="xhtml:td[@class='filename']/text()">
                     <p:with-option name="replace" select="concat('&quot;', $document-name, '&quot;')"/>
                 </p:string-replace>
                 
+                <p:string-replace match="xhtml:td[@class='issues']/xhtml:a/@href">
+                    <p:with-option name="replace" select="concat('&quot;', '#', $section-id, '&quot;')"/>
+                </p:string-replace>
+                
+                <p:choose>
+                    <p:when test="$error-count = 1">
+                        <p:string-replace match="xhtml:td[@class='issues']/xhtml:a/xhtml:span/text()">
+                            <p:with-option name="replace" select="'&quot;1 issue&quot;'"/>
+                        </p:string-replace>        
+                    </p:when>
+                    <p:otherwise>
+                        <p:string-replace match="xhtml:td[@class='issues']/xhtml:a/xhtml:span/text()">
+                            <p:with-option name="replace" select="concat('&quot;', $error-count, ' issues &quot;')"/>
+                        </p:string-replace>
+                    </p:otherwise>
+                </p:choose>
+                
+                
+                <p:string-replace match="xhtml:td[@class='filetype']/text()">
+                    <p:with-option name="replace" select="concat('&quot;', $document-type, '&quot;')"/>
+                </p:string-replace>
+                
+                <p:string-replace match="xhtml:td[@class='reportpath']/xhtml:a/@href">
+                    <p:with-option name="replace" select="concat('&quot;', $report-path, '&quot;')"/>
+                </p:string-replace>
+                
+                <p:string-replace match="xhtml:td[@class='filepath']/xhtml:a/@href">
+                    <p:with-option name="replace" select="concat('&quot;', $document-path, '&quot;')"/>
+                </p:string-replace>
                 
             </p:for-each>   
             
-            <p:insert match="xhtml:ul[@id='document-index']" position="first-child">
+            <p:insert match="xhtml:table[@id='toc']/xhtml:tbody" position="last-child">
                 <p:input port="source">
                     <p:pipe port="result" step="assemble-html-report"/>
                 </p:input>
@@ -140,9 +207,13 @@
             
         </p:when>
         <p:otherwise>
-            <p:delete match="xhtml:ul[@id='document-index']"></p:delete>
+            <p:delete match="xhtml:table[@id='toc']"></p:delete>
         </p:otherwise>
     </p:choose>
+    
+    <!-- remove the temporary data element inserted by validation-report-to-html.xsl -->
+    <p:delete match="//xhtml:div[@class='document-validation-report']/d:data"/>
+        
     
     <p:string-replace match="//*[@id='datetime']/text()">
         <p:with-option name="replace"
