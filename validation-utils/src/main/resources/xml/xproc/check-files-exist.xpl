@@ -22,7 +22,7 @@
     <p:input port="source" primary="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h1 px:role="name">source</h1>
-            <p px:role="desc">A list of files, formatted as described at http://code.google.com/p/daisy-pipeline/wiki/ValidationReportXML#Files_List</p>
+            <p px:role="desc">A list of files, formatted as described at http://code.google.com/p/daisy-pipeline/wiki/FileSetUtils</p>
         </p:documentation>
     </p:input>
     
@@ -41,16 +41,9 @@
         <p:documentation>For manipulating files.</p:documentation>
     </p:import>
     
-    <!-- validate the input document -->
-    <p:validate-with-relax-ng name="v-rng" assert-valid="true">
-        <p:input port="schema">
-            <p:document href="../schema/files.rng"/>
-        </p:input>
-    </p:validate-with-relax-ng>
-    
     <p:for-each name="check-each-file">
         <p:iteration-source select="//d:file"/>
-        <p:variable name="filepath" select="*/@path"/>
+        <p:variable name="filepath" select="*/@href"/>
         <p:variable name="ref" select="*/@ref"/>
         <p:try>
             <p:group>
