@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step name="main" xmlns:p="http://www.w3.org/ns/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:px="http://www.daisy.org/ns/pipeline/xproc" xmlns:cx="http://xmlcalabash.com/ns/extensions" exclude-inline-prefixes="#all"
-    version="1.0" type="px:mediatype-detect">
+<p:declare-step name="main" xmlns:p="http://www.w3.org/ns/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:px="http://www.daisy.org/ns/pipeline/xproc" xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
+    xmlns:cx="http://xmlcalabash.com/ns/extensions" exclude-inline-prefixes="#all" version="1.0" type="px:mediatype-detect">
 
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
         <h1 px:role="name">Media type detect</h1>
@@ -30,18 +30,18 @@
             <p px:role="desc">The same d:fileset that arrived on the input port, but with "media-type"-attributes added to all d:file elements.</p>
         </p:documentation>
     </p:output>
-    
+
     <p:option name="load-if-not-in-memory" select="'false'"/>
 
-    <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/xproc/fileset-library.xpl"/>
 
-    <p:viewport match="//d:file" name="file">
+    <p:declare-step type="pxi:mediatype-detect-from-extension">
+        <p:input port="source"/>
+        <p:output port="result"/>
         <p:variable name="ext" select="lower-case(replace(/*/@href,'^.+?([^/\.]+)$','$1'))"/>
-
         <p:choose>
-            <p:when test="/*/@media-type">
-                <p:identity/>
+            <p:when test="$ext = 'xml'">
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/xml"/>
             </p:when>
             <p:when test="$ext = 'xhtml'">
                 <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/xhtml+xml"/>
@@ -673,12 +673,129 @@
             <p:when test="$ext = 'hgignore'">
                 <p:add-attribute match="/*" attribute-name="media-type" attribute-value="text/plain"/>
             </p:when>
-            <p:when test="$ext = 'xml'">
-                
-                <!-- TODO: an improvement on this would be to read only the start tag of the root element instead of loading the entire XML into memory -->
-                
-                <px:fileset-load name="file.load">
-                    <p:with-option name="load-if-not-in-memory" select="$load-if-not-in-memory"/>
+            <p:otherwise>
+                <!-- unknown file extension; assume binary -->
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/octet-stream"/>
+            </p:otherwise>
+        </p:choose>
+    </p:declare-step>
+    
+    <p:declare-step type="pxi:mediatype-detect-from-namespace" name="detect-from-namespace">
+        <p:input port="source" primary="true"/>
+        <p:input port="in-memory"/>
+        <p:output port="result"/>
+        <p:variable name="ns" select="namespace-uri(/*)">
+            <p:pipe port="in-memory" step="detect-from-namespace"/>
+        </p:variable>
+        <p:choose>
+            <p:when test="$ns = 'http://www.w3.org/1999/xhtml'">
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/xhtml+xml"/>
+            </p:when>
+            <p:when test="$ns = 'http://www.idpf.org/2007/opf'">
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/oebps-package+xml"/>
+            </p:when>
+            <p:when test="$ns = 'http://www.daisy.org/z3986/2005/dtbook/'">
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/x-dtbook+xml"/>
+            </p:when>
+            <p:when test="$ns = 'http://www.w3.org/TR/REC-smil'">
+                <!-- SMIL 1.0 -->
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/smil+xml"/>
+            </p:when>
+            <p:when test="$ns = 'http://www.w3.org/2001/SMIL20/'">
+                <!-- SMIL 2.0 -->
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/smil+xml"/>
+            </p:when>
+            <p:when test="$ns = 'http://www.w3.org/2001/SMIL20/Language'">
+                <!-- SMIL 2.0 -->
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/smil+xml"/>
+            </p:when>
+            <p:when test="$ns = 'http://www.w3.org/2005/SMIL21/'">
+                <!-- SMIL 2.1 -->
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/smil+xml"/>
+            </p:when>
+            <p:when test="$ns = 'http://www.w3.org/2005/SMIL21/Language'">
+                <!-- SMIL 2.1 -->
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/smil+xml"/>
+            </p:when>
+            <p:when test="$ns = 'http://www.w3.org/2005/SMIL21/Mobile'">
+                <!-- SMIL 2.1 -->
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/smil+xml"/>
+            </p:when>
+            <p:when test="$ns = 'http://www.w3.org/2005/SMIL21/ExtendedMobile'">
+                <!-- SMIL 2.1 -->
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/smil+xml"/>
+            </p:when>
+            <p:when test="$ns = 'http://www.w3.org/2005/SMIL21/MobileProfile'">
+                <!-- SMIL 2.1 -->
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/smil+xml"/>
+            </p:when>
+            <p:when test="$ns = 'http://www.w3.org/2005/SMIL21/BasicExclTimeContainers'">
+                <!-- SMIL 2.1 -->
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/smil+xml"/>
+            </p:when>
+            <p:when test="$ns = 'http://www.w3.org/ns/SMIL'">
+                <!-- SMIL 3.0 -->
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/smil+xml"/>
+            </p:when>
+            <p:when test="$ns = 'http://www.daisy.org/z3986/2005/ncx/'">
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/x-dtbncx+xml"/>
+            </p:when>
+            <p:when test="$ns = 'http://www.w3.org/2000/svg'">
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="image/svg+xml"/>
+            </p:when>
+            <p:when test="$ns = 'http://www.w3.org/ns/xproc'">
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/xproc+xml"/>
+            </p:when>
+            <p:when test="$ns = 'http://www.w3.org/ns/xproc-step'">
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/xproc+xml"/>
+            </p:when>
+            <p:when test="$ns = 'http://www.w3.org/ns/xproc-error'">
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/xproc+xml"/>
+            </p:when>
+            <p:when test="$ns = 'http://www.w3.org/1999/XSL/Transform'">
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/xslt+xml"/>
+            </p:when>
+            <p:when test="$ns = 'http://www.w3.org/1999/XSL/Format'">
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/xml"/>
+            </p:when>
+            <p:when test="$ns = 'http://www.daisy.org/ns/z3986/authoring/'">
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/z3998-auth+xml"/>
+            </p:when>
+            <p:when test="$ns = 'http://www.daisy.org/ns/z3998/authoring/'">
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/z3998-auth+xml"/>
+            </p:when>
+            <p:when test="$ns = 'http://www.w3.org/XML/1998/namespace'">
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/xml"/>
+            </p:when>
+            <p:when test="$ns = 'http://openebook.org/namespaces/oeb-package/1.0/'">
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/oebps-package+xml"/>
+            </p:when>
+            <p:when test="$ns = 'http://www.w3.org/2001/XML'">
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/xml"/>
+            </p:when>
+            <p:when test="$ns = 'http://www.w3.org/ns/xproc-step'">
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/xproc+xml"/>
+            </p:when>
+            <p:when test="$ns = 'urn:oasis:names:tc:entity:xmlns:xml:catalog'">
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/xml"/>
+            </p:when>
+            <p:otherwise>
+                <!-- unknown namespace; use application/xml -->
+                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/xml"/>
+            </p:otherwise>
+        </p:choose>
+    </p:declare-step>
+
+    <p:viewport match="//d:file" name="file">
+        <p:choose>
+            <p:when test="/*/@media-type">
+                <!-- only try to find missing media types -->
+                <p:identity/>
+            </p:when>
+            <p:otherwise>
+                <!-- check if the file is in memory -->
+                <px:fileset-load name="file-in-memory">
+                    <p:with-option name="load-if-not-in-memory" select="'false'"/>
                     <p:with-option name="href" select="resolve-uri(/*/@href,base-uri(/*))"/>
                     <p:input port="fileset">
                         <p:pipe port="source" step="main"/>
@@ -687,132 +804,89 @@
                         <p:pipe port="in-memory" step="main"/>
                     </p:input>
                 </px:fileset-load>
-                <p:split-sequence test="position()=1" name="file.load-split"/>
-                <p:count name="file.load-count"/>
+                <p:count name="filecount-in-memory"/>
                 <p:identity>
                     <p:input port="source">
                         <p:pipe port="current" step="file"/>
                     </p:input>
                 </p:identity>
                 <p:choose>
-                    <p:xpath-context>
-                        <p:pipe port="result" step="file.load-count"/>
-                    </p:xpath-context>
-                    <p:when test="number(/*)=0 and $ext = 'xml'">
-                        <!-- Unknown XML grammar -->
-                        <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/xml"/>
-                    </p:when>
-                    <p:when test="number(/*)=0">
-                        <!-- Unknown binary filetype -->
-                        <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/octet-stream"/>
+                    <p:when test="number(.)&gt;0">
+                        <!-- file is in memory -->
+                        <p:xpath-context>
+                            <p:pipe port="result" step="filecount-in-memory"/>
+                        </p:xpath-context>
+                        <pxi:mediatype-detect-from-namespace>
+                            <p:input port="in-memory">
+                                <p:pipe port="result" step="file-in-memory"/>
+                            </p:input>
+                        </pxi:mediatype-detect-from-namespace>
                     </p:when>
                     <p:otherwise>
-                        <p:variable name="ns" select="namespace-uri(/*)">
-                            <p:pipe port="matched" step="file.load-split"/>
-                        </p:variable>
+                        <!-- file is not in memory -->
+                        <pxi:mediatype-detect-from-extension name="from-extension"/>
+                        <p:xslt>
+                            <p:input port="parameters">
+                                <p:empty/>
+                            </p:input>
+                            <p:input port="stylesheet">
+                                <p:document href="../xslt/mediatype-functions.xsl"/>
+                            </p:input>
+                        </p:xslt>
+
                         <p:choose>
-                            <p:when test="$ns = 'http://www.w3.org/1999/xhtml'">
-                                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/xhtml+xml"/>
-                            </p:when>
-                            <p:when test="$ns = 'http://www.idpf.org/2007/opf'">
-                                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/oebps-package+xml"/>
-                            </p:when>
-                            <p:when test="$ns = 'http://www.daisy.org/z3986/2005/dtbook/'">
-                                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/x-dtbook+xml"/>
-                            </p:when>
-                            <p:when test="$ns = 'http://www.w3.org/TR/REC-smil'">
-                                <!-- SMIL 1.0 -->
-                                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/smil+xml"/>
-                            </p:when>
-                            <p:when test="$ns = 'http://www.w3.org/2001/SMIL20/'">
-                                <!-- SMIL 2.0 -->
-                                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/smil+xml"/>
-                            </p:when>
-                            <p:when test="$ns = 'http://www.w3.org/2001/SMIL20/Language'">
-                                <!-- SMIL 2.0 -->
-                                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/smil+xml"/>
-                            </p:when>
-                            <p:when test="$ns = 'http://www.w3.org/2005/SMIL21/'">
-                                <!-- SMIL 2.1 -->
-                                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/smil+xml"/>
-                            </p:when>
-                            <p:when test="$ns = 'http://www.w3.org/2005/SMIL21/Language'">
-                                <!-- SMIL 2.1 -->
-                                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/smil+xml"/>
-                            </p:when>
-                            <p:when test="$ns = 'http://www.w3.org/2005/SMIL21/Mobile'">
-                                <!-- SMIL 2.1 -->
-                                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/smil+xml"/>
-                            </p:when>
-                            <p:when test="$ns = 'http://www.w3.org/2005/SMIL21/ExtendedMobile'">
-                                <!-- SMIL 2.1 -->
-                                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/smil+xml"/>
-                            </p:when>
-                            <p:when test="$ns = 'http://www.w3.org/2005/SMIL21/MobileProfile'">
-                                <!-- SMIL 2.1 -->
-                                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/smil+xml"/>
-                            </p:when>
-                            <p:when test="$ns = 'http://www.w3.org/2005/SMIL21/BasicExclTimeContainers'">
-                                <!-- SMIL 2.1 -->
-                                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/smil+xml"/>
-                            </p:when>
-                            <p:when test="$ns = 'http://www.w3.org/ns/SMIL'">
-                                <!-- SMIL 3.0 -->
-                                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/smil+xml"/>
-                            </p:when>
-                            <p:when test="$ns = 'http://www.daisy.org/z3986/2005/ncx/'">
-                                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/x-dtbncx+xml"/>
-                            </p:when>
-                            <p:when test="$ns = 'http://www.w3.org/2000/svg'">
-                                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="image/svg+xml"/>
-                            </p:when>
-                            <p:when test="$ns = 'http://www.w3.org/ns/xproc'">
-                                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/xproc+xml"/>
-                            </p:when>
-                            <p:when test="$ns = 'http://www.w3.org/ns/xproc-step'">
-                                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/xproc+xml"/>
-                            </p:when>
-                            <p:when test="$ns = 'http://www.w3.org/ns/xproc-error'">
-                                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/xproc+xml"/>
-                            </p:when>
-                            <p:when test="$ns = 'http://www.w3.org/1999/XSL/Transform'">
-                                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/xslt+xml"/>
-                            </p:when>
-                            <p:when test="$ns = 'http://www.w3.org/1999/XSL/Format'">
-                                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/xml"/>
-                            </p:when>
-                            <p:when test="$ns = 'http://www.daisy.org/ns/z3986/authoring/'">
-                                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/z3998-auth+xml"/>
-                            </p:when>
-                            <p:when test="$ns = 'http://www.daisy.org/ns/z3998/authoring/'">
-                                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/z3998-auth+xml"/>
-                            </p:when>
-                            <p:when test="$ns = 'http://www.w3.org/XML/1998/namespace'">
-                                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/xml"/>
-                            </p:when>
-                            <p:when test="$ns = 'http://openebook.org/namespaces/oeb-package/1.0/'">
-                                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/oebps-package+xml"/>
-                            </p:when>
-                            <p:when test="$ns = 'http://www.w3.org/2001/XML'">
-                                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/xml"/>
-                            </p:when>
-                            <p:when test="$ns = 'http://www.w3.org/ns/xproc-step'">
-                                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/xproc+xml"/>
-                            </p:when>
-                            <p:when test="$ns = 'urn:oasis:names:tc:entity:xmlns:xml:catalog'">
-                                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/xml"/>
+                            <p:when test="/*/@is-xml='true' and $load-if-not-in-memory='true'">
+                                <!-- try to load from disk -->
+                                <px:fileset-load method="xml" name="file-from-disk">
+                                    <p:with-option name="load-if-not-in-memory" select="$load-if-not-in-memory"/>
+                                    <p:with-option name="href" select="resolve-uri(/*/@href,base-uri(/*))"/>
+                                    <p:input port="fileset">
+                                        <p:pipe port="source" step="main"/>
+                                    </p:input>
+                                    <p:input port="in-memory">
+                                        <p:pipe port="in-memory" step="main"/>
+                                    </p:input>
+                                </px:fileset-load>
+                                <p:count name="file.load-count"/>
+                                <p:identity>
+                                    <p:input port="source">
+                                        <p:pipe port="current" step="file"/>
+                                    </p:input>
+                                </p:identity>
+                                <p:choose>
+                                    <p:xpath-context>
+                                        <p:pipe port="result" step="file.load-count"/>
+                                    </p:xpath-context>
+                                    <p:when test="number(/*)&gt;0">
+                                        <pxi:mediatype-detect-from-namespace>
+                                            <p:input port="in-memory">
+                                                <p:pipe port="result" step="file-from-disk"/>
+                                            </p:input>
+                                        </pxi:mediatype-detect-from-namespace>
+                                    </p:when>
+                                    <p:otherwise>
+                                        <!-- could not load xml from disk; use the file extension -->
+                                        <p:identity>
+                                            <p:input port="source">
+                                                <p:pipe port="result" step="from-extension"/>
+                                            </p:input>
+                                        </p:identity>
+                                    </p:otherwise>
+                                </p:choose>
                             </p:when>
                             <p:otherwise>
-                                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/xml"/>
+                                <!-- not xml or not allowed to load from memory; use the file extension -->
+                                <p:identity>
+                                    <p:input port="source">
+                                        <p:pipe port="result" step="from-extension"/>
+                                    </p:input>
+                                </p:identity>
                             </p:otherwise>
                         </p:choose>
                     </p:otherwise>
                 </p:choose>
-            </p:when>
-            <p:otherwise>
-                <!-- unknown binary filetype -->
-                <p:add-attribute match="/*" attribute-name="media-type" attribute-value="application/octet-stream"/>
             </p:otherwise>
+
         </p:choose>
 
     </p:viewport>

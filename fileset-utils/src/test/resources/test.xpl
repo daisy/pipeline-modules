@@ -17,6 +17,8 @@
     <p:import href="test-fileset-from-dir.xpl"/>
     <p:import href="test-fileset-intersect.xpl"/>
     <p:import href="test-fileset-join.xpl"/>
+    <p:import href="test-fileset-filter.xpl"/>
+    <p:import href="test-fileset-load.xpl"/>
 
     <pxi:test-fileset-add-entry name="test-fileset-add-entry"/>
     <pxi:test-fileset-add-ref name="test-fileset-add-ref"/>
@@ -27,6 +29,8 @@
     <pxi:test-fileset-from-dir name="test-fileset-from-dir"/>
     <pxi:test-fileset-intersect name="test-fileset-intersect"/>
     <pxi:test-fileset-join name="test-fileset-join"/>
+    <pxi:test-fileset-filter name="test-fileset-filter"/>
+    <pxi:test-fileset-load name="test-fileset-load"/>
 
     <p:for-each name="test">
         <p:output port="result">
@@ -42,10 +46,12 @@
             <p:pipe step="test-fileset-from-dir" port="result"/>
             <p:pipe step="test-fileset-intersect" port="result"/>
             <p:pipe step="test-fileset-join" port="result"/>
+            <p:pipe step="test-fileset-filter" port="result"/>
+            <p:pipe step="test-fileset-load" port="result"/>
         </p:iteration-source>
         <p:variable name="script-uri" select="/*/@script-uri"/>
         <p:variable name="test-group-name" select="/*/@name"/>
-        <p:delete match="/*/c:result[.='true']"/>
+        <p:delete match="/*/c:result[@result='true']"/>
         <p:viewport match="/*/c:result" name="test.viewport">
             <p:in-scope-names name="test.viewport.vars"/>
             <p:template>
@@ -55,9 +61,11 @@
                 <p:input port="template">
                     <p:inline>
                         <d:error>
-                            <d:desc>{string(//@name)} {if (.='false') then 'failed' else .}</d:desc>
+                            <d:desc>{string-join(/*/@name,' | ')} {if (/*/@result='false') then 'failed' else /*/@result}</d:desc>
                             <!--<d:file>{$script-uri}</d:file>-->
                             <d:location href="{$script-uri}#{/*/@name}"/>
+                            <d:expected/>
+                            <d:was/>
                         </d:error>
                     </p:inline>
                 </p:input>
@@ -65,6 +73,24 @@
                     <p:pipe step="test.viewport.vars" port="result"/>
                 </p:input>
             </p:template>
+            <p:insert match="d:expected" position="last-child">
+                <p:input port="insertion" select=".//c:expected/*">
+                    <p:pipe step="test.viewport" port="current"/>
+                </p:input>
+            </p:insert>
+            <p:insert match="d:was" position="last-child">
+                <p:input port="insertion" select=".//c:was/*">
+                    <p:pipe step="test.viewport" port="current"/>
+                </p:input>
+            </p:insert>
+            <p:choose>
+                <p:when test="count(//d:expected/node())=0 and count(//d:was/node())=0">
+                    <p:delete match="d:expected | d:was"/>
+                </p:when>
+                <p:otherwise>
+                    <p:identity/>
+                </p:otherwise>
+            </p:choose>
             <p:wrap match="/*" wrapper="d:errors"/>
             <p:wrap match="/*" wrapper="d:report"/>
             <p:add-attribute match="/*" attribute-name="type" attribute-value="filecheck"/>
@@ -89,6 +115,7 @@
                         <d:document-name>{string(/*/@name)}</d:document-name>
                         <d:document-type>XProc Unit Test</d:document-type>
                         <d:document-path>{$script-uri}</d:document-path>
+                        <d:error-count>{string(count(/*/*[@result='false']))}</d:error-count>
                     </d:document-info>
                 </p:inline>
             </p:input>
@@ -97,7 +124,7 @@
             </p:input>
         </p:template>
     </p:for-each>
-
+    
     <px:validation-report-to-html name="result"/>
     <p:store href="file:/tmp/report.html"/>
 

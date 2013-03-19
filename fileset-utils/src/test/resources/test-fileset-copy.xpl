@@ -80,7 +80,7 @@
     <p:group name="test-filesystem" cx:depends-on="test-fileset-copy">
         <p:output port="result"/>
         <p:choose>
-            <p:when test="not(/*='true')">
+            <p:when test="not(/*/@result='true')">
                 <p:xpath-context>
                     <p:pipe port="result" step="test-fileset-copy"/>
                 </p:xpath-context>
@@ -95,14 +95,14 @@
             <p:otherwise>
                 <p:identity>
                     <p:input port="source">
-                        <p:inline>
-                            <c:directory name="out">
-                                <c:directory name="dir">
-                                    <c:file name="file.txt"/>
-                                </c:directory>
-                                <c:file name="test.txt"/>
-                                <c:file name="test.xml"/>
-                            </c:directory>
+                        <p:inline xml:space="preserve">
+<c:directory name="out">
+    <c:directory name="dir">
+        <c:file name="file.txt"/>
+    </c:directory>
+    <c:file name="test.txt"/>
+    <c:file name="test.xml"/>
+</c:directory>
                         </p:inline>
                     </p:input>
                 </p:identity>
@@ -114,7 +114,7 @@
                 </p:add-attribute>
                 <p:sink/>
                 
-                <px:directory-list>
+                <px:directory-list name="filesystem.alternate">
                     <p:with-option name="path" select="$out-dir"/>
                 </px:directory-list>
                 <p:choose>
@@ -128,7 +128,7 @@
                         <p:identity>
                             <p:input port="source">
                                 <p:inline>
-                                    <c:result>true</c:result>
+                                    <c:result result="true"/>
                                 </p:inline>
                             </p:input>
                         </p:identity>
@@ -136,11 +136,24 @@
                     <p:otherwise>
                         <p:identity>
                             <p:input port="source">
-                                <p:inline>
-                                    <c:result>false</c:result>
+                                <p:inline xml:space="preserve">
+                                    <c:result result="false">
+                                        <c:expected/>
+                                        <c:was/>
+                                    </c:result>
                                 </p:inline>
                             </p:input>
                         </p:identity>
+                        <p:insert match="c:expected" position="last-child">
+                            <p:input port="insertion">
+                                <p:pipe port="result" step="expected"/>
+                            </p:input>
+                        </p:insert>
+                        <p:insert match="c:was" position="last-child">
+                            <p:input port="insertion">
+                                <p:pipe port="result" step="filesystem.alternate"/>
+                            </p:input>
+                        </p:insert>
                     </p:otherwise>
                 </p:choose>
                 <p:identity>
