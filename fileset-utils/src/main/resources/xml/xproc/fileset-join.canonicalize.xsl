@@ -14,6 +14,7 @@
         <xsl:copy>
             <xsl:copy-of select="@*"/>
             <xsl:attribute name="href" select="pf:relativize-uri(pf:normalize-uri(@href),$xml-base)"/>
+            <xsl:copy-of select="node()"/>
         </xsl:copy>
     </xsl:template>
 </xsl:stylesheet>

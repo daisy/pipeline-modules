@@ -11,7 +11,7 @@
         <xsl:if test="not(preceding::d:file/@href=$href)">
             <xsl:copy>
                 <xsl:apply-templates select="@* | following::d:file[@href=$href]/@*"/>
-                <xsl:apply-templates select="node()"/>
+                <xsl:apply-templates select="node() | following::d:file[@href=$href]/node()"/>
             </xsl:copy>
         </xsl:if>
     </xsl:template>
