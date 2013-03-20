@@ -14,6 +14,8 @@
             <p:pipe port="result" step="different-bases"/>
             <p:pipe port="result" step="longest-common-base"/>
             <p:pipe port="result" step="preserve-refs"/>
+            <p:pipe port="result" step="dont-relativize-hrefs-for-filesets-without-base"/>
+            <p:pipe port="result" step="relativize-against-first-fileset-if-base-is-missing"/>
         </p:input>
     </p:wrap-sequence>
     <p:add-attribute match="/*" attribute-name="script-uri">
@@ -175,6 +177,108 @@
             </p:input>
         </px:compare>
         <p:add-attribute match="/*" attribute-name="name" attribute-value="preserve-refs"/>
+    </p:group>
+    
+    <p:group name="dont-relativize-hrefs-for-filesets-without-base">
+        <!-- fileset without a base URI: https://code.google.com/p/daisy-pipeline/issues/detail?id=278 -->
+        <p:output port="result"/>
+        
+        <px:fileset-join>
+            <p:input port="source">
+                <p:inline xml:space="preserve">
+<d:fileset xmlns:d="http://www.daisy.org/ns/pipeline/data"/>
+                </p:inline>
+                <p:inline xml:space="preserve">
+<d:fileset xmlns:d="http://www.daisy.org/ns/pipeline/data">
+    <d:file href="href1">
+        <d:ref href="ref1"/>
+    </d:file>
+</d:fileset>
+                </p:inline>
+                <p:inline xml:space="preserve">
+<d:fileset xmlns:d="http://www.daisy.org/ns/pipeline/data">
+    <d:file href="href2">
+        <d:ref href="ref2"/>
+    </d:file>
+</d:fileset>
+                </p:inline>
+                <p:inline xml:space="preserve">
+<d:fileset xmlns:d="http://www.daisy.org/ns/pipeline/data">
+    <d:file href="href1">
+        <d:ref href="ref3"/>
+    </d:file>
+</d:fileset>
+                </p:inline>
+            </p:input>
+        </px:fileset-join>
+        <px:compare>
+            <p:log port="result"/>
+            <p:input port="alternate">
+                <p:inline xml:space="preserve">
+<d:fileset xmlns:d="http://www.daisy.org/ns/pipeline/data">
+    <d:file href="href1">
+        <d:ref href="ref1"/>
+        <d:ref href="ref3"/>
+    </d:file>
+    <d:file href="href2">
+        <d:ref href="ref2"/>
+    </d:file>
+</d:fileset>
+                </p:inline>
+            </p:input>
+        </px:compare>
+        <p:add-attribute match="/*" attribute-name="name" attribute-value="dont-relativize-hrefs-for-filesets-without-base"/>
+    </p:group>
+    
+    <p:group name="relativize-against-first-fileset-if-base-is-missing">
+        <!-- if the first fileset has a base but the second doesn't; use the first filesets base when relativizing hrefs in the second -->
+        <p:output port="result"/>
+        
+        <px:fileset-join>
+            <p:input port="source">
+                <p:inline xml:space="preserve">
+<d:fileset xmlns:d="http://www.daisy.org/ns/pipeline/data"/>
+                </p:inline>
+                <p:inline xml:space="preserve">
+<d:fileset xmlns:d="http://www.daisy.org/ns/pipeline/data">
+    <d:file href="href1">
+        <d:ref href="ref1"/>
+    </d:file>
+</d:fileset>
+                </p:inline>
+                <p:inline xml:space="preserve">
+<d:fileset xmlns:d="http://www.daisy.org/ns/pipeline/data" xml:base="file:/tmp/">
+    <d:file href="href2">
+        <d:ref href="ref2"/>
+    </d:file>
+</d:fileset>
+                </p:inline>
+                <p:inline xml:space="preserve">
+<d:fileset xmlns:d="http://www.daisy.org/ns/pipeline/data">
+    <d:file href="href1">
+        <d:ref href="ref3"/>
+    </d:file>
+</d:fileset>
+                </p:inline>
+            </p:input>
+        </px:fileset-join>
+        <px:compare>
+            <p:log port="result"/>
+            <p:input port="alternate">
+                <p:inline xml:space="preserve">
+<d:fileset xmlns:d="http://www.daisy.org/ns/pipeline/data" xml:base="file:/tmp/">
+    <d:file href="href1">
+        <d:ref href="ref1"/>
+        <d:ref href="ref3"/>
+    </d:file>
+    <d:file href="href2">
+        <d:ref href="ref2"/>
+    </d:file>
+</d:fileset>
+                </p:inline>
+            </p:input>
+        </px:compare>
+        <p:add-attribute match="/*" attribute-name="name" attribute-value="relativize-against-first-fileset-if-base-is-missing"/>
     </p:group>
 
 </p:declare-step>
