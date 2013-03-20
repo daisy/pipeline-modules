@@ -11,22 +11,15 @@
     
     <p:option name="fail-if-not-equal" select="'false'"/>
     
-    <p:wrap-sequence name="wrapped-source" wrapper="wrapper">
-        <p:log port="result" href="file:/tmp/source-wrapped.xml"/>
-    </p:wrap-sequence>
-    <p:string-replace match="text()" replace="normalize-space(replace(.,'&#x00a0;',' '))" name="source">
-        <p:log port="result" href="file:/tmp/source-text.xml"/>
-    </p:string-replace>
+    <p:wrap-sequence name="wrapped-source" wrapper="wrapper"/>
+    <p:string-replace match="text()" replace="normalize-space(replace(.,'&#x00a0;',' '))" name="source"/>
     
     <p:wrap-sequence name="wrapped-alternate" wrapper="wrapper">
-        <p:log port="result" href="file:/tmp/alternate-wrapped.xml"/>
         <p:input port="source">
             <p:pipe port="alternate" step="px-compare"/>
         </p:input>
     </p:wrap-sequence>
-    <p:string-replace match="text()" replace="normalize-space(replace(.,'&#x00a0;',' '))" name="alternate">
-        <p:log port="result" href="file:/tmp/alternate-text.xml"/>
-    </p:string-replace>
+    <p:string-replace match="text()" replace="normalize-space(replace(.,'&#x00a0;',' '))" name="alternate"/>
     
     <p:compare name="compare">
         <p:with-option name="fail-if-not-equal" select="$fail-if-not-equal"/>
@@ -54,7 +47,6 @@
         </p:when>
         <p:otherwise>
             <p:rename match="/*" new-name="c:was" name="was">
-                <p:log port="result" href="file:/tmp/was.xml"/>
                 <p:input port="source">
                     <p:pipe port="result" step="wrapped-source"/>
                 </p:input>

@@ -29,9 +29,7 @@
 
     <p:group name="absolute-base">
         <p:output port="result"/>
-        <px:fileset-create base="file:/tmp/dir">
-            <p:log port="result" href="file:/tmp/create-output.xml"/>
-        </px:fileset-create>
+        <px:fileset-create base="file:/tmp/dir"/>
         <px:compare>
             <p:log port="result"/>
             <p:input port="alternate">
