@@ -44,7 +44,7 @@
     <p:for-each name="check-each-file">
         <p:iteration-source select="//d:file"/>
         <p:variable name="filepath" select="*/@href"/>
-        <p:variable name="ref" select="*/@ref"/>
+        
         <p:try>
             <p:group>
                 <px:info>
@@ -65,22 +65,37 @@
         <!-- the <info> element, generated above, will be empty if the file was not found -->
         <p:choose name="file-exists">
             <p:when test="empty(/info/*)">
-                <p:output port="result"/>
-                <p:string-replace match="//d:file/text()">
-                    <p:with-option name="replace" select="concat('&quot;', $filepath, '&quot;')"/>
-                    <p:input port="source">
-                        <p:inline>
-                            <d:error type="file-not-found">
-                                <d:desc>File not found</d:desc>
-                                <d:file>@@</d:file>
-                                <d:location href="@@"/>
-                            </d:error>
-                        </p:inline>
-                    </p:input>
-                </p:string-replace>
-                <p:string-replace match="//d:location/@href">
-                    <p:with-option name="replace" select="concat('&quot;', $ref, '&quot;')"/>
-                </p:string-replace>    
+                <p:output port="result" sequence="true"/>
+                
+                <!-- for each ref, create an error -->
+                <p:for-each>
+                    
+                    <p:iteration-source select="*/d:ref">
+                        <p:pipe port="current" step="check-each-file"/>
+                    </p:iteration-source>
+                    
+                    <p:variable name="ref" select="*/@href"/>
+                    
+                    <p:identity>
+                        <p:input port="source">
+                            <p:inline>
+                                <d:error type="file-not-found">
+                                    <d:desc>File not found</d:desc>
+                                    <d:file>@@</d:file>
+                                    <d:location href="@@"/>
+                                </d:error>
+                            </p:inline>
+                        </p:input>
+                    </p:identity>
+                    
+                    <p:string-replace match="//d:file/text()">
+                        <p:with-option name="replace" select="concat('&quot;', $filepath, '&quot;')"/>
+                    </p:string-replace>
+                    
+                    <p:string-replace match="//d:location/@href">
+                        <p:with-option name="replace" select="concat('&quot;', resolve-uri($ref, $filepath), '&quot;')"/>
+                    </p:string-replace>
+                </p:for-each>
             </p:when>
             <p:otherwise>
                 <p:output port="result"/>
