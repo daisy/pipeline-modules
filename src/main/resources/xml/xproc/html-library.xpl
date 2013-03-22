@@ -26,7 +26,7 @@
                 <p:try>
                     <p:group>
                         <p:http-request/>
-                        <!-- remove doctypes etc (<!DOCTYPE html> doesn't work with p:unescape-markup) -->
+                        <!--  remove doctypes etc (<!DOCTYPE html> doesn't work with p:unescape-markup)  -->
                         <p:string-replace match="/*/text()[1]" replace="replace(/*/text()[1],'^&lt;[!\?].*?(&lt;[^!\?])','$1','s')"/>
                         <p:unescape-markup content-type="text/html"/>
                         <p:unwrap match="c:body"/>
