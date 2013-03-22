@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet exclude-result-prefixes="#all" version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions" xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
-    xmlns:d="http://www.daisy.org/ns/pipeline/data">
+    xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:di="http://www.daisy.org/ns/pipeline/data/internal">
 
     <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/xslt/uri-functions.xsl"/>
 
@@ -13,9 +13,16 @@
     <xsl:template match="/*">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
-            <xsl:if test="d:fileset/@xml:base">
-                <xsl:attribute name="xml:base" select="$base"/>
-            </xsl:if>
+            <xsl:choose>
+                <xsl:when test="d:fileset[@xml:base]">
+                    <xsl:attribute name="xml:base" select="f:longest-common-uri(distinct-values(/*/d:fileset/@xml:base))"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:attribute name="xml:base" select="f:longest-common-uri(distinct-values(/*/d:fileset/base-uri(.)))"/>
+                    <xsl:attribute name="di:_delete-base" select="''"/>
+                    <!-- no input filesets with an xml:base attribute; mark xml:base for deletion so that the output fileset doesn't have an xml:base attribute -->
+                </xsl:otherwise>
+            </xsl:choose>
             <xsl:apply-templates select="node()"/>
         </xsl:copy>
     </xsl:template>
@@ -25,8 +32,8 @@
     <xsl:template match="d:file">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
-            <xsl:if test="/*/d:fileset/@xml:base">
-                <xsl:attribute name="href" select="if (parent::d:fileset/@xml:base) then pf:relativize-uri(resolve-uri(@href,parent::d:fileset/@xml:base),$base) else @href"/>
+            <xsl:if test="/*/d:fileset[@xml:base] or not(matches(@href,'^\w+:'))">
+                <xsl:attribute name="href" select="pf:relativize-uri(resolve-uri(@href,base-uri(.)),base-uri(.))"/>
             </xsl:if>
             <xsl:apply-templates select="node()"/>
         </xsl:copy>

@@ -18,7 +18,7 @@
   <p:xslt name="href-uri">
     <p:with-param name="href" select="$href"/>
     <p:with-param name="original-href" select="$original-href"/>
-    <p:with-param name="base" select="/*/@xml:base"/>
+    <p:with-param name="base" select="base-uri(/*)"/>
     <p:input port="stylesheet">
       <p:inline>
         <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pf="http://www.daisy.org/ns/pipeline/functions" version="2.0" exclude-result-prefixes="#all">
@@ -28,9 +28,9 @@
           <xsl:param name="base" required="yes"/>
           <xsl:template match="/*">
             <d:file>
-              <xsl:attribute name="href" select="if ($base='') then $href else pf:relativize-uri($href,$base)"/>
+              <xsl:attribute name="href" select="if (/*[@xml:base] or not(matches($href,'^\w+:'))) then pf:relativize-uri(resolve-uri($href,$base),$base) else $href"/>
               <xsl:if test="not($original-href='')">
-                <xsl:attribute name="original-href" select="if ($base='') then $original-href else pf:normalize-uri(resolve-uri($original-href,$base))"/>
+                <xsl:attribute name="original-href" select="if (/*[@xml:base]) then pf:normalize-uri(resolve-uri($original-href,$base)) else $original-href"/>
               </xsl:if>
             </d:file>
           </xsl:template>
