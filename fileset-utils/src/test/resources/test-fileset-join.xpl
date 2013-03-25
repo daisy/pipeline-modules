@@ -36,6 +36,7 @@
             <p:pipe port="result" step="dont-relativize-absolute-hrefs-for-filesets-without-base"/>
             <p:pipe port="result" step="preserve-base-uris-of-each-file-and-relativize-against-it"/>
             <p:pipe port="result" step="relativize-hrefs-against-fileset-base"/>
+            <p:pipe port="result" step="normalize-all-elements-to-have-the-same-base-uri"/>
         </p:input>
     </p:wrap-sequence>
     <p:add-attribute match="/*" attribute-name="script-uri">
@@ -323,9 +324,6 @@
         </p:identity>
         <p:delete match="/*/@xml:base"/>
 
-        <p:add-attribute match="/*" attribute-name="qwer">
-            <p:with-option name="attribute-value" select="base-uri(/*)"/>
-        </p:add-attribute>
         <px:fileset-join/>
 
         <px:compare>
@@ -339,6 +337,45 @@
             </p:input>
         </px:compare>
         <p:add-attribute match="/*" attribute-name="name" attribute-value="relativize-hrefs-against-fileset-base"/>
+    </p:group>
+
+    <p:group name="normalize-all-elements-to-have-the-same-base-uri">
+        <p:output port="result"/>
+
+        <p:identity>
+            <p:input port="source">
+                <p:inline xml:space="preserve">
+<d:fileset xml:base="file:/home/user/Desktop/OEBPS/">
+    <d:file href="Content/content.xhtml"/>
+</d:fileset>
+                </p:inline>
+                <p:inline xml:space="preserve">
+<d:fileset xml:base="file:/home/user/Desktop/OEBPS/Content/">
+    <d:file href="default.css"/>
+    <d:file href="speechgen0001.mp3"/>
+    <d:file href="speechgen0002.mp3"/>
+</d:fileset>
+                </p:inline>
+            </p:input>
+        </p:identity>
+
+        <px:fileset-join/>
+        <p:add-xml-base all="true" relative="false"/>
+        
+        <px:compare>
+            <p:log port="result"/>
+            <p:input port="alternate">
+                <p:inline xml:space="preserve">
+<d:fileset xml:base="file:/home/user/Desktop/OEBPS/">
+    <d:file href="Content/content.xhtml" xml:base="file:/home/user/Desktop/OEBPS/"/>
+    <d:file href="Content/default.css" xml:base="file:/home/user/Desktop/OEBPS/"/>
+    <d:file href="Content/speechgen0001.mp3" xml:base="file:/home/user/Desktop/OEBPS/"/>
+    <d:file href="Content/speechgen0002.mp3" xml:base="file:/home/user/Desktop/OEBPS/"/>
+</d:fileset>
+                </p:inline>
+            </p:input>
+        </px:compare>
+        <p:add-attribute match="/*" attribute-name="name" attribute-value="normalize-all-elements-to-have-the-same-base-uri"/>
     </p:group>
 
 </p:declare-step>
