@@ -15,6 +15,7 @@
             <p:pipe port="result" step="add-entry-first"/>
             <p:pipe port="result" step="add-entry-absolute"/>
             <p:pipe port="result" step="add-entry-absolute-same-base"/>
+            <p:pipe port="result" step="add-entry-to-fileset-without-base"/>
         </p:input>
     </p:wrap-sequence>
     <p:add-attribute match="/*" attribute-name="script-uri">
@@ -141,4 +142,38 @@
         </px:compare>
         <p:add-attribute match="/*" attribute-name="name" attribute-value="add-entry-absolute-same-base"/>
     </p:group>
+
+    <p:group name="add-entry-to-fileset-without-base">
+        <!-- fileset without a base URI: https://code.google.com/p/daisy-pipeline/issues/detail?id=278 -->
+        <p:output port="result"/>
+
+        <p:identity>
+            <p:input port="source">
+                <p:inline xml:space="preserve">
+<d:fileset/>
+                </p:inline>
+            </p:input>
+        </p:identity>
+        <p:add-attribute match="/*" attribute-name="xml:base" attribute-value="file:/tmp/"/>
+        <p:delete match="/*/@xml:base"/>
+
+        <px:fileset-add-entry href="test.xpl"/>
+        <px:fileset-add-entry href="/Users/marisa/Desktop/test.xpl"/>
+        <px:fileset-add-entry href="file:/Users/marisa/Desktop/test.xpl"/>
+
+        <px:compare>
+            <p:log port="result"/>
+            <p:input port="alternate">
+                <p:inline xml:space="preserve">
+<d:fileset xmlns:d="http://www.daisy.org/ns/pipeline/data">
+    <d:file href="test.xpl"/>
+    <d:file href="../Users/marisa/Desktop/test.xpl"/>
+    <d:file href="file:/Users/marisa/Desktop/test.xpl"/>
+</d:fileset>
+                </p:inline>
+            </p:input>
+        </px:compare>
+        <p:add-attribute match="/*" attribute-name="name" attribute-value="add-entry-to-fileset-without-base"/>
+    </p:group>
+
 </p:declare-step>

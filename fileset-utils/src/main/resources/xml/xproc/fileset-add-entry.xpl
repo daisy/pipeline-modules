@@ -28,9 +28,9 @@
           <xsl:param name="base" required="yes"/>
           <xsl:template match="/*">
             <d:file>
-              <xsl:attribute name="href" select="pf:relativize-uri($href,$base)"/>
+              <xsl:attribute name="href" select="if (/*[@xml:base] or not(matches($href,'^\w+:'))) then pf:relativize-uri(resolve-uri($href,$base),$base) else $href"/>
               <xsl:if test="not($original-href='')">
-                <xsl:attribute name="original-href" select="pf:normalize-uri(resolve-uri($original-href,$base))"/>
+                <xsl:attribute name="original-href" select="if (/*[@xml:base]) then pf:normalize-uri(resolve-uri($original-href,$base)) else $original-href"/>
               </xsl:if>
             </d:file>
           </xsl:template>

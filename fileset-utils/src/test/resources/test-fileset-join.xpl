@@ -5,6 +5,25 @@
         <p:pipe port="result" step="result"/>
     </p:output>
 
+    <p:declare-step type="pxi:set-implicit-base-uri-of-documents-without-an-xml-base-attribute">
+        <p:input port="source" sequence="true"/>
+        <p:output port="result" sequence="true"/>
+        <p:option name="base"/>
+        <p:for-each>
+            <p:choose>
+                <p:when test="/*[@xml:base]">
+                    <p:identity/>
+                </p:when>
+                <p:otherwise>
+                    <p:add-attribute match="/*" attribute-name="xml:base">
+                        <p:with-option name="attribute-value" select="$base"/>
+                    </p:add-attribute>
+                    <p:delete match="/*/@xml:base"/>
+                </p:otherwise>
+            </p:choose>
+        </p:for-each>
+    </p:declare-step>
+
     <p:import href="../../main/resources/xml/xproc/fileset-join.xpl"/>
     <p:import href="compare.xpl"/>
 
@@ -14,6 +33,9 @@
             <p:pipe port="result" step="different-bases"/>
             <p:pipe port="result" step="longest-common-base"/>
             <p:pipe port="result" step="preserve-refs"/>
+            <p:pipe port="result" step="dont-relativize-absolute-hrefs-for-filesets-without-base"/>
+            <p:pipe port="result" step="preserve-base-uris-of-each-file-and-relativize-against-it"/>
+            <p:pipe port="result" step="relativize-hrefs-against-fileset-base"/>
         </p:input>
     </p:wrap-sequence>
     <p:add-attribute match="/*" attribute-name="script-uri">
@@ -69,16 +91,18 @@
         <p:output port="result"/>
         <px:fileset-join>
             <p:input port="source">
-                <p:inline>
+                <p:inline exclude-inline-prefixes="#all">
                     <d:fileset xml:base="file:/Users/me/dir/">
                         <d:file href="doc1.html"/>
                         <d:file href="doc2.html"/>
+                        <d:file href="../doc4.html"/>
                     </d:fileset>
                 </p:inline>
-                <p:inline>
+                <p:inline exclude-inline-prefixes="#all">
                     <d:fileset xml:base="file:/Users/me/other/">
                         <d:file href="doc1.html"/>
                         <d:file href="doc3.html"/>
+                        <d:file href="../doc4.html"/>
                     </d:fileset>
                 </p:inline>
             </p:input>
@@ -90,6 +114,7 @@
                     <d:fileset xml:base="file:/Users/me/">
                         <d:file href="dir/doc1.html"/>
                         <d:file href="dir/doc2.html"/>
+                        <d:file href="doc4.html"/>
                         <d:file href="other/doc1.html"/>
                         <d:file href="other/doc3.html"/>
                     </d:fileset>
@@ -175,6 +200,145 @@
             </p:input>
         </px:compare>
         <p:add-attribute match="/*" attribute-name="name" attribute-value="preserve-refs"/>
+    </p:group>
+
+    <p:group name="dont-relativize-absolute-hrefs-for-filesets-without-base">
+        <!-- fileset without a base URI: https://code.google.com/p/daisy-pipeline/issues/detail?id=278 -->
+        <p:output port="result"/>
+
+        <p:identity>
+            <p:input port="source">
+                <p:inline xml:space="preserve">
+<d:fileset xmlns:d="http://www.daisy.org/ns/pipeline/data"/>
+                </p:inline>
+                <p:inline xml:space="preserve">
+<d:fileset xmlns:d="http://www.daisy.org/ns/pipeline/data">
+    <d:file href="file:/href1">
+        <d:ref href="ref1"/>
+    </d:file>
+</d:fileset>
+                </p:inline>
+                <p:inline xml:space="preserve">
+<d:fileset xmlns:d="http://www.daisy.org/ns/pipeline/data">
+    <d:file href="file:/href2">
+        <d:ref href="ref2"/>
+    </d:file>
+</d:fileset>
+                </p:inline>
+                <p:inline xml:space="preserve">
+<d:fileset xmlns:d="http://www.daisy.org/ns/pipeline/data">
+    <d:file href="file:/href1">
+        <d:ref href="ref3"/>
+    </d:file>
+</d:fileset>
+                </p:inline>
+            </p:input>
+        </p:identity>
+        <pxi:set-implicit-base-uri-of-documents-without-an-xml-base-attribute base="file:/home/user/"/>
+        <px:fileset-join/>
+        <px:compare>
+            <p:log port="result"/>
+            <p:input port="alternate">
+                <p:inline xml:space="preserve">
+<d:fileset xmlns:d="http://www.daisy.org/ns/pipeline/data">
+    <d:file href="file:/href1">
+        <d:ref href="ref1"/>
+        <d:ref href="ref3"/>
+    </d:file>
+    <d:file href="file:/href2">
+        <d:ref href="ref2"/>
+    </d:file>
+</d:fileset>
+                </p:inline>
+            </p:input>
+        </px:compare>
+        <p:add-attribute match="/*" attribute-name="name" attribute-value="dont-relativize-absolute-hrefs-for-filesets-without-base"/>
+    </p:group>
+
+    <p:group name="preserve-base-uris-of-each-file-and-relativize-against-it">
+        <!-- relativize hrefs against the d:file elements base uri; not the d:fileset. also merge files that resolves to the same base uri regardless of their relative hrefs. -->
+        <p:output port="result"/>
+
+        <p:identity>
+            <p:input port="source">
+                <p:inline xml:space="preserve">
+<d:fileset xmlns:d="http://www.daisy.org/ns/pipeline/data">
+    <d:file href="file:/href1">
+        <d:ref href="ref1"/>
+    </d:file>
+</d:fileset>
+                </p:inline>
+                <p:inline xml:space="preserve">
+<d:fileset xmlns:d="http://www.daisy.org/ns/pipeline/data" xml:base="file:/tmp/">
+    <d:file href="file:/href2">
+        <d:ref href="ref2"/>
+    </d:file>
+</d:fileset>
+                </p:inline>
+                <p:inline xml:space="preserve">
+<d:fileset xmlns:d="http://www.daisy.org/ns/pipeline/data">
+    <d:file href="file:/href1">
+        <d:ref href="ref3"/>
+    </d:file>
+    <d:file href="file:/href2">
+        <d:ref href="ref4"/>
+    </d:file>
+</d:fileset>
+                </p:inline>
+            </p:input>
+        </p:identity>
+        <pxi:set-implicit-base-uri-of-documents-without-an-xml-base-attribute base="file:/home/user/"/>
+        <px:fileset-join/>
+        <px:compare>
+            <p:log port="result"/>
+            <p:input port="alternate">
+                <p:inline xml:space="preserve">
+<d:fileset xmlns:d="http://www.daisy.org/ns/pipeline/data" xml:base="file:/tmp/">
+    <d:file href="../href1">
+        <d:ref href="ref1"/>
+        <d:ref href="ref3"/>
+    </d:file>
+    <d:file href="../href2">
+        <d:ref href="ref2"/>
+        <d:ref href="ref4"/>
+    </d:file>
+</d:fileset>
+                </p:inline>
+            </p:input>
+        </px:compare>
+        <p:add-attribute match="/*" attribute-name="name" attribute-value="preserve-base-uris-of-each-file-and-relativize-against-it"/>
+    </p:group>
+
+    <p:group name="relativize-hrefs-against-fileset-base">
+        <p:output port="result"/>
+
+        <p:identity>
+            <p:input port="source">
+                <p:inline xml:space="preserve">
+<d:fileset xmlns:d="http://www.daisy.org/ns/pipeline/data" xml:base="file:/tmp/">
+    <d:file href="../tmp/href1"/>
+</d:fileset>
+                    </p:inline>
+            </p:input>
+        </p:identity>
+        <p:delete match="/*/@xml:base"/>
+
+        <p:add-attribute match="/*" attribute-name="qwer">
+            <p:with-option name="attribute-value" select="base-uri(/*)"/>
+        </p:add-attribute>
+        <px:fileset-join/>
+
+        <px:compare>
+            <p:log port="result"/>
+            <p:input port="alternate">
+                <p:inline xml:space="preserve">
+<d:fileset xmlns:d="http://www.daisy.org/ns/pipeline/data">
+    <d:file href="href1"/>
+</d:fileset>
+                </p:inline>
+            </p:input>
+        </px:compare>
+        <p:add-attribute match="/*" attribute-name="name" attribute-value="relativize-hrefs-against-fileset-base"/>
     </p:group>
 
 </p:declare-step>
