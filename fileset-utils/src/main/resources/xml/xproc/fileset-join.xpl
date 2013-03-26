@@ -53,7 +53,6 @@
 
   <!-- wrapper for p:xslt that preserves base uris for all elements -->
   <p:declare-step type="pxi:xslt" name="pxi-xslt">
-    <!-- a basic workaround for https://github.com/ndw/xmlcalabash1/issues/94 -->
     <p:input port="source" primary="true"/>
     <p:input port="stylesheet"/>
     <p:input port="parameters" kind="parameter"/>
@@ -108,14 +107,14 @@
       <p:document href="fileset-join.merge-duplicates.xsl"/>
     </p:input>
   </pxi:xslt>
-  <pxi:xslt>
+  <p:xslt>
     <p:input port="parameters">
       <p:empty/>
     </p:input>
     <p:input port="stylesheet">
       <p:document href="fileset-join.normalize-base-uris.xsl"/>
     </p:input>
-  </pxi:xslt>
+  </p:xslt>
   <p:identity name="result"/>
 
 </p:declare-step>
