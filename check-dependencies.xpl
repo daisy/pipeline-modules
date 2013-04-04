@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" xmlns:c="http://www.w3.org/ns/xproc-step" version="1.0" xmlns:px="http://www.daisy.org/ns/pipeline/xproc" xpath-version="2.0" xmlns:d="http://www.daisy.org/ns/pipeline/data"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:catalog="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:catalog="urn:oasis:names:tc:entity:xmlns:xml:catalog" xmlns:cx="http://xmlcalabash.com/ns/extensions">
     
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
         <h1 px:type="name">XProc+XSLT Dependency Checker</h1>
@@ -37,6 +37,10 @@
         <p:add-xml-base all="true" relative="false"/>
         <p:for-each name="module">
             <p:iteration-source select="/*/c:directory[not(starts-with(@name,'.'))]"/>
+            <p:variable name="current-catalog" select="concat('org:daisy:pipeline:modules:',/*/@name)"/>
+            <cx:message>
+                <p:with-option name="message" select="$current-catalog"/>
+            </cx:message>
             <p:identity name="module.current"/>
             <px:directory-list>
                 <p:with-option name="path" select="concat(/*/@xml:base,/*/@name,'/src/main/resources/')"/>
@@ -66,9 +70,13 @@
                         </p:input>
                     </p:add-attribute>
                 </p:for-each>
+                <p:identity name="insertion"/>
                 <p:insert match="/*" position="first-child">
                     <p:input port="source">
                         <p:pipe port="current" step="iterate"/>
+                    </p:input>
+                    <p:input port="insertion">
+                        <p:pipe port="result" step="insertion"/>
                     </p:input>
                 </p:insert>
                 <p:delete match="/*/d:ref[not(matches(@href,'^[^/]+:'))]"/>
@@ -91,6 +99,9 @@
                     </p:otherwise>
                 </p:choose>
             </p:viewport>
+            <p:add-attribute attribute-name="current-catalog" attribute-value="true">
+                <p:with-option name="match" select="concat('//d:ref[@catalog=&quot;',$current-catalog,'&quot;]')"/>
+            </p:add-attribute>
             <p:delete match="//d:ref[preceding::d:ref/@catalog=@catalog]"/>
             <p:add-xml-base all="true" relative="false"/>
             <p:identity name="module.refs"/>
@@ -125,7 +136,7 @@
                             </p:input>
                         </p:identity>
                         <p:choose>
-                            <p:when test="$catalog=//catalog:nextCatalog/@catalog">
+                            <p:when test="$catalog=//catalog:nextCatalog/@catalog or $catalog=$current-catalog">
                                 <p:sink/>
                                 <p:identity>
                                     <p:input port="source">
@@ -180,6 +191,29 @@
                         </p:input>
                     </p:identity>
                     <p:choose>
+                        <p:when test="$catalog=$current-catalog">
+                            <p:variable name="catalog-uri" select="concat(/*/@xml:base,/*/@name,'/src/main/resources/META-INF/catalog.xml')">
+                                <p:pipe port="current" step="module"/>
+                            </p:variable>
+                            <p:in-scope-names name="module.nextCatalog.vars"/>
+                            <p:template>
+                                <p:input port="template">
+                                    <p:inline>
+                                        <d:error type="file-not-found">
+                                            <d:desc>Self-referencing dependency</d:desc>
+                                            <d:file>{normalize-space(/*/@catalog)}</d:file>
+                                            <d:location href="{$catalog-uri}"/>
+                                        </d:error>
+                                    </p:inline>
+                                </p:input>
+                                <p:input port="source">
+                                    <p:pipe port="current" step="nextCatalog"/>
+                                </p:input>
+                                <p:input port="parameters">
+                                    <p:pipe step="module.nextCatalog.vars" port="result"/>
+                                </p:input>
+                            </p:template>
+                        </p:when>
                         <p:when test="$catalog=//d:ref/@catalog">
                             <p:sink/>
                             <p:identity>

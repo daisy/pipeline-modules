@@ -2,4 +2,5 @@
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
    <uri name="http://www.daisy.org/pipeline/modules/mediatype-utils/mediatype.xpl" uri="../xml/xproc/mediatype.xpl"/>
    <uri name="http://www.daisy.org/pipeline/modules/mediatype-utils/mediatype-functions.xsl" uri="../xml/xslt/mediatype-functions.xsl"/>
+   <nextCatalog catalog="org:daisy:pipeline:modules:fileset-utils"/>
 </catalog>
