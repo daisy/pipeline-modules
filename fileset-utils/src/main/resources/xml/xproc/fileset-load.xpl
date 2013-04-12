@@ -248,7 +248,7 @@
                 <p:choose>
                   <p:when test="$fail-on-not-found='true'">
                     <p:in-scope-names name="vars"/>
-                    <p:template>
+                    <p:template name="error">
                       <p:input port="template">
                         <p:inline>
                           <c:message><![CDATA[]]>{$file-not-found-message}<![CDATA[]]></c:message>
@@ -261,7 +261,11 @@
                         <p:pipe step="vars" port="result"/>
                       </p:input>
                     </p:template>
-                    <p:error code="PEZE00"/>
+                    <p:error code="PEZE00">
+                      <p:input port="source">
+                        <p:pipe port="result" step="error"/>
+                      </p:input>
+                    </p:error>
                   </p:when>
                   <p:otherwise>
                     <cx:message>
@@ -288,7 +292,7 @@
       <p:choose>
         <p:when test="not($href='') and $fail-on-not-found='true'">
           <p:in-scope-names name="vars"/>
-          <p:template>
+          <p:template name="error">
             <p:input port="template">
               <p:inline>
                 <c:message><![CDATA[]]>{$file-not-found-message}<![CDATA[]]></c:message>
@@ -301,7 +305,11 @@
               <p:pipe step="vars" port="result"/>
             </p:input>
           </p:template>
-          <p:error code="PEZE00"/>
+          <p:error code="PEZE00">
+            <p:input port="source">
+              <p:pipe port="result" step="error"/>
+            </p:input>
+          </p:error>
         </p:when>
         <p:otherwise>
           <p:identity/>

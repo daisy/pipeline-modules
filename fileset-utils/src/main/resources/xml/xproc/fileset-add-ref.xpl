@@ -60,6 +60,7 @@
             </p:variable>
 
             <p:delete match="//@parent-href"/>
+            <p:identity name="insertion"/>
 
             <!--Insert the entry as the last or first child of the file-->
             <p:insert>
@@ -67,6 +68,9 @@
                 <p:with-option name="position" select="if ($first='true') then 'first-child' else 'last-child'"/>
                 <p:input port="source">
                     <p:pipe port="source" step="main"/>
+                </p:input>
+                <p:input port="insertion">
+                    <p:pipe port="result" step="insertion"/>
                 </p:input>
             </p:insert>
         </p:otherwise>
