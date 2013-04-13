@@ -16,7 +16,7 @@
         <xsl:apply-templates select="." mode="add-id"/>
     </xsl:template>
     
-    <xsl:template match="*" mode="add-id">
+    <xsl:template match="*" mode="add-id" priority="10">
         <xsl:param name="id"/>
         <xsl:variable name="id" select="
             if (self::body) then concat('mo',$iteration-position)
