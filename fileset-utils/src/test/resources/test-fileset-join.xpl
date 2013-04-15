@@ -1,9 +1,11 @@
 <p:declare-step version="1.0" xmlns:p="http://www.w3.org/ns/xproc" xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal" type="pxi:test-fileset-join" xmlns:d="http://www.daisy.org/ns/pipeline/data"
-    xmlns:px="http://www.daisy.org/ns/pipeline/xproc" exclude-inline-prefixes="px" xmlns:c="http://www.w3.org/ns/xproc-step">
+    xmlns:px="http://www.daisy.org/ns/pipeline/xproc" exclude-inline-prefixes="#all" xmlns:c="http://www.w3.org/ns/xproc-step">
 
     <p:output port="result">
         <p:pipe port="result" step="result"/>
     </p:output>
+    
+    <p:serialization port="result" indent="true"/>
 
     <p:declare-step type="pxi:set-implicit-base-uri-of-documents-without-an-xml-base-attribute">
         <p:input port="source" sequence="true"/>
@@ -12,7 +14,9 @@
         <p:for-each>
             <p:choose>
                 <p:when test="/*[@xml:base]">
-                    <p:identity/>
+                    <!--hack to workaround a re-ordering bug in Calabash-->
+                    <p:add-attribute match="/*" attribute-name="foo" attribute-value="bar"/>
+                    <p:delete match="/*/@foo"/>
                 </p:when>
                 <p:otherwise>
                     <p:add-attribute match="/*" attribute-name="xml:base">
@@ -30,6 +34,7 @@
     <p:wrap-sequence wrapper="c:results">
         <p:input port="source">
             <p:pipe port="result" step="same-base"/>
+            <p:pipe port="result" step="same-base-normalized"/>
             <p:pipe port="result" step="different-bases"/>
             <p:pipe port="result" step="longest-common-base"/>
             <p:pipe port="result" step="preserve-refs"/>
@@ -64,6 +69,42 @@
                 </p:inline>
                 <p:inline>
                     <d:fileset xml:base="file:/Users/me/dir/">
+                        <d:file href="doc1.html"/>
+                        <d:file href="doc3.html"/>
+                        <d:file href="http://www.example.org/test"/>
+                    </d:fileset>
+                </p:inline>
+            </p:input>
+        </px:fileset-join>
+        <px:compare>
+            <p:log port="result"/>
+            <p:input port="alternate">
+                <p:inline>
+                    <d:fileset xml:base="file:/Users/me/dir/">
+                        <d:file href="doc1.html"/>
+                        <d:file href="doc2.html"/>
+                        <d:file href="http://www.example.org/test"/>
+                        <d:file href="doc3.html"/>
+                    </d:fileset>
+                </p:inline>
+            </p:input>
+        </px:compare>
+        <p:add-attribute match="/*" attribute-name="name" attribute-value="same-base"/>
+    </p:group>
+    
+    <p:group name="same-base-normalized">
+        <p:output port="result"/>
+        <px:fileset-join>
+            <p:input port="source">
+                <p:inline>
+                    <d:fileset xml:base="file:/Users/me/useles/../dir/">
+                        <d:file href="doc1.html"/>
+                        <d:file href="doc2.html"/>
+                        <d:file href="http://www.example.org/test"/>
+                    </d:fileset>
+                </p:inline>
+                <p:inline>
+                    <d:fileset xml:base="file:/Users///me/dir/">
                         <d:file href="doc1.html"/>
                         <d:file href="doc3.html"/>
                         <d:file href="http://www.example.org/test"/>
@@ -255,7 +296,7 @@
         </px:compare>
         <p:add-attribute match="/*" attribute-name="name" attribute-value="dont-relativize-absolute-hrefs-for-filesets-without-base"/>
     </p:group>
-
+    
     <p:group name="preserve-base-uris-of-each-file-and-relativize-against-it">
         <!-- relativize hrefs against the d:file elements base uri; not the d:fileset. also merge files that resolves to the same base uri regardless of their relative hrefs. -->
         <p:output port="result"/>
