@@ -67,7 +67,7 @@
                         </p:store>
                     </p:when>
                     <p:otherwise>
-                        <p:store omit-xml-declaration="false">
+                        <p:store omit-xml-declaration="false" indent="true" encoding="UTF-8">
                             <p:with-option name="href" select="$target"/>
                         </p:store>
                     </p:otherwise>
