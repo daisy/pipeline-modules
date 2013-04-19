@@ -40,7 +40,8 @@
     <!--TODO write tests-->
     <xsl:function name="pf:is-absolute" as="xs:boolean">
         <xsl:param name="uri" as="xs:string?"/>
-        <xsl:sequence select="boolean(pf:tokenize-uri(normalize-space($uri))[1])"/>
+        <xsl:variable name="tokens" select="pf:tokenize-uri(normalize-space($uri))"/>
+        <xsl:sequence select="boolean($tokens[1]) or starts-with($tokens[3],'/')"/>
     </xsl:function>
     
     <!--TODO write tests-->
@@ -53,6 +54,12 @@
     <xsl:function name="pf:get-path" as="xs:string">
         <xsl:param name="uri" as="xs:string?"/>
         <xsl:sequence select="pf:tokenize-uri(normalize-space($uri))[3]"/>
+    </xsl:function>
+    
+    <!--TODO write tests-->
+    <xsl:function name="pf:get-extension" as="xs:string">
+        <xsl:param name="uri" as="xs:string?"/>
+        <xsl:sequence select="lower-case(replace(pf:get-path($uri),'^.*\.([^.]*)$','$1'))"/>
     </xsl:function>
     
     <!--TODO write tests-->
