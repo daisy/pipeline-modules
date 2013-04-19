@@ -87,7 +87,7 @@
             if (matches(@src,'.*\.png$','i')) then 'image/png'
             else if (matches(@src,'.*\.jpe?g$','i')) then 'image/jpeg'
             else if (matches(@src,'.*\.gif$','i')) then 'image/gif'
-            else if (matches(@src,'.*\.svg$','i')) then 'image/xml+svg'
+            else if (matches(@src,'.*\.svg$','i')) then 'image/svg+xml'
             else '',resolve-uri(@data-original-href,base-uri()))"
         />
     </xsl:template>
