@@ -1,4 +1,0 @@
-<d:files xmlns:d="http://www.daisy.org/ns/pipeline/data">
-    <d:file path="file:/full/path/to/image1.jpg" ref="file:/full/path/to/dtbook.xml#ID"/>
-    <d:file path="file:/full/path/to/image1.jpg" ref="file:/full/path/to/dtbook.xml#ID"/>
-</d:files>
