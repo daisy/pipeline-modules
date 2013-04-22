@@ -4,15 +4,15 @@
     xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
     xmlns:c="http://www.w3.org/ns/xproc-step"
     xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
+    xmlns:cx="http://xmlcalabash.com/ns/extensions"
     exclude-inline-prefixes="#all">
     
     <p:option name="href" required="true"/>
     
-    <p:output port="result" primary="true">
-        <p:pipe step="temp-dir" port="result"/>
-    </p:output>
+    <p:output port="result" primary="true"/>
     
     <p:import href="normalize-uri.xpl"/>
+    <p:import href="file-library.xpl"/>
     
     <pxi:normalize-uri name="parent-dir">
         <p:with-option name="href" select="$href"/>
@@ -43,8 +43,14 @@
         </p:with-option>
     </p:string-replace>
     
-    <px:mkdir>
+    <px:mkdir name="mkdir">
         <p:with-option name="href" select="string(/c:result)"/>
     </px:mkdir>
+    
+    <p:identity cx:depends-on="mkdir">
+        <p:input port="source">
+            <p:pipe step="temp-dir" port="result"/>
+        </p:input>
+    </p:identity>
     
 </p:declare-step>
