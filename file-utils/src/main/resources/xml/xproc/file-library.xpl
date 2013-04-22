@@ -168,4 +168,8 @@
 
     <p:import href="recursive-directory-list.xpl"/>
 
+    <!-- ============================================================ -->
+
+    <p:import href="tempdir.xpl"/>
+
 </p:library>
