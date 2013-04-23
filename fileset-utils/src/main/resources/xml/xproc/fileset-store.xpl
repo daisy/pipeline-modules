@@ -56,13 +56,18 @@
                 </p:split-sequence>
                 <p:delete match="/*/@xml:base"/>
                 <p:choose>
-                    <p:when test="starts-with($media-type,'text/')">
+                    <p:when test="starts-with($media-type,'text/') and not(starts-with($media-type,'text/xml'))">
                         <p:store method="text">
                             <p:with-option name="href" select="$target"/>
                         </p:store>
                     </p:when>
+                    <p:when test="starts-with($media-type,'binary/') or /c:data[@encoding='base64']">
+                        <p:store cx:decode="true" encoding="base64">
+                            <p:with-option name="href" select="$target"/>
+                        </p:store>
+                    </p:when>
                     <p:otherwise>
-                        <p:store>
+                        <p:store omit-xml-declaration="false">
                             <p:with-option name="href" select="$target"/>
                         </p:store>
                     </p:otherwise>
