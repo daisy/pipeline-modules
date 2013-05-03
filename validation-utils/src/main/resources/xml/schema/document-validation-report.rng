@@ -121,6 +121,7 @@
     <choice>
       <value>relaxng</value>
       <value>file-not-found</value>
+      <value>file-not-wellformed</value>
     </choice>
   </define>
 </grammar>

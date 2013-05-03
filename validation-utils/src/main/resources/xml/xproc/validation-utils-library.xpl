@@ -28,10 +28,19 @@
     <p:import href="check-files-exist.xpl">
         <p:documentation>Step that, given a list of files, reports whether each exists on disk or not.</p:documentation>
     </p:import>
-    
+
     <p:import href="validation-status.xpl">
         <p:documentation>Step that, given one or more validation reports, outputs validation status XML (http://code.google.com/p/daisy-pipeline/wiki/ValidationStatusXML).</p:documentation>
     </p:import>
+    
+    <p:import href="check-files-wellformed.xpl">
+        <p:documentation>Step that, given a list of files, reports whether each is well-formed XML.</p:documentation>
+    </p:import>
+    
+    <p:import href="create-validation-report-error.xpl">
+        <p:documentation>Create an error for use in Validation Report XML.</p:documentation>
+    </p:import>
+    
     
     <p:documentation>Performs RELAX NG validation, returning two results: the source document (validated, if validation succeeds) and a report of the validation errors (if any). This step comes from the XProc.org library.</p:documentation>
     <p:declare-step name="main" type="l:relax-ng-report">

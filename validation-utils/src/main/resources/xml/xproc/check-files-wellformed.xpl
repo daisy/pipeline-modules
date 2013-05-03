@@ -1,127 +1,93 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step version="1.0" name="check-files-exist" type="px:check-files-exist"
-    xmlns:p="http://www.w3.org/ns/xproc" 
-    xmlns:c="http://www.w3.org/ns/xproc-step"
+<p:declare-step version="1.0" name="check-files-wellformed" type="px:check-files-wellformed"
+    xmlns:p="http://www.w3.org/ns/xproc" xmlns:c="http://www.w3.org/ns/xproc-step"
     xmlns:cx="http://xmlcalabash.com/ns/extensions"
     xmlns:cxo="http://xmlcalabash.com/ns/extensions/osutils"
     xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-    xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"    
-    xmlns:xhtml="http://www.w3.org/1999/xhtml" 
-    xmlns:d="http://www.daisy.org/ns/pipeline/data"
-    exclude-inline-prefixes="#all">
-    
+    xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:d="http://www.daisy.org/ns/pipeline/data"
+    xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp" exclude-inline-prefixes="#all">
+
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-        <h1 px:role="name">Check that files exist on disk</h1>
-        <p px:role="desc">Given a list of files, ensure that each exists on disk.</p>
+        <h1 px:role="name">Check that files exist and are well-formed XML</h1>
+        <p px:role="desc">Given a list of files, ensure that each exists and is well-formed XML.</p>
     </p:documentation>
-    
+
     <!-- ***************************************************** -->
     <!-- INPUT, OUTPUT and OPTIONS -->
     <!-- ***************************************************** -->
-    
+
     <p:input port="source" primary="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h1 px:role="name">source</h1>
-            <p px:role="desc">A list of files, formatted as a FileSet (http://code.google.com/p/daisy-pipeline/wiki/FileSetUtils).</p>
+            <p px:role="desc">A list of files, formatted as a FileSet
+                (http://code.google.com/p/daisy-pipeline/wiki/FileSetUtils).</p>
         </p:documentation>
     </p:input>
-    
-    <p:output port="result" primary="true">
+
+    <p:output port="result">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h1 px:role="name">result</h1>
-            <p px:role="desc">List of existing files, formatted as a DAISY Pipeline FileSet.</p>
+            <p px:role="desc">List of well-formed files, formatted as a DAISY Pipeline FileSet.</p>
         </p:documentation>
         <p:pipe port="result" step="wrap-fileset"/>
     </p:output>
-    
+
     <p:output port="report">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h1 px:role="name">result</h1>
-            <p px:role="desc">List of missing files, formatted as &lt;d:error&gt; elements, or an empty d:errors element if nothing is missing.</p>
+            <p px:role="desc">List of malformed files, formatted as &lt;d:error&gt; elements, or an
+                empty d:errors element if nothing is missing.</p>
         </p:documentation>
-        <p:pipe port="result" step="wrap-errors"/>
+        <p:pipe port="result" step="process-errors"/>
     </p:output>
-    
+
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl">
         <p:documentation>Calabash extension steps.</p:documentation>
     </p:import>
-    
+
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/xproc/fileset-library.xpl">
         <p:documentation>Utilities for representing a fileset.</p:documentation>
     </p:import>
-    
+
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/xproc/file-library.xpl">
         <p:documentation>For manipulating files.</p:documentation>
     </p:import>
     
-    <p:import href="create-validation-report-error-for-file.xpl"/>
+    <p:import href="check-files-exist.xpl"/>
     
+    <p:import href="create-validation-report-error-for-file.xpl"/>
+
     <p:variable name="base" select="/*/@xml:base"/>
     
+    <!-- first, make sure that the files exist on disk -->
+    <px:check-files-exist name="check-files-exist"/>
+
     <p:for-each name="check-each-file">
-        <p:iteration-source select="//d:file"/>
+        <p:iteration-source select="//d:file">
+            <p:pipe port="result" step="check-files-exist"/>
+        </p:iteration-source>
         <p:output port="result" sequence="true">
-            <p:pipe port="result" step="file-exists"/>
+            <p:pipe port="result" step="try-loading-each-file"/>
         </p:output>
         <p:output port="report" sequence="true">
-            <p:pipe port="report" step="file-exists"/>
+            <p:pipe port="report" step="try-loading-each-file"/>
         </p:output>
+
+        <p:variable name="filepath" select="resolve-uri(*/@href, $base)"/>
         
-        <p:variable name="filepath" select="resolve-uri(*/@href, $base)"/>    
-        <p:try>
+        <p:try name="try-loading-each-file">
             <p:group>
-                <px:info>
-                    <p:with-option name="href" select="$filepath"/>
-                </px:info>
-            </p:group>
-            <p:catch>
-                <p:identity>
-                    <p:input port="source">
-                        <p:empty/>
-                    </p:input>
-                </p:identity>
-            </p:catch>
-        </p:try>
-        
-        <p:wrap-sequence wrapper="info"/>
-        
-        <!-- the <info> element, generated above, will be empty if the file was not found -->
-        <p:choose name="file-exists">
-            <p:when test="empty(/info/*)">
-                <p:output port="report" sequence="true">
-                    <p:pipe port="result" step="create-error"/>
-                </p:output>
-                
-                <p:output port="result" sequence="true">
-                    <p:pipe port="result" step="empty-fileset"/>
-                </p:output>
-                
-                <cx:message>
-                    <p:with-option name="message" select="concat('File not found: ', $filepath)"/>
-                </cx:message>
-                
-                <p:identity name="empty-fileset">
-                    <p:input port="source">
-                        <p:empty/>
-                    </p:input>
-                </p:identity>
-                
-                <pxi:create-validation-report-error-for-file name="create-error">
-                    <p:input port="source">
-                        <p:pipe port="current" step="check-each-file"/>
-                    </p:input>
-                    <p:with-option name="error-type" select="'file-not-found'"/>
-                    <p:with-option name="desc" select="'File not found'"/>
-                    <p:with-option name="base" select="$base"/>
-                </pxi:create-validation-report-error-for-file>
-            </p:when>
-            <p:otherwise>
                 <p:output port="result" sequence="true">
                     <p:pipe port="result" step="create-fileset-entry"/>
                 </p:output>
                 <p:output port="report" sequence="true">
                     <p:pipe port="result" step="empty-error"/>
                 </p:output>
+                
+                <p:load>
+                    <p:with-option name="href" select="$filepath"/>
+                </p:load>
                 
                 <p:identity name="empty-error">
                     <p:input port="source">
@@ -138,23 +104,59 @@
                         </p:inline>
                     </p:input>
                 </px:fileset-add-entry>
-            </p:otherwise>
-        </p:choose>
-    </p:for-each>  
-    
-    <p:wrap-sequence wrapper="errors" wrapper-prefix="d" wrapper-namespace="http://www.daisy.org/ns/pipeline/data" name="wrap-errors">
+            </p:group>
+
+            <p:catch>
+                <p:output port="report" sequence="true">
+                    <p:pipe port="result" step="create-error"/>
+                </p:output>
+                
+                <p:output port="result" sequence="true">
+                    <p:pipe port="result" step="empty-fileset"/>
+                </p:output>
+                
+                <cx:message>
+                    <p:with-option name="message"
+                        select="concat('File not well-formed XML: ', $filepath)"/>
+                </cx:message>
+                
+                <p:identity name="empty-fileset">
+                    <p:input port="source">
+                        <p:empty/>
+                    </p:input>
+                </p:identity>
+                
+                <pxi:create-validation-report-error-for-file name="create-error">
+                    <p:input port="source">
+                        <p:pipe port="current" step="check-each-file"/>
+                    </p:input>
+                    <p:with-option name="error-type" select="'file-not-wellformed'"/>
+                    <p:with-option name="desc" select="'File is not well-formed XML'"/>
+                    <p:with-option name="base" select="$base"/>
+                </pxi:create-validation-report-error-for-file>
+            </p:catch>
+        </p:try>
+        
+    </p:for-each>
+
+    <!-- append the error report from the wellformedness check to the report from the initial check-files-exist step -->
+    <p:insert match="d:errors" position="last-child" name="process-errors">
         <p:input port="source">
-            <p:pipe port="report" step="check-each-file"/>
+            <p:pipe port="report" step="check-files-exist"/>
         </p:input>
-    </p:wrap-sequence>
+        <p:input port="insertion">
+            <p:pipe port="report" step="check-each-file"/>
+        </p:input>    
+    </p:insert>
+
     <p:sink/>
-    
+
     <p:group name="wrap-fileset">
         <p:output port="result"/>
-        
+
         <!-- input fileset -->
         <px:fileset-create name="fileset.in-memory-base"/>
-        
+
         <!-- output fileset -->
         <px:fileset-join>
             <p:input port="source">
@@ -164,5 +166,4 @@
         </px:fileset-join>
     </p:group>
     <p:sink/>
-    
 </p:declare-step>
