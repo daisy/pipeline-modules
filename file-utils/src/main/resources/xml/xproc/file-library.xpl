@@ -168,4 +168,14 @@
 
     <p:import href="recursive-directory-list.xpl"/>
 
+    <!-- ============================================================ -->
+    
+    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+        <p>Returns a <code>&lt;c:result></code> containing the absolute URI of a temporary
+        directory, which is guaranteed not to already exist. The directory is created inside
+        the directory specified by <code>href</code>.</p>
+    </p:documentation>
+    
+    <p:import href="tempdir.xpl"/>
+
 </p:library>
