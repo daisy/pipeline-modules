@@ -44,7 +44,13 @@
                 <c:result/>
             </p:inline>
         </p:input>
-        <p:with-option name="attribute-value"
+        <p:with-option name="attribute-value" use-when="p:system-property('p:xpath-version')='1.0'" select="$message">
+            <!-- replace(...) not supported in XPath 1.0 -->
+            <p:inline>
+                <irrelevant/>
+            </p:inline>
+        </p:with-option>
+        <p:with-option name="attribute-value" use-when="not(p:system-property('p:xpath-version')='1.0')"
             select="replace(replace(replace(replace(replace(replace(replace(replace(replace($message,'\$1',$param1),'\$2',$param2),'\$3',$param3),'\$4',$param4),'\$5',$param5),'\$6',$param6),'\$7',$param7),'\$8',$param8),'\$9',$param9)">
             <p:inline>
                 <irrelevant/>
