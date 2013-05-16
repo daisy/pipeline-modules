@@ -59,13 +59,14 @@
     </p:string-replace>
     
     <p:group>
-        <p:variable name="code-localName" select="concat(
+        <p:variable name="code-localName" use-when="p:system-property('p:xpath-version')='1.0'" select="concat(
             substring(substring-after($code,':'), 1, number(contains($code,':')) * string-length(substring-after($code,':'))),
             substring($code, 1, number(not(contains($code,':'))) * string-length($code))
             )"/>
+        <p:variable name="code-localName" use-when="not(p:system-property('p:xpath-version')='1.0')" select="if (contains($code,':')) then substring-after($code,':') else $code"/>
         <p:variable name="prefix" select="concat(substring-before($code,':'),$code-prefix)"/>
         <p:choose>
-            <p:when test="not($code-namespace='') and (not($code-prefix='') or contains($code,':'))">
+            <p:when test="not($code-namespace='') and not($prefix='')">
                 <p:error>
                     <p:input port="source">
                         <p:pipe port="result" step="message"/>
@@ -84,7 +85,7 @@
                     <p:with-option name="code-namespace" select="$code-namespace"/>
                 </p:error>
             </p:when>
-            <p:when test="(not($code-prefix='') or contains($code,':'))">
+            <p:when test="not($prefix='')">
                 <p:error>
                     <p:input port="source">
                         <p:pipe port="result" step="message"/>
