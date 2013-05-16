@@ -70,36 +70,12 @@
         
         <p:when test="p:value-available('error-code')">
             <!-- assertion failed; throw error -->
-            <p:choose>
-                <p:when test="p:value-available('error-code-namespace') and p:value-available('error-code-prefix')">
-                    <px:error>
-                        <p:with-option name="message" select="/*/@message"/>
-                        <p:with-option name="code" select="$error-code"/>
-                        <p:with-option name="code-namespace" select="$error-code-namespace"/>
-                        <p:with-option name="code-prefix" select="$error-code-prefix"/>
-                    </px:error>
-                </p:when>
-                <p:when test="p:value-available('error-code-namespace')">
-                    <px:error>
-                        <p:with-option name="message" select="/*/@message"/>
-                        <p:with-option name="code" select="$error-code"/>
-                        <p:with-option name="code-namespace" select="$error-code-namespace"/>
-                    </px:error>
-                </p:when>
-                <p:when test="p:value-available('error-code-prefix')">
-                    <px:error>
-                        <p:with-option name="message" select="/*/@message"/>
-                        <p:with-option name="code" select="$error-code"/>
-                        <p:with-option name="code-prefix" select="$error-code-prefix"/>
-                    </px:error>
-                </p:when>
-                <p:otherwise>
-                    <px:error>
-                        <p:with-option name="message" select="/*/@message"/>
-                        <p:with-option name="code" select="$error-code"/>
-                    </px:error>
-                </p:otherwise>
-            </p:choose>
+            <px:error>
+                <p:with-option name="message" select="/*/@message"/>
+                <p:with-option name="code" select="$error-code"/>
+                <p:with-option name="code-namespace" select="$error-code-namespace"/>
+                <p:with-option name="code-prefix" select="$error-code-prefix"/>
+            </px:error>
         </p:when>
         
         <p:otherwise>
