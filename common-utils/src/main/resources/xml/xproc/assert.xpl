@@ -68,7 +68,7 @@
             </p:identity>
         </p:when>
         
-        <p:when test="p:value-available('error-code')">
+        <p:when test="not($error-code='')">
             <!-- assertion failed; throw error -->
             <px:error>
                 <p:with-option name="message" select="/*/@message"/>
