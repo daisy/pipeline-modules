@@ -5,10 +5,13 @@
     <p:input port="fileset.in" primary="true"/>
     <p:input port="in-memory.in" sequence="true"/>
     <p:output port="fileset.out" primary="false">
-        <p:pipe port="fileset.in" step="main"/>
+        <p:pipe port="result" step="store"/>
     </p:output>
 
+    <p:option name="fail-on-error" required="false" select="'false'"/>
+
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/logging-library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/xproc/fileset-library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/xproc/file-library.xpl"/>
 
@@ -77,6 +80,11 @@
                         <p:pipe port="current" step="store"/>
                     </p:input>
                 </p:identity>
+            </p:when>
+            <p:when test="not($on-disk) and $fail-on-error = 'false'">
+                <px:message message="Resource not found: $1">
+                    <p:with-option name="param1" select="$href"/>
+                </px:message>
             </p:when>
             <p:when test="not($on-disk)">
                 <p:error code="PEZE00">
@@ -152,7 +160,7 @@
                     </p:group>
                     <p:catch name="store.copy.catch">
                         <p:output port="result">
-                            <p:pipe port="current" step="store"/>
+                            <p:empty/>
                         </p:output>
                         <p:identity>
                             <p:input port="source">
@@ -168,6 +176,5 @@
             </p:otherwise>
         </p:choose>
     </p:viewport>
-    <p:sink/>
 
 </p:declare-step>
