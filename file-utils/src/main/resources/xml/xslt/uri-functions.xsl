@@ -81,9 +81,9 @@
             - TODO percent-encoding normalization
             - TODO default http port
         -->
-        <xsl:variable name="tokens" select="pf:tokenize-uri($uri)" as="xs:string*"/>
+        <xsl:variable name="tokens" select="pf:tokenize-uri(normalize-space($uri))" as="xs:string*"/>
         <xsl:sequence
-            select="pf:recompose-uri(($tokens[1],$tokens[2],pf:normalize-path($tokens[3]),$tokens[4],$tokens[5]))"
+            select="iri-to-uri(pf:recompose-uri(($tokens[1],$tokens[2],pf:normalize-path($tokens[3]),$tokens[4],$tokens[5])))"
         />
     </xsl:function>
 
@@ -165,8 +165,8 @@
                 <xsl:value-of select="$uris"/>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:variable name="a" select="for $part in tokenize(pf:normalize-uri(replace($uris[1],'/+','SLASH|/')),'/') return replace($part,'SLASH\|$','/')"/>
-                <xsl:variable name="b" select="for $part in tokenize(pf:normalize-uri(replace($uris[2],'/+','SLASH|/')),'/') return replace($part,'SLASH\|$','/')"/>
+                <xsl:variable name="a" select="for $part in tokenize(pf:normalize-uri(replace($uris[1],'/+','SLASH|/')),'/') return replace($part,'SLASH%7C$','/')"/>
+                <xsl:variable name="b" select="for $part in tokenize(pf:normalize-uri(replace($uris[2],'/+','SLASH|/')),'/') return replace($part,'SLASH%7C$','/')"/>
                 <xsl:variable name="longest-common" select="for $i in 1 to count($a) return if ($a[$i]=$b[$i]) then $a[$i] else '	'"/>
                 <xsl:variable name="longest-common" select="for $i in 1 to count($a) return if ($longest-common[position()&lt;=$i]='	') then () else $longest-common[$i]"/>
                 <xsl:variable name="longest-common" select="concat($longest-common[1],if (matches($longest-common[1],'^\w+:/$') and not(matches($longest-common[1],'^file:/'))) then '/' else '',string-join($longest-common[position()&gt;1],''))"/>
