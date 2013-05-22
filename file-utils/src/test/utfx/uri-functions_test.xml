@@ -46,6 +46,7 @@
                     <test function="normalize-uri" uri="  " expected=""/>
                     <test function="normalize-uri" uri="  http://www.google.com  " expected="http://www.google.com"/>
                     <test function="normalize-uri" uri="  http://www.ex ample.com  " expected="http://www.ex%20ample.com"/>
+                    <test function="normalize-uri" uri="http://www.ex%20ample.com" expected="http://www.ex%20ample.com"/>
                     <!-- URI components are kept -->
                     <test function="normalize-uri" uri="file.xml?q=a#id" expected="file.xml?q=a#id"/>
                     <test function="normalize-uri" uri="mailto:johndoe@example.org" expected="mailto:johndoe@example.org"/>
