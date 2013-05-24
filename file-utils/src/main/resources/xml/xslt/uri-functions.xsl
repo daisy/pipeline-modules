@@ -77,13 +77,67 @@
         <!--
             http://en.wikipedia.org/wiki/URL_normalization
             - path segment normalization
-            - TODO case normalization
-            - TODO percent-encoding normalization
-            - TODO default http port
+            - case normalization
+            - percent-encoding normalization
+            - default http port
         -->
+        
+        <!--
+            normalize percent encodings:
+             * capitalize
+             * decode ALPHA (%41–%5A and %61–%7A), DIGIT (%30–%39), hyphen (%2D), period (%2E), underscore (%5F), and tilde (%7E)
+        -->
+        <xsl:variable name="uri">
+            <xsl:variable name="cp-base" select="string-to-codepoints('0A')" as="xs:integer+" />
+            <xsl:analyze-string select="$uri" regex="(%[0-9A-F]{{2}})+" flags="i">
+                <xsl:matching-substring>
+                    <!-- capitalize -->
+                    <xsl:variable name="upper-case" select="upper-case(.)"/>
+                    
+                    <!-- decode ALPHA/DIGIT/hyphen/period/underscore/tilde -->
+                    <xsl:variable name="utf8-bytes" as="xs:integer+">
+                        <xsl:analyze-string select="$upper-case" regex="%([0-9A-F]{{2}})" flags="i">
+                            <xsl:matching-substring>
+                                <xsl:variable name="nibble-pair" select="
+                                    for $nibble-char in string-to-codepoints(upper-case(regex-group(1))) return
+                                    if ($nibble-char ge $cp-base[2]) then
+                                    $nibble-char - $cp-base[2] + 10
+                                    else
+                                    $nibble-char - $cp-base[1]" as="xs:integer+" />
+                                <xsl:sequence select="$nibble-pair[1] * 16 + $nibble-pair[2]" />                
+                            </xsl:matching-substring>
+                        </xsl:analyze-string>
+                    </xsl:variable>
+                    
+                    <xsl:value-of select="if ($utf8-bytes = (65 to 90, 97 to 122, 48 to 57, 45, 46, 95, 126)) then codepoints-to-string(pf:utf8-decode($utf8-bytes)) else $upper-case" />
+                </xsl:matching-substring>
+                <xsl:non-matching-substring>
+                    <xsl:value-of select="." />
+                </xsl:non-matching-substring>
+            </xsl:analyze-string>
+        </xsl:variable>
+        
+        <xsl:variable name="uri" select="$uri"/>
+        
         <xsl:variable name="tokens" select="pf:tokenize-uri(normalize-space($uri))" as="xs:string*"/>
+        <xsl:variable name="scheme" select="$tokens[1]"/>
+        <xsl:variable name="authority" select="$tokens[2]"/>
+        <xsl:variable name="path" select="$tokens[3]"/>
+        <xsl:variable name="query" select="$tokens[4]"/>
+        <xsl:variable name="fragment" select="$tokens[5]"/>
+        
+        <!-- lower case scheme and authority components -->
+        <xsl:variable name="scheme" select="lower-case($scheme)"/>
+        <xsl:variable name="authority" select="lower-case($authority)"/>
+        
+        <!-- remove default port -->
+        <xsl:variable name="authority" select="if ($scheme='http' and ends-with($authority,':80')) then substring($authority,1,string-length($authority)-3) else $authority"/>
+        
+        <!-- normalize path -->
+        <xsl:variable name="path" select="pf:normalize-path($path)"/>
+        
         <xsl:sequence
-            select="iri-to-uri(pf:recompose-uri(($tokens[1],$tokens[2],pf:normalize-path($tokens[3]),$tokens[4],$tokens[5])))"
+            select="iri-to-uri(pf:recompose-uri(($scheme,$authority,$path,$query,$fragment)))"
         />
     </xsl:function>
 
@@ -118,7 +172,7 @@
                         ,'/(\.(/|$))+','/')
                     ,'/+','/')
                 ,'(^|/)\.\.$','$1../')
-            ,'^/\.\./$','/')
+            ,'^/(\.\./)+','/')
             "/>
         <xsl:sequence
             select="
@@ -158,7 +212,7 @@
         </xsl:choose>
     </xsl:function>
     
-    <xsl:function name="pf:longest-common-uri">
+    <xsl:function name="pf:longest-common-uri" as="xs:string">
         <xsl:param name="uris"/>
         <xsl:choose>
             <xsl:when test="count($uris)=1">
