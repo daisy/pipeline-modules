@@ -28,9 +28,9 @@
           <xsl:param name="base" required="yes"/>
           <xsl:template match="/*">
             <d:file>
-              <xsl:attribute name="href" select="if (/*[@xml:base] or not(matches($href,'^\w+:'))) then pf:relativize-uri(resolve-uri($href,$base),$base) else $href"/>
+              <xsl:attribute name="href" select="if (/*[@xml:base] or not(matches($href,'^\w+:'))) then pf:relativize-uri(resolve-uri($href,$base),$base) else pf:normalize-uri($href)"/>
               <xsl:if test="not($original-href='')">
-                <xsl:attribute name="original-href" select="if (/*[@xml:base]) then pf:normalize-uri(resolve-uri($original-href,$base)) else $original-href"/>
+                <xsl:attribute name="original-href" select="if (/*[@xml:base]) then pf:normalize-uri(resolve-uri($original-href,$base)) else pf:normalize-uri($original-href)"/>
               </xsl:if>
             </d:file>
           </xsl:template>
@@ -44,7 +44,7 @@
     <p:variable name="href-uri-ified" select="/*/@href">
       <p:pipe port="result" step="href-uri"/>
     </p:variable>
-
+    
     <p:identity>
       <p:input port="source">
         <p:pipe port="source" step="main"/>
@@ -91,11 +91,16 @@
       <p:delete match="@original-href[not(normalize-space())]"/>
     </p:group>
 
-    <!--Insert the entry as the last or first child of the file set-->
-    <p:insert match="/*">
+    <!--Delete any existing d:file elements with the same href as the new entry from the fileset-->
+    <p:delete>
+      <p:with-option name="match" select="concat('/*/d:file[@href=&quot;',$href-uri-ified,'&quot;]')"/>
       <p:input port="source">
         <p:pipe port="source" step="main"/>
       </p:input>
+    </p:delete>
+    
+    <!--Insert the entry as the last or first child of the file set-->
+    <p:insert match="/*">
       <p:input port="insertion">
         <p:pipe port="result" step="new-entry"/>
       </p:input>

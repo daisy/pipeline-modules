@@ -85,7 +85,7 @@
       <p:pipe port="result" step="filtered"/>
     </p:input>
   </p:identity>
-  
+
   <p:choose name="load">
     <p:when test="number(/*)&gt;0">
       <p:output port="result" sequence="true"/>
@@ -98,25 +98,67 @@
         <p:variable name="on-disk-attribute" select="/*/@original-href"/>
         <p:variable name="target" select="/*/resolve-uri(@href, base-uri(.))"/>
         <p:variable name="media-type" select="/*/@media-type"/>
-        
+
         <p:choose>
           <p:xpath-context>
             <p:pipe port="result" step="fileset.in-memory"/>
           </p:xpath-context>
-          
+
           <!-- from memory -->
           <p:when test="$target = //d:file/resolve-uri(@href,base-uri(.))">
             <cx:message>
               <p:with-option name="message" select="concat('processing file from memory: ',$target)"/>
             </cx:message>
-            <p:split-sequence>
-              <p:with-option name="test" select="concat('base-uri(/*)=&quot;',$target,'&quot;')"/>
-              <p:input port="source">
+            <p:for-each name="for-each-in-memory">
+              <p:iteration-source>
                 <p:pipe port="in-memory" step="main"/>
-              </p:input>
-            </p:split-sequence>
+              </p:iteration-source>
+              <p:xslt name="normalized-base-uri">
+                <p:with-param name="href" select="base-uri(/*)"/>
+                <p:input port="stylesheet">
+                  <p:inline>
+                    <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pf="http://www.daisy.org/ns/pipeline/functions" version="2.0" exclude-result-prefixes="#all">
+                      <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/xslt/uri-functions.xsl"/>
+                      <xsl:param name="href" required="yes"/>
+                      <xsl:template match="/*">
+                        <d:file href="{pf:normalize-uri($href)}"/>
+                      </xsl:template>
+                    </xsl:stylesheet>
+                  </p:inline>
+                </p:input>
+              </p:xslt>
+              <p:choose>
+                <p:when test="/*/@href=$target">
+                  <!-- set normalized xml base -->
+                  <p:add-attribute match="/*" attribute-name="xml:base">
+                    <p:with-option name="attribute-value" select="$target"/>
+                    <p:input port="source">
+                      <p:pipe port="current" step="for-each-in-memory"/>
+                    </p:input>
+                  </p:add-attribute>
+                  <p:choose>
+                    <p:xpath-context>
+                      <p:pipe port="current" step="for-each-in-memory"/>
+                    </p:xpath-context>
+                    <p:when test="/*[@xml:base]">
+                      <p:identity/>
+                    </p:when>
+                    <p:otherwise>
+                      <p:delete match="/*/@xml:base"/>
+                    </p:otherwise>
+                  </p:choose>
+                </p:when>
+                <p:otherwise>
+                  <p:identity>
+                    <p:input port="source">
+                      <p:empty/>
+                    </p:input>
+                  </p:identity>
+                </p:otherwise>
+              </p:choose>
+            </p:for-each>
           </p:when>
-          
+
           <!-- not in memory, but don't load it from disk -->
           <p:when test="not($load-if-not-in-memory = 'true')">
             <p:sink/>
@@ -126,7 +168,7 @@
               </p:input>
             </p:identity>
           </p:when>
-          
+
           <!-- load file into memory (from disk, HTTP, etc) -->
           <p:otherwise>
             <p:try>
@@ -136,7 +178,7 @@
                   <p:with-option name="message" select="concat('loading ',$target,' from disk: ',$on-disk)"/>
                 </cx:message>
                 <p:sink/>
-                
+
                 <px:info>
                   <p:with-option name="href" select="resolve-uri($on-disk,base-uri())">
                     <p:inline>
@@ -145,7 +187,7 @@
                   </p:with-option>
                 </px:info>
                 <p:count name="file-exists"/>
-                
+
                 <p:choose>
                   <p:when test="number(.)=0 and starts-with($on-disk,'file:')">
                     <p:error code="XC0011">
@@ -156,14 +198,14 @@
                       </p:input>
                     </p:error>
                   </p:when>
-                  
+
                   <!-- Force HTML -->
                   <p:when test="$method='html'">
                     <px:html-load>
                       <p:with-option name="href" select="$on-disk"/>
                     </px:html-load>
                   </p:when>
-                  
+
                   <!-- Force XML -->
                   <p:when test="$method='xml'">
                     <p:try>
@@ -182,28 +224,28 @@
                       </p:catch>
                     </p:try>
                   </p:when>
-                  
+
                   <!-- Force text -->
                   <p:when test="$method='text'">
                     <pxi:load-text>
                       <p:with-option name="href" select="$on-disk"/>
                     </pxi:load-text>
                   </p:when>
-                  
+
                   <!-- Force binary -->
                   <p:when test="$method='binary'">
                     <pxi:load-binary>
                       <p:with-option name="href" select="$on-disk"/>
                     </pxi:load-binary>
                   </p:when>
-                  
+
                   <!-- HTML -->
                   <p:when test="$media-type='text/html' or $media-type='application/xhtml+xml'">
                     <px:html-load>
                       <p:with-option name="href" select="$on-disk"/>
                     </px:html-load>
                   </p:when>
-                  
+
                   <!-- XML -->
                   <p:when test="$media-type='application/xml' or matches($media-type,'.*\+xml$')">
                     <p:try>
@@ -225,21 +267,21 @@
                       </p:catch>
                     </p:try>
                   </p:when>
-                  
+
                   <!-- text -->
                   <p:when test="matches($media-type,'^text/')">
                     <pxi:load-text>
                       <p:with-option name="href" select="$on-disk"/>
                     </pxi:load-text>
                   </p:when>
-                  
+
                   <!-- binary -->
                   <p:otherwise>
                     <pxi:load-binary>
                       <p:with-option name="href" select="$on-disk"/>
                     </pxi:load-binary>
                   </p:otherwise>
-                  
+
                 </p:choose>
               </p:group>
               <p:catch>
@@ -283,7 +325,7 @@
           </p:otherwise>
         </p:choose>
       </p:for-each>
-      
+
     </p:when>
     <p:otherwise>
       <p:output port="result" sequence="true"/>

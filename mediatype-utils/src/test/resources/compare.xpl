@@ -47,7 +47,6 @@
         </p:when>
         <p:otherwise>
             <p:rename match="/*" new-name="c:was" name="was">
-                <p:log port="result" href="file:/tmp/was.xml"/>
                 <p:input port="source">
                     <p:pipe port="result" step="wrapped-source"/>
                 </p:input>
