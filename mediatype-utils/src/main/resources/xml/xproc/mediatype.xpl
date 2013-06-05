@@ -793,17 +793,16 @@
                 <p:identity/>
             </p:when>
             <p:otherwise>
-                <!-- check if the file is in memory -->
-                <px:fileset-load name="file-in-memory">
-                    <p:with-option name="load-if-not-in-memory" select="'false'"/>
-                    <p:with-option name="href" select="resolve-uri(/*/@href,base-uri(/*))"/>
-                    <p:input port="fileset">
-                        <p:pipe port="source" step="main"/>
-                    </p:input>
-                    <p:input port="in-memory">
-                        <p:pipe port="in-memory" step="main"/>
-                    </p:input>
-                </px:fileset-load>
+                <p:group name="file-in-memory">
+                    <p:output port="result"/>
+                    <p:variable name="target" select="resolve-uri(/*/@href,base-uri(/*))"/>
+                    <p:split-sequence>
+                        <p:with-option name="test" select="concat('base-uri(/*)=&quot;',$target,'&quot;')"/>
+                        <p:input port="source">
+                            <p:pipe port="in-memory" step="main"/>
+                        </p:input>
+                    </p:split-sequence>
+                </p:group>
                 <p:count name="filecount-in-memory"/>
                 <p:identity>
                     <p:input port="source">
