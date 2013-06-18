@@ -48,12 +48,12 @@
             </p:inline>
         </p:input>
     </p:xslt>
+    <cx:message>
+        <p:with-option name="message" select="concat('loading NCC: ',/*/@href)"/>
+    </cx:message>
     <px:html-load name="in-memory.ncc">
         <p:with-option name="href" select="/*/@href"/>
     </px:html-load>
-    <cx:message>
-        <p:with-option name="message" select="concat('loaded NCC: ',base-uri(/*))"/>
-    </cx:message>
 
     <cx:message message="Making an ordered list of SMIL-files referenced from the NCC according to the flow (reading order)"/>
     <p:xslt name="fileset.smil">
@@ -124,15 +124,21 @@
     <p:identity name="in-memory.html"/>
 
     <cx:message message="Listing all resources referenced from the HTML files"/>
-    <p:for-each>
-        <p:xslt>
+    <p:for-each name="fileset.html-resources.for-each">
+        <px:html-to-fileset/>
+        <cx:message>
+            <p:with-option name="message" select="concat('extracted list of resources from ',replace(base-uri(/*),'^.*/',''))">
+                <p:pipe port="current" step="fileset.html-resources.for-each"/>
+            </p:with-option>
+        </cx:message>
+        <!--<p:xslt>
             <p:input port="parameters">
                 <p:empty/>
             </p:input>
             <p:input port="stylesheet">
                 <p:document href="make-resource-fileset.xsl"/>
             </p:input>
-        </p:xslt>
+        </p:xslt>-->
     </p:for-each>
     <px:fileset-join name="fileset.html-resources"/>
 

@@ -13,7 +13,19 @@
             <xsl:apply-templates select="@id|*"/>
         </smil>
     </xsl:template>
-    <xsl:template match="s:head"/>
+    <xsl:template match="s:head">
+        <metadata xmlns="http://www.w3.org/ns/SMIL">
+            <xsl:variable name="metas" select="s:meta"/>
+            <meta xmlns="http://www.w3.org/ns/SMIL" name="dc:format" content="EPUB3"/>
+            <xsl:if test="not(s:meta/@name=('dtb:generator','ncc:generator'))">
+                <meta xmlns="http://www.w3.org/ns/SMIL" name="dtb:generator" content="DAISY Pipeline 2"/>
+            </xsl:if>
+            <xsl:for-each select="s:meta[not(@name=('base','uid','dc:identifier','dc:format','dtb:totalElapsedTime','ncc:totalElapsedTime','total-elapsed-time','ncc:timeInThisSmil','time-in-this-smil'))]">
+                <meta xmlns="http://www.w3.org/ns/SMIL" name="{@name}" content="{@value}"/>
+            </xsl:for-each>
+            <xsl:copy-of select="*[not(self::s:meta)]"/>
+        </metadata>
+    </xsl:template>
     <xsl:template match="s:body">
         <body>
             <xsl:call-template name="seq">
