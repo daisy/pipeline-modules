@@ -12,7 +12,7 @@
     </xsl:template>
 
     <xsl:template match="d:file[@href and not(matches(@href,'^[^/]+:') or starts-with(@href,'..'))]">
-        <c:entry href="{@href}" name="{pf:percent-decode(@href)}"/>
+        <c:entry href="{@href}" name="{pf:unescape-uri(@href)}"/>
     </xsl:template>
 
 </xsl:stylesheet>
