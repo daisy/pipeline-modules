@@ -42,6 +42,14 @@
         <p:pipe port="result" step="wrap-errors"/>
     </p:output>
     
+    <p:output port="validation-status" px:media-type="application/xml+vnd.pipeline.status">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <h1 px:role="name">validation-status</h1>
+            <p px:role="desc">Validation status (http://code.google.com/p/daisy-pipeline/wiki/ValidationStatusXML) of the file check.</p>
+        </p:documentation>
+        <p:pipe step="format-validation-status" port="result"/>
+    </p:output>
+    
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl">
         <p:documentation>Calabash extension steps.</p:documentation>
     </p:import>
@@ -55,6 +63,7 @@
     </p:import>
     
     <p:import href="create-validation-report-error-for-file.xpl"/>
+    <p:import href="validation-status.xpl"/>
     
     <p:variable name="base" select="/*/@xml:base"/>
     
@@ -147,6 +156,12 @@
             <p:pipe port="report" step="check-each-file"/>
         </p:input>
     </p:wrap-sequence>
+    
+    <px:validation-status name="format-validation-status">
+        <p:input port="source">
+            <p:pipe port="result" step="wrap-errors"/>
+        </p:input>
+    </px:validation-status>
     <p:sink/>
     
     <p:group name="wrap-fileset">
