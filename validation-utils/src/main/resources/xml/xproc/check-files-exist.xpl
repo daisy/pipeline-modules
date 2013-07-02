@@ -26,7 +26,7 @@
         </p:documentation>
     </p:input>
     
-    <p:output port="result">
+    <p:output port="result" primary="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h1 px:role="name">result</h1>
             <p px:role="desc">List of existing files, formatted as a DAISY Pipeline FileSet.</p>
