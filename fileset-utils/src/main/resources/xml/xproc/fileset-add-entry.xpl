@@ -28,9 +28,9 @@
           <xsl:param name="base" required="yes"/>
           <xsl:template match="/*">
             <d:file>
-              <xsl:attribute name="href" select="if (/*[@xml:base] or not(matches($href,'^\w+:'))) then pf:relativize-uri(resolve-uri($href,$base),$base) else $href"/>
+              <xsl:attribute name="href" select="if (/*[@xml:base] or not(matches($href,'^\w+:'))) then pf:relativize-uri(resolve-uri($href,$base),$base) else pf:normalize-uri($href)"/>
               <xsl:if test="not($original-href='')">
-                <xsl:attribute name="original-href" select="if (/*[@xml:base]) then pf:normalize-uri(resolve-uri($original-href,$base)) else $original-href"/>
+                <xsl:attribute name="original-href" select="if (/*[@xml:base]) then pf:normalize-uri(resolve-uri($original-href,$base)) else pf:normalize-uri($original-href)"/>
               </xsl:if>
             </d:file>
           </xsl:template>
@@ -44,7 +44,7 @@
     <p:variable name="href-uri-ified" select="/*/@href">
       <p:pipe port="result" step="href-uri"/>
     </p:variable>
-
+    
     <p:identity>
       <p:input port="source">
         <p:pipe port="source" step="main"/>
@@ -90,17 +90,26 @@
       <p:delete match="@media-type[not(normalize-space())]"/>
       <p:delete match="@original-href[not(normalize-space())]"/>
     </p:group>
-
-    <!--Insert the entry as the last or first child of the file set-->
-    <p:insert match="/*">
+    
+    <!--Insert the entry as the last or first child of the file set - unless it already exists-->
+    <p:identity>
       <p:input port="source">
         <p:pipe port="source" step="main"/>
       </p:input>
-      <p:input port="insertion">
-        <p:pipe port="result" step="new-entry"/>
-      </p:input>
-      <p:with-option name="position" select="if ($first='true') then 'first-child' else 'last-child'"/>
-    </p:insert>
+    </p:identity>
+    <p:choose>
+      <p:when test="/*/d:file[@href=$href-uri-ified]">
+        <p:identity/>
+      </p:when>
+      <p:otherwise>
+        <p:insert match="/*">
+          <p:input port="insertion">
+            <p:pipe port="result" step="new-entry"/>
+          </p:input>
+          <p:with-option name="position" select="if ($first='true') then 'first-child' else 'last-child'"/>
+        </p:insert>
+      </p:otherwise>
+    </p:choose>
 
     <p:choose>
       <p:when test="$ref=''">

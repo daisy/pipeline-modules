@@ -6,7 +6,7 @@
     <p:output port="result"/>
 
     <p:option name="href" select="''">
-        <!-- href to the file in the fileset you want to retrieve -->
+        <!-- href to the file in the fileset you want to retrieve. suppports the glob characters '*' and '?', i.e. "*.txt" or "application/*+xml". -->
     </p:option>
     <p:option name="media-types" select="''">
         <!-- space separated list of whitelisted media types. suppports the glob characters '*' and '?', i.e. "image/*" or "application/*+xml". -->
@@ -23,11 +23,9 @@
             <p:identity/>
         </p:when>
         <p:otherwise>
-            <p:variable name="resolved-href" select="resolve-uri($href,base-uri(/*))">
-                
-            </p:variable>
+            <p:variable name="href-regex" select="concat('^',replace(replace(replace($href,'([\[\^\.\\\+\{\}\(\)\|\^\$\]])','\\$1'),'\?','.'),'\*','.*'),'$')"/>
             <p:delete>
-                <p:with-option name="match" select="concat(&quot;//d:file[not(resolve-uri(@href,base-uri(.))=resolve-uri('&quot;,$resolved-href,&quot;'))]&quot;)"/>
+                <p:with-option name="match" select="concat(&quot;//d:file[not(matches('&quot;,$href-regex,&quot;','^\w+:/') and matches(resolve-uri(@href,base-uri(.)),'&quot;,$href-regex,&quot;') or matches(@href,'&quot;,$href-regex,&quot;'))]&quot;)"/>
             </p:delete>
         </p:otherwise>
     </p:choose>
