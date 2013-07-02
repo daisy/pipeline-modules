@@ -16,10 +16,10 @@
         <metadata xmlns="http://www.w3.org/ns/SMIL">
             <xsl:variable name="metas" select="meta"/>
             <meta xmlns="http://www.w3.org/ns/SMIL" name="dc:format" content="EPUB3"/>
-            <xsl:if test="not(meta/@name=('dtb:generator','ncc:generator'))">
+            <xsl:if test="not(meta/lower-case(@name)=('dtb:generator','ncc:generator'))">
                 <meta xmlns="http://www.w3.org/ns/SMIL" name="dtb:generator" content="DAISY Pipeline 2"/>
             </xsl:if>
-            <xsl:for-each select="meta[not(@name=('base','uid','dc:identifier','dc:format','dtb:totalElapsedTime','ncc:totalElapsedTime','total-elapsed-time','ncc:timeInThisSmil','time-in-this-smil'))]">
+            <xsl:for-each select="meta[not(lower-case(@name)=('base','uid','dc:identifier','dc:format','dtb:totalelapsedtime','ncc:totalelapsedtime','total-elapsed-time','ncc:timeinthissmil','time-in-this-smil'))]">
                 <meta xmlns="http://www.w3.org/ns/SMIL" name="{@name}" content="{@value}"/>
             </xsl:for-each>
             <xsl:copy-of select="*[not(self::meta)]"/>
