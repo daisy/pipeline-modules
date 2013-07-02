@@ -90,22 +90,26 @@
       <p:delete match="@media-type[not(normalize-space())]"/>
       <p:delete match="@original-href[not(normalize-space())]"/>
     </p:group>
-
-    <!--Delete any existing d:file elements with the same href as the new entry from the fileset-->
-    <p:delete>
-      <p:with-option name="match" select="concat('/*/d:file[@href=&quot;',$href-uri-ified,'&quot;]')"/>
+    
+    <!--Insert the entry as the last or first child of the file set - unless it already exists-->
+    <p:identity>
       <p:input port="source">
         <p:pipe port="source" step="main"/>
       </p:input>
-    </p:delete>
-    
-    <!--Insert the entry as the last or first child of the file set-->
-    <p:insert match="/*">
-      <p:input port="insertion">
-        <p:pipe port="result" step="new-entry"/>
-      </p:input>
-      <p:with-option name="position" select="if ($first='true') then 'first-child' else 'last-child'"/>
-    </p:insert>
+    </p:identity>
+    <p:choose>
+      <p:when test="/*/d:file[@href=$href-uri-ified]">
+        <p:identity/>
+      </p:when>
+      <p:otherwise>
+        <p:insert match="/*">
+          <p:input port="insertion">
+            <p:pipe port="result" step="new-entry"/>
+          </p:input>
+          <p:with-option name="position" select="if ($first='true') then 'first-child' else 'last-child'"/>
+        </p:insert>
+      </p:otherwise>
+    </p:choose>
 
     <p:choose>
       <p:when test="$ref=''">
