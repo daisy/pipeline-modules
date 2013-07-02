@@ -64,11 +64,19 @@
         <p:output port="result" sequence="true"/>
     </p:declare-step>
 
-    <p:variable name="validSeverity" use-when="not(p:system-property('p:xpath-version')='1.0')" select="if ($severity=('WARN','INFO','DEBUG')) then $severity else 'INFO'"/>
+    <p:variable name="validSeverity" use-when="not(p:system-property('p:xpath-version')='1.0')" select="if ($severity=('WARN','INFO','DEBUG')) then $severity else 'INFO'">
+        <p:inline>
+            <irrelevant/>
+        </p:inline>
+    </p:variable>
     <p:variable name="validSeverity" use-when="p:system-property('p:xpath-version')='1.0'" select="concat(
         substring($severity, 1, number($severity='WARN' or $severity='INFO' or $severity='DEBUG') * string-length($severity)),
         substring('INFO', 1, number(not($severity='WARN' or $severity='INFO' or $severity='DEBUG')) * string-length('INFO'))
-        )"/>
+        )">
+        <p:inline>
+            <irrelevant/>
+        </p:inline>
+    </p:variable>
     
     <p:add-attribute match="/*" attribute-name="message" name="message">
         <p:input port="source">
@@ -97,6 +105,11 @@
         </p:input>
     </p:identity>
     <p:choose>
+        <p:xpath-context>
+            <p:inline>
+                <irrelevant/>
+            </p:inline>
+        </p:xpath-context>
         
         <!-- Pipeline 2 -->
         <p:when test="p:step-available('pxi:message')">
@@ -104,7 +117,11 @@
                 <p:with-option name="message" select="/*/@message">
                     <p:pipe port="result" step="message"/>
                 </p:with-option>
-                <p:with-option name="severity" select="$validSeverity"/>
+                <p:with-option name="severity" select="$validSeverity">
+                    <p:inline>
+                        <irrelevant/>
+                    </p:inline>
+                </p:with-option>
             </pxi:message>
         </p:when>
 
@@ -122,8 +139,16 @@
                 <p:with-option name="message" select="concat('[',$validSeverity,'] ',/*/@message)">
                     <p:pipe port="result" step="message"/>
                 </p:with-option>
-                <p:with-option name="stderr" select="$validSeverity='WARN'"/>
-                <p:with-option name="stdout" select="not($validSeverity='WARN')"/>
+                <p:with-option name="stderr" select="$validSeverity='WARN'">
+                    <p:inline>
+                        <irrelevant/>
+                    </p:inline>
+                </p:with-option>
+                <p:with-option name="stdout" select="not($validSeverity='WARN')">
+                    <p:inline>
+                        <irrelevant/>
+                    </p:inline>
+                </p:with-option>
             </x:message>
 
             <!-- Other XProc processor -->
