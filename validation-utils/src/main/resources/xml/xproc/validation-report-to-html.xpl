@@ -20,7 +20,7 @@
     http://code.google.com/p/daisy-pipeline/wiki/ValidationReportXML
     -->
     <p:input port="source" primary="true" sequence="true"/>
-    <p:output port="result" primary="true"/>
+    <p:output port="result" primary="true" px:media-type="application/xml+vnd.pipeline.report"/>
     <p:option name="toc" required="false" select="'false'"/>
     
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
