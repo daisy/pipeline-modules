@@ -1,11 +1,12 @@
-<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:svrl="http://purl.oclc.org/dsdl/svrl" xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns="http://www.w3.org/1999/xhtml"
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:svrl="http://purl.oclc.org/dsdl/svrl" xmlns:c="http://www.w3.org/ns/xproc-step"
+    xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns="http://www.w3.org/1999/xhtml"
     exclude-result-prefixes="#all">
     <xsl:output xml:space="default" media-type="text/html" indent="yes"/>
     <xsl:template match="/">
         <div class="document-validation-report" id="{generate-id()}">
             <xsl:choose>
-                <xsl:when
-                    test="d:document-info/d:error-count/text() = '0'">
+                <xsl:when test="d:document-info/d:error-count/text() = '0'">
                     <xsl:apply-templates select="d:document-info"/>
                 </xsl:when>
                 <xsl:otherwise>
@@ -33,7 +34,7 @@
                 </xsl:otherwise>
             </xsl:choose>
         </div>
-        
+
     </xsl:template>
 
     <!-- document info -->
@@ -81,9 +82,10 @@
             <xsl:if test="./d:file">
                 <pre><xsl:value-of select="./d:file"/></pre>
             </xsl:if>
-            <div>
-                <h3>Location:</h3>
-                <pre class="box">
+            <xsl:if test="string-length(./d:location/@href) > 0">
+                <div>
+                    <h3>Location:</h3>
+                    <pre class="box">
                     <xsl:choose>
                         <xsl:when test="./d:location/@href">
                             <xsl:value-of select="./d:location/@href"/>    
@@ -92,8 +94,9 @@
                             <em>Line <xsl:value-of select="./d:location/@line"/>, Column <xsl:value-of select="./d:location/@column"/></em>
                         </xsl:otherwise>
                     </xsl:choose>
-                </pre>
-            </div>
+                    </pre>
+                </div>
+            </xsl:if>
             <xsl:if test="./d:expected">
                 <div>
                     <h3 style="display:inline;">Expected:</h3>

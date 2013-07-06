@@ -12,6 +12,14 @@
   <define name="document-info">
     <element name="document-info">
       <interleave>
+        <optional>
+          <!-- anything special to say about the document that needs to be used later in the validation chain? 
+               e.g. dtbook-validator uses this for @internal='mathml' to indicate the presence of mathml
+          -->
+          <attribute name="internal">
+            <data type="string"/>
+          </attribute>
+        </optional>
         <element name="document-name">
           <text/>
         </element>
