@@ -85,7 +85,6 @@
         </p:output>
 
         <p:variable name="filepath" select="resolve-uri(*/@href, $base)"/>
-        
         <p:try name="try-loading-each-file">
             <p:group>
                 <p:output port="result" sequence="true">

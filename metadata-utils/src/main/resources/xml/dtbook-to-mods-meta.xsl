@@ -152,10 +152,10 @@
             </xsl:when>
             <xsl:otherwise>
                 <!-- use the extension element to hold the dc:Type data -->
-                <xsl:element name="extension" namespace="dcterms">
-                    <dcterms:Type>
+                <xsl:element name="extension">
+                    <xsl:element name="dcterms:Type">
                         <xsl:value-of select="@content"/>
-                    </dcterms:Type>
+                    </xsl:element>
                 </xsl:element>
             </xsl:otherwise>
         </xsl:choose>

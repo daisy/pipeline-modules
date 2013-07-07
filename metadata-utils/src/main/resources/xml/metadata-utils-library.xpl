@@ -42,7 +42,7 @@
                 <p:document href="dtbook-to-mods-meta.xsl"/>
             </p:input>
         </p:xslt>
-        <p:validate-with-xml-schema name="validate-mods-output">
+        <p:validate-with-xml-schema name="validate-mods-output" assert-valid="true">
             <p:input port="schema">
                 <p:document href="schema/mods-3-3.xsd"/>
             </p:input>
