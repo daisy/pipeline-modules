@@ -25,7 +25,7 @@
         <p:otherwise>
             <p:variable name="href-regex" select="concat('^',replace(replace(replace($href,'([\[\^\.\\\+\{\}\(\)\|\^\$\]])','\\$1'),'\?','.'),'\*','.*'),'$')"/>
             <p:delete>
-                <p:with-option name="match" select="concat(&quot;//d:file[not(matches('&quot;,$href-regex,&quot;','^\w+:/') and matches(resolve-uri(@href,base-uri(.)),'&quot;,$href-regex,&quot;') or matches(@href,'&quot;,$href-regex,&quot;'))]&quot;)"/>
+                <p:with-option name="match" select="concat(&quot;//d:file[not(matches('&quot;,$href-regex,&quot;','^\w+:/') and matches(resolve-uri(@href,base-uri(.)),'&quot;,$href-regex,&quot;') or matches(replace(concat('/',@href),'^/+','/'),'&quot;,$href-regex,&quot;'))]&quot;)"/>
             </p:delete>
         </p:otherwise>
     </p:choose>
