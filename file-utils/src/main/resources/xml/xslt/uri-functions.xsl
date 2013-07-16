@@ -37,17 +37,21 @@
         />
     </xsl:function>
     
-    <!--TODO write tests-->
     <xsl:function name="pf:is-absolute" as="xs:boolean">
         <xsl:param name="uri" as="xs:string?"/>
         <xsl:variable name="tokens" select="pf:tokenize-uri(normalize-space($uri))"/>
-        <xsl:sequence select="boolean($tokens[1]) or starts-with($tokens[3],'/')"/>
+        <xsl:sequence select="starts-with($tokens[3],'/')"/>
     </xsl:function>
     
-    <!--TODO write tests-->
     <xsl:function name="pf:is-relative" as="xs:boolean">
         <xsl:param name="uri" as="xs:string?"/>
-        <xsl:sequence select="not(pf:is-absolute($uri))"/>
+        <xsl:variable name="tokens" select="pf:tokenize-uri(normalize-space($uri))"/>
+        <xsl:sequence select="not($tokens[1]) and not(starts-with($tokens[3],'/'))"/>
+    </xsl:function>
+    
+    <xsl:function name="pf:get-scheme" as="xs:string">
+        <xsl:param name="uri" as="xs:string?"/>
+        <xsl:sequence select="pf:tokenize-uri(normalize-space($uri))[1]"/>
     </xsl:function>
     
     <!--TODO write tests-->

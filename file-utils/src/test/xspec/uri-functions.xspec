@@ -1,50 +1,162 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <x:description xmlns:x="http://www.jenitennison.com/xslt/xspec" xmlns:pf="http://www.daisy.org/ns/pipeline/functions" xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions"
-    stylesheet="file:/home/jostein/pipeline-modules/common-utils/file-utils/src/main/resources/xml/xslt/uri-functions.xsl">
+    stylesheet="../../main/resources/xml/xslt/uri-functions.xsl">
 
-    <x:scenario pending="Not yet implemented" label="Scenario for testing function tokenize-uri">
+    <x:scenario pending="Not yet implemented" label="function tokenize-uri">
         <x:call function="pf:tokenize-uri">
             <x:param name="uri" select="''"/>
         </x:call>
         <x:expect label="Not yet implemented" select="'Not yet implemented'"/>
     </x:scenario>
 
-    <x:scenario pending="Not yet implemented" label="Scenario for testing function recompose-uri">
+    <x:scenario pending="Not yet implemented" label="function recompose-uri">
         <x:call function="pf:recompose-uri">
             <x:param name="tokens" select="''"/>
         </x:call>
         <x:expect label="Not yet implemented" select="'Not yet implemented'"/>
     </x:scenario>
 
-    <x:scenario pending="Not yet implemented" label="Scenario for testing function is-absolute">
+    <x:scenario label="function is-absolute">
         <x:call function="pf:is-absolute">
             <x:param name="uri" select="''"/>
         </x:call>
-        <x:expect label="Not yet implemented" select="'Not yet implemented'"/>
+        <x:scenario label="on an hierchical absolute (http) URI">
+            <x:call>
+                <x:param name="uri" select="'http://www.example.com/'"/>
+            </x:call>
+            <x:expect label="returns true" select="true()"/>
+        </x:scenario>
+        <x:scenario label="on an hierchical absolute (file) URI">
+            <x:call>
+                <x:param name="uri" select="'file:/a/path'"/>
+            </x:call>
+            <x:expect label="returns true" select="true()"/>
+        </x:scenario>
+        <x:scenario label="on an absolute scheme-less path">
+            <x:call>
+                <x:param name="uri" select="'/a/path'"/>
+            </x:call>
+            <x:expect label="returns true" select="true()"/>
+        </x:scenario>
+        <x:scenario label="on a relative path URI">
+            <x:call>
+                <x:param name="uri" select="'a/path'"/>
+            </x:call>
+            <x:expect label="returns false" select="false()"/>
+        </x:scenario>
+        <x:scenario label="on a data URI">
+            <x:call>
+                <x:param name="uri" select="'data:image/png;base64,ABCDEFG'"/>
+            </x:call>
+            <x:expect label="returns false" select="false()"/>
+        </x:scenario>
+        <x:scenario label="on an empty URI">
+            <x:call>
+                <x:param name="uri" select="''"/>
+            </x:call>
+            <x:expect label="returns false" select="false()"/>
+        </x:scenario>
     </x:scenario>
 
-    <x:scenario pending="Not yet implemented" label="Scenario for testing function is-relative">
+    <x:scenario label="function is-relative">
         <x:call function="pf:is-relative">
             <x:param name="uri" select="''"/>
         </x:call>
-        <x:expect label="Not yet implemented" select="'Not yet implemented'"/>
+        <x:scenario label="on a relative path URI">
+            <x:call>
+                <x:param name="uri" select="'a/path'"/>
+            </x:call>
+            <x:expect label="returns true" select="true()"/>
+        </x:scenario>
+        <x:scenario label="on an hierchical absolute (http) URI">
+            <x:call>
+                <x:param name="uri" select="'http://www.example.com/'"/>
+            </x:call>
+            <x:expect label="returns false" select="false()"/>
+        </x:scenario>
+        <x:scenario label="on an 'opaque' (file) URI">
+            <x:call>
+                <x:param name="uri" select="'file:a/path'"/>
+            </x:call>
+            <x:expect label="returns false" select="false()"/>
+        </x:scenario>
+        <x:scenario label="on an absolute scheme-less path">
+            <x:call>
+                <x:param name="uri" select="'/a/path'"/>
+            </x:call>
+            <x:expect label="returns false" select="false()"/>
+        </x:scenario>
+        <x:scenario label="on a data URI">
+            <x:call>
+                <x:param name="uri" select="'data:image/png;base64,ABCDEFG'"/>
+            </x:call>
+            <x:expect label="returns false" select="false()"/>
+        </x:scenario>
+        <x:scenario label="on an empty URI">
+            <x:call>
+                <x:param name="uri" select="''"/>
+            </x:call>
+            <x:expect label="returns true" select="true()"/>
+        </x:scenario>
+    </x:scenario>
+    
+    <x:scenario label="function get-scheme">
+        <x:call function="pf:get-scheme">
+            <x:param name="uri" select="''"/>
+        </x:call>
+        <x:scenario label="on an hierchical absolute (http) URI">
+            <x:call>
+                <x:param name="uri" select="'http://www.example.com/'"/>
+            </x:call>
+            <x:expect label="returns 'http'" select="'http'"/>
+        </x:scenario>
+        <x:scenario label="on an hierchical absolute (file) URI">
+            <x:call>
+                <x:param name="uri" select="'file:/a/path'"/>
+            </x:call>
+            <x:expect label="returns 'file'" select="'file'"/>
+        </x:scenario>
+        <x:scenario label="on an absolute scheme-less path">
+            <x:call>
+                <x:param name="uri" select="'/a/path'"/>
+            </x:call>
+            <x:expect label="returns an empty string" select="''"/>
+        </x:scenario>
+        <x:scenario label="on a relative path URI">
+            <x:call>
+                <x:param name="uri" select="'a/path'"/>
+            </x:call>
+            <x:expect label="returns an empty string" select="''"/>
+        </x:scenario>
+        <x:scenario label="on a data URI">
+            <x:call>
+                <x:param name="uri" select="'data:image/png;base64,ABCDEFG'"/>
+            </x:call>
+            <x:expect label="returns 'data'" select="'data'"/>
+        </x:scenario>
+        <x:scenario label="on an empty URI">
+            <x:call>
+                <x:param name="uri" select="''"/>
+            </x:call>
+            <x:expect label="returns an empty string" select="''"/>
+        </x:scenario>
     </x:scenario>
 
-    <x:scenario pending="Not yet implemented" label="Scenario for testing function get-path">
+    <x:scenario pending="Not yet implemented" label="function get-path">
         <x:call function="pf:get-path">
             <x:param name="uri" select="''"/>
         </x:call>
         <x:expect label="Not yet implemented" select="'Not yet implemented'"/>
     </x:scenario>
 
-    <x:scenario pending="Not yet implemented" label="Scenario for testing function get-extension">
+    <x:scenario pending="Not yet implemented" label="function get-extension">
         <x:call function="pf:get-extension">
             <x:param name="uri" select="''"/>
         </x:call>
         <x:expect label="Not yet implemented" select="'Not yet implemented'"/>
     </x:scenario>
 
-    <x:scenario pending="Not yet implemented" label="Scenario for testing function replace-path">
+    <x:scenario pending="Not yet implemented" label="function replace-path">
         <x:call function="pf:replace-path">
             <x:param name="uri" select="''"/>
             <x:param name="path" select="''"/>
@@ -52,7 +164,7 @@
         <x:expect label="Not yet implemented" select="'Not yet implemented'"/>
     </x:scenario>
 
-    <x:scenario label="Scenario for testing function normalize-uri">
+    <x:scenario label="function normalize-uri">
         <x:call function="pf:normalize-uri">
             <x:param name="uri" select="''"/>
         </x:call>
@@ -245,7 +357,7 @@
         </x:scenario>
     </x:scenario>
 
-    <x:scenario label="Scenario for testing function relativize-uri">
+    <x:scenario label="function relativize-uri">
         <x:call function="pf:relativize-uri">
             <x:param name="uri" select="''"/>
             <x:param name="base" select="''"/>
@@ -394,7 +506,7 @@
         </x:scenario>
     </x:scenario>
 
-    <x:scenario label="Scenario for testing function normalize-path">
+    <x:scenario label="function normalize-path">
         <x:call function="pf:normalize-path">
             <x:param name="path" select="''"/>
         </x:call>
@@ -407,7 +519,7 @@
         </x:scenario>
     </x:scenario>
 
-    <x:scenario pending="Not yet implemented" label="Scenario for testing function relativize-path">
+    <x:scenario pending="Not yet implemented" label="function relativize-path">
         <x:call function="pf:relativize-path">
             <x:param name="path" select="''"/>
             <x:param name="base" select="''"/>
@@ -415,7 +527,7 @@
         <x:expect label="Not yet implemented" select="'Not yet implemented'"/>
     </x:scenario>
 
-    <x:scenario label="Scenario for testing function longest-common-uri">
+    <x:scenario label="function longest-common-uri">
         <x:call function="pf:longest-common-uri">
             <x:param name="uris" select="''"/>
         </x:call>
@@ -463,7 +575,7 @@
         </x:scenario>
     </x:scenario>
 
-    <x:scenario label="Scenario for testing function unescape-uri">
+    <x:scenario label="function unescape-uri">
         <x:call function="pf:unescape-uri"/>
         <x:scenario label="empty">
             <x:call>
@@ -534,7 +646,7 @@
         <!-- TODO: what to do with characters not allowed in XML? don't decode? remove? -->
     </x:scenario>
 
-    <x:scenario pending="Not yet implemented" label="Scenario for testing function utf8-decode">
+    <x:scenario pending="Not yet implemented" label="function utf8-decode">
         <x:call function="pf:utf8-decode">
             <x:param name="bytes" select="''"/>
         </x:call>
