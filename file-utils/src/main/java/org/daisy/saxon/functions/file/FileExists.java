@@ -46,7 +46,7 @@ public class FileExists extends ExtensionFunctionDefinition {
 				try {
 					String path = ((StringValue) arguments[0].next())
 							.getStringValue();
-					boolean result = new File(path).exists();
+					boolean result = (path.isEmpty())?true:new File(path).exists();
 					return SingletonIterator.makeIterator(new BooleanValue(
 							result, BuiltInAtomicType.BOOLEAN));
 				} catch (Exception e) {
