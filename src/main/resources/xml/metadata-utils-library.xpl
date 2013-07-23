@@ -21,6 +21,12 @@
         </p:documentation>
     </p:import>
     
+    <p:import href="http://www.daisy.org/pipeline/modules/dtbook-validator/dtbook-validator.select-schema.xpl">
+        <p:documentation>
+            Schema selector used for DTBook validation.
+        </p:documentation>
+    </p:import>
+    
     <p:documentation>Generate a MODS metadata record from a DTBook 2005-3 document.</p:documentation>
     <p:declare-step name="dtbook-to-mods-meta" type="px:dtbook-to-mods-meta">
         <p:input port="source"/>
@@ -31,9 +37,13 @@
                 Whether to stop processing and raise an error on validation issues.
             </p:documentation>
         </p:option>
+        <px:dtbook-validator.select-schema name="dtbook-schema" dtbook-version="2005-3" mathml-version="2.0"/>
         <px:validate-with-relax-ng-and-report name="validate-dtbook-input">
+            <p:input port="source">
+                <p:pipe port="source" step="dtbook-to-mods-meta"/>
+            </p:input>
             <p:input port="schema">
-                <p:document href="schema/dtbook-2005-3.rng"/>
+                <p:pipe port="result" step="dtbook-schema"/>
             </p:input>
             <p:with-option name="assert-valid" select="$assert-valid"/>
         </px:validate-with-relax-ng-and-report>
@@ -59,9 +69,13 @@
                 Whether to stop processing and raise an error on validation issues.
             </p:documentation>
         </p:option>
+        <px:dtbook-validator.select-schema name="dtbook-schema" dtbook-version="2005-3" mathml-version="2.0"/>
         <px:validate-with-relax-ng-and-report name="validate-dtbook-input">
+            <p:input port="source">
+                <p:pipe port="source" step="dtbook-to-zedai-meta"/>
+            </p:input>
             <p:input port="schema">
-                <p:document href="schema/dtbook-2005-3.rng"/>
+                <p:pipe port="result" step="dtbook-schema"/>
             </p:input>
             <p:with-option name="assert-valid" select="$assert-valid"/>
         </px:validate-with-relax-ng-and-report>
