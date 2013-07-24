@@ -17,5 +17,8 @@ ehthumbs.db
 Thumbs.db
 
 #vim files
-.*.sw?
-.*~
+*.sw?
+*~
+
+# test reports
+*-result.html
