@@ -114,12 +114,12 @@
             </p:choose>
         </p:when>
         
-        <p:when test="not($test) and not($test-count-min or $test-count-max)">
+        <p:otherwise>
             <px:message message="either the 'test' option or at least one of the 'test-count-*' options must be specified; assertion failed">
                 <p:with-option name="severity" select="'WARN'"/>
             </px:message>
             <p:add-attribute match="/*" attribute-name="result" attribute-value="false"/>
-        </p:when>
+        </p:otherwise>
     </p:choose>
     
     <p:choose>
