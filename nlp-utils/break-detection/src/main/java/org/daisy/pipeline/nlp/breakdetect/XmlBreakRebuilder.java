@@ -29,6 +29,7 @@ public class XmlBreakRebuilder {
     private LexService mLexer;
     private XProcRuntime mRuntime;
     private FormatSpecifications mFormatSpecs;
+    private long mMergeableID = 0;
 
     public XmlBreakRebuilder(XProcRuntime runtime, LexService lexer) {
         mRuntime = runtime;
@@ -114,13 +115,18 @@ public class XmlBreakRebuilder {
      * @param wrapper
      *            is meant to be a list of formatting elements.
      */
-    static private void wrapText(TreeWriter tw, XdmNode[] wrapper, String text) {
+    private void wrapText(TreeWriter tw, XdmNode[] wrapper, String text) {
         if (wrapper == null)
             return; // text should be an invisible delimiter
 
         for (int k = 0; k < wrapper.length; ++k) {
             tw.addStartElement(wrapper[k]);
             tw.addAttributes(wrapper[k]);
+            // this attribute will be a criterion to know whether the node is
+            // mergeable with other nodes with the same id. The id is icremented
+            // for every new text segments
+            tw.addAttribute(mFormatSpecs.mergeableAttr,
+                    String.valueOf(mMergeableID));
         }
         if (text.length() > 0) {
             // text.length() = 0 for <pagebreak/>
@@ -141,8 +147,8 @@ public class XmlBreakRebuilder {
      * @param pos
      *            is packed in a class to allow us to modify them
      */
-    static private void fillGap(SegmentPos pos, int untilSegment,
-            int untilIndex, TreeWriter tw, ArrayList<String> segments,
+    private void fillGap(SegmentPos pos, int untilSegment, int untilIndex,
+            TreeWriter tw, ArrayList<String> segments,
             ArrayList<XdmNode[]> inlineNodes) {
 
         if (pos.currentSegment < untilSegment) {
@@ -154,7 +160,7 @@ public class XmlBreakRebuilder {
                         segments.get(pos.currentSegment).substring(
                                 pos.charInSegment));
 
-            for (++pos.currentSegment; pos.currentSegment < untilSegment; ++pos.currentSegment) {
+            for (++pos.currentSegment, ++mMergeableID; pos.currentSegment < untilSegment; ++pos.currentSegment, ++mMergeableID) {
                 wrapText(tw, inlineNodes.get(pos.currentSegment),
                         segments.get(pos.currentSegment));
             }
@@ -188,6 +194,11 @@ public class XmlBreakRebuilder {
 
         for (Sentence s : sentences) {
             tw.addStartElement(mFormatSpecs.sentenceTag);
+            if (mFormatSpecs.sentenceAttrVal != null
+                    && !mFormatSpecs.sentenceAttrVal.equals("")) {
+                tw.addAttribute(mFormatSpecs.sentenceAttr,
+                        mFormatSpecs.sentenceAttrVal);
+            }
             for (TextReference r : s.content) {
 
                 fillGap(pos, r.firstSegment, r.firstIndex, tw, segments,
@@ -195,6 +206,11 @@ public class XmlBreakRebuilder {
 
                 // TODO: add proper nouns
                 tw.addStartElement(mFormatSpecs.wordTag);
+                if (mFormatSpecs.wordAttrVal != null
+                        && !mFormatSpecs.wordAttrVal.equals("")) {
+                    tw.addAttribute(mFormatSpecs.wordAttr,
+                            mFormatSpecs.wordAttrVal);
+                }
 
                 fillGap(pos, r.lastSegment, r.lastIndex, tw, segments,
                         inlineNodes);

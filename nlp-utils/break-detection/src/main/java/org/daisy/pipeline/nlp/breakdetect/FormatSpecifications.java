@@ -13,7 +13,15 @@ import net.sf.saxon.s9api.QName;
 public class FormatSpecifications {
 
     public QName sentenceTag;
+    public QName sentenceAttr;
+    public String sentenceAttrVal;
+
     public QName wordTag;
+    public QName wordAttr;
+    public String wordAttrVal;
+
+    public QName mergeableAttr = new QName(
+            "http://www.daisy.org/ns/pipeline/tmp", "mergeable");
     public QName nameTag;
     public QName langAttr;
     public Set<String> inlineElements;
@@ -23,8 +31,10 @@ public class FormatSpecifications {
     public Set<String> spaceEquivalentElements;
 
     FormatSpecifications(String outputNamespace, String sentenceElement,
-            String wordElement, String nameElement, String langNamespace,
-            String langAttr, Collection<String> inlineElements,
+            String sentenceAttr, String sentenceAttrVal, String wordElement,
+            String wordAttr, String wordAttrVal, String nameElement,
+            String langNamespace, String langAttr,
+            Collection<String> inlineElements,
             Collection<String> periodEquivalentElements,
             Collection<String> commaEquivalentElements,
             Collection<String> endOfSentenceElements,
@@ -35,6 +45,11 @@ public class FormatSpecifications {
         nameTag = nameElement == null ? null : new QName(outputNamespace,
                 nameElement);
         this.langAttr = new QName(langNamespace, langAttr);
+
+        this.sentenceAttr = new QName("", sentenceAttr);
+        this.sentenceAttrVal = sentenceAttrVal;
+        this.wordAttr = new QName("", wordAttr);
+        this.wordAttrVal = wordAttrVal;
 
         this.inlineElements = new HashSet<String>(inlineElements);
         this.inlineElements.addAll(periodEquivalentElements);

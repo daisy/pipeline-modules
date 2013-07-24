@@ -43,6 +43,10 @@ public class BreakDetectStep extends DefaultStep {
     private String wordTagOption;
     private String nameTagOption;
     private String sentenceTagOption;
+    private String wordAttrValOption;
+    private String wordAttrOption;
+    private String sentenceAttrValOption;
+    private String sentenceAttrOption;
     private FormatSpecifications mFormatSpecs;
 
     public BreakDetectStep(XProcRuntime runtime, XAtomicStep step,
@@ -85,6 +89,14 @@ public class BreakDetectStep extends DefaultStep {
             nameTagOption = value.getString();
         } else if ("output-ns".equalsIgnoreCase(name.getLocalName())) {
             outputNamespace = value.getString();
+        } else if ("sentence-attr".equalsIgnoreCase(name.getLocalName())) {
+            sentenceAttrOption = value.getString();
+        } else if ("sentence-attr-val".equalsIgnoreCase(name.getLocalName())) {
+            sentenceAttrValOption = value.getString();
+        } else if ("word-attr".equalsIgnoreCase(name.getLocalName())) {
+            wordAttrOption = value.getString();
+        } else if ("word-attr-val".equalsIgnoreCase(name.getLocalName())) {
+            wordAttrValOption = value.getString();
         } else {
             System.err.println("unrecognized option " + name);
         }
@@ -128,8 +140,9 @@ public class BreakDetectStep extends DefaultStep {
         super.run();
 
         mFormatSpecs = new FormatSpecifications(outputNamespace,
-                sentenceTagOption, wordTagOption, nameTagOption,
-                "http://www.w3.org/XML/1998/namespace", "lang",
+                sentenceTagOption, sentenceAttrOption, sentenceAttrValOption,
+                wordTagOption, wordAttrOption, wordAttrValOption,
+                nameTagOption, "http://www.w3.org/XML/1998/namespace", "lang",
                 inlineTagsOption, periodTagsOption, commaTagsOption,
                 endSentenceTagsOption, spaceTagsOption);
         mXmlRebuilder.setFormatSpecifications(mFormatSpecs);

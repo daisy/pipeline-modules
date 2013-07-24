@@ -8,7 +8,11 @@
   <p:option name="inline-tags" required="true"/>
   <p:option name="output-name-tag" required="false" select="''"/>
   <p:option name="output-word-tag" required="true"/>
+  <p:option name="word-attr" required="false" select="''"/>
+  <p:option name="word-attr-val" required="false" select="''"/>
   <p:option name="output-sentence-tag" required="true"/>
+  <p:option name="sentence-attr" required="false" select="''"/>
+  <p:option name="sentence-attr-val" required="false" select="''"/>
   <p:option name="output-ns" required="true"/>
   
   <p:option name="period-tags" required="false" select="''"/>

@@ -10,8 +10,6 @@
 
   <p:input port="source" primary="true"/>
   <p:output port="result" primary="true"/>
-
-  <cx:message message="inside zedai-break-detect"/>
   
   <px:break-and-reshape>
     <p:with-option name="inline-tags" select="'emph,span,ref,char,term,sub,ref,sup,pagebreak,name'"/>
@@ -20,5 +18,5 @@
     <p:with-option name="output-word-tag" select="'w'"/>
     <p:with-option name="output-sentence-tag" select="'s'"/>
   </px:break-and-reshape>
-    
+
 </p:declare-step>

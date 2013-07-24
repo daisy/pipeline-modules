@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns="http://www.daisy.org/ns/z3998/authoring/"
     exclude-result-prefixes="xs"
     version="2.0">
 
-  <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
-    
   <xsl:param name="markup"/>
+  <xsl:param name="markup-ns"/>
+  <xsl:param name="markup-attr"/>
+  <xsl:param name="markup-attr-val"/>    
 
-  <xsl:template match="*[local-name() = $markup]">
+  <xsl:template match="*[local-name() = $markup and string(@*[name() = $markup-attr]) = $markup-attr-val]">
       <xsl:apply-templates select="." mode="inside"/>
   </xsl:template>
 
@@ -36,7 +36,13 @@
       <xsl:otherwise>
 	<!-- create the $markup because we have reached one leaf or because -->
 	<!-- the current node has more than one child --> 
-	<xsl:element name="{$markup}">
+	<xsl:element namespace="{$markup-ns}" name="{$markup}">
+	  <xsl:if test="$markup-attr != ''">
+	    <xsl:attribute namespace="" name="{$markup-attr}">
+	      <xsl:value-of select="$markup-attr-val" />
+	    </xsl:attribute>
+	  </xsl:if>
+
 	  <!-- full recursive copy of all the children -->
 	  <xsl:copy-of select="node()"/>
 	</xsl:element>
