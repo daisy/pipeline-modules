@@ -1,6 +1,8 @@
 DAISY Pipeline 2 :: Script Utilities
 ====================================
 
+[![Build Status](https://travis-ci.org/daisy-consortium/pipeline-scripts-utils.png?branch=master)](https://travis-ci.org/daisy-consortium/pipeline-scripts-utils)
+
 Format-specific utility modules for the DAISY Pipeline 2. Contains utility modules for the following formats:
 
 - DAISY Authoring and Interchange (aka ZedAI)
