@@ -1,7 +1,8 @@
 <p:declare-step type="px:repeat-merge" version="1.0"
 		xmlns:p="http://www.w3.org/ns/xproc"
 		xmlns:px="http://www.daisy.org/ns/pipeline/xproc"	
-		xmlns:cx="http://xmlcalabash.com/ns/extensions">
+		xmlns:cx="http://xmlcalabash.com/ns/extensions"
+		exclude-inline-prefixes="#all">
   
   <p:option name="repeat" required="true"/>
   
@@ -13,7 +14,7 @@
       <p:identity/>
     </p:when>
     <p:otherwise>
-      <p:xslt>
+      <p:xslt name="m">
 	<p:input port="parameters">
 	  <p:empty/>
 	</p:input>

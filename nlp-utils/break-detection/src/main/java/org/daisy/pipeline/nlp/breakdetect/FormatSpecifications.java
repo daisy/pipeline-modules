@@ -20,8 +20,9 @@ public class FormatSpecifications {
     public QName wordAttr;
     public String wordAttrVal;
 
-    public QName mergeableAttr = new QName(
-            "http://www.daisy.org/ns/pipeline/tmp", "mergeable");
+    public String tmpNsPrefix = "tmp";
+    public String tmpNsURI = "http://www.daisy.org/ns/pipeline/tmp";
+    public QName mergeableAttr = new QName(tmpNsPrefix, tmpNsURI, "mergeable");
     public QName nameTag;
     public QName langAttr;
     public Set<String> inlineElements;

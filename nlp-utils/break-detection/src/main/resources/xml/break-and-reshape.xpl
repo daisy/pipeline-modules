@@ -2,7 +2,8 @@
 		version="1.0" xmlns:p="http://www.w3.org/ns/xproc"
 		xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
 		xmlns:cx="http://xmlcalabash.com/ns/extensions"
-		xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp">
+		xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp"
+		exclude-inline-prefixes="#all">
 
   <p:import href="break-detect.xpl"/>
   <p:import href="repeat-merge.xpl"/>
@@ -27,7 +28,7 @@
   <p:output port="result" primary="true"/>
   
   <!-- 1: run the java-based lexing step -->
-  <px:break-detect>
+  <px:break-detect name="break">
     <p:with-option name="inline-tags" select="$inline-tags"/>
     <p:with-option name="output-name-tag" select="$output-name-tag"/>
     <p:with-option name="output-word-tag" select="$output-word-tag"/>
@@ -46,7 +47,7 @@
   <cx:message message="java-based break detection done"/>
   
   <!-- 2: pull-down the <w> nodes when possible -->
-  <p:xslt>
+  <p:xslt name="swap">
     <p:with-param name="markup" select="$output-word-tag"/>
     <p:with-param name="markup-attr" select="$word-attr"/>
     <p:with-param name="markup-attr-val" select="$word-attr-val"/>
@@ -56,7 +57,7 @@
     </p:input>
   </p:xslt>
   <cx:message message="word nodes moved down"/>
-  
+
   <!-- 3: merge all the identical nodes of a certain kind -->
   <px:repeat-merge repeat="3"/>
   <cx:message message="formatting nodes merged, iteration-1"/>
@@ -78,7 +79,7 @@
   <cx:message message="formatting nodes merged, iteration-2"/>
   
   <!-- 6: remove the 'mergeable' attribute -->
-  <p:delete match="tmp:mergeable"/>
-  <cx:message message="mergeable temporary attributes removed"/>
+  <p:delete match="@tmp:mergeable"/>
+  <cx:message message="temporary attributes 'mergeable' removed"/>
   
 </p:declare-step>

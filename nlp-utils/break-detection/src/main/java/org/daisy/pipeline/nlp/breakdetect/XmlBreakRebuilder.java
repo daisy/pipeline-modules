@@ -8,6 +8,7 @@ import java.util.Set;
 import net.sf.saxon.s9api.Axis;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
+import net.sf.saxon.s9api.XdmNodeKind;
 import net.sf.saxon.s9api.XdmSequenceIterator;
 
 import org.daisy.pipeline.nlp.LanguageUtils;
@@ -30,6 +31,7 @@ public class XmlBreakRebuilder {
     private XProcRuntime mRuntime;
     private FormatSpecifications mFormatSpecs;
     private long mMergeableID = 0;
+    private boolean mSeenRoot;
 
     public XmlBreakRebuilder(XProcRuntime runtime, LexService lexer) {
         mRuntime = runtime;
@@ -276,11 +278,30 @@ public class XmlBreakRebuilder {
                 currentLanguage = x;
         }
 
-        if (node.getNodeName() != null) {
+        if (node.getNodeKind() == XdmNodeKind.PROCESSING_INSTRUCTION) {
+            tw.addPI(node.getNodeName().getClarkName(), node.getStringValue());
+        } else if (node.getNodeKind() == XdmNodeKind.COMMENT) {
+            tw.addComment(node.getStringValue());
+        } else if (node.getNodeKind() == XdmNodeKind.DOCUMENT) {
+            tw.startDocument(node.getDocumentURI());
+            XdmSequenceIterator iter = node.axisIterator(Axis.CHILD);
+            while (iter.hasNext()) {
+                XdmNode child = (XdmNode) iter.next();
+                rebuildFullTree(tw, child, inlineSections, currentLanguage);
+            }
+            tw.endDocument();
+
+        } else if (node.getNodeKind() == XdmNodeKind.ELEMENT) {
             tw.addStartElement(node);
+
+            // this prevent the namespace from being repeated into children
+            if (!mSeenRoot) {
+                tw.addNamespace(mFormatSpecs.tmpNsPrefix, mFormatSpecs.tmpNsURI);
+                mSeenRoot = true;
+            }
+
             tw.addAttributes(node);
-        }
-        {
+
             LinkedList<XdmNode> concatSection = new LinkedList<XdmNode>();
             XdmSequenceIterator iter = node.axisIterator(Axis.CHILD);
             while (iter.hasNext()) {
@@ -300,9 +321,8 @@ public class XmlBreakRebuilder {
             if (concatSection.size() > 0) {
                 tokenizeInlineSection(tw, concatSection, currentLanguage);
             }
-        }
-        if (node.getNodeName() != null)
             tw.addEndElement();
+        }
     }
 
     /**
@@ -310,17 +330,10 @@ public class XmlBreakRebuilder {
      */
     public XdmNode rebuild(XdmNode document, Set<XdmNode> inlineSections)
             throws SaxonApiException {
-        // generate the output document's start tag
-        XdmNode root = getFirstChild(document);
+
         TreeWriter tw = new TreeWriter(mRuntime);
-        tw.startDocument(document.getDocumentURI());
-
-        // rebuild the tree using the tree writer
-        rebuildFullTree(tw, root, inlineSections, null);
-
-        // generate the output document's end tag and push the result to the
-        // pipeline
-        tw.endDocument();
+        mSeenRoot = false;
+        rebuildFullTree(tw, document, inlineSections, null);
 
         return tw.getResult();
     }
