@@ -2,6 +2,8 @@
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
    <uri name="http://www.daisy.org/pipeline/modules/common-utils/logging-library.xpl"
         uri="../xml/xproc/logging-library.xpl"/>
+   <uri name="http://www.daisy.org/pipeline/modules/common-utils/utils-library.xpl"
+        uri="../xml/xproc/utils-library.xpl"/>
    <uri name="http://www.daisy.org/pipeline/modules/common-utils/numeral-conversion.xsl"
         uri="../xml/xslt/numeral-conversion.xsl"/>
 </catalog>
