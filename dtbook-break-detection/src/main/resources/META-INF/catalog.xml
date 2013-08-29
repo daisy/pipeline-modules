@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
-  <uri name="http://www.daisy.org/pipeline/modules/html-break-detection/html-break-library.xpl"
-       uri="../xml/html-break-library.xpl"/>
+  <uri name="http://www.daisy.org/pipeline/modules/dtbook-break-detection/dtbook-break-library.xpl"
+       uri="../xml/dtbook-break-library.xpl"/>
   
   <nextCatalog catalog="org:daisy:pipeline:modules:break-detection" />
 

@@ -4,4 +4,5 @@
   <nextCatalog catalog="./nlp-utils/break-detection/src/main/resources/META-INF/catalog.xml"/>
   <nextCatalog catalog="./zedai-break-detection/src/main/resources/META-INF/catalog.xml"/>
   <nextCatalog catalog="./html-break-detection/src/main/resources/META-INF/catalog.xml"/>
+  <nextCatalog catalog="./dtbook-break-detection/src/main/resources/META-INF/catalog.xml"/>
 </catalog>

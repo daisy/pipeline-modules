@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
-  <uri name="http://www.daisy.org/pipeline/modules/zedai-break-detection/zedai-break-detect.xpl"
-       uri="../xml/zedai-break-detect.xpl"/>
+  <uri name="http://www.daisy.org/pipeline/modules/zedai-break-detection/zedai-break-library.xpl"
+       uri="../xml/zedai-break-library.xpl"/>
   
   <nextCatalog catalog="org:daisy:pipeline:modules:break-detection" />
 

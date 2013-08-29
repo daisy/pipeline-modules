@@ -39,14 +39,10 @@ public class BreakDetectStep extends DefaultStep {
     private Collection<String> commaTagsOption;
     private Collection<String> spaceTagsOption;
     private Collection<String> endSentenceTagsOption;
-    private String outputNamespace;
+    private String tmpNs;
     private String wordTagOption;
-    private String nameTagOption;
     private String sentenceTagOption;
-    private String wordAttrValOption;
-    private String wordAttrOption;
-    private String sentenceAttrValOption;
-    private String sentenceAttrOption;
+    private String mergeableAttrOption;
     private FormatSpecifications mFormatSpecs;
 
     public BreakDetectStep(XProcRuntime runtime, XAtomicStep step,
@@ -85,20 +81,12 @@ public class BreakDetectStep extends DefaultStep {
             wordTagOption = value.getString();
         } else if ("output-sentence-tag".equalsIgnoreCase(name.getLocalName())) {
             sentenceTagOption = value.getString();
-        } else if ("output-name-tag".equalsIgnoreCase(name.getLocalName())) {
-            nameTagOption = value.getString();
-        } else if ("output-ns".equalsIgnoreCase(name.getLocalName())) {
-            outputNamespace = value.getString();
-        } else if ("sentence-attr".equalsIgnoreCase(name.getLocalName())) {
-            sentenceAttrOption = value.getString();
-        } else if ("sentence-attr-val".equalsIgnoreCase(name.getLocalName())) {
-            sentenceAttrValOption = value.getString();
-        } else if ("word-attr".equalsIgnoreCase(name.getLocalName())) {
-            wordAttrOption = value.getString();
-        } else if ("word-attr-val".equalsIgnoreCase(name.getLocalName())) {
-            wordAttrValOption = value.getString();
+        } else if ("tmp-ns".equalsIgnoreCase(name.getLocalName())) {
+            tmpNs = value.getString();
+        } else if ("mergeable-attr".equalsIgnoreCase(name.getLocalName())) {
+            mergeableAttrOption = value.getString();
         } else {
-            System.err.println("unrecognized option " + name);
+            runtime.error(new RuntimeException("unrecognized option " + name));
         }
     }
 
@@ -139,12 +127,11 @@ public class BreakDetectStep extends DefaultStep {
     public void run() throws SaxonApiException {
         super.run();
 
-        mFormatSpecs = new FormatSpecifications(outputNamespace,
-                sentenceTagOption, sentenceAttrOption, sentenceAttrValOption,
-                wordTagOption, wordAttrOption, wordAttrValOption,
-                nameTagOption, "http://www.w3.org/XML/1998/namespace", "lang",
+        mFormatSpecs = new FormatSpecifications(tmpNs, sentenceTagOption,
+                wordTagOption, "http://www.w3.org/XML/1998/namespace", "lang",
                 inlineTagsOption, periodTagsOption, commaTagsOption,
-                endSentenceTagsOption, spaceTagsOption);
+                endSentenceTagsOption, spaceTagsOption, mergeableAttrOption);
+
         mXmlRebuilder.setFormatSpecifications(mFormatSpecs);
 
         long before = System.currentTimeMillis();

@@ -13,44 +13,28 @@ import net.sf.saxon.s9api.QName;
 public class FormatSpecifications {
 
     public QName sentenceTag;
-    public QName sentenceAttr;
-    public String sentenceAttrVal;
-
     public QName wordTag;
-    public QName wordAttr;
-    public String wordAttrVal;
-
     public String tmpNsPrefix = "tmp";
-    public String tmpNsURI = "http://www.daisy.org/ns/pipeline/tmp";
-    public QName mergeableAttr = new QName(tmpNsPrefix, tmpNsURI, "mergeable");
-    public QName nameTag;
+    public QName mergeableAttr;
     public QName langAttr;
     public Set<String> inlineElements;
     public Set<String> periodEquivalentElements;
     public Set<String> commaEquivalentElements;
     public Set<String> endOfSentenceElements;
     public Set<String> spaceEquivalentElements;
+    public String tmpNs;
 
-    FormatSpecifications(String outputNamespace, String sentenceElement,
-            String sentenceAttr, String sentenceAttrVal, String wordElement,
-            String wordAttr, String wordAttrVal, String nameElement,
-            String langNamespace, String langAttr,
+    FormatSpecifications(String tmpNamespace, String sentenceElement,
+            String wordElement, String langNamespace, String langAttr,
             Collection<String> inlineElements,
             Collection<String> periodEquivalentElements,
             Collection<String> commaEquivalentElements,
             Collection<String> endOfSentenceElements,
-            Collection<String> spaceEquivalentElements) {
+            Collection<String> spaceEquivalentElements, String mergeableAttr) {
 
-        sentenceTag = new QName(outputNamespace, sentenceElement);
-        wordTag = new QName(outputNamespace, wordElement);
-        nameTag = nameElement == null ? null : new QName(outputNamespace,
-                nameElement);
+        sentenceTag = new QName(tmpNamespace, sentenceElement);
+        wordTag = new QName(tmpNamespace, wordElement);
         this.langAttr = new QName(langNamespace, langAttr);
-
-        this.sentenceAttr = new QName("", sentenceAttr);
-        this.sentenceAttrVal = sentenceAttrVal;
-        this.wordAttr = new QName("", wordAttr);
-        this.wordAttrVal = wordAttrVal;
 
         this.inlineElements = new HashSet<String>(inlineElements);
         this.inlineElements.addAll(periodEquivalentElements);
@@ -64,5 +48,9 @@ public class FormatSpecifications {
         this.endOfSentenceElements = new HashSet<String>(endOfSentenceElements);
         this.spaceEquivalentElements = new HashSet<String>(
                 spaceEquivalentElements);
+
+        this.mergeableAttr = new QName(tmpNsPrefix, tmpNamespace, mergeableAttr);
+
+        this.tmpNs = tmpNamespace;
     }
 }

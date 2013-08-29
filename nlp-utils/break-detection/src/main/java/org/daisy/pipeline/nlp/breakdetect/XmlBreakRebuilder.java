@@ -196,34 +196,20 @@ public class XmlBreakRebuilder {
 
         for (Sentence s : sentences) {
             tw.addStartElement(mFormatSpecs.sentenceTag);
-            if (mFormatSpecs.sentenceAttrVal != null
-                    && !mFormatSpecs.sentenceAttrVal.equals("")) {
-                tw.addAttribute(mFormatSpecs.sentenceAttr,
-                        mFormatSpecs.sentenceAttrVal);
-            }
             for (TextReference r : s.content) {
-
                 fillGap(pos, r.firstSegment, r.firstIndex, tw, segments,
                         inlineNodes);
-
                 // TODO: add proper nouns
                 tw.addStartElement(mFormatSpecs.wordTag);
-                if (mFormatSpecs.wordAttrVal != null
-                        && !mFormatSpecs.wordAttrVal.equals("")) {
-                    tw.addAttribute(mFormatSpecs.wordAttr,
-                            mFormatSpecs.wordAttrVal);
-                }
-
                 fillGap(pos, r.lastSegment, r.lastIndex, tw, segments,
                         inlineNodes);
-
-                tw.addEndElement(); // word tag
+                tw.addEndElement();
             }
 
             fillGap(pos, s.boundaries.lastSegment, s.boundaries.lastIndex, tw,
                     segments, inlineNodes);
 
-            tw.addEndElement();// sentence tag
+            tw.addEndElement(); // sentence
         }
 
     }
@@ -253,8 +239,7 @@ public class XmlBreakRebuilder {
         if (sentences.size() > 0)
             rebuildInlineSection(tw, segments, inlineNodes, sentences);
         else {
-            // if there are not sentence, we just rebuild the XML exactly
-            // like it was
+            // if there is no sentence, we rebuild the XML exactly like it was
             for (XdmNode subsection : inlineSection)
                 tw.addSubtree(subsection);
         }
@@ -294,9 +279,10 @@ public class XmlBreakRebuilder {
         } else if (node.getNodeKind() == XdmNodeKind.ELEMENT) {
             tw.addStartElement(node);
 
-            // this prevent the namespace from being repeated into children
+            // this prevents the namespace declaration from being repeated
+            // everywhere
             if (!mSeenRoot) {
-                tw.addNamespace(mFormatSpecs.tmpNsPrefix, mFormatSpecs.tmpNsURI);
+                tw.addNamespace(mFormatSpecs.tmpNsPrefix, mFormatSpecs.tmpNs);
                 mSeenRoot = true;
             }
 

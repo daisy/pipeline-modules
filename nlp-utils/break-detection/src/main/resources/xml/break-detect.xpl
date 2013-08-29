@@ -5,20 +5,15 @@
   
   <p:input port="source" primary="true" />
   <p:output port="result" primary="true" />
-  
+
   <p:option name="inline-tags" required="true"/>
-  <p:option name="output-name-tag" required="false" select="''"/>
   <p:option name="output-word-tag" required="true"/>
-  <p:option name="word-attr" required="false" select="''"/>
-  <p:option name="word-attr-val" required="false" select="''"/>
   <p:option name="output-sentence-tag" required="true"/>
-  <p:option name="sentence-attr" required="false" select="''"/>
-  <p:option name="sentence-attr-val" required="false" select="''"/>
-  <p:option name="output-ns" required="true"/>
-  
+  <p:option name="tmp-ns" required="true"/>
+  <p:option name="mergeable-attr" required="false" select="'mergeable'"/>
   <p:option name="period-tags" required="false" select="''"/>
   <p:option name="comma-tags" required="false" select="''"/>
   <p:option name="end-sentence-tags" required="false" select="''"/>
   <p:option name="space-tags" required="false" select="''"/>
-  
+
 </p:declare-step>
