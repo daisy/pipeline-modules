@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:pf="http://www.daisy.org/ns/pipeline/functions" exclude-result-prefixes="#all"
-    version="2.0" xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:pf="http://www.daisy.org/ns/pipeline/functions" exclude-result-prefixes="#all" version="2.0"
+    xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions">
 
     <xsl:function name="pf:tokenize-uri" as="xs:string*">
         <xsl:param name="uri" as="xs:string?"/>
@@ -14,12 +12,9 @@
             4. query
             5. fragment
         -->
-        <xsl:analyze-string select="concat('X',$uri)"
-            regex="^X(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?">
+        <xsl:analyze-string select="concat('X',$uri)" regex="^X(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?">
             <xsl:matching-substring>
-                <xsl:sequence
-                    select="(regex-group(2),regex-group(4),regex-group(5),regex-group(7),regex-group(9))"
-                />
+                <xsl:sequence select="(regex-group(2),regex-group(4),regex-group(5),regex-group(7),regex-group(9))"/>
             </xsl:matching-substring>
         </xsl:analyze-string>
     </xsl:function>
@@ -36,44 +31,42 @@
             ),'')"
         />
     </xsl:function>
-    
+
     <xsl:function name="pf:is-absolute" as="xs:boolean">
         <xsl:param name="uri" as="xs:string?"/>
         <xsl:variable name="tokens" select="pf:tokenize-uri(normalize-space($uri))"/>
         <xsl:sequence select="starts-with($tokens[3],'/')"/>
     </xsl:function>
-    
+
     <xsl:function name="pf:is-relative" as="xs:boolean">
         <xsl:param name="uri" as="xs:string?"/>
         <xsl:variable name="tokens" select="pf:tokenize-uri(normalize-space($uri))"/>
         <xsl:sequence select="not($tokens[1]) and not(starts-with($tokens[3],'/'))"/>
     </xsl:function>
-    
+
     <xsl:function name="pf:get-scheme" as="xs:string">
         <xsl:param name="uri" as="xs:string?"/>
         <xsl:sequence select="pf:tokenize-uri(normalize-space($uri))[1]"/>
     </xsl:function>
-    
+
     <!--TODO write tests-->
     <xsl:function name="pf:get-path" as="xs:string">
         <xsl:param name="uri" as="xs:string?"/>
         <xsl:sequence select="pf:tokenize-uri(normalize-space($uri))[3]"/>
     </xsl:function>
-    
+
     <!--TODO write tests-->
     <xsl:function name="pf:get-extension" as="xs:string">
         <xsl:param name="uri" as="xs:string?"/>
         <xsl:sequence select="lower-case(replace(pf:get-path($uri),'^.*\.([^.]*)$','$1'))"/>
     </xsl:function>
-    
+
     <!--TODO write tests-->
     <xsl:function name="pf:replace-path" as="xs:string">
         <xsl:param name="uri" as="xs:string?"/>
         <xsl:param name="path" as="xs:string?"/>
         <xsl:variable name="tokens" select="pf:tokenize-uri(normalize-space($uri))" as="xs:string*"/>
-        <xsl:sequence
-            select="pf:recompose-uri(($tokens[1],$tokens[2],pf:normalize-path($path),$tokens[4],$tokens[5]))"
-        />
+        <xsl:sequence select="pf:recompose-uri(($tokens[1],$tokens[2],pf:normalize-path($path),$tokens[4],$tokens[5]))"/>
     </xsl:function>
 
     <xsl:function name="pf:normalize-uri" as="xs:string">
@@ -85,64 +78,69 @@
             - percent-encoding normalization
             - default http port
         -->
-        
+
         <!--
             normalize percent encodings:
              * capitalize
              * decode ALPHA (%41–%5A and %61–%7A), DIGIT (%30–%39), hyphen (%2D), period (%2E), underscore (%5F), and tilde (%7E)
         -->
         <xsl:variable name="uri">
-            <xsl:variable name="cp-base" select="string-to-codepoints('0A')" as="xs:integer+" />
-            <xsl:analyze-string select="$uri" regex="(%[0-9A-F]{{2}})+" flags="i">
-                <xsl:matching-substring>
-                    <!-- capitalize -->
-                    <xsl:variable name="upper-case" select="upper-case(.)"/>
-                    
-                    <!-- decode ALPHA/DIGIT/hyphen/period/underscore/tilde -->
-                    <xsl:variable name="utf8-bytes" as="xs:integer+">
-                        <xsl:analyze-string select="$upper-case" regex="%([0-9A-F]{{2}})" flags="i">
-                            <xsl:matching-substring>
-                                <xsl:variable name="nibble-pair" select="
-                                    for $nibble-char in string-to-codepoints(upper-case(regex-group(1))) return
-                                    if ($nibble-char ge $cp-base[2]) then
-                                    $nibble-char - $cp-base[2] + 10
-                                    else
-                                    $nibble-char - $cp-base[1]" as="xs:integer+" />
-                                <xsl:sequence select="$nibble-pair[1] * 16 + $nibble-pair[2]" />                
-                            </xsl:matching-substring>
-                        </xsl:analyze-string>
-                    </xsl:variable>
-                    
-                    <xsl:value-of select="if ($utf8-bytes = (65 to 90, 97 to 122, 48 to 57, 45, 46, 95, 126)) then codepoints-to-string(pf:utf8-decode($utf8-bytes)) else $upper-case" />
-                </xsl:matching-substring>
-                <xsl:non-matching-substring>
-                    <xsl:value-of select="." />
-                </xsl:non-matching-substring>
-            </xsl:analyze-string>
+            <xsl:choose>
+                <xsl:when test="$uri">
+                    <xsl:variable name="cp-base" select="string-to-codepoints('0A')" as="xs:integer+"/>
+                    <xsl:analyze-string select="$uri" regex="(%[0-9A-F]{{2}})+" flags="i">
+                        <xsl:matching-substring>
+                            <!-- capitalize -->
+                            <xsl:variable name="upper-case" select="upper-case(.)"/>
+
+                            <!-- decode ALPHA/DIGIT/hyphen/period/underscore/tilde -->
+                            <xsl:variable name="utf8-bytes" as="xs:integer+">
+                                <xsl:analyze-string select="$upper-case" regex="%([0-9A-F]{{2}})" flags="i">
+                                    <xsl:matching-substring>
+                                        <xsl:variable name="nibble-pair"
+                                            select="
+                                           for $nibble-char in string-to-codepoints(upper-case(regex-group(1))) return
+                                           if ($nibble-char ge $cp-base[2]) then
+                                           $nibble-char - $cp-base[2] + 10
+                                           else
+                                           $nibble-char - $cp-base[1]"
+                                            as="xs:integer+"/>
+                                        <xsl:sequence select="$nibble-pair[1] * 16 + $nibble-pair[2]"/>
+                                    </xsl:matching-substring>
+                                </xsl:analyze-string>
+                            </xsl:variable>
+
+                            <xsl:value-of select="if ($utf8-bytes = (65 to 90, 97 to 122, 48 to 57, 45, 46, 95, 126)) then codepoints-to-string(pf:utf8-decode($utf8-bytes)) else $upper-case"/>
+                        </xsl:matching-substring>
+                        <xsl:non-matching-substring>
+                            <xsl:value-of select="."/>
+                        </xsl:non-matching-substring>
+                    </xsl:analyze-string>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="$uri"/>
+                </xsl:otherwise>
+            </xsl:choose>
         </xsl:variable>
-        
-        <xsl:variable name="uri" select="$uri"/>
-        
+
         <xsl:variable name="tokens" select="pf:tokenize-uri(normalize-space($uri))" as="xs:string*"/>
         <xsl:variable name="scheme" select="$tokens[1]"/>
         <xsl:variable name="authority" select="$tokens[2]"/>
         <xsl:variable name="path" select="$tokens[3]"/>
         <xsl:variable name="query" select="$tokens[4]"/>
         <xsl:variable name="fragment" select="$tokens[5]"/>
-        
+
         <!-- lower case scheme and authority components -->
         <xsl:variable name="scheme" select="lower-case($scheme)"/>
         <xsl:variable name="authority" select="lower-case($authority)"/>
-        
+
         <!-- remove default port -->
         <xsl:variable name="authority" select="if ($scheme='http' and ends-with($authority,':80')) then substring($authority,1,string-length($authority)-3) else $authority"/>
-        
+
         <!-- normalize path -->
         <xsl:variable name="path" select="pf:normalize-path($path)"/>
-        
-        <xsl:sequence
-            select="iri-to-uri(pf:recompose-uri(($scheme,$authority,$path,$query,$fragment)))"
-        />
+
+        <xsl:sequence select="iri-to-uri(pf:recompose-uri(($scheme,$authority,$path,$query,$fragment)))"/>
     </xsl:function>
 
     <xsl:function name="pf:relativize-uri" as="xs:string">
@@ -152,11 +150,8 @@
         <xsl:variable name="base-tokens" select="pf:tokenize-uri(pf:normalize-uri($base))"/>
 
         <xsl:choose>
-            <xsl:when
-                test="(not($uri-tokens[1]) or $uri-tokens[1]=$base-tokens[1]) and (not($uri-tokens[2]) or $uri-tokens[2]=$base-tokens[2])">
-                <xsl:sequence
-                    select="pf:recompose-uri(('','',pf:relativize-path($uri-tokens[3],$base-tokens[3]),$uri-tokens[4],$uri-tokens[5]))"
-                />
+            <xsl:when test="(not($uri-tokens[1]) or $uri-tokens[1]=$base-tokens[1]) and (not($uri-tokens[2]) or $uri-tokens[2]=$base-tokens[2])">
+                <xsl:sequence select="pf:recompose-uri(('','',pf:relativize-path($uri-tokens[3],$base-tokens[3]),$uri-tokens[4],$uri-tokens[5]))"/>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:sequence select="pf:recompose-uri($uri-tokens)"/>
@@ -178,13 +173,11 @@
                 ,'(^|/)\.\.$','$1../')
             ,'^/(\.\./)+','/')
             "/>
-        <xsl:sequence
-            select="
+        <xsl:sequence select="
             if (matches($normalized,'([^/]|\.[^/]|[^/]\.|[^/]{3,})/\.\./')) then
             pf:normalize-path(replace($normalized,'([^/]|\.[^/]|[^/]\.|[^/]{3,})/\.\./',''))
             else 
-            $normalized"
-        />
+            $normalized"/>
     </xsl:function>
 
     <xsl:function name="pf:relativize-path" as="xs:string">
@@ -215,7 +208,7 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:function>
-    
+
     <xsl:function name="pf:longest-common-uri" as="xs:string">
         <xsl:param name="uris"/>
         <xsl:choose>
@@ -232,75 +225,82 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:function>
-    
+
     <!--
         Taken from: http://stackoverflow.com/questions/13697036/url-query-xml-and-xpath-transform
         This could (should?) be replaced by a native Java-based extension function
     -->
     <xsl:function name="pf:unescape-uri" as="xs:string">
         <xsl:param name="string" as="xs:string?"/>
-        <xsl:variable name="cp-base" select="string-to-codepoints('0A')" as="xs:integer+" />
+        <xsl:variable name="cp-base" select="string-to-codepoints('0A')" as="xs:integer+"/>
         <xsl:variable name="result">
-            
+
             <xsl:analyze-string select="$string" regex="(%[0-9A-F]{{2}})+" flags="i">
                 <xsl:matching-substring>
                     <xsl:variable name="utf8-bytes" as="xs:integer+">
                         <xsl:analyze-string select="." regex="%([0-9A-F]{{2}})" flags="i">
                             <xsl:matching-substring>
-                                <xsl:variable name="nibble-pair" select="
+                                <xsl:variable name="nibble-pair"
+                                    select="
                                     for $nibble-char in string-to-codepoints( upper-case(regex-group(1))) return
                                     if ($nibble-char ge $cp-base[2]) then
                                     $nibble-char - $cp-base[2] + 10
                                     else
-                                    $nibble-char - $cp-base[1]" as="xs:integer+" />
-                                <xsl:sequence select="$nibble-pair[1] * 16 + $nibble-pair[2]" />                
+                                    $nibble-char - $cp-base[1]"
+                                    as="xs:integer+"/>
+                                <xsl:sequence select="$nibble-pair[1] * 16 + $nibble-pair[2]"/>
                             </xsl:matching-substring>
                         </xsl:analyze-string>
                     </xsl:variable>
-                    <xsl:value-of select="codepoints-to-string( pf:utf8-decode( $utf8-bytes))" />
+                    <xsl:value-of select="codepoints-to-string( pf:utf8-decode( $utf8-bytes))"/>
                 </xsl:matching-substring>
                 <xsl:non-matching-substring>
-                    <xsl:value-of select="." />
+                    <xsl:value-of select="."/>
                 </xsl:non-matching-substring>
             </xsl:analyze-string>
         </xsl:variable>
         <xsl:sequence select="string($result)"/>
     </xsl:function>
-    
+
     <xsl:function name="pf:utf8-decode" as="xs:integer*">
-        <xsl:param name="bytes" as="xs:integer*" />
+        <xsl:param name="bytes" as="xs:integer*"/>
         <xsl:choose>
-            <xsl:when test="empty($bytes)" />
-            <xsl:when test="$bytes[1] eq 0"><!-- The null character is not valid for XML. -->
-                <xsl:sequence select="pf:utf8-decode( remove( $bytes, 1))" />
+            <xsl:when test="empty($bytes)"/>
+            <xsl:when test="$bytes[1] eq 0">
+                <!-- The null character is not valid for XML. -->
+                <xsl:sequence select="pf:utf8-decode( remove( $bytes, 1))"/>
             </xsl:when>
             <xsl:when test="$bytes[1] le 127">
-                <xsl:sequence select="$bytes[1], pf:utf8-decode( remove( $bytes, 1))" />
+                <xsl:sequence select="$bytes[1], pf:utf8-decode( remove( $bytes, 1))"/>
             </xsl:when>
             <xsl:when test="$bytes[1] lt 224">
                 <xsl:sequence select="
                     ((($bytes[1] - 192) * 64) +
                     ($bytes[2] - 128)        ),
-                    pf:utf8-decode( remove( remove( $bytes, 1), 1))" />
+                    pf:utf8-decode( remove( remove( $bytes, 1), 1))"/>
             </xsl:when>
             <xsl:when test="$bytes[1] lt 240">
-                <xsl:sequence select="
+                <xsl:sequence
+                    select="
                     ((($bytes[1] - 224) * 4096) +
                     (($bytes[2] - 128) *   64) +
                     ($bytes[3] - 128)          ),
-                    pf:utf8-decode( remove( remove( remove( $bytes, 1), 1), 1))" />
+                    pf:utf8-decode( remove( remove( remove( $bytes, 1), 1), 1))"
+                />
             </xsl:when>
             <xsl:when test="$bytes[1] lt 248">
-                <xsl:sequence select="
+                <xsl:sequence
+                    select="
                     ((($bytes[1] - 224) * 262144) +
                     (($bytes[2] - 128) *   4096) +
                     (($bytes[3] - 128) *     64) +
                     ($bytes[4] - 128)            ),
-                    pf:utf8-decode( $bytes[position() gt 4])" />
+                    pf:utf8-decode( $bytes[position() gt 4])"
+                />
             </xsl:when>
             <xsl:otherwise>
                 <!-- Code-point valid for XML. -->
-                <xsl:sequence select="pf:utf8-decode( remove( $bytes, 1))" />
+                <xsl:sequence select="pf:utf8-decode( remove( $bytes, 1))"/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:function>
