@@ -59,6 +59,7 @@
                         <p:pipe port="in-memory.in" step="main"/>
                     </p:input>
                 </p:split-sequence>
+                <p:split-sequence test="position()=1" initial-only="true"/>
                 <p:delete match="/*/@xml:base"/>
                 <p:choose>
                     <p:when test="starts-with($media-type,'text/') and not(starts-with($media-type,'text/xml'))">
@@ -125,9 +126,19 @@
                         <cx:message>
                             <p:with-option name="message" select="concat('Making directory: ',substring-after($target-dir, $fileset-base))"/>
                         </cx:message>
-                        <px:mkdir>
-                            <p:with-option name="href" select="$target-dir"/>
-                        </px:mkdir>
+                        <p:try>
+                            <p:group>
+                                <px:mkdir>
+                                    <p:with-option name="href" select="$target-dir"/>
+                                </px:mkdir>
+                            </p:group>
+                            <p:catch>
+                                <cx:message>
+                                    <p:with-option name="message" select="concat('Could not create directory: ',substring-after($target-dir, $fileset-base))"/>
+                                </cx:message>
+                                <p:sink/>
+                            </p:catch>
+                        </p:try>
                     </p:when>
                     <p:when test="not(/info/c:directory)">
                         <!--TODO rename the error-->
