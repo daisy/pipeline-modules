@@ -77,12 +77,6 @@
   <!-- 5: merge all the identical nodes of a certain kind -->
   <px:repeat-merge name="merge2" repeat="3"/>
   <cx:message message="formatting nodes merged, iteration-2"/>
-  <p:store indent="true" href="file:///tmp/aftermerge2.xml"/>
-  <p:identity>
-    <p:input port="source">
-      <p:pipe port="result" step="merge2"/>
-    </p:input>
-  </p:identity>  
 
   <!-- 6: create the actual sentence/words element -->
   <p:xslt name="create-valid">
