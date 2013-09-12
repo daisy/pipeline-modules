@@ -12,8 +12,8 @@
     <relativePath>../../</relativePath>
   </parent>
 
+  <version>1.0.0-SNAPSHOT</version>
   <artifactId>tts-adapter-espeak</artifactId>
-  <version>1.0-SNAPSHOT</version>
   <packaging>bundle</packaging>
 
   <name>DAISY Pipeline 2 module :: TTS Adapter for ESpeak</name>
@@ -23,7 +23,6 @@
     <dependency>
       <groupId>org.daisy.pipeline.modules</groupId>
       <artifactId>tts-common</artifactId>
-      <version>1.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
   

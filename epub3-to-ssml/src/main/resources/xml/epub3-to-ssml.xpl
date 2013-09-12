@@ -1,30 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" xmlns:c="http://www.w3.org/ns/xproc-step"
-    xmlns:px="http://www.daisy.org/ns/pipeline/xproc" name="main" type="px:epub3-to-ssml"
-    version="1.0">
+<p:declare-step type="px:epub3-to-ssml" version="1.0"
+		xmlns:p="http://www.w3.org/ns/xproc"
+		xmlns:c="http://www.w3.org/ns/xproc-step"
+		xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+		xmlns:cx="http://xmlcalabash.com/ns/extensions"
+		exclude-inline-prefixes="#all"
+		name="main">
 
-    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-        <p>Pipes a verbatime copy of its input on its output, while logging a 'Hello World'
-            message.</p>
+    <p:documentation>
+      <p>Specialization of the SSML generation for EPUB3</p>
     </p:documentation>
+    
+    <p:input port="fileset.in" sequence="false"/>
+    <p:input port="content.in" primary="true" sequence="false"/>
+        
+    <p:output port="content.out" sequence="false">
+      <p:pipe port="content.out" step="ssml-gen" />
+    </p:output>
+    
+    <p:output port="ssml.out" primary="true" sequence="true">
+      <p:pipe port="ssml.out" step="ssml-gen" />
+    </p:output>
 
-    <!--=========================================================================-->
-    <!-- STEP SIGNATURE                                                          -->
-    <!--=========================================================================-->
+    <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>    
+    <p:import href="http://www.daisy.org/pipeline/modules/text-to-ssml/text-to-ssml.xpl" />
+    
+    <px:text-to-ssml name="ssml-gen">
+      <p:input port="fileset.in">
+	<p:pipe port="fileset.in" step="main"/>
+      </p:input>
+      <p:input port="content.in">
+	<p:pipe port="content.in" step="main"/>
+      </p:input>
+      <p:with-option name="section-element" select="'body'"/>
+      <p:with-option name="sentence-element" select="'span'"/>
+      <p:with-option name="sentence-attr" select="'role'"/>
+      <p:with-option name="sentence-attr-val" select="'sentence'"/>
+      <p:with-option name="word-element" select="'span'"/>
+      <p:with-option name="word-attr" select="'role'"/>
+      <p:with-option name="word-attr-val" select="'word'"/>
+    </px:text-to-ssml>
 
-    <p:input port="source"/>
-    <p:output port="result"/>
-
-    <!--=========================================================================-->
-    <!-- IMPORTS                                                                 -->
-    <!--=========================================================================-->
-
-    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/logging-library.xpl"/>
-
-    <!--=========================================================================-->
-    <!-- IMPLEMEMTATION BODY                                                     -->
-    <!--=========================================================================-->
-
-    <px:message message="Hello World!"/>
-
+    <cx:message message="End SSML generation for EPUB3"/>
+    <p:sink/>
+    
 </p:declare-step>

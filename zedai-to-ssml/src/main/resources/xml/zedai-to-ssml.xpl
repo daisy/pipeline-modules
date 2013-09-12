@@ -1,30 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" xmlns:c="http://www.w3.org/ns/xproc-step"
-    xmlns:px="http://www.daisy.org/ns/pipeline/xproc" name="main" type="px:zedai-to-ssml"
-    version="1.0">
+<p:declare-step type="px:zedai-to-ssml" version="1.0"
+		xmlns:p="http://www.w3.org/ns/xproc"
+		xmlns:c="http://www.w3.org/ns/xproc-step"
+		xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+		xmlns:cx="http://xmlcalabash.com/ns/extensions"
+		exclude-inline-prefixes="#all"
+		name="main">
 
-    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-        <p>Pipes a verbatime copy of its input on its output, while logging a 'Hello World'
-            message.</p>
+    <p:documentation>
+      <p>Specialization of the SSML generation for Zedai</p>
     </p:documentation>
+    
+    <p:input port="fileset.in" sequence="false"/>
+    <p:input port="content.in" primary="true" sequence="false"/>
+        
+    <p:output port="content.out" sequence="false">
+      <p:pipe port="content.out" step="ssml-gen" />
+    </p:output>
+    
+    <p:output port="ssml.out" primary="true" sequence="true">
+      <p:pipe port="ssml.out" step="ssml-gen" />
+    </p:output>
+    
+    <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/text-to-ssml/text-to-ssml.xpl" />
+    
+    <px:text-to-ssml name="ssml-gen">
+      <!-- output ssml.out and content.out -->
+      <p:input port="fileset.in">
+	<p:pipe port="fileset.in" step="main"/>
+      </p:input>
+      <p:input port="content.in">
+	<p:pipe port="content.in" step="main"/>
+      </p:input>
+      <p:with-option name="section-element" select="'section'"/>
+      <p:with-option name="sentence-element" select="'s'"/>
+      <p:with-option name="word-element" select="'w'"/>
+    </px:text-to-ssml>
 
-    <!--=========================================================================-->
-    <!-- STEP SIGNATURE                                                          -->
-    <!--=========================================================================-->
-
-    <p:input port="source"/>
-    <p:output port="result"/>
-
-    <!--=========================================================================-->
-    <!-- IMPORTS                                                                 -->
-    <!--=========================================================================-->
-
-    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/logging-library.xpl"/>
-
-    <!--=========================================================================-->
-    <!-- IMPLEMEMTATION BODY                                                     -->
-    <!--=========================================================================-->
-
-    <px:message message="Hello World!"/>
-
+    <cx:message message="End SSML generation for ZedAI"/><p:sink/>
+    
 </p:declare-step>

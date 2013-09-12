@@ -11,11 +11,58 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
 
+  <version>1.0.0-SNAPSHOT</version>
   <artifactId>ssml-to-audio</artifactId>
-  <version>1.0-SNAPSHOT</version>
   <packaging>bundle</packaging>
+  
+  <name>DAISY Pipeline 2 module :: SSML to Audio clips</name>
+  <description>Convert SSML to a list of Audio Clips</description>
 
-  <name>DAISY Pipeline 2 module :: SMIL+SSML to SMIL+Audio</name>
-  <description>Narrates SMIL+SSML fragments with TTS.</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.daisy.pipeline.modules</groupId>
+      <artifactId>tts-common</artifactId>
+    </dependency>
+      
+    <dependency>
+      <groupId>org.daisy.pipeline.modules</groupId>
+      <artifactId>audio-common</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+    </dependency>    
+
+    <!-- needed to use com.xmlcalabash.library.DefaultStep ... -->
+    <dependency>
+      <groupId>org.daisy.libs</groupId>
+      <artifactId>com.xmlcalabash</artifactId>
+      <version>1.0.3</version>
+    </dependency>
+   
+    <!-- needed to use org.daisy.common.xproc.calabash.XProcStepProvider -->
+    <dependency>
+      <groupId>org.daisy.pipeline</groupId>
+      <artifactId>calabash-adapter</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.sf.saxon</groupId>
+      <artifactId>Saxon-HE</artifactId>
+      <version>9.4</version>
+    </dependency>
+  </dependencies>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Service-Component>OSGI-INF/synthesize.xml</Service-Component>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>

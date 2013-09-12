@@ -8,6 +8,6 @@
       unbind="removeTTS"
       cardinality="0..n"
       interface="org.daisy.pipeline.tts.TTSService"
-      name="tts-service"
+      name="TTSService"
       policy="dynamic"/>
 </scr:component>

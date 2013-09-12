@@ -12,9 +12,9 @@
     <relativePath>../../</relativePath>
   </parent>
 
+  <version>1.0.0-SNAPSHOT</version>
   <artifactId>tts-common</artifactId>
-  <version>1.0-SNAPSHOT</version>
-  <packaging>bundle</packaging>
+  <packaging>bundle</packaging>  
 
   <name>DAISY Pipeline 2 module :: TTS API</name>
   <description>Common API for TTS functionality</description>
@@ -32,5 +32,22 @@
       </plugin>
     </plugins>
   </build>
+
+  <dependencies>
+    <!--  for its Multimap -->
+    <dependency>
+      <groupId>com.googlecode.guava-osgi</groupId>
+      <artifactId>guava-osgi</artifactId>
+      <version>11.0.1</version>
+    </dependency>
+  	
+  
+    <!-- the TTS service interface uses XdmNode -->
+    <dependency>
+      <groupId>net.sf.saxon</groupId>
+      <artifactId>Saxon-HE</artifactId>
+      <version>9.4</version>
+    </dependency>
+  </dependencies>
 
 </project>

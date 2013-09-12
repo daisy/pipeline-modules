@@ -3,5 +3,10 @@
 
   <uri name="http://www.daisy.org/pipeline/modules/ssml-to-audio/ssml-to-audio.xpl"
     uri="../xml/ssml-to-audio.xpl"/>
+  
+  <uri name="http://www.daisy.org/pipeline/modules/ssml-to-audio/create-audio-fileset.xpl"
+       uri="../xml/create-audio-fileset.xpl"/>
+
+  <nextCatalog catalog="org:daisy:pipeline:modules:fileset-utils" />
 
 </catalog>
