@@ -93,8 +93,6 @@ public class InlineCSSStep extends DefaultStep {
 	public void run() throws SaxonApiException {
 		super.run();
 
-		mRuntime.info(this, null, "version 11");
-
 		SupportedCSS supportedCSS = SupportedCSS21.getInstance();
 		CSSFactory.registerSupportedCSS(supportedCSS);
 		if (!supportedCSS.isSupportedMedia(mMediumOption)) {
