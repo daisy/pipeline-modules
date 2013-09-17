@@ -4,5 +4,5 @@
        uri="../xml/text-to-ssml.xpl"/>
 
     <nextCatalog catalog="org:daisy:pipeline:modules:css-speech" />
-
+    <nextCatalog catalog="org:daisy:pipeline:modules:fileset-utils"/>
 </catalog>

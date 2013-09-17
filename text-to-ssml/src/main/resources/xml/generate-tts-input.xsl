@@ -9,12 +9,16 @@
 
   <!--======================================================================= -->
   <!-- Create a SSML file for every future TTS thread. The SSML files will -->
-  <!-- contain a list of SSML sentences. Each one carries the CSS properties -->
-  <!-- inherited from their parents. The CSS cues and pauses are all -->
-  <!-- handled in this script, including the ones inside the -->
-  <!-- sentences. Aside the pauses and cues, the sentences' content is left -->
-  <!-- unchanged. -->
+  <!-- contain a list of SSML sentences. Each one carries the CSS -->
+  <!-- properties inherited from their parents. The CSS cues and pauses are -->
+  <!-- all handled by this script, including the ones inside the -->
+  <!-- sentences. Aside from the pauses and the cues, the sentences' -->
+  <!-- content is left unchanged. -->
+  <!-- For now, cues' location are relative to the CSS sheet location. -->
   <!--======================================================================= -->
+
+  <xsl:param name="css-sheet-uri"/>
+  <xsl:variable name="css-sheet-dir" select="substring-before($css-sheet-uri, tokenize($css-sheet-uri, '/')[last()])"/>
 
   <xsl:variable name="tmp-ns" select="'http://www.daisy.org/ns/pipeline/tmp'"/>
 
@@ -23,9 +27,9 @@
       <xsl:for-each-group select="//ssml:s" group-adjacent="@thread-id">
 	<ssml:speak>
 	  <xsl:for-each select="current-group()">
-	    
+
 	    <ssml:s>
-	      
+
 	      <!-- pauses and cues before -->
 	      <xsl:choose>
 		<xsl:when test="not(current()/preceding-sibling::*[1])">
@@ -35,7 +39,7 @@
 		  <xsl:apply-templates select="current()/preceding::*[1]" mode="prev"/>
 		</xsl:otherwise>
 	      </xsl:choose>
-	      
+
 	      <!-- Project the parents' CSS properties on the sentence -->
 	      <xsl:copy-of select="@*"/>
 	      <xsl:apply-templates select="current()" mode="project-css-properties">
@@ -44,14 +48,14 @@
 	      <xsl:attribute namespace="http://www.w3.org/XML/1998/namespace" name="lang">
 		<xsl:value-of select="current()/ancestor-or-self::*[@xml:lang][1]/@xml:lang"/>
 	      </xsl:attribute>
-	      
+
 	      <!-- sentence content -->
 	      <xsl:apply-templates select="current()/node()" mode="inside-sentence"/>
-	      <ssml:break time="250ms"/> 
-	      
+	      <ssml:break time="250ms"/>
+
 	      <!-- pauses and cues after -->
 	      <xsl:apply-templates select="current()/*[1]" mode="next"/>
-	      
+
 	    </ssml:s>
 	  </xsl:for-each>
 	</ssml:speak>
@@ -109,14 +113,23 @@
   </xsl:template>
 
   <xsl:template match="@*" mode="pause">
-    <!-- a faster way would be to output <audio src="long_blank.mp3" clipBegin=0 clipEnd=@pause-after> -->
     <ssml:break time="{.}"/>
   </xsl:template>
 
   <xsl:template match="@*" mode="cue">
-    <ssml:audio src="{.}"/>
+    <xsl:variable name="abs-uri" select="resolve-uri(., $css-sheet-dir)"/>
+    <xsl:if test="starts-with($abs-uri, 'file:/')">
+      <xsl:choose>
+    	<xsl:when test="starts-with($abs-uri, 'file:///')">
+    	  <ssml:audio src="{substring-after($abs-uri, 'file://')}"/>
+    	</xsl:when>
+    	<xsl:otherwise>
+    	  <ssml:audio src="{substring-after($abs-uri, 'file:')}"/>
+    	</xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
   </xsl:template>
-  
+
   <xsl:template match="*" mode="project-css-properties">
     <xsl:param name="properties"/>
     <xsl:if test="$properties != ''">
@@ -132,6 +145,6 @@
       </xsl:apply-templates>
     </xsl:if>
   </xsl:template>
-      
+
 </xsl:stylesheet>
 

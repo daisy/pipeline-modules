@@ -51,6 +51,16 @@ public class InlineCSSStep extends DefaultStep {
 	private ReadablePipe mSource = null;
 	private WritablePipe mResult = null;
 	private XProcRuntime mRuntime;
+	private boolean mFirst = true;
+
+	private static SupportedCSS mSupportedCSS;
+
+	static {
+		mSupportedCSS = SupportedCSS21.getInstance();
+		CSSFactory.registerSupportedCSS(mSupportedCSS);
+		CSSFactory
+		        .registerDeclarationTransformer(new SpeechDeclarationTransformer());
+	}
 
 	public InlineCSSStep(XProcRuntime runtime, XAtomicStep step) {
 		super(runtime, step);
@@ -88,14 +98,10 @@ public class InlineCSSStep extends DefaultStep {
 		mResult.resetWriter();
 	}
 
-	private boolean mFirst = true;
-
 	public void run() throws SaxonApiException {
 		super.run();
 
-		SupportedCSS supportedCSS = SupportedCSS21.getInstance();
-		CSSFactory.registerSupportedCSS(supportedCSS);
-		if (!supportedCSS.isSupportedMedia(mMediumOption)) {
+		if (!mSupportedCSS.isSupportedMedia(mMediumOption)) {
 			mRuntime.getMessageListener().error(
 			        new Throwable("medium '" + mMediumOption
 			                + "' is not supported"));

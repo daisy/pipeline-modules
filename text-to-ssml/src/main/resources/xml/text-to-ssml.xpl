@@ -6,7 +6,6 @@
 		xmlns:ssml="http://www.w3.org/2001/10/synthesis"
 		name="main"
 		exclude-inline-prefixes="#all">
-	
 
   <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/xproc/fileset-library.xpl"/>
   <p:import href="http://www.daisy.org/pipeline/modules/css-speech/inline-css.xpl"/>
@@ -15,7 +14,7 @@
   <p:documentation>
     Generate the TTS input, as SSML snippets.
   </p:documentation>
-  
+
   <p:input port="fileset.in" sequence="false"/>
   <p:input port="content.in" sequence="false" primary="true">
     <p:documentation>The content document (e.g. a Zedai document)</p:documentation>
@@ -23,7 +22,7 @@
   <p:input port="sentence-ids" sequence="false" >
     <p:documentation>The list of the sentence ids, generated the lexing.</p:documentation>
   </p:input>
-  
+
   <p:output port="result" sequence="true" primary="true">
     <p:pipe port="result" step="docs-extract"/>
   </p:output>
@@ -74,7 +73,7 @@
       <cx:message message="No CSS sheet given"/>
     </p:otherwise>
   </p:choose>
-    
+
  <!-- replace sentences and words with their SSML counterpart so that it -->
  <!-- will be much simpler and faster to apply transformations after. -->
   <p:xslt name="normalize">
@@ -104,17 +103,14 @@
 
   <!-- TODO: conversion of elements such as span role="address" -->
   <!-- better use a XSLT URI as an option, because this example is Zedai specific -->
-    
   <p:xslt name="gen-input">
-    <p:input port="parameters">
-      <p:empty/>
-    </p:input>
+    <p:with-param  name="css-sheet-uri" select="$css-sheet-uri"/>
     <p:input port="stylesheet">
       <p:document href="generate-tts-input.xsl"/>
     </p:input>
   </p:xslt>
   <cx:message message="TTS document input skeletons generated"/>
-    
+
   <p:xslt name="css-convert">
     <p:input port="parameters">
       <p:empty/>
@@ -124,14 +120,14 @@
     </p:input>
   </p:xslt>
   <cx:message message="CSS properties converted to SSML"/><p:sink/>
-  
+
   <!-- ============================================================== -->
   <!-- DO SOME TEXT-TO-SSML CONVERSIONS USING THE LEXICONS -->
   <!-- ============================================================== -->
-  
+
   <p:variable name="provided-lexicons" select="'provided'"/>
-  <p:variable name="builtin-lexicons" select="'builtins'"/>  
-  
+  <p:variable name="builtin-lexicons" select="'builtins'"/>
+
   <!-- iterate over the fileset to extract the lexicons URI, then load them -->
   <!-- from the disk -->
   <p:for-each>
@@ -158,7 +154,7 @@
     <p:with-option name="wrapper" select="$provided-lexicons"/>
   </p:wrap-sequence>
   <cx:message message="got the lexicons URI"/><p:sink/>
-  
+
   <!-- find all the languages actually used -->
   <p:xslt name="list-lang">
     <p:input port="source">
@@ -218,7 +214,7 @@
     <p:with-option name="wrapper" select="$builtin-lexicons"/>
   </p:wrap-sequence>
   <cx:message message="lexicons read from the disk"/><p:sink/>
-  
+
   <p:xslt name="pls">
     <p:input port="source">
       <p:pipe port="result" step="css-convert"/>
@@ -233,10 +229,10 @@
   </p:xslt>
 
   <cx:message message="PLS info converted to SSML"/>
-  
+
   <!-- split the result to extract the wrapped SSML files -->
   <p:filter name="docs-extract">
     <p:with-option name="select" select="'//ssml:speak'"/>
   </p:filter>
-  
+
 </p:declare-step>
