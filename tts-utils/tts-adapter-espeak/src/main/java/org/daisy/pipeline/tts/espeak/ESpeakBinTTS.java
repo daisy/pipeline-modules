@@ -9,6 +9,7 @@ import javax.sound.sampled.AudioSystem;
 
 import net.sf.saxon.s9api.XdmNode;
 
+import org.daisy.pipeline.tts.SSMLUtil;
 import org.daisy.pipeline.tts.TTSService;
 
 /**
@@ -64,7 +65,7 @@ public class ESpeakBinTTS implements TTSService {
 				// '-w' tells to dump the result to a WAV file
 				cmd = new String[]{
 				        mEspeakPath, "-m", "-w", dest.getAbsolutePath(),
-				        "\"" + ssml.toString() + "\""
+				        "\"" + SSMLUtil.toStringNoPrefix(ssml) + "\""
 				};
 				Runtime.getRuntime().exec(cmd).waitFor();
 			} catch (Exception e) {
