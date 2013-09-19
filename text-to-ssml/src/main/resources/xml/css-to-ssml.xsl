@@ -35,7 +35,7 @@
       <xsl:apply-templates select="." mode="css1"/>
     </xsl:copy>
   </xsl:template>
-  
+
   <xsl:template match="*" mode="css-child">
     <xsl:apply-templates select="." mode="css1"/>
   </xsl:template>
@@ -125,16 +125,16 @@
   <xsl:template match="*" mode="css-end">
     <xsl:apply-templates select="node()" mode="css-child"/>
   </xsl:template>
-  <xsl:template match="*[@voice-famility]" mode="css7">
-    <xsl:variable name="voice-info" select="substring-after(tmp:normlist(@tmp:voice-family), '|')"/>    
+  <xsl:template match="*[@tmp:voice-family]" mode="css7">
+    <xsl:variable name="voice-info" select="substring-after(tmp:normlist(@tmp:voice-family), '|')"/> <!-- first element is the TTS engine -->
     <xsl:choose>
       <xsl:when test="$voice-info">
-	<ssml:voice>	  
-	  <xsl:variable name="names" select="translate(translate(translate(translate($voice-info, 'neutral',''), 'male',''), 'female',''), '|', ' ')"/>
+	<ssml:voice>
+	  <xsl:variable name="names" select="translate(replace(replace(replace($voice-info, 'neutral', ''), 'male', ''), 'female', ''), '|', ' ')"/>
 
 	  <xsl:choose>
-	    <xsl:when test="translate($names,' ','') != ''">
-	      <xsl:attribute name="name"><xsl:value-of select="$names"/></xsl:attribute>
+	    <xsl:when test="translate($names, ' ', '') != ''">
+	      <xsl:attribute name="name"><xsl:value-of select="translate($names, ' ', '')"/></xsl:attribute>
 	    </xsl:when>
 	    <xsl:when test="contains($voice-info, 'male')">
 	      <xsl:attribute name="gender"><xsl:value-of select="'male'"/></xsl:attribute>

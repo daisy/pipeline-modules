@@ -1,4 +1,4 @@
-package org.daisy.pipeline.tts.espeak;
+package org.daisy.pipeline.tts.att;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,23 +16,26 @@ import org.daisy.pipeline.tts.SSMLUtil;
 import org.daisy.pipeline.tts.TTSService;
 
 /**
- * This synthesizer uses directly the espeak binary and intermediate WAV files.
+ * This synthesizer uses directly the AT&T's client binary and intermediate WAV
+ * files.
+ * 
+ * Before any conversion, run $HOME/ATT/bin/TTSServer -m 40 -c {mPort} -config
+ * your-tts-conf.cfg
  */
-public class ESpeakBinTTS implements TTSService {
-
+public class LinuxATT4 implements TTSService {
 	private AudioFormat mAudioFormat;
-	private String mEspeakPath;
+	private String mATTPath;
+	private int mPort;
+	private int mSampleRate;
 	private SSMLAdapter mSSMLAdapter = new BasicSSMLAdapter() {
 		@Override
 		public QName adaptElement(QName elementName) {
-			if (elementName.getLocalName().equals("mark"))
-				return null;
 			return new QName(null, elementName.getLocalName());
 		}
 
 		@Override
 		public QName adaptAttributeName(QName element, QName attrName,
-		        String value) {
+		        final String value) {
 			if (attrName.getLocalName().equals("lang")) {
 				return attrName;
 			}
@@ -40,28 +43,29 @@ public class ESpeakBinTTS implements TTSService {
 				return null;
 			return new QName(null, attrName.getLocalName());
 		}
+
+		@Override
+		public String adaptAttributeValue(QName element, QName attrName,
+		        String value) {
+			if (attrName.getLocalName().equals("lang") && !value.contains("_")) {
+				value = value.replaceAll("[^0-9a-zA-Z]+", "_");
+				if (!value.contains("_")) {
+					if (value.equals("en"))
+						value = value.concat("_us");
+					else
+						value = value.concat("_" + value); //e.g 'fr' => 'fr_fr'
+				}
+			}
+			return value;
+		}
 	};
 
-	private static String findExecutableOnPath(String executableName) {
-		String systemPath = System.getenv("PATH");
-		String[] pathDirs = systemPath.split(File.pathSeparator);
-
-		File fullyQualifiedExecutable = null;
-		for (String pathDir : pathDirs) {
-			File file = new File(pathDir, executableName);
-			if (file.isFile()) {
-				fullyQualifiedExecutable = file;
-				break;
-			}
-		}
-		return fullyQualifiedExecutable.getAbsolutePath();
-	}
-
-	//TODO: take the path from the properties if it exists
-	//and raise an exception if nothing is found
-	public ESpeakBinTTS() {
-		mAudioFormat = new AudioFormat(22050, 16, 1, true, false);
-		mEspeakPath = findExecutableOnPath("espeak");
+	//TODO: read the path, the port and the audio format from a configuration file
+	public LinuxATT4() {
+		mSampleRate = 16000;
+		mAudioFormat = new AudioFormat(mSampleRate, 16, 1, true, false);
+		mPort = 8888;
+		mATTPath = System.getProperty("user.home") + "/ATT/bin/TTSClientFile";
 	}
 
 	@Override
@@ -73,21 +77,28 @@ public class ESpeakBinTTS implements TTSService {
 			dest = (File) lastCallMemory;
 		} else {
 			try {
-				dest = File.createTempFile("espeak",
+				dest = File.createTempFile("att",
 				        Long.toString(System.nanoTime()));
 			} catch (IOException e) {
 				throw new SynthesisException(e.getMessage(), e.getCause());
 			}
 
+			ssml.toString();
+
 			String[] cmd = null;
 			try {
-				// '-m' tells to interpret the input as SSML
-				// '-w' tells to dump the result to a WAV file
 				cmd = new String[]{
-				        mEspeakPath, "-m", "-w", dest.getAbsolutePath(),
-				        "\"" + SSMLUtil.toString(ssml, mSSMLAdapter) + "\""
+				        mATTPath, "-ssml", "-v0", "-p", String.valueOf(mPort),
+				        "-r", String.valueOf(mSampleRate), "-o",
+				        dest.getAbsolutePath()
 				};
-				Runtime.getRuntime().exec(cmd).waitFor();
+				Process p = Runtime.getRuntime().exec(cmd);
+				//TODO: deal with SSML longer than 500 bytes
+				p.getOutputStream()
+				        .write(SSMLUtil.toString(ssml, mSSMLAdapter).getBytes(
+				                "UTF-8"));
+				p.getOutputStream().close();
+				p.waitFor();
 			} catch (Exception e) {
 				throw new SynthesisException(e.getMessage(), e.getCause());
 			}
@@ -114,7 +125,11 @@ public class ESpeakBinTTS implements TTSService {
 			}
 			fi.close();
 		} catch (Exception e) {
-			throw new SynthesisException(e.getMessage(), e.getCause());
+			if (e.getMessage() == null)
+				throw new SynthesisException(e.getClass().getSimpleName(),
+				        e.getCause());
+			else
+				throw new SynthesisException(e.getMessage(), e.getCause());
 		} finally {
 			dest.delete();
 		}
@@ -129,7 +144,7 @@ public class ESpeakBinTTS implements TTSService {
 
 	@Override
 	public String getName() {
-		return "espeak";
+		return "att";
 	}
 
 	@Override
@@ -139,7 +154,7 @@ public class ESpeakBinTTS implements TTSService {
 		}
 
 		if (lang.startsWith("en")) {
-			return 2;
+			return 3;
 		}
 		return 1;
 	}

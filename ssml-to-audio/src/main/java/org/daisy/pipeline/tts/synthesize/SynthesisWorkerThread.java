@@ -172,8 +172,8 @@ public class SynthesisWorkerThread extends Thread implements
 		} catch (Exception e) {
 			StringWriter sw = new StringWriter();
 			e.printStackTrace(new PrintWriter(sw));
-			mLogger.printInfo("error in synthesis thread: " + e + " "
-			        + sw.toString());
+			mLogger.printInfo("error in synthesis thread: " + e.getMessage()
+			        + " : " + sw.toString());
 		}
 	}
 }

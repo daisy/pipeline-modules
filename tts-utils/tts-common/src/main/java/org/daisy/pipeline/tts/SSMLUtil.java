@@ -1,38 +1,55 @@
 package org.daisy.pipeline.tts;
 
 import net.sf.saxon.s9api.Axis;
+import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmNodeKind;
 import net.sf.saxon.s9api.XdmSequenceIterator;
 
 public class SSMLUtil {
-	private static void toStringNoPrefix(XdmNode ssml, StringBuilder sb) {
+	private static void toString(XdmNode ssml, StringBuilder sb,
+	        SSMLAdapter adapter) {
 		if (ssml.getNodeKind() == XdmNodeKind.TEXT) {
 			sb.append(ssml.getStringValue());
 		} else if (ssml.getNodeKind() == XdmNodeKind.ELEMENT) {
-			sb.append("<" + ssml.getNodeName().getLocalName());
-			XdmSequenceIterator iter = ssml.axisIterator(Axis.ATTRIBUTE);
-			while (iter.hasNext()) {
-				sb.append(" ");
-				XdmNode node = (XdmNode) iter.next();
-				if (node.getNodeName().getLocalName().equals("lang"))
-					sb.append(" xml:");
-				sb.append(node.getNodeName().getLocalName() + "=\""
-				        + node.getStringValue() + "\"");
+			QName elementName = adapter.adaptElement(ssml.getNodeName());
+			if (elementName != null) {
+				sb.append("<" + elementName.toString());
+				XdmSequenceIterator iter = ssml.axisIterator(Axis.ATTRIBUTE);
+				while (iter.hasNext()) {
+					sb.append(" ");
+					XdmNode node = (XdmNode) iter.next();
+					QName attrName = adapter.adaptAttributeName(
+					        ssml.getNodeName(), node.getNodeName(),
+					        node.getStringValue());
+					if (attrName != null)
+						sb.append(attrName.toString()
+						        + "=\""
+						        + adapter.adaptAttributeValue(
+						                ssml.getNodeName(), node.getNodeName(),
+						                node.getStringValue()) + "\"");
+				}
+				sb.append(">");
 			}
-			sb.append(">");
 
-			iter = ssml.axisIterator(Axis.CHILD);
+			XdmSequenceIterator iter = ssml.axisIterator(Axis.CHILD);
 			while (iter.hasNext()) {
-				toStringNoPrefix((XdmNode) iter.next(), sb);
+				toString((XdmNode) iter.next(), sb, adapter);
 			}
-			sb.append("</" + ssml.getNodeName().getLocalName() + ">");
+
+			if (elementName != null) {
+				sb.append("</" + elementName.toString() + ">");
+			}
 		}
 	}
 
-	public static String toStringNoPrefix(XdmNode ssml) {
+	public static String toString(XdmNode ssml, SSMLAdapter adapter) {
+		if (adapter == null)
+			adapter = new BasicSSMLAdapter();
 		StringBuilder sb = new StringBuilder();
-		toStringNoPrefix(ssml, sb);
+		sb.append(adapter.getHeader());
+		toString(ssml, sb, adapter);
+		sb.append(adapter.getFooter());
 		return sb.toString();
 	}
 }
