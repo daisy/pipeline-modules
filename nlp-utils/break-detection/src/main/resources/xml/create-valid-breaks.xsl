@@ -7,10 +7,10 @@
 
   <xsl:param name="tmp-word-tag"/>
   <xsl:param name="tmp-sentence-tag"/>
-  <xsl:param name="can-contain-sentences"/>    
+  <xsl:param name="can-contain-sentences"/>
 
-  <xsl:param name="output-ns"/>    
-  <xsl:param name="output-sentence-tag"/>   
+  <xsl:param name="output-ns"/>
+  <xsl:param name="output-sentence-tag"/>
 
   <!-- the words need an additional pair (attr, val) because they cannot be -->
   <!-- identified later on otherwise, unlike the sentences which are -->
@@ -23,7 +23,7 @@
     <xsl:variable name="sentence-ids-tree">
       <d:sentences>
 	<xsl:apply-templates select="*" mode="sentence-ids"/>
-      </d:sentences>      
+      </d:sentences>
     </xsl:variable>
     <xsl:apply-templates select="node()">
       <xsl:with-param name="sentence-ids-tree" select="$sentence-ids-tree"/>
@@ -47,7 +47,7 @@
       <xsl:otherwise>
 	<xsl:variable name="children" select="*[count(descendant::*[local-name() = $tmp-word-tag]) > 0]" />
 	<xsl:choose>
-	  <xsl:when test="count($children) = 1">	  
+	  <xsl:when test="count($children) = 1">
 	    <d:sentence id="{if ($children[1]/@id) then ($children[1]/@id) else generate-id($children[1])}"/>
 	  </xsl:when>
 	  <xsl:otherwise>
@@ -58,7 +58,7 @@
     </xsl:choose>
     <xsl:apply-templates select="*" mode="sentence-ids"/>
   </xsl:template>
-  
+
   <xsl:template match="*" mode="sentence-ids" priority="1">
     <xsl:apply-templates  select="*" mode="sentence-ids"/>
   </xsl:template>
@@ -90,7 +90,9 @@
 	  <xsl:value-of select="$word-attr-val"/>
 	</xsl:attribute>
       </xsl:if>
-      <xsl:apply-templates select="@*|node()" mode="default-cpy"/>
+      <xsl:apply-templates select="@*|node()">
+	<xsl:with-param name="sentence-ids-tree" select="()"/>
+      </xsl:apply-templates>
     </xsl:element>
   </xsl:template>
 
@@ -105,7 +107,9 @@
 	      <xsl:value-of select="generate-id()"/>
 	    </xsl:attribute>
 	  </xsl:if>
-	  <xsl:apply-templates select="@*|node()" mode="default-cpy"/>
+	  <xsl:apply-templates select="@*|node()">
+	    <xsl:with-param name="sentence-ids-tree" select="()"/>
+	  </xsl:apply-templates>
 	</xsl:element>
       </xsl:when>
       <xsl:otherwise>
