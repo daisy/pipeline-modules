@@ -8,23 +8,24 @@
 		name="main">
 
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
-  
+
     <p:documentation>
       <p>Specialization of the SSML generation for DTBook</p>
     </p:documentation>
-    
+
     <p:input port="fileset.in" sequence="false"/>
     <p:input port="content.in" primary="true" sequence="false"/>
     <p:input port="sentence-ids" sequence="false"/>
-    
+
     <p:output port="result" primary="true" sequence="true">
       <p:pipe port="result" step="ssml-gen" />
     </p:output>
 
     <p:option name="css-sheet-uri" required="false" select="''"/>
-    
+    <p:option name="separate-skippable" required="false" select="'false'"/>
+
     <p:import href="http://www.daisy.org/pipeline/modules/text-to-ssml/text-to-ssml.xpl" />
-    
+
     <px:text-to-ssml name="ssml-gen">
       <!-- output ssml.out and content.out -->
       <p:input port="fileset.in">
@@ -39,8 +40,10 @@
       <p:with-option name="section-element" select="'level'"/>
       <p:with-option name="word-element" select="'w'"/>
       <p:with-option name="css-sheet-uri" select="$css-sheet-uri"/>
+      <p:with-option name="separate-skippable" select="$separate-skippable"/>
+      <p:with-option name="skippable-elements" select="'prodnote,pagenum,noteref'"/>
     </px:text-to-ssml>
 
     <cx:message message="End SSML generation for DTBook"/><p:sink/>
-    
+
 </p:declare-step>

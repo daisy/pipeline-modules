@@ -7,14 +7,14 @@
     xmlns:d="http://www.daisy.org/ns/pipeline/data"
     exclude-result-prefixes="#all"
     version="2.0">
-  
+
   <xsl:param name="word-element" />
   <xsl:param name="word-attr" />
   <xsl:param name="word-attr-val" />
   <xsl:param name="section-element" />
   <xsl:param name="section-attr" />
-  <xsl:param name="section-attr-val" />  
-  
+  <xsl:param name="section-attr-val" />
+
   <xsl:template match="@*|node()" priority="1">
     <xsl:copy>
       <xsl:apply-templates select="@*|node()"/>
@@ -27,7 +27,7 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="*[collection()/d:sentences/*[@id = current()/@id]]" priority="3">
+  <xsl:template match="*[collection()/d:sentences/*[@id = current()/@id] and not(ancestor-or-self::ssml:s)]" priority="3">
     <ssml:s>
       <xsl:apply-templates select="@*|node()" mode="inside-sentence"/>
     </ssml:s>

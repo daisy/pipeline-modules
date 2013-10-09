@@ -12,6 +12,7 @@ import net.sf.saxon.s9api.XdmSequenceIterator;
 
 import org.daisy.pipeline.audio.AudioEncoder;
 import org.daisy.pipeline.tts.TTSRegistry;
+import org.daisy.pipeline.tts.TTSService.SynthesisException;
 
 import com.xmlcalabash.core.XProcRuntime;
 import com.xmlcalabash.io.ReadablePipe;
@@ -53,7 +54,7 @@ public class SynthesizeStep extends DefaultStep implements
 		printInfo("New synthesize step. TTSregistry set: "
 		        + (ttsRegistry != null) + ", AudioEncoder set: "
 		        + (encoder != null));
-		mWorkerPool = new SynthesisWorkerPool(25, ttsRegistry, encoder, this);
+		mWorkerPool = new SynthesisWorkerPool(16, ttsRegistry, encoder, this);
 	}
 
 	@Override
@@ -102,17 +103,22 @@ public class SynthesizeStep extends DefaultStep implements
 	public void run() throws SaxonApiException {
 		super.run();
 
-		// dispatch the SSML sentences to the threads
-		List<SoundFragment> allSoundFragments = Collections
-		        .synchronizedList(new LinkedList<SoundFragment>());
-		mWorkerPool.initialize(allSoundFragments);
+		// split the SSML into meaningful sections
+		mWorkerPool.initialize();
+
 		while (source.moreDocuments()) {
 			traverse(getFirstChild(source.read()));
 			mWorkerPool.endSection();
 		}
 
 		// run the synthesis/encoding threads
-		mWorkerPool.synthesizeAndWait();
+		List<SoundFragment> allSoundFragments = Collections
+		        .synchronizedList(new LinkedList<SoundFragment>());
+		try {
+			mWorkerPool.synthesizeAndWait(allSoundFragments);
+		} catch (SynthesisException e) {
+			mRuntime.error(e);
+		}
 
 		printInfo("number of sound fragments: " + allSoundFragments.size());
 

@@ -43,19 +43,45 @@
   <p:option name="word-attr" required="false" select="''"/>
   <p:option name="word-attr-val" required="false" select="''"/>
 
+  <p:option name="separate-skippable" required="false" select="'false'"/>
+  <p:option name="skippable-elements" required="false" select="''"/>
+
   <!-- <p:option name="call-uid" required="false" select="'0'"> -->
   <!--   <p:documentation>Unique identifier for the call that allow to -->
   <!--   generate true pipeline-wide unique IDs.</p:documentation> -->
   <!-- </p:option> -->
+
+  <!-- The skippable elements are separated before the CSS inlining so that -->
+  <!-- the CSS will properly be applied on the new sentences that group -->
+  <!-- together the skippable elements. -->
+  <!-- As a result, the context-dependent CSS properties won't have any -->
+  <!-- effect on the skippable elements. -->
+
+  <p:choose name="separate">
+    <p:when test="$separate-skippable = 'true'">
+      <p:output port="result"/>
+      <p:xslt>
+	<p:with-param name="skippable-elements" select="$skippable-elements"/>
+	<p:input port="stylesheet">
+	  <p:document href="skippable-to-ssml.xsl"/>
+	</p:input>
+	<p:input port="source">
+	  <p:pipe port="content.in" step="main"/>
+	</p:input>
+      </p:xslt>
+      <cx:message message="Skippable elements separated"/>
+    </p:when>
+    <p:otherwise>
+      <p:output port="result"/>
+      <p:identity/>
+    </p:otherwise>
+  </p:choose>
 
   <!-- inline the CSS speech -->
   <p:choose name="inlining">
     <p:when test="$css-sheet-uri != ''">
       <p:output port="result"/>
       <px:inline-css>
-	<p:input port="source">
-	  <p:pipe port="content.in" step="main"/>
-	</p:input>
 	<p:with-option name="medium" select="'speech'"/>
 	<p:with-option name="inherit" select="'true'"/>
 	<p:with-option name="stylesheet-uri" select="$css-sheet-uri"/>

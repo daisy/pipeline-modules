@@ -1,6 +1,11 @@
 package org.daisy.pipeline.tts.synthesize;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.XdmNode;
@@ -8,24 +13,41 @@ import net.sf.saxon.s9api.XdmNode;
 import org.daisy.pipeline.audio.AudioEncoder;
 import org.daisy.pipeline.tts.TTSRegistry;
 import org.daisy.pipeline.tts.TTSService;
+import org.daisy.pipeline.tts.TTSService.SynthesisException;
 
-/**
- * The SynthesisWorkerPool must be used as follow: 1. call initialize() 2. call
- * pushSSML() to push all the SSML fragments you want to encode 3. call
- * endSection() to force the encoder to write the next audio data to a new file.
- * 4. call synthesizeAndWait() to perform the synthesis.
- */
 public class SynthesisWorkerPool {
 
+	public static class UndispatchableSection implements
+	        Comparable<UndispatchableSection> {
+		int size;
+		List<XdmNode> sentences;
+		TTSService synthesizer;
+
+		void computeSize() {
+			size = 0;
+			for (XdmNode sentence : sentences) {
+				size += sentence.toString().length(); //TODO: write finer/faster computation
+			}
+		}
+
+		@Override
+		public int compareTo(UndispatchableSection other) {
+			return (other.size - size);
+		}
+	}
+
 	private SynthesisWorkerThread[] mWorkers;
-	private int currentWorkingThread;
 	private TTSService currentSynthesizer;
 	private AudioEncoder mEncoder;
 	private TTSRegistry mTTSRegistry;
 	private IPipelineLogger mLogger;
+	private List<UndispatchableSection> mSections;
+	private UndispatchableSection mCurrentSection;
+	private int mNrThreads;
 
 	public SynthesisWorkerPool(int threadNumber, TTSRegistry registry,
 	        AudioEncoder encoder, IPipelineLogger logger) {
+		mNrThreads = threadNumber;
 		mWorkers = new SynthesisWorkerThread[threadNumber];
 		for (--threadNumber; threadNumber >= 0; --threadNumber)
 			mWorkers[threadNumber] = new SynthesisWorkerThread();
@@ -35,24 +57,16 @@ public class SynthesisWorkerPool {
 		mLogger = logger;
 	}
 
-	/**
-	 * Initialize the workers with a given synthesizer and encoder.
-	 * 
-	 * @param soundfragments is the list of references to sound files (such as
-	 *            mp3) produced by the combination of the synthesizer and the
-	 *            encoder. Operations on this list must be thread-safe.
-	 */
-	public void initialize(List<SoundFragment> soundfragments) {
-		for (SynthesisWorkerThread worker : mWorkers)
-			worker.init(mEncoder, soundfragments, mLogger);
-
-		currentWorkingThread = 0;
+	public void initialize() {
+		mSections = new ArrayList<UndispatchableSection>();
+		mCurrentSection = null;
 	}
 
 	public void pushSSML(XdmNode ssml) {
 		String engine = ssml.getAttributeValue(new QName("engine"));
 		String lang = ssml.getAttributeValue(new QName(
 		        "http://www.w3.org/XML/1998/namespace", "lang"));
+
 		TTSService newSynth = mTTSRegistry.getTTS(engine, lang);
 
 		if (newSynth != currentSynthesizer) {
@@ -62,15 +76,54 @@ public class SynthesisWorkerPool {
 			currentSynthesizer = newSynth;
 		}
 
-		mWorkers[currentWorkingThread].pushSSML(ssml, currentSynthesizer);
+		if (mCurrentSection == null) {
+			mCurrentSection = new UndispatchableSection();
+			mSections.add(mCurrentSection);
+			mCurrentSection.sentences = new ArrayList<XdmNode>();
+			mCurrentSection.synthesizer = currentSynthesizer;
+		}
+		mCurrentSection.sentences.add(ssml);
 	}
 
 	public void endSection() {
-		mWorkers[currentWorkingThread].endSection();
-		currentWorkingThread = (currentWorkingThread + 1) % mWorkers.length;
+		mCurrentSection = null;
 	}
 
-	public void synthesizeAndWait() {
+	public void synthesizeAndWait(List<SoundFragment> soundfragments)
+	        throws SynthesisException {
+		//pre-allocate resources for every TTS of every thread
+		Set<TTSService> allTTS = new HashSet<TTSService>();
+		for (UndispatchableSection section : mSections)
+			allTTS.add(section.synthesizer);
+
+		StringBuilder sb = new StringBuilder(
+		        "start allocating the resources on " + mNrThreads
+		                + " threads for the following TTS service(s):\n");
+		for (TTSService tts : allTTS) {
+			sb.append(" * " + tts.getName() + "-" + tts.getVersion() + "\n");
+		}
+		mLogger.printInfo(sb.toString());
+
+		for (TTSService tts : allTTS)
+			for (SynthesisWorkerThread worker : mWorkers)
+				worker.allocateResourcesFor(tts);
+
+		mLogger.printInfo("thread resources allocated.");
+
+		//sort the 'undispatchable' sections according to their size in descending-order
+		for (UndispatchableSection section : mSections)
+			section.computeSize();
+		Collections.sort(mSections);
+		mLogger.printInfo("number of sections to synthesize: "
+		        + mSections.size());
+
+		//give SynthetisWorkerThread access to a synchronized queue of sections to synthesize
+		ConcurrentLinkedQueue<UndispatchableSection> queue = new ConcurrentLinkedQueue<UndispatchableSection>(
+		        mSections);
+		for (SynthesisWorkerThread worker : mWorkers)
+			worker.init(mEncoder, mLogger, soundfragments, queue);
+
+		//perform the synthesis and encoding
 		for (SynthesisWorkerThread worker : mWorkers)
 			worker.start();
 
@@ -82,6 +135,12 @@ public class SynthesisWorkerPool {
 				mLogger.printInfo("error in synthesis thread: "
 				        + e.getMessage());
 			}
-	}
 
+		mLogger.printInfo("synthesis workers finished");
+
+		for (SynthesisWorkerThread worker : mWorkers)
+			worker.releaseResources();
+
+		mLogger.printInfo("synthesis resources released");
+	}
 }

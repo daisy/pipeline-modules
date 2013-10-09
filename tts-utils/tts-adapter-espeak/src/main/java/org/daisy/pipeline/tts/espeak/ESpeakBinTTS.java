@@ -2,6 +2,8 @@ package org.daisy.pipeline.tts.espeak;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map.Entry;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -19,7 +21,7 @@ import org.daisy.pipeline.tts.TTSService;
  * This synthesizer uses directly the espeak binary and intermediate WAV files.
  */
 public class ESpeakBinTTS implements TTSService {
-
+	private static int MinRiffHeaderSize = 44;
 	private AudioFormat mAudioFormat;
 	private String mEspeakPath;
 	private SSMLAdapter mSSMLAdapter = new BasicSSMLAdapter() {
@@ -59,14 +61,28 @@ public class ESpeakBinTTS implements TTSService {
 
 	//TODO: take the path from the properties if it exists
 	//and raise an exception if nothing is found
-	public ESpeakBinTTS() {
+	public ESpeakBinTTS() throws SynthesisException {
 		mAudioFormat = new AudioFormat(22050, 16, 1, true, false);
 		mEspeakPath = findExecutableOnPath("espeak");
+
+		//test the synthesizer so that the service won't be active if it fails
+		RawAudioBuffer testBuffer = new RawAudioBuffer();
+		testBuffer.offsetInOutput = 0;
+		testBuffer.output = new byte[2048];
+		synthesize("x", testBuffer, null, null, null);
 	}
 
 	@Override
 	public Object synthesize(XdmNode ssml, RawAudioBuffer audioBuffer,
-	        Object caller, Object lastCallMemory) throws SynthesisException {
+	        Object resource, Object lastCallMemory,
+	        List<Entry<String, Double>> marks) throws SynthesisException {
+		return synthesize(SSMLUtil.toString(ssml, mSSMLAdapter), audioBuffer,
+		        resource, lastCallMemory, marks);
+	}
+
+	private Object synthesize(String ssml, RawAudioBuffer audioBuffer,
+	        Object resource, Object lastCallMemory,
+	        List<Entry<String, Double>> marks) throws SynthesisException {
 
 		File dest;
 		if (lastCallMemory != null) {
@@ -85,16 +101,17 @@ public class ESpeakBinTTS implements TTSService {
 				// '-w' tells to dump the result to a WAV file
 				cmd = new String[]{
 				        mEspeakPath, "-m", "-w", dest.getAbsolutePath(),
-				        "\"" + SSMLUtil.toString(ssml, mSSMLAdapter) + "\""
+				        "\"" + ssml + "\""
 				};
 				Runtime.getRuntime().exec(cmd).waitFor();
 			} catch (Exception e) {
 				throw new SynthesisException(e.getMessage(), e.getCause());
 			}
 
-			if (dest.length() > audioBuffer.output.length) {
+			int maxLength = (int) (dest.length() - MinRiffHeaderSize);
+			if (maxLength > audioBuffer.output.length) {
 				// the audio is not big enough => dynamic allocation
-				audioBuffer.output = new byte[(int) dest.length()];
+				audioBuffer.output = new byte[(int) maxLength];
 				audioBuffer.offsetInOutput = 0;
 			} else if (dest.length() > (audioBuffer.output.length - audioBuffer.offsetInOutput)) {
 				// the audio buffer is big enough but it needs to be flushed
@@ -142,5 +159,20 @@ public class ESpeakBinTTS implements TTSService {
 			return 2;
 		}
 		return 1;
+	}
+
+	@Override
+	public Object allocateThreadResources() {
+		//no resource attached
+		return null;
+	}
+
+	@Override
+	public void releaseThreadResources(Object resource) {
+	}
+
+	@Override
+	public String getVersion() {
+		return "command-line";
 	}
 }

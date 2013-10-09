@@ -2,14 +2,22 @@ package org.daisy.pipeline.tts.synthesize;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.pipeline.audio.AudioEncoder;
 import org.daisy.pipeline.tts.TTSService;
 import org.daisy.pipeline.tts.TTSService.RawAudioBuffer;
+import org.daisy.pipeline.tts.TTSService.SynthesisException;
+import org.daisy.pipeline.tts.synthesize.SynthesisWorkerPool.UndispatchableSection;
 
 /**
  * The SynthesisWorkerThread is meant to be used by a SynthesisWorkerPool. It
@@ -36,53 +44,24 @@ public class SynthesisWorkerThread extends Thread implements
 	private IPipelineLogger mLogger;
 	private TTSService mLastUsedSynthesizer; // must be thread-safe!
 	private RawAudioBuffer mRawAudioBuffer;
-	private final static SynthesizerJob EndSectionMarker = null;
-
-	static private class SynthesizerJob {
-		XdmNode ssml;
-		TTSService synthesizer; // must be thread-safe!
-	}
-
-	// this list does not need to be thread-safe because the consuming step
-	// (run() method) and the producing step (pushSSML method()) do not occur
-	// simultaneously
-	private LinkedList<SynthesizerJob> mSsmlPackets;
+	private ConcurrentLinkedQueue<UndispatchableSection> mSectionsQueue;
+	private Map<TTSService, Object> mResources;
 
 	public SynthesisWorkerThread() {
 		mOutput = new byte[AUDIO_BUFFER_BYTES];
 		mRawAudioBuffer = new RawAudioBuffer();
+		mResources = new HashMap<TTSService, Object>();
 	}
 
-	/**
-	 * Initialize a worker with a given synthesizer and encoder.
-	 * 
-	 * @param soundfragments is the list of references to sound files (such as
-	 *            mp3) produced by the combination of the synthesizer and the
-	 *            encoder. Operations on this list must be thread-safe.
-	 */
-	public void init(AudioEncoder encoder,
-	        List<SoundFragment> allSoundFragments, IPipelineLogger logger) {
+	public void init(AudioEncoder encoder, IPipelineLogger logger,
+	        List<SoundFragment> allSoundFragments,
+	        ConcurrentLinkedQueue<UndispatchableSection> sectionQueue) {
 		mEncoder = encoder;
 		mOffsetInOutput = 0;
-		mSsmlPackets = new LinkedList<SynthesizerJob>();
 		mCurrentFragments = new LinkedList<SoundFragment>();
 		mGlobalSoundFragments = allSoundFragments;
 		mLogger = logger;
-	}
-
-	public void pushSSML(XdmNode ssml, TTSService synthesizer) {
-		if (ssml == null) {
-			mSsmlPackets.add(null);
-		} else {
-			SynthesizerJob sj = new SynthesizerJob();
-			sj.ssml = ssml;
-			sj.synthesizer = synthesizer;
-			mSsmlPackets.add(sj);
-		}
-	}
-
-	public void endSection() {
-		mSsmlPackets.add(EndSectionMarker);
+		mSectionsQueue = sectionQueue;
 	}
 
 	private void encodeAudio() {
@@ -109,71 +88,120 @@ public class SynthesisWorkerThread extends Thread implements
 		        .getFrameSize()));
 	}
 
+	public void allocateResourcesFor(TTSService s) throws SynthesisException {
+		mResources.put(s, s.allocateThreadResources());
+	}
+
+	public void releaseResources() {
+		for (Map.Entry<TTSService, Object> resource : mResources.entrySet()) {
+			resource.getKey().releaseThreadResources(resource.getValue());
+		}
+	}
+
+	private void processOneSentence(XdmNode sentence) throws SynthesisException {
+		if (mOffsetInOutput + MAX_ESTIMATED_SYNTHESIZED_BYTES > AUDIO_BUFFER_BYTES) {
+			encodeAudio();
+		}
+		Object resource = mResources.get(mLastUsedSynthesizer);
+		List<Map.Entry<String, Double>> marks = new ArrayList<Map.Entry<String, Double>>();
+		mRawAudioBuffer.output = mOutput;
+		mRawAudioBuffer.offsetInOutput = mOffsetInOutput;
+		Object memory = mLastUsedSynthesizer.synthesize(sentence,
+		        mRawAudioBuffer, resource, null, marks);
+
+		if (memory != null) {
+			encodeAudio();
+			// try again with the room freed after encoding
+			marks.clear();
+			mLastUsedSynthesizer.synthesize(sentence, mRawAudioBuffer,
+			        resource, memory, marks);
+		} else if (mRawAudioBuffer.output != mOutput) {
+			if ((mRawAudioBuffer.offsetInOutput + mOffsetInOutput) > mOutput.length) {
+				// it has been externally allocated because it does not fit
+				// in the current buffer
+				if (mOffsetInOutput > 0)
+					encodeAudio();
+			} else {
+				// this makes sense when TTS engine's policy is to always use its own buffers,
+				// even when it could fit in the current buffer
+				System.arraycopy(mRawAudioBuffer.output, 0, mOutput,
+				        mOffsetInOutput, mRawAudioBuffer.offsetInOutput);
+				mRawAudioBuffer.output = mOutput;
+				mRawAudioBuffer.offsetInOutput += mOffsetInOutput;
+			}
+		}
+
+		// keep track of where the sound begins and where it ends in the audio buffer
+		if (marks.size() == 0) {
+			SoundFragment sf = new SoundFragment();
+			sf.id = sentence.getAttributeValue(Sentence_attr_id);
+			sf.clipBegin = convertBytesToSecond(mOffsetInOutput);
+			mOffsetInOutput = mRawAudioBuffer.offsetInOutput;
+			sf.clipEnd = convertBytesToSecond(mOffsetInOutput);
+			mCurrentFragments.add(sf);
+		} else {
+			double begin = convertBytesToSecond(mOffsetInOutput);
+			mOffsetInOutput = mRawAudioBuffer.offsetInOutput;
+			double end = convertBytesToSecond(mOffsetInOutput);
+
+			Map<String, Double> starts = new HashMap<String, Double>();
+			Map<String, Double> ends = new HashMap<String, Double>();
+			Set<String> all = new HashSet<String>();
+
+			for (Map.Entry<String, Double> e : marks) {
+				String[] mark = e.getKey().split(
+				        FormatSpecifications.MarkDelimiter, -1);
+				if (!mark[0].isEmpty()) {
+					ends.put(mark[0], e.getValue());
+					all.add(mark[0]);
+				}
+				if (!mark[1].isEmpty()) {
+					starts.put(mark[1], e.getValue());
+					all.add(mark[1]);
+				}
+			}
+			for (String id : all) {
+				SoundFragment sf = new SoundFragment();
+				sf.id = id;
+				if (starts.containsKey(id))
+					sf.clipBegin = begin + starts.get(id);
+				else
+					sf.clipBegin = begin;
+				if (ends.containsKey(id))
+					sf.clipEnd = begin + ends.get(id);
+				else
+					sf.clipEnd = end;
+				mCurrentFragments.add(sf);
+			}
+		}
+
+		if (mRawAudioBuffer.output != mOutput) {
+			// externally allocated case that does not fit in current buffer
+			// => encode immediately
+			encodeAudio(mRawAudioBuffer.output, mRawAudioBuffer.offsetInOutput);
+		}
+	}
+
 	@Override
 	public void run() {
-		try {
-			for (SynthesizerJob job : mSsmlPackets) {
-				if (job == EndSectionMarker) {
-					if (mOffsetInOutput > 0)
-						encodeAudio();
-					continue;
-				}
-				mLastUsedSynthesizer = job.synthesizer;
-
-				if (mOffsetInOutput + MAX_ESTIMATED_SYNTHESIZED_BYTES > AUDIO_BUFFER_BYTES) {
-					encodeAudio();
-				}
-
-				mRawAudioBuffer.output = mOutput;
-				mRawAudioBuffer.offsetInOutput = mOffsetInOutput;
-				Object memory = mLastUsedSynthesizer.synthesize(job.ssml,
-				        mRawAudioBuffer, this, null);
-
-				if (memory != null) {
-					encodeAudio();
-					// try again with more room for the data
-					mLastUsedSynthesizer.synthesize(job.ssml, mRawAudioBuffer,
-					        this, memory);
-				} else if (mRawAudioBuffer.output != mOutput) {
-					if ((mRawAudioBuffer.offsetInOutput + mOffsetInOutput) > mOutput.length) {
-						// it has been externally allocated because it does not fit
-						// in the current buffer
-						if (mOffsetInOutput > 0)
-							encodeAudio(); // flush
-					} else {
-						// this makes sense when TTS engine's policy is to always use its own buffers,
-						// even when it could fit in the current buffer
-						System.arraycopy(mRawAudioBuffer.output, 0, mOutput,
-						        mOffsetInOutput, mRawAudioBuffer.offsetInOutput);
-						mRawAudioBuffer.output = mOutput;
-						mRawAudioBuffer.offsetInOutput += mOffsetInOutput;
-					}
-				}
-
-				// keep track of where the sound begins and where it ends in the audio buffer
-				SoundFragment sf = new SoundFragment();
-				sf.id = job.ssml.getAttributeValue(Sentence_attr_id);
-				sf.clipBegin = convertBytesToSecond(mOffsetInOutput);
-				mOffsetInOutput = mRawAudioBuffer.offsetInOutput;
-				sf.clipEnd = convertBytesToSecond(mOffsetInOutput);
-				mCurrentFragments.add(sf);
-
-				if (mRawAudioBuffer.output != mOutput) {
-					// externally allocated case that does not fit in current buffer
-					// => encode immediately
-					encodeAudio(mRawAudioBuffer.output,
-					        mRawAudioBuffer.offsetInOutput);
-				}
-
+		while (true) {
+			UndispatchableSection section = mSectionsQueue.poll();
+			if (section == null) {
+				break;
 			}
-			if (mOffsetInOutput != 0)
-				encodeAudio();
-			mSsmlPackets = null;
-		} catch (Exception e) {
-			StringWriter sw = new StringWriter();
-			e.printStackTrace(new PrintWriter(sw));
-			mLogger.printInfo("error in synthesis thread: " + e.getMessage()
-			        + " : " + sw.toString());
+			try {
+				mLastUsedSynthesizer = section.synthesizer;
+				for (XdmNode sentence : section.sentences) {
+					processOneSentence(sentence);
+				}
+				if (mOffsetInOutput > 0)
+					encodeAudio();
+			} catch (Exception e) {
+				StringWriter sw = new StringWriter();
+				e.printStackTrace(new PrintWriter(sw));
+				mLogger.printInfo("error in synthesis thread: "
+				        + e.getMessage() + " : " + sw.toString());
+			}
 		}
 	}
 }
