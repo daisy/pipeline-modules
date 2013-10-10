@@ -22,6 +22,9 @@ import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.pipeline.tts.BasicSSMLAdapter;
+import org.daisy.pipeline.tts.BinaryFinder;
+import org.daisy.pipeline.tts.LoadBalancer.Host;
+import org.daisy.pipeline.tts.RoundRobinLoadBalancer;
 import org.daisy.pipeline.tts.SSMLAdapter;
 import org.daisy.pipeline.tts.SSMLUtil;
 import org.daisy.pipeline.tts.TTSService;
@@ -37,9 +40,11 @@ public class ATTBin implements TTSService {
 	private static int MinRiffHeaderSize = 44;
 	private AudioFormat mAudioFormat;
 	private String mATTPath;
-	private int mPort;
 	private int mSampleRate;
 	private Pattern mMarkPattern;
+	private RoundRobinLoadBalancer mLoadBalancer;
+	private int fileid = 0;
+
 	private SSMLAdapter mSSMLAdapter = new BasicSSMLAdapter() {
 		@Override
 		public QName adaptElement(QName elementName) {
@@ -73,19 +78,27 @@ public class ATTBin implements TTSService {
 		}
 	};
 
-	private int fileid = 0;
-
 	private synchronized int getFileId() {
 		++fileid;
 		return fileid;
 	}
 
-	//TODO: read the path, the port and the audio format from a configuration file
 	public ATTBin() throws SynthesisException {
+
+		mLoadBalancer = new RoundRobinLoadBalancer(System.getProperty(
+		        "att.servers", "localhost:8888"), null);
+
 		mSampleRate = 16000;
 		mAudioFormat = new AudioFormat(mSampleRate, 16, 1, true, false);
-		mPort = 8888;
-		mATTPath = System.getProperty("user.home") + "/ATT/bin/TTSClientFile";
+
+		final String property = "att.client.path";
+		mATTPath = BinaryFinder.find(property, "TTSClientFile");
+		if (mATTPath == null) {
+			throw new SynthesisException(
+			        "Cannot find AT&T's client in PATH and " + property
+			                + " is not set");
+		}
+
 		mMarkPattern = Pattern.compile("([0-9]+)\\s+BOOKMARK:\\s+([^\\s]+)",
 		        Pattern.MULTILINE);
 
@@ -93,7 +106,7 @@ public class ATTBin implements TTSService {
 		RawAudioBuffer testBuffer = new RawAudioBuffer();
 		testBuffer.offsetInOutput = 0;
 		testBuffer.output = new byte[2048];
-		synthesize("x", testBuffer, null, null,
+		synthesize("x", testBuffer, mLoadBalancer.selectHost(), null,
 		        new LinkedList<Map.Entry<String, Double>>(), 1);
 	}
 
@@ -110,6 +123,8 @@ public class ATTBin implements TTSService {
 	        Object resources, Object lastCallMemory,
 	        List<Entry<String, Double>> marks, int tries)
 	        throws SynthesisException {
+
+		Host h = (Host) resources;
 		File dest;
 		if (lastCallMemory != null) {
 			dest = (File) lastCallMemory;
@@ -126,8 +141,9 @@ public class ATTBin implements TTSService {
 			String[] cmd = null;
 			try {
 				cmd = new String[]{
-				        mATTPath, "-ssml", "-v0", "-p", String.valueOf(mPort),
-				        "-r", String.valueOf(mSampleRate), "-o",
+				        mATTPath, "-ssml", "-v0", "-s", h.address, "-p",
+				        String.valueOf(h.port), "-r",
+				        String.valueOf(mSampleRate), "-o",
 				        dest.getAbsolutePath()
 				};
 
@@ -216,8 +232,7 @@ public class ATTBin implements TTSService {
 
 	@Override
 	public Object allocateThreadResources() {
-		// no resource attached
-		return null;
+		return mLoadBalancer.selectHost();
 	}
 
 	@Override

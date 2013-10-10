@@ -13,6 +13,7 @@ import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.pipeline.tts.BasicSSMLAdapter;
+import org.daisy.pipeline.tts.BinaryFinder;
 import org.daisy.pipeline.tts.SSMLAdapter;
 import org.daisy.pipeline.tts.SSMLUtil;
 import org.daisy.pipeline.tts.TTSService;
@@ -44,26 +45,14 @@ public class ESpeakBinTTS implements TTSService {
 		}
 	};
 
-	private static String findExecutableOnPath(String executableName) {
-		String systemPath = System.getenv("PATH");
-		String[] pathDirs = systemPath.split(File.pathSeparator);
-
-		File fullyQualifiedExecutable = null;
-		for (String pathDir : pathDirs) {
-			File file = new File(pathDir, executableName);
-			if (file.isFile()) {
-				fullyQualifiedExecutable = file;
-				break;
-			}
-		}
-		return fullyQualifiedExecutable.getAbsolutePath();
-	}
-
-	//TODO: take the path from the properties if it exists
-	//and raise an exception if nothing is found
 	public ESpeakBinTTS() throws SynthesisException {
 		mAudioFormat = new AudioFormat(22050, 16, 1, true, false);
-		mEspeakPath = findExecutableOnPath("espeak");
+		final String property = "espeak.client.path";
+		mEspeakPath = BinaryFinder.find(property, "espeak");
+		if (mEspeakPath == null) {
+			throw new SynthesisException("Cannot find eSpeak's binary and "
+			        + property + " is not set");
+		}
 
 		//test the synthesizer so that the service won't be active if it fails
 		RawAudioBuffer testBuffer = new RawAudioBuffer();

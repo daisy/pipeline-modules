@@ -163,11 +163,6 @@ Java_org_daisy_pipeline_tts_attnative_ATTLib_synthesizeRequest
     env->GetStaticMethodID(klass, "onRecvAudio", "(Ljava/lang/Object;Ljava/lang/Object;I)V");
   conn->sink->handler = handler;
 
-  int utf8size = std::min(MAX_SENTENCE_SIZE/2, env->GetStringLength(text));
-  int nativeSize = env->GetStringLength(text);
-  env->GetStringUTFRegion(text, 0, utf8size, conn->sentence);
-  conn->sentence[nativeSize] = '\0';
-
   //the cast here is necessary to make it interpret it as utf8 rather than latin-1
   TTS_RESULT r =
     conn->engine->Speak(toUTF8(env, text, conn->sentence, MAX_SENTENCE_SIZE), CTTSEngine::sf_ssml);

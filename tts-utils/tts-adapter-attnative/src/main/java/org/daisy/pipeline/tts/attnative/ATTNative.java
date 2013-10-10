@@ -12,6 +12,8 @@ import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.pipeline.tts.BasicSSMLAdapter;
+import org.daisy.pipeline.tts.LoadBalancer.Host;
+import org.daisy.pipeline.tts.RoundRobinLoadBalancer;
 import org.daisy.pipeline.tts.SSMLAdapter;
 import org.daisy.pipeline.tts.SSMLUtil;
 import org.daisy.pipeline.tts.TTSService;
@@ -19,8 +21,7 @@ import org.daisy.pipeline.tts.TTSService;
 public class ATTNative implements TTSService, ATTLibListener {
 
 	private AudioFormat mAudioFormat;
-	private static String Host = "localhost"; //TODO: make it a pipeline property
-	private static int Port = 8888; //TODO: make it a pipeline property
+	private RoundRobinLoadBalancer mLoadBalancer;
 
 	private SSMLAdapter mSSMLAdapter = new BasicSSMLAdapter() {
 		@Override
@@ -63,6 +64,9 @@ public class ATTNative implements TTSService, ATTLibListener {
 	}
 
 	public ATTNative() {
+		mLoadBalancer = new RoundRobinLoadBalancer(System.getProperty(
+		        "att.servers", "localhost:8888"), null);
+
 		mAudioFormat = new AudioFormat(16000, 16, 1, true, false);
 		System.loadLibrary("att");
 		ATTLib.setListener(this);
@@ -134,13 +138,14 @@ public class ATTNative implements TTSService, ATTLibListener {
 
 	@Override
 	public Object allocateThreadResources() throws SynthesisException {
-		long connection = ATTLib.openConnection(Host, Port,
+		Host h = mLoadBalancer.selectHost();
+		long connection = ATTLib.openConnection(h.address, h.port,
 		        (int) mAudioFormat.getSampleRate(),
 		        mAudioFormat.getSampleSizeInBits());
 		if (connection == 0) {
 			throw new SynthesisException(
-			        "cannot open connections with ATTServer on " + Host + ":"
-			                + Port, null);
+			        "cannot open connections with ATTServer on " + h.address
+			                + ":" + h.port, null);
 		}
 
 		ThreadResource tr = new ThreadResource();

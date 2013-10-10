@@ -13,6 +13,10 @@ public interface TTSService {
 		public SynthesisException(String message, Throwable cause) {
 			super(message, cause);
 		}
+
+		public SynthesisException(String message) {
+			super(message);
+		}
 	}
 
 	public static class RawAudioBuffer {

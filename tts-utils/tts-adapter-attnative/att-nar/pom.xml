@@ -13,6 +13,10 @@
   <name>AT&#038;T's JNI libraries</name>
   <description>Build of platform-dependent JNI libraries using the AT&#038;T's SDK >=4.0</description>
 
+  <properties>
+    <sdk.location>${basedir}/src/sdk/</sdk.location>
+  </properties>
+
   <build>
     <plugins>
       <plugin>
@@ -27,7 +31,7 @@
               <include>**/*.cpp</include>
             </includes>
             <options>
-              <option>-I${basedir}/src/sdk/include</option>
+              <option>-I${sdk.location}/include/</option>
               <option>-I${JAVA_HOME}/include</option>
               <option>${java.os.include}</option>
               <option>${stack.protector.option}</option>
