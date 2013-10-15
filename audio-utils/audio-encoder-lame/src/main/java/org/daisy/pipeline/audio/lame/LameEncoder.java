@@ -16,6 +16,13 @@ import org.daisy.pipeline.audio.AudioEncoder;
 public class LameEncoder implements AudioEncoder {
 	private static final String InputFormat = ".wav";
 	private static final String OutputFormat = ".mp3";
+	
+	private static final String[] winExtensions = {
+	        ".exe", ".bat", ".cmd", ".bin", ""
+	};
+	private static final String[] nixExtensions = {
+	        "", ".run", ".bin", ".sh"
+	};
 	private String mLamePath;
 
 	private String findBinary(String propertyName, String executableName) {
@@ -23,13 +30,22 @@ public class LameEncoder implements AudioEncoder {
 		if (result != null)
 			return result;
 
+		String os = System.getProperty("os.name");
+		String[] extensions;
+		if (os != null && os.startsWith("Windows"))
+			extensions = winExtensions;
+		else
+			extensions = nixExtensions;
+
 		String systemPath = System.getenv("PATH");
 		String[] pathDirs = systemPath.split(File.pathSeparator);
-
-		for (String pathDir : pathDirs) {
-			File file = new File(pathDir, executableName);
-			if (file.isFile()) {
-				return file.getAbsolutePath();
+		for (String ext : extensions) {
+			String fullname = executableName + ext;
+			for (String pathDir : pathDirs) {
+				File file = new File(pathDir, fullname);
+				if (file.isFile()) {
+					return file.getAbsolutePath();
+				}
 			}
 		}
 		return null;
