@@ -18,6 +18,7 @@ import org.daisy.pipeline.tts.SSMLAdapter;
 import org.daisy.pipeline.tts.SSMLUtil;
 import org.daisy.pipeline.tts.TTSService;
 
+
 /**
  * This synthesizer uses directly the espeak binary and intermediate WAV files.
  */
@@ -49,6 +50,7 @@ public class ESpeakBinTTS implements TTSService {
 		mAudioFormat = new AudioFormat(22050, 16, 1, true, false);
 		final String property = "espeak.client.path";
 		mEspeakPath = BinaryFinder.find(property, "espeak");
+		
 		if (mEspeakPath == null) {
 			throw new SynthesisException("Cannot find eSpeak's binary and "
 			        + property + " is not set");

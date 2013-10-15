@@ -62,13 +62,16 @@ public class SynthesisWorkerPool {
 		mCurrentSection = null;
 	}
 
-	public void pushSSML(XdmNode ssml) {
+	public void pushSSML(XdmNode ssml)  throws SynthesisException {
 		String engine = ssml.getAttributeValue(new QName("engine"));
 		String lang = ssml.getAttributeValue(new QName(
 		        "http://www.w3.org/XML/1998/namespace", "lang"));
 
 		TTSService newSynth = mTTSRegistry.getTTS(engine, lang);
-
+		if (newSynth == null) {
+			throw new SynthesisException("no TTS Service available for the language '" + lang+"'");
+		}
+		
 		if (newSynth != currentSynthesizer) {
 			if (currentSynthesizer != null)
 				endSection(); // the same thread might not be able to
