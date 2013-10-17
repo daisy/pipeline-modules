@@ -89,7 +89,7 @@ public class SynthesizeStep extends DefaultStep implements
 		result.resetWriter();
 	}
 
-	public void traverse(XdmNode node) {
+	public void traverse(XdmNode node) throws SynthesisException {
 		if (SentenceTag.equals(node.getNodeName())) {
 			mWorkerPool.pushSSML(node);
 		} else {
@@ -106,18 +106,20 @@ public class SynthesizeStep extends DefaultStep implements
 		// split the SSML into meaningful sections
 		mWorkerPool.initialize();
 
-		while (source.moreDocuments()) {
-			traverse(getFirstChild(source.read()));
-			mWorkerPool.endSection();
-		}
-
-		// run the synthesis/encoding threads
-		List<SoundFragment> allSoundFragments = Collections
-		        .synchronizedList(new LinkedList<SoundFragment>());
+		List<SoundFragment> allSoundFragments;
 		try {
-			mWorkerPool.synthesizeAndWait(allSoundFragments);
+			while (source.moreDocuments()) {
+				traverse(getFirstChild(source.read()));
+				mWorkerPool.endSection();
+			}
+
+			// run the synthesis/encoding threads
+			allSoundFragments = Collections
+			        .synchronizedList(new LinkedList<SoundFragment>());
+
 		} catch (SynthesisException e) {
 			mRuntime.error(e);
+			return;
 		}
 
 		printInfo("number of sound fragments: " + allSoundFragments.size());

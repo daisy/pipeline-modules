@@ -113,8 +113,8 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-	    <Import-Package>org.daisy.pipeline.tts;javax.sound.sampled;net.sf.saxon.s9api;com.sun.jna;org.osgi.framework</Import-Package>
 	    <Service-Component>OSGI-INF/tts-service.xml</Service-Component>
+	    <Bundle-SymbolicName>org.daisy.pipeline.modules.tts-adapter-attnative</Bundle-SymbolicName>
           </instructions>
         </configuration>
         <executions>
@@ -131,7 +131,6 @@
             <configuration>
               <classifier>linux</classifier>
               <instructions>
-                <Bundle-SymbolicName>org.daisy.pipeline.modules.tts-adapter-attnative</Bundle-SymbolicName>
 		<Bundle-NativeCode>libatt.so;osname=linux;processor=x86;processor=x86-64</Bundle-NativeCode>
                 <Include-Resource>
                   OSGI-INF/tts-service.xml=src/main/resources/OSGI-INF/tts-service.xml,
