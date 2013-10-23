@@ -7,6 +7,7 @@
     <p:input port="source" sequence="true"/>
     <p:output port="result"/>
     <p:option name="hidden" select="'true'"/>
+    <p:option name="base-dir"/>
 
     <p:for-each name="page-lists">
         <p:output port="result"/>
@@ -14,9 +15,7 @@
             <p:input port="stylesheet">
                 <p:document href="../xslt/html5-to-page-list.xsl"/>
             </p:input>
-            <p:input port="parameters">
-                <p:empty/>
-            </p:input>
+            <p:with-param name="base-uri" select="$base-dir" use-when="p:value-available('base-dir')"/>
         </p:xslt>
         <p:filter select="(//h:ol)[1]"/>
     </p:for-each>
