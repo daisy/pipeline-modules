@@ -80,22 +80,6 @@
     </p:declare-step>
 
     <!-- ============================================================ -->
-    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-        <p>Copies the resource pointed by the option "href" to the target file. The 
-	"target" option MUST be a uri with a "file:" scheme. If the "target" uri is a direrctory
-	( the path ends with / ) the step will try to name the file based on the href path. 
-	The return value is consistent with the cx:copy step, a <result> </result>element with 
-	the target file as text.
-	</p>
-    </p:documentation>
-    <p:declare-step type="px:copy-resource">
-        <p:output port="result"/>
-        <p:option name="href" required="true"/>
-        <p:option name="target" required="true"/>
-        <p:option name="fail-on-error" select="'true'"/>
-    </p:declare-step>
-
-    <!-- ============================================================ -->
 
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
         <p>Creates a directory with the name spacified in the "href" option. If the name includes
@@ -193,5 +177,6 @@
     </p:documentation>
     
     <p:import href="tempdir.xpl"/>
+    <p:import href="copy-resource.xpl"/>
 
 </p:library>
