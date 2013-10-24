@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step type="px:epub3-nav-aggregate" name="main" xmlns:p="http://www.w3.org/ns/xproc" xmlns:px="http://www.daisy.org/ns/pipeline/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data"
-    version="1.0">
+    xmlns:html="http://www.w3.org/1999/xhtml" version="1.0">
 
     <p:input port="source" sequence="true"/>
     <p:output port="result"/>
@@ -10,6 +10,9 @@
     <p:option name="css" select="''"/>
 
     <p:choose>
+        <p:xpath-context>
+            <p:empty/>
+        </p:xpath-context>
         <p:when test="not($title='') or $language=''">
             <p:identity>
                 <p:input port="source">
@@ -74,7 +77,7 @@
                     </p:inline>
                 </p:iteration-source>
                 <p:choose>
-                    <p:when test="@lang=$language or matches(@lang,concat('^',replace($language,'-.*','')),'-')">
+                    <p:when test="@lang=$language or matches(@lang,concat('^',replace($language,'-.*',''),'-'))">
                         <p:identity/>
                     </p:when>
                     <p:otherwise>
@@ -86,6 +89,27 @@
                     </p:otherwise>
                 </p:choose>
             </p:for-each>
+            <p:identity name="translation-precount"/>
+            <p:count/>
+            <p:choose>
+                <p:when test=".=0">
+                    <p:identity>
+                        <p:input port="source">
+                            <p:inline>
+                                <!-- Default to english if no matching language is found. -->
+                                <d:translation lang="en" language-name="English">Table of Contents</d:translation>
+                            </p:inline>
+                        </p:input>
+                    </p:identity>
+                </p:when>
+                <p:otherwise>
+                    <p:identity>
+                        <p:input port="source">
+                            <p:pipe port="result" step="translation-precount"/>
+                        </p:input>
+                    </p:identity>
+                </p:otherwise>
+            </p:choose>
         </p:otherwise>
     </p:choose>
     <p:split-sequence initial-only="true" test="position()=1"/>
@@ -102,19 +126,24 @@
                             <title>{$title-translated}</title>
                             <link rel="stylesheet" type="text/css" href="{$css}"/>
                         </head>
-                        <body>{/node()}</body>
+                        <body/>
                     </html>
                 </p:inline>
             </p:input>
             <p:input port="source">
-                <p:pipe step="main" port="source"/>
+                <p:empty/>
             </p:input>
             <p:input port="parameters">
                 <p:pipe step="vars" port="result"/>
             </p:input>
         </p:template>
-        <p:delete match="(html:html/@xml:lang|html:html/@lang)[.='']"/>
+        <p:delete match="html:html/@xml:lang[.=''] | html:html/@lang[.='']"/>
         <p:delete match="html:html/html:head/html:link[@href='']"/>
+        <p:insert match="/*/html:body" position="last-child">
+            <p:input port="insertion">
+                <p:pipe step="main" port="source"/>
+            </p:input>
+        </p:insert>
     </p:group>
 
 </p:declare-step>
