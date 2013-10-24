@@ -56,6 +56,19 @@
                 <d:file href="my-image.png" media-type="image/png" original-href="file:/other-base/other-uri.png"/>
             </x:expect>
         </x:scenario>
+        <x:scenario label="with a relative URI and an original href defined in an included fileset">
+            <x:context>
+                <html>
+                    <d:fileset xml:base="file:/other-base/">
+                        <d:file href="my-image.png" original-href="file:/other-base/other-uri.png" xml:base="file:/my-base/"/>
+                    </d:fileset>
+                    <img src="my-image.png" xml:base="file:/my-base/"/>
+                </html>
+            </x:context>
+            <x:expect label="produces a fileset entry and copies the original href" test="//d:file">
+                <d:file href="my-image.png" media-type="image/png" original-href="file:/other-base/other-uri.png"/>
+            </x:expect>
+        </x:scenario>
         <x:scenario label="with an absolute file URI">
             <x:context>
                 <html>
