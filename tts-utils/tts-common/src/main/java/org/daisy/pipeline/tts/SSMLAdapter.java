@@ -6,7 +6,7 @@ import net.sf.saxon.s9api.QName;
  * Transform the SSML according to the TTS engine's features and bugs
  */
 public interface SSMLAdapter {
-	String getHeader();
+	String getHeader(String voiceName);
 
 	String getFooter();
 

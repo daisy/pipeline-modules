@@ -4,7 +4,7 @@ import net.sf.saxon.s9api.QName;
 
 public class BasicSSMLAdapter implements SSMLAdapter {
 	@Override
-	public String getHeader() {
+	public String getHeader(String voiceName) {
 		return "";
 	}
 

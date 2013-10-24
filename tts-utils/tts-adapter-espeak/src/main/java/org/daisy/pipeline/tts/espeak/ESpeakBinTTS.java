@@ -2,12 +2,11 @@ package org.daisy.pipeline.tts.espeak;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
 
 import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
 
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.XdmNode;
@@ -16,14 +15,13 @@ import org.daisy.pipeline.tts.BasicSSMLAdapter;
 import org.daisy.pipeline.tts.BinaryFinder;
 import org.daisy.pipeline.tts.SSMLAdapter;
 import org.daisy.pipeline.tts.SSMLUtil;
+import org.daisy.pipeline.tts.SoundUtil;
 import org.daisy.pipeline.tts.TTSService;
 
-
 /**
- * This synthesizer uses directly the espeak binary and intermediate WAV files.
+ * This synthesizer uses directly the eSpeak binary and intermediate WAV files.
  */
 public class ESpeakBinTTS implements TTSService {
-	private static int MinRiffHeaderSize = 44;
 	private AudioFormat mAudioFormat;
 	private String mEspeakPath;
 	private SSMLAdapter mSSMLAdapter = new BasicSSMLAdapter() {
@@ -50,7 +48,7 @@ public class ESpeakBinTTS implements TTSService {
 		mAudioFormat = new AudioFormat(22050, 16, 1, true, false);
 		final String property = "espeak.client.path";
 		mEspeakPath = BinaryFinder.find(property, "espeak");
-		
+
 		if (mEspeakPath == null) {
 			throw new SynthesisException("Cannot find eSpeak's binary and "
 			        + property + " is not set");
@@ -59,72 +57,45 @@ public class ESpeakBinTTS implements TTSService {
 		//test the synthesizer so that the service won't be active if it fails
 		RawAudioBuffer testBuffer = new RawAudioBuffer();
 		testBuffer.offsetInOutput = 0;
-		testBuffer.output = new byte[2048];
-		synthesize("x", testBuffer, null, null, null);
+		testBuffer.output = new byte[1];
+		Object r = allocateThreadResources();
+		synthesize("x", testBuffer, r, null, null);
+		releaseThreadResources(r);
 	}
 
 	@Override
-	public Object synthesize(XdmNode ssml, RawAudioBuffer audioBuffer,
-	        Object resource, Object lastCallMemory,
+	public Object synthesize(XdmNode ssml, Voice voice,
+	        RawAudioBuffer audioBuffer, Object resource, Object lastCallMemory,
 	        List<Entry<String, Double>> marks) throws SynthesisException {
-		return synthesize(SSMLUtil.toString(ssml, mSSMLAdapter), audioBuffer,
-		        resource, lastCallMemory, marks);
+		return synthesize(SSMLUtil.toString(ssml, voice.name, mSSMLAdapter),
+		        audioBuffer, resource, lastCallMemory, marks);
 	}
 
 	private Object synthesize(String ssml, RawAudioBuffer audioBuffer,
 	        Object resource, Object lastCallMemory,
 	        List<Entry<String, Double>> marks) throws SynthesisException {
 
-		File dest;
-		if (lastCallMemory != null) {
-			dest = (File) lastCallMemory;
-		} else {
-			try {
-				dest = File.createTempFile("espeak",
-				        Long.toString(System.nanoTime()));
-			} catch (IOException e) {
-				throw new SynthesisException(e.getMessage(), e.getCause());
-			}
-
-			String[] cmd = null;
-			try {
-				// '-m' tells to interpret the input as SSML
-				// '-w' tells to dump the result to a WAV file
-				cmd = new String[]{
-				        mEspeakPath, "-m", "-w", dest.getAbsolutePath(),
-				        "\"" + ssml + "\""
-				};
-				Runtime.getRuntime().exec(cmd).waitFor();
-			} catch (Exception e) {
-				throw new SynthesisException(e.getMessage(), e.getCause());
-			}
-
-			int maxLength = (int) (dest.length() - MinRiffHeaderSize);
-			if (maxLength > audioBuffer.output.length) {
-				// the audio is not big enough => dynamic allocation
-				audioBuffer.output = new byte[(int) maxLength];
-				audioBuffer.offsetInOutput = 0;
-			} else if (dest.length() > (audioBuffer.output.length - audioBuffer.offsetInOutput)) {
-				// the audio buffer is big enough but it needs to be flushed
-				return dest;
-			}
+		File dest = (File) resource;
+		String[] cmd = null;
+		try {
+			// '-m' tells to interpret the input as SSML
+			// '-w' tells to dump the result to a WAV file
+			cmd = new String[]{
+			        mEspeakPath, "-m", "-w", dest.getAbsolutePath(),
+			        "\"" + ssml + "\""
+			};
+			Runtime.getRuntime().exec(cmd).waitFor();
+		} catch (Exception e) {
+			throw new SynthesisException(e.getMessage(), e.getCause());
 		}
 
 		// read the audio data from the resulting WAV file
 		try {
-			AudioInputStream fi = AudioSystem.getAudioInputStream(dest);
-			int read = 0;
-			while (audioBuffer.offsetInOutput + read != audioBuffer.output.length
-			        && read != -1) {
-				audioBuffer.offsetInOutput += read;
-				read = fi.read(audioBuffer.output, audioBuffer.offsetInOutput,
-				        audioBuffer.output.length - audioBuffer.offsetInOutput);
-			}
-			fi.close();
+			boolean tryAgain = !SoundUtil.readWave(dest, audioBuffer, true);
+			if (tryAgain)
+				return Boolean.valueOf(true);
 		} catch (Exception e) {
 			throw new SynthesisException(e.getMessage(), e.getCause());
-		} finally {
-			dest.delete();
 		}
 
 		return null;
@@ -141,29 +112,59 @@ public class ESpeakBinTTS implements TTSService {
 	}
 
 	@Override
-	public int getPriority(String lang) {
-		if (lang == null) {
-			return 1;
+	public Object allocateThreadResources() throws SynthesisException {
+		try {
+			return File.createTempFile("espeak", ".wav");
+		} catch (IOException e) {
+			throw new SynthesisException(e.getMessage(), e.getCause());
 		}
-
-		if (lang.startsWith("en")) {
-			return 2;
-		}
-		return 1;
-	}
-
-	@Override
-	public Object allocateThreadResources() {
-		//no resource attached
-		return null;
 	}
 
 	@Override
 	public void releaseThreadResources(Object resource) {
+		File f = (File) resource;
+		f.delete();
 	}
 
 	@Override
 	public String getVersion() {
 		return "command-line";
+	}
+
+	@Override
+	public void beforeAllocatingResources() throws SynthesisException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void afterAllocatingResources() throws SynthesisException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void beforeReleasingResources() throws SynthesisException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void afterReleasingResources() throws SynthesisException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public int getOverallPriority() {
+		return Integer.valueOf(System.getProperty("espeak.bin.priority", "1"));
+	}
+
+	@Override
+	public List<Voice> getAvailableVoices() throws SynthesisException {
+		//TODO: call the binary
+		return Arrays.asList(new Voice[]{
+		        new Voice(getName(), "en"), new Voice(getName(), "fr")
+		});
 	}
 }

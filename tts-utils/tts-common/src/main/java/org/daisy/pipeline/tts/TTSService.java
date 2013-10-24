@@ -24,6 +24,29 @@ public interface TTSService {
 		public int offsetInOutput;
 	};
 
+	public static class Voice {
+		public Voice(String vendor, String name) {
+			this.vendor = vendor;
+			this.name = name;
+		}
+
+		public int hashCode() {
+			if (name == null)
+				return super.hashCode();
+			return vendor.hashCode() ^ name.hashCode();
+		}
+
+		public boolean equals(Object other) {
+			if (name == null || vendor == null)
+				return false;
+			Voice v2 = (Voice) other;
+			return vendor.equals(v2.vendor) && name.equals(v2.name);
+		}
+
+		public String vendor;
+		public String name;
+	}
+
 	/**
 	 * Allocate new resources (such as TCP connections) unique for each thread.
 	 * All the allocation calls are made in a single thread before any sentence
@@ -40,7 +63,7 @@ public interface TTSService {
 	 * 
 	 * @param resources is the object returned by allocateThreadResource()
 	 */
-	void releaseThreadResources(Object resources);
+	void releaseThreadResources(Object resources) throws SynthesisException;
 
 	/**
 	 * Must be thread safe because there is only one Synthesizer instantiated.
@@ -48,6 +71,9 @@ public interface TTSService {
 	 * @param ssml is the SSML to synthesize. You may need to convert it to the
 	 *            format understandable for the TTS (e.g. SAPI). The SSML code
 	 *            must include the <mark> and the <break/> at the end.
+	 * @param voice is the voice the synthesizer must use. It is guaranteed to
+	 *            be one returned by getAvailableVoices()
+	 * 
 	 * @param output is the resulting raw audio data. Ideally the address of the
 	 *            buffer is left unchanged, but a new buffer can be allocated
 	 *            when the audio data do not fit in the one provided.
@@ -67,9 +93,9 @@ public interface TTSService {
 	 *         new data can fit into it. null is returned if the first call
 	 *         succeeds.
 	 */
-	Object synthesize(XdmNode ssml, RawAudioBuffer audioBuffer, Object memory,
-	        Object threadResources, List<Map.Entry<String, Double>> marks)
-	        throws SynthesisException;
+	Object synthesize(XdmNode ssml, Voice voice, RawAudioBuffer audioBuffer,
+	        Object memory, Object threadResources,
+	        List<Map.Entry<String, Double>> marks) throws SynthesisException;
 
 	/**
 	 * @return the audio format (sample rate etc...) of the data produced by
@@ -91,6 +117,33 @@ public interface TTSService {
 	 */
 	public String getVersion();
 
-	public int getPriority(String lang);
+	/**
+	 * Single threaded
+	 */
+	public void beforeAllocatingResources() throws SynthesisException;
 
+	/**
+	 * Single threaded
+	 */
+	public void afterAllocatingResources() throws SynthesisException;
+
+	/**
+	 * Single threaded
+	 */
+	public void beforeReleasingResources() throws SynthesisException;
+
+	/**
+	 * Single threaded
+	 */
+	public void afterReleasingResources() throws SynthesisException;
+
+	/**
+	 * Called anytime in multi-threaded contexts.
+	 */
+	public int getOverallPriority();
+
+	/**
+	 * Called anytime in multi-threaded contexts.
+	 */
+	public List<Voice> getAvailableVoices() throws SynthesisException;
 }

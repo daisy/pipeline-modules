@@ -43,11 +43,12 @@ public class SSMLUtil {
 		}
 	}
 
-	public static String toString(XdmNode ssml, SSMLAdapter adapter) {
+	public static String toString(XdmNode ssml, String voiceName,
+	        SSMLAdapter adapter) {
 		if (adapter == null)
 			adapter = new BasicSSMLAdapter();
 		StringBuilder sb = new StringBuilder();
-		sb.append(adapter.getHeader());
+		sb.append(adapter.getHeader(voiceName));
 		toString(ssml, sb, adapter);
 		sb.append(adapter.getFooter());
 		return sb.toString();

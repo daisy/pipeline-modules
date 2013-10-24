@@ -14,19 +14,31 @@ import org.daisy.pipeline.audio.AudioEncoder;
 import org.daisy.pipeline.tts.TTSRegistry;
 import org.daisy.pipeline.tts.TTSService;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
+import org.daisy.pipeline.tts.TTSService.Voice;
 
 public class SynthesisWorkerPool {
+
+	static class Speakable {
+		Speakable(Voice voice, XdmNode sentence) {
+			this.voice = voice;
+			this.sentence = sentence;
+		}
+
+		Voice voice;
+		XdmNode sentence;
+	}
 
 	public static class UndispatchableSection implements
 	        Comparable<UndispatchableSection> {
 		int size;
-		List<XdmNode> sentences;
+		List<Speakable> speakables;
 		TTSService synthesizer;
+		Voice voice;
 
 		void computeSize() {
 			size = 0;
-			for (XdmNode sentence : sentences) {
-				size += sentence.toString().length(); //TODO: write finer/faster computation
+			for (Speakable speakable : speakables) {
+				size += speakable.sentence.toString().length(); //TODO: write finer/faster computation
 			}
 		}
 
@@ -62,16 +74,20 @@ public class SynthesisWorkerPool {
 		mCurrentSection = null;
 	}
 
-	public void pushSSML(XdmNode ssml)  throws SynthesisException {
-		String engine = ssml.getAttributeValue(new QName("engine"));
+	public void pushSSML(XdmNode ssml) throws SynthesisException {
+		String voiceVendor = ssml.getAttributeValue(new QName("voice-vendor"));
+		String voiceName = ssml.getAttributeValue(new QName("voice-name"));
 		String lang = ssml.getAttributeValue(new QName(
 		        "http://www.w3.org/XML/1998/namespace", "lang"));
 
-		TTSService newSynth = mTTSRegistry.getTTS(engine, lang);
+		Voice voice = new Voice(voiceVendor, voiceName);
+		TTSService newSynth = mTTSRegistry.getTTS(voice, lang);
 		if (newSynth == null) {
-			throw new SynthesisException("no TTS Service available for the language '" + lang+"'");
+			throw new SynthesisException(
+			        "no TTS Service available for the voice '" + voiceVendor
+			                + ":" + voiceName + "' or language '" + lang + "'");
 		}
-		
+
 		if (newSynth != currentSynthesizer) {
 			if (currentSynthesizer != null)
 				endSection(); // the same thread might not be able to
@@ -82,10 +98,10 @@ public class SynthesisWorkerPool {
 		if (mCurrentSection == null) {
 			mCurrentSection = new UndispatchableSection();
 			mSections.add(mCurrentSection);
-			mCurrentSection.sentences = new ArrayList<XdmNode>();
+			mCurrentSection.speakables = new ArrayList<Speakable>();
 			mCurrentSection.synthesizer = currentSynthesizer;
 		}
-		mCurrentSection.sentences.add(ssml);
+		mCurrentSection.speakables.add(new Speakable(voice, ssml));
 	}
 
 	public void endSection() {
@@ -108,8 +124,14 @@ public class SynthesisWorkerPool {
 		mLogger.printInfo(sb.toString());
 
 		for (TTSService tts : allTTS)
+			tts.beforeAllocatingResources();
+
+		for (TTSService tts : allTTS)
 			for (SynthesisWorkerThread worker : mWorkers)
 				worker.allocateResourcesFor(tts);
+
+		for (TTSService tts : allTTS)
+			tts.afterAllocatingResources();
 
 		mLogger.printInfo("thread resources allocated.");
 
@@ -141,8 +163,14 @@ public class SynthesisWorkerPool {
 
 		mLogger.printInfo("synthesis workers finished");
 
+		for (TTSService tts : allTTS)
+			tts.beforeReleasingResources();
+
 		for (SynthesisWorkerThread worker : mWorkers)
 			worker.releaseResources();
+
+		for (TTSService tts : allTTS)
+			tts.afterReleasingResources();
 
 		mLogger.printInfo("synthesis resources released");
 	}

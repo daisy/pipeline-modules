@@ -25,6 +25,16 @@ public class ATTNative implements TTSService, ATTLibListener {
 
 	private SSMLAdapter mSSMLAdapter = new BasicSSMLAdapter() {
 		@Override
+		public String getFooter() {
+			return "</voice>";
+		}
+
+		@Override
+		public String getHeader(String voiceName) {
+			return "<voice name=\"" + voiceName + "\">";
+		}
+
+		@Override
 		public QName adaptElement(QName elementName) {
 			return new QName(null, elementName.getLocalName());
 		}
@@ -73,8 +83,8 @@ public class ATTNative implements TTSService, ATTLibListener {
 	}
 
 	@Override
-	public Object synthesize(XdmNode ssml, RawAudioBuffer audioBuffer,
-	        Object resource, Object lastCallMemory,
+	public Object synthesize(XdmNode ssml, Voice voice,
+	        RawAudioBuffer audioBuffer, Object resource, Object lastCallMemory,
 	        List<Entry<String, Double>> marks) throws SynthesisException {
 
 		ThreadResource tr = (ThreadResource) resource;
@@ -83,7 +93,7 @@ public class ATTNative implements TTSService, ATTLibListener {
 		tr.firstOffset = tr.audioBuffer.offsetInOutput;
 
 		ATTLib.synthesizeRequest(tr, tr.connection,
-		        SSMLUtil.toString(ssml, mSSMLAdapter));
+		        SSMLUtil.toString(ssml, voice.name, mSSMLAdapter));
 
 		return null;
 	}
@@ -96,21 +106,6 @@ public class ATTNative implements TTSService, ATTLibListener {
 	@Override
 	public String getName() {
 		return "att";
-	}
-
-	@Override
-	public int getPriority(String lang) {
-
-		if (lang == null) {
-			return 2;
-		}
-
-		if (lang.startsWith("en")) {
-			return 4;
-		} else if (lang.startsWith("fr")) {
-			return 4;
-		}
-		return 1;
 	}
 
 	@Override
@@ -162,5 +157,40 @@ public class ATTNative implements TTSService, ATTLibListener {
 	@Override
 	public String getVersion() {
 		return "sdk";
+	}
+
+	@Override
+	public void beforeAllocatingResources() throws SynthesisException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void afterAllocatingResources() throws SynthesisException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void beforeReleasingResources() throws SynthesisException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void afterReleasingResources() throws SynthesisException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public int getOverallPriority() {
+		return Integer.valueOf(System.getProperty("att.native.priority", "10"));
+	}
+
+	@Override
+	public List<Voice> getAvailableVoices() throws SynthesisException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

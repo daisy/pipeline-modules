@@ -17,6 +17,8 @@ import org.daisy.pipeline.audio.AudioEncoder;
 import org.daisy.pipeline.tts.TTSService;
 import org.daisy.pipeline.tts.TTSService.RawAudioBuffer;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
+import org.daisy.pipeline.tts.TTSService.Voice;
+import org.daisy.pipeline.tts.synthesize.SynthesisWorkerPool.Speakable;
 import org.daisy.pipeline.tts.synthesize.SynthesisWorkerPool.UndispatchableSection;
 
 /**
@@ -92,13 +94,14 @@ public class SynthesisWorkerThread extends Thread implements
 		mResources.put(s, s.allocateThreadResources());
 	}
 
-	public void releaseResources() {
+	public void releaseResources() throws SynthesisException {
 		for (Map.Entry<TTSService, Object> resource : mResources.entrySet()) {
 			resource.getKey().releaseThreadResources(resource.getValue());
 		}
 	}
 
-	private void processOneSentence(XdmNode sentence) throws SynthesisException {
+	private void processOneSentence(XdmNode sentence, Voice voice)
+	        throws SynthesisException {
 		if (mOffsetInOutput + MAX_ESTIMATED_SYNTHESIZED_BYTES > AUDIO_BUFFER_BYTES) {
 			encodeAudio();
 		}
@@ -106,14 +109,14 @@ public class SynthesisWorkerThread extends Thread implements
 		List<Map.Entry<String, Double>> marks = new ArrayList<Map.Entry<String, Double>>();
 		mRawAudioBuffer.output = mOutput;
 		mRawAudioBuffer.offsetInOutput = mOffsetInOutput;
-		Object memory = mLastUsedSynthesizer.synthesize(sentence,
+		Object memory = mLastUsedSynthesizer.synthesize(sentence, voice,
 		        mRawAudioBuffer, resource, null, marks);
 
 		if (memory != null) {
 			encodeAudio();
 			// try again with the room freed after encoding
 			marks.clear();
-			mLastUsedSynthesizer.synthesize(sentence, mRawAudioBuffer,
+			mLastUsedSynthesizer.synthesize(sentence, voice, mRawAudioBuffer,
 			        resource, memory, marks);
 		} else if (mRawAudioBuffer.output != mOutput) {
 			if ((mRawAudioBuffer.offsetInOutput + mOffsetInOutput) > mOutput.length) {
@@ -191,8 +194,8 @@ public class SynthesisWorkerThread extends Thread implements
 			}
 			try {
 				mLastUsedSynthesizer = section.synthesizer;
-				for (XdmNode sentence : section.sentences) {
-					processOneSentence(sentence);
+				for (Speakable speakable : section.speakables) {
+					processOneSentence(speakable.sentence, speakable.voice);
 				}
 				if (mOffsetInOutput > 0)
 					encodeAudio();

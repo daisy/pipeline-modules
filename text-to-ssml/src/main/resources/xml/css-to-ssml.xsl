@@ -26,11 +26,18 @@
     <xsl:copy>
       <xsl:copy-of select="@xml:lang|@id"/>
       <xsl:if test="@tmp:voice-family">
-	<xsl:attribute name="engine">
-	  <xsl:variable name="normalized" select="tmp:normlist(@tmp:voice-family)"/>
-	  <xsl:variable name="left" select="if (contains($normalized, '|')) then substring-before($normalized, '|') else $normalized"/>
-	  <xsl:value-of select="translate(lower-case($left), ' ','')"/>
-	</xsl:attribute>
+	<!-- voice-family has the format: voice-vendor|voice-name|attr1|attr2|... -->
+	<xsl:variable name="normalized" select="tmp:normlist(@tmp:voice-family)"/>
+	<xsl:if test="contains($normalized, '|')">
+	  <xsl:variable name="left" select="substring-before($normalized, '|')"/>
+	  <xsl:variable name="right" select="substring-after($normalized, '|')"/>
+	  <xsl:attribute name="voice-vendor">
+	    <xsl:value-of select="translate(lower-case($left), ' ','')"/>
+	  </xsl:attribute>
+	  <xsl:attribute name="voice-name">
+	    <xsl:value-of select="translate(lower-case(if (contains($right, '|')) then substring-before($right, '|') else $right), ' ','')"/>
+	  </xsl:attribute>
+	</xsl:if>
       </xsl:if>
       <xsl:apply-templates select="." mode="css1"/>
     </xsl:copy>
@@ -130,12 +137,7 @@
     <xsl:choose>
       <xsl:when test="$voice-info">
 	<ssml:voice>
-	  <xsl:variable name="names" select="translate(replace(replace(replace($voice-info, 'neutral', ''), 'male', ''), 'female', ''), '|', ' ')"/>
-
 	  <xsl:choose>
-	    <xsl:when test="translate($names, ' ', '') != ''">
-	      <xsl:attribute name="name"><xsl:value-of select="translate($names, ' ', '')"/></xsl:attribute>
-	    </xsl:when>
 	    <xsl:when test="contains($voice-info, 'male')">
 	      <xsl:attribute name="gender"><xsl:value-of select="'male'"/></xsl:attribute>
 	    </xsl:when>

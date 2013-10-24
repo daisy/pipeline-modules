@@ -1,8 +1,6 @@
 package org.daisy.pipeline.tts.att;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.AbstractMap;
@@ -15,8 +13,6 @@ import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 
 import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
 
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.XdmNode;
@@ -27,6 +23,7 @@ import org.daisy.pipeline.tts.LoadBalancer.Host;
 import org.daisy.pipeline.tts.RoundRobinLoadBalancer;
 import org.daisy.pipeline.tts.SSMLAdapter;
 import org.daisy.pipeline.tts.SSMLUtil;
+import org.daisy.pipeline.tts.SoundUtil;
 import org.daisy.pipeline.tts.TTSService;
 
 /**
@@ -46,6 +43,16 @@ public class ATTBin implements TTSService {
 	private int fileid = 0;
 
 	private SSMLAdapter mSSMLAdapter = new BasicSSMLAdapter() {
+		@Override
+		public String getFooter() {
+			return "</voice>";
+		}
+
+		@Override
+		public String getHeader(String voiceName) {
+			return "<voice name=\"" + voiceName + "\">";
+		}
+
 		@Override
 		public QName adaptElement(QName elementName) {
 			return new QName(null, elementName.getLocalName());
@@ -78,11 +85,6 @@ public class ATTBin implements TTSService {
 		}
 	};
 
-	private synchronized int getFileId() {
-		++fileid;
-		return fileid;
-	}
-
 	public ATTBin() throws SynthesisException {
 
 		mLoadBalancer = new RoundRobinLoadBalancer(System.getProperty(
@@ -111,11 +113,12 @@ public class ATTBin implements TTSService {
 	}
 
 	@Override
-	public Object synthesize(XdmNode ssml, RawAudioBuffer audioBuffer,
-	        Object resources, Object lastCallMemory,
-	        List<Entry<String, Double>> marks) throws SynthesisException {
-		return synthesize(SSMLUtil.toString(ssml, mSSMLAdapter), audioBuffer,
-		        resources, lastCallMemory, marks, 0);
+	public Object synthesize(XdmNode ssml, Voice voice,
+	        RawAudioBuffer audioBuffer, Object resources,
+	        Object lastCallMemory, List<Entry<String, Double>> marks)
+	        throws SynthesisException {
+		return synthesize(SSMLUtil.toString(ssml, voice.name, mSSMLAdapter),
+		        audioBuffer, resources, lastCallMemory, marks, 0);
 
 	}
 
@@ -130,8 +133,7 @@ public class ATTBin implements TTSService {
 			dest = (File) lastCallMemory;
 		} else {
 			try {
-				dest = File.createTempFile("attbin",
-				        String.valueOf(getFileId()));
+				dest = File.createTempFile("attbin", ".wav");
 			} catch (IOException e) {
 				throw new SynthesisException(e.getMessage(), e.getCause());
 			}
@@ -165,30 +167,11 @@ public class ATTBin implements TTSService {
 			} catch (Exception e) {
 				throw new SynthesisException(e.getMessage(), e.getCause());
 			}
-
-			int maxLength = (int) (dest.length() - MinRiffHeaderSize);
-			if (maxLength > audioBuffer.output.length) {
-				// the audio is not big enough => dynamic allocation
-				audioBuffer.output = new byte[(int) maxLength];
-				audioBuffer.offsetInOutput = 0;
-			} else if (maxLength > (audioBuffer.output.length - audioBuffer.offsetInOutput)) {
-				// the audio buffer is big enough but it needs to be flushed
-				return dest;
-			}
 		}
 
 		// read the audio data from the resulting WAV file
 		try {
-			AudioInputStream fi = AudioSystem
-			        .getAudioInputStream(new BufferedInputStream(
-			                new FileInputStream(dest)));
-			int read = 0;
-			while (read != -1) {
-				audioBuffer.offsetInOutput += read;
-				read = fi.read(audioBuffer.output, audioBuffer.offsetInOutput,
-				        audioBuffer.output.length - audioBuffer.offsetInOutput);
-			}
-			fi.close();
+			SoundUtil.readWave(dest, audioBuffer, false);
 		} catch (Exception e) {
 			if (tries == 0) {
 				marks.clear();
@@ -217,20 +200,6 @@ public class ATTBin implements TTSService {
 	}
 
 	@Override
-	public int getPriority(String lang) {
-		if (lang == null) {
-			return 1;
-		}
-
-		if (lang.startsWith("en")) {
-			return 3;
-		} else if (lang.startsWith("fr")) {
-			return 3;
-		}
-		return 1;
-	}
-
-	@Override
 	public Object allocateThreadResources() {
 		return mLoadBalancer.selectHost();
 	}
@@ -242,5 +211,40 @@ public class ATTBin implements TTSService {
 	@Override
 	public String getVersion() {
 		return "command-line";
+	}
+
+	@Override
+	public void beforeAllocatingResources() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void afterAllocatingResources() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void beforeReleasingResources() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void afterReleasingResources() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public int getOverallPriority() {
+		return Integer.valueOf(System.getProperty("att.bin.priority", "5"));
+	}
+
+	@Override
+	public List<Voice> getAvailableVoices() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
