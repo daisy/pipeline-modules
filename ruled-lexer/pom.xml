@@ -25,12 +25,10 @@
  		<version>1.6.4</version>
 	</dependency>
  	
-     
-   <dependency>
-     <groupId>com.googlecode.guava-osgi</groupId>
-     <artifactId>guava-osgi</artifactId>
-     <version>11.0.1</version>
-   </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+    </dependency>
    
    <dependency>
      <groupId>junit</groupId>
@@ -48,7 +46,6 @@
      <artifactId>lexing</artifactId>
    </dependency>
    
-	        
   </dependencies>
   
    <build>
