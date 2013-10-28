@@ -116,32 +116,32 @@ public interface TTSService {
 	public String getVersion();
 
 	/**
-	 * Single threaded
+	 * Called from a single thread
 	 */
 	public void beforeAllocatingResources() throws SynthesisException;
 
 	/**
-	 * Single threaded
+	 * Called from a single thread
 	 */
 	public void afterAllocatingResources() throws SynthesisException;
 
 	/**
-	 * Single threaded
+	 * Called from a single thread
 	 */
 	public void beforeReleasingResources() throws SynthesisException;
 
 	/**
-	 * Single threaded
+	 * Called from a single thread
 	 */
 	public void afterReleasingResources() throws SynthesisException;
 
 	/**
-	 * Called anytime in multi-threaded contexts.
+	 * Called from a single thread
 	 */
 	public int getOverallPriority();
 
 	/**
-	 * Called anytime in multi-threaded contexts.
+	 * Called from a single thread
 	 */
 	public List<Voice> getAvailableVoices() throws SynthesisException;
 }

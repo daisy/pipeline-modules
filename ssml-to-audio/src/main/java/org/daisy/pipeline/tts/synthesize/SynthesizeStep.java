@@ -29,6 +29,7 @@ public class SynthesizeStep extends DefaultStep implements
 	private WritablePipe result = null;
 	private SynthesisWorkerPool mWorkerPool;
 	private XProcRuntime mRuntime;
+	private TTSRegistry mTTSRegistry;
 
 	private static String convertSecondToString(double seconds) {
 		long milliseconds = (long) (1000 * seconds);
@@ -51,6 +52,7 @@ public class SynthesizeStep extends DefaultStep implements
 	        TTSRegistry ttsRegistry, AudioEncoder encoder) {
 		super(runtime, step);
 		mRuntime = runtime;
+		mTTSRegistry = ttsRegistry;
 		printInfo("New synthesize step. TTSregistry set: "
 		        + (ttsRegistry != null) + ", AudioEncoder set: "
 		        + (encoder != null));
@@ -102,6 +104,8 @@ public class SynthesizeStep extends DefaultStep implements
 
 	public void run() throws SaxonApiException {
 		super.run();
+
+		mTTSRegistry.regenerateVoiceMapping();
 
 		// split the SSML into meaningful sections
 		mWorkerPool.initialize();

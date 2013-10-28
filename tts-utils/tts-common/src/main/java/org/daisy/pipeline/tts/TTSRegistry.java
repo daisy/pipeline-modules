@@ -1,31 +1,38 @@
 package org.daisy.pipeline.tts;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.TTSService.Voice;
-
-import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Multimap;
 
 public class TTSRegistry {
 
-	private Multimap<Voice, TTSService> ttsServices = LinkedHashMultimap
-	        .<Voice, TTSService> create();
+	private List<TTSService> ttsServices;
+	private Map<Voice, TTSService> mBestServices;
+	private Map<String, Voice> mBestVoices; //for a given language
+	private List<VoiceInfo> mVoicePriorities;
 
 	private static class VoiceInfo {
-		VoiceInfo(int priority, String language) {
+		VoiceInfo(String voiceVendor, String voiceName, float priority,
+		        String language) {
+			this.voice = new Voice(voiceVendor, voiceName);
 			this.priority = priority;
 			this.language = language;
 		}
 
-		int priority;
+		VoiceInfo(Voice v, float priority, String language) {
+			this.voice = v;
+			this.priority = priority;
+			this.language = language;
+		}
+
+		Voice voice;
+		float priority;
 		String language;
 	}
 
@@ -33,90 +40,77 @@ public class TTSRegistry {
 		return language.split("[-_.]")[0];
 	}
 
-	private static final Map<Voice, VoiceInfo> mPriorityMap;
-	private static final Map<String, List<Voice>> mLangToVoices;
-	static {
-		mPriorityMap = new HashMap<Voice, VoiceInfo>();
+	public TTSRegistry() {
+		ttsServices = new ArrayList<TTSService>();
+		mVoicePriorities = new ArrayList<VoiceInfo>();
 		for (String lang : new String[]{
 		        "en", "fr", "es"
 		}) {
-			mPriorityMap.put(new Voice("espeak", lang), new VoiceInfo(1, lang));
+			mVoicePriorities.add(new VoiceInfo("espeak", lang, 1, lang));
 		}
 
 		//French
-		mPriorityMap.put(new Voice("att", "alain16"), new VoiceInfo(5, "fr"));
+		mVoicePriorities.add(new VoiceInfo("att", "alain16", 10, "fr"));
+		mVoicePriorities.add(new VoiceInfo("att", "alain8", 7, "fr"));
 
 		//English
-		mPriorityMap.put(new Voice("att", "mike16"), new VoiceInfo(3, "en_us"));
+		mVoicePriorities.add(new VoiceInfo("att", "mike16", 10, "en_us"));
+		mVoicePriorities.add(new VoiceInfo("att", "mike8", 7, "en_us"));
+		mVoicePriorities.add(new VoiceInfo("Microsoft", "Microsoft Anna", 4,
+		        "en_us"));
 
-		//override them with the system properties. format: priority.vendor.voicename.language = priorityVal
-		//TODO: iterate over the properties
+		//TODO: override and add some from the system properties.
+		//format: priority.vendor.voicename.language = priorityVal
 
 		//copy the priorities with language variants removed
-		for (Map.Entry<Voice, VoiceInfo> e : mPriorityMap.entrySet()) {
-			String shortLang = getPrefix(e.getValue().language);
-			if (!shortLang.equals(e.getValue().language)) {
-				mPriorityMap.put(e.getKey(), new VoiceInfo(
-				        e.getValue().priority, shortLang));
+		List<VoiceInfo> shallowCpy = new ArrayList<VoiceInfo>(mVoicePriorities);
+		for (VoiceInfo info : shallowCpy) {
+			String shortLang = getPrefix(info.language);
+			if (!shortLang.equals(info.language)) {
+				mVoicePriorities.add(new VoiceInfo(info.voice,
+				        info.priority - 0.1f, shortLang));
 			}
 		}
 
-		//create an access from language to voice, order by priority (descending order)
-		mLangToVoices = new HashMap<String, List<Voice>>();
-		for (Map.Entry<Voice, VoiceInfo> e : mPriorityMap.entrySet()) {
-			String lang = e.getValue().language;
-			List<Voice> li = mLangToVoices.get(lang);
-			if (li == null) {
-				li = new ArrayList<Voice>();
-				mLangToVoices.put(lang, li);
-			}
-			li.add(e.getKey());
-		}
-
-		Comparator<Voice> reverseComp = new Comparator<Voice>() {
+		Comparator<VoiceInfo> reverseComp = new Comparator<VoiceInfo>() {
 			@Override
-			public int compare(Voice v1, Voice v2) {
-				return Integer.valueOf(mPriorityMap.get(v2).priority)
-				        .compareTo(
-				                Integer.valueOf(mPriorityMap.get(v1).priority));
+			public int compare(VoiceInfo v1, VoiceInfo v2) {
+				return Float.valueOf(v1.priority).compareTo(
+				        Float.valueOf(v2.priority));
 			}
 		};
 
-		for (List<Voice> li : mLangToVoices.values()) {
-			Collections.sort(li, reverseComp);
-		}
+		Collections.sort(mVoicePriorities, reverseComp);
 	}
 
-	private Voice findAvailableVoice(String lang) {
-		Voice res = null;
-		List<Voice> alternateVoices = mLangToVoices.get(lang);
-		if (alternateVoices != null && !alternateVoices.isEmpty()) {
-			Iterator<Voice> it = alternateVoices.iterator();
-			while ((ttsServices.get(res) == null || ttsServices.get(res)
-			        .isEmpty()) && it.hasNext()) {
-				res = it.next();
+	public void regenerateVoiceMapping() {
+		mBestServices = new HashMap<Voice, TTSService>();
+		for (TTSService tts : ttsServices)
+			try {
+				if (tts.getAvailableVoices() != null)
+					for (Voice v : tts.getAvailableVoices()) {
+						TTSService competitor = mBestServices.get(v);
+						if (competitor == null
+						        || competitor.getOverallPriority() < tts
+						                .getOverallPriority())
+							mBestServices.put(v, tts);
+					}
+			} catch (SynthesisException e) {
+				//voices of this TTS Services are ignored
 			}
+
+		mBestVoices = new HashMap<String, Voice>();
+		for (VoiceInfo voiceInfo : mVoicePriorities) {
+			if (!mBestVoices.containsKey(voiceInfo.language)
+			        && mBestServices.containsKey(voiceInfo.voice))
+				mBestVoices.put(voiceInfo.language, voiceInfo.voice);
 		}
-		return res;
 	}
 
 	public Voice findAvailableVoice(Voice preferredVoice, String lang) {
-		if (ttsServices.get(preferredVoice) != null
-		        && !ttsServices.get(preferredVoice).isEmpty()) {
+		if (mBestServices.containsKey(preferredVoice))
 			return preferredVoice;
-		}
-
-		//find an alternative voice for the given language or its variant
-		preferredVoice = findAvailableVoice(lang);
-		if (preferredVoice != null)
-			return preferredVoice;
-
-		String shortLang = getPrefix(lang);
-		if (!shortLang.equals(lang)) {
-			return findAvailableVoice(shortLang);
-		}
-
-		return null;
+		return mBestVoices.get(lang);
 	}
 
 	/**
@@ -124,37 +118,15 @@ public class TTSRegistry {
 	 * @return the best TTS Service for @param voice
 	 */
 	public TTSService getTTS(Voice voice) {
-		Collection<TTSService> candidates = ttsServices.get(voice);
-		TTSService best = null;
-		int highestPriority = Integer.MIN_VALUE;
-		for (TTSService s : candidates) {
-			int p = s.getOverallPriority();
-			if (p > highestPriority) {
-				best = s;
-				highestPriority = p;
-			}
-		}
-		return best;
+		return mBestServices.get(voice);
 	}
 
 	public void addTTS(TTSService tts) {
-		try {
-			for (Voice voice : tts.getAvailableVoices())
-				ttsServices.put(voice, tts);
-		} catch (Exception e) {
-			//TTS is not added
-		} catch (Error e) {
-			//TTS is not added
-		}
+		ttsServices.add(tts);
 	}
 
 	public void removeTTS(TTSService tts) {
-		try {
-			for (Voice voice : tts.getAvailableVoices())
-				ttsServices.remove(voice, tts);
-		} catch (Exception e) {
-		} catch (Error e) {
-		}
+		ttsServices.remove(tts);
 	}
 
 }
