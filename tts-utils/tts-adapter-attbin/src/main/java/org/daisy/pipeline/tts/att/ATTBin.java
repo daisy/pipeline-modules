@@ -107,7 +107,7 @@ public class ATTBin implements TTSService {
 		//test the synthesizer so that the service won't be active if it fails
 		RawAudioBuffer testBuffer = new RawAudioBuffer();
 		testBuffer.offsetInOutput = 0;
-		testBuffer.output = new byte[2048];
+		testBuffer.output = new byte[1];
 		synthesize("x", testBuffer, mLoadBalancer.selectHost(), null,
 		        new LinkedList<Map.Entry<String, Double>>(), 1);
 	}

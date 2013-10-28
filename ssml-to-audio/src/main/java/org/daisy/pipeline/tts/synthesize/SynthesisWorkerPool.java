@@ -74,14 +74,20 @@ public class SynthesisWorkerPool {
 		mCurrentSection = null;
 	}
 
+	static private final Voice NoVoice = new Voice("", "");
+
 	public void pushSSML(XdmNode ssml) throws SynthesisException {
 		String voiceVendor = ssml.getAttributeValue(new QName("voice-vendor"));
 		String voiceName = ssml.getAttributeValue(new QName("voice-name"));
 		String lang = ssml.getAttributeValue(new QName(
 		        "http://www.w3.org/XML/1998/namespace", "lang"));
 
-		Voice voice = new Voice(voiceVendor, voiceName);
-		TTSService newSynth = mTTSRegistry.getTTS(voice, lang);
+		Voice voice = NoVoice;
+		if (voiceVendor != null && voiceName != null)
+			voice = new Voice(voiceVendor, voiceName);
+
+		voice = mTTSRegistry.findAvailableVoice(voice, lang);
+		TTSService newSynth = mTTSRegistry.getTTS(voice);
 		if (newSynth == null) {
 			throw new SynthesisException(
 			        "no TTS Service available for the voice '" + voiceVendor

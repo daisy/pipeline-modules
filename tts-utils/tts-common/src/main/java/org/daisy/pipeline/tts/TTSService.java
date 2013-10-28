@@ -26,18 +26,16 @@ public interface TTSService {
 
 	public static class Voice {
 		public Voice(String vendor, String name) {
-			this.vendor = vendor;
-			this.name = name;
+			this.vendor = vendor.toLowerCase();
+			this.name = name.toLowerCase();
 		}
 
 		public int hashCode() {
-			if (name == null)
-				return super.hashCode();
 			return vendor.hashCode() ^ name.hashCode();
 		}
 
 		public boolean equals(Object other) {
-			if (name == null || vendor == null)
+			if (other == null)
 				return false;
 			Voice v2 = (Voice) other;
 			return vendor.equals(v2.vendor) && name.equals(v2.name);

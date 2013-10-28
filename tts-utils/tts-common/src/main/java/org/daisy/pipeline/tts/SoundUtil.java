@@ -19,6 +19,10 @@ public class SoundUtil {
 	static public boolean readWave(File soundFile, RawAudioBuffer audioBuffer,
 	        boolean twoTries) throws UnsupportedAudioFileException, IOException {
 		int maxLength = (int) (soundFile.length() - MinRiffHeaderSize);
+		if (maxLength < 0) {
+			throw new IOException(soundFile.getAbsolutePath()
+			        + " is too small to be a WAV file");
+		}
 		boolean canFit = (soundFile.length() > (audioBuffer.output.length - audioBuffer.offsetInOutput));
 		if (maxLength > audioBuffer.output.length || (!twoTries && !canFit)) {
 			// the audio is not big enough => dynamic allocation

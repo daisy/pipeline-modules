@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -74,53 +73,58 @@ public class TTSRegistry {
 			li.add(e.getKey());
 		}
 
-		Comparator<Voice> comp = new Comparator<Voice>() {
+		Comparator<Voice> reverseComp = new Comparator<Voice>() {
 			@Override
-			public int compare(Voice v0, Voice v1) {
-				return (mPriorityMap.get(v1).priority - mPriorityMap.get(v0).priority);
+			public int compare(Voice v1, Voice v2) {
+				return Integer.valueOf(mPriorityMap.get(v2).priority)
+				        .compareTo(
+				                Integer.valueOf(mPriorityMap.get(v1).priority));
 			}
 		};
 
 		for (List<Voice> li : mLangToVoices.values()) {
-			Collections.sort(li, comp);
+			Collections.sort(li, reverseComp);
 		}
 	}
 
-	private static List<Voice> EmptyList = new LinkedList<Voice>();
+	private Voice findAvailableVoice(String lang) {
+		Voice res = null;
+		List<Voice> alternateVoices = mLangToVoices.get(lang);
+		if (alternateVoices != null && !alternateVoices.isEmpty()) {
+			Iterator<Voice> it = alternateVoices.iterator();
+			while ((ttsServices.get(res) == null || ttsServices.get(res)
+			        .isEmpty()) && it.hasNext()) {
+				res = it.next();
+			}
+		}
+		return res;
+	}
 
-	public TTSService getTTS(Voice voice, String lang) {
-		Collection<TTSService> candidates = ttsServices.get(voice);
+	public Voice findAvailableVoice(Voice preferredVoice, String lang) {
+		if (ttsServices.get(preferredVoice) != null
+		        && !ttsServices.get(preferredVoice).isEmpty()) {
+			return preferredVoice;
+		}
 
 		//find an alternative voice for the given language or its variant
-		if (candidates == null || candidates.size() == 0) {
-			List<Voice> alternateVoices1 = mLangToVoices.get(lang);
-			if (alternateVoices1 == null) {
-				alternateVoices1 = EmptyList;
-			}
-			List<Voice> alternateVoices2 = EmptyList;
-			String shortLang = getPrefix(lang);
-			if (!shortLang.equals(lang)) {
-				alternateVoices2 = mLangToVoices.get(shortLang);
-			}
+		preferredVoice = findAvailableVoice(lang);
+		if (preferredVoice != null)
+			return preferredVoice;
 
-			Iterator<Voice> it1 = alternateVoices1.iterator();
-			Iterator<Voice> it2 = alternateVoices2.iterator();
-			while ((candidates == null || candidates.size() == 0)
-			        && (it1.hasNext() || it2.hasNext())) {
-				if (it1.hasNext())
-					candidates = ttsServices.get(it1.next());
-				if ((candidates == null || candidates.size() == 0)
-				        && it2.hasNext()) {
-					candidates = ttsServices.get(it2.next());
-				}
-			}
+		String shortLang = getPrefix(lang);
+		if (!shortLang.equals(lang)) {
+			return findAvailableVoice(shortLang);
 		}
 
-		if (candidates == null || candidates.size() == 0) {
-			return null;
-		}
+		return null;
+	}
 
-		//find the best TTS service for the 
+	/**
+	 * @param voice is an available voice
+	 * @return the best TTS Service for @param voice
+	 */
+	public TTSService getTTS(Voice voice) {
+		Collection<TTSService> candidates = ttsServices.get(voice);
 		TTSService best = null;
 		int highestPriority = Integer.MIN_VALUE;
 		for (TTSService s : candidates) {
@@ -130,7 +134,6 @@ public class TTSRegistry {
 				highestPriority = p;
 			}
 		}
-
 		return best;
 	}
 
