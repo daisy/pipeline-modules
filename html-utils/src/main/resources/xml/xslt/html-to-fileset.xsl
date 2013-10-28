@@ -7,8 +7,8 @@
     xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:m="http://www.w3.org/1998/Math/MathML"
     xmlns:xs="http://www.w3.org/2001/XMLSchema" version="2.0" exclude-result-prefixes="#all">
 
-<!--    <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/xslt/uri-functions.xsl"/>-->
-    <xsl:import href="../../../../test/xspec/mock-functions.xsl"/>
+    <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/xslt/uri-functions.xsl"/>
+    <!--<xsl:import href="../../../../test/xspec/mock-functions.xsl"/>-->
 
     <xsl:strip-space elements="*"/>
     <xsl:output indent="yes"/>
