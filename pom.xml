@@ -23,6 +23,7 @@
     <module>tts-utils/tts-adapter-attbin</module>
     <module>tts-utils/tts-adapter-attnative/att-nar</module>
     <module>tts-utils/tts-adapter-attnative</module>
+	<module>tts-utils/tts-adapter-sapicom</module>
     <module>epub3-to-ssml</module>
     <module>ssml-to-audio</module>
     <module>zedai-to-ssml</module>
@@ -63,6 +64,11 @@
 	<artifactId>tts-adapter-attnative</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
       </dependency>
+	<dependency>
+		<groupId>org.daisy.pipeline.modules</groupId>
+		<artifactId>tts-adapter-sapicom</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+     </dependency>
       <dependency>
 	<groupId>org.daisy.pipeline.modules</groupId>
 	<artifactId>tts-common</artifactId>

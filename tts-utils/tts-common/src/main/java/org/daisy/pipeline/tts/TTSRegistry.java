@@ -52,7 +52,7 @@ public class TTSRegistry {
 		//French
 		mVoicePriorities.add(new VoiceInfo("att", "alain16", 10, "fr"));
 		mVoicePriorities.add(new VoiceInfo("att", "alain8", 7, "fr"));
-
+		
 		//English
 		mVoicePriorities.add(new VoiceInfo("att", "mike16", 10, "en_us"));
 		mVoicePriorities.add(new VoiceInfo("att", "mike8", 7, "en_us"));
@@ -75,8 +75,8 @@ public class TTSRegistry {
 		Comparator<VoiceInfo> reverseComp = new Comparator<VoiceInfo>() {
 			@Override
 			public int compare(VoiceInfo v1, VoiceInfo v2) {
-				return Float.valueOf(v1.priority).compareTo(
-				        Float.valueOf(v2.priority));
+				return Float.valueOf(v2.priority).compareTo(
+				        Float.valueOf(v1.priority));
 			}
 		};
 
@@ -87,8 +87,9 @@ public class TTSRegistry {
 		mBestServices = new HashMap<Voice, TTSService>();
 		for (TTSService tts : ttsServices)
 			try {
-				if (tts.getAvailableVoices() != null)
-					for (Voice v : tts.getAvailableVoices()) {
+				List<Voice> voices = tts.getAvailableVoices();
+				if (voices != null)
+					for (Voice v : voices) {
 						TTSService competitor = mBestServices.get(v);
 						if (competitor == null
 						        || competitor.getOverallPriority() < tts
@@ -96,14 +97,15 @@ public class TTSRegistry {
 							mBestServices.put(v, tts);
 					}
 			} catch (SynthesisException e) {
-				//voices of this TTS Services are ignored
+				//voices of this TTS Service are ignored
 			}
 
 		mBestVoices = new HashMap<String, Voice>();
 		for (VoiceInfo voiceInfo : mVoicePriorities) {
 			if (!mBestVoices.containsKey(voiceInfo.language)
-			        && mBestServices.containsKey(voiceInfo.voice))
+			        && mBestServices.containsKey(voiceInfo.voice)){
 				mBestVoices.put(voiceInfo.language, voiceInfo.voice);
+			}
 		}
 	}
 
