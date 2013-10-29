@@ -14,6 +14,14 @@
             <p px:role="desc">An XHTML document.</p>
         </p:documentation>
     </p:input>
+    
+    <p:input port="fileset.in">
+        <p:documentation>
+            <h2 px:role="name">Optional input fileset</h2>
+            <p px:role="desc">The input XHTML files will be temporarily annotated with 'data-original-href' attributes according to this fileset.</p>
+        </p:documentation>
+        <p:empty/>
+    </p:input>
 
     <p:output port="fileset.out" primary="true" sequence="false"/>
 
@@ -23,7 +31,13 @@
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">For manipulating
             filesets.</p:documentation>
     </p:import>
-
+    
+    <p:insert match="/*" position="first-child">
+        <p:input port="insertion">
+            <p:pipe port="fileset.in" step="main"/>
+        </p:input>
+    </p:insert>
+    
     <p:xslt name="fileset">
         <p:input port="stylesheet">
             <p:document href="../xslt/html-to-fileset.xsl"/>

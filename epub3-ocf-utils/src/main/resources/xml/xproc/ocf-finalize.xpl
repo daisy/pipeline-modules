@@ -13,7 +13,10 @@
         <p:empty/>
     </p:input>
     <p:option name="create-odf-manifest" select="'false'"/>
-    <p:output port="result" primary="true"/>
+    <p:option name="epub-dir"/>
+    <p:output port="result" primary="true">
+        <p:pipe port="result" step="fileset-finalized"/>
+    </p:output>
     <p:output port="container">
         <p:pipe port="result" step="create-container-descriptor"/>
     </p:output>
@@ -82,8 +85,6 @@
         </p:choose>
     </p:declare-step>
     
-    <p:variable name="result-base" select="base-uri(/*)"/>
-    
     <p:wrap-sequence name="opf-files" wrapper="wrapper">
         <p:input port="source" select="//*[@media-type='application/oebps-package+xml' or ends-with(@href,'.opf')]">
             <p:pipe port="source" step="main"/>
@@ -94,6 +95,9 @@
     <p:group name="create-container-descriptor">
         <p:output port="result"/>
         <p:xslt>
+            <p:with-param name="result-base" select="/*/@result-base">
+                <p:pipe port="result" step="result-base"/>
+            </p:with-param>
             <p:input port="source">
                 <p:pipe port="result" step="opf-files"/>
             </p:input>
@@ -105,7 +109,9 @@
             </p:input>
         </p:xslt>
         <p:add-attribute match="/*" attribute-name="xml:base">
-            <p:with-option name="attribute-value" select="resolve-uri('META-INF/container.xml',$result-base)"/>
+            <p:with-option name="attribute-value" select="resolve-uri('META-INF/container.xml',/*/@result-base)">
+                <p:pipe port="result" step="result-base"/>
+            </p:with-option>
         </p:add-attribute>
         <p:delete match="/*/@xml:base"/>
     </p:group>
@@ -129,7 +135,9 @@
                     </p:input>
                 </p:xslt>
                 <p:add-attribute match="/*" attribute-name="xml:base">
-                    <p:with-option name="attribute-value" select="resolve-uri('META-INF/manifest.xml',$result-base)"/>
+                    <p:with-option name="attribute-value" select="resolve-uri('META-INF/manifest.xml',/*/@result-base)">
+                        <p:pipe port="result" step="result-base"/>
+                    </p:with-option>
                 </p:add-attribute>
                 <p:delete match="/*/@xml:base"/>
             </p:when>
@@ -189,5 +197,29 @@
         </p:input>
     </pxi:fileset-add-ocf-entry>
     <p:identity name="fileset-finalized"/>
+    
+    <p:identity>
+        <p:input port="source">
+            <p:inline>
+                <result-base/>
+            </p:inline>
+        </p:input>
+    </p:identity>
+    <p:choose>
+        <p:when test="p:value-available('epub-dir')">
+            <p:add-attribute match="/*" attribute-name="result-base">
+                <p:with-option name="attribute-value" select="$epub-dir"/>
+            </p:add-attribute>
+        </p:when>
+        <p:otherwise>
+            <p:add-attribute match="/*" attribute-name="result-base">
+                <p:with-option name="attribute-value" select="base-uri(/*)">
+                    <p:pipe port="source" step="main"/>
+                </p:with-option>
+            </p:add-attribute>
+        </p:otherwise>
+    </p:choose>
+    <p:identity name="result-base"/>
+    <p:sink/>
 
 </p:declare-step>

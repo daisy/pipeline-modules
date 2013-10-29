@@ -5,13 +5,14 @@
         <d:fileset>
             <d:file href="{base-uri(/*)}" media-type="application/x-dtbook+xml"/>
             <xsl:for-each select="processing-instruction('xml-stylesheet')">
-                <d:file href="{replace(replace(.,'type=&quot;[^&quot;]*&quot;',''),'\s*href=&quot;(.*)&quot;\s*','$1')}"/>
+                <xsl:variable name="href" select="replace(replace(.,'type=&quot;[^&quot;]*&quot;',''),'\s*href=&quot;(.*)&quot;\s*','$1')"/>
+                <d:file href="{$href}" original-href="{resolve-uri($href,base-uri(/*))}"/>
             </xsl:for-each>
             <xsl:for-each select="//dtbook:link/@href">
-                <d:file href="{.}"/>
+                <d:file href="{.}" original-href="{resolve-uri(.,base-uri(/*))}"/>
             </xsl:for-each>
             <xsl:for-each select="//dtbook:img/@src">
-                <d:file href="{.}"/>
+                <d:file href="{.}" original-href="{resolve-uri(.,base-uri(/*))}"/>
             </xsl:for-each>
         </d:fileset>
     </xsl:template>
