@@ -15,7 +15,9 @@
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/xproc/fileset-library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/xproc/file-library.xpl"/>
 
-    <p:variable name="fileset-base" select="base-uri(/*)"/>
+    <p:variable name="fileset-base" select="base-uri(/*)">
+        <p:pipe port="fileset.in" step="main"/>
+    </p:variable>
     
     <px:fileset-create name="fileset.in-memory-base" base="/"/>
     <p:for-each>
@@ -121,7 +123,8 @@
                 <p:choose name="mkdir">
                     <p:when test="empty(/info/*)">
                         <cx:message>
-                            <p:with-option name="message" select="concat('Making directory: ',substring-after($target-dir, $fileset-base))"/>
+                            <!--<p:with-option name="message" select="concat('Making directory: ',substring-after($target-dir, $fileset-base))"/>-->
+                            <p:with-option name="message" select="concat('Making directory: ',$target-dir)"/>
                         </cx:message>
                         <px:mkdir>
                             <p:with-option name="href" select="$target-dir"/>
