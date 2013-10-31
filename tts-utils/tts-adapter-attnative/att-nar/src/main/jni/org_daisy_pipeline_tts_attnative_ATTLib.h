@@ -26,10 +26,18 @@ JNIEXPORT jint JNICALL Java_org_daisy_pipeline_tts_attnative_ATTLib_closeConnect
 /*
  * Class:     org_daisy_pipeline_tts_attnative_ATTLib
  * Method:    synthesizeRequest
- * Signature: (Ljava/lang/Object;J[B)I
+ * Signature: (Ljava/lang/Object;JLjava/lang/String;)I
  */
 JNIEXPORT jint JNICALL Java_org_daisy_pipeline_tts_attnative_ATTLib_synthesizeRequest
   (JNIEnv *, jclass, jobject, jlong, jstring);
+
+/*
+ * Class:     org_daisy_pipeline_tts_attnative_ATTLib
+ * Method:    getVoiceNames
+ * Signature: (J)[Ljava/lang/String;
+ */
+JNIEXPORT jobjectArray JNICALL Java_org_daisy_pipeline_tts_attnative_ATTLib_getVoiceNames
+  (JNIEnv *, jclass, jlong);
 
 #ifdef __cplusplus
 }

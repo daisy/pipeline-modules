@@ -4,12 +4,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.AbstractMap;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.sound.sampled.AudioFormat;
@@ -24,23 +28,23 @@ import org.daisy.pipeline.tts.RoundRobinLoadBalancer;
 import org.daisy.pipeline.tts.SSMLAdapter;
 import org.daisy.pipeline.tts.SSMLUtil;
 import org.daisy.pipeline.tts.SoundUtil;
+import org.daisy.pipeline.tts.TTSRegistry;
+import org.daisy.pipeline.tts.TTSRegistry.VoiceInfo;
 import org.daisy.pipeline.tts.TTSService;
 
 /**
  * This synthesizer uses directly the AT&T's client binary and intermediate WAV
  * files.
  * 
- * Before any conversion, run $HOME/ATT/bin/TTSServer -m 40 -c {mPort} -config
+ * Before any conversion, run ATT/bin/TTSServer -m 40 -c {mPort} -config
  * your-tts-conf.cfg
  */
 public class ATTBin implements TTSService {
-	private static int MinRiffHeaderSize = 44;
 	private AudioFormat mAudioFormat;
 	private String mATTPath;
 	private int mSampleRate;
 	private Pattern mMarkPattern;
 	private RoundRobinLoadBalancer mLoadBalancer;
-	private int fileid = 0;
 
 	private SSMLAdapter mSSMLAdapter = new BasicSSMLAdapter() {
 		@Override
@@ -50,7 +54,10 @@ public class ATTBin implements TTSService {
 
 		@Override
 		public String getHeader(String voiceName) {
-			return "<voice name=\"" + voiceName + "\">";
+			if (voiceName == null || voiceName.isEmpty()) {
+				return "<voice>";
+			}
+			return "<voice name=\"" + voiceName + "\"/>";
 		}
 
 		@Override
@@ -89,7 +96,8 @@ public class ATTBin implements TTSService {
 
 		mLoadBalancer = new RoundRobinLoadBalancer(System.getProperty(
 		        "att.servers", "localhost:8888"), null);
-
+		mMarkPattern = Pattern.compile("([0-9]+)\\s+BOOKMARK:\\s+([^\\s]+)",
+		        Pattern.MULTILINE);
 		mSampleRate = 16000;
 		mAudioFormat = new AudioFormat(mSampleRate, 16, 1, true, false);
 
@@ -101,15 +109,17 @@ public class ATTBin implements TTSService {
 			                + " is not set");
 		}
 
-		mMarkPattern = Pattern.compile("([0-9]+)\\s+BOOKMARK:\\s+([^\\s]+)",
-		        Pattern.MULTILINE);
-
 		//test the synthesizer so that the service won't be active if it fails
+		Host host = mLoadBalancer.selectHost();
 		RawAudioBuffer testBuffer = new RawAudioBuffer();
 		testBuffer.offsetInOutput = 0;
 		testBuffer.output = new byte[1];
-		synthesize("x", testBuffer, mLoadBalancer.selectHost(), null,
+		synthesize("test", testBuffer, host, null,
 		        new LinkedList<Map.Entry<String, Double>>(), 1);
+		if (testBuffer.offsetInOutput <= 0) {
+			throw new SynthesisException(
+			        "AT&T client binary did not produce any audio data");
+		}
 	}
 
 	@Override
@@ -243,8 +253,58 @@ public class ATTBin implements TTSService {
 	}
 
 	@Override
-	public List<Voice> getAvailableVoices() {
-		// TODO Auto-generated method stub
-		return null;
+	public Collection<Voice> getAvailableVoices() throws SynthesisException {
+		Set<Voice> result = new HashSet<Voice>();
+		//The client binary has no option to list all the voices, therefore we must
+		//iterate over the possible voices and check if they are accepted.
+		//If the server is smart enough, it can also return similar voices unknown 
+		//from the TTS registry.
+		//WARNING: all the AT&T servers are assumed to be configured with the same voices.
+		Host host = mLoadBalancer.selectHost();
+		String[] cmd = null;
+		Pattern voicePattern = Pattern.compile("VOICE:\\s([^;]+)");
+		Matcher mr = voicePattern.matcher("");
+
+		File dest;
+		try {
+			dest = File.createTempFile("atttest", ".wav");
+		} catch (IOException e1) {
+			return null;
+		}
+
+		try {
+			for (VoiceInfo voiceInfo : TTSRegistry.getAllPossibleVoices()) {
+				if (voiceInfo.voice.vendor.equalsIgnoreCase("att")) {
+					cmd = new String[]{
+					        mATTPath, "-ssml", "-v0", "-s", host.address, "-p",
+					        String.valueOf(host.port), "-o",
+					        dest.getAbsolutePath()
+					};
+
+					Process p = Runtime.getRuntime().exec(cmd);
+					p.getOutputStream()
+					        .write(("<voice name=\"" + voiceInfo.voice.name + "\">t</voice>")
+					                .getBytes());
+					p.getOutputStream().close();
+					InputStream is = p.getInputStream();
+					Scanner scanner = new Scanner(is);
+					while (scanner.hasNextLine()) {
+						mr.reset(scanner.nextLine());
+						if (mr.find()) {
+							result.add(new Voice(getName(), mr.group(1)));
+							break;
+						}
+					}
+					is.close();
+					p.waitFor();
+				}
+			}
+		} catch (Exception e) {
+			throw new SynthesisException(e.getMessage(), e.getCause());
+		} finally {
+			dest.delete();
+		}
+
+		return result;
 	}
 }

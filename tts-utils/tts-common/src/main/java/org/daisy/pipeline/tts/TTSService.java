@@ -1,5 +1,6 @@
 package org.daisy.pipeline.tts;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -143,5 +144,5 @@ public interface TTSService {
 	/**
 	 * Called from a single thread
 	 */
-	public List<Voice> getAvailableVoices() throws SynthesisException;
+	public Collection<Voice> getAvailableVoices() throws SynthesisException;
 }

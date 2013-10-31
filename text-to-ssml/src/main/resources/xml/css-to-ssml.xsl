@@ -26,7 +26,7 @@
     <xsl:copy>
       <xsl:copy-of select="@xml:lang|@id"/>
       <xsl:if test="@tmp:voice-family">
-	<!-- voice-family has the format: voice-vendor|voice-name|attr1|attr2|... -->
+	<!-- voice-family has the format: voice-vendor|voice-name|attr1|attr2|... where attr is a gender or an age -->
 	<xsl:variable name="normalized" select="tmp:normlist(@tmp:voice-family)"/>
 	<xsl:if test="contains($normalized, '|')">
 	  <xsl:variable name="left" select="substring-before($normalized, '|')"/>
@@ -34,9 +34,12 @@
 	  <xsl:attribute name="voice-vendor">
 	    <xsl:value-of select="translate(lower-case($left), ' ','')"/>
 	  </xsl:attribute>
-	  <xsl:attribute name="voice-name">
-	    <xsl:value-of select="translate(lower-case(if (contains($right, '|')) then substring-before($right, '|') else $right), ' ','')"/>
-	  </xsl:attribute>
+	  <xsl:variable name="voice-name" select="translate(lower-case(if (contains($right, '|')) then substring-before($right, '|') else $right), ' ','')"/>
+	  <xsl:if test="$voice-name">
+	    <xsl:attribute name="voice-name">
+	      <xsl:value-of select="$voice-name"/>
+	    </xsl:attribute>
+	  </xsl:if>
 	</xsl:if>
       </xsl:if>
       <xsl:apply-templates select="." mode="css1"/>
@@ -136,6 +139,7 @@
     <xsl:variable name="voice-info" select="substring-after(tmp:normlist(@tmp:voice-family), '|')"/> <!-- first element is the TTS engine -->
     <xsl:choose>
       <xsl:when test="$voice-info">
+	<!-- TODO: move the gender and the age to the same place as voice-vendor and voice-name -->
 	<ssml:voice>
 	  <xsl:choose>
 	    <xsl:when test="contains($voice-info, 'male')">
@@ -148,7 +152,10 @@
 	      <xsl:attribute name="gender"><xsl:value-of select="'neutral'"/></xsl:attribute>
 	    </xsl:when>
 	  </xsl:choose>
-
+	  <xsl:variable name="age" select="replace($voice-info, '\|([0-9]+)[\|\$]', '$1')"/>
+	  <xsl:if test="$age">
+	    <xsl:attribute name="age"><xsl:value-of select="$age"/></xsl:attribute>
+	  </xsl:if>
 	  <xsl:apply-templates select="node()" mode="css-child"/>
 	</ssml:voice>
       </xsl:when>

@@ -2,6 +2,8 @@ package org.daisy.pipeline.tts.attnative;
 
 import java.nio.ByteBuffer;
 import java.util.AbstractMap;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -31,7 +33,10 @@ public class ATTNative implements TTSService, ATTLibListener {
 
 		@Override
 		public String getHeader(String voiceName) {
-			return "<voice name=\"" + voiceName + "\">";
+			if (voiceName == null || voiceName.isEmpty()) {
+				return "<voice>";
+			}
+			return "<voice name=\"" + voiceName + "\"/>";
 		}
 
 		@Override
@@ -189,8 +194,16 @@ public class ATTNative implements TTSService, ATTLibListener {
 	}
 
 	@Override
-	public List<Voice> getAvailableVoices() throws SynthesisException {
-		// TODO Auto-generated method stub
-		return null;
+	public Collection<Voice> getAvailableVoices() throws SynthesisException {
+		ThreadResource tr = (ThreadResource) allocateThreadResources();
+		String[] voices = ATTLib.getVoiceNames(tr.connection);
+		ATTLib.closeConnection(tr.connection);
+
+		Voice[] result = new Voice[voices.length];
+		for (int i = 0; i < voices.length; ++i) {
+			result[i] = new Voice(getName(), voices[i]);
+		}
+
+		return Arrays.asList(result);
 	}
 }

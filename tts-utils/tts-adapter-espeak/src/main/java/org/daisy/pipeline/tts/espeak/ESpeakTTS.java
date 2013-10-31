@@ -1,5 +1,6 @@
 package org.daisy.pipeline.tts.espeak;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -73,7 +74,7 @@ public class ESpeakTTS implements TTSService {
 	}
 
 	@Override
-	public List<Voice> getAvailableVoices() throws SynthesisException {
+	public Collection<Voice> getAvailableVoices() throws SynthesisException {
 		// TODO Auto-generated method stub
 		return null;
 	}

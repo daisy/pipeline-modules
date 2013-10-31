@@ -83,10 +83,13 @@ public class SynthesisWorkerPool {
 		        "http://www.w3.org/XML/1998/namespace", "lang"));
 
 		Voice voice = NoVoice;
-		if (voiceVendor != null && voiceName != null)
-			voice = new Voice(voiceVendor, voiceName);
+		if (voiceVendor != null)
+			voice = new Voice(voiceVendor, voiceName == null ? "" : voiceName);
 
-		voice = mTTSRegistry.findAvailableVoice(voice, lang);
+		//if the vendor is provided alone, the voice name is up to the vendor which may
+		//take into account the age and the gender encapsulated in the SSML
+		if (voice.vendor.isEmpty() || !voice.name.isEmpty())
+			voice = mTTSRegistry.findAvailableVoice(voice, lang);
 		TTSService newSynth = mTTSRegistry.getTTS(voice);
 		if (newSynth == null) {
 			throw new SynthesisException(

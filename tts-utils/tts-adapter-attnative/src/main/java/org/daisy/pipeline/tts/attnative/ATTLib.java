@@ -26,4 +26,6 @@ public class ATTLib {
 
 	static native int synthesizeRequest(Object handler, long connection,
 	        String text);
+
+	static native String[] getVoiceNames(long connection);
 }

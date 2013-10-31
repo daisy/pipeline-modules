@@ -156,7 +156,6 @@ JNIEXPORT jint JNICALL
 Java_org_daisy_pipeline_tts_attnative_ATTLib_synthesizeRequest
 (JNIEnv* env, jclass klass, jobject handler, jlong connection, jstring text){
   Connection* conn = reinterpret_cast<Connection*>(connection);
-
   conn->sink->env = env;
   conn->sink->klass = klass;
   conn->sink->onRecvAudioID =
@@ -172,4 +171,29 @@ Java_org_daisy_pipeline_tts_attnative_ATTLib_synthesizeRequest
   }
 
   return 0;
+}
+
+JNIEXPORT jobjectArray JNICALL Java_org_daisy_pipeline_tts_attnative_ATTLib_getVoiceNames
+(JNIEnv* env, jclass, jlong connection){
+  Connection* conn = reinterpret_cast<Connection*>(connection);
+
+  int nVoices = 0;
+  TTS_RESULT result = conn->engine->NumVoices(&nVoices);
+
+  jclass stringClass = env->FindClass("java/lang/String");
+  jobjectArray stringArray = env->NewObjectArray(nVoices, stringClass, 0);
+  if (result == TTS_OK) {
+    for (int i = 0; i < nVoices; i++) {
+      TTSVoice voice;
+      //voice.m_szName's lifecycle is assumed to go beyond this scope
+      result = conn->engine->EnumVoice(i, &voice);
+      if (result == TTS_OK) {
+	//m_szName is a UTF8String*, i.e. unsigned char*
+	jstring javaString = env->NewStringUTF((char*) voice.m_szName);
+	env->SetObjectArrayElement(stringArray, i, javaString);
+      }
+    }
+  }
+
+  return stringArray;
 }

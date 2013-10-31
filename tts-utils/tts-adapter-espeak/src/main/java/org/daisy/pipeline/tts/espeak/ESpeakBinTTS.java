@@ -2,9 +2,16 @@ package org.daisy.pipeline.tts.espeak;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.sound.sampled.AudioFormat;
 
@@ -20,11 +27,27 @@ import org.daisy.pipeline.tts.TTSService;
 
 /**
  * This synthesizer uses directly the eSpeak binary and intermediate WAV files.
+ * The voice names are used to identify the voices, but their corresponding file
+ * names could be used instead (with the -v option instead of <ssml:voice
+ * name=...>), depending on how the connectors, such as SAPI, manage eSpeak.
  */
 public class ESpeakBinTTS implements TTSService {
 	private AudioFormat mAudioFormat;
 	private String mEspeakPath;
 	private SSMLAdapter mSSMLAdapter = new BasicSSMLAdapter() {
+		@Override
+		public String getHeader(String voiceName) {
+			if (voiceName == null || voiceName.isEmpty()) {
+				return "<voice>";
+			}
+			return "<voice name=\"" + voiceName + "\"/>";
+		}
+
+		@Override
+		public String getFooter() {
+			return "</voice>";
+		}
+
 		@Override
 		public QName adaptElement(QName elementName) {
 			if (elementName.getLocalName().equals("mark"))
@@ -161,10 +184,57 @@ public class ESpeakBinTTS implements TTSService {
 	}
 
 	@Override
-	public List<Voice> getAvailableVoices() throws SynthesisException {
-		//TODO: call the binary
-		return Arrays.asList(new Voice[]{
-		        new Voice(getName(), "en"), new Voice(getName(), "fr")
-		});
+	public Collection<Voice> getAvailableVoices() throws SynthesisException {
+		Collection<Voice> result;
+		//retrieve the list of installed voices
+		InputStream is;
+		Process proc;
+		Scanner scanner;
+		Matcher mr;
+		try {
+			//first: get the list of all the available languages
+			Set<String> languages = new HashSet<String>();
+			proc = Runtime.getRuntime().exec(new String[]{
+			        mEspeakPath, "--voices"
+			});
+			is = proc.getInputStream();
+			mr = Pattern.compile("\\s*[0-9]+\\s+([-a-z]+)").matcher("");
+			scanner = new Scanner(is);
+			scanner.nextLine(); //headers
+			while (scanner.hasNextLine()) {
+				mr.reset(scanner.nextLine());
+				mr.find();
+				languages.add(mr.group(1).split("-")[0]);
+			}
+			is.close();
+			proc.waitFor();
+
+			//second:get the list of the voices for the found languages.
+			//Whitespaces are not allowed in voice names
+			result = new ArrayList<Voice>();
+			mr = Pattern
+			        .compile("^\\s*[0-9]+\\s+[-a-z]+\\s+([FM]\\s+)?([^ ]+)")
+			        .matcher("");
+			for (String lang : languages) {
+				proc = Runtime.getRuntime().exec(new String[]{
+				        mEspeakPath, "--voices=" + lang
+				});
+				is = proc.getInputStream();
+				scanner = new Scanner(is);
+				scanner.nextLine(); //headers
+				while (scanner.hasNextLine()) {
+					mr.reset(scanner.nextLine());
+					mr.find();
+					result.add(new Voice(getName(), mr.group(2).trim()));
+				}
+				is.close();
+				proc.waitFor();
+			}
+
+		} catch (Exception e) {
+			throw new SynthesisException(e.getMessage(), e.getCause());
+		}
+
+		return result;
 	}
 }
