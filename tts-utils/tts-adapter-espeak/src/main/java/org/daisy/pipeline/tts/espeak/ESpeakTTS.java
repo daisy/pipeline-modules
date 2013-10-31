@@ -79,4 +79,10 @@ public class ESpeakTTS implements TTSService {
 		return null;
 	}
 
+	@Override
+	public void initialize() throws SynthesisException {
+		// TODO Auto-generated method stub
+
+	}
+
 }

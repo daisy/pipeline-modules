@@ -67,7 +67,7 @@ public class ESpeakBinTTS implements TTSService {
 		}
 	};
 
-	public ESpeakBinTTS() throws SynthesisException {
+	public void initialize() throws SynthesisException {
 		mAudioFormat = new AudioFormat(22050, 16, 1, true, false);
 		final String property = "espeak.client.path";
 		mEspeakPath = BinaryFinder.find(property, "espeak");

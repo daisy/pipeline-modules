@@ -78,7 +78,7 @@ public class ATTNative implements TTSService, ATTLibListener {
 		List<Map.Entry<String, Double>> marks;
 	}
 
-	public ATTNative() {
+	public void initialize() throws SynthesisException {
 		mLoadBalancer = new RoundRobinLoadBalancer(System.getProperty(
 		        "att.servers", "localhost:8888"), null);
 

@@ -92,7 +92,7 @@ public class ATTBin implements TTSService {
 		}
 	};
 
-	public ATTBin() throws SynthesisException {
+	public void initialize() throws SynthesisException {
 
 		mLoadBalancer = new RoundRobinLoadBalancer(System.getProperty(
 		        "att.servers", "localhost:8888"), null);

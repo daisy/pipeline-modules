@@ -1,5 +1,7 @@
 package org.daisy.pipeline.tts;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -14,12 +16,15 @@ import java.util.Set;
 
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.TTSService.Voice;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // TODO: mark the voices as Male or Female and use this information when
 // choosing a voice
 public class TTSRegistry {
 
-	private List<TTSService> ttsServices;
+	private Logger mLogger = LoggerFactory.getLogger(TTSRegistry.class);
+	private Map<TTSService, Boolean> ttsServices;
 	private Map<String, TTSService> mVendors;
 	private Map<Voice, TTSService> mBestServices;
 	private Map<String, Voice> mBestVoices; //for a given language
@@ -214,7 +219,7 @@ public class TTSRegistry {
 	}
 
 	public TTSRegistry() {
-		ttsServices = new ArrayList<TTSService>();
+		ttsServices = new HashMap<TTSService, Boolean>();
 	}
 
 	/**
@@ -227,12 +232,41 @@ public class TTSRegistry {
 	}
 
 	/**
-	 * Combine voices and TTS-services to build maps that allow one to quickly
-	 * access to the best voices or the best services.
+	 * Initialize the TTS services. Combine voices and TTS-services to build
+	 * maps that allow one to quickly access to the best voices or the best
+	 * services.
 	 */
 	public void regenerateVoiceMapping() {
+		List<TTSService> workingServices = new ArrayList<TTSService>();
+
+		for (Map.Entry<TTSService, Boolean> tts : ttsServices.entrySet()) {
+			String fullname = tts.getKey().getName() + "-"
+			        + tts.getKey().getVersion();
+			if (tts.getValue()) {
+				workingServices.add(tts.getKey());
+				mLogger.info(fullname + " already initialized");
+			} else {
+				try {
+					tts.getKey().initialize();
+					workingServices.add(tts.getKey());
+					tts.setValue(true);
+					mLogger.info(fullname + " successfully initialized");
+				} catch (Throwable t) {
+					StringWriter writer = new StringWriter();
+					PrintWriter printWriter = new PrintWriter(writer);
+					t.printStackTrace(printWriter);
+					printWriter.flush();
+					mLogger.info(fullname + " could not be initialized");
+					mLogger.debug(fullname + " init error: "
+					        + writer.toString());
+				}
+			}
+		}
+		mLogger.info("number of working TTS services: "
+		        + workingServices.size() + "/" + ttsServices.size());
+
 		mBestServices = new HashMap<Voice, TTSService>();
-		for (TTSService tts : ttsServices)
+		for (TTSService tts : workingServices)
 			try {
 
 				Collection<Voice> voices = tts.getAvailableVoices();
@@ -260,7 +294,7 @@ public class TTSRegistry {
 		}
 
 		mVendors = new HashMap<String, TTSService>();
-		for (TTSService tts : ttsServices) {
+		for (TTSService tts : workingServices) {
 			TTSService competitor = mVendors.get(tts.getName());
 			if (competitor == null
 			        || competitor.getOverallPriority() < tts
@@ -287,7 +321,7 @@ public class TTSRegistry {
 	}
 
 	public void addTTS(TTSService tts) {
-		ttsServices.add(tts);
+		ttsServices.put(tts, false);
 	}
 
 	public void removeTTS(TTSService tts) {

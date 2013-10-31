@@ -47,6 +47,14 @@ public interface TTSService {
 	}
 
 	/**
+	 * This method will be called once by the TTS Registry before running the
+	 * first synthesis step. Nothing should be done in the TTS Service
+	 * constructors in order to save resources if the server is never used for
+	 * TTS purpose.
+	 */
+	void initialize() throws SynthesisException;
+
+	/**
 	 * Allocate new resources (such as TCP connections) unique for each thread.
 	 * All the allocation calls are made in a single thread before any sentence
 	 * is processed.

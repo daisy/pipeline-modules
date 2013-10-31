@@ -34,20 +34,18 @@
   </build>
 
   <dependencies>
-    <!--  for its Multimap -->
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>15.0</version>
-    </dependency>
-
-
     <!-- the TTS service interface uses XdmNode -->
     <dependency>
       <groupId>net.sf.saxon</groupId>
       <artifactId>Saxon-HE</artifactId>
       <version>9.4</version>
     </dependency>
+
+     <dependency>
+       <groupId>org.slf4j</groupId>
+       <artifactId>slf4j-api</artifactId>
+       <version>1.6.4</version>
+     </dependency>
   </dependencies>
 
 </project>
