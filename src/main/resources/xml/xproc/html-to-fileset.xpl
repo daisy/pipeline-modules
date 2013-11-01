@@ -38,6 +38,9 @@
         </p:input>
     </p:insert>
     
+    <p:add-attribute match="/*" attribute-name="xml:base">
+        <p:with-option name="attribute-value" select="base-uri(/*)"/>
+    </p:add-attribute>
     <p:xslt name="fileset">
         <p:input port="stylesheet">
             <p:document href="../xslt/html-to-fileset.xsl"/>
@@ -46,6 +49,11 @@
             <p:empty/>
         </p:input>
     </p:xslt>
+    <!--<p:viewport match="/*/d:file">
+        <p:add-attribute match="/*" attribute-name="xml:base">
+            <p:with-option name="attribute-value" select="base-uri(/*)"/>
+        </p:add-attribute>
+    </p:viewport>-->
     <!--<p:group name="fileset">
         <p:output port="result"/>
         <p:variable name="doc-uri" select="base-uri(/*)"/>
