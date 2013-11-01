@@ -5,4 +5,5 @@
    <uri name="http://www.daisy.org/pipeline/modules/metadata-utils/zedai-to-metadata.xsl"
         uri="../xml/zedai-to-metadata.xsl"/>
    <nextCatalog catalog="org:daisy:pipeline:modules:validation-utils"/>
+   <nextCatalog catalog="org:daisy:pipeline:modules:dtbook-validator"/>
 </catalog>
