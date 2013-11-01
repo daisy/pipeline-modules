@@ -123,8 +123,7 @@
                 <p:choose name="mkdir">
                     <p:when test="empty(/info/*)">
                         <cx:message>
-                            <!--<p:with-option name="message" select="concat('Making directory: ',substring-after($target-dir, $fileset-base))"/>-->
-                            <p:with-option name="message" select="concat('Making directory: ',$target-dir)"/>
+                            <p:with-option name="message" select="concat('Making directory: ',substring-after($target-dir, $fileset-base))"/>
                         </cx:message>
                         <px:mkdir>
                             <p:with-option name="href" select="$target-dir"/>
