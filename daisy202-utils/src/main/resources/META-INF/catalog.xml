@@ -6,4 +6,5 @@
    <nextCatalog catalog="org:daisy:pipeline:modules:mediatype-utils"/>
    <nextCatalog catalog="org:daisy:pipeline:modules:html-utils"/>
    <nextCatalog catalog="org:daisy:pipeline:modules:mediaoverlay-utils"/>
+   <nextCatalog catalog="org:daisy:pipeline:modules:file-utils"/>
 </catalog>
