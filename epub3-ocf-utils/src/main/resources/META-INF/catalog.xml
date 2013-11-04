@@ -4,4 +4,5 @@
         uri="../xml/xproc/epub3-ocf-library.xpl"/>
    <nextCatalog catalog="org:daisy:pipeline:modules:fileset-utils"/>
    <nextCatalog catalog="org:daisy:pipeline:modules:zip-utils"/>
+   <nextCatalog catalog="org:daisy:pipeline:modules:file-utils"/>
 </catalog>

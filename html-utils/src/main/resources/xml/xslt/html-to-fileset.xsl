@@ -16,7 +16,7 @@
     <xsl:template match="text()"/>
 
     <xsl:variable name="doc-base"
-        select="if (/html/head/base[@href][1]) then resolve-uri(normalize-space(/html/head/base[@href][1]/@href),base-uri(/)) else base-uri(/)"/>
+        select="if (/html/head/base[@href][1]) then resolve-uri(normalize-space(/html/head/base[@href][1]/@href),base-uri(/*)) else base-uri(/*)"/>
 
     <xsl:template match="/*">
         <!--
