@@ -59,40 +59,6 @@ public class SAPIcomTTS implements TTSService {
 		ISpeechVoice voice;
 	}
 
-	public SAPIcomTTS() throws SynthesisException {
-		//retrieve the name of the available voices
-		ISpeechVoice v = ClassFactory.createSpVoice();
-		mAvailableVoices = new ArrayList<Voice>();
-		ISpeechObjectTokens allTokens = v.getVoices("", "");
-		for (int i = 0; i < allTokens.count(); i++) {
-			ISpeechObjectToken token = allTokens.item(i);
-			String vendor = token.getAttribute("vendor");
-			String name = token.getAttribute("name");
-			if (vendor != null && name != null && !vendor.isEmpty()
-					&& !name.isEmpty()) {
-				mAvailableVoices.add(new Voice(vendor, name));
-			
-			}
-		}
-		v.dispose();
-
-		//test the TTS Service before registration
-		ThreadResource th = (ThreadResource) allocateThreadResources();
-		RawAudioBuffer testBuffer = new RawAudioBuffer();
-		testBuffer.offsetInOutput = 0;
-		testBuffer.output = new byte[1];
-		synthesize(
-				mSSMLAdapter.getHeader(null)
-						+ "<s>test<break time=\"10ms\"></break></s>"
-						+ mSSMLAdapter.getFooter(),
-				mAvailableVoices.get(0), testBuffer, th, null, null);
-		releaseThreadResources(th);
-		if (testBuffer.offsetInOutput <= 0) {
-			throw new SynthesisException(
-					"SAPI with com4j did not output anything.");
-		}
-	}
-
 	@Override
 	public Object synthesize(XdmNode ssml, Voice voice,
 	        RawAudioBuffer audioBuffer, Object resource, Object lastCallMemory,
@@ -195,4 +161,39 @@ public class SAPIcomTTS implements TTSService {
 	public List<Voice> getAvailableVoices() throws SynthesisException {
 		return mAvailableVoices;
 	}
+	
+	@Override
+    public void initialize() throws SynthesisException {
+		//retrieve the name of the available voices
+		ISpeechVoice v = ClassFactory.createSpVoice();
+		mAvailableVoices = new ArrayList<Voice>();
+		ISpeechObjectTokens allTokens = v.getVoices("", "");
+		for (int i = 0; i < allTokens.count(); i++) {
+			ISpeechObjectToken token = allTokens.item(i);
+			String vendor = token.getAttribute("vendor");
+			String name = token.getAttribute("name");
+			if (vendor != null && name != null && !vendor.isEmpty()
+					&& !name.isEmpty()) {
+				mAvailableVoices.add(new Voice(vendor, name));
+			
+			}
+		}
+		v.dispose();
+
+		//test the TTS Service before registration
+		ThreadResource th = (ThreadResource) allocateThreadResources();
+		RawAudioBuffer testBuffer = new RawAudioBuffer();
+		testBuffer.offsetInOutput = 0;
+		testBuffer.output = new byte[1];
+		synthesize(
+				mSSMLAdapter.getHeader(null)
+						+ "<s>test<break time=\"10ms\"></break></s>"
+						+ mSSMLAdapter.getFooter(),
+				mAvailableVoices.get(0), testBuffer, th, null, null);
+		releaseThreadResources(th);
+		if (testBuffer.offsetInOutput <= 0) {
+			throw new SynthesisException(
+					"SAPI with com4j did not output anything.");
+		}
+    }
 }
