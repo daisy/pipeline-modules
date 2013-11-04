@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step version="1.0" name="validation-report-to-html" type="px:validation-report-to-html"
     xmlns:p="http://www.w3.org/ns/xproc" 
     xmlns:c="http://www.w3.org/ns/xproc-step"
@@ -20,7 +21,7 @@
     http://code.google.com/p/daisy-pipeline/wiki/ValidationReportXML
     -->
     <p:input port="source" primary="true" sequence="true"/>
-    <p:output port="result" primary="true" px:media-type="application/xml+vnd.pipeline.report"/>
+    <p:output port="result" primary="true" px:media-type="application/vnd.pipeline.report+xml"/>
     <p:option name="toc" required="false" select="'false'"/>
     
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>

@@ -15,7 +15,9 @@
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/xproc/fileset-library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/xproc/file-library.xpl"/>
 
-    <p:variable name="fileset-base" select="base-uri(/*)"/>
+    <p:variable name="fileset-base" select="base-uri(/*)">
+        <p:pipe port="fileset.in" step="main"/>
+    </p:variable>
     
     <px:fileset-create name="fileset.in-memory-base" base="/"/>
     <p:for-each>
