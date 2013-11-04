@@ -22,7 +22,7 @@
         </p:input>
     </px:fileset-store>
     
-    <px:epub3-ocf-zip name="zip">
+    <px:epub3-ocf-zip name="zip" cx:depends-on="fileset-store">
         <p:with-option name="target" select="$href"/>
         <p:input port="source">
             <p:pipe port="fileset.out" step="fileset-store"/>
