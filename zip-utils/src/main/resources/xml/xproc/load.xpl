@@ -6,11 +6,11 @@
     <p:option name="unzipped-basedir" required="true"/>
 
     <p:output port="fileset.out" primary="true">
-        <p:pipe port="result" step="epub.fileset"/>
+        <p:pipe port="result" step="zip.fileset"/>
     </p:output>
 
     <p:output port="in-memory.out" sequence="true">
-        <p:pipe port="result" step="epub.in-memory"/>
+        <p:pipe port="result" step="zip.in-memory"/>
     </p:output>
 
     <p:import href="http://www.daisy.org/pipeline/modules/zip-utils/xproc/zip-library.xpl"/>
@@ -32,7 +32,7 @@
         </p:add-attribute>
     </p:viewport>
     <p:delete match="/*/*/@*[not(name()='href')]"/>
-    <px:mediatype-detect name="epub.fileset"/>
+    <px:mediatype-detect name="zip.fileset"/>
     
     <p:for-each>
         <p:iteration-source select="/*/*"/>
@@ -46,6 +46,6 @@
             <p:with-option name="attribute-value" select="resolve-uri($entry-href, $unzipped-basedir)"/>
         </p:add-attribute>
     </p:for-each>
-    <p:identity name="epub.in-memory"/>
+    <p:identity name="zip.in-memory"/>
 
 </p:declare-step>
