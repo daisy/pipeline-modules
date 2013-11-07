@@ -46,4 +46,7 @@
             </p:input>
         </p:xslt>
     </p:declare-step>
+    
+    <p:import href="load.xpl"/>
+    
 </p:library>
