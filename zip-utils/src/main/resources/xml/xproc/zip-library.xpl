@@ -47,6 +47,6 @@
         </p:xslt>
     </p:declare-step>
     
-    <p:import href="load.xpl"/>
+    <p:import href="unzip-fileset.xpl"/>
     
 </p:library>
