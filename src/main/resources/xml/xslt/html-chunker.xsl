@@ -12,13 +12,21 @@
   <xsl:key name="ids" match="*" use="@id|@xml:id"/>
 
   <xsl:variable name="chunks" as="document-node()*">
+    <xsl:for-each select="$chunks-elems">
+      <xsl:document>
+        <xsl:copy-of select="."/>
+      </xsl:document>
+    </xsl:for-each>
+  </xsl:variable>
+  <xsl:variable name="chunks-elems" as="element()*">
     <xsl:apply-templates select="/html/body" mode="chunking"/>
   </xsl:variable>
+  <xsl:variable name="chunks-ids" as="xs:string*" select="$chunks/generate-id()"/>
 
   <xsl:function name="f:chunk-name">
     <xsl:param name="chunk" as="document-node()"/>
     <xsl:sequence
-      select="replace(base-uri($doc/*),'.*?([^/]+)(\.[^.]+)$',concat('$1-',index-of($chunks,$chunk),'$2'))"
+      select="replace(base-uri($doc/*),'.*?([^/]+)(\.[^.]+)$',concat('$1-',index-of($chunks-ids,generate-id($chunk)),'$2'))"
     />
   </xsl:function>
 
@@ -63,20 +71,16 @@
           <xsl:apply-templates select="current-group()" mode="chunking"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:document>
             <section>
               <xsl:apply-templates select="current-group()" mode="chunking"/>
             </section>
-          </xsl:document>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:for-each-group>
   </xsl:template>
 
   <xsl:template match="body/section" mode="chunking">
-    <xsl:document>
       <xsl:copy-of select="."/>
-    </xsl:document>
   </xsl:template>
 
   <xsl:template match="body/section[tokenize(@epub:type,'/s')='bodymatter']" mode="chunking"
@@ -85,19 +89,15 @@
       <xsl:choose>
         <xsl:when test="current-grouping-key()">
           <xsl:for-each select="current-group()">
-            <xsl:document>
               <section epub:type="bodymatter">
                 <xsl:copy-of select="."/>
               </section>
-            </xsl:document>
           </xsl:for-each>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:document>
             <section epub:type="bodymatter">
               <xsl:copy-of select="current-group()"/>
             </section>
-          </xsl:document>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:for-each-group>
