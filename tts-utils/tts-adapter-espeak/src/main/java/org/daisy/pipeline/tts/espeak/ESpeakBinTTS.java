@@ -40,7 +40,7 @@ public class ESpeakBinTTS implements TTSService {
 			if (voiceName == null || voiceName.isEmpty()) {
 				return "<voice>";
 			}
-			return "<voice name=\"" + voiceName + "\"/>";
+			return "<voice name=\"" + voiceName + "\">";
 		}
 
 		@Override
@@ -94,7 +94,7 @@ public class ESpeakBinTTS implements TTSService {
 		        audioBuffer, resource, lastCallMemory, marks);
 	}
 
-	private Object synthesize(String ssml, RawAudioBuffer audioBuffer,
+	public Object synthesize(String ssml, RawAudioBuffer audioBuffer,
 	        Object resource, Object lastCallMemory,
 	        List<Entry<String, Double>> marks) throws SynthesisException {
 
@@ -107,8 +107,10 @@ public class ESpeakBinTTS implements TTSService {
 			        mEspeakPath, "-m", "-w", dest.getAbsolutePath(),
 			        "\"" + ssml + "\""
 			};
+
 			Runtime.getRuntime().exec(cmd).waitFor();
 		} catch (Exception e) {
+
 			throw new SynthesisException(e.getMessage(), e.getCause());
 		}
 

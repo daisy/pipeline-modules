@@ -48,6 +48,8 @@ public class SynthesisWorkerThread extends Thread implements
 	private RawAudioBuffer mRawAudioBuffer;
 	private ConcurrentLinkedQueue<UndispatchableSection> mSectionsQueue;
 	private Map<TTSService, Object> mResources;
+	private int mCurrentDocPosition;
+	private int mSectionFiles;
 
 	public SynthesisWorkerThread() {
 		mOutput = new byte[AUDIO_BUFFER_BYTES];
@@ -71,8 +73,12 @@ public class SynthesisWorkerThread extends Thread implements
 	}
 
 	private void encodeAudio(byte[] output, int size) {
+		String preferredFileName = String.format("section%04d_%02d",
+		        mCurrentDocPosition, mSectionFiles);
+
 		String soundFile = mEncoder.encode(output, size,
-		        mLastUsedSynthesizer.getAudioOutputFormat(), this, null);
+		        mLastUsedSynthesizer.getAudioOutputFormat(), this,
+		        preferredFileName);
 
 		for (SoundFragment sf : mCurrentFragments) {
 			sf.soundFileURI = soundFile;
@@ -82,6 +88,7 @@ public class SynthesisWorkerThread extends Thread implements
 		// reset the state of the thread
 		mOffsetInOutput = 0;
 		mCurrentFragments.clear();
+		++mSectionFiles;
 	}
 
 	private double convertBytesToSecond(int bytes) {
@@ -193,6 +200,8 @@ public class SynthesisWorkerThread extends Thread implements
 				break;
 			}
 			try {
+				mCurrentDocPosition = section.documentPosition;
+				mSectionFiles = 0;
 				mLastUsedSynthesizer = section.synthesizer;
 				for (Speakable speakable : section.speakables) {
 					processOneSentence(speakable.sentence, speakable.voice);

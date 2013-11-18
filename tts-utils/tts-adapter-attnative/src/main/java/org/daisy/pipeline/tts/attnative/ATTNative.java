@@ -25,7 +25,7 @@ public class ATTNative implements TTSService, ATTLibListener {
 	private AudioFormat mAudioFormat;
 	private RoundRobinLoadBalancer mLoadBalancer;
 
-	private SSMLAdapter mSSMLAdapter = new BasicSSMLAdapter() {
+	public static SSMLAdapter mSSMLAdapter = new BasicSSMLAdapter() {
 		@Override
 		public String getFooter() {
 			return "</voice>";
@@ -36,7 +36,7 @@ public class ATTNative implements TTSService, ATTLibListener {
 			if (voiceName == null || voiceName.isEmpty()) {
 				return "<voice>";
 			}
-			return "<voice name=\"" + voiceName + "\"/>";
+			return "<voice name=\"" + voiceName + "\">";
 		}
 
 		@Override
@@ -76,6 +76,7 @@ public class ATTNative implements TTSService, ATTLibListener {
 		RawAudioBuffer audioBuffer;
 		int firstOffset;
 		List<Map.Entry<String, Double>> marks;
+		byte[] utf8text;
 	}
 
 	public void initialize() throws SynthesisException {
@@ -97,8 +98,12 @@ public class ATTNative implements TTSService, ATTLibListener {
 		tr.marks = marks;
 		tr.firstOffset = tr.audioBuffer.offsetInOutput;
 
-		ATTLib.synthesizeRequest(tr, tr.connection,
-		        SSMLUtil.toString(ssml, voice.name, mSSMLAdapter));
+		String str = SSMLUtil.toString(ssml, voice.name, mSSMLAdapter);
+		UTF8Converter.UTF8Buffer utf8Buffer = UTF8Converter.convertToUTF8(str,
+		        tr.utf8text);
+		tr.utf8text = utf8Buffer.buffer;
+
+		ATTLib.speak(tr, tr.connection, tr.utf8text);
 
 		return null;
 	}
@@ -150,6 +155,7 @@ public class ATTNative implements TTSService, ATTLibListener {
 
 		ThreadResource tr = new ThreadResource();
 		tr.connection = connection;
+		tr.utf8text = new byte[8];
 		return tr;
 	}
 

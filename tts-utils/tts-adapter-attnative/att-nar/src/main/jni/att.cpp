@@ -31,6 +31,8 @@ struct CSDKSink : public CTTSSink{
       {
 	utf8string utf8bookmark;
 	if (pNotification->Bookmark(utf8bookmark) == TTS_OK) {
+	  //the bookmark name is assumed to contain only simple UTF8 characters, i.e.
+	  //characters for which there is no difference between true UTF8 and modified UTF8
 	  jstring name = env->NewStringUTF((const char*) utf8bookmark.c_str());
 	  jmethodID mid = env->GetStaticMethodID(klass, "onRecvMark", "(Ljava/lang/Object;Ljava/lang/String;)V");
 	  env->CallStaticVoidMethod(klass, mid, handler, name);
@@ -38,10 +40,10 @@ struct CSDKSink : public CTTSSink{
       }
       break;
     case TTSNOTIFY_AUDIO:
-      // current solution:
+      // current solution (with callbacks and handlers):
       // [ATT engine data] (NO-COPY)--> [directBuffer] --> | -->  [directBuffer] (COPY)--> [java buffer]
       //                                               C++ | Java
-      // Another way would be:
+      // Another way would be (without callback):
       // 1. [ATT engine data] (COPY) --> [C++ buffers] for each TTSNOTIFY_AUDIO
       // 2. [java buffer] --> | --> [jbyte*] <--(COPY) [C++ buffers] for each call to read()
       //                 Java | C++
@@ -61,13 +63,10 @@ struct CSDKSink : public CTTSSink{
 };
 
 
-#define MAX_SENTENCE_SIZE (1024*256)
-
 struct Connection{
   ErrorHandler  errHandler; //TODO: make sure the destructor does the same as ErrorHandler::Release()
   CSDKSink*     sink;
   CTTSEngine*   engine;
-  char		sentence[MAX_SENTENCE_SIZE];
 };
 
 namespace{
@@ -83,17 +82,18 @@ namespace{
     delete conn;
   }
 
-  PCUTF8String toUTF8(JNIEnv* env, jstring text, char* buff, int maxSize){
-    //warning: Java and JNI use a modified version of UTF8 while ATT uses another one
-    //or the true one (if so, why building utf8strings from null terminated char arrays?)
-    //Perhaps it won't work with utf8string including null characters.
+  PCUTF8String toModifiedUTF8(JNIEnv* env, jstring text, char* buff, int maxSize){
+    //warning: this is not true UTF8 but this function will be used with simple ASCII
+    //characters that are encoded the same way with the regular UTF8 and the modified UTF8
     int nativeSize = env->GetStringUTFLength(text);
-    if (nativeSize >= maxSize){
+    if (nativeSize >= maxSize+1){
       buff[0] = '\0';
+      buff[1] = '\0';
     }
     else{
       env->GetStringUTFRegion(text, 0, env->GetStringLength(text), buff);
       buff[nativeSize] = '\0';
+      buff[nativeSize+1] = '\0';
     }
     return (PCUTF8String) buff;
   }
@@ -112,7 +112,7 @@ Java_org_daisy_pipeline_tts_attnative_ATTLib_openConnection
 			   TTSENGINE_SYNCHRONOUS, &conn->errHandler);
 
   char nativeHost[256];
-  TTSServerConfig serverCfg(::toUTF8(env, host, nativeHost, 256), port);
+  TTSServerConfig serverCfg(::toModifiedUTF8(env, host, nativeHost, 256), port);
   cfgSync.m_lstServerConfig.push_back(serverCfg);
 
   TTS_RESULT r = ttsCreateEngine(&conn->engine, cfgSync);
@@ -148,7 +148,7 @@ Java_org_daisy_pipeline_tts_attnative_ATTLib_openConnection
     return 0;
   }
 
-  return reinterpret_cast<long>(conn);
+  return reinterpret_cast<jlong>(conn);
 }
 
 
@@ -160,9 +160,13 @@ Java_org_daisy_pipeline_tts_attnative_ATTLib_closeConnection
 }
 
 
-JNIEXPORT jint JNICALL
-Java_org_daisy_pipeline_tts_attnative_ATTLib_synthesizeRequest
-(JNIEnv* env, jclass klass, jobject handler, jlong connection, jstring text){
+JNIEXPORT jint JNICALL Java_org_daisy_pipeline_tts_attnative_ATTLib_speak
+(JNIEnv* env, jclass klass, jobject handler, jlong connection, jbyteArray text){
+
+  jboolean isCopy;
+  //the byte array already contains the null-terminator and is UTF8 encoded
+  PCUTF8String str = (unsigned char*) env->GetByteArrayElements(text, &isCopy);
+
   Connection* conn = reinterpret_cast<Connection*>(connection);
   conn->sink->env = env;
   conn->sink->klass = klass;
@@ -170,13 +174,13 @@ Java_org_daisy_pipeline_tts_attnative_ATTLib_synthesizeRequest
     env->GetStaticMethodID(klass, "onRecvAudio", "(Ljava/lang/Object;Ljava/lang/Object;I)V");
   conn->sink->handler = handler;
 
-  TTS_RESULT r =
-    conn->engine->Speak(::toUTF8(env, text, conn->sentence, MAX_SENTENCE_SIZE), CTTSEngine::sf_ssml);
+  TTS_RESULT r = conn->engine->Speak(str, CTTSEngine::sf_ssml);
+
+  env->ReleaseByteArrayElements(text, (jbyte*) str, 0);
 
   if (r != TTS_OK){
     return 1;
   }
-
   return 0;
 }
 

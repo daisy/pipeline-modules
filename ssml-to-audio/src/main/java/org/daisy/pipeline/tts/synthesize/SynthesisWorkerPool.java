@@ -31,6 +31,7 @@ public class SynthesisWorkerPool {
 	public static class UndispatchableSection implements
 	        Comparable<UndispatchableSection> {
 		int size;
+		int documentPosition;
 		List<Speakable> speakables;
 		TTSService synthesizer;
 		Voice voice;
@@ -76,6 +77,9 @@ public class SynthesisWorkerPool {
 
 	static private final Voice NoVoice = new Voice("", "");
 
+	/**
+	 * The SSML is assumed to be pushed in document order.
+	 * */
 	public void pushSSML(XdmNode ssml) throws SynthesisException {
 		String voiceVendor = ssml.getAttributeValue(new QName("voice-vendor"));
 		String voiceName = ssml.getAttributeValue(new QName("voice-name"));
@@ -109,6 +113,7 @@ public class SynthesisWorkerPool {
 			mSections.add(mCurrentSection);
 			mCurrentSection.speakables = new ArrayList<Speakable>();
 			mCurrentSection.synthesizer = currentSynthesizer;
+			mCurrentSection.documentPosition = mSections.size();
 		}
 		mCurrentSection.speakables.add(new Speakable(voice, ssml));
 	}

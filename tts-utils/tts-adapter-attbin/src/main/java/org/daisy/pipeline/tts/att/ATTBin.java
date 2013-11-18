@@ -57,7 +57,7 @@ public class ATTBin implements TTSService {
 			if (voiceName == null || voiceName.isEmpty()) {
 				return "<voice>";
 			}
-			return "<voice name=\"" + voiceName + "\"/>";
+			return "<voice name=\"" + voiceName + "\">";
 		}
 
 		@Override

@@ -33,6 +33,14 @@ JNIEXPORT jint JNICALL Java_org_daisy_pipeline_tts_attnative_ATTLib_synthesizeRe
 
 /*
  * Class:     org_daisy_pipeline_tts_attnative_ATTLib
+ * Method:    speak
+ * Signature: (Ljava/lang/Object;J[B)I
+ */
+JNIEXPORT jint JNICALL Java_org_daisy_pipeline_tts_attnative_ATTLib_speak
+  (JNIEnv *, jclass, jobject, jlong, jbyteArray);
+
+/*
+ * Class:     org_daisy_pipeline_tts_attnative_ATTLib
  * Method:    getVoiceNames
  * Signature: (J)[Ljava/lang/String;
  */

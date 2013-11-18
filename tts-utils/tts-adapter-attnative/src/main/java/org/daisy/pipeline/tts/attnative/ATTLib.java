@@ -24,8 +24,7 @@ public class ATTLib {
 
 	static native int closeConnection(long connection);
 
-	static native int synthesizeRequest(Object handler, long connection,
-	        String text);
+	static native int speak(Object handler, long connection, byte[] text);
 
 	static native String[] getVoiceNames(long connection);
 }

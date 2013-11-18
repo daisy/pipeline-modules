@@ -48,6 +48,13 @@
               <option>${subsystem.option}</option>
               <option>${link.option}</option>
             </options>
+	    <libs>
+	      <lib>
+		<name>TTSAPICS</name>
+		<type>static</type>
+		<directory>${sdk.location}/lib/</directory>
+	      </lib>
+	    </libs>
           </linker>
           <libraries>
             <library>
@@ -88,17 +95,43 @@
                     <name>pthread</name>
                   </sysLib>
                 </sysLibs>
-                <libs>
-                  <lib>
-                    <name>TTSAPICS</name>
-                    <type>static</type>
-                    <directory>src/sdk/lib/</directory>
-                  </lib>
-                </libs>
               </linker>
             </configuration>
           </plugin>
-
+	</plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>x64-Linux</id>
+      <activation>
+        <os>
+          <name>Linux</name>
+          <arch>x64</arch>
+        </os>
+      </activation>
+      <properties>
+        <java.os.include>-I${JAVA_HOME}/include/linux</java.os.include>
+        <compile.option>-DUNIX -O3 -W -Wall -pthread</compile.option>
+        <stack.protector.option>-fno-stack-protector</stack.protector.option>
+        <architecture.option>-m64</architecture.option>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>nar-maven-plugin</artifactId>
+            <configuration>
+              <linker>
+                <sysLibs>
+                  <sysLib>
+                    <name>dl</name>
+                  </sysLib>
+                  <sysLib>
+                    <name>pthread</name>
+                  </sysLib>
+                </sysLibs>
+              </linker>
+            </configuration>
+          </plugin>
 	</plugins>
       </build>
     </profile>
