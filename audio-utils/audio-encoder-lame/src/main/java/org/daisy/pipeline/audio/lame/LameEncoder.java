@@ -16,7 +16,7 @@ import org.daisy.pipeline.audio.AudioEncoder;
 public class LameEncoder implements AudioEncoder {
 	private static final String InputFormat = ".wav";
 	private static final String OutputFormat = ".mp3";
-	
+
 	private static final String[] winExtensions = {
 	        ".exe", ".bat", ".cmd", ".bin", ""
 	};
@@ -97,7 +97,13 @@ public class LameEncoder implements AudioEncoder {
 		File encodedFile = null;
 		String[] cmd = null;
 		try {
-			encodedFile = File.createTempFile("chunk", OutputFormat);
+			if (name != null) {
+				encodedFile = new File(System.getProperty("java.io.tmpdir")
+				        + "/" + name + OutputFormat);
+			} else {
+				encodedFile = File.createTempFile("chunk", OutputFormat);
+			}
+
 			cmd = new String[]{
 			        mLamePath, "--silent", intermediateFile.getAbsolutePath(),
 			        encodedFile.getAbsolutePath()

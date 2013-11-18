@@ -6,8 +6,8 @@
    </service>
    <reference bind="addEncoder"
       unbind="addEncoder"
-      cardinality="0..n"
+      cardinality="1..n"
       interface="org.daisy.pipeline.audio.AudioEncoder"
       name="audio-encoder"
-      policy="dynamic"/>
+      policy="static"/>
 </scr:component>
