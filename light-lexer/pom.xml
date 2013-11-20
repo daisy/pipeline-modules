@@ -12,17 +12,13 @@
     <relativePath>../</relativePath>
   </parent>
 
-  <artifactId>ruled-lexer</artifactId>
+  <artifactId>light-lexer</artifactId>
   <packaging>bundle</packaging>
 
-  <name>DAISY Pipeline 2 module :: Rule-based Lexer</name>
-  <description>Lexer implementation based on a set of matching rules</description>
+  <name>DAISY Pipeline 2 module :: Light Lexer</name>
+  <description>Lexer implementation with no words detection (sentences only)</description>
 
   <dependencies>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -45,7 +41,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Service-Component>OSGI-INF/ruled-lex-service.xml</Service-Component>
+            <Service-Component>OSGI-INF/light-lex-service.xml</Service-Component>
           </instructions>
         </configuration>
       </plugin>

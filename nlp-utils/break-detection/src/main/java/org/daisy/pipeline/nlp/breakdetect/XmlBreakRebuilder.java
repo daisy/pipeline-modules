@@ -27,300 +27,316 @@ import com.xmlcalabash.util.TreeWriter;
  */
 public class XmlBreakRebuilder {
 
-    private LexService mLexer;
-    private XProcRuntime mRuntime;
-    private FormatSpecifications mFormatSpecs;
-    private long mMergeableID = 0;
-    private boolean mSeenRoot;
+	private LexService mLexer;
+	private XProcRuntime mRuntime;
+	private FormatSpecifications mFormatSpecs;
+	private long mMergeableID = 0;
+	private boolean mSeenRoot;
 
-    public XmlBreakRebuilder(XProcRuntime runtime, LexService lexer) {
-        mRuntime = runtime;
+	public XmlBreakRebuilder(XProcRuntime runtime, LexService lexer) {
+		mRuntime = runtime;
+		mLexer = lexer;
+		try {
+			mLexer.init();
+		} catch (LexerInitException e) {
+			e.printStackTrace();
+		}
+	}
 
-        mLexer = lexer;
-        try {
-            mLexer.init();
-        } catch (LexerInitException e) {
-            e.printStackTrace();
-        }
-    }
+	public void setFormatSpecifications(FormatSpecifications specs) {
+		mFormatSpecs = specs;
+	}
 
-    public void setFormatSpecifications(FormatSpecifications specs) {
-        mFormatSpecs = specs;
-    }
+	public static XdmNode getFirstChild(XdmNode node) {
+		XdmSequenceIterator iter = node.axisIterator(Axis.CHILD);
+		if (iter.hasNext()) {
+			return (XdmNode) iter.next();
+		} else {
+			return null;
+		}
+	}
 
-    public static XdmNode getFirstChild(XdmNode node) {
-        XdmSequenceIterator iter = node.axisIterator(Axis.CHILD);
-        if (iter.hasNext()) {
-            return (XdmNode) iter.next();
-        } else {
-            return null;
-        }
-    }
+	/**
+	 * Traverse recursively the sub-tree of an inline section to collect the
+	 * adjacent segments and the formatting info that will be needed both by the
+	 * lexer and the rebuilding step.
+	 */
+	private void collectInlineSection(List<String> segments,
+	        List<XdmNode[]> inlineNodes, LinkedList<XdmNode> currentPath,
+	        XdmNode node, Language lang) {
 
-    /**
-     * Traverse recursively the sub-tree of an inline section to collect the
-     * adjacent segments and the formatting info that will be needed both by the
-     * lexer and the rebuilding step.
-     */
-    private void collectInlineSection(List<String> segments,
-            List<XdmNode[]> inlineNodes, LinkedList<XdmNode> currentPath,
-            XdmNode node, Language lang) {
-        XdmSequenceIterator iter = node.axisIterator(Axis.CHILD);
-        if (!iter.hasNext()) {
-            String val = node.getStringValue();
-            if (node.getNodeName() != null) {
-                // case of <pagebreak/> for example
-                currentPath.add(node);
-                val = ""; // allow us to use substring() on it
-            }
+		// Inject temporary punctuation marks/spaces according to the context.
+		// For example, we may add a whitespace after every <span>.
+		// They won't be visible in the output document. 
+		if (node.getNodeName() != null) {
+			String name = node.getNodeName().getLocalName();
+			if (mFormatSpecs.spaceEquivalentElements.contains(name)) {
+				inlineNodes.add(null); //null means that the segment is not bound to anything
+				segments.add(LanguageUtils.getWhiteSpaceSymbol(lang));
+			} else if (mFormatSpecs.commaEquivalentElements.contains(name)
+			        && !LanguageUtils.getCommaLeftSymbol(lang).isEmpty()) {
+				inlineNodes.add(null);
+				segments.add(LanguageUtils.getCommaLeftSymbol(lang));
+			} else if (mFormatSpecs.endOfSentenceElements.contains(name)
+			        && !LanguageUtils.getFullStopLeftSymbol(lang).isEmpty()) {
+				inlineNodes.add(null);
+				segments.add(LanguageUtils.getFullStopLeftSymbol(lang));
+			}
+		}
 
-            XdmNode[] shallowCopy = new XdmNode[currentPath.size()];
-            currentPath.toArray(shallowCopy);
-            inlineNodes.add(shallowCopy);
-            segments.add(val);
+		XdmSequenceIterator iter = node.axisIterator(Axis.CHILD);
+		if (!iter.hasNext()) {
+			String val = node.getStringValue();
+			if (node.getNodeName() != null) {
+				// case of <pagebreak/> for example
+				currentPath.add(node);
+				val = ""; // allow us to use substring() on it
+			}
 
-            if (node.getNodeName() != null)
-                currentPath.removeLast(); // <pagebreak/>
-        } else {
-            currentPath.add(node);
-            while (iter.hasNext()) {
-                XdmNode child = (XdmNode) iter.next();
-                collectInlineSection(segments, inlineNodes, currentPath, child,
-                        lang);
-            }
-            currentPath.removeLast();
-        }
+			XdmNode[] shallowCopy = new XdmNode[currentPath.size()];
+			currentPath.toArray(shallowCopy);
+			inlineNodes.add(shallowCopy);
+			segments.add(val);
 
-        // inject temporary punctuations/spaces according to the context
-        // for example, we may add a whitespace after every <span>
-        if (node.getNodeName() != null) {
-            String name = node.getNodeName().getLocalName();
-            if (mFormatSpecs.spaceEquivalentElements.contains(name)) {
-                inlineNodes.add(null);
-                segments.add(LanguageUtils.getSpaceSymbol(lang));
-            } else if (mFormatSpecs.commaEquivalentElements.contains(name)) {
-                inlineNodes.add(null);
-                segments.add(LanguageUtils.getCommaSymbol(lang));
-            } else if (mFormatSpecs.periodEquivalentElements.contains(name)) {
-                inlineNodes.add(null);
-                segments.add(LanguageUtils.getPeriodSymbol(lang));
-            } else if (mFormatSpecs.endOfSentenceElements.contains(name)) {
-                inlineNodes.add(null);
-                segments.add(LanguageUtils.getEndOfSentenceSymbol(lang));
-            }
-        }
-    }
+			if (node.getNodeName() != null)
+				currentPath.removeLast(); // <pagebreak/>
+		} else {
+			currentPath.add(node);
+			while (iter.hasNext()) {
+				XdmNode child = (XdmNode) iter.next();
+				collectInlineSection(segments, inlineNodes, currentPath, child,
+				        lang);
+			}
+			currentPath.removeLast();
+		}
 
-    /**
-     * Add some text to the tree and wrapped it with a chain of XdmNodes.
-     * 
-     * @param wrapper
-     *            is meant to be a list of formatting elements.
-     */
-    private void wrapText(TreeWriter tw, XdmNode[] wrapper, String text) {
-        if (wrapper == null)
-            return; // text should be an invisible delimiter
+		// Inject temporary punctuation marks/spaces according to the context.
+		// For example, we may add a whitespace after every <span>
+		if (node.getNodeName() != null) {
+			String name = node.getNodeName().getLocalName();
+			if (mFormatSpecs.spaceEquivalentElements.contains(name)) {
+				inlineNodes.add(null); //null means that the segment is not bound to anything
+				segments.add(LanguageUtils.getWhiteSpaceSymbol(lang));
+			} else if (mFormatSpecs.commaEquivalentElements.contains(name)
+			        && !LanguageUtils.getCommaRightSymbol(lang).isEmpty()) {
+				inlineNodes.add(null);
+				segments.add(LanguageUtils.getCommaRightSymbol(lang));
+			} else if (mFormatSpecs.endOfSentenceElements.contains(name)
+			        && !LanguageUtils.getFullStopRightSymbol(lang).isEmpty()) {
+				inlineNodes.add(null);
+				segments.add(LanguageUtils.getFullStopRightSymbol(lang));
+			}
+		}
+	}
 
-        for (int k = 0; k < wrapper.length; ++k) {
-            tw.addStartElement(wrapper[k]);
-            tw.addAttributes(wrapper[k]);
-            // this attribute will be a criterion to know whether the node is
-            // mergeable with other nodes with the same id. The id is icremented
-            // for every new text segments
-            tw.addAttribute(mFormatSpecs.mergeableAttr,
-                    String.valueOf(mMergeableID));
-        }
-        if (text.length() > 0) {
-            // text.length() = 0 for <pagebreak/>
-            tw.addText(text);
-        }
-        for (int k = 0; k < wrapper.length; ++k)
-            tw.addEndElement();
-    }
+	/**
+	 * Add some text to the tree and wrapped it with a chain of XdmNodes.
+	 * 
+	 * @param wrapper is meant to be a list of formatting elements.
+	 */
+	private void wrapText(TreeWriter tw, XdmNode[] wrapper, String text) {
+		if (wrapper == null)
+			return; // text should be an invisible delimiter
 
-    static class SegmentPos {
-        int currentSegment;
-        int charInSegment;
-    }
+		for (int k = 0; k < wrapper.length; ++k) {
+			tw.addStartElement(wrapper[k]);
+			tw.addAttributes(wrapper[k]);
+			// this attribute will be a criterion to know whether the node is
+			// mergeable with other nodes with the same id. The id is incremented
+			// for every new text segments
+			tw.addAttribute(mFormatSpecs.mergeableAttr,
+			        String.valueOf(mMergeableID));
+		}
+		if (text.length() > 0) {
+			// text.length() = 0 for <pagebreak/>
+			tw.addText(text);
+		}
+		for (int k = 0; k < wrapper.length; ++k)
+			tw.addEndElement();
+	}
 
-    /**
-     * Add the text and the elements between two positions.
-     * 
-     * @param pos
-     *            is packed in a class to allow us to modify them
-     */
-    private void fillGap(SegmentPos pos, int untilSegment, int untilIndex,
-            TreeWriter tw, ArrayList<String> segments,
-            ArrayList<XdmNode[]> inlineNodes) {
+	static class SegmentPos {
+		int currentSegment;
+		int charInSegment;
+	}
 
-        if (pos.currentSegment < untilSegment) {
-            // complete the current segment if necessary
-            if (pos.charInSegment != segments.get(pos.currentSegment).length())
-                wrapText(
-                        tw,
-                        inlineNodes.get(pos.currentSegment),
-                        segments.get(pos.currentSegment).substring(
-                                pos.charInSegment));
+	/**
+	 * Add the text and the elements between two positions.
+	 * 
+	 * @param pos is packed in a class to allow us to modify them
+	 */
+	private void fillGap(SegmentPos pos, int untilSegment, int untilIndex,
+	        TreeWriter tw, ArrayList<String> segments,
+	        ArrayList<XdmNode[]> inlineNodes) {
 
-            for (++pos.currentSegment, ++mMergeableID; pos.currentSegment < untilSegment; ++pos.currentSegment, ++mMergeableID) {
-                wrapText(tw, inlineNodes.get(pos.currentSegment),
-                        segments.get(pos.currentSegment));
-            }
-            pos.charInSegment = 0;
-        }
-        if (pos.charInSegment < untilIndex) {
-            wrapText(
-                    tw,
-                    inlineNodes.get(pos.currentSegment),
-                    segments.get(pos.currentSegment).substring(
-                            pos.charInSegment, untilIndex));
-            pos.charInSegment = untilIndex;
-        }
+		if (pos.currentSegment < untilSegment) {
+			// complete the current segment if necessary
+			if (pos.charInSegment != segments.get(pos.currentSegment).length())
+				wrapText(
+				        tw,
+				        inlineNodes.get(pos.currentSegment),
+				        segments.get(pos.currentSegment).substring(
+				                pos.charInSegment));
 
-    }
+			for (++pos.currentSegment, ++mMergeableID; pos.currentSegment < untilSegment; ++pos.currentSegment, ++mMergeableID) {
+				wrapText(tw, inlineNodes.get(pos.currentSegment),
+				        segments.get(pos.currentSegment));
+			}
+			pos.charInSegment = 0;
+		}
+		if (pos.charInSegment < untilIndex) {
+			wrapText(
+			        tw,
+			        inlineNodes.get(pos.currentSegment),
+			        segments.get(pos.currentSegment).substring(
+			                pos.charInSegment, untilIndex));
+			pos.charInSegment = untilIndex;
+		}
 
-    /**
-     * rebuild a single inline section using the results of the lexer
-     */
-    private void rebuildInlineSection(TreeWriter tw,
-            ArrayList<String> segments, ArrayList<XdmNode[]> inlineNodes,
-            List<Sentence> sentences) {
+	}
 
-        SegmentPos pos = new SegmentPos();
-        pos.charInSegment = 0;
-        pos.currentSegment = 0;
+	/**
+	 * rebuild a single inline section using the results of the lexer
+	 */
+	private void rebuildInlineSection(TreeWriter tw,
+	        ArrayList<String> segments, ArrayList<XdmNode[]> inlineNodes,
+	        List<Sentence> sentences) {
 
-        fillGap(pos, sentences.get(0).boundaries.firstSegment,
-                sentences.get(0).boundaries.firstIndex, tw, segments,
-                inlineNodes);
+		SegmentPos pos = new SegmentPos();
+		pos.charInSegment = 0;
+		pos.currentSegment = 0;
 
-        for (Sentence s : sentences) {
-            tw.addStartElement(mFormatSpecs.sentenceTag);
-            for (TextReference r : s.content) {
-                fillGap(pos, r.firstSegment, r.firstIndex, tw, segments,
-                        inlineNodes);
-                // TODO: add proper nouns
-                tw.addStartElement(mFormatSpecs.wordTag);
-                fillGap(pos, r.lastSegment, r.lastIndex, tw, segments,
-                        inlineNodes);
-                tw.addEndElement();
-            }
+		fillGap(pos, sentences.get(0).boundaries.firstSegment,
+		        sentences.get(0).boundaries.firstIndex, tw, segments,
+		        inlineNodes);
 
-            fillGap(pos, s.boundaries.lastSegment, s.boundaries.lastIndex, tw,
-                    segments, inlineNodes);
+		for (Sentence s : sentences) {
+			tw.addStartElement(mFormatSpecs.sentenceTag);
+			if (s.content != null)
+				for (TextReference r : s.content) {
+					fillGap(pos, r.firstSegment, r.firstIndex, tw, segments,
+					        inlineNodes);
+					// TODO: add proper nouns
+					tw.addStartElement(mFormatSpecs.wordTag);
+					fillGap(pos, r.lastSegment, r.lastIndex, tw, segments,
+					        inlineNodes);
+					tw.addEndElement();
+				}
+			fillGap(pos, s.boundaries.lastSegment, s.boundaries.lastIndex, tw,
+			        segments, inlineNodes);
 
-            tw.addEndElement(); // sentence
-        }
+			tw.addEndElement(); // sentence
+		}
 
-    }
+	}
 
-    /**
-     * Lex an inline section and rebuild it.
-     */
-    private void tokenizeInlineSection(TreeWriter tw,
-            List<XdmNode> inlineSection, Language currentLanguage) {
-        // extract the text segments from the inlineSection
-        // and a list of inlineNodes for each segment
-        ArrayList<String> segments = new ArrayList<String>();
-        ArrayList<XdmNode[]> inlineNodes = new ArrayList<XdmNode[]>();
-        for (XdmNode subsection : inlineSection)
-            collectInlineSection(segments, inlineNodes,
-                    new LinkedList<XdmNode>(), subsection, currentLanguage);
+	/**
+	 * Lex an inline section and rebuild it.
+	 */
+	private void tokenizeInlineSection(TreeWriter tw,
+	        List<XdmNode> inlineSection, Language currentLanguage) {
+		// extract the text segments from the inlineSection
+		// and a list of inlineNodes for each segment
+		ArrayList<String> segments = new ArrayList<String>();
+		ArrayList<XdmNode[]> inlineNodes = new ArrayList<XdmNode[]>();
+		for (XdmNode subsection : inlineSection)
+			collectInlineSection(segments, inlineNodes,
+			        new LinkedList<XdmNode>(), subsection, currentLanguage);
 
-        // call the tokenizer on the segments
-        try {
-            mLexer.useLanguage(currentLanguage);
-        } catch (LexerInitException e) {
-            e.printStackTrace();
-        }
-        List<Sentence> sentences = mLexer.split(segments);
+		// call the tokenizer on the segments
+		try {
+			mLexer.useLanguage(currentLanguage);
+		} catch (LexerInitException e) {
+			e.printStackTrace();
+		}
+		List<Sentence> sentences = mLexer.split(segments);
 
-        // rebuild the tree with the additional markups
-        if (sentences.size() > 0)
-            rebuildInlineSection(tw, segments, inlineNodes, sentences);
-        else {
-            // if there is no sentence, we rebuild the XML exactly like it was
-            for (XdmNode subsection : inlineSection)
-                tw.addSubtree(subsection);
-        }
-    }
+		// rebuild the tree with the additional markups
+		if (sentences.size() > 0)
+			rebuildInlineSection(tw, segments, inlineNodes, sentences);
+		else {
+			// if there is no sentence, we rebuild the XML exactly like it was
+			for (XdmNode subsection : inlineSection)
+				tw.addSubtree(subsection);
+		}
+	}
 
-    /**
-     * Rebuild the whole tree, lexing the text on-the-fly. This step comes right
-     * after the inline sections have been found.
-     */
-    private void rebuildFullTree(TreeWriter tw, XdmNode node,
-            Set<XdmNode> inlineSections, Language currentLanguage) {
-        if (inlineSections.contains(node)) {
-            // this part of the tree will be built by tokenizeInlineSection()
-            return;
-        }
+	/**
+	 * Rebuild the whole tree, lexing the text on-the-fly. This step comes right
+	 * after the inline sections have been found.
+	 */
+	private void rebuildFullTree(TreeWriter tw, XdmNode node,
+	        Set<XdmNode> inlineSections, Language currentLanguage) {
+		if (inlineSections.contains(node)) {
+			// this part of the tree will be built by tokenizeInlineSection()
+			return;
+		}
 
-        String lang = node.getAttributeValue(mFormatSpecs.langAttr);
-        if (lang != null) {
-            Language x = LanguageUtils.stringToLanguage(lang);
-            if (x != null)
-                currentLanguage = x;
-        }
+		String lang = node.getAttributeValue(mFormatSpecs.langAttr);
+		if (lang != null) {
+			Language x = LanguageUtils.stringToLanguage(lang);
+			if (x != null)
+				currentLanguage = x;
+		}
 
-        if (node.getNodeKind() == XdmNodeKind.PROCESSING_INSTRUCTION) {
-            tw.addPI(node.getNodeName().getClarkName(), node.getStringValue());
-        } else if (node.getNodeKind() == XdmNodeKind.COMMENT) {
-            tw.addComment(node.getStringValue());
-        } else if (node.getNodeKind() == XdmNodeKind.DOCUMENT) {
-            tw.startDocument(node.getDocumentURI());
-            XdmSequenceIterator iter = node.axisIterator(Axis.CHILD);
-            while (iter.hasNext()) {
-                XdmNode child = (XdmNode) iter.next();
-                rebuildFullTree(tw, child, inlineSections, currentLanguage);
-            }
-            tw.endDocument();
+		if (node.getNodeKind() == XdmNodeKind.PROCESSING_INSTRUCTION) {
+			tw.addPI(node.getNodeName().getClarkName(), node.getStringValue());
+		} else if (node.getNodeKind() == XdmNodeKind.COMMENT) {
+			tw.addComment(node.getStringValue());
+		} else if (node.getNodeKind() == XdmNodeKind.DOCUMENT) {
+			tw.startDocument(node.getDocumentURI());
+			XdmSequenceIterator iter = node.axisIterator(Axis.CHILD);
+			while (iter.hasNext()) {
+				XdmNode child = (XdmNode) iter.next();
+				rebuildFullTree(tw, child, inlineSections, currentLanguage);
+			}
+			tw.endDocument();
 
-        } else if (node.getNodeKind() == XdmNodeKind.ELEMENT) {
-            tw.addStartElement(node);
+		} else if (node.getNodeKind() == XdmNodeKind.ELEMENT) {
+			tw.addStartElement(node);
 
-            // this prevents the namespace declaration from being repeated
-            // everywhere
-            if (!mSeenRoot) {
-                tw.addNamespace(mFormatSpecs.tmpNsPrefix, mFormatSpecs.tmpNs);
-                mSeenRoot = true;
-            }
+			// this prevents the namespace declaration from being repeated
+			// everywhere
+			if (!mSeenRoot) {
+				tw.addNamespace(mFormatSpecs.tmpNsPrefix, mFormatSpecs.tmpNs);
+				mSeenRoot = true;
+			}
 
-            tw.addAttributes(node);
+			tw.addAttributes(node);
 
-            LinkedList<XdmNode> concatSection = new LinkedList<XdmNode>();
-            XdmSequenceIterator iter = node.axisIterator(Axis.CHILD);
-            while (iter.hasNext()) {
-                XdmNode child = (XdmNode) iter.next();
-                if (inlineSections.contains(child)) {
-                    concatSection.add(child);
-                } else {
-                    // end of the current inline section
-                    if (concatSection.size() > 0) {
-                        tokenizeInlineSection(tw, concatSection,
-                                currentLanguage);
-                        concatSection.clear();
-                    }
-                    rebuildFullTree(tw, child, inlineSections, currentLanguage);
-                }
-            }
-            if (concatSection.size() > 0) {
-                tokenizeInlineSection(tw, concatSection, currentLanguage);
-            }
-            tw.addEndElement();
-        }
-    }
+			LinkedList<XdmNode> concatSection = new LinkedList<XdmNode>();
+			XdmSequenceIterator iter = node.axisIterator(Axis.CHILD);
+			while (iter.hasNext()) {
+				XdmNode child = (XdmNode) iter.next();
+				if (inlineSections.contains(child)) {
+					concatSection.add(child);
+				} else {
+					// end of the current inline section
+					if (concatSection.size() > 0) {
+						tokenizeInlineSection(tw, concatSection,
+						        currentLanguage);
+						concatSection.clear();
+					}
+					rebuildFullTree(tw, child, inlineSections, currentLanguage);
+				}
+			}
+			if (concatSection.size() > 0) {
+				tokenizeInlineSection(tw, concatSection, currentLanguage);
+			}
+			tw.addEndElement();
+		}
+	}
 
-    /**
-     * Entry point of the rebuilder.
-     */
-    public XdmNode rebuild(XdmNode document, Set<XdmNode> inlineSections)
-            throws SaxonApiException {
+	/**
+	 * Entry point of the rebuilder.
+	 */
+	public XdmNode rebuild(XdmNode document, Set<XdmNode> inlineSections)
+	        throws SaxonApiException {
 
-        TreeWriter tw = new TreeWriter(mRuntime);
-        mSeenRoot = false;
-        rebuildFullTree(tw, document, inlineSections, null);
+		TreeWriter tw = new TreeWriter(mRuntime);
+		mSeenRoot = false;
+		rebuildFullTree(tw, document, inlineSections, null);
 
-        return tw.getResult();
-    }
+		return tw.getResult();
+	}
 }

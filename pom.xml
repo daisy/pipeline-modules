@@ -22,11 +22,12 @@
     <module>nlp-utils/lexing</module>
     <module>nlp-utils/break-detection</module>
     <module>ruled-lexer</module>
+    <module>light-lexer</module>
     <module>zedai-break-detection</module>
     <module>html-break-detection</module>
     <module>dtbook-break-detection</module>
   </modules>
-  
+
   <dependencyManagement>
     <dependencies>
 
@@ -35,7 +36,7 @@
 	<artifactId>zedai-break-detection</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
       </dependency>
-      
+
       <dependency>
 	<groupId>org.daisy.pipeline.modules</groupId>
 	<artifactId>html-break-detection</artifactId>
@@ -47,19 +48,25 @@
 	<artifactId>dtbook-break-detection</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
       </dependency>
-      
+
       <dependency>
 	<groupId>org.daisy.pipeline.modules</groupId>
 	<artifactId>nlp-common</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
       </dependency>
-      
+
       <dependency>
 	<groupId>org.daisy.pipeline.modules</groupId>
 	<artifactId>ruled-lexer</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
       </dependency>
-      
+
+      <dependency>
+	<groupId>org.daisy.pipeline.modules</groupId>
+	<artifactId>light-lexer</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+      </dependency>
+
       <dependency>
 	<groupId>org.daisy.pipeline.modules</groupId>
 	<artifactId>lexing</artifactId>
@@ -77,10 +84,10 @@
       <artifactId>guava</artifactId>
       <version>15.0</version>
     </dependency>
-	  
+
     </dependencies>
    </dependencyManagement>
-   
+
    <repositories>
     <repository>
       <id>central</id>
@@ -88,5 +95,5 @@
       <url>http://repo.maven.apache.org/maven2/</url>
     </repository>
    </repositories>
-	
+
 </project>

@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="break detector">
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="break-detector">
 
   <implementation class="org.daisy.pipeline.nlp.breakdetect.BreakDetectProvider"/>
 
-  <reference bind="setLexer"
-	     unbind="unsetLexer"
-	     cardinality="1..1"
+  <reference bind="addLexer"
+	     unbind="removeLexer"
+	     cardinality="1..n"
 	     interface="org.daisy.pipeline.nlp.lexing.LexService"
 	     name="LexService"
-	     policy="dynamic"/>
+	     policy="static"/>
 
   <service>
     <provide interface="org.daisy.common.xproc.calabash.XProcStepProvider"/>
   </service>
   <property name="type" type="String" value="{http://www.daisy.org/ns/pipeline/xproc}break-detect"/>
-  
-  
+
 </scr:component>

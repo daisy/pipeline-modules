@@ -19,7 +19,7 @@
   <description>Break Detection Xproc Step based on any Lexer implementation</description>
 
  <dependencies>
-      
+
    <dependency>
      <groupId>junit</groupId>
      <artifactId>junit</artifactId>
@@ -31,14 +31,14 @@
      <artifactId>Saxon-HE</artifactId>
      <version>9.5.1-1</version>
    </dependency>
-    
+
    <!-- needed to use com.xmlcalabash.library.DefaultStep ... -->
    <dependency>
      <groupId>org.daisy.libs</groupId>
      <artifactId>com.xmlcalabash</artifactId>
      <version>1.0.9</version>
    </dependency>
-   
+
    <!-- needed to use org.daisy.common.xproc.calabash.XProcStepProvider -->
    <dependency>
      <groupId>org.daisy.pipeline</groupId>
@@ -51,20 +51,14 @@
      <artifactId>nlp-common</artifactId>
    </dependency>
 
-   <!-- default Lexer implementation if OSGI services are not up -->
-   <dependency>
-     <groupId>org.daisy.pipeline.modules</groupId>
-     <artifactId>ruled-lexer</artifactId>
-   </dependency>
-
    <!-- Lexing Services interface -->
    <dependency>
      <groupId>org.daisy.pipeline.modules</groupId>
      <artifactId>lexing</artifactId>
    </dependency>
-	        
+
   </dependencies>
-  
+
    <build>
     <plugins>
       <plugin>
@@ -78,6 +72,6 @@
       </plugin>
     </plugins>
   </build>
-  
-	
+
+
 </project>
