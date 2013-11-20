@@ -49,7 +49,7 @@
 	    </goals>
 	    <configuration>
 	      <javahOS>linux</javahOS> <!-- the OS does not matter here -->
-	      <javahOutputDirectory>att-nar/src/main/jni</javahOutputDirectory>
+	      <javahOutputDirectory>../../native-libs/att-nar/src/main/jni</javahOutputDirectory>
 	      <javahClassNames>
 	  	<javahClassName>org.daisy.pipeline.tts.attnative.ATTLib</javahClassName>
 	      </javahClassNames>
