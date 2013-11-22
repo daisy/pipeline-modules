@@ -30,6 +30,9 @@
                 <xsl:when test="@title">
                     <xsl:value-of select="@title"/>
                 </xsl:when>
+                <xsl:when test="normalize-space()=''">
+                    <xsl:value-of select="count(preceding::*[@epub:type='pagebreak'])+1"/>
+                </xsl:when>
                 <xsl:otherwise>
                     <xsl:apply-templates/>
                 </xsl:otherwise>

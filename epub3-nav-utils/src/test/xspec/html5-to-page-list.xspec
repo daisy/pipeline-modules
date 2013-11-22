@@ -45,6 +45,17 @@
         </x:context>
         <x:expect label="the title attribute is used as the page value" test="string(//h:a)='1'"/>
     </x:scenario>
+    <x:scenario label="when a page break is empty and has no title attribute ">
+        <x:context>
+            <body>
+                <span id="page1" epub:type="pagebreak"/>
+                <div>
+                    <span id="page2" epub:type="pagebreak"/>
+                </div>
+            </body>
+        </x:context>
+        <x:expect label="the page value is computed from the count of page breaks" test="string((//h:a)[1])='1' and string((//h:a)[2])='2'"/>
+    </x:scenario>
     <x:scenario label="when the document has several page breaks">
         <x:context>
             <body>
