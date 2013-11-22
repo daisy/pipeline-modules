@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:html="http://www.w3.org/1999/xhtml" xmlns="http://www.daisy.org/z3986/2005/ncx/" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:epub="http://www.idpf.org/2007/ops"
+<xsl:stylesheet xmlns:html="http://www.w3.org/1999/xhtml" xmlns="http://www.daisy.org/z3986/2005/ncx/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:epub="http://www.idpf.org/2007/ops"
     exclude-result-prefixes="#all" version="2.0" xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions" xmlns:d="http://www.daisy.org/ns/pipeline/data">
 
     <!-- Creates a text-only NCX based on a EPUB3 Navigation Document -->
@@ -9,9 +9,10 @@
     
     <xsl:variable name="lang" select="(@xml:lang,@lang)[1]"/>
 
+    <xsl:variable name="doc-base" select="base-uri(/*)"/>
     <xsl:variable name="srcMap1">
         <xsl:for-each select="//html:li[html:a]">
-            <map href="{./html:a/@href}" content-src="{f:make-content-src(.)}"/>
+            <map href="{./html:a[1]/@href}" content-src="{f:make-content-src(html:a[1])}"/>
         </xsl:for-each>
     </xsl:variable>
     <xsl:variable name="srcMap">
@@ -63,6 +64,7 @@
 
     <xsl:template match="html:nav">
         <xsl:choose>
+            <xsl:when test="empty(html:ol)"/>
             <xsl:when test="@epub:type='toc'">
                 <navMap>
                     <xsl:call-template name="make-label"/>
@@ -106,7 +108,7 @@
             <xsl:when test="ancestor::html:nav/@epub:type='toc'">
                 <xsl:choose>
                     <xsl:when test="html:a">
-                        <xsl:variable name="src" select="f:make-content-src(.)"/>
+                        <xsl:variable name="src" select="f:make-content-src(html:a[1])"/>
                         <xsl:variable name="playOrder" select="$srcMap/*[./@content-src=$src]/@playOrder"/>
                         <navPoint id="navPoint-{count(preceding::html:li | ancestor::html:li)+1}" playOrder="{$playOrder}">
                             <xsl:call-template name="make-label"/>
@@ -121,7 +123,7 @@
             </xsl:when>
             <xsl:when test="ancestor::html:nav/@epub:type='page-list'">
                 <xsl:if test="html:a">
-                    <xsl:variable name="src" select="f:make-content-src(.)"/>
+                    <xsl:variable name="src" select="f:make-content-src(html:a[1])"/>
                     <xsl:variable name="playOrder" select="$srcMap/*[./@content-src=$src]/@playOrder"/>
                     <pageTarget id="pageTarget-{count(preceding::html:li | ancestor::html:li)+1}" playOrder="{$playOrder}">
                         <xsl:choose>
@@ -141,7 +143,7 @@
             </xsl:when>
             <xsl:otherwise>
                 <xsl:if test="html:a">
-                    <xsl:variable name="src" select="f:make-content-src(.)"/>
+                    <xsl:variable name="src" select="f:make-content-src(html:a[1])"/>
                     <xsl:variable name="playOrder" select="$srcMap/*[./@content-src=$src]/@playOrder"/>
                     <navTarget id="navTarget-{count(preceding::html:li | ancestor::html:li)+1}" playOrder="{$playOrder}">
                         <xsl:call-template name="make-label"/>
@@ -164,9 +166,9 @@
         </xsl:if>
     </xsl:template>
 
-    <xsl:function name="f:make-content-src">
-        <xsl:param name="context"/>
-        <xsl:value-of select="if ($context/html:a) then (if (starts-with($context/html:a/@href,'#')) then concat(replace(base-uri($context//ancestor::*[last()]),'^.*/([^/]*)$','$1'),$context/html:a/@href) else $context/html:a/@href) else ''"/>
+    <xsl:function name="f:make-content-src" as="xs:string">
+        <xsl:param name="context" as="element(html:a)"/>
+        <xsl:value-of select="if (starts-with($context/@href,'#')) then concat(replace($doc-base,'^.*/([^/]*)$','$1'),$context/@href) else $context/@href"/>
     </xsl:function>
 
 </xsl:stylesheet>
