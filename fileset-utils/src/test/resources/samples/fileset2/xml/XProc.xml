@@ -85,7 +85,7 @@
     <p:import href="package.xpl">
         <p:documentation>For making the package document.</p:documentation>
     </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/epub3-ocf-utils/xproc/epub3-ocf-library.xpl">
+    <p:import href="http://www.daisy.org/pipeline/modules/epub3-ocf-utils/library.xpl">
         <p:documentation>For putting it all into a ZIP container.</p:documentation>
     </p:import>
 

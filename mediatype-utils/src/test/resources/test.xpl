@@ -6,7 +6,7 @@
         <p:pipe port="result" step="result"/>
     </p:output>
 
-    <p:import href="http://www.daisy.org/pipeline/modules/validation-utils/validation-utils-library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/validation-utils/library.xpl"/>
 
     <p:import href="test-mediatype-detect.xpl"/>
 
