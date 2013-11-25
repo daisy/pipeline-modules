@@ -3,7 +3,7 @@
     version="1.0" exclude-inline-prefixes="px">
 
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/html-utils/html-library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl"/>
 
     <!--<px:html-load href="http://dev.w3.org/html5/spec/single-page.html"/>
     <p:store href="HTML5.xhtml"/>-->
