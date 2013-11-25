@@ -51,7 +51,7 @@
         </p:documentation>
     </p:import>
     
-    <p:import href="http://www.daisy.org/pipeline/modules/validation-utils/validation-utils-library.xpl">
+    <p:import href="http://www.daisy.org/pipeline/modules/validation-utils/library.xpl">
         <p:documentation>
             Collection of utilities for validation and reporting.
         </p:documentation>

@@ -25,9 +25,9 @@
     </p:output>
 
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/html-utils/html-library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/xproc/fileset-library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/mediatype-utils/mediatype.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/mediatype-utils/library.xpl"/>
     
     <p:xslt>
         <p:with-param name="href" select="$ncc"/>

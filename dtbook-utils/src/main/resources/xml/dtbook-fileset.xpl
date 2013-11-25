@@ -11,8 +11,8 @@
         <p:documentation>A fileset containing references to the DTBook file and any resources it references (images etc.).</p:documentation>
     </p:output>
 
-    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/xproc/fileset-library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/mediatype-utils/mediatype.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/mediatype-utils/library.xpl"/>
 
     <p:xslt>
         <p:input port="parameters">

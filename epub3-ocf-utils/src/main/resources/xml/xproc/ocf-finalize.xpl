@@ -28,7 +28,7 @@
         <p:pipe port="signature" step="main"/>
     </p:output>
     
-    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/xproc/fileset-library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
     
     <p:declare-step type="pxi:fileset-add-ocf-entry" name="store-in-ocf">
         <p:input port="fileset" primary="true"/>
