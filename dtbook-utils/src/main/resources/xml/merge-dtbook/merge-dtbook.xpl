@@ -45,7 +45,7 @@
 
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
     
-    <p:import href="http://www.daisy.org/pipeline/modules/dtbook-validator/dtbook-validator.select-schema.xpl">
+    <p:import href="http://www.daisy.org/pipeline/modules/dtbook-validator/library.xpl">
         <p:documentation>
             Schema selector used for DTBook validation.
         </p:documentation>
