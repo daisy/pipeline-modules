@@ -47,7 +47,8 @@ public class LexResultPrettyPrinter {
 		} else {
 			sb.append(references.get(t.firstSegment).substring(t.firstIndex));
 			for (int i = t.firstSegment + 1; i < t.lastSegment; ++i) {
-				sb.append(references.get(i));
+				if (references.get(i) != null)
+					sb.append(references.get(i));
 			}
 			sb.append(references.get(t.lastSegment).substring(0, t.lastIndex));
 		}

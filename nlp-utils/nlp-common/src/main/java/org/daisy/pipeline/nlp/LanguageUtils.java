@@ -71,7 +71,7 @@ public class LanguageUtils {
 
 	public static String getFullStopLeftSymbol(Language lang) {
 		if (isRightToLeft(lang))
-			return " .";
+			return " !";
 		return "";
 	}
 

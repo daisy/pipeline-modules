@@ -70,8 +70,10 @@ public interface LexService {
 	/**
 	 * Split the input strings into sentences that refer to the input segments.
 	 * 
-	 * @param segments are adjacent blocks of text. A word can be spread over
-	 *            multiple blocks.
+	 * @param segments are adjacent blocks of text. Words and sentences can be
+	 *            spread over multiple blocks. One or many strings can be null,
+	 *            but not all of them.
+	 * 
 	 * @return a list of sentences referring to @param segments.
 	 */
 	List<Sentence> split(List<String> segments);

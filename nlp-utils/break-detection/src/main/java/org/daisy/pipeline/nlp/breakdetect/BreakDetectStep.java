@@ -2,16 +2,13 @@ package org.daisy.pipeline.nlp.breakdetect;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 
-import net.sf.saxon.s9api.Axis;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
-import net.sf.saxon.s9api.XdmNodeKind;
-import net.sf.saxon.s9api.XdmSequenceIterator;
 
 import org.daisy.pipeline.nlp.lexing.LexService;
+import org.daisy.pipeline.nlp.lexing.LexService.LexerInitException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,32 +18,32 @@ import com.xmlcalabash.io.WritablePipe;
 import com.xmlcalabash.library.DefaultStep;
 import com.xmlcalabash.model.RuntimeValue;
 import com.xmlcalabash.runtime.XAtomicStep;
+import com.xmlcalabash.util.TreeWriter;
 
 /**
  * XprocStep built on the top of a Lexer meant to be provided by an OSGI service
  * through BreakDetectProvider.
  */
-public class BreakDetectStep extends DefaultStep {
+public class BreakDetectStep extends DefaultStep implements TreeWriterFactory {
 
 	private Logger mLogger = LoggerFactory.getLogger(BreakDetectStep.class);
-	private XmlBreakRebuilder mXmlRebuilder;
 	private ReadablePipe mSource = null;
 	private WritablePipe mResult = null;
+	private XProcRuntime mRuntime = null;
+	private LexService mLexer;
 
 	private Collection<String> inlineTagsOption;
 	private Collection<String> commaTagsOption;
 	private Collection<String> spaceTagsOption;
-	private Collection<String> fullstopTagsOption;
 	private String tmpNs;
 	private String wordTagOption;
 	private String sentenceTagOption;
-	private String mergeableAttrOption;
-	private FormatSpecifications mFormatSpecs;
 
 	public BreakDetectStep(XProcRuntime runtime, XAtomicStep step,
 	        LexService lexer) {
 		super(runtime, step);
-		mXmlRebuilder = new XmlBreakRebuilder(runtime, lexer);
+		mRuntime = runtime;
+		mLexer = lexer;
 	}
 
 	// This constructor is provided so that it is compliant with vanilla Calabash
@@ -67,8 +64,6 @@ public class BreakDetectStep extends DefaultStep {
 			inlineTagsOption = processListOption(value.getString());
 		} else if ("comma-tags".equalsIgnoreCase(name.getLocalName())) {
 			commaTagsOption = processListOption(value.getString());
-		} else if ("end-sentence-tags".equalsIgnoreCase(name.getLocalName())) {
-			fullstopTagsOption = processListOption(value.getString());
 		} else if ("space-tags".equalsIgnoreCase(name.getLocalName())) {
 			spaceTagsOption = processListOption(value.getString());
 		} else if ("output-word-tag".equalsIgnoreCase(name.getLocalName())) {
@@ -77,8 +72,6 @@ public class BreakDetectStep extends DefaultStep {
 			sentenceTagOption = value.getString();
 		} else if ("tmp-ns".equalsIgnoreCase(name.getLocalName())) {
 			tmpNs = value.getString();
-		} else if ("mergeable-attr".equalsIgnoreCase(name.getLocalName())) {
-			mergeableAttrOption = value.getString();
 		} else {
 			runtime.error(new RuntimeException("unrecognized option " + name));
 		}
@@ -93,27 +86,6 @@ public class BreakDetectStep extends DefaultStep {
 		mResult.resetWriter();
 	}
 
-	/**
-	 * Traverse recursively the whole tree to find the inline sections of the
-	 * document.
-	 */
-	private boolean findInlineSections(XdmNode node,
-	        HashSet<XdmNode> inlineSections) {
-		XdmSequenceIterator iter = node.axisIterator(Axis.CHILD);
-		boolean isInlineSection = node.getNodeKind() == XdmNodeKind.TEXT
-		        || (node.getNodeName() != null && mFormatSpecs.inlineElements
-		                .contains(node.getNodeName().getLocalName()));
-		while (iter.hasNext()) {
-			XdmNode child = (XdmNode) iter.next();
-			boolean r = findInlineSections(child, inlineSections);
-			isInlineSection &= r;
-		}
-		if (isInlineSection)
-			inlineSections.add(node);
-
-		return isInlineSection;
-	}
-
 	static private Collection<String> processListOption(String opt) {
 		return Arrays.asList(opt.split(","));
 	}
@@ -121,29 +93,40 @@ public class BreakDetectStep extends DefaultStep {
 	public void run() throws SaxonApiException {
 		super.run();
 
-		mFormatSpecs = new FormatSpecifications(tmpNs, sentenceTagOption,
-		        wordTagOption, "http://www.w3.org/XML/1998/namespace", "lang",
-		        inlineTagsOption, commaTagsOption, fullstopTagsOption,
-		        spaceTagsOption, mergeableAttrOption);
+		try {
+			mLexer.init();
+		} catch (LexerInitException e) {
+			mRuntime.error(e);
+		}
 
-		mXmlRebuilder.setFormatSpecifications(mFormatSpecs);
+		FormatSpecifications formatSpecs = new FormatSpecifications(tmpNs,
+		        sentenceTagOption, wordTagOption,
+		        "http://www.w3.org/XML/1998/namespace", "lang",
+		        inlineTagsOption, commaTagsOption, spaceTagsOption);
+
+		XmlBreakRebuilder xmlRebuilder = new XmlBreakRebuilder();
 
 		long before = System.currentTimeMillis();
 
 		while (mSource.moreDocuments()) {
 			XdmNode doc = mSource.read();
-
-			// find the inline sections on which tokenizeInlineSection()
-			// will be called
-			HashSet<XdmNode> inlineSections = new HashSet<XdmNode>();
-			findInlineSections(doc, inlineSections);
-
-			XdmNode tree = mXmlRebuilder.rebuild(doc, inlineSections);
-
-			mResult.write(tree);
+			XdmNode tree;
+			try {
+				tree = xmlRebuilder.rebuild(this, mLexer, doc, formatSpecs);
+				mResult.write(tree);
+			} catch (LexerInitException e) {
+				mRuntime.error(e);
+			}
 		}
 
 		long after = System.currentTimeMillis();
 		mLogger.debug("lexing time = " + (after - before) / 1000.0 + " s.");
+
+		mLexer.cleanUpLangResources();
+	}
+
+	@Override
+	public TreeWriter newInstance() {
+		return new TreeWriter(mRuntime);
 	}
 }

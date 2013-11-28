@@ -64,8 +64,10 @@ public class LightLexer implements LexService {
 
 	public static void findInArray(List<String> segments, int index, int[] res) {
 		res[0] = 0;
-		while (index >= segments.get(res[0]).length()) {
-			index -= segments.get(res[0]).length();
+		while ((segments.get(res[0]) == null)
+		        || (index >= segments.get(res[0]).length())) {
+			if (segments.get(res[0]) != null)
+				index -= segments.get(res[0]).length();
 			++res[0];
 		}
 		res[1] = index;
@@ -79,7 +81,8 @@ public class LightLexer implements LexService {
 		// concatenate the input segments
 		StringBuilder sb = new StringBuilder();
 		for (String source : segments) {
-			sb.append(source);
+			if (source != null)
+				sb.append(source);
 		}
 		String input = sb.toString();
 

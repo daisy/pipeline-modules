@@ -1,6 +1,7 @@
 package org.daisy.pipeline.nlp.breakdetect;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,11 +16,9 @@ public class FormatSpecifications {
 	public QName sentenceTag;
 	public QName wordTag;
 	public String tmpNsPrefix = "tmp";
-	public QName mergeableAttr;
 	public QName langAttr;
 	public Set<String> inlineElements;
 	public Set<String> commaEquivalentElements;
-	public Set<String> endOfSentenceElements;
 	public Set<String> spaceEquivalentElements;
 	public String tmpNs;
 
@@ -27,8 +26,12 @@ public class FormatSpecifications {
 	        String wordElement, String langNamespace, String langAttr,
 	        Collection<String> inlineElements,
 	        Collection<String> commaEquivalentElements,
-	        Collection<String> endOfSentenceElements,
-	        Collection<String> spaceEquivalentElements, String mergeableAttr) {
+	        Collection<String> spaceEquivalentElements) {
+
+		if (commaEquivalentElements == null)
+			commaEquivalentElements = Collections.EMPTY_LIST;
+		if (spaceEquivalentElements == null)
+			spaceEquivalentElements = Collections.EMPTY_LIST;
 
 		sentenceTag = new QName(tmpNamespace, sentenceElement);
 		wordTag = new QName(tmpNamespace, wordElement);
@@ -36,15 +39,11 @@ public class FormatSpecifications {
 
 		this.inlineElements = new HashSet<String>(inlineElements);
 		this.inlineElements.addAll(commaEquivalentElements);
-		this.inlineElements.addAll(endOfSentenceElements);
 
 		this.commaEquivalentElements = new HashSet<String>(
 		        commaEquivalentElements);
-		this.endOfSentenceElements = new HashSet<String>(endOfSentenceElements);
 		this.spaceEquivalentElements = new HashSet<String>(
 		        spaceEquivalentElements);
-
-		this.mergeableAttr = new QName(tmpNsPrefix, tmpNamespace, mergeableAttr);
 
 		this.tmpNs = tmpNamespace;
 	}

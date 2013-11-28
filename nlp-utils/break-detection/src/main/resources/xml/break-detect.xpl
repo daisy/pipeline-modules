@@ -10,9 +10,7 @@
   <p:option name="output-word-tag" required="true"/>
   <p:option name="output-sentence-tag" required="true"/>
   <p:option name="tmp-ns" required="true"/>
-  <p:option name="mergeable-attr" required="false" select="'mergeable'"/>
   <p:option name="comma-tags" required="false" select="''"/>
-  <p:option name="end-sentence-tags" required="false" select="''"/>
   <p:option name="space-tags" required="false" select="''"/>
 
 </p:declare-step>

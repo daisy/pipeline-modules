@@ -111,7 +111,8 @@ public class RuleBasedLexer implements LexService {
 		// concatenate the input segments
 		StringBuilder sb = new StringBuilder();
 		for (String source : segments) {
-			sb.append(source);
+			if (source != null)
+				sb.append(source);
 		}
 		String input = sb.toString();
 
@@ -125,9 +126,14 @@ public class RuleBasedLexer implements LexService {
 		List<List<CategorizedWord>> sentences = mSentenceSplitter.split(words);
 
 		// ===== build the result according to the to input segments =====
+
+		int currentsegment = 0;
+		while (segments.get(currentsegment) == null) {
+			++currentsegment;
+		}
+
 		// those variables are used to compute relative positions according to
 		// the input segments
-		int currentsegment = 0;
 		int currentPos = 0;
 		int segmentStart = 0; // inclusive index
 		int segmentEnd = segments.get(currentsegment).length(); // exclusive
@@ -166,7 +172,8 @@ public class RuleBasedLexer implements LexService {
 				while (currentPos > segmentEnd) {
 					++currentsegment;
 					segmentStart = segmentEnd;
-					segmentEnd += segments.get(currentsegment).length();
+					if (segments.get(currentsegment) != null)
+						segmentEnd += segments.get(currentsegment).length();
 				}
 				ref.lastSegment = currentsegment;
 				ref.lastIndex = currentPos - segmentStart;
