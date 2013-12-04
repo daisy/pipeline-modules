@@ -4,7 +4,7 @@
     xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
     xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/xslt/uri-functions.xsl"/>
+    <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/uri-functions.xsl"/>
 
     <!-- Joint fileset base: longest common URI of all fileset bases -->
     <xsl:variable name="base"
