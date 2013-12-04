@@ -15,13 +15,13 @@
         </div>
     </p:documentation>
     
-    <p:import href="http://www.daisy.org/pipeline/modules/validation-utils/validation-utils-library.xpl">
+    <p:import href="http://www.daisy.org/pipeline/modules/validation-utils/library.xpl">
         <p:documentation>
             Collection of utilities for validation and reporting.
         </p:documentation>
     </p:import>
     
-    <p:import href="http://www.daisy.org/pipeline/modules/dtbook-validator/dtbook-validator.select-schema.xpl">
+    <p:import href="http://www.daisy.org/pipeline/modules/dtbook-validator/library.xpl">
         <p:documentation>
             Schema selector used for DTBook validation.
         </p:documentation>

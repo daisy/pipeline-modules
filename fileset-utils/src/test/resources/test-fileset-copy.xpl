@@ -7,7 +7,7 @@
 
     <p:import href="../../main/resources/xml/xproc/fileset-copy.xpl"/>
     <p:import href="compare.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/xproc/file-library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl"/>
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
 
     <p:variable name="out-dir" select="resolve-uri('samples/out/',base-uri())">

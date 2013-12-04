@@ -33,7 +33,7 @@
 
     <p:option name="load-if-not-in-memory" select="'false'"/>
 
-    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/xproc/fileset-library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
 
     <p:declare-step type="pxi:mediatype-detect-from-extension">
         <p:input port="source"/>
