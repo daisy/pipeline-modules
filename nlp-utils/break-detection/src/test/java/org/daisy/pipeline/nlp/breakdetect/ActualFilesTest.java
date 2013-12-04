@@ -19,7 +19,9 @@ import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmNodeKind;
 import net.sf.saxon.s9api.XdmSequenceIterator;
 
+import org.daisy.pipeline.nlp.LanguageUtils.Language;
 import org.daisy.pipeline.nlp.breakdetect.DummyLexer.Strategy;
+import org.daisy.pipeline.nlp.lexing.LexService;
 import org.daisy.pipeline.nlp.lexing.LexService.LexerInitException;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -37,12 +39,15 @@ public class ActualFilesTest implements TreeWriterFactory {
 	static private Processor Proc;
 	static private DocumentBuilder Builder;
 	static private DummyLexer Lexer;
+	static private HashMap<Language, LexService> Lexers;
 
 	@BeforeClass
 	static public void setUp() throws URISyntaxException {
 		Proc = new Processor(true);
 		Builder = Proc.newDocumentBuilder();
 		Lexer = new DummyLexer();
+		Lexers = new HashMap<Language, LexService>();
+		Lexers.put(null, Lexer);
 	}
 
 	@Override
@@ -89,8 +94,7 @@ public class ActualFilesTest implements TreeWriterFactory {
 		boolean toprint = false;
 		XdmSequenceIterator iter;
 		if (node.getNodeName() != null
-		        && !specs.inlineElements.contains(node.getNodeName()
-		                .getLocalName())
+		        && !specs.inlineElements.contains(node.getNodeName().getLocalName())
 		        && !specs.wordTag.equals(node.getNodeName())
 		        && !specs.sentenceTag.equals(node.getNodeName())) {
 			toprint = true;
@@ -113,37 +117,63 @@ public class ActualFilesTest implements TreeWriterFactory {
 		}
 	}
 
-	private static String getUnmutableElements(XdmNode node,
-	        FormatSpecifications specs) {
+	private static String getUnmutableElements(XdmNode node, FormatSpecifications specs) {
 		StringBuilder sb = new StringBuilder();
 		getUnmutableElements(node, sb, specs);
 		return sb.toString();
 	}
 
-	private static boolean hasOrphanWords(XdmNode node,
-	        boolean isInsideSentence, FormatSpecifications specs) {
+	private static void getOrphanWords(XdmNode node, boolean isInsideSentence,
+	        FormatSpecifications specs, Map<String, Integer> orphans) {
 		if (node.getNodeKind() != XdmNodeKind.ELEMENT) {
-			return false;
+			return;
 		}
-		if (specs.sentenceTag.getLocalName().equals(
-		        node.getNodeName().getLocalName())) {
+		if (specs.sentenceTag.getLocalName().equals(node.getNodeName().getLocalName())) {
 			isInsideSentence = true;
-		} else if (specs.wordTag.getLocalName().equals(
-		        node.getNodeName().getLocalName())
+		} else if (specs.wordTag.getLocalName().equals(node.getNodeName().getLocalName())
 		        && !isInsideSentence) {
-			return true;
+
+			StringBuilder sb = new StringBuilder();
+			XdmNode parent = node.getParent();
+			while (parent.getNodeKind() == XdmNodeKind.ELEMENT) {
+				sb.append(parent.getNodeName().getLocalName() + "_"
+				        + parent.getAttributeValue(new QName("id")) + "_"
+				        + parent.getAttributeValue(new QName("class")) + "/");
+				parent = parent.getParent();
+			}
+			String key = sb.toString();
+			Integer count = orphans.get(key);
+			if (count == null)
+				count = 0;
+			orphans.put(key, count + 1);
 		}
 
 		XdmSequenceIterator iter = node.axisIterator(Axis.CHILD);
 		while (iter.hasNext()) {
-			if (hasOrphanWords((XdmNode) iter.next(), isInsideSentence, specs))
+			getOrphanWords((XdmNode) iter.next(), isInsideSentence, specs, orphans);
+		}
+	}
+
+	private static boolean hasMoreOrphans(XdmNode before, XdmNode after,
+	        FormatSpecifications specs) {
+		Map<String, Integer> obefore = new HashMap<String, Integer>();
+		Map<String, Integer> oafter = new HashMap<String, Integer>();
+		getOrphanWords(before, false, specs, obefore);
+		getOrphanWords(after, false, specs, oafter);
+		for (Map.Entry<String, Integer> e : oafter.entrySet()) {
+			Integer b = obefore.get(e.getKey());
+			if (b == null || b < e.getValue()) {
+				System.out.println("orphan before: " + b + " orphan now: " + e.getValue()
+				        + "; path " + e.getKey());
+
 				return true;
+			}
 		}
 		return false;
 	}
 
-	private static boolean hasTooManyLevels(XdmNode node,
-	        boolean isInsideTheElement, String theElementName) {
+	private static boolean hasTooManyLevels(XdmNode node, boolean isInsideTheElement,
+	        String theElementName) {
 		if (node.getNodeKind() != XdmNodeKind.ELEMENT) {
 			return false;
 		}
@@ -156,29 +186,27 @@ public class ActualFilesTest implements TreeWriterFactory {
 
 		XdmSequenceIterator iter = node.axisIterator(Axis.CHILD);
 		while (iter.hasNext()) {
-			if (hasTooManyLevels((XdmNode) iter.next(), isInsideTheElement,
-			        theElementName))
+			if (hasTooManyLevels((XdmNode) iter.next(), isInsideTheElement, theElementName))
 				return true;
 		}
 		return false;
 	}
 
-	private static boolean sentenceContainNonInline(XdmNode node,
-	        boolean isInsideSentence, FormatSpecifications specs) {
+	private static boolean sentenceContainNonInline(XdmNode node, boolean isInsideSentence,
+	        FormatSpecifications specs) {
 		if (node.getNodeKind() != XdmNodeKind.ELEMENT) {
 			return false;
 		}
-		if (specs.sentenceTag.getLocalName().equals(
-		        node.getNodeName().getLocalName())) {
+		if (specs.sentenceTag.getLocalName().equals(node.getNodeName().getLocalName())) {
 			isInsideSentence = true;
-		} else if (!specs.inlineElements.contains(node.getNodeName()
-		        .getLocalName()) && isInsideSentence) {
+		} else if (!specs.inlineElements.contains(node.getNodeName().getLocalName())
+		        && isInsideSentence) {
 			return true;
 		}
 
 		XdmSequenceIterator iter = node.axisIterator(Axis.CHILD);
 		while (iter.hasNext()) {
-			if (hasOrphanWords((XdmNode) iter.next(), isInsideSentence, specs))
+			if (sentenceContainNonInline((XdmNode) iter.next(), isInsideSentence, specs))
 				return true;
 		}
 		return false;
@@ -214,9 +242,7 @@ public class ActualFilesTest implements TreeWriterFactory {
 
 		int res = 0;
 		for (Map.Entry<String, Integer> e : idrefs.entrySet()) {
-			if (e.getValue() == 1
-			        && !(Integer.valueOf(1).equals(idactuals.get(e.getKey())))) {
-				System.out.println("badid = " + e.getKey() + ";");
+			if (e.getValue() == 1 && !(Integer.valueOf(1).equals(idactuals.get(e.getKey())))) {
 				++res;
 			}
 		}
@@ -224,14 +250,12 @@ public class ActualFilesTest implements TreeWriterFactory {
 		return res;
 	}
 
-	private void check(String file, String[] inlineElements,
-	        String[] spaceEquivalents) throws SaxonApiException,
-	        LexerInitException {
+	private void check(String file, String[] inlineElements, String[] spaceEquivalents)
+	        throws SaxonApiException, LexerInitException {
 
 		for (Strategy stategy : new Strategy[]{
-		        Strategy.ONE_SENTENCE, Strategy.ONE_SEGMENT_ONE_SENTENCE,
-		        Strategy.ONE_SEGMENT_ONE_WORD,
-		        Strategy.ONE_SEGMENT_ONE_WORD_TRIMMED
+		        Strategy.ONE_SENTENCE, Strategy.SPACE_SEPARARED_SENTENCES,
+		        Strategy.SPACE_SEPARATED_WORDS, Strategy.REGULAR
 		}) {
 
 			Lexer.strategy = stategy;
@@ -239,22 +263,18 @@ public class ActualFilesTest implements TreeWriterFactory {
 			SAXSource source = new SAXSource(new InputSource(file));
 			XdmNode document = Builder.build(source);
 
-			FormatSpecifications specs = new FormatSpecifications("http://tmp",
-			        "sss", "www", "http://ns", "lang",
-			        Arrays.asList(inlineElements), null,
+			FormatSpecifications specs = new FormatSpecifications("http://tmp", "sss", "www",
+			        "http://ns", "lang", Arrays.asList(inlineElements), null,
 			        Arrays.asList(spaceEquivalents));
 
-			XdmNode tree = new XmlBreakRebuilder().rebuild(this, Lexer,
-			        document, specs);
+			XdmNode tree = new XmlBreakRebuilder().rebuild(this, Lexers, document, specs);
 
 			//check the tree well-formedness
 			XdmNode root = getRoot(tree);
-			Assert.assertFalse(hasOrphanWords(root, false, specs));
+			Assert.assertFalse(hasMoreOrphans(getRoot(document), root, specs));
 			Assert.assertFalse(sentenceContainNonInline(root, false, specs));
-			Assert.assertFalse(hasTooManyLevels(root, false,
-			        specs.wordTag.getLocalName()));
-			Assert.assertFalse(hasTooManyLevels(root, false,
-			        specs.sentenceTag.getLocalName()));
+			Assert.assertFalse(hasTooManyLevels(root, false, specs.wordTag.getLocalName()));
+			Assert.assertFalse(hasTooManyLevels(root, false, specs.sentenceTag.getLocalName()));
 			Assert.assertEquals(0, numberOfDuplicatedIDs(document, tree));
 
 			//check that the content has not changed
@@ -267,19 +287,17 @@ public class ActualFilesTest implements TreeWriterFactory {
 	}
 
 	private static String[] DTBookInline = new String[]{
-	        "strong", "a", "acronym", "abbr", "dfn", "linenum", "pagenum",
-	        "pagebreak", "samp", "span", "sub", "w", "noteref"
+	        "strong", "a", "acronym", "abbr", "dfn", "linenum", "pagenum", "pagebreak",
+	        "samp", "span", "sub", "w", "noteref"
 	};
 
 	private static String[] ZedaiInline = new String[]{
-	        "emph", "span", "ref", "char", "term", "sub", "ref", "sup",
-	        "pagebreak", "name"
+	        "emph", "span", "ref", "char", "term", "sub", "ref", "sup", "pagebreak", "name"
 	};
 
 	private static String[] EpubInline = new String[]{
-	        "span", "i", "b", "a", "br", "del", "font", "ruby", "s", "small",
-	        "strike", "strong", "sup", "u", "q", "address", "abbr", "em",
-	        "style"
+	        "span", "i", "b", "a", "br", "del", "font", "ruby", "s", "small", "strike",
+	        "strong", "sup", "u", "q", "address", "abbr", "em", "style"
 	};
 
 	private static String[] DTBookSpace = new String[]{

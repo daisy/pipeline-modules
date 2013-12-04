@@ -3,5 +3,6 @@
    <implementation class="org.daisy.pipeline.nlp.lexing.light.LightLexer"/>
    <service>
       <provide interface="org.daisy.pipeline.nlp.lexing.LexService"/>
+      <provide interface="org.daisy.pipeline.nlp.lexing.GenericLexService"/>
    </service>
 </scr:component>

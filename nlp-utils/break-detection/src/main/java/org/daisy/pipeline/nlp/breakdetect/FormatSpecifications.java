@@ -22,9 +22,8 @@ public class FormatSpecifications {
 	public Set<String> spaceEquivalentElements;
 	public String tmpNs;
 
-	FormatSpecifications(String tmpNamespace, String sentenceElement,
-	        String wordElement, String langNamespace, String langAttr,
-	        Collection<String> inlineElements,
+	FormatSpecifications(String tmpNamespace, String sentenceElement, String wordElement,
+	        String langNamespace, String langAttr, Collection<String> inlineElements,
 	        Collection<String> commaEquivalentElements,
 	        Collection<String> spaceEquivalentElements) {
 
@@ -39,11 +38,10 @@ public class FormatSpecifications {
 
 		this.inlineElements = new HashSet<String>(inlineElements);
 		this.inlineElements.addAll(commaEquivalentElements);
+		this.inlineElements.add(wordElement);
 
-		this.commaEquivalentElements = new HashSet<String>(
-		        commaEquivalentElements);
-		this.spaceEquivalentElements = new HashSet<String>(
-		        spaceEquivalentElements);
+		this.commaEquivalentElements = new HashSet<String>(commaEquivalentElements);
+		this.spaceEquivalentElements = new HashSet<String>(spaceEquivalentElements);
 
 		this.tmpNs = tmpNamespace;
 	}

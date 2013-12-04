@@ -2,13 +2,21 @@ package org.daisy.pipeline.nlp.breakdetect;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 
+import org.daisy.pipeline.nlp.LanguageUtils.Language;
 import org.daisy.pipeline.nlp.lexing.LexService;
 import org.daisy.pipeline.nlp.lexing.LexService.LexerInitException;
+import org.daisy.pipeline.nlp.lexing.LexServiceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,13 +32,15 @@ import com.xmlcalabash.util.TreeWriter;
  * XprocStep built on the top of a Lexer meant to be provided by an OSGI service
  * through BreakDetectProvider.
  */
-public class BreakDetectStep extends DefaultStep implements TreeWriterFactory {
+public class BreakDetectStep extends DefaultStep implements TreeWriterFactory,
+        InlineSectionProcessor {
 
 	private Logger mLogger = LoggerFactory.getLogger(BreakDetectStep.class);
 	private ReadablePipe mSource = null;
 	private WritablePipe mResult = null;
 	private XProcRuntime mRuntime = null;
-	private LexService mLexer;
+	private LexServiceRegistry mLexerRegistry;
+	private Set<Language> mLangs;
 
 	private Collection<String> inlineTagsOption;
 	private Collection<String> commaTagsOption;
@@ -39,11 +49,10 @@ public class BreakDetectStep extends DefaultStep implements TreeWriterFactory {
 	private String wordTagOption;
 	private String sentenceTagOption;
 
-	public BreakDetectStep(XProcRuntime runtime, XAtomicStep step,
-	        LexService lexer) {
+	public BreakDetectStep(XProcRuntime runtime, XAtomicStep step, LexServiceRegistry registry) {
 		super(runtime, step);
 		mRuntime = runtime;
-		mLexer = lexer;
+		mLexerRegistry = registry;
 	}
 
 	// This constructor is provided so that it is compliant with vanilla Calabash
@@ -93,15 +102,21 @@ public class BreakDetectStep extends DefaultStep implements TreeWriterFactory {
 	public void run() throws SaxonApiException {
 		super.run();
 
+		//Retrieve a generic lexer that can handle unexpected languages.
+		//Unexpected languages could happen if the detected languages in
+		//XmlBreakRebuilder are not the same as the ones detected in this class.
+		HashMap<Language, LexService> langToLexers = new HashMap<Language, LexService>();
+		LexService generic = mLexerRegistry.getBestGenericLexService();
 		try {
-			mLexer.init();
-		} catch (LexerInitException e) {
-			mRuntime.error(e);
+			generic.init();
+		} catch (LexerInitException e1) {
+			mRuntime.error(e1);
+			return;
 		}
+		langToLexers.put(null, generic);
 
-		FormatSpecifications formatSpecs = new FormatSpecifications(tmpNs,
-		        sentenceTagOption, wordTagOption,
-		        "http://www.w3.org/XML/1998/namespace", "lang",
+		FormatSpecifications formatSpecs = new FormatSpecifications(tmpNs, sentenceTagOption,
+		        wordTagOption, "http://www.w3.org/XML/1998/namespace", "lang",
 		        inlineTagsOption, commaTagsOption, spaceTagsOption);
 
 		XmlBreakRebuilder xmlRebuilder = new XmlBreakRebuilder();
@@ -110,9 +125,42 @@ public class BreakDetectStep extends DefaultStep implements TreeWriterFactory {
 
 		while (mSource.moreDocuments()) {
 			XdmNode doc = mSource.read();
+
+			//init the lexers with the languages
+			mLangs = new HashSet<Language>();
+			try {
+				new InlineSectionFinder().find(doc, 0, formatSpecs, this,
+				        Collections.EMPTY_SET);
+				for (Language lang : mLangs) {
+					if (!langToLexers.containsKey(lang)) {
+						LexService lexer = mLexerRegistry.getLexerForLanguage(lang,
+						        langToLexers.values());
+						if (lexer == null) {
+							throw new LexerInitException(
+							        "cannot find a lexer for the language: " + lang);
+						}
+						if (!langToLexers.containsValue(lexer))
+							lexer.init();
+						langToLexers.put(lang, lexer);
+					}
+				}
+			} catch (LexerInitException e) {
+				mRuntime.error(e);
+				continue;
+			}
+
+			mRuntime.info(null, null, "Total number of language(s): "
+			        + (langToLexers.size() - 1));
+			for (Map.Entry<Language, LexService> entry : langToLexers.entrySet()) {
+				mRuntime.info(null, null, "LexService for language '"
+				        + (entry.getKey() == null ? "<ANY>" : entry.getKey()) + "': "
+				        + entry.getValue().getName());
+			}
+
+			//rebuild the XML tree and lex the content on-the-fly
 			XdmNode tree;
 			try {
-				tree = xmlRebuilder.rebuild(this, mLexer, doc, formatSpecs);
+				tree = xmlRebuilder.rebuild(this, langToLexers, doc, formatSpecs);
 				mResult.write(tree);
 			} catch (LexerInitException e) {
 				mRuntime.error(e);
@@ -122,11 +170,31 @@ public class BreakDetectStep extends DefaultStep implements TreeWriterFactory {
 		long after = System.currentTimeMillis();
 		mLogger.debug("lexing time = " + (after - before) / 1000.0 + " s.");
 
-		mLexer.cleanUpLangResources();
+		for (LexService lexer : langToLexers.values()) {
+			lexer.cleanUpLangResources();
+		}
+
+		mLangs = null;
 	}
 
 	@Override
 	public TreeWriter newInstance() {
 		return new TreeWriter(mRuntime);
+	}
+
+	@Override
+	public void onInlineSectionFound(List<Leaf> leaves, List<String> text, Language lang)
+	        throws LexerInitException {
+
+		//TODO: insert the language detection here. Another language detection
+		//might be needed in XmlBreakRebuilder as well.
+		if (lang != null) {
+			mLangs.add(lang);
+		}
+	}
+
+	@Override
+	public void onEmptySectionFound(List<Leaf> leaves) {
+
 	}
 }

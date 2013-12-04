@@ -4,42 +4,31 @@ import java.util.List;
 
 import org.daisy.pipeline.nlp.LanguageUtils.Language;
 
-/**
- * A LexService is in charge of splitting the input text into sentences and each
- * sentence into words. The words may also be categorized (proper nouns...). In
- * order to handle the formatting info, which must not interfere with the
- * lexing, a lexer will have to process adjacent segments of text, instead of
- * single blocks, whose boundaries correspond to the location where the
- * formatting info are. Then the lexer will return references to the input
- * segments and let the caller rebuild everything with the formatting info.
- */
 public interface LexService {
 
-	class LexerInitException extends Exception {
+	public static final int MinSpecializedLexQuality = 10;
+
+	public class LexerInitException extends Exception {
 		public LexerInitException(String message, Throwable cause) {
 			super(message, cause);
 		}
 
+		public LexerInitException(String message) {
+			super(message);
+		}
 	}
 
-	class TextReference {
-		// inclusive index of the segment in which the first character is
-		public int firstSegment;
-		// inclusive index of the first character
-		public int firstIndex;
-		// inclusive index of the segment in which the last character is
-		public int lastSegment;
-		// EXLUSIVE index of the last character
-		public int lastIndex;
-
-		public boolean properNoun;
+	public class TextBoundaries {
+		public int left; //inclusive
+		public int right; //exclusive
 	}
 
-	class Sentence {
-		public TextReference boundaries; // this is necessary because the
-		                                 // punctuation marks and spaces are not
-		                                 // included in the content
-		public List<TextReference> content; //optional
+	public class Sentence {
+		public List<TextBoundaries> words; //optional
+		// this is necessary because the
+		// punctuation marks and spaces are not
+		// included in the content
+		public TextBoundaries boundaries;
 	}
 
 	/**
@@ -67,14 +56,10 @@ public interface LexService {
 	 */
 	public void useLanguage(Language lang) throws LexerInitException;
 
+	public List<Sentence> split(String text);
+
 	/**
-	 * Split the input strings into sentences that refer to the input segments.
-	 * 
-	 * @param segments are adjacent blocks of text. Words and sentences can be
-	 *            spread over multiple blocks. One or many strings can be null,
-	 *            but not all of them.
-	 * 
-	 * @return a list of sentences referring to @param segments.
+	 * So far it is only used for logging.
 	 */
-	List<Sentence> split(List<String> segments);
+	public String getName();
 }

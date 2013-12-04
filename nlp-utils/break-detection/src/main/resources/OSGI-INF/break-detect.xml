@@ -3,11 +3,11 @@
 
   <implementation class="org.daisy.pipeline.nlp.breakdetect.BreakDetectProvider"/>
 
-  <reference bind="addLexer"
-	     unbind="removeLexer"
-	     cardinality="1..n"
-	     interface="org.daisy.pipeline.nlp.lexing.LexService"
-	     name="LexService"
+  <reference bind="setLexServiceRegistry"
+	     unbind="unsetLexServiceRegistry"
+	     cardinality="1..1"
+	     interface="org.daisy.pipeline.nlp.lexing.LexServiceRegistry"
+	     name="LexServiceRegistry"
 	     policy="static"/>
 
   <service>

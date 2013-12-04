@@ -76,20 +76,16 @@ public class InlineSectionFinder {
 			for (k = 0; k < mCurrentSectionSize
 			        && (mCurrentText.get(k) == null || mCurrentSection.get(k).formatting == null); ++k);
 			if (k == mCurrentSectionSize) {
-				mProc.onEmptySectionFound(mCurrentSection.subList(0,
-				        mCurrentSectionSize));
+				mProc.onEmptySectionFound(mCurrentSection.subList(0, mCurrentSectionSize));
 			} else {
-				mProc.onInlineSectionFound(
-				        mCurrentSection.subList(0, mCurrentSectionSize),
-				        mCurrentText.subList(0, mCurrentSectionSize),
-				        mCurrentLang);
+				mProc.onInlineSectionFound(mCurrentSection.subList(0, mCurrentSectionSize),
+				        mCurrentText.subList(0, mCurrentSectionSize), mCurrentLang);
 			}
 			mCurrentSectionSize = 0;
 		}
 	}
 
-	private void findRec(XdmNode node, int level, Language lang)
-	        throws LexerInitException {
+	private void findRec(XdmNode node, int level, Language lang) throws LexerInitException {
 		if (node.getNodeKind() == XdmNodeKind.TEXT) {
 			addToSection(node.getParent(), level - 1, node.getStringValue());
 		} else {
@@ -111,22 +107,18 @@ public class InlineSectionFinder {
 
 			XdmSequenceIterator iter = node.axisIterator(Axis.CHILD);
 			if (node.getNodeName() != null
-			        && mSpecs.inlineElements.contains(node.getNodeName()
-			                .getLocalName())
+			        && mSpecs.inlineElements.contains(node.getNodeName().getLocalName())
 			        && (id == null || !mUnsplittable.contains(id))) {
 
 				//*** inline element ***
-				boolean isSpace = mSpecs.spaceEquivalentElements.contains(node
-				        .getNodeName().getLocalName());
+				boolean isSpace = mSpecs.spaceEquivalentElements.contains(node.getNodeName()
+				        .getLocalName());
 				if (isSpace) {
-					addToSection(null, level,
-					        LanguageUtils.getWhiteSpaceSymbol(lang));
+					addToSection(null, level, LanguageUtils.getWhiteSpaceSymbol(lang));
 				}
-				if (mSpecs.commaEquivalentElements.contains(node.getNodeName()
-				        .getLocalName())
+				if (mSpecs.commaEquivalentElements.contains(node.getNodeName().getLocalName())
 				        && !LanguageUtils.getCommaLeftSymbol(lang).isEmpty()) {
-					addToSection(null, level,
-					        LanguageUtils.getCommaLeftSymbol(lang));
+					addToSection(null, level, LanguageUtils.getCommaLeftSymbol(lang));
 				}
 
 				if (!iter.hasNext()) {
@@ -139,15 +131,12 @@ public class InlineSectionFinder {
 					}
 				}
 
-				if (mSpecs.commaEquivalentElements.contains(node.getNodeName()
-				        .getLocalName())
+				if (mSpecs.commaEquivalentElements.contains(node.getNodeName().getLocalName())
 				        && !LanguageUtils.getCommaRightSymbol(lang).isEmpty()) {
-					addToSection(null, level,
-					        LanguageUtils.getCommaRightSymbol(lang));
+					addToSection(null, level, LanguageUtils.getCommaRightSymbol(lang));
 				}
 				if (isSpace) {
-					addToSection(null, level,
-					        LanguageUtils.getWhiteSpaceSymbol(lang));
+					addToSection(null, level, LanguageUtils.getWhiteSpaceSymbol(lang));
 				}
 			} else {
 				notifyNewSection();

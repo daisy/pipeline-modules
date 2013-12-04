@@ -2,6 +2,7 @@ package org.daisy.pipeline.nlp.lexing.rulebased;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.daisy.pipeline.nlp.TextCategorizer.CategorizedWord;
@@ -12,17 +13,18 @@ import org.daisy.pipeline.nlp.TextCategorizer.Category;
  * spaces and capitalized words.
  */
 public class BasicSentenceDetector implements ISentenceDetector {
-	private Pattern mPossibleDelimiter;
-	private Pattern mSureDelimiter;
+	private Matcher mStrongDelimiters;
+	private Matcher mWeakDelimiters;
 
 	public BasicSentenceDetector() {
-		mPossibleDelimiter = Pattern.compile("[.:]+");
-		mSureDelimiter = Pattern.compile("[.:?!]*[?!…]+[.:?!]*");
+		mWeakDelimiters = Pattern.compile("[.:]+").matcher("");
+		mStrongDelimiters = Pattern.compile("[.:?!]*[?!…]+[.:?!]*").matcher("");
 	}
 
 	@Override
 	public List<List<CategorizedWord>> split(
 	        List<CategorizedWord> CategorizedWords) {
+
 		List<List<CategorizedWord>> result = new LinkedList<List<CategorizedWord>>();
 		List<CategorizedWord> currentSentence = new LinkedList<CategorizedWord>();
 
@@ -40,9 +42,12 @@ public class BasicSentenceDetector implements ISentenceDetector {
 
 			currentSentence.add(w);
 
-			if (mSureDelimiter.matcher(w.word).matches()) {
+			mStrongDelimiters.reset(w.word);
+			mWeakDelimiters.reset(w.word);
+
+			if (mStrongDelimiters.matches()) {
 				delimiter = 2;
-			} else if (mPossibleDelimiter.matcher(w.word).matches()) {
+			} else if (mWeakDelimiters.matches()) {
 				delimiter = 1;
 			} else if (w.category != Category.SPACE)
 				delimiter = 0;

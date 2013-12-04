@@ -1,6 +1,5 @@
 package org.daisy.pipeline.nlp.lexing.light;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.daisy.pipeline.nlp.LanguageUtils.Language;
@@ -15,215 +14,94 @@ import org.junit.Test;
 public class LightLexingTest {
 
 	LexResultPrettyPrinter mPrinter;
-	LexService mTokenizer;
+	LexService mLexer;
 
 	@Before
 	public void setUp() throws LexerInitException {
 		mPrinter = new LexResultPrettyPrinter();
-		mPrinter.displayAll(true);
-		mTokenizer = new LightLexer();
-		mTokenizer.init();
+		mLexer = new LightLexer();
+		mLexer.init();
 	}
 
 	@Test
 	public void twoSentences() throws LexerInitException {
-		mTokenizer.useLanguage(Language.ENGLISH);
-
-		String[] inp = new String[]{
-			"first sentence! Second sentence"
-		};
-		List<String> blocks = Arrays.asList(inp);
-		List<Sentence> sentences = mTokenizer.split(blocks);
-		String text = mPrinter.convert(sentences, blocks);
-
-		Assert.assertEquals("[/first sentence!][/Second sentence]", text);
-	}
-
-	@Test
-	public void twoBlocks() throws LexerInitException {
-		mTokenizer.useLanguage(Language.ENGLISH);
-
-		String[] inp = new String[]{
-		        "firstblock", "secondblock"
-		};
-		List<String> blocks = Arrays.asList(inp);
-		List<Sentence> sentences = mTokenizer.split(blocks);
-
-		String text = mPrinter.convert(sentences, blocks);
-		Assert.assertEquals("[/firstblocksecondblock]", text);
-	}
-
-	@Test
-	public void manyBlocks() throws LexerInitException {
-		mTokenizer.useLanguage(Language.ENGLISH);
-
-		String[] inp = new String[]{
-		        "block. Start ", "end block start", "end"
-		};
-		List<String> blocks = Arrays.asList(inp);
-		List<Sentence> sentences = mTokenizer.split(blocks);
-		String text = mPrinter.convert(sentences, blocks);
-
-		Assert.assertEquals("[/block. Start end block startend]", text);
+		mLexer.useLanguage(Language.ENGLISH);
+		String ref = "first sentence! Second sentence";
+		List<Sentence> sentences = mLexer.split(ref);
+		String text = mPrinter.convert(sentences, ref);
+		Assert.assertEquals("{first sentence!}{Second sentence}", text);
 	}
 
 	@Test
 	public void spanish() throws LexerInitException {
-		mTokenizer.useLanguage(Language.SPANISH);
-
-		String[] inp = new String[]{
-			"first sentence ¿ second sentence"
-		};
-		List<String> blocks = Arrays.asList(inp);
-		List<Sentence> sentences = mTokenizer.split(blocks);
-		String text = mPrinter.convert(sentences, blocks);
-
+		mLexer.useLanguage(Language.SPANISH);
+		String ref = "first sentence ¿ second sentence";
+		List<Sentence> sentences = mLexer.split(ref);
+		String text = mPrinter.convert(sentences, ref);
 		//the question mark is captured by the second sentence
-		Assert.assertEquals("[/first sentence][/¿ second sentence]", text);
+		Assert.assertEquals("{first sentence}{¿ second sentence}", text);
 	}
 
 	@Test
 	public void mixed() throws LexerInitException {
-		mTokenizer.useLanguage(Language.ENGLISH);
-		String[] inp = new String[]{
-			"first sentence !!... second sentence"
-		};
-		List<String> blocks = Arrays.asList(inp);
-		List<Sentence> sentences = mTokenizer.split(blocks);
-		String text = mPrinter.convert(sentences, blocks);
-
-		Assert.assertEquals("[/first sentence !!...][/second sentence]", text);
+		mLexer.useLanguage(Language.ENGLISH);
+		String ref = "first sentence !!... second sentence";
+		List<Sentence> sentences = mLexer.split(ref);
+		String text = mPrinter.convert(sentences, ref);
+		Assert.assertEquals("{first sentence !!...}{second sentence}", text);
 	}
 
 	@Test
 	public void malformed() throws LexerInitException {
-		mTokenizer.useLanguage(Language.ENGLISH);
-		String[] inp = new String[]{
-			"!!! first sentence  ! second sentence"
-		};
-		List<String> blocks = Arrays.asList(inp);
-		List<Sentence> sentences = mTokenizer.split(blocks);
-		String text = mPrinter.convert(sentences, blocks);
-
-		Assert.assertEquals("[/!!! first sentence  !][/second sentence]", text);
+		mLexer.useLanguage(Language.ENGLISH);
+		String ref = "!!! first sentence  ! second sentence";
+		List<Sentence> sentences = mLexer.split(ref);
+		String text = mPrinter.convert(sentences, ref);
+		Assert.assertEquals("{!!! first sentence  !}{second sentence}", text);
 	}
 
 	@Test
 	public void whitespaces1() throws LexerInitException {
-		mTokenizer.useLanguage(Language.ENGLISH);
-		String[] inp = new String[]{
-			"first sentence !!  !! second sentence"
-		};
-		List<String> blocks = Arrays.asList(inp);
-		List<Sentence> sentences = mTokenizer.split(blocks);
-		String text = mPrinter.convert(sentences, blocks);
-
-		Assert.assertEquals("[/first sentence !!  !!][/second sentence]", text);
+		mLexer.useLanguage(Language.ENGLISH);
+		String ref = "first sentence !!  !! second sentence";
+		List<Sentence> sentences = mLexer.split(ref);
+		String text = mPrinter.convert(sentences, ref);
+		Assert.assertEquals("{first sentence !!  !!}{second sentence}", text);
 	}
 
 	@Test
 	public void whitespaces2() throws LexerInitException {
-		mTokenizer.useLanguage(Language.SPANISH);
-		String[] inp = new String[]{
-			"first sentence !!  ¿¿ second sentence ?!"
-		};
-		List<String> blocks = Arrays.asList(inp);
-		List<Sentence> sentences = mTokenizer.split(blocks);
-		String text = mPrinter.convert(sentences, blocks);
-
-		Assert.assertEquals("[/first sentence !!][/¿¿ second sentence ?!]",
-		        text);
+		mLexer.useLanguage(Language.SPANISH);
+		String ref = "first sentence !!  ¿¿ second sentence ?!";
+		List<Sentence> sentences = mLexer.split(ref);
+		String text = mPrinter.convert(sentences, ref);
+		Assert.assertEquals("{first sentence !!}{¿¿ second sentence ?!}", text);
 	}
 
 	@Test
 	public void newline1() throws LexerInitException {
-		mTokenizer.useLanguage(Language.ENGLISH);
-		String[] inp = new String[]{
-			"\n"
-		};
-		List<String> blocks = Arrays.asList(inp);
-		List<Sentence> sentences = mTokenizer.split(blocks);
-		String text = mPrinter.convert(sentences, blocks);
-
+		mLexer.useLanguage(Language.ENGLISH);
+		String ref = "\n";
+		List<Sentence> sentences = mLexer.split(ref);
+		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("", text);
 	}
 
 	@Test
 	public void newline2() throws LexerInitException {
-		mTokenizer.useLanguage(Language.ENGLISH);
-		String[] inp = new String[]{
-			"\n  \n\n\n  \t\n "
-		};
-		List<String> blocks = Arrays.asList(inp);
-		List<Sentence> sentences = mTokenizer.split(blocks);
-		String text = mPrinter.convert(sentences, blocks);
-
+		mLexer.useLanguage(Language.ENGLISH);
+		String ref = "\n  \n\n\n  \t\n ";
+		List<Sentence> sentences = mLexer.split(ref);
+		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("", text);
 	}
 
 	@Test
 	public void newline3() throws LexerInitException {
-		mTokenizer.useLanguage(Language.ENGLISH);
-		String[] inp = new String[]{
-			"text text ? \t\n "
-		};
-		List<String> blocks = Arrays.asList(inp);
-		List<Sentence> sentences = mTokenizer.split(blocks);
-		String text = mPrinter.convert(sentences, blocks);
-
-		Assert.assertEquals("[/text text ?]", text);
+		mLexer.useLanguage(Language.ENGLISH);
+		String ref = "text text ? \t\n ";
+		List<Sentence> sentences = mLexer.split(ref);
+		String text = mPrinter.convert(sentences, ref);
+		Assert.assertEquals("{text text ?}", text);
 	}
-
-	@Test
-	public void nullSegments1() throws LexerInitException {
-		mTokenizer.useLanguage(Language.ENGLISH);
-		String[] inp = new String[]{
-		        "one ", null, "two"
-		};
-		List<String> blocks = Arrays.asList(inp);
-		List<Sentence> sentences = mTokenizer.split(blocks);
-		String text = mPrinter.convert(sentences, blocks);
-
-		Assert.assertEquals("[/one two]", text);
-	}
-
-	@Test
-	public void nullSegments2() throws LexerInitException {
-		mTokenizer.useLanguage(Language.ENGLISH);
-		String[] inp = new String[]{
-		        null, "one ", "two"
-		};
-		List<String> blocks = Arrays.asList(inp);
-		List<Sentence> sentences = mTokenizer.split(blocks);
-		String text = mPrinter.convert(sentences, blocks);
-
-		Assert.assertEquals("[/one two]", text);
-	}
-
-	@Test
-	public void nullSegments3() throws LexerInitException {
-		mTokenizer.useLanguage(Language.ENGLISH);
-		String[] inp = new String[]{
-		        "one ", "two", null
-		};
-		List<String> blocks = Arrays.asList(inp);
-		List<Sentence> sentences = mTokenizer.split(blocks);
-		String text = mPrinter.convert(sentences, blocks);
-
-		Assert.assertEquals("[/one two]", text);
-	}
-
-	@Test
-	public void nullSegments4() throws LexerInitException {
-		mTokenizer.useLanguage(Language.ENGLISH);
-		String[] inp = new String[]{
-		        null, "one ", "two", null
-		};
-		List<String> blocks = Arrays.asList(inp);
-		List<Sentence> sentences = mTokenizer.split(blocks);
-		String text = mPrinter.convert(sentences, blocks);
-
-		Assert.assertEquals("[/one two]", text);
-	}
-
 }

@@ -1,13 +1,14 @@
 package org.daisy.pipeline.nlp.lexing.light;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.daisy.pipeline.nlp.LanguageUtils;
 import org.daisy.pipeline.nlp.LanguageUtils.Language;
-import org.daisy.pipeline.nlp.lexing.LexService;
+import org.daisy.pipeline.nlp.lexing.GenericLexService;
 
 /**
  * This is a multi-language lexer that does not support the following features:
@@ -16,7 +17,8 @@ import org.daisy.pipeline.nlp.lexing.LexService;
  * 
  * - Period-based sentence segmentation (periods can be ambiguous).
  */
-public class LightLexer implements LexService {
+public class LightLexer implements GenericLexService {
+
 	private static String WhiteSpaces = " \t\r\n";
 	private ArrayList<Integer> mStartPositions;
 
@@ -25,12 +27,11 @@ public class LightLexer implements LexService {
 	private Matcher mSpaceMatcher;
 
 	private void compileRegex(String startMarks, String endMarks) {
-		Pattern p = Pattern.compile("(" + endMarks + "|[ \r\n\t\\p{Z}])+",
-		        Pattern.MULTILINE);
+		Pattern p = Pattern.compile("(" + endMarks + "|[ \r\n\t\\p{Z}])+", Pattern.MULTILINE);
 		mEndMatcher = p.matcher("");
 		String allMarks = "((" + startMarks + ")|(" + endMarks + "))";
-		p = Pattern.compile("(" + allMarks + "+[ \r\n\t\\p{Z}]+" + allMarks
-		        + "+)|(" + allMarks + "+)", Pattern.MULTILINE);
+		p = Pattern.compile("(" + allMarks + "+[ \r\n\t\\p{Z}]+" + allMarks + "+)|("
+		        + allMarks + "+)", Pattern.MULTILINE);
 		mSepMatcher = p.matcher("");
 	}
 
@@ -64,8 +65,7 @@ public class LightLexer implements LexService {
 
 	public static void findInArray(List<String> segments, int index, int[] res) {
 		res[0] = 0;
-		while ((segments.get(res[0]) == null)
-		        || (index >= segments.get(res[0]).length())) {
+		while ((segments.get(res[0]) == null) || (index >= segments.get(res[0]).length())) {
 			if (segments.get(res[0]) != null)
 				index -= segments.get(res[0]).length();
 			++res[0];
@@ -74,22 +74,14 @@ public class LightLexer implements LexService {
 	}
 
 	@Override
-	public List<Sentence> split(List<String> segments) {
-		if (segments.size() == 0)
-			return new ArrayList<Sentence>();
-
-		// concatenate the input segments
-		StringBuilder sb = new StringBuilder();
-		for (String source : segments) {
-			if (source != null)
-				sb.append(source);
-		}
-		String input = sb.toString();
+	public List<Sentence> split(String input) {
+		if (input.length() == 0)
+			return Collections.EMPTY_LIST;
 
 		mSpaceMatcher.reset(input);
 		if (mSpaceMatcher.matches()) {
 			//otherwise it wouldn't work with the whitespace trimming below
-			return new ArrayList<Sentence>();
+			return Collections.EMPTY_LIST;
 		}
 
 		//find where the sentences starts (inclusive index)
@@ -103,8 +95,7 @@ public class LightLexer implements LexService {
 			if (mEndMatcher.find()) {
 				startIndex += mEndMatcher.end();
 			}
-			mSpaceMatcher
-			        .reset(input.subSequence(lastIndex, mSepMatcher.end()));
+			mSpaceMatcher.reset(input.subSequence(lastIndex, mSepMatcher.end()));
 			lastIndex = mSepMatcher.end();
 			if (mSpaceMatcher.matches() || mSepMatcher.start() == 0) {
 				continue; //i.e. discard the sentence
@@ -114,10 +105,8 @@ public class LightLexer implements LexService {
 
 			mStartPositions.set(sepNumber++, startIndex);
 		}
-		mSpaceMatcher
-		        .reset(input.substring(mStartPositions.get(sepNumber - 1)));
-		if (mStartPositions.get(sepNumber - 1) != input.length()
-		        && !mSpaceMatcher.matches()) {
+		mSpaceMatcher.reset(input.substring(mStartPositions.get(sepNumber - 1)));
+		if (mStartPositions.get(sepNumber - 1) != input.length() && !mSpaceMatcher.matches()) {
 			//add a virtual new sentence only if the sentence is not
 			//already terminated by a separator and if the remaining text
 			//is not made of white spaces only
@@ -126,9 +115,7 @@ public class LightLexer implements LexService {
 			mStartPositions.set(sepNumber++, input.length());
 		}
 
-		// ===== build the result according to the to input segments =====
 		ArrayList<Sentence> result = new ArrayList<Sentence>();
-		int[] coord = new int[2];
 		for (int i = 0; i < sepNumber - 1; ++i) {
 			int start = mStartPositions.get(i);
 			int nextStart = mStartPositions.get(i + 1);
@@ -141,20 +128,20 @@ public class LightLexer implements LexService {
 
 			Sentence s = new Sentence();
 			result.add(s);
-			s.boundaries = new TextReference();
-			findInArray(segments, start, coord);
-			s.boundaries.firstSegment = coord[0];
-			s.boundaries.firstIndex = coord[1];
-			findInArray(segments, nextStart - 1, coord);
-			s.boundaries.lastSegment = coord[0];
-			s.boundaries.lastIndex = coord[1] + 1;
+			s.boundaries = new TextBoundaries();
+			s.boundaries.left = start;
+			s.boundaries.right = nextStart;
 		}
-
 		return result;
 	}
 
 	@Override
 	public int getLexQuality(Language lang) {
-		return 1;
+		return GenericLexService.MinimalQuality;
+	}
+
+	@Override
+	public String getName() {
+		return "light-lexer";
 	}
 }

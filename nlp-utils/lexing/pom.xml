@@ -19,13 +19,25 @@
   <description>Common API for Lexing functionality</description>
 
   <dependencies>
-      
     <!-- for its language definition -->
     <dependency>
       <groupId>org.daisy.pipeline.modules</groupId>
       <artifactId>nlp-common</artifactId>
     </dependency>
-    	        
   </dependencies>
-	
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Service-Component>OSGI-INF/lexer-registry.xml</Service-Component>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>

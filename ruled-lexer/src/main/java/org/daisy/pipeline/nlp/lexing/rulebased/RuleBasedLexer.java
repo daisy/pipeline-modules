@@ -2,9 +2,11 @@ package org.daisy.pipeline.nlp.lexing.rulebased;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import org.daisy.pipeline.nlp.LanguageUtils.Language;
@@ -20,8 +22,8 @@ import org.daisy.pipeline.nlp.ruledcategorizers.RuledMultilangCategorizer;
 /**
  * Use a RuledBasedTextCategorizer in PREFIX_MODE to split the input stream into
  * words. Then call a SentenceDectector to group them together in sentences.
- * Keep the language resources (i.e. special TextCategorizer) in memory until it
- * is explicitly requested to clean them up.
+ * Keep the language resources (i.e. language-specific TextCategorizers) in
+ * memory until it is explicitly requested to clean them up.
  */
 public class RuleBasedLexer implements LexService {
 	private ISentenceDetector mSentenceSplitter;
@@ -72,7 +74,7 @@ public class RuleBasedLexer implements LexService {
 				switch (lang) {
 				default:
 					if (mGenericSplitter == null)
-						mGenericSplitter = new BasicSentenceDetector();
+						mGenericSplitter = new EuroSentenceDetector();
 
 					isd = mGenericSplitter;
 					break;
@@ -86,7 +88,7 @@ public class RuleBasedLexer implements LexService {
 		mTextCategorizer = mTextCategorizers.get(lang);
 	}
 
-	public List<CategorizedWord> split(String input) {
+	public List<CategorizedWord> splitIntoWords(String input) {
 		String lowerCase = input.toLowerCase();
 		LinkedList<CategorizedWord> result = new LinkedList<CategorizedWord>();
 
@@ -94,8 +96,7 @@ public class RuleBasedLexer implements LexService {
 		while (shift < input.length()) {
 			String right = input.substring(shift);
 			String lowerCaseRight = lowerCase.substring(shift);
-			CategorizedWord w = mTextCategorizer.categorize(right,
-			        lowerCaseRight);
+			CategorizedWord w = mTextCategorizer.categorize(right, lowerCaseRight);
 			result.add(w);
 			shift += w.word.length();
 		}
@@ -104,92 +105,93 @@ public class RuleBasedLexer implements LexService {
 	}
 
 	@Override
-	public List<Sentence> split(List<String> segments) {
-		if (segments.size() == 0)
-			return new ArrayList<Sentence>();
-
-		// concatenate the input segments
-		StringBuilder sb = new StringBuilder();
-		for (String source : segments) {
-			if (source != null)
-				sb.append(source);
-		}
-		String input = sb.toString();
+	public List<Sentence> split(String input) {
+		if (input.length() == 0)
+			return Collections.EMPTY_LIST;
 
 		// call the categorizer and the sentence detector
-		List<CategorizedWord> words = split(input);
+		List<CategorizedWord> words = splitIntoWords(input);
 		if (words.size() == 0
-		        || (words.size() == 1 && !TextCategorizer.isSpeakable(words
-		                .iterator().next().category)))
-			return new ArrayList<Sentence>();
+		        || (words.size() == 1 && !TextCategorizer
+		                .isSpeakable(words.iterator().next().category)))
+			return Collections.EMPTY_LIST;
 
 		List<List<CategorizedWord>> sentences = mSentenceSplitter.split(words);
 
-		// ===== build the result according to the to input segments =====
-
-		int currentsegment = 0;
-		while (segments.get(currentsegment) == null) {
-			++currentsegment;
-		}
-
-		// those variables are used to compute relative positions according to
-		// the input segments
+		// build the sentences in the expected format
 		int currentPos = 0;
-		int segmentStart = 0; // inclusive index
-		int segmentEnd = segments.get(currentsegment).length(); // exclusive
-		                                                        // index
-
-		// compose the output by creating pointers to the input segments
-		// (the algorithm is a bit simpler than OpenNLPLexer
-		// because the input is 100% covered by the words provided by
-		// the splitter)
-		LinkedList<Sentence> result = new LinkedList<Sentence>();
+		List<Sentence> res = new ArrayList<Sentence>();
 		for (List<CategorizedWord> sentence : sentences) {
-			Sentence sentenceNode = new Sentence();
-			result.add(sentenceNode);
-			sentenceNode.content = new ArrayList<TextReference>();
-			sentenceNode.boundaries = new TextReference();
-			boolean first = true;
-
-			TextReference ref = null;
-			for (CategorizedWord w : sentence) {
-				ref = new TextReference();
-				if (w.category != Category.SPACE
-				        && w.category != Category.PUNCTUATION)
-					sentenceNode.content.add(ref);
-				ref.properNoun = RuleBasedTextCategorizer
-				        .isProperNoun(w.category);
-				ref.firstSegment = currentsegment;
-				ref.firstIndex = currentPos - segmentStart;
-				if (first) {
-					sentenceNode.boundaries.firstIndex = ref.firstIndex;
-					sentenceNode.boundaries.lastIndex = ref.lastIndex;
-					first = false;
+			//discard empty sentences
+			int emptySize = 0;
+			for (CategorizedWord word : sentence) {
+				if (TextCategorizer.isSpeakable(word.category)) {
+					emptySize = -1;
+					break;
 				}
-
-				// find where the token ends within the input segments
-				currentPos += w.word.length();
-				while (currentPos > segmentEnd) {
-					++currentsegment;
-					segmentStart = segmentEnd;
-					if (segments.get(currentsegment) != null)
-						segmentEnd += segments.get(currentsegment).length();
-				}
-				ref.lastSegment = currentsegment;
-				ref.lastIndex = currentPos - segmentStart;
+				emptySize += word.word.length();
 			}
-			sentenceNode.boundaries.lastIndex = ref.lastIndex;
-			sentenceNode.boundaries.lastSegment = ref.lastSegment;
+			if (emptySize != -1) {
+				currentPos += emptySize;
+				continue;
+			}
+
+			Sentence s = new Sentence();
+			s.boundaries = new TextBoundaries();
+			res.add(s);
+
+			//find the beginning of the sentence
+			ListIterator<CategorizedWord> it = sentence.listIterator();
+			while (it.hasNext()) {
+				CategorizedWord word = it.next();
+				if (word.category != Category.SPACE) {
+					s.boundaries.left = currentPos;
+					it.previous();
+					break;
+				}
+				currentPos += word.word.length();
+			}
+
+			//content
+			s.words = new ArrayList<LexService.TextBoundaries>();
+			while (it.hasNext()) {
+				CategorizedWord word = it.next();
+				if (TextCategorizer.isSpeakable(word.category)) {
+					TextBoundaries bounds = new TextBoundaries();
+					bounds.left = currentPos;
+					bounds.right = bounds.left + word.word.length();
+					s.words.add(bounds);
+				}
+				currentPos += word.word.length();
+			}
+
+			//go backward to find the end of the sentence
+			int end = currentPos;
+			while (it.hasPrevious()) {
+				CategorizedWord word = it.previous();
+				if (word.category != Category.SPACE) {
+					s.boundaries.right = end;
+					break;
+				}
+				end -= word.word.length();
+			}
 		}
 
-		return result;
+		return res;
 	}
 
 	@Override
 	public int getLexQuality(Language lang) {
 		if (lang == Language.ENGLISH)
-			return 10;
+			return 3 * LexService.MinSpecializedLexQuality;
+		if (lang == Language.FRENCH)
+			return 3 * LexService.MinSpecializedLexQuality;
 		return 0;
+	}
+
+	@Override
+	public String getName() {
+		return "rule-based-lexer";
 	}
 
 }

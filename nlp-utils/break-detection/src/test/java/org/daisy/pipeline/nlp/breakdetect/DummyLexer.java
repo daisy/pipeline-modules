@@ -1,5 +1,6 @@
 package org.daisy.pipeline.nlp.breakdetect;
 
+import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,10 +10,10 @@ import org.daisy.pipeline.nlp.lexing.LexService;
 public class DummyLexer implements LexService {
 
 	public enum Strategy {
-		ONE_SENTENCE, ONE_SEGMENT_ONE_SENTENCE, ONE_SEGMENT_ONE_WORD, ONE_SEGMENT_ONE_WORD_TRIMMED
+		ONE_SENTENCE, SPACE_SEPARARED_SENTENCES, SPACE_SEPARATED_WORDS, REGULAR
 	};
 
-	public Strategy strategy = Strategy.ONE_SEGMENT_ONE_WORD;
+	public Strategy strategy = Strategy.SPACE_SEPARATED_WORDS;
 
 	@Override
 	public int getLexQuality(Language lang) {
@@ -32,72 +33,91 @@ public class DummyLexer implements LexService {
 	}
 
 	@Override
-	public List<Sentence> split(List<String> segments) {
+	public List<Sentence> split(String input) {
 		ArrayList<Sentence> result = new ArrayList<Sentence>();
-		if (segments.size() == 0)
+		if (input.isEmpty())
 			return result;
 
 		Sentence s;
+		BreakIterator boundary;
+		int start;
 
 		switch (strategy) {
 		case ONE_SENTENCE:
-		case ONE_SEGMENT_ONE_WORD:
-		case ONE_SEGMENT_ONE_WORD_TRIMMED:
-			if (strategy == Strategy.ONE_SEGMENT_ONE_WORD_TRIMMED) {
-				ArrayList<String> segs = new ArrayList<String>();
-				for (String seg : segments) {
-					if (seg == null || seg.trim().isEmpty())
-						segs.add(null);
-					else
-						segs.add(seg.trim());
-				}
-				segments = segs;
-			}
-
+		case SPACE_SEPARATED_WORDS:
 			s = new Sentence();
-			s.boundaries = new TextReference();
-			s.content = null;
-			s.boundaries.firstIndex = 0;
-			for (s.boundaries.firstSegment = 0; s.boundaries.firstSegment < segments
-			        .size() && segments.get(s.boundaries.firstSegment) == null; ++s.boundaries.firstSegment);
-			if (s.boundaries.firstSegment < segments.size()) {
-				s.boundaries.lastSegment = segments.size() - 1;
-				for (s.boundaries.lastSegment = segments.size() - 1; segments
-				        .get(s.boundaries.lastSegment) == null; --s.boundaries.lastSegment);
-				s.boundaries.lastIndex = segments.get(s.boundaries.lastSegment)
-				        .length();
+			s.boundaries = new TextBoundaries();
+			s.words = null;
+			s.boundaries.left = 0;
+			s.boundaries.right = input.length();
 
-				result.add(s);
+			result.add(s);
 
-				if (strategy == Strategy.ONE_SEGMENT_ONE_WORD) {
-					s.content = new ArrayList<TextReference>();
-					for (int i = 0; i < segments.size(); ++i) {
-						if (segments.get(i) != null) {
-							TextReference ref = new TextReference();
-							ref.firstSegment = i;
-							ref.firstIndex = 0;
-							ref.lastSegment = i;
-							ref.lastIndex = segments.get(ref.lastSegment)
-							        .length();
-							s.content.add(ref);
-						}
+			if (strategy == Strategy.SPACE_SEPARATED_WORDS) {
+				s.words = new ArrayList<TextBoundaries>();
+				boundary = BreakIterator.getWordInstance();
+				boundary.setText(input.substring(s.boundaries.left));
+				start = boundary.first();
+				for (int end = boundary.next(); end != BreakIterator.DONE; start = end, end = boundary
+				        .next()) {
+					int p = start;
+					for (; p < end
+					        && !Character.isLetter(input.codePointAt(p + s.boundaries.left)); ++p);
+					if (p < end) {
+						TextBoundaries bounds = new TextBoundaries();
+						bounds.left = start + s.boundaries.left;
+						bounds.right = end + s.boundaries.left;
+						s.words.add(bounds);
 					}
 				}
 			}
 
 			break;
-		case ONE_SEGMENT_ONE_SENTENCE:
-			for (int i = 0; i < segments.size(); ++i) {
-				if (segments.get(i) != null) {
+		case SPACE_SEPARARED_SENTENCES:
+			boundary = BreakIterator.getWordInstance();
+			boundary.setText(input);
+			start = boundary.first();
+			for (int end = boundary.next(); end != BreakIterator.DONE; start = end, end = boundary
+			        .next()) {
+
+				int p = start;
+				for (; p < end && !Character.isLetter(input.codePointAt(p)); ++p);
+
+				if (p < end) {
 					s = new Sentence();
-					s.boundaries = new TextReference();
-					s.content = null;
-					s.boundaries.firstSegment = i;
-					s.boundaries.firstIndex = 0;
-					s.boundaries.lastSegment = i;
-					s.boundaries.lastIndex = segments.get(
-					        s.boundaries.lastSegment).length();
+					s.boundaries = new TextBoundaries();
+					s.words = null;
+					s.boundaries.left = start;
+					s.boundaries.right = end;
+
 					result.add(s);
+				}
+			}
+
+			break;
+		case REGULAR:
+			boundary = BreakIterator.getSentenceInstance();
+			boundary.setText(input);
+			start = boundary.first();
+			for (int end = boundary.next(); end != BreakIterator.DONE; start = end, end = boundary
+			        .next()) {
+
+				s = new Sentence();
+				s.boundaries = new TextBoundaries();
+				s.boundaries.left = start;
+				s.boundaries.right = end;
+				s.words = new ArrayList<TextBoundaries>();
+				result.add(s);
+
+				BreakIterator wb = BreakIterator.getWordInstance();
+				wb.setText(input.substring(start, end));
+				int wstart = wb.first();
+				for (int wend = wb.next(); wend != BreakIterator.DONE; wstart = wend, wend = wb
+				        .next()) {
+					TextBoundaries tb = new TextBoundaries();
+					tb.left = start + wstart;
+					tb.right = start + wend;
+					s.words.add(tb);
 				}
 			}
 
@@ -107,4 +127,8 @@ public class DummyLexer implements LexService {
 		return result;
 	}
 
+	@Override
+	public String getName() {
+		return null;
+	}
 }

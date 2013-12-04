@@ -4,12 +4,13 @@ import java.util.List;
 
 import org.daisy.pipeline.nlp.TextCategorizer.CategorizedWord;
 
-/**
- * Split into sentences. It must not discard anything, even spaces and
- * punctuation marks.
- */
 public interface ISentenceDetector {
 
-    List<List<CategorizedWord>> split(List<CategorizedWord> words);
+	/**
+	 * The result cannot be kept after another call as it might be recycled.
+	 * 
+	 * @return a list of sentences.
+	 */
+	List<List<CategorizedWord>> split(List<CategorizedWord> words);
 
 }

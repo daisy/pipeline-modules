@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import javax.xml.transform.sax.SAXSource;
 
@@ -15,7 +16,9 @@ import net.sf.saxon.s9api.Serializer;
 import net.sf.saxon.s9api.Serializer.Property;
 import net.sf.saxon.s9api.XdmNode;
 
+import org.daisy.pipeline.nlp.LanguageUtils.Language;
 import org.daisy.pipeline.nlp.breakdetect.DummyLexer.Strategy;
+import org.daisy.pipeline.nlp.lexing.LexService;
 import org.daisy.pipeline.nlp.lexing.LexService.LexerInitException;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -30,6 +33,7 @@ public class BreakDetectTest implements TreeWriterFactory {
 	static private DocumentBuilder Builder;
 	static private Serializer Serializer;
 	static private DummyLexer Lexer;
+	static private HashMap<Language, LexService> Lexers;
 
 	@BeforeClass
 	static public void setUp() throws URISyntaxException {
@@ -39,6 +43,8 @@ public class BreakDetectTest implements TreeWriterFactory {
 		Serializer.setOutputProperty(Property.OMIT_XML_DECLARATION, "yes");
 		Serializer.setOutputProperty(Property.INDENT, "no");
 		Lexer = new DummyLexer();
+		Lexers = new HashMap<Language, LexService>();
+		Lexers.put(null, Lexer);
 	}
 
 	@Override
@@ -58,16 +64,14 @@ public class BreakDetectTest implements TreeWriterFactory {
 		if (removeSpace)
 			input = input.replaceAll("\\p{Space}", "");
 
-		SAXSource source = new SAXSource(new InputSource(
-		        new StringReader(input)));
+		SAXSource source = new SAXSource(new InputSource(new StringReader(input)));
 		XdmNode document = Builder.build(source);
 
-		FormatSpecifications specs = new FormatSpecifications("http://tmp",
-		        "s", "w", "http://ns", "lang", Arrays.asList("span1", "span2"),
-		        null, Arrays.asList("space"));
+		FormatSpecifications specs = new FormatSpecifications("http://tmp", "s", "w",
+		        "http://ns", "lang", Arrays.asList("span1", "span2", "span3", "space"), null,
+		        Arrays.asList("space", "span3"));
 
-		XdmNode tree = new XmlBreakRebuilder().rebuild(this, Lexer, document,
-		        specs);
+		XdmNode tree = new XmlBreakRebuilder().rebuild(this, Lexers, document, specs);
 
 		OutputStream result = new ByteArrayOutputStream();
 		Serializer.setOutputStream(result);
@@ -104,66 +108,61 @@ public class BreakDetectTest implements TreeWriterFactory {
 	@Test
 	public void sameSection1() throws SaxonApiException, LexerInitException {
 		Lexer.strategy = Strategy.ONE_SENTENCE;
-		check("<root>a<span1>b</span1>c</root>",
-		        "<root><s>a<span1>b</span1>c</s></root>", false);
+		check("<root>a<span1>b</span1>c</root>", "<root><s>a<span1>b</span1>c</s></root>",
+		        false);
 	}
 
 	@Test
 	public void sameSection2() throws SaxonApiException, LexerInitException {
 		Lexer.strategy = Strategy.ONE_SENTENCE;
-		check("<root>a<span1/>b</root>", "<root><s>a<span1/>b</s></root>",
-		        false);
+		check("<root>a<span1/>b</root>", "<root><s>a<span1/>b</s></root>", false);
 	}
 
 	@Test
 	public void sameSection3() throws SaxonApiException, LexerInitException {
 		Lexer.strategy = Strategy.ONE_SENTENCE;
 		check("<root><span1><span2>a</span2>b<span2>c</span2></span1></root>",
-		        "<root><span1><s><span2>a</span2>b<span2>c</span2></s></span1></root>",
+		        "<root><span1><s><span2>a</span2>b<span2>c</span2></s></span1></root>", false);
+	}
+
+	@Test
+	public void multipleSentences1() throws SaxonApiException, LexerInitException {
+		Lexer.strategy = Strategy.SPACE_SEPARARED_SENTENCES;
+		check("<root><span3>sentence1</span3><span3>sentence2</span3></root>",
+		        "<root><span3><s>sentence1</s></span3><span3><s>sentence2</s></span3></root>",
 		        false);
 	}
 
 	@Test
-	public void multipleSentences1() throws SaxonApiException,
-	        LexerInitException {
-		Lexer.strategy = Strategy.ONE_SEGMENT_ONE_SENTENCE;
-		check("<root><span1>sentence 1</span1><span2>sentence 2</span2></root>",
-		        "<root><span1><s>sentence 1</s></span1><span2><s>sentence 2</s></span2></root>",
-		        false);
-	}
-
-	@Test
-	public void multipleSentences2() throws SaxonApiException,
-	        LexerInitException {
-		Lexer.strategy = Strategy.ONE_SEGMENT_ONE_SENTENCE;
-		check("<root><span1>sentence 1</span1>middle sent<span2>sentence 2</span2></root>",
-		        "<root><span1><s>sentence 1</s></span1><s>middle sent</s><span2><s>sentence 2</s></span2></root>",
+	public void multipleSentences2() throws SaxonApiException, LexerInitException {
+		Lexer.strategy = Strategy.SPACE_SEPARARED_SENTENCES;
+		check("<root><span3>sentence1</span3>middle-sent<span3>sentence2</span3></root>",
+		        "<root><span3><s>sentence1</s></span3><s>middle-sent</s><span3><s>sentence2</s></span3></root>",
 		        false);
 	}
 
 	@Test
 	public void singleWord() throws SaxonApiException, LexerInitException {
-		Lexer.strategy = Strategy.ONE_SEGMENT_ONE_WORD;
+		Lexer.strategy = Strategy.SPACE_SEPARATED_WORDS;
 		check("<root>word</root>", "<root><s><w>word</w></s></root>", false);
 	}
 
 	@Test
 	public void twoWords() throws SaxonApiException, LexerInitException {
-		Lexer.strategy = Strategy.ONE_SEGMENT_ONE_WORD;
-		check("<root>w1<span1/>w2</root>",
-		        "<root><s><w>w1</w><span1/><w>w2</w></s></root>", false);
+		Lexer.strategy = Strategy.SPACE_SEPARATED_WORDS;
+		check("<root>w1<span3/>w2</root>", "<root><s><w>w1</w><span3/><w>w2</w></s></root>",
+		        false);
 	}
 
 	@Test
 	public void emptyParts1() throws SaxonApiException, LexerInitException {
 		Lexer.strategy = Strategy.ONE_SENTENCE;
-		check("<root>begin<span1/>end</root>",
-		        "<root><s>begin<span1/>end</s></root>", false);
+		check("<root>begin<span1/>end</root>", "<root><s>begin<span1/>end</s></root>", false);
 	}
 
 	@Test
 	public void comments1() throws SaxonApiException, LexerInitException {
-		Lexer.strategy = Strategy.ONE_SEGMENT_ONE_SENTENCE;
+		Lexer.strategy = Strategy.SPACE_SEPARARED_SENTENCES;
 
 		String doc = "<doc><head><!-- comment1--></head><body><frontmatter><!-- comment2 --></frontmatter></body></doc>";
 		check(doc, doc, false);
@@ -191,8 +190,7 @@ public class BreakDetectTest implements TreeWriterFactory {
 		//here the id does not matter
 		Lexer.strategy = Strategy.ONE_SENTENCE;
 		check("<root>one<span2 id=\"123\">two</span2>three</root>",
-		        "<root><s>one<span2 id=\"123\">two</span2>three</s></root>",
-		        false);
+		        "<root><s>one<span2 id=\"123\">two</span2>three</s></root>", false);
 	}
 
 	@Test
@@ -265,26 +263,26 @@ public class BreakDetectTest implements TreeWriterFactory {
 
 	@Test
 	public void hard3() throws SaxonApiException, LexerInitException {
-		Lexer.strategy = Strategy.ONE_SEGMENT_ONE_WORD;
+		Lexer.strategy = Strategy.SPACE_SEPARATED_WORDS;
 		StringBuilder input = new StringBuilder(); //robust to IDE's auto formatting
 		input.append("<root>");
 		input.append(" first");
-		input.append(" <span1>second<span2>third</span2><sep/></span1>");
-		input.append(" <span1>fourth</span1>fifth<sep/>sixth");
+		input.append(" <span3>second<span3>third</span3><sep/></span3>");
+		input.append(" <span3>fourth</span3>fifth<sep/>sixth");
 		input.append("</root>");
 
 		StringBuilder expected = new StringBuilder();
 		expected.append("<root>");
 		expected.append("  <s>");
 		expected.append("    <w>first</w>");
-		expected.append("    <span1>");
+		expected.append("    <span3>");
 		expected.append("      <w>second</w>");
-		expected.append("      <span2><w>third</w></span2>");
-		expected.append("    </span1>");
+		expected.append("      <span3><w>third</w></span3>");
+		expected.append("    </span3>");
 		expected.append("  </s>");
-		expected.append("  <span1><sep/></span1>");
+		expected.append("  <span3><sep/></span3>");
 		expected.append("  <s>");
-		expected.append("    <span1><w>fourth</w></span1><w>fifth</w>");
+		expected.append("    <span3><w>fourth</w></span3><w>fifth</w>");
 		expected.append("  </s>");
 		expected.append("  <sep/>");
 		expected.append("  <s><w>sixth</w></s>");
@@ -295,7 +293,7 @@ public class BreakDetectTest implements TreeWriterFactory {
 
 	@Test
 	public void hard4() throws SaxonApiException, LexerInitException {
-		Lexer.strategy = Strategy.ONE_SEGMENT_ONE_WORD;
+		Lexer.strategy = Strategy.SPACE_SEPARATED_WORDS;
 		StringBuilder input = new StringBuilder();
 
 		input.append("<root>");
@@ -320,7 +318,7 @@ public class BreakDetectTest implements TreeWriterFactory {
 
 	@Test
 	public void hard5() throws SaxonApiException, LexerInitException {
-		Lexer.strategy = Strategy.ONE_SEGMENT_ONE_SENTENCE;
+		Lexer.strategy = Strategy.SPACE_SEPARARED_SENTENCES;
 		StringBuilder input = new StringBuilder(); //robust to IDE's auto formatting
 		input.append("<document>");
 		input.append("  <head>");
@@ -362,7 +360,7 @@ public class BreakDetectTest implements TreeWriterFactory {
 
 	@Test
 	public void hard6() throws SaxonApiException, LexerInitException {
-		Lexer.strategy = Strategy.ONE_SEGMENT_ONE_SENTENCE;
+		Lexer.strategy = Strategy.SPACE_SEPARARED_SENTENCES;
 		StringBuilder input = new StringBuilder(); //robust to IDE's auto formatting
 		input.append("<document>");
 		input.append("  <head>x");
@@ -404,7 +402,7 @@ public class BreakDetectTest implements TreeWriterFactory {
 
 	@Test
 	public void hard7() throws SaxonApiException, LexerInitException {
-		Lexer.strategy = Strategy.ONE_SEGMENT_ONE_SENTENCE;
+		Lexer.strategy = Strategy.SPACE_SEPARARED_SENTENCES;
 		StringBuilder input = new StringBuilder(); //robust to IDE's auto formatting
 		input.append("<dtbook>n");
 		input.append("  <frontmatter>n");
@@ -440,5 +438,37 @@ public class BreakDetectTest implements TreeWriterFactory {
 		expected.append("</dtbook>");
 
 		check(input.toString(), expected.toString(), true);
+	}
+
+	@Test
+	public void hard8() throws SaxonApiException, LexerInitException {
+		Lexer.strategy = Strategy.REGULAR;
+		StringBuilder input = new StringBuilder(); //robust to IDE's auto formatting
+		input.append("<root>");
+		input.append("<p>");
+		input.append("<span1>this is sentence one. This is </span1>");
+		input.append("sentence two.");
+		input.append("</p>");
+		input.append("</root>");
+
+		StringBuilder expected = new StringBuilder(); //robust to IDE's auto formatting
+		expected.append("<root>");
+		expected.append("<p>");
+		expected.append("<span1>");
+		expected.append("<s>");
+		expected.append("<w>this</w><w> </w><w>is</w><w> </w><w>sentence</w><w> </w><w>one</w><w>.</w><w> </w>");
+		expected.append("</s>");
+		expected.append("</span1>");
+		expected.append("<s>");
+		expected.append("<span1>");
+		expected.append("<w>This</w><w> </w><w>is</w><w> </w>");
+		expected.append("</span1>");
+		expected.append("<w>sentence</w><w> </w><w>two</w><w>.</w>");
+		expected.append("</s>");
+		expected.append("</p>");
+		expected.append("</root>");
+
+		check(input.toString(), expected.toString(), false);
+
 	}
 }

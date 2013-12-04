@@ -12,6 +12,10 @@
   <xsl:param name="output-ns"/>
   <xsl:param name="output-sentence-tag"/>
 
+  <!-- if the $output-sentence-tag is a generic tag (e.g. like in HTML), -->
+  <!-- we won't want them to be all interpreted as sentences. -->
+  <xsl:param name="detect-preexisting-sentences" select="'true'"/>
+
   <!-- the words need an additional pair (attr, val) because they cannot be -->
   <!-- identified later on otherwise, unlike the sentences which are -->
   <!-- identified thanks to their id. -->
@@ -40,7 +44,11 @@
   <xsl:variable name="ok-list" select="concat(',', $can-contain-sentences, ',')"/>
 
   <xsl:template match="*[local-name() = $tmp-sentence-tag]" mode="sentence-ids" priority="2">
+    <xsl:variable name="preexisting" select="(ancestor::*|descendant::*)[local-name()=$output-sentence-tag][1]"/>
     <xsl:choose>
+      <xsl:when test="$detect-preexisting-sentences and $preexisting">
+	<d:sentence id="{if ($preexisting/@id) then ($preexisting/@id) else generate-id($preexisting)}"/>
+      </xsl:when>
       <xsl:when test="contains($ok-list, concat(',', local-name(..), ','))">
 	<d:sentence id="{if (@id) then (@id) else generate-id()}"/>
       </xsl:when>
@@ -66,6 +74,7 @@
   <!--======================================================== -->
   <!-- REGENERATION OF THE CONTENT INCLUDING SENTENCES AND     -->
   <!-- WORDS REPLACED WITH VALID EQUIVALENT ELEMENTS           -->
+  <!-- COMPLIANT WITH THE FORMAT (e.g. Zedai, DTBook)          -->
   <!--======================================================== -->
 
   <xsl:template match="@*|node()">
@@ -84,16 +93,26 @@
 
   <xsl:template match="*[local-name() = $tmp-word-tag]" priority="2">
     <xsl:param name="sentence-ids-tree" select="/"/>
-    <xsl:element name="{$output-word-tag}" namespace="{$output-ns}">
-      <xsl:if test="$word-attr != ''">
-	<xsl:attribute name="{$word-attr}">
-	  <xsl:value-of select="$word-attr-val"/>
-	</xsl:attribute>
-      </xsl:if>
-      <xsl:apply-templates select="@*|node()">
-	<xsl:with-param name="sentence-ids-tree" select="()"/>
-      </xsl:apply-templates>
-    </xsl:element>
+    <xsl:choose>
+      <xsl:when test="(ancestor::*|descendant::*)[local-name()=$output-word-tag and string(@*[local-name()=$word-attr]) = $word-attr-val]">
+	<!-- a word already exists -->
+	<xsl:apply-templates select="node()">
+	  <xsl:with-param name="sentence-ids-tree" select="()"/>
+	</xsl:apply-templates>
+      </xsl:when>
+      <xsl:otherwise>
+	<xsl:element name="{$output-word-tag}" namespace="{$output-ns}">
+	  <xsl:if test="$word-attr != ''">
+	    <xsl:attribute name="{$word-attr}">
+	      <xsl:value-of select="$word-attr-val"/>
+	    </xsl:attribute>
+	  </xsl:if>
+	  <xsl:apply-templates select="node()">
+	    <xsl:with-param name="sentence-ids-tree" select="()"/>
+	  </xsl:apply-templates>
+	</xsl:element>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="*[local-name() = $tmp-sentence-tag]" priority="2">

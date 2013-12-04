@@ -3,7 +3,7 @@ package org.daisy.pipeline.nlp.lexing;
 import java.util.List;
 
 import org.daisy.pipeline.nlp.lexing.LexService.Sentence;
-import org.daisy.pipeline.nlp.lexing.LexService.TextReference;
+import org.daisy.pipeline.nlp.lexing.LexService.TextBoundaries;
 
 /**
  * Convert one Lexer's result to formatted text. Likely to be used for testing.
@@ -11,66 +11,52 @@ import org.daisy.pipeline.nlp.lexing.LexService.TextReference;
 public class LexResultPrettyPrinter {
 
 	private String mWordSeparator = "/";
-	private boolean mDisplayAll = false;
 
 	public void setWordSeperator(String wordSeparator) {
 		mWordSeparator = wordSeparator;
 	}
 
-	public void displayAll(boolean all) {
-		mDisplayAll = all;
-	}
-
-	public String convert(Object result, List<String> lexerInput) {
+	public String convert(Object result, String lexerInput) {
 		StringBuilder sb = new StringBuilder();
 		dispatch(result, sb, lexerInput);
 		return sb.toString();
 	}
 
-	private void dispatch(Object v, StringBuilder sb, List<String> references) {
+	private void dispatch(Object v, StringBuilder sb, String reference) {
 		if (v instanceof List) {
-			visit((List<Sentence>) v, sb, references);
+			visit((List<Sentence>) v, sb, reference);
 		} else if (v instanceof Sentence) {
-			visit((Sentence) v, sb, references);
-		} else if (v instanceof TextReference) {
-			visit((TextReference) v, sb, references);
+			visit((Sentence) v, sb, reference);
+		} else if (v instanceof TextBoundaries) {
+			visit((TextBoundaries) v, sb, reference);
 		}
 	}
 
-	private void visit(TextReference t, StringBuilder sb,
-	        List<String> references) {
-		sb.append(t.properNoun ? mWordSeparator + mWordSeparator
-		        : mWordSeparator);
-		if (t.firstSegment == t.lastSegment) {
-			sb.append(references.get(t.firstSegment).substring(t.firstIndex,
-			        t.lastIndex));
-		} else {
-			sb.append(references.get(t.firstSegment).substring(t.firstIndex));
-			for (int i = t.firstSegment + 1; i < t.lastSegment; ++i) {
-				if (references.get(i) != null)
-					sb.append(references.get(i));
-			}
-			sb.append(references.get(t.lastSegment).substring(0, t.lastIndex));
-		}
+	private void visit(TextBoundaries t, StringBuilder sb, String reference) {
+		sb.append(reference.substring(t.left, t.right));
 	}
 
 	private void visit(List<Sentence> sentences, StringBuilder sb,
-	        List<String> references) {
+	        String references) {
 		for (Sentence s : sentences)
 			dispatch(s, sb, references);
 	}
 
-	private void visit(Sentence s, StringBuilder sb, List<String> references) {
-		if (mDisplayAll) {
-			sb.append("[");
-			dispatch(s.boundaries, sb, references);
-			sb.append("]");
+	private void visit(Sentence s, StringBuilder sb, String reference) {
+		sb.append("{");
+		if (s.words == null || s.words.isEmpty()) {
+			visit(s.boundaries, sb, reference);
+		} else {
+			int lastPos = s.boundaries.left;
+			for (TextBoundaries word : s.words) {
+				sb.append(reference.substring(lastPos, word.left));
+				lastPos = word.right;
+				sb.append(mWordSeparator);
+				visit(word, sb, reference);
+				sb.append(mWordSeparator);
+			}
+			sb.append(reference.substring(lastPos, s.boundaries.right));
 		}
-		if (s.content != null) {
-			sb.append("{");
-			for (TextReference t : s.content)
-				dispatch(t, sb, references);
-			sb.append("}");
-		}
+		sb.append("}");
 	}
 }
