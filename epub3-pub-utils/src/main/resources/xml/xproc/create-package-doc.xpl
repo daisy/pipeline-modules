@@ -29,8 +29,8 @@
     <p:option name="result-uri" required="true"/>
     <p:output port="result" primary="true"/>
 
-    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/xproc/fileset-library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/mediatype-utils/mediatype.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/mediatype-utils/library.xpl"/>
     
     <px:fileset-join/>
     <px:mediatype-detect name="spine-filesets-with-mediatypes">

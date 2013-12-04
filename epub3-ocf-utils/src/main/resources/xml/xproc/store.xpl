@@ -11,7 +11,7 @@
 
     <p:option name="href" required="true"/>
 
-    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/xproc/fileset-library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
     <p:import href="ocf-zip.xpl"/>
 
     <px:fileset-store name="fileset-store">

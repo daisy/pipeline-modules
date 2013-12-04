@@ -6,9 +6,9 @@
     <p:output port="result"/>
     <p:option name="target" required="true"/>
 
-    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/xproc/fileset-library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/xproc/file-library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/zip-utils/xproc/zip-library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/zip-utils/library.xpl"/>
 
     <p:variable name="mimetype-target" select="resolve-uri('mimetype', base-uri(/*))">
         <p:pipe port="source" step="main"/>
