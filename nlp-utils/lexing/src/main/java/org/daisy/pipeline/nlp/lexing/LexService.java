@@ -1,8 +1,7 @@
 package org.daisy.pipeline.nlp.lexing;
 
 import java.util.List;
-
-import org.daisy.pipeline.nlp.LanguageUtils.Language;
+import java.util.Locale;
 
 public interface LexService {
 
@@ -35,7 +34,7 @@ public interface LexService {
 	 * @return a score for the given language. The higher the better. Zero or
 	 *         negative if the language is not supported.
 	 */
-	public int getLexQuality(Language lang);
+	public int getLexQuality(Locale lang);
 
 	/**
 	 * @throws LexerInitException if the lexer failed to preload the data
@@ -54,7 +53,7 @@ public interface LexService {
 	 *             to @param lang in case it has not load them yet in init()
 	 * 
 	 */
-	public void useLanguage(Language lang) throws LexerInitException;
+	public void useLanguage(Locale lang) throws LexerInitException;
 
 	public List<Sentence> split(String text);
 

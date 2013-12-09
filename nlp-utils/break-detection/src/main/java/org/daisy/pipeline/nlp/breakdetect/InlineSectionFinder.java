@@ -2,6 +2,7 @@ package org.daisy.pipeline.nlp.breakdetect;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import net.sf.saxon.s9api.Axis;
@@ -11,7 +12,6 @@ import net.sf.saxon.s9api.XdmNodeKind;
 import net.sf.saxon.s9api.XdmSequenceIterator;
 
 import org.daisy.pipeline.nlp.LanguageUtils;
-import org.daisy.pipeline.nlp.LanguageUtils.Language;
 import org.daisy.pipeline.nlp.breakdetect.InlineSectionProcessor.Leaf;
 import org.daisy.pipeline.nlp.lexing.LexService.LexerInitException;
 
@@ -33,7 +33,7 @@ public class InlineSectionFinder {
 	private List<Leaf> mCurrentSection;
 	private List<String> mCurrentText;
 	private int mCurrentSectionSize;
-	private Language mCurrentLang;
+	private Locale mCurrentLang;
 	private Set<String> mUnsplittable;
 
 	private static final QName IdAttr = new QName("id");
@@ -85,14 +85,14 @@ public class InlineSectionFinder {
 		}
 	}
 
-	private void findRec(XdmNode node, int level, Language lang) throws LexerInitException {
+	private void findRec(XdmNode node, int level, Locale lang) throws LexerInitException {
 		if (node.getNodeKind() == XdmNodeKind.TEXT) {
 			addToSection(node.getParent(), level - 1, node.getStringValue());
 		} else {
 
 			String langstr = node.getAttributeValue(mSpecs.langAttr);
 			if (langstr != null) {
-				Language x = LanguageUtils.stringToLanguage(langstr);
+				Locale x = LanguageUtils.stringToLanguage(langstr);
 				if (x != null) {
 					lang = x;
 				}

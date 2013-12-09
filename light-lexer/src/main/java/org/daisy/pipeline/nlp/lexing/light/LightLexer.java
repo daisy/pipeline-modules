@@ -3,11 +3,10 @@ package org.daisy.pipeline.nlp.lexing.light;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.daisy.pipeline.nlp.LanguageUtils;
-import org.daisy.pipeline.nlp.LanguageUtils.Language;
 import org.daisy.pipeline.nlp.lexing.GenericLexService;
 
 /**
@@ -27,11 +26,11 @@ public class LightLexer implements GenericLexService {
 	private Matcher mSpaceMatcher;
 
 	private void compileRegex(String startMarks, String endMarks) {
-		Pattern p = Pattern.compile("(" + endMarks + "|[ \r\n\t\\p{Z}])+", Pattern.MULTILINE);
+		Pattern p = Pattern.compile("(" + endMarks + "|[\\s\\p{Z}])+", Pattern.MULTILINE);
 		mEndMatcher = p.matcher("");
 		String allMarks = "((" + startMarks + ")|(" + endMarks + "))";
-		p = Pattern.compile("(" + allMarks + "+[ \r\n\t\\p{Z}]+" + allMarks + "+)|("
-		        + allMarks + "+)", Pattern.MULTILINE);
+		p = Pattern.compile("(" + allMarks + "+[\\s\\p{Z}]+" + allMarks + "+)|(" + allMarks
+		        + "+)", Pattern.MULTILINE);
 		mSepMatcher = p.matcher("");
 	}
 
@@ -39,7 +38,7 @@ public class LightLexer implements GenericLexService {
 	public void init() throws LexerInitException {
 		mStartPositions = new ArrayList<Integer>(1);
 		mStartPositions.add(0);
-		mSpaceMatcher = Pattern.compile("[ \r\n\t\\p{Z}]+").matcher("");
+		mSpaceMatcher = Pattern.compile("[\\s\\p{Z}]+", Pattern.MULTILINE).matcher("");
 	}
 
 	@Override
@@ -50,27 +49,16 @@ public class LightLexer implements GenericLexService {
 	}
 
 	@Override
-	public void useLanguage(Language lang) throws LexerInitException {
+	public void useLanguage(Locale lang) throws LexerInitException {
+		String l = lang.getISO3Language();
 		//Those are only examples. Feel free to customize them.
-		if (LanguageUtils.isRightToLeft(lang)) {
-			compileRegex("([؟…!?:׃])|([.][.][.])", "()");
-		} else if (lang == Language.GREEK) {
+		if ("grc".equals(l) || "gre".equals(l) || "ell".equals(l)) {
 			compileRegex("[¶]", "[:?!…;]|([.][.][.])"); //+ Greek semicolon
-		} else if (lang == Language.CHINESE) {
-			compileRegex("[¶]", "[:?!…;。]|([.][.][.])"); //+ Chinese full stop
+		} else if ("chi".equals(l) || "zho".equals(l)) {
+			compileRegex("[¶]", "[:?!…。]|([.][.][.])"); //+ Chinese full stop
 		} else {
-			compileRegex("[¡¿¶]", "[:?‥!…។៕]|([.][.][.])");
+			compileRegex("[¶]", "[؟:?‥!…។៕]|([.][.][.])");
 		}
-	}
-
-	public static void findInArray(List<String> segments, int index, int[] res) {
-		res[0] = 0;
-		while ((segments.get(res[0]) == null) || (index >= segments.get(res[0]).length())) {
-			if (segments.get(res[0]) != null)
-				index -= segments.get(res[0]).length();
-			++res[0];
-		}
-		res[1] = index;
 	}
 
 	@Override
@@ -136,7 +124,7 @@ public class LightLexer implements GenericLexService {
 	}
 
 	@Override
-	public int getLexQuality(Language lang) {
+	public int getLexQuality(Locale lang) {
 		return GenericLexService.MinimalQuality;
 	}
 

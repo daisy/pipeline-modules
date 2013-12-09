@@ -7,9 +7,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Locale;
 import java.util.Map;
 
-import org.daisy.pipeline.nlp.LanguageUtils.Language;
 import org.daisy.pipeline.nlp.RuleBasedTextCategorizer;
 import org.daisy.pipeline.nlp.TextCategorizer;
 import org.daisy.pipeline.nlp.TextCategorizer.CategorizedWord;
@@ -31,13 +31,13 @@ public class RuleBasedLexer implements LexService {
 	private RuleBasedTextCategorizer mGenericCategorizer = null;
 	private ISentenceDetector mGenericSplitter = null;
 
-	private Map<Language, ISentenceDetector> mSentenceSplitters;
-	private Map<Language, RuleBasedTextCategorizer> mTextCategorizers;
+	private Map<Locale, ISentenceDetector> mSentenceSplitters;
+	private Map<Locale, RuleBasedTextCategorizer> mTextCategorizers;
 
 	@Override
 	public void init() throws LexerInitException {
-		mSentenceSplitters = new HashMap<Language, ISentenceDetector>();
-		mTextCategorizers = new HashMap<Language, RuleBasedTextCategorizer>();
+		mSentenceSplitters = new HashMap<Locale, ISentenceDetector>();
+		mTextCategorizers = new HashMap<Locale, RuleBasedTextCategorizer>();
 	}
 
 	@Override
@@ -51,34 +51,29 @@ public class RuleBasedLexer implements LexService {
 	}
 
 	@Override
-	public void useLanguage(Language lang) throws LexerInitException {
+	public void useLanguage(Locale lang) throws LexerInitException {
 		if (!mTextCategorizers.containsKey(lang)) {
 			try {
 				RuleBasedTextCategorizer rtc;
-				switch (lang) {
-				case FRENCH:
+				String iso639_2lang = lang.getISO3Language();
+				if ("fre".equals(iso639_2lang) || "fra".equals(iso639_2lang)
+				        || "frm".equals(iso639_2lang) || "fro".equals(iso639_2lang)) {
 					rtc = new RuledFrenchCategorizer();
 					rtc.init(MatchMode.PREFIX_MATCH);
-					break;
-				default:
+				} else {
 					if (mGenericCategorizer == null) {
 						mGenericCategorizer = new RuledMultilangCategorizer();
 						mGenericCategorizer.init(MatchMode.PREFIX_MATCH);
 					}
 					rtc = mGenericCategorizer;
-					break;
 				}
 				mTextCategorizers.put(lang, rtc);
 
 				ISentenceDetector isd;
-				switch (lang) {
-				default:
-					if (mGenericSplitter == null)
-						mGenericSplitter = new EuroSentenceDetector();
+				if (mGenericSplitter == null)
+					mGenericSplitter = new EuroSentenceDetector();
 
-					isd = mGenericSplitter;
-					break;
-				}
+				isd = mGenericSplitter;
 				mSentenceSplitters.put(lang, isd);
 			} catch (IOException e) {
 				throw new LexerInitException(e.getMessage(), e.getCause());
@@ -181,10 +176,10 @@ public class RuleBasedLexer implements LexService {
 	}
 
 	@Override
-	public int getLexQuality(Language lang) {
-		if (lang == Language.ENGLISH)
+	public int getLexQuality(Locale lang) {
+		if (lang == Locale.ENGLISH)
 			return 3 * LexService.MinSpecializedLexQuality;
-		if (lang == Language.FRENCH)
+		if (lang == Locale.FRENCH)
 			return 3 * LexService.MinSpecializedLexQuality;
 		return 0;
 	}

@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,7 +14,6 @@ import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 
-import org.daisy.pipeline.nlp.LanguageUtils.Language;
 import org.daisy.pipeline.nlp.lexing.LexService;
 import org.daisy.pipeline.nlp.lexing.LexService.LexerInitException;
 import org.daisy.pipeline.nlp.lexing.LexServiceRegistry;
@@ -40,7 +40,7 @@ public class BreakDetectStep extends DefaultStep implements TreeWriterFactory,
 	private WritablePipe mResult = null;
 	private XProcRuntime mRuntime = null;
 	private LexServiceRegistry mLexerRegistry;
-	private Set<Language> mLangs;
+	private Set<Locale> mLangs;
 
 	private Collection<String> inlineTagsOption;
 	private Collection<String> commaTagsOption;
@@ -105,7 +105,7 @@ public class BreakDetectStep extends DefaultStep implements TreeWriterFactory,
 		//Retrieve a generic lexer that can handle unexpected languages.
 		//Unexpected languages could happen if the detected languages in
 		//XmlBreakRebuilder are not the same as the ones detected in this class.
-		HashMap<Language, LexService> langToLexers = new HashMap<Language, LexService>();
+		HashMap<Locale, LexService> langToLexers = new HashMap<Locale, LexService>();
 		LexService generic = mLexerRegistry.getBestGenericLexService();
 		try {
 			generic.init();
@@ -127,11 +127,11 @@ public class BreakDetectStep extends DefaultStep implements TreeWriterFactory,
 			XdmNode doc = mSource.read();
 
 			//init the lexers with the languages
-			mLangs = new HashSet<Language>();
+			mLangs = new HashSet<Locale>();
 			try {
 				new InlineSectionFinder().find(doc, 0, formatSpecs, this,
 				        Collections.EMPTY_SET);
-				for (Language lang : mLangs) {
+				for (Locale lang : mLangs) {
 					if (!langToLexers.containsKey(lang)) {
 						LexService lexer = mLexerRegistry.getLexerForLanguage(lang,
 						        langToLexers.values());
@@ -151,7 +151,7 @@ public class BreakDetectStep extends DefaultStep implements TreeWriterFactory,
 
 			mRuntime.info(null, null, "Total number of language(s): "
 			        + (langToLexers.size() - 1));
-			for (Map.Entry<Language, LexService> entry : langToLexers.entrySet()) {
+			for (Map.Entry<Locale, LexService> entry : langToLexers.entrySet()) {
 				mRuntime.info(null, null, "LexService for language '"
 				        + (entry.getKey() == null ? "<ANY>" : entry.getKey()) + "': "
 				        + entry.getValue().getName());
@@ -183,7 +183,7 @@ public class BreakDetectStep extends DefaultStep implements TreeWriterFactory,
 	}
 
 	@Override
-	public void onInlineSectionFound(List<Leaf> leaves, List<String> text, Language lang)
+	public void onInlineSectionFound(List<Leaf> leaves, List<String> text, Locale lang)
 	        throws LexerInitException {
 
 		//TODO: insert the language detection here. Another language detection

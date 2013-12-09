@@ -8,6 +8,7 @@
   <xsl:param name="tmp-word-tag"/>
   <xsl:param name="tmp-sentence-tag"/>
   <xsl:param name="can-contain-sentences"/>
+  <xsl:param name="ignored-elements" select="''"/>
 
   <xsl:param name="output-ns"/>
   <xsl:param name="output-sentence-tag"/>
@@ -53,7 +54,7 @@
 	<d:sentence id="{if (@id) then (@id) else generate-id()}"/>
       </xsl:when>
       <xsl:otherwise>
-	<xsl:variable name="children" select="*[count(descendant::*[local-name() = $tmp-word-tag]) > 0]" />
+	<xsl:variable name="children" select="*[count(descendant::*[local-name() = $tmp-word-tag]) > 0][1]" />
 	<xsl:choose>
 	  <xsl:when test="count($children) = 1">
 	    <d:sentence id="{if ($children[1]/@id) then ($children[1]/@id) else generate-id($children[1])}"/>
@@ -81,13 +82,31 @@
     <xsl:param name="sentence-ids-tree"/>
     <xsl:copy>
       <xsl:if test="$sentence-ids-tree/*/*[@id = generate-id(current())]">
-	<xsl:attribute name="id">
-	  <xsl:value-of select="generate-id()"/>
-	</xsl:attribute>
+      	<xsl:attribute name="id">
+      	  <xsl:value-of select="generate-id()"/>
+      	</xsl:attribute>
       </xsl:if>
       <xsl:apply-templates select="@*|node()">
 	<xsl:with-param name="sentence-ids-tree" select="$sentence-ids-tree"/>
       </xsl:apply-templates>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:variable name="ignore-list" select="concat(',', $ignored-elements, ',')"/>
+  <xsl:template match="*[contains($ignore-list, concat(',', local-name(), ','))]" priority="2">
+    <xsl:copy>
+      <xsl:copy-of select="@*"/>
+      <xsl:apply-templates select="node()" mode="ignore-mode"/>
+    </xsl:copy>
+  </xsl:template>
+  <xsl:template mode="ignore-mode" priority="2"
+		match="*[local-name() = $tmp-word-tag or local-name() = $tmp-sentence-tag]">
+    <xsl:apply-templates select="node()" mode="ignore-mode"/>
+  </xsl:template>
+  <xsl:template match="*" mode="ignore-mode" priority="1">
+    <xsl:copy>
+      <xsl:copy-of select="@*"/>
+      <xsl:apply-templates select="node()" mode="ignore-mode"/>
     </xsl:copy>
   </xsl:template>
 
@@ -123,7 +142,7 @@
 	<xsl:element name="{$output-sentence-tag}" namespace="{$output-ns}">
 	  <xsl:if test="not(@id)">
 	    <xsl:attribute name="id">
-	      <xsl:value-of select="generate-id()"/>
+	      <xsl:value-of select="$myid"/>
 	    </xsl:attribute>
 	  </xsl:if>
 	  <xsl:apply-templates select="@*|node()">

@@ -3,6 +3,7 @@ package org.daisy.pipeline.nlp.breakdetect;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,7 +13,6 @@ import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmNodeKind;
 import net.sf.saxon.s9api.XdmSequenceIterator;
 
-import org.daisy.pipeline.nlp.LanguageUtils.Language;
 import org.daisy.pipeline.nlp.breakdetect.StringComposer.SentencePointer;
 import org.daisy.pipeline.nlp.breakdetect.StringComposer.TextPointer;
 import org.daisy.pipeline.nlp.lexing.LexService;
@@ -40,7 +40,7 @@ import com.xmlcalabash.util.TreeWriter;
 public class XmlBreakRebuilder implements InlineSectionProcessor {
 
 	private TreeWriter mTreeWriter;
-	private Map<Language, LexService> mLexers;
+	private Map<Locale, LexService> mLexers;
 	private StringComposer mStringComposer;
 	private FormatSpecifications mSpecs;
 	private XdmNode mPreviousNode; //last node written
@@ -48,7 +48,7 @@ public class XmlBreakRebuilder implements InlineSectionProcessor {
 	private final static QName IDattr = new QName("id");
 
 	public XdmNode rebuild(TreeWriterFactory treeWriterFactory,
-	        HashMap<Language, LexService> lexers, XdmNode doc, FormatSpecifications specs)
+	        HashMap<Locale, LexService> lexers, XdmNode doc, FormatSpecifications specs)
 	        throws LexerInitException {
 		mLexers = lexers;
 		mSpecs = specs;
@@ -157,7 +157,7 @@ public class XmlBreakRebuilder implements InlineSectionProcessor {
 	}
 
 	@Override
-	public void onInlineSectionFound(List<Leaf> leaves, List<String> text, Language lang)
+	public void onInlineSectionFound(List<Leaf> leaves, List<String> text, Locale lang)
 	        throws LexerInitException {
 		LexService lexer = mLexers.get(lang);
 		if (lexer == null) {

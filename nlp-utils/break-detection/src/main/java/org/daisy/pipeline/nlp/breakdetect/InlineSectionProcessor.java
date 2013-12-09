@@ -1,10 +1,10 @@
 package org.daisy.pipeline.nlp.breakdetect;
 
 import java.util.List;
+import java.util.Locale;
 
 import net.sf.saxon.s9api.XdmNode;
 
-import org.daisy.pipeline.nlp.LanguageUtils.Language;
 import org.daisy.pipeline.nlp.lexing.LexService.LexerInitException;
 
 public interface InlineSectionProcessor {
@@ -29,8 +29,8 @@ public interface InlineSectionProcessor {
 	 * @throws LexerInitException
 	 */
 
-	public void onInlineSectionFound(List<Leaf> leaves, List<String> text,
-	        Language lang) throws LexerInitException;
+	public void onInlineSectionFound(List<Leaf> leaves, List<String> text, Locale lang)
+	        throws LexerInitException;
 
 	public void onEmptySectionFound(List<Leaf> leaves);
 }

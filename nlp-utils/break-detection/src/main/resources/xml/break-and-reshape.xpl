@@ -9,6 +9,7 @@
   <p:import href="break-detect.xpl"/>
 
   <p:option name="can-contain-sentences" required="false" select="''"/>
+  <p:option name="ignored-elements" required="false" select="''"/>
   <p:option name="inline-tags" required="true"/>
   <p:option name="output-word-tag" required="true"/>
   <p:option name="output-sentence-tag" required="true"/>
@@ -50,6 +51,7 @@
   <!-- create the actual sentence/words element -->
   <p:xslt name="create-valid">
     <p:with-param name="can-contain-sentences" select="$can-contain-sentences"/>
+    <p:with-param name="ignored-elements" select="$ignored-elements"/>
     <p:with-param name="tmp-word-tag" select="$tmp-word-tag"/>
     <p:with-param name="tmp-sentence-tag" select="$tmp-sentence-tag"/>
     <p:with-param name="output-word-tag" select="$output-word-tag"/>

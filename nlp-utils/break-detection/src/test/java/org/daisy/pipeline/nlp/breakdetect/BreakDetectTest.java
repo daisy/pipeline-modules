@@ -6,6 +6,7 @@ import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Locale;
 
 import javax.xml.transform.sax.SAXSource;
 
@@ -16,7 +17,6 @@ import net.sf.saxon.s9api.Serializer;
 import net.sf.saxon.s9api.Serializer.Property;
 import net.sf.saxon.s9api.XdmNode;
 
-import org.daisy.pipeline.nlp.LanguageUtils.Language;
 import org.daisy.pipeline.nlp.breakdetect.DummyLexer.Strategy;
 import org.daisy.pipeline.nlp.lexing.LexService;
 import org.daisy.pipeline.nlp.lexing.LexService.LexerInitException;
@@ -33,7 +33,7 @@ public class BreakDetectTest implements TreeWriterFactory {
 	static private DocumentBuilder Builder;
 	static private Serializer Serializer;
 	static private DummyLexer Lexer;
-	static private HashMap<Language, LexService> Lexers;
+	static private HashMap<Locale, LexService> Lexers;
 
 	@BeforeClass
 	static public void setUp() throws URISyntaxException {
@@ -43,7 +43,7 @@ public class BreakDetectTest implements TreeWriterFactory {
 		Serializer.setOutputProperty(Property.OMIT_XML_DECLARATION, "yes");
 		Serializer.setOutputProperty(Property.INDENT, "no");
 		Lexer = new DummyLexer();
-		Lexers = new HashMap<Language, LexService>();
+		Lexers = new HashMap<Locale, LexService>();
 		Lexers.put(null, Lexer);
 	}
 

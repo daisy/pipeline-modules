@@ -1,8 +1,8 @@
 package org.daisy.pipeline.nlp.lexing.rulebased;
 
 import java.util.List;
+import java.util.Locale;
 
-import org.daisy.pipeline.nlp.LanguageUtils.Language;
 import org.daisy.pipeline.nlp.lexing.LexResultPrettyPrinter;
 import org.daisy.pipeline.nlp.lexing.LexService;
 import org.daisy.pipeline.nlp.lexing.LexService.LexerInitException;
@@ -25,7 +25,7 @@ public class LexingTest {
 
 	@Test
 	public void basicSplit() throws LexerInitException {
-		mTokenizer.useLanguage(Language.ENGLISH);
+		mTokenizer.useLanguage(Locale.ENGLISH);
 		String inp = "this is a   basic test";
 		List<Sentence> sentences = mTokenizer.split(inp);
 		String text = mPrinter.convert(sentences, inp);
@@ -35,7 +35,7 @@ public class LexingTest {
 
 	@Test
 	public void twoSentences1() throws LexerInitException {
-		mTokenizer.useLanguage(Language.ENGLISH);
+		mTokenizer.useLanguage(Locale.ENGLISH);
 		String inp = "first sentence. Second sentence";
 		List<Sentence> sentences = mTokenizer.split(inp);
 		String text = mPrinter.convert(sentences, inp);
@@ -45,7 +45,7 @@ public class LexingTest {
 
 	@Test
 	public void twoSentences2() throws LexerInitException {
-		mTokenizer.useLanguage(Language.ENGLISH);
+		mTokenizer.useLanguage(Locale.ENGLISH);
 		String inp = "first sentence! Second sentence";
 		List<Sentence> sentences = mTokenizer.split(inp);
 		String text = mPrinter.convert(sentences, inp);
@@ -54,7 +54,7 @@ public class LexingTest {
 
 	@Test
 	public void capitalizedWords() throws LexerInitException {
-		mTokenizer.useLanguage(Language.ENGLISH);
+		mTokenizer.useLanguage(Locale.ENGLISH);
 		String inp = "Only One Sentence";
 		List<Sentence> sentences = mTokenizer.split(inp);
 		String text = mPrinter.convert(sentences, inp);
@@ -63,7 +63,7 @@ public class LexingTest {
 
 	@Test
 	public void acronym1() throws LexerInitException {
-		mTokenizer.useLanguage(Language.ENGLISH);
+		mTokenizer.useLanguage(Locale.ENGLISH);
 		String inp = "test A.C.R.O.N.Y.M. other";
 		List<Sentence> sentences = mTokenizer.split(inp);
 		String text = mPrinter.convert(sentences, inp);
@@ -72,7 +72,7 @@ public class LexingTest {
 
 	@Test
 	public void acronym2() throws LexerInitException {
-		mTokenizer.useLanguage(Language.ENGLISH);
+		mTokenizer.useLanguage(Locale.ENGLISH);
 		String inp = "test A.C.R.O.N.Y.M. Other";
 		List<Sentence> sentences = mTokenizer.split(inp);
 		String text = mPrinter.convert(sentences, inp);
@@ -81,7 +81,7 @@ public class LexingTest {
 
 	@Test
 	public void httpAddress() throws LexerInitException {
-		mTokenizer.useLanguage(Language.ENGLISH);
+		mTokenizer.useLanguage(Locale.ENGLISH);
 		String link = "http://www.google.fr/toto?a=b&_sessid=4547";
 		String inp = "before " + link + " after";
 		List<Sentence> sentences = mTokenizer.split(inp);
@@ -91,7 +91,7 @@ public class LexingTest {
 
 	@Test
 	public void latin() throws LexerInitException {
-		mTokenizer.useLanguage(Language.ENGLISH);
+		mTokenizer.useLanguage(Locale.ENGLISH);
 		String inp = "a priori a posteriori";
 		List<Sentence> sentences = mTokenizer.split(inp);
 		String text = mPrinter.convert(sentences, inp);
@@ -100,7 +100,7 @@ public class LexingTest {
 
 	@Test
 	public void whitespaces1() throws LexerInitException {
-		mTokenizer.useLanguage(Language.ENGLISH);
+		mTokenizer.useLanguage(Locale.ENGLISH);
 		String inp = "     sentence1.       Sentence2   ";
 		List<Sentence> sentences = mTokenizer.split(inp);
 		String text = mPrinter.convert(sentences, inp);
@@ -109,7 +109,7 @@ public class LexingTest {
 
 	@Test
 	public void punctuationOnly1() throws LexerInitException {
-		mTokenizer.useLanguage(Language.ENGLISH);
+		mTokenizer.useLanguage(Locale.ENGLISH);
 		String inp = "sentence1! ??!!!  !! ? sentence2! ";
 		List<Sentence> sentences = mTokenizer.split(inp);
 		String text = mPrinter.convert(sentences, inp);
@@ -120,7 +120,7 @@ public class LexingTest {
 
 	@Test
 	public void foreign() throws LexerInitException {
-		mTokenizer.useLanguage(Language.ENGLISH);
+		mTokenizer.useLanguage(Locale.ENGLISH);
 		String inp = "découpage basé sur des règles";
 		List<Sentence> sentences = mTokenizer.split(inp);
 		String text = mPrinter.convert(sentences, inp);
@@ -129,7 +129,7 @@ public class LexingTest {
 
 	@Test
 	public void french1() throws LexerInitException {
-		mTokenizer.useLanguage(Language.FRENCH);
+		mTokenizer.useLanguage(Locale.FRENCH);
 		String inp = "la raison d'être";
 		List<Sentence> sentences = mTokenizer.split(inp);
 		String text = mPrinter.convert(sentences, inp);

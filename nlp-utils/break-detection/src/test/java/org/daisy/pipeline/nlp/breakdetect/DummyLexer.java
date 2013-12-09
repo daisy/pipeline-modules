@@ -3,8 +3,8 @@ package org.daisy.pipeline.nlp.breakdetect;
 import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
-import org.daisy.pipeline.nlp.LanguageUtils.Language;
 import org.daisy.pipeline.nlp.lexing.LexService;
 
 public class DummyLexer implements LexService {
@@ -16,7 +16,7 @@ public class DummyLexer implements LexService {
 	public Strategy strategy = Strategy.SPACE_SEPARATED_WORDS;
 
 	@Override
-	public int getLexQuality(Language lang) {
+	public int getLexQuality(Locale lang) {
 		return 1;
 	}
 
@@ -29,7 +29,7 @@ public class DummyLexer implements LexService {
 	}
 
 	@Override
-	public void useLanguage(Language lang) throws LexerInitException {
+	public void useLanguage(Locale lang) throws LexerInitException {
 	}
 
 	@Override

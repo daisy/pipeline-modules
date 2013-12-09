@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="lexer-registry">
+
+  <implementation class="org.daisy.pipeline.nlp.lexing.LexServiceRegistry"/>
+
+  <reference bind="addGenericLexService"
+	     unbind="removeGenericLexService"
+	     cardinality="1..n"
+	     interface="org.daisy.pipeline.nlp.lexing.GenericLexService"
+	     name="GenericLexService"
+	     policy="static"/>
+
+  <reference bind="addLexService"
+	     unbind="removeLexService"
+	     cardinality="0..n"
+	     interface="org.daisy.pipeline.nlp.lexing.LexService"
+	     name="SpecializedLexService"
+	     policy="static"/>
+
+   <service>
+      <provide interface="org.daisy.pipeline.nlp.lexing.LexServiceRegistry"/>
+   </service>
+
+</scr:component>

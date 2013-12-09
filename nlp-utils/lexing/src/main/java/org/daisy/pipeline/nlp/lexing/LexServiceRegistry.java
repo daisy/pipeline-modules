@@ -1,9 +1,8 @@
 package org.daisy.pipeline.nlp.lexing;
 
 import java.util.Collection;
+import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import org.daisy.pipeline.nlp.LanguageUtils.Language;
 
 public class LexServiceRegistry {
 	private CopyOnWriteArrayList<LexService> mLexers = new CopyOnWriteArrayList<LexService>();
@@ -44,8 +43,7 @@ public class LexServiceRegistry {
 	 *            that if two lexers have the same score, the one already
 	 *            initialized will be chosen.
 	 */
-	public LexService getLexerForLanguage(Language lang,
-	        Collection<LexService> initializedLexers) {
+	public LexService getLexerForLanguage(Locale lang, Collection<LexService> initializedLexers) {
 		LexService best;
 		while (true) {
 			best = null;
@@ -59,13 +57,14 @@ public class LexServiceRegistry {
 				}
 			}
 
-			if (bestScore >= LexService.MinSpecializedLexQuality)
+			if (bestScore >= LexService.MinSpecializedLexQuality) {
 				return best;
+			}
 
 			long time = System.currentTimeMillis();
 			try {
 				synchronized (mLexers) {
-					mLexers.wait(Timeout - 100);
+					mLexers.wait(Timeout + 100);
 				}
 			} catch (InterruptedException e) {
 				return best;

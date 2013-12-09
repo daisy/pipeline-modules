@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.xml.transform.sax.SAXSource;
@@ -19,7 +20,6 @@ import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmNodeKind;
 import net.sf.saxon.s9api.XdmSequenceIterator;
 
-import org.daisy.pipeline.nlp.LanguageUtils.Language;
 import org.daisy.pipeline.nlp.breakdetect.DummyLexer.Strategy;
 import org.daisy.pipeline.nlp.lexing.LexService;
 import org.daisy.pipeline.nlp.lexing.LexService.LexerInitException;
@@ -39,14 +39,14 @@ public class ActualFilesTest implements TreeWriterFactory {
 	static private Processor Proc;
 	static private DocumentBuilder Builder;
 	static private DummyLexer Lexer;
-	static private HashMap<Language, LexService> Lexers;
+	static private HashMap<Locale, LexService> Lexers;
 
 	@BeforeClass
 	static public void setUp() throws URISyntaxException {
 		Proc = new Processor(true);
 		Builder = Proc.newDocumentBuilder();
 		Lexer = new DummyLexer();
-		Lexers = new HashMap<Language, LexService>();
+		Lexers = new HashMap<Locale, LexService>();
 		Lexers.put(null, Lexer);
 	}
 
