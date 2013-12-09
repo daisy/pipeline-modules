@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-    xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.daisy.pipeline.modules</groupId>
     <artifactId>modules-parent</artifactId>
     <version>1.0</version>
-    <relativePath/>
+    <relativePath />
   </parent>
   <artifactId>asciimath-utils</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0</version>
   <packaging>bundle</packaging>
   <name>DAISY Pipeline 2 module :: ASCIIMath Utils</name>
   <dependencies>
@@ -27,7 +25,7 @@
     <dependency>
       <groupId>org.daisy.pipeline</groupId>
       <artifactId>calabash-adapter</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>1.0.0</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -57,11 +55,10 @@
             </goals>
             <configuration>
               <tasks>
-                <mkdir dir="target/generated-resources/javascript"/>
+                <mkdir dir="target/generated-resources/javascript" />
                 <!-- FIXME: what if this version changes? -->
-                <get src="http://mathcs.chapman.edu/~jipsen/mathml/ASCIIMathML.js"
-                     dest="target/generated-resources/javascript"/>
-                <delete file="target/optimization-files/patches-applied.txt"/>
+                <get src="http://mathcs.chapman.edu/~jipsen/mathml/ASCIIMathML.js" dest="target/generated-resources/javascript" />
+                <delete file="target/optimization-files/patches-applied.txt" />
               </tasks>
             </configuration>
           </execution>
@@ -99,4 +96,8 @@
       </plugin>
     </plugins>
   </build>
+
+  <scm>
+    <tag>v1.7</tag>
+  </scm>
 </project>
