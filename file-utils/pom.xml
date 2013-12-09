@@ -11,7 +11,7 @@
   </parent>
 
   <artifactId>file-utils</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1-SNAPSHOT</version>
   <packaging>bundle</packaging>
 
   <name>DAISY Pipeline 2 module :: File Utilities</name>
@@ -65,9 +65,4 @@
       </plugin>
     </plugins>
   </build>
-
-
-  <scm>
-    <tag>v1.7</tag>
-  </scm>
 </project>
