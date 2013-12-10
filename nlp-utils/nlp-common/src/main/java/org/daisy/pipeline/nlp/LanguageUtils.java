@@ -44,19 +44,11 @@ public class LanguageUtils {
 	// one can customize the punctuation/space symbols depending on the
 	// given language.
 
-	public static String getFullStopLeftSymbol(Locale lang) {
-		return "";
-	}
-
-	public static String getCommaLeftSymbol(Locale lang) {
-		return "";
-	}
-
-	public static String getFullStopRightSymbol(Locale lang) {
+	public static String getFullStopSymbol(Locale lang) {
 		return "! ";
 	}
 
-	public static String getCommaRightSymbol(Locale lang) {
+	public static String getCommaSymbol(Locale lang) {
 		return ", ";
 	}
 

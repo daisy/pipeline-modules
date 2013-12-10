@@ -68,8 +68,9 @@ public class BreakDetectTest implements TreeWriterFactory {
 		XdmNode document = Builder.build(source);
 
 		FormatSpecifications specs = new FormatSpecifications("http://tmp", "s", "w",
-		        "http://ns", "lang", Arrays.asList("span1", "span2", "span3", "space"), null,
-		        Arrays.asList("space", "span3"));
+		        "http://ns", "lang", Arrays.asList("span1", "span2", "span3", "space"),
+		        Arrays.asList("space", "span3"), Arrays.asList("space", "span3"),
+		        Arrays.asList("sentbefore"), Arrays.asList("sentafter"));
 
 		XdmNode tree = new XmlBreakRebuilder().rebuild(this, Lexers, document, specs);
 
@@ -191,6 +192,14 @@ public class BreakDetectTest implements TreeWriterFactory {
 		Lexer.strategy = Strategy.ONE_SENTENCE;
 		check("<root>one<span2 id=\"123\">two</span2>three</root>",
 		        "<root><s>one<span2 id=\"123\">two</span2>three</s></root>", false);
+	}
+
+	@Test
+	public void sentenceInjection() throws SaxonApiException, LexerInitException {
+		Lexer.strategy = Strategy.REGULAR;
+		check("<root>First <sentafter>sent</sentafter>Second sent<sentbefore>Third sent</sentbefore></root>",
+		        "<root><s><w>First</w><w> </w><sentafter><w>sent</w></sentafter></s><s><w>Second</w><w> </w><w>sent</w></s><sentbefore><s><w>Third</w><w> </w><w>sent</w></s></sentbefore></root>",
+		        false);
 	}
 
 	@Test

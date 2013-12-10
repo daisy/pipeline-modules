@@ -264,8 +264,9 @@ public class ActualFilesTest implements TreeWriterFactory {
 			XdmNode document = Builder.build(source);
 
 			FormatSpecifications specs = new FormatSpecifications("http://tmp", "sss", "www",
-			        "http://ns", "lang", Arrays.asList(inlineElements), null,
-			        Arrays.asList(spaceEquivalents));
+			        "http://ns", "lang", Arrays.asList(inlineElements),
+			        Arrays.asList(spaceEquivalents), Arrays.asList(spaceEquivalents), null,
+			        null);
 
 			XdmNode tree = new XmlBreakRebuilder().rebuild(this, Lexers, document, specs);
 

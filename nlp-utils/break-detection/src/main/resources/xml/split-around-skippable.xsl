@@ -10,6 +10,7 @@
   <xsl:param name="output-ns" />
   <xsl:param name="skippable-tags" />
   <xsl:param name="output-subsentence-tag" />
+  <xsl:param name="can-contain-subsentences" />
 
   <xsl:variable name="skippable-tag-list" select="concat(',', $skippable-tags, ',')" />
 
@@ -21,7 +22,7 @@
 
   <xsl:template match="*[collection()/d:sentences/*[@id = current()/@id]]" priority="2">
     <xsl:choose>
-      <xsl:when test="count(descendant::*[contains($skippable-tag-list, local-name())]) = 0">
+      <xsl:when test="count(descendant::*[contains($skippable-tag-list, local-name())]) = 0 ">
 	<xsl:apply-templates select="." mode="copy"/>
       </xsl:when>
       <xsl:otherwise>
@@ -44,6 +45,14 @@
   <xsl:template match="node()" mode="split" priority="1">
     <xsl:copy>
       <xsl:copy-of select="@*"/>
+      <xsl:apply-templates select="node()" mode="split"/>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:variable name="ok-parent-list" select="concat(',', $can-contain-subsentences, ',')" />
+  <xsl:template match="*[contains($ok-parent-list, local-name())]" mode="split" priority="2">
+    <xsl:copy>
+      <xsl:copy-of select="@*"/>
       <xsl:for-each-group select="node()" group-adjacent="not(descendant-or-self::*[contains($skippable-tag-list, local-name())])">
 	<xsl:choose>
 	  <xsl:when test="current-grouping-key()">
@@ -64,9 +73,9 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="*[contains($skippable-tag-list, local-name())]" mode="split" priority="2">
+  <xsl:template match="*[contains($skippable-tag-list, local-name())]" mode="split" priority="3">
     <xsl:choose>
-      <xsl:when test="@id or (../@id and count(../node()) = 1)">
+      <xsl:when test="(@id or (../@id and count(../node()) = 1)) or not(contains($ok-parent-list, local-name()))">
 	<xsl:apply-templates select="." mode="copy"/>
       </xsl:when>
     <xsl:otherwise>

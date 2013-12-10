@@ -93,7 +93,6 @@ public class OmnilangTest {
 		String ref = "我喜欢中国。我喜欢英语了。";
 		List<Sentence> sentences = mLexer.split(ref);
 		String text = mPrinter.convert(sentences, ref);
-
 		Assert.assertEquals("{/我喜欢中国/。}{/我喜欢英语了/。}", text);
 	}
 
@@ -103,7 +102,6 @@ public class OmnilangTest {
 		String ref = "They do like\nJames.";
 		List<Sentence> sentences = mLexer.split(ref);
 		String text = mPrinter.convert(sentences, ref);
-
 		Assert.assertEquals("{/They/ /do/ /like/\n/James/.}", text);
 	}
 
@@ -114,6 +112,16 @@ public class OmnilangTest {
 		List<Sentence> sentences = mLexer.split(ref);
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{/J.J.R./ /Tolkien/}", text);
+	}
+
+	@Test
+	public void brackets1() throws LexerInitException {
+		mLexer.useLanguage(Locale.ENGLISH);
+		String ref = "Bracket example (this is not a sentence!), after.";
+		List<Sentence> sentences = mLexer.split(ref);
+		String text = mPrinter.convert(sentences, ref);
+		Assert.assertEquals(
+		        "{/Bracket/ /example/ (/this/ /is/ /not/ /a/ /sentence/!), /after/.}", text);
 	}
 
 }

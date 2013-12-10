@@ -9,6 +9,7 @@
   <p:import href="break-detect.xpl"/>
 
   <p:option name="can-contain-sentences" required="false" select="''"/>
+  <p:option name="can-contain-subsentences" required="true"/>
   <p:option name="ignored-elements" required="false" select="''"/>
   <p:option name="inline-tags" required="true"/>
   <p:option name="output-word-tag" required="true"/>
@@ -19,12 +20,19 @@
   <p:option name="sentence-attr-val" required="false" select="''"/>
   <p:option name="output-ns" required="true"/>
 
-  <p:option name="comma-tags" required="false" select="''"/>
-  <p:option name="space-tags" required="false" select="''"/>
+  <!-- Force the Lexer to create new words or new sentences -->
+  <!-- when the following elements are detected: -->
+  <p:option name="ensure-word-before" required="false" select="''"/>
+  <p:option name="ensure-word-after" required="false" select="''"/>
+  <p:option name="ensure-sentence-before" required="false" select="''"/>
+  <p:option name="ensure-sentence-after" required="false" select="''"/>
 
+  <!-- If $split-skippable is enable, the script will wrap the nodes around $skippable-tags -->
+  <!-- with a node of type $output-subsentence-tag. -->
+  <!-- The standard must allow $output-subsentence-tag to have an ID -->
   <p:option name="split-skippable" required="false" select="'false'"/>
   <p:option name="skippable-tags" required="false" select="''"/>
-  <p:option name="output-subsentence-tag" required="true"/> <!-- used to split the content around the skippable tags -->
+  <p:option name="output-subsentence-tag" required="true"/>
 
   <p:input port="source" primary="true"/>
   <p:output port="result" primary="true"/>
@@ -42,8 +50,10 @@
     <p:with-option name="output-word-tag" select="$tmp-word-tag"/>
     <p:with-option name="output-sentence-tag" select="$tmp-sentence-tag"/>
     <p:with-option name="tmp-ns" select="$tmp-ns"/>
-    <p:with-option name="comma-tags" select="$comma-tags"/>
-    <p:with-option name="space-tags" select="$space-tags"/>
+    <p:with-option name="ensure-word-before" select="$ensure-word-before"/>
+    <p:with-option name="ensure-word-after" select="$ensure-word-after"/>
+    <p:with-option name="ensure-sentence-before" select="$ensure-word-before"/>
+    <p:with-option name="ensure-sentence-after" select="$ensure-sentence-after"/>
   </px:break-detect>
 
   <cx:message message="java-based break detection done"/>
@@ -73,6 +83,7 @@
 	  <p:pipe port="result" step="create-valid"/>
 	  <p:pipe port="secondary" step="create-valid"/> <!-- sentence ids -->
 	</p:input>
+	<p:with-param name="can-contain-subsentences" select="$can-contain-subsentences"/>
 	<p:with-param name="output-ns" select="$output-ns"/>
 	<p:with-param name="skippable-tags" select="$skippable-tags"/>
 	<p:with-param name="output-subsentence-tag" select="$output-subsentence-tag"/>

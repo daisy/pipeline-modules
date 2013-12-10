@@ -110,15 +110,14 @@ public class InlineSectionFinder {
 			        && mSpecs.inlineElements.contains(node.getNodeName().getLocalName())
 			        && (id == null || !mUnsplittable.contains(id))) {
 
+				String name = node.getNodeName().getLocalName();
+
 				//*** inline element ***
-				boolean isSpace = mSpecs.spaceEquivalentElements.contains(node.getNodeName()
-				        .getLocalName());
-				if (isSpace) {
-					addToSection(null, level, LanguageUtils.getWhiteSpaceSymbol(lang));
+				if (mSpecs.ensureSentenceBefore.contains(name)) {
+					addToSection(null, level, LanguageUtils.getFullStopSymbol(lang));
 				}
-				if (mSpecs.commaEquivalentElements.contains(node.getNodeName().getLocalName())
-				        && !LanguageUtils.getCommaLeftSymbol(lang).isEmpty()) {
-					addToSection(null, level, LanguageUtils.getCommaLeftSymbol(lang));
+				if (mSpecs.ensureWordBefore.contains(name)) {
+					addToSection(null, level, LanguageUtils.getCommaSymbol(lang));
 				}
 
 				if (!iter.hasNext()) {
@@ -131,12 +130,11 @@ public class InlineSectionFinder {
 					}
 				}
 
-				if (mSpecs.commaEquivalentElements.contains(node.getNodeName().getLocalName())
-				        && !LanguageUtils.getCommaRightSymbol(lang).isEmpty()) {
-					addToSection(null, level, LanguageUtils.getCommaRightSymbol(lang));
+				if (mSpecs.ensureWordAfter.contains(name)) {
+					addToSection(null, level, LanguageUtils.getCommaSymbol(lang));
 				}
-				if (isSpace) {
-					addToSection(null, level, LanguageUtils.getWhiteSpaceSymbol(lang));
+				if (mSpecs.ensureSentenceAfter.contains(name)) {
+					addToSection(null, level, LanguageUtils.getFullStopSymbol(lang));
 				}
 			} else {
 				notifyNewSection();

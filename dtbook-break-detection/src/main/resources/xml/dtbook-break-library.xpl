@@ -17,12 +17,14 @@
       <p:pipe port="sentence-ids" step="generic"/>
     </p:output>
 
-    <p:option name="split-skippable" select="'false'" required="false" />
+    <p:option name="split-skippable" select="'true'" required="false" />
 
     <px:break-and-reshape name="generic">
       <p:with-option name="inline-tags" select="'acronym,em,strong,a,abbr,dfn,linenum,pagenum,samp,span,sup,sub,w,noteref'"/>
-      <p:with-option name="space-tags" select="'acronym,span,linenum,pagenum,samp,noteref'"/>
+      <p:with-option name="ensure-word-before" select="'acronym,span,linenum,pagenum,samp,noteref'"/>
+      <p:with-option name="ensure-word-after" select="'acronym,span,linenum,pagenum,samp,noteref'"/>
       <p:with-option name="can-contain-sentences" select="'span,p,lic,em,blockquote,byline,note'"/>
+      <p:with-option name="can-contain-subsentences" select="'sent,span,p,lic,blockquote,byline,note'"/>
       <p:with-option name="ignored-elements" select="'pagenum'"/>
       <p:with-option name="output-ns" select="'http://www.daisy.org/z3986/2005/dtbook/'"/>
       <p:with-option name="output-word-tag" select="'w'"/>

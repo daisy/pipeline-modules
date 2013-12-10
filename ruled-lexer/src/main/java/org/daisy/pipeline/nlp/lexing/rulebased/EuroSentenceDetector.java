@@ -39,7 +39,8 @@ public class EuroSentenceDetector implements ISentenceDetector {
 			mStrongDelimiters.reset(w.word);
 			mWeakDelimiters.reset(w.word);
 
-			if (mStrongDelimiters.matches()
+			if ((mStrongDelimiters.matches() && (j == words.size() - 1 || words.get(j + 1).word
+			        .charAt(0) != ')'))
 			        || ((j < words.size() - 2) && mWeakDelimiters.matches()
 			                && words.get(j + 1).category == Category.SPACE && Character
 			                    .isUpperCase(words.get(j + 2).word.charAt(0)))) {

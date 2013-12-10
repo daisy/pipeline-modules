@@ -14,20 +14,20 @@ import org.junit.Test;
 public class LexingTest {
 
 	private LexResultPrettyPrinter mPrinter;
-	private LexService mTokenizer;
+	private LexService mLexer;
 
 	@Before
 	public void setUp() throws LexerInitException {
 		mPrinter = new LexResultPrettyPrinter();
-		mTokenizer = new RuleBasedLexer();
-		mTokenizer.init();
+		mLexer = new RuleBasedLexer();
+		mLexer.init();
 	}
 
 	@Test
 	public void basicSplit() throws LexerInitException {
-		mTokenizer.useLanguage(Locale.ENGLISH);
+		mLexer.useLanguage(Locale.ENGLISH);
 		String inp = "this is a   basic test";
-		List<Sentence> sentences = mTokenizer.split(inp);
+		List<Sentence> sentences = mLexer.split(inp);
 		String text = mPrinter.convert(sentences, inp);
 
 		Assert.assertEquals("{/this/ /is/ /a/   /basic/ /test/}", text);
@@ -35,9 +35,9 @@ public class LexingTest {
 
 	@Test
 	public void twoSentences1() throws LexerInitException {
-		mTokenizer.useLanguage(Locale.ENGLISH);
+		mLexer.useLanguage(Locale.ENGLISH);
 		String inp = "first sentence. Second sentence";
-		List<Sentence> sentences = mTokenizer.split(inp);
+		List<Sentence> sentences = mLexer.split(inp);
 		String text = mPrinter.convert(sentences, inp);
 
 		Assert.assertEquals("{/first/ /sentence/.}{/Second/ /sentence/}", text);
@@ -45,94 +45,104 @@ public class LexingTest {
 
 	@Test
 	public void twoSentences2() throws LexerInitException {
-		mTokenizer.useLanguage(Locale.ENGLISH);
+		mLexer.useLanguage(Locale.ENGLISH);
 		String inp = "first sentence! Second sentence";
-		List<Sentence> sentences = mTokenizer.split(inp);
+		List<Sentence> sentences = mLexer.split(inp);
 		String text = mPrinter.convert(sentences, inp);
 		Assert.assertEquals("{/first/ /sentence/!}{/Second/ /sentence/}", text);
 	}
 
 	@Test
 	public void capitalizedWords() throws LexerInitException {
-		mTokenizer.useLanguage(Locale.ENGLISH);
+		mLexer.useLanguage(Locale.ENGLISH);
 		String inp = "Only One Sentence";
-		List<Sentence> sentences = mTokenizer.split(inp);
+		List<Sentence> sentences = mLexer.split(inp);
 		String text = mPrinter.convert(sentences, inp);
 		Assert.assertEquals("{/Only/ /One/ /Sentence/}", text);
 	}
 
 	@Test
 	public void acronym1() throws LexerInitException {
-		mTokenizer.useLanguage(Locale.ENGLISH);
+		mLexer.useLanguage(Locale.ENGLISH);
 		String inp = "test A.C.R.O.N.Y.M. other";
-		List<Sentence> sentences = mTokenizer.split(inp);
+		List<Sentence> sentences = mLexer.split(inp);
 		String text = mPrinter.convert(sentences, inp);
 		Assert.assertEquals("{/test/ /A.C.R.O.N.Y.M./ /other/}", text);
 	}
 
 	@Test
 	public void acronym2() throws LexerInitException {
-		mTokenizer.useLanguage(Locale.ENGLISH);
+		mLexer.useLanguage(Locale.ENGLISH);
 		String inp = "test A.C.R.O.N.Y.M. Other";
-		List<Sentence> sentences = mTokenizer.split(inp);
+		List<Sentence> sentences = mLexer.split(inp);
 		String text = mPrinter.convert(sentences, inp);
 		Assert.assertEquals("{/test/ /A.C.R.O.N.Y.M/.}{/Other/}", text);
 	}
 
 	@Test
 	public void httpAddress() throws LexerInitException {
-		mTokenizer.useLanguage(Locale.ENGLISH);
+		mLexer.useLanguage(Locale.ENGLISH);
 		String link = "http://www.google.fr/toto?a=b&_sessid=4547";
 		String inp = "before " + link + " after";
-		List<Sentence> sentences = mTokenizer.split(inp);
+		List<Sentence> sentences = mLexer.split(inp);
 		String text = mPrinter.convert(sentences, inp);
 		Assert.assertEquals("{/before/ /" + link + "/ /after/}", text);
 	}
 
 	@Test
 	public void latin() throws LexerInitException {
-		mTokenizer.useLanguage(Locale.ENGLISH);
+		mLexer.useLanguage(Locale.ENGLISH);
 		String inp = "a priori a posteriori";
-		List<Sentence> sentences = mTokenizer.split(inp);
+		List<Sentence> sentences = mLexer.split(inp);
 		String text = mPrinter.convert(sentences, inp);
 		Assert.assertEquals("{/a priori/ /a posteriori/}", text);
 	}
 
 	@Test
 	public void whitespaces1() throws LexerInitException {
-		mTokenizer.useLanguage(Locale.ENGLISH);
+		mLexer.useLanguage(Locale.ENGLISH);
 		String inp = "     sentence1.       Sentence2   ";
-		List<Sentence> sentences = mTokenizer.split(inp);
+		List<Sentence> sentences = mLexer.split(inp);
 		String text = mPrinter.convert(sentences, inp);
 		Assert.assertEquals("{/sentence1/.}{/Sentence2/}", text);
 	}
 
 	@Test
 	public void punctuationOnly1() throws LexerInitException {
-		mTokenizer.useLanguage(Locale.ENGLISH);
+		mLexer.useLanguage(Locale.ENGLISH);
 		String inp = "sentence1! ??!!!  !! ? sentence2! ";
-		List<Sentence> sentences = mTokenizer.split(inp);
+		List<Sentence> sentences = mLexer.split(inp);
 		String text = mPrinter.convert(sentences, inp);
-
 		Assert.assertEquals("{/sentence1/!}{/sentence2/!}", text);
 
 	}
 
 	@Test
 	public void foreign() throws LexerInitException {
-		mTokenizer.useLanguage(Locale.ENGLISH);
+		mLexer.useLanguage(Locale.ENGLISH);
 		String inp = "découpage basé sur des règles";
-		List<Sentence> sentences = mTokenizer.split(inp);
+		List<Sentence> sentences = mLexer.split(inp);
 		String text = mPrinter.convert(sentences, inp);
 		Assert.assertEquals("{/découpage/ /basé/ /sur/ /des/ /règles/}", text);
 	}
 
 	@Test
 	public void french1() throws LexerInitException {
-		mTokenizer.useLanguage(Locale.FRENCH);
+		mLexer.useLanguage(Locale.FRENCH);
 		String inp = "la raison d'être";
-		List<Sentence> sentences = mTokenizer.split(inp);
+		List<Sentence> sentences = mLexer.split(inp);
 		String text = mPrinter.convert(sentences, inp);
 		Assert.assertEquals("{/la/ /raison/ /d'//être/}", text);
+	}
+
+	@Test
+	public void brackets1() throws LexerInitException {
+		mLexer.useLanguage(Locale.ENGLISH);
+		String ref = "Bracket example (this is not a sentence!), after.";
+		List<Sentence> sentences = mLexer.split(ref);
+		String text = mPrinter.convert(sentences, ref);
+		System.out.println("text = " + text);
+		Assert.assertEquals(
+		        "{/Bracket/ /example/ (/this/ /is/ /not/ /a/ /sentence/!), /after/.}", text);
 	}
 }

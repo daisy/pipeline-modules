@@ -10,7 +10,9 @@
   <p:option name="output-word-tag" required="true"/>
   <p:option name="output-sentence-tag" required="true"/>
   <p:option name="tmp-ns" required="true"/>
-  <p:option name="comma-tags" required="false" select="''"/>
-  <p:option name="space-tags" required="false" select="''"/>
+  <p:option name="ensure-word-before" required="false" select="''"/>
+  <p:option name="ensure-word-after" required="false" select="''"/>
+  <p:option name="ensure-sentence-before" required="false" select="''"/>
+  <p:option name="ensure-sentence-after" required="false" select="''"/>
 
 </p:declare-step>

@@ -43,8 +43,10 @@ public class BreakDetectStep extends DefaultStep implements TreeWriterFactory,
 	private Set<Locale> mLangs;
 
 	private Collection<String> inlineTagsOption;
-	private Collection<String> commaTagsOption;
-	private Collection<String> spaceTagsOption;
+	private Collection<String> wordBeforeOption;
+	private Collection<String> wordAfterOption;
+	private Collection<String> sentenceBeforeOption;
+	private Collection<String> sentenceAfterOption;
 	private String tmpNs;
 	private String wordTagOption;
 	private String sentenceTagOption;
@@ -71,10 +73,14 @@ public class BreakDetectStep extends DefaultStep implements TreeWriterFactory,
 		super.setOption(name, value);
 		if ("inline-tags".equalsIgnoreCase(name.getLocalName())) {
 			inlineTagsOption = processListOption(value.getString());
-		} else if ("comma-tags".equalsIgnoreCase(name.getLocalName())) {
-			commaTagsOption = processListOption(value.getString());
-		} else if ("space-tags".equalsIgnoreCase(name.getLocalName())) {
-			spaceTagsOption = processListOption(value.getString());
+		} else if ("ensure-word-before".equalsIgnoreCase(name.getLocalName())) {
+			wordBeforeOption = processListOption(value.getString());
+		} else if ("ensure-word-after".equalsIgnoreCase(name.getLocalName())) {
+			wordAfterOption = processListOption(value.getString());
+		} else if ("ensure-sentence-before".equalsIgnoreCase(name.getLocalName())) {
+			sentenceBeforeOption = processListOption(value.getString());
+		} else if ("ensure-sentence-after".equalsIgnoreCase(name.getLocalName())) {
+			sentenceAfterOption = processListOption(value.getString());
 		} else if ("output-word-tag".equalsIgnoreCase(name.getLocalName())) {
 			wordTagOption = value.getString();
 		} else if ("output-sentence-tag".equalsIgnoreCase(name.getLocalName())) {
@@ -117,7 +123,8 @@ public class BreakDetectStep extends DefaultStep implements TreeWriterFactory,
 
 		FormatSpecifications formatSpecs = new FormatSpecifications(tmpNs, sentenceTagOption,
 		        wordTagOption, "http://www.w3.org/XML/1998/namespace", "lang",
-		        inlineTagsOption, commaTagsOption, spaceTagsOption);
+		        inlineTagsOption, wordBeforeOption, wordAfterOption, sentenceBeforeOption,
+		        sentenceAfterOption);
 
 		XmlBreakRebuilder xmlRebuilder = new XmlBreakRebuilder();
 

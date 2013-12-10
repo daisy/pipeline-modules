@@ -26,12 +26,16 @@ public class LightLexer implements GenericLexService {
 	private Matcher mSpaceMatcher;
 
 	private void compileRegex(String startMarks, String endMarks) {
-		Pattern p = Pattern.compile("(" + endMarks + "|[\\s\\p{Z}])+", Pattern.MULTILINE);
-		mEndMatcher = p.matcher("");
+		//pattern to match any group of sentence separators:
+		//like "!!?" or "?!!   !!", but not "!)"
 		String allMarks = "((" + startMarks + ")|(" + endMarks + "))";
-		p = Pattern.compile("(" + allMarks + "+[\\s\\p{Z}]+" + allMarks + "+)|(" + allMarks
-		        + "+)", Pattern.MULTILINE);
+		Pattern p = Pattern.compile("(" + allMarks + "+[\\s\\p{Z}]+" + allMarks + "+)|("
+		        + allMarks + "+)(?!\\))", Pattern.MULTILINE);
 		mSepMatcher = p.matcher("");
+
+		//pattern to find the ending marks within the group of separators
+		p = Pattern.compile("(" + endMarks + "|[\\s\\p{Z}])+", Pattern.MULTILINE);
+		mEndMatcher = p.matcher("");
 	}
 
 	@Override

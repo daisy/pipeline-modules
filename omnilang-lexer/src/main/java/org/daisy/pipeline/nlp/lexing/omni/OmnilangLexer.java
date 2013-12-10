@@ -63,6 +63,9 @@ public class OmnilangLexer implements GenericLexService {
 		//replace "J.J.R. Tolkien" with "J.J.RA Tolkien"
 		input = input.replaceAll("(\\p{Lu})(([.]\\p{Lu})+)[.](?=[\n ]\\p{Lu})", "$1$2A");
 
+		//replace "!)" with ",)" to prevent it from detecting a new sentence
+		input = input.replaceAll("[؟:?‥!…។៕。]\\)", ",)");
+
 		mSentIterator.setText(input);
 		int start = mSentIterator.first();
 		for (int end = mSentIterator.next(); end != BreakIterator.DONE; start = end, end = mSentIterator

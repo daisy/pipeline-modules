@@ -120,4 +120,13 @@ public class LightLexingTest {
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{text text ?}", text);
 	}
+
+	@Test
+	public void brackets1() throws LexerInitException {
+		mLexer.useLanguage(Locale.ENGLISH);
+		String ref = "Bracket example (this is not a sentence!), after.";
+		List<Sentence> sentences = mLexer.split(ref);
+		String text = mPrinter.convert(sentences, ref);
+		Assert.assertEquals("{Bracket example (this is not a sentence!), after.}", text);
+	}
 }

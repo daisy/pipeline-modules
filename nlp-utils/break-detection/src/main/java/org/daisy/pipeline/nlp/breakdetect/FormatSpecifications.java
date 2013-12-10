@@ -18,30 +18,41 @@ public class FormatSpecifications {
 	public String tmpNsPrefix = "tmp";
 	public QName langAttr;
 	public Set<String> inlineElements;
-	public Set<String> commaEquivalentElements;
-	public Set<String> spaceEquivalentElements;
+	public Set<String> ensureWordBefore;
+	public Set<String> ensureWordAfter;
+	public Set<String> ensureSentenceBefore;
+	public Set<String> ensureSentenceAfter;
 	public String tmpNs;
 
 	FormatSpecifications(String tmpNamespace, String sentenceElement, String wordElement,
 	        String langNamespace, String langAttr, Collection<String> inlineElements,
-	        Collection<String> commaEquivalentElements,
-	        Collection<String> spaceEquivalentElements) {
+	        Collection<String> ensureWordBefore, Collection<String> ensureWordAfter,
+	        Collection<String> ensureSentenceBefore, Collection<String> ensureSentenceAfter) {
 
-		if (commaEquivalentElements == null)
-			commaEquivalentElements = Collections.EMPTY_LIST;
-		if (spaceEquivalentElements == null)
-			spaceEquivalentElements = Collections.EMPTY_LIST;
+		if (ensureWordBefore == null)
+			ensureWordBefore = Collections.EMPTY_LIST;
+		if (ensureWordAfter == null)
+			ensureWordAfter = Collections.EMPTY_LIST;
+		if (ensureSentenceBefore == null)
+			ensureSentenceBefore = Collections.EMPTY_LIST;
+		if (ensureSentenceAfter == null)
+			ensureSentenceAfter = Collections.EMPTY_LIST;
 
 		sentenceTag = new QName(tmpNamespace, sentenceElement);
 		wordTag = new QName(tmpNamespace, wordElement);
 		this.langAttr = new QName(langNamespace, langAttr);
 
 		this.inlineElements = new HashSet<String>(inlineElements);
-		this.inlineElements.addAll(commaEquivalentElements);
+		this.inlineElements.addAll(ensureWordBefore);
+		this.inlineElements.addAll(ensureWordAfter);
+		this.inlineElements.addAll(ensureSentenceBefore);
+		this.inlineElements.addAll(ensureSentenceAfter);
 		this.inlineElements.add(wordElement);
 
-		this.commaEquivalentElements = new HashSet<String>(commaEquivalentElements);
-		this.spaceEquivalentElements = new HashSet<String>(spaceEquivalentElements);
+		this.ensureWordBefore = new HashSet<String>(ensureWordBefore);
+		this.ensureWordAfter = new HashSet<String>(ensureWordAfter);
+		this.ensureSentenceBefore = new HashSet<String>(ensureSentenceBefore);
+		this.ensureSentenceAfter = new HashSet<String>(ensureSentenceAfter);
 
 		this.tmpNs = tmpNamespace;
 	}
