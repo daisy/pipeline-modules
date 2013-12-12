@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import net.sf.saxon.om.NodeInfo;
 import net.sf.saxon.s9api.Axis;
-import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmNodeKind;
 import net.sf.saxon.s9api.XdmSequenceIterator;
@@ -34,12 +34,10 @@ public class InlineSectionFinder {
 	private List<String> mCurrentText;
 	private int mCurrentSectionSize;
 	private Locale mCurrentLang;
-	private Set<String> mUnsplittable;
-
-	private static final QName IdAttr = new QName("id");
+	private Set<NodeInfo> mUnsplittable;
 
 	public void find(XdmNode root, int rootLevel, FormatSpecifications specs,
-	        InlineSectionProcessor processor, Set<String> unsplittable)
+	        InlineSectionProcessor processor, Set<NodeInfo> unsplittable)
 	        throws LexerInitException {
 
 		mCurrentSection = new ArrayList<Leaf>();
@@ -103,12 +101,10 @@ public class InlineSectionFinder {
 				mCurrentLang = lang;
 			}
 
-			String id = node.getAttributeValue(IdAttr);
-
 			XdmSequenceIterator iter = node.axisIterator(Axis.CHILD);
 			if (node.getNodeName() != null
 			        && mSpecs.inlineElements.contains(node.getNodeName().getLocalName())
-			        && (id == null || !mUnsplittable.contains(id))) {
+			        && (!mUnsplittable.contains(node.getUnderlyingNode()))) {
 
 				String name = node.getNodeName().getLocalName();
 

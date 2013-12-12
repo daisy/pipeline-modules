@@ -167,7 +167,7 @@ public class BreakDetectStep extends DefaultStep implements TreeWriterFactory,
 			//rebuild the XML tree and lex the content on-the-fly
 			XdmNode tree;
 			try {
-				tree = xmlRebuilder.rebuild(this, langToLexers, doc, formatSpecs);
+				tree = xmlRebuilder.rebuild(this, langToLexers, doc, formatSpecs, false);
 				mResult.write(tree);
 			} catch (LexerInitException e) {
 				mRuntime.error(e);

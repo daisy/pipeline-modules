@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.daisy.pipeline.nlp.breakdetect.StringComposer.SentencePointer;
+import org.daisy.pipeline.nlp.breakdetect.StringComposer.TextPointer;
 import org.daisy.pipeline.nlp.lexing.LexResultPrettyPrinter;
 import org.daisy.pipeline.nlp.lexing.LexService.Sentence;
 import org.daisy.pipeline.nlp.lexing.LexService.TextBoundaries;
@@ -22,19 +23,38 @@ public class StringComposerTest {
 	static public void setUp() {
 		sc = new StringComposer();
 		lexPrinter = new LexResultPrettyPrinter();
+		lexPrinter.enableTrimming(true);
 		segmentsPrinter = new SegmentsPrettyPrinter();
 	}
 
-	public void check(Sentence[] sentences, String[] segments) {
+	static private void checkBoundaries(TextPointer pointer, String[] segments) {
+		Assert.assertFalse(segments[pointer.firstSegment].length() == pointer.firstIndex);
+		Assert.assertFalse(0 == pointer.lastIndex);
+	}
+
+	public void check(Sentence[] sentences, String[] segments, boolean[] lexHelper) {
 		List<Sentence> sents = Arrays.asList(sentences);
 		List<String> segs = Arrays.asList(segments);
 
-		List<SentencePointer> pointers = sc.makePointers(sents, segs);
+		if (lexHelper == null) {
+			lexHelper = new boolean[segments.length];
+			Arrays.fill(lexHelper, false);
+		}
+		List<SentencePointer> pointers = sc.makePointers(sents, segs, lexHelper);
 
 		String expected = lexPrinter.convert(sents, sc.concat(segs));
 		String actual = segmentsPrinter.convert(pointers, segs);
 
 		Assert.assertEquals(expected, actual);
+
+		//check that no pointer refers to segment left/right bounds
+		for (SentencePointer p : pointers) {
+			checkBoundaries(p.boundaries, segments);
+			if (p.content != null)
+				for (TextPointer wp : p.content) {
+					checkBoundaries(wp, segments);
+				}
+		}
 	}
 
 	@Test
@@ -50,7 +70,7 @@ public class StringComposerTest {
 
 		check(new Sentence[]{
 			s
-		}, segments);
+		}, segments, null);
 	}
 
 	@Test
@@ -66,7 +86,7 @@ public class StringComposerTest {
 
 		check(new Sentence[]{
 			s
-		}, segments);
+		}, segments, null);
 	}
 
 	@Test
@@ -82,7 +102,7 @@ public class StringComposerTest {
 
 		check(new Sentence[]{
 			s
-		}, segments);
+		}, segments, null);
 	}
 
 	@Test
@@ -98,7 +118,7 @@ public class StringComposerTest {
 
 		check(new Sentence[]{
 			s
-		}, segments);
+		}, segments, null);
 	}
 
 	@Test
@@ -114,7 +134,7 @@ public class StringComposerTest {
 
 		check(new Sentence[]{
 			s
-		}, segments);
+		}, segments, null);
 	}
 
 	@Test
@@ -135,7 +155,7 @@ public class StringComposerTest {
 
 		check(new Sentence[]{
 		        s1, s2
-		}, segments);
+		}, segments, null);
 	}
 
 	@Test
@@ -156,7 +176,7 @@ public class StringComposerTest {
 
 		check(new Sentence[]{
 		        s1, s2
-		}, segments);
+		}, segments, null);
 	}
 
 	@Test
@@ -174,7 +194,7 @@ public class StringComposerTest {
 
 			check(new Sentence[]{
 				s1
-			}, segments);
+			}, segments, null);
 		}
 	}
 
@@ -187,13 +207,18 @@ public class StringComposerTest {
 		Sentence s1 = new Sentence();
 		s1.boundaries = new TextBoundaries();
 
+		Sentence s2 = new Sentence();
+		s2.boundaries = new TextBoundaries();
+
 		for (int shift = -1; shift <= 1; ++shift) {
-			s1.boundaries.left = segments[0].length() + shift;
-			s1.boundaries.right = segments[1].length() + segments[0].length();
+			s1.boundaries.left = 0;
+			s1.boundaries.right = segments[0].length() + shift;
+			s2.boundaries.left = s1.boundaries.right;
+			s2.boundaries.right = segments[1].length() + segments[0].length();
 
 			check(new Sentence[]{
-				s1
-			}, segments);
+			        s1, s2
+			}, segments, null);
 		}
 	}
 
@@ -217,13 +242,13 @@ public class StringComposerTest {
 				TextBoundaries w2 = new TextBoundaries();
 				w2.left = w1.right + shift2;
 				w2.right = w2.left + (1 + shift1) * (1 + shift2);
+
 				s.words = Arrays.asList(new TextBoundaries[]{
 				        w1, w2
 				});
-
 				check(new Sentence[]{
 					s
-				}, segments);
+				}, segments, null);
 			}
 		}
 

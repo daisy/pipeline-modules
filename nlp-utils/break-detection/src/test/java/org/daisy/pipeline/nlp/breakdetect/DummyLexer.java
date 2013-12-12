@@ -4,6 +4,7 @@ import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 import org.daisy.pipeline.nlp.lexing.LexService;
 
@@ -117,7 +118,9 @@ public class DummyLexer implements LexService {
 					TextBoundaries tb = new TextBoundaries();
 					tb.left = start + wstart;
 					tb.right = start + wend;
-					s.words.add(tb);
+
+					if (!Pattern.matches("[\\p{Z}\\s]+", input.substring(tb.left, tb.right)))
+						s.words.add(tb);
 				}
 			}
 

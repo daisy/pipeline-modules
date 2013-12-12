@@ -19,6 +19,7 @@
   <p:option name="sentence-attr" required="false" select="''"/>
   <p:option name="sentence-attr-val" required="false" select="''"/>
   <p:option name="output-ns" required="true"/>
+  <!-- TODO: option "can-contain-words" -->
 
   <!-- Force the Lexer to create new words or new sentences -->
   <!-- when the following elements are detected: -->
@@ -55,7 +56,6 @@
     <p:with-option name="ensure-sentence-before" select="$ensure-word-before"/>
     <p:with-option name="ensure-sentence-after" select="$ensure-sentence-after"/>
   </px:break-detect>
-
   <cx:message message="java-based break detection done"/>
 
   <!-- create the actual sentence/words element -->

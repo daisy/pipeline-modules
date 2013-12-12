@@ -24,10 +24,11 @@ public interface LexService {
 
 	public class Sentence {
 		public List<TextBoundaries> words; //optional
+		public TextBoundaries boundaries;
+		//                    ^^^^^^^^^^^
 		// this is necessary because the
 		// punctuation marks and spaces are not
-		// included in the content
-		public TextBoundaries boundaries;
+		// necessarily included in the content
 	}
 
 	/**

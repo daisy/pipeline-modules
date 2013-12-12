@@ -6,8 +6,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.xml.transform.sax.SAXSource;
 
@@ -250,39 +252,91 @@ public class ActualFilesTest implements TreeWriterFactory {
 		return res;
 	}
 
+	private static boolean notLeftTrimmed(XdmNode node) {
+		return Pattern.compile("^[\\p{Z}\\s]").matcher(node.getStringValue()).find();
+	}
+
+	private static boolean notRightTrimmed(XdmNode node) {
+		return Pattern.compile("[\\p{Z}\\s]$").matcher(node.getStringValue()).find();
+	}
+
+	private boolean isWellTrimmed(XdmNode node, String lexElement, String subLexElement) {
+		if (node.getNodeKind() != XdmNodeKind.DOCUMENT
+		        && node.getNodeKind() != XdmNodeKind.ELEMENT)
+			return true;
+
+		XdmSequenceIterator iter = node.axisIterator(Axis.CHILD);
+		List<XdmNode> children = new ArrayList<XdmNode>();
+		while (iter.hasNext()) {
+			XdmNode child = (XdmNode) iter.next();
+			if (!isWellTrimmed(child, lexElement, subLexElement))
+				return false;
+			children.add(child);
+		}
+
+		if (node.getNodeName() != null && lexElement.equals(node.getNodeName().getLocalName())) {
+			XdmNode first = children.get(0);
+			XdmNode last = children.get(children.size() - 1);
+			if (children.size() == 1 && first.getNodeKind() != XdmNodeKind.TEXT
+			        && !first.getNodeName().getLocalName().equals(subLexElement)) {
+				System.out.print("bad location for: " + node);
+				return false;
+			}
+			if (first.getNodeKind() == XdmNodeKind.TEXT && notLeftTrimmed(first)) {
+				System.out.print("bad left trimming for: " + node);
+				return false;
+			}
+			if (last.getNodeKind() == XdmNodeKind.TEXT && notRightTrimmed(last)) {
+				System.out.print("bad right trimming for: " + node);
+				return false;
+			}
+		}
+		return true;
+	}
+
 	private void check(String file, String[] inlineElements, String[] spaceEquivalents)
 	        throws SaxonApiException, LexerInitException {
 
-		for (Strategy stategy : new Strategy[]{
-		        Strategy.ONE_SENTENCE, Strategy.SPACE_SEPARARED_SENTENCES,
-		        Strategy.SPACE_SEPARATED_WORDS, Strategy.REGULAR
+		for (boolean forbidAll : new boolean[]{
+		        false, true
 		}) {
+			for (Strategy stategy : new Strategy[]{
+			        Strategy.ONE_SENTENCE, Strategy.SPACE_SEPARARED_SENTENCES,
+			        Strategy.SPACE_SEPARATED_WORDS, Strategy.REGULAR
+			}) {
 
-			Lexer.strategy = stategy;
+				Lexer.strategy = stategy;
 
-			SAXSource source = new SAXSource(new InputSource(file));
-			XdmNode document = Builder.build(source);
+				SAXSource source = new SAXSource(new InputSource(file));
+				XdmNode document = Builder.build(source);
 
-			FormatSpecifications specs = new FormatSpecifications("http://tmp", "sss", "www",
-			        "http://ns", "lang", Arrays.asList(inlineElements),
-			        Arrays.asList(spaceEquivalents), Arrays.asList(spaceEquivalents), null,
-			        null);
+				FormatSpecifications specs = new FormatSpecifications("http://tmp", "sss",
+				        "www", "http://ns", "lang", Arrays.asList(inlineElements), Arrays
+				                .asList(spaceEquivalents), Arrays.asList(spaceEquivalents),
+				        null, null);
 
-			XdmNode tree = new XmlBreakRebuilder().rebuild(this, Lexers, document, specs);
+				XdmNode tree = new XmlBreakRebuilder().rebuild(this, Lexers, document, specs,
+				        forbidAll);
 
-			//check the tree well-formedness
-			XdmNode root = getRoot(tree);
-			Assert.assertFalse(hasMoreOrphans(getRoot(document), root, specs));
-			Assert.assertFalse(sentenceContainNonInline(root, false, specs));
-			Assert.assertFalse(hasTooManyLevels(root, false, specs.wordTag.getLocalName()));
-			Assert.assertFalse(hasTooManyLevels(root, false, specs.sentenceTag.getLocalName()));
-			Assert.assertEquals(0, numberOfDuplicatedIDs(document, tree));
+				//check the tree well-formedness
+				XdmNode root = getRoot(tree);
+				Assert.assertFalse(hasMoreOrphans(getRoot(document), root, specs));
+				Assert.assertFalse(sentenceContainNonInline(root, false, specs));
+				Assert.assertFalse(hasTooManyLevels(root, false, specs.wordTag.getLocalName()));
+				Assert.assertFalse(hasTooManyLevels(root, false, specs.sentenceTag
+				        .getLocalName()));
+				Assert.assertEquals(0, numberOfDuplicatedIDs(document, tree));
 
-			//check that the content has not changed
-			String ref = getUnmutableElements(document, specs);
-			String processed = getUnmutableElements(tree, specs);
-			Assert.assertEquals(ref, processed);
-			Assert.assertEquals(getText(document), getText(tree));
+				Assert.assertTrue(isWellTrimmed(tree, specs.sentenceTag.getLocalName(),
+				        specs.wordTag.getLocalName()));
+				Assert.assertTrue(isWellTrimmed(tree, specs.wordTag.getLocalName(), null));
+
+				//check that the content has not changed
+				String ref = getUnmutableElements(document, specs);
+				String processed = getUnmutableElements(tree, specs);
+				Assert.assertEquals(ref, processed);
+				Assert.assertEquals(getText(document), getText(tree));
+			}
 		}
 
 	}

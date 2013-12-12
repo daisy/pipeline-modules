@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.saxon.om.NodeInfo;
 import net.sf.saxon.s9api.Axis;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.XdmNode;
@@ -22,20 +23,24 @@ import org.daisy.pipeline.nlp.lexing.LexService.Sentence;
 import com.xmlcalabash.util.TreeWriter;
 
 /**
- * This class is used to rebuild the input document with the additional XML
+ * This class is used for rebuilding the input document with the additional XML
  * elements resulting from the lexing, i.e. the sentences and the words.
  * 
- * The algorithm is run multiple times until no unique IDs have been duplicated
- * (this is the main reason for its slow execution).
+ * The algorithm is run multiple times until no forbidden duplication is
+ * performed (this is the main reason why it can be slow sometimes). If the
+ * 'no-duplication-allowed' option is not enable, then only the nodes with ID
+ * will be kept under watch. Further improvements should forbid the algorithm to
+ * duplicate nodes attach to CSS properties such as "display: block", "border"
+ * or "cue-before".
  * 
  * The algorithm processes the inline sections on-the-fly as soon as they are
  * detected by the InlineSectionFinder. Since the sections can be dispatched
  * over distinct branches of the document tree, the tree is rebuilt by
- * agglomerating tree paths with writeTree(), instead of the usual top-down way
- * whose the scope is too small.
+ * agglomerating tree paths with writeTree(), instead of the usual top-down
+ * recursive way whose the building scope is too small for this purpose.
  * 
- * The levels are used to quickly align the tree paths each other so that it is
- * easy to find the common ancestor of a group of leaves.
+ * The levels are used for aligning the tree paths each other so that it is easy
+ * to find the common ancestor of a group of leaves.
  */
 public class XmlBreakRebuilder implements InlineSectionProcessor {
 
@@ -45,11 +50,11 @@ public class XmlBreakRebuilder implements InlineSectionProcessor {
 	private FormatSpecifications mSpecs;
 	private XdmNode mPreviousNode; //last node written
 	private int mPreviousLevel;
-	private final static QName IDattr = new QName("id");
+	private DuplicationManager mDuplicationManager;
 
 	public XdmNode rebuild(TreeWriterFactory treeWriterFactory,
-	        HashMap<Locale, LexService> lexers, XdmNode doc, FormatSpecifications specs)
-	        throws LexerInitException {
+	        HashMap<Locale, LexService> lexers, XdmNode doc, FormatSpecifications specs,
+	        boolean forbidAnyDup) throws LexerInitException {
 		mLexers = lexers;
 		mSpecs = specs;
 
@@ -57,13 +62,12 @@ public class XmlBreakRebuilder implements InlineSectionProcessor {
 		mPreviousNode = getRoot(doc);
 		mPreviousLevel = 0;
 
-		Map<String, Integer> docIDs = new HashMap<String, Integer>();
-		Map<String, Integer> resultIDs;
-		Set<String> unsplittable = new HashSet<String>();
-		getIDs(doc, docIDs);
+		mDuplicationManager = new DuplicationManager(forbidAnyDup);
+		Set<NodeInfo> unsplittable = new HashSet<NodeInfo>();
+		List<NodeInfo> duplicated;
 
-		XdmNode result;
 		do {
+			mDuplicationManager.onNewDocument();
 			mTreeWriter = treeWriterFactory.newInstance();
 			mTreeWriter.startDocument(doc.getDocumentURI());
 			XdmSequenceIterator iter = doc.axisIterator(Axis.CHILD);
@@ -89,16 +93,22 @@ public class XmlBreakRebuilder implements InlineSectionProcessor {
 				}
 			}
 			mTreeWriter.endDocument();
-			result = mTreeWriter.getResult();
-			resultIDs = new HashMap<String, Integer>();
-			getIDs(result, resultIDs);
 
-		} while (getDuplicatedIDs(docIDs, resultIDs, unsplittable) != 0);
+			duplicated = mDuplicationManager.getDuplicatedNodes();
 
+			unsplittable.addAll(duplicated);
+
+		} while (duplicated.size() > 0);
+
+		XdmNode result = mTreeWriter.getResult();
+
+		//help the GC
+		mDuplicationManager = null;
 		mPreviousNode = null;
 		mSpecs = null;
 		mStringComposer = null;
 		mTreeWriter = null;
+
 		return result;
 	}
 
@@ -115,27 +125,6 @@ public class XmlBreakRebuilder implements InlineSectionProcessor {
 		return res;
 	}
 
-	private static void getIDs(XdmNode node, Map<String, Integer> ids) {
-		if (node.getNodeKind() != XdmNodeKind.ELEMENT
-		        && node.getNodeKind() != XdmNodeKind.DOCUMENT) {
-			return;
-		}
-
-		String id = node.getAttributeValue(IDattr);
-		if (id != null) {
-			Integer existing = ids.get(id);
-			if (existing == null) {
-				existing = 0;
-			}
-			ids.put(id, existing + 1);
-		}
-
-		XdmSequenceIterator iter = node.axisIterator(Axis.CHILD);
-		while (iter.hasNext()) {
-			getIDs((XdmNode) iter.next(), ids);
-		}
-	}
-
 	private void addOneWord(TextPointer word, List<Leaf> leaves, List<String> text) {
 		Leaf wordParent = deepestAncestorOf(leaves, word.firstSegment, word.lastSegment);
 		if (wordParent.formatting == null)
@@ -143,15 +132,15 @@ public class XmlBreakRebuilder implements InlineSectionProcessor {
 
 		startLexingElement(wordParent, mSpecs.wordTag);
 		if (word.firstSegment == word.lastSegment) {
-			writeTree(leaves.get(word.firstSegment),
-			        text.get(word.firstSegment).substring(word.firstIndex, word.lastIndex));
+			writeTree(leaves.get(word.firstSegment), text.get(word.firstSegment).substring(
+			        word.firstIndex, word.lastIndex));
 		} else {
-			writeTree(leaves.get(word.firstSegment),
-			        text.get(word.firstSegment).substring(word.firstIndex));
+			writeTree(leaves.get(word.firstSegment), text.get(word.firstSegment).substring(
+			        word.firstIndex));
 			for (int i = word.firstSegment + 1; i < word.lastSegment; ++i)
 				writeTree(leaves.get(i), text.get(i));
-			writeTree(leaves.get(word.lastSegment),
-			        text.get(word.lastSegment).substring(0, word.lastIndex));
+			writeTree(leaves.get(word.lastSegment), text.get(word.lastSegment).substring(0,
+			        word.lastIndex));
 		}
 		closeAllElementsUntil(wordParent.formatting, 1);
 	}
@@ -164,8 +153,16 @@ public class XmlBreakRebuilder implements InlineSectionProcessor {
 			lexer = mLexers.get(null); //a generic lexer is always provided
 		}
 		lexer.useLanguage(lang);
-		List<Sentence> sentences = lexer.split(mStringComposer.concat(text));
-		List<SentencePointer> pointers = mStringComposer.makePointers(sentences, text);
+		String input = mStringComposer.concat(text);
+		List<Sentence> sentences = lexer.split(input);
+
+		boolean[] isLexMark = new boolean[leaves.size()];
+		for (int k = 0; k < isLexMark.length; ++k)
+			isLexMark[k] = (leaves.get(k).formatting == null);
+		List<SentencePointer> pointers = mStringComposer.makePointers(sentences, text,
+		        isLexMark);
+
+		mDuplicationManager.onNewSection();
 
 		int sSegBoundary = -1;
 		int sIndexBoundary = -1;
@@ -184,6 +181,7 @@ public class XmlBreakRebuilder implements InlineSectionProcessor {
 				//marks inserted to help the Lexer
 				continue;
 			}
+
 			startLexingElement(sentenceParent, mSpecs.sentenceTag);
 			int wSegBoundary = sp.boundaries.firstSegment;
 			int wIndexBoundary = sp.boundaries.firstIndex;
@@ -209,6 +207,7 @@ public class XmlBreakRebuilder implements InlineSectionProcessor {
 
 	@Override
 	public void onEmptySectionFound(List<Leaf> leaves) {
+		mDuplicationManager.onNewSection();
 		for (int i = 0; i < leaves.size(); ++i) {
 			writeTree(leaves.get(i), null);
 		}
@@ -217,6 +216,7 @@ public class XmlBreakRebuilder implements InlineSectionProcessor {
 	private void addNode(XdmNode node, int level) {
 		switch (node.getNodeKind()) {
 		case ELEMENT:
+			mDuplicationManager.onNewNode(node);
 			mTreeWriter.addStartElement(node);
 			mTreeWriter.addAttributes(node);
 			mPreviousLevel = level;
@@ -371,8 +371,8 @@ public class XmlBreakRebuilder implements InlineSectionProcessor {
 			writeTree(leaves.get(rightSegment), text.get(rightSegment)
 			        .substring(0, rightIndex));
 		} else if (leftSegment == rightSegment && rightIndex > leftIndex) {
-			writeTree(leaves.get(leftSegment),
-			        text.get(leftSegment).substring(leftIndex, rightIndex));
+			writeTree(leaves.get(leftSegment), text.get(leftSegment).substring(leftIndex,
+			        rightIndex));
 		}
 
 		for (++rightSegment; rightSegment <= formerRightSegment; ++rightSegment) {
@@ -435,5 +435,4 @@ public class XmlBreakRebuilder implements InlineSectionProcessor {
 		return ((n1 == null && n2 == null) || (n1 != null && n2 != null && n1
 		        .getUnderlyingNode().isSameNodeInfo(n2.getUnderlyingNode())));
 	}
-
 }
