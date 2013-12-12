@@ -22,8 +22,8 @@ import com.xmlcalabash.model.RuntimeValue;
 import com.xmlcalabash.runtime.XAtomicStep;
 import com.xmlcalabash.util.TreeWriter;
 
-public class SynthesizeStep extends DefaultStep implements
-        FormatSpecifications, IPipelineLogger {
+public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
+        IPipelineLogger {
 
 	private ReadablePipe source = null;
 	private WritablePipe result = null;
@@ -34,9 +34,8 @@ public class SynthesizeStep extends DefaultStep implements
 	private static String convertSecondToString(double seconds) {
 		long milliseconds = (long) (1000 * seconds);
 		int iseconds = (int) (seconds);
-		return String.format("%d:%02d:%02d.%d", iseconds / 3600,
-		        (iseconds % 3600) / 60, (iseconds % 60), milliseconds - 1000
-		                * iseconds);
+		return String.format("%d:%02d:%02d.%d", iseconds / 3600, (iseconds % 3600) / 60,
+		        (iseconds % 60), milliseconds - 1000 * iseconds);
 	}
 
 	public static XdmNode getFirstChild(XdmNode node) {
@@ -48,14 +47,11 @@ public class SynthesizeStep extends DefaultStep implements
 		}
 	}
 
-	public SynthesizeStep(XProcRuntime runtime, XAtomicStep step,
-	        TTSRegistry ttsRegistry, AudioEncoder encoder) {
+	public SynthesizeStep(XProcRuntime runtime, XAtomicStep step, TTSRegistry ttsRegistry,
+	        AudioEncoder encoder) {
 		super(runtime, step);
 		mRuntime = runtime;
 		mTTSRegistry = ttsRegistry;
-		printInfo("New synthesize step. TTSregistry set: "
-		        + (ttsRegistry != null) + ", AudioEncoder set: "
-		        + (encoder != null));
 		mWorkerPool = new SynthesisWorkerPool(16, ttsRegistry, encoder, this);
 	}
 
@@ -118,8 +114,7 @@ public class SynthesizeStep extends DefaultStep implements
 			}
 
 			// run the synthesis/encoding threads
-			allSoundFragments = Collections
-			        .synchronizedList(new LinkedList<SoundFragment>());
+			allSoundFragments = Collections.synchronizedList(new LinkedList<SoundFragment>());
 			mWorkerPool.synthesizeAndWait(allSoundFragments);
 
 		} catch (SynthesisException e) {
@@ -136,10 +131,8 @@ public class SynthesizeStep extends DefaultStep implements
 		for (SoundFragment sf : allSoundFragments) {
 			tw.addStartElement(ClipTag);
 			tw.addAttribute(Audio_attr_id, sf.id);
-			tw.addAttribute(Audio_attr_clipBegin,
-			        convertSecondToString(sf.clipBegin));
-			tw.addAttribute(Audio_attr_clipEnd,
-			        convertSecondToString(sf.clipEnd));
+			tw.addAttribute(Audio_attr_clipBegin, convertSecondToString(sf.clipBegin));
+			tw.addAttribute(Audio_attr_clipEnd, convertSecondToString(sf.clipEnd));
 			tw.addAttribute(Audio_attr_src, sf.soundFileURI);
 			tw.addEndElement();
 		}

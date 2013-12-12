@@ -63,7 +63,6 @@ public class ATTNativeTest {
 	}
 
 	private static class MultiThreadsListener implements ATTLibListener {
-
 		Map<Object, AtomicInteger> sizes = new HashMap<Object, AtomicInteger>();
 
 		@Override
@@ -74,7 +73,6 @@ public class ATTNativeTest {
 		@Override
 		public void onRecvMark(Object handler, String name) {
 		}
-
 	}
 
 	private String SSML(String str) {
@@ -138,8 +136,7 @@ public class ATTNativeTest {
 		Assert.assertTrue(connection != 0);
 
 		String bmark = "bmark1";
-		speak(this, connection, SSML("around <mark name=\"" + bmark
-		        + "\"/> around"));
+		speak(this, connection, SSML("around <mark name=\"" + bmark + "\"/> around"));
 		ATTLib.closeConnection(connection);
 
 		Assert.assertTrue(l.totalSize > 2000);
@@ -166,8 +163,7 @@ public class ATTNativeTest {
 		Assert.assertTrue(2 == l.markNames.size());
 		Assert.assertEquals(bmark1, l.markNames.get(0));
 		Assert.assertEquals(bmark2, l.markNames.get(1));
-		Assert.assertTrue(l.markPos.get(1) - l.markPos.get(0) < l.markPos
-		        .get(0));
+		Assert.assertTrue(l.markPos.get(1) - l.markPos.get(0) < l.markPos.get(0));
 	}
 
 	static private int[] findSize(final String[] sentences, int startShift)
@@ -183,8 +179,7 @@ public class ATTNativeTest {
 			final int j = i;
 			threads[i] = new Thread() {
 				public void run() {
-					long connection = ATTLib.openConnection(Host, Port, 16000,
-					        16);
+					long connection = ATTLib.openConnection(Host, Port, 16000, 16);
 					if (connection != 0) {
 						speak(this, connection, sentences[j]);
 						ATTLib.closeConnection(connection);
@@ -232,8 +227,7 @@ public class ATTNativeTest {
 		long connection = ATTLib.openConnection(Host, Port, 16000, 16);
 		Assert.assertTrue(0 != connection);
 
-		speak(this, connection,
-		        SSML("𝄞𝄞𝄞𝄞 水水水水水 𝄞水𝄞水𝄞水𝄞水 test 国Ø家Ť标准 ĜæŘ ß ŒÞ ๕"));
+		speak(this, connection, SSML("𝄞𝄞𝄞𝄞 水水水水水 𝄞水𝄞水𝄞水𝄞水 test 国Ø家Ť标准 ĜæŘ ß ŒÞ ๕"));
 		ATTLib.closeConnection(connection);
 
 		Assert.assertTrue(l.totalSize > 2000);
@@ -251,13 +245,12 @@ public class ATTNativeTest {
 		for (int i = 0; i < vnames.length; ++i) {
 			l.totalSize = 0;
 			speak(this, connection, SSML("hello world", vnames[i]));
-			sizes.add(l.totalSize); //div 4 helps being more robust to tiny differences
+			sizes.add(l.totalSize);
 		}
 		ATTLib.closeConnection(connection);
 		Assert.assertTrue(vnames.length > 0);
 
-		//this number will be very low if the voice names are not properly retrieved or used
-
+		//the diversity will be very low if the voice names are not properly retrieved or used
 		float diversity = Float.valueOf(sizes.size()) / vnames.length;
 
 		Assert.assertTrue(diversity >= 0.6);

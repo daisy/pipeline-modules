@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.TTSService.Voice;
@@ -31,8 +32,7 @@ public class TTSRegistry {
 	private static List<VoiceInfo> mVoicePriorities;
 
 	public static class VoiceInfo {
-		VoiceInfo(String voiceVendor, String voiceName, String language,
-		        float priority) {
+		VoiceInfo(String voiceVendor, String voiceName, String language, float priority) {
 			this.voice = new Voice(voiceVendor, voiceName);
 			this.language = language;
 			this.priority = priority;
@@ -93,8 +93,7 @@ public class TTSRegistry {
 		        new VoiceInfo(eSpeak, "turkish", "tr", eSpeakPriority),
 		        new VoiceInfo(eSpeak, "afrikaans", "af", eSpeakPriority),
 		        new VoiceInfo(eSpeak, "spanish", "es", eSpeakPriority),
-		        new VoiceInfo(eSpeak, "spanish-latin-american", "es-la",
-		                eSpeakPriority),
+		        new VoiceInfo(eSpeak, "spanish-latin-american", "es-la", eSpeakPriority),
 		        new VoiceInfo(eSpeak, "english-us", "en", eSpeakPriority),
 		        new VoiceInfo(eSpeak, "english-us", "en-us", eSpeakPriority),
 		        new VoiceInfo(eSpeak, "english", "en-uk", eSpeakPriority),
@@ -152,13 +151,12 @@ public class TTSRegistry {
 		        new VoiceInfo(microsoft, "en-uk", "Microsoft Hazel", 6),
 		        new VoiceInfo(microsoft, "en-us", "Microsoft Mike", 2),
 		        new VoiceInfo(microsoft, "zh", "Microsoft Lili", 3),
-		        new VoiceInfo(microsoft, "Microsoft Simplified Chinese", "zh",
-		                2)
+		        new VoiceInfo(microsoft, "Microsoft Simplified Chinese", "zh", 2)
 		};
 		Set<VoiceInfo> priorities = new HashSet<VoiceInfo>(Arrays.asList(info));
 
 		//Override and add some priorities from the system properties.
-		//format: priority.ven_dor.voice_name.language = priorityVal
+		//format: priority.vendor_name.voice_name.language = priorityVal
 		Properties props = System.getProperties();
 		for (String key : props.stringPropertyNames()) {
 			String[] parts = key.split("\\.");
@@ -185,8 +183,7 @@ public class TTSRegistry {
 						for (String name : new String[]{
 						        parts[2], parts[2].replace("_", " ")
 						}) {
-							VoiceInfo vi = new VoiceInfo(vendor, name, lang,
-							        priority);
+							VoiceInfo vi = new VoiceInfo(vendor, name, lang, priority);
 							if (!priorities.add(vi)) {
 								priorities.remove(vi);
 								priorities.add(vi);
@@ -202,16 +199,15 @@ public class TTSRegistry {
 		for (VoiceInfo vinfo : priorities) {
 			String shortLang = getPrefix(vinfo.language);
 			if (!shortLang.equals(vinfo.language)) {
-				mVoicePriorities.add(new VoiceInfo(vinfo.voice, shortLang,
-				        vinfo.priority - priorityVariantPenalty));
+				mVoicePriorities.add(new VoiceInfo(vinfo.voice, shortLang, vinfo.priority
+				        - priorityVariantPenalty));
 			}
 		}
 
 		Comparator<VoiceInfo> reverseComp = new Comparator<VoiceInfo>() {
 			@Override
 			public int compare(VoiceInfo v1, VoiceInfo v2) {
-				return Float.valueOf(v2.priority).compareTo(
-				        Float.valueOf(v1.priority));
+				return Float.valueOf(v2.priority).compareTo(Float.valueOf(v1.priority));
 			}
 		};
 
@@ -219,7 +215,7 @@ public class TTSRegistry {
 	}
 
 	public TTSRegistry() {
-		ttsServices = new HashMap<TTSService, Boolean>();
+		ttsServices = new ConcurrentHashMap<TTSService, Boolean>();
 	}
 
 	/**
@@ -240,8 +236,7 @@ public class TTSRegistry {
 		List<TTSService> workingServices = new ArrayList<TTSService>();
 
 		for (Map.Entry<TTSService, Boolean> tts : ttsServices.entrySet()) {
-			String fullname = tts.getKey().getName() + "-"
-			        + tts.getKey().getVersion();
+			String fullname = tts.getKey().getName() + "-" + tts.getKey().getVersion();
 			if (tts.getValue()) {
 				workingServices.add(tts.getKey());
 				mLogger.info(fullname + " already initialized");
@@ -257,13 +252,12 @@ public class TTSRegistry {
 					t.printStackTrace(printWriter);
 					printWriter.flush();
 					mLogger.info(fullname + " could not be initialized");
-					mLogger.debug(fullname + " init error: "
-					        + writer.toString());
+					mLogger.debug(fullname + " init error: " + writer.toString());
 				}
 			}
 		}
-		mLogger.info("number of working TTS services: "
-		        + workingServices.size() + "/" + ttsServices.size());
+		mLogger.info("number of working TTS services: " + workingServices.size() + "/"
+		        + ttsServices.size());
 
 		mBestServices = new HashMap<Voice, TTSService>();
 		for (TTSService tts : workingServices)
@@ -274,8 +268,7 @@ public class TTSRegistry {
 					for (Voice v : voices) {
 						TTSService competitor = mBestServices.get(v);
 						if (competitor == null
-						        || competitor.getOverallPriority() < tts
-						                .getOverallPriority()) {
+						        || competitor.getOverallPriority() < tts.getOverallPriority()) {
 							mBestServices.put(v, tts);
 
 						}
@@ -297,8 +290,7 @@ public class TTSRegistry {
 		for (TTSService tts : workingServices) {
 			TTSService competitor = mVendors.get(tts.getName());
 			if (competitor == null
-			        || competitor.getOverallPriority() < tts
-			                .getOverallPriority())
+			        || competitor.getOverallPriority() < tts.getOverallPriority())
 				mVendors.put(tts.getName(), tts);
 		}
 

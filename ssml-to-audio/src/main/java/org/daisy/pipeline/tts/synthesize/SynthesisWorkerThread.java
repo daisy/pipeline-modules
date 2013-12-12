@@ -29,8 +29,7 @@ import org.daisy.pipeline.tts.synthesize.SynthesisWorkerPool.UndispatchableSecti
  * threads call the encoder to transform the buffer into a compressed audio
  * file.
  */
-public class SynthesisWorkerThread extends Thread implements
-        FormatSpecifications {
+public class SynthesisWorkerThread extends Thread implements FormatSpecifications {
 
 	// 20 seconds with 24kHz 16 bits audio
 	private static final int MAX_ESTIMATED_SYNTHESIZED_BYTES = 24000 * 2 * 20;
@@ -73,17 +72,21 @@ public class SynthesisWorkerThread extends Thread implements
 	}
 
 	private void encodeAudio(byte[] output, int size) {
-		String preferredFileName = String.format("section%04d_%02d",
-		        mCurrentDocPosition, mSectionFiles);
+		String preferredFileName = String.format("section%04d_%02d", mCurrentDocPosition,
+		        mSectionFiles);
 
-		String soundFile = mEncoder.encode(output, size,
-		        mLastUsedSynthesizer.getAudioOutputFormat(), this,
-		        preferredFileName);
+		String soundFile = mEncoder.encode(output, size, mLastUsedSynthesizer
+		        .getAudioOutputFormat(), this, preferredFileName);
 
-		for (SoundFragment sf : mCurrentFragments) {
-			sf.soundFileURI = soundFile;
+		if (soundFile == null) {
+			float sec = size / mLastUsedSynthesizer.getAudioOutputFormat().getFrameRate();
+			mLogger.printInfo("" + sec + " seconds of audio data could not be encoded!");
+		} else {
+			for (SoundFragment sf : mCurrentFragments) {
+				sf.soundFileURI = soundFile;
+			}
+			mGlobalSoundFragments.addAll(mCurrentFragments); // must be thread-safe
 		}
-		mGlobalSoundFragments.addAll(mCurrentFragments); // must be thread-safe
 
 		// reset the state of the thread
 		mOffsetInOutput = 0;
@@ -92,9 +95,8 @@ public class SynthesisWorkerThread extends Thread implements
 	}
 
 	private double convertBytesToSecond(int bytes) {
-		return (bytes / (mLastUsedSynthesizer.getAudioOutputFormat()
-		        .getFrameRate() * mLastUsedSynthesizer.getAudioOutputFormat()
-		        .getFrameSize()));
+		return (bytes / (mLastUsedSynthesizer.getAudioOutputFormat().getFrameRate() * mLastUsedSynthesizer
+		        .getAudioOutputFormat().getFrameSize()));
 	}
 
 	public void allocateResourcesFor(TTSService s) throws SynthesisException {
@@ -107,8 +109,7 @@ public class SynthesisWorkerThread extends Thread implements
 		}
 	}
 
-	private void processOneSentence(XdmNode sentence, Voice voice)
-	        throws SynthesisException {
+	private void processOneSentence(XdmNode sentence, Voice voice) throws SynthesisException {
 		if (mOffsetInOutput + MAX_ESTIMATED_SYNTHESIZED_BYTES > AUDIO_BUFFER_BYTES) {
 			encodeAudio();
 		}
@@ -116,15 +117,15 @@ public class SynthesisWorkerThread extends Thread implements
 		List<Map.Entry<String, Double>> marks = new ArrayList<Map.Entry<String, Double>>();
 		mRawAudioBuffer.output = mOutput;
 		mRawAudioBuffer.offsetInOutput = mOffsetInOutput;
-		Object memory = mLastUsedSynthesizer.synthesize(sentence, voice,
-		        mRawAudioBuffer, resource, null, marks);
+		Object memory = mLastUsedSynthesizer.synthesize(sentence, voice, mRawAudioBuffer,
+		        resource, null, marks);
 
 		if (memory != null) {
 			encodeAudio();
 			// try again with the room freed after encoding
 			marks.clear();
-			mLastUsedSynthesizer.synthesize(sentence, voice, mRawAudioBuffer,
-			        resource, memory, marks);
+			mLastUsedSynthesizer.synthesize(sentence, voice, mRawAudioBuffer, resource,
+			        memory, marks);
 		} else if (mRawAudioBuffer.output != mOutput) {
 			if ((mRawAudioBuffer.offsetInOutput + mOffsetInOutput) > mOutput.length) {
 				// it has been externally allocated because it does not fit
@@ -134,8 +135,8 @@ public class SynthesisWorkerThread extends Thread implements
 			} else {
 				// this makes sense when TTS engine's policy is to always use its own buffers,
 				// even when it could fit in the current buffer
-				System.arraycopy(mRawAudioBuffer.output, 0, mOutput,
-				        mOffsetInOutput, mRawAudioBuffer.offsetInOutput);
+				System.arraycopy(mRawAudioBuffer.output, 0, mOutput, mOffsetInOutput,
+				        mRawAudioBuffer.offsetInOutput);
 				mRawAudioBuffer.output = mOutput;
 				mRawAudioBuffer.offsetInOutput += mOffsetInOutput;
 			}
@@ -159,8 +160,7 @@ public class SynthesisWorkerThread extends Thread implements
 			Set<String> all = new HashSet<String>();
 
 			for (Map.Entry<String, Double> e : marks) {
-				String[] mark = e.getKey().split(
-				        FormatSpecifications.MarkDelimiter, -1);
+				String[] mark = e.getKey().split(FormatSpecifications.MarkDelimiter, -1);
 				if (!mark[0].isEmpty()) {
 					ends.put(mark[0], e.getValue());
 					all.add(mark[0]);
@@ -186,7 +186,7 @@ public class SynthesisWorkerThread extends Thread implements
 		}
 
 		if (mRawAudioBuffer.output != mOutput) {
-			// externally allocated case that does not fit in current buffer
+			// externally allocated case: it does not fit in current buffer
 			// => encode immediately
 			encodeAudio(mRawAudioBuffer.output, mRawAudioBuffer.offsetInOutput);
 		}
@@ -211,8 +211,8 @@ public class SynthesisWorkerThread extends Thread implements
 			} catch (Exception e) {
 				StringWriter sw = new StringWriter();
 				e.printStackTrace(new PrintWriter(sw));
-				mLogger.printInfo("error in synthesis thread: "
-				        + e.getMessage() + " : " + sw.toString());
+				mLogger.printInfo("error in synthesis thread: " + e.getMessage() + " : "
+				        + sw.toString());
 			}
 		}
 	}

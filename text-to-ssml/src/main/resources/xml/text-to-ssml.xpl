@@ -82,8 +82,6 @@
     <p:when test="$css-sheet-uri != ''">
       <p:output port="result"/>
       <px:inline-css>
-	<p:with-option name="medium" select="'speech'"/>
-	<p:with-option name="inherit" select="'true'"/>
 	<p:with-option name="stylesheet-uri" select="$css-sheet-uri"/>
 	<p:with-option name="style-ns" select="'http://www.daisy.org/ns/pipeline/tmp'"/>
       </px:inline-css>

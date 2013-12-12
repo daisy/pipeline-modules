@@ -56,8 +56,7 @@ public class ESpeakBinTTS implements TTSService {
 		}
 
 		@Override
-		public QName adaptAttributeName(QName element, QName attrName,
-		        String value) {
+		public QName adaptAttributeName(QName element, QName attrName, String value) {
 			if (attrName.getLocalName().equals("lang")) {
 				return attrName;
 			}
@@ -73,8 +72,8 @@ public class ESpeakBinTTS implements TTSService {
 		mEspeakPath = BinaryFinder.find(property, "espeak");
 
 		if (mEspeakPath == null) {
-			throw new SynthesisException("Cannot find eSpeak's binary and "
-			        + property + " is not set");
+			throw new SynthesisException("Cannot find eSpeak's binary and " + property
+			        + " is not set");
 		}
 
 		//test the synthesizer so that the service won't be active if it fails
@@ -87,16 +86,16 @@ public class ESpeakBinTTS implements TTSService {
 	}
 
 	@Override
-	public Object synthesize(XdmNode ssml, Voice voice,
-	        RawAudioBuffer audioBuffer, Object resource, Object lastCallMemory,
-	        List<Entry<String, Double>> marks) throws SynthesisException {
-		return synthesize(SSMLUtil.toString(ssml, voice.name, mSSMLAdapter),
-		        audioBuffer, resource, lastCallMemory, marks);
+	public Object synthesize(XdmNode ssml, Voice voice, RawAudioBuffer audioBuffer,
+	        Object resource, Object lastCallMemory, List<Entry<String, Double>> marks)
+	        throws SynthesisException {
+		return synthesize(SSMLUtil.toString(ssml, voice.name, mSSMLAdapter), audioBuffer,
+		        resource, lastCallMemory, marks);
 	}
 
-	public Object synthesize(String ssml, RawAudioBuffer audioBuffer,
-	        Object resource, Object lastCallMemory,
-	        List<Entry<String, Double>> marks) throws SynthesisException {
+	public Object synthesize(String ssml, RawAudioBuffer audioBuffer, Object resource,
+	        Object lastCallMemory, List<Entry<String, Double>> marks)
+	        throws SynthesisException {
 
 		File dest = (File) resource;
 		String[] cmd = null;
@@ -104,13 +103,10 @@ public class ESpeakBinTTS implements TTSService {
 			// '-m' tells to interpret the input as SSML
 			// '-w' tells to dump the result to a WAV file
 			cmd = new String[]{
-			        mEspeakPath, "-m", "-w", dest.getAbsolutePath(),
-			        "\"" + ssml + "\""
+			        mEspeakPath, "-m", "-w", dest.getAbsolutePath(), "\"" + ssml + "\""
 			};
-
 			Runtime.getRuntime().exec(cmd).waitFor();
 		} catch (Exception e) {
-
 			throw new SynthesisException(e.getMessage(), e.getCause());
 		}
 
@@ -214,9 +210,7 @@ public class ESpeakBinTTS implements TTSService {
 			//second:get the list of the voices for the found languages.
 			//Whitespaces are not allowed in voice names
 			result = new ArrayList<Voice>();
-			mr = Pattern
-			        .compile("^\\s*[0-9]+\\s+[-a-z]+\\s+([FM]\\s+)?([^ ]+)")
-			        .matcher("");
+			mr = Pattern.compile("^\\s*[0-9]+\\s+[-a-z]+\\s+([FM]\\s+)?([^ ]+)").matcher("");
 			for (String lang : languages) {
 				proc = Runtime.getRuntime().exec(new String[]{
 				        mEspeakPath, "--voices=" + lang

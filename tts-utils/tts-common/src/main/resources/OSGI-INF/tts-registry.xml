@@ -9,5 +9,5 @@
       cardinality="0..n"
       interface="org.daisy.pipeline.tts.TTSService"
       name="TTSService"
-      policy="dynamic"/>
+      policy="static"/>
 </scr:component>
