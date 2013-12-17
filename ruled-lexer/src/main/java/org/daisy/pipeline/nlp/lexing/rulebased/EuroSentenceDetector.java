@@ -39,13 +39,24 @@ public class EuroSentenceDetector implements ISentenceDetector {
 			mStrongDelimiters.reset(w.word);
 			mWeakDelimiters.reset(w.word);
 
-			if ((mStrongDelimiters.matches() && (j == words.size() - 1 || words.get(j + 1).word
-			        .charAt(0) != ')'))
-			        || ((j < words.size() - 2) && mWeakDelimiters.matches()
-			                && words.get(j + 1).category == Category.SPACE && Character
-			                    .isUpperCase(words.get(j + 2).word.charAt(0)))) {
-				newSentence(words);
+			//'?' and '!' not followed by a ')'
+			boolean match = mStrongDelimiters.matches()
+			        && (j == words.size() - 1 || words.get(j + 1).word.charAt(0) != ')');
+			if (!match) {
+				//periods followed by a space and a capital letter
+				match = (j < words.size() - 2) && mWeakDelimiters.matches()
+				        && words.get(j + 1).category == Category.SPACE
+				        && Character.isUpperCase(words.get(j + 2).word.charAt(0));
+
+				if (!match && j > 0 && w.category == Category.QUOTE) {
+					//ending quotes, for example: "end of sentence." New sentence
+					mWeakDelimiters.reset(words.get(j - 1).word);
+					match = mWeakDelimiters.matches();
+				}
 			}
+
+			if (match)
+				newSentence(words);
 		}
 
 		newSentence(words);

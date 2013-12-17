@@ -11,7 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class RuledCategorizerTest {
-	TextCategorizer mCategorizer;
+	private TextCategorizer mCategorizer;
 
 	@Before
 	public void setUp() throws IOException {
@@ -20,8 +20,7 @@ public class RuledCategorizerTest {
 
 	public CategorizedWord categorizeForPrefix(String x) throws IOException {
 		mCategorizer.init(MatchMode.PREFIX_MATCH);
-		CategorizedWord v = mCategorizer
-		        .categorize(x + " foo", x.toLowerCase());
+		CategorizedWord v = mCategorizer.categorize(x + " foo", x.toLowerCase());
 		if (v == null) {
 			v = new CategorizedWord();
 			v.category = Category.UNKNOWN;

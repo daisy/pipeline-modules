@@ -30,6 +30,7 @@ public class RuleBasedLexer implements LexService {
 	private RuleBasedTextCategorizer mTextCategorizer;
 	private RuleBasedTextCategorizer mGenericCategorizer = null;
 	private ISentenceDetector mGenericSplitter = null;
+	private Locale mCurrentLocale = null;
 
 	private Map<Locale, ISentenceDetector> mSentenceSplitters;
 	private Map<Locale, RuleBasedTextCategorizer> mTextCategorizers;
@@ -48,6 +49,7 @@ public class RuleBasedLexer implements LexService {
 		mTextCategorizer = null;
 		mGenericCategorizer = null;
 		mGenericSplitter = null;
+		mCurrentLocale = null;
 	}
 
 	@Override
@@ -81,10 +83,11 @@ public class RuleBasedLexer implements LexService {
 		}
 		mSentenceSplitter = mSentenceSplitters.get(lang);
 		mTextCategorizer = mTextCategorizers.get(lang);
+		mCurrentLocale = lang;
 	}
 
 	public List<CategorizedWord> splitIntoWords(String input) {
-		String lowerCase = input.toLowerCase();
+		String lowerCase = input.toLowerCase(mCurrentLocale);
 		LinkedList<CategorizedWord> result = new LinkedList<CategorizedWord>();
 
 		int shift = 0;
@@ -135,6 +138,8 @@ public class RuleBasedLexer implements LexService {
 			s.boundaries = new TextBoundaries();
 			res.add(s);
 
+			//NOTE: Now, the StringComposer should already trim the sentences 
+
 			//find the beginning of the sentence
 			ListIterator<CategorizedWord> it = sentence.listIterator();
 			while (it.hasNext()) {
@@ -177,9 +182,9 @@ public class RuleBasedLexer implements LexService {
 
 	@Override
 	public int getLexQuality(Locale lang) {
-		if (lang == Locale.ENGLISH)
+		if (lang.getLanguage().equals(new Locale("en").getLanguage()))
 			return 3 * LexService.MinSpecializedLexQuality;
-		if (lang == Locale.FRENCH)
+		if (lang.getLanguage().equals(new Locale("fr").getLanguage()))
 			return 3 * LexService.MinSpecializedLexQuality;
 		return 0;
 	}

@@ -4,33 +4,26 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class LanguageUtils {
-	public static Locale stringToLanguage(String bcp47lang) {
+	private static Pattern localePattern = Pattern
+	        .compile("(\\p{Alpha}{2})(?:[-_](\\p{Alpha}{2}))?(?:[-_](\\p{Alnum}{1,8}))*");
+
+	public static Locale stringToLanguage(String lang) {
 		//TODO: in Java7 we would use:
-		//return Locale.setLanguageTag(bcp47lang).build();
-		//or with Locale.forLanguageTag(bcp47lang)
+		//return Locale.forLanguageTag(lang)
+		//=> this works with BCP47 tags, and should work with old tags from RFC 3066
 
-		String lw = bcp47lang.toLowerCase();
-
-		Locale res = Locale.getDefault();
-		if (lw.startsWith("fr")) {
-			res = Locale.FRENCH;
-		} else if (lw.startsWith("en")) {
-			res = Locale.ENGLISH;
-		} else if (lw.startsWith("de")) {
-			res = Locale.GERMAN;
-		} else if (lw.startsWith("it")) {
-			res = Locale.ITALIAN;
-		} else if (lw.startsWith("zh")) {
-			res = Locale.CHINESE;
-		} else if (lw.startsWith("ko")) {
-			res = Locale.KOREAN;
-		} else if (lw.startsWith("ja") || lw.equals("jpn")) {
-			res = Locale.JAPANESE;
+		Locale locale = null;
+		if (lang != null) {
+			Matcher m = localePattern.matcher(lang.toLowerCase());
+			if (m.matches()) {
+				locale = new Locale(m.group(1), m.group(2) != null ? m.group(2) : "");
+			}
 		}
-
-		return res;
+		return locale;
 	}
 
 	//lowercase ISO 639-2/T language codes (www.loc.gov/standards/iso639-2/php/English_list.php)

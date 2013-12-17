@@ -127,22 +127,30 @@ public class LexingTest {
 	}
 
 	@Test
-	public void french1() throws LexerInitException {
-		mLexer.useLanguage(Locale.FRENCH);
-		String inp = "la raison d'être";
-		List<Sentence> sentences = mLexer.split(inp);
-		String text = mPrinter.convert(sentences, inp);
-		Assert.assertEquals("{/la/ /raison/ /d'//être/}", text);
-	}
-
-	@Test
 	public void brackets1() throws LexerInitException {
 		mLexer.useLanguage(Locale.ENGLISH);
 		String ref = "Bracket example (this is not a sentence!), after.";
 		List<Sentence> sentences = mLexer.split(ref);
 		String text = mPrinter.convert(sentences, ref);
-		System.out.println("text = " + text);
 		Assert.assertEquals(
 		        "{/Bracket/ /example/ (/this/ /is/ /not/ /a/ /sentence/!), /after/.}", text);
+	}
+
+	@Test
+	public void quotes1() throws LexerInitException {
+		mLexer.useLanguage(Locale.ENGLISH);
+		String ref = "\"First sentence.\" Second sentence";
+		List<Sentence> sentences = mLexer.split(ref);
+		String text = mPrinter.convert(sentences, ref);
+		Assert.assertEquals("{\"/First/ /sentence/.\"}{/Second/ /sentence/}", text);
+	}
+
+	@Test
+	public void quotes2() throws LexerInitException {
+		mLexer.useLanguage(Locale.ENGLISH);
+		String ref = "\"First sentence\". Second sentence";
+		List<Sentence> sentences = mLexer.split(ref);
+		String text = mPrinter.convert(sentences, ref);
+		Assert.assertEquals("{\"/First/ /sentence/\".}{/Second/ /sentence/}", text);
 	}
 }

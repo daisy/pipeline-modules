@@ -3,6 +3,7 @@ package org.daisy.pipeline.nlp.matchrules;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 import org.daisy.pipeline.nlp.TextCategorizer.Category;
 import org.daisy.pipeline.nlp.TextCategorizer.MatchMode;
@@ -15,15 +16,14 @@ import com.google.common.io.Files;
  */
 public class WordFileMatchRule extends WordListMatchRule {
 
-    public WordFileMatchRule(Category category, int priority,
-            boolean caseSensitive, MatchMode matchMode, boolean capitalSensitive) {
-        super(category, priority, caseSensitive, matchMode, capitalSensitive);
-    }
+	public WordFileMatchRule(Category category, int priority, boolean caseSensitive,
+	        MatchMode matchMode, boolean capitalSensitive, Locale locale) {
+		super(category, priority, caseSensitive, matchMode, capitalSensitive, locale);
+	}
 
-    void init(String filename) throws IOException {
-        List<String> prefixes = Files.readLines(new File(filename),
-                Charsets.UTF_8);
-        super.init(prefixes);
-    }
+	public void init(String filename) throws IOException {
+		List<String> prefixes = Files.readLines(new File(filename), Charsets.UTF_8);
+		super.init(prefixes);
+	}
 
 }

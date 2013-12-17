@@ -5,12 +5,16 @@ import java.util.TreeMap;
 
 /**
  * Prefix matching strategy based on a naive trie structure.
+ * 
+ * It is not memory-efficient since it uses java objects (i.e. Character) as map
+ * keys, among other issues. A better way would be to perform binary searches on
+ * native char[].
  */
 public class PrefixMatchStringFinder implements IStringFinder {
 
 	static class Trie {
-		TreeMap<Byte, Trie> children = new TreeMap<Byte, Trie>();
-		boolean present = false;
+		TreeMap<Character, Trie> children = new TreeMap<Character, Trie>();
+		boolean endOfWord = false;
 	}
 
 	private Trie mTrieRoot;
@@ -20,15 +24,16 @@ public class PrefixMatchStringFinder implements IStringFinder {
 		mTrieRoot = new Trie();
 		for (String s : matchable) {
 			Trie current = mTrieRoot;
-			for (Byte b : s.getBytes()) {
-				Trie next = current.children.get(b);
+			for (int k = 0; k < s.length(); ++k) {
+				Character c = s.charAt(k);
+				Trie next = current.children.get(c);
 				if (next == null) {
 					next = new Trie();
-					current.children.put(b, next);
+					current.children.put(c, next);
 				}
 				current = next;
 			}
-			current.present = true;
+			current.endOfWord = true;
 		}
 	}
 
@@ -38,15 +43,14 @@ public class PrefixMatchStringFinder implements IStringFinder {
 	@Override
 	public String find(String input) {
 		Trie current = mTrieRoot;
-		byte[] bytes = input.getBytes();
 		int longestMatch = -1;
-		for (int k = 0; k < bytes.length && current != null; ++k) {
-			if (current.present) {
+		for (int k = 0; k < input.length() && current != null; ++k) {
+			if (current.endOfWord) {
 				longestMatch = k;
 			}
-			current = current.children.get(bytes[k]);
+			current = current.children.get(input.charAt(k));
 		}
-		if (current != null && current.present) {
+		if (current != null && current.endOfWord) {
 			return input;
 		} else if (longestMatch > -1) {
 			return input.substring(0, longestMatch);

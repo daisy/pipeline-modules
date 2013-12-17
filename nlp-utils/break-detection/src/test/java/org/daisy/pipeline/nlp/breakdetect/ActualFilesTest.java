@@ -306,8 +306,8 @@ public class ActualFilesTest implements TreeWriterFactory {
 			}) {
 
 				Lexer.strategy = stategy;
-
-				SAXSource source = new SAXSource(new InputSource(file));
+				SAXSource source = new SAXSource(new InputSource(getClass()
+				        .getResourceAsStream(file)));
 				XdmNode document = Builder.build(source);
 
 				FormatSpecifications specs = new FormatSpecifications("http://tmp", "sss",
@@ -369,25 +369,26 @@ public class ActualFilesTest implements TreeWriterFactory {
 
 	@Test
 	public void dtbook1() throws SaxonApiException, LexerInitException {
-		check("src/test/resources/dtbook_test.xml", DTBookInline, DTBookSpace);
+		check("/dtbook_test.xml", DTBookInline, DTBookSpace);
 	}
 
 	@Test
 	public void zedai1() throws SaxonApiException, LexerInitException {
-		check("src/test/resources/zedai_test.xml", ZedaiInline, ZedaiSpace);
+		check("/zedai_test.xml", ZedaiInline, ZedaiSpace);
 	}
 
 	@Test
 	public void epub1() throws SaxonApiException, LexerInitException {
-		check("src/test/resources/epub3_test.html", EpubInline, EpubSpace);
+		check("/epub3_test.html", EpubInline, EpubSpace);
 	}
 
-	private static Collection<String> getSamples(String suffix) {
-		File[] files = new File("src/test/resources/").listFiles();
+	private Collection<String> getSamples(String suffix) {
+		String path = getClass().getResource("/").getPath();
+		File[] files = new File(path).listFiles();
 		ArrayList<String> samples = new ArrayList<String>();
 		for (File file : files) {
 			if (file.getName().endsWith(suffix))
-				samples.add(file.getAbsolutePath());
+				samples.add("/" + file.getName());
 		}
 		return samples;
 	}
