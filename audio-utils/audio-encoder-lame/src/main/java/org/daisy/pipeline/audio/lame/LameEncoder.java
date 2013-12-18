@@ -1,20 +1,15 @@
 package org.daisy.pipeline.audio.lame;
 
-import java.io.ByteArrayInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
 
 import org.daisy.pipeline.audio.AudioEncoder;
 
 public class LameEncoder implements AudioEncoder {
-	private static final String InputFormat = ".wav";
 	private static final String OutputFormat = ".mp3";
 
 	private static final String[] winExtensions = {
@@ -52,69 +47,87 @@ public class LameEncoder implements AudioEncoder {
 	}
 
 	//TODO: call the TTS's BinaryFinder.find instead of findBinary
-	public LameEncoder() throws InterruptedException, IOException {
+	public LameEncoder() throws Exception {
 		final String property = "lame.path";
 		mLamePath = findBinary(property, "lame");
 		if (mLamePath == null) {
-			throw new RuntimeException("Cannot find lame in PATH and "
-			        + property + " is not set");
+			throw new RuntimeException("Cannot find lame in PATH and " + property
+			        + " is not set");
 		}
 
 		//check that the encoder can be run
 		String[] cmd = new String[]{
 		        mLamePath, "--help"
 		};
-		Runtime.getRuntime().exec(cmd).waitFor();
+		Process p = null;
+		try {
+			p = Runtime.getRuntime().exec(cmd);
+			//read the output to prevent the process from sleeping
+			InputStream in = p.getInputStream();
+			while (in.available() > 0) {
+				in.skip(in.available());
+			}
+			p.waitFor();
+		} catch (Exception e) {
+			if (p != null)
+				p.destroy();
+			throw new Exception(e);
+		}
+
 	}
 
 	@Override
-	public String encode(byte[] input, int size, AudioFormat audioFormat,
-	        Object caller, String name) {
-		// generate the intermediate WAV file from the input audio data
-		File intermediateFile;
-		try {
-			intermediateFile = File.createTempFile("chunk", InputFormat);
-		} catch (IOException e1) {
-			return null;
-		}
-		try {
-			InputStream inputStream = new ByteArrayInputStream(input);
-			AudioInputStream ais = new AudioInputStream(inputStream,
-			        audioFormat, size / audioFormat.getFrameSize());
+	public String encode(byte[] input, int size, AudioFormat audioFormat, Object caller,
+	        String name) {
 
-			AudioSystem.write(ais, AudioFileFormat.Type.WAVE, intermediateFile);
-			ais.close();
-			inputStream.close();
-		} catch (FileNotFoundException e1) {
-			intermediateFile.delete();
-			return null;
-		} catch (IOException e) {
-			intermediateFile.delete();
-			return null;
-		}
-
-		// execute the lame binary on the intermediate WAV file
 		File encodedFile = null;
-		String[] cmd = null;
-		try {
-			if (name != null) {
-				encodedFile = new File(System.getProperty("java.io.tmpdir")
-				        + "/" + name + OutputFormat);
-			} else {
+		if (name != null) {
+			encodedFile = new File(System.getProperty("java.io.tmpdir") + "/" + name
+			        + OutputFormat);
+		} else {
+			try {
 				encodedFile = File.createTempFile("chunk", OutputFormat);
+			} catch (IOException e) {
+				return null;
 			}
+		}
 
-			cmd = new String[]{
-			        mLamePath, "--silent", intermediateFile.getAbsolutePath(),
-			        encodedFile.getAbsolutePath()
-			};
-			Runtime.getRuntime().exec(cmd).waitFor();
+		String freq = String.valueOf((Float.valueOf(audioFormat.getSampleRate()) / 1000));
+		String bitwidth = String.valueOf(audioFormat.getSampleSizeInBits());
+		String signedOpt = audioFormat.getEncoding() == AudioFormat.Encoding.PCM_SIGNED ? "--signed"
+		        : "--unsigned";
+		String endianness = audioFormat.isBigEndian() ? "--big-endian" : "--little-endian";
 
+		//-r: raw pcm
+		//-s: sample rate in kHz
+		//-mm: mono
+		//-: PCM read on the standard input
+		String[] cmdbegin = new String[]{
+		        mLamePath, "-r", "-s", freq, "--bitwidth", bitwidth, signedOpt, endianness,
+		        "-m", "m", "--silent"
+		};
+		String[] custom = System.getProperty("lame.options", "").split(" ");
+		String[] cmdend = new String[]{
+		        "-", encodedFile.getAbsolutePath()
+		};
+
+		Process p = null;
+		try {
+			String[] cmd = new String[cmdbegin.length + custom.length + cmdend.length];
+			System.arraycopy(cmdbegin, 0, cmd, 0, cmdbegin.length);
+			System.arraycopy(custom, 0, cmd, cmdbegin.length, custom.length);
+			System.arraycopy(cmdend, 0, cmd, cmdbegin.length + custom.length, cmdend.length);
+			p = Runtime.getRuntime().exec(cmd);
+			BufferedOutputStream out = new BufferedOutputStream((p.getOutputStream()));
+			out.write(input, 0, size);
+			out.close();
+			p.waitFor();
 		} catch (Exception e) {
-			encodedFile = null;
+			if (name == null)
+				encodedFile.delete();
+			if (p != null)
+				p.destroy();
 			return null;
-		} finally {
-			intermediateFile.delete();
 		}
 
 		return encodedFile.toURI().toString();
