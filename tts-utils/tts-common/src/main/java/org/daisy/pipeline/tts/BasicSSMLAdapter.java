@@ -10,19 +10,21 @@ public class BasicSSMLAdapter implements SSMLAdapter {
 
 	@Override
 	public String getFooter() {
-		return "";
+		//we assume the adapter is called on a single sentence
+		return SSMLUtil.getBreakAfterSentence();
 	}
 
 	@Override
 	public QName adaptElement(QName element) {
-		return element;
+		if ("w".equals(element.getLocalName()) || "token".equals(element.getLocalName()))
+			return null; //conversion from SSML 1.1 to SSML 1.0
+		return new QName(null, element.getLocalName());
 	}
 
 	@Override
 	public QName adaptAttributeName(QName element, QName attr, String value) {
-		if (element.getLocalName().equals("s")
-		        && !attr.getLocalName().equals("lang"))
-			return null; //only xml:lang is allowed in the <s> markups
+		if (element.getLocalName().equals("s"))
+			return null;
 		return attr;
 	}
 

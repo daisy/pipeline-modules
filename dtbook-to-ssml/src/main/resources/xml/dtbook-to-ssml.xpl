@@ -39,7 +39,7 @@
       </p:input>
       <p:with-option name="section-element" select="'level'"/>
       <p:with-option name="word-element" select="'w'"/>
-      <p:with-option name="css-sheet-uri" select="$css-sheet-uri"/>
+      <p:with-option name="aural-sheet-uri" select="$css-sheet-uri"/>
       <p:with-option name="separate-skippable" select="$separate-skippable"/>
       <p:with-option name="skippable-elements" select="'prodnote,pagenum,noteref'"/>
     </px:text-to-ssml>

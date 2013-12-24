@@ -16,8 +16,8 @@ public class SoundUtil {
 	 * @return true if @param audioBuffer has been filled, false if @param
 	 *         audioBuffer need to be flushed
 	 */
-	static public boolean readWave(File soundFile, RawAudioBuffer audioBuffer,
-	        boolean twoTries) throws UnsupportedAudioFileException, IOException {
+	static public boolean readWave(File soundFile, RawAudioBuffer audioBuffer, boolean twoTries)
+	        throws UnsupportedAudioFileException, IOException {
 		int maxLength = (int) (soundFile.length() - MinRiffHeaderSize);
 		if (maxLength < 0) {
 			throw new IOException(soundFile.getAbsolutePath()
@@ -35,8 +35,7 @@ public class SoundUtil {
 
 		AudioInputStream fi = AudioSystem.getAudioInputStream(soundFile);
 		int read = 0;
-		while (audioBuffer.offsetInOutput + read != audioBuffer.output.length
-		        && read != -1) {
+		while (audioBuffer.offsetInOutput + read != audioBuffer.output.length && read != -1) {
 			audioBuffer.offsetInOutput += read;
 			read = fi.read(audioBuffer.output, audioBuffer.offsetInOutput,
 			        audioBuffer.output.length - audioBuffer.offsetInOutput);

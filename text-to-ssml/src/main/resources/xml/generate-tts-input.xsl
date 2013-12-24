@@ -13,7 +13,8 @@
   <!-- all handled by this script, including the ones inside the -->
   <!-- sentences. Aside from the pauses and the cues, the sentences' -->
   <!-- content is left unchanged. -->
-  <!-- For now, cues' location are relative to the CSS sheet location. -->
+  <!-- For now, cues' location are relative to the main CSS sheet location. -->
+  <!-- (only one sheet is taken into account) -->
   <!--======================================================================= -->
 
   <xsl:param name="css-sheet-uri"/>
@@ -107,11 +108,10 @@
   </xsl:template>
 
   <!-- ========= iterate over the sentences ========= -->
-
   <xsl:template match="/">
     <tmp:root>
       <xsl:for-each-group select="//ssml:s" group-adjacent="@thread-id">
-	<ssml:speak>
+	<ssml:speak version="1.1"> <!-- version 1.0 has no <ssml:token>, nor <ssml:w>. -->
 	  <xsl:for-each select="current-group()">
 	    <ssml:s>
 	      <xsl:variable name="sentence" select="current()"/>
@@ -132,7 +132,9 @@
 		  <xsl:otherwise>
 		    <!-- sentence content -->
 		    <xsl:apply-templates select="$sentence/node()" mode="inside-sentence"/>
-		    <ssml:break time="250ms"/>
+		    <xsl:value-of select="'.'"/> <!-- sometimes the lexers do not include the punctuation marks -->
+		    <!-- no ssml:break is added here as some TTS processors may arleady add breaks after the -->
+		    <!-- final punctuation marks. -->
 		  </xsl:otherwise>
 		</xsl:choose>
 	      </xsl:for-each>

@@ -28,8 +28,7 @@ public class SynthesisWorkerPool {
 		XdmNode sentence;
 	}
 
-	public static class UndispatchableSection implements
-	        Comparable<UndispatchableSection> {
+	public static class UndispatchableSection implements Comparable<UndispatchableSection> {
 		int size;
 		int documentPosition;
 		List<Speakable> speakables;
@@ -58,8 +57,8 @@ public class SynthesisWorkerPool {
 	private UndispatchableSection mCurrentSection;
 	private int mNrThreads;
 
-	public SynthesisWorkerPool(int threadNumber, TTSRegistry registry,
-	        AudioEncoder encoder, IPipelineLogger logger) {
+	public SynthesisWorkerPool(int threadNumber, TTSRegistry registry, AudioEncoder encoder,
+	        IPipelineLogger logger) {
 		mNrThreads = threadNumber;
 		mWorkers = new SynthesisWorkerThread[threadNumber];
 		for (--threadNumber; threadNumber >= 0; --threadNumber)
@@ -75,31 +74,22 @@ public class SynthesisWorkerPool {
 		mCurrentSection = null;
 	}
 
-	static private final Voice NoVoice = new Voice("", "");
-
 	/**
 	 * The SSML is assumed to be pushed in document order.
 	 * */
 	public void pushSSML(XdmNode ssml) throws SynthesisException {
 		String voiceVendor = ssml.getAttributeValue(new QName("voice-vendor"));
 		String voiceName = ssml.getAttributeValue(new QName("voice-name"));
-		String lang = ssml.getAttributeValue(new QName(
-		        "http://www.w3.org/XML/1998/namespace", "lang"));
+		String lang = ssml.getAttributeValue(new QName("http://www.w3.org/XML/1998/namespace",
+		        "lang"));
 
-		Voice voice = NoVoice;
-		if (voiceVendor != null)
-			voice = new Voice(voiceVendor, voiceName == null ? "" : voiceName);
-
-		//if the vendor is provided alone, the voice name is up to the vendor which may
-		//take into account the age and the gender encapsulated in the SSML
-		if (voice.vendor.isEmpty() || !voice.name.isEmpty())
-			voice = mTTSRegistry.findAvailableVoice(voice, lang);
-		TTSService newSynth = mTTSRegistry.getTTS(voice);
-		if (newSynth == null) {
-			throw new SynthesisException(
-			        "no TTS Service available for the voice '" + voiceVendor
-			                + ":" + voiceName + "' or language '" + lang + "'");
+		Voice voice = mTTSRegistry.findAvailableVoice(voiceVendor, voiceName, lang);
+		if (voice == null) {
+			throw new SynthesisException("Could not find any installed voice matching "
+			        + new Voice(voiceVendor, voiceName) + " or providing the language '"
+			        + lang + "'");
 		}
+		TTSService newSynth = mTTSRegistry.getTTS(voice);
 
 		if (newSynth != currentSynthesizer) {
 			if (currentSynthesizer != null)
@@ -129,9 +119,8 @@ public class SynthesisWorkerPool {
 		for (UndispatchableSection section : mSections)
 			allTTS.add(section.synthesizer);
 
-		StringBuilder sb = new StringBuilder(
-		        "start allocating the resources on " + mNrThreads
-		                + " threads for the following TTS service(s):\n");
+		StringBuilder sb = new StringBuilder("start allocating the resources on " + mNrThreads
+		        + " threads for the following TTS service(s):\n");
 		for (TTSService tts : allTTS) {
 			sb.append(" * " + tts.getName() + "-" + tts.getVersion() + "\n");
 		}
@@ -153,8 +142,7 @@ public class SynthesisWorkerPool {
 		for (UndispatchableSection section : mSections)
 			section.computeSize();
 		Collections.sort(mSections);
-		mLogger.printInfo("number of sections to synthesize: "
-		        + mSections.size());
+		mLogger.printInfo("number of sections to synthesize: " + mSections.size());
 
 		//give SynthetisWorkerThread access to a synchronized queue of sections to synthesize
 		ConcurrentLinkedQueue<UndispatchableSection> queue = new ConcurrentLinkedQueue<UndispatchableSection>(
@@ -171,8 +159,7 @@ public class SynthesisWorkerPool {
 			try {
 				worker.join();
 			} catch (InterruptedException e) {
-				mLogger.printInfo("error in synthesis thread: "
-				        + e.getMessage());
+				mLogger.printInfo("error in synthesis thread: " + e.getMessage());
 			}
 
 		mLogger.printInfo("synthesis workers finished");

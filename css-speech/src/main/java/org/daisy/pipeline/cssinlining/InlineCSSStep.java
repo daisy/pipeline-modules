@@ -63,7 +63,11 @@ public class InlineCSSStep extends DefaultStep implements TreeWriterFactory {
 		try {
 			analyzer.analyse(mStylesheetURIOption);
 		} catch (Throwable t) {
-			mRuntime.error(t);
+			mRuntime.info(null, null, t.toString());
+			//copy the input
+			while (mSource.moreDocuments()) {
+				mResult.write(mSource.read());
+			}
 			return;
 		}
 
@@ -71,8 +75,8 @@ public class InlineCSSStep extends DefaultStep implements TreeWriterFactory {
 			XdmNode source = mSource.read();
 
 			// rebuild the document with the additional style info
-			XdmNode rebuilt = inliner.inline(this, source.getDocumentURI(), source,
-			        analyzer, mStyleNsOption);
+			XdmNode rebuilt = inliner.inline(this, source.getDocumentURI(), source, analyzer,
+			        mStyleNsOption);
 
 			mResult.write(rebuilt);
 		}

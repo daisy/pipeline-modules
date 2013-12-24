@@ -18,7 +18,6 @@ import java.util.regex.Pattern;
 
 import javax.sound.sampled.AudioFormat;
 
-import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.pipeline.tts.BasicSSMLAdapter;
@@ -59,54 +58,22 @@ public class ATTBin implements TTSService {
 			}
 			return "<voice name=\"" + voiceName + "\">";
 		}
-
-		@Override
-		public QName adaptElement(QName elementName) {
-			return new QName(null, elementName.getLocalName());
-		}
-
-		@Override
-		public QName adaptAttributeName(QName element, QName attrName,
-		        final String value) {
-			if (attrName.getLocalName().equals("lang")) {
-				return attrName;
-			}
-			if (element.getLocalName().equals("s"))
-				return null;
-			return new QName(null, attrName.getLocalName());
-		}
-
-		@Override
-		public String adaptAttributeValue(QName element, QName attrName,
-		        String value) {
-			if (attrName.getLocalName().equals("lang") && !value.contains("_")) {
-				value = value.replaceAll("[^0-9a-zA-Z]+", "_");
-				if (!value.contains("_")) {
-					if (value.equals("en"))
-						value = value.concat("_us");
-					else
-						value = value.concat("_" + value); //e.g 'fr' => 'fr_fr'
-				}
-			}
-			return value;
-		}
 	};
 
 	public void initialize() throws SynthesisException {
 
-		mLoadBalancer = new RoundRobinLoadBalancer(System.getProperty(
-		        "att.servers", "localhost:8888"), null);
-		mMarkPattern = Pattern.compile("([0-9]+)\\s+BOOKMARK:\\s+([^\\s]+)",
-		        Pattern.MULTILINE);
+		mLoadBalancer = new RoundRobinLoadBalancer(System.getProperty("att.servers",
+		        "localhost:8888"), null);
+		mMarkPattern = Pattern
+		        .compile("([0-9]+)\\s+BOOKMARK:\\s+([^\\s]+)", Pattern.MULTILINE);
 		mSampleRate = 16000;
 		mAudioFormat = new AudioFormat(mSampleRate, 16, 1, true, false);
 
 		final String property = "att.client.path";
 		mATTPath = BinaryFinder.find(property, "TTSClientFile");
 		if (mATTPath == null) {
-			throw new SynthesisException(
-			        "Cannot find AT&T's client in PATH and " + property
-			                + " is not set");
+			throw new SynthesisException("Cannot find AT&T's client in PATH and " + property
+			        + " is not set");
 		}
 
 		//test the synthesizer so that the service won't be active if it fails
@@ -117,24 +84,21 @@ public class ATTBin implements TTSService {
 		synthesize("test", testBuffer, host, null,
 		        new LinkedList<Map.Entry<String, Double>>(), 1);
 		if (testBuffer.offsetInOutput <= 0) {
-			throw new SynthesisException(
-			        "AT&T client binary did not produce any audio data");
+			throw new SynthesisException("AT&T client binary did not produce any audio data");
 		}
 	}
 
 	@Override
-	public Object synthesize(XdmNode ssml, Voice voice,
-	        RawAudioBuffer audioBuffer, Object resources,
-	        Object lastCallMemory, List<Entry<String, Double>> marks)
+	public Object synthesize(XdmNode ssml, Voice voice, RawAudioBuffer audioBuffer,
+	        Object resources, Object lastCallMemory, List<Entry<String, Double>> marks)
 	        throws SynthesisException {
-		return synthesize(SSMLUtil.toString(ssml, voice.name, mSSMLAdapter),
-		        audioBuffer, resources, lastCallMemory, marks, 0);
+		return synthesize(SSMLUtil.toString(ssml, voice.name, mSSMLAdapter), audioBuffer,
+		        resources, lastCallMemory, marks, 0);
 
 	}
 
-	private Object synthesize(String ssml, RawAudioBuffer audioBuffer,
-	        Object resources, Object lastCallMemory,
-	        List<Entry<String, Double>> marks, int tries)
+	private Object synthesize(String ssml, RawAudioBuffer audioBuffer, Object resources,
+	        Object lastCallMemory, List<Entry<String, Double>> marks, int tries)
 	        throws SynthesisException {
 
 		Host h = (Host) resources;
@@ -154,8 +118,7 @@ public class ATTBin implements TTSService {
 			try {
 				cmd = new String[]{
 				        mATTPath, "-ssml", "-v0", "-s", h.address, "-p",
-				        String.valueOf(h.port), "-r",
-				        String.valueOf(mSampleRate), "-o",
+				        String.valueOf(h.port), "-r", String.valueOf(mSampleRate), "-o",
 				        dest.getAbsolutePath()
 				};
 
@@ -169,8 +132,7 @@ public class ATTBin implements TTSService {
 					MatchResult mr = scanner.match();
 					double seconds = Double.valueOf(mr.group(1))
 					        / mAudioFormat.getSampleRate();
-					marks.add(new AbstractMap.SimpleEntry<String, Double>(mr
-					        .group(2), seconds));
+					marks.add(new AbstractMap.SimpleEntry<String, Double>(mr.group(2), seconds));
 				}
 				is.close();
 				p.waitFor();
@@ -185,11 +147,10 @@ public class ATTBin implements TTSService {
 		} catch (Exception e) {
 			if (tries == 0) {
 				marks.clear();
-				return synthesize(ssml, audioBuffer, resources, lastCallMemory,
-				        marks, tries + 1);
+				return synthesize(ssml, audioBuffer, resources, lastCallMemory, marks,
+				        tries + 1);
 			} else if (e.getMessage() == null)
-				throw new SynthesisException(e.getClass().getSimpleName(),
-				        e.getCause());
+				throw new SynthesisException(e.getClass().getSimpleName(), e.getCause());
 			else
 				throw new SynthesisException(e.getMessage(), e.getCause());
 		} finally {
@@ -277,13 +238,12 @@ public class ATTBin implements TTSService {
 				if (voiceInfo.voice.vendor.equalsIgnoreCase("att")) {
 					cmd = new String[]{
 					        mATTPath, "-ssml", "-v0", "-s", host.address, "-p",
-					        String.valueOf(host.port), "-o",
-					        dest.getAbsolutePath()
+					        String.valueOf(host.port), "-o", dest.getAbsolutePath()
 					};
 
 					Process p = Runtime.getRuntime().exec(cmd);
-					p.getOutputStream()
-					        .write(("<voice name=\"" + voiceInfo.voice.name + "\">t</voice>")
+					p.getOutputStream().write(
+					        ("<voice name=\"" + voiceInfo.voice.name + "\">t</voice>")
 					                .getBytes());
 					p.getOutputStream().close();
 					InputStream is = p.getInputStream();

@@ -27,8 +27,14 @@ public interface TTSService {
 
 	public static class Voice {
 		public Voice(String vendor, String name) {
-			this.vendor = vendor.toLowerCase();
-			this.name = name.toLowerCase();
+			if (vendor == null)
+				this.vendor = "";
+			else
+				this.vendor = vendor.toLowerCase();
+			if (name == null)
+				this.name = "";
+			else
+				this.name = name.toLowerCase();
 		}
 
 		public int hashCode() {
@@ -40,6 +46,11 @@ public interface TTSService {
 				return false;
 			Voice v2 = (Voice) other;
 			return vendor.equals(v2.vendor) && name.equals(v2.name);
+		}
+
+		public String toString() {
+			return "{vendor:" + (!vendor.isEmpty() ? vendor : "%unknown%") + ", name:"
+			        + (!name.isEmpty() ? name : "%unkown%") + "}";
 		}
 
 		public String vendor;
@@ -100,9 +111,9 @@ public interface TTSService {
 	 *         new data can fit into it. null is returned if the first call
 	 *         succeeds.
 	 */
-	Object synthesize(XdmNode ssml, Voice voice, RawAudioBuffer audioBuffer,
-	        Object memory, Object threadResources,
-	        List<Map.Entry<String, Double>> marks) throws SynthesisException;
+	Object synthesize(XdmNode ssml, Voice voice, RawAudioBuffer audioBuffer, Object memory,
+	        Object threadResources, List<Map.Entry<String, Double>> marks)
+	        throws SynthesisException;
 
 	/**
 	 * @return the audio format (sample rate etc...) of the data produced by

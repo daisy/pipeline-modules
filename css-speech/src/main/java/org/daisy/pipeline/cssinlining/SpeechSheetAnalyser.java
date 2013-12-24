@@ -27,7 +27,6 @@ public class SpeechSheetAnalyser {
 	private Analyzer mAnalyzer;
 
 	public void analyse(Collection<String> URIs) {
-
 		if (!SupportedCSS.isSupportedMedia(Medium)) {
 			throw new IllegalStateException("medium '" + Medium + "' is not supported");
 		}
@@ -38,8 +37,8 @@ public class SpeechSheetAnalyser {
 				styleSheets.add(CSSFactory.parse(new URL(uri), "utf-8"));
 			}
 		} catch (Exception e) {
-			throw new IllegalArgumentException(
-			        "could not analyse one of the CSS stylesheet(s): " + e.getMessage());
+			throw new IllegalArgumentException("could not analyse the stylesheet: "
+			        + e.getMessage());
 		}
 
 		mAnalyzer = new Analyzer(styleSheets);

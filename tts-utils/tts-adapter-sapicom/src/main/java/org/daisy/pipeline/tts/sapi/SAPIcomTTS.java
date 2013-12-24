@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 
 import javax.sound.sampled.AudioFormat;
 
-import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.XdmNode;
 
 import org.concord.win.sapi53.ClassFactory;
@@ -30,28 +29,13 @@ public class SAPIcomTTS implements TTSService {
 	private List<Voice> mAvailableVoices;
 	private SSMLAdapter mSSMLAdapter = new BasicSSMLAdapter() {
 		@Override
-		public QName adaptElement(QName elementName) {
-			if (elementName.getLocalName().equals("token"))
-				return null;
-			return new QName(null, elementName.getLocalName());
-		}
-
-		@Override
-		public QName adaptAttributeName(QName element, QName attrName,
-		        final String value) {
-			if (element.getLocalName().equals("s"))
-				return null;
-			return new QName(null, attrName.getLocalName());
-		}
-
-		@Override
 		public String getHeader(String voiceName) {
 			return "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\">";
 		}
 
 		@Override
 		public String getFooter() {
-			return "</speak>";
+			return super.getFooter() + "</speak>";
 		}
 	};
 
@@ -60,16 +44,16 @@ public class SAPIcomTTS implements TTSService {
 	}
 
 	@Override
-	public Object synthesize(XdmNode ssml, Voice voice,
-	        RawAudioBuffer audioBuffer, Object resource, Object lastCallMemory,
-	        List<Entry<String, Double>> marks) throws SynthesisException {
-		return synthesize(SSMLUtil.toString(ssml, voice.name, mSSMLAdapter),
-		        voice, audioBuffer, resource, lastCallMemory, marks);
+	public Object synthesize(XdmNode ssml, Voice voice, RawAudioBuffer audioBuffer,
+	        Object resource, Object lastCallMemory, List<Entry<String, Double>> marks)
+	        throws SynthesisException {
+		return synthesize(SSMLUtil.toString(ssml, voice.name, mSSMLAdapter), voice,
+		        audioBuffer, resource, lastCallMemory, marks);
 	}
 
-	private Object synthesize(String ssml, Voice voice,
-	        RawAudioBuffer audioBuffer, Object resource, Object lastCallMemory,
-	        List<Entry<String, Double>> marks) throws SynthesisException {
+	private Object synthesize(String ssml, Voice voice, RawAudioBuffer audioBuffer,
+	        Object resource, Object lastCallMemory, List<Entry<String, Double>> marks)
+	        throws SynthesisException {
 
 		ThreadResource th = (ThreadResource) resource;
 
@@ -81,16 +65,14 @@ public class SAPIcomTTS implements TTSService {
 			throw new SynthesisException(e.getMessage(), e.getCause());
 		}
 
-
 		ISpeechFileStream stream = ClassFactory.createSpFileStream();
-		stream.open(dest.getAbsolutePath(),
-		        SpeechStreamFileMode.SSFMCreateForWrite, false);
+		stream.open(dest.getAbsolutePath(), SpeechStreamFileMode.SSFMCreateForWrite, false);
 		th.voice.audioOutputStream(stream);
 
 		if (mAudioFormat == null) { //assuming there is a single-threaded testing call first
 			ISpeechWaveFormatEx format = stream.format().getWaveFormatEx();
-			mAudioFormat = new AudioFormat(format.samplesPerSec(),
-			        format.bitsPerSample(), format.channels(), true, false);
+			mAudioFormat = new AudioFormat(format.samplesPerSec(), format.bitsPerSample(),
+			        format.channels(), true, false);
 		}
 
 		th.voice.speak(ssml, SpeechVoiceSpeakFlags.SVSFParseSsml);
@@ -161,9 +143,9 @@ public class SAPIcomTTS implements TTSService {
 	public List<Voice> getAvailableVoices() throws SynthesisException {
 		return mAvailableVoices;
 	}
-	
+
 	@Override
-    public void initialize() throws SynthesisException {
+	public void initialize() throws SynthesisException {
 		//retrieve the name of the available voices
 		ISpeechVoice v = ClassFactory.createSpVoice();
 		mAvailableVoices = new ArrayList<Voice>();
@@ -172,10 +154,9 @@ public class SAPIcomTTS implements TTSService {
 			ISpeechObjectToken token = allTokens.item(i);
 			String vendor = token.getAttribute("vendor");
 			String name = token.getAttribute("name");
-			if (vendor != null && name != null && !vendor.isEmpty()
-					&& !name.isEmpty()) {
+			if (vendor != null && name != null && !vendor.isEmpty() && !name.isEmpty()) {
 				mAvailableVoices.add(new Voice(vendor, name));
-			
+
 			}
 		}
 		v.dispose();
@@ -185,15 +166,12 @@ public class SAPIcomTTS implements TTSService {
 		RawAudioBuffer testBuffer = new RawAudioBuffer();
 		testBuffer.offsetInOutput = 0;
 		testBuffer.output = new byte[1];
-		synthesize(
-				mSSMLAdapter.getHeader(null)
-						+ "<s>test<break time=\"10ms\"></break></s>"
-						+ mSSMLAdapter.getFooter(),
-				mAvailableVoices.get(0), testBuffer, th, null, null);
+		synthesize(mSSMLAdapter.getHeader(null) + "<s>test<break time=\"10ms\"></break></s>"
+		        + mSSMLAdapter.getFooter(), mAvailableVoices.get(0), testBuffer, th, null,
+		        null);
 		releaseThreadResources(th);
 		if (testBuffer.offsetInOutput <= 0) {
-			throw new SynthesisException(
-					"SAPI with com4j did not output anything.");
+			throw new SynthesisException("SAPI with com4j did not output anything.");
 		}
-    }
+	}
 }

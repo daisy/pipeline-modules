@@ -7,8 +7,7 @@ import net.sf.saxon.s9api.XdmNodeKind;
 import net.sf.saxon.s9api.XdmSequenceIterator;
 
 public class SSMLUtil {
-	private static void toString(XdmNode ssml, StringBuilder sb,
-	        SSMLAdapter adapter) {
+	private static void toString(XdmNode ssml, StringBuilder sb, SSMLAdapter adapter) {
 		if (ssml.getNodeKind() == XdmNodeKind.TEXT) {
 			sb.append(ssml.getStringValue());
 		} else if (ssml.getNodeKind() == XdmNodeKind.ELEMENT) {
@@ -19,15 +18,13 @@ public class SSMLUtil {
 				while (iter.hasNext()) {
 					sb.append(" ");
 					XdmNode node = (XdmNode) iter.next();
-					QName attrName = adapter.adaptAttributeName(
-					        ssml.getNodeName(), node.getNodeName(),
-					        node.getStringValue());
+					QName attrName = adapter.adaptAttributeName(ssml.getNodeName(), node
+					        .getNodeName(), node.getStringValue());
 					if (attrName != null)
 						sb.append(attrName.toString()
 						        + "=\""
-						        + adapter.adaptAttributeValue(
-						                ssml.getNodeName(), node.getNodeName(),
-						                node.getStringValue()) + "\"");
+						        + adapter.adaptAttributeValue(ssml.getNodeName(), node
+						                .getNodeName(), node.getStringValue()) + "\"");
 				}
 				sb.append(">");
 			}
@@ -43,8 +40,7 @@ public class SSMLUtil {
 		}
 	}
 
-	public static String toString(XdmNode ssml, String voiceName,
-	        SSMLAdapter adapter) {
+	public static String toString(XdmNode ssml, String voiceName, SSMLAdapter adapter) {
 		if (adapter == null)
 			adapter = new BasicSSMLAdapter();
 		StringBuilder sb = new StringBuilder();
@@ -53,4 +49,12 @@ public class SSMLUtil {
 		sb.append(adapter.getFooter());
 		return sb.toString();
 	}
+
+	private static final String BreakAfterSentence = "<break time=\""
+	        + System.getProperty("tts.pause.after.sentence", "250") + "\"/>";
+
+	public static String getBreakAfterSentence() {
+		return BreakAfterSentence;
+	}
+
 }

@@ -179,4 +179,10 @@ public class CSSInliningTest implements TreeWriterFactory {
 		check("<root><div>test1</div><y>test2</y></root>", null, "<root", "<div", "test1",
 		        "</div>", "<y", "tmp:speech-rate=\"40[.]?[0]*\"", "test2", "</y>", "</root>");
 	}
+
+	@Test
+	public void mixedMedia() throws SaxonApiException, URISyntaxException {
+		check("<root><simple>test</simple></root>", "mixed.css", "<root", "<simple",
+		        "tmp:volume=\"[a-z]+\"", "test", "</simple>", "</root>");
+	}
 }

@@ -10,7 +10,6 @@ import java.util.Map.Entry;
 
 import javax.sound.sampled.AudioFormat;
 
-import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.pipeline.tts.BasicSSMLAdapter;
@@ -38,37 +37,6 @@ public class ATTNative implements TTSService, ATTLibListener {
 			}
 			return "<voice name=\"" + voiceName + "\">";
 		}
-
-		@Override
-		public QName adaptElement(QName elementName) {
-			return new QName(null, elementName.getLocalName());
-		}
-
-		@Override
-		public QName adaptAttributeName(QName element, QName attrName,
-		        final String value) {
-			if (attrName.getLocalName().equals("lang")) {
-				return attrName;
-			}
-			if (element.getLocalName().equals("s"))
-				return null;
-			return new QName(null, attrName.getLocalName());
-		}
-
-		@Override
-		public String adaptAttributeValue(QName element, QName attrName,
-		        String value) {
-			if (attrName.getLocalName().equals("lang") && !value.contains("_")) {
-				value = value.replaceAll("[^0-9a-zA-Z]+", "_");
-				if (!value.contains("_")) {
-					if (value.equals("en"))
-						value = value.concat("_us");
-					else
-						value = value.concat("_" + value); //e.g 'fr' => 'fr_fr'
-				}
-			}
-			return value;
-		}
 	};
 
 	private static class ThreadResource {
@@ -80,32 +48,50 @@ public class ATTNative implements TTSService, ATTLibListener {
 	}
 
 	public void initialize() throws SynthesisException {
-		mLoadBalancer = new RoundRobinLoadBalancer(System.getProperty(
-		        "att.servers", "localhost:8888"), null);
+		mLoadBalancer = new RoundRobinLoadBalancer(System.getProperty("att.servers",
+		        "localhost:8888"), null);
 
 		mAudioFormat = new AudioFormat(16000, 16, 1, true, false);
 		System.loadLibrary("att");
 		ATTLib.setListener(this);
+
+		//Test the synthesizer so that the service won't be active if it fails.
+		//It sets mAudioFormat too
+		mAudioFormat = null;
+		RawAudioBuffer testBuffer = new RawAudioBuffer();
+		testBuffer.offsetInOutput = 0;
+		testBuffer.output = new byte[16];
+		Object r = allocateThreadResources();
+		synthesize("test", new Voice(null, null), testBuffer, r, null);
+		releaseThreadResources(r);
+		if (testBuffer.output.length < 500) {
+			throw new SynthesisException("ATT server(s) not working with att-sdk.");
+		}
 	}
 
 	@Override
-	public Object synthesize(XdmNode ssml, Voice voice,
-	        RawAudioBuffer audioBuffer, Object resource, Object lastCallMemory,
-	        List<Entry<String, Double>> marks) throws SynthesisException {
+	public Object synthesize(XdmNode ssml, Voice voice, RawAudioBuffer audioBuffer,
+	        Object resource, Object lastCallMemory, List<Entry<String, Double>> marks)
+	        throws SynthesisException {
+
+		String str = SSMLUtil.toString(ssml, voice.name, mSSMLAdapter);
+		synthesize(str, voice, audioBuffer, resource, marks);
+
+		return null;
+	}
+
+	private void synthesize(String ssml, Voice voice, RawAudioBuffer audioBuffer,
+	        Object resource, List<Entry<String, Double>> marks) throws SynthesisException {
 
 		ThreadResource tr = (ThreadResource) resource;
 		tr.audioBuffer = audioBuffer;
 		tr.marks = marks;
 		tr.firstOffset = tr.audioBuffer.offsetInOutput;
 
-		String str = SSMLUtil.toString(ssml, voice.name, mSSMLAdapter);
-		UTF8Converter.UTF8Buffer utf8Buffer = UTF8Converter.convertToUTF8(str,
-		        tr.utf8text);
+		UTF8Converter.UTF8Buffer utf8Buffer = UTF8Converter.convertToUTF8(ssml, tr.utf8text);
 		tr.utf8text = utf8Buffer.buffer;
 
 		ATTLib.speak(tr, tr.connection, tr.utf8text);
-
-		return null;
 	}
 
 	@Override
@@ -144,13 +130,11 @@ public class ATTNative implements TTSService, ATTLibListener {
 	@Override
 	public Object allocateThreadResources() throws SynthesisException {
 		Host h = mLoadBalancer.selectHost();
-		long connection = ATTLib.openConnection(h.address, h.port,
-		        (int) mAudioFormat.getSampleRate(),
-		        mAudioFormat.getSampleSizeInBits());
+		long connection = ATTLib.openConnection(h.address, h.port, (int) mAudioFormat
+		        .getSampleRate(), mAudioFormat.getSampleSizeInBits());
 		if (connection == 0) {
-			throw new SynthesisException(
-			        "cannot open connections with ATTServer on " + h.address
-			                + ":" + h.port, null);
+			throw new SynthesisException("cannot open connections with ATTServer on "
+			        + h.address + ":" + h.port, null);
 		}
 
 		ThreadResource tr = new ThreadResource();

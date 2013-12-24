@@ -52,7 +52,8 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 		super(runtime, step);
 		mRuntime = runtime;
 		mTTSRegistry = ttsRegistry;
-		mWorkerPool = new SynthesisWorkerPool(16, ttsRegistry, encoder, this);
+		int nrThreads = Integer.valueOf(System.getProperty("tts.threads", "12"));
+		mWorkerPool = new SynthesisWorkerPool(nrThreads, ttsRegistry, encoder, this);
 	}
 
 	@Override
