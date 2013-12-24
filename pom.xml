@@ -20,10 +20,12 @@
   <modules>
     <module>tts-utils/tts-common</module>
     <module>native-libs/att-nar</module>
+	<module>native-libs/sapi-nar</module>
     <module>tts-utils/tts-adapter-espeak</module>
     <module>tts-utils/tts-adapter-attbin</module>
     <module>tts-utils/tts-adapter-attnative</module>
     <module>tts-utils/tts-adapter-sapicom</module>
+	<module>tts-utils/tts-adapter-sapinative</module>
     <module>epub3-to-ssml</module>
     <module>ssml-to-audio</module>
     <module>zedai-to-ssml</module>
