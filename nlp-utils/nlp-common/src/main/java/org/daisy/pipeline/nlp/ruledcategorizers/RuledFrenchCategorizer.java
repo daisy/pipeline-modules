@@ -16,7 +16,7 @@ public class RuledFrenchCategorizer extends RuledMultilangCategorizer {
 
 		RegexMatchRule rsm = new RegexMatchRule(Category.COMMON,
 		        RuledMultilangCategorizer.COMMON_WORD_MAX_PRIORITY + 1, true, mMatchMode);
-		rsm.init(CommonWordPattern + "'?");
+		rsm.init(CommonWordPattern + "[’']?");
 		addRule(rsm);
 
 		rsm = new RegexMatchRule(Category.TIME, NUMBER_COMPOSED_MAX_PRIORITY, true, mMatchMode);

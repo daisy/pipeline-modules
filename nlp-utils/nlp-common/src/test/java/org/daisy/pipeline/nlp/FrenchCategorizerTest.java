@@ -68,4 +68,12 @@ public class FrenchCategorizerTest {
 		Assert.assertEquals(l, w.word);
 		Assert.assertEquals(Category.ABBREVIATION, w.category);
 	}
+
+	@Test
+	public void apostrophe() throws IOException {
+		String l = "l'avant";
+		CategorizedWord w = categorizeForPrefix(l);
+		Assert.assertEquals("l'", w.word);
+		Assert.assertEquals(Category.COMMON, w.category);
+	}
 }

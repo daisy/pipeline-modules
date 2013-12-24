@@ -12,6 +12,10 @@
   <xsl:param name="output-subsentence-tag" />
   <xsl:param name="can-contain-subsentences" />
 
+
+  <!-- - - - - - - -->
+  <!-- Look for the sentences. Either split them or copy them. -->
+
   <xsl:variable name="skippable-tag-list" select="concat(',', $skippable-tags, ',')" />
 
   <xsl:template match="@*|node()" priority="1">
@@ -20,9 +24,9 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="*[collection()/d:sentences/*[@id = current()/@id]]" priority="2">
+  <xsl:template match="*[collection()//*[@id = current()/@id]]" priority="2">
     <xsl:choose>
-      <xsl:when test="count(descendant::*[contains($skippable-tag-list, local-name())]) = 0 ">
+      <xsl:when test="count(descendant::*[contains($skippable-tag-list, concat(',', local-name(), ','))]) = 0">
 	<xsl:apply-templates select="." mode="copy"/>
       </xsl:when>
       <xsl:otherwise>
@@ -30,6 +34,9 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
+  <!-- - - - - - - -->
+  <!-- Copy the sentences. -->
 
   <xsl:template match="node()" mode="copy" priority="1">
     <xsl:copy/>
@@ -42,6 +49,9 @@
     </xsl:element>
   </xsl:template>
 
+  <!-- - - - - - - -->
+  <!-- Split the sentences. -->
+
   <xsl:template match="node()" mode="split" priority="1">
     <xsl:copy>
       <xsl:copy-of select="@*"/>
@@ -50,21 +60,38 @@
   </xsl:template>
 
   <xsl:variable name="ok-parent-list" select="concat(',', $can-contain-subsentences, ',')" />
-  <xsl:template match="*[contains($ok-parent-list, local-name())]" mode="split" priority="2">
+  <xsl:template match="*[contains($ok-parent-list, concat(',', local-name(), ','))]"
+		mode="split" priority="2">
     <xsl:copy>
       <xsl:copy-of select="@*"/>
-      <xsl:for-each-group select="node()" group-adjacent="not(descendant-or-self::*[contains($skippable-tag-list, local-name())])">
+      <!-- Group together the adjacent nodes that do not contain any skippable elements. -->
+      <!-- When they do, we recursively call the split mode. -->
+      <xsl:for-each-group select="node()"
+			  group-adjacent="not(descendant-or-self::*[contains($skippable-tag-list, concat(',', local-name(), ','))][1])">
 	<xsl:choose>
+	  <!-- An existing node is recycled. -->
+	  <xsl:when test="current-grouping-key() and count(current-group()) = 1 and current-group()[1]/@id">
+	    <xsl:apply-templates select="current-group()" mode="copy"/>
+	  </xsl:when>
+	  <xsl:when test="current-grouping-key() and count(current-group()) = 1 and local-name(current-group()[1]) = $output-subsentence-tag">
+	    <xsl:copy>
+	      <xsl:copy-of select="@*"/>
+	      <xsl:attribute name="id">
+		<xsl:value-of select="concat('sub-', generate-id(current-group()[1]))" />
+	      </xsl:attribute>
+	      <xsl:apply-templates select="current-group()/node()" mode="copy"/>
+	    </xsl:copy>
+	  </xsl:when>
+	  <!-- General case. -->
 	  <xsl:when test="current-grouping-key()">
-	    <!-- if no skippable element is found in this neighbourhood, then -->
-	    <!-- all the neighbors are grouped together under the same node -->
 	    <xsl:element name="{$output-subsentence-tag}" namespace="{$output-ns}">
 	      <xsl:attribute name="id">
-		<xsl:value-of select="concat('sub-', generate-id())" />
+		<xsl:value-of select="concat('sub-', generate-id(current-group()[1]))" />
 	      </xsl:attribute>
 	      <xsl:apply-templates select="current-group()" mode="copy"/>
 	    </xsl:element>
 	  </xsl:when>
+	  <!-- Recursive call. -->
 	  <xsl:otherwise>
 	    <xsl:apply-templates select="current-group()" mode="split"/>
 	  </xsl:otherwise>
@@ -73,21 +100,17 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="*[contains($skippable-tag-list, local-name())]" mode="split" priority="3">
-    <xsl:choose>
-      <xsl:when test="(@id or (../@id and count(../node()) = 1)) or not(contains($ok-parent-list, local-name()))">
-	<xsl:apply-templates select="." mode="copy"/>
-      </xsl:when>
-    <xsl:otherwise>
-      <!-- wrap the skippable element into an element that can hold an id -->
-      <xsl:element name="{$output-subsentence-tag}" namespace="{$output-ns}">
+  <xsl:template match="*[contains($skippable-tag-list, concat(',', local-name(), ','))]"
+		mode="split" priority="3">
+    <xsl:copy>
+      <xsl:copy-of select="@*"/>
+      <xsl:if test="not(@id)">
 	<xsl:attribute name="id">
 	  <xsl:value-of select="concat('skip-', generate-id())" />
 	</xsl:attribute>
-	<xsl:apply-templates select="." mode="copy"/>
-      </xsl:element>
-    </xsl:otherwise>
-    </xsl:choose>
+      </xsl:if>
+      <xsl:apply-templates select="node()" mode="copy"/>
+    </xsl:copy>
   </xsl:template>
 
 </xsl:stylesheet>

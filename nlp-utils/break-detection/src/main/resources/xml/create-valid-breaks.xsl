@@ -7,157 +7,135 @@
 
   <xsl:param name="tmp-word-tag"/>
   <xsl:param name="tmp-sentence-tag"/>
-  <xsl:param name="can-contain-sentences"/>
-  <xsl:param name="ignored-elements" select="''"/>
+  <xsl:param name="can-contain-words"/>
+  <xsl:param name="special-sentences" select="''"/>
 
   <xsl:param name="output-ns"/>
   <xsl:param name="output-sentence-tag"/>
 
-  <!-- if the $output-sentence-tag is a generic tag (e.g. like in HTML), -->
-  <!-- we won't want them to be all interpreted as sentences. -->
-  <xsl:param name="detect-preexisting-sentences" select="'true'"/>
+  <xsl:function name="d:sentid">
+    <xsl:param name="node"/>
+    <xsl:value-of select="if ($node/@id) then $node/@id else concat('st', generate-id($node))"/>
+  </xsl:function>
 
-  <!-- the words need an additional pair (attr, val) because they cannot be -->
-  <!-- identified later on otherwise, unlike the sentences which are -->
-  <!-- identified thanks to their id. -->
+
+  <!-- The words need an additional pair (attr, val), otherwise they
+       could not be identified later on, unlike the sentences which
+       are identified thanks to their id. -->
   <xsl:param name="output-word-tag"/>
   <xsl:param name="word-attr" select="''"/>
   <xsl:param name="word-attr-val" select="''"/>
 
   <xsl:template match="/">
+    <!-- Find all the sentences -->
     <xsl:variable name="sentence-ids-tree">
       <d:sentences>
 	<xsl:apply-templates select="*" mode="sentence-ids"/>
       </d:sentences>
     </xsl:variable>
+    <!-- Create the sentences and the words -->
     <xsl:apply-templates select="node()">
       <xsl:with-param name="sentence-ids-tree" select="$sentence-ids-tree"/>
     </xsl:apply-templates>
+    <!-- Write the list of sentences on the secondary port -->
     <xsl:result-document href="sids.xml" method="xml">
       <xsl:copy-of select="$sentence-ids-tree"/>
     </xsl:result-document>
   </xsl:template>
 
   <!--========================================================= -->
-  <!-- WRITE THE SENTENCE IDS ON THE SECONDARY PORT             -->
+  <!-- FIND ALL THE SENTENCES' ID                               -->
   <!--========================================================= -->
 
-  <xsl:variable name="ok-list" select="concat(',', $can-contain-sentences, ',')"/>
-
-  <xsl:template match="*[local-name() = $tmp-sentence-tag]" mode="sentence-ids" priority="2">
-    <xsl:variable name="preexisting" select="(ancestor::*|descendant::*)[local-name()=$output-sentence-tag][1]"/>
-    <xsl:choose>
-      <xsl:when test="$detect-preexisting-sentences and $preexisting">
-	<d:sentence id="{if ($preexisting/@id) then ($preexisting/@id) else generate-id($preexisting)}"/>
-      </xsl:when>
-      <xsl:when test="contains($ok-list, concat(',', local-name(..), ','))">
-	<d:sentence id="{if (@id) then (@id) else generate-id()}"/>
-      </xsl:when>
-      <xsl:otherwise>
-	<xsl:variable name="children" select="*[count(descendant::*[local-name() = $tmp-word-tag]) > 0][1]" />
-	<xsl:choose>
-	  <xsl:when test="count($children) = 1">
-	    <d:sentence id="{if ($children[1]/@id) then ($children[1]/@id) else generate-id($children[1])}"/>
-	  </xsl:when>
-	  <xsl:otherwise>
-	    <d:sentence id="{if (../@id) then (../@id) else generate-id(..)}"/>
-	  </xsl:otherwise>
-	</xsl:choose>
-      </xsl:otherwise>
-    </xsl:choose>
+  <xsl:template match="*" mode="sentence-ids" priority="1">
     <xsl:apply-templates select="*" mode="sentence-ids"/>
   </xsl:template>
 
-  <xsl:template match="*" mode="sentence-ids" priority="1">
-    <xsl:apply-templates  select="*" mode="sentence-ids"/>
+  <xsl:template match="*[local-name() = $tmp-sentence-tag]" mode="sentence-ids" priority="2">
+    <d:sentence id="{d:sentid(.)}"/>
+  </xsl:template>
+
+  <xsl:variable name="special-list" select="concat(',', $special-sentences, ',')"/>
+  <xsl:template mode="sentence-ids" priority="2"
+      match="*[contains($special-list, concat(',', local-name(), ',')) or (local-name() = $output-sentence-tag and count(*) = 1 and count(*[local-name() = $tmp-sentence-tag]) = 1)]">
+    <d:sentence id="{d:sentid(.)}" recycled="1"/>
   </xsl:template>
 
   <!--======================================================== -->
-  <!-- REGENERATION OF THE CONTENT INCLUDING SENTENCES AND     -->
-  <!-- WORDS REPLACED WITH VALID EQUIVALENT ELEMENTS           -->
-  <!-- COMPLIANT WITH THE FORMAT (e.g. Zedai, DTBook)          -->
+  <!-- INSERT THE SENTENCES USING VALID ELEMENTS COMPLIANT     -->
+  <!-- WITH THE FORMAT (e.g. Zedai, DTBook)                    -->
   <!--======================================================== -->
+
+  <!-- A word is guaranteed to be one sentence's descendant. -->
 
   <xsl:template match="@*|node()">
     <xsl:param name="sentence-ids-tree"/>
-    <xsl:copy>
-      <xsl:if test="$sentence-ids-tree/*/*[@id = generate-id(current())]">
-      	<xsl:attribute name="id">
-      	  <xsl:value-of select="generate-id()"/>
-      	</xsl:attribute>
-      </xsl:if>
-      <xsl:apply-templates select="@*|node()">
-	<xsl:with-param name="sentence-ids-tree" select="$sentence-ids-tree"/>
-      </xsl:apply-templates>
-    </xsl:copy>
-  </xsl:template>
-
-  <xsl:variable name="ignore-list" select="concat(',', $ignored-elements, ',')"/>
-  <xsl:template match="*[contains($ignore-list, concat(',', local-name(), ','))]" priority="2">
-    <xsl:copy>
-      <xsl:copy-of select="@*"/>
-      <xsl:apply-templates select="node()" mode="ignore-mode"/>
-    </xsl:copy>
-  </xsl:template>
-  <xsl:template mode="ignore-mode" priority="2"
-		match="*[local-name() = $tmp-word-tag or local-name() = $tmp-sentence-tag]">
-    <xsl:apply-templates select="node()" mode="ignore-mode"/>
-  </xsl:template>
-  <xsl:template match="*" mode="ignore-mode" priority="1">
-    <xsl:copy>
-      <xsl:copy-of select="@*"/>
-      <xsl:apply-templates select="node()" mode="ignore-mode"/>
-    </xsl:copy>
-  </xsl:template>
-
-  <xsl:template match="*[local-name() = $tmp-word-tag]" priority="2">
-    <xsl:param name="sentence-ids-tree" select="/"/>
+    <xsl:variable name="myid" select="d:sentid(.)"/>
+    <xsl:variable name="entry" select="$sentence-ids-tree/*/*[@id = $myid][1]"/>
     <xsl:choose>
-      <xsl:when test="(ancestor::*|descendant::*)[local-name()=$output-word-tag and string(@*[local-name()=$word-attr]) = $word-attr-val]">
-	<!-- a word already exists -->
-	<xsl:apply-templates select="node()">
-	  <xsl:with-param name="sentence-ids-tree" select="()"/>
-	</xsl:apply-templates>
+      <xsl:when test="$entry and $entry/@recycled">
+	<xsl:copy>
+	  <xsl:copy-of select="@*"/>
+	  <xsl:if test="not(@id)">
+	    <xsl:attribute name="id">
+	      <xsl:value-of select="$entry/@id"/>
+	    </xsl:attribute>
+	  </xsl:if>
+	  <xsl:apply-templates select="node()" mode="inside-sentence"/>
+	</xsl:copy>
+      </xsl:when>
+      <xsl:when test="$entry">
+	<xsl:element name="{$output-sentence-tag}" namespace="{$output-ns}">
+	  <xsl:attribute name="id">
+	    <xsl:value-of select="$entry/@id"/>
+	  </xsl:attribute>
+	  <xsl:apply-templates select="node()" mode="inside-sentence"/>
+	</xsl:element>
       </xsl:when>
       <xsl:otherwise>
+	<xsl:copy>
+	  <xsl:apply-templates select="@*|node()">
+	    <xsl:with-param name="sentence-ids-tree" select="$sentence-ids-tree"/>
+	  </xsl:apply-templates>
+	</xsl:copy>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!--======================================================== -->
+  <!-- INSIDE THE SENTENCES (ONCE THEY HAVE BEEN ADDED)        -->
+  <!--======================================================== -->
+
+  <xsl:template match="*[local-name() = $tmp-sentence-tag]" mode="inside-sentence" priority="2">
+    <!-- Ignore the sentence: a parent node has been recycled to contain the sentence. -->
+    <xsl:apply-templates select="node()" mode="inside-sentence"/>
+  </xsl:template>
+
+  <xsl:variable name="ok-parent-list" select="concat(',', $can-contain-words, ',')" />
+  <xsl:template match="*[local-name() = $tmp-word-tag]" mode="inside-sentence" priority="2">
+    <xsl:choose>
+      <xsl:when test="contains($ok-parent-list, concat(',', local-name(..), ','))">
 	<xsl:element name="{$output-word-tag}" namespace="{$output-ns}">
 	  <xsl:if test="$word-attr != ''">
 	    <xsl:attribute name="{$word-attr}">
 	      <xsl:value-of select="$word-attr-val"/>
 	    </xsl:attribute>
 	  </xsl:if>
-	  <xsl:apply-templates select="node()">
-	    <xsl:with-param name="sentence-ids-tree" select="()"/>
-	  </xsl:apply-templates>
+	  <xsl:apply-templates select="node()" mode="inside-sentence"/>
 	</xsl:element>
+      </xsl:when>
+      <xsl:otherwise>
+	<!-- The word is ignored. -->
+	<xsl:apply-templates select="node()" mode="inside-sentence"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="*[local-name() = $tmp-sentence-tag]" priority="2">
-    <xsl:param name="sentence-ids-tree"/>
-    <xsl:variable name="myid" select="if (@id) then (@id) else generate-id()"/>
-    <xsl:choose>
-      <xsl:when test="$sentence-ids-tree/*/*[@id = $myid]">
-	<xsl:element name="{$output-sentence-tag}" namespace="{$output-ns}">
-	  <xsl:if test="not(@id)">
-	    <xsl:attribute name="id">
-	      <xsl:value-of select="$myid"/>
-	    </xsl:attribute>
-	  </xsl:if>
-	  <xsl:apply-templates select="@*|node()">
-	    <xsl:with-param name="sentence-ids-tree" select="()"/>
-	  </xsl:apply-templates>
-	</xsl:element>
-      </xsl:when>
-      <xsl:otherwise>
-	<xsl:apply-templates select="@*|node()">
-	  <!-- current node is not a true sentence -->
-	  <!-- => we keep looking for sentences in this branch -->
-	  <xsl:with-param name="sentence-ids-tree" select="$sentence-ids-tree"/>
-	</xsl:apply-templates>
-      </xsl:otherwise>
-    </xsl:choose>
+  <xsl:template match="node()" mode="inside-sentence" priority="1">
+    <xsl:copy>
+      <xsl:copy-of select="@*"/>
+      <xsl:apply-templates select="node()" mode="inside-sentence"/>
+    </xsl:copy>
   </xsl:template>
 
 </xsl:stylesheet>

@@ -22,7 +22,6 @@
       <p:with-option name="ensure-word-before" select="'span'"/>
       <p:with-option name="ensure-word-after" select="'span'"/>
       <p:with-option name="can-contain-sentences" select="'span,p,citation,note,quote,address,block,annotation,item,description,definition,caption,aside'"/>
-      <p:with-option name="can-contain-subsentences" select="'s,span,p,citation,note,quote,address,block,annotation,item,description,definition,caption,aside'"/>
       <p:with-option name="output-ns" select="'http://www.daisy.org/ns/z3998/authoring'"/>
       <p:with-option name="output-word-tag" select="'w'"/>
       <p:with-option name="output-sentence-tag" select="'s'"/>
@@ -31,9 +30,7 @@
   </p:declare-step>
 
   <p:declare-step type="px:zedai-unwrap-words">
-
     <p:documentation>Remove the word markups from the input document.</p:documentation>
-
     <p:input port="source" primary="true"/>
     <p:output port="result" primary="true"/>
     <p:unwrap match="z:w" />

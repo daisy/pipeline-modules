@@ -22,7 +22,6 @@
       <p:with-option name="ensure-word-before" select="'span,br,ruby,s,address,abbr,style'"/>
       <p:with-option name="ensure-word-after" select="'span,br,ruby,s,address,abbr,style'"/>
       <p:with-option name="can-contain-sentences" select="'span,p,div'"/>
-      <p:with-option name="can-contain-subsentences" select="'span,p,div'"/>
       <p:with-option name="output-ns" select="'http://www.w3.org/1999/xhtml'"/>
       <p:with-option name="output-word-tag" select="'span'"/>
       <p:with-option name="word-attr" select="'role'"/>
@@ -33,9 +32,7 @@
   </p:declare-step>
 
   <p:declare-step type="px:html-unwrap-words">
-
     <p:documentation>Remove the word markups from the input document.</p:documentation>
-
     <p:input port="source" primary="true"/>
     <p:output port="result" primary="true"/>
     <p:unwrap match="xhtml:span[@role='word']" />

@@ -9,8 +9,7 @@ import org.daisy.pipeline.nlp.TextCategorizer.Category;
 import org.daisy.pipeline.nlp.TextCategorizer.MatchMode;
 
 /**
- * Match compact abbreviations such as "etc" and "etc.", but "e.t.c" does not
- * match.
+ * Match compact abbreviations such as "etc.", but "e.t.c" does not match.
  */
 public class CompactAbbrMatchRule extends WordListMatchRule {
 	public CompactAbbrMatchRule(Category category, int priority, boolean caseSensitive,
@@ -21,7 +20,6 @@ public class CompactAbbrMatchRule extends WordListMatchRule {
 	public void init(Collection<String> rawAbbrs) {
 		List<String> abbrs = new ArrayList<String>();
 		for (String prefix : rawAbbrs) {
-			abbrs.add(prefix);
 			abbrs.add(prefix + ".");
 		}
 

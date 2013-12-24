@@ -9,7 +9,7 @@ import org.daisy.pipeline.nlp.TextCategorizer.Category;
 import org.daisy.pipeline.nlp.TextCategorizer.MatchMode;
 
 /**
- * Match abbreviations such as "i.e.", "i.e" and "ie".
+ * Match abbreviations such as "i.e." and "i.e".
  */
 public class AbbrMatchRule extends CompactAbbrMatchRule {
 
