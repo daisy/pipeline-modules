@@ -7,7 +7,7 @@
 		name="main"
 		exclude-inline-prefixes="#all">
 
-  <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/xproc/fileset-library.xpl"/>
+  <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
   <p:import href="http://www.daisy.org/pipeline/modules/css-speech/inline-css.xpl"/>
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl" />
 
