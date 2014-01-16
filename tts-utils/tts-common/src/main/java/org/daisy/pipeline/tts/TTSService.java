@@ -91,28 +91,20 @@ public interface TTSService {
 	 *            must include the <mark> and the <break/> at the end.
 	 * @param voice is the voice the synthesizer must use. It is guaranteed to
 	 *            be one returned by getAvailableVoices()
-	 * 
 	 * @param output is the resulting raw audio data. Ideally the address of the
 	 *            buffer is left unchanged, but a new buffer can be allocated
-	 *            when the audio data do not fit in the one provided.
-	 * @param memory is the object returned by synthesize() when the audio data
-	 *            do not fit in @param audioBuffer but could fit if it were
-	 *            flushed before. In such case synthesize() is called twice.
-	 *            null is passed the first time.
+	 *            when the audio data do not fit in the one provided. The new
+	 *            buffer must contain the previous data as well.
 	 * @param threadResources is the object returned by
 	 *            allocateThreadResource().
-	 * @param marks are the returned pairs (markName, timeInOutput)
+	 * @param marks are the returned pairs (markName, offsetInOutput)
 	 *            corresponding to the ssml:marks of @param ssml. The order must
-	 *            be kept. This parameter should be ignored by synthesizers that
-	 *            cannot handle ssml marks. The provided list is always empty
-	 *            even when synthesize() is called twice.
-	 * @return an object containing resources kept for a second call to
-	 *         synthesize() when @param audioBuffer needs to be flushed so the
-	 *         new data can fit into it. null is returned if the first call
-	 *         succeeds.
+	 *            be kept. The provided list is always empty. The offsetInOutput
+	 *            are relative to the new data inserted (they start at 0 no
+	 *            matter what audioBuffer already contains).
 	 */
-	Object synthesize(XdmNode ssml, Voice voice, RawAudioBuffer audioBuffer, Object memory,
-	        Object threadResources, List<Map.Entry<String, Double>> marks)
+	void synthesize(XdmNode ssml, Voice voice, RawAudioBuffer audioBuffer,
+	        Object threadResources, List<Map.Entry<String, Integer>> marks)
 	        throws SynthesisException;
 
 	/**

@@ -1,5 +1,6 @@
 package org.daisy.pipeline.tts.espeak;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -13,6 +14,15 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class EspeakTest {
+
+	private static int getSize(Collection<RawAudioBuffer> buffers) {
+		int res = 0;
+		for (RawAudioBuffer buf : buffers) {
+			res += buf.offsetInOutput;
+		}
+		return res;
+	}
+
 	@Test
 	public void getVoiceInfo() throws SynthesisException {
 		TTSService service = new ESpeakBinTTS();
@@ -26,15 +36,13 @@ public class EspeakTest {
 		ESpeakBinTTS service = new ESpeakBinTTS();
 		service.initialize();
 
-		RawAudioBuffer rab = new RawAudioBuffer();
-		rab.output = new byte[512 * 1024];
-		rab.offsetInOutput = 0;
+		ArrayList<RawAudioBuffer> li = new ArrayList<RawAudioBuffer>();
 
 		Object resource = service.allocateThreadResources();
-		service.synthesize("<s>this is a test</s>", rab, resource, null, null);
+		service.synthesize("<s>this is a test</s>", null, resource, li);
 		service.releaseThreadResources(resource);
 
-		Assert.assertTrue(rab.offsetInOutput > 2000);
+		Assert.assertTrue(getSize(li) > 2000);
 	}
 
 	@Test
@@ -43,18 +51,17 @@ public class EspeakTest {
 		service.initialize();
 		Object resource = service.allocateThreadResources();
 
-		RawAudioBuffer rab = new RawAudioBuffer();
-		rab.output = new byte[512 * 1024];
+		ArrayList<RawAudioBuffer> li = new ArrayList<RawAudioBuffer>();
 
 		Set<Integer> sizes = new HashSet<Integer>();
 		int totalVoices = 0;
 		Iterator<Voice> ite = service.getAvailableVoices().iterator();
 		while (ite.hasNext()) {
 			Voice v = ite.next();
-			rab.offsetInOutput = 0;
-			service.synthesize("<s><voice name=\"" + v.name
-			        + "\">small test</voice></s>", rab, resource, null, null);
-			sizes.add(rab.offsetInOutput / 4); //div 4 helps being more robust to tiny differences
+			li.clear();
+			service.synthesize("<s><voice name=\"" + v.name + "\">small test</voice></s>",
+			        null, resource, li);
+			sizes.add(getSize(li) / 4); //div 4 helps being more robust to tiny differences
 			totalVoices++;
 		}
 		service.releaseThreadResources(resource);
@@ -70,17 +77,14 @@ public class EspeakTest {
 		ESpeakBinTTS service = new ESpeakBinTTS();
 		service.initialize();
 
-		RawAudioBuffer rab = new RawAudioBuffer();
-		rab.output = new byte[512 * 1024];
-		rab.offsetInOutput = 0;
+		ArrayList<RawAudioBuffer> li = new ArrayList<RawAudioBuffer>();
 
 		Object resource = service.allocateThreadResources();
-		service.synthesize(
-		        "<s>𝄞𝄞𝄞𝄞 水水水水水 𝄞水𝄞水𝄞水𝄞水 test 国Ø家Ť标准 ĜæŘ ß ŒÞ ๕</s>",
-		        rab, resource, null, null);
+		service.synthesize("<s>𝄞𝄞𝄞𝄞 水水水水水 𝄞水𝄞水𝄞水𝄞水 test 国Ø家Ť标准 ĜæŘ ß ŒÞ ๕</s>", null,
+		        resource, li);
 		service.releaseThreadResources(resource);
 
-		Assert.assertTrue(rab.offsetInOutput > 2000);
+		Assert.assertTrue(getSize(li) > 2000);
 	}
 
 	@Test
@@ -94,8 +98,7 @@ public class EspeakTest {
 			final int j = i;
 			threads[i] = new Thread() {
 				public void run() {
-					RawAudioBuffer rab = new RawAudioBuffer();
-					rab.output = new byte[512 * 1024];
+					ArrayList<RawAudioBuffer> li = new ArrayList<RawAudioBuffer>();
 					Object resource = null;
 					try {
 						resource = service.allocateThreadResources();
@@ -104,16 +107,18 @@ public class EspeakTest {
 					}
 
 					for (int k = 0; k < 16; ++k) {
-						rab.offsetInOutput = 0;
+						li.clear();
 						try {
-							service.synthesize("<s>small test</s>", rab,
-							        resource, null, null);
+							service.synthesize("<s>small test</s>", null, resource, li);
 						} catch (SynthesisException e) {
 							break;
 						}
-						sizes[j] += rab.offsetInOutput;
+						sizes[j] += getSize(li);
 					}
-					service.releaseThreadResources(resource);
+					try {
+						service.releaseThreadResources(resource);
+					} catch (SynthesisException e) {
+					}
 				}
 			};
 		}

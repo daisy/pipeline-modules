@@ -4,11 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
 
 import javax.sound.sampled.AudioFormat;
-
-import net.sf.saxon.s9api.XdmNode;
 
 import org.concord.win.sapi53.ClassFactory;
 import org.concord.win.sapi53.ISpeechFileStream;
@@ -19,12 +16,11 @@ import org.concord.win.sapi53.ISpeechWaveFormatEx;
 import org.concord.win.sapi53.SpeechStreamFileMode;
 import org.concord.win.sapi53.SpeechVoiceSpeakFlags;
 import org.daisy.pipeline.tts.BasicSSMLAdapter;
+import org.daisy.pipeline.tts.MarkFreeTTSService;
 import org.daisy.pipeline.tts.SSMLAdapter;
-import org.daisy.pipeline.tts.SSMLUtil;
 import org.daisy.pipeline.tts.SoundUtil;
-import org.daisy.pipeline.tts.TTSService;
 
-public class SAPIcomTTS implements TTSService {
+public class SAPIcomTTS extends MarkFreeTTSService {
 	private AudioFormat mAudioFormat = null;
 	private List<Voice> mAvailableVoices;
 	private SSMLAdapter mSSMLAdapter = new BasicSSMLAdapter() {
@@ -41,53 +37,6 @@ public class SAPIcomTTS implements TTSService {
 
 	static private class ThreadResource {
 		ISpeechVoice voice;
-	}
-
-	@Override
-	public Object synthesize(XdmNode ssml, Voice voice, RawAudioBuffer audioBuffer,
-	        Object resource, Object lastCallMemory, List<Entry<String, Double>> marks)
-	        throws SynthesisException {
-		return synthesize(SSMLUtil.toString(ssml, voice.name, mSSMLAdapter), voice,
-		        audioBuffer, resource, lastCallMemory, marks);
-	}
-
-	private Object synthesize(String ssml, Voice voice, RawAudioBuffer audioBuffer,
-	        Object resource, Object lastCallMemory, List<Entry<String, Double>> marks)
-	        throws SynthesisException {
-
-		ThreadResource th = (ThreadResource) resource;
-
-		File dest;
-		try {
-			dest = File.createTempFile("sapi", ".wav");
-			dest.deleteOnExit();
-		} catch (IOException e) {
-			throw new SynthesisException(e.getMessage(), e.getCause());
-		}
-
-		ISpeechFileStream stream = ClassFactory.createSpFileStream();
-		stream.open(dest.getAbsolutePath(), SpeechStreamFileMode.SSFMCreateForWrite, false);
-		th.voice.audioOutputStream(stream);
-
-		if (mAudioFormat == null) { //assuming there is a single-threaded testing call first
-			ISpeechWaveFormatEx format = stream.format().getWaveFormatEx();
-			mAudioFormat = new AudioFormat(format.samplesPerSec(), format.bitsPerSample(),
-			        format.channels(), true, false);
-		}
-
-		th.voice.speak(ssml, SpeechVoiceSpeakFlags.SVSFParseSsml);
-		th.voice.waitUntilDone(-1);
-
-		stream.close();
-		stream.dispose();
-
-		try {
-			SoundUtil.readWave(dest, audioBuffer, false);
-		} catch (Exception e) {
-			throw new SynthesisException(e.getMessage(), e.getCause());
-		}
-
-		return null;
 	}
 
 	@Override
@@ -119,22 +68,6 @@ public class SAPIcomTTS implements TTSService {
 	}
 
 	@Override
-	public void beforeAllocatingResources() throws SynthesisException {
-	}
-
-	@Override
-	public void afterAllocatingResources() throws SynthesisException {
-	}
-
-	@Override
-	public void beforeReleasingResources() throws SynthesisException {
-	}
-
-	@Override
-	public void afterReleasingResources() throws SynthesisException {
-	}
-
-	@Override
 	public int getOverallPriority() {
 		return 1;
 	}
@@ -163,15 +96,59 @@ public class SAPIcomTTS implements TTSService {
 
 		//test the TTS Service before registration
 		ThreadResource th = (ThreadResource) allocateThreadResources();
-		RawAudioBuffer testBuffer = new RawAudioBuffer();
-		testBuffer.offsetInOutput = 0;
-		testBuffer.output = new byte[1];
+		List<RawAudioBuffer> li = new ArrayList<RawAudioBuffer>();
 		synthesize(mSSMLAdapter.getHeader(null) + "<s>test<break time=\"10ms\"></break></s>"
-		        + mSSMLAdapter.getFooter(), mAvailableVoices.get(0), testBuffer, th, null,
-		        null);
+		        + mSSMLAdapter.getFooter(), mAvailableVoices.get(0), th,
+		        new ArrayList<RawAudioBuffer>());
 		releaseThreadResources(th);
-		if (testBuffer.offsetInOutput <= 0) {
+		if (li.get(0).offsetInOutput <= 0) {
 			throw new SynthesisException("SAPI with com4j did not output anything.");
 		}
+	}
+
+	@Override
+	public SSMLAdapter getSSMLAdapter() {
+		return mSSMLAdapter;
+	}
+
+	@Override
+	public void synthesize(String ssml, Voice voice, Object threadResources,
+	        List<RawAudioBuffer> results) throws SynthesisException {
+		ThreadResource th = (ThreadResource) threadResources;
+
+		File dest;
+		try {
+			dest = File.createTempFile("sapi", ".wav");
+			dest.deleteOnExit();
+		} catch (IOException e) {
+			throw new SynthesisException(e.getMessage(), e.getCause());
+		}
+
+		ISpeechFileStream stream = ClassFactory.createSpFileStream();
+		stream.open(dest.getAbsolutePath(), SpeechStreamFileMode.SSFMCreateForWrite, false);
+		th.voice.audioOutputStream(stream);
+
+		if (mAudioFormat == null) { //assuming there is a single-threaded testing call first
+			ISpeechWaveFormatEx format = stream.format().getWaveFormatEx();
+			mAudioFormat = new AudioFormat(format.samplesPerSec(), format.bitsPerSample(),
+			        format.channels(), true, false);
+		}
+
+		th.voice.speak(ssml, SpeechVoiceSpeakFlags.SVSFParseSsml);
+		th.voice.waitUntilDone(-1);
+
+		stream.close();
+		stream.dispose();
+
+		RawAudioBuffer b = new RawAudioBuffer();
+		b.offsetInOutput = 0;
+
+		try {
+			SoundUtil.readWave(dest, b);
+		} catch (Exception e) {
+			throw new SynthesisException(e.getMessage(), e.getCause());
+		}
+
+		results.add(b);
 	}
 }

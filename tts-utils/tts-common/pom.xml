@@ -34,6 +34,19 @@
   </build>
 
   <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+    </dependency>
+
+    <!-- For its TreeWriter -->
+    <dependency>
+      <groupId>org.daisy.libs</groupId>
+      <artifactId>com.xmlcalabash</artifactId>
+      <version>1.0.9</version>
+    </dependency>
+
     <!-- the TTS service interface uses XdmNode -->
     <dependency>
       <groupId>net.sf.saxon</groupId>
@@ -41,11 +54,18 @@
       <version>9.4</version>
     </dependency>
 
-     <dependency>
-       <groupId>org.slf4j</groupId>
-       <artifactId>slf4j-api</artifactId>
-       <version>1.6.4</version>
-     </dependency>
+    <!-- For its Multimap. -->
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>15.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.6.4</version>
+    </dependency>
   </dependencies>
 
 </project>

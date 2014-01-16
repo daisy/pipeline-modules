@@ -114,15 +114,28 @@ public class SynthesisWorkerPool {
 
 	public void synthesizeAndWait(List<SoundFragment> soundfragments)
 	        throws SynthesisException {
+
+		//sort the 'undispatchable' sections according to their size in descending-order
+		for (UndispatchableSection section : mSections)
+			section.computeSize();
+		Collections.sort(mSections);
+		mLogger.printInfo("number of sections to synthesize: " + mSections.size());
+
+		//give SynthetisWorkerThread access to a synchronized queue of sections to synthesize
+		ConcurrentLinkedQueue<UndispatchableSection> queue = new ConcurrentLinkedQueue<UndispatchableSection>(
+		        mSections);
+		for (SynthesisWorkerThread worker : mWorkers)
+			worker.init(mEncoder, mLogger, soundfragments, queue);
+
 		//pre-allocate resources for every TTS of every thread
 		Set<TTSService> allTTS = new HashSet<TTSService>();
 		for (UndispatchableSection section : mSections)
 			allTTS.add(section.synthesizer);
 
 		StringBuilder sb = new StringBuilder("start allocating the resources on " + mNrThreads
-		        + " threads for the following TTS service(s):\n");
+		        + " threads for the following TTS service(s):");
 		for (TTSService tts : allTTS) {
-			sb.append(" * " + tts.getName() + "-" + tts.getVersion() + "\n");
+			sb.append("\n * " + tts.getName() + "-" + tts.getVersion());
 		}
 		mLogger.printInfo(sb.toString());
 
@@ -137,18 +150,6 @@ public class SynthesisWorkerPool {
 			tts.afterAllocatingResources();
 
 		mLogger.printInfo("thread resources allocated.");
-
-		//sort the 'undispatchable' sections according to their size in descending-order
-		for (UndispatchableSection section : mSections)
-			section.computeSize();
-		Collections.sort(mSections);
-		mLogger.printInfo("number of sections to synthesize: " + mSections.size());
-
-		//give SynthetisWorkerThread access to a synchronized queue of sections to synthesize
-		ConcurrentLinkedQueue<UndispatchableSection> queue = new ConcurrentLinkedQueue<UndispatchableSection>(
-		        mSections);
-		for (SynthesisWorkerThread worker : mWorkers)
-			worker.init(mEncoder, mLogger, soundfragments, queue);
 
 		//perform the synthesis and encoding
 		for (SynthesisWorkerThread worker : mWorkers)

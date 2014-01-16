@@ -39,28 +39,26 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 
 	private AudioEncoder mEncoder; // must be thread-safe!
 	private byte[] mOutput;
-	private int mOffsetInOutput;
+	private RawAudioBuffer mAudioBuffer;
 	private List<SoundFragment> mGlobalSoundFragments; // must be thread-safe!
 	private List<SoundFragment> mCurrentFragments;
 	private IPipelineLogger mLogger;
 	private TTSService mLastUsedSynthesizer; // must be thread-safe!
-	private RawAudioBuffer mRawAudioBuffer;
 	private ConcurrentLinkedQueue<UndispatchableSection> mSectionsQueue;
 	private Map<TTSService, Object> mResources;
 	private int mCurrentDocPosition;
 	private int mSectionFiles;
 
-	public SynthesisWorkerThread() {
-		mOutput = new byte[AUDIO_BUFFER_BYTES];
-		mRawAudioBuffer = new RawAudioBuffer();
-		mResources = new HashMap<TTSService, Object>();
-	}
-
 	public void init(AudioEncoder encoder, IPipelineLogger logger,
 	        List<SoundFragment> allSoundFragments,
 	        ConcurrentLinkedQueue<UndispatchableSection> sectionQueue) {
+		mOutput = new byte[AUDIO_BUFFER_BYTES];
+		mResources = new HashMap<TTSService, Object>();
 		mEncoder = encoder;
-		mOffsetInOutput = 0;
+		mAudioBuffer = new RawAudioBuffer();
+		mAudioBuffer.offsetInOutput = 0;
+		mAudioBuffer.output = mOutput;
+
 		mCurrentFragments = new LinkedList<SoundFragment>();
 		mGlobalSoundFragments = allSoundFragments;
 		mLogger = logger;
@@ -68,18 +66,15 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 	}
 
 	private void encodeAudio() {
-		encodeAudio(mOutput, mOffsetInOutput);
-	}
-
-	private void encodeAudio(byte[] output, int size) {
 		String preferredFileName = String.format("section%04d_%02d", mCurrentDocPosition,
 		        mSectionFiles);
 
-		String soundFile = mEncoder.encode(output, size, mLastUsedSynthesizer
-		        .getAudioOutputFormat(), this, preferredFileName);
+		String soundFile = mEncoder.encode(mAudioBuffer.output, mAudioBuffer.offsetInOutput,
+		        mLastUsedSynthesizer.getAudioOutputFormat(), this, preferredFileName);
 
 		if (soundFile == null) {
-			float sec = size / mLastUsedSynthesizer.getAudioOutputFormat().getFrameRate();
+			float sec = mAudioBuffer.offsetInOutput
+			        / mLastUsedSynthesizer.getAudioOutputFormat().getFrameRate();
 			mLogger.printInfo("" + sec + " seconds of audio data could not be encoded!");
 		} else {
 			for (SoundFragment sf : mCurrentFragments) {
@@ -89,7 +84,8 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 		}
 
 		// reset the state of the thread
-		mOffsetInOutput = 0;
+		mAudioBuffer.offsetInOutput = 0;
+		mAudioBuffer.output = mOutput;
 		mCurrentFragments.clear();
 		++mSectionFiles;
 	}
@@ -110,56 +106,27 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 	}
 
 	private void processOneSentence(XdmNode sentence, Voice voice) throws SynthesisException {
-		if (mOffsetInOutput + MAX_ESTIMATED_SYNTHESIZED_BYTES > AUDIO_BUFFER_BYTES) {
+		if (mAudioBuffer.offsetInOutput + MAX_ESTIMATED_SYNTHESIZED_BYTES > mAudioBuffer.output.length) {
 			encodeAudio();
 		}
 		Object resource = mResources.get(mLastUsedSynthesizer);
-		List<Map.Entry<String, Double>> marks = new ArrayList<Map.Entry<String, Double>>();
-		mRawAudioBuffer.output = mOutput;
-		mRawAudioBuffer.offsetInOutput = mOffsetInOutput;
-		Object memory = mLastUsedSynthesizer.synthesize(sentence, voice, mRawAudioBuffer,
-		        resource, null, marks);
-
-		if (memory != null) {
-			encodeAudio();
-			// try again with the room freed after encoding
-			marks.clear();
-			mLastUsedSynthesizer.synthesize(sentence, voice, mRawAudioBuffer, resource,
-			        memory, marks);
-		} else if (mRawAudioBuffer.output != mOutput) {
-			if ((mRawAudioBuffer.offsetInOutput + mOffsetInOutput) > mOutput.length) {
-				// it has been externally allocated because it does not fit
-				// in the current buffer
-				if (mOffsetInOutput > 0)
-					encodeAudio();
-			} else {
-				// this makes sense when TTS engine's policy is to always use its own buffers,
-				// even when it could fit in the current buffer
-				System.arraycopy(mRawAudioBuffer.output, 0, mOutput, mOffsetInOutput,
-				        mRawAudioBuffer.offsetInOutput);
-				mRawAudioBuffer.output = mOutput;
-				mRawAudioBuffer.offsetInOutput += mOffsetInOutput;
-			}
-		}
+		List<Map.Entry<String, Integer>> marks = new ArrayList<Map.Entry<String, Integer>>();
+		int begin = mAudioBuffer.offsetInOutput;
+		mLastUsedSynthesizer.synthesize(sentence, voice, mAudioBuffer, resource, marks);
 
 		// keep track of where the sound begins and where it ends in the audio buffer
 		if (marks.size() == 0) {
 			SoundFragment sf = new SoundFragment();
 			sf.id = sentence.getAttributeValue(Sentence_attr_id);
-			sf.clipBegin = convertBytesToSecond(mOffsetInOutput);
-			mOffsetInOutput = mRawAudioBuffer.offsetInOutput;
-			sf.clipEnd = convertBytesToSecond(mOffsetInOutput);
+			sf.clipBegin = convertBytesToSecond(begin);
+			sf.clipEnd = convertBytesToSecond(mAudioBuffer.offsetInOutput);
 			mCurrentFragments.add(sf);
 		} else {
-			double begin = convertBytesToSecond(mOffsetInOutput);
-			mOffsetInOutput = mRawAudioBuffer.offsetInOutput;
-			double end = convertBytesToSecond(mOffsetInOutput);
-
-			Map<String, Double> starts = new HashMap<String, Double>();
-			Map<String, Double> ends = new HashMap<String, Double>();
+			Map<String, Integer> starts = new HashMap<String, Integer>();
+			Map<String, Integer> ends = new HashMap<String, Integer>();
 			Set<String> all = new HashSet<String>();
 
-			for (Map.Entry<String, Double> e : marks) {
+			for (Map.Entry<String, Integer> e : marks) {
 				String[] mark = e.getKey().split(FormatSpecifications.MarkDelimiter, -1);
 				if (!mark[0].isEmpty()) {
 					ends.put(mark[0], e.getValue());
@@ -174,21 +141,15 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 				SoundFragment sf = new SoundFragment();
 				sf.id = id;
 				if (starts.containsKey(id))
-					sf.clipBegin = begin + starts.get(id);
+					sf.clipBegin = convertBytesToSecond(begin + starts.get(id));
 				else
-					sf.clipBegin = begin;
+					sf.clipBegin = convertBytesToSecond(begin);
 				if (ends.containsKey(id))
-					sf.clipEnd = begin + ends.get(id);
+					sf.clipEnd = convertBytesToSecond(begin + ends.get(id));
 				else
-					sf.clipEnd = end;
+					sf.clipEnd = convertBytesToSecond(mAudioBuffer.offsetInOutput);
 				mCurrentFragments.add(sf);
 			}
-		}
-
-		if (mRawAudioBuffer.output != mOutput) {
-			// externally allocated case: it does not fit in current buffer
-			// => encode immediately
-			encodeAudio(mRawAudioBuffer.output, mRawAudioBuffer.offsetInOutput);
 		}
 	}
 
@@ -206,7 +167,7 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 				for (Speakable speakable : section.speakables) {
 					processOneSentence(speakable.sentence, speakable.voice);
 				}
-				if (mOffsetInOutput > 0)
+				if (mAudioBuffer.offsetInOutput > 0)
 					encodeAudio();
 			} catch (Exception e) {
 				StringWriter sw = new StringWriter();

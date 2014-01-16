@@ -16,21 +16,15 @@ public class SoundUtil {
 	 * @return true if @param audioBuffer has been filled, false if @param
 	 *         audioBuffer need to be flushed
 	 */
-	static public boolean readWave(File soundFile, RawAudioBuffer audioBuffer, boolean twoTries)
+	static public boolean readWave(File soundFile, RawAudioBuffer audioBuffer)
 	        throws UnsupportedAudioFileException, IOException {
 		int maxLength = (int) (soundFile.length() - MinRiffHeaderSize);
 		if (maxLength < 0) {
 			throw new IOException(soundFile.getAbsolutePath()
 			        + " is too small to be a WAV file");
 		}
-		boolean canFit = (soundFile.length() > (audioBuffer.output.length - audioBuffer.offsetInOutput));
-		if (maxLength > audioBuffer.output.length || (!twoTries && !canFit)) {
-			// the audio is not big enough => dynamic allocation
-			audioBuffer.output = new byte[(int) maxLength];
-			audioBuffer.offsetInOutput = 0;
-		} else if (twoTries && canFit) {
-			// the audio buffer is big enough but it needs to be flushed
-			return false;
+		if (soundFile.length() > (audioBuffer.output.length - audioBuffer.offsetInOutput)) {
+			realloc(audioBuffer, (int) soundFile.length());
 		}
 
 		AudioInputStream fi = AudioSystem.getAudioInputStream(soundFile);
@@ -43,5 +37,11 @@ public class SoundUtil {
 		fi.close();
 
 		return true;
+	}
+
+	static public void realloc(RawAudioBuffer buffer, int extra) {
+		byte[] newBuffer = new byte[buffer.offsetInOutput + extra];
+		System.arraycopy(buffer.output, 0, newBuffer, 0, buffer.offsetInOutput);
+		buffer.output = newBuffer;
 	}
 }

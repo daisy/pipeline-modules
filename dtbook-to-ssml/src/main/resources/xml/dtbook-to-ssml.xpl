@@ -22,7 +22,7 @@
     </p:output>
 
     <p:option name="css-sheet-uri" required="false" select="''"/>
-    <p:option name="separate-skippable" required="false" select="'false'"/>
+    <p:option name="separate-skippable" required="false" select="'true'"/>
 
     <p:import href="http://www.daisy.org/pipeline/modules/text-to-ssml/text-to-ssml.xpl" />
 

@@ -23,10 +23,8 @@ public class ESpeakTTS implements TTSService {
 	}
 
 	@Override
-	public Object synthesize(XdmNode ssml, Voice voice,
-	        RawAudioBuffer audioBuffer, Object resource, Object memory,
-	        List<Entry<String, Double>> marks) throws SynthesisException {
-		return null;
+	public void synthesize(XdmNode ssml, Voice voice, RawAudioBuffer audioBuffer,
+	        Object resource, List<Entry<String, Integer>> marks) throws SynthesisException {
 	}
 
 	@Override

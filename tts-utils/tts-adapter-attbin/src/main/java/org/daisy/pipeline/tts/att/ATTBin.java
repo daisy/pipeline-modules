@@ -81,83 +81,66 @@ public class ATTBin implements TTSService {
 		RawAudioBuffer testBuffer = new RawAudioBuffer();
 		testBuffer.offsetInOutput = 0;
 		testBuffer.output = new byte[1];
-		synthesize("test", testBuffer, host, null,
-		        new LinkedList<Map.Entry<String, Double>>(), 1);
+		synthesize("test", testBuffer, host, new LinkedList<Map.Entry<String, Integer>>());
 		if (testBuffer.offsetInOutput <= 0) {
 			throw new SynthesisException("AT&T client binary did not produce any audio data");
 		}
 	}
 
 	@Override
-	public Object synthesize(XdmNode ssml, Voice voice, RawAudioBuffer audioBuffer,
-	        Object resources, Object lastCallMemory, List<Entry<String, Double>> marks)
-	        throws SynthesisException {
-		return synthesize(SSMLUtil.toString(ssml, voice.name, mSSMLAdapter), audioBuffer,
-		        resources, lastCallMemory, marks, 0);
-
+	public void synthesize(XdmNode ssml, Voice voice, RawAudioBuffer audioBuffer,
+	        Object resources, List<Entry<String, Integer>> marks) throws SynthesisException {
+		synthesize(SSMLUtil.toString(ssml, voice.name, mSSMLAdapter), audioBuffer, resources,
+		        marks);
 	}
 
-	private Object synthesize(String ssml, RawAudioBuffer audioBuffer, Object resources,
-	        Object lastCallMemory, List<Entry<String, Double>> marks, int tries)
-	        throws SynthesisException {
+	private void synthesize(String ssml, RawAudioBuffer audioBuffer, Object resources,
+	        List<Entry<String, Integer>> marks) throws SynthesisException {
 
 		Host h = (Host) resources;
 		File dest;
-		if (lastCallMemory != null) {
-			dest = (File) lastCallMemory;
-		} else {
-			try {
-				dest = File.createTempFile("attbin", ".wav");
-			} catch (IOException e) {
-				throw new SynthesisException(e.getMessage(), e.getCause());
+		try {
+			dest = File.createTempFile("attbin", ".wav");
+		} catch (IOException e) {
+			throw new SynthesisException(e.getMessage(), e.getCause());
+		}
+
+		Process p = null;
+		String[] cmd = null;
+		try {
+			cmd = new String[]{
+			        mATTPath, "-ssml", "-v0", "-s", h.address, "-p", String.valueOf(h.port),
+			        "-r", String.valueOf(mSampleRate), "-o", dest.getAbsolutePath()
+			};
+
+			p = Runtime.getRuntime().exec(cmd);
+			p.getOutputStream().write(ssml.getBytes("UTF-8"));
+			p.getOutputStream().close();
+
+			InputStream is = p.getInputStream();
+			Scanner scanner = new Scanner(is);
+			while (scanner.findWithinHorizon(mMarkPattern, 0) != null) {
+				MatchResult mr = scanner.match();
+				int bytes = (mAudioFormat.getSampleSizeInBits() * Integer.valueOf(mr.group(1))) / 8;
+				marks.add(new AbstractMap.SimpleEntry<String, Integer>(mr.group(2), bytes));
 			}
-
-			ssml.toString();
-
-			String[] cmd = null;
-			try {
-				cmd = new String[]{
-				        mATTPath, "-ssml", "-v0", "-s", h.address, "-p",
-				        String.valueOf(h.port), "-r", String.valueOf(mSampleRate), "-o",
-				        dest.getAbsolutePath()
-				};
-
-				Process p = Runtime.getRuntime().exec(cmd);
-				p.getOutputStream().write(ssml.getBytes("UTF-8"));
-				p.getOutputStream().close();
-
-				InputStream is = p.getInputStream();
-				Scanner scanner = new Scanner(is);
-				while (scanner.findWithinHorizon(mMarkPattern, 0) != null) {
-					MatchResult mr = scanner.match();
-					double seconds = Double.valueOf(mr.group(1))
-					        / mAudioFormat.getSampleRate();
-					marks.add(new AbstractMap.SimpleEntry<String, Double>(mr.group(2), seconds));
-				}
-				is.close();
-				p.waitFor();
-			} catch (Exception e) {
-				throw new SynthesisException(e.getMessage(), e.getCause());
-			}
+			is.close();
+			p.waitFor();
+		} catch (Exception e) {
+			dest.delete();
+			if (p != null)
+				p.destroy();
+			throw new SynthesisException(e.getMessage(), e.getCause());
 		}
 
 		// read the audio data from the resulting WAV file
 		try {
-			SoundUtil.readWave(dest, audioBuffer, false);
+			SoundUtil.readWave(dest, audioBuffer);
 		} catch (Exception e) {
-			if (tries == 0) {
-				marks.clear();
-				return synthesize(ssml, audioBuffer, resources, lastCallMemory, marks,
-				        tries + 1);
-			} else if (e.getMessage() == null)
-				throw new SynthesisException(e.getClass().getSimpleName(), e.getCause());
-			else
-				throw new SynthesisException(e.getMessage(), e.getCause());
+			throw new SynthesisException(e.getMessage(), e.getCause());
 		} finally {
 			dest.delete();
 		}
-
-		return null;
 	}
 
 	@Override

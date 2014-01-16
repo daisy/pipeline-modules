@@ -43,7 +43,7 @@ public class ATTNative implements TTSService, ATTLibListener {
 		long connection;
 		RawAudioBuffer audioBuffer;
 		int firstOffset;
-		List<Map.Entry<String, Double>> marks;
+		List<Map.Entry<String, Integer>> marks;
 		byte[] utf8text;
 	}
 
@@ -57,7 +57,6 @@ public class ATTNative implements TTSService, ATTLibListener {
 
 		//Test the synthesizer so that the service won't be active if it fails.
 		//It sets mAudioFormat too
-		mAudioFormat = null;
 		RawAudioBuffer testBuffer = new RawAudioBuffer();
 		testBuffer.offsetInOutput = 0;
 		testBuffer.output = new byte[16];
@@ -70,18 +69,14 @@ public class ATTNative implements TTSService, ATTLibListener {
 	}
 
 	@Override
-	public Object synthesize(XdmNode ssml, Voice voice, RawAudioBuffer audioBuffer,
-	        Object resource, Object lastCallMemory, List<Entry<String, Double>> marks)
-	        throws SynthesisException {
-
+	public void synthesize(XdmNode ssml, Voice voice, RawAudioBuffer audioBuffer,
+	        Object resource, List<Entry<String, Integer>> marks) throws SynthesisException {
 		String str = SSMLUtil.toString(ssml, voice.name, mSSMLAdapter);
 		synthesize(str, voice, audioBuffer, resource, marks);
-
-		return null;
 	}
 
 	private void synthesize(String ssml, Voice voice, RawAudioBuffer audioBuffer,
-	        Object resource, List<Entry<String, Double>> marks) throws SynthesisException {
+	        Object resource, List<Entry<String, Integer>> marks) throws SynthesisException {
 
 		ThreadResource tr = (ThreadResource) resource;
 		tr.audioBuffer = audioBuffer;
@@ -122,9 +117,8 @@ public class ATTNative implements TTSService, ATTLibListener {
 	@Override
 	public void onRecvMark(Object handler, String name) {
 		ThreadResource tr = (ThreadResource) handler;
-		double time = (double) ((tr.audioBuffer.offsetInOutput - tr.firstOffset) / (mAudioFormat
-		        .getFrameRate() * mAudioFormat.getFrameSize()));
-		tr.marks.add(new AbstractMap.SimpleEntry<String, Double>(name, time));
+		tr.marks.add(new AbstractMap.SimpleEntry<String, Integer>(name,
+		        tr.audioBuffer.offsetInOutput - tr.firstOffset));
 	}
 
 	@Override

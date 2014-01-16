@@ -35,7 +35,7 @@ public class CSSInliningTest implements TreeWriterFactory {
 
 	@BeforeClass
 	static public void setUp() throws URISyntaxException {
-		Proc = new Processor(true);
+		Proc = new Processor(false);
 		Builder = Proc.newDocumentBuilder();
 		Serializer = Proc.newSerializer();
 		Serializer.setOutputProperty(Property.OMIT_XML_DECLARATION, "yes");

@@ -32,10 +32,10 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 	private TTSRegistry mTTSRegistry;
 
 	private static String convertSecondToString(double seconds) {
-		long milliseconds = (long) (1000 * seconds);
-		int iseconds = (int) (seconds);
-		return String.format("%d:%02d:%02d.%d", iseconds / 3600, (iseconds % 3600) / 60,
-		        (iseconds % 60), milliseconds - 1000 * iseconds);
+		int iseconds = (int) (Math.floor(seconds));
+		int milliseconds = (int) (Math.round(1000 * (seconds - iseconds)));
+		return String.format("%d:%02d:%02d.%03d", iseconds / 3600, (iseconds / 60) % 60,
+		        (iseconds % 60), milliseconds);
 	}
 
 	public static XdmNode getFirstChild(XdmNode node) {

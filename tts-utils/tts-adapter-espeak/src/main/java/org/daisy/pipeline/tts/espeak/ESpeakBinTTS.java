@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -18,13 +17,11 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 
 import net.sf.saxon.s9api.QName;
-import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.pipeline.tts.BasicSSMLAdapter;
 import org.daisy.pipeline.tts.BinaryFinder;
+import org.daisy.pipeline.tts.MarkFreeTTSService;
 import org.daisy.pipeline.tts.SSMLAdapter;
-import org.daisy.pipeline.tts.SSMLUtil;
-import org.daisy.pipeline.tts.TTSService;
 
 /**
  * This synthesizer uses directly the eSpeak binary. The voice names are used
@@ -33,11 +30,12 @@ import org.daisy.pipeline.tts.TTSService;
  * name=...>), depending on how the connectors (SAPI etc.) manage the eSpeak
  * voices.
  */
-public class ESpeakBinTTS implements TTSService {
+public class ESpeakBinTTS extends MarkFreeTTSService {
 	private AudioFormat mAudioFormat;
 	private String[] mCmd;
 	private SSMLAdapter mSSMLAdapter;
 	private String mEspeakPath;
+	private final static int MIN_CHUNK_SIZE = 2048;
 
 	public void initialize() throws SynthesisException {
 		final String property = "espeak.client.path";
@@ -79,68 +77,12 @@ public class ESpeakBinTTS implements TTSService {
 		};;
 
 		//Test the synthesizer so that the service won't be active if it fails.
-		//It sets mAudioFormat too
+		//It sets mAudioFormat too.
 		mAudioFormat = null;
-		RawAudioBuffer testBuffer = new RawAudioBuffer();
-		testBuffer.offsetInOutput = 0;
-		testBuffer.output = new byte[16];
 		Object r = allocateThreadResources();
-		synthesize("x", testBuffer, r, null, null);
+		synthesize(mSSMLAdapter.getHeader(null) + "x" + mSSMLAdapter.getFooter(), null, r,
+		        new ArrayList<RawAudioBuffer>());
 		releaseThreadResources(r);
-	}
-
-	@Override
-	public Object synthesize(XdmNode ssml, Voice voice, RawAudioBuffer audioBuffer,
-	        Object resource, Object lastCallMemory, List<Entry<String, Double>> marks)
-	        throws SynthesisException {
-		return synthesize(SSMLUtil.toString(ssml, voice.name, mSSMLAdapter), audioBuffer,
-		        resource, lastCallMemory, marks);
-	}
-
-	public Object synthesize(String ssml, RawAudioBuffer audioBuffer, Object resource,
-	        Object lastCallMemory, List<Entry<String, Double>> marks)
-	        throws SynthesisException {
-
-		Process p = null;
-		try {
-			p = Runtime.getRuntime().exec(mCmd);
-
-			//write the SSML
-			BufferedOutputStream out = new BufferedOutputStream((p.getOutputStream()));
-			out.write(ssml.getBytes("utf-8"));
-			out.close();
-
-			//read the wave on the standard output
-			BufferedInputStream in = new BufferedInputStream(p.getInputStream());
-			AudioInputStream fi = AudioSystem.getAudioInputStream(in);
-
-			if (mAudioFormat == null)
-				mAudioFormat = fi.getFormat();
-
-			int read = 0;
-			while (read != -1) {
-				while (audioBuffer.offsetInOutput + read != audioBuffer.output.length
-				        && read != -1) {
-					audioBuffer.offsetInOutput += read;
-					read = fi.read(audioBuffer.output, audioBuffer.offsetInOutput,
-					        audioBuffer.output.length - audioBuffer.offsetInOutput);
-				}
-				if (read != -1) {
-					//the buffer is not big enough
-					byte[] newBuffer = new byte[audioBuffer.output.length + in.available()];
-					System.arraycopy(audioBuffer, 0, newBuffer, 0, audioBuffer.output.length);
-					audioBuffer.output = newBuffer;
-				}
-			}
-			fi.close();
-			p.waitFor();
-		} catch (Exception e) {
-			if (p != null)
-				p.destroy();
-			return null;
-		}
-
-		return null;
 	}
 
 	@Override
@@ -154,29 +96,8 @@ public class ESpeakBinTTS implements TTSService {
 	}
 
 	@Override
-	public Object allocateThreadResources() throws SynthesisException {
-		return null;
-	}
-
-	@Override
-	public void releaseThreadResources(Object resource) {
-	}
-
-	@Override
 	public String getVersion() {
 		return "command-line";
-	}
-
-	@Override
-	public void beforeAllocatingResources() throws SynthesisException {
-	}
-
-	@Override
-	public void afterAllocatingResources() throws SynthesisException {
-	}
-
-	@Override
-	public void beforeReleasingResources() throws SynthesisException {
 	}
 
 	@Override
@@ -246,5 +167,47 @@ public class ESpeakBinTTS implements TTSService {
 		}
 
 		return result;
+	}
+
+	@Override
+	public SSMLAdapter getSSMLAdapter() {
+		return mSSMLAdapter;
+	}
+
+	@Override
+	public void synthesize(String ssml, Voice voice, Object threadResources,
+	        List<RawAudioBuffer> output) throws SynthesisException {
+		Process p = null;
+		try {
+			p = Runtime.getRuntime().exec(mCmd);
+
+			//write the SSML
+			BufferedOutputStream out = new BufferedOutputStream((p.getOutputStream()));
+			out.write(ssml.getBytes("utf-8"));
+			out.close();
+
+			//read the wave on the standard output
+			BufferedInputStream in = new BufferedInputStream(p.getInputStream());
+			AudioInputStream fi = AudioSystem.getAudioInputStream(in);
+
+			if (mAudioFormat == null)
+				mAudioFormat = fi.getFormat();
+
+			while (true) {
+				RawAudioBuffer b = new RawAudioBuffer();
+				int toread = MIN_CHUNK_SIZE + fi.available();
+				b.output = new byte[toread];
+				b.offsetInOutput = fi.read(b.output, 0, toread);
+				if (b.offsetInOutput == -1)
+					break;
+				output.add(b);
+			}
+
+			fi.close();
+			p.waitFor();
+		} catch (Exception e) {
+			if (p != null)
+				p.destroy();
+		}
 	}
 }
