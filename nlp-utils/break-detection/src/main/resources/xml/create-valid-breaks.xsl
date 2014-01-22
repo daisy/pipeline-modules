@@ -13,11 +13,12 @@
   <xsl:param name="output-ns"/>
   <xsl:param name="output-sentence-tag"/>
 
+  <xsl:key name="sentences" match="*[@id]" use="@id"/>
+
   <xsl:function name="d:sentid">
     <xsl:param name="node"/>
     <xsl:value-of select="if ($node/@id) then $node/@id else concat('st', generate-id($node))"/>
   </xsl:function>
-
 
   <!-- The words need an additional pair (attr, val), otherwise they
        could not be identified later on, unlike the sentences which
@@ -71,10 +72,11 @@
   <xsl:template match="@*|node()">
     <xsl:param name="sentence-ids-tree"/>
     <xsl:variable name="myid" select="d:sentid(.)"/>
-    <xsl:variable name="entry" select="$sentence-ids-tree/*/*[@id = $myid][1]"/>
+    <xsl:variable name="entry" select="key('sentences', $myid, $sentence-ids-tree)"/>
     <xsl:choose>
       <xsl:when test="$entry and $entry/@recycled">
-	<xsl:copy>
+	<xsl:copy copy-namespaces="no">
+	  <xsl:apply-templates select="." mode="copy-namespaces"/>
 	  <xsl:copy-of select="@*"/>
 	  <xsl:if test="not(@id)">
 	    <xsl:attribute name="id">
@@ -93,7 +95,8 @@
 	</xsl:element>
       </xsl:when>
       <xsl:otherwise>
-	<xsl:copy>
+	<xsl:copy copy-namespaces="no">
+	  <xsl:apply-templates select="." mode="copy-namespaces"/>
 	  <xsl:apply-templates select="@*|node()">
 	    <xsl:with-param name="sentence-ids-tree" select="$sentence-ids-tree"/>
 	  </xsl:apply-templates>
@@ -132,10 +135,18 @@
   </xsl:template>
 
   <xsl:template match="node()" mode="inside-sentence" priority="1">
-    <xsl:copy>
+    <xsl:copy copy-namespaces="no">
+      <xsl:apply-templates select="." mode="copy-namespaces"/>
       <xsl:copy-of select="@*"/>
       <xsl:apply-templates select="node()" mode="inside-sentence"/>
     </xsl:copy>
+  </xsl:template>
+
+  <!-- UTILS -->
+  <xsl:template match="*" mode="copy-namespaces">
+    <xsl:for-each select="namespace::* except namespace::tmp">
+      <xsl:namespace name="{name(.)}" select="string(.)"/>
+    </xsl:for-each>
   </xsl:template>
 
 </xsl:stylesheet>

@@ -12,6 +12,7 @@
   <xsl:param name="output-subsentence-tag" />
   <xsl:param name="can-contain-subsentences" />
 
+  <xsl:key name="sentences" match="*[@id]" use="@id"/>
 
   <!-- - - - - - - -->
   <!-- Look for the sentences. Either split them or copy them. -->
@@ -24,7 +25,7 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="*[collection()//*[@id = current()/@id]]" priority="2">
+  <xsl:template match="*[key('sentences', @id, collection()[/d:sentences])]" priority="2">
     <xsl:choose>
       <xsl:when test="count(descendant::*[contains($skippable-tag-list, concat(',', local-name(), ','))]) = 0">
 	<xsl:apply-templates select="." mode="copy"/>

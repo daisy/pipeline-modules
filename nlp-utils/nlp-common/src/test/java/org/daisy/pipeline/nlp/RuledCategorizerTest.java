@@ -29,6 +29,28 @@ public class RuledCategorizerTest {
 		return v;
 	}
 
+	public CategorizedWord categorizeWithEndDelimiter(String x) throws IOException {
+		mCategorizer.init(MatchMode.PREFIX_MATCH);
+		CategorizedWord v = mCategorizer.categorize(x, x.toLowerCase());
+		if (v == null) {
+			v = new CategorizedWord();
+			v.category = Category.UNKNOWN;
+			v.word = "";
+		}
+		return v;
+	}
+
+	public CategorizedWord categorizeFullMode(String x) throws IOException {
+		mCategorizer.init(MatchMode.FULL_MATCH);
+		CategorizedWord v = mCategorizer.categorize(x, x.toLowerCase());
+		if (v == null) {
+			v = new CategorizedWord();
+			v.category = Category.UNKNOWN;
+			v.word = "";
+		}
+		return v;
+	}
+
 	@Test
 	public void date1() throws IOException {
 		String date = "2008-12-24";
@@ -57,14 +79,14 @@ public class RuledCategorizerTest {
 	public void not_date2() throws IOException {
 		String d = "1998-20-18";
 		CategorizedWord w = categorizeForPrefix(d);
-		Assert.assertFalse(w.category == Category.DATE && d.equals(w.word));
+		Assert.assertNotSame(w.category, Category.DATE);
 	}
 
 	@Test
 	public void not_date3() throws IOException {
 		String d = "1998-11-42";
 		CategorizedWord w = categorizeForPrefix(d);
-		Assert.assertFalse(w.category == Category.DATE && d.equals(w.word));
+		Assert.assertNotSame(w.category, Category.DATE);
 	}
 
 	@Test
@@ -83,14 +105,21 @@ public class RuledCategorizerTest {
 	public void not_date6() throws IOException {
 		String d = "00/10/1985";
 		CategorizedWord w = categorizeForPrefix(d);
-		Assert.assertFalse(w.category == Category.DATE && d.equals(w.word));
+		Assert.assertNotSame(w.category, Category.DATE);
 	}
 
 	@Test
 	public void not_date7() throws IOException {
 		String d = "5/00/1985";
 		CategorizedWord w = categorizeForPrefix(d);
-		Assert.assertFalse(w.category == Category.DATE && d.equals(w.word));
+		Assert.assertNotSame(w.category, Category.DATE);
+	}
+
+	@Test
+	public void not_date8() throws IOException {
+		String date = "08/1982b";
+		CategorizedWord w = categorizeForPrefix(date);
+		Assert.assertNotSame(w.category, Category.DATE);
 	}
 
 	@Test
@@ -136,13 +165,6 @@ public class RuledCategorizerTest {
 	public void fakeQuantity2() throws IOException {
 		CategorizedWord w = categorizeForPrefix("042");
 		Assert.assertNotSame(Category.QUANTITY, w.category);
-	}
-
-	@Test
-	public void latin() throws IOException {
-		CategorizedWord w = categorizeForPrefix("a priori");
-		Assert.assertEquals("a priori", w.word);
-		Assert.assertEquals(Category.COMMON, w.category);
 	}
 
 	@Test
@@ -206,5 +228,44 @@ public class RuledCategorizerTest {
 		CategorizedWord w = categorizeForPrefix(l);
 		Assert.assertEquals(l, w.word);
 		Assert.assertEquals(Category.TIME, w.category);
+	}
+
+	@Test
+	public void time_fullmode() throws IOException {
+		String l = "12:31";
+		CategorizedWord w = categorizeFullMode(l);
+		Assert.assertEquals(l, w.word);
+		Assert.assertEquals(Category.TIME, w.category);
+	}
+
+	@Test
+	public void time_endsep() throws IOException {
+		String l = "12:31";
+		CategorizedWord w = categorizeWithEndDelimiter(l);
+		Assert.assertEquals(l, w.word);
+		Assert.assertEquals(Category.TIME, w.category);
+	}
+
+	@Test
+	public void not_time1() throws IOException {
+		String l = "12:311";
+		CategorizedWord w = categorizeForPrefix(l);
+		Assert.assertNotSame(Category.TIME, w.category);
+	}
+
+	@Test
+	public void initialism1() throws IOException {
+		String l = "J.B.";
+		CategorizedWord w = categorizeForPrefix(l);
+		Assert.assertEquals(l, w.word);
+		Assert.assertEquals(Category.ACRONYM, w.category);
+	}
+
+	@Test
+	public void initialism2() throws IOException {
+		String l = "J.-B.";
+		CategorizedWord w = categorizeForPrefix(l);
+		Assert.assertEquals(l, w.word);
+		Assert.assertEquals(Category.ACRONYM, w.category);
 	}
 }

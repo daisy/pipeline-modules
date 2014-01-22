@@ -9,6 +9,7 @@ import org.daisy.pipeline.nlp.lexing.LexService.LexerInitException;
 import org.daisy.pipeline.nlp.lexing.LexService.Sentence;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class LexingTest {
@@ -53,6 +54,15 @@ public class LexingTest {
 	}
 
 	@Test
+	public void noSentence1() throws LexerInitException {
+		mLexer.useLanguage(Locale.ENGLISH);
+		String inp = "first block. 55";
+		List<Sentence> sentences = mLexer.split(inp);
+		String text = mPrinter.convert(sentences, inp);
+		Assert.assertEquals("{/first/ /block/. /55/}", text);
+	}
+
+	@Test
 	public void capitalizedWords() throws LexerInitException {
 		mLexer.useLanguage(Locale.ENGLISH);
 		String inp = "Only One Sentence";
@@ -89,6 +99,7 @@ public class LexingTest {
 		Assert.assertEquals("{/before/ /" + link + "/ /after/}", text);
 	}
 
+	@Ignore
 	@Test
 	public void latin() throws LexerInitException {
 		mLexer.useLanguage(Locale.ENGLISH);
@@ -152,5 +163,50 @@ public class LexingTest {
 		List<Sentence> sentences = mLexer.split(ref);
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{\"/First/ /sentence/\".}{/Second/ /sentence/}", text);
+	}
+
+	@Test
+	public void quotes3() throws LexerInitException {
+		mLexer.useLanguage(Locale.ENGLISH);
+		String ref = "\"First sentence. \" Second sentence";
+		List<Sentence> sentences = mLexer.split(ref);
+		String text = mPrinter.convert(sentences, ref);
+		Assert.assertEquals("{\"/First/ /sentence/. \"}{/Second/ /sentence/}", text);
+	}
+
+	@Test
+	public void quotes4() throws LexerInitException {
+		mLexer.useLanguage(Locale.ENGLISH);
+		String ref = "First sentence. » Second sentence";
+		List<Sentence> sentences = mLexer.split(ref);
+		String text = mPrinter.convert(sentences, ref);
+		Assert.assertEquals("{/First/ /sentence/. »}{/Second/ /sentence/}", text);
+	}
+
+	@Test
+	public void quotes5() throws LexerInitException {
+		mLexer.useLanguage(Locale.ENGLISH);
+		String ref = "First block: \"Second block";
+		List<Sentence> sentences = mLexer.split(ref);
+		String text = mPrinter.convert(sentences, ref);
+		Assert.assertEquals("{/First/ /block/: \"/Second/ /block/}", text);
+	}
+
+	@Test
+	public void weirdSentence1() throws LexerInitException {
+		mLexer.useLanguage(Locale.ENGLISH);
+		String ref = "Then he asked this and that?, etc.";
+		List<Sentence> sentences = mLexer.split(ref);
+		String text = mPrinter.convert(sentences, ref);
+		Assert.assertEquals("{/Then/ /he/ /asked/ /this/ /and/ /that/?, /etc/.}", text);
+	}
+
+	@Test
+	public void weirdSentence2() throws LexerInitException {
+		mLexer.useLanguage(Locale.ENGLISH);
+		String ref = "He sighed…: Bla bla.";
+		List<Sentence> sentences = mLexer.split(ref);
+		String text = mPrinter.convert(sentences, ref);
+		Assert.assertEquals("{/He/ /sighed/…:}{/Bla/ /bla/.}", text);
 	}
 }
