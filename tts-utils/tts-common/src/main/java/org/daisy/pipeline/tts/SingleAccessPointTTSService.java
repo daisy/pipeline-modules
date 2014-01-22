@@ -21,7 +21,7 @@ public abstract class SingleAccessPointTTSService implements TTSService {
 
 	@Override
 	public void synthesize(XdmNode ssml, Voice voice, RawAudioBuffer audioBuffer,
-	        Object threadResources, List<Map.Entry<String, Integer>> marks)
+	        Object threadResources, List<Map.Entry<String, Integer>> marks, boolean retry)
 	        throws SynthesisException {
 
 		int myID;

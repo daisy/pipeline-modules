@@ -70,8 +70,18 @@ public class ATTNative implements TTSService, ATTLibListener {
 
 	@Override
 	public void synthesize(XdmNode ssml, Voice voice, RawAudioBuffer audioBuffer,
-	        Object resource, List<Entry<String, Integer>> marks) throws SynthesisException {
-		String str = SSMLUtil.toString(ssml, voice.name, mSSMLAdapter);
+	        Object resource, List<Entry<String, Integer>> marks, boolean retry)
+	        throws SynthesisException {
+		if (retry) {
+			//If the synthesis has failed once, it's likely because the connection is dead,
+			//therefore we open a new connection.
+			ThreadResource old = (ThreadResource) resource;
+			releaseThreadResources(resource);
+			ThreadResource tr = (ThreadResource) allocateThreadResources();
+			old.connection = tr.connection;
+		}
+
+		String str = SSMLUtil.toString(ssml, voice.name, mSSMLAdapter, endingMark());
 		synthesize(str, voice, audioBuffer, resource, marks);
 	}
 
@@ -117,6 +127,7 @@ public class ATTNative implements TTSService, ATTLibListener {
 	@Override
 	public void onRecvMark(Object handler, String name) {
 		ThreadResource tr = (ThreadResource) handler;
+
 		tr.marks.add(new AbstractMap.SimpleEntry<String, Integer>(name,
 		        tr.audioBuffer.offsetInOutput - tr.firstOffset));
 	}
@@ -189,5 +200,10 @@ public class ATTNative implements TTSService, ATTLibListener {
 		}
 
 		return Arrays.asList(result);
+	}
+
+	@Override
+	public String endingMark() {
+		return "ending-mark";
 	}
 }

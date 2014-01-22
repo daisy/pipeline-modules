@@ -3,6 +3,7 @@ package org.daisy.pipeline.tts;
 import net.sf.saxon.s9api.QName;
 
 public class BasicSSMLAdapter implements SSMLAdapter {
+
 	@Override
 	public String getHeader(String voiceName) {
 		return "";
@@ -33,4 +34,9 @@ public class BasicSSMLAdapter implements SSMLAdapter {
 		return value;
 	}
 
+	@Override
+	public String adaptText(String text) {
+		//replace non-breaking spaces with regular white spaces.
+		return text.replace(" ", " ").replace("’", "'");
+	}
 }

@@ -84,7 +84,9 @@ public interface TTSService {
 	void releaseThreadResources(Object resources) throws SynthesisException;
 
 	/**
-	 * Must be thread safe because there is only one Synthesizer instantiated.
+	 * This function must be thread-safe for there is only one instance of
+	 * TTSService for each TTS processors. But @param threadResources is here to
+	 * prevent you from locking internal resources.
 	 * 
 	 * @param ssml is the SSML to synthesize. You may need to convert it to the
 	 *            format understandable for the TTS (e.g. SAPI). The SSML code
@@ -94,17 +96,22 @@ public interface TTSService {
 	 * @param output is the resulting raw audio data. Ideally the address of the
 	 *            buffer is left unchanged, but a new buffer can be allocated
 	 *            when the audio data do not fit in the one provided. The new
-	 *            buffer must contain the previous data as well.
+	 *            buffer must contain the previous data as well. Use
+	 *            SoundUtil.realloc() is designed to help you doing it.
 	 * @param threadResources is the object returned by
-	 *            allocateThreadResource().
+	 *            allocateThreadResource(). It may contain persistent buffers,
+	 *            TCP connections and so on.
 	 * @param marks are the returned pairs (markName, offsetInOutput)
 	 *            corresponding to the ssml:marks of @param ssml. The order must
 	 *            be kept. The provided list is always empty. The offsetInOutput
 	 *            are relative to the new data inserted (they start at 0 no
-	 *            matter what audioBuffer already contains).
+	 *            matter what @param audioBuffer already contains).
+	 * @param retry is true when this is not the first time the thread attempts
+	 *            to synthesize @param smml. In such cases, you may reinitialize
+	 *            the connection to the remote TTS server.
 	 */
 	void synthesize(XdmNode ssml, Voice voice, RawAudioBuffer audioBuffer,
-	        Object threadResources, List<Map.Entry<String, Integer>> marks)
+	        Object threadResources, List<Map.Entry<String, Integer>> marks, boolean retry)
 	        throws SynthesisException;
 
 	/**
@@ -156,4 +163,11 @@ public interface TTSService {
 	 * Called from a single thread
 	 */
 	public Collection<Voice> getAvailableVoices() throws SynthesisException;
+
+	/**
+	 * @return the name of the mark that will be added to check whether all the
+	 *         SSML have been successfully synthesized. TTS processors that
+	 *         cannot handle marks must return null.
+	 */
+	public String endingMark();
 }

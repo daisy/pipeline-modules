@@ -16,6 +16,11 @@ public interface SSMLAdapter {
 	QName adaptElement(QName element);
 
 	/**
+	 * @return a clean version of the input text.
+	 */
+	String adaptText(String text);
+
+	/**
 	 * @return null to discard the attribute
 	 */
 	QName adaptAttributeName(QName element, QName attr, String value);

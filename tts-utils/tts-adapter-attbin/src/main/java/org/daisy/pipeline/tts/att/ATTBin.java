@@ -89,9 +89,10 @@ public class ATTBin implements TTSService {
 
 	@Override
 	public void synthesize(XdmNode ssml, Voice voice, RawAudioBuffer audioBuffer,
-	        Object resources, List<Entry<String, Integer>> marks) throws SynthesisException {
-		synthesize(SSMLUtil.toString(ssml, voice.name, mSSMLAdapter), audioBuffer, resources,
-		        marks);
+	        Object resources, List<Entry<String, Integer>> marks, boolean retry)
+	        throws SynthesisException {
+		synthesize(SSMLUtil.toString(ssml, voice.name, mSSMLAdapter, endingMark()),
+		        audioBuffer, resources, marks);
 	}
 
 	private void synthesize(String ssml, RawAudioBuffer audioBuffer, Object resources,
@@ -249,5 +250,10 @@ public class ATTBin implements TTSService {
 		}
 
 		return result;
+	}
+
+	@Override
+	public String endingMark() {
+		return "ending-mark";
 	}
 }

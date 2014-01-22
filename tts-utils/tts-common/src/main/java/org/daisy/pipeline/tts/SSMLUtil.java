@@ -13,6 +13,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 public class SSMLUtil {
+
 	private static void toString(XdmNode ssml, StringBuilder sb, SSMLAdapter adapter,
 	        String markName, Multimap<NodeInfo, String> marksScope) {
 		if (marksScope != null
@@ -20,7 +21,7 @@ public class SSMLUtil {
 			return;
 		}
 		if (ssml.getNodeKind() == XdmNodeKind.TEXT) {
-			sb.append(ssml.getStringValue());
+			sb.append(adapter.adaptText(ssml.getStringValue()));
 		} else if (ssml.getNodeKind() == XdmNodeKind.DOCUMENT) {
 			XdmSequenceIterator iter = ssml.axisIterator(Axis.CHILD);
 			while (iter.hasNext()) {
@@ -77,12 +78,18 @@ public class SSMLUtil {
 		}
 	}
 
-	public static String toString(XdmNode ssml, String voiceName, SSMLAdapter adapter) {
+	public static String toString(XdmNode ssml, String voiceName, SSMLAdapter adapter,
+	        String endingMark) {
 		if (adapter == null)
 			adapter = new BasicSSMLAdapter();
 		StringBuilder sb = new StringBuilder();
 		sb.append(adapter.getHeader(voiceName));
 		toString(ssml, sb, adapter, null, null);
+
+		if (endingMark != null) {
+			sb.append("<mark name=\"" + endingMark + "\"/>");
+		}
+
 		sb.append(adapter.getFooter());
 		return sb.toString();
 	}
@@ -96,7 +103,7 @@ public class SSMLUtil {
 		String[] result = new String[sortedMarkNames.size()];
 
 		if (sortedMarkNames.size() == 1) {
-			result[0] = toString(ssml, voiceName, adapter);
+			result[0] = toString(ssml, voiceName, adapter, null);
 		} else {
 			int i = 0;
 			for (String markName : sortedMarkNames) {

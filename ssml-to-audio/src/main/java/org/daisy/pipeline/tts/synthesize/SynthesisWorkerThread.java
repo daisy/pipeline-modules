@@ -37,6 +37,9 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 	// 2 minutes, i.e. ~6MBytes
 	private static final int AUDIO_BUFFER_BYTES = 24000 * 2 * 60 * 2;
 
+	//number of tries before giving up synthesizing a piece of SSML
+	private static final int SYNTHESIS_TRIES = 3;
+
 	private AudioEncoder mEncoder; // must be thread-safe!
 	private byte[] mOutput;
 	private RawAudioBuffer mAudioBuffer;
@@ -111,8 +114,36 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 		}
 		Object resource = mResources.get(mLastUsedSynthesizer);
 		List<Map.Entry<String, Integer>> marks = new ArrayList<Map.Entry<String, Integer>>();
+
+		//try to synthesize the SSML using an ending mark to know whether if anything went wrong
+		int tries;
+		boolean valid = false;
 		int begin = mAudioBuffer.offsetInOutput;
-		mLastUsedSynthesizer.synthesize(sentence, voice, mAudioBuffer, resource, marks);
+		for (tries = SYNTHESIS_TRIES; !valid && tries > 0; --tries) {
+			mAudioBuffer.offsetInOutput = begin;
+			marks.clear();
+			mLastUsedSynthesizer.synthesize(sentence, voice, mAudioBuffer, resource, marks,
+			        (tries != SYNTHESIS_TRIES));
+			if (mLastUsedSynthesizer.endingMark() == null
+			        || (marks.size() > 0 && mLastUsedSynthesizer.endingMark().equals(
+			                marks.get(marks.size() - 1).getKey()))) {
+				valid = true;
+			} else {
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {
+					throw new SynthesisException(e.getMessage(), e.getCause());
+				}
+			}
+		}
+		if (!valid) {
+			throw new SynthesisException("TTS Processor " + mLastUsedSynthesizer.getName()
+			        + "-" + mLastUsedSynthesizer.getVersion()
+			        + " was enable to synthesize a piece of SSML.");
+		}
+		if (mLastUsedSynthesizer.endingMark() != null) {
+			marks = marks.subList(0, marks.size() - 1);
+		}
 
 		// keep track of where the sound begins and where it ends in the audio buffer
 		if (marks.size() == 0) {

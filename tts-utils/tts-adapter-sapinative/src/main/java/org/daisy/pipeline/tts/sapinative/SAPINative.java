@@ -44,7 +44,8 @@ public class SAPINative implements TTSService {
 
 	@Override
 	public void synthesize(XdmNode ssml, Voice voice, RawAudioBuffer audioBuffer,
-	        Object resource, List<Entry<String, Integer>> marks) throws SynthesisException {
+	        Object resource, List<Entry<String, Integer>> marks, boolean retry)
+	        throws SynthesisException {
 
 		ThreadResource tr = (ThreadResource) resource;
 
@@ -135,5 +136,10 @@ public class SAPINative implements TTSService {
 
 	public void deactivate() {
 		SAPILib.dispose();
+	}
+
+	@Override
+	public String endingMark() {
+		return "ending-mark";
 	}
 }
