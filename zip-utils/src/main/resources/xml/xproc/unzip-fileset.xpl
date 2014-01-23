@@ -25,6 +25,7 @@
         <p:with-option name="attribute-value" select="$unzipped-basedir"/>
     </p:add-attribute>
     <p:delete match="/*/@*[not(name()='xml:base')]"/>
+    <p:delete match="/*/*[ends-with(@name,'/')]"/>
     <p:viewport match="/*/*">
         <p:rename match="/*" new-name="d:file"/>
         <p:add-attribute match="/*" attribute-name="href">
