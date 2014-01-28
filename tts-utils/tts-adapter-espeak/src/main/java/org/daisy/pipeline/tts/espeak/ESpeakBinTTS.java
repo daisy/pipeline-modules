@@ -78,11 +78,14 @@ public class ESpeakBinTTS extends MarkFreeTTSService {
 
 		//Test the synthesizer so that the service won't be active if it fails.
 		//It sets mAudioFormat too.
+		List<RawAudioBuffer> li = new ArrayList<RawAudioBuffer>();
 		mAudioFormat = null;
 		Object r = allocateThreadResources();
-		synthesize(mSSMLAdapter.getHeader(null) + "x" + mSSMLAdapter.getFooter(), null, r,
-		        new ArrayList<RawAudioBuffer>());
+		synthesize(mSSMLAdapter.getHeader(null) + "test" + mSSMLAdapter.getFooter(), null, r, li);
 		releaseThreadResources(r);
+		if (li.get(0).offsetInOutput <= 500) {
+			throw new SynthesisException("eSpeak did not output audio.");
+		}
 	}
 
 	@Override

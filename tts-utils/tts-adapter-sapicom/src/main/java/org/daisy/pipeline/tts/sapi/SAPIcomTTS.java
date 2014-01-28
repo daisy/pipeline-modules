@@ -97,12 +97,11 @@ public class SAPIcomTTS extends MarkFreeTTSService {
 		//test the TTS Service before registration
 		ThreadResource th = (ThreadResource) allocateThreadResources();
 		List<RawAudioBuffer> li = new ArrayList<RawAudioBuffer>();
-		synthesize(mSSMLAdapter.getHeader(null) + "<s>test<break time=\"10ms\"></break></s>"
-		        + mSSMLAdapter.getFooter(), mAvailableVoices.get(0), th,
-		        new ArrayList<RawAudioBuffer>());
+		synthesize(mSSMLAdapter.getHeader(null) + "<s>test<break time=\"10ms\"/></s>"
+		        + mSSMLAdapter.getFooter(), mAvailableVoices.get(0), th, li);
 		releaseThreadResources(th);
-		if (li.get(0).offsetInOutput <= 0) {
-			throw new SynthesisException("SAPI with com4j did not output anything.");
+		if (li.get(0).offsetInOutput <= 500) {
+			throw new SynthesisException("SAPI with com4j did not output audio.");
 		}
 	}
 

@@ -273,7 +273,7 @@ public class TTSRegistry {
 					t.printStackTrace(printWriter);
 					printWriter.flush();
 					mLogger.info(fullname + " could not be initialized");
-					mLogger.debug(fullname + " init error: " + writer.toString());
+					mLogger.debug(fullname + " init error: "+ writer.toString());
 				}
 			}
 		}

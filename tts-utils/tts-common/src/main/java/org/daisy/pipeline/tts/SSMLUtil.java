@@ -119,7 +119,7 @@ public class SSMLUtil {
 	}
 
 	private static final String BreakAfterSentence = "<break time=\""
-	        + System.getProperty("tts.pause.after.sentence", "250") + "\"/>";
+	        + System.getProperty("tts.pause.after.sentence", "250ms") + "\"/>";
 
 	public static String getBreakAfterSentence() {
 		return BreakAfterSentence;

@@ -43,7 +43,8 @@ public class SAPINativeTest {
 		long connection = SAPILib.openConnection();
 		Assert.assertNotSame(0, connection);
 		
-		int error = SAPILib.speak(connection, vendors[0], names[0], text);		
+		int error = SAPILib.speak(connection, vendors[0], names[0], text);
+		
 		int spoken = -1;
 		if (error == 0){
 			spoken = SAPILib.getStreamSize(connection);
@@ -52,13 +53,15 @@ public class SAPINativeTest {
 				byte[] audio = new byte[offset+spoken];
 				int total = SAPILib.readStream(connection, audio, offset);
 			}
+			if (spoken <= 200){
+				error = -1;
+			}
 		}
-		int minSpoken = 200;
-		if (spoken <= minSpoken)
+		
+		if (error != 0)
 			SAPILib.closeConnection(connection);
 			
 		Assert.assertSame(0, error);
-		Assert.assertTrue(spoken > minSpoken);
 
 		return connection;
 	}
@@ -72,8 +75,8 @@ public class SAPINativeTest {
 	
 	@Test
 	public void getVoiceVendors(){
-		String[] voices = SAPILib.getVoiceVendors();
-		Assert.assertTrue(voices.length > 0);
+		String[] vendors = SAPILib.getVoiceVendors();
+		Assert.assertTrue(vendors.length > 0);
 	}
 	
 	@Test
@@ -157,6 +160,8 @@ public class SAPINativeTest {
 		Assert.assertEquals(b1, names[0]);
 		Assert.assertEquals(b2, names[1]);
 		long diff = pos[1] - pos[0];
+		
+		Assert.assertTrue(diff > 200);
 		Assert.assertTrue(pos[0] > diff);
 	}
 	

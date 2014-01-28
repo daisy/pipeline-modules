@@ -19,8 +19,11 @@ import org.daisy.pipeline.tts.TTSService;
 public class SAPINative implements TTSService {
 
 	private AudioFormat mAudioFormat;
+	private int mSampleRate;
+	private int mBytesPerSample;
 
 	private SSMLAdapter mSSMLAdapter = new BasicSSMLAdapter() {
+		//note: the <s> element is already provided by the XdmNode
 		@Override
 		public String getHeader(String voiceName) {
 			return "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\">";
@@ -38,33 +41,72 @@ public class SAPINative implements TTSService {
 
 	public void initialize() throws SynthesisException {
 		System.loadLibrary("sapinative");
-		SAPILib.initialize(Integer.valueOf(System.getProperty("sapi.samplerate", "22050")),
-		        Integer.valueOf(System.getProperty("sapi.bitspersample", "16")));
+		mSampleRate = Integer.valueOf(System.getProperty("sapi.samplerate", "22050"));
+		mBytesPerSample = Integer.valueOf(System.getProperty("sapi.bytespersample", "2"));
+		mAudioFormat = new AudioFormat(mSampleRate, 8*mBytesPerSample, 1, true, false);
+		//This audio format is only a preference. We should get the one returned by SAPI if
+		//SAPI cannot handle the one above.
+		int res = SAPILib.initialize(mSampleRate, 8*mBytesPerSample);
+		if (res != 0){
+			throw new SynthesisException("SAPI initialization failed with error code '"+res+"'");
+		}
+		
+		//test whether SAPI can synthesize text with marks
+		String[] vendors = SAPILib.getVoiceVendors();	
+		String[] names = SAPILib.getVoiceNames();
+		if (vendors.length == 0 || names.length == 0){
+			throw new SynthesisException("Cannot find any SAPI voice");
+		}
+		
+		Voice voice = new Voice(vendors[0], names[0]);
+		String text = mSSMLAdapter.getHeader(voice.name)+"text <mark name=\""+endingMark()+"\"/>"+mSSMLAdapter.getFooter();
+		RawAudioBuffer testBuffer = new RawAudioBuffer();
+		testBuffer.offsetInOutput = 0;
+		testBuffer.output = new byte[16];
+		ThreadResource r = (ThreadResource) allocateThreadResources();
+		List<Entry<String, Integer>> marks = new ArrayList<Entry<String, Integer>>();
+		synthesize(text, voice, testBuffer, r, marks);
+		releaseThreadResources(r);
+		if (testBuffer.offsetInOutput < 500) {
+			throw new SynthesisException("SAPI's output is too small to be audio when processing "+text);
+		}
+		if (marks.size() == 0 ||  !endingMark().equals(marks.get(0).getKey())){
+			throw new SynthesisException("SAPI's did not output the ending SSML mark as expected.");
+		}
 	}
-
+	
 	@Override
 	public void synthesize(XdmNode ssml, Voice voice, RawAudioBuffer audioBuffer,
 	        Object resource, List<Entry<String, Integer>> marks, boolean retry)
 	        throws SynthesisException {
-
+			
 		ThreadResource tr = (ThreadResource) resource;
+		String text = SSMLUtil.toString(ssml, voice.name, mSSMLAdapter, endingMark());	
+		synthesize(text, voice, audioBuffer, tr, marks);
+	}
+	
+	private void synthesize(String ssml, Voice voice, RawAudioBuffer audioBuffer,
+	        ThreadResource tr, List<Entry<String, Integer>> marks)
+	        throws SynthesisException {
 
-		SAPILib.speak(tr.connection, voice.name, voice.vendor, SSMLUtil.toString(ssml,
-		        voice.name, mSSMLAdapter));
+		int res = SAPILib.speak(tr.connection, voice.vendor, voice.name, ssml);
+		if (res != 0){
+			throw new SynthesisException("SAPI speak error number "+res+" with voice "+voice);
+		}
 
 		int size = SAPILib.getStreamSize(tr.connection);
 		if (size > (audioBuffer.output.length - audioBuffer.offsetInOutput)) {
 			SoundUtil.realloc(audioBuffer, size);
 		}
 
-		SAPILib.readStream(tr.connection, audioBuffer.output, audioBuffer.offsetInOutput);
-		audioBuffer.offsetInOutput += size;
-
+		audioBuffer.offsetInOutput = SAPILib.readStream(tr.connection, audioBuffer.output, audioBuffer.offsetInOutput);
+		
 		String[] names = SAPILib.getBookmarkNames(tr.connection);
 		long[] pos = SAPILib.getBookmarkPositions(tr.connection);
-
+		
 		for (int i = 0; i < names.length; ++i) {
-			marks.add(new AbstractMap.SimpleEntry<String, Integer>(names[i], (int) pos[i]));
+			int offset = (int) ((pos[i]*mSampleRate*mBytesPerSample)/1000);
+			marks.add(new AbstractMap.SimpleEntry<String, Integer>(names[i], offset));
 		}
 	}
 

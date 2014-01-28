@@ -38,6 +38,7 @@
       <plugin>
 		<groupId>org.codehaus.mojo</groupId>
 		<artifactId>native-maven-plugin</artifactId>
+		<version>1.0-alpha-7</version>
 		<extensions>true</extensions>
 		<executions>
 		  <execution>
@@ -130,7 +131,6 @@
               <goal>bundle</goal>
             </goals>
             <configuration>
-              <classifier>windows</classifier>
               <instructions>
 				<Bundle-NativeCode>
 					x86/sapinative.dll;osname=Win32;processor=x86,

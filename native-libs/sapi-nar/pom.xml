@@ -78,6 +78,7 @@
               <include>**/*.cpp</include>
             </includes>
             <options>
+			  <option>/MD</option> <!-- This ensures dynamic linking to prevent any license issues. -->
 			  <option>/O2</option>
 			  <option>/I${win.sdk.location}\include</option>
               <option>/I${JAVA_HOME}\include</option>
@@ -90,7 +91,8 @@
             <options>
 				<option>/LIBPATH:${vc.libdir}</option>
 				<option>/LIBPATH:${sdk.libdir}</option>
-				<option>/DEFAULTLIB:sapi</option> <!-- the usual <lib><name>sapi...</lib> does not seem to work -->
+				<!-- The expected <lib><name>sapi...</lib> doesn't seem to work for enumerating the libraries. -->
+				<option>/DEFAULTLIB:sapi</option> 
 				<option>/DEFAULTLIB:ole32</option>
 				<option>/DEFAULTLIB:shlwapi</option> <!-- for its memory stream -->
 				<option>${architecture.option}</option>

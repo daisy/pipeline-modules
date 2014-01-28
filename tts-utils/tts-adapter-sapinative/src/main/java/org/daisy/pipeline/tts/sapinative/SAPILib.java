@@ -20,6 +20,7 @@ public class SAPILib {
 	
 	static native String[] getBookmarkNames(long connection);
 	
+	/* in milliseconds */
 	static native long[] getBookmarkPositions(long connection);
 	
 	static native int initialize(int sampleRate, int bitsPerSample);

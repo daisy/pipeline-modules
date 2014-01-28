@@ -23,6 +23,7 @@ void
 WinQueueStream::startWritingPhase(){
 	LARGE_INTEGER zero = { 0 };
 	base_->Seek(zero, STREAM_SEEK_SET, NULL);
+	base_->SetSize(*reinterpret_cast<ULARGE_INTEGER*>(&zero));
 }
 	
 void
