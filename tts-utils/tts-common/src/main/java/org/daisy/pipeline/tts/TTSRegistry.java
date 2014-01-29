@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 public class TTSRegistry {
 
 	private Logger mLogger = LoggerFactory.getLogger(TTSRegistry.class);
-	private Map<TTSService, Boolean> ttsServices;
+	private Collection<TTSService> mTTSServices;
 	private Map<Map.Entry<String, Locale>, Voice> mBestVendorVoices;
 	private Map<Voice, TTSService> mBestServices;
 	private Map<Locale, Voice> mBestVoices;
@@ -218,7 +218,7 @@ public class TTSRegistry {
 		mVoicePriorities = new ArrayList<VoiceInfo>(priorities);
 		for (VoiceInfo vinfo : priorities) {
 			String shortLang = vinfo.language.getLanguage();
-			if (!shortLang.equals(vinfo.language)) {
+			if (!vinfo.language.equals(new Locale(shortLang))) {
 				mVoicePriorities.add(new VoiceInfo(vinfo.voice, shortLang, vinfo.priority
 				        - priorityVariantPenalty));
 			}
@@ -235,7 +235,7 @@ public class TTSRegistry {
 	}
 
 	public TTSRegistry() {
-		ttsServices = new ConcurrentHashMap<TTSService, Boolean>();
+		mTTSServices = new CopyOnWriteArrayList<TTSService>();
 	}
 
 	/**
@@ -254,31 +254,20 @@ public class TTSRegistry {
 	 */
 	public void regenerateVoiceMapping() {
 		List<TTSService> workingServices = new ArrayList<TTSService>();
-
-		//initialize the TTS services if they are not already initialized
-		for (Map.Entry<TTSService, Boolean> tts : ttsServices.entrySet()) {
-			String fullname = tts.getKey().getName() + "-" + tts.getKey().getVersion();
-			if (tts.getValue()) {
-				workingServices.add(tts.getKey());
-				mLogger.info(fullname + " already initialized");
-			} else {
-				try {
-					tts.getKey().initialize();
-					workingServices.add(tts.getKey());
-					tts.setValue(true);
-					mLogger.info(fullname + " successfully initialized");
-				} catch (Throwable t) {
-					StringWriter writer = new StringWriter();
-					PrintWriter printWriter = new PrintWriter(writer);
-					t.printStackTrace(printWriter);
-					printWriter.flush();
-					mLogger.info(fullname + " could not be initialized");
-					mLogger.debug(fullname + " init error: "+ writer.toString());
-				}
+		for (TTSService tts : mTTSServices) {
+			String fullname = tts.getName() + "-" + tts.getVersion();
+			try {
+				tts.initialize();
+				workingServices.add(tts);
+				mLogger.info(fullname + " successfully initialized");
+			} catch (Throwable t) {
+				mLogger.info(fullname + " could not be initialized");
+				mLogger.debug(fullname + " init error: " + getStack(t));
 			}
+
 		}
 		mLogger.info("number of working TTS services: " + workingServices.size() + "/"
-		        + ttsServices.size());
+		        + mTTSServices.size());
 
 		//Create a map of the best services for each available voice, given that two different
 		//services can serve the same voice. 
@@ -324,6 +313,15 @@ public class TTSRegistry {
 	}
 
 	/**
+	 * Release the resources allocated by the calls to TTSService.initialize().
+	 */
+	public void releaseServices() {
+		for (TTSService tts : mTTSServices) {
+			tts.release();
+		}
+	}
+
+	/**
 	 * @return null if no voice is available for the given parameters.
 	 */
 	public Voice findAvailableVoice(String voiceVendor, String voiceName, String lang) {
@@ -336,14 +334,26 @@ public class TTSRegistry {
 		}
 
 		Locale loc = VoiceInfo.tagToLocale(lang);
+		Locale shortLoc = new Locale(loc.getLanguage());
+		Voice result;
+
 		if (voiceVendor != null && !voiceVendor.isEmpty()) {
-			Voice result = mBestVendorVoices.get(new AbstractMap.SimpleEntry<String, Locale>(
-			        voiceVendor, loc));
+			Entry<String, Locale> entry = new AbstractMap.SimpleEntry<String, Locale>(
+			        voiceVendor, loc);
+			result = mBestVendorVoices.get(entry);
 			if (result != null)
+				return result;
+			//try with a more generic voice
+			entry.setValue(shortLoc);
+			result = mBestVendorVoices.get(entry);
+			if (result == null)
 				return result;
 		}
 
-		return mBestVoices.get(loc);
+		result = mBestVoices.get(loc);
+		if (result != null)
+			return result;
+		return mBestVoices.get(shortLoc);
 	}
 
 	/**
@@ -355,11 +365,20 @@ public class TTSRegistry {
 	}
 
 	public void addTTS(TTSService tts) {
-		ttsServices.put(tts, false);
+		mTTSServices.add(tts);
 	}
 
 	public void removeTTS(TTSService tts) {
-		ttsServices.remove(tts);
+		tts.release();
+		mTTSServices.remove(tts);
+	}
+
+	private static String getStack(Throwable t) {
+		StringWriter writer = new StringWriter();
+		PrintWriter printWriter = new PrintWriter(writer);
+		t.printStackTrace(printWriter);
+		printWriter.flush();
+		return writer.toString();
 	}
 
 }

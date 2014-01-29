@@ -44,23 +44,23 @@ public class ATTBin implements TTSService {
 	private int mSampleRate;
 	private Pattern mMarkPattern;
 	private RoundRobinLoadBalancer mLoadBalancer;
-
-	private SSMLAdapter mSSMLAdapter = new BasicSSMLAdapter() {
-		@Override
-		public String getFooter() {
-			return "</voice>";
-		}
-
-		@Override
-		public String getHeader(String voiceName) {
-			if (voiceName == null || voiceName.isEmpty()) {
-				return "<voice>";
-			}
-			return "<voice name=\"" + voiceName + "\">";
-		}
-	};
+	private SSMLAdapter mSSMLAdapter;
 
 	public void initialize() throws SynthesisException {
+		mSSMLAdapter = new BasicSSMLAdapter() {
+			@Override
+			public String getFooter() {
+				return "</voice>";
+			}
+
+			@Override
+			public String getHeader(String voiceName) {
+				if (voiceName == null || voiceName.isEmpty()) {
+					return "<voice>";
+				}
+				return "<voice name=\"" + voiceName + "\">";
+			}
+		};
 
 		mLoadBalancer = new RoundRobinLoadBalancer(System.getProperty("att.servers",
 		        "localhost:8888"), null);
@@ -170,26 +170,22 @@ public class ATTBin implements TTSService {
 
 	@Override
 	public void beforeAllocatingResources() {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void afterAllocatingResources() {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void beforeReleasingResources() {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
-	public void afterReleasingResources() {
-		// TODO Auto-generated method stub
-
+	public void release() {
+		mLoadBalancer = null;
+		mMarkPattern = null;
+		mAudioFormat = null;
+		mSSMLAdapter = null;
 	}
 
 	@Override

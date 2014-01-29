@@ -113,7 +113,6 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 				traverse(getFirstChild(source.read()));
 				mWorkerPool.endSection();
 			}
-
 			// run the synthesis/encoding threads
 			allSoundFragments = Collections.synchronizedList(new LinkedList<SoundFragment>());
 			mWorkerPool.synthesizeAndWait(allSoundFragments);
@@ -121,6 +120,8 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 		} catch (SynthesisException e) {
 			mRuntime.error(e);
 			return;
+		} finally {
+			mTTSRegistry.releaseServices();
 		}
 
 		printInfo("number of sound fragments: " + allSoundFragments.size());

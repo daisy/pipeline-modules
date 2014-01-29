@@ -82,7 +82,7 @@ public abstract class MarkFreeTTSService implements TTSService {
 	}
 
 	@Override
-	public void afterReleasingResources() throws SynthesisException {
+	public void release() {
 	}
 
 	@Override

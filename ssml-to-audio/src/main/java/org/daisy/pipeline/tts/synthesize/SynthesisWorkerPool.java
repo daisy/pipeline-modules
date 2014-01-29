@@ -171,9 +171,6 @@ public class SynthesisWorkerPool {
 		for (SynthesisWorkerThread worker : mWorkers)
 			worker.releaseResources();
 
-		for (TTSService tts : allTTS)
-			tts.afterReleasingResources();
-
 		mLogger.printInfo("synthesis resources released");
 	}
 }

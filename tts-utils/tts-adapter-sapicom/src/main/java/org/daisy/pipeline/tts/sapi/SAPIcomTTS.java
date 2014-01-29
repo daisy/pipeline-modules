@@ -23,17 +23,7 @@ import org.daisy.pipeline.tts.SoundUtil;
 public class SAPIcomTTS extends MarkFreeTTSService {
 	private AudioFormat mAudioFormat = null;
 	private List<Voice> mAvailableVoices;
-	private SSMLAdapter mSSMLAdapter = new BasicSSMLAdapter() {
-		@Override
-		public String getHeader(String voiceName) {
-			return "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\">";
-		}
-
-		@Override
-		public String getFooter() {
-			return super.getFooter() + "</speak>";
-		}
-	};
+	private SSMLAdapter mSSMLAdapter;
 
 	static private class ThreadResource {
 		ISpeechVoice voice;
@@ -79,6 +69,18 @@ public class SAPIcomTTS extends MarkFreeTTSService {
 
 	@Override
 	public void initialize() throws SynthesisException {
+		mSSMLAdapter = new BasicSSMLAdapter() {
+			@Override
+			public String getHeader(String voiceName) {
+				return "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\">";
+			}
+
+			@Override
+			public String getFooter() {
+				return super.getFooter() + "</speak>";
+			}
+		};
+
 		//retrieve the name of the available voices
 		ISpeechVoice v = ClassFactory.createSpVoice();
 		mAvailableVoices = new ArrayList<Voice>();
@@ -149,5 +151,12 @@ public class SAPIcomTTS extends MarkFreeTTSService {
 		}
 
 		results.add(b);
+	}
+
+	@Override
+	public void release() {
+		mAudioFormat = null;
+		mAvailableVoices = null;
+		mSSMLAdapter = null;
 	}
 }

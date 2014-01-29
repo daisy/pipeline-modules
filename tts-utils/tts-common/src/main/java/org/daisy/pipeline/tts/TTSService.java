@@ -33,7 +33,7 @@ public interface TTSService {
 			this.name = name;
 			if (name == null)
 				this.name = "";
-				
+
 			mVendor_lo = this.vendor.toLowerCase();
 			mName_lo = this.name.toLowerCase();
 		}
@@ -155,9 +155,10 @@ public interface TTSService {
 	public void beforeReleasingResources() throws SynthesisException;
 
 	/**
-	 * Called from a single thread
+	 * Called from a single thread. Releases the objects initialized in
+	 * initialize().
 	 */
-	public void afterReleasingResources() throws SynthesisException;
+	public void release();
 
 	/**
 	 * Called from a single thread

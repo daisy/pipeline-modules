@@ -23,6 +23,7 @@ public class ATTNative implements TTSService, ATTLibListener {
 
 	private AudioFormat mAudioFormat;
 	private RoundRobinLoadBalancer mLoadBalancer;
+	private boolean mFirstInit = true;
 
 	public static SSMLAdapter mSSMLAdapter = new BasicSSMLAdapter() {
 		@Override
@@ -48,11 +49,15 @@ public class ATTNative implements TTSService, ATTLibListener {
 	}
 
 	public void initialize() throws SynthesisException {
+		if (mFirstInit) {
+			System.loadLibrary("att");
+			mFirstInit = false;
+		}
+
 		mLoadBalancer = new RoundRobinLoadBalancer(System.getProperty("att.servers",
 		        "localhost:8888"), null);
 
 		mAudioFormat = new AudioFormat(16000, 16, 1, true, false);
-		System.loadLibrary("att");
 		ATTLib.setListener(this);
 
 		//Test the synthesizer so that the service won't be active if it fails.
@@ -161,26 +166,20 @@ public class ATTNative implements TTSService, ATTLibListener {
 
 	@Override
 	public void beforeAllocatingResources() throws SynthesisException {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void afterAllocatingResources() throws SynthesisException {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void beforeReleasingResources() throws SynthesisException {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
-	public void afterReleasingResources() throws SynthesisException {
-		// TODO Auto-generated method stub
-
+	public void release() {
+		mAudioFormat = null;
+		mLoadBalancer = null;
 	}
 
 	@Override

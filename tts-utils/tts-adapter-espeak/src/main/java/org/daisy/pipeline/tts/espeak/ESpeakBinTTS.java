@@ -81,7 +81,8 @@ public class ESpeakBinTTS extends MarkFreeTTSService {
 		List<RawAudioBuffer> li = new ArrayList<RawAudioBuffer>();
 		mAudioFormat = null;
 		Object r = allocateThreadResources();
-		synthesize(mSSMLAdapter.getHeader(null) + "test" + mSSMLAdapter.getFooter(), null, r, li);
+		synthesize(mSSMLAdapter.getHeader(null) + "test" + mSSMLAdapter.getFooter(), null, r,
+		        li);
 		releaseThreadResources(r);
 		if (li.get(0).offsetInOutput <= 500) {
 			throw new SynthesisException("eSpeak did not output audio.");
@@ -104,7 +105,7 @@ public class ESpeakBinTTS extends MarkFreeTTSService {
 	}
 
 	@Override
-	public void afterReleasingResources() throws SynthesisException {
+	public void release() {
 		mAudioFormat = null;
 		mCmd = null;
 		mSSMLAdapter = null;
