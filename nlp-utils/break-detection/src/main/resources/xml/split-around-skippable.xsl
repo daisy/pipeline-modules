@@ -70,10 +70,15 @@
       <xsl:for-each-group select="node()"
 			  group-adjacent="not(descendant-or-self::*[contains($skippable-tag-list, concat(',', local-name(), ','))][1])">
 	<xsl:choose>
-	  <!-- An existing node is recycled. -->
+	  <!-- An existing node (holding an @id) is recycled -->
 	  <xsl:when test="current-grouping-key() and count(current-group()) = 1 and current-group()[1]/@id">
 	    <xsl:apply-templates select="current-group()" mode="copy"/>
 	  </xsl:when>
+	  <!-- Non-speakable fragment. -->
+	  <xsl:when test="current-grouping-key() and matches(string-join(descendant-or-self::text(),''),'^[\p{M}\p{P}\p{Z}]*$')">
+	    <xsl:apply-templates select="current-group()" mode="copy"/>
+	  </xsl:when>
+	  <!-- An existing node (not holding an @id) is recycled  -->
 	  <xsl:when test="current-grouping-key() and count(current-group()) = 1 and local-name(current-group()[1]) = $output-subsentence-tag">
 	    <xsl:copy>
 	      <xsl:copy-of select="@*"/>

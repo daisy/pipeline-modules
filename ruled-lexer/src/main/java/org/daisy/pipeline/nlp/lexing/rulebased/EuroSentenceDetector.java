@@ -49,6 +49,11 @@ public class EuroSentenceDetector implements ISentenceDetector {
 			}
 			return mSentenceEndPos;
 		}
+
+		public int size() {
+			return mCategories.length;
+		}
+
 	}
 
 	private List<List<CategorizedWord>> mResult;
@@ -67,15 +72,15 @@ public class EuroSentenceDetector implements ISentenceDetector {
 		String delimiter = "[.:?!…]*[?!…]+[….:?!]*";
 
 		mPositivePatterns = new SentencePattern[]{
-		        new SentencePattern(0, Category.PUNCTUATION, Category.SPACE, Category.COMMON)
+		        new SentencePattern(1, Category.PUNCTUATION, Category.SPACE, Category.COMMON)
 		                .regex("[.:]+", ".+", "[\\p{Lu}].*"),
-		        new SentencePattern(1, Category.PUNCTUATION, Category.QUOTE).regex("[.?!…]+",
+		        new SentencePattern(2, Category.PUNCTUATION, Category.QUOTE).regex("[.?!…]+",
 		                ".+"),
-		        new SentencePattern(2, Category.PUNCTUATION, Category.SPACE, Category.QUOTE)
+		        new SentencePattern(3, Category.PUNCTUATION, Category.SPACE, Category.QUOTE)
 		                .regex("[.?!…]+", ".+", ".+"),
-		        new SentencePattern(1, Category.PUNCTUATION, Category.PUNCTUATION).regex(
+		        new SentencePattern(2, Category.PUNCTUATION, Category.PUNCTUATION).regex(
 		                delimiter, ":"),
-		        new SentencePattern(0, Category.PUNCTUATION).regex(delimiter)
+		        new SentencePattern(1, Category.PUNCTUATION).regex(delimiter)
 		};
 
 		mNegativePatterns = new SentencePattern[]{
@@ -84,6 +89,10 @@ public class EuroSentenceDetector implements ISentenceDetector {
 		                .regex("\\[", ".", ".", ".", "\\]"),
 		        new SentencePattern(0, Category.PUNCTUATION, Category.PUNCTUATION,
 		                Category.PUNCTUATION).regex("\\[", "…", "\\]"),
+		        new SentencePattern(0, Category.PUNCTUATION, Category.SPACE,
+		                Category.PUNCTUATION).regex("…", ".*", "-"),
+		        new SentencePattern(0, Category.PUNCTUATION, Category.PUNCTUATION).regex("…",
+		                "-"),
 		        new SentencePattern(0, Category.PUNCTUATION, Category.PUNCTUATION).regex(".*",
 		                "[),]")
 		};
@@ -94,24 +103,29 @@ public class EuroSentenceDetector implements ISentenceDetector {
 		mHead = 0;
 		mTail = 0;
 		mSentenceIndex = 0;
-
-		for (int j = 0; j < words.size(); ++j) {
-			addWord();
+		int eat;
+		for (int j = 0; j < words.size(); j += eat) {
+			eat = 1;
 			List<CategorizedWord> right = words.subList(j, words.size());
 			int i;
 			int res = 0;
 			for (i = 0; i < mNegativePatterns.length
 			        && (res = mNegativePatterns[i].match(right)) == -1; ++i);
-			if (res != -1)
-				continue;
-			for (i = 0; i < mPositivePatterns.length
-			        && (res = mPositivePatterns[i].match(right)) == -1; ++i);
+			if (res != -1) {
+				eat = mNegativePatterns[i].size();
+			} else {
+				for (i = 0; i < mPositivePatterns.length
+				        && (res = mPositivePatterns[i].match(right)) == -1; ++i);
 
-			if (res == -1)
-				continue;
-			for (; res > 0; --res, ++j)
+				if (res != -1) {
+					eat = mPositivePatterns[i].size() - res;
+					for (; res > 0; --res, ++j)
+						addWord();
+					newSentence(words);
+				}
+			}
+			for (i = 0; i < eat; ++i)
 				addWord();
-			newSentence(words);
 		}
 
 		newSentence(words);
