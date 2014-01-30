@@ -37,7 +37,7 @@
       <p:input port="sentence-ids">
 	<p:pipe port="sentence-ids" step="main"/>
       </p:input>
-      <p:with-option name="section-element" select="'level'"/>
+      <p:with-option name="section-elements" select="'level,level1,level2,level3'"/>
       <p:with-option name="word-element" select="'w'"/>
       <p:with-option name="aural-sheet-uri" select="$css-sheet-uri"/>
       <p:with-option name="separate-skippable" select="$separate-skippable"/>

@@ -69,7 +69,7 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 	}
 
 	private void encodeAudio() {
-		String preferredFileName = String.format("section%04d_%02d", mCurrentDocPosition,
+		String preferredFileName = String.format("section%04d_%04d", mCurrentDocPosition,
 		        mSectionFiles);
 
 		String soundFile = mEncoder.encode(mAudioBuffer.output, mAudioBuffer.offsetInOutput,

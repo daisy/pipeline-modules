@@ -33,7 +33,7 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 
 	private static String convertSecondToString(double seconds) {
 		int iseconds = (int) (Math.floor(seconds));
-		int milliseconds = (int) (Math.round(1000 * (seconds - iseconds)));
+		int milliseconds = (int) (Math.floor(1000 * (seconds - iseconds)));
 		return String.format("%d:%02d:%02d.%03d", iseconds / 3600, (iseconds / 60) % 60,
 		        (iseconds % 60), milliseconds);
 	}

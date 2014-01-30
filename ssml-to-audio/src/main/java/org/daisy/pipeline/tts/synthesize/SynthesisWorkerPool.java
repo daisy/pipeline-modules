@@ -55,6 +55,7 @@ public class SynthesisWorkerPool {
 	private IPipelineLogger mLogger;
 	private List<UndispatchableSection> mSections;
 	private UndispatchableSection mCurrentSection;
+	private Voice mPreviousVoice;
 	private int mNrThreads;
 
 	public SynthesisWorkerPool(int threadNumber, TTSRegistry registry, AudioEncoder encoder,
@@ -72,6 +73,7 @@ public class SynthesisWorkerPool {
 	public void initialize() {
 		mSections = new ArrayList<UndispatchableSection>();
 		mCurrentSection = null;
+		mPreviousVoice = null;
 	}
 
 	/**
@@ -85,12 +87,21 @@ public class SynthesisWorkerPool {
 
 		Voice voice = mTTSRegistry.findAvailableVoice(voiceVendor, voiceName, lang);
 		if (voice == null) {
-			throw new SynthesisException("Could not find any installed voice matching "
+			mLogger.printInfo("Could not find any installed voice matching "
 			        + new Voice(voiceVendor, voiceName) + " or providing the language '"
 			        + lang + "'");
-		}
-		TTSService newSynth = mTTSRegistry.getTTS(voice);
+			if (mPreviousVoice == null) {
+				mLogger.printInfo("This part of the text won't be synthesized.");
+				endSection();
+				return;
+			} else {
+				voice = mPreviousVoice;
+				mLogger.printInfo("Voice " + voice + " will be used instead.");
+			}
+		} else
+			mPreviousVoice = voice;
 
+		TTSService newSynth = mTTSRegistry.getTTS(voice);
 		if (newSynth != currentSynthesizer) {
 			if (currentSynthesizer != null)
 				endSection(); // the same thread might not be able to

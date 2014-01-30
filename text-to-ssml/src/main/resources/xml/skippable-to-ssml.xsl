@@ -33,23 +33,30 @@
     <xsl:param name="skippable-list"/>
     <xsl:variable name="skippable" select="substring-before($skippable-list, ',')"/>
     <xsl:if test="$skippable != ''">
-      <tmp:group> <!-- allow to put this in a new thread -->
-	<!-- adding a non-existing element here allows us to apply CSS properties on the whole sentence, -->
-	<!-- especially the engine name which is customizable at the sentence-level only -->
-	<xsl:element name="{$skippable}" namespace="http://www.daisy.org/ns/pipeline/tmp">
-	  <ssml:s id="{concat('fake-sentence-for-', $skippable)}">
-	    <xsl:for-each select="//*[local-name() = $skippable]">
-	      <xsl:variable name="id" select="if (current()/@id) then (current()/@id) else (current()/../@id)"/>
-	      <xsl:if test="$id">
-		<ssml:mark name="{concat($mark-delimiter, $id)}"/>
-		<xsl:copy-of select="current()"/>
-	      <ssml:mark name="{concat($id, $mark-delimiter)}"/>
-	      <xsl:value-of select="' , '"/> <!-- break in prosody -->
-	      </xsl:if>
-	    </xsl:for-each>
-	  </ssml:s>
-	</xsl:element>
-      </tmp:group>
+      <xsl:variable name="all-skippable" select="//*[local-name() = $skippable]"/>
+      <xsl:if test="$all-skippable">
+	<tmp:group> <!-- Makes possible to the Java-step to process the following sentence in a separate thread. -->
+	  <!-- Adding a non-existing element here allows us to apply
+	       CSS properties on the whole sentence, especially the
+	       engine name which is customizable at the sentence-level
+	       only. -->
+	  <xsl:element name="{$skippable}" namespace="http://www.daisy.org/ns/pipeline/tmp">
+	    <!-- The id does not matter here because it won't be visible in the output document. -->
+	    <!-- Only the ssml:marks' id will be visible. -->
+	    <ssml:s id="{concat('group-of-', $skippable)}">
+	      <xsl:for-each select="$all-skippable">
+		<xsl:variable name="id" select="if (current()/@id) then (current()/@id) else (current()/../@id)"/>
+		<xsl:if test="$id">
+		  <ssml:mark name="{concat($mark-delimiter, $id)}"/>
+		  <xsl:copy-of select="current()"/>
+		  <ssml:mark name="{concat($id, $mark-delimiter)}"/>
+		  <xsl:value-of select="' , '"/> <!-- break in prosody -->
+		</xsl:if>
+	      </xsl:for-each>
+	    </ssml:s>
+	  </xsl:element>
+	</tmp:group>
+      </xsl:if>
       <xsl:call-template name="one-skippable">
 	<xsl:with-param name="skippable-list" select="substring-after($skippable-list, ',')"/>
       </xsl:call-template>
@@ -68,12 +75,6 @@
 		priority="2">
 
     <ssml:mark name="{concat(preceding-sibling::*[@id][1]/@id, $mark-delimiter, following-sibling::*[@id][1]/@id)}"/>
-    <!-- <xsl:if test="preceding-sibling::*[@id]"> -->
-    <!--   <ssml:mark name="{concat('end_', preceding-sibling::*[@id][1]/@id)}"/> -->
-    <!-- </xsl:if> -->
-    <!-- <xsl:if test="following-sibling::*[@id]"> -->
-    <!--   <ssml:mark name="{concat('start_', following-sibling::*[@id][1]/@id)}"/> -->
-    <!-- </xsl:if> -->
   </xsl:template>
 
 </xsl:stylesheet>

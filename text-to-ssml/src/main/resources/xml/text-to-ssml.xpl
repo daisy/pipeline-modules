@@ -36,11 +36,15 @@
       </p:documentation>
   </p:option>
 
-  <p:option name="section-element" required="true">
-    <p:documentation>Element used to identify threadable groups,
+  <p:option name="section-elements" required="true">
+    <p:documentation>Elements used to identify threadable groups,
     together with its attribute 'section-attr'.</p:documentation>
   </p:option>
-  <p:option name="section-attr" required="false" select="''"/>
+  <p:option name="section-attr" required="false" select="''">
+    <p:documentation>If provided, there should be only one section
+    element and the option 'section-attr-val' must be provided
+    too.</p:documentation>
+  </p:option>
   <p:option name="section-attr-val" required="false" select="''"/>
 
   <p:option name="word-element" required="true">
@@ -167,13 +171,14 @@
       </p:otherwise>
     </p:choose>
 
-    <!-- replace sentences and words with their SSML counterpart so that it -->
-    <!-- will be much simpler and faster to apply transformations after. -->
+    <!-- Replace the sentences and the words with their SSML counterpart so that it -->
+    <!-- will be much simpler and faster to apply transformations after. It also encapsulates -->
+    <!-- the section elements into tmp:group. -->
     <p:xslt name="normalize">
       <p:with-param name="word-element" select="$word-element"/>
       <p:with-param name="word-attr" select="$word-attr"/>
       <p:with-param name="word-attr-val" select="$word-attr-val"/>
-      <p:with-param name="section-element" select="$section-element"/>
+      <p:with-param name="section-elements" select="$section-elements"/>
       <p:with-param name="section-attr" select="$section-attr"/>
       <p:with-param name="section-attr-val" select="$section-attr-val"/>
       <p:input port="source">
