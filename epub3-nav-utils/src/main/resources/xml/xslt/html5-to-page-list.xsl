@@ -4,16 +4,17 @@
 
     <xsl:output indent="yes"/>
 
-    <xsl:param name="base-uri" select="replace(base-uri(/),'/[^/]*(#.*)?$','/')"/>
+    <xsl:param name="base-uri" select="base-uri(/*)"/>
 
     <xsl:variable name="base-ref">
+        <xsl:variable name="base-dir" select="replace($base-uri,'/[^/]*(#.*)?$','/')"/>
         <xsl:choose>
-            <xsl:when test="starts-with(base-uri(/),$base-uri)">
-                <xsl:value-of select="concat(substring-after(base-uri(/),$base-uri),'#')"/>
+            <xsl:when test="starts-with(base-uri(/*),$base-dir)">
+                <xsl:value-of select="concat(substring-after(base-uri(/*),$base-dir),'#')"/>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:message
-                    select="concat('Document base URI [',base-uri(/),'] is not relative to the given base URI [',$base-uri,']')"/>
+                    select="concat('Document base URI [',base-uri(/*),'] is not relative to the given base URI [',$base-uri,']')"/>
                 <xsl:value-of select="concat(base-uri(/),'#')"/>
             </xsl:otherwise>
         </xsl:choose>
