@@ -268,4 +268,13 @@ public class RuledCategorizerTest {
 		Assert.assertEquals(l, w.word);
 		Assert.assertEquals(Category.ACRONYM, w.category);
 	}
+
+	@Test
+	public void numbering1() throws IOException {
+		String item = "35.2.";
+		String l = item + " test";
+		CategorizedWord w = categorizeForPrefix(l);
+		Assert.assertEquals(item, w.word);
+		Assert.assertEquals(Category.NUMBERING_ITEM, w.category);
+	}
 }

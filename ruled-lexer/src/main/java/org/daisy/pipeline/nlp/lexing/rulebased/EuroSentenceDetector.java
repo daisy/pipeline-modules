@@ -25,7 +25,6 @@ public class EuroSentenceDetector implements ISentenceDetector {
 		public SentencePattern(int sentenceEndPos, Category... categories) {
 			mCategories = categories;
 			mSentenceEndPos = sentenceEndPos;
-
 		}
 
 		public SentencePattern regex(String... regex) {
@@ -53,7 +52,6 @@ public class EuroSentenceDetector implements ISentenceDetector {
 		public int size() {
 			return mCategories.length;
 		}
-
 	}
 
 	private List<List<CategorizedWord>> mResult;
@@ -86,7 +84,11 @@ public class EuroSentenceDetector implements ISentenceDetector {
 		mNegativePatterns = new SentencePattern[]{
 		        new SentencePattern(0, Category.PUNCTUATION, Category.PUNCTUATION,
 		                Category.PUNCTUATION, Category.PUNCTUATION, Category.PUNCTUATION)
-		                .regex("\\[", ".", ".", ".", "\\]"),
+		                .regex("\\[", "\\.", "\\.", "\\.", "\\]"),
+		        new SentencePattern(0, Category.QUOTE, Category.PUNCTUATION,
+		                Category.PUNCTUATION, Category.PUNCTUATION).regex(".*", "\\.", "\\.",
+		                "\\."),
+		        new SentencePattern(0, Category.QUOTE, Category.PUNCTUATION).regex(".*", "…"),
 		        new SentencePattern(0, Category.PUNCTUATION, Category.PUNCTUATION,
 		                Category.PUNCTUATION).regex("\\[", "…", "\\]"),
 		        new SentencePattern(0, Category.PUNCTUATION, Category.SPACE,

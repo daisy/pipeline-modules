@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:ssml="http://www.w3.org/2001/10/synthesis"
     xmlns:xml="http://www.w3.org/XML/1998/namespace"
     xmlns:d="http://www.daisy.org/ns/pipeline/data"
     exclude-result-prefixes="#all"
@@ -74,8 +73,8 @@
 	  <xsl:when test="current-grouping-key() and count(current-group()) = 1 and current-group()[1]/@id">
 	    <xsl:apply-templates select="current-group()" mode="copy"/>
 	  </xsl:when>
-	  <!-- Non-speakable fragment. -->
-	  <xsl:when test="current-grouping-key() and matches(string-join(descendant-or-self::text(),''),'^[\p{M}\p{P}\p{Z}]*$')">
+	  <!-- Silent fragment. -->
+	  <xsl:when test="current-grouping-key() and matches(string-join(current-group()/descendant-or-self::text(),''),'^[\p{M}\p{P}\p{Z}]*$')">
 	    <xsl:apply-templates select="current-group()" mode="copy"/>
 	  </xsl:when>
 	  <!-- An existing node (not holding an @id) is recycled  -->

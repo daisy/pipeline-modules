@@ -34,7 +34,8 @@ public abstract class TextCategorizer {
 		MEASURE,
 		PHONE_NUMBER,
 		RANGE,
-		IDENTIFIER
+		IDENTIFIER,
+		NUMBERING_ITEM
 	};
 
 	public static boolean isProperNoun(Category c) {

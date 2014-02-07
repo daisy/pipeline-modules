@@ -85,6 +85,11 @@ public class RuledMultilangCategorizer extends RuleBasedTextCategorizer {
 		rsm.init(currency + real + "(?![\\p{L}\\p{Nd}])");
 		addRule(rsm);
 
+		rsm = new RegexMatchRule(Category.NUMBERING_ITEM, NUMBER_COMPOSED_MAX_PRIORITY, false,
+		        mMatchMode);
+		rsm.init("[0-9]+([-.][0-9]+)*\\." + "(?![\\p{L}\\p{Nd}])");
+		addRule(rsm);
+
 		rsm = new RegexMatchRule(Category.QUANTITY, NUMBER_MAX_PRIORITY, true, mMatchMode);
 		rsm.init(real);
 		addRule(rsm);

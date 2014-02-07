@@ -57,9 +57,12 @@
   </xsl:template>
 
   <xsl:variable name="special-list" select="concat(',', $special-sentences, ',')"/>
-  <xsl:template mode="sentence-ids" priority="2"
+  <xsl:template mode="sentence-ids" priority="3"
       match="*[contains($special-list, concat(',', local-name(), ',')) or (local-name() = $output-sentence-tag and count(*) = 1 and count(*[local-name() = $tmp-sentence-tag]) = 1)]">
     <d:sentence id="{d:sentid(.)}" recycled="1"/>
+    <!-- Warning: a 'special-sentence', such as noteref, is unlikely
+         to be stamped as 'recycled' because it is usually the child
+         of a tmp:sentence (not the other way around). -->
   </xsl:template>
 
   <!--======================================================== -->
@@ -83,7 +86,9 @@
 	      <xsl:value-of select="$entry/@id"/>
 	    </xsl:attribute>
 	  </xsl:if>
-	  <xsl:apply-templates select="node()" mode="inside-sentence"/>
+	  <xsl:apply-templates select="node()" mode="inside-sentence">
+	    <xsl:with-param name="parent-name" select="local-name()"/>
+	  </xsl:apply-templates>
 	</xsl:copy>
       </xsl:when>
       <xsl:when test="$entry">
@@ -91,8 +96,18 @@
 	  <xsl:attribute name="id">
 	    <xsl:value-of select="$entry/@id"/>
 	  </xsl:attribute>
-	  <xsl:apply-templates select="node()" mode="inside-sentence"/>
+	  <xsl:apply-templates select="node()" mode="inside-sentence">
+	    <xsl:with-param name="parent-name" select="$output-sentence-tag"/>
+	  </xsl:apply-templates>
 	</xsl:element>
+      </xsl:when>
+      <xsl:when test="local-name() = $tmp-word-tag or local-name() = $tmp-sentence-tag">
+	<!-- The node is ignored. This shouldn't happen though,
+	     because the sentences have been properly distributed by
+	     the previous script.-->
+	<xsl:apply-templates select="node()">
+	  <xsl:with-param name="sentence-ids-tree" select="()"/>
+	</xsl:apply-templates>
       </xsl:when>
       <xsl:otherwise>
 	<xsl:copy copy-namespaces="no">
@@ -110,26 +125,36 @@
   <!--======================================================== -->
 
   <xsl:template match="*[local-name() = $tmp-sentence-tag]" mode="inside-sentence" priority="2">
-    <!-- Ignore the sentence: a parent node has been recycled to contain the sentence. -->
-    <xsl:apply-templates select="node()" mode="inside-sentence"/>
+    <xsl:param name="parent-name"/>
+    <!-- Ignore the node: since we are already inside a sentence,
+         it means that a parent node has been recycled to contain the
+         current sentence. -->
+    <xsl:apply-templates select="node()" mode="inside-sentence">
+      <xsl:with-param name="parent-name" select="$parent-name"/>
+    </xsl:apply-templates>
   </xsl:template>
 
-  <xsl:variable name="ok-parent-list" select="concat(',', $can-contain-words, ',')" />
+  <xsl:variable name="ok-parent-list" select="concat(',', $can-contain-words, ',', $output-sentence-tag, ',')" />
   <xsl:template match="*[local-name() = $tmp-word-tag]" mode="inside-sentence" priority="2">
+    <xsl:param name="parent-name"/>
     <xsl:choose>
-      <xsl:when test="contains($ok-parent-list, concat(',', local-name(..), ','))">
+      <xsl:when test="contains($ok-parent-list, concat(',', $parent-name, ','))">
 	<xsl:element name="{$output-word-tag}" namespace="{$output-ns}">
 	  <xsl:if test="$word-attr != ''">
 	    <xsl:attribute name="{$word-attr}">
 	      <xsl:value-of select="$word-attr-val"/>
 	    </xsl:attribute>
 	  </xsl:if>
-	  <xsl:apply-templates select="node()" mode="inside-sentence"/>
+	  <xsl:apply-templates select="node()" mode="inside-sentence">
+	    <xsl:with-param name="parent-name" select="local-name()"/>
+	  </xsl:apply-templates>
 	</xsl:element>
       </xsl:when>
       <xsl:otherwise>
 	<!-- The word is ignored. -->
-	<xsl:apply-templates select="node()" mode="inside-sentence"/>
+	<xsl:apply-templates select="node()" mode="inside-sentence">
+	  <xsl:with-param name="parent-name" select="local-name()"/>
+	</xsl:apply-templates>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -138,7 +163,9 @@
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="." mode="copy-namespaces"/>
       <xsl:copy-of select="@*"/>
-      <xsl:apply-templates select="node()" mode="inside-sentence"/>
+      <xsl:apply-templates select="node()" mode="inside-sentence">
+	<xsl:with-param name="parent-name" select="local-name()"/>
+      </xsl:apply-templates>
     </xsl:copy>
   </xsl:template>
 
