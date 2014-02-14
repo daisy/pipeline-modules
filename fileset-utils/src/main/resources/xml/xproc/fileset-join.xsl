@@ -20,7 +20,7 @@
             <xsl:for-each-group select="collection()/d:fileset/d:file"
                 group-by="
                 if ($base) then pf:normalize-uri(pf:relativize-uri(resolve-uri(@href,base-uri(.)),$base))
-                else if (not(matches(@href,'^\w+:'))) then pf:normalize-uri(pf:relativize-uri(resolve-uri(@href,base-uri(.)),base-uri(.)))
+                else if (not(matches(@href,'^\w+:'))) then pf:normalize-uri(resolve-uri(@href,base-uri(.)))
                 else pf:normalize-uri(@href)">
                 <d:file href="{current-grouping-key()}">
                     <xsl:apply-templates

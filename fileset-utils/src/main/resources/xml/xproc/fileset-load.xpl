@@ -19,6 +19,7 @@
   <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl"/>
   <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
   <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl"/>
+  <p:import href="http://www.daisy.org/pipeline/modules/zip-utils/library.xpl"/>
 
   <p:declare-step type="pxi:load-text">
     <p:output port="result"/>
@@ -95,8 +96,8 @@
       <p:for-each>
         <p:output port="result" sequence="true"/>
         <p:iteration-source select="//d:file"/>
-        <p:variable name="on-disk-attribute" select="/*/@original-href"/>
         <p:variable name="target" select="/*/resolve-uri(@href, base-uri(.))"/>
+        <p:variable name="on-disk" select="/*/resolve-uri((@original-href,@href)[1], base-uri(.))"/>
         <p:variable name="media-type" select="/*/@media-type"/>
 
         <p:choose>
@@ -173,14 +174,13 @@
           <p:otherwise>
             <p:try>
               <p:group>
-                <p:variable name="on-disk" select="if ($on-disk-attribute='') then $target else $on-disk-attribute"/>
                 <cx:message>
                   <p:with-option name="message" select="concat('loading ',$target,' from disk: ',$on-disk)"/>
                 </cx:message>
                 <p:sink/>
 
                 <px:info>
-                  <p:with-option name="href" select="resolve-uri($on-disk,base-uri())">
+                  <p:with-option name="href" select="replace(resolve-uri($on-disk, base-uri()), '^([^!]+)(!/.+)?$', '$1')">
                     <p:inline>
                       <doc/>
                     </p:inline>
@@ -197,6 +197,25 @@
                         </p:inline>
                       </p:input>
                     </p:error>
+                  </p:when>
+
+                  <!-- Load from ZIP -->
+                  <p:when test="contains($on-disk, '!/')">
+                    <cx:message>
+                      <p:input port="source">
+                        <p:empty/>
+                      </p:input>
+                      <p:with-option name="message" select="replace($on-disk, '^([^!]+)!/(.+)$', 'Loading $2 from ZIP $1')"/>
+                    </cx:message>
+                    <p:sink/>
+                    <px:unzip>
+                      <p:with-option name="href" select="replace($on-disk, '^([^!]+)!/(.+)$', '$1')"/>
+                      <p:with-option name="file" select="replace($on-disk, '^([^!]+)!/(.+)$', '$2')"/>
+                      <p:with-option name="content-type" select="$media-type"/>
+                    </px:unzip>
+                    <p:add-attribute match="/*" attribute-name="xml:base">
+                      <p:with-option name="attribute-value" select="$target"/>
+                    </p:add-attribute>
                   </p:when>
 
                   <!-- Force HTML -->

@@ -34,8 +34,33 @@
             </p:input>
         </px:fileset-add-entry>
     </p:for-each>
-    <px:fileset-join name="fileset.in-memory"/>
+    <px:fileset-join name="fileset.in-memory.in"/>
+    <p:sink/>
 
+    <p:documentation>Load zipped files into memory.</p:documentation>
+    <p:delete match="//d:file[not(contains(resolve-uri((@original-href, @href)[1], base-uri(.)), '!/'))]">
+        <p:input port="source">
+            <p:pipe step="main" port="fileset.in"/>
+        </p:input>
+    </p:delete>
+    <px:fileset-diff name="fileset.unzip">
+        <p:input port="secondary">
+            <p:pipe step="fileset.in-memory.in" port="result"/>
+        </p:input>
+    </px:fileset-diff>
+    <px:fileset-load name="in-memory.unzip">
+        <p:input port="in-memory">
+            <p:empty/>
+        </p:input>
+    </px:fileset-load>
+    <p:sink/>
+    <px:fileset-join name="fileset.in-memory">
+        <p:input port="source">
+            <p:pipe step="fileset.in-memory.in" port="result"/>
+            <p:pipe step="fileset.unzip" port="result"/>
+        </p:input>
+    </px:fileset-join>
+    <p:sink/>
 
     <p:documentation>Stores files and filters out missing files in the result
         fileset.</p:documentation>
@@ -79,6 +104,7 @@
                         select="concat('base-uri(/*)=&quot;',$target,'&quot;')"/>
                     <p:input port="source">
                         <p:pipe port="in-memory.in" step="main"/>
+                        <p:pipe step="in-memory.unzip" port="result"/>
                     </p:input>
                 </p:split-sequence>
                 <p:split-sequence test="position()=1" initial-only="true"/>
