@@ -58,8 +58,8 @@ public class BreakDetectTest implements TreeWriterFactory {
 		        .replaceAll("<(/?)[^:]*:", "<$1"); //remove the namespace prefixes
 	}
 
-	private void check(String input, String expected, boolean removeSpace, boolean forbidAll)
-	        throws SaxonApiException, LexerInitException {
+	private void check(String input, String expected, boolean removeSpace,
+	        boolean forbidAnyDuplication) throws SaxonApiException, LexerInitException {
 
 		if (removeSpace)
 			input = input.replaceAll("\\p{Space}", "");
@@ -68,12 +68,12 @@ public class BreakDetectTest implements TreeWriterFactory {
 		XdmNode document = Builder.build(source);
 
 		FormatSpecifications specs = new FormatSpecifications("http://tmp", "s", "w",
-		        "http://ns", "lang", Arrays.asList("span1", "span2", "span3", "space"),
-		        Arrays.asList("space", "span3"), Arrays.asList("space", "span3"),
-		        Arrays.asList("sentbefore"), Arrays.asList("sentafter"));
+		        "http://ns", "lang", Arrays.asList("span1", "span2", "span3", "space"), Arrays
+		                .asList("space", "span3"), Arrays.asList("space", "span3"), Arrays
+		                .asList("sentbefore"), Arrays.asList("sentafter"));
 
 		XdmNode tree = new XmlBreakRebuilder().rebuild(this, Lexers, document, specs,
-		        forbidAll);
+		        forbidAnyDuplication);
 
 		OutputStream result = new ByteArrayOutputStream();
 		Serializer.setOutputStream(result);
@@ -212,6 +212,60 @@ public class BreakDetectTest implements TreeWriterFactory {
 	}
 
 	@Test
+	public void unsplittable4() throws SaxonApiException, LexerInitException {
+		Lexer.strategy = Strategy.ONE_SENTENCE;
+		StringBuilder input = new StringBuilder(); //robust to IDE's auto formatting
+		input.append("<root>");
+		input.append("<span1>one</span1>");
+		input.append("<span2 id=\"123\">");
+		input.append("two<sep/>");
+		input.append("<span3>section1</span3><sep/>");
+		input.append("<span3>section2</span3><sep/>");
+		input.append("three");
+		input.append("</span2>");
+		input.append("</root>");
+
+		StringBuilder expected = new StringBuilder(); //robust to IDE's auto formatting
+		expected.append("<root>");
+		expected.append("<span1><s>one</s></span1>");
+		expected.append("<span2 id=\"123\">");
+		expected.append("<s>two</s><sep/>");
+		expected.append("<span3><s>section1</s></span3><sep/>");
+		expected.append("<span3><s>section2</s></span3><sep/>");
+		expected.append("<s>three</s>");
+		expected.append("</span2>");
+		expected.append("</root>");
+
+		check(input.toString(), expected.toString(), false, false);
+	}
+
+	@Test
+	public void unsplittable5() throws SaxonApiException, LexerInitException {
+		Lexer.strategy = Strategy.REGULAR;
+		StringBuilder input = new StringBuilder();
+		input.append("<root>");
+		input.append("<span2 id=\"123\">");
+		input.append("<span3>section1</span3><sep/>");
+		input.append("<span3>section2</span3><sep/>");
+		input.append("begin-sentence");
+		input.append("</span2>");
+		input.append("end-sentence");
+		input.append("</root>");
+
+		StringBuilder expected = new StringBuilder();
+		expected.append("<root>");
+		expected.append("<span2 id=\"123\">");
+		expected.append("<span3><s><w>section1</w></s></span3><sep/>");
+		expected.append("<span3><s><w>section2</w></s></span3><sep/>");
+		expected.append("<s><w>begin-sentence</w></s>");
+		expected.append("</span2>");
+		expected.append("<s><w>end-sentence</w></s>");
+		expected.append("</root>");
+
+		check(input.toString(), expected.toString(), false, false);
+	}
+
+	@Test
 	public void sentenceInjection() throws SaxonApiException, LexerInitException {
 		Lexer.strategy = Strategy.REGULAR;
 		check("<root>First <sentafter>sent</sentafter>Second sent<sentbefore>Third sent</sentbefore></root>",
@@ -322,7 +376,6 @@ public class BreakDetectTest implements TreeWriterFactory {
 	public void hard4() throws SaxonApiException, LexerInitException {
 		Lexer.strategy = Strategy.SPACE_SEPARATED_WORDS;
 		StringBuilder input = new StringBuilder();
-
 		input.append("<root>");
 		input.append(" <sep>");
 		input.append("   <sep>one<sep/>two</sep>");

@@ -297,15 +297,15 @@ public class ActualFilesTest implements TreeWriterFactory {
 	private void check(String file, String[] inlineElements, String[] spaceEquivalents)
 	        throws SaxonApiException, LexerInitException {
 
-		for (boolean forbidAll : new boolean[]{
+		for (boolean forbidAnyDuplication : new boolean[]{
 		        false, true
 		}) {
-			for (Strategy stategy : new Strategy[]{
+			for (Strategy strategy : new Strategy[]{
 			        Strategy.ONE_SENTENCE, Strategy.SPACE_SEPARARED_SENTENCES,
 			        Strategy.SPACE_SEPARATED_WORDS, Strategy.REGULAR
 			}) {
 
-				Lexer.strategy = stategy;
+				Lexer.strategy = strategy;
 				SAXSource source = new SAXSource(new InputSource(getClass()
 				        .getResourceAsStream(file)));
 				XdmNode document = Builder.build(source);
@@ -316,7 +316,7 @@ public class ActualFilesTest implements TreeWriterFactory {
 				        null, null);
 
 				XdmNode tree = new XmlBreakRebuilder().rebuild(this, Lexers, document, specs,
-				        forbidAll);
+				        forbidAnyDuplication);
 
 				//check the tree well-formedness
 				XdmNode root = getRoot(tree);
@@ -325,6 +325,7 @@ public class ActualFilesTest implements TreeWriterFactory {
 				Assert.assertFalse(hasTooManyLevels(root, false, specs.wordTag.getLocalName()));
 				Assert.assertFalse(hasTooManyLevels(root, false, specs.sentenceTag
 				        .getLocalName()));
+
 				Assert.assertEquals(0, numberOfDuplicatedIDs(document, tree));
 
 				Assert.assertTrue(isWellTrimmed(tree, specs.sentenceTag.getLocalName(),

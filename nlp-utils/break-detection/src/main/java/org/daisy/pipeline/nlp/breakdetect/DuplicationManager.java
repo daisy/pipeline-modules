@@ -10,13 +10,16 @@ import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.XdmNode;
 
 /**
- * This class keeps track of the duplicated nodes.
+ * This class keeps track of the duplicated nodes. Rather than maintaining a set
+ * of all the nodes created, it keeps under watch only those that might not have
+ * been closed yet in the original document. The nodes' depth levels are used
+ * for detecting when they are closed.
  */
 public class DuplicationManager {
 
-	private Set<NodeInfo> mAddedNodes;
-	private Set<NodeInfo> mPrevAddedNodes;
 	private List<NodeInfo> mDuplicatedNodes;
+	private ArrayList<Set<NodeInfo>> mUnderWatch;
+
 	private boolean mForbidAnyDup;
 	private final static QName IDattr = new QName("id");
 
@@ -25,23 +28,30 @@ public class DuplicationManager {
 	}
 
 	public void onNewDocument() {
-		mAddedNodes = new HashSet<NodeInfo>();
 		mDuplicatedNodes = new ArrayList<NodeInfo>();
+		mUnderWatch = new ArrayList<Set<NodeInfo>>();
 	}
 
 	public void onNewSection() {
-		mPrevAddedNodes = mAddedNodes;
-		mAddedNodes = new HashSet<NodeInfo>();
 	}
 
-	public void onNewNode(XdmNode node) {
+	public void onNewNode(XdmNode node, int level) {
 		if (!mForbidAnyDup && node.getAttributeValue(IDattr) == null)
 			return;
+
 		NodeInfo info = node.getUnderlyingNode();
-		if (mPrevAddedNodes.contains(info) || mAddedNodes.contains(info)) {
-			mDuplicatedNodes.add(info);
-		} else
-			mAddedNodes.add(info);
+		for (Set<NodeInfo> watched : mUnderWatch)
+			if (watched.contains(info)) {
+				mDuplicatedNodes.add(info);
+				break;
+			}
+
+		if (mUnderWatch.size() > level)
+			mUnderWatch.subList(level + 1, mUnderWatch.size()).clear();
+		else
+			while (mUnderWatch.size() <= level)
+				mUnderWatch.add(new HashSet<NodeInfo>());
+		mUnderWatch.get(level).add(info);
 	}
 
 	//the result may contain multiple occurrences of the same node

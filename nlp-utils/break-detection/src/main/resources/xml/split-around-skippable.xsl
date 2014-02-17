@@ -69,16 +69,19 @@
       <xsl:for-each-group select="node()"
 			  group-adjacent="not(descendant-or-self::*[contains($skippable-tag-list, concat(',', local-name(), ','))][1])">
 	<xsl:choose>
+	  <xsl:when test="not(current-grouping-key())">
+	    <xsl:apply-templates select="current-group()" mode="split"/>
+	  </xsl:when>
 	  <!-- An existing node (holding an @id) is recycled -->
-	  <xsl:when test="current-grouping-key() and count(current-group()) = 1 and current-group()[1]/@id">
+	  <xsl:when test="count(current-group()) = 1 and current-group()[1]/@id">
 	    <xsl:apply-templates select="current-group()" mode="copy"/>
 	  </xsl:when>
 	  <!-- Silent fragment. -->
-	  <xsl:when test="current-grouping-key() and matches(string-join(current-group()/descendant-or-self::text(),''),'^[\p{M}\p{P}\p{Z}]*$')">
+	  <xsl:when test="matches(string-join(current-group()/descendant-or-self::text(),''),'^[\p{M}\p{P}\p{Z}\t\r\n]*$')">
 	    <xsl:apply-templates select="current-group()" mode="copy"/>
 	  </xsl:when>
 	  <!-- An existing node (not holding an @id) is recycled  -->
-	  <xsl:when test="current-grouping-key() and count(current-group()) = 1 and local-name(current-group()[1]) = $output-subsentence-tag">
+	  <xsl:when test="count(current-group()) = 1 and local-name(current-group()[1]) = $output-subsentence-tag">
 	    <xsl:copy>
 	      <xsl:copy-of select="@*"/>
 	      <xsl:attribute name="id">
@@ -88,17 +91,13 @@
 	    </xsl:copy>
 	  </xsl:when>
 	  <!-- General case. -->
-	  <xsl:when test="current-grouping-key()">
+	  <xsl:otherwise>
 	    <xsl:element name="{$output-subsentence-tag}" namespace="{$output-ns}">
 	      <xsl:attribute name="id">
 		<xsl:value-of select="concat('sub-', generate-id(current-group()[1]))" />
 	      </xsl:attribute>
 	      <xsl:apply-templates select="current-group()" mode="copy"/>
 	    </xsl:element>
-	  </xsl:when>
-	  <!-- Recursive call. -->
-	  <xsl:otherwise>
-	    <xsl:apply-templates select="current-group()" mode="split"/>
 	  </xsl:otherwise>
 	</xsl:choose>
       </xsl:for-each-group>

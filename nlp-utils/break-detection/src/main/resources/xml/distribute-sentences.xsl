@@ -25,11 +25,18 @@
   <!-- Keep the sentence where it is, if possible. Otherwise split it. -->
 
   <xsl:variable name="ok-parent-list" select="concat(',', $can-contain-sentences, ',')"/>
-  <xsl:template match="*[contains($ok-parent-list, concat(',', local-name(..), ','))]"
+  <xsl:template match="node()[contains($ok-parent-list, concat(',', local-name(..), ','))]"
 		mode="create-sentence" priority="3">
-    <xsl:element name="{$tmp-sentence-tag}" namespace="{$tmp-ns}">
-      <xsl:copy-of select="node()"/> <!-- including the <tmp:word> nodes. -->
-    </xsl:element>
+    <xsl:choose>
+      <xsl:when test="local-name() = $tmp-sentence-tag">
+	<xsl:copy-of select="."/> <!-- including the <tmp:word> nodes. -->
+      </xsl:when>
+      <xsl:otherwise>
+	<xsl:element name="{$tmp-sentence-tag}" namespace="{$tmp-ns}">
+	  <xsl:copy-of select="."/> <!-- including the <tmp:word> nodes. -->
+	</xsl:element>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="*[local-name() = $tmp-word-tag]" mode="create-sentence" priority="2">

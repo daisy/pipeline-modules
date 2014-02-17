@@ -37,7 +37,7 @@ import com.xmlcalabash.util.TreeWriter;
  * detected by the InlineSectionFinder. Since the sections can be dispatched
  * over distinct branches of the document tree, the tree is rebuilt by
  * agglomerating tree paths with writeTree(), instead of the usual top-down
- * recursive way whose the building scope is too small for this purpose.
+ * recursive way whose building scope is too small for this purpose.
  * 
  * The levels are used for aligning the tree paths each other so that it is easy
  * to find the common ancestor of a group of leaves.
@@ -216,7 +216,7 @@ public class XmlBreakRebuilder implements InlineSectionProcessor {
 	private void addNode(XdmNode node, int level) {
 		switch (node.getNodeKind()) {
 		case ELEMENT:
-			mDuplicationManager.onNewNode(node);
+			mDuplicationManager.onNewNode(node, level);
 			mTreeWriter.addStartElement(node);
 			mTreeWriter.addAttributes(node);
 			mPreviousLevel = level;
