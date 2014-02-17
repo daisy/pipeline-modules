@@ -80,8 +80,8 @@ public class SynthesisWorkerPool {
 	 * The SSML is assumed to be pushed in document order.
 	 * */
 	public void pushSSML(XdmNode ssml) throws SynthesisException {
-		String voiceVendor = ssml.getAttributeValue(new QName("voice-vendor"));
-		String voiceName = ssml.getAttributeValue(new QName("voice-name"));
+		String voiceVendor = ssml.getAttributeValue(new QName("voice-selector1"));
+		String voiceName = ssml.getAttributeValue(new QName("voice-selector2"));
 		String lang = ssml.getAttributeValue(new QName("http://www.w3.org/XML/1998/namespace",
 		        "lang"));
 
@@ -91,7 +91,7 @@ public class SynthesisWorkerPool {
 			        + new Voice(voiceVendor, voiceName) + " or providing the language '"
 			        + lang + "'");
 			if (mPreviousVoice == null) {
-				mLogger.printInfo("This part of the text won't be synthesized.");
+				mLogger.printInfo("The corresponding part of the text won't be synthesized.");
 				endSection();
 				return;
 			} else {

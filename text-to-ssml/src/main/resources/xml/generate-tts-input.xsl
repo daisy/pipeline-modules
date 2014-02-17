@@ -25,6 +25,8 @@
   <!-- ========= bind every cue and pause to its most relevant sentence ========= -->
   <!-- ========= (document order is kept on purpose)                    ========= -->
 
+  <xsl:key name="bindings" match="*[@sentence]" use="@sentence"/>
+
   <xsl:variable name="bindings">
     <root>
       <xsl:apply-templates mode="build-bindings" select="/*"/>
@@ -93,10 +95,16 @@
 	    <xsl:variable name="prev-sentence-ancestor" select="ancestor::*[preceding-sibling::*/descendant-or-self::ssml:s[1]][1]" />
 	    <xsl:variable name="next-sentence-ancestor" select="ancestor::*[following-sibling::*/descendant-or-self::ssml:s[1]][1]" />
 	    <xsl:apply-templates select="." mode="build-bindings-no-sentence">
+	      <!-- Legacy code: -->
+	      <!-- <xsl:with-param name="sentence-id" -->
+	      <!-- 		      select="if ($prev-sentence-ancestor/ancestor::*[self = $next-sentence-ancestor]) then -->
+	      <!-- 			      ($prev-sentence-ancestor/preceding-sibling::*[descendant-or-self::ssml:s[1]][1]/descendant-or-self::ssml:s[last()]/@id) else -->
+	      <!-- 			      ($next-sentence-ancestor/following-sibling::*/descendant-or-self::ssml:s[1]/@id)"/> -->
+
 	      <xsl:with-param name="sentence-id"
-			      select="if ($prev-sentence-ancestor/ancestor::*[self = $next-sentence-ancestor]) then
+			      select="if ($prev-sentence-ancestor) then
 				      ($prev-sentence-ancestor/preceding-sibling::*[descendant-or-self::ssml:s[1]][1]/descendant-or-self::ssml:s[last()]/@id) else
-				      ($next-sentence-ancestor/following-sibling::*/descendant-or-self::ssml:s[1]/@id)"/>
+				      ($next-sentence-ancestor/following-sibling::*[descendant-or-self::ssml:s[1]][1]/descendant-or-self::ssml:s[1]/@id)"/>
 	    </xsl:apply-templates>
 	  </xsl:otherwise>
 	</xsl:choose>
@@ -123,7 +131,7 @@
 	      <xsl:attribute namespace="http://www.w3.org/XML/1998/namespace" name="lang">
 		<xsl:value-of select="$sentence/ancestor-or-self::*[@xml:lang][1]/@xml:lang"/>
 	      </xsl:attribute>
-	      <xsl:for-each select="$bindings//*[@sentence = $sentence/@id]">
+	      <xsl:for-each select="key('bindings', $sentence/@id, $bindings)">
 		<xsl:choose>
 		  <xsl:when test="current()/@tmp:pause-before or current()/@tmp:cue-before or current()/@tmp:pause-after or current()/@tmp:cue-after">
 		    <xsl:apply-templates select="current()/@tmp:pause-before|current()/@tmp:pause-after" mode="pause"/>

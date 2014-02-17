@@ -56,11 +56,12 @@
 		    <xsl:if test="$id">
 		      <ssml:mark name="{concat($mark-delimiter, $id)}"/>
 		      <xsl:variable name="say" select="key('translate', $skippable, $dictionary)/@say"/>
-		      <xsl:apply-templates select="current()" mode="copy-ref">
+		      <xsl:apply-templates select="current()/node()" mode="copy-ref">
 			<xsl:with-param name="say" select="if ($say) then $say else '$1'"/>
 		      </xsl:apply-templates>
 		      <ssml:mark name="{concat($id, $mark-delimiter)}"/>
 		      <xsl:value-of select="' , '"/> <!-- break in prosody -->
+		      <!-- TODO: merge the adjacent marks with the syntax 'idleft__idright' to speed up the TTS. -->
 		    </xsl:if>
 		  </xsl:for-each>
 		</ssml:s>

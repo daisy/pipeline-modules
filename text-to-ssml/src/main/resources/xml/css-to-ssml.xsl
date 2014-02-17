@@ -26,21 +26,45 @@
     <xsl:copy>
       <xsl:copy-of select="@xml:lang|@id"/>
       <xsl:if test="@tmp:voice-family">
-	<!-- voice-family has the format: voice-vendor|voice-name|attr1|attr2|... where attr is a gender or an age -->
-	<xsl:variable name="normalized" select="tmp:normlist(@tmp:voice-family)"/>
-	<xsl:if test="contains($normalized, '|')">
-	  <xsl:variable name="left" select="substring-before($normalized, '|')"/>
-	  <xsl:variable name="right" select="substring-after($normalized, '|')"/>
-	  <xsl:attribute name="voice-vendor">
-	    <xsl:value-of select="translate(lower-case($left), ' ','')"/>
+	<!-- voice-family has the format: attr1|attr2|attr3 where attr
+	     is either age, gender, voice's vendor or voice's name. If
+	     a voice-name is given, it should come after the mandatory
+	     voice-vendor.-->
+	<!-- Should we use the wildcard '*' to mean 'any vendor'? -->
+	<xsl:variable name="voice-selectors">
+	  <tmp:selectors>
+	    <xsl:analyze-string select="tmp:normlist(@tmp:voice-family)" regex="(\||^)([0-9]+)(\||$)">
+	      <xsl:matching-substring>
+		<tmp:sel age="{regex-group(2)}"/>
+	      </xsl:matching-substring>
+	      <xsl:non-matching-substring>
+		<xsl:analyze-string select="." regex="(\||^)((male)|(female)|(neutral))(\||$)">
+		  <xsl:matching-substring>
+		    <tmp:sel gender="{regex-group(2)}"/>
+		  </xsl:matching-substring>
+		  <xsl:non-matching-substring>
+		    <tmp:sel other="{.}"/>
+		  </xsl:non-matching-substring>
+		</xsl:analyze-string>
+	      </xsl:non-matching-substring>
+	    </xsl:analyze-string>
+	  </tmp:selectors>
+	</xsl:variable>
+	<xsl:if test="$voice-selectors//@age">
+	  <xsl:attribute name="voice-age">
+	    <xsl:value-of select="$voice-selectors//@age"/>
 	  </xsl:attribute>
-	  <xsl:variable name="voice-name" select="translate(lower-case(if (contains($right, '|')) then substring-before($right, '|') else $right), ' ','')"/>
-	  <xsl:if test="$voice-name">
-	    <xsl:attribute name="voice-name">
-	      <xsl:value-of select="$voice-name"/>
-	    </xsl:attribute>
-	  </xsl:if>
 	</xsl:if>
+	<xsl:if test="$voice-selectors//@gender">
+	  <xsl:attribute name="voice-gender">
+	    <xsl:value-of select="$voice-selectors//@gender"/>
+	  </xsl:attribute>
+	</xsl:if>
+	<xsl:for-each select="tokenize($voice-selectors//@other, '\|+')">
+	  <xsl:attribute name="{concat('voice-selector', position())}">
+	    <xsl:value-of select="."/>
+	  </xsl:attribute>
+	</xsl:for-each>
       </xsl:if>
       <xsl:apply-templates select="." mode="css1"/>
     </xsl:copy>
@@ -121,48 +145,13 @@
     </ssml:say-as>
   </xsl:template>
 
-
   <xsl:template match="*" mode="css8">
-    <xsl:apply-templates select="." mode="css-end"/>
+    <xsl:apply-templates select="node()" mode="css-child"/>
   </xsl:template>
   <xsl:template match="*[@tmp:speak-numeral = 'continuous']" mode="css8">
     <ssml:say-as interpret-as="cardinal">
-      <xsl:apply-templates select="." mode="css-end"/>
+      <xsl:apply-templates select="node()" mode="css-child"/>
     </ssml:say-as>
-  </xsl:template>
-
-
-  <xsl:template match="*" mode="css-end">
-    <xsl:apply-templates select="node()" mode="css-child"/>
-  </xsl:template>
-  <xsl:template match="*[@tmp:voice-family]" mode="css7">
-    <xsl:variable name="voice-info" select="substring-after(tmp:normlist(@tmp:voice-family), '|')"/> <!-- first element is the TTS engine -->
-    <xsl:choose>
-      <xsl:when test="$voice-info">
-	<!-- TODO: move the gender and the age to the same place as voice-vendor and voice-name -->
-	<ssml:voice>
-	  <xsl:choose>
-	    <xsl:when test="contains($voice-info, 'male')">
-	      <xsl:attribute name="gender"><xsl:value-of select="'male'"/></xsl:attribute>
-	    </xsl:when>
-	    <xsl:when test="contains($voice-info, 'female')">
-	      <xsl:attribute name="gender"><xsl:value-of select="'female'"/></xsl:attribute>
-	    </xsl:when>
-	    <xsl:when test="contains($voice-info, 'neutral')">
-	      <xsl:attribute name="gender"><xsl:value-of select="'neutral'"/></xsl:attribute>
-	    </xsl:when>
-	  </xsl:choose>
-	  <xsl:variable name="age" select="replace($voice-info, '\|([0-9]+)[\|\$]', '$1')"/>
-	  <xsl:if test="$age">
-	    <xsl:attribute name="age"><xsl:value-of select="$age"/></xsl:attribute>
-	  </xsl:if>
-	  <xsl:apply-templates select="node()" mode="css-child"/>
-	</ssml:voice>
-      </xsl:when>
-      <xsl:otherwise>
-	<xsl:apply-templates select="node()" mode="css-child"/>
-      </xsl:otherwise>
-    </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>

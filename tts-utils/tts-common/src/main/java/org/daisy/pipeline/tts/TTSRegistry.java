@@ -334,6 +334,9 @@ public class TTSRegistry {
 		}
 
 		Locale loc = VoiceInfo.tagToLocale(lang);
+		if (loc == null)
+			return null;
+
 		Locale shortLoc = new Locale(loc.getLanguage());
 		Voice result;
 
