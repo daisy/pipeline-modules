@@ -11,6 +11,7 @@
   <p:import href="http://www.daisy.org/pipeline/modules/css-speech/inline-css.xpl"/>
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl" />
   <p:import href="styled-text-to-ssml.xpl" />
+  <p:import href="skippable-to-ssml.xpl" />
 
   <p:documentation>
     Generate the TTS input, as SSML snippets.
@@ -72,36 +73,21 @@
     stylesheets.</p:documentation>
   </p:option>
 
-  <!-- <p:option name="call-uid" required="false" select="'0'"> -->
-  <!--   <p:documentation>Unique identifier for the call that allow to -->
-  <!--   generate true pipeline-wide unique IDs.</p:documentation> -->
-  <!-- </p:option> -->
+  <p:variable name="style-ns" select="'http://www.daisy.org/ns/pipeline/tmp'"/>
 
   <!-- The skippable elements are separated before the CSS inlining so that -->
   <!-- the CSS will properly be applied on the new sentences that group -->
   <!-- together the skippable elements. -->
-  <!-- As a result, the context-dependent CSS properties won't have any -->
-  <!-- effect on the skippable elements. -->
-
-  <p:choose name="separate">
-    <p:when test="$separate-skippable = 'true'">
-      <p:output port="result"/>
-      <p:xslt>
-	<p:with-param name="skippable-elements" select="$skippable-elements"/>
-	<p:input port="stylesheet">
-	  <p:document href="skippable-to-ssml.xsl"/>
-	</p:input>
-	<p:input port="source">
-	  <p:pipe port="content.in" step="main"/>
-	</p:input>
-      </p:xslt>
-      <cx:message message="Skippable elements separated"/>
-    </p:when>
-    <p:otherwise>
-      <p:output port="result"/>
-      <p:identity/>
-    </p:otherwise>
-  </p:choose>
+  <p:xslt name="separate">
+    <p:with-param name="skippable-elements" select="$skippable-elements"/>
+    <p:input port="stylesheet">
+      <p:document href="extract-skippable.xsl"/>
+    </p:input>
+    <p:input port="source">
+      <p:pipe port="content.in" step="main"/>
+    </p:input>
+  </p:xslt>
+  <!-- <cx:message message="Skippable elements separated"/><p:sink/> -->
 
   <!-- Get the CSS stylesheets -->
   <p:try>
@@ -137,7 +123,11 @@
   </p:try>
 
   <p:group>
-    <p:output port="result" sequence="true"/>
+    <p:output port="result" sequence="true">
+      <p:pipe port="result" step="skippable-to-ssml"/>
+      <p:pipe port="result" step="content-to-ssml"/>
+    </p:output>
+
     <p:variable name="sheet-uri-list" select="string-join(//*[@original-href]/@original-href, ',')"/>
     <p:variable name="all-sheet-uris"
 		select="if ($aural-sheet-uri) then concat($sheet-uri-list, ',', $aural-sheet-uri) else $sheet-uri-list">
@@ -147,15 +137,20 @@
 		select="if ($aural-sheet-uri) then $aural-sheet-uri else //*[@original-href][1]/@original-href"/>
     <p:choose name="inlining">
       <p:when test="$all-sheet-uris != '' and $all-sheet-uris != ','">
-	<p:output port="result"/>
+	<p:output port="result" sequence="true"/>
 	<p:identity>
 	  <p:input port="source">
-	    <p:pipe port="result" step="separate"/>
+	    <p:pipe port="result" step="separate"/> <!-- skippable free -->
+	    <p:pipe port="secondary" step="separate"/> <!-- skippable only -->
 	  </p:input>
 	</p:identity>
 	<px:inline-css>
-	  <p:with-option name="stylesheet-uri" select="$all-sheet-uris"/>
-	  <p:with-option name="style-ns" select="'http://www.daisy.org/ns/pipeline/tmp'"/>
+	  <p:with-option name="stylesheet-uri" select="$all-sheet-uris">
+	    <p:empty/> <!-- More than one document in context. -->
+	  </p:with-option>
+	  <p:with-option name="style-ns" select="$style-ns">
+	    <p:empty/>
+	  </p:with-option>
 	</px:inline-css>
 	<cx:message message="CSS speech inlined"/>
       </p:when>
@@ -163,22 +158,38 @@
 	<p:output port="result"/>
 	<p:identity>
 	  <p:input port="source">
-	    <p:pipe port="result" step="separate"/>
+	    <p:pipe port="result" step="separate"/> <!-- skippable free -->
+	    <p:pipe port="secondary" step="separate"/> <!-- skippable only -->
 	  </p:input>
 	</p:identity>
 	<cx:message message="No CSS sheet found"/>
       </p:otherwise>
     </p:choose>
+    <p:split-sequence test="position()=1" name="split-seq"/>
 
-    <px:styled-text-to-ssml name="to-smml">
+    <px:skippable-to-ssml name="skippable-to-ssml">
       <p:input port="content.in">
-	<p:pipe port="result" step="inlining"/>
+	<p:pipe port="not-matched" step="split-seq"/>
+      </p:input>
+      <p:with-option name="skippable-elements" select="$skippable-elements"/>
+      <p:with-option name="style-ns" select="$style-ns"/>
+    </px:skippable-to-ssml>
+
+    <p:identity>
+      <p:input port="source">
+	<p:empty/> <!-- Empty context for the next options. -->
+      </p:input>
+    </p:identity>
+
+    <px:styled-text-to-ssml name="content-to-ssml">
+      <p:input port="content.in">
+	<p:pipe port="matched" step="split-seq"/>
       </p:input>
       <p:input port="fileset.in">
 	<p:pipe port="fileset.in" step="main"/>
       </p:input>
       <p:input port="sentence-ids">
-      <p:pipe port="sentence-ids" step="main"/>
+	<p:pipe port="sentence-ids" step="main"/>
       </p:input>
       <p:with-option name="word-element" select="$word-element"/>
       <p:with-option name="word-attr" select="$word-attr"/>
@@ -187,6 +198,7 @@
       <p:with-option name="section-attr" select="$section-attr"/>
       <p:with-option name="section-attr-val" select="$section-attr-val"/>
       <p:with-option name="first-sheet-uri" select="$first-sheet-uri"/>
+      <p:with-option name="style-ns" select="$style-ns"/>
     </px:styled-text-to-ssml>
   </p:group>
 

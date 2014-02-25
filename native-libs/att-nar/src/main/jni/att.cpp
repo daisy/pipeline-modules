@@ -67,6 +67,7 @@ struct Connection{
   ErrorHandler  errHandler; //TODO: make sure the destructor does the same as ErrorHandler::Release()
   CSDKSink*     sink;
   CTTSEngine*   engine;
+  int		sampleRate;
 };
 
 namespace{
@@ -134,8 +135,13 @@ Java_org_daisy_pipeline_tts_attnative_ATTLib_openConnection
   format.m_nType = TTSAUDIOTYPE_DEFAULT;
   format.m_nSampleRate = sampleRate;
   format.m_nBits = bitsPerSample;
+  //No matter which voice is chosen (e.g. mike16 or mike8), the output
+  //will be resampled to match with 'format'.
   if (r == TTS_OK && (r == conn->engine->SetAudioFormat(&format, &formatReturned)) != TTS_OK){
-    //TODO:Error
+    //TODO:Error According to the documentation: "The application
+    //should be aware that the returned audio format may not be
+    //exactly what the application desired", but if sampleRate == 8000
+    //or sampleRate == 16000, it should always work.
   }
 
   long notifevents = TTSNOTIFY_AUDIO|TTSNOTIFY_BOOKMARK;
@@ -147,6 +153,8 @@ Java_org_daisy_pipeline_tts_attnative_ATTLib_openConnection
     ::release(conn);
     return 0;
   }
+
+  conn->sampleRate = sampleRate;
 
   return reinterpret_cast<jlong>(conn);
 }
@@ -189,21 +197,32 @@ JNIEXPORT jobjectArray JNICALL Java_org_daisy_pipeline_tts_attnative_ATTLib_getV
   Connection* conn = reinterpret_cast<Connection*>(connection);
 
   int nVoices = 0;
+  jclass stringClass = env->FindClass("java/lang/String");
+  jobjectArray stringArray;
   TTS_RESULT result = conn->engine->NumVoices(&nVoices);
 
-  jclass stringClass = env->FindClass("java/lang/String");
-  jobjectArray stringArray = env->NewObjectArray(nVoices, stringClass, 0);
   if (result == TTS_OK) {
-    for (int i = 0; i < nVoices; i++) {
+    int size = 0;
+    jstring* names = new jstring[nVoices];
+    for (int i = 0; i < nVoices; ++i) {
       TTSVoice voice;
-      //voice.m_szName's lifecycle is assumed to go beyond this scope
       result = conn->engine->EnumVoice(i, &voice);
-      if (result == TTS_OK) {
+      if (result == TTS_OK && voice.m_nSampleRate == conn->sampleRate) {
+	//When the voice's sample rate doesn't match with the connection's
+	//sample rate, ATT chooses the default voice (e.g. mike8) instead of
+	//resampling the one chosen by the user, which is not the expected behaviour.
+	//This is why we make sure that the sample rates do match.
+	names[size++] = env->NewStringUTF((char*) voice.m_szName);
 	//m_szName is a UTF8String*, i.e. unsigned char*
-	jstring javaString = env->NewStringUTF((char*) voice.m_szName);
-	env->SetObjectArrayElement(stringArray, i, javaString);
       }
     }
+    stringArray = env->NewObjectArray(size, stringClass, 0);
+    for (int i = 0; i < size; ++i)
+      env->SetObjectArrayElement(stringArray, i, names[i]);
+    delete [] names;
+  }
+  else{
+    stringArray = env->NewObjectArray(0, stringClass, 0);
   }
 
   return stringArray;

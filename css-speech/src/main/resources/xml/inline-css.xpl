@@ -3,8 +3,8 @@
 		xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
 		exclude-inline-prefixes="#all">
 
-  <p:input port="source" primary="true" />
-  <p:output port="result" primary="true" />
+  <p:input port="source" primary="true" sequence="true" />
+  <p:output port="result" primary="true" sequence="true" />
 
   <p:option name="stylesheet-uri" required="true"/>
 

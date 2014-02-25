@@ -58,8 +58,6 @@ public class SSMLUtil {
 		}
 	}
 
-	private final static QName markNameAttr = new QName(null, "name");
-
 	private static void findMarks(XdmNode ssml, Multimap<NodeInfo, String> marksScope,
 	        List<String> sortedMarkNames) {
 		String markName = sortedMarkNames.get(sortedMarkNames.size() - 1);
@@ -69,7 +67,8 @@ public class SSMLUtil {
 			XdmNode parent = (XdmNode) iter.next();
 			marksScope.put(parent.getUnderlyingNode(), markName);
 		}
-		if (ssml.getNodeName() != null && "mark".equals(ssml.getNodeName().getLocalName())) {
+		if (ssml.getNodeName() != null
+		        && markNode.getLocalName().equals(ssml.getNodeName().getLocalName())) {
 			sortedMarkNames.add(ssml.getAttributeValue(markNameAttr));
 		}
 		iter = ssml.axisIterator(Axis.CHILD);
@@ -87,7 +86,8 @@ public class SSMLUtil {
 		toString(ssml, sb, adapter, null, null);
 
 		if (endingMark != null) {
-			sb.append("<mark name=\"" + endingMark + "\"/>");
+			sb.append("<mark name=\""
+			        + adapter.adaptAttributeValue(markNode, markNameAttr, endingMark) + "\"/>");
 		}
 
 		sb.append(adapter.getFooter());
@@ -118,11 +118,14 @@ public class SSMLUtil {
 		return result;
 	}
 
-	private static final String BreakAfterSentence = "<break time=\""
-	        + System.getProperty("tts.pause.after.sentence", "250ms") + "\"/>";
-
 	public static String getBreakAfterSentence() {
 		return BreakAfterSentence;
 	}
+
+	private static final String BreakAfterSentence = "<break time=\""
+	        + System.getProperty("tts.pause.after.sentence", "250ms") + "\"/>";
+
+	private static final QName markNode = new QName(null, "mark");
+	private static final QName markNameAttr = new QName(null, "name");
 
 }

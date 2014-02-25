@@ -21,6 +21,14 @@ public interface TTSService {
 	}
 
 	public static class RawAudioBuffer {
+		public RawAudioBuffer() {
+
+		}
+
+		public RawAudioBuffer(int size) {
+			output = new byte[size];
+		}
+
 		public byte[] output;
 		public int offsetInOutput;
 	};

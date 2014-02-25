@@ -1,5 +1,6 @@
 package org.daisy.pipeline.cssinlining;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,9 +33,18 @@ public class SpeechSheetAnalyser {
 		}
 		// create a CSS matcher for the given stylesheets
 		List<StyleSheet> styleSheets = new ArrayList<StyleSheet>();
+
 		try {
 			for (String uri : URIs) {
-				styleSheets.add(CSSFactory.parse(new URL(uri), "utf-8"));
+				if (uri != null && !uri.isEmpty()) {
+					URL url = null;
+					try {
+						url = new URL(uri); //first try
+					} catch (MalformedURLException e) {
+						url = new URL("file://" + uri); //second try
+					}
+					styleSheets.add(CSSFactory.parse(url, "utf-8"));
+				}
 			}
 		} catch (Exception e) {
 			throw new IllegalArgumentException("could not analyse the stylesheet: "

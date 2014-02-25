@@ -1,6 +1,7 @@
 package org.daisy.pipeline.tts.attnative;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -114,16 +115,23 @@ public class ATTNativeTest {
 	}
 
 	@Test
-	public void speakEasy() {
+	public void badSampleRate() {
+		long connection = ATTLib.openConnection(Host, Port, 16666, 16);
+		Assert.assertTrue(0 != connection);
+		String[] vnames = ATTLib.getVoiceNames(connection);
+		ATTLib.closeConnection(connection);
+		Assert.assertEquals(vnames.length, 0);
+	}
+
+	@Test
+	public void speakEasy() throws IOException {
 		SingleThreadListener l = new SingleThreadListener();
 		ATTLib.setListener(l);
-
 		long connection = ATTLib.openConnection(Host, Port, 16000, 16);
 		Assert.assertTrue(0 != connection);
 
 		speak(this, connection, SSML("hello world"));
 		ATTLib.closeConnection(connection);
-
 		Assert.assertTrue(l.totalSize > 2000);
 	}
 

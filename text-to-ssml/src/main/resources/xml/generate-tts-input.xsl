@@ -17,10 +17,11 @@
   <!-- (only one sheet is taken into account) -->
   <!--======================================================================= -->
 
+  <xsl:import href="flatten-css.xsl"/>
   <xsl:param name="css-sheet-uri"/>
-  <xsl:variable name="css-sheet-dir" select="substring-before($css-sheet-uri, tokenize($css-sheet-uri, '/')[last()])"/>
 
-  <xsl:variable name="tmp-ns" select="'http://www.daisy.org/ns/pipeline/tmp'"/>
+  <xsl:variable name="css-sheet-dir" select="substring-before($css-sheet-uri, tokenize($css-sheet-uri, '/')[last()])"/>
+  <xsl:variable name="style-ns" select="'http://www.daisy.org/ns/pipeline/tmp'"/>
 
   <!-- ========= bind every cue and pause to its most relevant sentence ========= -->
   <!-- ========= (document order is kept on purpose)                    ========= -->
@@ -124,9 +125,8 @@
 	    <ssml:s>
 	      <xsl:variable name="sentence" select="current()"/>
 	      <xsl:copy-of select="$sentence/@*"/>
-	      <xsl:apply-templates select="$sentence" mode="project-css-properties">
-		<xsl:with-param name="properties"
-				select="'voice-family,richness,volume,rate,stress,speech-rate,pitch,pitch-range,speak,azimuth,speak-punctuation,speak-numeral,elevation'"/>
+	      <xsl:apply-templates select="$sentence" mode="flatten-css-properties">
+		<xsl:with-param name="style-ns" select="$style-ns"/>
 	      </xsl:apply-templates>
 	      <xsl:attribute namespace="http://www.w3.org/XML/1998/namespace" name="lang">
 		<xsl:value-of select="$sentence/ancestor-or-self::*[@xml:lang][1]/@xml:lang"/>
@@ -141,7 +141,7 @@
 		    <!-- sentence content -->
 		    <xsl:apply-templates select="$sentence/node()" mode="inside-sentence"/>
 		    <xsl:value-of select="'.'"/> <!-- sometimes the lexers do not include the punctuation marks -->
-		    <!-- no ssml:break is added here as some TTS processors may arleady add breaks after the -->
+		    <!-- No ssml:break is added here as some TTS processors may already add the silent fragments after the -->
 		    <!-- final punctuation marks. -->
 		  </xsl:otherwise>
 		</xsl:choose>
@@ -186,23 +186,6 @@
     	  <ssml:audio src="{substring-after($abs-uri, 'file:')}"/>
     	</xsl:otherwise>
       </xsl:choose>
-    </xsl:if>
-  </xsl:template>
-
-  <xsl:template match="*" mode="project-css-properties">
-    <xsl:param name="properties"/>
-    <xsl:if test="$properties != ''">
-      <xsl:variable name="property" select="substring-before($properties, ',')"/>
-      <xsl:variable name="ref"
-		    select="ancestor-or-self::*[@*[local-name() = $property and namespace-uri() = $tmp-ns]][1]"/>
-      <xsl:if test="$ref">
-	<xsl:attribute namespace="{$tmp-ns}" name="{$property}">
-	  <xsl:value-of select="$ref/@*[local-name() = $property and namespace-uri() = $tmp-ns]" />
-	</xsl:attribute>
-      </xsl:if>
-      <xsl:apply-templates select="." mode="project-css-properties">
-	<xsl:with-param name="properties" select="substring-after($properties, ',')"/>
-      </xsl:apply-templates>
     </xsl:if>
   </xsl:template>
 

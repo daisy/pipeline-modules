@@ -87,9 +87,11 @@ public class TTSRegistry {
 		final String eSpeak = "espeak";
 		final String att = "att";
 		final String microsoft = "Microsoft";
+		final String acapela = "acapela";
 		final int eSpeakPriority = 1;
 		final int ATT16Priority = 10;
 		final int ATT8Priority = 7;
+		final int AcapelaPriority = 12;
 
 		VoiceInfo[] info = {
 		        //eSpeak:
@@ -155,7 +157,7 @@ public class TTSRegistry {
 		        new VoiceInfo(att, "rosa8", "es-us", ATT8Priority),
 		        new VoiceInfo(att, "francesca16", "it", ATT16Priority),
 		        new VoiceInfo(att, "francesca8", "it", ATT8Priority),
-		        new VoiceInfo(att, "giovanni6", "it", ATT16Priority),
+		        new VoiceInfo(att, "giovanni16", "it", ATT16Priority),
 		        new VoiceInfo(att, "giovanni8", "it", ATT8Priority),
 		        new VoiceInfo(att, "marina16", "pt-br", ATT16Priority),
 		        new VoiceInfo(att, "marina8", "pt-br", ATT8Priority),
@@ -170,7 +172,16 @@ public class TTSRegistry {
 		        new VoiceInfo(microsoft, "Microsoft Hazel", "en-uk", 6),
 		        new VoiceInfo(microsoft, "Microsoft Mike", "en-us", 2),
 		        new VoiceInfo(microsoft, "Microsoft Lili", "zh", 3),
-		        new VoiceInfo(microsoft, "Microsoft Simplified Chinese", "zh", 2)
+		        new VoiceInfo(microsoft, "Microsoft Simplified Chinese", "zh", 2),
+		        //Acapela (those are the speaker's names, not the voice names):
+		        new VoiceInfo(acapela, "heather", "en-us", AcapelaPriority),
+		        new VoiceInfo(acapela, "will", "en-us", AcapelaPriority),
+		        new VoiceInfo(acapela, "tracy", "en-us", AcapelaPriority),
+		        new VoiceInfo(acapela, "antoine", "fr", AcapelaPriority),
+		        new VoiceInfo(acapela, "claire", "fr", AcapelaPriority),
+		        new VoiceInfo(acapela, "alice", "fr", AcapelaPriority),
+		        new VoiceInfo(acapela, "bruno", "fr", AcapelaPriority),
+
 		};
 		Set<VoiceInfo> priorities = new HashSet<VoiceInfo>(Arrays.asList(info));
 

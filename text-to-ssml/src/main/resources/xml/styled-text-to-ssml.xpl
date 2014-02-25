@@ -10,7 +10,7 @@
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl" />
 
   <p:input port="fileset.in" sequence="false"/>
-  <p:input port="content.in"  sequence="false" primary="true"/>
+  <p:input port="content.in" sequence="false" primary="true"/>
   <p:input port="sentence-ids" sequence="false"/>
   <p:output port="result" sequence="true" primary="true"/>
 
@@ -21,6 +21,7 @@
   <p:option name="word-attr" required="false" select="''"/>
   <p:option name="word-attr-val" required="false" select="''"/>
   <p:option name="first-sheet-uri" required="false" select="''"/>
+  <p:option name="style-ns" required="true"/>
 
   <!-- Replace the sentences and the words with their SSML counterpart so that it -->
   <!-- will be much simpler and faster to apply transformations after. It also encapsulates -->
@@ -44,7 +45,7 @@
 
   <!-- Map the content to undispatchable objets (i.e. the content can be split -->
   <!-- within these objects but not transfered to other objects. Each object -->
-  <!-- subdivision will be processed by a single thread. -->
+  <!-- subdivision will be processed by a single thread). -->
   <p:xslt name="set-thread">
     <p:input port="parameters">
       <p:empty/>
@@ -62,13 +63,15 @@
   <!-- Everything is converted but the content of the sentences.-->
   <p:xslt name="gen-input">
     <p:with-param  name="css-sheet-uri" select="$first-sheet-uri"/>
+    <p:with-param  name="style-ns" select="$style-ns"/>
     <p:input port="stylesheet">
       <p:document href="generate-tts-input.xsl"/>
     </p:input>
   </p:xslt>
   <cx:message message="TTS document input skeletons generated"/>
 
-  <!-- Convert the sentences' content with the help of the CSS properties. -->
+  <!-- Convert to SSML the own sentences' CSS properties and the CSS
+       properties inside them. -->
   <p:xslt name="css-convert">
     <p:input port="parameters">
       <p:empty/>

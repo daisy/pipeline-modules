@@ -2,6 +2,7 @@ package org.daisy.pipeline.tts.attnative;
 
 import java.nio.ByteBuffer;
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -61,16 +62,23 @@ public class ATTNative implements TTSService, ATTLibListener {
 		ATTLib.setListener(this);
 
 		//Test the synthesizer so that the service won't be active if it fails.
-		//It sets mAudioFormat too
-		RawAudioBuffer testBuffer = new RawAudioBuffer();
-		testBuffer.offsetInOutput = 0;
-		testBuffer.output = new byte[16];
-		Object r = allocateThreadResources();
-		synthesize("test", new Voice(null, null), testBuffer, r, null);
-		releaseThreadResources(r);
-		if (testBuffer.output.length < 500) {
-			throw new SynthesisException("ATT server(s) not working with att-sdk.");
+		int workingHosts = 0;
+		List<Host> nonWorking = new ArrayList<Host>();
+		for (Host h : mLoadBalancer.getAllHosts()) {
+			RawAudioBuffer testBuffer = new RawAudioBuffer(16);
+			Object r = allocateThreadResources(h);
+			synthesize("test", new Voice(null, null), testBuffer, r, null);
+			releaseThreadResources(r);
+			if (testBuffer.output.length > 500) {
+				++workingHosts;
+			} else {
+				nonWorking.add(h);
+			}
 		}
+		if (workingHosts == 0) {
+			throw new SynthesisException("None of the ATT servers is working.");
+		}
+		mLoadBalancer.discardAll(nonWorking);
 	}
 
 	@Override
@@ -139,12 +147,15 @@ public class ATTNative implements TTSService, ATTLibListener {
 
 	@Override
 	public Object allocateThreadResources() throws SynthesisException {
-		Host h = mLoadBalancer.selectHost();
+		return allocateThreadResources(mLoadBalancer.selectHost());
+	}
+
+	private Object allocateThreadResources(Host h) throws SynthesisException {
 		long connection = ATTLib.openConnection(h.address, h.port, (int) mAudioFormat
 		        .getSampleRate(), mAudioFormat.getSampleSizeInBits());
 		if (connection == 0) {
-			throw new SynthesisException("cannot open connections with ATTServer on "
-			        + h.address + ":" + h.port, null);
+			throw new SynthesisException("cannot open connections with ATTServer on " + h,
+			        null);
 		}
 
 		ThreadResource tr = new ThreadResource();
@@ -189,7 +200,7 @@ public class ATTNative implements TTSService, ATTLibListener {
 
 	@Override
 	public Collection<Voice> getAvailableVoices() throws SynthesisException {
-		ThreadResource tr = (ThreadResource) allocateThreadResources();
+		ThreadResource tr = (ThreadResource) allocateThreadResources(mLoadBalancer.getMaster());
 		String[] voices = ATTLib.getVoiceNames(tr.connection);
 		ATTLib.closeConnection(tr.connection);
 

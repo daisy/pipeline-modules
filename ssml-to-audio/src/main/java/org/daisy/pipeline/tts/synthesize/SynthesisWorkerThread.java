@@ -124,6 +124,7 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 			marks.clear();
 			mLastUsedSynthesizer.synthesize(sentence, voice, mAudioBuffer, resource, marks,
 			        (tries != SYNTHESIS_TRIES));
+
 			if (mLastUsedSynthesizer.endingMark() == null
 			        || (marks.size() > 0 && mLastUsedSynthesizer.endingMark().equals(
 			                marks.get(marks.size() - 1).getKey()))) {

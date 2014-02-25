@@ -39,6 +39,8 @@ public class InlineCSSStep extends DefaultStep implements TreeWriterFactory {
 		if ("style-ns".equalsIgnoreCase(name.getLocalName())) {
 			mStyleNsOption = value.getString();
 		} else if ("stylesheet-uri".equalsIgnoreCase(name.getLocalName())) {
+			//caution: sometimes the option starts with ','.
+			//The blank URI will be replaced in analyzer.analyze
 			mStylesheetURIOption = Arrays.asList(value.getString().split(","));
 		} else {
 			mRuntime.error(new Throwable("unknown option " + name.getLocalName()));
