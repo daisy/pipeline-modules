@@ -15,7 +15,9 @@
             <xsl:for-each select="d:file">
                 <xsl:copy>
                     <xsl:copy-of select="@*"/>
-                    <xsl:attribute name="href" select="pf:relativize-uri(resolve-uri(@href,base-uri(.)),$new-base)"/>
+                    <xsl:if test="not(@xml:base)">
+                        <xsl:attribute name="href" select="pf:relativize-uri(resolve-uri(@href,base-uri(.)),$new-base)"/>
+                    </xsl:if>
                     <xsl:copy-of select="node()"/>
                 </xsl:copy>
             </xsl:for-each>
