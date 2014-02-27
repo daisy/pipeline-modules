@@ -13,5 +13,6 @@
     <p:import href="fileset-store.xpl"/>
     <p:import href="fileset-add-ref.xpl"/>
     <p:import href="fileset-rebase.xpl"/>
+    <p:import href="fileset-move.xpl"/>
 
 </p:library>
