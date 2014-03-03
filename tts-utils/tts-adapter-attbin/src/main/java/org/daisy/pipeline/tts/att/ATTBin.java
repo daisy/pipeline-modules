@@ -28,8 +28,10 @@ import org.daisy.pipeline.tts.SSMLAdapter;
 import org.daisy.pipeline.tts.SSMLUtil;
 import org.daisy.pipeline.tts.SoundUtil;
 import org.daisy.pipeline.tts.TTSRegistry;
-import org.daisy.pipeline.tts.TTSRegistry.VoiceInfo;
+import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService;
+import org.daisy.pipeline.tts.Voice;
+import org.daisy.pipeline.tts.VoiceInfo;
 
 /**
  * This synthesizer uses directly the AT&T's client binary and intermediate WAV
@@ -45,6 +47,10 @@ public class ATTBin implements TTSService {
 	private Pattern mMarkPattern;
 	private RoundRobinLoadBalancer mLoadBalancer;
 	private SSMLAdapter mSSMLAdapter;
+
+	private static class ThreadResource extends TTSResource {
+		Host h;
+	}
 
 	public void initialize() throws SynthesisException {
 		mSSMLAdapter = new BasicSSMLAdapter() {
@@ -155,8 +161,10 @@ public class ATTBin implements TTSService {
 	}
 
 	@Override
-	public Object allocateThreadResources() {
-		return mLoadBalancer.selectHost();
+	public TTSResource allocateThreadResources() {
+		ThreadResource th = new ThreadResource();
+		th.h = mLoadBalancer.selectHost();
+		return th;
 	}
 
 	@Override
@@ -166,18 +174,6 @@ public class ATTBin implements TTSService {
 	@Override
 	public String getVersion() {
 		return "command-line";
-	}
-
-	@Override
-	public void beforeAllocatingResources() {
-	}
-
-	@Override
-	public void afterAllocatingResources() {
-	}
-
-	@Override
-	public void beforeReleasingResources() {
 	}
 
 	@Override

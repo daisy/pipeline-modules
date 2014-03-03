@@ -3,6 +3,7 @@
     xmlns:ssml="http://www.w3.org/2001/10/synthesis"
     xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp"
     xmlns:d="http://www.daisy.org/ns/pipeline/data"
+    xmlns:xml="http://www.w3.org/XML/1998/namespace"
     exclude-result-prefixes="#all"
     version="2.0">
 
@@ -46,6 +47,7 @@
   </xsl:variable>
   <xsl:key name="skippables" match="*[@id]" use="@id"/>
 
+  <!-- The language used for page numbers, notes etc. is not sensitive to the sentence's context. -->
   <xsl:variable name="main-lang" select="tokenize((//*[@xml:lang])[1]/@xml:lang, '-')[1]"/>
   <xsl:variable name="dictionary" select="if ($pronounce-references = 'true')
 					  then $dictionaries//*[@lang=$main-lang or @lang='default'][1]
@@ -55,7 +57,7 @@
     <tmp:root>
       <!-- Group skippable elements with the same CSS properties. -->
       <xsl:for-each-group select="//*[contains($skippable-list, concat(',', local-name(), ','))]"
-			  group-by="key('skippables', @id, $skippable-properties)/concat(string-join(@*[namespace-uri()=$style-ns]/local-name(),'_'), string-join(@*[namespace-uri()=$style-ns],'_'))">
+			  group-by="key('skippables', @id, $skippable-properties)/concat(string-join(@*[namespace-uri()=$style-ns]/local-name(),'_'), string-join(@xml:lang|@*[namespace-uri()=$style-ns],'_'))">
 	<ssml:speak version="1.1"> <!-- version 1.0 has no <ssml:token> nor <ssml:w> -->
 	  <ssml:s id="{concat('cousins-of-',@id)}">
 	    <xsl:copy-of select="key('skippables', current-group()[1]/@id, $skippable-properties)/@*[local-name() != 'id']"/>

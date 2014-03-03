@@ -128,9 +128,6 @@
 	      <xsl:apply-templates select="$sentence" mode="flatten-css-properties">
 		<xsl:with-param name="style-ns" select="$style-ns"/>
 	      </xsl:apply-templates>
-	      <xsl:attribute namespace="http://www.w3.org/XML/1998/namespace" name="lang">
-		<xsl:value-of select="$sentence/ancestor-or-self::*[@xml:lang][1]/@xml:lang"/>
-	      </xsl:attribute>
 	      <xsl:for-each select="key('bindings', $sentence/@id, $bindings)">
 		<xsl:choose>
 		  <xsl:when test="current()/@tmp:pause-before or current()/@tmp:cue-before or current()/@tmp:pause-after or current()/@tmp:cue-after">

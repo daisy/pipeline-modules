@@ -9,7 +9,7 @@ import java.util.Set;
 import org.daisy.pipeline.tts.TTSService;
 import org.daisy.pipeline.tts.TTSService.RawAudioBuffer;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
-import org.daisy.pipeline.tts.TTSService.Voice;
+import org.daisy.pipeline.tts.Voice;
 import org.junit.Assert;
 import org.junit.Test;
 

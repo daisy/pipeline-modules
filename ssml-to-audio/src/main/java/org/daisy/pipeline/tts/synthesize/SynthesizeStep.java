@@ -102,7 +102,7 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 	public void run() throws SaxonApiException {
 		super.run();
 
-		mTTSRegistry.regenerateVoiceMapping();
+		mTTSRegistry.openSynthesizingContext();
 
 		// split the SSML into meaningful sections
 		mWorkerPool.initialize();
@@ -121,7 +121,7 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 			mRuntime.error(e);
 			return;
 		} finally {
-			mTTSRegistry.releaseServices();
+			mTTSRegistry.closeSynthesizingContext();
 		}
 
 		printInfo("number of sound fragments: " + allSoundFragments.size());

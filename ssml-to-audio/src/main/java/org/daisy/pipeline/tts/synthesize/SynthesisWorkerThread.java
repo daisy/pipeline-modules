@@ -14,10 +14,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.pipeline.audio.AudioEncoder;
+import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService;
 import org.daisy.pipeline.tts.TTSService.RawAudioBuffer;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
-import org.daisy.pipeline.tts.TTSService.Voice;
+import org.daisy.pipeline.tts.Voice;
 import org.daisy.pipeline.tts.synthesize.SynthesisWorkerPool.Speakable;
 import org.daisy.pipeline.tts.synthesize.SynthesisWorkerPool.UndispatchableSection;
 
@@ -48,7 +49,7 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 	private IPipelineLogger mLogger;
 	private TTSService mLastUsedSynthesizer; // must be thread-safe!
 	private ConcurrentLinkedQueue<UndispatchableSection> mSectionsQueue;
-	private Map<TTSService, Object> mResources;
+	private Map<TTSService, TTSResource> mResources;
 	private int mCurrentDocPosition;
 	private int mSectionFiles;
 
@@ -56,7 +57,7 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 	        List<SoundFragment> allSoundFragments,
 	        ConcurrentLinkedQueue<UndispatchableSection> sectionQueue) {
 		mOutput = new byte[AUDIO_BUFFER_BYTES];
-		mResources = new HashMap<TTSService, Object>();
+		mResources = new HashMap<TTSService, TTSResource>();
 		mEncoder = encoder;
 		mAudioBuffer = new RawAudioBuffer();
 		mAudioBuffer.offsetInOutput = 0;
@@ -98,21 +99,16 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 		        .getAudioOutputFormat().getFrameSize()));
 	}
 
-	public void allocateResourcesFor(TTSService s) throws SynthesisException {
-		mResources.put(s, s.allocateThreadResources());
-	}
-
-	public void releaseResources() throws SynthesisException {
-		for (Map.Entry<TTSService, Object> resource : mResources.entrySet()) {
-			resource.getKey().releaseThreadResources(resource.getValue());
-		}
+	public void assignResource(TTSService s, TTSResource r) {
+		mResources.put(s, r);
 	}
 
 	private void processOneSentence(XdmNode sentence, Voice voice) throws SynthesisException {
 		if (mAudioBuffer.offsetInOutput + MAX_ESTIMATED_SYNTHESIZED_BYTES > mAudioBuffer.output.length) {
 			encodeAudio();
 		}
-		Object resource = mResources.get(mLastUsedSynthesizer);
+		//warning: the resource may be already released if mLastUsedSynthesizer has been stopped during the synthesis (e.g. after a CTRL-C).
+		TTSResource resource = mResources.get(mLastUsedSynthesizer);
 		List<Map.Entry<String, Integer>> marks = new ArrayList<Map.Entry<String, Integer>>();
 
 		//try to synthesize the SSML using an ending mark to know whether if anything went wrong
@@ -122,8 +118,14 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 		for (tries = SYNTHESIS_TRIES; !valid && tries > 0; --tries) {
 			mAudioBuffer.offsetInOutput = begin;
 			marks.clear();
-			mLastUsedSynthesizer.synthesize(sentence, voice, mAudioBuffer, resource, marks,
-			        (tries != SYNTHESIS_TRIES));
+			synchronized (resource) {
+				//The synchronized is necessary because it is possible that the TTSRegistry 
+				//is currently releasing the resource. 
+				if (resource.released)
+					break;
+				mLastUsedSynthesizer.synthesize(sentence, voice, mAudioBuffer, resource,
+				        marks, (tries != SYNTHESIS_TRIES));
+			}
 
 			if (mLastUsedSynthesizer.endingMark() == null
 			        || (marks.size() > 0 && mLastUsedSynthesizer.endingMark().equals(
@@ -204,8 +206,11 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 			} catch (Exception e) {
 				StringWriter sw = new StringWriter();
 				e.printStackTrace(new PrintWriter(sw));
-				mLogger.printInfo("error in synthesis thread: " + e.getMessage() + " : "
-				        + sw.toString());
+				String synthInfo = (mLastUsedSynthesizer == null) ? "(synthesizer missing)"
+				        : " with synthesizer " + mLastUsedSynthesizer.getName()
+				                + " (audio-format set:"
+				                + (mLastUsedSynthesizer.getAudioOutputFormat() != null) + ")";
+				mLogger.printInfo("error in TTS thread " + synthInfo + ": " + sw.toString());
 			}
 		}
 	}

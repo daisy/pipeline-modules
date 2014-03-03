@@ -14,7 +14,9 @@ import org.daisy.pipeline.tts.BasicSSMLAdapter;
 import org.daisy.pipeline.tts.SSMLAdapter;
 import org.daisy.pipeline.tts.SSMLUtil;
 import org.daisy.pipeline.tts.SoundUtil;
+import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService;
+import org.daisy.pipeline.tts.Voice;
 
 public class SAPINative implements TTSService {
 
@@ -24,7 +26,7 @@ public class SAPINative implements TTSService {
 	private boolean mFirstInit = true;
 	private SSMLAdapter mSSMLAdapter;
 
-	private static class ThreadResource {
+	private static class ThreadResource extends TTSResource {
 		long connection;
 	}
 
@@ -132,7 +134,7 @@ public class SAPINative implements TTSService {
 	}
 
 	@Override
-	public Object allocateThreadResources() throws SynthesisException {
+	public TTSResource allocateThreadResources() throws SynthesisException {
 		long connection = SAPILib.openConnection();
 
 		if (connection == 0) {
@@ -153,18 +155,6 @@ public class SAPINative implements TTSService {
 	@Override
 	public String getVersion() {
 		return "native";
-	}
-
-	@Override
-	public void beforeAllocatingResources() throws SynthesisException {
-	}
-
-	@Override
-	public void afterAllocatingResources() throws SynthesisException {
-	}
-
-	@Override
-	public void beforeReleasingResources() throws SynthesisException {
 	}
 
 	@Override

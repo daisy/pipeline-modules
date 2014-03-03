@@ -7,6 +7,8 @@ import java.util.Map.Entry;
 
 import net.sf.saxon.s9api.XdmNode;
 
+import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
+
 /**
  * This class is intended to handle ssml:marks with TTS processors that are not
  * designed to deal with them (such as eSpeak). To make it work, the class maps
@@ -26,7 +28,7 @@ public abstract class MarkFreeTTSService implements TTSService {
 	}
 
 	@Override
-	public Object allocateThreadResources() throws SynthesisException {
+	public TTSResource allocateThreadResources() throws SynthesisException {
 		return null;
 	}
 
@@ -67,18 +69,6 @@ public abstract class MarkFreeTTSService implements TTSService {
 			        buffer.offsetInOutput);
 			audioBuffer.offsetInOutput += buffer.offsetInOutput;
 		}
-	}
-
-	@Override
-	public void beforeAllocatingResources() throws SynthesisException {
-	}
-
-	@Override
-	public void afterAllocatingResources() throws SynthesisException {
-	}
-
-	@Override
-	public void beforeReleasingResources() throws SynthesisException {
 	}
 
 	@Override

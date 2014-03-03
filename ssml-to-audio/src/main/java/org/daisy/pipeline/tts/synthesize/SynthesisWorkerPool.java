@@ -12,9 +12,10 @@ import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.pipeline.audio.AudioEncoder;
 import org.daisy.pipeline.tts.TTSRegistry;
+import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
-import org.daisy.pipeline.tts.TTSService.Voice;
+import org.daisy.pipeline.tts.Voice;
 
 public class SynthesisWorkerPool {
 
@@ -158,14 +159,10 @@ public class SynthesisWorkerPool {
 		mLogger.printInfo(sb.toString());
 
 		for (TTSService tts : allTTS)
-			tts.beforeAllocatingResources();
-
-		for (TTSService tts : allTTS)
-			for (SynthesisWorkerThread worker : mWorkers)
-				worker.allocateResourcesFor(tts);
-
-		for (TTSService tts : allTTS)
-			tts.afterAllocatingResources();
+			for (SynthesisWorkerThread worker : mWorkers) {
+				TTSResource resource = mTTSRegistry.allocateResourceFor(tts);
+				worker.assignResource(tts, resource);
+			}
 
 		mLogger.printInfo("thread resources allocated.");
 
@@ -183,12 +180,6 @@ public class SynthesisWorkerPool {
 
 		mLogger.printInfo("synthesis workers finished");
 
-		for (TTSService tts : allTTS)
-			tts.beforeReleasingResources();
-
-		for (SynthesisWorkerThread worker : mWorkers)
-			worker.releaseResources();
-
-		mLogger.printInfo("synthesis resources released");
+		mTTSRegistry.closeSynthesizingContext();
 	}
 }

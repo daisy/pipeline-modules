@@ -3,6 +3,8 @@ package org.daisy.pipeline.tts.espeak;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -22,6 +24,7 @@ import org.daisy.pipeline.tts.BasicSSMLAdapter;
 import org.daisy.pipeline.tts.BinaryFinder;
 import org.daisy.pipeline.tts.MarkFreeTTSService;
 import org.daisy.pipeline.tts.SSMLAdapter;
+import org.daisy.pipeline.tts.Voice;
 
 /**
  * This synthesizer uses directly the eSpeak binary. The voice names are used
@@ -110,6 +113,7 @@ public class ESpeakBinTTS extends MarkFreeTTSService {
 		mCmd = null;
 		mSSMLAdapter = null;
 		mEspeakPath = null;
+		super.release();
 	}
 
 	@Override
@@ -210,8 +214,12 @@ public class ESpeakBinTTS extends MarkFreeTTSService {
 			fi.close();
 			p.waitFor();
 		} catch (Exception e) {
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
 			if (p != null)
 				p.destroy();
+			throw new SynthesisException(e.getMessage() + " text: "
+			        + ssml.substring(0, Math.min(ssml.length(), 100)) + "...", e);
 		}
 	}
 

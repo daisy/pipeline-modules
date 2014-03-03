@@ -19,13 +19,15 @@ import org.daisy.pipeline.tts.BasicSSMLAdapter;
 import org.daisy.pipeline.tts.MarkFreeTTSService;
 import org.daisy.pipeline.tts.SSMLAdapter;
 import org.daisy.pipeline.tts.SoundUtil;
+import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
+import org.daisy.pipeline.tts.Voice;
 
 public class SAPIcomTTS extends MarkFreeTTSService {
 	private AudioFormat mAudioFormat = null;
 	private List<Voice> mAvailableVoices;
 	private SSMLAdapter mSSMLAdapter;
 
-	static private class ThreadResource {
+	static private class ThreadResource extends TTSResource {
 		ISpeechVoice voice;
 	}
 
@@ -40,7 +42,7 @@ public class SAPIcomTTS extends MarkFreeTTSService {
 	}
 
 	@Override
-	public Object allocateThreadResources() throws SynthesisException {
+	public TTSResource allocateThreadResources() throws SynthesisException {
 		ThreadResource th = new ThreadResource();
 		th.voice = ClassFactory.createSpVoice();
 		return th;
@@ -158,5 +160,6 @@ public class SAPIcomTTS extends MarkFreeTTSService {
 		mAudioFormat = null;
 		mAvailableVoices = null;
 		mSSMLAdapter = null;
+		super.release();
 	}
 }

@@ -18,7 +18,9 @@ import org.daisy.pipeline.tts.LoadBalancer.Host;
 import org.daisy.pipeline.tts.RoundRobinLoadBalancer;
 import org.daisy.pipeline.tts.SSMLAdapter;
 import org.daisy.pipeline.tts.SSMLUtil;
+import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService;
+import org.daisy.pipeline.tts.Voice;
 
 public class ATTNative implements TTSService, ATTLibListener {
 
@@ -41,7 +43,7 @@ public class ATTNative implements TTSService, ATTLibListener {
 		}
 	};
 
-	private static class ThreadResource {
+	private static class ThreadResource extends TTSResource {
 		long connection;
 		RawAudioBuffer audioBuffer;
 		int firstOffset;
@@ -56,7 +58,7 @@ public class ATTNative implements TTSService, ATTLibListener {
 		}
 
 		mLoadBalancer = new RoundRobinLoadBalancer(System.getProperty("att.servers",
-		        "localhost:8888"), null);
+		        "localhost:8888"), this);
 
 		mAudioFormat = new AudioFormat(16000, 16, 1, true, false);
 		ATTLib.setListener(this);
@@ -69,7 +71,7 @@ public class ATTNative implements TTSService, ATTLibListener {
 			Object r = allocateThreadResources(h);
 			synthesize("test", new Voice(null, null), testBuffer, r, null);
 			releaseThreadResources(r);
-			if (testBuffer.output.length > 500) {
+			if (testBuffer.offsetInOutput > 500) {
 				++workingHosts;
 			} else {
 				nonWorking.add(h);
@@ -146,11 +148,11 @@ public class ATTNative implements TTSService, ATTLibListener {
 	}
 
 	@Override
-	public Object allocateThreadResources() throws SynthesisException {
+	public TTSResource allocateThreadResources() throws SynthesisException {
 		return allocateThreadResources(mLoadBalancer.selectHost());
 	}
 
-	private Object allocateThreadResources(Host h) throws SynthesisException {
+	private ThreadResource allocateThreadResources(Host h) throws SynthesisException {
 		long connection = ATTLib.openConnection(h.address, h.port, (int) mAudioFormat
 		        .getSampleRate(), mAudioFormat.getSampleSizeInBits());
 		if (connection == 0) {
@@ -173,18 +175,6 @@ public class ATTNative implements TTSService, ATTLibListener {
 	@Override
 	public String getVersion() {
 		return "sdk";
-	}
-
-	@Override
-	public void beforeAllocatingResources() throws SynthesisException {
-	}
-
-	@Override
-	public void afterAllocatingResources() throws SynthesisException {
-	}
-
-	@Override
-	public void beforeReleasingResources() throws SynthesisException {
 	}
 
 	@Override
@@ -216,4 +206,5 @@ public class ATTNative implements TTSService, ATTLibListener {
 	public String endingMark() {
 		return "ending-mark";
 	}
+
 }

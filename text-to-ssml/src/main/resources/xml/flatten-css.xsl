@@ -3,12 +3,22 @@
     exclude-result-prefixes="#all"
     version="2.0">
 
+  <!-- ================================================================================= -->
+  <!-- Retrieve the CSS properties and the current language from a the node's ancestors. -->
+  <!-- Put them into attributes.                                                         -->
+  <!-- ================================================================================= -->
+
   <xsl:variable name="properties"
 		select="'voice-family,richness,volume,stress,speech-rate,pitch,pitch-range,speak,azimuth,speak-punctuation,speak-numeral,elevation'"/>
 
   <xsl:template match="*" mode="flatten-css-properties">
     <xsl:param name="style-ns" select="''"/>
     <xsl:variable name="node" select="."/>
+
+    <xsl:attribute namespace="http://www.w3.org/XML/1998/namespace" name="lang">
+      <xsl:value-of select="ancestor-or-self::*[@xml:lang][1]/@xml:lang"/>
+    </xsl:attribute>
+
     <xsl:for-each select="tokenize($properties, ',')">
       <xsl:variable name="property" select="current()"/>
       <xsl:variable name="ref"
