@@ -12,6 +12,11 @@
   <packaging>bundle</packaging>
   <name>DAISY Pipeline 2 module :: ASCIIMath Utils</name>
   
+  <properties>
+    <asciimathml.js.url>http://mathcs.chapman.edu/~jipsen/mathml/ASCIIMathML.js</asciimathml.js.url>
+    <asciimathml.js.sha1>3c31edd313d5f312a5aed3719b7dd6c022111b09</asciimathml.js.sha1>
+  </properties>
+  
   <dependencies>
     <dependency>
       <groupId>org.daisy.libs</groupId>
@@ -230,9 +235,16 @@
             <configuration>
               <tasks>
                 <mkdir dir="target/generated-resources/javascript" />
-                <!-- FIXME: what if this version changes? -->
-                <get src="http://mathcs.chapman.edu/~jipsen/mathml/ASCIIMathML.js" dest="target/generated-resources/javascript" />
-                <delete file="target/optimization-files/patches-applied.txt" />
+                <get src="${asciimathml.js.url}" dest="target/generated-resources/javascript" />
+                <delete file="target/optimization-files/patches-applied.txt"/>
+                <local name="checksum.matches"/>
+                <local name="checksum.matches.fail"/>
+                <checksum file="target/generated-resources/javascript/ASCIIMathML.js" algorithm="sha1"
+                          property="${asciimathml.js.sha1}" verifyproperty="checksum.matches"/>
+                <condition property="checksum.matches.fail">
+                  <equals arg1="${checksum.matches}" arg2="false"/>
+                </condition>
+                <fail if="checksum.matches.fail">Checksum error</fail>
               </tasks>
             </configuration>
           </execution>
