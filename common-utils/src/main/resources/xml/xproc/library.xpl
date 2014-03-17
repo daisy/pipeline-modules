@@ -5,5 +5,6 @@
     <p:import href="error.xpl"/>
     <p:import href="assert.xpl"/>
     <p:import href="tokenize.xpl"/>
+    <p:import href="i18n-translate.xpl"/>
     
 </p:library>
