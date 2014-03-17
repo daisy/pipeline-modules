@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:html="http://www.w3.org/1999/xhtml" xmlns="http://www.daisy.org/z3986/2005/ncx/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:epub="http://www.idpf.org/2007/ops"
-    exclude-result-prefixes="#all" version="2.0" xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions" xmlns:d="http://www.daisy.org/ns/pipeline/data">
+<xsl:stylesheet xmlns:html="http://www.w3.org/1999/xhtml" xmlns="http://www.daisy.org/z3986/2005/ncx/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:epub="http://www.idpf.org/2007/ops" exclude-result-prefixes="#all" version="2.0" xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions" xmlns:d="http://www.daisy.org/ns/pipeline/data"
+    xmlns:pf="http://www.daisy.org/ns/pipeline/functions">
 
     <!-- Creates a text-only NCX based on a EPUB3 Navigation Document -->
     <!-- TODO: pages and landmarks will not be in reading order. to determine their reading order, the content documents would have to be inspected. -->
 
+    <xsl:import href="http://www.daisy.org/pipeline/modules/common-utils/i18n.xsl"/>
+
     <xsl:output indent="yes"/>
-    
-    <xsl:variable name="lang" select="(@xml:lang,@lang)[1]"/>
+
+    <xsl:variable name="lang" select="(@xml:lang,@lang,'en')[1]"/>
+    <xsl:variable name="translations" select="document('../i18n.xml')"/>
 
     <xsl:variable name="doc-base" select="base-uri(/*)"/>
     <xsl:variable name="srcMap1">
@@ -85,11 +89,9 @@
                         </xsl:when>
                         <xsl:otherwise>
                             <navLabel>
-                                <xsl:for-each select="document('i18n.xml')/*/(*[lower-case(@xml:lang)=lower-case($lang)],*[tokenize(lower-case(@xml:lang),'-')[1]=tokenize(lower-case($lang),'-')[1]],*[lower-case(@xml:lang)='en'])[1]">
-                                    <text>
-                                        <xsl:value-of select="."/>
-                                    </text>
-                                </xsl:for-each>
+                                <text>
+                                    <xsl:value-of select="pf:i18n-translate('Guide', $lang, $translations)"/>
+                                </text>
                             </navLabel>
                         </xsl:otherwise>
                     </xsl:choose>
