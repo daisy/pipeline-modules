@@ -9,7 +9,9 @@
     </p:output>
     <p:option name="hidden" select="'true'"/>
     <p:option name="base-dir" select="''"/>
-
+    
+    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
+    
     <p:for-each name="page-lists">
         <p:output port="result"/>
         <p:xslt>
