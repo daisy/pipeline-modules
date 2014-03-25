@@ -22,6 +22,7 @@ import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmNodeKind;
 import net.sf.saxon.s9api.XdmSequenceIterator;
 
+import org.daisy.pipeline.nlp.DummyLangDetector;
 import org.daisy.pipeline.nlp.breakdetect.DummyLexer.Strategy;
 import org.daisy.pipeline.nlp.lexing.LexService;
 import org.daisy.pipeline.nlp.lexing.LexService.LexerInitException;
@@ -50,6 +51,7 @@ public class ActualFilesTest implements TreeWriterFactory {
 		Lexer = new DummyLexer();
 		Lexers = new HashMap<Locale, LexService>();
 		Lexers.put(null, Lexer);
+
 	}
 
 	@Override
@@ -316,7 +318,7 @@ public class ActualFilesTest implements TreeWriterFactory {
 				        null, null);
 
 				XdmNode tree = new XmlBreakRebuilder().rebuild(this, Lexers, document, specs,
-				        forbidAnyDuplication);
+				        new DummyLangDetector(), forbidAnyDuplication);
 
 				//check the tree well-formedness
 				XdmNode root = getRoot(tree);

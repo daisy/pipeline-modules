@@ -14,6 +14,8 @@ import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 
+import org.daisy.pipeline.nlp.DummyLangDetector;
+import org.daisy.pipeline.nlp.LangDetector;
 import org.daisy.pipeline.nlp.lexing.LexService;
 import org.daisy.pipeline.nlp.lexing.LexService.LexerInitException;
 import org.daisy.pipeline.nlp.lexing.LexServiceRegistry;
@@ -41,7 +43,6 @@ public class BreakDetectStep extends DefaultStep implements TreeWriterFactory,
 	private XProcRuntime mRuntime = null;
 	private LexServiceRegistry mLexerRegistry;
 	private Set<Locale> mLangs;
-
 	private Collection<String> inlineTagsOption;
 	private Collection<String> wordBeforeOption;
 	private Collection<String> wordAfterOption;
@@ -50,16 +51,12 @@ public class BreakDetectStep extends DefaultStep implements TreeWriterFactory,
 	private String tmpNs;
 	private String wordTagOption;
 	private String sentenceTagOption;
+	private LangDetector mLangDetector = null;
 
 	public BreakDetectStep(XProcRuntime runtime, XAtomicStep step, LexServiceRegistry registry) {
 		super(runtime, step);
 		mRuntime = runtime;
 		mLexerRegistry = registry;
-	}
-
-	// This constructor is provided so that it is compliant with vanilla Calabash
-	public BreakDetectStep(XProcRuntime runtime, XAtomicStep step) {
-		this(runtime, step, null);
 	}
 
 	public void setInput(String port, ReadablePipe pipe) {
@@ -109,8 +106,6 @@ public class BreakDetectStep extends DefaultStep implements TreeWriterFactory,
 		super.run();
 
 		//Retrieve a generic lexer that can handle unexpected languages.
-		//Unexpected languages could happen if the detected languages in
-		//XmlBreakRebuilder are not the same as the ones detected in this class.
 		HashMap<Locale, LexService> langToLexers = new HashMap<Locale, LexService>();
 		LexService generic = mLexerRegistry.getBestGenericLexService();
 		try {
@@ -129,6 +124,13 @@ public class BreakDetectStep extends DefaultStep implements TreeWriterFactory,
 		XmlBreakRebuilder xmlRebuilder = new XmlBreakRebuilder();
 
 		long before = System.currentTimeMillis();
+
+		if (mLangDetector == null) {
+			mLangDetector = new DummyLangDetector();
+			mLangDetector.train();
+		}
+
+		mLangDetector.enable();
 
 		while (mSource.moreDocuments()) {
 			XdmNode doc = mSource.read();
@@ -167,7 +169,8 @@ public class BreakDetectStep extends DefaultStep implements TreeWriterFactory,
 			//rebuild the XML tree and lex the content on-the-fly
 			XdmNode tree;
 			try {
-				tree = xmlRebuilder.rebuild(this, langToLexers, doc, formatSpecs, false);
+				tree = xmlRebuilder.rebuild(this, langToLexers, doc, formatSpecs,
+				        mLangDetector, false);
 				mResult.write(tree);
 			} catch (LexerInitException e) {
 				mRuntime.error(e);
@@ -181,6 +184,8 @@ public class BreakDetectStep extends DefaultStep implements TreeWriterFactory,
 			lexer.cleanUpLangResources();
 		}
 
+		mLangDetector.disable();
+
 		mLangs = null;
 	}
 
@@ -193,8 +198,14 @@ public class BreakDetectStep extends DefaultStep implements TreeWriterFactory,
 	public void onInlineSectionFound(List<Leaf> leaves, List<String> text, Locale lang)
 	        throws LexerInitException {
 
-		//TODO: insert the language detection here. Another language detection
-		//might be needed in XmlBreakRebuilder as well.
+		//TODO: find a way to not doing this multiple times (it is done also in the rebuilder)
+		//If this is really too CPU-intensive, one can skip this detection.
+		//As a result, no lexer would be loaded for the true language if the language is not
+		//also used somewhere else, and the XMLRebuilder will eventually use a generic lexer for
+		//the detected language.
+
+		lang = mLangDetector.findLang(lang, text);
+
 		if (lang != null) {
 			mLangs.add(lang);
 		}

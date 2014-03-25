@@ -32,6 +32,13 @@
      <version>9.5.1-1</version>
    </dependency>
 
+   <!--  Future language detection: -->
+   <!--  <dependency>
+     <groupId>org.daisy.libs</groupId>
+     <artifactId>langdetect-osgi</artifactId>
+     <version>1.1-SNAPSHOT</version>
+   </dependency> -->
+
    <!-- needed to use com.xmlcalabash.library.DefaultStep ... -->
    <dependency>
      <groupId>org.daisy.libs</groupId>

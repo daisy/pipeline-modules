@@ -2,6 +2,7 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:d="http://www.daisy.org/ns/pipeline/data"
+    xmlns:xml="http://www.w3.org/XML/1998/namespace"
     exclude-result-prefixes="xs"
     version="2.0">
 
@@ -41,12 +42,15 @@
   </xsl:template>
 
   <xsl:template match="*[local-name() = $tmp-sentence-tag]" mode="sentence-ids" priority="2">
-    <d:sentence id="{d:sentid(.)}"/>
+    <d:sentence id="{d:sentid(.)}">
+      <xsl:copy-of select="@xml:lang"/> <!-- doesn't always exist -->
+    </d:sentence>
   </xsl:template>
 
   <xsl:variable name="special-list" select="concat(',', $special-sentences, ',')"/>
   <xsl:template mode="sentence-ids" priority="3"
       match="*[contains($special-list, concat(',', local-name(), ',')) or (local-name() = $output-sentence-tag and count(*) = 1 and count(*[local-name() = $tmp-sentence-tag]) = 1)]">
+    <!-- TODO: copy the @xml:lang -->
     <d:sentence id="{d:sentid(.)}" recycled="1"/>
     <!-- Warning: a 'special-sentence', such as noteref, is unlikely
          to be stamped as 'recycled' because it is usually the child
@@ -59,10 +63,7 @@
   <!--======================================================== -->
 
   <xsl:template match="/" priority="2">
-    <!-- <xsl:copy copy-namespaces="no"> -->
-    <!--   <xsl:call-template name="copy-namespaces"/> -->
-      <xsl:apply-templates select="node()"/>
-    <!-- </xsl:copy> -->
+    <xsl:apply-templates select="node()"/>
     <!-- Write the list of sentences on the secondary port. -->
     <xsl:result-document href="{concat('sids', generate-id(), '.xml')}" method="xml">
      <xsl:copy-of select="$sentence-ids-tree"/>
@@ -92,6 +93,7 @@
   	  <xsl:attribute name="id">
   	    <xsl:value-of select="$entry/@id"/>
   	  </xsl:attribute>
+	  <xsl:copy-of select="@xml:lang"/> <!-- doesn't always exist -->
   	  <xsl:apply-templates select="node()" mode="inside-sentence">
   	    <xsl:with-param name="parent-name" select="$output-sentence-tag"/>
   	  </xsl:apply-templates>

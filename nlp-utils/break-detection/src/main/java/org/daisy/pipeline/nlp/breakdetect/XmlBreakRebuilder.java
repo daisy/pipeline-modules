@@ -14,6 +14,7 @@ import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmNodeKind;
 import net.sf.saxon.s9api.XdmSequenceIterator;
 
+import org.daisy.pipeline.nlp.LangDetector;
 import org.daisy.pipeline.nlp.breakdetect.StringComposer.SentencePointer;
 import org.daisy.pipeline.nlp.breakdetect.StringComposer.TextPointer;
 import org.daisy.pipeline.nlp.lexing.LexService;
@@ -51,12 +52,15 @@ public class XmlBreakRebuilder implements InlineSectionProcessor {
 	private XdmNode mPreviousNode; //last node written
 	private int mPreviousLevel;
 	private DuplicationManager mDuplicationManager;
+	private String mCurrentLang;
+	private LangDetector mLangDetector;
 
 	public XdmNode rebuild(TreeWriterFactory treeWriterFactory,
 	        HashMap<Locale, LexService> lexers, XdmNode doc, FormatSpecifications specs,
-	        boolean forbidAnyDup) throws LexerInitException {
+	        LangDetector langDetector, boolean forbidAnyDup) throws LexerInitException {
 		mLexers = lexers;
 		mSpecs = specs;
+		mLangDetector = langDetector;
 
 		mStringComposer = new StringComposer();
 		mPreviousNode = getRoot(doc);
@@ -148,11 +152,23 @@ public class XmlBreakRebuilder implements InlineSectionProcessor {
 	@Override
 	public void onInlineSectionFound(List<Leaf> leaves, List<String> text, Locale lang)
 	        throws LexerInitException {
+
+		Locale expectedLang = lang;
+		lang = mLangDetector.findLang(lang, text);
+		if (lang != null && expectedLang != null) {
+			if (expectedLang.getLanguage().equals(lang.getLanguage()))
+				mCurrentLang = null; //this indicates that there is no need to add xml:lang attributes
+			else
+				mCurrentLang = lang.getISO3Language(); //is it the right standard?
+		} else
+			mCurrentLang = null;
+
 		LexService lexer = mLexers.get(lang);
 		if (lexer == null) {
 			lexer = mLexers.get(null); //a generic lexer is always provided
 		}
 		lexer.useLanguage(lang);
+
 		String input = mStringComposer.concat(text);
 		List<Sentence> sentences = lexer.split(input);
 
@@ -203,6 +219,7 @@ public class XmlBreakRebuilder implements InlineSectionProcessor {
 		}
 		//Gap between the last sentence and the end of the section
 		fillGap(sSegBoundary, sIndexBoundary, -1, -1, leaves, text);
+		mCurrentLang = null;
 	}
 
 	@Override
@@ -277,6 +294,11 @@ public class XmlBreakRebuilder implements InlineSectionProcessor {
 
 		//*** Create the element ***
 		mTreeWriter.addStartElement(elementToWrite);
+		if (mCurrentLang != null) {
+			//the lang attribute will be dispatched later when the format-compliant
+			//elements will be created.
+			mTreeWriter.addAttribute(mSpecs.langAttr, mCurrentLang);
+		}
 		mPreviousLevel = wordOrsentenceParent.level;
 	}
 

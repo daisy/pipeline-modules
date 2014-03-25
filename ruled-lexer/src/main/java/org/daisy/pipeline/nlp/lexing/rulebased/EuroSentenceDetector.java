@@ -76,6 +76,8 @@ public class EuroSentenceDetector implements ISentenceDetector {
 		                ".+"),
 		        new SentencePattern(3, Category.PUNCTUATION, Category.SPACE, Category.QUOTE)
 		                .regex("[.?!…]+", ".+", ".+"),
+		        new SentencePattern(3, Category.PUNCTUATION, Category.SPACE, Category.PUNCTUATION).regex(
+				                delimiter, ".+", ":"),
 		        new SentencePattern(2, Category.PUNCTUATION, Category.PUNCTUATION).regex(
 		                delimiter, ":"),
 		        new SentencePattern(1, Category.PUNCTUATION).regex(delimiter)

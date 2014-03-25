@@ -17,6 +17,7 @@ import net.sf.saxon.s9api.Serializer;
 import net.sf.saxon.s9api.Serializer.Property;
 import net.sf.saxon.s9api.XdmNode;
 
+import org.daisy.pipeline.nlp.DummyLangDetector;
 import org.daisy.pipeline.nlp.breakdetect.DummyLexer.Strategy;
 import org.daisy.pipeline.nlp.lexing.LexService;
 import org.daisy.pipeline.nlp.lexing.LexService.LexerInitException;
@@ -73,7 +74,7 @@ public class BreakDetectTest implements TreeWriterFactory {
 		                .asList("sentbefore"), Arrays.asList("sentafter"));
 
 		XdmNode tree = new XmlBreakRebuilder().rebuild(this, Lexers, document, specs,
-		        forbidAnyDuplication);
+		        new DummyLangDetector(), forbidAnyDuplication);
 
 		OutputStream result = new ByteArrayOutputStream();
 		Serializer.setOutputStream(result);
