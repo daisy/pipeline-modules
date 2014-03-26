@@ -4,6 +4,7 @@
     
     <p:option name="href" required="true"/>
     <p:option name="unzipped-basedir" required="true"/>
+    <p:option name="encode-as-base64" select="'false'"/>
 
     <p:output port="fileset.out" primary="true">
         <p:pipe port="result" step="zip.fileset"/>
@@ -41,7 +42,7 @@
         <px:unzip>
             <p:with-option name="href" select="$href"/>
             <p:with-option name="file" select="/*/@href"/>
-            <p:with-option name="content-type" select="/*/@media-type"/>
+            <p:with-option name="content-type" select="if ($encode-as-base64='true') then 'application/octet-stream' else /*/@media-type"/>
         </px:unzip>
         <p:add-attribute match="/*" attribute-name="xml:base">
             <p:with-option name="attribute-value" select="resolve-uri($entry-href, $unzipped-basedir)"/>
