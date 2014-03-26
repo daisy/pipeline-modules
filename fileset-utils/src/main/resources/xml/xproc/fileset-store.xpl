@@ -159,9 +159,27 @@
                 </p:error>
             </p:when>
             <p:otherwise>
-                <p:documentation>File is already on disk; copy it to the new
-                    location.</p:documentation>
+                <p:documentation>File is already on disk; copy it to the new location.</p:documentation>
                 <p:variable name="target-dir" select="replace($target,'[^/]+$','')"/>
+                
+                <p:try>
+                    <p:group>
+                        <px:info>
+                            <p:with-option name="href" select="$on-disk"/>
+                        </px:info>
+                    </p:group>
+                    <p:catch>
+                        <px:error code="PEZE01" message="Found document in fileset that was declared as being on disk but were neither stored on disk nor in memory: $1">
+                            <p:with-option name="param1" select="$on-disk"/>
+                        </px:error>
+                    </p:catch>
+                </p:try>
+                <p:identity>
+                    <p:input port="source">
+                        <p:pipe port="current" step="store"/>
+                    </p:input>
+                </p:identity>
+                
                 <p:try>
                     <p:group>
                         <px:info>
