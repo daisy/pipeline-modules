@@ -73,6 +73,12 @@
     stylesheets.</p:documentation>
   </p:option>
 
+  <p:option name="ssml-of-lexicons-uris" required="false" select="''">
+    <p:documentation>URI of a SSML file containing a list of pointers
+    to custom lexicons. The phonemes will owerwrite those defined in
+    the builtin lexicons.</p:documentation>
+  </p:option>
+
   <p:variable name="style-ns" select="'http://www.daisy.org/ns/pipeline/tmp'"/>
 
   <!-- The skippable elements are separated before the CSS inlining so that -->
@@ -87,7 +93,6 @@
       <p:pipe port="content.in" step="main"/>
     </p:input>
   </p:xslt>
-  <!-- <cx:message message="Skippable elements separated"/><p:sink/> -->
 
   <!-- Get the CSS stylesheets -->
   <p:try>
@@ -175,13 +180,28 @@
       <p:with-option name="style-ns" select="$style-ns"/>
     </px:skippable-to-ssml>
 
-    <p:identity>
-      <p:input port="source">
-	<p:empty/> <!-- Empty context for the next options. -->
-      </p:input>
-    </p:identity>
+    <!-- Load the SSML file containing user's lexicons -->
+    <p:choose name="ssml-of-lexicons-uris">
+      <p:when test="$ssml-of-lexicons-uris != ''">
+	<p:output port="result"/>
+	<p:load>
+	  <p:with-option name="href" select="$ssml-of-lexicons-uris"/>
+	</p:load>
+      </p:when>
+      <p:otherwise>
+	<p:output port="result"/>
+	<p:identity>
+	  <p:input port="source">
+	    <p:empty/>
+	  </p:input>
+	</p:identity>
+      </p:otherwise>
+    </p:choose>
 
     <px:styled-text-to-ssml name="content-to-ssml">
+      <p:input port="ssml-of-lexicons-uris">
+	<p:pipe port="result" step="ssml-of-lexicons-uris"/>
+      </p:input>
       <p:input port="content.in">
 	<p:pipe port="matched" step="split-seq"/>
       </p:input>

@@ -22,6 +22,9 @@
       <p:pipe port="ssml.out" step="ssml-gen" />
     </p:output>
 
+    <p:option name="css-sheet-uri" required="false" select="''"/>
+    <p:option name="ssml-of-lexicons-uris" required="false" select="''"/>
+
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/text-to-ssml/text-to-ssml.xpl" />
 
@@ -39,6 +42,8 @@
       <p:with-option name="word-element" select="'span'"/>
       <p:with-option name="word-attr" select="'role'"/>
       <p:with-option name="word-attr-val" select="'word'"/>
+      <p:with-option name="ssml-of-lexicons-uris" select="$ssml-of-lexicons-uris"/>
+      <p:with-option name="aural-sheet-uri" select="$css-sheet-uri"/>
     </px:text-to-ssml>
 
     <cx:message message="End SSML generation for EPUB3"/>

@@ -4,6 +4,7 @@
     xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp"
     xmlns:d="http://www.daisy.org/ns/pipeline/data"
     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
     exclude-result-prefixes="#all"
     version="2.0">
 
@@ -20,14 +21,14 @@
   <!-- This could be moved to a place where the format (DTBook, HTML etc.) is known. -->
   <xsl:variable name="dictionaries">
     <tmp:lang lang="fr">
-      <tmp:entry type="noteref" say="note $1"/>
-      <tmp:entry type="annoref" say="annotation $1"/>
-      <tmp:entry type="pagenum" say="page $1"/>
+      <tmp:entry type="noteref" say="note $1" empty="cf. note"/>
+      <tmp:entry type="annoref" say="annotation $1" empty="cf. annotation"/>
+      <tmp:entry type="pagenum" say="page $1" empty="nouvelle page"/>
     </tmp:lang>
     <tmp:lang lang="en">
-      <tmp:entry type="noteref" say="note $1"/>
-      <tmp:entry type="annoref" say="annotation $1"/>
-      <tmp:entry type="pagenum" say="page $1"/>
+      <tmp:entry type="noteref" say="note $1" empty="cf. note"/>
+      <tmp:entry type="annoref" say="annotation $1" empty="cf. annotation"/>
+      <tmp:entry type="pagenum" say="page $1" empty="new page"/>
     </tmp:lang>
     <tmp:lang lang="default">
     </tmp:lang>
@@ -64,10 +65,24 @@
 	    <xsl:for-each select="current-group()">
 	      <!-- TODO: merge the adjacent marks with the syntax 'idleft__idright' to speed up the TTS. -->
 	      <ssml:mark name="{concat($mark-delimiter, @id)}"/>
-	      <xsl:variable name="say" select="key('translate', local-name(current()), $dictionary)/@say"/>
-	      <xsl:apply-templates select="current()/node()" mode="inside-skippable">
-		<xsl:with-param name="say" select="if ($say) then $say else '$1'"/>
-	      </xsl:apply-templates>
+	      <xsl:variable name="dict-entry" select="key('translate', local-name(current()), $dictionary)"/>
+	      <xsl:variable name="text" select="current()//text()"/>
+	      <xsl:variable name="new-text" select="if ($dict-entry) then
+	      					    (if ($text != '') then replace($text, '^(.)+$', $dict-entry/@say)
+	      					    else $dict-entry/@empty)
+	      					    else $text"/>
+	      <xsl:choose>
+		<xsl:when test="not($new-text = $text)">
+		  <xsl:copy>
+		    <xsl:copy-of select="@*"/>
+		    <xsl:value-of select="$new-text"/>
+		  </xsl:copy>
+		</xsl:when>
+		<xsl:otherwise>
+		  <xsl:copy-of select="current()"/>
+		</xsl:otherwise>
+	      </xsl:choose>
+
 	      <xsl:value-of select="','"/> <!-- force the processor to end the pronunciation with a neutral prosody. -->
 	      <ssml:mark name="{concat(@id, $mark-delimiter)}"/>
 	      <xsl:value-of select="' . '"/> <!-- force the processor to reinitialize the prosody state. -->
@@ -76,21 +91,6 @@
 	</ssml:speak>
       </xsl:for-each-group>
     </tmp:root>
-  </xsl:template>
-
-  <xsl:template match="@*|*" mode="inside-skippable">
-    <xsl:param name="say"/>
-    <xsl:copy>
-      <xsl:apply-templates select="@*|node()" mode="inside-skippable">
-        <xsl:with-param name="say" select="$say"/>
-      </xsl:apply-templates>
-    </xsl:copy>
-  </xsl:template>
-
-  <xsl:template match="text()" mode="inside-skippable">
-    <!-- There should be only one text node in the ref. -->
-    <xsl:param name="say"/>
-    <xsl:value-of select="replace(., '^(.)+$', $say)"/>
   </xsl:template>
 
 </xsl:stylesheet>

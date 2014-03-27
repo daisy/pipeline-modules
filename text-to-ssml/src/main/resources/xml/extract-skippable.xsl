@@ -40,10 +40,10 @@
          marks. But we let the empty harmless mark as it is, since it
          won't be included in any synthesizable section. -->
     <xsl:variable name="right-level" select="ancestor-or-self::*[preceding-sibling::*[@id][1] or following-sibling::*[@id][1]][1]"/>
-      <!-- The skippable element is replaced with a mark delimiting
-           the end of the previous element and the beginning of the
-           next one. The skippable element is copied somewhere else at
-           the end of the document (see the for-each above). -->
+    <!-- The skippable element is replaced with a mark delimiting
+	 the end of the previous element and the beginning of the
+	 next one. The skippable elements are copied in a separate
+	 document. -->
     <ssml:mark name="{concat($right-level/preceding-sibling::*[@id][1]/@id, $mark-delimiter, $right-level/following-sibling::*[@id][1]/@id)}"/>
   </xsl:template>
 

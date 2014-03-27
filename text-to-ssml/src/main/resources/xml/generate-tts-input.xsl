@@ -137,9 +137,45 @@
 		  <xsl:otherwise>
 		    <!-- sentence content -->
 		    <xsl:apply-templates select="$sentence/node()" mode="inside-sentence"/>
-		    <xsl:value-of select="'.'"/> <!-- sometimes the lexers do not include the punctuation marks -->
-		    <!-- No ssml:break is added here as some TTS processors may already add the silent fragments after the -->
-		    <!-- final punctuation marks. -->
+
+		    <!-- Capture the next punctuation marks to produce the right prosody. -->
+		    <xsl:variable name="next-text-node"
+				  select="$sentence/following-sibling::text()[normalize-space(.) != ''][1]"/>
+
+		    <xsl:choose>
+		      <xsl:when test="$next-text-node">
+			<xsl:analyze-string select="$next-text-node" regex="^[\p{{Z}}]*([.!?…])">
+			  <xsl:matching-substring>
+			    <xsl:value-of select="regex-group(1)"/>
+			  </xsl:matching-substring>
+			  <xsl:non-matching-substring>
+			    <!-- Add the mark only if nothing has
+			         matched (i.e. the non-matching
+			         substring is the whole string). -->
+			    <xsl:if test="$next-text-node = .">
+			      <xsl:value-of select="'.'"/>
+			    </xsl:if>
+			  </xsl:non-matching-substring>
+		      </xsl:analyze-string>
+		      </xsl:when>
+		      <xsl:otherwise>
+			<xsl:value-of select="'.'"/>
+		      </xsl:otherwise>
+		    </xsl:choose>
+
+		    <!-- Legacy code (too CPU-intensive, but more accurate): -->
+		    <!-- <xsl:variable name="next-node" select="following-sibling::node()[preceding-sibling::ssml:s = current()]"/> -->
+		    <!-- <xsl:variable name="next-node-content" select="if ($next-node/self::text()) -->
+		    <!-- 						   then $next-node -->
+		    <!-- 						   else string-join($next-node//text(),'')"/> -->
+
+		    <!-- <xsl:value-of select="replace($next-node-content, '[^.!?…]', '')"/> -->
+
+
+		    <!-- No ssml:break is added here as some TTS
+		         processors may already add the silent
+		         fragments after the final punctuation
+		         marks. -->
 		  </xsl:otherwise>
 		</xsl:choose>
 	      </xsl:for-each>

@@ -4,6 +4,8 @@
 		xmlns:cx="http://xmlcalabash.com/ns/extensions"
 		xmlns:xml="http://www.w3.org/XML/1998/namespace"
 		xmlns:ssml="http://www.w3.org/2001/10/synthesis"
+		xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp"
+		xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon"
 		name="main"
 		exclude-inline-prefixes="#all">
 
@@ -12,6 +14,7 @@
   <p:input port="fileset.in" sequence="false"/>
   <p:input port="content.in" sequence="false" primary="true"/>
   <p:input port="sentence-ids" sequence="false"/>
+  <p:input port="ssml-of-lexicons-uris" sequence="false"/>
   <p:output port="result" sequence="true" primary="true"/>
 
   <p:option name="section-elements" required="true"/>
@@ -56,9 +59,6 @@
   </p:xslt>
   <cx:message message="ssml assigned to threads"/>
 
-  <!-- TODO: conversion of elements such as span role="address" -->
-  <!-- better use a XSLT URI as an option, because this example is Zedai specific -->
-
   <!-- Generate the rough skeleton of the SSML document. -->
   <!-- Everything is converted but the content of the sentences.-->
   <p:xslt name="gen-input">
@@ -86,12 +86,20 @@
   <!-- DO SOME TEXT-TO-SSML CONVERSIONS USING THE LEXICONS -->
   <!-- ============================================================== -->
 
-  <p:variable name="provided-lexicons" select="'provided'"/>
-  <p:variable name="builtin-lexicons" select="'builtins'"/>
+  <!-- Load the user's lexicons. -->
+  <p:for-each name="user-lexicons">
+    <p:output port="result" sequence="true"/>
+    <p:iteration-source select="//ssml:lexicon[@uri]">
+      <p:pipe port="ssml-of-lexicons-uris" step="main"/>
+    </p:iteration-source>
+    <p:load>
+      <p:with-option name="href" select="*/@uri"/>
+    </p:load>
+  </p:for-each>
 
   <!-- iterate over the fileset to extract the lexicons URI, then load them -->
   <!-- from the disk -->
-  <p:for-each>
+  <p:for-each name="doc-lexicons">
     <p:iteration-source select="//*[@media-type = 'application/pls+xml']">
       <p:pipe port="fileset.in" step="main"/>
     </p:iteration-source>
@@ -100,10 +108,6 @@
       <p:with-option name="href" select="/*/@original-href"/>
     </p:load>
   </p:for-each>
-  <p:wrap-sequence name="wrap-provided-lexicons">
-    <p:with-option name="wrapper" select="$provided-lexicons"/>
-  </p:wrap-sequence>
-  <cx:message message="got the lexicons URI"/><p:sink/>
 
   <!-- find all the languages actually used -->
   <p:xslt name="list-lang">
@@ -111,7 +115,7 @@
       <p:pipe port="content.in" step="main"/>
     </p:input>
     <p:input port="parameters">
-	<p:empty/>
+      <p:empty/>
     </p:input>
     <p:input port="stylesheet">
       <p:inline>
@@ -132,50 +136,87 @@
   </p:xslt>
 
   <!-- read the corresponding lexicons from the disk -->
-  <p:for-each name="for-each">
+  <p:for-each name="builtin-lexicons">
+    <p:output port="result" sequence="true"/>
     <p:iteration-source select="//*[@lang]">
       <p:pipe port="result" step="list-lang"/>
     </p:iteration-source>
-    <p:variable name="l" select="/*/@lang">
-	<p:pipe port="current" step="for-each"/>
+    <p:variable name="lang" select="/*/@lang">
+      <p:pipe port="current" step="builtin-lexicons"/>
     </p:variable>
     <p:try>
       <p:group>
 	<p:load>
-	  <p:with-option name="href" select="concat('../lexicons/lexicon_', $l,'.pls')"/>
+	  <p:with-option name="href" select="concat('../lexicons/lexicon_', $lang,'.pls')"/>
 	</p:load>
 	<cx:message>
-	  <p:with-option name="message" select="concat('loaded lexicon for language: ', $l)"/>
+	  <p:with-option name="message" select="concat('loaded lexicon for language: ', $lang)"/>
 	</cx:message>
       </p:group>
       <p:catch>
 	<p:identity>
 	  <p:input port="source">
 	    <p:empty/>
-	    </p:input>
+	  </p:input>
 	</p:identity>
 	<cx:message>
-	  <p:with-option name="message" select="concat('could not find the builtin lexicon for language: ', $l)"/>
+	  <p:with-option name="message" select="concat('could not find the builtin lexicon for language: ', $lang)"/>
 	</cx:message>
       </p:catch>
     </p:try>
   </p:for-each>
-  <p:wrap-sequence name="wrap-builtin-lexicons">
-    <p:with-option name="wrapper" select="$builtin-lexicons"/>
-  </p:wrap-sequence>
+
   <cx:message message="lexicons read from the disk"/><p:sink/>
+
+  <p:identity name="empty-lexicon">
+    <p:input port="source">
+      <p:inline>
+	<pls:lexicon version="1.0" xmlns="http://www.w3.org/2005/01/pronunciation-lexicon"/>
+      </p:inline>
+    </p:input>
+  </p:identity>
+
+  <p:xslt name="separate-regex-lexicons">
+    <p:input port="source">
+      <p:pipe port="result" step="user-lexicons"/>
+      <p:pipe port="result" step="doc-lexicons"/>
+      <p:pipe port="result" step="builtin-lexicons"/>
+      <p:pipe port="result" step="empty-lexicon"/>
+    </p:input>
+    <p:input port="stylesheet">
+      <p:document href="reorganize-lexicons.xsl"/>
+    </p:input>
+    <p:input port="parameters">
+      <p:empty/>
+    </p:input>
+  </p:xslt>
+
+  <cx:message message="PLS info separated"/><p:sink/>
 
   <p:xslt name="pls">
     <p:input port="source">
       <p:pipe port="result" step="css-convert"/>
-      <p:pipe port="result" step="wrap-provided-lexicons"/>
-      <p:pipe port="result" step="wrap-builtin-lexicons"/>
+      <p:pipe port="result" step="separate-regex-lexicons"/>
     </p:input>
     <p:input port="stylesheet">
       <p:document href="pls-to-ssml.xsl"/>
     </p:input>
-    <p:with-param name="builtin-lexicons" select="$builtin-lexicons"/>
-    <p:with-param name="provided-lexicons" select="$provided-lexicons"/>
+    <p:input port="parameters">
+      <p:empty/>
+    </p:input>
+  </p:xslt>
+
+  <p:xslt name="regex-pls">
+    <p:input port="source">
+      <p:pipe port="result" step="pls"/>
+      <p:pipe port="secondary" step="separate-regex-lexicons"/>
+    </p:input>
+    <p:input port="stylesheet">
+      <p:document href="regex-pls-to-ssml.xsl"/>
+    </p:input>
+    <p:input port="parameters">
+      <p:empty/>
+    </p:input>
   </p:xslt>
 
   <cx:message message="PLS info converted to SSML"/>
