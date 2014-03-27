@@ -55,9 +55,9 @@
         <p:variable name="doctype-system" select="/*/@doctype-system"/>
         <p:variable name="encoding" select="if (/*/@encoding) then /*/@encoding else 'utf-8'"/>
         <p:variable name="escape-uri-attributes" select="if (/*/@escape-uri-attributes) then /*/@escape-uri-attributes else 'false'"/>
-        <p:variable name="include-content-type" select="if (/*/@include-content-type) then /*/@include-content-type else 'true'"/>
+        <p:variable name="include-content-type" select="/*/@include-content-type"/>
         <p:variable name="indent" select="if (/*/@indent) then /*/@indent else 'false'"/>
-        <p:variable name="method" select="if (/*/@method) then /*/@method else 'xml'"/>
+        <p:variable name="method" select="/*/@method"/>
         <p:variable name="normalization-form" select="if (/*/@normalization-form) then /*/@normalization-form else 'none'"/>
         <p:variable name="omit-xml-declaration" select="if (/*/@omit-xml-declaration) then /*/@omit-xml-declaration else 'false'"/>
         <p:variable name="standalone" select="if (/*/@standalone) then /*/@standalone else 'omit'"/>
@@ -99,23 +99,6 @@
                             <p:with-option name="normalization-form" select="$normalization-form"/>
                         </p:store>
                     </p:when>
-                    <p:when test="$media-type='application/xhtml+xml'">
-                        <p:store encoding="utf-8" method="xhtml"
-                            include-content-type="false">
-                            <p:with-option name="href" select="$target"/>
-                            <p:with-option name="byte-order-mark" select="$byte-order-mark"/>
-                            <p:with-option name="cdata-section-elements" select="$cdata-section-elements"/>
-                            <p:with-option name="doctype-public" select="$doctype-public"/>
-                            <p:with-option name="doctype-system" select="$doctype-system"/>
-                            <p:with-option name="escape-uri-attributes" select="$escape-uri-attributes"/>
-                            <p:with-option name="indent" select="$indent"/>
-                            <p:with-option name="media-type" select="$media-type"/>
-                            <p:with-option name="normalization-form" select="$normalization-form"/>
-                            <p:with-option name="standalone" select="$standalone"/>
-                            <p:with-option name="undeclare-prefixes" select="$undeclare-prefixes"/>
-                            <p:with-option name="version" select="$version"/>
-                        </p:store>
-                    </p:when>
                     <p:otherwise>
                         <p:store>
                             <p:with-option name="href" select="$target"/>
@@ -125,10 +108,19 @@
                             <p:with-option name="doctype-system" select="$doctype-system"/>
                             <p:with-option name="encoding" select="$encoding"/>
                             <p:with-option name="escape-uri-attributes" select="$escape-uri-attributes"/>
-                            <p:with-option name="include-content-type" select="$include-content-type"/>
+                            <p:with-option name="include-content-type" select="
+                                if ($include-content-type) then
+                                    $include-content-type
+                                else string($media-type!='application/xhtml+xml')"/>
                             <p:with-option name="indent" select="$indent"/>
                             <p:with-option name="media-type" select="$media-type"/>
-                            <p:with-option name="method" select="$method"/>
+                            <p:with-option name="method" select="
+                                if ($media-type='application/xhtml+xml' and not($method)) then
+                                    'xhtml'
+                                else if ($method) then
+                                    $method
+                                else
+                                    'xml'"/>
                             <p:with-option name="normalization-form" select="$normalization-form"/>
                             <p:with-option name="omit-xml-declaration" select="$omit-xml-declaration"/>
                             <p:with-option name="standalone" select="$standalone"/>
