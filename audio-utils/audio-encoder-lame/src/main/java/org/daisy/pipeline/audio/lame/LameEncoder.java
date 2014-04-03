@@ -2,7 +2,6 @@ package org.daisy.pipeline.audio.lame;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 
 import javax.sound.sampled.AudioFormat;
@@ -73,25 +72,13 @@ public class LameEncoder implements AudioEncoder {
 				p.destroy();
 			throw new Exception(e);
 		}
-
 	}
 
 	@Override
 	public String encode(byte[] input, int size, AudioFormat audioFormat, Object caller,
-	        String name) {
+	        File outputDir, String filePrefix) {
 
-		File encodedFile = null;
-		if (name != null) {
-			encodedFile = new File(System.getProperty("java.io.tmpdir") + "/" + name
-			        + OutputFormat);
-		} else {
-			try {
-				encodedFile = File.createTempFile("chunk", OutputFormat);
-			} catch (IOException e) {
-				return null;
-			}
-		}
-
+		File encodedFile = new File(outputDir, filePrefix + OutputFormat);
 		String freq = String.valueOf((Float.valueOf(audioFormat.getSampleRate()) / 1000));
 		String bitwidth = String.valueOf(audioFormat.getSampleSizeInBits());
 		String signedOpt = audioFormat.getEncoding() == AudioFormat.Encoding.PCM_SIGNED ? "--signed"
@@ -123,8 +110,6 @@ public class LameEncoder implements AudioEncoder {
 			out.close();
 			p.waitFor();
 		} catch (Exception e) {
-			if (name == null)
-				encodedFile.delete();
 			if (p != null)
 				p.destroy();
 			return null;
