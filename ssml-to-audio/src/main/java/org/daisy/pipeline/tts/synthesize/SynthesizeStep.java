@@ -1,8 +1,10 @@
 package org.daisy.pipeline.tts.synthesize;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 import net.sf.saxon.s9api.Axis;
 import net.sf.saxon.s9api.QName;
@@ -30,6 +32,8 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 	private SynthesisWorkerPool mWorkerPool;
 	private XProcRuntime mRuntime;
 	private TTSRegistry mTTSRegistry;
+	private Random mRandGenerator;
+	private String mTempDirectory;
 
 	private static String convertSecondToString(double seconds) {
 		int iseconds = (int) (Math.floor(seconds));
@@ -54,6 +58,10 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 		mTTSRegistry = ttsRegistry;
 		int nrThreads = Integer.valueOf(System.getProperty("tts.threads", "12"));
 		mWorkerPool = new SynthesisWorkerPool(nrThreads, ttsRegistry, encoder, this);
+		mRandGenerator = new Random();
+		mTempDirectory = System.getProperty("audio.tmpdir");
+		if (mTempDirectory == null)
+			mTempDirectory = System.getProperty("java.io.tmpdir");
 	}
 
 	@Override
@@ -102,26 +110,40 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 	public void run() throws SaxonApiException {
 		super.run();
 
-		mTTSRegistry.openSynthesizingContext();
-
-		// split the SSML into meaningful sections
-		mWorkerPool.initialize();
-
 		List<SoundFragment> allSoundFragments;
-		try {
-			while (source.moreDocuments()) {
-				traverse(getFirstChild(source.read()));
-				mWorkerPool.endSection();
-			}
-			// run the synthesis/encoding threads
-			allSoundFragments = Collections.synchronizedList(new LinkedList<SoundFragment>());
-			mWorkerPool.synthesizeAndWait(allSoundFragments);
 
-		} catch (SynthesisException e) {
-			mRuntime.error(e);
-			return;
-		} finally {
-			mTTSRegistry.closeSynthesizingContext();
+		synchronized (mTTSRegistry) {
+			//only one synthesis step at a time! the synthesis step is
+			//already multithreaded anyway.
+
+			mTTSRegistry.openSynthesizingContext();
+
+			File audioOutputDir = null;
+			do {
+				String audioDir = mTempDirectory + "/";
+				for (int k = 0; k < 2; ++k)
+					audioDir += Long.toString(mRandGenerator.nextLong(), 32);
+				audioOutputDir = new File(audioDir);
+			} while (audioOutputDir.exists());
+			audioOutputDir.mkdir();
+			mWorkerPool.initialize(audioOutputDir);
+
+			try {
+				while (source.moreDocuments()) {
+					traverse(getFirstChild(source.read()));
+					mWorkerPool.endSection();
+				}
+				// run the synthesis/encoding threads
+				allSoundFragments = Collections
+				        .synchronizedList(new LinkedList<SoundFragment>());
+				mWorkerPool.synthesizeAndWait(allSoundFragments);
+
+			} catch (SynthesisException e) {
+				mRuntime.error(e);
+				return;
+			} finally {
+				mTTSRegistry.closeSynthesizingContext();
+			}
 		}
 
 		printInfo("number of sound fragments: " + allSoundFragments.size());

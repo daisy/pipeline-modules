@@ -20,7 +20,7 @@
     <dependency>
       <groupId>org.daisy.libs</groupId>
       <artifactId>jstyleparser</artifactId>
-      <version>1.13.0-p1-SNAPSHOT</version>
+      <version>1.13.0-p2-SNAPSHOT</version>
     </dependency>
 
     <!-- needed to use com.xmlcalabash.library.DefaultStep ... -->

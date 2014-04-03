@@ -1,5 +1,6 @@
 package org.daisy.pipeline.tts.synthesize;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -32,6 +33,7 @@ public class SynthesisWorkerPool {
 	public static class UndispatchableSection implements Comparable<UndispatchableSection> {
 		int size;
 		int documentPosition;
+		File audioOutputDir;
 		List<Speakable> speakables;
 		TTSService synthesizer;
 		Voice voice;
@@ -58,6 +60,7 @@ public class SynthesisWorkerPool {
 	private UndispatchableSection mCurrentSection;
 	private Voice mPreviousVoice;
 	private int mNrThreads;
+	private File mAudioDir;
 
 	public SynthesisWorkerPool(int threadNumber, TTSRegistry registry, AudioEncoder encoder,
 	        IPipelineLogger logger) {
@@ -71,10 +74,11 @@ public class SynthesisWorkerPool {
 		mLogger = logger;
 	}
 
-	public void initialize() {
+	public void initialize(File audioDir) {
 		mSections = new ArrayList<UndispatchableSection>();
 		mCurrentSection = null;
 		mPreviousVoice = null;
+		mAudioDir = audioDir;
 	}
 
 	/**
@@ -123,6 +127,7 @@ public class SynthesisWorkerPool {
 			mCurrentSection.speakables = new ArrayList<Speakable>();
 			mCurrentSection.synthesizer = currentSynthesizer;
 			mCurrentSection.documentPosition = mSections.size();
+			mCurrentSection.audioOutputDir = mAudioDir;
 		}
 		mCurrentSection.speakables.add(new Speakable(voice, ssml));
 	}
@@ -179,7 +184,5 @@ public class SynthesisWorkerPool {
 			}
 
 		mLogger.printInfo("synthesis workers finished");
-
-		mTTSRegistry.closeSynthesizingContext();
 	}
 }

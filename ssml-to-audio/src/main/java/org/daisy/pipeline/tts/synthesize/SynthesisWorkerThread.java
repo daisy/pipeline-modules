@@ -50,7 +50,7 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 	private TTSService mLastUsedSynthesizer; // must be thread-safe!
 	private ConcurrentLinkedQueue<UndispatchableSection> mSectionsQueue;
 	private Map<TTSService, TTSResource> mResources;
-	private int mCurrentDocPosition;
+	private UndispatchableSection mCurrentSection;
 	private int mSectionFiles;
 
 	public void init(AudioEncoder encoder, IPipelineLogger logger,
@@ -70,11 +70,12 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 	}
 
 	private void encodeAudio() {
-		String preferredFileName = String.format("section%04d_%04d", mCurrentDocPosition,
-		        mSectionFiles);
+		String filePrefix = String.format("section%04d_%04d",
+		        mCurrentSection.documentPosition, mSectionFiles);
 
 		String soundFile = mEncoder.encode(mAudioBuffer.output, mAudioBuffer.offsetInOutput,
-		        mLastUsedSynthesizer.getAudioOutputFormat(), this, preferredFileName);
+		        mLastUsedSynthesizer.getAudioOutputFormat(), this,
+		        mCurrentSection.audioOutputDir, filePrefix);
 
 		if (soundFile == null) {
 			float sec = mAudioBuffer.offsetInOutput
@@ -195,7 +196,7 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 				break;
 			}
 			try {
-				mCurrentDocPosition = section.documentPosition;
+				mCurrentSection = section;
 				mSectionFiles = 0;
 				mLastUsedSynthesizer = section.synthesizer;
 				for (Speakable speakable : section.speakables) {
