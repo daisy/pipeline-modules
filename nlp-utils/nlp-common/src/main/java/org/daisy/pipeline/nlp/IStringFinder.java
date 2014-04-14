@@ -8,13 +8,14 @@ import java.util.Collection;
  */
 public interface IStringFinder {
 
-    void compile(Collection<String> matchable);
+	void compile(Collection<String> matchable);
 
-    /**
-     * @param input
-     *            the string to find
-     * @return null if not found, the matched substring of @param input
-     *         otherwise
-     */
-    String find(String input);
+	/**
+	 * @param input the string to find
+	 * @return null if not found, the matched substring of @param input
+	 *         otherwise
+	 */
+	String find(String input);
+
+	boolean threadsafe();
 }

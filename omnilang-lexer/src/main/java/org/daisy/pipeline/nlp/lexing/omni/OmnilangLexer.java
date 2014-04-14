@@ -8,7 +8,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.daisy.pipeline.nlp.lexing.GenericLexService;
+import org.daisy.pipeline.nlp.lexing.LexService;
 
 /**
  * This is a multi-language lexer that does not support the following features:
@@ -17,96 +17,115 @@ import org.daisy.pipeline.nlp.lexing.GenericLexService;
  * 
  * - Period-based sentence segmentation (periods can be ambiguous).
  */
-public class OmnilangLexer implements GenericLexService {
+public class OmnilangLexer implements LexService {
 
-	private BreakIterator mSentIterator;
-	private BreakIterator mWordIterator;
-	private Matcher mWordMatcher;
-	private Matcher mSpaceMatcher;
+	private static class OmniLexerToken extends LexerToken {
 
-	@Override
-	public void init() throws LexerInitException {
-		mWordMatcher = Pattern.compile("[^\\p{P}\\s\\p{Z}\\p{C}]", Pattern.MULTILINE).matcher(
-		        "");
-		mSpaceMatcher = Pattern.compile("[\\p{Z}\\s]+", Pattern.MULTILINE).matcher("");
-	}
+		private Matcher mWordMatcher;
+		private Matcher mSpaceMatcher;
 
-	@Override
-	public void cleanUpLangResources() {
-		mSentIterator = null;
-		mWordIterator = null;
-		mWordMatcher = null;
-	}
-
-	@Override
-	public void useLanguage(Locale lang) throws LexerInitException {
-		if (lang == null) {
-			mSentIterator = BreakIterator.getSentenceInstance();
-			mWordIterator = BreakIterator.getWordInstance();
-		} else {
-			mSentIterator = BreakIterator.getSentenceInstance(lang);
-			mWordIterator = BreakIterator.getWordInstance(lang);
+		public OmniLexerToken(LexService lexService) {
+			super(lexService);
+			mWordMatcher = Pattern.compile("[^\\p{P}\\s\\p{Z}\\p{C}]", Pattern.MULTILINE)
+			        .matcher("");
+			mSpaceMatcher = Pattern.compile("[\\p{Z}\\s]+", Pattern.MULTILINE).matcher("");
 		}
-	}
 
-	@Override
-	public List<Sentence> split(String input) {
-		if (input.length() == 0)
-			return Collections.EMPTY_LIST;
+		@Override
+		public void shareResourcesWith(LexerToken other, Locale lang) {
+		}
 
-		mSpaceMatcher.reset(input);
-		if (mSpaceMatcher.matches())
-			return Collections.EMPTY_LIST;
+		@Override
+		public void addLang(Locale lang) throws LexerInitException {
+		}
 
-		List<Sentence> result = new ArrayList<Sentence>();
+		@Override
+		public List<Sentence> split(String input, Locale lang) {
+			if (input.length() == 0)
+				return Collections.EMPTY_LIST;
 
-		//replace "J.J.R. Tolkien" with "J.J.RA Tolkien"
-		input = input.replaceAll("(\\p{Lu})(([.]\\p{Lu})+)[.](?=[\n ]\\p{Lu})", "$1$2A");
+			mSpaceMatcher.reset(input);
+			if (mSpaceMatcher.matches())
+				return Collections.EMPTY_LIST;
 
-		//replace "!)" with ",)" to prevent it from detecting a new sentence
-		input = input.replaceAll("[؟:?‥!…។៕。]\\)", ",)");
+			BreakIterator sentIterator;
+			BreakIterator wordIterator;
+			if (lang == null) {
+				sentIterator = BreakIterator.getSentenceInstance();
+				wordIterator = BreakIterator.getWordInstance();
+			} else {
+				sentIterator = BreakIterator.getSentenceInstance(lang);
+				wordIterator = BreakIterator.getWordInstance(lang);
+			}
+			List<Sentence> result = new ArrayList<Sentence>();
 
-		mSentIterator.setText(input);
-		int start = mSentIterator.first();
-		for (int end = mSentIterator.next(); end != BreakIterator.DONE; start = end, end = mSentIterator
-		        .next()) {
-			Sentence s = new Sentence();
-			s.boundaries = new TextBoundaries();
-			s.boundaries.left = start;
-			s.boundaries.right = end;
-			s.words = new ArrayList<TextBoundaries>();
-			result.add(s);
+			//replace "J.J.R. Tolkien" with "J.J.RA Tolkien"
+			input = input.replaceAll("(\\p{Lu})(([.]\\p{Lu})+)[.](?=[\n ]\\p{Lu})", "$1$2A");
 
-			//TODO: trim the white spaces?
+			//replace "!)" with ",)" to prevent it from detecting a new sentence
+			input = input.replaceAll("[؟:?‥!…។៕。]\\)", ",)");
 
-			mWordIterator.setText(input.substring(start, end));
-			int wstart = mWordIterator.first();
-			for (int wend = mWordIterator.next(); wend != BreakIterator.DONE; wstart = wend, wend = mWordIterator
+			sentIterator.setText(input);
+			int start = sentIterator.first();
+			for (int end = sentIterator.next(); end != BreakIterator.DONE; start = end, end = sentIterator
 			        .next()) {
+				Sentence s = new Sentence();
+				s.boundaries = new TextBoundaries();
+				s.boundaries.left = start;
+				s.boundaries.right = end;
+				s.words = new ArrayList<TextBoundaries>();
+				result.add(s);
 
-				int left = start + wstart;
-				int right = start + wend;
+				//TODO: trim the white spaces?
 
-				mWordMatcher.reset(input.substring(left, right));
-				if (mWordMatcher.lookingAt()) {
-					TextBoundaries tb = new TextBoundaries();
-					tb.left = left;
-					tb.right = right;
-					s.words.add(tb);
+				wordIterator.setText(input.substring(start, end));
+				int wstart = wordIterator.first();
+				for (int wend = wordIterator.next(); wend != BreakIterator.DONE; wstart = wend, wend = wordIterator
+				        .next()) {
+
+					int left = start + wstart;
+					int right = start + wend;
+
+					mWordMatcher.reset(input.substring(left, right));
+					if (mWordMatcher.lookingAt()) {
+						TextBoundaries tb = new TextBoundaries();
+						tb.left = left;
+						tb.right = right;
+						s.words.add(tb);
+					}
 				}
 			}
+
+			return result;
 		}
 
-		return result;
 	}
 
 	@Override
 	public int getLexQuality(Locale lang) {
-		return GenericLexService.MinimalQuality;
+		return 3;
 	}
 
 	@Override
 	public String getName() {
 		return "omnilang-lexer";
+	}
+
+	@Override
+	public LexerToken newToken() {
+		return new OmniLexerToken(this);
+	}
+
+	@Override
+	public void globalInit() throws LexerInitException {
+	}
+
+	@Override
+	public void globalRelease() {
+	}
+
+	@Override
+	public int getOverallQuality() {
+		return 5;
 	}
 }

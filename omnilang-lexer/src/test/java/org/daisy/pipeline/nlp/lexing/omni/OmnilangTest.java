@@ -6,7 +6,9 @@ import java.util.Locale;
 import org.daisy.pipeline.nlp.lexing.LexResultPrettyPrinter;
 import org.daisy.pipeline.nlp.lexing.LexService;
 import org.daisy.pipeline.nlp.lexing.LexService.LexerInitException;
+import org.daisy.pipeline.nlp.lexing.LexService.LexerToken;
 import org.daisy.pipeline.nlp.lexing.LexService.Sentence;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -15,6 +17,7 @@ import org.junit.Test;
 public class OmnilangTest {
 
 	LexResultPrettyPrinter mPrinter;
+	LexerToken mLexerToken;
 	LexService mLexer;
 
 	static Locale SPANISH;
@@ -37,23 +40,32 @@ public class OmnilangTest {
 	public void setUp() throws LexerInitException {
 		mPrinter = new LexResultPrettyPrinter();
 		mLexer = new OmnilangLexer();
-		mLexer.init();
+		mLexer.globalInit();
+		mLexerToken = mLexer.newToken();
+		mLexerToken.addLang(Locale.ENGLISH);
+		mLexerToken.addLang(Locale.FRENCH);
+		mLexerToken.addLang(SPANISH);
+		mLexerToken.addLang(CHINESE);
+		mLexerToken.addLang(ARABIC);
+	}
+
+	@After
+	public void shutDown() {
+		mLexer.globalRelease();
 	}
 
 	@Test
 	public void twoSentences() throws LexerInitException {
-		mLexer.useLanguage(Locale.ENGLISH);
 		String ref = "first sentence! Second sentence";
-		List<Sentence> sentences = mLexer.split(ref);
+		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH);
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{/first/ /sentence/! }{/Second/ /sentence/}", text);
 	}
 
 	@Test
 	public void mixed() throws LexerInitException {
-		mLexer.useLanguage(Locale.ENGLISH);
 		String ref = "first sentence !!... second sentence";
-		List<Sentence> sentences = mLexer.split(ref);
+		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH);
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{/first/ /sentence/ !!... }{/second/ /sentence/}", text);
 	}
@@ -61,18 +73,16 @@ public class OmnilangTest {
 	@Ignore
 	@Test
 	public void whitespaces1() throws LexerInitException {
-		mLexer.useLanguage(Locale.ENGLISH);
 		String ref = "first sentence !!  !! second sentence";
-		List<Sentence> sentences = mLexer.split(ref);
+		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH);
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{/first/ /sentence/ !! !! }{/second/ /sentence/}", text);
 	}
 
 	@Test
 	public void spanish1() throws LexerInitException {
-		mLexer.useLanguage(SPANISH);
 		String ref = "first sentence. ¿Second sentence?";
-		List<Sentence> sentences = mLexer.split(ref);
+		List<Sentence> sentences = mLexerToken.split(ref, SPANISH);
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{/first/ /sentence/. }{¿/Second/ /sentence/?}", text);
 	}
@@ -80,48 +90,42 @@ public class OmnilangTest {
 	@Ignore
 	@Test
 	public void spanish2() throws LexerInitException {
-		mLexer.useLanguage(SPANISH);
 		String ref = "first sentence. ¿ Second sentence ?";
-		List<Sentence> sentences = mLexer.split(ref);
+		List<Sentence> sentences = mLexerToken.split(ref, SPANISH);
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{/first/ /sentence/. }{¿ /Second/ /sentence/ ?}", text);
 	}
 
 	@Test
 	public void chinese() throws LexerInitException {
-		mLexer.useLanguage(CHINESE);
 		String ref = "我喜欢中国。我喜欢英语了。";
-		List<Sentence> sentences = mLexer.split(ref);
+		List<Sentence> sentences = mLexerToken.split(ref, CHINESE);
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{/我喜欢中国/。}{/我喜欢英语了/。}", text);
 	}
 
 	@Test
 	public void newline() throws LexerInitException {
-		mLexer.useLanguage(Locale.ENGLISH);
 		String ref = "They do like\nJames.";
-		List<Sentence> sentences = mLexer.split(ref);
+		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH);
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{/They/ /do/ /like/\n/James/.}", text);
 	}
 
 	@Test
 	public void abbr1() throws LexerInitException {
-		mLexer.useLanguage(Locale.ENGLISH);
 		String ref = "J.J.R. Tolkien";
-		List<Sentence> sentences = mLexer.split(ref);
+		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH);
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{/J.J.R./ /Tolkien/}", text);
 	}
 
 	@Test
 	public void brackets1() throws LexerInitException {
-		mLexer.useLanguage(Locale.ENGLISH);
 		String ref = "Bracket example (this is not a sentence!), after.";
-		List<Sentence> sentences = mLexer.split(ref);
+		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH);
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals(
 		        "{/Bracket/ /example/ (/this/ /is/ /not/ /a/ /sentence/!), /after/.}", text);
 	}
-
 }

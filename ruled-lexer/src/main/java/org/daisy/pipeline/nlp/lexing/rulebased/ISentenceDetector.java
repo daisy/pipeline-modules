@@ -13,4 +13,5 @@ public interface ISentenceDetector {
 	 */
 	List<List<CategorizedWord>> split(List<CategorizedWord> words);
 
+	boolean threadsafe();
 }

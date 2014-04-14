@@ -64,4 +64,9 @@ public class WordListMatchRule extends MatchRule {
 		return mStringFinder.find(input);
 	}
 
+	@Override
+	public boolean threadsafe() {
+		return mStringFinder.threadsafe();
+	}
+
 }

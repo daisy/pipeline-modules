@@ -58,4 +58,9 @@ public class PrefixMatchStringFinder implements IStringFinder {
 
 		return null;
 	}
+
+	@Override
+	public boolean threadsafe() {
+		return true;
+	}
 }

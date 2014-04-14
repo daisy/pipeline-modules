@@ -10,10 +10,10 @@ import org.daisy.pipeline.nlp.TextCategorizer.Category;
 
 /**
  * Sentence detector suited for languages with sentences starting with a capital
- * letter after a white space and a stopping punctuation mark. To detect cases
- * such like 'quoted sentence. » New sentence', the algorithm tries to match
+ * letter after a white space and a stop punctuation mark. To detect cases such
+ * like 'quoted sentence. » New sentence', the algorithm tries to match
  * unigrams, bigrams and trigrams against a prioritized list of ending-sentence
- * patterns.
+ * patterns. The class is not thread-safe.
  */
 public class EuroSentenceDetector implements ISentenceDetector {
 
@@ -76,8 +76,8 @@ public class EuroSentenceDetector implements ISentenceDetector {
 		                ".+"),
 		        new SentencePattern(3, Category.PUNCTUATION, Category.SPACE, Category.QUOTE)
 		                .regex("[.?!…]+", ".+", ".+"),
-		        new SentencePattern(3, Category.PUNCTUATION, Category.SPACE, Category.PUNCTUATION).regex(
-				                delimiter, ".+", ":"),
+		        new SentencePattern(3, Category.PUNCTUATION, Category.SPACE,
+		                Category.PUNCTUATION).regex(delimiter, ".+", ":"),
 		        new SentencePattern(2, Category.PUNCTUATION, Category.PUNCTUATION).regex(
 		                delimiter, ":"),
 		        new SentencePattern(1, Category.PUNCTUATION).regex(delimiter)
@@ -150,5 +150,10 @@ public class EuroSentenceDetector implements ISentenceDetector {
 
 	private void addWord() {
 		++mHead;
+	}
+
+	@Override
+	public boolean threadsafe() {
+		return false; //results are recycled
 	}
 }

@@ -34,8 +34,6 @@ public class RuledFrenchCategorizer extends RuledMultilangCategorizer {
 		        DICTIONARY_MAX_PRIORITY, true, mMatchMode, false, Locale.FRANCE);
 		cmr.init(ResourceUtils.readLines(dictFolder, "compact_abbr_fr.txt"));
 		addRule(cmr);
-
-		compile();
 	}
 
 }

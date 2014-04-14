@@ -20,6 +20,10 @@ public class RuledMultilangCategorizer extends RuleBasedTextCategorizer {
 	public static int DICTIONARY_MAX_PRIORITY = 700;
 	protected static String CommonWordPattern = "[@\\p{L}][-_@\\p{L}\\p{Nd}]*";
 
+	public RuledMultilangCategorizer() {
+
+	}
+
 	@Override
 	public void init(MatchMode matchMode) throws IOException {
 		super.init(matchMode);
@@ -148,7 +152,5 @@ public class RuledMultilangCategorizer extends RuleBasedTextCategorizer {
 		rsm = new RegexMatchRule(Category.PUNCTUATION, LOWEST_PRIORITY, true, mMatchMode);
 		rsm.init(".");
 		addRule(rsm);
-
-		compile();
 	}
 }

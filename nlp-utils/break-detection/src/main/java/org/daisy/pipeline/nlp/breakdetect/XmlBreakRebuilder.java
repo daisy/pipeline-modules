@@ -1,6 +1,5 @@
 package org.daisy.pipeline.nlp.breakdetect;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -17,21 +16,21 @@ import net.sf.saxon.s9api.XdmSequenceIterator;
 import org.daisy.pipeline.nlp.LangDetector;
 import org.daisy.pipeline.nlp.breakdetect.StringComposer.SentencePointer;
 import org.daisy.pipeline.nlp.breakdetect.StringComposer.TextPointer;
-import org.daisy.pipeline.nlp.lexing.LexService;
 import org.daisy.pipeline.nlp.lexing.LexService.LexerInitException;
+import org.daisy.pipeline.nlp.lexing.LexService.LexerToken;
 import org.daisy.pipeline.nlp.lexing.LexService.Sentence;
 
 import com.xmlcalabash.util.TreeWriter;
 
 /**
  * This class is used for rebuilding the input document with the additional XML
- * elements resulting from the lexing, i.e. the sentences and the words.
+ * elements resulting from the lexing, i.e. sentences and words.
  * 
  * The algorithm is run multiple times until no forbidden duplication is
  * performed (this is the main reason why it can be slow sometimes). If the
  * 'no-duplication-allowed' option is not enable, then only the nodes with ID
  * will be kept under watch. Further improvements should forbid the algorithm to
- * duplicate nodes attach to CSS properties such as "display: block", "border"
+ * duplicate nodes attached to CSS properties such as "display: block", "border"
  * or "cue-before".
  * 
  * The algorithm processes the inline sections on-the-fly as soon as they are
@@ -42,11 +41,12 @@ import com.xmlcalabash.util.TreeWriter;
  * 
  * The levels are used for aligning the tree paths each other so that it is easy
  * to find the common ancestor of a group of leaves.
+ * 
  */
 public class XmlBreakRebuilder implements InlineSectionProcessor {
 
 	private TreeWriter mTreeWriter;
-	private Map<Locale, LexService> mLexers;
+	private Map<Locale, LexerToken> mLexers;
 	private StringComposer mStringComposer;
 	private FormatSpecifications mSpecs;
 	private XdmNode mPreviousNode; //last node written
@@ -56,12 +56,11 @@ public class XmlBreakRebuilder implements InlineSectionProcessor {
 	private LangDetector mLangDetector;
 
 	public XdmNode rebuild(TreeWriterFactory treeWriterFactory,
-	        HashMap<Locale, LexService> lexers, XdmNode doc, FormatSpecifications specs,
+	        Map<Locale, LexerToken> lexers, XdmNode doc, FormatSpecifications specs,
 	        LangDetector langDetector, boolean forbidAnyDup) throws LexerInitException {
 		mLexers = lexers;
 		mSpecs = specs;
 		mLangDetector = langDetector;
-
 		mStringComposer = new StringComposer();
 		mPreviousNode = getRoot(doc);
 		mPreviousLevel = 0;
@@ -105,13 +104,6 @@ public class XmlBreakRebuilder implements InlineSectionProcessor {
 		} while (duplicated.size() > 0);
 
 		XdmNode result = mTreeWriter.getResult();
-
-		//help the GC
-		mDuplicationManager = null;
-		mPreviousNode = null;
-		mSpecs = null;
-		mStringComposer = null;
-		mTreeWriter = null;
 
 		return result;
 	}
@@ -163,14 +155,13 @@ public class XmlBreakRebuilder implements InlineSectionProcessor {
 		} else
 			mCurrentLang = null;
 
-		LexService lexer = mLexers.get(lang);
+		LexerToken lexer = mLexers.get(lang);
 		if (lexer == null) {
 			lexer = mLexers.get(null); //a generic lexer is always provided
 		}
-		lexer.useLanguage(lang);
 
 		String input = mStringComposer.concat(text);
-		List<Sentence> sentences = lexer.split(input);
+		List<Sentence> sentences = lexer.split(input, lang);
 
 		boolean[] isLexMark = new boolean[leaves.size()];
 		for (int k = 0; k < isLexMark.length; ++k)

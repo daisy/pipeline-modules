@@ -33,6 +33,11 @@ public abstract class RuleBasedTextCategorizer extends TextCategorizer {
 		// this categorizer does not need any context
 	}
 
+	@Override
+	public boolean threadsafe() {
+		return mThreadsafe;
+	}
+
 	// ///// internal helpers //////
 	protected ArrayList<MatchRule> mRules = new ArrayList<MatchRule>();
 
@@ -40,6 +45,10 @@ public abstract class RuleBasedTextCategorizer extends TextCategorizer {
 		mRules.add(rule);
 	}
 
+	/**
+	 * Should only be called once.
+	 */
+	@Override
 	public void compile() {
 		Collections.sort(mRules, new Comparator<MatchRule>() {
 			@Override
@@ -49,5 +58,13 @@ public abstract class RuleBasedTextCategorizer extends TextCategorizer {
 				return (r1.getPriority() > r2.getPriority() ? -1 : 1);
 			}
 		});
+		for (MatchRule rule : mRules) {
+			if (!rule.threadsafe()) {
+				return;
+			}
+		}
+		mThreadsafe = true;
 	}
+
+	private boolean mThreadsafe = false;
 }

@@ -20,6 +20,7 @@ public class FrenchCategorizerTest {
 
 	public CategorizedWord categorizeForPrefix(String x) throws IOException {
 		mCategorizer.init(MatchMode.PREFIX_MATCH);
+		mCategorizer.compile();
 		CategorizedWord v = mCategorizer.categorize(x + " foo", x.toLowerCase());
 		if (v == null) {
 			v = new CategorizedWord();

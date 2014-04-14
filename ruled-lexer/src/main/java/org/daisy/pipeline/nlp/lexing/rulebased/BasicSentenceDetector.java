@@ -2,7 +2,6 @@ package org.daisy.pipeline.nlp.lexing.rulebased;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.daisy.pipeline.nlp.TextCategorizer.CategorizedWord;
@@ -10,20 +9,19 @@ import org.daisy.pipeline.nlp.TextCategorizer.Category;
 
 /**
  * Dummy sentence detector based on the detection of combination of periods,
- * spaces and capitalized words.
+ * spaces and capitalized words. The class is thread-safe.
  */
 public class BasicSentenceDetector implements ISentenceDetector {
-	private Matcher mStrongDelimiters;
-	private Matcher mWeakDelimiters;
+	private Pattern mStrongDelimiters;
+	private Pattern mWeakDelimiters;
 
 	public BasicSentenceDetector() {
-		mWeakDelimiters = Pattern.compile("[.:]+").matcher("");
-		mStrongDelimiters = Pattern.compile("[.:?!]*[?!…]+[.:?!]*").matcher("");
+		mWeakDelimiters = Pattern.compile("[.:]+");
+		mStrongDelimiters = Pattern.compile("[.:?!]*[?!…]+[.:?!]*");
 	}
 
 	@Override
-	public List<List<CategorizedWord>> split(
-	        List<CategorizedWord> CategorizedWords) {
+	public List<List<CategorizedWord>> split(List<CategorizedWord> CategorizedWords) {
 
 		List<List<CategorizedWord>> result = new LinkedList<List<CategorizedWord>>();
 		List<CategorizedWord> currentSentence = new LinkedList<CategorizedWord>();
@@ -33,21 +31,17 @@ public class BasicSentenceDetector implements ISentenceDetector {
 			if (currentSentence.size() > 0
 			        && w.category != Category.PUNCTUATION
 			        && w.category != Category.SPACE
-			        && (delimiter == 2 || (delimiter == 1
-			                && w.category == Category.COMMON && Character
-			                    .isUpperCase(w.word.charAt(0))))) {
+			        && (delimiter == 2 || (delimiter == 1 && w.category == Category.COMMON && Character
+			                .isUpperCase(w.word.charAt(0))))) {
 				result.add(currentSentence);
 				currentSentence = new LinkedList<CategorizedWord>();
 			}
 
 			currentSentence.add(w);
 
-			mStrongDelimiters.reset(w.word);
-			mWeakDelimiters.reset(w.word);
-
-			if (mStrongDelimiters.matches()) {
+			if (mStrongDelimiters.matcher(w.word).matches()) {
 				delimiter = 2;
-			} else if (mWeakDelimiters.matches()) {
+			} else if (mWeakDelimiters.matcher(w.word).matches()) {
 				delimiter = 1;
 			} else if (w.category != Category.SPACE)
 				delimiter = 0;
@@ -57,5 +51,10 @@ public class BasicSentenceDetector implements ISentenceDetector {
 			result.add(currentSentence);
 
 		return result;
+	}
+
+	@Override
+	public boolean threadsafe() {
+		return true;
 	}
 }

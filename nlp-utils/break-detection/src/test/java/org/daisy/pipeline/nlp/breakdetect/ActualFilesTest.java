@@ -23,9 +23,10 @@ import net.sf.saxon.s9api.XdmNodeKind;
 import net.sf.saxon.s9api.XdmSequenceIterator;
 
 import org.daisy.pipeline.nlp.DummyLangDetector;
+import org.daisy.pipeline.nlp.breakdetect.DummyLexer.DummyLexerToken;
 import org.daisy.pipeline.nlp.breakdetect.DummyLexer.Strategy;
-import org.daisy.pipeline.nlp.lexing.LexService;
 import org.daisy.pipeline.nlp.lexing.LexService.LexerInitException;
+import org.daisy.pipeline.nlp.lexing.LexService.LexerToken;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -41,16 +42,16 @@ import com.xmlcalabash.util.TreeWriter;
 public class ActualFilesTest implements TreeWriterFactory {
 	static private Processor Proc;
 	static private DocumentBuilder Builder;
-	static private DummyLexer Lexer;
-	static private HashMap<Locale, LexService> Lexers;
+	static private DummyLexerToken LexerToken;
+	static private HashMap<Locale, LexerToken> Lexers;
 
 	@BeforeClass
-	static public void setUp() throws URISyntaxException {
+	static public void setUp() throws URISyntaxException, LexerInitException {
 		Proc = new Processor(true);
 		Builder = Proc.newDocumentBuilder();
-		Lexer = new DummyLexer();
-		Lexers = new HashMap<Locale, LexService>();
-		Lexers.put(null, Lexer);
+		LexerToken = (DummyLexerToken) new DummyLexer().newToken();
+		Lexers = new HashMap<Locale, LexerToken>();
+		Lexers.put(null, LexerToken);
 
 	}
 
@@ -307,7 +308,7 @@ public class ActualFilesTest implements TreeWriterFactory {
 			        Strategy.SPACE_SEPARATED_WORDS, Strategy.REGULAR
 			}) {
 
-				Lexer.strategy = strategy;
+				LexerToken.strategy = strategy;
 				SAXSource source = new SAXSource(new InputSource(getClass()
 				        .getResourceAsStream(file)));
 				XdmNode document = Builder.build(source);

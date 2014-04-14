@@ -74,7 +74,14 @@ public abstract class TextCategorizer {
 		mMatchMode = mode;
 	}
 
+	/**
+	 * Called after init()
+	 */
+	public abstract void compile();
+
 	public abstract void resetContext();
+
+	public abstract boolean threadsafe();
 
 	/**
 	 * Both the fullcase and lower case versions are provided to prevent us from

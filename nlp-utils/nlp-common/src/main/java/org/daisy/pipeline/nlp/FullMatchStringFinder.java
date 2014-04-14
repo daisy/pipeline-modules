@@ -10,18 +10,23 @@ import java.util.Set;
  */
 public class FullMatchStringFinder implements IStringFinder {
 
-    private Set<String> mSet = new HashSet<String>();
+	private Set<String> mSet = new HashSet<String>();
 
-    @Override
-    public void compile(Collection<String> matchable) {
-        mSet.addAll(matchable);
-    }
+	@Override
+	public void compile(Collection<String> matchable) {
+		mSet.addAll(matchable);
+	}
 
-    @Override
-    public String find(String input) {
-        if (mSet.contains(input))
-            return input;
-        return null;
-    }
+	@Override
+	public String find(String input) {
+		if (mSet.contains(input))
+			return input;
+		return null;
+	}
+
+	@Override
+	public boolean threadsafe() {
+		return true;
+	}
 
 }

@@ -13,42 +13,47 @@ import org.daisy.pipeline.nlp.TextCategorizer.MatchMode;
  */
 public class RegexMatchRule extends MatchRule {
 
-    // warning: the Java Regexp engine always break the search if X matches in
-    // "(X|Y)"
-    // even if Y is longer than X.
+	// warning: the Java Regexp engine always break the search if X matches in
+	// "(X|Y)"
+	// even if Y is longer than X.
 
-    private Pattern mPattern;
+	private Pattern mPattern;
 
-    public RegexMatchRule(Category category, int priority,
-            boolean caseSensitive, MatchMode matchMode) {
-        super(category, priority, caseSensitive, matchMode);
-    }
+	public RegexMatchRule(Category category, int priority, boolean caseSensitive,
+	        MatchMode matchMode) {
+		super(category, priority, caseSensitive, matchMode);
+	}
 
-    public void init(String regexp) {
-        switch (mMatchMode) {
-        case FULL_MATCH:
-            regexp += "$";
-            break;
-        default:
-            break;
-        }
+	public void init(String regexp) {
+		switch (mMatchMode) {
+		case FULL_MATCH:
+			regexp += "$";
+			break;
+		default:
+			break;
+		}
 
-        int flags = Pattern.UNICODE_CASE | Pattern.MULTILINE;
-        // java7: flags |= Pattern.UNICODE_CHARACTER_CLASS;
+		int flags = Pattern.UNICODE_CASE | Pattern.MULTILINE;
+		// java7: flags |= Pattern.UNICODE_CHARACTER_CLASS;
 
-        if (!mCaseSensitive) {
-            flags |= Pattern.CASE_INSENSITIVE;
-        }
+		if (!mCaseSensitive) {
+			flags |= Pattern.CASE_INSENSITIVE;
+		}
 
-        mPattern = Pattern.compile(regexp, flags);
-    }
+		mPattern = Pattern.compile(regexp, flags);
+	}
 
-    @Override
-    protected String match(String input) {
-        Matcher m = mPattern.matcher(input);
-        if (m.lookingAt()) {
-            return m.group(0);
-        }
-        return null;
-    }
+	@Override
+	protected String match(String input) {
+		Matcher m = mPattern.matcher(input);
+		if (m.lookingAt()) {
+			return m.group(0);
+		}
+		return null;
+	}
+
+	@Override
+	public boolean threadsafe() {
+		return true;
+	}
 }

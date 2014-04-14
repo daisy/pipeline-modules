@@ -16,8 +16,8 @@ import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.pipeline.nlp.DummyLangDetector;
 import org.daisy.pipeline.nlp.LangDetector;
-import org.daisy.pipeline.nlp.lexing.LexService;
 import org.daisy.pipeline.nlp.lexing.LexService.LexerInitException;
+import org.daisy.pipeline.nlp.lexing.LexService.LexerToken;
 import org.daisy.pipeline.nlp.lexing.LexServiceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,16 +105,17 @@ public class BreakDetectStep extends DefaultStep implements TreeWriterFactory,
 	public void run() throws SaxonApiException {
 		super.run();
 
+		HashMap<Locale, LexerToken> langToToken = new HashMap<Locale, LexerToken>();
+
 		//Retrieve a generic lexer that can handle unexpected languages.
-		HashMap<Locale, LexService> langToLexers = new HashMap<Locale, LexService>();
-		LexService generic = mLexerRegistry.getBestGenericLexService();
+		LexerToken generic;
 		try {
-			generic.init();
+			generic = mLexerRegistry.getFallbackToken(Collections.EMPTY_LIST);
 		} catch (LexerInitException e1) {
 			mRuntime.error(e1);
 			return;
 		}
-		langToLexers.put(null, generic);
+		langToToken.put(null, generic);
 
 		FormatSpecifications formatSpecs = new FormatSpecifications(tmpNs, sentenceTagOption,
 		        wordTagOption, "http://www.w3.org/XML/1998/namespace", "lang",
@@ -130,8 +131,6 @@ public class BreakDetectStep extends DefaultStep implements TreeWriterFactory,
 			mLangDetector.train();
 		}
 
-		mLangDetector.enable();
-
 		while (mSource.moreDocuments()) {
 			XdmNode doc = mSource.read();
 
@@ -141,16 +140,14 @@ public class BreakDetectStep extends DefaultStep implements TreeWriterFactory,
 				new InlineSectionFinder().find(doc, 0, formatSpecs, this,
 				        Collections.EMPTY_SET);
 				for (Locale lang : mLangs) {
-					if (!langToLexers.containsKey(lang)) {
-						LexService lexer = mLexerRegistry.getLexerForLanguage(lang,
-						        langToLexers.values());
-						if (lexer == null) {
+					if (!langToToken.containsKey(lang)) {
+						LexerToken token = mLexerRegistry.getTokenForLang(lang, langToToken
+						        .values());
+						if (token == null) {
 							throw new LexerInitException(
 							        "cannot find a lexer for the language: " + lang);
 						}
-						if (!langToLexers.containsValue(lexer))
-							lexer.init();
-						langToLexers.put(lang, lexer);
+						langToToken.put(lang, token);
 					}
 				}
 			} catch (LexerInitException e) {
@@ -159,17 +156,17 @@ public class BreakDetectStep extends DefaultStep implements TreeWriterFactory,
 			}
 
 			mRuntime.info(null, null, "Total number of language(s): "
-			        + (langToLexers.size() - 1));
-			for (Map.Entry<Locale, LexService> entry : langToLexers.entrySet()) {
+			        + (langToToken.size() - 1));
+			for (Map.Entry<Locale, LexerToken> entry : langToToken.entrySet()) {
 				mRuntime.info(null, null, "LexService for language '"
 				        + (entry.getKey() == null ? "<ANY>" : entry.getKey()) + "': "
-				        + entry.getValue().getName());
+				        + entry.getValue().getLexService().getName());
 			}
 
 			//rebuild the XML tree and lex the content on-the-fly
 			XdmNode tree;
 			try {
-				tree = xmlRebuilder.rebuild(this, langToLexers, doc, formatSpecs,
+				tree = xmlRebuilder.rebuild(this, langToToken, doc, formatSpecs,
 				        mLangDetector, false);
 				mResult.write(tree);
 			} catch (LexerInitException e) {
@@ -177,14 +174,12 @@ public class BreakDetectStep extends DefaultStep implements TreeWriterFactory,
 			}
 		}
 
-		long after = System.currentTimeMillis();
-		mLogger.debug("lexing time = " + (after - before) / 1000.0 + " s.");
-
-		for (LexService lexer : langToLexers.values()) {
-			lexer.cleanUpLangResources();
+		for (LexerToken token : langToToken.values()) {
+			mLexerRegistry.releaseToken(token);
 		}
 
-		mLangDetector.disable();
+		long after = System.currentTimeMillis();
+		mLogger.debug("lexing time = " + (after - before) / 1000.0 + " s.");
 
 		mLangs = null;
 	}
