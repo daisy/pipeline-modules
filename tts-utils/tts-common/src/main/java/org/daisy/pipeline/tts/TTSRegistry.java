@@ -27,7 +27,8 @@ public class TTSRegistry {
 	private Logger mLogger = LoggerFactory.getLogger(TTSRegistry.class);
 
 	/// ==========================================================================================
-	/// The following methods manage resources shared by the OSGi callbacks and the synthesis step
+	/// The following methods manage resources shared by the service-component callbacks
+	/// and the synthesis step.
 	/// ==========================================================================================
 
 	public static class TTSResource {
@@ -37,18 +38,18 @@ public class TTSRegistry {
 	private Map<TTSService, List<TTSResource>> mTTSResources = new HashMap<TTSService, List<TTSResource>>();
 
 	/**
-	 * OSGi callback
+	 * Service component callback
 	 * 
 	 * @return
 	 */
-	public synchronized void addTTS(TTSService tts) {
+	public void addTTS(TTSService tts) {
 		mTTSResources.put(tts, new ArrayList<TTSResource>());
 	}
 
 	/**
-	 * OSGI callback
+	 * Service component callback
 	 */
-	public synchronized void removeTTS(TTSService tts) {
+	public void removeTTS(TTSService tts) {
 		for (TTSResource resource : mTTSResources.get(tts)) {
 			synchronized (resource) { //the other synchronized(resource) surrounds the calls to TTSService.synthesize()
 				try {
@@ -60,9 +61,11 @@ public class TTSRegistry {
 				resource.released = true;
 			}
 		}
+
 		//note: it is not necessary to prevent the following call from being concurrent to 
-		//a synthesizing process since it wouldn't have any resource to be called with,
-		//and all the processes started before removeTTS() have finished after the 'for'.
+		//synthesizing processes since they wouldn't have any valid resource to be called with,
+		//and all the synthesizing/encoding processes started before removeTTS() have
+		//finished after the 'for' thanks to the 'synchronized()'.
 		tts.release();
 		mTTSResources.remove(tts);
 	}

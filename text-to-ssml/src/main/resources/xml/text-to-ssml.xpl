@@ -81,9 +81,7 @@
 
   <p:variable name="style-ns" select="'http://www.daisy.org/ns/pipeline/tmp'"/>
 
-  <!-- The skippable elements are separated before the CSS inlining so that -->
-  <!-- the CSS will properly be applied on the new sentences that group -->
-  <!-- together the skippable elements. -->
+  <!-- TODO: move the separation after the CSS inlining -->
   <p:xslt name="separate">
     <p:with-param name="skippable-elements" select="$skippable-elements"/>
     <p:input port="stylesheet">

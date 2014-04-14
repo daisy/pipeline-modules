@@ -23,5 +23,33 @@
     </xsl:copy>
   </xsl:template>
 
+  <!-- Add extra white spaces around elements that are sometimes badly juxtaposed. -->
+  <xsl:template match="dt:abbr|dt:acronym|dt:br">
+    <xsl:value-of select="' '"/>
+    <xsl:copy>
+      <xsl:apply-templates select="@*|node()"/>
+    </xsl:copy>
+    <xsl:value-of select="' '"/>
+  </xsl:template>
+
+  <!-- Wrap links with words in order to make sure they can be matched against lexicon entries. -->
+  <!-- (provided that DTBook links cannot contain words) -->
+  <xsl:template match="dt:a">
+    <xsl:value-of select="' '"/>
+    <xsl:copy>
+      <xsl:copy-of select="@*"/>
+      <xsl:choose>
+	<xsl:when test="not(ancestor::*[local-name() = 'w'][1])">
+	  <dt:w><xsl:apply-templates select="node()"/></dt:w>
+	</xsl:when>
+	<xsl:otherwise>
+	  <xsl:apply-templates select="node()"/>
+	</xsl:otherwise>
+      </xsl:choose>
+    </xsl:copy>
+    <xsl:value-of select="' '"/>
+  </xsl:template>
+
+
 </xsl:stylesheet>
 
