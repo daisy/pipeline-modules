@@ -24,6 +24,12 @@
       <groupId>org.daisy.pipeline.modules</groupId>
       <artifactId>tts-common</artifactId>
     </dependency>
+    <!-- For the binary finder: -->
+    <dependency>
+      <groupId>org.daisy.pipeline</groupId>
+      <artifactId>common-utils</artifactId>
+      <version>1.0.1-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -34,6 +40,7 @@
         <configuration>
           <instructions>
             <Service-Component>OSGI-INF/tts-service.xml</Service-Component>
+	    <Export-Package/>
           </instructions>
         </configuration>
       </plugin>

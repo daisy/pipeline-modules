@@ -113,7 +113,7 @@
         <configuration>
           <instructions>
 	    <Service-Component>OSGI-INF/tts-service.xml</Service-Component>
-	    <Bundle-SymbolicName>org.daisy.pipeline.modules.tts-adapter-attnative</Bundle-SymbolicName>
+	    <Export-Package/>
           </instructions>
         </configuration>
         <executions>

@@ -65,6 +65,7 @@
         <configuration>
           <instructions>
             <Service-Component>OSGI-INF/inline-css.xml</Service-Component>
+	    <Export-Package/>
           </instructions>
         </configuration>
       </plugin>

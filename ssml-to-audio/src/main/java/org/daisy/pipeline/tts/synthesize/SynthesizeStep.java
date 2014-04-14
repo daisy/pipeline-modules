@@ -66,13 +66,13 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 
 	@Override
 	synchronized public void printInfo(String message) {
-		mRuntime.getMessageListener().info(this, null, message);
+		mRuntime.info(this, null, message);
 	}
 
 	@Override
 	synchronized public void printDebug(String message) {
 		if (mRuntime.getDebug()) {
-			mRuntime.getMessageListener().info(this, null, message);
+			mRuntime.info(this, null, message);
 		}
 	}
 

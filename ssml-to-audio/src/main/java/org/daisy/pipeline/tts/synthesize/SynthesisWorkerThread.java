@@ -47,6 +47,7 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 	private List<SoundFragment> mGlobalSoundFragments; // must be thread-safe!
 	private List<SoundFragment> mCurrentFragments;
 	private IPipelineLogger mLogger;
+	private IProgressListener mProgressListener;
 	private TTSService mLastUsedSynthesizer; // must be thread-safe!
 	private ConcurrentLinkedQueue<UndispatchableSection> mSectionsQueue;
 	private Map<TTSService, TTSResource> mResources;
@@ -54,7 +55,7 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 	private int mSectionFiles;
 
 	public void init(AudioEncoder encoder, IPipelineLogger logger,
-	        List<SoundFragment> allSoundFragments,
+	        IProgressListener progressListener, List<SoundFragment> allSoundFragments,
 	        ConcurrentLinkedQueue<UndispatchableSection> sectionQueue) {
 		mOutput = new byte[AUDIO_BUFFER_BYTES];
 		mResources = new HashMap<TTSService, TTSResource>();
@@ -66,6 +67,7 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 		mCurrentFragments = new LinkedList<SoundFragment>();
 		mGlobalSoundFragments = allSoundFragments;
 		mLogger = logger;
+		mProgressListener = progressListener;
 		mSectionsQueue = sectionQueue;
 	}
 
@@ -213,6 +215,7 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 				                + (mLastUsedSynthesizer.getAudioOutputFormat() != null) + ")";
 				mLogger.printInfo("error in TTS thread " + synthInfo + ": " + sw.toString());
 			}
+			mProgressListener.notifyFinished(section);
 		}
 	}
 }

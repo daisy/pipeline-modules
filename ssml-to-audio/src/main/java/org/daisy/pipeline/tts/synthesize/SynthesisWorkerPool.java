@@ -18,7 +18,7 @@ import org.daisy.pipeline.tts.TTSService;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.Voice;
 
-public class SynthesisWorkerPool {
+public class SynthesisWorkerPool implements IProgressListener {
 
 	static class Speakable {
 		Speakable(Voice voice, XdmNode sentence) {
@@ -61,6 +61,9 @@ public class SynthesisWorkerPool {
 	private Voice mPreviousVoice;
 	private int mNrThreads;
 	private File mAudioDir;
+	private int mTotalTextSize;
+	private int mPrintedProgress;
+	private int mProgress;
 
 	public SynthesisWorkerPool(int threadNumber, TTSRegistry registry, AudioEncoder encoder,
 	        IPipelineLogger logger) {
@@ -138,18 +141,25 @@ public class SynthesisWorkerPool {
 
 	public void synthesizeAndWait(List<SoundFragment> soundfragments)
 	        throws SynthesisException {
-
 		//sort the 'undispatchable' sections according to their size in descending-order
 		for (UndispatchableSection section : mSections)
 			section.computeSize();
 		Collections.sort(mSections);
 		mLogger.printInfo("number of sections to synthesize: " + mSections.size());
 
+		//retrieve the total size to be able to print the progression on the screen
+		mTotalTextSize = 0;
+		for (UndispatchableSection section : mSections) {
+			mTotalTextSize += section.size;
+		}
+		mProgress = 0;
+		mPrintedProgress = 0;
+
 		//give SynthetisWorkerThread access to a synchronized queue of sections to synthesize
 		ConcurrentLinkedQueue<UndispatchableSection> queue = new ConcurrentLinkedQueue<UndispatchableSection>(
 		        mSections);
 		for (SynthesisWorkerThread worker : mWorkers)
-			worker.init(mEncoder, mLogger, soundfragments, queue);
+			worker.init(mEncoder, mLogger, this, soundfragments, queue);
 
 		//pre-allocate resources for every TTS of every thread
 		Set<TTSService> allTTS = new HashSet<TTSService>();
@@ -184,5 +194,14 @@ public class SynthesisWorkerPool {
 			}
 
 		mLogger.printInfo("synthesis workers finished");
+	}
+
+	@Override
+	synchronized public void notifyFinished(UndispatchableSection section) {
+		mProgress += section.size;
+		if (mProgress - mPrintedProgress > mTotalTextSize / 15) {
+			mLogger.printInfo("progress: " + 100 * mProgress / mTotalTextSize + "%");
+			mPrintedProgress = mProgress;
+		}
 	}
 }

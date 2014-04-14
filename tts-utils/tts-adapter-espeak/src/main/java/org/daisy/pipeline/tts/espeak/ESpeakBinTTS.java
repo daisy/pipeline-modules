@@ -20,8 +20,8 @@ import javax.sound.sampled.AudioSystem;
 
 import net.sf.saxon.s9api.QName;
 
+import org.daisy.common.shell.BinaryFinder;
 import org.daisy.pipeline.tts.BasicSSMLAdapter;
-import org.daisy.pipeline.tts.BinaryFinder;
 import org.daisy.pipeline.tts.MarkFreeTTSService;
 import org.daisy.pipeline.tts.SSMLAdapter;
 import org.daisy.pipeline.tts.Voice;
@@ -42,7 +42,9 @@ public class ESpeakBinTTS extends MarkFreeTTSService {
 
 	public void initialize() throws SynthesisException {
 		final String property = "espeak.client.path";
-		mEspeakPath = BinaryFinder.find(property, "espeak");
+		mEspeakPath = System.getProperty(property);
+		if (mEspeakPath == null)
+			mEspeakPath = BinaryFinder.find("espeak");
 
 		if (mEspeakPath == null) {
 			throw new SynthesisException("Cannot find eSpeak's binary and " + property

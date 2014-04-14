@@ -20,8 +20,8 @@ import javax.sound.sampled.AudioFormat;
 
 import net.sf.saxon.s9api.XdmNode;
 
+import org.daisy.common.shell.BinaryFinder;
 import org.daisy.pipeline.tts.BasicSSMLAdapter;
-import org.daisy.pipeline.tts.BinaryFinder;
 import org.daisy.pipeline.tts.LoadBalancer.Host;
 import org.daisy.pipeline.tts.RoundRobinLoadBalancer;
 import org.daisy.pipeline.tts.SSMLAdapter;
@@ -76,14 +76,16 @@ public class ATTBin implements TTSService {
 		mAudioFormat = new AudioFormat(mSampleRate, 16, 1, true, false);
 
 		final String property = "att.client.path";
-		mATTPath = BinaryFinder.find(property, "TTSClientFile");
+		mATTPath = System.getProperty(property);
+		if (mATTPath == null)
+			mATTPath = BinaryFinder.find("TTSClientFile");
 		if (mATTPath == null) {
 			throw new SynthesisException("Cannot find AT&T's client in PATH and " + property
 			        + " is not set");
 		}
 
 		//test the synthesizer so that the service won't be active if it fails
-		Host host = mLoadBalancer.selectHost();
+		Host host = mLoadBalancer.getMaster();
 		RawAudioBuffer testBuffer = new RawAudioBuffer();
 		testBuffer.offsetInOutput = 0;
 		testBuffer.output = new byte[1];
@@ -194,10 +196,8 @@ public class ATTBin implements TTSService {
 		Set<Voice> result = new HashSet<Voice>();
 		//The client binary has no option to list all the voices, therefore we must
 		//iterate over the possible voices and check if they are accepted.
-		//If the server is smart enough, it can also return similar voices unknown 
-		//from the TTS registry.
 		//WARNING: all the AT&T servers are assumed to be configured with the same voices.
-		Host host = mLoadBalancer.selectHost();
+		Host host = mLoadBalancer.getMaster();
 		String[] cmd = null;
 		Pattern voicePattern = Pattern.compile("VOICE:\\s([^;]+)");
 		Matcher mr = voicePattern.matcher("");

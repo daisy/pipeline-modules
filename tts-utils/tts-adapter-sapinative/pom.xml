@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -24,11 +24,11 @@
       <groupId>org.daisy.pipeline.modules</groupId>
       <artifactId>tts-common</artifactId>
     </dependency>
-   <dependency>
-     <groupId>junit</groupId>
-     <artifactId>junit</artifactId>
-     <version>4.11</version>
-   </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -36,26 +36,26 @@
       <!-- note: Run mvn compile native:javah to generate again the C++ headers from -->
       <!-- the Java class. -->
       <plugin>
-		<groupId>org.codehaus.mojo</groupId>
-		<artifactId>native-maven-plugin</artifactId>
-		<version>1.0-alpha-7</version>
-		<extensions>true</extensions>
-		<executions>
-		  <execution>
-			<phase>none</phase>
-			<id>default-cli</id>
-			<goals>
-			  <goal>javah</goal>
-			</goals>
-			<configuration>
-			  <javahOS>windows</javahOS>
-			  <javahOutputDirectory>../../native-libs/sapi-nar/src/main/jni</javahOutputDirectory>
-			  <javahClassNames>
-				<javahClassName>org.daisy.pipeline.tts.sapinative.SAPILib</javahClassName>
-			  </javahClassNames>
-			</configuration>
-		  </execution>
-		</executions>
+	<groupId>org.codehaus.mojo</groupId>
+	<artifactId>native-maven-plugin</artifactId>
+	<version>1.0-alpha-7</version>
+	<extensions>true</extensions>
+	<executions>
+	  <execution>
+	    <phase>none</phase>
+	    <id>default-cli</id>
+	    <goals>
+	      <goal>javah</goal>
+	    </goals>
+	    <configuration>
+	      <javahOS>windows</javahOS>
+	      <javahOutputDirectory>../../native-libs/sapi-nar/src/main/jni</javahOutputDirectory>
+	      <javahClassNames>
+		<javahClassName>org.daisy.pipeline.tts.sapinative.SAPILib</javahClassName>
+	      </javahClassNames>
+	    </configuration>
+	  </execution>
+	</executions>
       </plugin>
 
       <!-- Extract the libraries from the NAR package -->
@@ -76,7 +76,7 @@
                   <classifier>x64-Windows-msvc-jni</classifier>
                   <type>nar</type>
                 </artifactItem>
-				 <artifactItem>
+		<artifactItem>
                   <groupId>org.daisy.pipeline</groupId>
                   <artifactId>sapi-nar</artifactId>
                   <version>1.0.0-SNAPSHOT</version>
@@ -89,14 +89,14 @@
         </executions>
       </plugin>
       <plugin>
-		<artifactId>maven-antrun-plugin</artifactId>
-         <executions>
-           <execution>
-             <phase>generate-resources</phase>
-             <goals>
-               <goal>run</goal>
-             </goals>
-             <configuration>
+	<artifactId>maven-antrun-plugin</artifactId>
+	<executions>
+	  <execution>
+	    <phase>generate-resources</phase>
+	    <goals>
+	      <goal>run</goal>
+	    </goals>
+	    <configuration>
               <tasks>
                 <copy todir="target/generated-resources/">
                   <fileset dir="target/dependency">
@@ -104,9 +104,9 @@
                   </fileset>
                 </copy>
               </tasks>
-             </configuration>
-	   </execution>
-	 </executions>
+	    </configuration>
+	  </execution>
+	</executions>
       </plugin>
 
       <!-- Package the dynamic library into an OSGI bundle -->
@@ -115,8 +115,8 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-			<Service-Component>OSGI-INF/tts-service.xml</Service-Component>
-			<Bundle-SymbolicName>org.daisy.pipeline.modules.tts-adapter-sapinative</Bundle-SymbolicName>
+	    <Service-Component>OSGI-INF/tts-service.xml</Service-Component>
+	    <Export-Package/>
           </instructions>
         </configuration>
         <executions>
@@ -132,14 +132,14 @@
             </goals>
             <configuration>
               <instructions>
-				<Bundle-NativeCode>
-					x86/sapinative.dll;osname=Win32;processor=x86,
-					x64/sapinative.dll;osname=Win32;processor=x86-64
-				</Bundle-NativeCode>
+		<Bundle-NativeCode>
+		  x86/sapinative.dll;osname=Win32;processor=x86,
+		  x64/sapinative.dll;osname=Win32;processor=x86-64
+		</Bundle-NativeCode>
                 <Include-Resource>
                   OSGI-INF/tts-service.xml=src/main/resources/OSGI-INF/tts-service.xml,
                   x64/sapinative.dll=target/generated-resources/lib/x64-Windows-msvc/jni/sapi-nar.dll,
-				  x86/sapinative.dll=target/generated-resources/lib/x86-Windows-msvc/jni/sapi-nar.dll
+		  x86/sapinative.dll=target/generated-resources/lib/x86-Windows-msvc/jni/sapi-nar.dll
                 </Include-Resource>
               </instructions>
             </configuration>
