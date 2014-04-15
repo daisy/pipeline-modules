@@ -6,55 +6,25 @@ import java.io.InputStream;
 
 import javax.sound.sampled.AudioFormat;
 
+import org.daisy.common.shell.BinaryFinder;
 import org.daisy.pipeline.audio.AudioEncoder;
 
 public class LameEncoder implements AudioEncoder {
 	private static final String OutputFormat = ".mp3";
-
-	private static final String[] winExtensions = {
-	        ".exe", ".bat", ".cmd", ".bin", ""
-	};
-	private static final String[] nixExtensions = {
-	        "", ".run", ".bin", ".sh"
-	};
 	private String mLamePath;
 
-	private String findBinary(String propertyName, String executableName) {
-		String result = System.getProperty(propertyName);
-		if (result != null)
-			return result;
-
-		String os = System.getProperty("os.name");
-		String[] extensions;
-		if (os != null && os.startsWith("Windows"))
-			extensions = winExtensions;
-		else
-			extensions = nixExtensions;
-
-		String systemPath = System.getenv("PATH");
-		String[] pathDirs = systemPath.split(File.pathSeparator);
-		for (String ext : extensions) {
-			String fullname = executableName + ext;
-			for (String pathDir : pathDirs) {
-				File file = new File(pathDir, fullname);
-				if (file.isFile()) {
-					return file.getAbsolutePath();
-				}
-			}
-		}
-		return null;
-	}
-
-	//TODO: call the TTS's BinaryFinder.find instead of findBinary
 	public LameEncoder() throws Exception {
 		final String property = "lame.path";
-		mLamePath = findBinary(property, "lame");
+		mLamePath = System.getProperty(property);
 		if (mLamePath == null) {
-			throw new RuntimeException("Cannot find lame in PATH and " + property
-			        + " is not set");
+			mLamePath = BinaryFinder.find("lame");
+			if (mLamePath == null) {
+				throw new RuntimeException("Cannot find lame in PATH and " + property
+				        + " is not set");
+			}
 		}
 
-		//check that the encoder can be run
+		//check that the encoder can run
 		String[] cmd = new String[]{
 		        mLamePath, "--help"
 		};
