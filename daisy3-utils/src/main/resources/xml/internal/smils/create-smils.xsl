@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:d="http://www.daisy.org/ns/pipeline/data"
+    xmlns:dtbook="http://www.daisy.org/z3986/2005/dtbook/"
+    xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
+    xmlns="http://www.w3.org/2001/SMIL20/" exclude-result-prefixes="#all" version="2.0">
+
+  <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/uri-functions.xsl"/>
+
+  <xsl:param name="mo-dir"/>
+  <xsl:param name="audio-dir"/>
+  <xsl:param name="content-dir"/>
+  <xsl:param name="content-uri"/>
+  <xsl:param name="uid"/>
+
+  <xsl:variable name="audio-dir-rel" select="pf:relativize-uri($audio-dir, $mo-dir)"/>
+  <xsl:variable name="content-doc-rel" select="pf:relativize-uri($content-uri, $mo-dir)"/>
+
+  <xsl:variable name="custom-attrs">
+    <customAttributes>
+      <customTest defaultState="false" id="pagenum" override="visible"/>
+      <customTest defaultState="false" id="note" override="visible"/>
+      <customTest defaultState="false" id="noteref" override="visible"/>
+      <customTest defaultState="false" id="annotation" override="visible"/>
+      <customTest defaultState="false" id="linenum" override="visible"/>
+      <customTest defaultState="false" id="sidebar" override="visible"/>
+      <customTest defaultState="false" id="prodnote" override="visible"/>
+    </customAttributes>
+  </xsl:variable>
+
+  <xsl:variable name="ref-targets" select="' note annotation '"/>
+
+  <xsl:key name="clips" match="*[@idref]" use="@idref"/>
+  <xsl:key name="targets" match="*[@id and contains($ref-targets, concat(' ', local-name(), ' '))]" use="@id"/>
+
+  <xsl:template match="/">
+    <!-- TODO: rewrite the algorithm to iterate over the document only once. -->
+    <xsl:for-each-group select="//*[@smilref]" group-by="substring-before(@smilref, '#')">
+      <xsl:result-document href="{resolve-uri(current-grouping-key(), $content-dir)}">
+	<smil>
+	  <head>
+	     <meta content="{$uid}" name="dtb:uid"/>
+	     <meta content="00:00:00" name="dtb:totalElapsedTime"/>
+	     <meta content="DAISY Pipeline 2" name="dtb:generator"/>
+	     <xsl:copy-of select="$custom-attrs"/>
+	  </head>
+	  <body>
+	    <xsl:apply-templates select="/*" mode="find-ref">
+	      <xsl:with-param name="smilfile" select="current-grouping-key()"/>
+	    </xsl:apply-templates>
+	  </body>
+	</smil>
+      </xsl:result-document>
+    </xsl:for-each-group>
+  </xsl:template>
+
+  <!-- === FIND THE SUBTREES THAT CORRESPOND TO THE SMIL FILE WE ARE LOOKING FOR === -->
+
+  <xsl:template match="*" mode="find-ref">
+    <xsl:param name="smilfile"/>
+    <xsl:apply-templates mode="find-ref" select="*">
+      <xsl:with-param name="smilfile" select="$smilfile"/>
+    </xsl:apply-templates>
+  </xsl:template>
+
+  <xsl:template match="*[@smilref]" mode="find-ref">
+    <xsl:param name="smilfile"/>
+    <xsl:if test="substring-before(@smilref, '#') = $smilfile">
+      <xsl:apply-templates select="." mode="write-smil"/>
+    </xsl:if>
+    <!-- No 'otherwise' needed as the children will have the same
+         @smilref. Annotations and notes are the only
+         exceptions. There is a special case for them .-->
+  </xsl:template>
+
+  <!-- === SMIL WRITING TEMPLATES === -->
+
+  <xsl:template match="*[@smilref]" mode="write-smil">
+    <xsl:param name="target-mode" select="'false'"/>
+    <xsl:variable name="id-in-smil" select="substring-after(@smilref, '#')"/>
+    <xsl:choose>
+      <xsl:when test="$target-mode='false' and exists(key('targets', @id))">
+	<!-- Do nothing because the targets are already taken care of by their reference. -->
+      </xsl:when>
+      <xsl:when test="descendant::*[@smilref and not(key('targets', @id))][1]">
+	<seq id="{$id-in-smil}" class="{local-name()}">
+	  <xsl:apply-templates select="." mode="write-custom"/>
+	  <xsl:apply-templates mode="write-smil" select="*"/>
+	</seq>
+      </xsl:when>
+      <xsl:otherwise>
+	<par id="{$id-in-smil}" class="{local-name()}">
+	  <xsl:apply-templates select="." mode="write-custom"/>
+	  <xsl:apply-templates select="." mode="add-link"/>
+	</par>
+	<xsl:apply-templates select="." mode="add-target"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template match="*" mode="write-smil">
+    <xsl:apply-templates mode="write-smil" select="*"/>
+  </xsl:template>
+
+  <xsl:template name="add-audio">
+    <xsl:variable name="clip" select="key('clips', @id, collection()[/d:audio-clips])"/>
+    <text src="{concat($content-doc-rel, '#', @id)}"/>
+    <xsl:if test="$clip">
+      <audio src="{concat($audio-dir-rel, tokenize($clip/@src, '[/\\]')[last()])}">
+	<xsl:copy-of select="$clip/(@clipBegin|@clipEnd)"/>
+      </audio>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:variable name="custom-list" select="concat(' ', string-join($custom-attrs/*/*/@id, ' '), ' ')"/>
+  <xsl:template match="*[contains($custom-list, concat(' ', local-name(), ' '))]" mode="write-custom">
+    <xsl:attribute name="customTest" >
+      <xsl:value-of select="local-name()"/>
+    </xsl:attribute>
+  </xsl:template>
+
+  <xsl:template match="*" mode="write-custom"/>
+
+  <!-- === DEAL WITH THE NOTEREF AND ANNOREF -->
+
+  <xsl:template match="dtbook:noteref|dtbook:annoref" mode="add-link">
+    <a external="false" href="{tokenize(key('targets', substring-after(@idref, '#'))/@smilref, '[/\\]')[last()]}">
+      <xsl:call-template name="add-audio"/>
+    </a>
+  </xsl:template>
+
+  <xsl:template match="*" mode="add-link">
+    <xsl:call-template name="add-audio"/>
+  </xsl:template>
+
+  <xsl:template match="dtbook:noteref|dtbook:annoref" mode="add-target">
+    <!-- Exceptions to the document order: the SMIL order put together the noteref and the note. -->
+    <xsl:apply-templates select="key('targets', substring-after(@idref, '#'))" mode="write-smil">
+      <xsl:with-param name="target-mode" select="'true'"/>
+    </xsl:apply-templates>
+  </xsl:template>
+
+  <xsl:template match="*" mode="add-target">
+    <!-- nothing -->
+  </xsl:template>
+
+</xsl:stylesheet>
