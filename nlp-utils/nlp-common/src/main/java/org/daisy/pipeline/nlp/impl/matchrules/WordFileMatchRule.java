@@ -1,4 +1,4 @@
-package org.daisy.pipeline.nlp.matchrules;
+package org.daisy.pipeline.nlp.impl.matchrules;
 
 import java.io.File;
 import java.io.IOException;

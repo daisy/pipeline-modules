@@ -1,8 +1,8 @@
-package org.daisy.pipeline.nlp.matchrules;
+package org.daisy.pipeline.nlp.impl.matchrules;
 
-import org.daisy.pipeline.nlp.MatchRule;
 import org.daisy.pipeline.nlp.TextCategorizer.Category;
 import org.daisy.pipeline.nlp.TextCategorizer.MatchMode;
+import org.daisy.pipeline.nlp.impl.MatchRule;
 
 /**
  * Match ranges like "x-y" where x,y are integers such that x < y

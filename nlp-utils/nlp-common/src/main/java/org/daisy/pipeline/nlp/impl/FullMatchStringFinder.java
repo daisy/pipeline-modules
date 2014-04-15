@@ -1,4 +1,4 @@
-package org.daisy.pipeline.nlp;
+package org.daisy.pipeline.nlp.impl;
 
 import java.util.Collection;
 import java.util.HashSet;

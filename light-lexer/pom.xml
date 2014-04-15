@@ -41,6 +41,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
+	    <Export-Package/>
             <Service-Component>OSGI-INF/light-lex-service.xml</Service-Component>
           </instructions>
         </configuration>

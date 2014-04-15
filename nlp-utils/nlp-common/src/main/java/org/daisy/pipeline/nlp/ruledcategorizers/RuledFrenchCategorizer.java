@@ -3,10 +3,10 @@ package org.daisy.pipeline.nlp.ruledcategorizers;
 import java.io.IOException;
 import java.util.Locale;
 
-import org.daisy.pipeline.nlp.ResourceUtils;
-import org.daisy.pipeline.nlp.matchrules.AbbrMatchRule;
-import org.daisy.pipeline.nlp.matchrules.CompactAbbrMatchRule;
-import org.daisy.pipeline.nlp.matchrules.RegexMatchRule;
+import org.daisy.pipeline.nlp.impl.ResourceUtils;
+import org.daisy.pipeline.nlp.impl.matchrules.AbbrMatchRule;
+import org.daisy.pipeline.nlp.impl.matchrules.CompactAbbrMatchRule;
+import org.daisy.pipeline.nlp.impl.matchrules.RegexMatchRule;
 
 public class RuledFrenchCategorizer extends RuledMultilangCategorizer {
 

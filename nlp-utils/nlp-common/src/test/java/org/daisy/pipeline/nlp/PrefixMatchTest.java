@@ -2,6 +2,7 @@ package org.daisy.pipeline.nlp;
 
 import java.util.Arrays;
 
+import org.daisy.pipeline.nlp.impl.PrefixMatchStringFinder;
 import org.junit.Assert;
 import org.junit.Test;
 

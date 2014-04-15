@@ -1,11 +1,11 @@
-package org.daisy.pipeline.nlp.matchrules;
+package org.daisy.pipeline.nlp.impl.matchrules;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.daisy.pipeline.nlp.MatchRule;
 import org.daisy.pipeline.nlp.TextCategorizer.Category;
 import org.daisy.pipeline.nlp.TextCategorizer.MatchMode;
+import org.daisy.pipeline.nlp.impl.MatchRule;
 
 /**
  * MatchRule based on the Java core's Regexp engine. See dk.brics.automaton for

@@ -1,5 +1,6 @@
-package org.daisy.pipeline.nlp;
+package org.daisy.pipeline.nlp.impl;
 
+import org.daisy.pipeline.nlp.TextCategorizer;
 import org.daisy.pipeline.nlp.TextCategorizer.CategorizedWord;
 import org.daisy.pipeline.nlp.TextCategorizer.Category;
 import org.daisy.pipeline.nlp.TextCategorizer.MatchMode;

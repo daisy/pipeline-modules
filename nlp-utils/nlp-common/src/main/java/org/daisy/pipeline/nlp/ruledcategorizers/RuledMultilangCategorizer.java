@@ -3,8 +3,8 @@ package org.daisy.pipeline.nlp.ruledcategorizers;
 import java.io.IOException;
 
 import org.daisy.pipeline.nlp.RuleBasedTextCategorizer;
-import org.daisy.pipeline.nlp.matchrules.NumberRangeMatchRule;
-import org.daisy.pipeline.nlp.matchrules.RegexMatchRule;
+import org.daisy.pipeline.nlp.impl.matchrules.NumberRangeMatchRule;
+import org.daisy.pipeline.nlp.impl.matchrules.RegexMatchRule;
 
 public class RuledMultilangCategorizer extends RuleBasedTextCategorizer {
 

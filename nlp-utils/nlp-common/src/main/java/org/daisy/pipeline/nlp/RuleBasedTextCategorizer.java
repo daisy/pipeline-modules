@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import org.daisy.pipeline.nlp.impl.MatchRule;
+
 public abstract class RuleBasedTextCategorizer extends TextCategorizer {
 
 	@Override

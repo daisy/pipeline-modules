@@ -1,16 +1,16 @@
-package org.daisy.pipeline.nlp.matchrules;
+package org.daisy.pipeline.nlp.impl.matchrules;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
 
-import org.daisy.pipeline.nlp.FullMatchStringFinder;
-import org.daisy.pipeline.nlp.IStringFinder;
-import org.daisy.pipeline.nlp.MatchRule;
-import org.daisy.pipeline.nlp.PrefixMatchStringFinder;
 import org.daisy.pipeline.nlp.TextCategorizer.Category;
 import org.daisy.pipeline.nlp.TextCategorizer.MatchMode;
+import org.daisy.pipeline.nlp.impl.FullMatchStringFinder;
+import org.daisy.pipeline.nlp.impl.IStringFinder;
+import org.daisy.pipeline.nlp.impl.MatchRule;
+import org.daisy.pipeline.nlp.impl.PrefixMatchStringFinder;
 
 /**
  * Match the input strings with a list of strings.
