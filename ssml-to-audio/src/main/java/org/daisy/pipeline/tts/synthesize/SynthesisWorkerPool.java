@@ -61,9 +61,9 @@ public class SynthesisWorkerPool implements IProgressListener {
 	private Voice mPreviousVoice;
 	private int mNrThreads;
 	private File mAudioDir;
-	private int mTotalTextSize;
-	private int mPrintedProgress;
-	private int mProgress;
+	private long mTotalTextSize;
+	private long mPrintedProgress;
+	private long mProgress;
 
 	public SynthesisWorkerPool(int threadNumber, TTSRegistry registry, AudioEncoder encoder,
 	        IPipelineLogger logger) {

@@ -133,7 +133,7 @@ public class AcapelaTTS implements TTSService {
 	}
 
 	@Override
-	public void initialize() throws SynthesisException {
+	public void onBeforeOneExecution() throws SynthesisException {
 		mLoadBalancer = new RoundRobinLoadBalancer(System.getProperty("acapela.servers",
 		        "localhost:0"), this); //'0' means that the port is left to Nscube's choice
 
@@ -323,7 +323,7 @@ public class AcapelaTTS implements TTSService {
 	}
 
 	@Override
-	public void release() {
+	public void onAfterOneExecution() {
 		mLoadBalancer = null;
 		mAudioFormat = null;
 	}

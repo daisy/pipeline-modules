@@ -24,7 +24,7 @@ public abstract class MarkFreeTTSService implements TTSService {
 	public abstract SSMLAdapter getSSMLAdapter();
 
 	@Override
-	public void initialize() throws SynthesisException {
+	public void onBeforeOneExecution() throws SynthesisException {
 	}
 
 	@Override
@@ -72,7 +72,7 @@ public abstract class MarkFreeTTSService implements TTSService {
 	}
 
 	@Override
-	public void release() {
+	public void onAfterOneExecution() {
 	}
 
 	@Override

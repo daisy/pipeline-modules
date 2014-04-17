@@ -106,12 +106,13 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 		mResources.put(s, r);
 	}
 
-	private void processOneSentence(XdmNode sentence, Voice voice) throws SynthesisException {
+	private void processOneSentence(final XdmNode sentence, final Voice voice)
+	        throws SynthesisException {
 		if (mAudioBuffer.offsetInOutput + MAX_ESTIMATED_SYNTHESIZED_BYTES > mAudioBuffer.output.length) {
 			encodeAudio();
 		}
 		//warning: the resource may be already released if mLastUsedSynthesizer has been stopped during the synthesis (e.g. after a CTRL-C).
-		TTSResource resource = mResources.get(mLastUsedSynthesizer);
+		final TTSResource resource = mResources.get(mLastUsedSynthesizer);
 		List<Map.Entry<String, Integer>> marks = new ArrayList<Map.Entry<String, Integer>>();
 
 		//try to synthesize the SSML using an ending mark to know whether if anything went wrong
@@ -126,8 +127,33 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 				//is currently releasing the resource. 
 				if (resource.released)
 					break;
-				mLastUsedSynthesizer.synthesize(sentence, voice, mAudioBuffer, resource,
-				        marks, (tries != SYNTHESIS_TRIES));
+
+				final boolean retry = (tries != SYNTHESIS_TRIES);
+				final List<Map.Entry<String, Integer>> fmarks = marks;
+				final SynthesisException[] exceptions = new SynthesisException[]{
+					null
+				};
+				Thread synthJob = new Thread() {
+					@Override
+					public void run() {
+						try {
+							mLastUsedSynthesizer.synthesize(sentence, voice, mAudioBuffer,
+							        resource, fmarks, retry);
+						} catch (SynthesisException e) {
+							exceptions[0] = e;
+						}
+					}
+				};
+				new TTSTimeout(synthJob, 4 * 60).start();
+				synthJob.start();
+				try {
+					synthJob.join();
+				} catch (InterruptedException e) {
+					continue; //try again
+				}
+				if (exceptions[0] != null) {
+					throw exceptions[0];
+				}
 			}
 
 			if (mLastUsedSynthesizer.endingMark() == null
@@ -187,6 +213,10 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 					sf.clipEnd = convertBytesToSecond(mAudioBuffer.offsetInOutput);
 				mCurrentFragments.add(sf);
 			}
+			//note, if marks.size() > 0 but all.size() == 0, it means that no marks refer to
+			//no ID. It should imply that the sentence contains skippable elements but no text.
+			//In such case, it is important to let the script NOT add any fragment, not even the
+			//sentence parent.
 		}
 	}
 

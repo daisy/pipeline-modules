@@ -66,7 +66,7 @@ public class TTSRegistry {
 		//synthesizing processes since they wouldn't have any valid resource to be called with,
 		//and all the synthesizing/encoding processes started before removeTTS() have
 		//finished after the 'for' thanks to the 'synchronized()'.
-		tts.release();
+		tts.onAfterOneExecution();
 		mTTSResources.remove(tts);
 	}
 
@@ -86,7 +86,7 @@ public class TTSRegistry {
 		for (TTSService tts : services) {
 			String fullname = tts.getName() + "-" + tts.getVersion();
 			try {
-				tts.initialize();
+				tts.onBeforeOneExecution();
 				workingServices.add(tts);
 				mLogger.info(fullname + " successfully initialized");
 			} catch (Throwable t) {
@@ -161,7 +161,7 @@ public class TTSRegistry {
 				resources.getValue().clear();
 			}
 			for (TTSService tts : mTTSResources.keySet()) {
-				tts.release();
+				tts.onAfterOneExecution();
 			}
 		}
 

@@ -51,7 +51,7 @@ public class ATTNative implements TTSService, ATTLibListener {
 		byte[] utf8text;
 	}
 
-	public void initialize() throws SynthesisException {
+	public void onBeforeOneExecution() throws SynthesisException {
 		if (mFirstInit) {
 			System.loadLibrary("att");
 			mFirstInit = false;
@@ -178,7 +178,7 @@ public class ATTNative implements TTSService, ATTLibListener {
 	}
 
 	@Override
-	public void release() {
+	public void onAfterOneExecution() {
 		mAudioFormat = null;
 		mLoadBalancer = null;
 	}

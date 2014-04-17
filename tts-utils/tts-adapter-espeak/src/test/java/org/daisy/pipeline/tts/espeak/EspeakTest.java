@@ -26,7 +26,7 @@ public class EspeakTest {
 	@Test
 	public void getVoiceInfo() throws SynthesisException {
 		TTSService service = new ESpeakBinTTS();
-		service.initialize();
+		service.onBeforeOneExecution();
 		Collection<Voice> voices = service.getAvailableVoices();
 		Assert.assertTrue(voices.size() > 5);
 	}
@@ -34,7 +34,7 @@ public class EspeakTest {
 	@Test
 	public void speakEasy() throws SynthesisException {
 		ESpeakBinTTS service = new ESpeakBinTTS();
-		service.initialize();
+		service.onBeforeOneExecution();
 
 		ArrayList<RawAudioBuffer> li = new ArrayList<RawAudioBuffer>();
 
@@ -48,7 +48,7 @@ public class EspeakTest {
 	@Test
 	public void speakWithVoices() throws SynthesisException {
 		ESpeakBinTTS service = new ESpeakBinTTS();
-		service.initialize();
+		service.onBeforeOneExecution();
 		Object resource = service.allocateThreadResources();
 
 		ArrayList<RawAudioBuffer> li = new ArrayList<RawAudioBuffer>();
@@ -75,7 +75,7 @@ public class EspeakTest {
 	@Test
 	public void speakUnicode() throws SynthesisException {
 		ESpeakBinTTS service = new ESpeakBinTTS();
-		service.initialize();
+		service.onBeforeOneExecution();
 
 		ArrayList<RawAudioBuffer> li = new ArrayList<RawAudioBuffer>();
 
@@ -90,7 +90,7 @@ public class EspeakTest {
 	@Test
 	public void multiSpeak() throws SynthesisException, InterruptedException {
 		final ESpeakBinTTS service = new ESpeakBinTTS();
-		service.initialize();
+		service.onBeforeOneExecution();
 
 		final int[] sizes = new int[16];
 		Thread[] threads = new Thread[sizes.length];

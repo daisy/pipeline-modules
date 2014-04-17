@@ -1,4 +1,4 @@
-<p:declare-step type="px:styled-text-to-ssml" version="1.0"
+<p:declare-step type="px:styled-text-to-ssml" version="1.0" name="main"
 		xmlns:p="http://www.w3.org/ns/xproc"
 		xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
 		xmlns:cx="http://xmlcalabash.com/ns/extensions"
@@ -6,55 +6,44 @@
 		xmlns:ssml="http://www.w3.org/2001/10/synthesis"
 		xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp"
 		xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon"
-		name="main"
 		exclude-inline-prefixes="#all">
 
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl" />
 
   <p:input port="fileset.in" sequence="false"/>
   <p:input port="content.in" sequence="false" primary="true"/>
-  <p:input port="sentence-ids" sequence="false"/>
   <p:input port="ssml-of-lexicons-uris" sequence="false"/>
   <p:output port="result" sequence="true" primary="true"/>
 
   <p:option name="section-elements" required="true"/>
   <p:option name="section-attr" required="false" select="''"/>
   <p:option name="section-attr-val" required="false" select="''"/>
-  <p:option name="word-element" required="true"/>
-  <p:option name="word-attr" required="false" select="''"/>
-  <p:option name="word-attr-val" required="false" select="''"/>
   <p:option name="first-sheet-uri" required="false" select="''"/>
   <p:option name="style-ns" required="true"/>
 
-  <!-- Replace the sentences and the words with their SSML counterpart so that it -->
-  <!-- will be much simpler and faster to apply transformations after. It also encapsulates -->
-  <!-- the section elements into tmp:group. -->
-  <p:xslt name="normalize">
-    <p:with-param name="word-element" select="$word-element"/>
-    <p:with-param name="word-attr" select="$word-attr"/>
-    <p:with-param name="word-attr-val" select="$word-attr-val"/>
+  <!-- Encapsulates the section elements into tmp:group. -->
+  <p:xslt name="identify-sections">
     <p:with-param name="section-elements" select="$section-elements"/>
     <p:with-param name="section-attr" select="$section-attr"/>
     <p:with-param name="section-attr-val" select="$section-attr-val"/>
     <p:input port="source">
       <p:pipe port="content.in" step="main"/>
-      <p:pipe port="sentence-ids" step="main"/>
     </p:input>
     <p:input port="stylesheet">
-      <p:document href="normalize.xsl"/>
+      <p:document href="../xslt/identify-sections.xsl"/>
     </p:input>
   </p:xslt>
-  <cx:message message="Lexing information normalized"/>
+  <cx:message message="Sections identified"/>
 
-  <!-- Map the content to undispatchable objets (i.e. the content can be split -->
-  <!-- within these objects but not transfered to other objects. Each object -->
-  <!-- subdivision will be processed by a single thread). -->
+  <!-- Map the content to undispatchable units (i.e. the content can
+       be split into smaller objects but not transfered to other
+       units. The units will be processed by a single thread. -->
   <p:xslt name="set-thread">
     <p:input port="parameters">
       <p:empty/>
     </p:input>
     <p:input port="stylesheet">
-      <p:document href="assign-thread-id.xsl"/>
+      <p:document href="../xslt/assign-thread-id.xsl"/>
     </p:input>
   </p:xslt>
   <cx:message message="ssml assigned to threads"/>
@@ -65,7 +54,7 @@
     <p:with-param  name="css-sheet-uri" select="$first-sheet-uri"/>
     <p:with-param  name="style-ns" select="$style-ns"/>
     <p:input port="stylesheet">
-      <p:document href="generate-tts-input.xsl"/>
+      <p:document href="../xslt/generate-tts-input.xsl"/>
     </p:input>
   </p:xslt>
   <cx:message message="TTS document input skeletons generated"/>
@@ -77,7 +66,7 @@
       <p:empty/>
     </p:input>
     <p:input port="stylesheet">
-      <p:document href="css-to-ssml.xsl"/>
+      <p:document href="../xslt/css-to-ssml.xsl"/>
     </p:input>
   </p:xslt>
   <cx:message message="CSS properties converted to SSML"/><p:sink/>
@@ -184,7 +173,7 @@
       <p:pipe port="result" step="empty-lexicon"/>
     </p:input>
     <p:input port="stylesheet">
-      <p:document href="reorganize-lexicons.xsl"/>
+      <p:document href="../xslt/reorganize-lexicons.xsl"/>
     </p:input>
     <p:input port="parameters">
       <p:empty/>
@@ -199,7 +188,7 @@
       <p:pipe port="result" step="separate-regex-lexicons"/>
     </p:input>
     <p:input port="stylesheet">
-      <p:document href="pls-to-ssml.xsl"/>
+      <p:document href="../xslt/pls-to-ssml.xsl"/>
     </p:input>
     <p:input port="parameters">
       <p:empty/>
@@ -212,7 +201,7 @@
       <p:pipe port="secondary" step="separate-regex-lexicons"/>
     </p:input>
     <p:input port="stylesheet">
-      <p:document href="regex-pls-to-ssml.xsl"/>
+      <p:document href="../xslt/regex-pls-to-ssml.xsl"/>
     </p:input>
     <p:input port="parameters">
       <p:empty/>
@@ -222,6 +211,7 @@
   <cx:message message="PLS info converted to SSML"/>
 
   <!-- split the result to extract the wrapped SSML files -->
+  <p:delete match="@tmp:*"/>
   <p:filter name="docs-extract">
     <p:with-option name="select" select="'//ssml:speak'"/>
   </p:filter>

@@ -1,10 +1,9 @@
-<p:declare-step type="px:text-to-ssml" version="1.0"
+<p:declare-step type="px:text-to-ssml" version="1.0" name="main"
 		xmlns:p="http://www.w3.org/ns/xproc"
 		xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
 		xmlns:cx="http://xmlcalabash.com/ns/extensions"
 		xmlns:xml="http://www.w3.org/XML/1998/namespace"
 		xmlns:ssml="http://www.w3.org/2001/10/synthesis"
-		name="main"
 		exclude-inline-prefixes="#all">
 
   <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
@@ -81,17 +80,6 @@
 
   <p:variable name="style-ns" select="'http://www.daisy.org/ns/pipeline/tmp'"/>
 
-  <!-- TODO: move the separation after the CSS inlining -->
-  <p:xslt name="separate">
-    <p:with-param name="skippable-elements" select="$skippable-elements"/>
-    <p:input port="stylesheet">
-      <p:document href="extract-skippable.xsl"/>
-    </p:input>
-    <p:input port="source">
-      <p:pipe port="content.in" step="main"/>
-    </p:input>
-  </p:xslt>
-
   <!-- Get the CSS stylesheets -->
   <p:try>
     <p:group>
@@ -105,7 +93,8 @@
 	  <p:pipe port="content.in" step="main"/>
 	</p:input>
 	<p:input port="stylesheet">
-	  <p:document href="get-css-uris.xsl"/>
+	  <p:document href="../xslt/get-css-uris.xsl"/> <!-- TODO: use the one in pipeline-common -->
+	  <!-- http://www.daisy.org/pipeline/modules/file-utils/css-stylesheet-uris.xsl -->
 	</p:input>
       </p:xslt>
       <p:viewport match="//*[@href]">
@@ -143,8 +132,7 @@
 	<p:output port="result" sequence="true"/>
 	<p:identity>
 	  <p:input port="source">
-	    <p:pipe port="result" step="separate"/> <!-- skippable free -->
-	    <p:pipe port="secondary" step="separate"/> <!-- skippable only -->
+	    <p:pipe port="content.in" step="main"/>
 	  </p:input>
 	</p:identity>
 	<px:inline-css>
@@ -161,18 +149,39 @@
 	<p:output port="result"/>
 	<p:identity>
 	  <p:input port="source">
-	    <p:pipe port="result" step="separate"/> <!-- skippable free -->
-	    <p:pipe port="secondary" step="separate"/> <!-- skippable only -->
+	    <p:pipe port="content.in" step="main"/>
 	  </p:input>
 	</p:identity>
 	<cx:message message="No CSS sheet found"/>
       </p:otherwise>
     </p:choose>
-    <p:split-sequence test="position()=1" name="split-seq"/>
+
+    <!-- Replace the sentences and the words with their SSML counterpart so that it -->
+    <!-- will be much simpler and faster to apply transformations after.  -->
+    <p:xslt name="normalize">
+      <p:with-param name="word-element" select="$word-element"/>
+      <p:with-param name="word-attr" select="$word-attr"/>
+      <p:with-param name="word-attr-val" select="$word-attr-val"/>
+      <p:input port="source">
+	<p:pipe port="content.in" step="main"/>
+	<p:pipe port="sentence-ids" step="main"/>
+      </p:input>
+      <p:input port="stylesheet">
+	<p:document href="../xslt/normalize.xsl"/>
+      </p:input>
+    </p:xslt>
+    <cx:message message="Lexing information normalized"/>
+
+    <p:xslt name="separate">
+      <p:with-param name="skippable-elements" select="$skippable-elements"/>
+      <p:input port="stylesheet">
+	<p:document href="../xslt/extract-skippable.xsl"/>
+      </p:input>
+    </p:xslt>
 
     <px:skippable-to-ssml name="skippable-to-ssml">
       <p:input port="content.in">
-	<p:pipe port="not-matched" step="split-seq"/>
+	<p:pipe port="secondary" step="separate"/>
       </p:input>
       <p:with-option name="skippable-elements" select="$skippable-elements"/>
       <p:with-option name="style-ns" select="$style-ns"/>
@@ -180,6 +189,9 @@
 
     <!-- Load the SSML file containing user's lexicons -->
     <p:choose name="ssml-of-lexicons-uris">
+      <p:xpath-context>
+	<p:empty/>
+      </p:xpath-context>
       <p:when test="$ssml-of-lexicons-uris != ''">
 	<p:output port="result"/>
 	<p:load>
@@ -201,17 +213,11 @@
 	<p:pipe port="result" step="ssml-of-lexicons-uris"/>
       </p:input>
       <p:input port="content.in">
-	<p:pipe port="matched" step="split-seq"/>
+	<p:pipe port="result" step="separate"/>
       </p:input>
       <p:input port="fileset.in">
 	<p:pipe port="fileset.in" step="main"/>
       </p:input>
-      <p:input port="sentence-ids">
-	<p:pipe port="sentence-ids" step="main"/>
-      </p:input>
-      <p:with-option name="word-element" select="$word-element"/>
-      <p:with-option name="word-attr" select="$word-attr"/>
-      <p:with-option name="word-attr-val" select="$word-attr-val"/>
       <p:with-option name="section-elements" select="$section-elements"/>
       <p:with-option name="section-attr" select="$section-attr"/>
       <p:with-option name="section-attr-val" select="$section-attr-val"/>

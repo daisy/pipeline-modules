@@ -40,17 +40,23 @@ public interface TTSService {
 	};
 
 	/**
-	 * This method will be called before TTSRegistry.openSynthesizingContext().
-	 * The initialization should be done by this method, rather than by the
-	 * TTSService's constructor, in order to save resources if the server is not
-	 * meant to be used for TTS purpose.
+	 * This method is called by TTSRegistry.openSynthesizingContext() from the
+	 * pipeline's step thread. It should test the TTSService, configures it and
+	 * allocates temporary resources.
 	 */
-	void initialize() throws SynthesisException;
+	void onBeforeOneExecution() throws SynthesisException;
+
+	/**
+	 * This method is called by TTSRegistry.closeSynthesisContext() from the
+	 * pipeline's step thread. It releases the resources allocated by
+	 * onBeforeOneExecution().
+	 */
+	public void onAfterOneExecution();
 
 	/**
 	 * Allocate new resources (such as TCP connections) unique for each thread.
-	 * All the allocation calls are made in a single thread before any sentence
-	 * is processed.
+	 * All the allocation calls are made from the pipeline's step thread before
+	 * any sentence is processed.
 	 * 
 	 * @return the resources. It can be null
 	 * @throws SynthesisException
@@ -103,7 +109,7 @@ public interface TTSService {
 	/**
 	 * @return the audio format (sample rate etc...) of the data produced by
 	 *         synthesize(). The synthesizer is assumed to use the same audio
-	 *         format every time.
+	 *         format every time. Can be called from any thread context.
 	 */
 	public AudioFormat getAudioOutputFormat();
 
@@ -121,18 +127,12 @@ public interface TTSService {
 	public String getVersion();
 
 	/**
-	 * Called from a single thread. Releases the objects initialized in
-	 * initialize().
-	 */
-	public void release();
-
-	/**
-	 * Called from a single thread
+	 * Called from the pipeline's step thread.
 	 */
 	public int getOverallPriority();
 
 	/**
-	 * Called from a single thread
+	 * Called from the pipeline's step thread.
 	 */
 	public Collection<Voice> getAvailableVoices() throws SynthesisException;
 

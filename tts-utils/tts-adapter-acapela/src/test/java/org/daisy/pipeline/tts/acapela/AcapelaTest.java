@@ -36,12 +36,12 @@ public class AcapelaTest {
 	@Before
 	public void setUp() throws SynthesisException {
 		tts = new AcapelaTTS();
-		tts.initialize();
+		tts.onBeforeOneExecution();
 	}
 
 	@After
 	public void shutdown() {
-		tts.release();
+		tts.onAfterOneExecution();
 	}
 
 	@Test

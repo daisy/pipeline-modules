@@ -30,7 +30,7 @@ public class SAPINative implements TTSService {
 		long connection;
 	}
 
-	public void initialize() throws SynthesisException {
+	public void onBeforeOneExecution() throws SynthesisException {
 		if (mFirstInit) {
 			System.loadLibrary("sapinative");
 			mFirstInit = false;
@@ -158,7 +158,7 @@ public class SAPINative implements TTSService {
 	}
 
 	@Override
-	public void release() {
+	public void onAfterOneExecution() {
 		mAudioFormat = null;
 		mSSMLAdapter = null;
 	}

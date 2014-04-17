@@ -40,7 +40,7 @@ public class ESpeakBinTTS extends MarkFreeTTSService {
 	private String mEspeakPath;
 	private final static int MIN_CHUNK_SIZE = 2048;
 
-	public void initialize() throws SynthesisException {
+	public void onBeforeOneExecution() throws SynthesisException {
 		final String property = "espeak.client.path";
 		mEspeakPath = System.getProperty(property);
 		if (mEspeakPath == null)
@@ -110,12 +110,12 @@ public class ESpeakBinTTS extends MarkFreeTTSService {
 	}
 
 	@Override
-	public void release() {
+	public void onAfterOneExecution() {
 		mAudioFormat = null;
 		mCmd = null;
 		mSSMLAdapter = null;
 		mEspeakPath = null;
-		super.release();
+		super.onAfterOneExecution();
 	}
 
 	@Override

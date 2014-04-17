@@ -4,18 +4,12 @@
     xmlns:ssml="http://www.w3.org/2001/10/synthesis"
     xmlns:xml="http://www.w3.org/XML/1998/namespace"
     xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp"
-    xmlns:d="http://www.daisy.org/ns/pipeline/data"
     exclude-result-prefixes="#all"
     version="2.0">
 
-  <xsl:param name="word-element" />
-  <xsl:param name="word-attr" />
-  <xsl:param name="word-attr-val" />
   <xsl:param name="section-elements" />
   <xsl:param name="section-attr" />
   <xsl:param name="section-attr-val" />
-
-  <xsl:key name="sentences" match="*[@id]" use="@id"/>
 
   <xsl:variable name="sections" select="concat(',', $section-elements, ',')"/>
 
@@ -31,19 +25,14 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="*[key('sentences', @id, collection()[/d:sentences]) and not(ancestor-or-self::ssml:s)]" priority="3">
-    <ssml:s>
+  <xsl:template match="ssml:s" priority="3">
+    <xsl:copy>
       <xsl:apply-templates select="@*|node()" mode="inside-sentence"/>
-    </ssml:s>
+    </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="*[local-name()=$word-element and string(@*[local-name()=$word-attr]) = $word-attr-val]" priority="2" mode="inside-sentence">
-    <ssml:token>
-      <xsl:apply-templates select="@*|node()" mode="inside-sentence"/>
-    </ssml:token>
-  </xsl:template>
-
-  <xsl:template match="*[contains($sections, concat(',', local-name(), ',')) and string(@*[local-name()=$section-attr]) = $section-attr-val]" priority="2">
+  <xsl:template match="*[contains($sections, concat(',', local-name(), ',')) and string(@*[local-name()=$section-attr]) = $section-attr-val]"
+		priority="2">
     <tmp:group>
       <xsl:element name="{name()}" namespace="{namespace-uri()}">
 	<xsl:apply-templates select="@*|node()"/>

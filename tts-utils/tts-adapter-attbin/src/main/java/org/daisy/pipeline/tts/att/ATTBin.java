@@ -52,7 +52,7 @@ public class ATTBin implements TTSService {
 		Host h;
 	}
 
-	public void initialize() throws SynthesisException {
+	public void onBeforeOneExecution() throws SynthesisException {
 		mSSMLAdapter = new BasicSSMLAdapter() {
 			@Override
 			public String getFooter() {
@@ -179,7 +179,7 @@ public class ATTBin implements TTSService {
 	}
 
 	@Override
-	public void release() {
+	public void onAfterOneExecution() {
 		mLoadBalancer = null;
 		mMarkPattern = null;
 		mAudioFormat = null;
