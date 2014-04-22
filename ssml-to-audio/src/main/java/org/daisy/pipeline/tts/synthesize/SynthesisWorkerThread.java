@@ -122,6 +122,7 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 		for (tries = SYNTHESIS_TRIES; !valid && tries > 0; --tries) {
 			mAudioBuffer.offsetInOutput = begin;
 			marks.clear();
+			TTSTimeout timeout = new TTSTimeout(3 * 60);
 			synchronized (resource) {
 				//The synchronized is necessary because it is possible that the TTSRegistry 
 				//is currently releasing the resource. 
@@ -139,28 +140,33 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 						try {
 							mLastUsedSynthesizer.synthesize(sentence, voice, mAudioBuffer,
 							        resource, fmarks, retry);
+						} catch (InterruptedException e) {
 						} catch (SynthesisException e) {
 							exceptions[0] = e;
 						}
 					}
 				};
-				new TTSTimeout(synthJob, 4 * 60).start();
+				timeout.watch(synthJob);
 				synthJob.start();
 				try {
 					synthJob.join();
 				} catch (InterruptedException e) {
-					continue; //try again
+					throw new SynthesisException(e);
 				}
 				if (exceptions[0] != null) {
 					throw exceptions[0];
 				}
 			}
 
-			if (mLastUsedSynthesizer.endingMark() == null
-			        || (marks.size() > 0 && mLastUsedSynthesizer.endingMark().equals(
-			                marks.get(marks.size() - 1).getKey()))) {
+			if (timeout.stillTime()
+			        && (mLastUsedSynthesizer.endingMark() == null || (marks.size() > 0 && mLastUsedSynthesizer
+			                .endingMark().equals(marks.get(marks.size() - 1).getKey())))) {
 				valid = true;
 			} else {
+				if (!timeout.stillTime()) {
+					mLogger.printInfo("timeout with " + mLastUsedSynthesizer.getName() + "-"
+					        + mLastUsedSynthesizer.getVersion() + ": new try");
+				}
 				try {
 					Thread.sleep(2000);
 				} catch (InterruptedException e) {

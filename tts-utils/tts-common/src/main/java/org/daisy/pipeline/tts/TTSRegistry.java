@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.slf4j.Logger;
@@ -26,15 +27,19 @@ import org.slf4j.LoggerFactory;
 public class TTSRegistry {
 	private Logger mLogger = LoggerFactory.getLogger(TTSRegistry.class);
 
-	/// ==========================================================================================
-	/// The following methods manage resources shared by the service-component callbacks
-	/// and the synthesis step.
-	/// ==========================================================================================
-
 	public static class TTSResource {
 		public boolean released = false;
 	}
 
+	/// ==========================================================================================
+	/// The following methods manage resources shared between the service-component callbacks
+	/// and the synthesis step.
+	/// ==========================================================================================
+
+	//List of active service
+	private List<TTSService> mServices = new CopyOnWriteArrayList<TTSService>();
+
+	//List of services used by the current running step (some of them may not be active anymore)
 	private Map<TTSService, List<TTSResource>> mTTSResources = new HashMap<TTSService, List<TTSResource>>();
 
 	/**
@@ -43,31 +48,31 @@ public class TTSRegistry {
 	 * @return
 	 */
 	public void addTTS(TTSService tts) {
-		mTTSResources.put(tts, new ArrayList<TTSResource>());
+		mServices.add(tts);
 	}
 
 	/**
 	 * Service component callback
 	 */
 	public void removeTTS(TTSService tts) {
-		for (TTSResource resource : mTTSResources.get(tts)) {
-			synchronized (resource) { //the other synchronized(resource) surrounds the calls to TTSService.synthesize()
-				try {
-					tts.releaseThreadResources(resource);
-				} catch (SynthesisException e) {
-					mLogger.error("error while releasing resource of " + tts.getName() + ": "
-					        + getStack(e));
-				}
-				resource.released = true;
-			}
+		List<TTSResource> resources = null;
+		synchronized (mTTSResources) {
+			resources = mTTSResources.get(tts);
 		}
+		if (resources != null)
+			for (TTSResource resource : resources) {
+				synchronized (resource) { //the other synchronized(resource) surrounds the calls to TTSService.synthesize()
+					try {
+						tts.releaseThreadResources(resource);
+					} catch (SynthesisException e) {
+						mLogger.error("error while releasing resource of " + tts.getName()
+						        + ": " + getStack(e));
+					}
+					resource.released = true;
+				}
+			}
 
-		//note: it is not necessary to prevent the following call from being concurrent to 
-		//synthesizing processes since they wouldn't have any valid resource to be called with,
-		//and all the synthesizing/encoding processes started before removeTTS() have
-		//finished after the 'for' thanks to the 'synchronized()'.
-		tts.onAfterOneExecution();
-		mTTSResources.remove(tts);
+		mServices.remove(tts);
 	}
 
 	/**
@@ -76,18 +81,16 @@ public class TTSRegistry {
 	 * services for a given language/gender.
 	 */
 	public void openSynthesizingContext() {
-
-		List<TTSService> services = new ArrayList<TTSService>();
-		synchronized (this) {
-			services.addAll(mTTSResources.keySet());
+		synchronized (mTTSResources) {
+			mTTSResources.clear();
 		}
-
-		List<TTSService> workingServices = new ArrayList<TTSService>();
-		for (TTSService tts : services) {
+		for (TTSService tts : mServices) {
 			String fullname = tts.getName() + "-" + tts.getVersion();
 			try {
 				tts.onBeforeOneExecution();
-				workingServices.add(tts);
+				synchronized (mTTSResources) {
+					mTTSResources.put(tts, new ArrayList<TTSResource>());
+				}
 				mLogger.info(fullname + " successfully initialized");
 			} catch (Throwable t) {
 				mLogger.info(fullname + " could not be initialized");
@@ -96,13 +99,13 @@ public class TTSRegistry {
 
 		}
 
-		mLogger.info("number of working TTS services: " + workingServices.size() + "/"
-		        + services.size());
+		mLogger.info("number of working TTS services: " + mTTSResources.size() + "/"
+		        + mServices.size());
 
 		//Create a map of the best services for each available voice, given that two different
 		//services can serve the same voice. 
 		mBestServices = new HashMap<Voice, TTSService>();
-		for (TTSService tts : workingServices)
+		for (TTSService tts : mTTSResources.keySet()) { //no possible concurrent write
 			try {
 				Collection<Voice> voices = tts.getAvailableVoices();
 				if (voices != null)
@@ -117,6 +120,7 @@ public class TTSRegistry {
 				//could not get the available voices:
 				//voices of this TTS Service are ignored
 			}
+		}
 
 		//Create map of the best voices for each language
 		mBestVoices = new HashMap<Locale, Voice>();
@@ -140,31 +144,46 @@ public class TTSRegistry {
 				mBestVendorVoices.put(entry, voiceInfo.voice);
 			}
 		}
+
+		//log the available voices
+		StringBuilder sb = new StringBuilder("Available voices:");
+		for (Entry<Voice, TTSService> e : mBestServices.entrySet()) {
+			sb.append("\n* " + e.getKey() + " by " + e.getValue().getName() + "-"
+			        + e.getValue().getVersion());
+		}
+		mLogger.info(sb.toString());
+		sb = new StringBuilder("Fallback voices:");
+		for (Entry<Locale, Voice> e : mBestVoices.entrySet()) {
+			sb.append("\n* " + e.getKey() + ": " + e.getValue());
+		}
+		mLogger.info(sb.toString());
 	}
 
 	public void closeSynthesizingContext() {
-		synchronized (this) {
-			for (Entry<TTSService, List<TTSResource>> resources : mTTSResources.entrySet()) {
-				for (TTSResource resource : resources.getValue()) {
-					//no need to synchronized(resource) because the method is only called after
-					//the synthesizing step and because synchronized(this) already prevents any
-					//concurrent call with removeTTS()
-					try {
-						resources.getKey().releaseThreadResources(resource);
-					} catch (SynthesisException e) {
-						mLogger.error("error while releasing resource of "
-						        + resources.getKey().getName() + ": " + getStack(e));
+		for (Entry<TTSService, List<TTSResource>> resources : mTTSResources.entrySet()) { //no possible concurrent write
+			for (TTSResource resource : resources.getValue()) {
+				synchronized (resource) {
+					if (!resource.released) {
+						try {
+							resources.getKey().releaseThreadResources(resource);
+						} catch (SynthesisException e) {
+							mLogger.error("error while releasing resource of "
+							        + resources.getKey().getName() + ": " + getStack(e));
+						}
+						resource.released = true;
 					}
-					resource.released = true;
-
 				}
-				resources.getValue().clear();
-			}
-			for (TTSService tts : mTTSResources.keySet()) {
-				tts.onAfterOneExecution();
+
 			}
 		}
 
+		for (TTSService tts : mTTSResources.keySet()) { //no possible concurrent write
+			tts.onAfterOneExecution();
+		}
+
+		synchronized (mTTSResources) {
+			mTTSResources.clear();
+		}
 		mBestVendorVoices = null;
 		mBestServices = null;
 		mBestVoices = null;
@@ -172,9 +191,10 @@ public class TTSRegistry {
 
 	public synchronized TTSResource allocateResourceFor(TTSService tts)
 	        throws SynthesisException {
-		List<TTSResource> resources = mTTSResources.get(tts);
+		List<TTSResource> resources = mTTSResources.get(tts); //no possible concurrent write
+
 		if (resources == null)
-			return null; //the OSGi component has been stopped (e.g. CTRL-C)
+			return null; //the OSGi component has been stopped
 
 		TTSResource r = tts.allocateThreadResources();
 		if (r == null)
@@ -288,7 +308,6 @@ public class TTSRegistry {
 		        new VoiceInfo(eSpeak, "russian_test", "ru", eSpeakPriority),
 		        new VoiceInfo(eSpeak, "swedish", "sv", eSpeakPriority),
 		        new VoiceInfo(eSpeak, "mandarin", "zh", eSpeakPriority),
-		        new VoiceInfo(eSpeak, "cantonese", "zh-yue", eSpeakPriority),
 		        new VoiceInfo(eSpeak, "turkish", "tr", eSpeakPriority),
 		        new VoiceInfo(eSpeak, "afrikaans", "af", eSpeakPriority),
 		        new VoiceInfo(eSpeak, "spanish", "es", eSpeakPriority),

@@ -25,6 +25,8 @@ import org.daisy.pipeline.tts.BasicSSMLAdapter;
 import org.daisy.pipeline.tts.MarkFreeTTSService;
 import org.daisy.pipeline.tts.SSMLAdapter;
 import org.daisy.pipeline.tts.Voice;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This synthesizer uses directly the eSpeak binary. The voice names are used
@@ -34,6 +36,9 @@ import org.daisy.pipeline.tts.Voice;
  * voices.
  */
 public class ESpeakBinTTS extends MarkFreeTTSService {
+
+	private Logger mLogger = LoggerFactory.getLogger(ESpeakBinTTS.class);
+
 	private AudioFormat mAudioFormat;
 	private String[] mCmd;
 	private SSMLAdapter mSSMLAdapter;
@@ -41,7 +46,7 @@ public class ESpeakBinTTS extends MarkFreeTTSService {
 	private final static int MIN_CHUNK_SIZE = 2048;
 
 	public void onBeforeOneExecution() throws SynthesisException {
-		final String property = "espeak.client.path";
+		final String property = "espeak.path";
 		mEspeakPath = System.getProperty(property);
 		if (mEspeakPath == null)
 			mEspeakPath = BinaryFinder.find("espeak");
@@ -50,6 +55,8 @@ public class ESpeakBinTTS extends MarkFreeTTSService {
 			throw new SynthesisException("Cannot find eSpeak's binary and " + property
 			        + " is not set");
 		}
+
+		mLogger.info("Will use eSpeak binary: " + mEspeakPath);
 
 		mSSMLAdapter = new BasicSSMLAdapter() {
 			@Override
@@ -86,9 +93,14 @@ public class ESpeakBinTTS extends MarkFreeTTSService {
 		List<RawAudioBuffer> li = new ArrayList<RawAudioBuffer>();
 		mAudioFormat = null;
 		Object r = allocateThreadResources();
-		synthesize(mSSMLAdapter.getHeader(null) + "test" + mSSMLAdapter.getFooter(), null, r,
-		        li);
-		releaseThreadResources(r);
+		try {
+			synthesize(mSSMLAdapter.getHeader(null) + "test" + mSSMLAdapter.getFooter(), null,
+			        r, li);
+		} catch (InterruptedException e) {
+			throw new SynthesisException(e);
+		} finally {
+			releaseThreadResources(r);
+		}
 		if (li.get(0).offsetInOutput <= 500) {
 			throw new SynthesisException("eSpeak did not output audio.");
 		}
@@ -186,7 +198,7 @@ public class ESpeakBinTTS extends MarkFreeTTSService {
 
 	@Override
 	public void synthesize(String ssml, Voice voice, Object threadResources,
-	        List<RawAudioBuffer> output) throws SynthesisException {
+	        List<RawAudioBuffer> output) throws SynthesisException, InterruptedException {
 		Process p = null;
 		try {
 			p = Runtime.getRuntime().exec(mCmd);
@@ -215,6 +227,10 @@ public class ESpeakBinTTS extends MarkFreeTTSService {
 
 			fi.close();
 			p.waitFor();
+		} catch (InterruptedException e) {
+			if (p != null)
+				p.destroy();
+			throw e;
 		} catch (Exception e) {
 			StringWriter sw = new StringWriter();
 			e.printStackTrace(new PrintWriter(sw));

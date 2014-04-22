@@ -19,7 +19,7 @@ import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 public abstract class MarkFreeTTSService implements TTSService {
 
 	public abstract void synthesize(String ssml, Voice voice, Object threadResources,
-	        List<RawAudioBuffer> results) throws SynthesisException;
+	        List<RawAudioBuffer> results) throws SynthesisException, InterruptedException;
 
 	public abstract SSMLAdapter getSSMLAdapter();
 
@@ -39,7 +39,7 @@ public abstract class MarkFreeTTSService implements TTSService {
 	@Override
 	public void synthesize(XdmNode ssml, Voice voice, RawAudioBuffer audioBuffer,
 	        Object threadResources, List<Entry<String, Integer>> marks, boolean retry)
-	        throws SynthesisException {
+	        throws SynthesisException, InterruptedException {
 
 		List<String> sortedMarkNames = new ArrayList<String>();
 		String[] separated = SSMLUtil.toStringNoMarks(ssml, voice.name, getSSMLAdapter(),

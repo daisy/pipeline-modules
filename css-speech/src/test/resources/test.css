@@ -26,6 +26,12 @@ simple {
     speech-rate: 22
 }
 
+hyphens{
+    speech-rate: x-slow;
+    cue-before: url('a_b-c.mp3');
+}
+
+
 *[type="prefixed"]{
     cue-before: url('prefixed.mp3');
 }

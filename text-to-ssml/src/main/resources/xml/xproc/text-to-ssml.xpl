@@ -163,7 +163,7 @@
       <p:with-param name="word-attr" select="$word-attr"/>
       <p:with-param name="word-attr-val" select="$word-attr-val"/>
       <p:input port="source">
-	<p:pipe port="content.in" step="main"/>
+	<p:pipe port="result" step="inlining"/>
 	<p:pipe port="sentence-ids" step="main"/>
       </p:input>
       <p:input port="stylesheet">

@@ -6,10 +6,14 @@ public class TTSTimeout extends Thread {
 	private int mSeconds;
 	private boolean mOk;
 
-	public TTSTimeout(Thread job, int seconds) {
-		mJob = job;
+	public TTSTimeout(int seconds) {
 		mSeconds = seconds;
 		mOk = true;
+	}
+
+	public void watch(Thread job) {
+		mJob = job;
+		start();
 	}
 
 	@Override
@@ -17,13 +21,12 @@ public class TTSTimeout extends Thread {
 		try {
 			sleep(mSeconds * 1000);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
 		}
 		mOk = false;
 		mJob.interrupt();
 	}
 
-	public boolean jobFinished() {
+	public boolean stillTime() {
 		return mOk;
 	}
 }

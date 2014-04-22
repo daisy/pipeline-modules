@@ -32,7 +32,7 @@ public class EspeakTest {
 	}
 
 	@Test
-	public void speakEasy() throws SynthesisException {
+	public void speakEasy() throws SynthesisException, InterruptedException {
 		ESpeakBinTTS service = new ESpeakBinTTS();
 		service.onBeforeOneExecution();
 
@@ -46,7 +46,7 @@ public class EspeakTest {
 	}
 
 	@Test
-	public void speakWithVoices() throws SynthesisException {
+	public void speakWithVoices() throws SynthesisException, InterruptedException {
 		ESpeakBinTTS service = new ESpeakBinTTS();
 		service.onBeforeOneExecution();
 		Object resource = service.allocateThreadResources();
@@ -73,7 +73,7 @@ public class EspeakTest {
 	}
 
 	@Test
-	public void speakUnicode() throws SynthesisException {
+	public void speakUnicode() throws SynthesisException, InterruptedException {
 		ESpeakBinTTS service = new ESpeakBinTTS();
 		service.onBeforeOneExecution();
 
@@ -112,6 +112,9 @@ public class EspeakTest {
 							service.synthesize("<s>small test</s>", null, resource, li);
 						} catch (SynthesisException e) {
 							break;
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
 						sizes[j] += getSize(li);
 					}

@@ -142,6 +142,18 @@ public class CSSInliningTest implements TreeWriterFactory {
 	}
 
 	@Test
+	public void hyphen1() throws SaxonApiException, URISyntaxException {
+		check("<root><hyphens>test</hyphens></root>", null, "<root", "<hyphens",
+		        "tmp:speech-rate=\"x-slow\"", "test", "</hyphens>", "</root>");
+	}
+
+	@Test
+	public void hyphen2() throws SaxonApiException, URISyntaxException {
+		check("<root><hyphens>test</hyphens></root>", null, "<root", "<hyphens",
+		        "tmp:cue-before=\".*a_b-c.*\"", "test", "</hyphens>", "</root>");
+	}
+
+	@Test
 	public void voiceFamily() throws SaxonApiException, URISyntaxException {
 		check("<root><simple>test</simple></root>", null, "<root", "<simple",
 		        "tmp:voice-family=\"[a-z0-9]+,[a-z0-9]+\"", "test", "</simple>", "</root>");

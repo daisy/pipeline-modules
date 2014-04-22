@@ -49,7 +49,7 @@ public class ATTBin implements TTSService {
 	private SSMLAdapter mSSMLAdapter;
 
 	private static class ThreadResource extends TTSResource {
-		Host h;
+		Host host;
 	}
 
 	public void onBeforeOneExecution() throws SynthesisException {
@@ -89,7 +89,11 @@ public class ATTBin implements TTSService {
 		RawAudioBuffer testBuffer = new RawAudioBuffer();
 		testBuffer.offsetInOutput = 0;
 		testBuffer.output = new byte[1];
-		synthesize("test", testBuffer, host, new LinkedList<Map.Entry<String, Integer>>());
+		try {
+			synthesize("test", testBuffer, host, new LinkedList<Map.Entry<String, Integer>>());
+		} catch (InterruptedException e) {
+			throw new SynthesisException(e);
+		}
 		if (testBuffer.offsetInOutput <= 0) {
 			throw new SynthesisException("AT&T client binary did not produce any audio data");
 		}
@@ -98,15 +102,15 @@ public class ATTBin implements TTSService {
 	@Override
 	public void synthesize(XdmNode ssml, Voice voice, RawAudioBuffer audioBuffer,
 	        Object resources, List<Entry<String, Integer>> marks, boolean retry)
-	        throws SynthesisException {
+	        throws SynthesisException, InterruptedException {
 		synthesize(SSMLUtil.toString(ssml, voice.name, mSSMLAdapter, endingMark()),
 		        audioBuffer, resources, marks);
 	}
 
 	private void synthesize(String ssml, RawAudioBuffer audioBuffer, Object resources,
-	        List<Entry<String, Integer>> marks) throws SynthesisException {
-
-		Host h = (Host) resources;
+	        List<Entry<String, Integer>> marks) throws SynthesisException,
+	        InterruptedException {
+		ThreadResource th = (ThreadResource) resources;
 		File dest;
 		try {
 			dest = File.createTempFile("attbin", ".wav");
@@ -118,8 +122,9 @@ public class ATTBin implements TTSService {
 		String[] cmd = null;
 		try {
 			cmd = new String[]{
-			        mATTPath, "-ssml", "-v0", "-s", h.address, "-p", String.valueOf(h.port),
-			        "-r", String.valueOf(mSampleRate), "-o", dest.getAbsolutePath()
+			        mATTPath, "-ssml", "-v0", "-s", th.host.address, "-p",
+			        String.valueOf(th.host.port), "-r", String.valueOf(mSampleRate), "-o",
+			        dest.getAbsolutePath()
 			};
 
 			p = Runtime.getRuntime().exec(cmd);
@@ -135,6 +140,11 @@ public class ATTBin implements TTSService {
 			}
 			is.close();
 			p.waitFor();
+		} catch (InterruptedException e) {
+			dest.delete();
+			if (p != null)
+				p.destroy();
+			throw e;
 		} catch (Exception e) {
 			dest.delete();
 			if (p != null)
@@ -165,7 +175,7 @@ public class ATTBin implements TTSService {
 	@Override
 	public TTSResource allocateThreadResources() {
 		ThreadResource th = new ThreadResource();
-		th.h = mLoadBalancer.selectHost();
+		th.host = mLoadBalancer.selectHost();
 		return th;
 	}
 

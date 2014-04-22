@@ -137,7 +137,6 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 				allSoundFragments = Collections
 				        .synchronizedList(new LinkedList<SoundFragment>());
 				mWorkerPool.synthesizeAndWait(allSoundFragments);
-
 			} catch (SynthesisException e) {
 				mRuntime.error(e);
 				return;

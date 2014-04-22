@@ -21,6 +21,10 @@ public interface TTSService {
 
 		}
 
+		public SynthesisException(Throwable t) {
+			super(t);
+		}
+
 		public SynthesisException(String message) {
 			super(message);
 		}
@@ -48,8 +52,9 @@ public interface TTSService {
 
 	/**
 	 * This method is called by TTSRegistry.closeSynthesisContext() from the
-	 * pipeline's step thread. It releases the resources allocated by
-	 * onBeforeOneExecution().
+	 * pipeline's step thread after releaseThreadResources(). It releases the
+	 * resources allocated by onBeforeOneExecution() if onBeforeOneExecution()
+	 * hasn't thrown any exception.
 	 */
 	public void onAfterOneExecution();
 
@@ -104,7 +109,7 @@ public interface TTSService {
 	 */
 	void synthesize(XdmNode ssml, Voice voice, RawAudioBuffer audioBuffer,
 	        Object threadResources, List<Map.Entry<String, Integer>> marks, boolean retry)
-	        throws SynthesisException;
+	        throws SynthesisException, InterruptedException;
 
 	/**
 	 * @return the audio format (sample rate etc...) of the data produced by

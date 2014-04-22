@@ -91,13 +91,11 @@ public class CSSInliner {
 			for (int i = 0; i < attributes.getLength(); i++) {
 				Node attr = attributes.item(i);
 				if (attr.getPrefix() != null && attr.getPrefix().length() > 0)
-					mTreeWriter.addAttribute(
-					        new QName(attr.getPrefix(), attr.getNamespaceURI(), attr
-					                .getLocalName()), attr.getNodeValue());
+					mTreeWriter.addAttribute(new QName(attr.getPrefix(), attr
+					        .getNamespaceURI(), attr.getLocalName()), attr.getNodeValue());
 				else
-					mTreeWriter.addAttribute(
-					        new QName(attr.getNamespaceURI(), attr.getLocalName()),
-					        attr.getNodeValue());
+					mTreeWriter.addAttribute(new QName(attr.getNamespaceURI(), attr
+					        .getLocalName()), attr.getNodeValue());
 			}
 
 			// ===== start inlining ===== //
@@ -122,8 +120,13 @@ public class CSSInliner {
 								sb.append("," + term.getValue().toString());
 							}
 							str = sb.toString();
-						} else
+						} else if (property.startsWith("cue")) {
 							str = val.toString();
+						} else {
+							//jStyleParser replaces '-' with '_'. Best workaround so far is to do the opposite:
+							//(voice-family and cue aside, there is no property values with '_' in Aural CSS)
+							str = val.toString().replace("_", "-").toLowerCase();
+						}
 						mTreeWriter.addAttribute(
 						        new QName(mStyleNsPrefix, mStyleNS, property), str);
 					}
