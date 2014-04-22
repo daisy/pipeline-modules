@@ -15,5 +15,6 @@
     <p:import href="internal/smils/create-daisy3-smils.xpl"/>
     <p:import href="internal/ncx/create-ncx.xpl"/>
     <p:import href="internal/opf/create-daisy3-opf.xpl"/>
+    <p:import href="internal/dtbook/fix-dtbook-structure.xpl"/>
 
 </p:library>

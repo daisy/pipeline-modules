@@ -18,7 +18,6 @@
   <xsl:param name="ncx-dir"/>
   <xsl:param name="uid"/>
 
-  <!-- note: hd is intented for lists and sidebars but can be confused with levelhd. -->
   <xsl:variable name="titles" select="' levelhd hd h1 h2 h3 h4 h5 h6 '"/>
   <xsl:variable name="navPoints" select="' level level1 level2 level3 level4 level5 level6 '"/>
   <xsl:variable name="pageTargets" select="' pagenum '"/>
@@ -31,11 +30,26 @@
     </targets>
   </xsl:variable>
 
+  <xsl:variable name="all-but-headings"
+		select="concat(' ', string-join($navTargets//@type, ' '), ' ', $pageTargets)"/>
+
+
   <xsl:key name="clips" use="@idref" match="*[@idref]"/>
-  <xsl:key name="orders" use="@id" match="*[@id]"/>
   <xsl:key name="headings" use="generate-id()"
 	   match="*[contains($navPoints, concat(' ', local-name(), ' ')) and
 		  *[contains($titles, concat(' ', local-name(), ' '))]]"/>
+
+
+  <xsl:variable name="play-orders">
+    <d:playOrders>
+      <xsl:for-each select="//*[key('headings', generate-id()) or
+			    contains($all-but-headings, concat(' ', local-name(), ' '))]">
+	<d:o v="{position()}" id="{generate-id()}"/>
+      </xsl:for-each>
+    </d:playOrders>
+  </xsl:variable>
+
+  <xsl:key name="orders" use="@id" match="*[@id]"/>
 
   <xsl:function name="d:getText">
     <xsl:param name="container"/>
@@ -43,16 +57,6 @@
   </xsl:function>
 
   <xsl:template match="/">
-    <xsl:variable name="allnodes" select="concat(' ', string-join($navTargets//@type, ' '), ' ', $pageTargets)"/>
-    <xsl:variable name="play-orders">
-      <d:playOrders>
-	<xsl:for-each select="//*[key('headings', generate-id()) or
-			      contains($allnodes, concat(' ', local-name(), ' '))]">
-	  <d:o v="{position()}" id="{generate-id()}"/>
-	</xsl:for-each>
-      </d:playOrders>
-    </xsl:variable>
-
     <!-- TODO: set xml:lang -->
     <ncx version="2005-1">
       <head>
@@ -74,18 +78,27 @@
       </head>
 
       <docTitle>
-	<xsl:apply-templates mode="add-text" select="//dtbook:doctitle"/>
+	<xsl:apply-templates mode="add-text" select="(//dtbook:doctitle)[1]"/>
       </docTitle>
-      <xsl:if test="//dtbook:docauthor">
-	<docAuthor>
-	  <xsl:apply-templates mode="add-text" select="//dtbook:docauthor"/>
-	</docAuthor>
-      </xsl:if>
+
+      <xsl:apply-templates select="//dtbook:docauthor" mode="author"/>
 
       <navMap>
-	<xsl:apply-templates select="*" mode="navMap">
-	  <xsl:with-param name="play-orders" select="$play-orders"/>
-	</xsl:apply-templates>
+	<xsl:choose>
+	  <xsl:when test="not(($play-orders//*[@id])[1]) or not((//*[key('headings', generate-id())])[1])">
+	    <!-- Fake navPoint: should not happen if the dtbook has been previously fixed -->
+	    <navPoint playOrder="{count($play-orders//*[@id]) + 1}" id="fake-navPoint">
+	      <navLabel><text>Error: no headings</text></navLabel>
+	      <xsl:apply-templates mode="add-content-link"
+				   select="(//*[@smilref and not(key('orders', generate-id(), $play-orders))])[1]"/>
+	    </navPoint>
+	  </xsl:when>
+	  <xsl:otherwise>
+	    <xsl:apply-templates select="*" mode="navMap">
+	      <xsl:with-param name="play-orders" select="$play-orders"/>
+	    </xsl:apply-templates>
+	  </xsl:otherwise>
+	</xsl:choose>
       </navMap>
 
       <xsl:call-template name="pageList">
@@ -96,6 +109,12 @@
 	<xsl:with-param name="play-orders" select="$play-orders"/>
       </xsl:call-template>
     </ncx>
+  </xsl:template>
+
+  <xsl:template match="*" mode="author">
+    <docAuthor>
+      <xsl:apply-templates mode="add-text" select="."/>
+    </docAuthor>
   </xsl:template>
 
   <!-- ======== navMap ======== -->
@@ -172,10 +191,14 @@
       <xsl:value-of select="concat('ncx-', $play-order)"/>
     </xsl:attribute>
     <navLabel>
-      <xsl:apply-templates mode="add-text" select="$text-container"/>
+      <xsl:apply-templates select="$text-container" mode="add-text"/>
     </navLabel>
-    <xsl:if test="$text-container/@smilref">
-      <content src="{concat($mo-dir-rel, tokenize($text-container/@smilref, '[/\\]')[last()])}"/>
+    <xsl:apply-templates select="$text-container" mode="add-content-link"/>
+  </xsl:template>
+
+  <xsl:template match="*" mode="add-content-link">
+    <xsl:if test="@smilref">
+      <content src="{concat($mo-dir-rel, tokenize(@smilref, '[/\\]')[last()])}"/>
     </xsl:if>
   </xsl:template>
 
