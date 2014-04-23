@@ -71,8 +71,12 @@ public interface LexService {
 		 * @param lang is guaranteed to have been added with addLang() if
 		 *            getOverallQuality() returns a negative number. Otherwise
 		 *            it can be any language or null if the language is unknown.
+		 * 
+		 * @param errors is a list of non-critical parsing errors that occurred
+		 *            during the process (e.g. unknown kind of words).
 		 */
-		public abstract List<Sentence> split(String text, Locale lang);
+		public abstract List<Sentence> split(String text, Locale lang,
+		        List<String> parsingErrors);
 
 		/**
 		 * @param lexService is the LexService which the token belongs to.

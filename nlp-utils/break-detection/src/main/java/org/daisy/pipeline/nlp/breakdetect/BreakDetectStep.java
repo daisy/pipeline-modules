@@ -1,5 +1,6 @@
 package org.daisy.pipeline.nlp.breakdetect;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -164,13 +165,17 @@ public class BreakDetectStep extends DefaultStep implements TreeWriterFactory,
 			}
 
 			//rebuild the XML tree and lex the content on-the-fly
+			List<String> parsingErrors = new ArrayList<String>();
 			XdmNode tree;
 			try {
 				tree = xmlRebuilder.rebuild(this, langToToken, doc, formatSpecs,
-				        mLangDetector, false);
+				        mLangDetector, false, parsingErrors);
 				mResult.write(tree);
 			} catch (LexerInitException e) {
 				mRuntime.error(e);
+			}
+			for (String error : parsingErrors) {
+				mRuntime.info(null, null, doc.getDocumentURI() + ": " + error);
 			}
 		}
 

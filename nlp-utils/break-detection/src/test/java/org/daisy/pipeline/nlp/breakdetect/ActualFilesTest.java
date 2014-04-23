@@ -318,8 +318,9 @@ public class ActualFilesTest implements TreeWriterFactory {
 				                .asList(spaceEquivalents), Arrays.asList(spaceEquivalents),
 				        null, null);
 
-				XdmNode tree = new XmlBreakRebuilder().rebuild(this, Lexers, document, specs,
-				        new DummyLangDetector(), forbidAnyDuplication);
+				XdmNode tree = new XmlBreakRebuilder()
+				        .rebuild(this, Lexers, document, specs, new DummyLangDetector(),
+				                forbidAnyDuplication, new ArrayList<String>());
 
 				//check the tree well-formedness
 				XdmNode root = getRoot(tree);

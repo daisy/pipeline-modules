@@ -43,7 +43,7 @@ public class LightLexer implements LexService {
 		}
 
 		@Override
-		public List<Sentence> split(String input, Locale lang) {
+		public List<Sentence> split(String input, Locale lang, List<String> parsingErrors) {
 			if (input.length() == 0)
 				return Collections.EMPTY_LIST;
 

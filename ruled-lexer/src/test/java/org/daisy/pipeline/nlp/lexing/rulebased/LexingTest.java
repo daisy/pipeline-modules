@@ -1,5 +1,6 @@
 package org.daisy.pipeline.nlp.lexing.rulebased;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -36,7 +37,8 @@ public class LexingTest {
 	@Test
 	public void basicSplit() throws LexerInitException {
 		String inp = "this is a   basic test";
-		List<Sentence> sentences = mLexerToken.split(inp, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(inp, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, inp);
 
 		Assert.assertEquals("{/this/ /is/ /a/   /basic/ /test/}", text);
@@ -45,7 +47,8 @@ public class LexingTest {
 	@Test
 	public void twoSentences1() throws LexerInitException {
 		String inp = "first sentence. Second sentence";
-		List<Sentence> sentences = mLexerToken.split(inp, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(inp, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, inp);
 
 		Assert.assertEquals("{/first/ /sentence/.}{/Second/ /sentence/}", text);
@@ -54,15 +57,18 @@ public class LexingTest {
 	@Test
 	public void twoSentences2() throws LexerInitException {
 		String inp = "first sentence! Second sentence";
-		List<Sentence> sentences = mLexerToken.split(inp, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(inp, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, inp);
+
 		Assert.assertEquals("{/first/ /sentence/!}{/Second/ /sentence/}", text);
 	}
 
 	@Test
 	public void noSentence1() throws LexerInitException {
 		String inp = "first block. 55";
-		List<Sentence> sentences = mLexerToken.split(inp, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(inp, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, inp);
 		Assert.assertEquals("{/first/ /block/. /55/}", text);
 	}
@@ -70,7 +76,8 @@ public class LexingTest {
 	@Test
 	public void capitalizedWords() throws LexerInitException {
 		String inp = "Only One Sentence";
-		List<Sentence> sentences = mLexerToken.split(inp, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(inp, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, inp);
 		Assert.assertEquals("{/Only/ /One/ /Sentence/}", text);
 	}
@@ -78,7 +85,8 @@ public class LexingTest {
 	@Test
 	public void acronym1() throws LexerInitException {
 		String inp = "test A.C.R.O.N.Y.M. other";
-		List<Sentence> sentences = mLexerToken.split(inp, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(inp, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, inp);
 		Assert.assertEquals("{/test/ /A.C.R.O.N.Y.M./ /other/}", text);
 	}
@@ -86,7 +94,8 @@ public class LexingTest {
 	@Test
 	public void acronym2() throws LexerInitException {
 		String inp = "test A.C.R.O.N.Y.M. Other";
-		List<Sentence> sentences = mLexerToken.split(inp, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(inp, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, inp);
 		Assert.assertEquals("{/test/ /A.C.R.O.N.Y.M/.}{/Other/}", text);
 	}
@@ -95,7 +104,8 @@ public class LexingTest {
 	public void httpAddress() throws LexerInitException {
 		String link = "http://www.google.fr/toto?a=b&_sessid=4547";
 		String inp = "before " + link + " after";
-		List<Sentence> sentences = mLexerToken.split(inp, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(inp, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, inp);
 		Assert.assertEquals("{/before/ /" + link + "/ /after/}", text);
 	}
@@ -104,7 +114,8 @@ public class LexingTest {
 	@Test
 	public void latin() throws LexerInitException {
 		String inp = "a priori a posteriori";
-		List<Sentence> sentences = mLexerToken.split(inp, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(inp, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, inp);
 		Assert.assertEquals("{/a priori/ /a posteriori/}", text);
 	}
@@ -112,7 +123,8 @@ public class LexingTest {
 	@Test
 	public void whitespaces1() throws LexerInitException {
 		String inp = "     sentence1.       Sentence2   ";
-		List<Sentence> sentences = mLexerToken.split(inp, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(inp, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, inp);
 		Assert.assertEquals("{/sentence1/.}{/Sentence2/}", text);
 	}
@@ -120,7 +132,8 @@ public class LexingTest {
 	@Test
 	public void punctuationOnly1() throws LexerInitException {
 		String inp = "sentence1! ??!!!  !! ? sentence2! ";
-		List<Sentence> sentences = mLexerToken.split(inp, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(inp, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, inp);
 		Assert.assertEquals("{/sentence1/!}{/sentence2/!}", text);
 
@@ -129,7 +142,8 @@ public class LexingTest {
 	@Test
 	public void foreign() throws LexerInitException {
 		String inp = "découpage basé sur des règles";
-		List<Sentence> sentences = mLexerToken.split(inp, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(inp, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, inp);
 		Assert.assertEquals("{/découpage/ /basé/ /sur/ /des/ /règles/}", text);
 	}
@@ -137,7 +151,8 @@ public class LexingTest {
 	@Test
 	public void brackets1() throws LexerInitException {
 		String ref = "Bracket example (this is not a sentence!), after.";
-		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals(
 		        "{/Bracket/ /example/ (/this/ /is/ /not/ /a/ /sentence/!), /after/.}", text);
@@ -146,7 +161,8 @@ public class LexingTest {
 	@Test
 	public void quotes1() throws LexerInitException {
 		String ref = "\"First sentence.\" Second sentence";
-		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{\"/First/ /sentence/.\"}{/Second/ /sentence/}", text);
 	}
@@ -154,7 +170,8 @@ public class LexingTest {
 	@Test
 	public void quotes2() throws LexerInitException {
 		String ref = "\"First sentence\". Second sentence";
-		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{\"/First/ /sentence/\".}{/Second/ /sentence/}", text);
 	}
@@ -162,7 +179,8 @@ public class LexingTest {
 	@Test
 	public void quotes3() throws LexerInitException {
 		String ref = "\"First sentence. \" Second sentence";
-		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{\"/First/ /sentence/. \"}{/Second/ /sentence/}", text);
 	}
@@ -170,7 +188,8 @@ public class LexingTest {
 	@Test
 	public void quotes4() throws LexerInitException {
 		String ref = "First sentence. » Second sentence";
-		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{/First/ /sentence/. »}{/Second/ /sentence/}", text);
 	}
@@ -178,7 +197,8 @@ public class LexingTest {
 	@Test
 	public void quotes5() throws LexerInitException {
 		String ref = "First block: \"Second block";
-		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{/First/ /block/: \"/Second/ /block/}", text);
 	}
@@ -186,7 +206,8 @@ public class LexingTest {
 	@Test
 	public void weirdSentence1() throws LexerInitException {
 		String ref = "Then he asked this and that?, etc.";
-		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{/Then/ /he/ /asked/ /this/ /and/ /that/?, /etc/.}", text);
 	}
@@ -194,7 +215,8 @@ public class LexingTest {
 	@Test
 	public void weirdSentence2() throws LexerInitException {
 		String ref = "He sighed…: Bla bla.";
-		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{/He/ /sighed/…:}{/Bla/ /bla/.}", text);
 	}

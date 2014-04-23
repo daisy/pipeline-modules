@@ -1,6 +1,5 @@
 package org.daisy.pipeline.nlp.impl;
 
-import org.daisy.pipeline.nlp.TextCategorizer;
 import org.daisy.pipeline.nlp.TextCategorizer.CategorizedWord;
 import org.daisy.pipeline.nlp.TextCategorizer.Category;
 import org.daisy.pipeline.nlp.TextCategorizer.MatchMode;
@@ -52,5 +51,8 @@ public abstract class MatchRule {
 
 	protected abstract String match(String input);
 
+	/**
+	 * Can return false before returning true, but not the other way around.
+	 */
 	public abstract boolean threadsafe();
 }

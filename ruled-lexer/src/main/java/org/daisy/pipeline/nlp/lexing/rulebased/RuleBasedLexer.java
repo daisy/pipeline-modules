@@ -39,7 +39,7 @@ public class RuleBasedLexer implements LexService {
 		}
 
 		@Override
-		public List<Sentence> split(String input, Locale lang) {
+		public List<Sentence> split(String input, Locale lang, List<String> parsingErrors) {
 			if (input.length() == 0)
 				return Collections.EMPTY_LIST;
 
@@ -48,6 +48,20 @@ public class RuleBasedLexer implements LexService {
 
 			// call the categorizer and the sentence detector
 			List<CategorizedWord> words = splitIntoWords(input, lang, categorizer);
+
+			for (int k = 0; k < words.size(); ++k) {
+				if (words.get(k).category == Category.UNKNOWN) {
+					StringBuilder error = new StringBuilder(getName()
+					        + ": the lexeme between square brackets could not be recognized: ");
+					for (int i = Math.max(0, k - 10); i < k; ++i)
+						error.append(words.get(i).word);
+					error.append("[" + words.get(k).word + "]");
+					for (int i = k + 1; i < Math.min(words.size(), k + 10); ++i)
+						error.append(words.get(i).word);
+					parsingErrors.add(error.toString());
+				}
+			}
+
 			if (words.size() == 0
 			        || (words.size() == 1 && !TextCategorizer.isSpeakable(words.iterator()
 			                .next().category)))
@@ -171,8 +185,9 @@ public class RuleBasedLexer implements LexService {
 
 		@Override
 		public void addLang(Locale lang) throws LexerInitException {
-			if (mGenericSentDetector == null)
+			if (mGenericSentDetector == null) {
 				mGenericSentDetector = new EuroSentenceDetector();
+			}
 
 			if (mSentDetectors.get(lang) == null) {
 				mSentDetectors.put(lang, mGenericSentDetector);
@@ -191,10 +206,10 @@ public class RuleBasedLexer implements LexService {
 					if ("fre".equals(iso639_2lang) || "fra".equals(iso639_2lang)
 					        || "frm".equals(iso639_2lang) || "fro".equals(iso639_2lang)) {
 						rtc = new RuledFrenchCategorizer();
-
 						rtc.init(MatchMode.PREFIX_MATCH);
 						rtc.compile();
 					}
+
 					mTextCategorizers.put(lang, rtc);
 				}
 

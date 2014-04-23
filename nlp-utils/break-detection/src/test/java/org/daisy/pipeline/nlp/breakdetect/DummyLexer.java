@@ -26,7 +26,7 @@ public class DummyLexer implements LexService {
 		public Strategy strategy = Strategy.SPACE_SEPARATED_WORDS;
 
 		@Override
-		public List<Sentence> split(String input, Locale lang) {
+		public List<Sentence> split(String input, Locale lang, List<String> parsingErrors) {
 			ArrayList<Sentence> result = new ArrayList<Sentence>();
 			if (input.isEmpty())
 				return result;

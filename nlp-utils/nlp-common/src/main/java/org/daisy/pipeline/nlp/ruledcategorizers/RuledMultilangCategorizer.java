@@ -20,8 +20,18 @@ public class RuledMultilangCategorizer extends RuleBasedTextCategorizer {
 	public static int DICTIONARY_MAX_PRIORITY = 700;
 	protected static String CommonWordPattern = "[@\\p{L}][-_@\\p{L}\\p{Nd}]*";
 
-	public RuledMultilangCategorizer() {
+	//line breaks cannot be written with the usual unicode notation	
+	protected static char[] SpaceChars = {
+	        0x0020, 0x0085, 0x00A0, 0x1680, 0x180E, 0x2028, 0x2029, 0x202F, 0x205F, 0x3000
+	};
 
+	protected static String Space = "";
+	static {
+		for (char spaceChar : SpaceChars) {
+			Space += new Character(spaceChar);
+		}
+		Space += new Character((char) 0x0009) + "-" + new Character((char) 0x000D);
+		Space += new Character((char) 0x2000) + "-" + new Character((char) 0x200A);
 	}
 
 	@Override
@@ -105,7 +115,7 @@ public class RuledMultilangCategorizer extends RuleBasedTextCategorizer {
 
 		// ==== SPACES ====
 		rsm = new RegexMatchRule(Category.SPACE, SPACE_MAX_PRIORITY, true, mMatchMode);
-		rsm.init("[\\p{Space} ]+");
+		rsm.init("[" + Space + "]+");
 		addRule(rsm);
 
 		// ==== QUOTES ====
@@ -115,11 +125,11 @@ public class RuledMultilangCategorizer extends RuleBasedTextCategorizer {
 
 		// ==== SPECIAL STRINGS ====
 		rsm = new RegexMatchRule(Category.WEB_LINK, WEBLINK_MAX_PRIORITY, true, mMatchMode);
-		rsm.init("[a-z]+://[^\\p{Space}]*");
+		rsm.init("[a-z]+://[^" + Space + "]*");
 		addRule(rsm);
 
 		rsm = new RegexMatchRule(Category.WEB_LINK, WEBLINK_MAX_PRIORITY, true, mMatchMode);
-		rsm.init("www\\.[^\\p{Space}]+");
+		rsm.init("www\\.[^" + Space + "]+");
 		addRule(rsm);
 
 		rsm = new RegexMatchRule(Category.EMAIL_ADDR, WEBLINK_MAX_PRIORITY, true, mMatchMode);
@@ -134,7 +144,7 @@ public class RuledMultilangCategorizer extends RuleBasedTextCategorizer {
 		// with at least 2 components
 		rsm = new RegexMatchRule(Category.ACRONYM, REGEX_MAX_ACRONYM_PRIORITY, true,
 		        mMatchMode);
-		rsm.init(acronymPrefix + "(?=[\\p{Space}]+[\\p{Ll}])");
+		rsm.init(acronymPrefix + "(?=[" + Space + "]+[\\p{Ll}])");
 		addRule(rsm);
 
 		// acronyms not terminated by a point and at least 3 components

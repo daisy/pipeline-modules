@@ -33,7 +33,7 @@ public class RegexMatchRule extends MatchRule {
 			break;
 		}
 
-		int flags = Pattern.UNICODE_CASE | Pattern.MULTILINE;
+		int flags = Pattern.UNICODE_CASE | Pattern.MULTILINE | Pattern.DOTALL;
 		// java7: flags |= Pattern.UNICODE_CHARACTER_CLASS;
 
 		if (!mCaseSensitive) {
@@ -46,6 +46,7 @@ public class RegexMatchRule extends MatchRule {
 	@Override
 	protected String match(String input) {
 		Matcher m = mPattern.matcher(input);
+
 		if (m.lookingAt()) {
 			return m.group(0);
 		}

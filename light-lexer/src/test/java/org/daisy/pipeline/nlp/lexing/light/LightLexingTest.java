@@ -1,5 +1,6 @@
 package org.daisy.pipeline.nlp.lexing.light;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -47,7 +48,8 @@ public class LightLexingTest {
 	@Test
 	public void twoSentences() throws LexerInitException {
 		String ref = "first sentence! Second sentence";
-		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{first sentence!}{Second sentence}", text);
 	}
@@ -55,7 +57,8 @@ public class LightLexingTest {
 	@Test
 	public void spanish() throws LexerInitException {
 		String ref = "first sentence! ¿Second sentence?";
-		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, ref);
 		//the question mark is captured by the second sentence
 		Assert.assertEquals("{first sentence!}{¿Second sentence?}", text);
@@ -64,7 +67,8 @@ public class LightLexingTest {
 	@Test
 	public void mixed() throws LexerInitException {
 		String ref = "first sentence !!... second sentence";
-		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{first sentence !!...}{second sentence}", text);
 	}
@@ -72,7 +76,8 @@ public class LightLexingTest {
 	@Test
 	public void malformed() throws LexerInitException {
 		String ref = "!!! first sentence  ! second sentence";
-		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{!!! first sentence  !}{second sentence}", text);
 	}
@@ -80,7 +85,8 @@ public class LightLexingTest {
 	@Test
 	public void whitespaces1() throws LexerInitException {
 		String ref = "first sentence !!  !! second sentence";
-		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{first sentence !!  !!}{second sentence}", text);
 	}
@@ -88,7 +94,7 @@ public class LightLexingTest {
 	@Test
 	public void whitespaces2() throws LexerInitException {
 		String ref = "first sentence !!  ¿¿ second sentence ?!";
-		List<Sentence> sentences = mLexerToken.split(ref, SPANISH);
+		List<Sentence> sentences = mLexerToken.split(ref, SPANISH, new ArrayList<String>());
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{first sentence !!}{¿¿ second sentence ?!}", text);
 	}
@@ -96,7 +102,8 @@ public class LightLexingTest {
 	@Test
 	public void newline1() throws LexerInitException {
 		String ref = "\n";
-		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("", text);
 	}
@@ -104,7 +111,8 @@ public class LightLexingTest {
 	@Test
 	public void newline2() throws LexerInitException {
 		String ref = "\n  \n\n\n  \t\n ";
-		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("", text);
 	}
@@ -112,7 +120,8 @@ public class LightLexingTest {
 	@Test
 	public void newline3() throws LexerInitException {
 		String ref = "text text ? \t\n ";
-		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{text text ?}", text);
 	}
@@ -120,7 +129,8 @@ public class LightLexingTest {
 	@Test
 	public void brackets1() throws LexerInitException {
 		String ref = "Bracket example (this is not a sentence!), after.";
-		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{Bracket example (this is not a sentence!), after.}", text);
 	}

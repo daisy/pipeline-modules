@@ -81,6 +81,9 @@ public abstract class TextCategorizer {
 
 	public abstract void resetContext();
 
+	/**
+	 * Can return false before returning true, but not the other way around.
+	 */
 	public abstract boolean threadsafe();
 
 	/**

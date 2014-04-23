@@ -1,5 +1,6 @@
 package org.daisy.pipeline.nlp.lexing.omni;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -57,7 +58,8 @@ public class OmnilangTest {
 	@Test
 	public void twoSentences() throws LexerInitException {
 		String ref = "first sentence! Second sentence";
-		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{/first/ /sentence/! }{/Second/ /sentence/}", text);
 	}
@@ -65,7 +67,8 @@ public class OmnilangTest {
 	@Test
 	public void mixed() throws LexerInitException {
 		String ref = "first sentence !!... second sentence";
-		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{/first/ /sentence/ !!... }{/second/ /sentence/}", text);
 	}
@@ -74,7 +77,8 @@ public class OmnilangTest {
 	@Test
 	public void whitespaces1() throws LexerInitException {
 		String ref = "first sentence !!  !! second sentence";
-		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{/first/ /sentence/ !! !! }{/second/ /sentence/}", text);
 	}
@@ -82,7 +86,7 @@ public class OmnilangTest {
 	@Test
 	public void spanish1() throws LexerInitException {
 		String ref = "first sentence. ¿Second sentence?";
-		List<Sentence> sentences = mLexerToken.split(ref, SPANISH);
+		List<Sentence> sentences = mLexerToken.split(ref, SPANISH, new ArrayList<String>());
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{/first/ /sentence/. }{¿/Second/ /sentence/?}", text);
 	}
@@ -91,7 +95,7 @@ public class OmnilangTest {
 	@Test
 	public void spanish2() throws LexerInitException {
 		String ref = "first sentence. ¿ Second sentence ?";
-		List<Sentence> sentences = mLexerToken.split(ref, SPANISH);
+		List<Sentence> sentences = mLexerToken.split(ref, SPANISH, new ArrayList<String>());
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{/first/ /sentence/. }{¿ /Second/ /sentence/ ?}", text);
 	}
@@ -99,7 +103,7 @@ public class OmnilangTest {
 	@Test
 	public void chinese() throws LexerInitException {
 		String ref = "我喜欢中国。我喜欢英语了。";
-		List<Sentence> sentences = mLexerToken.split(ref, CHINESE);
+		List<Sentence> sentences = mLexerToken.split(ref, CHINESE, new ArrayList<String>());
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{/我喜欢中国/。}{/我喜欢英语了/。}", text);
 	}
@@ -107,7 +111,8 @@ public class OmnilangTest {
 	@Test
 	public void newline() throws LexerInitException {
 		String ref = "They do like\nJames.";
-		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{/They/ /do/ /like/\n/James/.}", text);
 	}
@@ -115,7 +120,8 @@ public class OmnilangTest {
 	@Test
 	public void abbr1() throws LexerInitException {
 		String ref = "J.J.R. Tolkien";
-		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{/J.J.R./ /Tolkien/}", text);
 	}
@@ -123,7 +129,8 @@ public class OmnilangTest {
 	@Test
 	public void brackets1() throws LexerInitException {
 		String ref = "Bracket example (this is not a sentence!), after.";
-		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH);
+		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals(
 		        "{/Bracket/ /example/ (/this/ /is/ /not/ /a/ /sentence/!), /after/.}", text);

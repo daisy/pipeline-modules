@@ -1,5 +1,6 @@
 package org.daisy.pipeline.nlp.lexing.rulebased;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -28,7 +29,8 @@ public class FrenchLexingTest {
 	@Test
 	public void apostrophe() throws LexerInitException {
 		String inp = "la raison d'être";
-		List<Sentence> sentences = mLexerToken.split(inp, Locale.FRENCH);
+		List<Sentence> sentences = mLexerToken.split(inp, Locale.FRENCH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, inp);
 		Assert.assertEquals("{/la/ /raison/ /d'//être/}", text);
 	}
@@ -36,7 +38,8 @@ public class FrenchLexingTest {
 	@Test
 	public void abbr1() {
 		String inp = "fausse-abbr. Majuscule";
-		List<Sentence> sentences = mLexerToken.split(inp, Locale.FRENCH);
+		List<Sentence> sentences = mLexerToken.split(inp, Locale.FRENCH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, inp);
 		Assert.assertEquals("{/fausse-abbr/.}{/Majuscule/}", text);
 	}
@@ -44,7 +47,8 @@ public class FrenchLexingTest {
 	@Test
 	public void abbr2() {
 		String inp = "mr. Majuscule";
-		List<Sentence> sentences = mLexerToken.split(inp, Locale.FRENCH);
+		List<Sentence> sentences = mLexerToken.split(inp, Locale.FRENCH,
+		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, inp);
 		Assert.assertEquals("{/mr./ /Majuscule/}", text);
 	}

@@ -13,11 +13,19 @@ public abstract class RuleBasedTextCategorizer extends TextCategorizer {
 		CategorizedWord res = null;
 		int k;
 		// find the first match in the priority-sorted list
-		for (k = 0; res == null; ++k) {
+		for (k = 0; res == null && k < mRules.size(); ++k) {
 			// k < mRules.size() is not tested because raising an exception
 			// is the best we can do here
 			res = mRules.get(k).match(fullcase, lowercase);
 		}
+
+		if (res == null) {
+			res = new CategorizedWord();
+			res.category = Category.UNKNOWN;
+			res.word = fullcase.substring(0, 1);
+			return res;
+		}
+
 		// select the longest match with the same priority
 		int priority = mRules.get(k - 1).getPriority();
 		for (; k < mRules.size() && mRules.get(k).getPriority() == priority; ++k) {

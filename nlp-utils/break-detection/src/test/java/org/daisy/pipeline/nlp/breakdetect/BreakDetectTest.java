@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
@@ -75,7 +76,7 @@ public class BreakDetectTest implements TreeWriterFactory {
 		                .asList("sentbefore"), Arrays.asList("sentafter"));
 
 		XdmNode tree = new XmlBreakRebuilder().rebuild(this, Lexers, document, specs,
-		        new DummyLangDetector(), forbidAnyDuplication);
+		        new DummyLangDetector(), forbidAnyDuplication, new ArrayList<String>());
 
 		OutputStream result = new ByteArrayOutputStream();
 		Serializer.setOutputStream(result);

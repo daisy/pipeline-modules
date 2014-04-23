@@ -54,16 +54,19 @@ public class XmlBreakRebuilder implements InlineSectionProcessor {
 	private DuplicationManager mDuplicationManager;
 	private String mCurrentLang;
 	private LangDetector mLangDetector;
+	private List<String> mParsingErrors;
 
 	public XdmNode rebuild(TreeWriterFactory treeWriterFactory,
 	        Map<Locale, LexerToken> lexers, XdmNode doc, FormatSpecifications specs,
-	        LangDetector langDetector, boolean forbidAnyDup) throws LexerInitException {
+	        LangDetector langDetector, boolean forbidAnyDup, List<String> parsingErrors)
+	        throws LexerInitException {
 		mLexers = lexers;
 		mSpecs = specs;
 		mLangDetector = langDetector;
 		mStringComposer = new StringComposer();
 		mPreviousNode = getRoot(doc);
 		mPreviousLevel = 0;
+		mParsingErrors = parsingErrors;
 
 		mDuplicationManager = new DuplicationManager(forbidAnyDup);
 		Set<NodeInfo> unsplittable = new HashSet<NodeInfo>();
@@ -161,7 +164,7 @@ public class XmlBreakRebuilder implements InlineSectionProcessor {
 		}
 
 		String input = mStringComposer.concat(text);
-		List<Sentence> sentences = lexer.split(input, lang);
+		List<Sentence> sentences = lexer.split(input, lang, mParsingErrors);
 
 		boolean[] isLexMark = new boolean[leaves.size()];
 		for (int k = 0; k < isLexMark.length; ++k)

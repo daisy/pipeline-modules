@@ -13,5 +13,8 @@ public interface ISentenceDetector {
 	 */
 	List<List<CategorizedWord>> split(List<CategorizedWord> words);
 
+	/**
+	 * Can return false before returning true, but not the other way around.
+	 */
 	boolean threadsafe();
 }
