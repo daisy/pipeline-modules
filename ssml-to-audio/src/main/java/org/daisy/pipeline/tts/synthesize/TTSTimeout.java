@@ -21,6 +21,8 @@ public class TTSTimeout extends Thread {
 		try {
 			sleep(mSeconds * 1000);
 		} catch (InterruptedException e) {
+			//interrupted by the TTS thread because the watched job is finished
+			return;
 		}
 		mOk = false;
 		mJob.interrupt();

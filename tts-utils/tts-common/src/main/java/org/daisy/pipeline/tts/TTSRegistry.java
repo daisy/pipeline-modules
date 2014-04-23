@@ -59,9 +59,13 @@ public class TTSRegistry {
 		synchronized (mTTSResources) {
 			resources = mTTSResources.get(tts);
 		}
-		if (resources != null)
+		if (resources != null) {
+			mLogger.info("Stop bundle of " + tts.getName() + "-" + tts.getVersion()
+			        + " during one TTS step");
 			for (TTSResource resource : resources) {
-				synchronized (resource) { //the other synchronized(resource) surrounds the calls to TTSService.synthesize()
+				synchronized (resource) {
+					//the other synchronized(resource) surrounds the calls to TTSService.synthesize()
+					//and closeSynthesisContext()
 					try {
 						tts.releaseThreadResources(resource);
 					} catch (SynthesisException e) {
@@ -71,6 +75,7 @@ public class TTSRegistry {
 					resource.released = true;
 				}
 			}
+		}
 
 		mServices.remove(tts);
 	}

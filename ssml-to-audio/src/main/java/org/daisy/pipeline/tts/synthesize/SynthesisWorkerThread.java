@@ -106,12 +106,66 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 		mResources.put(s, r);
 	}
 
+	private boolean processOneSentenceOneTry(final XdmNode sentence, final Voice voice,
+	        final List<Map.Entry<String, Integer>> marks, final TTSResource resource,
+	        final boolean firstTry) throws Throwable {
+
+		final Throwable[] exceptions = new SynthesisException[]{
+			null
+		};
+		TTSTimeout timeout = new TTSTimeout(3 * 60);
+		Thread synthJob = new Thread() {
+			@Override
+			public void run() {
+				try {
+					mLastUsedSynthesizer.synthesize(sentence, voice, mAudioBuffer, resource,
+					        marks, !firstTry);
+				} catch (InterruptedException e) {
+				} catch (Throwable e) {
+					exceptions[0] = e;
+				}
+			}
+		};
+		timeout.watch(synthJob);
+
+		synchronized (resource) {
+			//The synchronized is necessary because it is possible that the TTSRegistry 
+			//is currently releasing the resource. 
+			if (resource.released)
+				throw new SynthesisException("TTS resource no longer valid.");
+
+			synthJob.start();
+			try {
+				synthJob.join();
+			} catch (InterruptedException e) {
+				throw new SynthesisException(e);
+			} finally {
+				timeout.interrupt();
+			}
+		}
+		if (exceptions[0] != null) {
+			throw exceptions[0];
+		}
+
+		if (!timeout.stillTime()) {
+			mLogger.printInfo("timeout with " + mLastUsedSynthesizer.getName() + "-"
+			        + mLastUsedSynthesizer.getVersion() + ": new try");
+		} else if (mLastUsedSynthesizer.endingMark() == null
+		        || (marks.size() > 0 && mLastUsedSynthesizer.endingMark().equals(
+		                marks.get(marks.size() - 1).getKey()))) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 	private void processOneSentence(final XdmNode sentence, final Voice voice)
-	        throws SynthesisException {
+	        throws Throwable {
 		if (mAudioBuffer.offsetInOutput + MAX_ESTIMATED_SYNTHESIZED_BYTES > mAudioBuffer.output.length) {
 			encodeAudio();
 		}
-		//warning: the resource may be already released if mLastUsedSynthesizer has been stopped during the synthesis (e.g. after a CTRL-C).
+		//warning: the resource may be already released if mLastUsedSynthesizer has been stopped during the synthesis
 		final TTSResource resource = mResources.get(mLastUsedSynthesizer);
 		List<Map.Entry<String, Integer>> marks = new ArrayList<Map.Entry<String, Integer>>();
 
@@ -119,54 +173,11 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 		int tries;
 		boolean valid = false;
 		int begin = mAudioBuffer.offsetInOutput;
-		for (tries = SYNTHESIS_TRIES; !valid && tries > 0; --tries) {
+		for (tries = 0; !valid && tries < SYNTHESIS_TRIES; ++tries) {
 			mAudioBuffer.offsetInOutput = begin;
 			marks.clear();
-			TTSTimeout timeout = new TTSTimeout(3 * 60);
-			synchronized (resource) {
-				//The synchronized is necessary because it is possible that the TTSRegistry 
-				//is currently releasing the resource. 
-				if (resource.released)
-					break;
-
-				final boolean retry = (tries != SYNTHESIS_TRIES);
-				final List<Map.Entry<String, Integer>> fmarks = marks;
-				final SynthesisException[] exceptions = new SynthesisException[]{
-					null
-				};
-				Thread synthJob = new Thread() {
-					@Override
-					public void run() {
-						try {
-							mLastUsedSynthesizer.synthesize(sentence, voice, mAudioBuffer,
-							        resource, fmarks, retry);
-						} catch (InterruptedException e) {
-						} catch (SynthesisException e) {
-							exceptions[0] = e;
-						}
-					}
-				};
-				timeout.watch(synthJob);
-				synthJob.start();
-				try {
-					synthJob.join();
-				} catch (InterruptedException e) {
-					throw new SynthesisException(e);
-				}
-				if (exceptions[0] != null) {
-					throw exceptions[0];
-				}
-			}
-
-			if (timeout.stillTime()
-			        && (mLastUsedSynthesizer.endingMark() == null || (marks.size() > 0 && mLastUsedSynthesizer
-			                .endingMark().equals(marks.get(marks.size() - 1).getKey())))) {
-				valid = true;
-			} else {
-				if (!timeout.stillTime()) {
-					mLogger.printInfo("timeout with " + mLastUsedSynthesizer.getName() + "-"
-					        + mLastUsedSynthesizer.getVersion() + ": new try");
-				}
+			valid = processOneSentenceOneTry(sentence, voice, marks, resource, (tries > 0));
+			if (!valid) {
 				try {
 					Thread.sleep(2000);
 				} catch (InterruptedException e) {
@@ -242,7 +253,7 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 				}
 				if (mAudioBuffer.offsetInOutput > 0)
 					encodeAudio();
-			} catch (Exception e) {
+			} catch (Throwable e) {
 				StringWriter sw = new StringWriter();
 				e.printStackTrace(new PrintWriter(sw));
 				String synthInfo = (mLastUsedSynthesizer == null) ? "(synthesizer missing)"
@@ -250,6 +261,7 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 				                + " (audio-format set:"
 				                + (mLastUsedSynthesizer.getAudioOutputFormat() != null) + ")";
 				mLogger.printInfo("error in TTS thread " + synthInfo + ": " + sw.toString());
+				break;
 			}
 			mProgressListener.notifyFinished(section);
 		}

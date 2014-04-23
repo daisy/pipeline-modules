@@ -190,10 +190,15 @@ public class SynthesisWorkerPool implements IProgressListener {
 			try {
 				worker.join();
 			} catch (InterruptedException e) {
-				mLogger.printInfo("error in synthesis thread: " + e.getMessage());
+				mLogger.printInfo("error while waiting for a thread to finish: "
+				        + e.getMessage());
 			}
 
 		mLogger.printInfo("synthesis workers finished");
+
+		if (queue.size() > 0) {
+			mLogger.printInfo("error: " + queue.size() + " sentences no synthesized.");
+		}
 	}
 
 	@Override
