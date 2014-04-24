@@ -21,9 +21,9 @@ partition "Generic text-to-ssml" {
 ===B1=== ..>[MathML] "[C]convert CSS to SSML (XPL)"
 ..>[MathML] "Convert MathML to SSML (XPL)"
 ..>[SSML file] ===B2===
+}
 
 ==B2==-->[SSML files] "ssml-to-audio (Java)"
-}
 
 -->[Map of @id to audio files] "dtbook-to-epub3"
 

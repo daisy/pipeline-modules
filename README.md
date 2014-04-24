@@ -21,16 +21,18 @@ NLP and TTS tasks are performed on the original documents. At the end, the TTS s
 </audio-clips>
 ```
 
-@idref is the id of an element of the original document. Most likely a sentence, sometimes a skippable element. The map is then provided to whichever script that requires it to generate SMIL-like files.
+@idref is the id of an element of the original document: most likely a sentence, sometimes a skippable element (not contained in any sentence). The map is then provided to whichever script that requires it to generate SMIL-like files.
 
 ![alt text](dtbook-to-epub3.png)
+
 [plantuml source](dtbook-to-epub3.uml)
 
 ### Modules
 
-A small part of the job is done in XProc. The CSS inlining and the conversion from SSML to audio clips are done in Java. Conversion from MathML to SSML (in XProc) is not integrated yet.
+A small part of the job is done in XProc. The CSS inlining and the conversion from SSML to audio clips are done in Java. Conversion from MathML to SSML (in XProc) is not finished yet.
 
 ![alt text](tts.png)
+
 [plantuml source](tts.uml)
 
 ### ssml-to-audio
@@ -41,24 +43,26 @@ Every execution of a pipeline job calls the following TTSService's callbacks in 
 - releaseResource for every thread
 - onAfterOneExecution
 
-No resource is allocated if onBeforeOneExecution failed to communicate with the TTS engine.
+No resource will be allocated if onBeforeOneExecution fails, e.g. because it can't connect to a TTS Server or cannot find a synthesizer binary.
 
-The step starts synthesizing after all the resources have been allocated. ReleaseResource callback is not called before every thread has finished so as to easily distinguish between the different stages, unless TTSServices explicity set the flag which tells that their resources have to be released as soon as possible.
+The step starts all the threads after all the resources have been allocated. ReleaseResource callback is not called before every thread has finished so as to let users easily distinguish between the different stages, unless TTSServices explicity set the flag which tells that their resources have to be released as soon as possible.
 
 If no such flag is set:
 ![alt text](ssml-to-audio.png)
+
 [plantuml source](ssml-to-audio.uml)
 
 If a TTSService is unplugged earlier than expected, then the resources will be released earlier, however the callbacks will remain the same.
 
 ![alt text](stop.png)
+
 [plantuml source](stop.uml)
 
 ### SSML Partitioning
 
 Text-to-ssml module is responsible for converting the text and partitioning the SSML into multiple files on which ssml-to-audio relies to dispatch the SSML over the threads. The partitioning is performed according to structural elements such as DTBook levels. The only constraints are that sections must not be dispatched over different partitions, and partitions must contain only contiguous text, so that the final mp3 files will roughly correspond to sections of the original document.
 
-Ssml-to-audio module is free to split the partitions into smaller parts as long as the partitions are not merged together. As a result, the mp3 file will be smaller. They are indeed split when the audio format changes or when the sections are too big. The resulting small parts are then stored in a central queue. The threads pop one by one the elements of the queue when they are not busy.
+Ssml-to-audio module is free to split the partitions into smaller parts as long as the partitions are not merged together. As a result, the mp3 files will be smaller. They are indeed split when the audio format changes or when the sections are too big to get the most out of the multi-threading architecture. The resulting small parts are then stored in a central queue. The threads pop one by one the elements of the queue when they are not busy.
 
 ### Audio Buffers
 
@@ -66,7 +70,7 @@ Every thread has its own pre-allocated audio buffer with a writing offset. The T
 
 ### Voices
 
-The voice-family CSS property allows users to specify which voice and TTS engine they want to use. If the voice is not found, if the TTS engine is provided without the voice name, or if nothing at all is provided, ssml-to-audio will ask the TTS-Registry which voice is the best match for the requirements (i.e. language and TTS engine). This is why TTSRegistry includes an array of voices with ratings. The array can be extended with a system property.
+The voice-family CSS property allows users to specify which voice and TTS engine they want to use. If the voice is not found, if the TTS engine is provided without the voice name, or if nothing at all is provided, ssml-to-audio will ask the TTSRegistry which voice is the best match for the requirements (i.e. language and TTS engine). This is why TTSRegistry includes an array of voices ordered by their rating. This array can be extended with a system property.
 
 ### Skippable elements and audio clips
 
@@ -75,12 +79,12 @@ The skippable elements must be separated from their sentence so that the readers
 
 Recall that the NLP step has wrapped the text with span elements when there are noterefs involved (for DTBooks):
 ```xml
-<sent id="sent1"><span id="span1">begin</span><noteref id="ref1">note1</noteref><span id="span1">end</span></sent>"
+<sent id="sent1"><span id="span1">begin</span><noteref id="ref1">note1</noteref><span id="span2">end</span></sent>"
 ```
 
 One of the first step of text-to-ssml is to replace the noteref with a SSML mark:
 ```xml
-<sent id="sent1"><span id="span2">begin</span><ssml:mark name="span1__span2"><span id="span2">end</span></sent>"
+<sent id="sent1"><span id="span1">begin</span><ssml:mark name="span1__span2"><span id="span2">end</span></sent>"
 ```
 
 The sentence can then be pronounced with a right prosody.
@@ -94,10 +98,10 @@ The mark's name contains information about where the sub-sentences begin and whe
 </audio-clips>
 ```
 
-When a sentence doesn't contain any skippable elements, it is directly referred in the audio-map by a single audio clip. Otherwise, its @id won't be found in the list of audio clips (see example above).
+If a sentence doesn't contain any skippable elements, it will be referred by a single audio clip in the audio-map. Otherwise, its @id won't be found in the list of audio clips (see example above).
 
 
-The contents of the skippable elements are grouped together and copied to a separate document. Such document contains sentences of this kind:
+The contents of the skippable elements are grouped together and copied to a separate document. Such document contains sentences with juxtaposed SSML marks such as the following one:
 ```xml
 <sent>note1<ssml:mark name="ref1__"></sent>"
 ```
@@ -108,10 +112,10 @@ The same mechanism is at work to build the noteref's audio clip.
 ### Known Limitations
 
 - Has only been tested with DTBook documents;
-- Although the Java code is multi-threaded for single jobs, multiple jobs won't run in parallel. They will be queued instead. Usually that doesn't make any difference unless the jobs use different TTS engines;
+- Although the Java code is multi-threaded for single jobs, multiple jobs won't run in parallel. They will wait for the TTSRegistry's lock to be released instead. Usually that doesn't make any difference unless the jobs use different TTS engines;
 - Relative CSS properties (e.g. increase/decrease volume) are not interpreted;
 - SSML elements outside the scope of sentences are not kept;
 - TTS engines that cannot handle SSML marks, such as eSpeak, will produce audio with wrong prosody and we won't be able to automatically check that the input text has been entirely synthesized;
 - Remote TTS engines must share the same configuration (installed voices, sample rates etc.) or at least the 'master' server must be configured with the minimal configuration;
-- TTS vendors can provide different audio formats, but the same vendor must always provide the same format. If different voices are used with different formats, it is the responsability of the vendor to re-sample the data;
+- TTS vendors can provide different audio formats, but the same vendor must always provide the same format. If different voices of the same vendor use different formats, it is the responsibility of the vendor to re-sample the data before sending them to the TTS adapters;
 - When a TTSService is stopped, the TTSRegistry acknowledges the stop but keeps a reference to it until all the releasing callbacks have been called, which is not exactly what one would expect from an OSGi bundle.

@@ -1,6 +1,6 @@
 @startuml
 dtbookToEpub3->NLP: original dtbook
-NLP->dtbookToEpub3: dtbook with word, sentences + sentence ids list
+NLP->dtbookToEpub3: dtbook with words and sentences + sentence ids list
 dtbookToEpub3->TTS: enriched dtbook + sentence ids list
 TTS->dtbookToEpub3: map id to audio files (AudioMap)
 dtbookToEpub3->dtbookToHTML: enriched dtbook
