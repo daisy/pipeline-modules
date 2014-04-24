@@ -18,6 +18,7 @@ import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService;
 import org.daisy.pipeline.tts.TTSService.RawAudioBuffer;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
+import org.daisy.pipeline.tts.TTSServiceUtil;
 import org.daisy.pipeline.tts.Voice;
 import org.daisy.pipeline.tts.synthesize.SynthesisWorkerPool.Speakable;
 import org.daisy.pipeline.tts.synthesize.SynthesisWorkerPool.UndispatchableSection;
@@ -72,8 +73,9 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 	}
 
 	private void encodeAudio() {
-		String filePrefix = String.format("section%04d_%04d",
-		        mCurrentSection.documentPosition, mSectionFiles);
+		String filePrefix = String.format("part%04d_%02d_%04d",
+		        mCurrentSection.documentPosition, mCurrentSection.documentSubPosition,
+		        mSectionFiles);
 
 		String soundFile = mEncoder.encode(mAudioBuffer.output, mAudioBuffer.offsetInOutput,
 		        mLastUsedSynthesizer.getAudioOutputFormat(), this,
@@ -148,8 +150,8 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 		}
 
 		if (!timeout.stillTime()) {
-			mLogger.printInfo("timeout with " + mLastUsedSynthesizer.getName() + "-"
-			        + mLastUsedSynthesizer.getVersion() + ": new try");
+			mLogger.printInfo("timeout with "
+			        + TTSServiceUtil.displayName(mLastUsedSynthesizer));
 		} else if (mLastUsedSynthesizer.endingMark() == null
 		        || (marks.size() > 0 && mLastUsedSynthesizer.endingMark().equals(
 		                marks.get(marks.size() - 1).getKey()))) {
@@ -178,6 +180,10 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 			marks.clear();
 			valid = processOneSentenceOneTry(sentence, voice, marks, resource, (tries > 0));
 			if (!valid) {
+				String ssml = sentence.toString();
+				mLogger.printInfo("something went wrong with "
+				        + TTSServiceUtil.displayName(mLastUsedSynthesizer) + "; input SSML: "
+				        + ssml.substring(0, Math.min(300, ssml.length())) + "...");
 				try {
 					Thread.sleep(2000);
 				} catch (InterruptedException e) {
@@ -186,9 +192,10 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 			}
 		}
 		if (!valid) {
-			throw new SynthesisException("TTS Processor " + mLastUsedSynthesizer.getName()
-			        + "-" + mLastUsedSynthesizer.getVersion()
-			        + " was enable to synthesize a piece of SSML.");
+			throw new SynthesisException("TTS Processor "
+			        + TTSServiceUtil.displayName(mLastUsedSynthesizer)
+			        + " was enable to synthesize a piece of SSML after " + SYNTHESIS_TRIES
+			        + " tries");
 		}
 		if (mLastUsedSynthesizer.endingMark() != null) {
 			marks = marks.subList(0, marks.size() - 1);
@@ -257,7 +264,8 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 				StringWriter sw = new StringWriter();
 				e.printStackTrace(new PrintWriter(sw));
 				String synthInfo = (mLastUsedSynthesizer == null) ? "(synthesizer missing)"
-				        : " with synthesizer " + mLastUsedSynthesizer.getName()
+				        : " with synthesizer "
+				                + TTSServiceUtil.displayName(mLastUsedSynthesizer)
 				                + " (audio-format set:"
 				                + (mLastUsedSynthesizer.getAudioOutputFormat() != null) + ")";
 				mLogger.printInfo("error in TTS thread " + synthInfo + ": " + sw.toString());
@@ -265,5 +273,26 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 			}
 			mProgressListener.notifyFinished(section);
 		}
+
+		for (Map.Entry<TTSService, TTSResource> e : mResources.entrySet()) {
+			if (e.getKey().resourcesReleasedASAP()) {
+				TTSResource r = e.getValue();
+				synchronized (r) {
+					if (!r.released) {
+						try {
+							e.getKey().releaseThreadResources(r);
+						} catch (Throwable t) {
+							StringWriter sw = new StringWriter();
+							t.printStackTrace(new PrintWriter(sw));
+							mLogger.printInfo("error while releasing resources of "
+							        + TTSServiceUtil.displayName(e.getKey()) + ": "
+							        + sw.toString());
+						}
+						r.released = true;
+					}
+				}
+			}
+		}
+
 	}
 }

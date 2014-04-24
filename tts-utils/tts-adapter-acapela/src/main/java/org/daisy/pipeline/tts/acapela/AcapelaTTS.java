@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.sound.sampled.AudioFormat;
 
@@ -57,6 +58,11 @@ public class AcapelaTTS implements TTSService {
 			idsToMark = new ArrayList<String>();
 
 			ssmlAdapter = new BasicSSMLAdapter() {
+				@Override
+				public String adaptText(String text) {
+					return SpaceRegex.matcher(text).replaceAll(" ");
+				}
+
 				@Override
 				public String adaptAttributeValue(QName element, QName attr, String value) {
 					if ("mark".equals(element.getLocalName())
@@ -384,4 +390,28 @@ public class AcapelaTTS implements TTSService {
 	public String getVersion() {
 		return "jna";
 	}
+
+	@Override
+	public boolean resourcesReleasedASAP() {
+		return false;
+	}
+
+	//// TODO: use the new unicode class in Java7 or move this somewhere in framework/common
+
+	private static Pattern SpaceRegex = null;
+	static {
+		char[] SpaceChars = {
+		        0x0020, 0x0085, 0x00A0, 0x1680, 0x180E, 0x2028, 0x2029, 0x202F, 0x205F, 0x3000
+		};
+
+		String spaces = "";
+		for (char spaceChar : SpaceChars) {
+			spaces += new Character(spaceChar);
+		}
+		spaces += new Character((char) 0x0009) + "-" + new Character((char) 0x000D);
+		spaces += new Character((char) 0x2000) + "-" + new Character((char) 0x200A);
+		SpaceRegex = Pattern.compile("[" + spaces + "]+", Pattern.DOTALL
+		        | Pattern.UNICODE_CASE | Pattern.MULTILINE);
+	}
+
 }

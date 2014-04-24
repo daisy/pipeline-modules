@@ -187,4 +187,9 @@ public class SAPINative implements TTSService {
 	public String endingMark() {
 		return "ending-mark";
 	}
+
+	@Override
+	public boolean resourcesReleasedASAP() {
+		return false;
+	}
 }

@@ -60,7 +60,7 @@ public class TTSRegistry {
 			resources = mTTSResources.get(tts);
 		}
 		if (resources != null) {
-			mLogger.info("Stop bundle of " + tts.getName() + "-" + tts.getVersion()
+			mLogger.info("Stop bundle of " + TTSServiceUtil.displayName(tts)
 			        + " during one TTS step");
 			for (TTSResource resource : resources) {
 				synchronized (resource) {
@@ -90,7 +90,7 @@ public class TTSRegistry {
 			mTTSResources.clear();
 		}
 		for (TTSService tts : mServices) {
-			String fullname = tts.getName() + "-" + tts.getVersion();
+			String fullname = TTSServiceUtil.displayName(tts);
 			try {
 				tts.onBeforeOneExecution();
 				synchronized (mTTSResources) {
@@ -153,8 +153,7 @@ public class TTSRegistry {
 		//log the available voices
 		StringBuilder sb = new StringBuilder("Available voices:");
 		for (Entry<Voice, TTSService> e : mBestServices.entrySet()) {
-			sb.append("\n* " + e.getKey() + " by " + e.getValue().getName() + "-"
-			        + e.getValue().getVersion());
+			sb.append("\n* " + e.getKey() + " by " + TTSServiceUtil.displayName(e.getValue()));
 		}
 		mLogger.info(sb.toString());
 		sb = new StringBuilder("Fallback voices:");

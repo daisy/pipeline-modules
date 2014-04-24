@@ -241,4 +241,9 @@ public class ESpeakBinTTS extends MarkFreeTTSService {
 		}
 	}
 
+	@Override
+	public boolean resourcesReleasedASAP() {
+		return false;
+	}
+
 }

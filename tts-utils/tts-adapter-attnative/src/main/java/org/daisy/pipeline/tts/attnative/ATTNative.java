@@ -207,4 +207,9 @@ public class ATTNative implements TTSService, ATTLibListener {
 		return "ending-mark";
 	}
 
+	@Override
+	public boolean resourcesReleasedASAP() {
+		return false;
+	}
+
 }

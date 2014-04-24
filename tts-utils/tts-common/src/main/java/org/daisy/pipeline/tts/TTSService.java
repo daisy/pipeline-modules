@@ -147,4 +147,12 @@ public interface TTSService {
 	 *         cannot handle marks must return null.
 	 */
 	public String endingMark();
+
+	/**
+	 * @return true to recommend the threads to release the resources once there
+	 *         is no more text to synthesize. This can speed up the other
+	 *         working threads if the resources consume processing units of
+	 *         remote servers.
+	 */
+	public boolean resourcesReleasedASAP();
 }

@@ -16,6 +16,7 @@ import org.daisy.pipeline.tts.TTSRegistry;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
+import org.daisy.pipeline.tts.TTSServiceUtil;
 import org.daisy.pipeline.tts.Voice;
 
 public class SynthesisWorkerPool implements IProgressListener {
@@ -26,13 +27,20 @@ public class SynthesisWorkerPool implements IProgressListener {
 			this.sentence = sentence;
 		}
 
+		public int computeSize() {
+			//TODO: write finer/faster computation
+			return sentence.toString().length();
+		}
+
 		Voice voice;
 		XdmNode sentence;
 	}
 
-	public static class UndispatchableSection implements Comparable<UndispatchableSection> {
+	public static class UndispatchableSection implements Comparable<UndispatchableSection>,
+	        Cloneable {
 		int size;
 		int documentPosition;
+		int documentSubPosition;
 		File audioOutputDir;
 		List<Speakable> speakables;
 		TTSService synthesizer;
@@ -41,13 +49,26 @@ public class SynthesisWorkerPool implements IProgressListener {
 		void computeSize() {
 			size = 0;
 			for (Speakable speakable : speakables) {
-				size += speakable.sentence.toString().length(); //TODO: write finer/faster computation
+				size += speakable.computeSize();
 			}
 		}
 
 		@Override
 		public int compareTo(UndispatchableSection other) {
 			return (other.size - size);
+		}
+
+		@Override
+		protected Object clone() {
+			UndispatchableSection cl = new UndispatchableSection();
+			cl.size = size;
+			cl.documentPosition = documentPosition;
+			cl.documentSubPosition = documentSubPosition;
+			cl.audioOutputDir = audioOutputDir;
+			cl.speakables = speakables;
+			cl.synthesizer = synthesizer;
+			cl.voice = voice;
+			return cl;
 		}
 	}
 
@@ -139,21 +160,59 @@ public class SynthesisWorkerPool implements IProgressListener {
 		mCurrentSection = null;
 	}
 
+	public void splitSection(UndispatchableSection section, int maxSize,
+	        List<UndispatchableSection> newSections) {
+		int left = 0;
+		int count = 0;
+		UndispatchableSection currentSection = (UndispatchableSection) section.clone();
+		currentSection.size = 0;
+		for (int right = 0; right < section.speakables.size(); ++right) {
+			if (currentSection.size > maxSize) {
+				currentSection.speakables = section.speakables.subList(left, right);
+				currentSection.documentSubPosition = count;
+				newSections.add(currentSection);
+				currentSection = (UndispatchableSection) section.clone();
+				currentSection.size = 0;
+				left = right;
+				++count;
+			}
+			currentSection.size += section.speakables.get(right).computeSize();
+		}
+		currentSection.speakables = section.speakables
+		        .subList(left, section.speakables.size());
+		currentSection.documentSubPosition = count;
+		newSections.add(currentSection);
+	}
+
 	public void synthesizeAndWait(List<SoundFragment> soundfragments)
 	        throws SynthesisException {
-		//sort the 'undispatchable' sections according to their size in descending-order
+		//compute the sections' size: needed for displaying the progress,
+		//splitting the sections and sorting the sections
 		for (UndispatchableSection section : mSections)
 			section.computeSize();
-		Collections.sort(mSections);
-		mLogger.printInfo("number of sections to synthesize: " + mSections.size());
-
-		//retrieve the total size to be able to print the progression on the screen
 		mTotalTextSize = 0;
 		for (UndispatchableSection section : mSections) {
 			mTotalTextSize += section.size;
 		}
 		mProgress = 0;
 		mPrintedProgress = 0;
+
+		//split the section which are too big
+		int maxSize = (int) (mTotalTextSize / 15);
+		List<UndispatchableSection> newSections = new ArrayList<UndispatchableSection>();
+		List<UndispatchableSection> toRemove = new ArrayList<UndispatchableSection>();
+		for (UndispatchableSection section : mSections) {
+			if (section.size >= maxSize) {
+				toRemove.add(section);
+				splitSection(section, maxSize, newSections);
+			}
+		}
+		mSections.removeAll(toRemove);
+		mSections.addAll(newSections);
+
+		//sort the 'undispatchable' sections according to their size in descending-order
+		Collections.sort(mSections);
+		mLogger.printInfo("number of sections to synthesize: " + mSections.size());
 
 		//give SynthetisWorkerThread access to a synchronized queue of sections to synthesize
 		ConcurrentLinkedQueue<UndispatchableSection> queue = new ConcurrentLinkedQueue<UndispatchableSection>(
@@ -169,7 +228,7 @@ public class SynthesisWorkerPool implements IProgressListener {
 		StringBuilder sb = new StringBuilder("start allocating the resources on " + mNrThreads
 		        + " threads for the following TTS service(s):");
 		for (TTSService tts : allTTS) {
-			sb.append("\n * " + tts.getName() + "-" + tts.getVersion());
+			sb.append("\n * " + TTSServiceUtil.displayName(tts));
 		}
 		mLogger.printInfo(sb.toString());
 
