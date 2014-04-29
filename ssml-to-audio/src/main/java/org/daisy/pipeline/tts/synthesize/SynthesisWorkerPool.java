@@ -20,7 +20,6 @@ import org.daisy.pipeline.tts.TTSServiceUtil;
 import org.daisy.pipeline.tts.Voice;
 
 public class SynthesisWorkerPool implements IProgressListener {
-
 	static class Speakable {
 		Speakable(Voice voice, XdmNode sentence) {
 			this.voice = voice;
@@ -207,6 +206,7 @@ public class SynthesisWorkerPool implements IProgressListener {
 				splitSection(section, maxSize, newSections);
 			}
 		}
+
 		mSections.removeAll(toRemove);
 		mSections.addAll(newSections);
 
@@ -256,7 +256,7 @@ public class SynthesisWorkerPool implements IProgressListener {
 		mLogger.printInfo("synthesis workers finished");
 
 		if (queue.size() > 0) {
-			mLogger.printInfo("error: " + queue.size() + " sentences no synthesized.");
+			mLogger.printInfo("warning: " + queue.size() + " sections not synthesized.");
 		}
 	}
 

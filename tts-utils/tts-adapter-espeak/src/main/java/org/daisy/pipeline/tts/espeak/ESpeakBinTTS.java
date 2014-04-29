@@ -240,10 +240,4 @@ public class ESpeakBinTTS extends MarkFreeTTSService {
 			        + ssml.substring(0, Math.min(ssml.length(), 100)) + "...", e);
 		}
 	}
-
-	@Override
-	public boolean resourcesReleasedASAP() {
-		return false;
-	}
-
 }

@@ -13,16 +13,16 @@ import javax.sound.sampled.AudioFormat;
 
 import net.sf.saxon.s9api.XdmNode;
 
+import org.daisy.pipeline.tts.AbstractTTSService;
 import org.daisy.pipeline.tts.BasicSSMLAdapter;
 import org.daisy.pipeline.tts.LoadBalancer.Host;
 import org.daisy.pipeline.tts.RoundRobinLoadBalancer;
 import org.daisy.pipeline.tts.SSMLAdapter;
 import org.daisy.pipeline.tts.SSMLUtil;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
-import org.daisy.pipeline.tts.TTSService;
 import org.daisy.pipeline.tts.Voice;
 
-public class ATTNative implements TTSService, ATTLibListener {
+public class ATTNative extends AbstractTTSService implements ATTLibListener {
 
 	private AudioFormat mAudioFormat;
 	private RoundRobinLoadBalancer mLoadBalancer;
@@ -206,10 +206,4 @@ public class ATTNative implements TTSService, ATTLibListener {
 	public String endingMark() {
 		return "ending-mark";
 	}
-
-	@Override
-	public boolean resourcesReleasedASAP() {
-		return false;
-	}
-
 }

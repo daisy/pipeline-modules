@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 // TODO: mark the voices as Male or Female and use this information when
 // choosing a voice
 public class TTSRegistry {
-	private Logger mLogger = LoggerFactory.getLogger(TTSRegistry.class);
+	private Logger ServerLogger = LoggerFactory.getLogger(TTSRegistry.class);
 
 	public static class TTSResource {
 		public boolean released = false;
@@ -60,7 +60,7 @@ public class TTSRegistry {
 			resources = mTTSResources.get(tts);
 		}
 		if (resources != null) {
-			mLogger.info("Stop bundle of " + TTSServiceUtil.displayName(tts)
+			ServerLogger.info("Stop bundle of " + TTSServiceUtil.displayName(tts)
 			        + " during one TTS step");
 			for (TTSResource resource : resources) {
 				synchronized (resource) {
@@ -69,7 +69,7 @@ public class TTSRegistry {
 					try {
 						tts.releaseThreadResources(resource);
 					} catch (SynthesisException e) {
-						mLogger.error("error while releasing resource of " + tts.getName()
+						ServerLogger.error("error while releasing resource of " + tts.getName()
 						        + ": " + getStack(e));
 					}
 					resource.released = true;
@@ -96,15 +96,15 @@ public class TTSRegistry {
 				synchronized (mTTSResources) {
 					mTTSResources.put(tts, new ArrayList<TTSResource>());
 				}
-				mLogger.info(fullname + " successfully initialized");
+				ServerLogger.info(fullname + " successfully initialized");
 			} catch (Throwable t) {
-				mLogger.info(fullname + " could not be initialized");
-				mLogger.debug(fullname + " init error: " + getStack(t));
+				ServerLogger.info(fullname + " could not be initialized");
+				ServerLogger.debug(fullname + " init error: " + getStack(t));
 			}
 
 		}
 
-		mLogger.info("number of working TTS services: " + mTTSResources.size() + "/"
+		ServerLogger.info("number of working TTS services: " + mTTSResources.size() + "/"
 		        + mServices.size());
 
 		//Create a map of the best services for each available voice, given that two different
@@ -155,12 +155,12 @@ public class TTSRegistry {
 		for (Entry<Voice, TTSService> e : mBestServices.entrySet()) {
 			sb.append("\n* " + e.getKey() + " by " + TTSServiceUtil.displayName(e.getValue()));
 		}
-		mLogger.info(sb.toString());
+		ServerLogger.info(sb.toString());
 		sb = new StringBuilder("Fallback voices:");
 		for (Entry<Locale, Voice> e : mBestVoices.entrySet()) {
 			sb.append("\n* " + e.getKey() + ": " + e.getValue());
 		}
-		mLogger.info(sb.toString());
+		ServerLogger.info(sb.toString());
 	}
 
 	public void closeSynthesizingContext() {
@@ -171,7 +171,7 @@ public class TTSRegistry {
 						try {
 							resources.getKey().releaseThreadResources(resource);
 						} catch (SynthesisException e) {
-							mLogger.error("error while releasing resource of "
+							ServerLogger.error("error while releasing resource of "
 							        + resources.getKey().getName() + ": " + getStack(e));
 						}
 						resource.released = true;

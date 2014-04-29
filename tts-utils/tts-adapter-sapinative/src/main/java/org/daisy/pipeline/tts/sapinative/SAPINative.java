@@ -10,15 +10,15 @@ import javax.sound.sampled.AudioFormat;
 
 import net.sf.saxon.s9api.XdmNode;
 
+import org.daisy.pipeline.tts.AbstractTTSService;
 import org.daisy.pipeline.tts.BasicSSMLAdapter;
 import org.daisy.pipeline.tts.SSMLAdapter;
 import org.daisy.pipeline.tts.SSMLUtil;
 import org.daisy.pipeline.tts.SoundUtil;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
-import org.daisy.pipeline.tts.TTSService;
 import org.daisy.pipeline.tts.Voice;
 
-public class SAPINative implements TTSService {
+public class SAPINative extends AbstractTTSService {
 
 	private AudioFormat mAudioFormat;
 	private int mSampleRate;
@@ -186,10 +186,5 @@ public class SAPINative implements TTSService {
 	@Override
 	public String endingMark() {
 		return "ending-mark";
-	}
-
-	@Override
-	public boolean resourcesReleasedASAP() {
-		return false;
 	}
 }

@@ -112,6 +112,14 @@ public interface TTSService {
 	        throws SynthesisException, InterruptedException;
 
 	/**
+	 * Force interruption of the execution of synthesize() when the thread-level
+	 * interruption is not enough to make synthesize() finish.
+	 * 
+	 * @param resource is the same as the one provided to synthesize()
+	 */
+	public void interruptCurrentWork(TTSResource resource);
+
+	/**
 	 * @return the audio format (sample rate etc...) of the data produced by
 	 *         synthesize(). The synthesizer is assumed to use the same audio
 	 *         format every time. Can be called from any thread context.

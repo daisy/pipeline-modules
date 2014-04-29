@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.pipeline.audio.AudioEncoder;
@@ -22,6 +23,8 @@ import org.daisy.pipeline.tts.TTSServiceUtil;
 import org.daisy.pipeline.tts.Voice;
 import org.daisy.pipeline.tts.synthesize.SynthesisWorkerPool.Speakable;
 import org.daisy.pipeline.tts.synthesize.SynthesisWorkerPool.UndispatchableSection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The SynthesisWorkerThread is meant to be used by a SynthesisWorkerPool. It
@@ -32,6 +35,8 @@ import org.daisy.pipeline.tts.synthesize.SynthesisWorkerPool.UndispatchableSecti
  * file.
  */
 public class SynthesisWorkerThread extends Thread implements FormatSpecifications {
+
+	private Logger ServerLogger = LoggerFactory.getLogger(SynthesisWorkerThread.class);
 
 	// 20 seconds with 24kHz 16 bits audio
 	private static final int MAX_ESTIMATED_SYNTHESIZED_BYTES = 24000 * 2 * 20;
@@ -128,21 +133,20 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 				}
 			}
 		};
-		timeout.watch(synthJob);
-
 		synchronized (resource) {
 			//The synchronized is necessary because it is possible that the TTSRegistry 
 			//is currently releasing the resource. 
 			if (resource.released)
 				throw new SynthesisException("TTS resource no longer valid.");
 
+			timeout.watch(synthJob, mLastUsedSynthesizer, resource);
 			synthJob.start();
 			try {
 				synthJob.join();
 			} catch (InterruptedException e) {
 				throw new SynthesisException(e);
 			} finally {
-				timeout.interrupt();
+				timeout.cancel();
 			}
 		}
 		if (exceptions[0] != null) {
@@ -150,16 +154,23 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 		}
 
 		if (!timeout.stillTime()) {
-			mLogger.printInfo("timeout with "
+			ServerLogger.warn("timeout with "
 			        + TTSServiceUtil.displayName(mLastUsedSynthesizer));
-		} else if (mLastUsedSynthesizer.endingMark() == null
-		        || (marks.size() > 0 && mLastUsedSynthesizer.endingMark().equals(
-		                marks.get(marks.size() - 1).getKey()))) {
-
-			return true;
+			return false;
 		}
 
-		return false;
+		if (mLastUsedSynthesizer.endingMark() != null
+		        && !(marks.size() > 0 && mLastUsedSynthesizer.endingMark().equals(
+		                marks.get(marks.size() - 1).getKey()))) {
+			String ssml = sentence.toString();
+			ServerLogger.warn("missing ending mark with "
+			        + TTSServiceUtil.displayName(mLastUsedSynthesizer) + " for SSML: "
+			        + ssml.substring(0, Math.min(500, ssml.length())) + "...");
+
+			return false;
+		}
+
+		return true;
 	}
 
 	private void processOneSentence(final XdmNode sentence, final Voice voice)
@@ -180,22 +191,20 @@ public class SynthesisWorkerThread extends Thread implements FormatSpecification
 			marks.clear();
 			valid = processOneSentenceOneTry(sentence, voice, marks, resource, (tries > 0));
 			if (!valid) {
-				String ssml = sentence.toString();
-				mLogger.printInfo("something went wrong with "
-				        + TTSServiceUtil.displayName(mLastUsedSynthesizer) + "; input SSML: "
-				        + ssml.substring(0, Math.min(300, ssml.length())) + "...");
 				try {
 					Thread.sleep(2000);
 				} catch (InterruptedException e) {
-					throw new SynthesisException(e.getMessage(), e.getCause());
 				}
 			}
 		}
 		if (!valid) {
-			throw new SynthesisException("TTS Processor "
-			        + TTSServiceUtil.displayName(mLastUsedSynthesizer)
-			        + " was enable to synthesize a piece of SSML after " + SYNTHESIS_TRIES
-			        + " tries");
+			mAudioBuffer.offsetInOutput = begin;
+			mLogger.printInfo("Something went wrong: text with id="
+			        + sentence.getAttributeValue(new QName(null, "id")) + " not synthesized");
+
+			//The error is not critical: keep going.
+			//For critical errors, exceptions are thrown.
+			return;
 		}
 		if (mLastUsedSynthesizer.endingMark() != null) {
 			marks = marks.subList(0, marks.size() - 1);

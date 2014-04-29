@@ -14,6 +14,7 @@ import javax.sound.sampled.AudioFormat;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.XdmNode;
 
+import org.daisy.pipeline.tts.AbstractTTSService;
 import org.daisy.pipeline.tts.BasicSSMLAdapter;
 import org.daisy.pipeline.tts.LoadBalancer.Host;
 import org.daisy.pipeline.tts.RoundRobinLoadBalancer;
@@ -21,7 +22,6 @@ import org.daisy.pipeline.tts.SSMLAdapter;
 import org.daisy.pipeline.tts.SSMLUtil;
 import org.daisy.pipeline.tts.SoundUtil;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
-import org.daisy.pipeline.tts.TTSService;
 import org.daisy.pipeline.tts.Voice;
 import org.daisy.pipeline.tts.acapela.NscubeLibrary.PNSC_FNSPEECH_DATA;
 import org.daisy.pipeline.tts.acapela.NscubeLibrary.PNSC_FNSPEECH_EVENT;
@@ -39,7 +39,7 @@ import com.sun.jna.ptr.PointerByReference;
  * (it) • Brazilian (br) • German (de). For other languages, we can adapt the
  * SSML to the tag language (/mark{...}, /voice{...}) etc.
  */
-public class AcapelaTTS implements TTSService {
+public class AcapelaTTS extends AbstractTTSService {
 
 	private AudioFormat mAudioFormat;
 	private RoundRobinLoadBalancer mLoadBalancer;
@@ -47,6 +47,7 @@ public class AcapelaTTS implements TTSService {
 	public static class ThreadResources extends TTSResource {
 		Pointer dispatcher;
 		NativeLong channelId;
+		PointerByReference channelLock;
 		Pointer server;
 		RawAudioBuffer buff;
 		List<Entry<String, Integer>> marks;
@@ -60,7 +61,7 @@ public class AcapelaTTS implements TTSService {
 			ssmlAdapter = new BasicSSMLAdapter() {
 				@Override
 				public String adaptText(String text) {
-					return SpaceRegex.matcher(text).replaceAll(" ");
+					return super.adaptText(SpaceRegex.matcher(text).replaceAll(" "));
 				}
 
 				@Override
@@ -95,7 +96,6 @@ public class AcapelaTTS implements TTSService {
 				@Override
 				public int apply(Pointer pData, int cbDataSize, NSC_SOUND_DATA pSoundData,
 				        Pointer pAppInstanceData) {
-
 					if (cbDataSize + buff.offsetInOutput > buff.output.length)
 						SoundUtil.realloc(buff, cbDataSize);
 
@@ -112,7 +112,6 @@ public class AcapelaTTS implements TTSService {
 				        Pointer pAppInstanceData) {
 
 					if (nEventID == NscubeLibrary.NSC_EVID_ENUM.NSC_EVID_BOOKMARK) {
-
 						NSC_EVENT_DATA_Bookmark bookmark = new NSC_EVENT_DATA_Bookmark(
 						        pEventData.getPointer());
 						bookmark.read();
@@ -307,25 +306,33 @@ public class AcapelaTTS implements TTSService {
 	}
 
 	public void synthesize(String ssml, RawAudioBuffer audioBuffer, ThreadResources th,
-	        List<Entry<String, Integer>> marks) {
+	        List<Entry<String, Integer>> marks) throws SynthesisException {
 		th.buff = audioBuffer;
 		th.marks = marks;
-
-		PointerByReference lockRef = new PointerByReference();
+		th.channelLock = new PointerByReference();
 		NscubeLibrary lib = NscubeLibrary.INSTANCE;
 
-		int ret = lib.nscLockChannel(th.server, th.channelId, th.dispatcher, lockRef);
+		int ret = lib.nscLockChannel(th.server, th.channelId, th.dispatcher, th.channelLock);
 		if (ret != NscubeLibrary.NSC_OK)
 			return;
 
-		ret = lib.nscAddTextUTF8(lockRef.getValue(), ssml, null);
+		ret = lib.nscAddTextUTF8(th.channelLock.getValue(), ssml, null);
 		if (ret != NscubeLibrary.NSC_OK) {
-			lib.nscUnlockChannel(lockRef.getValue());
+			lib.nscUnlockChannel(th.channelLock.getValue());
 			return;
 		}
 
-		lib.nscExecChannel(lockRef.getValue(), th.execData);
-		lib.nscUnlockChannel(lockRef.getValue());
+		ret = lib.nscExecChannel(th.channelLock.getValue(), th.execData);
+		lib.nscUnlockChannel(th.channelLock.getValue());
+		if (ret != NscubeLibrary.NSC_OK) {
+			throw new SynthesisException("nscExecChannel returned error code:" + ret);
+		}
+	}
+
+	@Override
+	public void interruptCurrentWork(TTSResource resource) {
+		ThreadResources th = (ThreadResources) resource;
+		NscubeLibrary.INSTANCE.nscExitChannel(th.channelLock.getValue());
 	}
 
 	@Override
@@ -413,5 +420,4 @@ public class AcapelaTTS implements TTSService {
 		SpaceRegex = Pattern.compile("[" + spaces + "]+", Pattern.DOTALL
 		        | Pattern.UNICODE_CASE | Pattern.MULTILINE);
 	}
-
 }

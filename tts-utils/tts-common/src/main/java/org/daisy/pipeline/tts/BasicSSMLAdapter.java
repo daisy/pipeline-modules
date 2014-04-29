@@ -37,6 +37,6 @@ public class BasicSSMLAdapter implements SSMLAdapter {
 	@Override
 	public String adaptText(String text) {
 		//replace non-breaking spaces with regular white spaces.
-		return text.replace(" ", " ").replace("’", "'");
+		return text.replace(" ", " ").replace("’", "'").replace("”", "\"");
 	}
 }

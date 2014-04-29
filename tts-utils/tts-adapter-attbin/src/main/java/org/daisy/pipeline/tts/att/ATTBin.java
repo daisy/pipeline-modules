@@ -21,6 +21,7 @@ import javax.sound.sampled.AudioFormat;
 import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.common.shell.BinaryFinder;
+import org.daisy.pipeline.tts.AbstractTTSService;
 import org.daisy.pipeline.tts.BasicSSMLAdapter;
 import org.daisy.pipeline.tts.LoadBalancer.Host;
 import org.daisy.pipeline.tts.RoundRobinLoadBalancer;
@@ -29,7 +30,6 @@ import org.daisy.pipeline.tts.SSMLUtil;
 import org.daisy.pipeline.tts.SoundUtil;
 import org.daisy.pipeline.tts.TTSRegistry;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
-import org.daisy.pipeline.tts.TTSService;
 import org.daisy.pipeline.tts.Voice;
 import org.daisy.pipeline.tts.VoiceInfo;
 
@@ -40,7 +40,7 @@ import org.daisy.pipeline.tts.VoiceInfo;
  * Before any conversion, run ATT/bin/TTSServer -m 40 -c {mPort} -config
  * your-tts-conf.cfg
  */
-public class ATTBin implements TTSService {
+public class ATTBin extends AbstractTTSService {
 	private AudioFormat mAudioFormat;
 	private String mATTPath;
 	private int mSampleRate;
@@ -180,10 +180,6 @@ public class ATTBin implements TTSService {
 	}
 
 	@Override
-	public void releaseThreadResources(Object resource) {
-	}
-
-	@Override
 	public String getVersion() {
 		return "command-line";
 	}
@@ -257,10 +253,5 @@ public class ATTBin implements TTSService {
 	@Override
 	public String endingMark() {
 		return "ending-mark";
-	}
-
-	@Override
-	public boolean resourcesReleasedASAP() {
-		return false;
 	}
 }
