@@ -5,28 +5,53 @@
     xmlns:smil="http://www.w3.org/2001/SMIL20/"
     version="1.0">
 
-    <p:input port="content" primary="true" sequence="false"/>
-    <p:input port="audio-map"/>
+    <p:input port="content" primary="true" sequence="false">
+      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+	 <p>DTBook file. Its URI does no matter.</p>
+      </p:documentation>
+    </p:input>
 
-    <p:option name="content-dir"/>
-    <p:option name="mo-dir"/>
-    <p:option name="audio-dir"/>
-    <p:option name="daisy3-file-uri"/>
-    <p:option name="uid"/>
+    <p:input port="audio-map">
+       <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+	 <p>The clipBegin and clipEnd attributes must be compliant
+	 with the XML time data type and not be greater than 24
+	 hours. See pipeline-mod-tts's documentation for more
+	 details.</p>
+       </p:documentation>
+    </p:input>
 
     <p:output port="fileset.out">
       <p:pipe port="result" step="smil-in-fileset"/>
+      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+	 <p>Fileset entries for the SMIL files.</p>
+      </p:documentation>
     </p:output>
 
     <p:output port="smil.out" sequence="true">
       <p:pipe port="result" step="smil-with-durations"/>
     </p:output>
+
     <p:output port="updated-content" primary="true">
       <p:pipe port="result" step="add-smilrefs"/>
+      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+	 <p>Content document with smilref attributes.</p>
+      </p:documentation>
     </p:output>
+
     <p:output port="duration">
       <p:pipe port="result" step="total-duration"/>
     </p:output>
+
+    <p:option name="content-dir"/>
+    <p:option name="mo-dir"/>
+    <p:option name="audio-dir"/>
+
+    <p:option name="daisy3-file-uri">
+      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+	<p>URI of the expected final DTBook file.</p>
+      </p:documentation>
+    </p:option>
+    <p:option name="uid"/>
 
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
