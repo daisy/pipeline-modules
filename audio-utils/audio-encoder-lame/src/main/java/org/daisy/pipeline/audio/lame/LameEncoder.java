@@ -8,8 +8,15 @@ import javax.sound.sampled.AudioFormat;
 
 import org.daisy.common.shell.BinaryFinder;
 import org.daisy.pipeline.audio.AudioEncoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Optional;
 
 public class LameEncoder implements AudioEncoder {
+
+	private Logger mLogger = LoggerFactory.getLogger(LameEncoder.class);
+
 	private static final String OutputFormat = ".mp3";
 	private String mLamePath;
 
@@ -17,12 +24,14 @@ public class LameEncoder implements AudioEncoder {
 		final String property = "lame.path";
 		mLamePath = System.getProperty(property);
 		if (mLamePath == null) {
-			mLamePath = BinaryFinder.find("lame");
-			if (mLamePath == null) {
+			Optional<String> lpath = BinaryFinder.find("lame");
+			if (!lpath.isPresent()) {
 				throw new RuntimeException("Cannot find lame in PATH and " + property
 				        + " is not set");
 			}
+			mLamePath = lpath.get();
 		}
+		mLogger.info("Will use lame binary: " + mLamePath);
 
 		//check that the encoder can run
 		String[] cmd = new String[]{
