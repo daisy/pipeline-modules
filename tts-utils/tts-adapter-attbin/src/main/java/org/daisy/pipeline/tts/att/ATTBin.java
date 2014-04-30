@@ -33,6 +33,8 @@ import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.Voice;
 import org.daisy.pipeline.tts.VoiceInfo;
 
+import com.google.common.base.Optional;
+
 /**
  * This synthesizer uses directly the AT&T's client binary and intermediate WAV
  * files.
@@ -77,11 +79,13 @@ public class ATTBin extends AbstractTTSService {
 
 		final String property = "att.client.path";
 		mATTPath = System.getProperty(property);
-		if (mATTPath == null)
-			mATTPath = BinaryFinder.find("TTSClientFile");
 		if (mATTPath == null) {
-			throw new SynthesisException("Cannot find AT&T's client in PATH and " + property
-			        + " is not set");
+			Optional<String> apath = BinaryFinder.find("TTSClientFile");
+			if (!apath.isPresent()) {
+				throw new SynthesisException("Cannot find AT&T's client in PATH and "
+				        + property + " is not set");
+			}
+			mATTPath = apath.get();
 		}
 
 		//test the synthesizer so that the service won't be active if it fails

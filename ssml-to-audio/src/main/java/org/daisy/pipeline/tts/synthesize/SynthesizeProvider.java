@@ -15,6 +15,20 @@ public class SynthesizeProvider implements XProcStepProvider {
 
 	@Override
 	public XProcStep newStep(XProcRuntime runtime, XAtomicStep step) {
+		boolean error = false;
+		if (mRegistry == null) {
+			runtime.error(new RuntimeException("Registry of TTS engines is missing."));
+			error = true;
+		}
+
+		if (mEncoder == null) {
+			runtime.error(new RuntimeException("Audio encoder is missing."));
+			error = true;
+		}
+
+		if (error)
+			return null;
+
 		return new SynthesizeStep(runtime, step, mRegistry, mEncoder);
 	}
 

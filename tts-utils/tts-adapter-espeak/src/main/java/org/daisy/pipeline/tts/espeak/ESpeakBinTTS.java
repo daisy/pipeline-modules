@@ -28,6 +28,8 @@ import org.daisy.pipeline.tts.Voice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Optional;
+
 /**
  * This synthesizer uses directly the eSpeak binary. The voice names are used
  * for identifying the voices, but, for future improvements, their corresponding
@@ -48,12 +50,13 @@ public class ESpeakBinTTS extends MarkFreeTTSService {
 	public void onBeforeOneExecution() throws SynthesisException {
 		final String property = "espeak.path";
 		mEspeakPath = System.getProperty(property);
-		if (mEspeakPath == null)
-			mEspeakPath = BinaryFinder.find("espeak");
-
 		if (mEspeakPath == null) {
-			throw new SynthesisException("Cannot find eSpeak's binary and " + property
-			        + " is not set");
+			Optional<String> epath = BinaryFinder.find("espeak");
+			if (!epath.isPresent()) {
+				throw new SynthesisException("Cannot find eSpeak's binary and " + property
+				        + " is not set");
+			}
+			mEspeakPath = epath.get();
 		}
 
 		mLogger.info("Will use eSpeak binary: " + mEspeakPath);
