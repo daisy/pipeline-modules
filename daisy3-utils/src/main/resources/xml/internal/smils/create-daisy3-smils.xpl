@@ -40,18 +40,40 @@
 
     <p:output port="duration">
       <p:pipe port="result" step="total-duration"/>
+      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+	<p>Total duration.</p>
+      </p:documentation>
     </p:output>
 
-    <p:option name="content-dir"/>
-    <p:option name="mo-dir"/>
-    <p:option name="audio-dir"/>
-
-    <p:option name="daisy3-file-uri">
+    <p:option name="root-dir">
       <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-	<p>URI of the expected final DTBook file.</p>
+	<p>Root directory of the DAISY 3 files.</p>
       </p:documentation>
     </p:option>
-    <p:option name="uid"/>
+
+    <p:option name="audio-dir">
+      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+	<p>Parent directory URI of the audio files.</p>
+      </p:documentation>
+    </p:option>
+
+    <p:option name="smil-dir">
+      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+	<p>Directory URI which the URI of the output SMIL files will be based on.</p>
+      </p:documentation>
+    </p:option>
+
+    <p:option name="daisy3-dtbook-uri">
+      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+	<p>Expected URI of the final DTBook document.</p>
+      </p:documentation>
+    </p:option>
+
+    <p:option name="uid">
+      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+	<p>UID of the DTBook (in the meta elements)</p>
+      </p:documentation>
+    </p:option>
 
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
@@ -65,8 +87,8 @@
 	<p:document href="add-smilrefs.xsl"/>
       </p:input>
       <p:with-param name="granularity" select="'level'"/>
-      <p:with-param name="mo-dir" select="$mo-dir"/>
-      <p:with-param name="output-dir" select="$content-dir"/>
+      <p:with-param name="mo-dir" select="$smil-dir"/>
+      <p:with-param name="output-dir" select="$root-dir"/>
     </p:xslt>
     <cx:message message="Smilref attributes added."/>
     <p:sink/>
@@ -80,10 +102,10 @@
 	<p:document href="create-smils.xsl"/>
       </p:input>
       <p:with-param name="uid" select="$uid"/>
-      <p:with-param name="mo-dir" select="$mo-dir"/>
+      <p:with-param name="mo-dir" select="$smil-dir"/>
       <p:with-param name="audio-dir" select="$audio-dir"/>
-      <p:with-param name="content-uri" select="$daisy3-file-uri"/>
-      <p:with-param name="content-dir" select="$content-dir"/>
+      <p:with-param name="content-uri" select="$daisy3-dtbook-uri"/>
+      <p:with-param name="content-dir" select="$root-dir"/>
     </p:xslt>
     <cx:message message="SMIL files generated."/><p:sink/>
 
@@ -123,7 +145,7 @@
       <p:output port="result" sequence="true"/>
       <p:variable name="mo-uri" select="base-uri(/*)"/>
       <px:fileset-create>
-	<p:with-option name="base" select="$mo-dir"/>
+	<p:with-option name="base" select="$smil-dir"/>
       </px:fileset-create>
       <px:fileset-add-entry media-type="application/smil">
 	<p:with-option name="href" select="$mo-uri"/>

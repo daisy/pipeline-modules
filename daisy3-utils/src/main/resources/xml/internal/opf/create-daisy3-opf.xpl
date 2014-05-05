@@ -8,12 +8,42 @@
       <p:documentation>The fileset.</p:documentation>
     </p:input>
 
-    <p:option name="output-dir"/>
-    <p:option name="title"/>
-    <p:option name="uid"/>
-    <p:option name="total-time"/>
-    <p:option name="opf-uri"/>
-    <p:option name="lang"/>
+    <p:option name="output-dir">
+      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+	<p>Root directory URI common to all the files to package (NCX, smil etc.)</p>
+      </p:documentation>
+    </p:option>
+
+    <p:option name="title">
+      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+	<p>Title of the DTBook document.</p>
+      </p:documentation>
+    </p:option>
+
+    <p:option name="uid">
+      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+	<p>UID of the DTBook (in the meta elements)</p>
+      </p:documentation>
+    </p:option>
+
+    <p:option name="total-time">
+      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+	<p>Total duration as returned by px:create-smil-files</p>
+      </p:documentation>
+    </p:option>
+
+    <p:option name="opf-uri">
+      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+	<p>Output directory URI if the OPF file were to be stored or refered by a fileset.</p>
+      </p:documentation>
+    </p:option>
+
+    <p:option name="lang">
+      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+	<p>Main language of the DTBook file(s).</p>
+      </p:documentation>
+    </p:option>
+
     <p:option name="publisher"/>
 
     <p:output port="result" primary="true"/>
