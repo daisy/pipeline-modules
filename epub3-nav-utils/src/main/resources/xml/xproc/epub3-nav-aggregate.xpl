@@ -16,8 +16,8 @@
             <p:pipe port="source" step="main"/>
         </p:input>
     </p:wrap-sequence>
-    <px:i18n-translate name="toc-string" id="Table of contents">
-        <p:with-option name="language" select="( //html:head/html:meta[@name='dc:language']/@content , //html:html/@xml:lang , //*/@xml:lang , 'en' )[1]"/>
+    <px:i18n-translate name="toc-string" string="Table of contents">
+        <p:with-option name="language" select="( /*/html:html/@lang , /*/html:html/@xml:lang , /*/html:html/html:head/html:meta[matches(lower-case(@name),'^(.*[:\.])?language$')]/@content , 'en' )[1]"/>
         <p:input port="maps">
             <p:document href="../i18n.xml"/>
         </p:input>

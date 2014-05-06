@@ -66,8 +66,8 @@
             <p:pipe port="source" step="main"/>
         </p:input>
     </p:wrap-sequence>
-    <px:i18n-translate name="lop-string" id="List of pages">
-        <p:with-option name="language" select="( //h:head/h:meta[@name='dc:language']/@content , //h:html/@xml:lang , //*/@xml:lang , 'en' )[1]"/>
+    <px:i18n-translate name="lop-string" string="List of pages">
+        <p:with-option name="language" select="( /*/html:html/@lang , /*/html:html/@xml:lang , /*/html:html/html:head/html:meta[matches(lower-case(@name),'^(.*[:\.])?language$')]/@content , 'en' )[1]"/>
         <p:input port="maps">
             <p:document href="../i18n.xml"/>
         </p:input>
