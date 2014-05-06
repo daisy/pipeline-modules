@@ -200,7 +200,8 @@ public class LexingTest {
 		List<Sentence> sentences = mLexerToken.split(ref, Locale.ENGLISH,
 		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, ref);
-		Assert.assertEquals("{/First/ /block/: \"/Second/ /block/}", text);
+
+		Assert.assertEquals("{/First/ /block/:}{\"/Second/ /block/}", text);
 	}
 
 	@Test
@@ -219,5 +220,23 @@ public class LexingTest {
 		        new ArrayList<String>());
 		String text = mPrinter.convert(sentences, ref);
 		Assert.assertEquals("{/He/ /sighed/…:}{/Bla/ /bla/.}", text);
+	}
+
+	@Test
+	public void openingQuote() {
+		String inp = "end. “Begin";
+		List<Sentence> sentences = mLexerToken.split(inp, Locale.ENGLISH,
+		        new ArrayList<String>());
+		String text = mPrinter.convert(sentences, inp);
+		Assert.assertEquals("{/end/.}{“/Begin/}", text);
+	}
+
+	@Test
+	public void quotedQuestion() {
+		String inp = "He asked me \"what is this?\" and";
+		List<Sentence> sentences = mLexerToken.split(inp, Locale.ENGLISH,
+		        new ArrayList<String>());
+		String text = mPrinter.convert(sentences, inp);
+		Assert.assertEquals("{/He/ /asked/ /me/ \"/what/ /is/ /this/?\" /and/}", text);
 	}
 }

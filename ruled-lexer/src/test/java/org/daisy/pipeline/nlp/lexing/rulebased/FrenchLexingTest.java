@@ -52,5 +52,14 @@ public class FrenchLexingTest {
 		String text = mPrinter.convert(sentences, inp);
 		Assert.assertEquals("{/mr./ /Majuscule/}", text);
 	}
+	
+	@Test
+	public void openingQuote(){
+		String inp = "fin. « Début";
+		List<Sentence> sentences = mLexerToken.split(inp, Locale.FRENCH,
+		        new ArrayList<String>());
+		String text = mPrinter.convert(sentences, inp);
+		Assert.assertEquals("{/fin/.}{« /Début/}", text);
+	}
 
 }

@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.daisy.pipeline.nlp.RuleBasedTextCategorizer;
 import org.daisy.pipeline.nlp.TextCategorizer;
@@ -222,10 +224,18 @@ public class RuleBasedLexer implements LexService {
 
 	@Override
 	public int getLexQuality(Locale lang) {
-		if (lang.getLanguage().equals(new Locale("en").getLanguage()))
+		String language = lang.getLanguage();
+
+		if (language.equals(new Locale("fr").getLanguage()))
 			return 3 * LexService.MinSpecializedLexQuality;
-		if (lang.getLanguage().equals(new Locale("fr").getLanguage()))
+
+		if (language.equals(new Locale("en").getLanguage()))
 			return 3 * LexService.MinSpecializedLexQuality;
+
+		if (okLanguages.contains(language)) {
+			return 2 * LexService.MinSpecializedLexQuality;
+		}
+
 		return 0;
 	}
 
@@ -252,4 +262,13 @@ public class RuleBasedLexer implements LexService {
 		return -1; //cannot handle all the languages
 	}
 
+	private static Set<String> okLanguages;
+	static {
+		okLanguages = new HashSet<String>();
+		for (String code : new String[]{
+		        "it", "pt"
+		}) {
+			okLanguages.add(new Locale(code).getLanguage());
+		}
+	}
 }

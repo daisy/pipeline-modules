@@ -273,11 +273,36 @@ public class RuledCategorizerTest {
 	}
 
 	@Test
+	public void initialism3() throws IOException {
+		String l = "R.";
+		CategorizedWord w = categorizeForPrefix(l);
+		Assert.assertEquals(l, w.word);
+		Assert.assertEquals(Category.ACRONYM, w.category);
+	}
+
+	@Test
+	public void smallabbr() throws IOException {
+		String l = "p. III";
+		CategorizedWord w = categorizeForPrefix(l);
+		Assert.assertEquals("p.", w.word);
+		Assert.assertEquals(Category.ABBREVIATION, w.category);
+	}
+
+	@Test
 	public void numbering1() throws IOException {
 		String item = "35.2.";
 		String l = item + " test";
 		CategorizedWord w = categorizeForPrefix(l);
 		Assert.assertEquals(item, w.word);
 		Assert.assertEquals(Category.NUMBERING_ITEM, w.category);
+	}
+
+	@Test
+	public void quotes1() throws IOException {
+		String item = "”";
+		String l = item + "after";
+		CategorizedWord w = categorizeForPrefix(l);
+		Assert.assertEquals(item, w.word);
+		Assert.assertEquals(Category.QUOTE, w.category);
 	}
 }

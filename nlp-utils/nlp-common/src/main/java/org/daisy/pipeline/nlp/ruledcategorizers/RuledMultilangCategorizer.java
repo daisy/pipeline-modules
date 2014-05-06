@@ -13,7 +13,8 @@ public class RuledMultilangCategorizer extends RuleBasedTextCategorizer {
 	public static int SPACE_MAX_PRIORITY = 100;
 	public static int QUOTE_MAX_PRIORITY = 125;
 	public static int NUMBER_MAX_PRIORITY = 150;
-	public static int REGEX_MAX_ACRONYM_PRIORITY = 160;
+	public static int ACRONYM_MAX_PRIORITY = 160;
+	public static int ABBR_MAX_PRIORITY = 220;
 	public static int WEBLINK_MAX_PRIORITY = 300;
 	public static int SPACE_COMPOSED_MAX_PRIORITY = 500;
 	public static int NUMBER_COMPOSED_MAX_PRIORITY = 600;
@@ -21,12 +22,11 @@ public class RuledMultilangCategorizer extends RuleBasedTextCategorizer {
 	protected static String CommonWordPattern = "[@\\p{L}][-_@\\p{L}\\p{Nd}]*";
 
 	//line breaks cannot be written with the usual unicode notation	
-	protected static char[] SpaceChars = {
-	        0x0020, 0x0085, 0x00A0, 0x1680, 0x180E, 0x2028, 0x2029, 0x202F, 0x205F, 0x3000
-	};
-
 	protected static String Space = "";
 	static {
+		char[] SpaceChars = {
+		        0x0020, 0x0085, 0x00A0, 0x1680, 0x180E, 0x2028, 0x2029, 0x202F, 0x205F, 0x3000
+		};
 		for (char spaceChar : SpaceChars) {
 			Space += new Character(spaceChar);
 		}
@@ -136,21 +136,33 @@ public class RuledMultilangCategorizer extends RuleBasedTextCategorizer {
 		rsm.init("[\\p{L}][-_.\\p{L}\\p{Nd}]*(@|\\(at\\))[\\p{L}][-_.\\p{L}\\p{Nd}]*");
 		addRule(rsm);
 
-		// ==== ACRONYMS ====
+		// ==== ACRONYMS, INITIALISMS AND ABBREVIATIONS ====
 
 		String acronymPrefix = "[\\p{L}]\\.([-]?[\\p{L}\\p{Nd}]\\.)+";
 
-		// acronyms terminated by a point that does not start a new sentence
-		// with at least 2 components
-		rsm = new RegexMatchRule(Category.ACRONYM, REGEX_MAX_ACRONYM_PRIORITY, true,
-		        mMatchMode);
+		// 2 or more characters acronyms terminated by a point (if the following
+		// character is not a capital letter). Example:
+		// The U.S. are ...
+		// but not: ... to the U.S. As a consequence, ... 
+		rsm = new RegexMatchRule(Category.ACRONYM, ACRONYM_MAX_PRIORITY, true, mMatchMode);
 		rsm.init(acronymPrefix + "(?=[" + Space + "]+[\\p{Ll}])");
 		addRule(rsm);
 
-		// acronyms not terminated by a point and at least 3 components
-		rsm = new RegexMatchRule(Category.ACRONYM, REGEX_MAX_ACRONYM_PRIORITY, true,
-		        mMatchMode);
+		// 3 or more characters acronyms not terminated by a point
+		rsm = new RegexMatchRule(Category.ACRONYM, ACRONYM_MAX_PRIORITY, true, mMatchMode);
 		rsm.init(acronymPrefix + "[\\p{L}\\p{Nd}]");
+		addRule(rsm);
+
+		// one-letter acronyms. There are a few cases where they shouldn't be recognized as
+		//acronyms, such as 'he and I.', but those as not as frequent as acronyms and initialisms.
+		//Examples: "R. Descartes", "B. IV" (B for Book)
+		rsm = new RegexMatchRule(Category.ACRONYM, ACRONYM_MAX_PRIORITY, true, mMatchMode);
+		rsm.init("[\\p{Lu}]\\.(?=[" + Space + "])");
+		addRule(rsm);
+
+		//plausible abbreviation
+		rsm = new RegexMatchRule(Category.ABBREVIATION, ABBR_MAX_PRIORITY, true, mMatchMode);
+		rsm.init("[\\p{Ll}]\\.(?=[" + Space + "])");
 		addRule(rsm);
 
 		// ==== COMMON WORDS ====

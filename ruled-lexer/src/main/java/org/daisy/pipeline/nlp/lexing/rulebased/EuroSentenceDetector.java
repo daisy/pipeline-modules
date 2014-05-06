@@ -68,14 +68,19 @@ public class EuroSentenceDetector implements ISentenceDetector {
 		//produces only 1-length punctuation marks.
 
 		String delimiter = "[.:?!…]*[?!…]+[….:?!]*";
+		String closingQuote = "['\"’”»›]";
 
 		mPositivePatterns = new SentencePattern[]{
 		        new SentencePattern(1, Category.PUNCTUATION, Category.SPACE, Category.COMMON)
 		                .regex("[.:]+", ".+", "[\\p{Lu}].*"),
 		        new SentencePattern(2, Category.PUNCTUATION, Category.QUOTE).regex("[.?!…]+",
-		                ".+"),
+		                closingQuote),
+		        new SentencePattern(1, Category.PUNCTUATION, Category.QUOTE).regex("[.?!…:]+",
+		                ".*"),
 		        new SentencePattern(3, Category.PUNCTUATION, Category.SPACE, Category.QUOTE)
-		                .regex("[.?!…]+", ".+", ".+"),
+		                .regex("[.?!…]+", ".+", closingQuote),
+		        new SentencePattern(1, Category.PUNCTUATION, Category.SPACE, Category.QUOTE)
+		                .regex("[.?!…:]+", ".+", ".*"),
 		        new SentencePattern(3, Category.PUNCTUATION, Category.SPACE,
 		                Category.PUNCTUATION).regex(delimiter, ".+", ":"),
 		        new SentencePattern(2, Category.PUNCTUATION, Category.PUNCTUATION).regex(
@@ -98,7 +103,12 @@ public class EuroSentenceDetector implements ISentenceDetector {
 		        new SentencePattern(0, Category.PUNCTUATION, Category.PUNCTUATION).regex("…",
 		                "-"),
 		        new SentencePattern(0, Category.PUNCTUATION, Category.PUNCTUATION).regex(".*",
-		                "[),]")
+		                "[),]"),
+		        new SentencePattern(0, Category.PUNCTUATION, Category.QUOTE, Category.SPACE,
+		                Category.COMMON).regex(".*", ".*", ".*", "[\\p{Ll}].*"),
+		        new SentencePattern(0, Category.PUNCTUATION, Category.SPACE, Category.QUOTE,
+		                Category.SPACE, Category.COMMON).regex(".*", ".*", ".*", ".*",
+		                "[\\p{Ll}].*")
 		};
 	}
 

@@ -51,4 +51,6 @@ TextCategorizers can be invoked from outside the usual NLP workflow to categoriz
 - Under certain circumstances, the break-detection step reorganizes the inline elements to keep the sentences where they should be (this lexing strategy is configurable though). This can have side effects on the CSS-based display and the meaning of the inline elements;
 - The general workflow makes the assumption that any @id added in the first stages will be left
 unchanged from the beginning to the end, i.e. the SMIL files generation.
+- Existing word elements are never kept;
+- Some of the existing sentence elements might be kept;
 - Lexicons (in TTS modules) wouldn't work well with elements that cannot contain sentences, such as the 'a' elements in dtbook110.
