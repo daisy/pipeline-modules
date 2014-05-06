@@ -52,7 +52,7 @@
         </p:when>
         <p:otherwise>
             <p:string-replace match="//html:title/text()">
-                <p:with-option name="replace" select="concat('&quot;',$title,'&quot;')"/>
+                <p:with-option name="replace" select="concat('''',replace($title,'''',''''''),'''')"/>
             </p:string-replace>
         </p:otherwise>
     </p:choose>
