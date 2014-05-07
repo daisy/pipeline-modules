@@ -62,6 +62,8 @@
         <p:documentation>For manipulating files.</p:documentation>
     </p:import>
     
+    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
+    
     <p:import href="check-files-exist.xpl"/>
     
     <p:import href="create-validation-report-error-for-file.xpl"/>
@@ -124,10 +126,10 @@
                     <p:pipe port="result" step="empty-fileset"/>
                 </p:output>
                 
-                <cx:message>
+                <px:message>
                     <p:with-option name="message"
                         select="concat('File not well-formed XML: ', $filepath)"/>
-                </cx:message>
+                </px:message>
                 
                 <p:identity name="empty-fileset">
                     <p:input port="source">

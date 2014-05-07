@@ -10,6 +10,7 @@
     <p:option name="first" select="'false'"/>
 
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
 
     <!--TODO awkward, add the entry with XProc, then perform URI cleanup-->
     <p:xslt name="href-uri">
@@ -47,9 +48,9 @@
                     <p:pipe port="source" step="main"/>
                 </p:input>
             </p:identity>
-            <cx:message>
+            <px:message>
                 <p:with-option name="message" select="concat('The file ',$niceHref,' referenced from ',$niceRef,' is not in the fileset.')"/>
-            </cx:message>
+            </px:message>
         </p:when>
         <p:otherwise>
             <p:variable name="href-uri-ified" select="/*/@href">
