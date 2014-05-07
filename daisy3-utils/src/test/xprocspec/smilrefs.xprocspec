@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.daisy.org/ns/xprocspec/xprocspec.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<x:description script="../../main/resources/xml/internal/smils/create-daisy3-smils.xpl"
+	       xmlns:x="http://www.daisy.org/ns/xprocspec"
+	       xmlns:p="http://www.w3.org/ns/xproc"
+	       xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+	       xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
+	       xmlns:dt="http://www.daisy.org/z3986/2005/dtbook/"
+	       xmlns:d="http://www.daisy.org/ns/pipeline/data">
+
+  <x:scenario label="Scenarii for testing the @smilref generation">
+    <x:call step="px:create-daisy3-smils">
+      <x:input port="audio-map">
+  	<x:document type="inline">
+  	  <d:audio-clips>
+	    <d:clip idref="s1"/>
+	    <d:clip idref="s2"/>
+	    <d:clip idref="s3"/>
+	    <d:clip idref="h1"/>
+  	  </d:audio-clips>
+  	</x:document>
+      </x:input>
+      <x:option name="smil-dir" select="'file:///output/'"/>
+      <x:option name="audio-dir" select="'file:///output/'"/>
+      <x:option name="root-dir" select="'file:///output/'"/>
+      <x:option name="daisy3-dtbook-uri" select="'file:///dtbook.xml'"/>
+      <x:option name="uid" select="'uid'"/>
+    </x:call>
+
+    <x:scenario label="simple sentence">
+      <x:call>
+  	<x:input port="content">
+  	  <x:document type="inline">
+	    <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+	      <sent id="s1">test</sent>
+	    </dtbook>
+	  </x:document>
+  	</x:input>
+      </x:call>
+      <x:context label="context">
+  	<x:document type="port" port="updated-content"/>
+      </x:context>
+      <x:expect label="result" type="custom" href="../resources/dtbook-compare.xpl" step="pxi:dtbook-compare">
+	<x:document type="inline">
+	  <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+	    <sent smilref="mo0.smil#xxx" id="s1">test</sent>
+	  </dtbook>
+	</x:document>
+      </x:expect>
+    </x:scenario>
+
+    <x:scenario label="headings without audio">
+      <x:call>
+  	<x:input port="content">
+  	  <x:document type="inline">
+	    <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+	      <h1 id="i1"><sent id="i2">test</sent></h1>
+	    </dtbook>
+	  </x:document>
+  	</x:input>
+      </x:call>
+      <x:context label="context">
+  	<x:document type="port" port="updated-content"/>
+      </x:context>
+      <x:expect label="result" type="custom" href="../resources/dtbook-compare.xpl" step="pxi:dtbook-compare">
+	<x:document type="inline">
+	  <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+	    <h1 id="i1" smilref="a">
+	      <sent id="i2" smilref="a">test</sent>
+            </h1>
+	  </dtbook>
+	</x:document>
+      </x:expect>
+    </x:scenario>
+
+    <x:scenario label="headings with audio">
+      <x:call>
+  	<x:input port="content">
+  	  <x:document type="inline">
+	    <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+	      <h1 id="h1"><sent>test</sent></h1>
+	    </dtbook>
+	  </x:document>
+  	</x:input>
+      </x:call>
+      <x:context label="context">
+  	<x:document type="port" port="updated-content"/>
+      </x:context>
+      <x:expect label="result" type="custom" href="../resources/dtbook-compare.xpl" step="pxi:dtbook-compare">
+	<x:document type="inline">
+	  <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+	    <h1 smilref="a" id="h1">
+	      <sent>test</sent>
+            </h1>
+	  </dtbook>
+	</x:document>
+      </x:expect>
+    </x:scenario>
+
+    <x:scenario label="two levels">
+      <x:call>
+  	<x:input port="content">
+  	  <x:document type="inline">
+	    <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+	      <level>
+		<sent id="s1">test</sent>
+	      </level>
+	      <level>
+		<sent id="s2">test</sent>
+	      </level>
+	    </dtbook>
+	  </x:document>
+  	</x:input>
+      </x:call>
+      <x:context label="context">
+	<x:document type="port" port="updated-content"/>
+      </x:context>
+      <x:expect label="result" type="custom" href="../resources/info-document.xpl" step="pxi:info-document"/>
+    </x:scenario>
+
+    <x:scenario label="level separator">
+      <x:call>
+  	<x:input port="content">
+  	  <x:document type="inline">
+	    <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+	      <level>
+		<sent id="s1">test</sent>
+		<level>
+		  <sent id="s2">test</sent>
+		</level>
+		<sent id="s3">test</sent>
+	      </level>
+	    </dtbook>
+	  </x:document>
+  	</x:input>
+      </x:call>
+      <x:context label="context">
+  	<x:document type="port" port="updated-content"/>
+      </x:context>
+      <x:expect label="result" type="custom" href="../resources/info-document.xpl" step="pxi:info-document"/>
+    </x:scenario>
+
+    <x:scenario label="nested levels">
+      <x:call>
+  	<x:input port="content">
+  	  <x:document type="inline">
+	    <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+	      <level1>
+		<sent id="s1">test</sent>
+		<level2>
+		  <sent id="s2">test</sent>
+		  <sent id="s3">test</sent>
+		  <level3>
+		    <level4>
+		      <level5>
+			<sent id="s4">test</sent>
+		      </level5>
+		      <sent id="s5">test</sent>
+		    </level4>
+		  </level3>
+		</level2>
+		<sent id="s6">test</sent>
+	      </level1>
+	    </dtbook>
+	  </x:document>
+  	</x:input>
+      </x:call>
+      <x:context label="context">
+  	<x:document type="port" port="updated-content"/>
+      </x:context>
+      <x:expect label="result" type="custom" href="../resources/info-document.xpl" step="pxi:info-document"/>
+    </x:scenario>
+
+
+    <x:scenario label="mixed levels">
+      <x:call>
+  	<x:input port="content">
+  	  <x:document type="inline">
+	    <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+	      <level>
+		<p>
+		  <sent id="s1">test</sent>
+		  <sent id="s2">test</sent>
+		</p>
+		<level>
+		  <level>
+		    <sent id="s3">test</sent>
+		  </level>
+		  <p>
+		    <sent id="s4">test</sent>
+		    <sent id="s5">test</sent>
+		  </p>
+		  <level>
+		    <sent id="s6">test</sent>
+		  </level>
+		</level>
+	      </level>
+	    </dtbook>
+	  </x:document>
+  	</x:input>
+      </x:call>
+      <x:context label="context">
+  	<x:document type="port" port="updated-content"/>
+      </x:context>
+      <x:expect label="result" type="custom" href="../resources/info-document.xpl" step="pxi:info-document"/>
+    </x:scenario>
+
+    <x:scenario label="noteref outside sentence">
+      <x:call>
+  	<x:input port="content">
+  	  <x:document type="inline">
+	    <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+	      <level>
+		<noteref id="ref1" idref="#n1">ref</noteref>
+	      </level>
+	      <level>
+		<note id="n1"><sent id="s1">note</sent></note>
+	      </level>
+	    </dtbook>
+	  </x:document>
+  	</x:input>
+      </x:call>
+      <x:context label="context">
+  	<x:document type="port" port="updated-content"/>
+      </x:context>
+      <x:expect label="result" type="custom" href="../resources/dtbook-compare.xpl" step="pxi:dtbook-compare">
+	<x:document type="inline">
+	  <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+	    <level>
+	      <noteref smilref="a" id="ref1" idref="#n1">ref</noteref>
+	    </level>
+            <level>
+	      <note smilref="a" id="n1">
+		<sent smilref="a" id="s1">note</sent>
+	      </note>
+            </level>
+	  </dtbook>
+	</x:document>
+      </x:expect>
+    </x:scenario>
+
+    <x:scenario label="noteref inside sentence">
+      <x:call>
+  	<x:input port="content">
+  	  <x:document type="inline">
+	    <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+	      <level>
+		<sent id="s8">
+		  <noteref id="ref1" idref="#n1">ref</noteref>
+		</sent>
+	      </level>
+	      <level>
+		<note id="n1">note</note>
+	      </level>
+	    </dtbook>
+	  </x:document>
+  	</x:input>
+      </x:call>
+      <x:context label="context">
+  	<x:document type="port" port="updated-content"/>
+      </x:context>
+      <x:expect label="result" type="custom" href="../resources/dtbook-compare.xpl" step="pxi:dtbook-compare">
+	<x:document type="inline">
+	  <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+            <level>
+	      <sent smilref="a" id="s8">
+		<noteref smilref="a" id="ref1" idref="#n1">ref</noteref>
+	      </sent>
+            </level>
+            <level>
+	      <note smilref="a" id="n1">note</note>
+            </level>
+        </dtbook>
+	</x:document>
+      </x:expect>
+    </x:scenario>
+
+    <x:scenario label="deep content note">
+      <x:call>
+  	<x:input port="content">
+  	  <x:document type="inline">
+	    <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+	      <level>
+		<noteref id="ref1" idref="#n1">ref</noteref>
+	      </level>
+	      <level>
+		<note id="n1">
+		  <p><p>
+		    <p>test</p>
+		    <sent id="s1">note</sent>
+		  </p></p>
+		  </note>
+	      </level>
+	    </dtbook>
+	  </x:document>
+  	</x:input>
+      </x:call>
+      <x:context label="context">
+  	<x:document type="port" port="updated-content"/>
+      </x:context>
+      <x:expect label="result" type="custom" href="../resources/dtbook-compare.xpl" step="pxi:dtbook-compare">
+	<x:document type="inline">
+	  <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+	    <level>
+	      <noteref smilref="a" id="ref1" idref="#n1">ref</noteref>
+	    </level>
+	    <level>
+	      <note smilref="a" id="n1">
+		<p><p>
+		  <p>test</p>
+		  <sent smilref="a" id="s1">note</sent>
+		</p></p>
+	      </note>
+	    </level>
+	  </dtbook>
+	</x:document>
+      </x:expect>
+    </x:scenario>
+
+    <x:scenario label="noteref inside note">
+      <x:call>
+  	<x:input port="content">
+  	  <x:document type="inline">
+	    <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+	      <level>
+		<noteref id="ref1" idref="#n1">ref</noteref>
+	      </level>
+	      <level>
+		<note id="n1">
+		  <noteref id="ref2" idref="#n2"/>
+		</note>
+	      </level>
+	      <level>
+		<note id="n2">note</note>
+	      </level>
+	    </dtbook>
+	  </x:document>
+	</x:input>
+      </x:call>
+      <x:context label="context">
+  	<x:document type="port" port="updated-content"/>
+      </x:context>
+      <x:expect label="result" type="custom" href="../resources/dtbook-compare.xpl" step="pxi:dtbook-compare">
+	<x:document type="inline">
+	  <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+	    <level>
+	      <noteref smilref="a" id="ref1" idref="#n1">ref</noteref>
+	    </level>
+	    <level>
+	      <note smilref="a" id="n1">
+		<noteref smilref="a" id="ref2" idref="#n2"/>
+	      </note>
+	    </level>
+	    <level>
+	      <note smilref="a" id="n2">note</note>
+	    </level>
+	  </dtbook>
+	</x:document>
+      </x:expect>
+    </x:scenario>
+  </x:scenario>
+
+</x:description>
