@@ -124,6 +124,8 @@
 		<system systemId="http://www.w3.org/TR/xhtml-modularization/DTD/xhtml-table-1.mod" uri="./xhtml11/xhtml-table-1.mod" />     
 		<system systemId="http://www.w3.org/TR/xhtml-modularization/DTD/xhtml-form-1.mod" uri="./xhtml11/xhtml-form-1.mod" />         
 		<system systemId="http://www.w3.org/TR/xhtml-modularization/DTD/xhtml-struct-1.mod" uri="./xhtml11/xhtml-struct-1.mod" />
-	</group>   
+	</group>
+	
+	<nextCatalog catalog="org:daisy:pipeline:modules:common-utils" />
     
 </catalog>

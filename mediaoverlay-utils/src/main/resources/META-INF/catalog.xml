@@ -9,4 +9,5 @@
    <uri name="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/clock-functions.xsl"
         uri="../xml/clock-functions.xsl"/>
    <nextCatalog catalog="org:daisy:pipeline:modules:file-utils"/>
+   <nextCatalog catalog="org:daisy:pipeline:modules:common-utils" />
 </catalog>
