@@ -44,6 +44,7 @@
     </p:option>
 
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
     
     <p:import href="http://www.daisy.org/pipeline/modules/dtbook-validator/library.xpl">
         <p:documentation>
@@ -66,7 +67,7 @@
             <p:pipe port="source" step="merge-dtbook"/>
         </p:input>
     </p:split-sequence>
-    <cx:message message="Merging DTBook documents"/>
+    <px:message message="Merging DTBook documents"/>
     <p:sink/>
 
     <p:for-each name="validate-input">

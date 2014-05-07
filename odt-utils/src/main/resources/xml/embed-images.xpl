@@ -29,6 +29,7 @@
 	<p:import href="update-files.xpl"/>
 	<p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
 	<p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
+	<p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
 	
 	<p:variable name="base" select="//d:file[starts-with(@media-type,'application/vnd.oasis.opendocument')]/resolve-uri(@href, base-uri(.))">
 		<p:pipe step="embed-images" port="fileset.in"/>
@@ -49,7 +50,7 @@
 		</p:input>
 	</odt:get-file>
 	
-	<cx:message message="[odt-utils] embedding images"/>
+	<px:message message="[odt-utils] embedding images"/>
 	<p:sink/>
 	
 	<px:fileset-create name="base">

@@ -25,6 +25,7 @@
     </p:output>
 
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/mediatype-utils/library.xpl"/>
@@ -48,14 +49,14 @@
             </p:inline>
         </p:input>
     </p:xslt>
-    <cx:message>
+    <px:message>
         <p:with-option name="message" select="concat('loading NCC: ',/*/@href)"/>
-    </cx:message>
+    </px:message>
     <px:html-load name="in-memory.ncc">
         <p:with-option name="href" select="/*/@href"/>
     </px:html-load>
 
-    <cx:message message="Making an ordered list of SMIL-files referenced from the NCC according to the flow (reading order)"/>
+    <px:message message="Making an ordered list of SMIL-files referenced from the NCC according to the flow (reading order)"/>
     <p:xslt name="fileset.smil">
         <p:input port="parameters">
             <p:empty/>
@@ -65,19 +66,19 @@
         </p:input>
     </p:xslt>
 
-    <cx:message message="Loading all SMIL files"/>
+    <px:message message="Loading all SMIL files"/>
     <p:for-each>
         <p:iteration-source select="//d:file"/>
-        <cx:message>
+        <px:message>
             <p:with-option name="message" select="concat('loading ',/*/@href,'...')"/>
-        </cx:message>
+        </px:message>
         <p:load>
             <p:with-option name="href" select="p:resolve-uri(/*/@href,base-uri(/*))"/>
         </p:load>
     </p:for-each>
     <p:identity name="in-memory.smil"/>
 
-    <cx:message message="Listing all resources referenced from the SMIL files"/>
+    <px:message message="Listing all resources referenced from the SMIL files"/>
     <p:for-each>
         <p:identity name="fileset.html-and-resources.in-memory.smil"/>
 
@@ -111,26 +112,26 @@
     </p:for-each>
     <px:fileset-join name="fileset.html-and-audio"/>
 
-    <cx:message message="Loading all HTML-files"/>
+    <px:message message="Loading all HTML-files"/>
     <p:for-each>
         <p:iteration-source select="//d:file[@media-type='text/html' or @media-type='application/xhtml+xml' or matches(lower-case(@href),'\.x?html$')]"/>
-        <cx:message>
+        <px:message>
             <p:with-option name="message" select="concat('loading ',/*/@href,'...')"/>
-        </cx:message>
+        </px:message>
         <px:html-load>
             <p:with-option name="href" select="p:resolve-uri(/*/@href,base-uri(/*))"/>
         </px:html-load>
     </p:for-each>
     <p:identity name="in-memory.html"/>
 
-    <cx:message message="Listing all resources referenced from the HTML files"/>
+    <px:message message="Listing all resources referenced from the HTML files"/>
     <p:for-each name="fileset.html-resources.for-each">
         <px:html-to-fileset/>
-        <cx:message>
+        <px:message>
             <p:with-option name="message" select="concat('extracted list of resources from ',replace(base-uri(/*),'^.*/',''))">
                 <p:pipe port="current" step="fileset.html-resources.for-each"/>
             </p:with-option>
-        </cx:message>
+        </px:message>
         <!--<p:xslt>
             <p:input port="parameters">
                 <p:empty/>
