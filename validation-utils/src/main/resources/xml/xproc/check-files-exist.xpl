@@ -42,7 +42,7 @@
         <p:pipe port="result" step="wrap-errors"/>
     </p:output>
     
-    <p:output port="validation-status" px:media-type="application/xml+vnd.pipeline.status">
+    <p:output port="validation-status" px:media-type="application/vnd.pipeline.status+xml">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h1 px:role="name">validation-status</h1>
             <p px:role="desc">Validation status (http://code.google.com/p/daisy-pipeline/wiki/ValidationStatusXML) of the file check.</p>
