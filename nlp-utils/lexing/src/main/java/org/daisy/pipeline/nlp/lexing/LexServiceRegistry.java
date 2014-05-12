@@ -103,7 +103,7 @@ public class LexServiceRegistry {
 	public LexerToken getFallbackToken(Collection<LexerToken> existingTokens)
 	        throws LexerInitException {
 		// Look in priority in the existing tokens
-		int bestScore = -1;
+		int bestScore = 0;
 		LexerToken bestToken = null;
 		for (LexerToken token : existingTokens) {
 			int score = token.getLexService().getOverallQuality();
@@ -113,7 +113,7 @@ public class LexServiceRegistry {
 			}
 		}
 
-		// Look at the others lexers
+		// Look at the other lexers
 		Map.Entry<LexService, List<LexerToken>> best = null;
 		for (Map.Entry<LexService, List<LexerToken>> entry : mLexerToTokens.entrySet()) {
 			int score = entry.getKey().getOverallQuality();
@@ -126,6 +126,10 @@ public class LexServiceRegistry {
 
 		if (bestToken != null) {
 			return bestToken;
+		}
+
+		if (best == null) {
+			throw new LexerInitException("No generic lexing service available");
 		}
 
 		//The best fallback choice is to use a new token
