@@ -11,7 +11,7 @@
   </parent>
 
   <artifactId>file-utils</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.1.0-SNAPSHOT</version>
   <packaging>bundle</packaging>
 
   <name>DAISY Pipeline 2 module :: File Utilities</name>
@@ -65,7 +65,7 @@
         <configuration>
           <instructions>
             <Service-Component>
-              OSGI-INF/file-exists.xml,OSGI-INF/copy-resource-step.xml
+              OSGI-INF/file-exists.xml,OSGI-INF/file-expand83.xml,OSGI-INF/copy-resource-step.xml
             </Service-Component>
           </instructions>
         </configuration>

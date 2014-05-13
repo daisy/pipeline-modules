@@ -139,8 +139,11 @@
 
         <!-- normalize path -->
         <xsl:variable name="path" select="pf:normalize-path($path)"/>
-
-        <xsl:sequence select="iri-to-uri(pf:recompose-uri(($scheme,$authority,$path,$query,$fragment)))"/>
+        
+        <xsl:variable name="uri" select="pf:recompose-uri(($scheme,$authority,$path,$query,$fragment))"/>
+        <xsl:variable name="uri" select="pf:file-expand83($uri)" use-when="function-available('pf:file-expand83')"/>
+        
+        <xsl:sequence select="iri-to-uri($uri)"/>
     </xsl:function>
 
     <xsl:function name="pf:relativize-uri" as="xs:string">
