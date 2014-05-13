@@ -135,7 +135,7 @@ public class ESpeakBinTTS extends MarkFreeTTSService {
 
 	@Override
 	public int getOverallPriority() {
-		return Integer.valueOf(System.getProperty("espeak.bin.priority", "1"));
+		return Integer.valueOf(System.getProperty("espeak.priority", "1"));
 	}
 
 	@Override

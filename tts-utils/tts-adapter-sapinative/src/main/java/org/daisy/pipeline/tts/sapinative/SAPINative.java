@@ -165,7 +165,7 @@ public class SAPINative extends AbstractTTSService {
 
 	@Override
 	public int getOverallPriority() {
-		return Integer.valueOf(System.getProperty("sapi.native.priority", "2"));
+		return Integer.valueOf(System.getProperty("sapi.priority", "2"));
 	}
 
 	@Override

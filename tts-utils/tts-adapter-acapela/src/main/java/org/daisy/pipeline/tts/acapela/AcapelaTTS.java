@@ -375,7 +375,7 @@ public class AcapelaTTS extends AbstractTTSService {
 
 	@Override
 	public int getOverallPriority() {
-		return 10;
+		return Integer.valueOf(System.getProperty("att.priority", "10"));
 	}
 
 	@Override

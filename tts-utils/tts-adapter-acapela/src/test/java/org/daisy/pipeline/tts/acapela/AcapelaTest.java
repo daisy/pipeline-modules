@@ -1,6 +1,9 @@
 package org.daisy.pipeline.tts.acapela;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -201,5 +204,52 @@ public class AcapelaTest {
 		Assert.assertTrue(buffer1.offsetInOutput > 2000);
 
 		Assert.assertTrue(Math.abs(buffer1.offsetInOutput - buffer2.offsetInOutput) < 2000);
+	}
+
+	@Test
+	public void utf8chars() throws SynthesisException {
+		List<Character> chars = new ArrayList<Character>();
+		chars.add("a".charAt(0)); //for the reference test
+
+		//get a list of 'dangerous' characters
+		InputStream is = getClass().getResourceAsStream("/decimal_chars.txt");
+		BufferedReader br = new BufferedReader(new InputStreamReader(is));
+		while (true) {
+			try {
+				String line = br.readLine();
+				if (line == null)
+					break;
+				int i = Integer.parseInt(line);
+				chars.add((char) i);
+			} catch (IOException e) {
+				e.printStackTrace();
+				break;
+			}
+
+		}
+
+		//test every character individually
+		String begin = "<s>begin ";
+		String end = " this is the end of the sentence long enough for tests<mark name=\"0\"></s>";
+		Integer refSize = null;
+
+		for (Character c : chars) {
+			ThreadResources r = (ThreadResources) tts.allocateThreadResources();
+			r.idsToMark = Arrays.asList("end");
+			List<Entry<String, Integer>> l = new ArrayList<Entry<String, Integer>>();
+			RawAudioBuffer buffer = new RawAudioBuffer(1);
+
+			tts.synthesize(format(begin + c + end, "alice"), buffer, r, l);
+			tts.releaseThreadResources(r);
+
+			Assert.assertTrue(1 == l.size());
+
+			if (refSize == null) {
+				refSize = new Integer(buffer.offsetInOutput);
+			}
+
+			Assert.assertTrue(2 * refSize / 3 - buffer.offsetInOutput < 0);
+		}
+
 	}
 }
