@@ -78,6 +78,7 @@
         <p:variable name="cdata-section-elements" select="/*/@cdata-section-elements"/>
         <p:variable name="doctype-public" select="/*/@doctype-public"/>
         <p:variable name="doctype-system" select="/*/@doctype-system"/>
+        <p:variable name="doctype" select="/*/@doctype"/>
         <p:variable name="encoding" select="if (/*/@encoding) then /*/@encoding else 'utf-8'"/>
         <p:variable name="escape-uri-attributes" select="if (/*/@escape-uri-attributes) then /*/@escape-uri-attributes else 'false'"/>
         <p:variable name="include-content-type" select="/*/@include-content-type"/>
@@ -111,13 +112,19 @@
                 <p:delete match="/*/@xml:base"/>
                 <p:choose>
                     <p:when test="starts-with($media-type,'binary/') or /c:data[@encoding='base64']">
-                        <p:store cx:decode="true" encoding="base64">
+                        <p:output port="result">
+                            <p:pipe port="result" step="store-binary"/>
+                        </p:output>
+                        <p:store cx:decode="true" encoding="base64" name="store-binary">
                             <p:with-option name="href" select="$target"/>
                         </p:store>
                     </p:when>
                     <p:when
                         test="/c:data or (starts-with($media-type,'text/') and not(starts-with($media-type,'text/xml')))">
-                        <p:store method="text">
+                        <p:output port="result">
+                            <p:pipe port="result" step="store-text"/>
+                        </p:output>
+                        <p:store method="text" name="store-text">
                             <p:with-option name="href" select="$target"/>
                             <p:with-option name="byte-order-mark" select="$byte-order-mark"/>
                             <p:with-option name="encoding" select="$encoding"/>
@@ -126,7 +133,8 @@
                         </p:store>
                     </p:when>
                     <p:otherwise>
-                        <p:store>
+                        <p:output port="result"/>
+                        <p:store name="store-xml">
                             <p:with-option name="href" select="$target"/>
                             <p:with-option name="byte-order-mark" select="$byte-order-mark"/>
                             <p:with-option name="cdata-section-elements" select="$cdata-section-elements"/>
@@ -153,9 +161,27 @@
                             <p:with-option name="undeclare-prefixes" select="$undeclare-prefixes"/>
                             <p:with-option name="version" select="$version"/>
                         </p:store>
+                        <p:choose>
+                            <p:when test="$doctype">
+                                <px:set-doctype>
+                                    <p:with-option name="href" select="/*/text()">
+                                        <p:pipe port="result" step="store-xml"/>
+                                    </p:with-option>
+                                    <p:with-option name="doctype" select="$doctype"/>
+                                </px:set-doctype>
+                            </p:when>
+                            <p:otherwise>
+                                <p:identity>
+                                    <p:input port="source">
+                                        <p:pipe port="result" step="store-xml"/>
+                                    </p:input>
+                                </p:identity>
+                            </p:otherwise>
+                        </p:choose>
                     </p:otherwise>
                 </p:choose>
-                <p:identity>
+                <p:identity name="store-complete"/>
+                <p:identity cx:depends-on="store-complete">
                     <p:input port="source">
                         <p:pipe port="current" step="store"/>
                     </p:input>
