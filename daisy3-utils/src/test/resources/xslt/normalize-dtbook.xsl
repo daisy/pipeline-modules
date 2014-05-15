@@ -21,7 +21,7 @@
   <xsl:template match="@smilref">
     <xsl:variable name="smil" select="dt:smil(.)"/>
     <xsl:attribute name="smilref">
-      <xsl:value-of select="string-join(//*[dt:smil(@smilref) = $smil]/@id, '-')"/>
+      <xsl:value-of select="string-join(//*[@smilref and dt:smil(@smilref) = $smil]/@id, '-')"/>
     </xsl:attribute>
   </xsl:template>
 

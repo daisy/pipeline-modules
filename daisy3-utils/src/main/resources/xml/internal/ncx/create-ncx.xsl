@@ -33,6 +33,7 @@
   <xsl:variable name="all-but-headings"
 		select="concat(' ', string-join($navTargets//@type, ' '), ' ', $pageTargets)"/>
 
+  <xsl:variable name="pages" select="//dtbook:pagenum"/>
 
   <xsl:key name="clips" use="@idref" match="*[@idref]"/>
   <xsl:key name="headings" use="generate-id()"
@@ -65,8 +66,8 @@
 	<meta name="dtb:depth"
 	      content="{max(//*[key('headings', generate-id())]/
 		       count(ancestor-or-self::*[key('headings', generate-id())]))}"/>
-	<meta name="dtb:totalPageCount" content="{count(distinct-values(//dtbook:pagenum/text()))}"/>
-	<xsl:variable name="total-pages" select="max(//dtbook:pagenum[not(@page) or @page='normal']/text())"/>
+	<meta name="dtb:totalPageCount" content="{count($pages)}"/>
+	<xsl:variable name="total-pages" select="max($pages[not(@page) or @page='normal']/text())"/>
 	<meta name="dtb:maxPageNumber" content="{if (not($total-pages)) then '0' else $total-pages}"/>
 	<smilCustomTest bookStruct="PAGE_NUMBER" defaultState="false" id="pagenum" override="visible"/>
 	<smilCustomTest bookStruct="NOTE" defaultState="false" id="note" override="visible"/>
@@ -141,11 +142,12 @@
   <!-- ======== pageList ======== -->
   <xsl:template name="pageList">
     <xsl:param name="play-orders"/>
-    <xsl:variable name="pages" select="//*[contains($pageTargets, concat(' ', local-name(), ' '))]"/>
     <xsl:if test="$pages">
       <pageList>
 	<xsl:for-each select="$pages">
-	  <pageTarget type="{if (@page) then @page else 'normal'}" value="{d:getText(.)}">
+	  <xsl:variable name="val" select="d:getText(.)"/>
+	  <pageTarget type="{if (@page) then @page else 'normal'}"
+		      value="{if ($val='') then string(count($pages)+position()) else $val}">
 	    <xsl:apply-templates select="."  mode="add-content">
 	      <xsl:with-param name="play-orders" select="$play-orders"/>
 	      <xsl:with-param name="text-container" select="."/>

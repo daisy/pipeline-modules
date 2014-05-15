@@ -6,6 +6,18 @@
 
   <!-- This script add missing elements so as to make the NCX/OPF/SMIL generation easier. -->
 
+  <xsl:variable name="title" select="(//meta[@name='dc:Title'])[1]"/>
+  <xsl:variable name="safe-title">
+    <xsl:choose>
+      <xsl:when test="not($title) or $title/@content = ''">
+	<xsl:value-of select="'Content'"/>
+      </xsl:when>
+      <xsl:otherwise>
+	<xsl:value-of select="$title/@content"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
   <xsl:template match="bodymatter" priority="2">
     <xsl:copy>
       <xsl:copy-of select="@*"/>
@@ -14,17 +26,7 @@
 	<xsl:when test="not($first-level)">
 	  <!-- Case 1: no levels at all -->
 	  <level1>
-	    <h1 id="faux-heading">
-	      <xsl:variable name="title" select="(//meta[@name='dc:Title'])[1]"/>
-	      <xsl:choose>
-		<xsl:when test="not($title) or $title/@content = ''">
-		  <xsl:value-of select="'Content'"/>
-		</xsl:when>
-		<xsl:otherwise>
-		  <xsl:value-of select="$title/@content"/>
-		</xsl:otherwise>
-	      </xsl:choose>
-	    </h1>
+	    <h1 id="faux-heading"><xsl:value-of select="$safe-title"/></h1>
 	    <xsl:apply-templates select="node()"/>
 	  </level1>
 	</xsl:when>
@@ -39,6 +41,34 @@
 	</xsl:otherwise>
       </xsl:choose>
     </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="book" priority="2">
+    <xsl:copy>
+      <xsl:copy-of select="@*"/>
+      <xsl:if test="not(child::frontmatter)">
+	<frontmatter>
+	  <xsl:if test="not(//doctitle)">
+	    <xsl:call-template name="add-doc-title"/>
+	  </xsl:if>
+	</frontmatter>
+      </xsl:if>
+      <xsl:apply-templates select="node()|@*"/>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="frontmatter" priority="2">
+    <xsl:copy>
+      <xsl:copy-of select="@*"/>
+      <xsl:if test="not(//doctitle)">
+	<xsl:call-template name="add-doc-title"/>
+      </xsl:if>
+      <xsl:apply-templates select="node()|@*"/>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template name="add-doc-title">
+    <doctitle><xsl:value-of select="$safe-title"/></doctitle>
   </xsl:template>
 
   <xsl:template match="level|level1" priority="2" mode="find-level">

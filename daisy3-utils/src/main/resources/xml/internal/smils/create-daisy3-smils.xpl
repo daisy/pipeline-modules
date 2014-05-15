@@ -32,7 +32,7 @@
     </p:output>
 
     <p:output port="updated-content" primary="true">
-      <p:pipe port="result" step="add-smilrefs"/>
+      <p:pipe port="result" step="copy-smilrefs"/>
       <p:documentation xmlns="http://www.w3.org/1999/xhtml">
 	 <p>Content document with smilref attributes.</p>
       </p:documentation>
@@ -78,22 +78,63 @@
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
 
-    <p:xslt name="add-smilrefs">
+    <p:xslt name="add-ids">
       <p:input port="source">
 	<p:pipe port="content" step="main"/>
+      </p:input>
+      <p:input port="stylesheet">
+	<p:document href="add-ids.xsl"/>
+      </p:input>
+      <p:input port="parameters">
+	<p:empty/>
+      </p:input>
+    </p:xslt>
+    <cx:message message="Smil-needed IDs generated"/>
+
+    <p:xslt name="audio-order">
+      <p:input port="stylesheet">
+    	<p:document href="audio-order.xsl"/>
+      </p:input>
+      <p:input port="parameters">
+    	<p:empty/>
+      </p:input>
+    </p:xslt>
+    <cx:message message="SMIL audio order generated"/>
+    <p:sink/>
+
+    <p:xslt name="add-smilrefs">
+      <p:input port="source">
+	<p:pipe port="result" step="audio-order"/>
 	<p:pipe port="audio-map" step="main"/>
       </p:input>
       <p:input port="stylesheet">
 	<p:document href="add-smilrefs.xsl"/>
       </p:input>
-      <p:with-param name="granularity" select="'level'"/>
+      <p:input port="parameters">
+	<p:empty/>
+      </p:input>
       <p:with-param name="mo-dir" select="$smil-dir"/>
       <p:with-param name="output-dir" select="$root-dir"/>
     </p:xslt>
-    <cx:message message="Smilref attributes added."/>
+    <cx:message message="Smilref generated"/>
     <p:sink/>
 
-    <p:xslt name="create-mo">
+    <p:xslt name="copy-smilrefs">
+      <p:input port="source">
+	<p:pipe port="result" step="add-ids"/>
+	<p:pipe port="result" step="add-smilrefs"/>
+      </p:input>
+      <p:input port="stylesheet">
+	<p:document href="copy-smilrefs.xsl"/>
+      </p:input>
+      <p:input port="parameters">
+	<p:empty/>
+      </p:input>
+    </p:xslt>
+    <cx:message message="Smilrefs copied to the original document"/>
+    <p:sink/>
+
+    <p:xslt name="create-smils">
       <p:input port="source">
 	<p:pipe port="result" step="add-smilrefs"/>
 	<p:pipe port="audio-map" step="main"/>
@@ -111,7 +152,7 @@
 
     <p:xslt name="compute-durations">
       <p:input port="source">
-	<p:pipe port="secondary" step="create-mo"/>
+	<p:pipe port="secondary" step="create-smils"/>
       </p:input>
       <p:input port="stylesheet">
 	<p:document href="compute-durations.xsl"/>
@@ -126,7 +167,7 @@
     <p:for-each name="smil-with-durations">
       <p:output port="result"/>
       <p:iteration-source>
-	<p:pipe port="secondary" step="create-mo"/>
+	<p:pipe port="secondary" step="create-smils"/>
       </p:iteration-source>
       <p:variable name="doc-uri" select="base-uri(/*)"/>
       <p:viewport match="smil:head/smil:meta[@name='dtb:totalElapsedTime']">
@@ -140,7 +181,7 @@
 
     <p:for-each>
       <p:iteration-source>
-	<p:pipe port="secondary" step="create-mo"/>
+	<p:pipe port="secondary" step="create-smils"/>
       </p:iteration-source>
       <p:output port="result" sequence="true"/>
       <p:variable name="mo-uri" select="base-uri(/*)"/>

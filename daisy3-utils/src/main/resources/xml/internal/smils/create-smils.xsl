@@ -13,8 +13,14 @@
   <xsl:param name="content-uri"/>
   <xsl:param name="uid"/>
 
+  <xsl:function name="d:smil">
+    <xsl:param name="smilref"/>
+    <xsl:value-of select="substring-before($smilref, '#')"/>
+  </xsl:function>
+
   <xsl:variable name="audio-dir-rel" select="pf:relativize-uri($audio-dir, $mo-dir)"/>
   <xsl:variable name="content-doc-rel" select="pf:relativize-uri($content-uri, $mo-dir)"/>
+  <xsl:variable name="ref-targets" select="' note annotation '"/>
 
   <xsl:variable name="custom-attrs">
     <customAttributes>
@@ -28,14 +34,14 @@
     </customAttributes>
   </xsl:variable>
 
-  <xsl:variable name="ref-targets" select="' note annotation '"/>
-
   <xsl:key name="clips" match="*[@idref]" use="@idref"/>
   <xsl:key name="targets" match="*[@id and contains($ref-targets, concat(' ', local-name(), ' '))]" use="@id"/>
 
   <xsl:template match="/">
     <!-- TODO: rewrite the algorithm to iterate over the document only once. -->
-    <xsl:for-each-group select="//*[@smilref]" group-by="substring-before(@smilref, '#')">
+    <xsl:variable name="root" select="/"/>
+    <!-- This could be optimized by not recursing over the nodes with a @smilref. -->
+    <xsl:for-each-group select="//*[@smilref]" group-by="d:smil(@smilref)">
       <xsl:result-document href="{resolve-uri(current-grouping-key(), $content-dir)}">
 	<smil>
 	  <head>
@@ -45,7 +51,7 @@
 	     <xsl:copy-of select="$custom-attrs"/>
 	  </head>
 	  <body>
-	    <xsl:apply-templates select="/*" mode="find-ref">
+	    <xsl:apply-templates select="$root/*" mode="find-ref">
 	      <xsl:with-param name="smilfile" select="current-grouping-key()"/>
 	    </xsl:apply-templates>
 	  </body>
@@ -56,16 +62,16 @@
 
   <!-- === FIND THE SUBTREES THAT CORRESPOND TO THE SMIL FILE WE ARE LOOKING FOR === -->
 
-  <xsl:template match="*" mode="find-ref">
+  <xsl:template match="*" mode="find-ref" priority="1">
     <xsl:param name="smilfile"/>
     <xsl:apply-templates mode="find-ref" select="*">
       <xsl:with-param name="smilfile" select="$smilfile"/>
     </xsl:apply-templates>
   </xsl:template>
 
-  <xsl:template match="*[@smilref]" mode="find-ref">
+  <xsl:template match="*[@smilref]" mode="find-ref" priority="2">
     <xsl:param name="smilfile"/>
-    <xsl:if test="substring-before(@smilref, '#') = $smilfile">
+    <xsl:if test="d:smil(@smilref) = $smilfile">
       <xsl:apply-templates select="." mode="write-smil"/>
     </xsl:if>
     <!-- No 'otherwise' needed as the children will have the same
@@ -75,14 +81,11 @@
 
   <!-- === SMIL WRITING TEMPLATES === -->
 
-  <xsl:template match="*[@smilref]" mode="write-smil">
-    <xsl:param name="target-mode" select="'false'"/>
+  <xsl:template match="*[@smilref]" mode="write-smil" priority="2">
+    <xsl:variable name="smil-nr" select="d:smil(@smilref)"/>
     <xsl:variable name="id-in-smil" select="substring-after(@smilref, '#')"/>
     <xsl:choose>
-      <xsl:when test="$target-mode='false' and exists(key('targets', @id))">
-	<!-- Do nothing because the targets are already taken care of by their reference. -->
-      </xsl:when>
-      <xsl:when test="descendant::*[@smilref and not(key('targets', @id))][1]">
+      <xsl:when test="descendant::*[@smilref and d:smil(@smilref) = $smil-nr][1]">
 	<seq id="{$id-in-smil}" class="{local-name()}">
 	  <xsl:apply-templates select="." mode="write-custom"/>
 	  <xsl:apply-templates mode="write-smil" select="*"/>
@@ -93,12 +96,11 @@
 	  <xsl:apply-templates select="." mode="write-custom"/>
 	  <xsl:apply-templates select="." mode="add-link"/>
 	</par>
-	<xsl:apply-templates select="." mode="add-target"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="*" mode="write-smil">
+  <xsl:template match="*" mode="write-smil" priority="1">
     <xsl:apply-templates mode="write-smil" select="*"/>
   </xsl:template>
 
@@ -121,8 +123,6 @@
 
   <xsl:template match="*" mode="write-custom"/>
 
-  <!-- === DEAL WITH THE NOTEREF AND ANNOREF -->
-
   <xsl:template match="dtbook:noteref|dtbook:annoref" mode="add-link">
     <a external="false" href="{tokenize(key('targets', substring-after(@idref, '#'))/@smilref, '[/\\]')[last()]}">
       <xsl:call-template name="add-audio"/>
@@ -131,17 +131,6 @@
 
   <xsl:template match="*" mode="add-link">
     <xsl:call-template name="add-audio"/>
-  </xsl:template>
-
-  <xsl:template match="dtbook:noteref|dtbook:annoref" mode="add-target">
-    <!-- Exceptions to the document order: the SMIL order put together the noteref and the note. -->
-    <xsl:apply-templates select="key('targets', substring-after(@idref, '#'))" mode="write-smil">
-      <xsl:with-param name="target-mode" select="'true'"/>
-    </xsl:apply-templates>
-  </xsl:template>
-
-  <xsl:template match="*" mode="add-target">
-    <!-- nothing -->
   </xsl:template>
 
 </xsl:stylesheet>
