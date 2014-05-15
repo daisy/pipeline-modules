@@ -21,7 +21,7 @@
     <module>audio-utils/audio-common</module>
     <module>audio-utils/audio-encoder-lame</module>
   </modules>
-  
+
   <dependencyManagement>
     <dependencies>
       <dependency>
