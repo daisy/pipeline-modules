@@ -7,8 +7,8 @@
 	     unbind="removeLexService"
 	     cardinality="0..n"
 	     interface="org.daisy.pipeline.nlp.lexing.LexService"
-	     name="SpecializedLexService"
-	     policy="static"/>
+	     name="LexService"
+	     policy="dynamic"/>
 
    <service>
       <provide interface="org.daisy.pipeline.nlp.lexing.LexServiceRegistry"/>
