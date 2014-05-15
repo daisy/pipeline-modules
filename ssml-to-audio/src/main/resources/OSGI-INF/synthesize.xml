@@ -15,9 +15,9 @@
 
   <reference bind="setAudioServices"
 	     unbind="unsetAudioServices"
-	     cardinality="1..1"
+	     cardinality="0..1"
 	     interface="org.daisy.pipeline.audio.AudioServices"
 	     name="AudioServices"
-	     policy="static"/>
+	     policy="dynamic"/>
 
 </scr:component>
