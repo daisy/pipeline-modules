@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.daisy</groupId>
     <artifactId>daisy</artifactId>
-    <version>2</version>
+    <version>3</version>
     <relativePath />
   </parent>
 
@@ -29,7 +29,7 @@
     <module>validation-utils</module>
     <module>zip-utils</module>
   </modules>
-  
+
   <!-- BoM of the default script modules (for use in assemblies) -->
   <dependencyManagement>
     <dependencies>
