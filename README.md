@@ -1,5 +1,7 @@
-pipeline-mod-nlp
-================
+DAISY Pipeline 2 :: NLP Modules
+===============================
+
+[![Build Status](https://travis-ci.org/daisy/pipeline-mod-nlp.png?branch=master)](https://travis-ci.org/daisy/pipeline-mod-nlp)
 
 NLP-related modules for the DAISY Pipeline 2
 
