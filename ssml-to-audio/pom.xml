@@ -8,7 +8,8 @@
   <parent>
     <groupId>org.daisy.pipeline.modules</groupId>
     <artifactId>tts-modules-parent</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.8-SNAPSHOT</version>
+    <relativePath>../parent</relativePath>
   </parent>
 
   <version>1.0.0-SNAPSHOT</version>
@@ -27,14 +28,12 @@
     <dependency>
       <groupId>org.daisy.pipeline.modules</groupId>
       <artifactId>audio-common</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
     </dependency>
 
     <!-- needed to use com.xmlcalabash.library.DefaultStep ... -->
     <dependency>
       <groupId>org.daisy.libs</groupId>
       <artifactId>com.xmlcalabash</artifactId>
-      <version>1.0.3</version>
     </dependency>
 
     <!-- needed to use org.daisy.common.xproc.calabash.XProcStepProvider -->
@@ -46,7 +45,6 @@
     <dependency>
       <groupId>net.sf.saxon</groupId>
       <artifactId>Saxon-HE</artifactId>
-      <version>9.4</version>
     </dependency>
   </dependencies>
 
