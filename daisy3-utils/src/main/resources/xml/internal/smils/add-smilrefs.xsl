@@ -7,29 +7,23 @@
 
   <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/uri-functions.xsl"/>
 
-  <xsl:param name="smil-nodes"/>
+  <xsl:param name="no-smilref"/>
   <xsl:param name="mo-dir"/>
   <xsl:param name="output-dir"/>
 
   <xsl:variable name="mo-dir-rel" select="pf:relativize-uri($mo-dir, $output-dir)"/>
 
   <xsl:key name="struct" match="*[@node]" use="@node"/>
-  <xsl:key name="nosmil" match="*[@id]" use="@id"/>
   <xsl:key name="clips" match="*[@idref]" use="@idref"/>
 
   <!-- This variable maps levels to numbers. They will be used for
-       determining the smil names. It is used also for excluding the
-       level's ancestors.-->
+       determining the smil names.-->
   <xsl:variable name="top-elements">
     <d:structs>
-      <!-- Note: this might create position not refered anywhere,
+      <!-- Note: this might create position not referred anywhere,
            which should be harmless. -->
       <xsl:for-each select="//*[starts-with(local-name(), 'level')]">
 	<d:s pos="{position()}" node="{generate-id(current())}"/>
-	<xsl:for-each select="current()/ancestor-or-self::*[@id]">
-	  <!-- There will be some duplicates of d:e -->
-	  <d:e id="{current()/@id}"/>
-	</xsl:for-each>
       </xsl:for-each>
     </d:structs>
   </xsl:variable>
@@ -40,7 +34,8 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="*[@id and not(key('nosmil', @id, $top-elements)[1])]" priority="4">
+  <xsl:template match="*[@id and not(contains($no-smilref, concat(' ', local-name(), ' ')))]"
+		priority="4">
     <xsl:copy>
       <xsl:variable name="prev" select="preceding::*[key('struct', generate-id(), $top-elements)][1]"/>
       <xsl:variable name="smil-id">

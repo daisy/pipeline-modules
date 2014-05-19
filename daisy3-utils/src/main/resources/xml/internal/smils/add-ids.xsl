@@ -4,9 +4,9 @@
 		xmlns:dt="http://www.daisy.org/z3986/2005/dtbook/"
 		exclude-result-prefixes="#all" version="2.0">
 
-  <xsl:variable name="smil-nodes" select="' img list sent linegroup pagenum table linenum prodnote sidebar hd levelhd h1 h2 h3 h4 h5 h6 noteref annoref note annotation math '"/>
+  <xsl:param name="no-smilref"/>
 
-  <xsl:template match="*[not(@id) and (contains($smil-nodes, concat(' ', local-name(), ' ')) or count(dt:w) > 0)]">
+  <xsl:template match="*[not(@id) and not(contains($no-smilref, concat(' ', local-name(), ' ')))]" priority="2">
     <xsl:copy>
       <xsl:attribute name="id">
 	<xsl:value-of select="concat('forsmil-', generate-id())"/>
@@ -15,7 +15,7 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="@*|node()">
+  <xsl:template match="@*|node()" priority="1">
     <xsl:copy>
       <xsl:apply-templates select="@*|node()"/>
     </xsl:copy>

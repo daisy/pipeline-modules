@@ -78,6 +78,9 @@
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
 
+    <!-- They cannot hold a smilref attribute or they can contain levels (which would make them wrongly dispatched over multiple smils) -->
+    <p:variable name="no-smilref" select="' level level1 level2 level3 level4 level5 level6 dtbook frontmatter bodymatter rearmatter br head title meta style book bdo hr '"/>
+
     <p:xslt name="add-ids">
       <p:input port="source">
 	<p:pipe port="content" step="main"/>
@@ -85,9 +88,7 @@
       <p:input port="stylesheet">
 	<p:document href="add-ids.xsl"/>
       </p:input>
-      <p:input port="parameters">
-	<p:empty/>
-      </p:input>
+      <p:with-param name="no-smilref" select="$no-smilref"/>
     </p:xslt>
     <cx:message message="Smil-needed IDs generated"/>
 
@@ -110,9 +111,7 @@
       <p:input port="stylesheet">
 	<p:document href="add-smilrefs.xsl"/>
       </p:input>
-      <p:input port="parameters">
-	<p:empty/>
-      </p:input>
+      <p:with-param name="no-smilref" select="$no-smilref"/>
       <p:with-param name="mo-dir" select="$smil-dir"/>
       <p:with-param name="output-dir" select="$root-dir"/>
     </p:xslt>

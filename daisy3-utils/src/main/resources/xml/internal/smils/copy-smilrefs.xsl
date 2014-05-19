@@ -4,16 +4,15 @@
 		xmlns:dt="http://www.daisy.org/z3986/2005/dtbook/"
 		exclude-result-prefixes="#all" version="2.0">
 
-
   <xsl:key name="audio-loc" match="*[@id]" use="@id"/>
 
-  <xsl:template match="node()|@*">
+  <xsl:template match="node()|@*" priority="1">
     <xsl:copy>
       <xsl:apply-templates select="node()|@*"/>
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="*[@id]">
+  <xsl:template match="*[@id]" priority="2">
     <xsl:copy>
       <xsl:variable name="model" select="key('audio-loc', @id, collection()[/d:audio-order])[1]"/>
       <xsl:if test="$model/@smilref">

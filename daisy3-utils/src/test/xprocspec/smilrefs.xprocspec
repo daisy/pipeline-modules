@@ -285,8 +285,8 @@
     	      </level>
     	      <level>
     		<note id="n1">
-    		  <p><p>
-    		    <p>test</p>
+    		  <p id="p1"><p id="p2">
+    		    <p id="p3">test</p>
     		    <sent id="s1">note</sent>
     		  </p></p>
     		  </note>
@@ -302,13 +302,13 @@
     	<x:document type="inline">
     	  <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
     	    <level>
-    	      <noteref smilref="a" id="ref1" idref="#n1">ref</noteref>
+    	      <noteref smilref="a#x" id="ref1" idref="#n1">ref</noteref>
     	    </level>
     	    <level>
-    	      <note smilref="a" id="n1">
-    		<p><p>
-    		  <p>test</p>
-    		  <sent smilref="a" id="s1">note</sent>
+    	      <note smilref="a#x" id="n1">
+    		<p smilref="a#x" id="p1"><p id="p2" smilref="a#x">
+    		  <p smilref="a#x" id="p3">test</p>
+    		  <sent smilref="a#x" id="s1">note</sent>
     		</p></p>
     	      </note>
     	    </level>
@@ -405,11 +405,11 @@
 	      <level>
 		<sent id="s1">test</sent>
 	      </level>
-	      <top id="top">
+	      <bodymatter id="top">
 		<level>
 		  <sent id="s2">test</sent>
 		</level>
-	      </top>
+	      </bodymatter>
 	    </dtbook>
 	  </x:document>
   	</x:input>
@@ -423,11 +423,11 @@
 	    <level>
 	      <sent smilref="x.smil#tt" id="s1">test</sent>
 	    </level>
-	    <top id="top">
+	    <bodymatter id="top">
 	      <level>
 		<sent smilref="y.smil#tt" id="s2">test</sent>
 	      </level>
-	    </top>
+	    </bodymatter>
 	  </dtbook>
 	</x:document>
       </x:expect>
