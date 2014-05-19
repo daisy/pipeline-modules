@@ -1,5 +1,7 @@
-pipeline-mod-tts
-================
+DAISY Pipeline 2 :: TTS Modules
+===============================
+
+[![Build Status](https://travis-ci.org/daisy/pipeline-mod-tts.png?branch=master)](https://travis-ci.org/daisy/pipeline-mod-tts)
 
 TTS-based production modules for the DAISY Pipeline 2
 
