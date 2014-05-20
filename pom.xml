@@ -4,20 +4,23 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.daisy.pipeline.modules</groupId>
-    <artifactId>modules-parent</artifactId>
-    <version>1.0</version>
+    <groupId>org.daisy</groupId>
+    <artifactId>daisy</artifactId>
+    <version>3</version>
     <relativePath/>
   </parent>
 
-  <artifactId>nlp-modules-parent</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <groupId>org.daisy.pipeline.modules</groupId>
+  <artifactId>nlp-modules-aggregator</artifactId>
+  <version>1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>DAISY Pipeline 2 :: NLP Modules Parent POM</name>
-  <description>Parent POM for modules related to Natural Language Processing</description>
+  <name>DAISY Pipeline 2 :: NLP Modules Aggregator POM</name>
+  <description>Aggregator POM for modules related to Natural Language Processing</description>
 
   <modules>
+    <module>bom</module>
+    <module>parent</module>
     <module>nlp-utils/nlp-common</module>
     <module>nlp-utils/lexing</module>
     <module>nlp-utils/break-detection</module>
@@ -28,79 +31,5 @@
     <module>html-break-detection</module>
     <module>dtbook-break-detection</module>
   </modules>
-
-  <dependencyManagement>
-    <dependencies>
-
-      <dependency>
-	<groupId>org.daisy.pipeline.modules</groupId>
-	<artifactId>zedai-break-detection</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-	<groupId>org.daisy.pipeline.modules</groupId>
-	<artifactId>html-break-detection</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-	<groupId>org.daisy.pipeline.modules</groupId>
-	<artifactId>dtbook-break-detection</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-	<groupId>org.daisy.pipeline.modules</groupId>
-	<artifactId>nlp-common</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-	<groupId>org.daisy.pipeline.modules</groupId>
-	<artifactId>ruled-lexer</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-	<groupId>org.daisy.pipeline.modules</groupId>
-	<artifactId>light-lexer</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-	<groupId>org.daisy.pipeline.modules</groupId>
-	<artifactId>omnilang-lexer</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-	<groupId>org.daisy.pipeline.modules</groupId>
-	<artifactId>lexing</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-	<groupId>org.daisy.pipeline.modules</groupId>
-	<artifactId>break-detection</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-	<groupId>com.google.guava</groupId>
-	<artifactId>guava</artifactId>
-	<version>15.0</version>
-      </dependency>
-
-    </dependencies>
-   </dependencyManagement>
-
-   <repositories>
-    <repository>
-      <id>central</id>
-      <name>Maven Central</name>
-      <url>http://repo.maven.apache.org/maven2/</url>
-    </repository>
-   </repositories>
 
 </project>
