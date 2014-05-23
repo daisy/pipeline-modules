@@ -178,5 +178,6 @@
     
     <p:import href="tempdir.xpl"/>
     <p:import href="copy-resource.xpl"/>
+    <p:import href="set-doctype.xpl"/>
 
 </p:library>
