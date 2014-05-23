@@ -9,20 +9,20 @@
         example translation map:
             
         <i18n xmlns="http://www.daisy.org/ns/pipeline/data">
-            <translation id="Guide">
+            <translation string="Guide">
                 <text xml:lang="en">Guide</text>
                 <text xml:lang="ar">دليل</text>
                 <text xml:lang="bg">Ръководство</text>
             </translation>
-            <translation id="...">
+            <translation string="...">
                 <text xml:lang="...">...</text>
                 ...
             </translation>
         </i18n>
         -->
 
-        <!-- The id of the translation. -->
-        <xsl:param name="id" as="xs:string"/>
+        <!-- The string to look up in the translation map. -->
+        <xsl:param name="string" as="xs:string"/>
 
         <!-- The preferred language (RFC5646). For instance "en" or "en-US". -->
         <xsl:param name="language" as="xs:string"/>
@@ -32,10 +32,10 @@
 
         <xsl:variable name="generic-language-code" select="tokenize(lower-case($language),'-')[1]"/>
 
-        <xsl:variable name="exact-language" select="(for $map in ($maps) return $map//d:translation[@id=$id]/d:text[@xml:lang=$language])[1]"/>
+        <xsl:variable name="exact-language" select="(for $map in ($maps) return $map//d:translation[@string=$string]/d:text[@xml:lang=$language])[1]"/>
         <xsl:variable name="generic-language"
-            select="if ($exact-language) then () else (for $map in ($maps) return $map//d:translation[@id=$id]/d:text[starts-with(@xml:lang,$generic-language-code)])[1]"/>
-        <xsl:variable name="any-language" select="if ($exact-language or $generic-language) then () else (for $map in ($maps) return $map//d:translation[@id=$id]/d:text[1])[1]"/>
+            select="if ($exact-language) then () else (for $map in ($maps) return $map//d:translation[@string=$string]/d:text[starts-with(@xml:lang,$generic-language-code)])[1]"/>
+        <xsl:variable name="any-language" select="if ($exact-language or $generic-language) then () else (for $map in ($maps) return $map//d:translation[@string=$string]/d:text[1])[1]"/>
 
         <xsl:value-of select="($exact-language, $generic-language, $any-language)[1]"/>
         

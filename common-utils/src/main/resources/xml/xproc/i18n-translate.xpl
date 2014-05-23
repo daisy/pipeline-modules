@@ -7,9 +7,9 @@
             document.</p>
     </p:documentation>
 
-    <p:option name="id" required="true">
+    <p:option name="string" required="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <p>The id of the translation.</p>
+            <p>The string to look up in the translation map.</p>
         </p:documentation>
     </p:option>
 
@@ -34,18 +34,18 @@
     <p:wrap-sequence wrapper="d:maps"/>
 
     <p:xslt>
-        <p:with-param name="id" select="$id"/>
+        <p:with-param name="string" select="$string"/>
         <p:with-param name="language" select="$language"/>
         <p:input port="stylesheet">
             <p:inline>
                 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="2.0" exclude-result-prefixes="#all"
                     xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:pf="http://www.daisy.org/ns/pipeline/functions">
                     <xsl:import href="../xslt/i18n.xsl"/>
-                    <xsl:param name="id" as="xs:string"/>
+                    <xsl:param name="string" as="xs:string"/>
                     <xsl:param name="language" as="xs:string"/>
                     <xsl:template match="/*">
                         <c:result>
-                            <xsl:value-of select="pf:i18n-translate($id, $language, /*/*)"/>
+                            <xsl:value-of select="pf:i18n-translate($string, $language, /*/*)"/>
                         </c:result>
                     </xsl:template>
                 </xsl:stylesheet>

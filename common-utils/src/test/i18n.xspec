@@ -5,11 +5,11 @@
     <x:scenario label="Scenario for testing pf:i18n-translate">
         <x:scenario label="when specifying en-GB">
             <x:call function="pf:i18n-translate">
-                <x:param name="id" select="'Guide'"/>
+                <x:param name="string" select="'Guide'"/>
                 <x:param name="language" select="'en-GB'"/>
                 <x:param name="maps">
                     <i18n xmlns="http://www.daisy.org/ns/pipeline/data">
-                        <translation id="Guide">
+                        <translation string="Guide">
                             <text xml:lang="id">Panduan</text>
                             <text xml:lang="en">Guide</text>
                             <text xml:lang="sv">Guide</text>
@@ -17,7 +17,7 @@
                         </translation>
                     </i18n>
                     <i18n xmlns="http://www.daisy.org/ns/pipeline/data">
-                        <translation id="Guide">
+                        <translation string="Guide">
                             <text xml:lang="en-US">Guide (US)</text>
                             <text xml:lang="en-GB">Guide (GB)</text>
                         </translation>
@@ -29,11 +29,11 @@
 
         <x:scenario label="when specifying en">
             <x:call function="pf:i18n-translate">
-                <x:param name="id" select="'Guide'"/>
+                <x:param name="string" select="'Guide'"/>
                 <x:param name="language" select="'en'"/>
                 <x:param name="maps">
                     <i18n xmlns="http://www.daisy.org/ns/pipeline/data">
-                        <translation id="Guide">
+                        <translation string="Guide">
                             <text xml:lang="id">Panduan</text>
                             <text xml:lang="en">Guide</text>
                             <text xml:lang="sv">Guide</text>
@@ -41,7 +41,7 @@
                         </translation>
                     </i18n>
                     <i18n xmlns="http://www.daisy.org/ns/pipeline/data">
-                        <translation id="Guide">
+                        <translation string="Guide">
                             <text xml:lang="en-US">Guide (US)</text>
                             <text xml:lang="en-GB">Guide (GB)</text>
                         </translation>
@@ -53,11 +53,11 @@
 
         <x:scenario label="when specifying a non-existing language">
             <x:call function="pf:i18n-translate">
-                <x:param name="id" select="'Guide'"/>
+                <x:param name="string" select="'Guide'"/>
                 <x:param name="language" select="'nonexisting'"/>
                 <x:param name="maps">
                     <i18n xmlns="http://www.daisy.org/ns/pipeline/data">
-                        <translation id="Guide">
+                        <translation string="Guide">
                             <text xml:lang="id">Panduan</text>
                             <text xml:lang="en">Guide</text>
                             <text xml:lang="sv">Guide</text>
@@ -65,7 +65,7 @@
                         </translation>
                     </i18n>
                     <i18n xmlns="http://www.daisy.org/ns/pipeline/data">
-                        <translation id="Guide">
+                        <translation string="Guide">
                             <text xml:lang="en-US">Guide (US)</text>
                             <text xml:lang="en-GB">Guide (GB)</text>
                         </translation>
@@ -81,7 +81,7 @@
                 <x:param name="language" select="'en'"/>
                 <x:param name="maps">
                     <i18n xmlns="http://www.daisy.org/ns/pipeline/data">
-                        <translation id="Guide">
+                        <translation string="Guide">
                             <text xml:lang="id">Panduan</text>
                             <text xml:lang="en">Guide</text>
                             <text xml:lang="sv">Guide</text>
@@ -89,7 +89,7 @@
                         </translation>
                     </i18n>
                     <i18n xmlns="http://www.daisy.org/ns/pipeline/data">
-                        <translation id="Guide">
+                        <translation string="Guide">
                             <text xml:lang="en-US">Guide (US)</text>
                             <text xml:lang="en-GB">Guide (GB)</text>
                         </translation>
