@@ -3,6 +3,7 @@ package org.daisy.pipeline.audio.lame;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import javax.sound.sampled.AudioFormat;
 
@@ -11,6 +12,7 @@ import org.daisy.pipeline.audio.AudioEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 
 public class LameEncoder implements AudioEncoder {
@@ -60,8 +62,8 @@ public class LameEncoder implements AudioEncoder {
 		File encodedFile = new File(outputDir, filePrefix + OutputFormat);
 		String freq = String.valueOf((Float.valueOf(audioFormat.getSampleRate()) / 1000));
 		String bitwidth = String.valueOf(audioFormat.getSampleSizeInBits());
-		String signedOpt = audioFormat.getEncoding() == AudioFormat.Encoding.PCM_SIGNED ? "--signed"
-		        : "--unsigned";
+		String signedOpt = audioFormat.getEncoding() == AudioFormat.Encoding.PCM_UNSIGNED ? "--unsigned"
+		        : "--signed";
 		String endianness = audioFormat.isBigEndian() ? "--big-endian" : "--little-endian";
 
 		//-r: raw pcm
@@ -83,6 +85,7 @@ public class LameEncoder implements AudioEncoder {
 			System.arraycopy(cmdbegin, 0, cmd, 0, cmdbegin.length);
 			System.arraycopy(custom, 0, cmd, cmdbegin.length, custom.length);
 			System.arraycopy(cmdend, 0, cmd, cmdbegin.length + custom.length, cmdend.length);
+			mLogger.debug("Encoding command: {}", Joiner.on(' ').join(Arrays.asList(cmd)));
 			p = Runtime.getRuntime().exec(cmd);
 			BufferedOutputStream out = new BufferedOutputStream((p.getOutputStream()));
 			out.write(input, 0, size);
