@@ -29,6 +29,7 @@
     <module>tts-utils/tts-adapter-espeak</module>
     <module>tts-utils/tts-adapter-acapela</module>
     <module>tts-utils/tts-adapter-attbin</module>
+    <module>tts-utils/tts-adapter-osx</module>
     <module>tts-utils/tts-adapter-sapinative</module>
     <module>epub3-to-ssml</module>
     <module>ssml-to-audio</module>

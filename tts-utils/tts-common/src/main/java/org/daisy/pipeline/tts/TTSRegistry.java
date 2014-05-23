@@ -290,10 +290,12 @@ public class TTSRegistry {
 		final String att = "att";
 		final String microsoft = "Microsoft";
 		final String acapela = "acapela";
+		final String osx = "osx-speech";
 		final int eSpeakPriority = 1;
 		final int ATT16Priority = 10;
 		final int ATT8Priority = 7;
 		final int AcapelaPriority = 12;
+		final int OSXSpeechPriority = 5;
 
 		VoiceInfo[] info = {
 		        //eSpeak:
@@ -382,6 +384,9 @@ public class TTSRegistry {
 		        new VoiceInfo(acapela, "claire", "fr", AcapelaPriority),
 		        new VoiceInfo(acapela, "alice", "fr", AcapelaPriority),
 		        new VoiceInfo(acapela, "bruno", "fr", AcapelaPriority),
+		        // OS X
+		        new VoiceInfo(osx,"Alex","en-us",OSXSpeechPriority),
+		        new VoiceInfo(osx,"Thomas","fr-fr",OSXSpeechPriority)
 
 		};
 		Set<VoiceInfo> priorities = new HashSet<VoiceInfo>(Arrays.asList(info));
