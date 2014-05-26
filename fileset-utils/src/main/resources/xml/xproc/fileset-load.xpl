@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step version="1.0" type="px:fileset-load" name="main" xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns:p="http://www.w3.org/ns/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+<p:declare-step version="1.0" type="px:fileset-load" name="main" xmlns:p="http://www.w3.org/ns/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
   xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal/fileset-load" xmlns:c="http://www.w3.org/ns/xproc-step" exclude-inline-prefixes="cx px">
 
   <p:input port="fileset" primary="true"/>
@@ -15,7 +15,6 @@
   <p:option name="load-if-not-in-memory" select="'true'"/>
   <p:option name="method" select="''"/>
 
-  <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
   <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl"/>
   <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
   <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl"/>
@@ -90,10 +89,10 @@
 
   <p:choose name="load">
     <p:when test="number(/*)&gt;0">
-      <p:output port="result" sequence="true"/>
       <p:xpath-context>
         <p:pipe port="result" step="filtered.count"/>
       </p:xpath-context>
+      <p:output port="result" sequence="true"/>
       <p:for-each>
         <p:output port="result" sequence="true"/>
         <p:iteration-source select="//d:file"/>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step version="1.0" type="px:fileset-add-ref" name="main" xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns:p="http://www.w3.org/ns/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-    exclude-inline-prefixes="cx px">
+<p:declare-step version="1.0" type="px:fileset-add-ref" name="main" xmlns:p="http://www.w3.org/ns/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+    exclude-inline-prefixes="px">
 
     <p:input port="source"/>
     <p:output port="result"/>
@@ -9,7 +9,6 @@
     <p:option name="ref" select="''"><!-- if relative; will be resolved relative to the file --></p:option>
     <p:option name="first" select="'false'"/>
 
-    <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
 
     <!--TODO awkward, add the entry with XProc, then perform URI cleanup-->
