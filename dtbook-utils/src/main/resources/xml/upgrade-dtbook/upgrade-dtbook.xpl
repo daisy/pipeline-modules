@@ -2,8 +2,6 @@
 <p:declare-step version="1.0" name="upgrade-dtbook" type="px:upgrade-dtbook"
     xmlns:p="http://www.w3.org/ns/xproc"
     xmlns:c="http://www.w3.org/ns/xproc-step" 
-    xmlns:cx="http://xmlcalabash.com/ns/extensions"
-    xmlns:cxo="http://xmlcalabash.com/ns/extensions/osutils"
     xmlns:dtb="http://www.daisy.org/z3986/2005/dtbook/"
     xmlns:px="http://www.daisy.org/ns/pipeline/xproc" 
     xmlns:dc="http://purl.org/dc/terms/"
@@ -42,26 +40,15 @@
         </p:documentation>
     </p:option>
     
-    <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
-    
-    
-    <p:import href="http://www.daisy.org/pipeline/modules/dtbook-validator/library.xpl">
-        <p:documentation>
-            Schema selector used for DTBook validation.
-        </p:documentation>
-    </p:import>
-    
-    <p:import href="http://www.daisy.org/pipeline/modules/validation-utils/library.xpl">
-        <p:documentation>
-            Collection of utilities for validation and reporting.
-        </p:documentation>
-    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/dtbook-validator/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/validation-utils/library.xpl"/>
     
     <p:variable name="version" select="dtb:dtbook/@version"/>
     
-    <cx:message>
+    <px:message>
         <p:with-option name="message" select="concat('Input document version: ', $version)"/>    
-    </cx:message>
+    </px:message>
     
     <p:choose name="main">
         <p:when test="$version = '1.1.0'">
@@ -105,16 +92,16 @@
         </p:when>
         <p:when test="$version = '2005-3'">
             <p:output port="result"/>
-            <cx:message>
+            <px:message>
                 <p:with-option name="message" select="concat('File is already the most recent version: ', $version)"/>
-            </cx:message>
+            </px:message>
             <p:identity/>
         </p:when>
         <p:otherwise>
             <p:output port="result"/>
-            <cx:message>
+            <px:message>
                 <p:with-option name="message" select="concat('Version not identified: ', $version)"/>
-            </cx:message>
+            </px:message>
             <p:identity/>
         </p:otherwise>
     </p:choose>

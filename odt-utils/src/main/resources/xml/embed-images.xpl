@@ -2,7 +2,6 @@
 <p:declare-step version="1.0"
 	xmlns:p="http://www.w3.org/ns/xproc"
 	xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-	xmlns:cx="http://xmlcalabash.com/ns/extensions"
 	xmlns:d="http://www.daisy.org/ns/pipeline/data"
 	xmlns:odt="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
 	xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
@@ -28,7 +27,7 @@
 	<p:import href="get-file.xpl"/>
 	<p:import href="update-files.xpl"/>
 	<p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
-	<p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
+	<p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
 	
 	<p:variable name="base" select="//d:file[starts-with(@media-type,'application/vnd.oasis.opendocument')]/resolve-uri(@href, base-uri(.))">
 		<p:pipe step="embed-images" port="fileset.in"/>
@@ -49,7 +48,7 @@
 		</p:input>
 	</odt:get-file>
 	
-	<cx:message message="[odt-utils] embedding images"/>
+	<px:message message="[odt-utils] embedding images"/>
 	<p:sink/>
 	
 	<px:fileset-create name="base">

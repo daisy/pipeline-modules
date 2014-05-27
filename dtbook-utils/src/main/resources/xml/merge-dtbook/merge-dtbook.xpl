@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step version="1.0" name="merge-dtbook" type="px:merge-dtbook"
     xmlns:p="http://www.w3.org/ns/xproc" xmlns:c="http://www.w3.org/ns/xproc-step"
-    xmlns:cx="http://xmlcalabash.com/ns/extensions"
-    xmlns:cxo="http://xmlcalabash.com/ns/extensions/osutils"
     xmlns:dtb="http://www.daisy.org/z3986/2005/dtbook/"
     xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
     exclude-inline-prefixes="cx">
@@ -43,19 +41,9 @@
         </p:documentation>
     </p:option>
 
-    <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
-    
-    <p:import href="http://www.daisy.org/pipeline/modules/dtbook-validator/library.xpl">
-        <p:documentation>
-            Schema selector used for DTBook validation.
-        </p:documentation>
-    </p:import>
-    
-    <p:import href="http://www.daisy.org/pipeline/modules/validation-utils/library.xpl">
-        <p:documentation>
-            Collection of utilities for validation and reporting.
-        </p:documentation>
-    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/dtbook-validator/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/validation-utils/library.xpl"/>
     
     <!--Loads the DTBook schema-->
     <px:dtbook-validator.select-schema name="dtbook-schema" dtbook-version="2005-3" mathml-version="2.0"/>
@@ -66,7 +54,7 @@
             <p:pipe port="source" step="merge-dtbook"/>
         </p:input>
     </p:split-sequence>
-    <cx:message message="Merging DTBook documents"/>
+    <px:message message="Merging DTBook documents"/>
     <p:sink/>
 
     <p:for-each name="validate-input">
