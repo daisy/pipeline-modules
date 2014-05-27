@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step version="1.0" type="px:fileset-add-entry" name="main" xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns:p="http://www.w3.org/ns/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data"
-  xmlns:px="http://www.daisy.org/ns/pipeline/xproc" exclude-inline-prefixes="cx px">
+<p:declare-step version="1.0" type="px:fileset-add-entry" name="main" xmlns:p="http://www.w3.org/ns/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data"
+  xmlns:px="http://www.daisy.org/ns/pipeline/xproc" exclude-inline-prefixes="px">
 
   <p:input port="source"/>
   <p:output port="result"/>
@@ -11,7 +11,7 @@
   <p:option name="original-href" select="''"><!-- if relative; will be resolved relative to the file --></p:option>
   <p:option name="first" select="'false'"/>
 
-  <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
+  <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
   <p:import href="fileset-add-ref.xpl"/>
 
   <!--TODO awkward, add the entry with XProc, then perform URI cleanup-->
@@ -54,7 +54,7 @@
     <p:choose name="check-base">
       <!--TODO replace by uri-utils 'is-relative' function-->
       <p:when test="not(/*/@xml:base) and not(matches($href-uri-ified,'^[^/]+:'))">
-        <cx:message message="Adding a relative resource to a file set with no base URI"/>
+        <px:message message="Adding a relative resource to a file set with no base URI"/>
       </p:when>
       <p:otherwise>
         <p:identity/>

@@ -2,8 +2,6 @@
 <p:declare-step version="1.0" name="check-files-exist" type="px:check-files-exist"
     xmlns:p="http://www.w3.org/ns/xproc" 
     xmlns:c="http://www.w3.org/ns/xproc-step"
-    xmlns:cx="http://xmlcalabash.com/ns/extensions"
-    xmlns:cxo="http://xmlcalabash.com/ns/extensions/osutils"
     xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
     xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"    
     xmlns:xhtml="http://www.w3.org/1999/xhtml" 
@@ -50,10 +48,6 @@
         <p:pipe step="format-validation-status" port="result"/>
     </p:output>
     
-    <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl">
-        <p:documentation>Calabash extension steps.</p:documentation>
-    </p:import>
-    
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
         <p:documentation>Utilities for representing a fileset.</p:documentation>
     </p:import>
@@ -61,6 +55,8 @@
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
         <p:documentation>For manipulating files.</p:documentation>
     </p:import>
+    
+    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
     
     <p:import href="create-validation-report-error-for-file.xpl"/>
     <p:import href="validation-status.xpl"/>
@@ -105,9 +101,9 @@
                     <p:pipe port="result" step="empty-fileset"/>
                 </p:output>
                 
-                <cx:message>
+                <px:message>
                     <p:with-option name="message" select="concat('File not found: ', $filepath)"/>
-                </cx:message>
+                </px:message>
                 
                 <p:identity name="empty-fileset">
                     <p:input port="source">

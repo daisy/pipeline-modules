@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step version="1.0" type="px:fileset-load" name="main" xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns:p="http://www.w3.org/ns/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+<p:declare-step version="1.0" type="px:fileset-load" name="main" xmlns:p="http://www.w3.org/ns/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
   xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal/fileset-load" xmlns:c="http://www.w3.org/ns/xproc-step" exclude-inline-prefixes="cx px">
 
   <p:input port="fileset" primary="true"/>
@@ -15,11 +15,11 @@
   <p:option name="load-if-not-in-memory" select="'true'"/>
   <p:option name="method" select="''"/>
 
-  <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
   <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl"/>
   <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
   <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl"/>
   <p:import href="http://www.daisy.org/pipeline/modules/zip-utils/library.xpl"/>
+  <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
 
   <p:declare-step type="pxi:load-text">
     <p:output port="result"/>
@@ -89,10 +89,10 @@
 
   <p:choose name="load">
     <p:when test="number(/*)&gt;0">
-      <p:output port="result" sequence="true"/>
       <p:xpath-context>
         <p:pipe port="result" step="filtered.count"/>
       </p:xpath-context>
+      <p:output port="result" sequence="true"/>
       <p:for-each>
         <p:output port="result" sequence="true"/>
         <p:iteration-source select="//d:file"/>
@@ -107,9 +107,9 @@
 
           <!-- from memory -->
           <p:when test="$target = //d:file/resolve-uri(@href,base-uri(.))">
-            <cx:message>
+            <px:message>
               <p:with-option name="message" select="concat('processing file from memory: ',$target)"/>
-            </cx:message>
+            </px:message>
             <p:for-each name="for-each-in-memory">
               <p:iteration-source>
                 <p:pipe port="in-memory" step="main"/>
@@ -174,9 +174,9 @@
           <p:otherwise>
             <p:try>
               <p:group>
-                <cx:message>
+                <px:message>
                   <p:with-option name="message" select="concat('loading ',$target,' from disk: ',$on-disk)"/>
-                </cx:message>
+                </px:message>
                 <p:sink/>
 
                 <px:info>
@@ -201,12 +201,12 @@
 
                   <!-- Load from ZIP -->
                   <p:when test="contains($on-disk, '!/')">
-                    <cx:message>
+                    <px:message>
                       <p:input port="source">
                         <p:empty/>
                       </p:input>
                       <p:with-option name="message" select="replace($on-disk, '^([^!]+)!/(.+)$', 'Loading $2 from ZIP $1')"/>
-                    </cx:message>
+                    </px:message>
                     <p:sink/>
                     <px:unzip>
                       <p:with-option name="href" select="replace($on-disk, '^([^!]+)!/(.+)$', '$1')"/>
@@ -234,12 +234,12 @@
                         </p:load>
                       </p:group>
                       <p:catch>
-                        <cx:message>
+                        <px:message>
                           <p:input port="source">
                             <p:empty/>
                           </p:input>
                           <p:with-option name="message" select="concat('unable to load ',$on-disk,' as XML')"/>
-                        </cx:message>
+                        </px:message>
                       </p:catch>
                     </p:try>
                   </p:when>
@@ -274,12 +274,12 @@
                         </p:load>
                       </p:group>
                       <p:catch>
-                        <cx:message>
+                        <px:message>
                           <p:input port="source">
                             <p:empty/>
                           </p:input>
                           <p:with-option name="message" select="concat('unable to load ',$on-disk,' as XML; trying as text...')"/>
-                        </cx:message>
+                        </px:message>
                         <pxi:load-text>
                           <p:with-option name="href" select="$on-disk"/>
                         </pxi:load-text>
@@ -329,9 +329,9 @@
                     </p:error>
                   </p:when>
                   <p:otherwise>
-                    <cx:message>
+                    <px:message>
                       <p:with-option name="message" select="$file-not-found-message"/>
-                    </cx:message>
+                    </px:message>
                   </p:otherwise>
                 </p:choose>
                 <p:identity>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step type="px:message" name="main" xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:p="http://www.w3.org/ns/xproc" xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns:x="http://www.emc.com/documentum/xml/xproc"
-    xmlns:px="http://www.daisy.org/ns/pipeline/xproc" xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal" xmlns:d="http://www.daisy.org/ns/pipeline/data" exclude-inline-prefixes="#all" version="1.0">
+    xmlns:px="http://www.daisy.org/ns/pipeline/xproc" exclude-inline-prefixes="#all" version="1.0">
 
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
         <p>Example usage:</p>
@@ -57,7 +57,7 @@
     -->
     
     <!-- TODO: implement this in Java to make use of the logging levels there -->
-    <p:declare-step type="pxi:message">
+    <p:declare-step type="px:log-message">
         <p:option name="message" required="true"/>
         <p:option name="severity" select="'INFO'"/>
         <p:input port="source" primary="true" sequence="true"/>
@@ -112,8 +112,8 @@
         </p:xpath-context>
         
         <!-- Pipeline 2 -->
-        <p:when test="p:step-available('pxi:message')">
-            <pxi:message>
+        <p:when test="p:step-available('px:log-message')">
+            <px:log-message>
                 <p:with-option name="message" select="/*/@message">
                     <p:pipe port="result" step="message"/>
                 </p:with-option>
@@ -122,7 +122,7 @@
                         <irrelevant/>
                     </p:inline>
                 </p:with-option>
-            </pxi:message>
+            </px:log-message>
         </p:when>
 
         <p:otherwise>

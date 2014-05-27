@@ -13,7 +13,6 @@
 
     <p:option name="fail-on-error" required="false" select="'false'"/>
 
-    <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl"/>
@@ -96,10 +95,10 @@
             </p:xpath-context>
             <p:when test="//d:file[resolve-uri(@href,base-uri(.))=$target]">
                 <p:documentation>File is in memory.</p:documentation>
-                <cx:message>
+                <px:message>
                     <p:with-option name="message"
                         select="concat('Writing in-memory document to ',$href)"/>
-                </cx:message>
+                </px:message>
                 <p:split-sequence>
                     <p:with-option name="test"
                         select="concat('base-uri(/*)=&quot;',$target,'&quot;')"/>
@@ -241,11 +240,11 @@
                 <p:wrap-sequence wrapper="info"/>
                 <p:choose name="mkdir">
                     <p:when test="empty(/info/*)">
-                        <cx:message>
+                        <px:message>
                             <p:with-option name="message"
                                 select="concat('Making directory: ',substring-after($target-dir, $fileset-base))"
                             />
-                        </cx:message>
+                        </px:message>
                         <p:try>
                             <p:group>
                                 <px:mkdir>
@@ -253,21 +252,21 @@
                                 </px:mkdir>
                             </p:group>
                             <p:catch>
-                                <cx:message>
+                                <px:message>
                                     <p:with-option name="message"
                                         select="concat('Could not create directory: ',substring-after($target-dir, $fileset-base))"
                                     />
-                                </cx:message>
+                                </px:message>
                                 <p:sink/>
                             </p:catch>
                         </p:try>
                     </p:when>
                     <p:when test="not(/info/c:directory)">
                         <!--TODO rename the error-->
-                        <cx:message>
+                        <px:message>
                             <p:with-option name="message"
                                 select="concat('The target is not a directory: ',$href)"/>
-                        </cx:message>
+                        </px:message>
                         <p:error code="err:file">
                             <p:input port="source">
                                 <p:inline exclude-inline-prefixes="d">
@@ -295,11 +294,11 @@
                                 <p:pipe port="current" step="store"/>
                             </p:input>
                         </p:identity>
-                        <cx:message>
+                        <px:message>
                             <p:with-option name="message"
                                 select="concat('Copied ',replace($on-disk,'^.*/([^/]*)$','$1'),' to ',$href)"
                             />
-                        </cx:message>
+                        </px:message>
                     </p:group>
                     <p:catch name="store.copy.catch">
                         <p:output port="result">
@@ -310,9 +309,9 @@
                                 <p:pipe port="error" step="store.copy.catch"/>
                             </p:input>
                         </p:identity>
-                        <cx:message>
+                        <px:message>
                             <p:with-option name="message" select="concat('Copy error: ',/*/*)"/>
-                        </cx:message>
+                        </px:message>
                         <p:sink/>
                     </p:catch>
                 </p:try>
