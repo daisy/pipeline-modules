@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" xmlns:px="http://www.daisy.org/ns/pipeline/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:cx="http://xmlcalabash.com/ns/extensions" type="px:daisy202-load" version="1.0">
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" xmlns:px="http://www.daisy.org/ns/pipeline/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data" type="px:daisy202-load" version="1.0">
 
     <p:documentation>
         <p px:role="desc">Load a DAISY 2.02 fileset based on its NCC.</p>
@@ -24,7 +24,6 @@
         <p:pipe port="result" step="in-memory"/>
     </p:output>
 
-    <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>

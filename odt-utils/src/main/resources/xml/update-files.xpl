@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step version="1.0"
 	xmlns:p="http://www.w3.org/ns/xproc"
-	xmlns:cx="http://xmlcalabash.com/ns/extensions"
 	xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
 	xmlns:d="http://www.daisy.org/ns/pipeline/data"
 	xmlns:odt="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
@@ -20,7 +19,6 @@
 		<p:pipe step="updated-files" port="result"/>
 	</p:output>
 	
-	<p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
 	<p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
 	
 	<p:for-each name="updated-files">
