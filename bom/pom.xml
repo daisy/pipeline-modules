@@ -20,7 +20,7 @@
     <dependencies>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
-        <artifactId>break-detection</artifactId>
+        <artifactId>nlp-break-detection</artifactId>
         <version>1.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
@@ -35,12 +35,12 @@
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
-        <artifactId>lexing</artifactId>
+        <artifactId>nlp-lexing</artifactId>
         <version>1.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
-        <artifactId>light-lexer</artifactId>
+        <artifactId>nlp-light-lexer</artifactId>
         <version>1.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
@@ -50,12 +50,12 @@
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
-        <artifactId>omnilang-lexer</artifactId>
+        <artifactId>nlp-omnilang-lexer</artifactId>
         <version>1.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
-        <artifactId>ruled-lexer</artifactId>
+        <artifactId>nlp-ruled-lexer</artifactId>
         <version>1.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
