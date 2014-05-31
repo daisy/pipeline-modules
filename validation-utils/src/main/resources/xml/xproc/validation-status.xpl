@@ -6,7 +6,6 @@
     xmlns:xhtml="http://www.w3.org/1999/xhtml" 
     xmlns:d="http://www.daisy.org/ns/pipeline/data"
     xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp"
-    xmlns:cx="http://xmlcalabash.com/ns/extensions"
     exclude-inline-prefixes="#all">
     
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">

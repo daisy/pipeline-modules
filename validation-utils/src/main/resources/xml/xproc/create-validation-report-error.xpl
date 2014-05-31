@@ -1,7 +1,5 @@
 <p:declare-step version="1.0" name="create-validation-report-error" type="pxi:create-validation-report-error"
     xmlns:p="http://www.w3.org/ns/xproc" xmlns:c="http://www.w3.org/ns/xproc-step"
-    xmlns:cx="http://xmlcalabash.com/ns/extensions"
-    xmlns:cxo="http://xmlcalabash.com/ns/extensions/osutils"
     xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
     xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
     xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:d="http://www.daisy.org/ns/pipeline/data"

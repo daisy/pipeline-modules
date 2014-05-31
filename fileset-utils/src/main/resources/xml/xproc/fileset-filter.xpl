@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step version="1.0" type="px:fileset-filter" name="main" xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns:p="http://www.w3.org/ns/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-    xmlns:c="http://www.w3.org/ns/xproc-step" exclude-inline-prefixes="cx px" xpath-version="2.0">
+<p:declare-step version="1.0" type="px:fileset-filter" name="main" xmlns:p="http://www.w3.org/ns/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+    xmlns:c="http://www.w3.org/ns/xproc-step" exclude-inline-prefixes="px" xpath-version="2.0">
 
     <p:input port="source"/>
     <p:output port="result"/>
@@ -15,7 +15,6 @@
         <!-- space separated list of blacklisted media types. suppports the glob characters '*' and '?', i.e. "image/*" or "application/*+xml". -->
     </p:option>
 
-    <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
 
     <p:choose>

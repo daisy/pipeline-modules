@@ -2,7 +2,6 @@
 <p:declare-step version="1.0" name="validation-report-to-html" type="px:validation-report-to-html"
     xmlns:p="http://www.w3.org/ns/xproc" 
     xmlns:c="http://www.w3.org/ns/xproc-step"
-    xmlns:cx="http://xmlcalabash.com/ns/extensions"
     xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
     xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
     xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp" 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" xmlns:px="http://www.daisy.org/ns/pipeline/xproc" xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal" xmlns:c="http://www.w3.org/ns/xproc-step" version="1.0"
-    xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:catalog="urn:oasis:names:tc:entity:xmlns:xml:catalog" exclude-inline-prefixes="#all">
+    xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:catalog="urn:oasis:names:tc:entity:xmlns:xml:catalog" exclude-inline-prefixes="#all">
 
     <p:output port="result" sequence="true">
         <p:pipe port="result" step="result"/>
