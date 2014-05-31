@@ -80,7 +80,7 @@
         </p:input>
     </p:wrap-sequence>
     <px:i18n-translate name="toc-string" string="Table of contents">
-        <p:with-option name="language" select="( /*/html:html/@lang , /*/html:html/@xml:lang , /*/html:html/html:head/html:meta[matches(lower-case(@name),'^(.*[:\.])?language$')]/@content , 'en' )[1]"/>
+        <p:with-option name="language" select="( /*/h:html/@lang , /*/h:html/@xml:lang , /*/h:html/h:head/h:meta[matches(lower-case(@name),'^(.*[:\.])?language$')]/@content , 'en' )[1]"/>
         <p:input port="maps">
             <p:document href="../i18n.xml"/>
         </p:input>
