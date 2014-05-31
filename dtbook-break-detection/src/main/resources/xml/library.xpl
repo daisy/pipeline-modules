@@ -7,8 +7,6 @@
 
   <p:declare-step type="px:dtbook-break-detect">
 
-    <p:import href="http://www.daisy.org/pipeline/modules/break-detection/break-and-reshape.xpl" />
-
     <p:documentation>Break an input DTBook document into words and sentences by inserting word and sentence elements.</p:documentation>
 
     <p:input port="source" primary="true"/>
@@ -18,6 +16,8 @@
     </p:output>
 
     <p:option name="split-skippable" select="'true'" required="false" />
+
+    <p:import href="http://www.daisy.org/pipeline/modules/nlp-break-detection/library.xpl" />
 
     <px:break-and-reshape name="generic">
       <p:with-option name="inline-tags" select="'acronym,em,strong,a,abbr,dfn,linenum,pagenum,samp,span,sup,sub,w,noteref,br'"/>
