@@ -3,6 +3,7 @@
   <uri name="http://www.daisy.org/pipeline/modules/text-to-ssml/text-to-ssml.xpl"
        uri="../xml/xproc/text-to-ssml.xpl"/>
 
+    <nextCatalog catalog="org:daisy:pipeline:modules:common-utils"/>
     <nextCatalog catalog="org:daisy:pipeline:modules:css-speech" />
     <nextCatalog catalog="org:daisy:pipeline:modules:css-utils" />
     <nextCatalog catalog="org:daisy:pipeline:modules:fileset-utils"/>

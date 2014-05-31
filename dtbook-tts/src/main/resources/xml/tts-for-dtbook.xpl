@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step version="1.0" name="main" type="px:tts-for-dtbook"
 		xmlns:p="http://www.w3.org/ns/xproc"
-		xmlns:cx="http://xmlcalabash.com/ns/extensions"
 		xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
 		xmlns:d="http://www.daisy.org/ns/pipeline/data"
 		exclude-inline-prefixes="#all">

@@ -4,6 +4,7 @@
   <uri name="http://www.daisy.org/pipeline/modules/zedai-to-ssml/zedai-to-ssml.xpl"
     uri="../xml/zedai-to-ssml.xpl"/>
 
+  <nextCatalog catalog="org:daisy:pipeline:modules:common-utils"/>
   <nextCatalog catalog="org:daisy:pipeline:modules:text-to-ssml" />
 
 </catalog>

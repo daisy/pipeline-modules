@@ -4,6 +4,7 @@
   <uri name="http://www.daisy.org/pipeline/modules/epub3-to-ssml/epub3-to-ssml.xpl"
     uri="../xml/epub3-to-ssml.xpl"/>
 
+  <nextCatalog catalog="org:daisy:pipeline:modules:common-utils"/>
   <nextCatalog catalog="org:daisy:pipeline:modules:text-to-ssml" />
   
 </catalog>

@@ -1,12 +1,12 @@
 <p:declare-step version="1.0" type="px:ssml-to-audio" name="main"
 		xmlns:p="http://www.w3.org/ns/xproc"
 		xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-		xmlns:cx="http://xmlcalabash.com/ns/extensions"
 		xmlns:d="http://www.daisy.org/ns/pipeline/data">	
 
-  <p:import href="synthesize.xpl" />
   <p:input port="source" primary="true" sequence="true"/>    
   <p:output port="result" primary="true" sequence="false"/>
+
+  <p:import href="synthesize.xpl" />
 
   <px:synthesize/>
 
