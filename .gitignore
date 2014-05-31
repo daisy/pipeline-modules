@@ -21,4 +21,4 @@ Thumbs.db
 .*~
 
 # xspec reports
-xspec/*html
+**/xspec/*-result.html
