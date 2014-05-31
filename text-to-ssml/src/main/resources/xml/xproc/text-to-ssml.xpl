@@ -6,12 +6,6 @@
 		xmlns:ssml="http://www.w3.org/2001/10/synthesis"
 		exclude-inline-prefixes="#all">
 
-  <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
-  <p:import href="http://www.daisy.org/pipeline/modules/css-speech/inline-css.xpl"/>
-  <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl" />
-  <p:import href="styled-text-to-ssml.xpl" />
-  <p:import href="skippable-to-ssml.xpl" />
-
   <p:documentation>
     Generate the TTS input, as SSML snippets.
   </p:documentation>
@@ -66,8 +60,8 @@
     </p:documentation>
   </p:option>
 
-  <p:option name="xhtml-link" required="false" select="'true'">
-    <p:documentation>Whether or not the XHTML element 'link' exists,
+  <p:option name="link-element" required="false" select="'true'">
+    <p:documentation>Whether or not an HTML-like 'link' element exists,
     such as in EPUB3 and DTBook. Used for retrieving the CSS
     stylesheets.</p:documentation>
   </p:option>
@@ -77,6 +71,13 @@
     to custom lexicons. The phonemes will owerwrite those defined in
     the builtin lexicons.</p:documentation>
   </p:option>
+  
+  
+  <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
+  <p:import href="http://www.daisy.org/pipeline/modules/css-speech/inline-css.xpl"/>
+  <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl" />
+  <p:import href="styled-text-to-ssml.xpl" />
+  <p:import href="skippable-to-ssml.xpl" />
 
   <p:variable name="style-ns" select="'http://www.daisy.org/ns/pipeline/tmp'"/>
 
@@ -88,13 +89,12 @@
 	<p:pipe port="fileset.in" step="main"/>
       </p:variable>
       <p:xslt name="get-css">
-	<p:with-param name="xhtml-link" select="$xhtml-link"/>
+	<p:with-param name="link-element" select="$link-element"/>
 	<p:input port="source">
 	  <p:pipe port="content.in" step="main"/>
 	</p:input>
 	<p:input port="stylesheet">
-	  <p:document href="../xslt/get-css-uris.xsl"/> <!-- TODO: use the one in pipeline-common -->
-	  <!-- http://www.daisy.org/pipeline/modules/file-utils/css-stylesheet-uris.xsl -->
+	  <p:document href="http://www.daisy.org/pipeline/modules/css-utils/xml-to-css-uris.xsl"/>
 	</p:input>
       </p:xslt>
       <p:viewport match="//*[@href]">
