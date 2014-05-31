@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step type="px:html-load" xmlns:p="http://www.w3.org/ns/xproc"
     xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-    xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
-    xmlns:cx="http://xmlcalabash.com/ns/extensions" exclude-inline-prefixes="#all" version="1.0">
+    xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal" exclude-inline-prefixes="#all"
+    version="1.0">
     <p:documentation>Tries first to p:load the HTML-file. An exception will be thrown if the file is
         not well formed XML, in which case the file will be loaded using p:http-request and
         p:unescape-markup. As the xproc-step ('c:') namespace is still attached to the elements

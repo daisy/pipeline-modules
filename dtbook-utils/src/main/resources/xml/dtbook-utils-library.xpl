@@ -10,9 +10,9 @@
             <p px:role="organization">DAISY Consortium</p>
         </div>
     </p:documentation>
-    
+
     <p:import href="dtbook-load.xpl"/>
     <p:import href="upgrade-dtbook/upgrade-dtbook.xpl"/>
     <p:import href="merge-dtbook/merge-dtbook.xpl"/>
-    
+
 </p:library>
