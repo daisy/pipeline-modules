@@ -14,6 +14,5 @@
     <p:import href="dtbook-load.xpl"/>
     <p:import href="upgrade-dtbook/upgrade-dtbook.xpl"/>
     <p:import href="merge-dtbook/merge-dtbook.xpl"/>
-    <p:import href="tts/tts-for-dtbook.xpl"/>
 
 </p:library>
