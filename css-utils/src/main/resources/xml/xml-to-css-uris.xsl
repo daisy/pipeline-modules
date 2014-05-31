@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:d="http://www.daisy.org/ns/pipeline/data" version="2.0" exclude-result-prefixes="#all">
+    xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    version="2.0" exclude-result-prefixes="#all">
 
-    <xsl:param name="link-element" select="'true'"/>
+    <xsl:param name="link-element" select="'true'" as="xs:string"/>
 
     <xsl:template match="/" name="stylesheets">
         <d:sheets>
@@ -25,7 +26,7 @@
     <xsl:template
         match="*:link[normalize-space(@href)][normalize-space(@rel) eq 'stylesheet' 
                              and (empty(@type) or normalize-space(@type) eq 'text/css')]">
-        <xsl:if test="$link-element">
+        <xsl:if test="$link-element = 'true'">
             <d:sheet href="{normalize-space(@href)}"/>
         </xsl:if>
     </xsl:template>
