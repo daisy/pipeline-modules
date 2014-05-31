@@ -22,6 +22,7 @@
   <modules>
     <module>asciimath-utils</module>
     <module>common-entities</module>
+    <module>css-utils</module>
     <module>daisy202-utils</module>
     <module>daisy3-utils</module>
     <module>dtbook-utils</module>
@@ -46,6 +47,11 @@
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>common-entities</artifactId>
         <version>1.0.1-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.daisy.pipeline.modules</groupId>
+        <artifactId>css-utils</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
