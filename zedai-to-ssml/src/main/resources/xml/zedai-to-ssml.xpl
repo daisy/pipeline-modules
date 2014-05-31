@@ -36,7 +36,7 @@
       <p:input port="content.in">
 	<p:pipe port="content.in" step="main"/>
       </p:input>
-      <p:with-option name="xhtml-link" select="'false'"/>
+      <p:with-option name="link-element" select="'false'"/>
       <p:with-option name="section-elements" select="'section'"/>
       <p:with-option name="sentence-element" select="'s'"/>
       <p:with-option name="word-element" select="'w'"/>
