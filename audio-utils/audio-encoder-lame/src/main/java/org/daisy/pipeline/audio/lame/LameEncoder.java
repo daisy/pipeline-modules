@@ -1,8 +1,10 @@
 package org.daisy.pipeline.audio.lame;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 
 import javax.sound.sampled.AudioFormat;
@@ -43,10 +45,8 @@ public class LameEncoder implements AudioEncoder {
 		try {
 			p = Runtime.getRuntime().exec(cmd);
 			//read the output to prevent the process from sleeping
-			InputStream in = p.getInputStream();
-			while (in.available() > 0) {
-				in.skip(in.available());
-			}
+			BufferedReader stdOut=new BufferedReader(new InputStreamReader(p.getInputStream()));
+			while((stdOut.readLine())!=null){}
 			p.waitFor();
 		} catch (Exception e) {
 			if (p != null)
