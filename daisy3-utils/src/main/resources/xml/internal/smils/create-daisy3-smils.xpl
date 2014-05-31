@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step name="main" type="px:create-daisy3-smils" xmlns:p="http://www.w3.org/ns/xproc"
-    xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns:d="http://www.daisy.org/ns/pipeline/data"
+    xmlns:d="http://www.daisy.org/ns/pipeline/data"
     xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
     xmlns:smil="http://www.w3.org/2001/SMIL20/"
     version="1.0">
@@ -75,8 +75,8 @@
       </p:documentation>
     </p:option>
 
+    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
-    <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
 
     <!-- They cannot hold a smilref attribute or they can contain levels (which would make them wrongly dispatched over multiple smils) -->
     <p:variable name="no-smilref" select="' level level1 level2 level3 level4 level5 level6 dtbook frontmatter bodymatter rearmatter br head title meta style book bdo hr '"/>
@@ -90,7 +90,7 @@
       </p:input>
       <p:with-param name="no-smilref" select="$no-smilref"/>
     </p:xslt>
-    <cx:message message="Smil-needed IDs generated"/>
+    <px:message message="Smil-needed IDs generated"/>
 
     <p:xslt name="audio-order">
       <p:input port="stylesheet">
@@ -100,7 +100,7 @@
     	<p:empty/>
       </p:input>
     </p:xslt>
-    <cx:message message="SMIL audio order generated"/>
+    <px:message message="SMIL audio order generated"/>
     <p:sink/>
 
     <p:xslt name="add-smilrefs">
@@ -115,7 +115,7 @@
       <p:with-param name="mo-dir" select="$smil-dir"/>
       <p:with-param name="output-dir" select="$root-dir"/>
     </p:xslt>
-    <cx:message message="Smilref generated"/>
+    <px:message message="Smilref generated"/>
     <p:sink/>
 
     <p:xslt name="copy-smilrefs">
@@ -130,7 +130,7 @@
 	<p:empty/>
       </p:input>
     </p:xslt>
-    <cx:message message="Smilrefs copied to the original document"/>
+    <px:message message="Smilrefs copied to the original document"/>
     <p:sink/>
 
     <p:xslt name="create-smils">
@@ -147,7 +147,7 @@
       <p:with-param name="content-uri" select="$daisy3-dtbook-uri"/>
       <p:with-param name="content-dir" select="$root-dir"/>
     </p:xslt>
-    <cx:message message="SMIL files generated."/><p:sink/>
+    <px:message message="SMIL files generated."/><p:sink/>
 
     <p:xslt name="compute-durations">
       <p:input port="source">
@@ -161,7 +161,7 @@
       </p:input>
     </p:xslt>
     <p:delete match="d:duration" name="total-duration"/>
-    <cx:message message="Durations computed."/><p:sink/>
+    <px:message message="Durations computed."/><p:sink/>
 
     <p:for-each name="smil-with-durations">
       <p:output port="result"/>
@@ -193,6 +193,6 @@
     </p:for-each>
     <px:fileset-join name="smil-in-fileset"/>
 
-    <cx:message message="SMIL fileset created."/><p:sink/>
+    <px:message message="SMIL fileset created."/><p:sink/>
 
 </p:declare-step>
