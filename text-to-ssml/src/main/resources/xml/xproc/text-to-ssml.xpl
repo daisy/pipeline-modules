@@ -73,7 +73,7 @@
   
   
   <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
-  <p:import href="http://www.daisy.org/pipeline/modules/css-speech/inline-css.xpl"/>
+  <p:import href="http://www.daisy.org/pipeline/modules/css-speech/library.xpl"/>
   <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
   <p:import href="styled-text-to-ssml.xpl" />
   <p:import href="skippable-to-ssml.xpl" />

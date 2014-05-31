@@ -25,7 +25,7 @@
     <p:option name="ssml-of-lexicons-uris" required="false" select="''"/>
 
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/text-to-ssml/text-to-ssml.xpl" />
+    <p:import href="http://www.daisy.org/pipeline/modules/text-to-ssml/library.xpl" />
 
     <px:text-to-ssml name="ssml-gen">
       <p:input port="fileset.in">

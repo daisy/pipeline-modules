@@ -66,8 +66,8 @@
     </p:documentation>
   </p:option>
 
-  <p:import href="http://www.daisy.org/pipeline/modules/ssml-to-audio/ssml-to-audio.xpl" />
-  <p:import href="http://www.daisy.org/pipeline/modules/dtbook-to-ssml/dtbook-to-ssml.xpl" />
+  <p:import href="http://www.daisy.org/pipeline/modules/ssml-to-audio/library.xpl" />
+  <p:import href="http://www.daisy.org/pipeline/modules/dtbook-to-ssml/library.xpl" />
   <p:import href="http://www.daisy.org/pipeline/modules/dtbook-break-detection/library.xpl"/>
 
   <!-- Find the sentences and the words, even if the Text-To-Speech is off. -->
