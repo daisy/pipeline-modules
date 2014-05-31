@@ -1,16 +1,16 @@
 <p:declare-step version="1.0" type="px:create-audio-fileset" name="main"
 		xmlns:p="http://www.w3.org/ns/xproc"
 		xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-		xmlns:cx="http://xmlcalabash.com/ns/extensions"
 		xmlns:d="http://www.daisy.org/ns/pipeline/data">
-
-  <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
 
   <p:input port="source" primary="true" /> <!-- audio clips -->
   <p:output port="fileset.out" sequence="false" primary="true"/>  <!-- fileset of audio files -->
 
   <p:option name="output-dir" required="true"/>
   <p:option name="audio-relative-dir" required="true"/>
+  
+  <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
+  
   <p:variable name="audio-dir" select="concat($output-dir, $audio-relative-dir)">
     <p:empty/>
   </p:variable>

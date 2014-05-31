@@ -1,14 +1,11 @@
 <p:declare-step type="px:styled-text-to-ssml" version="1.0" name="main"
 		xmlns:p="http://www.w3.org/ns/xproc"
 		xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-		xmlns:cx="http://xmlcalabash.com/ns/extensions"
 		xmlns:xml="http://www.w3.org/XML/1998/namespace"
 		xmlns:ssml="http://www.w3.org/2001/10/synthesis"
 		xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp"
 		xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon"
 		exclude-inline-prefixes="#all">
-
-  <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl" />
 
   <p:input port="fileset.in" sequence="false"/>
   <p:input port="content.in" sequence="false" primary="true"/>
@@ -20,6 +17,8 @@
   <p:option name="section-attr-val" required="false" select="''"/>
   <p:option name="first-sheet-uri" required="false" select="''"/>
   <p:option name="style-ns" required="true"/>
+  
+  <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
 
   <!-- Encapsulates the section elements into tmp:group. -->
   <p:xslt name="identify-sections">
@@ -33,7 +32,7 @@
       <p:document href="../xslt/identify-sections.xsl"/>
     </p:input>
   </p:xslt>
-  <cx:message message="Sections identified"/>
+  <px:message message="Sections identified"/>
 
   <!-- Map the content to undispatchable units (i.e. the content can
        be split into smaller objects but not transfered to other
@@ -46,7 +45,7 @@
       <p:document href="../xslt/assign-thread-id.xsl"/>
     </p:input>
   </p:xslt>
-  <cx:message message="ssml assigned to threads"/>
+  <px:message message="ssml assigned to threads"/>
 
   <!-- Generate the rough skeleton of the SSML document. -->
   <!-- Everything is converted but the content of the sentences.-->
@@ -57,7 +56,7 @@
       <p:document href="../xslt/generate-tts-input.xsl"/>
     </p:input>
   </p:xslt>
-  <cx:message message="TTS document input skeletons generated"/>
+  <px:message message="TTS document input skeletons generated"/>
 
   <!-- Convert to SSML the own sentences' CSS properties and the CSS
        properties inside them. -->
@@ -69,7 +68,7 @@
       <p:document href="../xslt/css-to-ssml.xsl"/>
     </p:input>
   </p:xslt>
-  <cx:message message="CSS properties converted to SSML"/><p:sink/>
+  <px:message message="CSS properties converted to SSML"/><p:sink/>
 
   <!-- ============================================================== -->
   <!-- DO SOME TEXT-TO-SSML CONVERSIONS USING THE LEXICONS -->
@@ -138,9 +137,9 @@
 	<p:load>
 	  <p:with-option name="href" select="concat('../lexicons/lexicon_', $lang,'.pls')"/>
 	</p:load>
-	<cx:message>
+	<px:message>
 	  <p:with-option name="message" select="concat('loaded lexicon for language: ', $lang)"/>
-	</cx:message>
+	</px:message>
       </p:group>
       <p:catch>
 	<p:identity>
@@ -148,14 +147,14 @@
 	    <p:empty/>
 	  </p:input>
 	</p:identity>
-	<cx:message>
+	<px:message>
 	  <p:with-option name="message" select="concat('could not find the builtin lexicon for language: ', $lang)"/>
-	</cx:message>
+	</px:message>
       </p:catch>
     </p:try>
   </p:for-each>
 
-  <cx:message message="lexicons read from the disk"/><p:sink/>
+  <px:message message="lexicons read from the disk"/><p:sink/>
 
   <p:identity name="empty-lexicon">
     <p:input port="source">
@@ -180,7 +179,7 @@
     </p:input>
   </p:xslt>
 
-  <cx:message message="PLS info separated"/><p:sink/>
+  <px:message message="PLS info separated"/><p:sink/>
 
   <p:xslt name="pls">
     <p:input port="source">
@@ -208,7 +207,7 @@
     </p:input>
   </p:xslt>
 
-  <cx:message message="PLS info converted to SSML"/>
+  <px:message message="PLS info converted to SSML"/>
 
   <!-- split the result to extract the wrapped SSML files -->
   <p:delete match="@tmp:*"/>

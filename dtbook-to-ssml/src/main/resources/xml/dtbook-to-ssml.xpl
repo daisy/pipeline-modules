@@ -3,11 +3,8 @@
 		xmlns:p="http://www.w3.org/ns/xproc"
 		xmlns:c="http://www.w3.org/ns/xproc-step"
 		xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-		xmlns:cx="http://xmlcalabash.com/ns/extensions"
 		exclude-inline-prefixes="#all"
 		name="main">
-
-  <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
 
     <p:documentation>
       <p>Specialization of the SSML generation for DTBook</p>
@@ -25,7 +22,8 @@
     <p:option name="separate-skippable" required="false" select="'true'"/>
     <p:option name="ssml-of-lexicons-uris" required="false" select="''"/>
 
-    <p:import href="http://www.daisy.org/pipeline/modules/text-to-ssml/text-to-ssml.xpl" />
+    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/text-to-ssml/library.xpl" />
 
     <p:xslt name="semantic">
       <p:input port="source">
@@ -58,6 +56,6 @@
       <p:with-option name="ssml-of-lexicons-uris" select="$ssml-of-lexicons-uris"/>
     </px:text-to-ssml>
 
-    <cx:message message="End SSML generation for DTBook"/><p:sink/>
+    <px:message message="End SSML generation for DTBook"/><p:sink/>
 
 </p:declare-step>

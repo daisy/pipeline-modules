@@ -1,7 +1,6 @@
 <p:declare-step type="px:text-to-ssml" version="1.0" name="main"
 		xmlns:p="http://www.w3.org/ns/xproc"
 		xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-		xmlns:cx="http://xmlcalabash.com/ns/extensions"
 		xmlns:xml="http://www.w3.org/XML/1998/namespace"
 		xmlns:ssml="http://www.w3.org/2001/10/synthesis"
 		exclude-inline-prefixes="#all">
@@ -73,9 +72,9 @@
   </p:option>
   
   
+  <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
+  <p:import href="http://www.daisy.org/pipeline/modules/css-speech/library.xpl"/>
   <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
-  <p:import href="http://www.daisy.org/pipeline/modules/css-speech/inline-css.xpl"/>
-  <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl" />
   <p:import href="styled-text-to-ssml.xpl" />
   <p:import href="skippable-to-ssml.xpl" />
 
@@ -105,7 +104,7 @@
     </p:group>
     <p:catch>
       <p:output port="result"/>
-      <cx:message message="CSS stylesheet URI(s) are malformed."/>
+      <px:message message="CSS stylesheet URI(s) are malformed."/>
       <p:identity>
 	<p:input port="source">
 	  <p:empty/>
@@ -143,7 +142,7 @@
 	    <p:empty/>
 	  </p:with-option>
 	</px:inline-css>
-	<cx:message message="CSS speech inlined"/>
+	<px:message message="CSS speech inlined"/>
       </p:when>
       <p:otherwise>
 	<p:output port="result"/>
@@ -152,7 +151,7 @@
 	    <p:pipe port="content.in" step="main"/>
 	  </p:input>
 	</p:identity>
-	<cx:message message="No CSS sheet found"/>
+	<px:message message="No CSS sheet found"/>
       </p:otherwise>
     </p:choose>
 
@@ -170,7 +169,7 @@
 	<p:document href="../xslt/normalize.xsl"/>
       </p:input>
     </p:xslt>
-    <cx:message message="Lexing information normalized"/>
+    <px:message message="Lexing information normalized"/>
 
     <p:xslt name="separate">
       <p:with-param name="skippable-elements" select="$skippable-elements"/>
