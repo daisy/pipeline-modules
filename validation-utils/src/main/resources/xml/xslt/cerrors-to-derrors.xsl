@@ -16,7 +16,7 @@
     </xsl:template>
     
     <xsl:template match="c:error">
-        <d:error type="relaxng">
+        <d:error>
             <d:desc><xsl:value-of select="text()"/></d:desc>
             <d:location>
                 <xsl:attribute name="line"><xsl:value-of select="@line"/></xsl:attribute>
