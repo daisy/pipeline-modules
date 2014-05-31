@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step name="main" type="px:create-daisy3-opf" xmlns:p="http://www.w3.org/ns/xproc"
-    xmlns:cx="http://xmlcalabash.com/ns/extensions"
     xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
     version="1.0">
 
