@@ -1,7 +1,7 @@
 package org.daisy.pipeline.cssinlining;
 
 import net.sf.saxon.dom.ElementOverNodeInfo;
-import net.sf.saxon.om.Axis;
+import net.sf.saxon.om.AxisInfo;
 import net.sf.saxon.om.NodeInfo;
 import net.sf.saxon.tree.iter.AxisIterator;
 
@@ -60,7 +60,7 @@ public class W3CElementAdapter extends ElementOverNodeInfo implements Adaptable 
 		if (name == null || name.equals(""))
 			return null;
 
-		AxisIterator atts = node.iterateAxis(Axis.ATTRIBUTE);
+		AxisIterator atts = node.iterateAxis(AxisInfo.ATTRIBUTE);
 		while (true) {
 			NodeInfo att = (NodeInfo) atts.next();
 			if (att == null) {
@@ -76,7 +76,7 @@ public class W3CElementAdapter extends ElementOverNodeInfo implements Adaptable 
 
 	@Override
 	public String getAttribute(String name) {
-		AxisIterator atts = node.iterateAxis(Axis.ATTRIBUTE);
+		AxisIterator atts = node.iterateAxis(AxisInfo.ATTRIBUTE);
 		while (true) {
 			NodeInfo att = atts.next();
 			if (att == null) {
