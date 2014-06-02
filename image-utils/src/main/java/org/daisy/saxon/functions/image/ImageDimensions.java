@@ -9,6 +9,8 @@ import javax.imageio.ImageIO;
 import net.sf.saxon.expr.XPathContext;
 import net.sf.saxon.lib.ExtensionFunctionCall;
 import net.sf.saxon.lib.ExtensionFunctionDefinition;
+import net.sf.saxon.om.LazySequence;
+import net.sf.saxon.om.Sequence;
 import net.sf.saxon.om.SequenceIterator;
 import net.sf.saxon.om.StructuredQName;
 import net.sf.saxon.trans.XPathException;
@@ -23,40 +25,47 @@ import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("serial")
 public class ImageDimensions extends ExtensionFunctionDefinition {
-	
+
 	private static final StructuredQName funcname = new StructuredQName("pf",
 			"http://www.daisy.org/ns/pipeline/functions", "image-dimensions");
-	
+
 	@Override
 	public SequenceType[] getArgumentTypes() {
 		return new SequenceType[] { SequenceType.SINGLE_STRING };
 	}
-	
+
 	public StructuredQName getFunctionQName() {
 		return funcname;
 	}
-	
+
 	public SequenceType getResultType(SequenceType[] arg0) {
 		return SequenceType.NUMERIC_SEQUENCE;
 	}
-	
+
 	@Override
 	public ExtensionFunctionCall makeCallExpression() {
 		return new ExtensionFunctionCall() {
-			@SuppressWarnings({ "unchecked", "rawtypes", "deprecation" })
-			public SequenceIterator call(SequenceIterator[] arguments, XPathContext context) throws XPathException {
+
+			@Override
+			public Sequence call(XPathContext context, Sequence[] arguments)
+					throws XPathException {
 				try {
-					String path = ((StringValue) arguments[0].next()).getStringValue();
-					BufferedImage image = ImageIO.read(new URL(URLDecoder.decode(path)));
-					return new ArrayIterator<IntegerValue>(new IntegerValue[]{
-							new BigIntegerValue(image.getWidth()),
-							new BigIntegerValue(image.getHeight())}); }
-				catch (Exception e) {
+					String path = ((StringValue) arguments[0])
+							.getStringValue();
+					BufferedImage image = ImageIO.read(new URL(URLDecoder
+							.decode(path)));
+					return new LazySequence(
+							new ArrayIterator < IntegerValue > (new IntegerValue[] {
+									new BigIntegerValue(image.getWidth()),
+									new BigIntegerValue(image.getHeight()) }));
+				} catch (Exception e) {
 					logger.error("pf:image-dimensions", e);
-					throw new XPathException("pf:image-dimensions failed", e); }
+					throw new XPathException("pf:image-dimensions failed", e);
+				}
 			}
 		};
 	}
-	
-	private static final Logger logger = LoggerFactory.getLogger(ImageDimensions.class);
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(ImageDimensions.class);
 }
