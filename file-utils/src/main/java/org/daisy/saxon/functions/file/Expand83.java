@@ -2,9 +2,12 @@ package org.daisy.saxon.functions.file;
 
 import java.io.File;
 import java.net.URI;
+
 import net.sf.saxon.expr.XPathContext;
 import net.sf.saxon.lib.ExtensionFunctionCall;
 import net.sf.saxon.lib.ExtensionFunctionDefinition;
+import net.sf.saxon.om.AtomicSequence;
+import net.sf.saxon.om.Sequence;
 import net.sf.saxon.om.SequenceIterator;
 import net.sf.saxon.om.StructuredQName;
 import net.sf.saxon.trans.XPathException;
@@ -38,14 +41,12 @@ public class Expand83 extends ExtensionFunctionDefinition {
 	public ExtensionFunctionCall makeCallExpression() {
 		return new ExtensionFunctionCall() {
 
-			@SuppressWarnings({ "unchecked", "rawtypes" })
-			public SequenceIterator call(SequenceIterator[] arguments,
-					XPathContext context) throws XPathException {
-
-				String uri = ((StringValue) arguments[0].next()).getStringValue();
+			@Override
+			public Sequence call(XPathContext context, Sequence[] arguments)
+					throws XPathException {
+				String uri = ((AtomicSequence) arguments[0]).getStringValue();
 				uri = Expand83.expand83(uri);
-				return SingletonIterator.makeIterator(new StringValue(
-						uri, BuiltInAtomicType.STRING));
+				return new StringValue(uri, BuiltInAtomicType.STRING);
 			}
 		};
 	}
@@ -53,13 +54,14 @@ public class Expand83 extends ExtensionFunctionDefinition {
 	/**
 	 * Expands 8.3 encoded path segments.
 	 *
-	 * For instance `C:\DOCUME~1\file.xml` will become `C:\Documents and Settings\file.xml`
+	 * For instance `C:\DOCUME~1\file.xml` will become `C:\Documents and
+	 * Settings\file.xml`
 	 */
 	public static String expand83(String uri) throws XPathException {
 		if (uri == null || !uri.startsWith("file:/")) {
 			return uri;
 		}
-		
+
 		try {
 			File file = new File(new URI(uri));
 			String expandedUri = expand83(file);
@@ -74,7 +76,10 @@ public class Expand83 extends ExtensionFunctionDefinition {
 		}
 	}
 
-	/** this is extracted out of `expand83(String)` because it can be unit tested with a custom File implementation. */
+	/**
+	 * this is extracted out of `expand83(String)` because it can be unit tested
+	 * with a custom File implementation.
+	 */
 	public static String expand83(File file) throws XPathException {
 		try {
 			if (file.exists()) {
