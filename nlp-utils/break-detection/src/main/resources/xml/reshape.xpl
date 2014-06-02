@@ -31,7 +31,11 @@
   <!-- Distribute some sentences to prevent them from having parents
        not compliant with the format. -->
   <p:xslt name="distribute">
-    <p:with-param name="can-contain-sentences" select="$can-contain-sentences"/>
+    <!-- The output-sentence-tag is added so as to accept words which
+         are children of a temporary sentence which is in turn the
+         child of an existing sentence. -->
+    <p:with-param name="can-contain-sentences"
+		  select="concat($can-contain-sentences, ',', $output-sentence-tag)"/>
     <p:with-param name="tmp-word-tag" select="$tmp-word-tag"/>
     <p:with-param name="tmp-sentence-tag" select="$tmp-sentence-tag"/>
     <p:with-param name="tmp-ns" select="$tmp-ns"/>
@@ -52,6 +56,7 @@
     <p:with-param name="word-attr" select="$word-attr"/>
     <p:with-param name="word-attr-val" select="$word-attr-val"/>
     <p:with-param name="output-ns" select="$output-ns"/>
+    <p:with-param name="output-subsentence-tag" select="$output-subsentence-tag"/>
     <p:input port="stylesheet">
       <p:document href="create-valid-breaks.xsl"/>
     </p:input>
