@@ -22,8 +22,17 @@
             </p:input>
             <p:input port="stylesheet">
                 <p:inline>
-                    <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0" xmlns:mo="http://www.w3.org/ns/SMIL">
+                    <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0" xmlns:mo="http://www.w3.org/ns/SMIL" xmlns:di="http://www.daisy.org/ns/pipeline/tmp">
                         <xsl:template match="@*|node()">
+                            <xsl:copy>
+                                <xsl:apply-templates select="@*|node()"/>
+                            </xsl:copy>
+                        </xsl:template>
+                        <xsl:template match="/di:smil-map">
+                            <!--
+                                avoids the SXXP0005 warning
+                                see: http://sourceforge.net/p/saxon/mailman/saxon-help/thread/E68C5E59-6E71-4E91-9B1D-29B4B9B0F290@saxonica.com/
+                            -->
                             <xsl:copy>
                                 <xsl:apply-templates select="@*|node()"/>
                             </xsl:copy>

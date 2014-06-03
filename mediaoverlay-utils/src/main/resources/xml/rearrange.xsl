@@ -16,6 +16,10 @@
             </body>
         </smil>
     </xsl:template>
+    
+    <xsl:template match="di:*">
+        <xsl:apply-templates/>
+    </xsl:template>
 
     <xsl:template match="*[@id]">
         <xsl:variable name="smil-elements"

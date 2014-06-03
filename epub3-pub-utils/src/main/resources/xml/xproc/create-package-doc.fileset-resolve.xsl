@@ -5,6 +5,12 @@
             <xsl:apply-templates select="@*|node()"/>
         </xsl:copy>
     </xsl:template>
+    <xsl:template match="d:fallback">
+        <!-- matching the wrapper element explicitly to avoid the SXXP0005 warning -->
+        <xsl:copy>
+            <xsl:apply-templates select="node() | @*"/>
+        </xsl:copy>
+    </xsl:template>
     <xsl:template match="d:file">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>

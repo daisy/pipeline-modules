@@ -2,7 +2,8 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
     xmlns="http://www.idpf.org/2007/opf" xmlns:dc="http://purl.org/dc/elements/1.1/"
     xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema" exclude-result-prefixes="f xs"
+    xmlns:d="http://www.daisy.org/ns/pipeline/data"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema" exclude-result-prefixes="#all"
     xpath-default-namespace="http://www.idpf.org/2007/opf">
 
     <!--=========================================-->
@@ -170,6 +171,13 @@
 
 
     <xsl:template match="node() | @*">
+        <xsl:copy>
+            <xsl:apply-templates select="node() | @*"/>
+        </xsl:copy>
+    </xsl:template>
+    
+    <xsl:template match="d:wrapper">
+        <!-- matching the wrapper element explicitly to avoid the SXXP0005 warning -->
         <xsl:copy>
             <xsl:apply-templates select="node() | @*"/>
         </xsl:copy>
