@@ -3,8 +3,9 @@ package org.daisy.pipeline.audio.lame;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Arrays;
 
 import javax.sound.sampled.AudioFormat;
@@ -45,8 +46,10 @@ public class LameEncoder implements AudioEncoder {
 		try {
 			p = Runtime.getRuntime().exec(cmd);
 			//read the output to prevent the process from sleeping
-			BufferedReader stdOut=new BufferedReader(new InputStreamReader(p.getInputStream()));
-			while((stdOut.readLine())!=null){}
+			BufferedReader stdOut = new BufferedReader(new InputStreamReader(p
+			        .getInputStream()));
+			while ((stdOut.readLine()) != null) {
+			}
 			p.waitFor();
 		} catch (Exception e) {
 			if (p != null)
@@ -65,6 +68,38 @@ public class LameEncoder implements AudioEncoder {
 		String signedOpt = audioFormat.getEncoding() == AudioFormat.Encoding.PCM_UNSIGNED ? "--unsigned"
 		        : "--signed";
 		String endianness = audioFormat.isBigEndian() ? "--big-endian" : "--little-endian";
+
+		//lame cannot deal with unsigned encoding for other bitwidths than 8
+		if (audioFormat.getEncoding() == AudioFormat.Encoding.PCM_UNSIGNED
+		        && audioFormat.getSampleSizeInBits() > 8
+		        && (audioFormat.getSampleSizeInBits() % 8) == 0) {
+			//downsampling: keep the most significant bit only, in order to produce 8-bit unsigned data
+			int ratio = audioFormat.getSampleSizeInBits() / 8;
+			int mse = audioFormat.isBigEndian() ? 0 : (ratio - 1);
+			size /= ratio;
+			for (int i = 0; i < size; ++i)
+				input[i] = input[ratio * i + mse];
+			bitwidth = "8";
+		} else if (audioFormat.getEncoding() == AudioFormat.Encoding.PCM_FLOAT) {
+			//convert [-1.0, 1.0] values to regular 32-bit signed integers
+			//TODO: find a faster and more accurate way
+			ByteBuffer buffer = ByteBuffer.wrap(input, 0, size);
+			buffer.order(audioFormat.isBigEndian() ? ByteOrder.BIG_ENDIAN
+			        : ByteOrder.LITTLE_ENDIAN);
+			if (audioFormat.getSampleSizeInBits() == 32) {
+				for (int i = 0; i < size; i += Float.SIZE / 8) {
+					float v = buffer.getFloat(i);
+					buffer.putInt(i, (int) (v * Integer.MAX_VALUE));
+				}
+			} else { //Lame cannot handle 64-bit data => downsampling to 32-bit
+				for (int i = 0; i < size; i += Double.SIZE / 8) {
+					double v = buffer.getDouble(i);
+					buffer.putInt(i / 2, (int) (v * Integer.MAX_VALUE));
+				}
+				size /= 2;
+				bitwidth = "32";
+			}
+		}
 
 		//-r: raw pcm
 		//-s: sample rate in kHz
