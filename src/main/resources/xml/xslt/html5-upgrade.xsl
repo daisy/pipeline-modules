@@ -96,7 +96,7 @@
 
     <!--====== Element 'a' ======-->
     <xsl:template
-        match="a/@href|a/@target|a/@download|a/@rel|a/@hreflang|a/@type|a/@coords|a/@shape">
+        match="a/@href|a/@target|a/@download|a/@rel|a/@hreflang|a/@type">
         <xsl:copy/>
     </xsl:template>
     <xsl:template match="a/@name|embed/@name|img/@name|option/@name">
@@ -110,8 +110,9 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-    <xsl:template match="a[@coords|@shape]">
+    <xsl:template match="a[ancestor::map or ancestor::template][@coords|@shape][normalize-space()='']">
         <area>
+            <xsl:copy-of select="@shape|@coords"/>
             <xsl:apply-templates select="node()|@*"/>
         </area>
     </xsl:template>
@@ -356,7 +357,7 @@
 
     <!--====== Element 'img' ======-->
     <xsl:template
-        match="img/@alt|img/@src|img/@crossorigin|img/@usemap|img/@ismap|img/@width|img/@height">
+        match="img/@alt|img/@src|img/@crossorigin|img/@usemap|img/@ismap|img/@width|img/@height|img/@longdesc">
         <xsl:copy/>
     </xsl:template>
     <xsl:template match="img[empty(@style)]/@border">
@@ -450,17 +451,7 @@
     </xsl:template>
 
     <!--====== Element 'meta' ======-->
-    <xsl:template match="meta/@name|meta/@content">
-        <xsl:copy/>
-    </xsl:template>
-
-    <!--====== Element 'meta' ======-->
-    <xsl:template match="meta/@http-equiv|meta/@content">
-        <xsl:copy/>
-    </xsl:template>
-
-    <!--====== Element 'meta' ======-->
-    <xsl:template match="meta/@charset">
+    <xsl:template match="meta/@http-equiv|meta/@content|meta/@charset|meta/@name">
         <xsl:copy/>
     </xsl:template>
 
