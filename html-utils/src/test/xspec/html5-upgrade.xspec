@@ -439,24 +439,29 @@
                 </x:expect>
             </x:scenario>
         </x:scenario>
-        <x:scenario label="with a coords attribute">
+        <x:scenario label="with a coords or attribute and an area content model">
             <x:context>
-                <a id="foo" foo="bar" epub:type="foo" href="#foo" target="_self" download=""
-                    rel="alternate" hreflang="en" type="text/html" coords="1 2">test</a>
+                <map>
+                    <a id="foo" foo="bar" epub:type="foo" href="#foo" target="_self" download=""
+                        rel="alternate" hreflang="en" type="text/html" coords="1 2" shape="circle"/>
+                </map>
             </x:context>
             <x:expect label="is converted to area">
-                <area id="foo" epub:type="foo" href="#foo" target="_self" download=""
-                    rel="alternate" hreflang="en" type="text/html" coords="1 2">test</area>
+                <map>
+                    <area id="foo" epub:type="foo" href="#foo" target="_self" download=""
+                        rel="alternate" hreflang="en" type="text/html" coords="1 2" shape="circle"/>
+                </map>
             </x:expect>
         </x:scenario>
-        <x:scenario label="with a shape attribute">
+        <x:scenario label="with a shape or coords attribute and non-empty">
             <x:context>
                 <a id="foo" foo="bar" epub:type="foo" href="#foo" target="_self" download=""
-                    rel="alternate" hreflang="en" type="text/html" shape="circle">test</a>
+                    rel="alternate" hreflang="en" type="text/html" coords="1 2" shape="circle"
+                    >test</a>
             </x:context>
-            <x:expect label="is converted to area">
-                <area id="foo" epub:type="foo" href="#foo" target="_self" download=""
-                    rel="alternate" hreflang="en" type="text/html" shape="circle">test</area>
+            <x:expect label="is kept as an a, and attributes are removed">
+                <a id="foo" epub:type="foo" href="#foo" target="_self" download="" rel="alternate"
+                    hreflang="en" type="text/html">test</a>
             </x:expect>
         </x:scenario>
     </x:scenario>
@@ -844,7 +849,7 @@
             </x:expect>
         </x:scenario>
     </x:scenario>
-    
+
     <x:scenario label="Element :: dfn">
         <x:scenario label="element and allowed attributes">
             <x:context>
@@ -1327,11 +1332,12 @@
         <x:scenario label="element and allowed attributes">
             <x:context>
                 <img id="foo" foo="bar" epub:type="foo" alt="foo" src="foo.jpg"
-                    crossorigin="anonymous" usemap="#foo" ismap="" width="100" height="100"/>
+                    crossorigin="anonymous" usemap="#foo" ismap="" width="100" height="100"
+                    longdesc="desc.xml"/>
             </x:context>
             <x:expect label="are translated as-is">
                 <img id="foo" epub:type="foo" alt="foo" src="foo.jpg" crossorigin="anonymous"
-                    usemap="#foo" ismap="" width="100" height="100"/>
+                    usemap="#foo" ismap="" width="100" height="100" longdesc="desc.xml"/>
             </x:expect>
         </x:scenario>
         <x:scenario label="border attribute">
@@ -2064,7 +2070,7 @@
             </x:expect>
         </x:scenario>
     </x:scenario>
-    
+
     <x:scenario label="Element :: summary">
         <x:scenario label="element and allowed attributes">
             <x:context>
