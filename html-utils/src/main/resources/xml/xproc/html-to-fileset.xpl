@@ -18,7 +18,7 @@
     <p:input port="fileset.in">
         <p:documentation>
             <h2 px:role="name">Optional input fileset</h2>
-            <p px:role="desc">The input XHTML files will be temporarily annotated with 'data-original-href' attributes according to this fileset.</p>
+            <p px:role="desc">The input XHTML files will be temporarily annotated with 'data-original-*' attributes according to this fileset.</p>
         </p:documentation>
         <p:empty/>
     </p:input>

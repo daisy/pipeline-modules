@@ -8,12 +8,12 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema" version="2.0" exclude-result-prefixes="#all">
 
     <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/uri-functions.xsl"/>
-    <!--<xsl:import href="../../../../test/xspec/mock-functions.xsl"/>-->
+    <!--    <xsl:import href="../../../../test/xspec/mock-functions.xsl"/>-->
 
     <xsl:strip-space elements="*"/>
     <xsl:output indent="yes"/>
 
-    <xsl:template match="text()"/>
+    <xsl:template match="text()|@*"/>
 
     <xsl:variable name="doc-base"
         select="if (/html/head/base[@href][1]) then resolve-uri(normalize-space(/html/head/base[@href][1]/@href),base-uri(/*)) else base-uri(/*)"/>
@@ -31,7 +31,10 @@
                     <d:fileset>
                         <xsl:for-each select="d:fileset/d:file">
                             <xsl:if test="@original-href">
-                                <d:file href="{pf:normalize-uri(string(resolve-uri(@href,base-uri(.))))}" original-href="{pf:normalize-uri(string(resolve-uri(@original-href,base-uri(.))))}"/>
+                                <d:file
+                                    href="{pf:normalize-uri(string(resolve-uri(@href,base-uri(.))))}"
+                                    original-href="{pf:normalize-uri(string(resolve-uri(@original-href,base-uri(.))))}"
+                                />
                             </xsl:if>
                         </xsl:for-each>
                     </d:fileset>
@@ -40,6 +43,9 @@
         </d:fileset>
     </xsl:template>
 
+    <xsl:template match="*">
+        <xsl:apply-templates select="node()|@*"/>
+    </xsl:template>
 
     <xsl:template match="/processing-instruction('xml-stylesheet')">
         <xsl:param name="fileset" tunnel="yes"/>
@@ -52,6 +58,11 @@
             else if (pf:get-extension($href)=('xsl','xslt')) then 'application/xslt+xml'
             else '',false(),$fileset)"
         />
+    </xsl:template>
+
+    <xsl:template match="@aria-describedat[not(starts-with(.,'#'))]">
+        <xsl:param name="fileset" tunnel="yes"/>
+        <xsl:sequence select="f:fileset-entry(.,(),false(),$fileset)"/>
     </xsl:template>
 
     <xsl:template match="link">
@@ -73,11 +84,10 @@
             />
         </xsl:if>
         <xsl:if test="$rel='stylesheet' and (@type='text/css' or pf:get-extension(@href)='css')">
-            <xsl:variable name="original-href" select="f:original-href(@href, ., $fileset)"/>
+            <xsl:variable name="original-href" select="f:original-href(@href, $fileset)"/>
             <xsl:variable name="href" select="resolve-uri(@href,base-uri(.))"/>
             <xsl:if test="unparsed-text-available($original-href)">
-                <xsl:for-each
-                    select="f:get-css-resources(unparsed-text($original-href),$href)">
+                <xsl:for-each select="f:get-css-resources(unparsed-text($original-href),$href)">
                     <xsl:sequence select="f:fileset-entry(.,(),false(),$fileset)"/>
                 </xsl:for-each>
             </xsl:if>
@@ -94,7 +104,8 @@
     <xsl:template match="script[@src]">
         <xsl:param name="fileset" tunnel="yes"/>
         <xsl:sequence
-            select="f:fileset-entry(@src,if (@type) then @type else 'text/javascript',false(),$fileset)"/>
+            select="f:fileset-entry(@src,if (@type) then @type else 'text/javascript',false(),$fileset)"
+        />
     </xsl:template>
 
     <xsl:template match="a[@href]">
@@ -114,6 +125,12 @@
             else (),false(),$fileset)"
             />
         </xsl:if>
+        <xsl:apply-templates select="@*"/>
+    </xsl:template>
+
+    <xsl:template match="img/@longdesc[not(starts-with(.,'#'))]">
+        <xsl:param name="fileset" tunnel="yes"/>
+        <xsl:sequence select="f:fileset-entry(.,(),false(),$fileset)"/>
     </xsl:template>
 
     <xsl:template match="iframe[@src]">
@@ -230,7 +247,8 @@
             <xsl:when test="not($href)"/>
             <!--ignore empty href-->
             <xsl:when test="starts-with($href,'file:')">
-                <d:file href="{pf:relativize-uri($href,$doc-base)}" original-href="{f:original-href($href, (), $fileset)}">
+                <d:file href="{pf:relativize-uri($href,$doc-base)}"
+                    original-href="{f:original-href($uri, $fileset)}">
                     <xsl:if test="$type">
                         <xsl:attribute name="media-type" select="$type"/>
                     </xsl:if>
@@ -242,7 +260,7 @@
             </xsl:when>
             <xsl:when test="$uri instance of attribute()">
                 <!--try to get the pre-computed original href from the parent element-->
-                <xsl:variable name="original-href" select="f:original-href($href, $uri/.., $fileset)"/>
+                <xsl:variable name="original-href" select="f:original-href($uri, $fileset)"/>
                 <d:file href="{$href}">
                     <xsl:if test="$type">
                         <xsl:attribute name="media-type" select="$type"/>
@@ -323,20 +341,33 @@
             else ()"
         />
     </xsl:function>
-    
+
     <xsl:function name="f:original-href">
-        <xsl:param name="href-attribute" as="xs:string"/>
-        <xsl:param name="context-element"/>
+        <xsl:param name="uri" as="item()"/>
+        <!--        <xsl:param name="context-element"/>-->
         <xsl:param name="fileset" as="document-node()"/>
         <xsl:choose>
-            <xsl:when test="$context-element">
-                <xsl:variable name="resolved-href" select="pf:normalize-uri(string(resolve-uri($href-attribute,base-uri($context-element))))"/>
-                <xsl:variable name="original-href" select="if ($context-element/@data-original-href) then pf:normalize-uri(string(resolve-uri($context-element/@data-original-href,base-uri($context-element)))) else if ($fileset//d:file[@href=$resolved-href]) then $fileset//d:file[@href=$resolved-href]/@original-href else $resolved-href"/>
+            <xsl:when test="$uri instance of attribute()">
+                <xsl:variable name="resolved-href"
+                    select="pf:normalize-uri(string(resolve-uri($uri,base-uri($uri/..))))"/>
+                <xsl:variable name="original-attr"
+                    select="$uri/../@*[name()=concat('data-original-',name($uri))]"/>
+                <xsl:variable name="original-href"
+                    select="if ($original-attr) then 
+                                pf:normalize-uri(string(resolve-uri($original-attr,base-uri($uri)))) 
+                            else if ($fileset//d:file[@href=$resolved-href]) then
+                                $fileset//d:file[@href=$resolved-href]/@original-href
+                            else
+                                $resolved-href"/>
                 <xsl:value-of select="$original-href"/>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:variable name="resolved-href" select="pf:normalize-uri($href-attribute)"/>
-                <xsl:variable name="original-href" select="if ($fileset//d:file[@href=$resolved-href]) then $fileset//d:file[@href=$resolved-href]/@original-href else $resolved-href"/>
+                <xsl:variable name="resolved-href" select="pf:normalize-uri($uri)"/>
+                <xsl:variable name="original-href"
+                    select="if ($fileset//d:file[@href=$resolved-href]) then
+                                $fileset//d:file[@href=$resolved-href]/@original-href
+                            else
+                                $resolved-href"/>
                 <xsl:value-of select="$original-href"/>
             </xsl:otherwise>
         </xsl:choose>
