@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <i18n xmlns="http://www.daisy.org/ns/pipeline/data">
     <!-- Note: these translations were translated using http://nicetranslator.com/ -->
-    <translation id="Guide">
+    <translation string="Guide">
         <text xml:lang="en">Guide</text>
         <text xml:lang="ar">دليل</text>
         <text xml:lang="bg">Ръководство</text>
@@ -46,7 +46,7 @@
         <text xml:lang="ur">ہدایت نامہ</text>
         <text xml:lang="vi">Hướng dẫn</text>
     </translation>
-    <translation id="Table of contents">
+    <translation string="Table of contents">
         <text xml:lang="en">Table of contents</text>
         <text xml:lang="ar">جدول المحتويات</text>
         <text xml:lang="bg">Таблица на съдържанието</text>
@@ -93,7 +93,7 @@
         <text xml:lang="vi">Bảng nội dung</text>
         <text xml:lang="cy">Tabl cynnwys</text>
     </translation>
-    <translation id="List of pages">
+    <translation string="List of pages">
         <text xml:lang="ar">قائمة الصفحات</text>
         <text xml:lang="bg">Списък на страници</text>
         <text xml:lang="ca">Llista de pàgines</text>
