@@ -29,7 +29,7 @@
       <p:with-option name="output-word-tag" select="'w'"/>
       <p:with-option name="output-sentence-tag" select="'sent'"/>
       <p:with-option name="split-skippable" select="$split-skippable"/>
-      <p:with-option name="skippable-tags" select="'pagenum,noteref,prodnote'"/>
+      <p:with-option name="skippable-tags" select="'pagenum,noteref,annoref,linenum'"/>
       <p:with-option name="output-subsentence-tag" select="'span'"/>
     </px:break-and-reshape>
 
