@@ -71,6 +71,12 @@
 
     <xsl:function name="pf:normalize-uri" as="xs:string">
         <xsl:param name="uri" as="xs:string?"/>
+        <xsl:sequence select="pf:normalize-uri($uri,true())"/>
+    </xsl:function>
+    
+    <xsl:function name="pf:normalize-uri" as="xs:string">
+        <xsl:param name="uri" as="xs:string?"/>
+        <xsl:param name="fragment" as="xs:boolean?"/>
         <!--
             http://en.wikipedia.org/wiki/URL_normalization
             - path segment normalization
@@ -128,7 +134,7 @@
         <xsl:variable name="authority" select="$tokens[2]"/>
         <xsl:variable name="path" select="$tokens[3]"/>
         <xsl:variable name="query" select="$tokens[4]"/>
-        <xsl:variable name="fragment" select="$tokens[5]"/>
+        <xsl:variable name="fragment" select="if ($fragment) then $tokens[5] else ()"/>
 
         <!-- lower case scheme and authority components -->
         <xsl:variable name="scheme" select="lower-case($scheme)"/>
