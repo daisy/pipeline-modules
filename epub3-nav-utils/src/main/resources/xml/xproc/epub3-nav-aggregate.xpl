@@ -58,16 +58,26 @@
     </p:choose>
 
     <!-- add xml:lang and lang attributes -->
-    <p:add-attribute match="/*" attribute-name="xml:lang">
-        <p:with-option name="attribute-value" select="if ($language) then $language else /*/@xml:lang">
+    <p:choose>
+        <p:xpath-context>
             <p:pipe port="result" step="toc-string"/>
-        </p:with-option>
-    </p:add-attribute>
-    <p:add-attribute match="/*" attribute-name="lang">
-        <p:with-option name="attribute-value" select="if ($language) then $language else /*/@xml:lang">
-            <p:pipe port="result" step="toc-string"/>
-        </p:with-option>
-    </p:add-attribute>
+        </p:xpath-context>
+        <p:when test="$language or /*/@xml:lang">
+            <p:add-attribute match="/*" attribute-name="xml:lang">
+                <p:with-option name="attribute-value" select="if ($language) then $language else /*/@xml:lang">
+                    <p:pipe port="result" step="toc-string"/>
+                </p:with-option>
+            </p:add-attribute>
+            <p:add-attribute match="/*" attribute-name="lang">
+                <p:with-option name="attribute-value" select="if ($language) then $language else /*/@xml:lang">
+                    <p:pipe port="result" step="toc-string"/>
+                </p:with-option>
+            </p:add-attribute>
+        </p:when>
+        <p:otherwise>
+            <p:identity/>
+        </p:otherwise>
+    </p:choose>
 
     <!-- add CSS -->
     <p:add-attribute match="//html:link" attribute-name="href">

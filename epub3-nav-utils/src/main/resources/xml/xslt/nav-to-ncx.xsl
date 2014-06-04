@@ -11,7 +11,7 @@
     <xsl:output indent="yes"/>
 
     <xsl:variable name="lang" select="(@xml:lang,@lang,'en')[1]"/>
-    <xsl:variable name="translations" select="document('../i18n.xml')"/>
+    <xsl:variable name="translations" select="document('../i18n.xml')/*"/>
 
     <xsl:variable name="doc-base" select="base-uri(/*)"/>
     <xsl:variable name="srcMap1">
@@ -50,7 +50,7 @@
 
     <xsl:template match="html:head">
         <head>
-            <meta name="dtb:uid" content="{html:meta[@name='dc:identifier']}"/>
+            <meta name="dtb:uid" content="{html:meta[@name='dc:identifier']/@content}"/>
             <meta name="dtb:depth" content="{max(//html:li/count(ancestor::html:li))+1}"/>
             <meta name="dtb:generator" content="DAISY Pipeline 2"/>
             <xsl:variable name="totalPageCount" select="count(//html:nav[@epub:type='page-list']/html:ol/html:li)"/>
