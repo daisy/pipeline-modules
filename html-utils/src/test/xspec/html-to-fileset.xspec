@@ -2,13 +2,13 @@
 <x:description xmlns="http://www.w3.org/1999/xhtml" xmlns:d="http://www.daisy.org/ns/pipeline/data"
     xmlns:x="http://www.jenitennison.com/xslt/xspec"
     stylesheet="../../main/resources/xml/xslt/html-to-fileset.xsl">
-    
-    <x:variable name="doc-base" select="'file:/example/doc.html'"/>
-    
+
+    <x:param name="doc-base" select="'file:/example/doc.html'"/>
+
     <!--TODO add more tests, for other HTML elements-->
 
-    <x:scenario label="The base URI">
-        <x:scenario label="of the HTML document">
+    <x:scenario label="For a regular document ">
+        <x:scenario label="the base URI of the HTML document">
             <x:context>
                 <html/>
             </x:context>
@@ -16,9 +16,19 @@
                 <d:fileset xml:base="file:/example/"/>
             </x:expect>
         </x:scenario>
-        
+        <x:scenario label="non-resources text nodes and attributes">
+            <x:context>
+                <html>
+                    <p class="foo">bar</p>
+                </html>
+            </x:context>
+            <x:expect label="are ignored">
+                <d:fileset xml:base="file:/example/"/>
+            </x:expect>
+        </x:scenario>
     </x:scenario>
-    
+
+
     <x:scenario label="'img' element">
         <x:scenario label="with no @src">
             <x:context>
@@ -39,34 +49,13 @@
         <x:scenario label="with a relative URI">
             <x:context>
                 <html>
-                    <img src="my-image.png" xml:base="file:/my-base/"/>
+                    <img src="my-image.png" xml:base="file:/example/images/"/>
                 </html>
             </x:context>
-            <x:expect label="produces a fileset entry resolved to the attribute base" test="//d:file">
-                <d:file href="my-image.png" media-type="image/png" original-href="file:/my-base/my-image.png"/>
-            </x:expect>
-        </x:scenario>
-        <x:scenario label="with a relative URI and an original href">
-            <x:context>
-                <html>
-                    <img src="my-image.png" data-original-href="file:/other-base/other-uri.png" xml:base="file:/my-base/"/>
-                </html>
-            </x:context>
-            <x:expect label="produces a fileset entry and copies the original href" test="//d:file">
-                <d:file href="my-image.png" media-type="image/png" original-href="file:/other-base/other-uri.png"/>
-            </x:expect>
-        </x:scenario>
-        <x:scenario label="with a relative URI and an original href defined in an included fileset">
-            <x:context>
-                <html>
-                    <d:fileset xml:base="file:/other-base/">
-                        <d:file href="my-image.png" original-href="file:/other-base/other-uri.png" xml:base="file:/my-base/"/>
-                    </d:fileset>
-                    <img src="my-image.png" xml:base="file:/my-base/"/>
-                </html>
-            </x:context>
-            <x:expect label="produces a fileset entry and copies the original href" test="//d:file">
-                <d:file href="my-image.png" media-type="image/png" original-href="file:/other-base/other-uri.png"/>
+            <x:expect label="produces a fileset entry resolved to the attribute base"
+                test="//d:file">
+                <d:file href="images/my-image.png" media-type="image/png"
+                    original-href="file:/example/images/my-image.png" kind="image"/>
             </x:expect>
         </x:scenario>
         <x:scenario label="with an absolute file URI">
@@ -75,8 +64,10 @@
                     <img src="file:/example/my-image.png"/>
                 </html>
             </x:context>
-            <x:expect label="produces a fileset entry relativized to the fileset base" test="//d:file">
-                <d:file href="my-image.png" media-type="image/png" original-href="file:/example/my-image.png"/>
+            <x:expect label="produces a fileset entry relativized to the fileset base"
+                test="//d:file">
+                <d:file href="my-image.png" media-type="image/png"
+                    original-href="file:/example/my-image.png" kind="image"/>
             </x:expect>
         </x:scenario>
         <x:scenario label="with a 'data' URI">
@@ -97,4 +88,52 @@
         </x:scenario>
     </x:scenario>
 
+    <x:scenario label="'longdesc' attribute">
+        <x:scenario label="pointing to an external resource">
+            <x:context>
+                <html>
+                    <img src="my-image.png" xml:base="file:/example/images/" longdesc="desc.xml"/>
+                </html>
+            </x:context>
+            <x:expect label="produces a fileset entry with no media type" test="//d:file[2]">
+                <d:file href="images/desc.xml" original-href="file:/example/images/desc.xml"
+                    kind="description"/>
+            </x:expect>
+        </x:scenario>
+        <x:scenario label="pointing to local content">
+            <x:context>
+                <html>
+                    <img src="my-image.png" xml:base="file:/my-base/" longdesc="#foo"/>
+                </html>
+            </x:context>
+            <x:expect label="produces no fileset entry" test="count(//d:file)=1"/>
+        </x:scenario>
+    </x:scenario>
+
+
+    <x:scenario label="'aria-descrbedat' attribute">
+        <x:scenario label="on an image">
+            <x:context>
+                <html>
+                    <img src="my-image.png" xml:base="file:/example/images/"
+                        aria-describedat="desc.xml"/>
+                </html>
+            </x:context>
+            <x:expect label="produces a fileset entry with no media type" test="//d:file[2]">
+                <d:file href="images/desc.xml" original-href="file:/example/images/desc.xml"
+                    kind="description"/>
+            </x:expect>
+        </x:scenario>
+        <x:scenario label="on any element">
+            <x:context>
+                <html>
+                    <span xml:base="file:/example/images/" aria-describedat="desc.xml"/>
+                </html>
+            </x:context>
+            <x:expect label="produces a fileset entry with no media type" test="//d:file">
+                <d:file href="images/desc.xml" original-href="file:/example/images/desc.xml"
+                    kind="description"/>
+            </x:expect>
+        </x:scenario>
+    </x:scenario>
 </x:description>
