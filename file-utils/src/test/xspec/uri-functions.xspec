@@ -356,6 +356,35 @@
             <x:expect label="grandchild directory with multipls dots and slashes" select="'/dir/sub/'"/>
         </x:scenario>
     </x:scenario>
+    
+    
+    <x:scenario label="function normalize-uri – two args">
+        <x:call function="pf:normalize-uri">
+            <x:param name="uri" select="''"/>
+            <x:param name="fragment" select="true()"/>
+        </x:call>
+        <x:scenario label="when the URI has a fragment and the second arg is true">
+            <x:call>
+                <x:param name="uri" select="'file.xml?q=a#id'"/>
+                <x:param name="fragment" select="true()"/>
+            </x:call>
+            <x:expect label="the fragment is kept" select="'file.xml?q=a#id'"/>
+        </x:scenario>
+        <x:scenario label="when the URI has a fragment and the second arg is false">
+            <x:call>
+                <x:param name="uri" select="'file.xml?q=a#id'"/>
+                <x:param name="fragment" select="false()"/>
+            </x:call>
+            <x:expect label="the fragment is discarded" select="'file.xml?q=a'"/>
+        </x:scenario>
+        <x:scenario label="when the URI is just a fragment ID and the second arg is false">
+            <x:call>
+                <x:param name="uri" select="'#id'"/>
+                <x:param name="fragment" select="false()"/>
+            </x:call>
+            <x:expect label="the fragment is discarded" select="''"/>
+        </x:scenario>
+    </x:scenario>
 
     <x:scenario label="function relativize-uri">
         <x:call function="pf:relativize-uri">
