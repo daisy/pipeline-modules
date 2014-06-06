@@ -12,6 +12,9 @@
   <xsl:param name="special-sentences" select="''"/>
   <xsl:param name="output-ns"/>
   <xsl:param name="output-sentence-tag"/>
+  <xsl:param name="exclusive-sentence-tag" select="'true'"/>
+  <xsl:param name="exclusive-word-tag" select="'true'"/>
+  <xsl:param name="output-subsentence-tag" />
 
   <!-- The words need an additional pair (attr, val), otherwise they
        could not be identified later on, unlike the sentences which
@@ -21,6 +24,8 @@
   <xsl:param name="word-attr-val" select="''"/>
 
   <xsl:key name="sentences" match="*[@id]" use="@id"/>
+
+  <xsl:variable name="special-list" select="concat(',', $special-sentences, ',')"/>
 
   <xsl:function name="d:sentid">
     <xsl:param name="node"/>
@@ -47,9 +52,14 @@
     </d:sentence>
   </xsl:template>
 
-  <xsl:variable name="special-list" select="concat(',', $special-sentences, ',')"/>
+  <!-- If an existing sentence is the parent of detected temporary
+       sentence(s), it will be used instead of them. That is, the
+       temporary sentence(s) will be ignored. Likewise, if a temporary
+       sentence is the parent of existing sentence(s), the existing
+       sentences will be discarded. -->
   <xsl:template mode="sentence-ids" priority="3"
-      match="*[contains($special-list, concat(',', local-name(), ',')) or (local-name() = $output-sentence-tag and count(*) = 1 and count(*[local-name() = $tmp-sentence-tag]) = 1)]">
+      match="*[contains($special-list, concat(',', local-name(), ',')) or
+	     ($exclusive-sentence-tag = 'true' and local-name() = $output-sentence-tag)]">
     <!-- TODO: copy the @xml:lang -->
     <d:sentence id="{d:sentid(.)}" recycled="1"/>
     <!-- Warning: a 'special-sentence', such as noteref, is unlikely
@@ -122,7 +132,7 @@
     <xsl:param name="parent-name"/>
     <!-- Ignore the node: since we are already inside a sentence,
          it means that a parent node has been recycled to contain the
-         current sentence. -->
+         current sentence (e.g. a pagenum or an existing sentence) -->
     <xsl:apply-templates select="node()" mode="inside-sentence">
       <xsl:with-param name="parent-name" select="$parent-name"/>
     </xsl:apply-templates>
@@ -139,7 +149,7 @@
 	      <xsl:value-of select="$word-attr-val"/>
 	    </xsl:attribute>
 	  </xsl:if>
-	  <xsl:apply-templates select="node()" mode="inside-sentence">
+	  <xsl:apply-templates select="node()" mode="inside-word">
 	    <xsl:with-param name="parent-name" select="local-name()"/>
 	  </xsl:apply-templates>
 	</xsl:element>
@@ -153,6 +163,23 @@
     </xsl:choose>
   </xsl:template>
 
+  <xsl:template match="*[$exclusive-sentence-tag='true' and local-name()=$output-sentence-tag]"
+		mode="inside-sentence" priority="2">
+    <!-- The existing sentence is ignored. Warning: the attributes are lost. -->
+    <xsl:apply-templates select="node()" mode="inside-sentence">
+      <xsl:with-param name="parent-name" select="local-name()"/>
+    </xsl:apply-templates>
+  </xsl:template>
+
+  <xsl:template match="*[$exclusive-word-tag='true' and local-name()=$output-word-tag]"
+		mode="inside-sentence" priority="2">
+    <xsl:copy copy-namespaces="no">
+      <xsl:call-template name="copy-namespaces"/>
+      <xsl:copy-of select="@*"/>
+      <xsl:apply-templates select="node()" mode="inside-word"/>
+    </xsl:copy>
+  </xsl:template>
+
   <xsl:template match="node()" mode="inside-sentence" priority="1">
     <xsl:copy copy-namespaces="no">
       <xsl:call-template name="copy-namespaces"/>
@@ -160,6 +187,35 @@
       <xsl:apply-templates select="node()" mode="inside-sentence">
 	<xsl:with-param name="parent-name" select="local-name()"/>
       </xsl:apply-templates>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="*[local-name() = $tmp-word-tag]" mode="inside-word" priority="2">
+    <!-- the temporary word is ignored.-->
+    <xsl:apply-templates select="node()" mode="inside-word"/>
+  </xsl:template>
+
+  <xsl:template match="*[$exclusive-word-tag='true' and local-name()=$output-word-tag]"
+		mode="inside-word" priority="2">
+    <!-- the word is ignored -->
+    <xsl:choose>
+      <xsl:when test="count(@*) > 0">
+	<xsl:element name="{$output-subsentence-tag}" namespace="{$output-ns}">
+	  <xsl:copy-of select="@*"/>
+	  <xsl:apply-templates select="node()" mode="inside-word"/>
+	</xsl:element>
+      </xsl:when>
+      <xsl:otherwise>
+	<xsl:apply-templates select="node()" mode="inside-word"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template match="node()" mode="inside-word" priority="1">
+    <xsl:copy copy-namespaces="no">
+      <xsl:call-template name="copy-namespaces"/>
+      <xsl:copy-of select="@*"/>
+      <xsl:apply-templates select="node()" mode="inside-word"/>
     </xsl:copy>
   </xsl:template>
 

@@ -108,8 +108,9 @@
     </p:documentation>
   </p:output>
 
-  <!-- The tags are chosen to not conflict with other elements as the
-       namespace may not be used in the XSLT scripts. -->
+  <!-- The tags are chosen to not conflict with other elements since
+       the namespace is not always used in the XSLT scripts, which
+       otherwise helps distinguish temporary tags from the others. -->
   <p:variable name="tmp-ns" select="'http://www.daisy.org/ns/pipeline/tmp'"/>
   <p:variable name="tmp-word-tag" select="'ww'"/>
   <p:variable name="tmp-sentence-tag" select="'ss'"/>

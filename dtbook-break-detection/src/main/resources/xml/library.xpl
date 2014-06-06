@@ -24,12 +24,12 @@
       <p:with-option name="ensure-word-before" select="'acronym,span,linenum,pagenum,samp,noteref,abbr,acronym,br'"/>
       <p:with-option name="ensure-word-after" select="'acronym,span,linenum,pagenum,samp,noteref,abbr,acronym,br'"/>
       <p:with-option name="can-contain-sentences" select="'address,author,notice,prodnote,sidebar,line,em,strong,dfn,kdb,code,samp,cite,abbr,acronym,sub,sup,span,bdo,q,p,doctitle,docauthor,levelhd,hd,h1,h2,h3,h4,h5,h6,dt,dd,li,lic,caption,th,td,bridgehead,byline,covertitle,epigraph,dateline,a'"/>
-      <p:with-option name="special-sentences" select="'pagenum,prodnote,annoref,noteref,linenum'"/>
+      <p:with-option name="special-sentences" select="'pagenum,annoref,noteref,linenum'"/>
       <p:with-option name="output-ns" select="'http://www.daisy.org/z3986/2005/dtbook/'"/>
       <p:with-option name="output-word-tag" select="'w'"/>
       <p:with-option name="output-sentence-tag" select="'sent'"/>
       <p:with-option name="split-skippable" select="$split-skippable"/>
-      <p:with-option name="skippable-tags" select="'pagenum,noteref,prodnote'"/>
+      <p:with-option name="skippable-tags" select="'pagenum,noteref,annoref,linenum'"/>
       <p:with-option name="output-subsentence-tag" select="'span'"/>
     </px:break-and-reshape>
 
