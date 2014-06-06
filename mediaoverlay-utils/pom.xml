@@ -11,8 +11,12 @@
   </parent>
 
   <artifactId>mediaoverlay-utils</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.1</version>
   <packaging>bundle</packaging>
 
   <name>DAISY Pipeline 2 module :: EPUB 3 Media Overlays Utilities</name>
+
+  <scm>
+    <tag>v1.8</tag>
+  </scm>
 </project>
