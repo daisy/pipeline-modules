@@ -11,7 +11,7 @@
   </parent>
 
   <artifactId>common-utils</artifactId>
-  <version>1.1.0</version>
+  <version>1.1.1-SNAPSHOT</version>
   <packaging>bundle</packaging>
 
   <name>DAISY Pipeline 2 module :: Common Utilities</name>
@@ -48,9 +48,4 @@
       </plugin>
     </plugins>
   </build>
-  
-
-  <scm>
-    <tag>v1.8</tag>
-  </scm>
 </project>

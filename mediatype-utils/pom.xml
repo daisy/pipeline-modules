@@ -11,12 +11,8 @@
   </parent>
 
   <artifactId>mediatype-utils</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2-SNAPSHOT</version>
   <packaging>bundle</packaging>
 
   <name>DAISY Pipeline 2 module :: mediatype-utils</name>
-
-  <scm>
-    <tag>v1.8</tag>
-  </scm>
 </project>
