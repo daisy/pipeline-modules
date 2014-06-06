@@ -407,15 +407,29 @@
 
     <p:group name="spine">
         <p:output port="result"/>
-        <p:identity>
+        <p:group name="content-docs-primary">
+            <p:output port="result"/>
+            <px:fileset-filter media-types="application/xhtml+xml">
+                <p:input port="source">
+                    <p:pipe port="result" step="spine-filesets-with-mediatypes"/>
+                </p:input>
+            </px:fileset-filter>
+        </p:group>
+        <p:group name="content-docs-resources">
+            <p:output port="result"/>
+            <px:fileset-filter media-types="application/xhtml+xml">
+                <p:input port="source">
+                    <p:pipe port="publication-resources" step="main"/>
+                </p:input>
+            </px:fileset-filter>
+            <p:add-attribute match="/d:fileset/d:file" attribute-name="linear" attribute-value="no"/>
+        </p:group>    
+        <px:fileset-join>
             <p:input port="source">
-                <p:pipe port="result" step="spine-filesets-with-mediatypes"/>
+                <p:pipe port="result" step="content-docs-primary"/>
+                <p:pipe port="result" step="content-docs-resources"/>
             </p:input>
-        </p:identity>
-        <p:for-each>
-            <p:delete match="/d:fileset/d:file[not(@media-type='application/xhtml+xml')]"/>
-        </p:for-each>
-        <px:fileset-join/>
+        </px:fileset-join>
         <p:group>
             <p:viewport match="/*/d:file">
                 <p:variable name="file-uri" select="/*/resolve-uri(@href,base-uri(.))"/>
