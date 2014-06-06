@@ -70,16 +70,16 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <groupId>org.daisy.pipeline</groupId>
+                  <groupId>org.daisy.pipeline.bindings</groupId>
                   <artifactId>sapi-nar</artifactId>
-                  <version>1.0.0-SNAPSHOT</version>
+                  <version>1.0.0</version>
                   <classifier>x64-Windows-msvc-jni</classifier>
                   <type>nar</type>
                 </artifactItem>
 		<artifactItem>
-                  <groupId>org.daisy.pipeline</groupId>
+                  <groupId>org.daisy.pipeline.bindings</groupId>
                   <artifactId>sapi-nar</artifactId>
-                  <version>1.0.0-SNAPSHOT</version>
+                  <version>1.0.0</version>
                   <classifier>x86-Windows-msvc-jni</classifier>
                   <type>nar</type>
                 </artifactItem>
