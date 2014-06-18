@@ -4,23 +4,25 @@ import java.io.File;
 
 import javax.sound.sampled.AudioFormat;
 
+import com.google.common.base.Optional;
+
 public interface AudioEncoder {
 	/**
 	 * Encode raw audio data into a single file (mp3 for instance).
 	 * 
-	 * @param input are the audio data
-	 * @param size is the number of bytes of 'input' to be encoded
-	 * @param audioFormat tells how the data must be interpreted
+	 * @param pcm are the audio data. The method is allowed to modify the audio
+	 *            buffers (both their content and their size).
 	 * 
-	 * @param caller is the Java object calling encode(). It can help making
-	 *            multi-threading strategies.
+	 * @param audioFormat tells how the data must be interpreted
 	 * 
 	 * @param outputDir is the directory where the sound file will be stored
 	 * 
-	 * @param filePrefix is the prefix of the name of the output sound file.
+	 * @param filePrefix is the prefix of the output sound filename.
 	 * 
-	 * @return the URI where the sound has been output
+	 * @return the URI where the sound has been output. The extension (e.g.
+	 *         'mp3') is up to the encoder.
+	 * 
 	 */
-	String encode(byte[] input, int size, AudioFormat audioFormat, Object caller,
+	Optional<String> encode(Iterable<AudioBuffer> pcm, AudioFormat audioFormat,
 	        File outputDir, String filePrefix);
 }

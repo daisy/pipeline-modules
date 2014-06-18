@@ -11,6 +11,7 @@ import java.util.Arrays;
 import javax.sound.sampled.AudioFormat;
 
 import org.daisy.common.shell.BinaryFinder;
+import org.daisy.pipeline.audio.AudioBuffer;
 import org.daisy.pipeline.audio.AudioEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +60,7 @@ public class LameEncoder implements AudioEncoder {
 	}
 
 	@Override
-	public String encode(byte[] input, int size, AudioFormat audioFormat, Object caller,
+	public Optional<String> encode(Iterable<AudioBuffer> pcm, AudioFormat audioFormat,
 	        File outputDir, String filePrefix) {
 
 		File encodedFile = new File(outputDir, filePrefix + OutputFormat);
@@ -76,27 +77,37 @@ public class LameEncoder implements AudioEncoder {
 			//downsampling: keep the most significant bit only, in order to produce 8-bit unsigned data
 			int ratio = audioFormat.getSampleSizeInBits() / 8;
 			int mse = audioFormat.isBigEndian() ? 0 : (ratio - 1);
-			size /= ratio;
-			for (int i = 0; i < size; ++i)
-				input[i] = input[ratio * i + mse];
+			for (AudioBuffer buffer : pcm) {
+				buffer.size /= ratio;
+				for (int i = 0; i < buffer.size; ++i)
+					buffer.data[i] = buffer.data[ratio * i + mse];
+			}
 			bitwidth = "8";
 		} else if (audioFormat.getEncoding() == AudioFormat.Encoding.PCM_FLOAT) {
 			//convert [-1.0, 1.0] values to regular 32-bit signed integers
 			//TODO: find a faster and more accurate way
-			ByteBuffer buffer = ByteBuffer.wrap(input, 0, size);
-			buffer.order(audioFormat.isBigEndian() ? ByteOrder.BIG_ENDIAN
-			        : ByteOrder.LITTLE_ENDIAN);
+
 			if (audioFormat.getSampleSizeInBits() == 32) {
-				for (int i = 0; i < size; i += Float.SIZE / 8) {
-					float v = buffer.getFloat(i);
-					buffer.putInt(i, (int) (v * Integer.MAX_VALUE));
+				for (AudioBuffer b : pcm) {
+					ByteBuffer buffer = ByteBuffer.wrap(b.data, 0, b.size);
+					buffer.order(audioFormat.isBigEndian() ? ByteOrder.BIG_ENDIAN
+					        : ByteOrder.LITTLE_ENDIAN);
+					for (int i = 0; i < b.size; i += Float.SIZE / 8) {
+						float v = buffer.getFloat(i);
+						buffer.putInt(i, (int) (v * Integer.MAX_VALUE));
+					}
 				}
 			} else { //Lame cannot handle 64-bit data => downsampling to 32-bit
-				for (int i = 0; i < size; i += Double.SIZE / 8) {
-					double v = buffer.getDouble(i);
-					buffer.putInt(i / 2, (int) (v * Integer.MAX_VALUE));
+				for (AudioBuffer b : pcm) {
+					ByteBuffer buffer = ByteBuffer.wrap(b.data, 0, b.size);
+					buffer.order(audioFormat.isBigEndian() ? ByteOrder.BIG_ENDIAN
+					        : ByteOrder.LITTLE_ENDIAN);
+					for (int i = 0; i < b.size; i += Double.SIZE / 8) {
+						double v = buffer.getDouble(i);
+						buffer.putInt(i / 2, (int) (v * Integer.MAX_VALUE));
+					}
+					b.size /= 2;
 				}
-				size /= 2;
 				bitwidth = "32";
 			}
 		}
@@ -123,15 +134,17 @@ public class LameEncoder implements AudioEncoder {
 			mLogger.debug("Encoding command: {}", Joiner.on(' ').join(Arrays.asList(cmd)));
 			p = Runtime.getRuntime().exec(cmd);
 			BufferedOutputStream out = new BufferedOutputStream((p.getOutputStream()));
-			out.write(input, 0, size);
+			for (AudioBuffer b : pcm) {
+				out.write(b.data, 0, b.size);
+			}
 			out.close();
 			p.waitFor();
 		} catch (Exception e) {
 			if (p != null)
 				p.destroy();
-			return null;
+			return Optional.absent();
 		}
 
-		return encodedFile.toURI().toString();
+		return Optional.of(encodedFile.toURI().toString());
 	}
 }

@@ -4,15 +4,18 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.Random;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioFormat.Encoding;
 
+import org.daisy.pipeline.audio.AudioBuffer;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.google.common.base.Optional;
 import com.google.common.io.Files;
 
 /**
@@ -25,6 +28,19 @@ import com.google.common.io.Files;
  * - Read and write permissions on the OS' tmp directory
  */
 public class LameTest {
+
+	static class AudioBufferTest extends AudioBuffer {
+		public AudioBufferTest(int size) {
+			data = new byte[size];
+			this.size = size;
+		}
+
+		public AudioBufferTest(byte[] data, int size) {
+			this.data = data;
+			this.size = size;
+		}
+	}
+
 	private static byte[] mp3ToPCM(AudioFormat originalFormat, String mp3File)
 	        throws IOException, InterruptedException {
 
@@ -76,7 +92,7 @@ public class LameTest {
 		return Files.toByteArray(pcmFile);
 	}
 
-	private static byte[] ref;
+	private static AudioBuffer ref;
 	private static AudioFormat refFormat;
 	private static String mp3ref;
 	private static LameEncoder lame;
@@ -85,23 +101,23 @@ public class LameTest {
 	public static void buildReference() throws Exception {
 		refFormat = new AudioFormat(8000, 8, 1, true, true); //8 bits signed big-endian (for easy comparisons)
 
-		ref = new byte[1024 * 100];
+		ref = new AudioBufferTest(1024 * 100);
 		Random r = new Random();
 		r.setSeed(0);
-		ref[0] = (byte) r.nextInt(256);
-		for (int i = 1; i < ref.length; ++i) {
-			int next = (r.nextInt(3) - 1) + ref[i - 1];
+		ref.data[0] = (byte) r.nextInt(256);
+		for (int i = 1; i < ref.size; ++i) {
+			int next = (r.nextInt(3) - 1) + ref.data[i - 1];
 			if (next > 127)
 				next = 127;
 			else if (next < -127)
 				next = -127;
-			ref[i] = (byte) next;
+			ref.data[i] = (byte) next;
 		}
 
 		//dump the reference on the disk using Lame
 		lame = new LameEncoder();
-		mp3ref = lame.encode(ref, ref.length, refFormat, null, new File(System
-		        .getProperty("java.io.tmpdir")), "mp3ref");
+		mp3ref = lame.encode(Arrays.asList(ref), refFormat,
+		        new File(System.getProperty("java.io.tmpdir")), "mp3ref").get();
 	}
 
 	private boolean isValid(AudioFormat sourceFormat) throws IOException, InterruptedException {
@@ -109,31 +125,32 @@ public class LameTest {
 		byte[] audio = mp3ToPCM(sourceFormat, mp3ref);
 
 		//use lame to convert it to MP3
-		String lameMp3 = lame.encode(audio, audio.length, sourceFormat, null, new File(System
+		AudioBuffer b = new AudioBufferTest(audio, audio.length);
+		Optional<String> lameMp3 = lame.encode(Arrays.asList(b), sourceFormat, new File(System
 		        .getProperty("java.io.tmpdir")), "lametest");
 
-		if (lameMp3 == null) {
+		if (!lameMp3.isPresent()) {
 			System.err.println("Lame could not encode the data");
 			return false;
 		}
 
 		//convert it back to PCM in order to compare them
-		byte[] lameAudio = mp3ToPCM(refFormat, lameMp3);
+		byte[] lameAudio = mp3ToPCM(refFormat, lameMp3.get());
 
 		//compare
 		//TODO: proper convolution or frequency-based comparison (after FFT)
-		byte[] small = ref;
+		byte[] small = ref.data;
 		byte[] big = lameAudio;
-		if (ref.length > lameAudio.length) {
-			big = ref;
+		if (ref.data.length > lameAudio.length) {
+			big = ref.data;
 			small = lameAudio;
 		}
 		int diff = big.length - small.length;
-		if (diff > 3 * ref.length / 100) {
+		if (diff > 3 * ref.data.length / 100) {
 			System.err.println("size differs too much");
 			return false;
 		}
-		int window = Math.min(ref.length, lameAudio.length);
+		int window = Math.min(ref.data.length, lameAudio.length);
 		long minerror = Long.MAX_VALUE;
 		for (int d = 0; d < diff; d += 2) {
 			long e = 0;
