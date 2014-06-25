@@ -14,17 +14,28 @@
     <p:output port="sentence-ids">
       <p:pipe port="sentence-ids" step="generic"/>
     </p:output>
-    
-    <p:import href="http://www.daisy.org/pipeline/modules/nlp-break-detection/library.xpl" />
 
+    <p:option name="split-skippable" select="'true'" required="false" />
+
+    <p:import href="http://www.daisy.org/pipeline/modules/nlp-break-detection/library.xpl" />
     <px:break-and-reshape name="generic">
-      <p:with-option name="inline-tags" select="'emph,span,ref,char,term,sub,ref,sup,pagebreak,name'"/>
+      <p:with-option name="inline-tags" select="'emph,span,ref,char,term,sub,sup,pagebreak,name,time,noteref,annoref,lnum,num,w,wpart,abbr'"/>
       <p:with-option name="ensure-word-before" select="'span'"/>
       <p:with-option name="ensure-word-after" select="'span'"/>
-      <p:with-option name="can-contain-sentences" select="'span,p,citation,note,quote,address,block,annotation,item,description,definition,caption,aside'"/>
-      <p:with-option name="output-ns" select="'http://www.daisy.org/ns/z3998/authoring'"/>
+      <!-- note1: For now, if an element can-contain-sentences only in
+           certain contexts, i.e. it depends on its ancestors, then
+           the best we can do is ignore them no matter which context
+           they appear in. -->
+      <!-- note2: some of the following elements are not in the ZedAI
+           namespace. -->
+      <p:with-option name="can-contain-sentences" select="'address,annoref,annotation,aside,block,caption,citation,d,definition,description,emph,entry,expansion,h,hd,hpart,item,ln,longdesc,group,label,note,noteref,object,otherwise,p,phoneme,prosody,quote,rb,ref,repeat,rt,say-as,span,spine,sub,summary,td,term,th,tour,when'"/>
+      <p:with-option name="output-ns" select="'http://www.daisy.org/ns/z3998/authoring/'"/>
       <p:with-option name="output-word-tag" select="'w'"/>
       <p:with-option name="output-sentence-tag" select="'s'"/>
+      <p:with-option name="split-skippable" select="$split-skippable"/>
+      <p:with-option name="skippable-tags" select="'noteref,annoref,lnum,ref'"/>
+      <p:with-option name="output-subsentence-tag" select="'span'"/>
+      <p:with-option name="special-sentences" select="'name,time'"/>
     </px:break-and-reshape>
 
   </p:declare-step>
