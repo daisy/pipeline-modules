@@ -80,9 +80,16 @@
     <p:iteration-source select="//ssml:lexicon[@uri]">
       <p:pipe port="ssml-of-lexicons-uris" step="main"/>
     </p:iteration-source>
+    <p:variable name="ssml-uri" select="p:base-uri(/*)">
+      <p:pipe port="ssml-of-lexicons-uris" step="main"/>
+    </p:variable>
+    <p:variable name="lexicon-uri" select="resolve-uri(*/@uri, $ssml-uri)"/>
     <p:load>
-      <p:with-option name="href" select="*/@uri"/>
+      <p:with-option name="href" select="$lexicon-uri"/>
     </p:load>
+    <px:message>
+      <p:with-option name="message" select="concat('loaded lexicon: ', $lexicon-uri)"/>
+    </px:message>
   </p:for-each>
 
   <!-- iterate over the fileset to extract the lexicons URI, then load them -->
