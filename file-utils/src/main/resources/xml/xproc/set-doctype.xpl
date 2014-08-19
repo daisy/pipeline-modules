@@ -12,6 +12,7 @@
     </p:output>
     <p:option name="href" required="true"/>
     <p:option name="doctype" required="true"/>
+    <p:option name="encoding" select="'utf-8'"/>
     
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
     
@@ -21,9 +22,12 @@
         <p:with-option name="attribute-value" select="$href"/>
         <p:input port="source">
             <p:inline exclude-inline-prefixes="#all">
-                <c:request method="GET" override-content-type="text/plain"/>
+                <c:request method="GET"/>
             </p:inline>
         </p:input>
+    </p:add-attribute>
+    <p:add-attribute match="/*" attribute-name="override-content-type">
+        <p:with-option name="attribute-value" select="concat('text/plain; charset=',$encoding)"/>
     </p:add-attribute>
     
     <px:assert message="The href must be an absolute file URI: $1" error-code="DPSD01">
@@ -42,6 +46,7 @@
     </p:string-replace>
     <p:store method="text" name="store">
         <p:with-option name="href" select="$href"/>
+        <p:with-option name="encoding" select="$encoding"/>
     </p:store>
 
 
