@@ -26,7 +26,7 @@
     <!-- <module>daisy202-utils</module> -->
     <module>daisy3-utils</module>
     <!-- <module>dtbook-utils</module> -->
-    <!-- <module>epub3-nav-utils</module> -->
+    <module>epub3-nav-utils</module>
     <!-- <module>epub3-ocf-utils</module> -->
     <!-- <module>epub3-pub-utils</module> -->
     <!-- <module>epubcheck-adapter</module> -->
@@ -72,7 +72,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>epub3-nav-utils</artifactId>
-        <version>1.0.2</version>
+        <version>1.0.3-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
