@@ -88,6 +88,8 @@
   </p:option>
   <p:option name="skippable-tags" required="false" select="''"/>
   <p:option name="output-subsentence-tag" required="true"/>
+  <p:option name="exclusive-word-tag" select="'true'"/>
+  <p:option name="exclusive-sentence-tag" select="'true'"/>
 
   <p:input port="source" primary="true">
     <p:documentation>
@@ -142,6 +144,8 @@
     <p:with-option name="tmp-ns" select="$tmp-ns"/>
     <p:with-option name="tmp-word-tag" select="$tmp-word-tag"/>
     <p:with-option name="tmp-sentence-tag" select="$tmp-sentence-tag"/>
+    <p:with-option name="exclusive-word-tag" select="$exclusive-word-tag"/>
+    <p:with-option name="exclusive-sentence-tag" select="$exclusive-sentence-tag"/>
   </px:reshape>
 
 </p:declare-step>

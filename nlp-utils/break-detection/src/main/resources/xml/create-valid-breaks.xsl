@@ -12,8 +12,8 @@
   <xsl:param name="special-sentences" select="''"/>
   <xsl:param name="output-ns"/>
   <xsl:param name="output-sentence-tag"/>
-  <xsl:param name="exclusive-sentence-tag" select="'true'"/>
-  <xsl:param name="exclusive-word-tag" select="'true'"/>
+  <xsl:param name="exclusive-sentence-tag" select="'true'"/> <!-- false if the element can be used for another purpose -->
+  <xsl:param name="exclusive-word-tag" select="'true'"/><!-- false if the element can be used for another purpose -->
   <xsl:param name="output-subsentence-tag" />
 
   <!-- The words need an additional pair (attr, val), otherwise they
@@ -164,7 +164,7 @@
   </xsl:template>
 
   <xsl:template match="*[$exclusive-sentence-tag='true' and local-name()=$output-sentence-tag]"
-		mode="inside-sentence" priority="2">
+		mode="inside-sentence" priority="3">
     <!-- The existing sentence is ignored. Warning: the attributes are lost. -->
     <xsl:apply-templates select="node()" mode="inside-sentence">
       <xsl:with-param name="parent-name" select="local-name()"/>

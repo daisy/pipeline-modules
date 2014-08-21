@@ -21,6 +21,8 @@
   <p:option name="tmp-ns" select="'http://www.daisy.org/ns/pipeline/tmp'"/>
   <p:option name="tmp-word-tag" select="'ww'"/>
   <p:option name="tmp-sentence-tag" select="'ss'"/>
+  <p:option name="exclusive-word-tag" select="'true'"/>
+  <p:option name="exclusive-sentence-tag" select="'true'"/>
 
   <p:input port="source" primary="true"/>
   <p:output port="result" primary="true"/>
@@ -31,6 +33,7 @@
   <!-- Distribute some sentences to prevent them from having parents
        not compliant with the format. -->
   <p:xslt name="distribute">
+    <p:with-option name="output-base-uri" select="base-uri(/*)"/>
     <!-- The output-sentence-tag is added so as to accept words which
          are children of a temporary sentence which is in turn the
          child of an existing sentence. -->
@@ -57,6 +60,8 @@
     <p:with-param name="word-attr-val" select="$word-attr-val"/>
     <p:with-param name="output-ns" select="$output-ns"/>
     <p:with-param name="output-subsentence-tag" select="$output-subsentence-tag"/>
+    <p:with-param name="exclusive-word-tag" select="$exclusive-word-tag"/>
+    <p:with-param name="exclusive-sentence-tag" select="$exclusive-sentence-tag"/>
     <p:input port="stylesheet">
       <p:document href="create-valid-breaks.xsl"/>
     </p:input>
