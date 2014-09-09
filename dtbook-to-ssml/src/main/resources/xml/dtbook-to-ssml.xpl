@@ -18,7 +18,6 @@
       <p:pipe port="result" step="ssml-gen" />
     </p:output>
 
-    <p:option name="css-sheet-uri" required="false" select="''"/>
     <p:option name="separate-skippable" required="false" select="'true'"/>
     <p:option name="ssml-of-lexicons-uris" required="false" select="''"/>
 
@@ -50,7 +49,6 @@
       </p:input>
       <p:with-option name="section-elements" select="'level,level1,level2,level3'"/>
       <p:with-option name="word-element" select="'w'"/>
-      <p:with-option name="aural-sheet-uri" select="$css-sheet-uri"/>
       <p:with-option name="separate-skippable" select="$separate-skippable"/>
       <p:with-option name="skippable-elements" select="'annoref,linenum,pagenum,noteref'"/>
       <p:with-option name="ssml-of-lexicons-uris" select="$ssml-of-lexicons-uris"/>

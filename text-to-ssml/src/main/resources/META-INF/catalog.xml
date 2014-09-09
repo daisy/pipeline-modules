@@ -5,7 +5,5 @@
        uri="../xml/xproc/library.xpl"/>
 
     <nextCatalog catalog="org:daisy:pipeline:modules:common-utils"/>
-    <nextCatalog catalog="org:daisy:pipeline:modules:css-speech" />
-    <nextCatalog catalog="org:daisy:pipeline:modules:css-utils" />
     <nextCatalog catalog="org:daisy:pipeline:modules:fileset-utils"/>
 </catalog>

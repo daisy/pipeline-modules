@@ -4,4 +4,6 @@
   <uri name="http://www.daisy.org/pipeline/modules/css-speech/library.xpl"
        uri="../xml/library.xpl"/>
 
+  <nextCatalog catalog="org:daisy:pipeline:modules:css-utils" />
+
 </catalog>

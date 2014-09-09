@@ -1,12 +1,14 @@
 package org.daisy.pipeline.cssinlining;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.regex.Pattern;
 
 import javax.xml.transform.sax.SAXSource;
@@ -24,6 +26,8 @@ import org.junit.Test;
 import org.xml.sax.InputSource;
 
 import com.xmlcalabash.util.TreeWriter;
+
+import cz.vutbr.web.css.CSSException;
 
 public class CSSInliningTest implements TreeWriterFactory {
 
@@ -50,7 +54,7 @@ public class CSSInliningTest implements TreeWriterFactory {
 	}
 
 	private void check(String input, String cssFile, String... expectedParts)
-	        throws SaxonApiException, URISyntaxException {
+	        throws SaxonApiException, URISyntaxException, IOException, CSSException {
 
 		//build the expected output regex
 		StringBuilder expected = new StringBuilder();
@@ -87,12 +91,11 @@ public class CSSInliningTest implements TreeWriterFactory {
 			cssFile = "test.css";
 		}
 
-		//TODO: in Java7:
-		//Paths.get(System.getProperty("user.dir"),"foo", "bar.css"); instead of:
-		cssFile = new File(new File(System.getProperty("user.dir"), "src/test/resources/"),
-		        cssFile).toURI().toString();
+		cssFile = new URI("file://"
+		        + Paths.get(System.getProperty("user.dir"), "src/test/resources/", cssFile)
+		                .toString()).toString();
 
-		SheetAnalyzer.analyse(Arrays.asList(cssFile));
+		SheetAnalyzer.analyse(Arrays.asList(cssFile), Collections.EMPTY_LIST, null);
 		XdmNode tree = CSSInliner.inline(this, new URI("http://doc"), document, SheetAnalyzer,
 		        "tmp");
 
@@ -106,95 +109,122 @@ public class CSSInliningTest implements TreeWriterFactory {
 	}
 
 	@Test
-	public void pauseBefore() throws SaxonApiException, URISyntaxException {
+	public void pauseBefore() throws SaxonApiException, URISyntaxException, IOException,
+	        CSSException {
 		check("<root><simple>test</simple></root>", null, "<root", "<simple",
-		        "tmp:pause-before=\"[0-9.]+\"", "test", "</simple>", "</root>");
+		        "tts:pause-before=\"[0-9.]+\"", "test", "</simple>", "</root>");
 	}
 
 	@Test
-	public void pauseAfter() throws SaxonApiException, URISyntaxException {
+	public void pauseAfter() throws SaxonApiException, URISyntaxException, IOException,
+	        CSSException {
 		check("<root><simple>test</simple></root>", null, "<root", "<simple",
-		        "tmp:pause-after=\"[0-9.]+\"", "test", "</simple>", "</root>");
+		        "tts:pause-after=\"[0-9.]+\"", "test", "</simple>", "</root>");
 	}
 
 	@Test
-	public void cueBefore() throws SaxonApiException, URISyntaxException {
+	public void cueBefore() throws SaxonApiException, URISyntaxException, IOException,
+	        CSSException {
 		check("<root><simple>test</simple></root>", null, "<root", "<simple",
-		        "tmp:cue-before=\"[-_a-z0-9]+\\.mp3\"", "test", "</simple>", "</root>");
+		        "tts:cue-before=\".*\\.mp3\"", "test", "</simple>", "</root>");
+	}
+
+	//
+
+	@Test
+	public void cueAfter() throws SaxonApiException, URISyntaxException, IOException,
+	        CSSException {
+		check("<root><simple>test</simple></root>", null, "<root", "<simple",
+		        "tts:cue-after=\".*\\.mp3\"", "test", "</simple>", "</root>");
 	}
 
 	@Test
-	public void cueAfter() throws SaxonApiException, URISyntaxException {
+	public void cuePath() throws SaxonApiException, URISyntaxException, IOException,
+	        CSSException {
+		String expectedPath = new URI(Paths.get(System.getProperty("user.dir"),
+		        "src/test/resources/").toString()).toString();
 		check("<root><simple>test</simple></root>", null, "<root", "<simple",
-		        "tmp:cue-after=\"[-_a-z0-9]+\\.mp3\"", "test", "</simple>", "</root>");
+		        "tts:cue-after=\"" + expectedPath + "/[-_a-z0-9]+\\.mp3\"", "test",
+		        "</simple>", "</root>");
 	}
 
 	@Test
-	public void volume() throws SaxonApiException, URISyntaxException {
+	public void volume() throws SaxonApiException, URISyntaxException, IOException,
+	        CSSException {
 		check("<root><simple>test</simple></root>", null, "<root", "<simple",
-		        "tmp:volume=\"[a-z.0-9]+\"", "test", "</simple>", "</root>");
+		        "tts:volume=\"[a-z.0-9]+\"", "test", "</simple>", "</root>");
 	}
 
 	@Test
-	public void speechRate() throws SaxonApiException, URISyntaxException {
+	public void speechRate() throws SaxonApiException, URISyntaxException, IOException,
+	        CSSException {
 		check("<root><simple>test</simple></root>", null, "<root", "<simple",
-		        "tmp:speech-rate=\"[a-z.0-9]+\"", "test", "</simple>", "</root>");
+		        "tts:speech-rate=\"[a-z.0-9]+\"", "test", "</simple>", "</root>");
 	}
 
 	@Test
-	public void hyphen1() throws SaxonApiException, URISyntaxException {
+	public void hyphen1() throws SaxonApiException, URISyntaxException, IOException,
+	        CSSException {
 		check("<root><hyphens>test</hyphens></root>", null, "<root", "<hyphens",
-		        "tmp:speech-rate=\"x-slow\"", "test", "</hyphens>", "</root>");
+		        "tts:speech-rate=\"x-slow\"", "test", "</hyphens>", "</root>");
 	}
 
 	@Test
-	public void hyphen2() throws SaxonApiException, URISyntaxException {
+	public void hyphen2() throws SaxonApiException, URISyntaxException, IOException,
+	        CSSException {
 		check("<root><hyphens>test</hyphens></root>", null, "<root", "<hyphens",
-		        "tmp:cue-before=\".*a_b-c.*\"", "test", "</hyphens>", "</root>");
+		        "tts:cue-before=\".*a_b-c.*\"", "test", "</hyphens>", "</root>");
 	}
 
 	@Test
-	public void voiceFamily() throws SaxonApiException, URISyntaxException {
+	public void voiceFamily() throws SaxonApiException, URISyntaxException, IOException,
+	        CSSException {
 		check("<root><simple>test</simple></root>", null, "<root", "<simple",
-		        "tmp:voice-family=\"[a-z0-9]+,[a-z0-9]+\"", "test", "</simple>", "</root>");
+		        "tts:voice-family=\"[a-z0-9]+,[a-z0-9]+\"", "test", "</simple>", "</root>");
 	}
 
 	@Test
-	public void prefixedAttr() throws SaxonApiException, URISyntaxException {
+	public void prefixedAttr() throws SaxonApiException, URISyntaxException, IOException,
+	        CSSException {
 		check("<root xmlns:epub=\"http://epub\"><n epub:type=\"prefixed\">test</n></root>",
-		        null, "<root", "<n", "=\"prefixed\\.mp3", "test", "</n>", "</root>");
+		        null, "<root", "<n", "=\".*prefixed\\.mp3", "test", "</n>", "</root>");
 	}
 
 	@Test
-	public void keepContent() throws SaxonApiException, URISyntaxException {
+	public void keepContent() throws SaxonApiException, URISyntaxException, IOException,
+	        CSSException {
 		check("<root x=\"1\"><n y=\"1\">content1<n z=\"1\">content2</n></n>content3</root>",
 		        null, "<root", "x=\"1\"", "<n", "y=\"1\"", "content1", "<n", "z=\"1\"",
 		        "content2", "</n>", "</n>", "content3", "</root>");
 	}
 
 	@Test
-	public void selectors1() throws SaxonApiException, URISyntaxException {
+	public void selectors1() throws SaxonApiException, URISyntaxException, IOException,
+	        CSSException {
 		check("<root><div><b><p>test</p></b></div><div><a>test</a></div></root>", null,
-		        "<root", "<div", "<b", "<p", "tmp:speech-rate=\"10[.]?[0]*\"", "test", "</p>",
-		        "</b>", "</div>", "<div", "<a", "tmp:speech-rate=\"20[.]?[0]*\"", "test",
+		        "<root", "<div", "<b", "<p", "tts:speech-rate=\"10[.]?[0]*\"", "test", "</p>",
+		        "</b>", "</div>", "<div", "<a", "tts:speech-rate=\"20[.]?[0]*\"", "test",
 		        "</a>", "</div>", "</root>");
 	}
 
 	@Test
-	public void selectors2() throws SaxonApiException, URISyntaxException {
+	public void selectors2() throws SaxonApiException, URISyntaxException, IOException,
+	        CSSException {
 		check("<root><div><x>test</x></div></root>", null, "<root", "<div", "<x",
-		        "tmp:speech-rate=\"30[.]?[0]*\"", "test", "</x>", "</div>", "</root>");
+		        "tts:speech-rate=\"30[.]?[0]*\"", "test", "</x>", "</div>", "</root>");
 	}
 
 	@Test
-	public void selectors3() throws SaxonApiException, URISyntaxException {
+	public void selectors3() throws SaxonApiException, URISyntaxException, IOException,
+	        CSSException {
 		check("<root><div>test1</div><y>test2</y></root>", null, "<root", "<div", "test1",
-		        "</div>", "<y", "tmp:speech-rate=\"40[.]?[0]*\"", "test2", "</y>", "</root>");
+		        "</div>", "<y", "tts:speech-rate=\"40[.]?[0]*\"", "test2", "</y>", "</root>");
 	}
 
 	@Test
-	public void mixedMedia() throws SaxonApiException, URISyntaxException {
+	public void mixedMedia() throws SaxonApiException, URISyntaxException, IOException,
+	        CSSException {
 		check("<root><simple>test</simple></root>", "mixed.css", "<root", "<simple",
-		        "tmp:volume=\"[a-z]+\"", "test", "</simple>", "</root>");
+		        "tts:volume=\"[a-z]+\"", "test", "</simple>", "</root>");
 	}
 }

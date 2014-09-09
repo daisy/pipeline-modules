@@ -3,7 +3,7 @@
 	       xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
 	       xmlns:dt="http://www.daisy.org/z3986/2005/dtbook/"
 	       xmlns="http://www.w3.org/2001/10/synthesis"
-	       xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp"
+	       xmlns:tmp="http://www.daisy.org/ns/pipeline/tts"
                script="text-to-ssml-wrapper.xpl">
 
   <x:scenario label="basic transformation">

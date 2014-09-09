@@ -25,9 +25,10 @@
   </p:output>
 
   <p:output port="content.out" primary="true" sequence="true">
-    <p:pipe port="result" step="lexing"/>
+    <p:pipe port="result" step="remove-css"/>
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-       <p>Copy of the DTBook documents enriched with ids, words and sentences.</p>
+       <p>Copy of the DTBook documents enriched with ids, words and
+       sentences, and without inlined aural CSS.</p>
     </p:documentation>
   </p:output>
 
@@ -47,13 +48,6 @@
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
       <h2 px:role="name">Enable Text-To-Speech</h2>
       <p px:role="desc">Whether to use a speech synthesizer to produce audio files.</p>
-    </p:documentation>
-  </p:option>
-
-  <p:option name="aural-css" required="false" px:type="anyURI" select="''">
-    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-      <h2 px:role="name">Aural CSS sheet</h2>
-      <p px:role="desc">Path of an additional Aural CSS stylesheet for the Text-To-Speech.</p>
     </p:documentation>
   </p:option>
 
@@ -124,12 +118,19 @@
 	  <p:input port="fileset.in">
 	    <p:pipe port="fileset.in" step="main"/>
 	  </p:input>
-	  <p:with-option name="css-sheet-uri" select="$aural-css"/>
 	  <p:with-option name="ssml-of-lexicons-uris" select="$ssml-of-lexicons-uris"/>
 	</px:dtbook-to-ssml>
       </p:for-each>
       <px:ssml-to-audio name="to-audio"/>
     </p:otherwise>
   </p:choose>
+
+  <p:for-each name="remove-css">
+    <p:iteration-source>
+      <p:pipe port="result" step="lexing"/>
+    </p:iteration-source>
+    <p:output port="result" primary="true"/>
+    <px:remove-inline-css-speech/>
+  </p:for-each>
 
 </p:declare-step>

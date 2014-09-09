@@ -22,6 +22,11 @@
       <artifactId>jstyleparser</artifactId>
       <version>1.13.0-p1</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>1.3.2</version>
+    </dependency>
     <!-- needed to use com.xmlcalabash.library.DefaultStep ... -->
     <dependency>
       <groupId>org.daisy.libs</groupId>

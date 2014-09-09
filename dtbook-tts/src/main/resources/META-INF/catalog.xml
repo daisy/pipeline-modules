@@ -7,5 +7,6 @@
   <nextCatalog catalog="org:daisy:pipeline:modules:dtbook-break-detection"/>
   <nextCatalog catalog="org:daisy:pipeline:modules:dtbook-to-ssml"/>
   <nextCatalog catalog="org:daisy:pipeline:modules:ssml-to-audio"/>
+  <nextCatalog catalog="org:daisy:pipeline:modules:css-speech"/>
 
 </catalog>

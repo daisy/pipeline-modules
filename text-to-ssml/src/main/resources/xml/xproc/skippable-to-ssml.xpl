@@ -3,7 +3,7 @@
 		xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
 		xmlns:xml="http://www.w3.org/XML/1998/namespace"
 		xmlns:ssml="http://www.w3.org/2001/10/synthesis"
-		xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp"
+		xmlns:tts="http://www.daisy.org/ns/pipeline/tts"
 		exclude-inline-prefixes="#all">
 
   <p:input port="content.in" sequence="false" primary="true"/>
@@ -39,7 +39,7 @@
   <px:message message="Skippable elements' inner CSS properties converted to SSML."/>
 
   <!-- Split the result to extract the wrapped SSML files. -->
-  <p:delete match="@tmp:*"/>
+  <p:delete match="@tts:*"/>
   <p:filter name="docs-extract">
     <p:with-option name="select" select="'//ssml:speak'"/>
   </p:filter>
