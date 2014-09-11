@@ -23,6 +23,7 @@
   <p:option name="tmp-sentence-tag" select="'ss'"/>
   <p:option name="exclusive-word-tag" select="'true'"/>
   <p:option name="exclusive-sentence-tag" select="'true'"/>
+  <p:option name="id-prefix" required="false" select="''"/>
 
   <p:input port="source" primary="true"/>
   <p:output port="result" primary="true"/>
@@ -62,6 +63,7 @@
     <p:with-param name="output-subsentence-tag" select="$output-subsentence-tag"/>
     <p:with-param name="exclusive-word-tag" select="$exclusive-word-tag"/>
     <p:with-param name="exclusive-sentence-tag" select="$exclusive-sentence-tag"/>
+    <p:with-param name="id-prefix" select="$id-prefix"/>
     <p:input port="stylesheet">
       <p:document href="create-valid-breaks.xsl"/>
     </p:input>
@@ -81,6 +83,7 @@
 	<p:with-param name="output-ns" select="$output-ns"/>
 	<p:with-param name="skippable-tags" select="$skippable-tags"/>
 	<p:with-param name="output-subsentence-tag" select="$output-subsentence-tag"/>
+	<p:with-param name="id-prefix" select="$id-prefix"/>
 	<p:input port="stylesheet">
 	  <p:document href="split-around-skippable.xsl"/>
 	</p:input>

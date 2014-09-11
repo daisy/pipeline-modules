@@ -15,6 +15,7 @@
   <xsl:param name="exclusive-sentence-tag" select="'true'"/> <!-- false if the element can be used for another purpose -->
   <xsl:param name="exclusive-word-tag" select="'true'"/><!-- false if the element can be used for another purpose -->
   <xsl:param name="output-subsentence-tag" />
+  <xsl:param name="id-prefix" select="''"/>
 
   <!-- The words need an additional pair (attr, val), otherwise they
        could not be identified later on, unlike the sentences which
@@ -29,7 +30,7 @@
 
   <xsl:function name="d:sentid">
     <xsl:param name="node"/>
-    <xsl:value-of select="if ($node/@id) then $node/@id else concat('st', generate-id($node))"/>
+    <xsl:value-of select="if ($node/@id) then $node/@id else concat('st', $id-prefix, generate-id($node))"/>
   </xsl:function>
 
   <!--========================================================= -->
@@ -75,7 +76,7 @@
   <xsl:template match="/" priority="2">
     <xsl:apply-templates select="node()"/>
     <!-- Write the list of sentences on the secondary port. -->
-    <xsl:result-document href="{concat('sids', generate-id(), '.xml')}" method="xml">
+    <xsl:result-document href="{concat('sids', $id-prefix, generate-id(), '.xml')}" method="xml">
      <xsl:copy-of select="$sentence-ids-tree"/>
     </xsl:result-document>
   </xsl:template>

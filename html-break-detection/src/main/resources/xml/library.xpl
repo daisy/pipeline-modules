@@ -15,6 +15,8 @@
       <p:pipe port="sentence-ids" step="generic"/>
     </p:output>
 
+    <p:option name="id-prefix" required="false" select="''"/>
+
     <p:import href="http://www.daisy.org/pipeline/modules/nlp-break-detection/library.xpl" />
 
     <px:break-and-reshape name="generic">
@@ -31,6 +33,7 @@
       <p:with-option name="output-subsentence-tag" select="'span'"/>
       <p:with-option name="exclusive-sentence-tag" select="'false'"/>
       <p:with-option name="exclusive-word-tag" select="'false'"/>
+      <p:with-option name="id-prefix" select="$id-prefix"/>
     </px:break-and-reshape>
 
   </p:declare-step>
