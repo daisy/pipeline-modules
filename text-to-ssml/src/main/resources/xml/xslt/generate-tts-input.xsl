@@ -3,7 +3,7 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:ssml="http://www.w3.org/2001/10/synthesis"
     xmlns:tts="http://www.daisy.org/ns/pipeline/tts"
-    xmlns:tts="http://www.daisy.org/ns/pipeline/tmp"
+    xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp"
     exclude-result-prefixes="#all"
     version="2.0">
 

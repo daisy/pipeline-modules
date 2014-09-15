@@ -9,7 +9,7 @@
 
   <p:input port="fileset.in" sequence="false"/>
   <p:input port="content.in" sequence="false" primary="true"/>
-  <p:input port="ssml-of-lexicons-uris" sequence="false"/>
+  <p:input port="config"/>
   <p:output port="result" sequence="true" primary="true"/>
 
   <p:option name="section-elements" required="true"/>
@@ -75,13 +75,13 @@
   <!-- Load the user's lexicons. -->
   <p:for-each name="user-lexicons">
     <p:output port="result" sequence="true"/>
-    <p:iteration-source select="//ssml:lexicon[@uri]">
-      <p:pipe port="ssml-of-lexicons-uris" step="main"/>
+    <p:iteration-source select="//*[local-name() = 'lexicon' and exists(@href)]">
+      <p:pipe port="config" step="main"/>
     </p:iteration-source>
-    <p:variable name="ssml-uri" select="p:base-uri(/*)">
-      <p:pipe port="ssml-of-lexicons-uris" step="main"/>
+    <p:variable name="config-uri" select="p:base-uri(/*)">
+      <p:pipe port="config" step="main"/>
     </p:variable>
-    <p:variable name="lexicon-uri" select="resolve-uri(*/@uri, $ssml-uri)"/>
+    <p:variable name="lexicon-uri" select="resolve-uri(*/@href, $config-uri)"/>
     <p:load>
       <p:with-option name="href" select="$lexicon-uri"/>
     </p:load>

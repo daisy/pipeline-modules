@@ -41,27 +41,27 @@ public class SpeechSheetAnalyser {
 		CSSFactory.registerDeclarationTransformer(new SpeechDeclarationTransformer());
 	}
 
-	public void analyse(Collection<String> sheetURIs, Collection<String> embeddedCSS,
-	        String embedContainerURI) throws IOException, URISyntaxException, CSSException {
+	public void analyse(Collection<URI> sheetURIs, Collection<String> embeddedCSS,
+	        URI embedContainerURI) throws IOException, URISyntaxException, CSSException {
 		if (!SupportedCSS.isSupportedMedia(Medium)) {
 			throw new IllegalStateException("medium '" + Medium + "' is not supported");
 		}
 
-		List<String> alluris = new ArrayList<String>();
+		List<URI> alluris = new ArrayList<URI>();
 		List<String> csscode = new ArrayList<String>(embeddedCSS);
 		for (int k = 0; k < embeddedCSS.size(); ++k)
 			alluris.add(embedContainerURI);
 
-		for (String uri : sheetURIs) {
-			if (uri != null && !uri.isEmpty()) {
+		for (URI uri : sheetURIs) {
+			if (uri != null) {
 				alluris.add(uri);
-				csscode.add(IOUtils.toString(new URI(uri).toURL().openStream(), "UTF-8"));
+				csscode.add(IOUtils.toString(uri.toURL().openStream(), "UTF-8"));
 			}
 		}
 
 		List<StyleSheet> styleSheets = new ArrayList<StyleSheet>();
 		for (int k = 0; k < csscode.size(); ++k) {
-			String basePath = new File(new URI(alluris.get(k))).getParent();
+			String basePath = new File(alluris.get(k)).getParent();
 			String withAbsURL = makeURLabsolute(csscode.get(k), basePath);
 			styleSheets.add(CSSParserFactory.parse(withAbsURL, null, SourceType.EMBEDDED,
 			        new URL("http://base")));

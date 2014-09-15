@@ -17,6 +17,12 @@
     </p:documentation>
   </p:input>
 
+  <p:input port="config">
+    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+       <p>Configuration file with lexicons, voices declaration and various properties.</p>
+    </p:documentation>
+  </p:input>
+
   <p:output port="audio-map">
     <p:pipe port="audio-map" step="synthesize"/>
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -48,15 +54,6 @@
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
       <h2 px:role="name">Enable Text-To-Speech</h2>
       <p px:role="desc">Whether to use a speech synthesizer to produce audio files.</p>
-    </p:documentation>
-  </p:option>
-
-  <p:option name="ssml-of-lexicons-uris" required="false" px:type="anyURI" select="''">
-    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-      <h2 px:role="name">Lexicons SSML pointers</h2>
-      <p px:role="desc">URI of an SSML file which contains a list of
-      lexicon elements with their URI. The lexicons will be provided
-      to the Text-To-Speech processors.</p>
     </p:documentation>
   </p:option>
 
@@ -118,10 +115,16 @@
 	  <p:input port="fileset.in">
 	    <p:pipe port="fileset.in" step="main"/>
 	  </p:input>
-	  <p:with-option name="ssml-of-lexicons-uris" select="$ssml-of-lexicons-uris"/>
+	  <p:input port="config">
+	    <p:pipe port="config" step="main"/>
+	  </p:input>
 	</px:dtbook-to-ssml>
       </p:for-each>
-      <px:ssml-to-audio name="to-audio"/>
+      <px:ssml-to-audio name="to-audio">
+	<p:input port="config">
+	  <p:pipe port="config" step="main"/>
+	</p:input>
+      </px:ssml-to-audio>
     </p:otherwise>
   </p:choose>
 

@@ -10,7 +10,7 @@ public class VoiceInfo {
 	private static Pattern localePattern = Pattern
 	        .compile("(\\p{Alpha}{2})(?:[-_](\\p{Alpha}{2}))?(?:[-_](\\p{Alnum}{1,8}))*");
 
-	enum Gender {
+	public enum Gender {
 		MALE_ADULT,
 		MALE_CHILD,
 		MALE_ELDERY,
@@ -74,7 +74,7 @@ public class VoiceInfo {
 		return locale;
 	}
 
-	VoiceInfo(String voiceVendor, String voiceName, String language, Gender gender,
+	public VoiceInfo(String voiceVendor, String voiceName, String language, Gender gender,
 	        float priority) {
 		this.voice = new Voice(voiceVendor, voiceName);
 		this.language = tagToLocale(language);
@@ -82,14 +82,14 @@ public class VoiceInfo {
 		this.gender = gender;
 	}
 
-	VoiceInfo(Voice v, String language, Gender gender, float priority) {
+	public VoiceInfo(Voice v, String language, Gender gender, float priority) {
 		this.voice = v;
 		this.language = tagToLocale(language);
 		this.priority = priority;
 		this.gender = gender;
 	}
 
-	VoiceInfo(Voice v, Locale language, Gender gender) {
+	public VoiceInfo(Voice v, Locale language, Gender gender) {
 		this.voice = v;
 		this.language = language;
 		this.gender = gender;
@@ -109,5 +109,5 @@ public class VoiceInfo {
 	public Gender gender;
 	public Voice voice;
 	public Locale language;
-	float priority;
+	public float priority;
 }

@@ -13,7 +13,7 @@
       <x:input port="fileset.in">
 	<x:empty/>
       </x:input>
-    <x:input port="ssml-of-lexicons-uris">
+    <x:input port="config">
       <x:empty/>
     </x:input>
     <x:option name="section-elements" select="'level,section'"/>

@@ -9,6 +9,8 @@ import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.xml.transform.sax.SAXSource;
@@ -91,11 +93,11 @@ public class CSSInliningTest implements TreeWriterFactory {
 			cssFile = "test.css";
 		}
 
-		cssFile = new URI("file://"
+		URI cssFileURI = new URI("file://"
 		        + Paths.get(System.getProperty("user.dir"), "src/test/resources/", cssFile)
-		                .toString()).toString();
+		                .toString());
 
-		SheetAnalyzer.analyse(Arrays.asList(cssFile), Collections.EMPTY_LIST, null);
+		SheetAnalyzer.analyse(Arrays.asList(cssFileURI), Collections.EMPTY_LIST, null);
 		XdmNode tree = CSSInliner.inline(this, new URI("http://doc"), document, SheetAnalyzer,
 		        "tmp");
 
@@ -226,5 +228,27 @@ public class CSSInliningTest implements TreeWriterFactory {
 	        CSSException {
 		check("<root><simple>test</simple></root>", "mixed.css", "<root", "<simple",
 		        "tts:volume=\"[a-z]+\"", "test", "</simple>", "</root>");
+	}
+
+	@Test
+	public void retrieveCSSuris() throws SaxonApiException, URISyntaxException {
+		String xml = "<?node type=\"text/css\" href=\"sheet1.css\"?>";
+		xml += "<?xml-stylesheet type=\"text/zzz\" href=\"sheet2.css\"?>";
+		xml += "<?xml-stylesheet type=\"text/css\" href=\"sheet3.css\"?>"; //valid
+		xml += "<?xml-stylesheet type=\"text/css\" href=\"file:///foo/bar/sheet4.css\"?>"; //valid
+		xml += "<root><head>";
+		xml += "<link rel=\"stylesheet\" href=\"sheet5.css\"/>"; //valid
+		xml += "<link rel=\"zzz\" href=\"sheet6.css\"/>";
+		xml += "</head></root>";
+		SAXSource source = new SAXSource(new InputSource(new StringReader(xml)));
+		String directory = "file:///dir/";
+		source.setSystemId(directory + "file.xml");
+		XdmNode document = Builder.build(source);
+
+		Set<URI> uris = new HashSet<URI>(InlineCSSStep.getCSSurisInContent(document));
+		Assert.assertTrue(uris.contains(new URI(directory + "sheet3.css")));
+		Assert.assertTrue(uris.contains(new URI("file:///foo/bar/sheet4.css")));
+		Assert.assertTrue(uris.contains(new URI(directory + "sheet5.css")));
+		Assert.assertEquals(3, uris.size());
 	}
 }

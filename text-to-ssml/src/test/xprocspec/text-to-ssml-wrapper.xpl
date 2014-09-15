@@ -28,8 +28,8 @@
 			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 			xsi:schemaLocation="http://www.w3.org/2001/10/synthesis
 					    http://www.w3.org/TR/speech-synthesis/synthesis.xsd">
-	      <ssml:lexicon uri="../resources/lexicon-test-en.pls"/>
-	      <ssml:lexicon uri="../resources/lexicon-test-fr.pls"/>
+	      <ssml:lexicon href="../resources/lexicon-test-en.pls"/>
+	      <ssml:lexicon href="../resources/lexicon-test-fr.pls"/>
 	    </ssml:speak>
 	  </p:inline>
 	</p:input>
@@ -37,7 +37,9 @@
     </p:when>
     <p:otherwise>
       <p:output port="result">
-	<p:empty/>
+	<p:inline>
+	  <ssml:speak/>
+	</p:inline>
       </p:output>
       <p:sink/>
     </p:otherwise>
@@ -50,7 +52,7 @@
     <p:input port="fileset.in">
       <p:empty/>
     </p:input>
-    <p:input port="ssml-of-lexicons-uris">
+    <p:input port="config">
       <p:pipe port="result" step="lexicons-uris"/>
     </p:input>
     <p:with-option name="section-elements" select="'level,section'"/>
