@@ -24,7 +24,7 @@
     <!-- <module>common-entities</module> -->
     <!-- <module>css-utils</module> -->
     <!-- <module>daisy202-utils</module> -->
-    <!-- <module>daisy3-utils</module> -->
+    <module>daisy3-utils</module>
     <!-- <module>dtbook-utils</module> -->
     <!-- <module>epub3-nav-utils</module> -->
     <!-- <module>epub3-ocf-utils</module> -->
@@ -62,7 +62,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>daisy3-utils</artifactId>
-        <version>1.1.0</version>
+        <version>1.1.1-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
