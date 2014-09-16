@@ -30,7 +30,7 @@
     <!-- <module>epub3-ocf-utils</module> -->
     <!-- <module>epub3-pub-utils</module> -->
     <!-- <module>epubcheck-adapter</module> -->
-    <!-- <module>html-utils</module> -->
+    <module>html-utils</module>
     <module>mediaoverlay-utils</module>
     <!-- <module>odt-utils</module> -->
     <!-- <module>zedai-utils</module> -->
@@ -92,7 +92,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>html-utils</artifactId>
-        <version>2.0.0</version>
+        <version>2.0.1-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
