@@ -55,7 +55,7 @@ public class CSSInliner {
 		mTreeWriter.startContent();
 		Node firstnode = wrapped.getDocumentElement();
 		Set<String> namespaces = new HashSet<String>();
-		getAllNamespaces(firstnode, namespaces);
+		String defaultNs = getAllNamespaces(firstnode, namespaces);
 		namespaces.remove(xmlns);
 		mPrefixes = new HashMap<String, String>();
 		for (String ns : namespaces) {
@@ -64,6 +64,8 @@ public class CSSInliner {
 		}
 		mPrefixes.put(mStyleNS, "tts");
 		mPrefixes.put("http://www.w3.org/XML/1998/namespace", "xml");
+		if (defaultNs != null)
+			mPrefixes.put(defaultNs, "");
 		rebuildRec(firstnode);
 		mTreeWriter.endDocument();
 
@@ -77,7 +79,7 @@ public class CSSInliner {
 		return result;
 	}
 
-	private static void getAllNamespaces(Node n, Set<String> namespaces) {
+	private static String getAllNamespaces(Node n, Set<String> namespaces) {
 		if (n.getNodeType() == Node.ELEMENT_NODE) {
 			String ns = n.getNamespaceURI();
 			if (ns != null && !ns.isEmpty())
@@ -89,9 +91,17 @@ public class CSSInliner {
 				if (ns != null && !ns.isEmpty())
 					namespaces.add(ns);
 			}
-			for (Node child = n.getFirstChild(); child != null; child = child.getNextSibling())
-				getAllNamespaces(child, namespaces);
+			String defaultNs = null;
+			for (Node child = n.getFirstChild(); child != null; child = child.getNextSibling()) {
+				String ret = getAllNamespaces(child, namespaces);
+				if (ret != null)
+					defaultNs = ret;
+			}
+			if (n.getPrefix() == null || n.getPrefix().isEmpty())
+				return n.getNamespaceURI();
+			return defaultNs;
 		}
+		return null;
 	}
 
 	private void rebuildRec(Node node) {
