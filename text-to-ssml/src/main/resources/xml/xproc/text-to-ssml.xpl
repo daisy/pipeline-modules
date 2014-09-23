@@ -19,6 +19,10 @@
   <p:input port="config">
     <p:documentation>Configuration file with lexicons.</p:documentation>
   </p:input>
+  <p:input port="annotations" sequence="true">
+    <p:documentation>XSLT Stylesheets to annotate the content</p:documentation>
+    <p:empty/>
+  </p:input>
 
   <p:output port="result" sequence="true" primary="true">
     <p:documentation>The SSML output.</p:documentation>
@@ -65,6 +69,7 @@
   <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
   <p:import href="styled-text-to-ssml.xpl" />
   <p:import href="skippable-to-ssml.xpl" />
+  <p:import href="annotate.xpl" />
 
   <p:variable name="style-ns" select="'http://www.daisy.org/ns/pipeline/tts'"/>
 
@@ -83,6 +88,13 @@
     </p:input>
   </p:xslt>
   <px:message message="Lexing information normalized"/>
+
+  <px:annotate>
+    <p:input port="annotations">
+      <p:pipe port="annotations" step="main"/>
+    </p:input>
+  </px:annotate>
+  <px:message message="Extra spoken annotations inserted for clarification purposes."/>
 
   <p:xslt name="separate">
     <p:with-param name="skippable-elements" select="$skippable-elements"/>

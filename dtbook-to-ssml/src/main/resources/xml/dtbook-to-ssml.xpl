@@ -23,6 +23,28 @@
 
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/text-to-ssml/library.xpl" />
+    <p:import href="http://www.daisy.org/pipeline/modules/tts-common/library.xpl" />
+
+    <px:get-config-annotations content-type="application/x-dtbook+xml" name="get-config-annot">
+      <p:input port="config">
+	<p:pipe port="config" step="main"/>
+      </p:input>
+    </px:get-config-annotations>
+    <p:count limit="1"/>
+    <p:choose name="get-annotations">
+      <p:when test=". &gt; 0">
+	<p:output port="result" primary="true"/>
+	<p:identity>
+	  <p:input port="source">
+	    <p:pipe port="result" step="get-config-annot"/>
+	  </p:input>
+	</p:identity>
+      </p:when>
+      <p:otherwise>
+	<p:output port="result" primary="true"/>
+	<p:load href="http://www.daisy.org/pipeline/modules/text-to-ssml/dtbook-annotating.xsl"/>
+      </p:otherwise>
+    </p:choose>
 
     <p:xslt name="semantic">
       <p:input port="source">
@@ -49,6 +71,9 @@
       </p:input>
       <p:input port="config">
 	<p:pipe port="config" step="main"/>
+      </p:input>
+      <p:input port="annotations">
+	<p:pipe port="result" step="get-annotations"/>
       </p:input>
       <p:with-option name="section-elements" select="'level,level1,level2,level3'"/>
       <p:with-option name="word-element" select="'w'"/>
