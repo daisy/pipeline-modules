@@ -5,6 +5,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 public class URITest {
+
 	@Test
 	public void relativeURI1() {
 		String result = SpeechSheetAnalyser.makeURLabsolute("blabla url(dir/file) blabla",

@@ -131,8 +131,6 @@ public class CSSInliningTest implements TreeWriterFactory {
 		        "tts:cue-before=\".*\\.mp3\"", "test", "</simple>", "</root>");
 	}
 
-	//
-
 	@Test
 	public void cueAfter() throws SaxonApiException, URISyntaxException, IOException,
 	        CSSException {
@@ -228,6 +226,28 @@ public class CSSInliningTest implements TreeWriterFactory {
 	        CSSException {
 		check("<root><simple>test</simple></root>", "mixed.css", "<root", "<simple",
 		        "tts:volume=\"[a-z]+\"", "test", "</simple>", "</root>");
+	}
+
+	@Test
+	public void units1() throws SaxonApiException, URISyntaxException, IOException,
+	        CSSException {
+		check("<root><simple2>test</simple2></root>", "test.css", "<root", "<simple2",
+		        "tts:pause=\"[.0-9]+ms\"", "test", "</simple2>", "</root>");
+	}
+
+	@Test
+	public void units2() throws SaxonApiException, URISyntaxException, IOException,
+	        CSSException {
+		check("<root><simple3>test</simple3></root>", "test.css", "<root", "<simple3",
+		        "tts:pause=\"[.0-9]+s\"", "test", "</simple3>", "</root>");
+	}
+
+	@Test
+	public void keepProcessingInstructions() throws SaxonApiException, URISyntaxException,
+	        IOException, CSSException {
+		String PI = "<?xml-stylesheet type=\"text/xsl\" href=\"style.xsl\"?>";
+		check(PI + "<root>content</root>", null, PI.replace("?", "\\?") + "<root",
+		        "content</root>");
 	}
 
 	@Test

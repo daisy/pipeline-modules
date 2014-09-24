@@ -52,10 +52,9 @@ public class CSSInliner {
 		mFirst = true;
 		mTreeWriter = twFactory.newInstance();
 		mTreeWriter.startDocument(docURI);
-		mTreeWriter.startContent();
-		Node firstnode = wrapped.getDocumentElement();
+
 		Set<String> namespaces = new HashSet<String>();
-		String defaultNs = getAllNamespaces(firstnode, namespaces);
+		String defaultNs = getAllNamespaces(wrapped.getDocumentElement(), namespaces);
 		namespaces.remove(xmlns);
 		mPrefixes = new HashMap<String, String>();
 		for (String ns : namespaces) {
@@ -66,7 +65,8 @@ public class CSSInliner {
 		mPrefixes.put("http://www.w3.org/XML/1998/namespace", "xml");
 		if (defaultNs != null)
 			mPrefixes.put(defaultNs, "");
-		rebuildRec(firstnode);
+
+		rebuildRec(wrapped.getOwnerDocument());
 		mTreeWriter.endDocument();
 
 		XdmNode result = mTreeWriter.getResult();
@@ -110,7 +110,11 @@ public class CSSInliner {
 		} else if (node.getNodeType() == Node.TEXT_NODE) {
 			mTreeWriter.addText(node.getNodeValue());
 		} else if (node.getNodeType() == Node.PROCESSING_INSTRUCTION_NODE) {
-			mTreeWriter.addPI(node.getLocalName(), node.getNodeValue());
+			mTreeWriter.addPI(node.getNodeName(), node.getNodeValue());
+		} else if (node.getNodeType() == Node.DOCUMENT_NODE) {
+			for (Node child = node.getFirstChild(); child != null; child = child
+			        .getNextSibling())
+				rebuildRec(child);
 		} else if (node.getNodeType() == Node.ELEMENT_NODE) {
 			if (node.getNamespaceURI() == null || node.getNamespaceURI().isEmpty())
 				mTreeWriter.addStartElement(new QName(null, node.getLocalName()));
@@ -144,34 +148,32 @@ public class CSSInliner {
 			if (nd != null) {
 				for (String property : nd.getPropertyNames()) {
 					if (mCSS2Properties.contains(property)) {
-						Object val = null;
 						Term<?> t = nd.getValue(property, false);
-						if (t == null || t.getValue() == null)
-							val = nd.getProperty(property, false);
-						else
-							val = t.getValue();
-						if (val != null) {
-							String str = null;
-							if (val instanceof List<?>) {
-								List<?> li = (List<?>) val;
-								StringBuilder sb = new StringBuilder();
-								Iterator it = li.iterator();
-								sb.append(it.next());
-								while (it.hasNext()) {
-									Term<?> term = (Term<?>) it.next();
-									sb.append("," + term.getValue().toString());
-								}
-								str = sb.toString();
-							} else if (property.startsWith("cue")) {
-								str = val.toString();
-							} else {
-								//jStyleParser replaces '-' with '_'. Best workaround so far is to do the opposite:
-								//(voice-family and cue aside, there is no property values with '_' in Aural CSS)
-								str = val.toString().replace("_", "-").toLowerCase();
+						String str = null;
+						if (t == null || t.getValue() == null) {
+							//jStyleParser replaces '-' with '_'. Best workaround so far is to do the opposite:
+							//(voice-family and cue aside, there is no property values with '_' in Aural CSS)
+							str = nd.getProperty(property, false).toString().replace("_", "-")
+							        .toLowerCase();
+						} else if (t.getValue() instanceof List<?>) {
+							List<?> li = (List<?>) t.getValue();
+							StringBuilder sb = new StringBuilder();
+							Iterator it = li.iterator();
+							sb.append(it.next());
+							while (it.hasNext()) {
+								Term<?> term = (Term<?>) it.next();
+								sb.append("," + term.getValue().toString());
 							}
-							mTreeWriter.addAttribute(new QName(mStyleNsPrefix, mStyleNS,
-							        property), str);
+							str = sb.toString();
+
+						} else if (property.startsWith("cue")) {
+							str = t.getValue().toString();
+						} else {
+							str = t.toString().replace("_", "-").toLowerCase();
 						}
+						mTreeWriter.addAttribute(
+						        new QName(mStyleNsPrefix, mStyleNS, property), str);
+
 					}
 				}
 			}
