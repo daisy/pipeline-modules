@@ -86,8 +86,20 @@
       of 'output-subsentence-tag' to hold an ID.
     </p:documentation>
   </p:option>
+
+  <p:option name="id-prefix" required="false" select="''">
+    <p:documentation>
+      Generated IDs will be prefixed with this option so as to prevent
+      conflicts when the lexing is run multiple times whereas the
+      produced IDs are intented to be stored in the same place, such
+      as a central list of audio clips.
+    </p:documentation>
+  </p:option>
+
   <p:option name="skippable-tags" required="false" select="''"/>
   <p:option name="output-subsentence-tag" required="true"/>
+  <p:option name="exclusive-word-tag" select="'true'"/>
+  <p:option name="exclusive-sentence-tag" select="'true'"/>
 
   <p:input port="source" primary="true">
     <p:documentation>
@@ -142,6 +154,9 @@
     <p:with-option name="tmp-ns" select="$tmp-ns"/>
     <p:with-option name="tmp-word-tag" select="$tmp-word-tag"/>
     <p:with-option name="tmp-sentence-tag" select="$tmp-sentence-tag"/>
+    <p:with-option name="exclusive-word-tag" select="$exclusive-word-tag"/>
+    <p:with-option name="exclusive-sentence-tag" select="$exclusive-sentence-tag"/>
+    <p:with-option name="id-prefix" select="$id-prefix"/>
   </px:reshape>
 
 </p:declare-step>

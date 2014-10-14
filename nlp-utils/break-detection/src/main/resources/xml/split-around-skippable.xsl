@@ -10,6 +10,7 @@
   <xsl:param name="skippable-tags" />
   <xsl:param name="output-subsentence-tag" />
   <xsl:param name="can-contain-subsentences" />
+  <xsl:param name="id-prefix" />
 
   <xsl:key name="sentences" match="*[@id]" use="@id"/>
 
@@ -84,18 +85,18 @@
 	  <xsl:when test="count(current-group()) = 1 and local-name(current-group()[1]) = $output-subsentence-tag">
 	    <xsl:copy>
 	      <xsl:copy-of select="@*"/>
-	      <xsl:attribute name="id">
-		<xsl:value-of select="concat('sub-', generate-id(current-group()[1]))" />
-	      </xsl:attribute>
+	      <xsl:apply-templates select="current-group()[1]" mode="add-id">
+		<xsl:with-param name="prefix" select="'sub'"/>
+	      </xsl:apply-templates>
 	      <xsl:apply-templates select="current-group()/node()" mode="copy"/>
 	    </xsl:copy>
 	  </xsl:when>
 	  <!-- General case. -->
 	  <xsl:otherwise>
 	    <xsl:element name="{$output-subsentence-tag}" namespace="{$output-ns}">
-	      <xsl:attribute name="id">
-		<xsl:value-of select="concat('sub-', generate-id(current-group()[1]))" />
-	      </xsl:attribute>
+	      <xsl:apply-templates select="current-group()[1]" mode="add-id">
+		<xsl:with-param name="prefix" select="'sub'"/>
+	      </xsl:apply-templates>
 	      <xsl:apply-templates select="current-group()" mode="copy"/>
 	    </xsl:element>
 	  </xsl:otherwise>
@@ -109,12 +110,19 @@
     <xsl:copy>
       <xsl:copy-of select="@*"/>
       <xsl:if test="not(@id)">
-	<xsl:attribute name="id">
-	  <xsl:value-of select="concat('skip-', generate-id())" />
-	</xsl:attribute>
+	<xsl:apply-templates select="." mode="add-id">
+	  <xsl:with-param name="prefix" select="'skip'"/>
+	</xsl:apply-templates>
       </xsl:if>
       <xsl:apply-templates select="node()" mode="copy"/>
     </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="*" mode="add-id">
+    <xsl:param name="prefix"/>
+    <xsl:attribute name="id">
+      <xsl:value-of select="concat($prefix, '-', $id-prefix, generate-id(.))" />
+    </xsl:attribute>
   </xsl:template>
 
 </xsl:stylesheet>
