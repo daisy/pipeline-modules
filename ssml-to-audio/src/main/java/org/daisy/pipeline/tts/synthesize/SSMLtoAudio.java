@@ -11,10 +11,13 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 
+import javax.xml.transform.URIResolver;
+
 import net.sf.saxon.s9api.Processor;
-import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.XdmNode;
 
+import org.daisy.common.xslt.CompiledStylesheet;
+import org.daisy.common.xslt.XslTransformCompiler;
 import org.daisy.pipeline.audio.AudioServices;
 import org.daisy.pipeline.tts.AudioBufferTracker;
 import org.daisy.pipeline.tts.DefaultSSMLMarkSplitter;
@@ -57,12 +60,11 @@ import com.google.common.collect.Iterables;
  * corresponding text into the list of audio clips.
  * 
  */
-class SSMLtoAudio implements IProgressListener {
+class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 	private TTSService mLastTTS; //used if no TTS is found for the current sentence
 	private TTSRegistry mTTSRegistry;
 	private IPipelineLogger mLogger;
 	private ContiguousText mCurrentSection;
-	private Voice mPreviousVoice;
 	private File mAudioDir; //where all the sound files will be stored
 	private long mTotalTextSize; //used for the progress bar
 	private long mPrintedProgress;
@@ -71,13 +73,14 @@ class SSMLtoAudio implements IProgressListener {
 	private Map<TTSService, List<ContiguousText>> mOrganizedText;
 	private AudioBufferTracker mAudioBufferTracker;
 	private Processor mProc;
+	private URIResolver mURIResolver;
 
 	SSMLtoAudio(File audioDir, TTSRegistry ttsregistry, IPipelineLogger logger,
-	        AudioBufferTracker audioBufferTracker, Processor proc) {
+	        AudioBufferTracker audioBufferTracker, Processor proc, URIResolver uriResolver) {
+		mURIResolver = uriResolver;
 		mTTSRegistry = ttsregistry;
 		mLogger = logger;
 		mCurrentSection = null;
-		mPreviousVoice = null;
 		mDocumentPosition = 0;
 		mOrganizedText = new HashMap<TTSService, List<ContiguousText>>();
 		mAudioBufferTracker = audioBufferTracker;
@@ -89,35 +92,55 @@ class SSMLtoAudio implements IProgressListener {
 	 * The SSML is assumed to be pushed in document order.
 	 **/
 	void dispatchSSML(XdmNode ssml) throws SynthesisException {
-		String voiceVendor = ssml.getAttributeValue(new QName("voice-selector1"));
-		String voiceName = ssml.getAttributeValue(new QName("voice-selector2"));
-		String lang = ssml.getAttributeValue(new QName("http://www.w3.org/XML/1998/namespace",
-		        "lang"));
+		String voiceVendor = ssml.getAttributeValue(Sentence_attr_select1);
+		String voiceName = ssml.getAttributeValue(Sentence_attr_select2);
+		String gender = ssml.getAttributeValue(Sentence_attr_gender);
+		String age = ssml.getAttributeValue(Sentence_attr_age);
+		String id = ssml.getAttributeValue(Sentence_attr_id);
+		String lang = ssml.getAttributeValue(Sentence_attr_lang);
 
-		Voice voice = mTTSRegistry.findAvailableVoice(voiceVendor, voiceName, lang);
-		if (voice == null) {
-			mLogger.printInfo("Could not find any installed voice matching "
-			        + new Voice(voiceVendor, voiceName) + " or providing the language '"
-			        + lang + "'");
-			if (mPreviousVoice == null) {
-				mLogger.printInfo("The corresponding part of the text won't be synthesized.");
-				endSection();
-				return;
-			} else {
-				voice = mPreviousVoice;
-				mLogger.printInfo("Voice " + voice + " will be used instead.");
+		if (age != null) {
+			try {
+				int age_i = Integer.parseInt(age);
+				if (age_i <= 16) {
+					gender += "-child";
+				} else if (age_i >= 70) {
+					gender += "-eldery";
+				}
+			} catch (NumberFormatException e) {
+				//ignore
 			}
-		} else
-			mPreviousVoice = voice;
+		}
 
-		TTSService newSynth = mTTSRegistry.getTTS(voice);
+		boolean[] exactMatch = new boolean[1];
+		Voice voice = mTTSRegistry.getCurrentVoiceManager().findAvailableVoice(voiceVendor,
+		        voiceName, lang, gender, exactMatch);
+		if (voice == null) {
+			mLogger.printInfo(IPipelineLogger.AUDIO_MISSING
+			        + ": could not find any installed voice matching "
+			        + new Voice(voiceVendor, voiceName) + " or providing the language '"
+			        + lang + "'. The sentence with id " + id + " won't be synthesized.");
+			endSection();
+			return;
+		}
+
+		TTSService newSynth = mTTSRegistry.getCurrentVoiceManager().getTTS(voice);
 		if (newSynth == null) {
 			/*
 			 * Should not happen since findAvailableVoice() returns only a
 			 * non-null voice if a TTSService can provide it
 			 */
-			mLogger.printInfo("Could find any TTS processor for the voice " + voice);
+			mLogger.printInfo(IPipelineLogger.AUDIO_MISSING
+			        + ": could find any TTS processor for the voice " + voice
+			        + ". The sentence with id " + id + " won't be synthesized.");
+			endSection();
 			return;
+		}
+
+		if (!exactMatch[0]) {
+			mLogger.printInfo(IPipelineLogger.UNEXPECTED_VOICE
+			        + ": no voice matches exactly the requested characteristics. Voice "
+			        + voice + " will be used for synthesizing sentence with id=" + id);
 		}
 
 		/*
@@ -163,6 +186,19 @@ class SSMLtoAudio implements IProgressListener {
 	Iterable<SoundFileLink> blockingRun(AudioServices audioServices)
 	        throws SynthesisException, InterruptedException {
 
+		XslTransformCompiler xslCompiler = new XslTransformCompiler(mProc
+		        .getUnderlyingConfiguration(), mURIResolver);
+		Map<TTSService, CompiledStylesheet> ssmlTransformers = new HashMap<TTSService, CompiledStylesheet>();
+		for (TTSService tts : mTTSRegistry.getCurrentVoiceManager().getWorkingTTSServices()) {
+			CompiledStylesheet transf = null;
+			try {
+				transf = xslCompiler.compileStylesheet(tts.getSSMLxslTransformerURL()
+				        .openStream());
+			} catch (Exception e) {
+				//should not happen as the XSLTs have already been compiled in the TTSRegistry
+			}
+			ssmlTransformers.put(tts, transf);
+		}
 		//SSML mark splitter shared by the threads:
 		SSMLMarkSplitter ssmlSplitter = new DefaultSSMLMarkSplitter(mProc);
 
@@ -208,7 +244,7 @@ class SSMLtoAudio implements IProgressListener {
 		for (; i < regularTTSthreadNum; ++i) {
 			tpt[i] = new TextToPcmThread();
 			tpt[i].start(stext, pcmQueue, mTTSRegistry, ssmlSplitter, this, mLogger,
-			        mAudioBufferTracker, maxMemPerTTSThread);
+			        mAudioBufferTracker, maxMemPerTTSThread, ssmlTransformers);
 		}
 		for (Map.Entry<TTSService, List<ContiguousText>> e : mOrganizedText.entrySet()) {
 			TTSService tts = e.getKey();
@@ -217,7 +253,7 @@ class SSMLtoAudio implements IProgressListener {
 				for (int j = 0; j < tts.reservedThreadNum(); ++i, ++j) {
 					tpt[i] = new TextToPcmThread();
 					tpt[i].start(stext, pcmQueue, mTTSRegistry, ssmlSplitter, this, mLogger,
-					        mAudioBufferTracker, maxMemPerTTSThread);
+					        mAudioBufferTracker, maxMemPerTTSThread, ssmlTransformers);
 				}
 			}
 		}

@@ -18,6 +18,7 @@ import javax.sound.sampled.AudioFormat;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 
+import org.daisy.common.xslt.CompiledStylesheet;
 import org.daisy.common.xslt.ThreadUnsafeXslTransformer;
 import org.daisy.pipeline.audio.AudioBuffer;
 import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
@@ -67,16 +68,18 @@ public class TextToPcmThread implements FormatSpecifications {
 	private Thread mThread;
 	private TTSRegistry mTTSRegistry;
 	private IPipelineLogger mPipelineLogger;
-	private AudioFormat lastFormat; //used for knowing if a flush is necessary
+	private AudioFormat mLastFormat; //used for knowing if a flush is necessary
 	private AudioBufferTracker mAudioBufferTracker;
 	private SSMLMarkSplitter mSSMLSplitter;
-	private Map<String, Object> transformParams = new TreeMap<String, Object>();
+	private Map<String, Object> mTransformParams = new TreeMap<String, Object>();
+	private Map<TTSService, CompiledStylesheet> mSSMLTransformers;
 
 	void start(final ConcurrentLinkedQueue<ContiguousText> input,
 	        final BlockingQueue<ContiguousPCM> pcmOutput, TTSRegistry ttsregistry,
 	        SSMLMarkSplitter ssmlSplitter, final IProgressListener progressListener,
 	        IPipelineLogger pLogger, AudioBufferTracker AudioBufferTracker,
-	        final int maxQueueEltSize) {
+	        final int maxQueueEltSize, Map<TTSService, CompiledStylesheet> ssmlTransformers) {
+		mSSMLTransformers = ssmlTransformers;
 		mSSMLSplitter = ssmlSplitter;
 		mSoundFileLinks = new ArrayList<SoundFileLink>();
 		mTTSRegistry = ttsregistry;
@@ -103,7 +106,8 @@ public class TextToPcmThread implements FormatSpecifications {
 						} catch (Throwable t) {
 							StringWriter sw = new StringWriter();
 							t.printStackTrace(new PrintWriter(sw));
-							mPipelineLogger.printInfo("Sentence " + sentence.getID()
+							mPipelineLogger.printInfo(IPipelineLogger.AUDIO_MISSING
+							        + ": sentence " + sentence.getID()
 							        + " caused the current thread to stop because of error: "
 							        + sw.toString());
 							breakloop = true;
@@ -183,7 +187,7 @@ public class TextToPcmThread implements FormatSpecifications {
 		mBuffersOfCurrentFile = new ArrayList<AudioBuffer>();
 		mOffsetInFile = 0;
 		mMemFootprint = 0;
-		lastFormat = null;
+		mLastFormat = null;
 	}
 
 	/**
@@ -268,7 +272,7 @@ public class TextToPcmThread implements FormatSpecifications {
 			mResources.put(tts, resource);
 
 			if (!mTransforms.containsKey(tts)) {
-				mTransforms.put(tts, mTTSRegistry.getSSMLTransformer(tts).newTransformer());
+				mTransforms.put(tts, mSSMLTransformers.get(tts).newTransformer());
 			}
 		}
 
@@ -345,17 +349,16 @@ public class TextToPcmThread implements FormatSpecifications {
 			mResources.remove(tts);
 
 			//Find another TTS vendor for this sentence
-			Voice newVoice = mTTSRegistry.findSecondaryVoice(sentence.getVoice());
+			Voice newVoice = mTTSRegistry.getCurrentVoiceManager().findSecondaryVoice(
+			        sentence.getVoice());
 			if (newVoice == null) {
-				mPipelineLogger
-				        .printInfo("Something went wrong but no fallback voice can be found for "
-				                + originalVoice
-				                + ". Sentence with id="
-				                + sentence.getID()
-				                + " won't be synthesized.");
+				mPipelineLogger.printInfo(IPipelineLogger.AUDIO_MISSING
+				        + ": something went wrong but no fallback voice can be found for "
+				        + originalVoice + ". Sentence with id=" + sentence.getID()
+				        + " won't be synthesized.");
 				return;
 			}
-			tts = mTTSRegistry.getTTS(newVoice); //cannot return null in this case
+			tts = mTTSRegistry.getCurrentVoiceManager().getTTS(newVoice); //cannot return null in this case
 
 			//Try with the new vendor
 			marks.clear();
@@ -367,21 +370,24 @@ public class TextToPcmThread implements FormatSpecifications {
 				return;
 			}
 			if (pcm == null) {
-				mPipelineLogger.printInfo("Something went wrong with " + originalVoice
+				mPipelineLogger.printInfo(IPipelineLogger.AUDIO_MISSING
+				        + ": something went wrong with " + originalVoice
 				        + " but fallback voice " + newVoice
 				        + " didn't work either. Sentence with id=" + sentence.getID()
 				        + " won't be synthesized.");
 				return;
 			}
 
-			mPipelineLogger.printInfo("Something went wrong with " + originalVoice
-			        + ". Used voice " + newVoice + " instead to synthesize sentence with id="
-			        + sentence.getID());
+			mPipelineLogger
+			        .printInfo(IPipelineLogger.UNEXPECTED_VOICE
+			                + ": something went wrong with " + originalVoice + ". Used voice "
+			                + newVoice + " instead to synthesize sentence with id="
+			                + sentence.getID());
 
-			if (!tts.getAudioOutputFormat().equals(lastFormat))
+			if (!tts.getAudioOutputFormat().equals(mLastFormat))
 				flush(section, pcmOutput);
 		}
-		lastFormat = tts.getAudioOutputFormat();
+		mLastFormat = tts.getAudioOutputFormat();
 
 		int begin = mOffsetInFile;
 		try {
@@ -398,8 +404,8 @@ public class TextToPcmThread implements FormatSpecifications {
 		if (marks.size() == 0) {
 			SoundFileLink sf = new SoundFileLink();
 			sf.xmlid = sentence.getID();
-			sf.clipBegin = convertBytesToSecond(lastFormat, begin);
-			sf.clipEnd = convertBytesToSecond(lastFormat, mOffsetInFile);
+			sf.clipBegin = convertBytesToSecond(mLastFormat, begin);
+			sf.clipEnd = convertBytesToSecond(mLastFormat, mOffsetInFile);
 			mLinksOfCurrentFile.add(sf);
 		} else {
 			Map<String, Integer> starts = new HashMap<String, Integer>();
@@ -421,13 +427,13 @@ public class TextToPcmThread implements FormatSpecifications {
 				SoundFileLink sf = new SoundFileLink();
 				sf.xmlid = id;
 				if (starts.containsKey(id))
-					sf.clipBegin = convertBytesToSecond(lastFormat, begin + starts.get(id));
+					sf.clipBegin = convertBytesToSecond(mLastFormat, begin + starts.get(id));
 				else
-					sf.clipBegin = convertBytesToSecond(lastFormat, begin);
+					sf.clipBegin = convertBytesToSecond(mLastFormat, begin);
 				if (ends.containsKey(id))
-					sf.clipEnd = convertBytesToSecond(lastFormat, begin + ends.get(id));
+					sf.clipEnd = convertBytesToSecond(mLastFormat, begin + ends.get(id));
 				else
-					sf.clipEnd = convertBytesToSecond(lastFormat, mOffsetInFile);
+					sf.clipEnd = convertBytesToSecond(mLastFormat, mOffsetInFile);
 				mLinksOfCurrentFile.add(sf);
 			}
 			/*
@@ -450,8 +456,9 @@ public class TextToPcmThread implements FormatSpecifications {
 	}
 
 	private void printMemError(Sentence sentence, MemoryException e) {
-		mPipelineLogger.printInfo("Out of memory when processing sentence with id="
-		        + sentence.getID() + " (" + e + "). It won't be synthesized.");
+		mPipelineLogger.printInfo(IPipelineLogger.AUDIO_MISSING
+		        + ": out of memory when processing sentence with id=" + sentence.getID()
+		        + " (" + e + "). It won't be synthesized.");
 	}
 
 	private void addBuffers(Iterable<AudioBuffer> toadd) throws InterruptedException {
@@ -468,10 +475,10 @@ public class TextToPcmThread implements FormatSpecifications {
 
 	private String transformSSML(XdmNode ssml, TTSService tts, Voice v)
 	        throws SaxonApiException {
-		transformParams.put("voice", v.name);
+		mTransformParams.put("voice", v.name);
 		if (tts.endingMark() != null)
-			transformParams.put("ending-mark", tts.endingMark());
-		return mTransforms.get(tts).transformToString(ssml, transformParams);
+			mTransformParams.put("ending-mark", tts.endingMark());
+		return mTransforms.get(tts).transformToString(ssml, mTransformParams);
 	}
 
 	private String getPrintableContext(Sentence sentence, TTSService tts, Voice v) {
