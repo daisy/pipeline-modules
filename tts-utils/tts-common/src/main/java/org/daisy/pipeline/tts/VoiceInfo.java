@@ -1,62 +1,58 @@
 package org.daisy.pipeline.tts;
 
+import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 
 public class VoiceInfo {
 	private static Pattern localePattern = Pattern
 	        .compile("(\\p{Alpha}{2})(?:[-_](\\p{Alpha}{2}))?(?:[-_](\\p{Alnum}{1,8}))*");
 
 	public enum Gender {
-		MALE_ADULT,
-		MALE_CHILD,
-		MALE_ELDERY,
-		FEMALE_CHILD,
-		FEMALE_ADULT,
-		FEMALE_ELDERY
-	}
+		MALE_ADULT("male", "man", "male-adult"), 
+		MALE_CHILD("boy", "male-young", "male-child"), 
+		MALE_ELDERY("man-old", "male-old", "male-elder", "man-elder"),
+		FEMALE_CHILD("girl", "female-young", "female-child"),
+		FEMALE_ADULT("woman", "female", "female-adult"),
+		FEMALE_ELDERY("woman-old", "female-old", "woman-elder", "female-elder");
+		
+		private final List<String> variants;
+		private Gender(String... variants) {
+			this.variants = Lists.newArrayList(variants);
+		}
 
-	private static Map<String, Gender> strToGender;
-	static {
-		strToGender = new HashMap<String, Gender>();
-		strToGender.put("male", Gender.MALE_ADULT);
-		strToGender.put("female", Gender.FEMALE_ADULT);
-		strToGender.put("man", Gender.MALE_ADULT);
-		strToGender.put("woman", Gender.FEMALE_ADULT);
-		strToGender.put("girl", Gender.FEMALE_CHILD);
-		strToGender.put("boy", Gender.MALE_CHILD);
-		addVariants("male", "child", Gender.MALE_CHILD);
-		addVariants("male", "young", Gender.MALE_CHILD);
-		addVariants("male", "adult", Gender.MALE_ADULT);
-		addVariants("male", "old", Gender.MALE_ELDERY);
-		addVariants("man", "old", Gender.MALE_ELDERY);
-		addVariants("male", "eldery", Gender.MALE_ELDERY);
-		addVariants("man", "eldery", Gender.MALE_ELDERY);
-		addVariants("female", "child", Gender.FEMALE_CHILD);
-		addVariants("female", "young", Gender.FEMALE_CHILD);
-		addVariants("female", "adult", Gender.FEMALE_ADULT);
-		addVariants("female", "old", Gender.FEMALE_ELDERY);
-		addVariants("woman", "old", Gender.FEMALE_ELDERY);
-		addVariants("female", "eldery", Gender.FEMALE_ELDERY);
-		addVariants("woman", "eldery", Gender.FEMALE_ELDERY);
-	}
+		private static final Map<String, Gender> lookup = new HashMap<String, Gender>();
 
-	private static void addVariants(String gender, String age, Gender g) {
-		strToGender.put(gender + age, g);
-		strToGender.put(age + gender, g);
-		strToGender.put(age + "-" + gender, g);
-		strToGender.put(gender + "-" + age, g);
-		strToGender.put(age + "_" + gender, g);
-		strToGender.put(gender + "_" + age, g);
-	}
+		static {
+			Splitter splitter = Splitter.on('-').omitEmptyStrings();
+			for (Gender gender : EnumSet.allOf(Gender.class)) {
+				for (String variant : gender.variants) {
+					lookup.put(variant, gender);
+					List<String> parts = splitter.splitToList(variant);
+					if (parts.size() > 1) {
+						lookup.put(parts.get(0) + parts.get(1), gender);
+						lookup.put(parts.get(1) + parts.get(0), gender);
+						lookup.put(parts.get(0) + '-' + parts.get(1), gender);
+						lookup.put(parts.get(1) + '-' + parts.get(0), gender);
+						lookup.put(parts.get(0) + '_' + parts.get(1), gender);
+						lookup.put(parts.get(1) + '_' + parts.get(0), gender);
+					}
+				}
+			}
+		}
 
-	public static Gender gender(String str) {
-		if (str == null)
-			return null; //unknown gender
-		return strToGender.get(str);
+		public static Gender of(String gender) {
+			return lookup.get(gender);
+		}
+
 	}
 
 	public static Locale tagToLocale(String langtag) {
@@ -76,24 +72,25 @@ public class VoiceInfo {
 
 	public VoiceInfo(String voiceVendor, String voiceName, String language, Gender gender,
 	        float priority) {
-		this.voice = new Voice(voiceVendor, voiceName);
-		this.language = tagToLocale(language);
-		this.priority = priority;
-		this.gender = gender;
+		this(new Voice(voiceVendor, voiceName),language,gender,priority);
 	}
 
 	public VoiceInfo(Voice v, String language, Gender gender, float priority) {
-		this.voice = v;
-		this.language = tagToLocale(language);
-		this.priority = priority;
-		this.gender = gender;
+		this(v,tagToLocale(language),gender,priority);
 	}
 
 	public VoiceInfo(Voice v, Locale language, Gender gender) {
+		this(v,language,gender,-1);
+	}
+	
+	private VoiceInfo(Voice v, Locale locale, Gender gender, float priority) {
+		Preconditions.checkNotNull(v);
+		Preconditions.checkNotNull(locale);
+		Preconditions.checkNotNull(gender);
 		this.voice = v;
-		this.language = language;
+		this.language = locale;
+		this.priority = priority;
 		this.gender = gender;
-		this.priority = -1; //not used in the comparison
 	}
 
 	@Override

@@ -14,6 +14,7 @@ import net.sf.saxon.s9api.XdmNodeKind;
 import net.sf.saxon.s9api.XdmSequenceIterator;
 
 import org.daisy.pipeline.tts.VoiceInfo;
+import org.daisy.pipeline.tts.VoiceInfo.Gender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,14 +66,14 @@ public class ConfigReader {
 					String vvendor = node.getAttributeValue(new QName(null, "vendor"));
 					String vname = node.getAttributeValue(new QName(null, "name"));
 					String priority = node.getAttributeValue(new QName(null, "priority"));
-					String gender = node.getAttributeValue(new QName(null, "gender"));
+					Gender gender = Gender.of(node.getAttributeValue(new QName(null, "gender")));
 					if (priority == null)
 						priority = "5";
 					if (lang == null || vvendor == null || vname == null || gender == null) {
 						Logger.warn("Config file invalid near " + node.toString());
 					} else {
 						try {
-							mVoices.add(new VoiceInfo(vvendor, vname, lang, VoiceInfo.gender(gender),
+							mVoices.add(new VoiceInfo(vvendor, vname, lang, gender,
 									Float.valueOf(priority)));
 						} catch (NumberFormatException e) {
 							Logger.warn("Error while converting config file's priority "
