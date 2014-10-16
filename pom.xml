@@ -12,7 +12,7 @@
 
   <groupId>org.daisy.pipeline.modules</groupId>
   <artifactId>script-utils-aggregator</artifactId>
-  <version>1.8.1-SNAPSHOT</version>
+  <version>1.9-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>DAISY Pipeline 2 :: Aggregator POM for the Script Utility Modules</name>
@@ -20,20 +20,20 @@
 
   <!-- List of the modules to build all-at-once -->
   <modules>
-    <module>asciimath-utils</module>
-    <module>common-entities</module>
-    <module>css-utils</module>
-    <module>daisy202-utils</module>
-    <module>daisy3-utils</module>
-    <module>dtbook-utils</module>
-    <module>epub3-nav-utils</module>
-    <module>epub3-ocf-utils</module>
-    <module>epub3-pub-utils</module>
-    <module>epubcheck-adapter</module>
-    <module>html-utils</module>
-    <module>mediaoverlay-utils</module>
-    <module>odt-utils</module>
-    <module>zedai-utils</module>
+    <!-- <module>asciimath-utils</module> -->
+    <!-- <module>common-entities</module> -->
+    <!-- <module>css-utils</module> -->
+    <!-- <module>daisy202-utils</module> -->
+    <!-- <module>daisy3-utils</module> -->
+    <!-- <module>dtbook-utils</module> -->
+    <!-- <module>epub3-nav-utils</module> -->
+    <!-- <module>epub3-ocf-utils</module> -->
+    <!-- <module>epub3-pub-utils</module> -->
+    <!-- <module>epubcheck-adapter</module> -->
+    <!-- <module>html-utils</module> -->
+    <!-- <module>mediaoverlay-utils</module> -->
+    <!-- <module>odt-utils</module> -->
+    <!-- <module>zedai-utils</module> -->
   </modules>
 
   <!-- BoM of the default script modules (for use in assemblies) -->
