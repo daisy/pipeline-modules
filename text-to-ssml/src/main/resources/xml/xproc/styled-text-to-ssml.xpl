@@ -3,19 +3,18 @@
 		xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
 		xmlns:xml="http://www.w3.org/XML/1998/namespace"
 		xmlns:ssml="http://www.w3.org/2001/10/synthesis"
-		xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp"
+		xmlns:tts="http://www.daisy.org/ns/pipeline/tts"
 		xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon"
 		exclude-inline-prefixes="#all">
 
   <p:input port="fileset.in" sequence="false"/>
   <p:input port="content.in" sequence="false" primary="true"/>
-  <p:input port="ssml-of-lexicons-uris" sequence="false"/>
+  <p:input port="config"/>
   <p:output port="result" sequence="true" primary="true"/>
 
   <p:option name="section-elements" required="true"/>
   <p:option name="section-attr" required="false" select="''"/>
   <p:option name="section-attr-val" required="false" select="''"/>
-  <p:option name="first-sheet-uri" required="false" select="''"/>
   <p:option name="style-ns" required="true"/>
 
   <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
@@ -50,7 +49,6 @@
   <!-- Generate the rough skeleton of the SSML document. -->
   <!-- Everything is converted but the content of the sentences.-->
   <p:xslt name="gen-input">
-    <p:with-param  name="css-sheet-uri" select="$first-sheet-uri"/>
     <p:with-param  name="style-ns" select="$style-ns"/>
     <p:input port="stylesheet">
       <p:document href="../xslt/generate-tts-input.xsl"/>
@@ -77,13 +75,13 @@
   <!-- Load the user's lexicons. -->
   <p:for-each name="user-lexicons">
     <p:output port="result" sequence="true"/>
-    <p:iteration-source select="//ssml:lexicon[@uri]">
-      <p:pipe port="ssml-of-lexicons-uris" step="main"/>
+    <p:iteration-source select="//*[local-name() = 'lexicon' and exists(@href)]">
+      <p:pipe port="config" step="main"/>
     </p:iteration-source>
-    <p:variable name="ssml-uri" select="p:base-uri(/*)">
-      <p:pipe port="ssml-of-lexicons-uris" step="main"/>
+    <p:variable name="config-uri" select="p:base-uri(/*)">
+      <p:pipe port="config" step="main"/>
     </p:variable>
-    <p:variable name="lexicon-uri" select="resolve-uri(*/@uri, $ssml-uri)"/>
+    <p:variable name="lexicon-uri" select="resolve-uri(*/@href, $config-uri)"/>
     <p:load>
       <p:with-option name="href" select="$lexicon-uri"/>
     </p:load>
@@ -226,7 +224,7 @@
   <px:message message="Unsolicited graphical characters removed."/>
 
   <!-- split the result to extract the wrapped SSML files -->
-  <p:delete match="@tmp:*"/>
+  <p:delete match="@tts:*"/>
   <p:filter name="docs-extract">
     <p:with-option name="select" select="'//ssml:speak'"/>
   </p:filter>

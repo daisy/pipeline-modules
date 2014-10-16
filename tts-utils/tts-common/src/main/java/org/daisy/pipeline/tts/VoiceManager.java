@@ -163,7 +163,7 @@ public class VoiceManager {
 				//Another way would be to move the pair {vendor, name} from the key
 				//to the value.
 				Locale locale = VoiceInfo.tagToLocale(parts[4]);
-				Gender gender = VoiceInfo.gender(parts[3]);
+				Gender gender = Gender.of(parts[3]);
 				for (String lang : new String[]{
 				        parts[4], locale != null ? locale.getLanguage() : parts[4]
 				}) {
@@ -313,7 +313,7 @@ public class VoiceManager {
 	 */
 	public Voice findAvailableVoice(String voiceVendor, String voiceName, String lang,
 	        String gender, boolean[] exactMatch) {
-		return findAvailableVoice(voiceVendor, voiceName, lang, VoiceInfo.gender(gender),
+		return findAvailableVoice(voiceVendor, voiceName, lang, Gender.of(gender),
 		        exactMatch == null ? new boolean[1] : exactMatch);
 	}
 

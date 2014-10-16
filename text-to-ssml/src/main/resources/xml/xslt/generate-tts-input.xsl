@@ -2,6 +2,7 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:ssml="http://www.w3.org/2001/10/synthesis"
+    xmlns:tts="http://www.daisy.org/ns/pipeline/tts"
     xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp"
     exclude-result-prefixes="#all"
     version="2.0">
@@ -18,10 +19,8 @@
   <!--======================================================================= -->
 
   <xsl:import href="flatten-css.xsl"/>
-  <xsl:param name="css-sheet-uri"/>
 
-  <xsl:variable name="css-sheet-dir" select="substring-before($css-sheet-uri, tokenize($css-sheet-uri, '/')[last()])"/>
-  <xsl:variable name="style-ns" select="'http://www.daisy.org/ns/pipeline/tmp'"/>
+  <xsl:variable name="style-ns" select="'http://www.daisy.org/ns/pipeline/tts'"/>
 
   <!-- ========= bind every cue and pause to its most relevant sentence ========= -->
   <!-- ========= (document order is kept on purpose)                    ========= -->
@@ -36,20 +35,20 @@
 
   <xsl:template match="*" mode="build-before-binding">
     <xsl:param name="sentence-id"/>
-    <xsl:if test="@tmp:pause-before or @tmp:cue-before">
+    <xsl:if test="@tts:pause-before or @tts:cue-before">
       <bind sentence="{$sentence-id}">
-	<xsl:copy-of select="@tmp:pause-before"/>
-	<xsl:copy-of select="@tmp:cue-before"/>
+	<xsl:copy-of select="@tts:pause-before"/>
+	<xsl:copy-of select="@tts:cue-before"/>
       </bind>
     </xsl:if>
   </xsl:template>
 
   <xsl:template match="*" mode="build-after-binding">
     <xsl:param name="sentence-id"/>
-    <xsl:if test="@tmp:pause-after or @tmp:cue-after">
+    <xsl:if test="@tts:pause-after or @tts:cue-after">
       <bind sentence="{$sentence-id}">
-	<xsl:copy-of select="@tmp:cue-after"/>
-	<xsl:copy-of select="@tmp:pause-after"/>
+	<xsl:copy-of select="@tts:cue-after"/>
+	<xsl:copy-of select="@tts:pause-after"/>
       </bind>
     </xsl:if>
   </xsl:template>
@@ -79,7 +78,7 @@
 
   <xsl:template match="*" mode="build-bindings" priority="1">
     <xsl:choose>
-      <xsl:when test="@tmp:pause-before or @tmp:cue-before or @tmp:pause-after or @tmp:cue-after">
+      <xsl:when test="@tts:pause-before or @tts:cue-before or @tts:pause-after or @tts:cue-after">
 	<xsl:variable name="descendants" select="descendant::ssml:s" />
 	<xsl:choose>
 	  <xsl:when test="$descendants">
@@ -130,9 +129,9 @@
 	      </xsl:apply-templates>
 	      <xsl:for-each select="key('bindings', $sentence/@id, $bindings)">
 		<xsl:choose>
-		  <xsl:when test="current()/@tmp:pause-before or current()/@tmp:cue-before or current()/@tmp:pause-after or current()/@tmp:cue-after">
-		    <xsl:apply-templates select="current()/@tmp:pause-before|current()/@tmp:pause-after" mode="pause"/>
-		    <xsl:apply-templates select="current()/@tmp:cue-before|current()/@tmp:cue-after" mode="cue"/>
+		  <xsl:when test="current()/@tts:pause-before or current()/@tts:cue-before or current()/@tts:pause-after or current()/@tts:cue-after">
+		    <xsl:apply-templates select="current()/@tts:pause-before|current()/@tts:pause-after" mode="pause"/>
+		    <xsl:apply-templates select="current()/@tts:cue-before|current()/@tts:cue-after" mode="cue"/>
 		  </xsl:when>
 		  <xsl:otherwise>
 		    <!-- sentence content -->
@@ -188,16 +187,16 @@
 
   <!-- === copy the sentences' content and add the cues and pauses if necessary === -->
   <xsl:template match="*" mode="inside-sentence">
-    <xsl:apply-templates select="@tmp:pause-before" mode="pause"/>
-    <xsl:apply-templates select="@tmp:cue-before" mode="cue"/>
+    <xsl:apply-templates select="@tts:pause-before" mode="pause"/>
+    <xsl:apply-templates select="@tts:cue-before" mode="cue"/>
 
     <xsl:element name="{name()}" namespace="{namespace-uri()}">
       <xsl:copy-of select="@*"/>
       <xsl:apply-templates select="node()" mode="inside-sentence"/>
     </xsl:element>
 
-    <xsl:apply-templates select="@tmp:cue-after" mode="cue"/>
-    <xsl:apply-templates select="@tmp:pause-after" mode="pause"/>
+    <xsl:apply-templates select="@tts:cue-after" mode="cue"/>
+    <xsl:apply-templates select="@tts:pause-after" mode="pause"/>
   </xsl:template>
 
   <xsl:template match="text()" mode="inside-sentence">
@@ -209,17 +208,17 @@
   </xsl:template>
 
   <xsl:template match="@*" mode="cue">
-    <xsl:variable name="abs-uri" select="resolve-uri(., $css-sheet-dir)"/>
-    <xsl:if test="starts-with($abs-uri, 'file:/')">
-      <xsl:choose>
-    	<xsl:when test="starts-with($abs-uri, 'file:///')">
-    	  <ssml:audio src="{substring-after($abs-uri, 'file://')}"/>
-    	</xsl:when>
-    	<xsl:otherwise>
-    	  <ssml:audio src="{substring-after($abs-uri, 'file:')}"/>
-    	</xsl:otherwise>
-      </xsl:choose>
-    </xsl:if>
+    <xsl:choose>
+      <xsl:when test="starts-with(., 'file:///')">
+	<ssml:audio src="{substring-after(., 'file://')}"/>
+      </xsl:when>
+      <xsl:when test="starts-with(., 'file:/')">
+	<ssml:audio src="{substring-after(., 'file:')}"/>
+      </xsl:when>
+      <xsl:when test="starts-with(., '/')">
+	<ssml:audio src="{.}"/>
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>

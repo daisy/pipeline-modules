@@ -1,9 +1,10 @@
 <p:declare-step version="1.0" type="px:ssml-to-audio" name="main"
 		xmlns:p="http://www.w3.org/ns/xproc"
 		xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-		xmlns:d="http://www.daisy.org/ns/pipeline/data">	
+		xmlns:d="http://www.daisy.org/ns/pipeline/data">
 
-  <p:input port="source" primary="true" sequence="true"/>    
+  <p:input port="source" primary="true" sequence="true"/>
+  <p:input port="config"/>
   <p:output port="result" primary="true" sequence="false"/>
 
   <p:import href="synthesize.xpl" />
@@ -23,5 +24,5 @@
   <!--     </p:string-replace> -->
   <!--   </p:viewport> -->
   <!-- </p:for-each> -->
-  
+
 </p:declare-step>

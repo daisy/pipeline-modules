@@ -2,7 +2,7 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:ssml="http://www.w3.org/2001/10/synthesis"
-    xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp"
+    xmlns:tts="http://www.daisy.org/ns/pipeline/tts"
     exclude-result-prefixes="#all"
     version="2.0">
 
@@ -11,7 +11,7 @@
   <!-- which is not SSML. -->
   <!--======================================================================= -->
 
-  <xsl:function name="tmp:normlist">
+  <xsl:function name="tts:normlist">
     <xsl:param name="li"/>
     <xsl:value-of select="replace(translate($li, ' ',''), '[^-_0-9a-zA-Z]+', '|')"/>
   </xsl:function>
@@ -25,30 +25,30 @@
   <xsl:template match="ssml:s">
     <xsl:copy>
       <xsl:copy-of select="@xml:lang|@id"/>
-      <xsl:if test="@tmp:voice-family">
+      <xsl:if test="@tts:voice-family">
 	<!-- voice-family has the format: attr1|attr2|attr3 where attr
 	     is either age, gender, voice's vendor or voice's name. If
 	     a voice-name is given, it should come after the mandatory
 	     voice-vendor.-->
 	<!-- Should we use the wildcard '*' to mean 'any vendor'? -->
 	<xsl:variable name="voice-selectors">
-	  <tmp:selectors>
-	    <xsl:analyze-string select="tmp:normlist(@tmp:voice-family)" regex="(\||^)([0-9]+)(\||$)">
+	  <tts:selectors>
+	    <xsl:analyze-string select="tts:normlist(@tts:voice-family)" regex="(\||^)([0-9]+)(\||$)">
 	      <xsl:matching-substring>
-		<tmp:sel age="{regex-group(2)}"/>
+		<tts:sel age="{regex-group(2)}"/>
 	      </xsl:matching-substring>
 	      <xsl:non-matching-substring>
 		<xsl:analyze-string select="." regex="(\||^)((male)|(female)|(neutral))(\||$)">
 		  <xsl:matching-substring>
-		    <tmp:sel gender="{regex-group(2)}"/>
+		    <tts:sel gender="{regex-group(2)}"/>
 		  </xsl:matching-substring>
 		  <xsl:non-matching-substring>
-		    <tmp:sel other="{.}"/>
+		    <tts:sel other="{.}"/>
 		  </xsl:non-matching-substring>
 		</xsl:analyze-string>
 	      </xsl:non-matching-substring>
 	    </xsl:analyze-string>
-	  </tmp:selectors>
+	  </tts:selectors>
 	</xsl:variable>
 	<xsl:if test="$voice-selectors//@age">
 	  <xsl:attribute name="voice-age">
@@ -88,14 +88,14 @@
   <xsl:template match="*" mode="css1">
     <xsl:apply-templates select="." mode="css2"/>
   </xsl:template>
-  <xsl:template match="*[@tmp:speak = 'none']" mode="css1">
+  <xsl:template match="*[@tts:speak = 'none']" mode="css1">
   </xsl:template>
 
   <xsl:template match="*" mode="css2">
     <xsl:apply-templates select="." mode="css3"/>
   </xsl:template>
-  <xsl:template match="*[@tmp:volume]" mode="css2">
-    <ssml:prosody volume="{@tmp:volume}">
+  <xsl:template match="*[@tts:volume]" mode="css2">
+    <ssml:prosody volume="{@tts:volume}">
       <xsl:apply-templates select="." mode="css3"/>
     </ssml:prosody>
   </xsl:template>
@@ -103,8 +103,8 @@
   <xsl:template match="*" mode="css3">
     <xsl:apply-templates select="." mode="css4"/>
   </xsl:template>
-  <xsl:template match="*[@tmp:pitch]" mode="css3">
-    <ssml:prosody pitch="{@tmp:pitch}">
+  <xsl:template match="*[@tts:pitch]" mode="css3">
+    <ssml:prosody pitch="{@tts:pitch}">
       <xsl:apply-templates select="." mode="css4"/>
     </ssml:prosody>
   </xsl:template>
@@ -112,7 +112,7 @@
   <xsl:template match="*" mode="css4">
     <xsl:apply-templates select="." mode="css5"/>
   </xsl:template>
-  <xsl:template match="*[@tmp:speak = 'spell-out']" mode="css4">
+  <xsl:template match="*[@tts:speak = 'spell-out']" mode="css4">
     <ssml:say-as interpret-as="characters">
       <xsl:apply-templates select="." mode="css5"/>
     </ssml:say-as>
@@ -121,8 +121,8 @@
   <xsl:template match="*" mode="css5">
     <xsl:apply-templates select="." mode="css6"/>
   </xsl:template>
-  <xsl:template match="*[@tmp:speech-rate]" mode="css5">
-    <ssml:prosody rate="{@tmp:speech-rate}">
+  <xsl:template match="*[@tts:speech-rate]" mode="css5">
+    <ssml:prosody rate="{@tts:speech-rate}">
       <xsl:apply-templates select="." mode="css6"/>
     </ssml:prosody>
   </xsl:template>
@@ -130,8 +130,8 @@
   <xsl:template match="*" mode="css6">
     <xsl:apply-templates select="." mode="css7"/>
   </xsl:template>
-  <xsl:template match="*[@tmp:pitch-range]" mode="css6">
-    <ssml:prosody range="{@tmp:pitch-range}">
+  <xsl:template match="*[@tts:pitch-range]" mode="css6">
+    <ssml:prosody range="{@tts:pitch-range}">
       <xsl:apply-templates select="." mode="css7"/>
     </ssml:prosody>
   </xsl:template>
@@ -139,7 +139,7 @@
   <xsl:template match="*" mode="css7">
     <xsl:apply-templates select="." mode="css8"/>
   </xsl:template>
-  <xsl:template match="*[@tmp:speak-numeral = 'digits']" mode="css7">
+  <xsl:template match="*[@tts:speak-numeral = 'digits']" mode="css7">
     <ssml:say-as interpret-as="ordinal">
       <xsl:apply-templates select="." mode="css8"/>
     </ssml:say-as>
@@ -148,7 +148,7 @@
   <xsl:template match="*" mode="css8">
     <xsl:apply-templates select="node()" mode="css-child"/>
   </xsl:template>
-  <xsl:template match="*[@tmp:speak-numeral = 'continuous']" mode="css8">
+  <xsl:template match="*[@tts:speak-numeral = 'continuous']" mode="css8">
     <ssml:say-as interpret-as="cardinal">
       <xsl:apply-templates select="node()" mode="css-child"/>
     </ssml:say-as>

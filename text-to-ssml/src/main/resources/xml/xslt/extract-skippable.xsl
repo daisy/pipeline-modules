@@ -3,7 +3,6 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:ssml="http://www.w3.org/2001/10/synthesis"
     xmlns:xml="http://www.w3.org/XML/1998/namespace"
-    xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp"
     exclude-result-prefixes="#all"
     version="2.0">
 
