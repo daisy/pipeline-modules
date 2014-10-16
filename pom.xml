@@ -12,7 +12,7 @@
 
   <groupId>org.daisy.pipeline.modules</groupId>
   <artifactId>common-utils-aggregator</artifactId>
-  <version>1.8.1-SNAPSHOT</version>
+  <version>1.9-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>DAISY Pipeline 2 :: Aggregator POM for the Common Utility Modules</name>
@@ -20,14 +20,14 @@
 
   <!-- List of the modules to build all-at-once -->
   <modules>
-    <module>common-utils</module>
-    <module>file-utils</module>
-    <module>fileset-utils</module>
-    <module>image-utils</module>
-    <module>mediatype-utils</module>
-    <module>metadata-utils</module>
-    <module>validation-utils</module>
-    <module>zip-utils</module>
+    <!-- <module>common-utils</module> -->
+    <!-- <module>file-utils</module> -->
+    <!-- <module>fileset-utils</module> -->
+    <!-- <module>image-utils</module> -->
+    <!-- <module>mediatype-utils</module> -->
+    <!-- <module>metadata-utils</module> -->
+    <!-- <module>validation-utils</module> -->
+    <!-- <module>zip-utils</module> -->
   </modules>
 
   <!-- BoM of the default script modules (for use in assemblies) -->
