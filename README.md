@@ -7,15 +7,18 @@ NLP-related modules for the DAISY Pipeline 2
 
 ### XProc scripts
 
-The NLP/TTS must always be called before any other transformation to make certain that the aural CSS stylesheets will be applied on the original documents.
+The XProc scripts aims at dealing with the restrictions of the input formats and the TTS workflow, which the Java step is unaware of. They can process three different formats:
+- DTBook
+- Zedai
+- HTML
 
-Let us consider the transformation of a DTBook document. Such document will be processed in the following order:
+Let us consider the transformation of a DTBook document. Such a document will be processed in the following order:
 
-- dtbook-break-detection (XProc) passes dtbook-specific lexing options to the generic module break-detection (XProc);
-- break-detection starts by calling the Java-based break detection which adds dtbook-independent words and sentences to the document (Java);
-- The words and sentences are moved, merged or discarded so as to be compliant with the DTBook grammar (XProc);
+- dtbook-break-detection (XProc) passes dtbook-specific lexing options to the generic module called `break-detection` (XProc);
+- `break-detection` starts by calling the Java-based break detection which adds format-independent words and sentences to the document (Java);
+- The words and sentences are moved, merged or discarded so as to comply with the DTBook grammar (XProc);
 - The words and sentences are replaced with DTBook elements (XProc);
-- The content is split around the skippable elements (e.g. pagenums) so that the SMIL files will be able to reference them individually (XProc);
+- The XML content is split around the skippable/escapable elements (e.g. pagenums) so that the SMIL files will be able to reference them individually (XProc);
 - Some IDs are generated to make sure that we'll be able to reference the elements in the SMIL files (XProc);
 - The enriched DTBook and the list of sentence IDs are returned to the main script, e.g. to dtbook-to-epub3 or dtbook-to-daisy3.
 
@@ -23,7 +26,7 @@ Let us consider the transformation of a DTBook document. Such document will be p
 
 ##### Languages
 
-At the first stage, the step retrieves all the languages that exist in the document. Then the LexRegistry provides to the step the best lexer for each language according to scores returned via the LexService interface. The LexRegistry also provides a fallback lexer that can handle situations where languages are unknown or not expected.
+At the first stage, the step retrieves all the languages that exist in the document. Then the LexRegistry provides to the step the best lexer for each language according to rankings returned via the LexService interface. The LexRegistry also provides a fallback lexer that can handle situations where languages are unknown or not expected.
 
 ##### Resource allocation
 
@@ -41,18 +44,15 @@ TextCategorizers can be invoked from outside the usual NLP workflow to categoriz
 
 - OmniLangLexer: based on Java's break iterators and a top-down approach. Works with any language (fallback lexer).
 - LightLexer. Works with any language (fallback lexer). It doesn't detect the words and may mistakenly detect groups of sentences rather than single sentences.
-- RuleBasedLexer: Works best for English and French. Should do OK with other Indo-European languages. Not suited for languages such as Japanese or Chinese. Cannot be used as a fallback lexer.
+- RuleBasedLexer: Works best for English and French. Should do OK with other Indo-European languages. Not suitable for languages such as Japanese or Chinese. Cannot be used as a fallback lexer.
 
 ### Current Limitations
 
-- Has only been tested with DTBook documents;
-- The CSS inlining (in TTS modules) may be impacted by the partitioning of the content around the skippable elements;
-- Even if there are dictionaries of abbreviations, lexers encounter difficulties segmenting strings such as 'I like the U.S. John too.' (two sentences) and 'I like the G.R.R. Martin's books' (one sentence)
+- Has only been thoroughly tested on DTBook documents;
+- Even if there are dictionaries of abbreviations, lexers encounter difficulties in segmenting strings such as 'I like the U.S. John too.' (two sentences) and 'I like the G.R.R. Martin's books' (one sentence)
 - The NLP is not yet designed to allow word-level audio synchronization;
 - Some authors forget to add white spaces when there are already inline elements (e.g. span) to separate the words. Depending on the context, the break-detection steps can parse the text as if there were implicit spaces, although not always solicited by the authors.
 - Under certain circumstances, the break-detection step reorganizes the inline elements to keep the sentences where they should be (this lexing strategy is configurable though). This can have side effects on the CSS-based display and the meaning of the inline elements;
-- The general workflow makes the assumption that any @id added in the first stages will be left
-unchanged from the beginning to the end, i.e. the SMIL files generation.
 - Existing word elements are never kept;
-- Some of the existing sentence elements might be kept;
-- Lexicons (in TTS modules) wouldn't work well with elements that cannot contain sentences, such as the 'a' elements in dtbook110.
+- Some of the existing sentence elements might be discarded;
+- Lexicons (in TTS modules) wouldn't work well with elements that cannot contain word elements, such as the 'a' elements in dtbook110.
