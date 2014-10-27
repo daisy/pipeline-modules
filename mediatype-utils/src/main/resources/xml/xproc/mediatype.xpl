@@ -77,6 +77,7 @@
                             <p:pipe port="in-memory" step="main"/>
                         </p:input>
                     </p:split-sequence>
+                    <p:split-sequence test="position()=1" initial-only="true"/>
                 </p:group>
                 <p:count name="filecount-in-memory"/>
                 <p:identity>
