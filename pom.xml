@@ -32,7 +32,7 @@
     <!-- <module>epubcheck-adapter</module> -->
     <module>html-utils</module>
     <module>mediaoverlay-utils</module>
-    <!-- <module>odt-utils</module> -->
+    <module>odt-utils</module>
     <!-- <module>zedai-utils</module> -->
   </modules>
 
@@ -102,7 +102,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>odt-utils</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
