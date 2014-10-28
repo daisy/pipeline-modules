@@ -8,6 +8,7 @@
 
   <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/uri-functions.xsl"/>
 
+
   <!-- input: the fileset -->
   <!-- output: the the opf file -->
 
@@ -18,6 +19,7 @@
   <xsl:param name="lang"/>
   <xsl:param name="publisher"/>
   <xsl:param name="audio-only"/>
+  <xsl:param name="mathml-xslt-fallback" select="''"/>
 
   <xsl:template match="/">
     <xsl:variable name="has-audio" select="boolean(//d:file[contains(@media-type, 'audio')][1])"/>
@@ -42,6 +44,14 @@
 		content="{concat(
 			 if ($audio-only='true') then 'audio' else (if ($has-audio) then 'audio,text' else 'text'),
 			 if ($has-image) then ',image' else '')}"/>
+	  <xsl:if test="$mathml-xslt-fallback != ''">
+	    <meta name="z39-86-extension-version"
+		  scheme="http://www.w3.org/1998/Math/MathML"
+		  content="1.0" />
+	    <meta name="DTBook-XSLTFallback"
+		  scheme="http://www.w3.org/1998/Math/MathML"
+		  content="{pf:relativize-uri($mathml-xslt-fallback, $output-dir)}" />
+	  </xsl:if>
 	</x-metadata>
       </metadata>
       <manifest>

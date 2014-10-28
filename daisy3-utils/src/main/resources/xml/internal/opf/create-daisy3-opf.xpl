@@ -7,6 +7,10 @@
       <p:documentation>The fileset.</p:documentation>
     </p:input>
 
+    <p:output port="result" primary="true">
+      <p:documentation>The OPF file.</p:documentation>
+    </p:output>
+
     <p:option name="output-dir">
       <p:documentation xmlns="http://www.w3.org/1999/xhtml">
 	<p>Root directory URI common to all the files to package (NCX, smil etc.)</p>
@@ -45,13 +49,19 @@
 
     <p:option name="audio-only" required="false" select="'false'">
       <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-	<p>No reference to DTBook in SMIL files</p>
+        <p>No reference to DTBook in SMIL files</p>
       </p:documentation>
     </p:option>
 
     <p:option name="publisher"/>
 
-    <p:output port="result" primary="true"/>
+    <p:option name="mathml-xslt-fallback" select="''">
+      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+        <p>Fallback stylesheet for DAISY players (see DAISY specifications). Empty if no MathML</p>
+      </p:documentation>
+    </p:option>
+
+    <p:option name="publisher"/>
 
     <p:xslt>
       <p:input port="stylesheet">
@@ -64,6 +74,7 @@
       <p:with-param name="title" select="$title"/>
       <p:with-param name="total-time" select="$total-time"/>
       <p:with-param name="audio-only" select="$audio-only"/>
+      <p:with-param name="mathml-xslt-fallback" select="$mathml-xslt-fallback"/>
     </p:xslt>
 
     <p:add-attribute match="/*" attribute-name="xml:base">
