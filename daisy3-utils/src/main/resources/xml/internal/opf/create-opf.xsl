@@ -34,7 +34,7 @@
 	</dc-metadata>
 	<x-metadata>
 	  <meta name="dtb:multimediaType"
-		content="{if ($has-audio) then 'audioFullText' else 'textPartAudio'}"/>
+		content="{if ($has-audio) then 'audioFullText' else 'textNCX'}"/>
 	  <meta content="{$total-time}" name="dtb:totalTime"/>
 	  <meta content="{concat((if ($has-audio) then 'audio,' else ''),
 	  		         (if ($has-image) then 'image,' else ''),
