@@ -72,40 +72,72 @@
             <x:option name="doctype" select="'&lt;!DOCTYPE html&gt;'"/>
             <x:option name="href" select="resolve-uri('samples/set-doctype.with-doctype.xml',base-uri(.))"/>
         </x:call>
-        
+
         <x:context label="the stored document">
             <x:document type="file" base-uri="temp-dir" href="set-doctype.with-doctype.xml" method="text"/>
         </x:context>
         <x:expect label="the document should start with a xml declaration" type="xpath" test="starts-with(/*/text(),'&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;')"/>
         <x:expect label="the document should contain the correct DOCTYPE declaration" type="xpath" test="matches(/*/text(),'.*&lt;!DOCTYPE html&gt;.*&lt;html.*','s')"/>
     </x:scenario>
-    
+
     <x:scenario label="Scenario for testing px:set-doctype - without a xml declaration">
         <x:call step="test:test">
             <x:option name="target" select="resolve-uri('set-doctype.without-xml-declaration.xml',$temp-dir)"/>
             <x:option name="doctype" select="'&lt;!DOCTYPE html&gt;'"/>
             <x:option name="href" select="resolve-uri('samples/set-doctype.without-xml-declaration.xml',base-uri(.))"/>
         </x:call>
-        
+
         <x:context label="the stored document">
             <x:document type="file" base-uri="temp-dir" href="set-doctype.without-xml-declaration.xml" method="text"/>
         </x:context>
         <x:expect label="the document should not start with a xml declaration" type="xpath" test="not(starts-with(/*/text(),'&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;'))"/>
         <x:expect label="the document should contain the correct DOCTYPE declaration" type="xpath" test="matches(/*/text(),'.*&lt;!DOCTYPE html&gt;.*&lt;html.*','s')"/>
     </x:scenario>
-    
+
     <x:scenario label="Scenario for testing px:set-doctype - deleting an existing doctype declaration">
         <x:call step="test:test">
             <x:option name="target" select="resolve-uri('set-doctype.delete-existing.xml',$temp-dir)"/>
             <x:option name="doctype" select="''"/>
             <x:option name="href" select="resolve-uri('samples/set-doctype.without-xml-declaration.xml',base-uri(.))"/>
         </x:call>
-        
+
         <x:context label="the stored document">
             <x:document type="file" base-uri="temp-dir" href="set-doctype.delete-existing.xml" method="text"/>
         </x:context>
         <x:expect label="the document should not start with a xml declaration" type="xpath" test="not(starts-with(/*/text(),'&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;'))"/>
         <x:expect label="the document should not contain a DOCTYPE declaration" type="xpath" test="not(matches(/*/text(),'.*&lt;!DOCTYPE[^&gt;]*&gt;.*&lt;html.*','s'))"/>
+    </x:scenario>
+
+    <x:scenario label="Scenario for testing px:set-doctype - with a MathML doctype extension">
+        <x:call step="test:test">
+            <x:option name="target" select="resolve-uri('set-doctype.add-extension.xml',$temp-dir)"/>
+            <x:option name="doctype"
+		      select="'&lt;!DOCTYPE dtbook PUBLIC &quot;-//NISO//DTD dtbook 2005-2//EN&quot;
+	      &quot;http://www.daisy.org/z3986/2005/dtbook-2005-2.dtd&quot;[
+	      &lt;!ENTITY % MATHML.prefixed &quot;INCLUDE&quot; &gt;
+	      &lt;!ENTITY % MATHML.prefix &quot;m&quot;&gt;
+	      &lt;!ENTITY % MATHML.Common.attrib
+	      &quot;xlink:href    CDATA       #IMPLIED
+	      xlink:type     CDATA       #IMPLIED
+	      class          CDATA       #IMPLIED
+	      style          CDATA       #IMPLIED
+	      id             ID          #IMPLIED
+	      xref           IDREF       #IMPLIED
+	      other          CDATA       #IMPLIED
+	      xmlns:dtbook   CDATA       #FIXED ''http://www.daisy.org/z3986/2005/dtbook/''
+	      dtbook:smilref CDATA       #IMPLIED&quot;&gt;
+	      &lt;!ENTITY % mathML2 PUBLIC &quot;-//W3C//DTD MathML 2.0//EN&quot;
+	      &quot;http://www.w3.org/Math/DTD/mathml2/mathml2.dtd&quot;&gt;
+	      %mathML2;
+	      &lt;!ENTITY % externalFlow &quot;| m:math&quot;&gt;
+	      &lt;!ENTITY % externalNamespaces &quot;xmlns:m CDATA #FIXED
+	      ''http://www.w3.org/1998/Math/MathML''&quot;&gt;]&gt;'"/>
+            <x:option name="href" select="resolve-uri('samples/set-doctype.add-extension.xml',base-uri(.))"/>
+        </x:call>
+        <x:context label="the stored document">
+            <x:document type="file" base-uri="temp-dir" href="set-doctype.add-extension.xml" method="text"/>
+        </x:context>
+        <x:expect label="the document DOCTYPE should contain a MathML extension" type="xpath" test="matches(/*/text(),'.*&lt;!DOCTYPE.*MATHML\.Common.*&gt;.*&lt;html.*','s')"/>
     </x:scenario>
 
 </x:description>
