@@ -137,7 +137,8 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 			return;
 		}
 
-		ConfigReader cr = new ConfigReader(config.read());
+		VoiceConfigExtension configExt = new VoiceConfigExtension();
+		ConfigReader cr = new ConfigReader(config.read(), configExt);
 
 		String logEnabledProp = cr.getProperty("log");
 		boolean logEnabled = "true".equalsIgnoreCase(logEnabledProp) && mOutputDirOpt != null
@@ -162,7 +163,7 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 		audioOutputDir.deleteOnExit();
 
 		SSMLtoAudio ssmltoaudio = new SSMLtoAudio(audioOutputDir, mTTSRegistry, this,
-		        mAudioBufferTracker, mRuntime.getProcessor(), mURIresolver, cr, log);
+		        mAudioBufferTracker, mRuntime.getProcessor(), mURIresolver, configExt, log);
 
 		Iterable<SoundFileLink> soundFragments = Collections.EMPTY_LIST;
 		try {
