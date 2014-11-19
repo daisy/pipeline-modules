@@ -85,7 +85,7 @@
 	  <xsl:when test="count(current-group()) = 1 and local-name(current-group()[1]) = $output-subsentence-tag">
 	    <xsl:copy>
 	      <xsl:copy-of select="@*"/>
-	      <xsl:apply-templates select="current-group()[1]" mode="add-id">
+	      <xsl:apply-templates select="current-group()[self::*][1]" mode="add-id">
 		<xsl:with-param name="prefix" select="'sub'"/>
 	      </xsl:apply-templates>
 	      <xsl:apply-templates select="current-group()/node()" mode="copy"/>
@@ -94,8 +94,8 @@
 	  <!-- General case. -->
 	  <xsl:otherwise>
 	    <xsl:element name="{$output-subsentence-tag}" namespace="{$output-ns}">
-	      <xsl:apply-templates select="current-group()[1]" mode="add-id">
-		<xsl:with-param name="prefix" select="'sub'"/>
+	      <xsl:apply-templates select="current-group()[self::*][1]" mode="add-id">
+	      	<xsl:with-param name="prefix" select="'sub'"/>
 	      </xsl:apply-templates>
 	      <xsl:apply-templates select="current-group()" mode="copy"/>
 	    </xsl:element>

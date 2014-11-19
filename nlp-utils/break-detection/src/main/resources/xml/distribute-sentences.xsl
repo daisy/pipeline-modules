@@ -10,8 +10,10 @@
   <xsl:param name="tmp-word-tag"/>
   <xsl:param name="tmp-sentence-tag"/>
   <xsl:param name="can-contain-sentences"/>
+  <xsl:param name="cannot-be-sentence-child"/>
 
   <xsl:variable name="ok-parent-list" select="concat(',', $can-contain-sentences, ',')"/>
+  <xsl:variable name="no-sent-child" select="concat(',', $cannot-be-sentence-child, ',')"/>
 
   <!-- Copy the document until a sentence is found. -->
 
@@ -72,15 +74,29 @@
 
   <xsl:template name="new-sent-on-top-of-children">
     <xsl:param name="lang" select="''"/>
-    <xsl:element name="{$tmp-sentence-tag}" namespace="{$tmp-ns}">
-      <xsl:if test="$lang != ''">
-	<xsl:attribute namespace="http://www.w3.org/XML/1998/namespace" name="lang">
-	  <xsl:value-of select="$lang"/>
-	</xsl:attribute>
-      </xsl:if>
-      <xsl:copy-of select="node()"/> <!-- including the <tmp:word> nodes. -->
-    </xsl:element>
+    <xsl:for-each-group select="node()"
+			group-adjacent="self::text() or not(contains($no-sent-child, concat(',', local-name(.), ',')))">
+      <xsl:choose>
+	<xsl:when test="current-grouping-key()">
+	  <!-- assuming the tmp words are inserted at the lowest possible level. -->
+	  <xsl:element name="{$tmp-sentence-tag}" namespace="{$tmp-ns}">
+	    <xsl:if test="$lang != ''">
+	      <xsl:attribute namespace="http://www.w3.org/XML/1998/namespace" name="lang">
+		<xsl:value-of select="$lang"/>
+	      </xsl:attribute>
+	    </xsl:if>
+	    <xsl:copy-of select="current-group()"/> <!-- including the <tmp:word> nodes. -->
+	  </xsl:element>
+	</xsl:when>
+	<xsl:otherwise>
+	  <xsl:apply-templates select="current-group()" mode="split-sentence">
+	    <xsl:with-param name="lang" select="$lang"/>
+	  </xsl:apply-templates>
+	</xsl:otherwise>
+      </xsl:choose>
+    </xsl:for-each-group>
   </xsl:template>
+
 
 </xsl:stylesheet>
 

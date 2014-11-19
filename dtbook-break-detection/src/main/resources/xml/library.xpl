@@ -19,11 +19,23 @@
 
     <p:import href="http://www.daisy.org/pipeline/modules/nlp-break-detection/library.xpl" />
 
+
+    <!-- The 'can-contain-sentences' covers almost all possible
+         cases. We don't usually need to make a special case for nodes
+         that cannot be containED by sentences because those nodes are
+         children of nodes that cannot contain sentences,
+         e.g. headings are children of levels, which cannot contain
+         sentences, thus there is no way to insert 'sent' between
+         levels and headings. So most of the $cannot-be-sentence-child
+         are redundant, but some are necessary nonetheless
+         (e.g. linenum and epigraph). -->
+
     <px:break-and-reshape name="generic">
       <p:with-option name="inline-tags" select="'acronym,em,strong,a,abbr,dfn,linenum,pagenum,samp,span,sup,sub,w,noteref,br'"/>
       <p:with-option name="ensure-word-before" select="'acronym,span,linenum,pagenum,samp,noteref,abbr,acronym,br'"/>
       <p:with-option name="ensure-word-after" select="'acronym,span,linenum,pagenum,samp,noteref,abbr,acronym,br'"/>
       <p:with-option name="can-contain-sentences" select="'address,author,notice,prodnote,sidebar,line,em,strong,dfn,kdb,code,samp,cite,abbr,acronym,sub,sup,span,bdo,q,p,doctitle,docauthor,levelhd,hd,h1,h2,h3,h4,h5,h6,dt,dd,li,lic,caption,th,td,bridgehead,byline,covertitle,epigraph,dateline,a'"/>
+      <p:with-option name="cannot-be-sentence-child" select="'linenum,epigraph,td,th,tr,tfoot,thead,tbody,colgroup,col,list,li,lic,table,bridgehead,blockquote,dl,dd,div,title,author,sidebar,note,annotation,byline,dateline,linegroup,poem,p,doctitle,docauthor,covertitle,h1,h2,h3,h4,h5,h6,hd'"/>
       <p:with-option name="special-sentences" select="'pagenum,annoref,noteref,linenum'"/>
       <p:with-option name="output-ns" select="'http://www.daisy.org/z3986/2005/dtbook/'"/>
       <p:with-option name="output-word-tag" select="'w'"/>

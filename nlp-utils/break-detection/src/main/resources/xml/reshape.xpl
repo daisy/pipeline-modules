@@ -5,6 +5,7 @@
 		exclude-inline-prefixes="#all">
 
   <p:option name="can-contain-sentences" required="true"/>
+  <p:option name="cannot-be-sentence-child" required="false" select="''"/>
   <p:option name="special-sentences" required="false" select="''"/>
   <p:option name="output-word-tag" required="true"/>
   <p:option name="output-sentence-tag" required="true"/>
@@ -36,6 +37,7 @@
          child of an existing sentence. -->
     <p:with-param name="can-contain-sentences"
 		  select="concat($can-contain-sentences, ',', $output-sentence-tag)"/>
+    <p:with-param name="cannot-be-sentence-child" select="$cannot-be-sentence-child"/>
     <p:with-param name="tmp-word-tag" select="$tmp-word-tag"/>
     <p:with-param name="tmp-sentence-tag" select="$tmp-sentence-tag"/>
     <p:with-param name="tmp-ns" select="$tmp-ns"/>

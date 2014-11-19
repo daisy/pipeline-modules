@@ -15,6 +15,13 @@
     </p:documentation>
   </p:option>
 
+  <p:option name="cannot-be-sentence-child" required="false" select="''">
+    <p:documentation>
+      Comma-separated list of elements that cannot be contained by
+      sentence elements.
+    </p:documentation>
+  </p:option>
+
   <p:option name="special-sentences" required="false" select="''">
     <p:documentation>
       Comma-separated list of elements that cannot contain sentence
@@ -141,6 +148,7 @@
 
   <px:reshape name="reshape">
     <p:with-option name="can-contain-sentences" select="$can-contain-sentences"/>
+    <p:with-option name="cannot-be-sentence-child" select="$cannot-be-sentence-child"/>
     <p:with-option name="special-sentences" select="$special-sentences"/>
     <p:with-option name="output-word-tag" select="$output-word-tag"/>
     <p:with-option name="output-sentence-tag" select="$output-sentence-tag"/>

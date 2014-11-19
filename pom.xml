@@ -29,6 +29,6 @@
     <!-- <module>omnilang-lexer</module> -->
     <module>zedai-break-detection</module>
     <module>html-break-detection</module>
-    <!-- <module>dtbook-break-detection</module> -->
+    <module>dtbook-break-detection</module>
   </modules>
 </project>
