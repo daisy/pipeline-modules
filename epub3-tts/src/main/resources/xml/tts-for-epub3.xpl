@@ -96,6 +96,13 @@
     </p:documentation>
   </p:option>
 
+  <p:option name="output-dir" required="true">
+    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <h2 px:role="name">Output directory</h2>
+      <p px:role="desc">Output directory for log files or other things.</p>
+    </p:documentation>
+  </p:option>
+
   <p:import href="http://www.daisy.org/pipeline/modules/ssml-to-audio/library.xpl" />
   <p:import href="http://www.daisy.org/pipeline/modules/epub3-to-ssml/library.xpl" />
   <p:import href="http://www.daisy.org/pipeline/modules/html-break-detection/library.xpl"/>
@@ -209,6 +216,9 @@
 	<p:input port="config">
 	  <p:pipe port="config" step="main"/>
 	</p:input>
+	<p:with-option name="output-dir" select="$output-dir">
+	  <p:empty/>
+	</p:with-option>
       </px:ssml-to-audio>
     </p:otherwise>
   </p:choose>
