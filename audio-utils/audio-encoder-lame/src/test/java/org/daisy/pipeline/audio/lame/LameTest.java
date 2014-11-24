@@ -5,13 +5,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Random;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioFormat.Encoding;
 
 import org.daisy.pipeline.audio.AudioBuffer;
+import org.daisy.pipeline.audio.AudioEncoder;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -39,6 +42,11 @@ public class LameTest {
 			this.data = data;
 			this.size = size;
 		}
+	}
+
+	@Before
+	public void cleanProperties() {
+		System.setProperty("host.protection", "true");
 	}
 
 	private static byte[] mp3ToPCM(AudioFormat originalFormat, String mp3File)
@@ -69,8 +77,6 @@ public class LameTest {
 				f += "le";
 		}
 
-		System.out.println("using format = " + f);
-
 		//convert to PCM file with AVCONV
 		//TODO: check that it does not output WAV instead of PCM (the difference of size is rather suspicious)
 		ProcessBuilder ps = new ProcessBuilder("avconv", "-loglevel", "warning", "-i",
@@ -86,8 +92,6 @@ public class LameTest {
 		}
 		in.close();
 		p.waitFor();
-
-		System.out.println("avconv return value: " + p.waitFor());
 
 		return Files.toByteArray(pcmFile);
 	}
@@ -116,18 +120,24 @@ public class LameTest {
 
 		//dump the reference on the disk using Lame
 		lame = new LameEncoder();
-		mp3ref = lame.encode(Arrays.asList(ref), refFormat,
-		        new File(System.getProperty("java.io.tmpdir")), "mp3ref").get();
+		AudioEncoder.EncodingOptions opts = lame.parseEncodingOptions(Collections.EMPTY_MAP);
+		Optional<String> uri = lame.encode(Arrays.asList(ref), refFormat, new File(System
+		        .getProperty("java.io.tmpdir")), "mp3ref", opts);
+		if (!uri.isPresent())
+			throw new RuntimeException("Could not encode the reference mp3");
+		mp3ref = uri.get();
 	}
 
 	private boolean isValid(AudioFormat sourceFormat) throws IOException, InterruptedException {
+		AudioEncoder.EncodingOptions opts = lame.parseEncodingOptions(Collections.EMPTY_MAP);
+
 		//use avconv to create a new version of the PCM reference encoded with sourceFormat
 		byte[] audio = mp3ToPCM(sourceFormat, mp3ref);
 
 		//use lame to convert it to MP3
 		AudioBuffer b = new AudioBufferTest(audio, audio.length);
 		Optional<String> lameMp3 = lame.encode(Arrays.asList(b), sourceFormat, new File(System
-		        .getProperty("java.io.tmpdir")), "lametest");
+		        .getProperty("java.io.tmpdir")), "lametest", opts);
 
 		if (!lameMp3.isPresent()) {
 			System.err.println("Lame could not encode the data");
@@ -161,9 +171,14 @@ public class LameTest {
 		}
 		double error = ((double) minerror) / window;
 
-		System.out.println("error = " + error);
-
 		return (error < 10.0);
+	}
+
+	@Test
+	public void noHostProtection() throws IOException, InterruptedException {
+		System.setProperty("host.protection", "false");
+		boolean valid = isValid(new AudioFormat(8000, 8, 1, true, true));
+		Assert.assertTrue(valid);
 	}
 
 	@Test

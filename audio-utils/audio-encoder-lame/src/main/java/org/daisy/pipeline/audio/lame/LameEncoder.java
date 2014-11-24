@@ -9,6 +9,7 @@ import java.io.StringWriter;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
+import java.util.Map;
 
 import javax.sound.sampled.AudioFormat;
 
@@ -23,57 +24,19 @@ import com.google.common.base.Optional;
 
 public class LameEncoder implements AudioEncoder {
 
-	private Logger mLogger = LoggerFactory.getLogger(LameEncoder.class);
-
-	private static final String OutputFormat = ".mp3";
-	private String mLamePath;
-
-	public LameEncoder() throws Throwable {
-		try {
-			final String property = "lame.path";
-			mLamePath = System.getProperty(property);
-			if (mLamePath == null) {
-				Optional<String> lpath = BinaryFinder.find("lame");
-				if (!lpath.isPresent()) {
-					throw new RuntimeException("Cannot find lame in PATH and property "
-					        + property + " is not set");
-				}
-				mLamePath = lpath.get();
-			}
-			mLogger.info("Will use lame binary: " + mLamePath);
-
-			//check that the encoder can run
-			String[] cmd = new String[]{
-			        mLamePath, "--help"
-			};
-			Process p = null;
-			try {
-				p = Runtime.getRuntime().exec(cmd);
-				//read the output to prevent the process from sleeping
-				BufferedReader stdOut = new BufferedReader(new InputStreamReader(p
-				        .getInputStream()));
-				while ((stdOut.readLine()) != null) {
-				}
-				p.waitFor();
-			} catch (Exception e) {
-				if (p != null)
-					p.destroy();
-				throw e;
-			}
-		} catch (Throwable t) {
-			StringWriter writer = new StringWriter();
-			PrintWriter printWriter = new PrintWriter(writer);
-			t.printStackTrace(printWriter);
-			printWriter.flush();
-			mLogger.error("error in Lame initialization: " + t.getMessage() + ": "
-			        + writer.toString());
-			throw t;
-		}
+	static private class LameEncodingOptions implements EncodingOptions {
+		private String binpath;
+		private String[] cliOptions;
 	}
+
+	private Logger mLogger = LoggerFactory.getLogger(LameEncoder.class);
+	private static final String OutputFormat = ".mp3";
 
 	@Override
 	public Optional<String> encode(Iterable<AudioBuffer> pcm, AudioFormat audioFormat,
-	        File outputDir, String filePrefix) {
+	        File outputDir, String filePrefix, EncodingOptions options) {
+
+		LameEncodingOptions lameOpts = (LameEncodingOptions) options;
 
 		File encodedFile = new File(outputDir, filePrefix + OutputFormat);
 		String freq = String.valueOf((Float.valueOf(audioFormat.getSampleRate()) / 1000));
@@ -129,20 +92,22 @@ public class LameEncoder implements AudioEncoder {
 		//-mm: mono
 		//-: PCM read on the standard input
 		String[] cmdbegin = new String[]{
-		        mLamePath, "-r", "-s", freq, "--bitwidth", bitwidth, signedOpt, endianness,
-		        "-m", "m", "--silent"
+		        lameOpts.binpath, "-r", "-s", freq, "--bitwidth", bitwidth, signedOpt,
+		        endianness, "-m", "m", "--silent"
 		};
-		String[] custom = System.getProperty("lame.options", "").split(" ");
 		String[] cmdend = new String[]{
 		        "-", encodedFile.getAbsolutePath()
 		};
 
 		Process p = null;
 		try {
-			String[] cmd = new String[cmdbegin.length + custom.length + cmdend.length];
+			String[] cmd = new String[cmdbegin.length + lameOpts.cliOptions.length
+			        + cmdend.length];
 			System.arraycopy(cmdbegin, 0, cmd, 0, cmdbegin.length);
-			System.arraycopy(custom, 0, cmd, cmdbegin.length, custom.length);
-			System.arraycopy(cmdend, 0, cmd, cmdbegin.length + custom.length, cmdend.length);
+			System.arraycopy(lameOpts.cliOptions, 0, cmd, cmdbegin.length,
+			        lameOpts.cliOptions.length);
+			System.arraycopy(cmdend, 0, cmd, cmdbegin.length + lameOpts.cliOptions.length,
+			        cmdend.length);
 			mLogger.debug("Encoding command: {}", Joiner.on(' ').join(Arrays.asList(cmd)));
 			p = Runtime.getRuntime().exec(cmd);
 			BufferedOutputStream out = new BufferedOutputStream((p.getOutputStream()));
@@ -158,5 +123,56 @@ public class LameEncoder implements AudioEncoder {
 		}
 
 		return Optional.of(encodedFile.toURI().toString());
+	}
+
+	@Override
+	public EncodingOptions parseEncodingOptions(Map<String, String> params) {
+		LameEncodingOptions opts = new LameEncodingOptions();
+		opts.cliOptions = new String[0];
+		if ("false".equalsIgnoreCase(System.getProperty("host.protection", "true"))) {
+			//we don't want any random user to execute whatever he/she wants
+			opts.binpath = params.get("lame.path");
+			String cliextra = params.get("lame.cli.options");
+			if (cliextra != null) {
+				opts.cliOptions = cliextra.split(" ");
+			}
+		}
+		if (opts.binpath == null) {
+			Optional<String> lpath = BinaryFinder.find("lame");
+			if (lpath.isPresent())
+				opts.binpath = lpath.get();
+		}
+
+		return opts;
+	}
+
+	@Override
+	public void test(EncodingOptions options) throws Exception {
+		LameEncodingOptions lameOpts = (LameEncodingOptions) options;
+		if (lameOpts.binpath == null) {
+			throw new RuntimeException("Lame encoder not found.");
+		}
+		if (!new File(lameOpts.binpath).exists()) {
+			throw new RuntimeException(lameOpts.binpath + " not found");
+		}
+
+		//check that the encoder can run
+		String[] cmd = new String[]{
+		        lameOpts.binpath, "--help"
+		};
+		Process p = null;
+		try {
+			p = Runtime.getRuntime().exec(cmd);
+			//read the output to prevent the process from sleeping
+			BufferedReader stdOut = new BufferedReader(new InputStreamReader(p
+			        .getInputStream()));
+			while ((stdOut.readLine()) != null) {
+			}
+			p.waitFor();
+		} catch (Exception e) {
+			if (p != null)
+				p.destroy();
+			throw e;
+		}
 	}
 }

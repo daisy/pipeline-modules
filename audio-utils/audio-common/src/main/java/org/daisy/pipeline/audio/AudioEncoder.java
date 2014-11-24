@@ -1,14 +1,20 @@
 package org.daisy.pipeline.audio;
 
 import java.io.File;
+import java.util.Map;
 
 import javax.sound.sampled.AudioFormat;
 
 import com.google.common.base.Optional;
 
 public interface AudioEncoder {
+	interface EncodingOptions {
+
+	}
+
 	/**
-	 * Encode raw audio data into a single file (mp3 for instance).
+	 * Encode raw audio data into a single file (mp3 for instance). This method
+	 * must properly catch and handle thread interruptions.
 	 * 
 	 * @param pcm are the audio data. The method is allowed to modify the audio
 	 *            buffers (both their content and their size).
@@ -19,10 +25,28 @@ public interface AudioEncoder {
 	 * 
 	 * @param filePrefix is the prefix of the output sound filename.
 	 * 
+	 * @param options is the object returned by parseEncodingOptions()
+	 * 
 	 * @return the URI where the sound has been output. The extension (e.g.
 	 *         'mp3') is up to the encoder.
 	 * 
 	 */
 	Optional<String> encode(Iterable<AudioBuffer> pcm, AudioFormat audioFormat,
-	        File outputDir, String filePrefix);
+	        File outputDir, String filePrefix, EncodingOptions options);
+
+	/**
+	 * @param params stores the options in their raw format. Note that the map
+	 *            can contain more options than necessary. In such cases, the
+	 *            AudioEncoder must ignore them. In the particular case of the
+	 *            Daisy Pipeline, parseEncodingOptions() is called by
+	 *            ssml-to-audio with the TTS config file's properties as input.
+	 * @return non-null object containing the ready-to-use options.
+	 */
+	EncodingOptions parseEncodingOptions(Map<String, String> params);
+
+	/**
+	 * Test the encoder with the current options.
+	 */
+	void test(EncodingOptions options) throws Exception;
+
 }
