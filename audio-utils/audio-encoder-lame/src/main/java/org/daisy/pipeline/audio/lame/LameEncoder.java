@@ -4,6 +4,8 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -26,36 +28,46 @@ public class LameEncoder implements AudioEncoder {
 	private static final String OutputFormat = ".mp3";
 	private String mLamePath;
 
-	public LameEncoder() throws Exception {
-		final String property = "lame.path";
-		mLamePath = System.getProperty(property);
-		if (mLamePath == null) {
-			Optional<String> lpath = BinaryFinder.find("lame");
-			if (!lpath.isPresent()) {
-				throw new RuntimeException("Cannot find lame in PATH and " + property
-				        + " is not set");
-			}
-			mLamePath = lpath.get();
-		}
-		mLogger.info("Will use lame binary: " + mLamePath);
-
-		//check that the encoder can run
-		String[] cmd = new String[]{
-		        mLamePath, "--help"
-		};
-		Process p = null;
+	public LameEncoder() throws Throwable {
 		try {
-			p = Runtime.getRuntime().exec(cmd);
-			//read the output to prevent the process from sleeping
-			BufferedReader stdOut = new BufferedReader(new InputStreamReader(p
-			        .getInputStream()));
-			while ((stdOut.readLine()) != null) {
+			final String property = "lame.path";
+			mLamePath = System.getProperty(property);
+			if (mLamePath == null) {
+				Optional<String> lpath = BinaryFinder.find("lame");
+				if (!lpath.isPresent()) {
+					throw new RuntimeException("Cannot find lame in PATH and property "
+					        + property + " is not set");
+				}
+				mLamePath = lpath.get();
 			}
-			p.waitFor();
-		} catch (Exception e) {
-			if (p != null)
-				p.destroy();
-			throw new Exception(e);
+			mLogger.info("Will use lame binary: " + mLamePath);
+
+			//check that the encoder can run
+			String[] cmd = new String[]{
+			        mLamePath, "--help"
+			};
+			Process p = null;
+			try {
+				p = Runtime.getRuntime().exec(cmd);
+				//read the output to prevent the process from sleeping
+				BufferedReader stdOut = new BufferedReader(new InputStreamReader(p
+				        .getInputStream()));
+				while ((stdOut.readLine()) != null) {
+				}
+				p.waitFor();
+			} catch (Exception e) {
+				if (p != null)
+					p.destroy();
+				throw e;
+			}
+		} catch (Throwable t) {
+			StringWriter writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter(writer);
+			t.printStackTrace(printWriter);
+			printWriter.flush();
+			mLogger.error("error in Lame initialization: " + t.getMessage() + ": "
+			        + writer.toString());
+			throw t;
 		}
 	}
 

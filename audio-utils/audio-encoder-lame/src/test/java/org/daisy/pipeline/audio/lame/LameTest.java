@@ -98,7 +98,7 @@ public class LameTest {
 	private static LameEncoder lame;
 
 	@BeforeClass
-	public static void buildReference() throws Exception {
+	public static void buildReference() throws Throwable {
 		refFormat = new AudioFormat(8000, 8, 1, true, true); //8 bits signed big-endian (for easy comparisons)
 
 		ref = new AudioBufferTest(1024 * 100);
