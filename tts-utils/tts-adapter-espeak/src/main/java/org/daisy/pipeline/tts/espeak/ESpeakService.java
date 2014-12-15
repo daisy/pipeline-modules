@@ -14,12 +14,12 @@ public class ESpeakService extends AbstractTTSService {
 	public TTSEngine newEngine(Map<String, String> params) throws Throwable {
 		// settings
 		String prop = "espeak.path";
-		String eSpeakPath = params.get(prop);
+		String eSpeakPath = System.getProperty(prop);
 		if (eSpeakPath == null) {
 			Optional<String> epath = BinaryFinder.find("espeak");
 			if (!epath.isPresent()) {
 				throw new SynthesisException(
-				        "Cannot find eSpeak's binary and config property " + prop
+				        "Cannot find eSpeak's binary and system property " + prop
 				                + " is not set.");
 			}
 			eSpeakPath = epath.get();
