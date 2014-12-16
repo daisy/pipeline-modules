@@ -128,15 +128,24 @@ public class LameEncoder implements AudioEncoder {
 	@Override
 	public EncodingOptions parseEncodingOptions(Map<String, String> params) {
 		LameEncodingOptions opts = new LameEncodingOptions();
+		String lamePathProp = "lame.path";
+		opts.binpath = System.getProperty(lamePathProp);
+
 		opts.cliOptions = new String[0];
 		if ("false".equalsIgnoreCase(System.getProperty("host.protection", "true"))) {
-			//we don't want any random user to execute whatever he/she wants
-			opts.binpath = params.get("lame.path");
+			//we don't want any random user to use the output option to erase some
+			//important files
 			String cliextra = params.get("lame.cli.options");
 			if (cliextra != null) {
 				opts.cliOptions = cliextra.split(" ");
 			}
+
+			//non-official feature which can come in handy:
+			if (opts.binpath == null) {
+				opts.binpath = params.get(lamePathProp);
+			}
 		}
+
 		if (opts.binpath == null) {
 			Optional<String> lpath = BinaryFinder.find("lame");
 			if (lpath.isPresent())
