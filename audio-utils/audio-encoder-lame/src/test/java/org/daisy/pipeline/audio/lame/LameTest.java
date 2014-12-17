@@ -128,7 +128,7 @@ public class LameTest {
 		mp3ref = uri.get();
 	}
 
-	private boolean isValid(AudioFormat sourceFormat) throws IOException, InterruptedException {
+	private boolean isValid(AudioFormat sourceFormat) throws Throwable {
 		AudioEncoder.EncodingOptions opts = lame.parseEncodingOptions(Collections.EMPTY_MAP);
 
 		//use avconv to create a new version of the PCM reference encoded with sourceFormat
@@ -175,93 +175,93 @@ public class LameTest {
 	}
 
 	@Test
-	public void noHostProtection() throws IOException, InterruptedException {
+	public void noHostProtection() throws Throwable {
 		System.setProperty("host.protection", "false");
 		boolean valid = isValid(new AudioFormat(8000, 8, 1, true, true));
 		Assert.assertTrue(valid);
 	}
 
 	@Test
-	public void sampleRate8Khz() throws IOException, InterruptedException {
+	public void sampleRate8Khz() throws Throwable {
 		boolean valid = isValid(new AudioFormat(8000, 8, 1, true, true));
 		Assert.assertTrue(valid);
 	}
 
 	@Test
-	public void sampleRate16Khz() throws IOException, InterruptedException {
+	public void sampleRate16Khz() throws Throwable {
 		boolean valid = isValid(new AudioFormat(16000, 8, 1, true, true));
 		Assert.assertTrue(valid);
 	}
 
 	@Test
-	public void sampleRate32Khz() throws IOException, InterruptedException {
+	public void sampleRate32Khz() throws Throwable {
 		boolean valid = isValid(new AudioFormat(32000, 8, 1, true, true));
 		Assert.assertTrue(valid);
 	}
 
 	@Test
-	public void sampleRate48Khz() throws IOException, InterruptedException {
+	public void sampleRate48Khz() throws Throwable {
 		boolean valid = isValid(new AudioFormat(48000, 8, 1, true, true));
 		Assert.assertTrue(valid);
 	}
 
 	@Test
-	public void width16bits() throws IOException, InterruptedException {
+	public void width16bits() throws Throwable {
 		boolean valid = isValid(new AudioFormat(16000, 16, 1, true, true));
 		Assert.assertTrue(valid);
 	}
 
 	@Test
-	public void width32bits() throws IOException, InterruptedException {
+	public void width32bits() throws Throwable {
 		boolean valid = isValid(new AudioFormat(16000, 32, 1, true, true));
 		Assert.assertTrue(valid);
 	}
 
 	@Test
-	public void litteEndian16bits() throws IOException, InterruptedException {
+	public void litteEndian16bits() throws Throwable {
 		boolean valid = isValid(new AudioFormat(16000, 16, 1, true, false));
 		Assert.assertTrue(valid);
 	}
 
 	@Test
-	public void unsigned8bits() throws IOException, InterruptedException {
+	public void unsigned8bits() throws Throwable {
 		boolean valid = isValid(new AudioFormat(8000, 8, 1, false, true));
 		Assert.assertTrue(valid);
 	}
 
 	@Test
-	public void unsigned16bitsBigEndian() throws IOException, InterruptedException {
+	public void unsigned16bitsBigEndian() throws Throwable {
 		boolean valid = isValid(new AudioFormat(8000, 16, 1, false, true));
 		Assert.assertTrue(valid);
 	}
 
 	@Test
-	public void unsigned16bitsLittleEndian() throws IOException, InterruptedException {
+	public void unsigned16bitsLittleEndian() throws Throwable {
 		boolean valid = isValid(new AudioFormat(8000, 16, 1, false, false));
 		Assert.assertTrue(valid);
 	}
 
 	@Test
-	public void floatingpoint32bigEndian() throws IOException, InterruptedException {
+	public void floatingpoint32bigEndian() throws Throwable {
 		boolean valid = isValid(new AudioFormat(Encoding.PCM_FLOAT, 8000, 32, 1, 4, 8000, true));
 		Assert.assertTrue(valid);
 	}
 
 	@Test
-	public void floatingpoint32littleEndian() throws IOException, InterruptedException {
+	public void floatingpoint32littleEndian() throws Throwable {
 		boolean valid = isValid(new AudioFormat(Encoding.PCM_FLOAT, 8000, 32, 1, 4, 8000,
 		        false));
 		Assert.assertTrue(valid);
 	}
 
 	@Test
-	public void floatingpoint64bigEndian() throws IOException, InterruptedException {
+	public void floatingpoint64bigEndian() throws Throwable {
 		boolean valid = isValid(new AudioFormat(Encoding.PCM_FLOAT, 8000, 64, 1, 4, 8000, true));
 		Assert.assertTrue(valid);
 	}
 
 	@Test
-	public void floatingpoint64littleEndian() throws IOException, InterruptedException {
+	public void floatingpoint64littleEndian() throws Throwable {
 		boolean valid = isValid(new AudioFormat(Encoding.PCM_FLOAT, 8000, 64, 1, 4, 8000,
 		        false));
 		Assert.assertTrue(valid);

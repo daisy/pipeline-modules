@@ -8,7 +8,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Arrays;
 import java.util.Map;
 
 import javax.sound.sampled.AudioFormat;
@@ -19,7 +18,6 @@ import org.daisy.pipeline.audio.AudioEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 
 public class LameEncoder implements AudioEncoder {
@@ -34,7 +32,7 @@ public class LameEncoder implements AudioEncoder {
 
 	@Override
 	public Optional<String> encode(Iterable<AudioBuffer> pcm, AudioFormat audioFormat,
-	        File outputDir, String filePrefix, EncodingOptions options) {
+	        File outputDir, String filePrefix, EncodingOptions options) throws Throwable {
 
 		LameEncodingOptions lameOpts = (LameEncodingOptions) options;
 
@@ -108,7 +106,6 @@ public class LameEncoder implements AudioEncoder {
 			        lameOpts.cliOptions.length);
 			System.arraycopy(cmdend, 0, cmd, cmdbegin.length + lameOpts.cliOptions.length,
 			        cmdend.length);
-			mLogger.debug("Encoding command: {}", Joiner.on(' ').join(Arrays.asList(cmd)));
 			p = Runtime.getRuntime().exec(cmd);
 			BufferedOutputStream out = new BufferedOutputStream((p.getOutputStream()));
 			for (AudioBuffer b : pcm) {
@@ -116,10 +113,10 @@ public class LameEncoder implements AudioEncoder {
 			}
 			out.close();
 			p.waitFor();
-		} catch (Exception e) {
+		} catch (Throwable t) {
 			if (p != null)
 				p.destroy();
-			return Optional.absent();
+			throw t;
 		}
 
 		return Optional.of(encodedFile.toURI().toString());

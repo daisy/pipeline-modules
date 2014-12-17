@@ -14,7 +14,7 @@ public interface AudioEncoder {
 
 	/**
 	 * Encode raw audio data into a single file (mp3 for instance). This method
-	 * must properly catch and handle thread interruptions.
+	 * must forward any exceptions (including InterruptionException).
 	 * 
 	 * @param pcm are the audio data. The method is allowed to modify the audio
 	 *            buffers (both their content and their size).
@@ -28,11 +28,14 @@ public interface AudioEncoder {
 	 * @param options is the object returned by parseEncodingOptions()
 	 * 
 	 * @return the URI where the sound has been output. The extension (e.g.
-	 *         'mp3') is up to the encoder.
+	 *         'mp3') is up to the encoder. Returns an absent optional if an
+	 *         error occurs that cannot be easily transformed into a throwable
+	 *         exception.
+	 * @throws Throwable
 	 * 
 	 */
 	Optional<String> encode(Iterable<AudioBuffer> pcm, AudioFormat audioFormat,
-	        File outputDir, String filePrefix, EncodingOptions options);
+	        File outputDir, String filePrefix, EncodingOptions options) throws Throwable;
 
 	/**
 	 * @param params stores the options in their raw format. Note that the map
@@ -48,5 +51,4 @@ public interface AudioEncoder {
 	 * Test the encoder with the current options.
 	 */
 	void test(EncodingOptions options) throws Exception;
-
 }
