@@ -2,12 +2,12 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pf="http://www.daisy.org/ns/pipeline/functions" xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions"
     xmlns:xs="http://www.w3.org/2001/XMLSchema" exclude-result-prefixes="#all" version="2.0">
     <xsl:output indent="yes"/>
-    
+
     <xsl:function name="pf:numeric-is-roman" as="xs:boolean">
         <xsl:param name="roman" as="xs:string"/>
-        <xsl:value-of select="(for $char in string-to-codepoints($roman) return contains('MDCLXVI',upper-case(codepoints-to-string($char)))) = true()"/>
+        <xsl:value-of select="not((for $char in string-to-codepoints($roman) return contains('MDCLXVI',upper-case(codepoints-to-string($char)))) = false())"/>
     </xsl:function>
-    
+
     <xsl:function name="pf:numeric-roman-to-decimal" as="xs:integer">
         <xsl:param name="roman" as="xs:string"/>
         <!-- TODO: throw error for strings containing characters other than MDCLXVI (case insensitive), the seven characters still in use. -->
@@ -18,7 +18,7 @@
             select="for $i in 1 to count($hindu-sequence) return if (subsequence($hindu-sequence,$i+1) &gt; $hindu-sequence[$i]) then -$hindu-sequence[$i] else $hindu-sequence[$i]"/>
         <xsl:value-of select="sum($hindu-sequence-signed)"/>
     </xsl:function>
-    
+
     <xsl:function name="pf:numeric-decimal-to-roman" as="xs:string">
         <xsl:param name="hindu" as="xs:integer"/>
         <!-- TODO: throw error for non-positive integers -->
@@ -54,12 +54,12 @@
         <xsl:variable name="dec4" select="string-join(for $i in 1 to xs:integer(concat('0',string-join(reverse(subsequence($hindu-sequence,4)),''))) return 'M','')"/>
         <xsl:value-of select="concat($dec4,$dec3,$dec2,$dec1)"/>
     </xsl:function>
-    
+
     <xsl:function name="pf:numeric-alpha-to-decimal" as="xs:integer">
         <xsl:param name="alpha" as="xs:string"/>
         <xsl:sequence select="string-to-codepoints($alpha)-96"/>
     </xsl:function>
-    
+
     <!--<xsl:template match="/*" name="test">
         <tests>
             <is-roman>
@@ -171,5 +171,5 @@
             </hindu-to-roman>
         </tests>
     </xsl:template>-->
-    
+
 </xsl:stylesheet>
