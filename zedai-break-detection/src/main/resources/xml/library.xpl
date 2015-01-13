@@ -15,8 +15,6 @@
       <p:pipe port="sentence-ids" step="generic"/>
     </p:output>
 
-    <p:option name="split-skippable" select="'true'" required="false" />
-
     <p:import href="http://www.daisy.org/pipeline/modules/nlp-break-detection/library.xpl" />
     <px:break-and-reshape name="generic">
       <p:with-option name="inline-tags" select="'emph,span,ref,char,term,sub,sup,pagebreak,name,time,noteref,annoref,lnum,num,w,wpart,abbr'"/>
@@ -32,8 +30,6 @@
       <p:with-option name="output-ns" select="'http://www.daisy.org/ns/z3998/authoring/'"/>
       <p:with-option name="output-word-tag" select="'w'"/>
       <p:with-option name="output-sentence-tag" select="'s'"/>
-      <p:with-option name="split-skippable" select="$split-skippable"/>
-      <p:with-option name="skippable-tags" select="'noteref,annoref,lnum,ref'"/>
       <p:with-option name="output-subsentence-tag" select="'span'"/>
       <p:with-option name="special-sentences" select="'name,time'"/>
     </px:break-and-reshape>

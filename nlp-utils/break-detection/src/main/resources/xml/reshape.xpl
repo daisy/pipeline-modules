@@ -12,8 +12,6 @@
   <p:option name="word-attr" required="false" select="''"/>
   <p:option name="word-attr-val" required="false" select="''"/>
   <p:option name="output-ns" required="true"/>
-  <p:option name="split-skippable" required="false" select="'false'"/>
-  <p:option name="skippable-tags" required="false" select="''"/>
   <p:option name="output-subsentence-tag" required="true"/>
   <p:option name="tmp-ns" select="'http://www.daisy.org/ns/pipeline/tmp'"/>
   <p:option name="tmp-word-tag" select="'ww'"/>
@@ -65,30 +63,5 @@
       <p:document href="create-valid-breaks.xsl"/>
     </p:input>
   </p:xslt>
-
-  <!-- split the content around the skippable elements -->
-  <p:choose name="split">
-    <p:when test="$split-skippable = 'true'">
-      <p:output port="result"/>
-      <p:xslt>
-	<p:input port="source">
-	  <p:pipe port="result" step="create-valid"/>
-	  <p:pipe port="secondary" step="create-valid"/> <!-- sentence ids -->
-	</p:input>
-	<p:with-param name="can-contain-subsentences" select="concat($can-contain-sentences, ',', $output-sentence-tag)"/>
-	<p:with-param name="output-ns" select="$output-ns"/>
-	<p:with-param name="skippable-tags" select="$skippable-tags"/>
-	<p:with-param name="output-subsentence-tag" select="$output-subsentence-tag"/>
-	<p:with-param name="id-prefix" select="$id-prefix"/>
-	<p:input port="stylesheet">
-	  <p:document href="split-around-skippable.xsl"/>
-	</p:input>
-      </p:xslt>
-    </p:when>
-    <p:otherwise>
-      <p:output port="result"/>
-      <p:identity/>
-    </p:otherwise>
-  </p:choose>
 
 </p:declare-step>

@@ -84,15 +84,6 @@
   </p:option>
   <p:option name="ensure-sentence-after" required="false" select="''"/>
 
-  <p:option name="split-skippable" required="false" select="'false'">
-    <p:documentation>
-      If this option is enable, the script will wrap the nodes around
-      the elements of 'skippable-tags' with a node of type given by
-      'output-subsentence-tag'. The standard must allow the elements
-      of 'output-subsentence-tag' to hold an ID.
-    </p:documentation>
-  </p:option>
-
   <p:option name="id-prefix" required="false" select="''">
     <p:documentation>
       Generated IDs will be prefixed with this option so as to prevent
@@ -102,7 +93,6 @@
     </p:documentation>
   </p:option>
 
-  <p:option name="skippable-tags" required="false" select="''"/>
   <p:option name="output-subsentence-tag" required="true"/>
   <p:option name="exclusive-word-tag" select="'true'"/>
   <p:option name="exclusive-sentence-tag" select="'true'"/>
@@ -155,8 +145,6 @@
     <p:with-option name="word-attr" select="$word-attr"/>
     <p:with-option name="word-attr-val" select="$word-attr-val"/>
     <p:with-option name="output-ns" select="$output-ns"/>
-    <p:with-option name="split-skippable" select="$split-skippable"/>
-    <p:with-option name="skippable-tags" select="$skippable-tags"/>
     <p:with-option name="output-subsentence-tag" select="$output-subsentence-tag"/>
     <p:with-option name="tmp-ns" select="$tmp-ns"/>
     <p:with-option name="tmp-word-tag" select="$tmp-word-tag"/>

@@ -15,8 +15,6 @@
       <p:pipe port="sentence-ids" step="generic"/>
     </p:output>
 
-    <p:option name="split-skippable" select="'true'" required="false" />
-
     <p:import href="http://www.daisy.org/pipeline/modules/nlp-break-detection/library.xpl" />
 
 
@@ -40,8 +38,6 @@
       <p:with-option name="output-ns" select="'http://www.daisy.org/z3986/2005/dtbook/'"/>
       <p:with-option name="output-word-tag" select="'w'"/>
       <p:with-option name="output-sentence-tag" select="'sent'"/>
-      <p:with-option name="split-skippable" select="$split-skippable"/>
-      <p:with-option name="skippable-tags" select="'pagenum,noteref,annoref,linenum'"/>
       <p:with-option name="output-subsentence-tag" select="'span'"/>
     </px:break-and-reshape>
 
