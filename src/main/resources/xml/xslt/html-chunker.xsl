@@ -36,7 +36,10 @@
       <xsl:result-document href="{replace(base-uri($doc/*),'([^/]+)$',f:chunk-name(.))}">
         <html>
           <xsl:copy-of select="$doc/html/((@* except @xml:base) | namespace::*)"/>
-          <xsl:apply-templates select="$doc/html/head"/>
+          <xsl:apply-templates select="$doc/html/head">
+            <xsl:with-param name="title"
+              select="string(((//h1)[1],(//h2)[1],$doc/html/head/title)[1])" tunnel="yes"/>
+          </xsl:apply-templates>
           <body>
             <!-- TODO: try to not "depend" on the TTS namespace here -->
             <xsl:copy-of select="$doc/html/body/@tts:*|/*/@*"/>
@@ -45,6 +48,14 @@
         </html>
       </xsl:result-document>
     </xsl:for-each>
+  </xsl:template>
+  
+  <xsl:template match="title">
+    <xsl:param name="title" tunnel="yes"/>
+    <title>
+      <xsl:apply-templates select="@*"/>
+      <xsl:sequence select="$title"/>    
+    </title>
   </xsl:template>
 
 
