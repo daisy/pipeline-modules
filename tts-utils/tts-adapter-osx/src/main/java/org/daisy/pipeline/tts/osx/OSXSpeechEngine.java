@@ -137,8 +137,9 @@ public class OSXSpeechEngine extends TTSEngine {
 			scanner = new Scanner(is);
 			while (scanner.hasNextLine()) {
 				mr.reset(scanner.nextLine());
-				mr.find();
-				result.add(new Voice(getProvider().getName(), mr.group(1).trim()));
+				if (mr.find()) {
+					result.add(new Voice(getProvider().getName(), mr.group(1).trim()));
+				}
 			}
 			is.close();
 			proc.waitFor();
