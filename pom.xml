@@ -23,7 +23,7 @@
     <!-- <module>asciimath-utils</module> -->
     <!-- <module>common-entities</module> -->
     <!-- <module>css-utils</module> -->
-    <!-- <module>daisy202-utils</module> -->
+    <module>daisy202-utils</module>
     <module>daisy3-utils</module>
     <!-- <module>dtbook-utils</module> -->
     <module>epub3-nav-utils</module>
@@ -57,7 +57,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>daisy202-utils</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
