@@ -12,7 +12,7 @@
 
   <groupId>org.daisy.pipeline.modules</groupId>
   <artifactId>nlp-modules-aggregator</artifactId>
-  <version>2-SNAPSHOT</version>
+  <version>1.9</version>
   <packaging>pom</packaging>
 
   <name>DAISY Pipeline 2 :: NLP Modules Aggregator POM</name>
@@ -31,4 +31,8 @@
     <module>html-break-detection</module>
     <!-- <module>dtbook-break-detection</module> -->
   </modules>
+
+  <scm>
+    <tag>v1.9</tag>
+  </scm>
 </project>
