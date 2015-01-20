@@ -12,7 +12,7 @@
 
   <groupId>org.daisy.pipeline.modules</groupId>
   <artifactId>script-utils-aggregator</artifactId>
-  <version>1.9-SNAPSHOT</version>
+  <version>1.9</version>
   <packaging>pom</packaging>
 
   <name>DAISY Pipeline 2 :: Aggregator POM for the Script Utility Modules</name>
@@ -57,12 +57,12 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>daisy202-utils</artifactId>
-        <version>1.0.2-SNAPSHOT</version>
+        <version>1.0.2</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>daisy3-utils</artifactId>
-        <version>1.1.1-SNAPSHOT</version>
+        <version>1.1.1</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
@@ -72,7 +72,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>epub3-nav-utils</artifactId>
-        <version>1.0.3-SNAPSHOT</version>
+        <version>1.0.3</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
@@ -82,7 +82,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>epub3-pub-utils</artifactId>
-        <version>1.0.2-SNAPSHOT</version>
+        <version>1.0.2</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
@@ -92,17 +92,17 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>html-utils</artifactId>
-        <version>2.0.1-SNAPSHOT</version>
+        <version>2.0.1</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>mediaoverlay-utils</artifactId>
-        <version>1.1.0-SNAPSHOT</version>
+        <version>1.1.0</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>odt-utils</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>1.0.1</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
@@ -111,4 +111,8 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+
+  <scm>
+    <tag>v1.9</tag>
+  </scm>
 </project>

@@ -11,8 +11,12 @@
   </parent>
 
   <artifactId>daisy202-utils</artifactId>
-  <version>1.0.2-SNAPSHOT</version>
+  <version>1.0.2</version>
   <packaging>bundle</packaging>
 
   <name>DAISY Pipeline 2 module :: DAISY 2.02 Utils</name>
+
+  <scm>
+    <tag>v1.9</tag>
+  </scm>
 </project>
