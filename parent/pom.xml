@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>nlp-modules-parent</artifactId>
-  <version>1.9</version>
+  <version>1.9.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>DAISY Pipeline 2 :: NLP Modules Parent POM</name>
@@ -34,8 +34,4 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-
-  <scm>
-    <tag>v1.9</tag>
-  </scm>
 </project>
