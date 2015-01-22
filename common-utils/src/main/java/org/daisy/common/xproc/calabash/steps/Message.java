@@ -30,7 +30,8 @@ public class Message implements XProcStepProvider {
 			if ("WARN".equals(severity)) {
 				warning(this.step.getNode(), message);
 			} else if ("DEBUG".equals(severity)) {
-				fine(this.step.getNode(), message);
+				// DefaultStep#fine() removed in ndw/xmlcalabash1@ce9b07d
+				this.runtime.getMessageListener().fine(this,this.step.getNode(), message);
 			} else {
 				info(this.step.getNode(), message);
 			}

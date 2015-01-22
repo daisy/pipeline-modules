@@ -16,8 +16,13 @@ public class Mocks  {
 	}
 
 	public static XAtomicStep getAtomicStep( XProcRuntime runtime){
-		Step step = new Step(runtime,null,new QName("","qname"),"name");
-		return new XAtomicStep(runtime,step,null);
+		Step step = new Step(runtime,null,new QName("","qname"),"name");		
+		return new XAtomicStep(runtime,step,null) {
+
+		    public QName getType() {
+		        return new QName("","qname");
+		    }
+		};
 	}
 
 	static class MyConf extends XProcConfiguration{
