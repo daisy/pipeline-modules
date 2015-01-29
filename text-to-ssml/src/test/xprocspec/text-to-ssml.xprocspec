@@ -4,6 +4,7 @@
 	       xmlns="http://www.w3.org/2001/10/synthesis"
 	       xmlns:tmp="http://www.daisy.org/ns/pipeline/tts"
 	       xmlns:d="http://www.daisy.org/ns/pipeline/data"
+	       xmlns:m="http://www.w3.org/1998/Math/MathML"
                script="../../main/resources/xml/xproc/text-to-ssml.xpl">
 
 
@@ -63,13 +64,9 @@
 	  <speak version="1.1">
 	    <s id="s1" xml:lang="en"><token>xzy</token></s>
 	  </speak>
-	  <speak version="1.1">
-	    <!-- SSML for skippable elements -->
-	  </speak>
 	</x:document>
       </x:expect>
     </x:scenario>
-
 
     <x:scenario label="basic transformation with 1 skippable structure">
       <x:call step="px:text-to-ssml">
@@ -77,11 +74,11 @@
 	  <x:document type="inline">
 	    <dt:dtbook xml:lang="en">
 	      <dt:sent id="s1">
-		<dt:span id="s1"><dt:w>text1</dt:w></dt:span>
+		<dt:span id="sp1"><dt:w>text1</dt:w></dt:span>
 		<dt:span>
 		  <dt:pagenum id="sk1">13</dt:pagenum>
 		</dt:span>
-		<dt:span id="s2"><dt:w>text2</dt:w></dt:span>
+		<dt:span id="sp2"><dt:w>text2</dt:w></dt:span>
 	      </dt:sent>
 	    </dt:dtbook>
 	  </x:document>
@@ -93,9 +90,7 @@
       <x:expect label="result" type="compare">
 	<x:document type="inline">
 	  <speak version="1.1">
-	    <s id="s1" xml:lang="en"><token>text1</token> <mark name="s1___s2"/> <token>text2</token></s>
-	  </speak>
-	  <speak version="1.1">
+	    <s id="s1" xml:lang="en"><token>text1</token> <mark name="sp1___sp2"/> <token>text2</token></s>
 	    <s id="sk1" xml:lang="en">13</s>
 	  </speak>
 	</x:document>
@@ -108,15 +103,15 @@
 	  <x:document type="inline">
 	    <dt:dtbook xml:lang="en">
 	      <dt:sent id="s1">
-		<dt:span id="s1"><dt:w>text1</dt:w></dt:span>
+		<dt:span id="sp1"><dt:w>text1</dt:w></dt:span>
 		<dt:span>
 		  <dt:pagenum id="sk1">13</dt:pagenum>
 		</dt:span>
-		<dt:span id="s2"><dt:w>text2</dt:w></dt:span>
+		<dt:span id="sp2"><dt:w>text2</dt:w></dt:span>
 		<dt:span>
 		  <dt:pagenum id="sk2">14</dt:pagenum>
 		</dt:span>
-		<dt:span id="s3"><dt:w>text3</dt:w></dt:span>
+		<dt:span id="sp3"><dt:w>text3</dt:w></dt:span>
 	      </dt:sent>
 	    </dt:dtbook>
 	  </x:document>
@@ -142,7 +137,7 @@
 	<x:input port="content.in">
 	  <x:document type="inline">
 	    <dt:dtbook xml:lang="en">
-	      <dt:pagenum id="s1">1</dt:pagenum>
+	      <dt:pagenum id="s1"><dt:w>1</dt:w></dt:pagenum>
 	    </dt:dtbook>
 	  </x:document>
 	</x:input>
@@ -160,10 +155,7 @@
       <x:expect label="result" type="compare">
 	<x:document type="inline">
 	  <speak version="1.1">
-	    <s id="s1" xml:lang="en">1</s>
-	  </speak>
-	  <speak version="1.1">
-	    <!-- SSML for skippable elements -->
+	    <s id="s1" xml:lang="en"><token>1</token></s>
 	  </speak>
 	</x:document>
       </x:expect>
@@ -189,9 +181,6 @@
 	<x:document type="inline">
 	  <speak version="1.1">
 	    <s id="s1" xml:lang="fr"><token>sentence</token></s>
-	  </speak>
-	  <speak version="1.1">
-	    <!-- SSML for skippable elements -->
 	  </speak>
 	</x:document>
       </x:expect>
@@ -227,9 +216,6 @@
 		</prosody>
 	      </prosody>
 	    </s>
-	  </speak>
-	  <speak version="1.1">
-	    <!-- SSML for skippable elements -->
 	  </speak>
 	</x:document>
       </x:expect>
@@ -269,9 +255,6 @@
   	      </prosody>
   	    </s>
   	  </speak>
-	  <speak version="1.1">
-	    <!-- SSML for skippable elements -->
-	  </speak>
 	</x:document>
       </x:expect>
     </x:scenario>
@@ -301,9 +284,6 @@
   	      </prosody>
   	    </s>
   	  </speak>
-	  <speak version="1.1">
-	    <!-- SSML for skippable elements -->
-	  </speak>
 	</x:document>
       </x:expect>
     </x:scenario>
@@ -493,9 +473,6 @@
   	      <prosody volume="1"><token>sentence</token></prosody>
   	    </s>
   	  </speak>
-	  <speak version="1.1">
-	    <!-- SSML for skippable elements -->
-	  </speak>
 	</x:document>
       </x:expect>
     </x:scenario>
@@ -550,9 +527,6 @@
   	      <token>word1</token> <token>word2</token>
   	    </s>
   	  </speak>
-	  <speak version="1.1">
-	    <!-- SSML for skippable elements -->
-	  </speak>
 	</x:document>
       </x:expect>
     </x:scenario>
@@ -585,9 +559,6 @@
   	    <s id="s4" xml:lang="en" voice-selector1="att" voice-age="16" voice-gender="male"><token>sentence4</token></s>
   	    <s id="s5" xml:lang="en" voice-age="15" voice-gender="female"><token>sentence5</token></s>
   	  </speak>
-	  <speak version="1.1">
-	    <!-- SSML for skippable elements -->
-	  </speak>
 	</x:document>
       </x:expect>
     </x:scenario>
@@ -617,9 +588,6 @@
   	    <s id="s2" xml:lang="en"><say-as interpret-as="ordinal"><token>sentence2</token></say-as></s>
   	    <s id="s3" xml:lang="en"><say-as interpret-as="cardinal"><token>sentence3</token></say-as></s>
   	  </speak>
-	  <speak version="1.1">
-	    <!-- SSML for skippable elements -->
-	  </speak>
 	</x:document>
       </x:expect>
     </x:scenario>
@@ -644,9 +612,6 @@
   	  <speak version="1.1">
   	    <s id="s1" xml:lang="en"><break time="10"/><token>sentence</token></s>
   	  </speak>
-	  <speak version="1.1">
-	    <!-- SSML for skippable elements -->
-	  </speak>
 	</x:document>
       </x:expect>
     </x:scenario>
@@ -671,9 +636,6 @@
   	  <speak version="1.1">
   	    <s id="s1" xml:lang="en"><token>sentence</token><break time="10"/></s>
   	  </speak>
-	  <speak version="1.1">
-	    <!-- SSML for skippable elements -->
-	  </speak>
 	</x:document>
       </x:expect>
     </x:scenario>
@@ -718,12 +680,71 @@
   	      <audio src="/foo/beep3.mp3"/>
   	    </s>
   	  </speak>
+	</x:document>
+      </x:expect>
+    </x:scenario>
+
+    <x:scenario label="Standalone MathML">
+      <x:call step="px:text-to-ssml">
+	<x:input port="content.in">
+	  <x:document type="inline">
+	    <dt:dtbook xml:lang="en">
+	      <m:math id="s1"><m:mi>x</m:mi></m:math>
+	      <dt:sent id="s2"><dt:w>regular</dt:w></dt:sent>
+	    </dt:dtbook>
+	  </x:document>
+	</x:input>
+      </x:call>
+      <x:context label="result">
+	<x:document type="port" port="result"/>
+      </x:context>
+      <x:expect label="result" type="compare">
+	<x:document type="inline">
 	  <speak version="1.1">
-	    <!-- SSML for skippable elements -->
+	    <s id="s1" xml:lang="en"> x </s>
+	    <s id="s2" xml:lang="en">
+              <token>regular</token>
+	    </s>
 	  </speak>
 	</x:document>
       </x:expect>
     </x:scenario>
+
+    <x:scenario label="Skippable MathML">
+      <x:call step="px:text-to-ssml">
+	<x:input port="content.in">
+	  <x:document type="inline">
+	    <dt:dtbook xml:lang="en">
+	      <dt:sent id="s1">
+		<dt:span id="sp1"><dt:w>before</dt:w></dt:span>
+		<m:math id="sk1"><m:mi>x</m:mi></m:math>
+		<dt:span id="sp2"><dt:w>after</dt:w></dt:span>
+	      </dt:sent>
+	      <dt:sent id="s2"><dt:w>regular</dt:w></dt:sent>
+	    </dt:dtbook>
+	  </x:document>
+	</x:input>
+      </x:call>
+      <x:context label="result">
+	<x:document type="port" port="result"/>
+      </x:context>
+      <x:expect label="result" type="compare">
+	<x:document type="inline">
+	  <speak version="1.1">
+	     <s id="s1" xml:lang="en">
+               <token>before</token>
+               <mark name="sp1___sp2"/>
+               <token>after</token>
+	     </s>
+	     <s id="sk1" xml:lang="en"> x </s>
+	     <s id="s2" xml:lang="en">
+               <token>regular</token>
+	     </s>
+	  </speak>
+	</x:document>
+      </x:expect>
+    </x:scenario>
+
 
   </x:scenario>
 
