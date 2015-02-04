@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+    <uri name="http://www.daisy.org/pipeline/modules/common-utils/library.xpl" uri="../mock/xproc/common-utils.xpl"/>
+    <uri name="http://www.daisy.org/pipeline/modules/file-utils/library.xpl" uri="../mock/xproc/file-utils.xpl"/>
+    <uri name="http://www.daisy.org/pipeline/modules/html-utils/library.xpl" uri="../mock/xproc/html-utils.xpl"/>
+    <uri name="http://www.daisy.org/pipeline/modules/zip-utils/library.xpl" uri="../mock/xproc/zip-utils.xpl"/>
+    <uri name="http://www.daisy.org/pipeline/modules/file-utils/uri-functions.xsl" uri="../mock/xslt/uri-functions.xsl"/>
+</catalog>

@@ -15,8 +15,8 @@
   <p:option name="load-if-not-in-memory" select="'true'"/>
   <p:option name="method" select="''"/>
 
+  <p:import href="fileset-library.xpl"/>
   <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl"/>
-  <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
   <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl"/>
   <p:import href="http://www.daisy.org/pipeline/modules/zip-utils/library.xpl"/>
   <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>

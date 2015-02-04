@@ -19,9 +19,17 @@ File =
     element d:file {
         common.attributes,
         attribute href { xsd:anyURI },
-        attribute media-type { text }?
+        attribute original-href { xsd:anyURI }?,
+        attribute media-type { text }?,
+        FileRef*
     }
-    
+
+FileRef =
+    element d:ref {
+        common.attributes,
+        attribute href { xsd:anyURI }
+    }
+
 # ============================================================
 
 _any.attr = attribute * { text }
