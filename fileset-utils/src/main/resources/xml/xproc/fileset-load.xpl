@@ -112,42 +112,11 @@
             </px:message>
             <p:for-each name="for-each-in-memory">
               <p:iteration-source>
-                <p:pipe port="in-memory" step="main"/>
+                <p:pipe port="in-memory" step="normalized"/>
               </p:iteration-source>
-              <p:xslt name="normalized-base-uri">
-                <p:with-param name="href" select="base-uri(/*)"/>
-                <p:input port="stylesheet">
-                  <p:inline>
-                    <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pf="http://www.daisy.org/ns/pipeline/functions" version="2.0" exclude-result-prefixes="#all">
-                      <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/uri-functions.xsl"/>
-                      <xsl:param name="href" required="yes"/>
-                      <xsl:template match="/*">
-                        <d:file href="{pf:normalize-uri($href)}"/>
-                      </xsl:template>
-                    </xsl:stylesheet>
-                  </p:inline>
-                </p:input>
-              </p:xslt>
               <p:choose>
-                <p:when test="/*/@href=$target">
-                  <!-- set normalized xml base -->
-                  <p:add-attribute match="/*" attribute-name="xml:base">
-                    <p:with-option name="attribute-value" select="$target"/>
-                    <p:input port="source">
-                      <p:pipe port="current" step="for-each-in-memory"/>
-                    </p:input>
-                  </p:add-attribute>
-                  <p:choose>
-                    <p:xpath-context>
-                      <p:pipe port="current" step="for-each-in-memory"/>
-                    </p:xpath-context>
-                    <p:when test="/*[@xml:base]">
-                      <p:identity/>
-                    </p:when>
-                    <p:otherwise>
-                      <p:delete match="/*/@xml:base"/>
-                    </p:otherwise>
-                  </p:choose>
+                <p:when test="base-uri(/*)=$target">
+                  <p:identity/>
                 </p:when>
                 <p:otherwise>
                   <p:identity>
@@ -349,7 +318,8 @@
     <p:otherwise>
       <p:output port="result" sequence="true"/>
       <!-- no files matched filter criteria (or fileset empty) -->
-      <p:variable name="file-not-found-message" select="if (not($href='')) then concat('File is not part of fileset: ',$href) else 'Fileset empty or no files matched filter criteria. No files loaded.'"/>
+      <p:variable name="file-not-found-message"
+        select="if (not($href='')) then concat('File is not part of fileset: ',$href) else 'Fileset empty or no files matched filter criteria. No files loaded.'"/>
       <p:choose>
         <p:when test="not($href='') and $fail-on-not-found='true'">
           <p:in-scope-names name="vars"/>
@@ -385,20 +355,94 @@
   </p:choose>
   <p:sink/>
 
-  <px:fileset-create name="fileset.in-memory-base" base="/"/>
+  <!-- URI normalization -->
+  <px:fileset-create>
+    <p:with-option name="base" select="base-uri(/*)">
+      <p:pipe port="fileset" step="main"/>
+    </p:with-option>
+  </px:fileset-create>
+  <px:message severity="DEBUG" message="Initialized in-memory fileset with xml:base=&quot;$1&quot;">
+    <p:with-option name="param1" select="base-uri(/*)"/>
+  </px:message>
+  <p:identity name="fileset.in-memory-base"/>
   <p:sink/>
-  <p:for-each>
+  <p:for-each name="normalized">
+    <p:output port="in-memory" sequence="true">
+      <p:pipe port="result" step="normalized.in-memory"/>
+    </p:output>
+    <p:output port="filesets" sequence="true" primary="true">
+      <p:pipe port="result" step="normalized.fileset"/>
+    </p:output>
+
     <p:iteration-source>
       <p:pipe port="in-memory" step="main"/>
     </p:iteration-source>
-    <px:fileset-add-entry>
-      <p:with-option name="href" select="resolve-uri(base-uri(/*))"/>
+
+    <p:variable name="base-uri" select="resolve-uri(base-uri(/*))"/>
+
+    <px:fileset-add-entry name="normalized.fileset">
+      <p:with-option name="href" select="$base-uri"/>
       <p:input port="source">
         <p:pipe port="result" step="fileset.in-memory-base"/>
       </p:input>
     </px:fileset-add-entry>
+
+    <p:choose>
+      <p:when test="/d:fileset/d:file/resolve-uri(@href, base-uri()) != $base-uri">
+        <!-- document has incorrect base URI; let's fix it -->
+        <p:add-attribute match="/*" attribute-name="xml:base">
+          <p:with-option name="attribute-value" select="$base-uri"/>
+          <p:input port="source">
+            <p:pipe port="current" step="normalized"/>
+          </p:input>
+        </p:add-attribute>
+        <p:choose>
+          <p:xpath-context>
+            <p:pipe port="current" step="normalized"/>
+          </p:xpath-context>
+          <p:when test="/*[@xml:base]">
+            <!-- keep xml:base attribute -->
+            <p:identity/>
+          </p:when>
+          <p:otherwise>
+            <!-- don't keep xml:base attribute -->
+            <p:delete match="/*/@xml:base"/>
+          </p:otherwise>
+        </p:choose>
+
+      </p:when>
+      <p:otherwise>
+        <!-- document has correct base URI already -->
+        <p:identity>
+          <p:input port="source">
+            <p:pipe port="current" step="normalized"/>
+          </p:input>
+        </p:identity>
+
+      </p:otherwise>
+    </p:choose>
+    <p:identity name="normalized.in-memory"/>
+    <p:sink/>
+
   </p:for-each>
-  <px:fileset-join name="fileset.in-memory"/>
+
+  <p:wrap-sequence wrapper="d:fileset"/>
+  <p:choose>
+    <p:when test="count(distinct-values(/*/*/base-uri())) = 1">
+      <p:add-attribute match="/*" attribute-name="xml:base">
+        <p:with-option name="attribute-value" select="/*/*[1]/base-uri()"/>
+      </p:add-attribute>
+      <p:unwrap match="/*/*"/>
+    </p:when>
+    <p:otherwise>
+      <px:fileset-join>
+        <p:input port="source">
+          <p:pipe port="filesets" step="normalized"/>
+        </p:input>
+      </px:fileset-join>
+    </p:otherwise>
+  </p:choose>
+  <p:identity name="fileset.in-memory"/>
   <p:sink/>
 
 </p:declare-step>

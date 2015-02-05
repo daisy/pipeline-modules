@@ -205,6 +205,7 @@
         <x:context label="the errors">
             <x:document type="errors"/>
         </x:context>
+        <x:expect type="count" label="there should be errors" min="1"/>
         <x:expect type="xpath" label="the error PEZE00 should be thrown" test="/*/*/@code" equals="'PEZE00'"/>
     </x:scenario>
 
