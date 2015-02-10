@@ -14,6 +14,8 @@
   <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
   <p:import href="fileset-add-ref.xpl"/>
 
+  <p:variable name="fileset-base" select="/*/@xml:base"/>
+
   <p:choose name="check-base">
     <!-- TODO: replace by uri-utils 'is-relative' function (depending on how that impacts performance) -->
     <p:when test="not(/*/@xml:base) and not(matches($href,'^[^/]+:')) and not(starts-with($href,'/'))">
@@ -33,14 +35,22 @@
     </p:input>
     <p:with-option name="attribute-value" select="base-uri(/*)"/>
   </p:add-attribute>
+  <p:choose>
+    <p:when test="$fileset-base">
+      <p:identity/>
+    </p:when>
+    <p:otherwise>
+      <p:delete match="/*/@xml:base"/>
+    </p:otherwise>
+  </p:choose>
   <p:add-attribute match="/*" attribute-name="media-type">
     <p:with-option name="attribute-value" select="$media-type"/>
   </p:add-attribute>
   <p:add-attribute match="/*" attribute-name="href">
-    <p:with-option name="attribute-value" select="if (starts-with($href, /*/@xml:base) and ends-with(/*/@xml:base,'/')) then substring-after($href, /*/@xml:base) else $href"/>
+    <p:with-option name="attribute-value" select="if (starts-with($href, $fileset-base) and ends-with($fileset-base,'/')) then substring-after($href, $fileset-base) else $href"/>
   </p:add-attribute>
   <p:add-attribute match="/*" attribute-name="original-href">
-    <p:with-option name="attribute-value" select="if ($original-href) then resolve-uri($original-href, base-uri(/*)) else ''"/>
+    <p:with-option name="attribute-value" select="if ($original-href and $fileset-base) then resolve-uri($original-href, $fileset-base) else ''"/>
   </p:add-attribute>
   <p:delete match="@media-type[not(normalize-space())]"/>
   <p:delete match="@original-href[not(normalize-space())]"/>
@@ -51,7 +61,7 @@
       <!-- URI probably needs normalization -->
       <px:message severity="DEBUG" message="URI normalization: $1">
         <p:with-option name="param1"
-          select="string-join((concat('href=&quot;',/*/@href,'&quot;'),if (/*/@original-href) then concat('original-href=&quot;',/*/@original-href,'&quot;') else (),if (/*/@original-href!=$original-href or /*/@href!=$href) then concat('xml:base=&quot;',/*/@xml:base,'&quot;') else ()),' ')"
+          select="string-join((concat('href=&quot;',/*/@href,'&quot;'),if (/*/@original-href) then concat('original-href=&quot;',/*/@original-href,'&quot;') else (),if (/*/@original-href!=$original-href or /*/@href!=$href) then concat('xml:base=&quot;',$fileset-base,'&quot;') else ()),' ')"
         />
       </px:message>
       <p:xslt>
@@ -68,7 +78,7 @@
       <p:identity/>
     </p:otherwise>
   </p:choose>
-  <p:delete match="@xml:base"/>
+  <p:delete match="/*/@xml:base"/>
   <p:identity name="new-entry"/>
 
   <!-- Insert the entry as the last or first child of the file set - unless it already exists -->
