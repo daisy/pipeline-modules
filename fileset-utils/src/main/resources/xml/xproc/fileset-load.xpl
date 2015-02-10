@@ -185,6 +185,7 @@
                     <p:add-attribute match="/*" attribute-name="xml:base">
                       <p:with-option name="attribute-value" select="$target"/>
                     </p:add-attribute>
+                    <p:delete match="/*/@xml:base"/>
                   </p:when>
 
                   <!-- Force HTML -->
