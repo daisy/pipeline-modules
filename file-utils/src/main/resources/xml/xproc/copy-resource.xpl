@@ -22,7 +22,7 @@
         <p:option name="fail-on-error" select="'true'"/>
     </p:declare-step>
     
-    <p:import href="file-library.xpl"/>
+    <p:import href="java-library.xpl"/>
     
     <p:choose>
         <p:when test="p:step-available('pxi:copy-resource')">

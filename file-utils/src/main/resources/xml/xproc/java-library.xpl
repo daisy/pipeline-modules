@@ -1,17 +1,6 @@
 <p:library version="1.0" xmlns:p="http://www.w3.org/ns/xproc"
     xmlns:px="http://www.daisy.org/ns/pipeline/xproc">
 
-    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-        <div>
-            <h1>File Utilities</h1>
-            <p>The steps defined in this library provide information about files and the ability to
-                manipulate them. All implementations are required to support <code>file:</code>
-                scheme URIs. Support for other schemes is implementation-defined. </p>
-            <p>All <code>href</code> attributes are made absolute with respect to the element on
-                which they are specified.</p>
-        </div>
-    </p:documentation>
-
     <!-- ============================================================ -->
 
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -163,21 +152,5 @@
     <p:declare-step type="px:cwd">
         <p:output port="result" sequence="true"/>
     </p:declare-step>
-
-    <!-- ============================================================ -->
-
-    <p:import href="recursive-directory-list.xpl"/>
-
-    <!-- ============================================================ -->
-    
-    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-        <p>Returns a <code>&lt;c:result></code> containing the absolute URI of a temporary
-        directory, which is guaranteed not to already exist. The directory is created inside
-        the directory specified by <code>href</code>.</p>
-    </p:documentation>
-    
-    <p:import href="tempdir.xpl"/>
-    <p:import href="copy-resource.xpl"/>
-    <p:import href="set-doctype.xpl"/>
 
 </p:library>
