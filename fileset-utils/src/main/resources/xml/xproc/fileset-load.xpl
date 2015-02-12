@@ -107,7 +107,7 @@
 
           <!-- from memory -->
           <p:when test="$target = //d:file/resolve-uri(@href,base-uri(.))">
-            <px:message>
+            <px:message severity="DEBUG">
               <p:with-option name="message" select="concat('processing file from memory: ',$target)"/>
             </px:message>
             <p:for-each name="for-each-in-memory">
@@ -143,7 +143,7 @@
           <p:otherwise>
             <p:try>
               <p:group>
-                <px:message>
+                <px:message severity="DEBUG">
                   <p:with-option name="message" select="concat('loading ',$target,' from disk: ',$on-disk)"/>
                 </px:message>
                 <p:sink/>
@@ -170,7 +170,7 @@
 
                   <!-- Load from ZIP -->
                   <p:when test="contains($on-disk, '!/')">
-                    <px:message>
+                    <px:message severity="DEBUG">
                       <p:input port="source">
                         <p:empty/>
                       </p:input>
@@ -204,7 +204,7 @@
                         </p:load>
                       </p:group>
                       <p:catch>
-                        <px:message>
+                        <px:message severity="WARN">
                           <p:input port="source">
                             <p:empty/>
                           </p:input>
@@ -244,7 +244,7 @@
                         </p:load>
                       </p:group>
                       <p:catch>
-                        <px:message>
+                        <px:message severity="WARN">
                           <p:input port="source">
                             <p:empty/>
                           </p:input>
@@ -299,7 +299,7 @@
                     </p:error>
                   </p:when>
                   <p:otherwise>
-                    <px:message>
+                    <px:message severity="WARN">
                       <p:with-option name="message" select="$file-not-found-message"/>
                     </px:message>
                   </p:otherwise>

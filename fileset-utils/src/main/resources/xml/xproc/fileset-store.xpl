@@ -136,7 +136,7 @@
             </p:when>
             <p:when test="//d:file[resolve-uri(@href,base-uri(.))=$target]">
                 <p:documentation>File is in memory.</p:documentation>
-                <px:message>
+                <px:message severity="DEBUG">
                     <p:with-option name="message"
                         select="concat('Writing in-memory document to ',$href)"/>
                 </px:message>
@@ -228,7 +228,7 @@
                 </p:identity>
             </p:when>
             <p:when test="not($on-disk) and $fail-on-error = 'false'">
-                <px:message message="Resource not found: $1">
+                <px:message message="Resource not found: $1" severity="WARN">
                     <p:with-option name="param1" select="$href"/>
                 </px:message>
             </p:when>
@@ -281,7 +281,7 @@
                 <p:wrap-sequence wrapper="info"/>
                 <p:choose name="mkdir">
                     <p:when test="empty(/info/*)">
-                        <px:message>
+                        <px:message severity="DEBUG">
                             <p:with-option name="message"
                                 select="concat('Making directory: ',substring-after($target-dir, $fileset-base))"
                             />
@@ -293,7 +293,7 @@
                                 </px:mkdir>
                             </p:group>
                             <p:catch>
-                                <px:message>
+                                <px:message severity="WARN">
                                     <p:with-option name="message"
                                         select="concat('Could not create directory: ',substring-after($target-dir, $fileset-base))"
                                     />
@@ -304,7 +304,7 @@
                     </p:when>
                     <p:when test="not(/info/c:directory)">
                         <!--TODO rename the error-->
-                        <px:message>
+                        <px:message severity="WARN">
                             <p:with-option name="message"
                                 select="concat('The target is not a directory: ',$href)"/>
                         </px:message>
@@ -335,7 +335,7 @@
                                 <p:pipe port="current" step="store"/>
                             </p:input>
                         </p:identity>
-                        <px:message>
+                        <px:message severity="DEBUG">
                             <p:with-option name="message"
                                 select="concat('Copied ',replace($on-disk,'^.*/([^/]*)$','$1'),' to ',$href)"
                             />
@@ -350,7 +350,7 @@
                                 <p:pipe port="error" step="store.copy.catch"/>
                             </p:input>
                         </p:identity>
-                        <px:message>
+                        <px:message severity="WARN">
                             <p:with-option name="message" select="concat('Copy error: ',/*/*)"/>
                         </px:message>
                         <p:sink/>

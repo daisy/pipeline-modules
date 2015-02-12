@@ -19,7 +19,7 @@
   <p:choose name="check-base">
     <!-- TODO: replace by uri-utils 'is-relative' function (depending on how that impacts performance) -->
     <p:when test="not(/*/@xml:base) and not(matches($href,'^[^/]+:')) and not(starts-with($href,'/'))">
-      <px:message message="Adding a relative resource to a file set with no base URI"/>
+      <px:message severity="WARN" message="Adding a relative resource to a file set with no base URI"/>
     </p:when>
     <p:otherwise>
       <p:identity/>
