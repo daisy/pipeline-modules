@@ -2,11 +2,7 @@
 		name="main"
 		version="1.0" xmlns:p="http://www.w3.org/ns/xproc"
 		xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-		xmlns:cx="http://xmlcalabash.com/ns/extensions"
-		xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp"
 		exclude-inline-prefixes="#all">
-
-  <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
 
   <p:option name="can-contain-sentences" required="true"/>
   <p:option name="special-sentences" required="false" select="''"/>
@@ -47,7 +43,6 @@
       <p:document href="distribute-sentences.xsl"/>
     </p:input>
   </p:xslt>
-  <cx:message message="Sentences distributed."/>
 
   <!-- Create the actual sentence/word elements. -->
   <p:xslt name="create-valid">
@@ -68,7 +63,6 @@
       <p:document href="create-valid-breaks.xsl"/>
     </p:input>
   </p:xslt>
-  <cx:message message="Format-compliant elements inserted."/>
 
   <!-- split the content around the skippable elements -->
   <p:choose name="split">
@@ -88,7 +82,6 @@
 	  <p:document href="split-around-skippable.xsl"/>
 	</p:input>
       </p:xslt>
-      <cx:message message="Content split around the skippable elements."/>
     </p:when>
     <p:otherwise>
       <p:output port="result"/>

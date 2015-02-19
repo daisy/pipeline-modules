@@ -1,11 +1,10 @@
 <p:declare-step type="px:break-and-reshape"
 		version="1.0" xmlns:p="http://www.w3.org/ns/xproc"
 		xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-		xmlns:cx="http://xmlcalabash.com/ns/extensions"
 		xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp"
 		exclude-inline-prefixes="#all">
 
-  <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
+  <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
   <p:import href="break-detect.xpl"/>
   <p:import href="reshape.xpl"/>
 
@@ -138,7 +137,7 @@
     <p:with-option name="ensure-sentence-before" select="$ensure-sentence-before"/>
     <p:with-option name="ensure-sentence-after" select="$ensure-sentence-after"/>
   </px:break-detect>
-  <cx:message message="Java-based break detection done."/>
+  <px:message message="Java-based break detection done." severity="DEBUG"/>
 
   <px:reshape name="reshape">
     <p:with-option name="can-contain-sentences" select="$can-contain-sentences"/>
@@ -158,5 +157,6 @@
     <p:with-option name="exclusive-sentence-tag" select="$exclusive-sentence-tag"/>
     <p:with-option name="id-prefix" select="$id-prefix"/>
   </px:reshape>
+  <px:message message="Full break detection done" severity="DEBUG"/>
 
 </p:declare-step>
