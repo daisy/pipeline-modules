@@ -4,16 +4,27 @@
 
     <!--
         NOTE:
-        When the Java-implementation is not available, offset and length will be "rounded" down and up respectively to the nearest number with a factor of 3.
+        A current limitation is that when using base64 encoding and the Java-implementation is not available, offset and length will be "rounded" down and up respectively to the nearest number with a factor of 3.
         So for instance, if you request offset=5 and length=4, then offset will be set to 3 and length will be set to 6, so that all the requested bytes are available in the result.
         The actual offset and length used are available as attributes in the result, for instance:
         
-        <c:result xmlns:c="http://www.w3.org/ns/xproc-step" content-type="binary/octet-stream" encoding="base64" offset="3" length="6">bWwgdmVy</c:result>        
+        <c:result xmlns:c="http://www.w3.org/ns/xproc-step" content-type="binary/octet-stream" encoding="base64" offset="3" length="6">bWwgdmVy</c:result>
+        
+        This might be improved in the future if needed. It is not a problem when using hex encoding (default).
     -->
 
-    <p:option name="href" required="true"/>
-    <p:option name="offset" required="true"/>
-    <p:option name="length" required="true"/>
+    <p:option name="href" required="true">
+        <p:documentation>URI to the file you want to read bytes from.</p:documentation>
+    </p:option>
+    <p:option name="offset" required="true">
+        <p:documentation>Number of bytes to skip into the file.</p:documentation>
+    </p:option>
+    <p:option name="length" required="true">
+        <p:documentation>Number of bytes to include in the result.</p:documentation>
+    </p:option>
+    <p:option name="use-base64" select="'false'">
+        <p:documentation>By default, the output will be hex-ecoded, which is normally easier to manipulate. If you want base64-encoded output then you can set this to true.</p:documentation>
+    </p:option>
 
     <p:output port="result"/>
 
@@ -69,6 +80,21 @@
             <p:add-attribute match="/*" attribute-name="length">
                 <p:with-option name="attribute-value" select="$length_3"/>
             </p:add-attribute>
+        </p:otherwise>
+    </p:choose>
+
+    <p:choose>
+        <p:when test="$use-base64 = 'true'">
+            <p:identity/>
+        </p:when>
+        <p:otherwise>
+            <p:xslt>
+                <p:with-param name="offset" select="$offset"/>
+                <p:with-param name="length" select="$length"/>
+                <p:input port="stylesheet">
+                    <p:document href="../xslt/base64-to-hex.xsl"/>
+                </p:input>
+            </p:xslt>
         </p:otherwise>
     </p:choose>
 
