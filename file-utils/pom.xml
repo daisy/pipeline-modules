@@ -54,6 +54,12 @@
     <dependency>
       <groupId>org.daisy.pipeline</groupId>
       <artifactId>calabash-adapter</artifactId>
+      <exclusions>
+      	<exclusion>
+          <groupId>ch.qos.logback</groupId>
+          <artifactId>logback-classic</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 
@@ -65,7 +71,7 @@
         <configuration>
           <instructions>
             <Service-Component>
-              OSGI-INF/file-exists.xml,OSGI-INF/file-expand83.xml,OSGI-INF/copy-resource-step.xml
+              OSGI-INF/file-exists.xml,OSGI-INF/file-expand83.xml,OSGI-INF/copy-resource-step.xml,OSGI-INF/peek-step.xml,OSGI-INF/xml-peek-step.xml
             </Service-Component>
           </instructions>
         </configuration>
