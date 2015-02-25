@@ -15,11 +15,11 @@ public class AudioServices {
 		return null;
 	}
 
-	protected void addEncoder(AudioEncoder encoder) {
+	public void addEncoder(AudioEncoder encoder) {
 		encoders.add(encoder);
 	}
 
-	protected void removeEncoder(AudioEncoder encoder) {
+	public void removeEncoder(AudioEncoder encoder) {
 		encoders.remove(encoder);
 	}
 
