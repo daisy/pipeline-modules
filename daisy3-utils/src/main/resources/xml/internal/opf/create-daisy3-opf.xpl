@@ -61,8 +61,6 @@
       </p:documentation>
     </p:option>
 
-    <p:option name="publisher"/>
-
     <p:xslt>
       <p:input port="stylesheet">
 	<p:document href="create-opf.xsl"/>
