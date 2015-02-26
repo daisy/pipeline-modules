@@ -14,6 +14,7 @@ import net.sf.saxon.s9api.XdmNode;
 import org.daisy.pipeline.audio.AudioBuffer;
 import org.daisy.pipeline.tts.AudioBufferAllocator;
 import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
+import org.daisy.pipeline.tts.SimpleTTSEngine;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.Mark;
@@ -22,37 +23,31 @@ import org.daisy.pipeline.tts.Voice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SAPIengine extends TTSEngine {
+public class SAPIengine extends SimpleTTSEngine {
 
 	private Logger Logger = LoggerFactory.getLogger(SAPIengine.class);
 
 	private AudioFormat mAudioFormat;
 	private int mOverallPriority;
-	private boolean mHandleMarks;
 	private Map<String, Voice> mVoiceFormatConverter = null;
 
 	private static class ThreadResource extends TTSResource {
 		long connection;
 	}
 
-	public SAPIengine(SAPIservice service, AudioFormat audioFormat, int priority,
-	        boolean handleMarks) {
+	public SAPIengine(SAPIservice service, AudioFormat audioFormat, int priority) {
 		super(service);
 		mAudioFormat = audioFormat;
 		mOverallPriority = priority;
-		mHandleMarks = handleMarks;
 	}
 
 	@Override
 	public String endingMark() {
-		if (mHandleMarks)
-			return "ending-mark";
-
-		return null;
+		return "ending-mark";
 	}
 
 	@Override
-	public Collection<AudioBuffer> synthesize(String ssml, XdmNode xmlSSML, Voice voice,
+	public Collection<AudioBuffer> synthesize(String ssml, Voice voice,
 	        TTSResource resource, List<Mark> marks, AudioBufferAllocator bufferAllocator,
 	        boolean retry) throws SynthesisException, InterruptedException, MemoryException {
 

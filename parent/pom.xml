@@ -35,7 +35,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>audio-modules-bom</artifactId>
-        <version>1.9-SNAPSHOT</version>
+        <version>1.9.1-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>

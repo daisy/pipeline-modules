@@ -10,7 +10,7 @@
     <relativePath>../../parent</relativePath>
   </parent>
 
-  <version>2.0.1-SNAPSHOT</version>
+  <version>3.0.0-SNAPSHOT</version>
   <artifactId>tts-common</artifactId>
   <packaging>bundle</packaging>
 
@@ -72,10 +72,15 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-     <!-- For the AudioBuffer -->
+    <!-- For the AudioBuffer -->
     <dependency>
       <groupId>org.daisy.pipeline.modules</groupId>
       <artifactId>audio-common</artifactId>
+    </dependency>
+    <!-- For the ConfigReader -->
+    <dependency>
+      <groupId>org.daisy.pipeline.modules</groupId>
+      <artifactId>tts-helpers</artifactId>
     </dependency>
   </dependencies>
 

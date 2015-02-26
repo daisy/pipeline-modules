@@ -14,6 +14,8 @@ import net.sf.saxon.s9api.XdmSequenceIterator;
 import net.sf.saxon.tree.util.ProcInstParser;
 
 import org.daisy.pipeline.tts.config.ConfigReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xmlcalabash.core.XProcRuntime;
 import com.xmlcalabash.io.ReadablePipe;
@@ -24,6 +26,8 @@ import com.xmlcalabash.runtime.XAtomicStep;
 import com.xmlcalabash.util.TreeWriter;
 
 public class InlineCSSStep extends DefaultStep implements TreeWriterFactory {
+
+	private Logger Logger = LoggerFactory.getLogger(InlineCSSStep.class);
 
 	private String mStyleNsOption;
 	private ReadablePipe mConfig;
@@ -126,29 +130,29 @@ public class InlineCSSStep extends DefaultStep implements TreeWriterFactory {
 		super.run();
 
 		//read config
-		ConfigReader cr = null;
-		while (mConfig.moreDocuments()) {
-			cr = new ConfigReader(mConfig.read());
-			break;
+		CSSConfigExtension cssExt = new CSSConfigExtension();
+		XdmNode config = null; //it is allowed to not provide any config file
+		if (mConfig.moreDocuments()) {
+			config = mConfig.read();
 		}
+		new ConfigReader(mRuntime.getProcessor(), config, cssExt);
 
 		//read first document
 		XdmNode doc = null;
-		while (mSource.moreDocuments()) {
+		if (mSource.moreDocuments()) {
 			doc = mSource.read();
-			break;
 		}
 
 		Collection<URI> alluris = new ArrayList<URI>();
 		alluris.addAll(getCSSurisInContent(doc));
-		alluris.addAll(cr.getCSSstylesheetURIs());
+		alluris.addAll(cssExt.getCSSstylesheetURIs());
 
 		CSSInliner inliner = new CSSInliner();
 		SpeechSheetAnalyser analyzer = new SpeechSheetAnalyser();
 		try {
-			analyzer.analyse(alluris, cr.getEmbeddedCSS(), cr.getConfigDocURI());
+			analyzer.analyse(alluris, cssExt.getEmbeddedCSS(), config.getDocumentURI());
 		} catch (Throwable t) {
-			mRuntime.warning(t);
+			Logger.debug("error while analyzing CSS speech: " + t.getMessage());
 			mResult.write(doc);
 			return;
 		}

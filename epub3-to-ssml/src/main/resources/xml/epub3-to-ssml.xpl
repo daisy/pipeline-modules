@@ -21,6 +21,13 @@
 
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/text-to-ssml/library.xpl" />
+    <p:import href="http://www.daisy.org/pipeline/modules/tts-helpers/library.xpl"/>
+
+    <px:get-tts-lexicons name="user-lexicons">
+      <p:input port="config">
+	<p:pipe port="config" step="main"/>
+      </p:input>
+    </px:get-tts-lexicons>
 
     <px:text-to-ssml name="ssml-gen">
       <p:input port="fileset.in">
@@ -32,10 +39,9 @@
       <p:input port="sentence-ids">
 	<p:pipe port="sentence-ids" step="main"/>
       </p:input>
-      <p:input port="config">
-	<p:pipe port="config" step="main"/>
+      <p:input port="user-lexicons">
+	<p:pipe port="result" step="user-lexicons"/>
       </p:input>
-      <p:with-option name="section-elements" select="'body'"/>
       <p:with-option name="word-element" select="'span'"/>
       <p:with-option name="word-attr" select="'role'"/>
       <p:with-option name="word-attr-val" select="'word'"/>

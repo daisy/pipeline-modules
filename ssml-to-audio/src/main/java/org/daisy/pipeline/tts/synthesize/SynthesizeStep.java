@@ -48,6 +48,7 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 	private AudioBufferTracker mAudioBufferTracker;
 	private URIResolver mURIresolver;
 	private String mOutputDirOpt;
+	private int mSentenceCounter = 0;
 
 	private static String convertSecondToString(double seconds) {
 		int iseconds = (int) (Math.floor(seconds));
@@ -119,6 +120,10 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 	public void traverse(XdmNode node, SSMLtoAudio pool) throws SynthesisException {
 		if (SentenceTag.equals(node.getNodeName())) {
 			pool.dispatchSSML(node);
+			if (++mSentenceCounter % 10 == 0){
+				pool.endSection();
+				mSentenceCounter = 0;
+			}
 		} else {
 			XdmSequenceIterator iter = node.axisIterator(Axis.CHILD);
 			while (iter.hasNext()) {
@@ -137,9 +142,10 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 			return;
 		}
 
-		ConfigReader cr = new ConfigReader(config.read());
+		VoiceConfigExtension configExt = new VoiceConfigExtension();
+		ConfigReader cr = new ConfigReader(mRuntime.getProcessor(), config.read(), configExt);
 
-		String logEnabledProp = cr.getProperty("log");
+		String logEnabledProp = cr.getAllProperties().get("log");
 		boolean logEnabled = "true".equalsIgnoreCase(logEnabledProp) && mOutputDirOpt != null
 		        && !mOutputDirOpt.isEmpty();
 		TTSLog log;
@@ -148,7 +154,7 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 		} else
 			log = new TTSLogEmpty();
 
-		String tmpDir = cr.getProperty("audio.tmpdir");
+		String tmpDir = cr.getAllProperties().get("audio.tmpdir");
 		if (tmpDir == null)
 			tmpDir = System.getProperty("java.io.tmpdir");
 		File audioOutputDir = null;
@@ -162,7 +168,7 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 		audioOutputDir.deleteOnExit();
 
 		SSMLtoAudio ssmltoaudio = new SSMLtoAudio(audioOutputDir, mTTSRegistry, this,
-		        mAudioBufferTracker, mRuntime.getProcessor(), mURIresolver, cr, log);
+		        mAudioBufferTracker, mRuntime.getProcessor(), mURIresolver, configExt, log);
 
 		Iterable<SoundFileLink> soundFragments = Collections.EMPTY_LIST;
 		try {
@@ -190,20 +196,24 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 		for (SoundFileLink sf : soundFragments) {
 			String soundFileURI = sf.soundFileURIHolder.toString();
 			if (!soundFileURI.isEmpty()) {
-				tw.addStartElement(ClipTag);
-				tw.addAttribute(Audio_attr_id, sf.xmlid);
-				tw.addAttribute(Audio_attr_clipBegin, convertSecondToString(sf.clipBegin));
-				tw.addAttribute(Audio_attr_clipEnd, convertSecondToString(sf.clipEnd));
-				tw.addAttribute(Audio_attr_src, soundFileURI);
-				tw.addEndElement();
+				if (sf.clipBegin < sf.clipEnd){
+					//sf.clipBegin = sf.clipEnd if the input text is empty. Those clips are not useful
+					//and they can eventually lead to validation errors
+					tw.addStartElement(ClipTag);
+					tw.addAttribute(Audio_attr_id, sf.xmlid);
+					tw.addAttribute(Audio_attr_clipBegin, convertSecondToString(sf.clipBegin));
+					tw.addAttribute(Audio_attr_clipEnd, convertSecondToString(sf.clipEnd));
+					tw.addAttribute(Audio_attr_src, soundFileURI);
+					tw.addEndElement();
+				}
 				++num;
 				TTSLog.Entry entry = log.getOrCreateEntry(sf.xmlid);
-				entry.soundfile = soundFileURI;
-				entry.beginInFile = sf.clipBegin;
-				entry.endInFile = sf.clipEnd;
+				entry.setSoundfile(soundFileURI);
+				entry.setPositionInFile(sf.clipBegin, sf.clipEnd);
 			} else {
-				log.getOrCreateEntry(sf.xmlid).errors.add(new TTSLog.Error(
-				        ErrorCode.AUDIO_MISSING, "not synthesized or not encoded"));
+				log.getOrCreateEntry(sf.xmlid).addError(
+				        new TTSLog.Error(ErrorCode.AUDIO_MISSING,
+				                "not synthesized or not encoded"));
 			}
 		}
 		tw.addEndElement();
@@ -232,30 +242,38 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 				xmlLog.addStartElement(LogTextTag);
 
 				xmlLog.addAttribute(Log_attr_id, entry.getKey());
-				if (le.soundfile != null) {
-					String basename = new File(le.soundfile).getName();
+				if (le.getSoundFile() != null) {
+					String basename = new File(le.getSoundFile()).getName();
 					xmlLog.addAttribute(Log_attr_file, basename);
-					xmlLog.addAttribute(Log_attr_begin, String.valueOf(le.beginInFile));
-					xmlLog.addAttribute(Log_attr_end, String.valueOf(le.endInFile));
+					xmlLog.addAttribute(Log_attr_begin, String.valueOf(le.getBeginInFile()));
+					xmlLog.addAttribute(Log_attr_end, String.valueOf(le.getEndInFile()));
 				}
-				if (le.selectedVoice != null)
-					xmlLog.addAttribute(Log_attr_selected_voice, le.selectedVoice.toString());
-				if (le.actualVoice != null)
-					xmlLog.addAttribute(Log_attr_actual_voice, le.actualVoice.toString());
 
-				for (TTSLog.Error err : le.errors)
+				xmlLog.addAttribute(Log_attr_timeout, "" + le.getTimeout() + "s");
+
+				if (le.getSelectedVoice() != null)
+					xmlLog.addAttribute(Log_attr_selected_voice, le.getSelectedVoice()
+					        .toString());
+				if (le.getActualVoice() != null)
+					xmlLog.addAttribute(Log_attr_actual_voice, le.getActualVoice().toString());
+
+				for (TTSLog.Error err : le.getReadOnlyErrors())
 					writeXMLerror(xmlLog, err);
 
-				if (le.ssml != null) {
+				if (le.getSSML() != null) {
 					xmlLog.addStartElement(LogSsmlTag);
-					xmlLog.addSubtree(le.ssml);
+					xmlLog.addSubtree(le.getSSML());
 					xmlLog.addEndElement();
+				}else{
+					xmlLog.addText("No SSML available. This piece of text has probably been extracted from inside another sentence.");
 				}
 
-				if (le.ttsinput != null && !le.ttsinput.isEmpty()) {
-					xmlLog.addStartElement(LogInpTag);
-					xmlLog.addText(le.ttsinput);
-					xmlLog.addEndElement();
+				if (le.getTTSinput() != null && !le.getTTSinput().isEmpty()) {
+					for (String inp : le.getTTSinput()) {
+						xmlLog.addStartElement(LogInpTag);
+						xmlLog.addText(inp);
+						xmlLog.addEndElement();
+					}
 				}
 
 				xmlLog.addEndElement(); //LogTextTag

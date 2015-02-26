@@ -29,9 +29,9 @@ import org.daisy.common.xslt.XslTransformCompiler;
 import org.daisy.pipeline.audio.AudioBuffer;
 import org.daisy.pipeline.audio.AudioServices;
 import org.daisy.pipeline.tts.AudioBufferTracker;
-import org.daisy.pipeline.tts.DefaultSSMLMarkSplitter;
 import org.daisy.pipeline.tts.SSMLMarkSplitter;
 import org.daisy.pipeline.tts.StraightBufferAllocator;
+import org.daisy.pipeline.tts.StructuredSSMLSplitter;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSRegistry;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
@@ -42,8 +42,8 @@ import org.daisy.pipeline.tts.TTSServiceUtil;
 import org.daisy.pipeline.tts.TTSTimeout;
 import org.daisy.pipeline.tts.TTSTimeout.ThreadFreeInterrupter;
 import org.daisy.pipeline.tts.Voice;
+import org.daisy.pipeline.tts.Voice.MarkSupport;
 import org.daisy.pipeline.tts.VoiceManager;
-import org.daisy.pipeline.tts.config.ConfigReader;
 import org.daisy.pipeline.tts.synthesize.TTSLog.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,15 +56,15 @@ import com.google.common.collect.Iterables;
  * ContiguousText. Every section contains a list of contiguous sentences that
  * may be eventually stored into different audio files, but it is guaranteed
  * that such audio files won't contain sentences of other sections in such a
- * manner that the list of audio files will mirror the document order. Every
- * sentence has the same single sample rate to prevent us from resampling the
- * audio data before sending them to encoders.
- *
+ * manner that the list of audio files will mirror the document order. Within
+ * a section, every sentence has the same single sample rate to prevent us from
+ * resampling the audio data before sending them to encoders.
+ * 
  * Once all the sentences have been assigned to TTS voices, they are sorted by
  * size and stored in a shared queue of ContiguousText (actually, only the
  * smallest sentences are sorted that way). SSMLtoAudio creates threads to
  * consume this queue.
- *
+ * 
  * The TextToPcmThreads send PCM data to EncodingThreads via a queue of
  * ContiguousPCM. These PCM packets are then processed from the longest (with
  * respect to the number of samples) to the shortest in order to make it likely
@@ -72,17 +72,17 @@ import com.google.common.collect.Iterables;
  * are joined, the pipeline pushes an EndOfQueue marker to every EncodingThreads
  * to notify that they must stop waiting for more PCM packets than the ones
  * already pushed.
- *
+ * 
  * The queue of PCM chunks, along with the queues of other TTS steps, share a
  * global max size so as to make sure that they won't grow too much if the
  * encoding is slower than the synthesizing (see AudioBuffersTracker).
- *
+ * 
  * If an EncodingThread fails to encode samples, it won't set the URI attribute
  * of the audio chunks. In that way, SSMLtoAudio is informed not to include the
  * corresponding text into the list of audio clips.
- *
+ * 
  */
-class SSMLtoAudio implements IProgressListener, FormatSpecifications {
+public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 	private TTSEngine mLastTTS; //used if no TTS is found for the current sentence
 	private TTSRegistry mTTSRegistry;
 	private IPipelineLogger mLogger;
@@ -101,9 +101,9 @@ class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 	private Map<String, String> mProperties;
 	private TTSLog mTTSlog;
 
-	SSMLtoAudio(File audioDir, TTSRegistry ttsregistry, IPipelineLogger logger,
+	public SSMLtoAudio(File audioDir, TTSRegistry ttsregistry, IPipelineLogger logger,
 	        AudioBufferTracker audioBufferTracker, Processor proc, URIResolver uriResolver,
-	        ConfigReader configReader, TTSLog logs) {
+	        VoiceConfigExtension configExt, TTSLog logs) {
 		mTTSRegistry = ttsregistry;
 		mLogger = logger;
 		mCurrentSection = null;
@@ -137,7 +137,7 @@ class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 		 */
 
 		TTSTimeout timeout = new TTSTimeout();
-		mProperties = configReader.getProperties();
+		mProperties = configExt.getAllProperties();
 		XslTransformCompiler xslCompiler = new XslTransformCompiler(proc
 		        .getUnderlyingConfiguration(), uriResolver);
 		List<TTSEngine> workingEngines = new ArrayList<TTSEngine>();
@@ -178,7 +178,7 @@ class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 		mLogger.printInfo("Number of working TTS engine(s): " + workingEngines.size() + "/"
 		        + ttsregistry.getServices().size());
 
-		mVoiceManager = new VoiceManager(workingEngines, configReader.getVoiceDeclarations());
+		mVoiceManager = new VoiceManager(workingEngines, configExt.getVoiceDeclarations());
 	}
 
 	private TTSEngine createAndTestEngine(final TTSService service,
@@ -216,19 +216,23 @@ class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 			return null;
 		}
 
-		//get a voice
+		//get a voice supporting SSML marks (so far as they are supported by the engine)
 		Voice firstVoice = null;
 		try {
 			timeout.enableForCurrentThread(2);
-			Collection<Voice> voices = engine.getAvailableVoices();
-			if (voices.size() == 0) {
+			for (Voice v : engine.getAvailableVoices()) {
+				if (engine.endingMark() == null
+				        || v.getMarkSupport() != MarkSupport.MARK_NOT_SUPPORTED) {
+					firstVoice = v;
+				}
+			}
+			if (firstVoice == null) {
 				String err = TTSServiceUtil.displayName(service)
 				        + " cannot be tested because no voice seems available.";
 				mTTSlog.addGeneralError(ErrorCode.WARNING, err);
 				ServerLogger.error(err);
 				return null;
 			}
-			firstVoice = voices.iterator().next();
 		} catch (Exception e) {
 			String err = TTSServiceUtil.displayName(service)
 			        + " failed to return voices, cause: " + e.getMessage() + ": "
@@ -275,10 +279,13 @@ class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 		//run the text-to-speech on the testing input
 		Collection<AudioBuffer> audioBuffers = null;
 		List<TTSService.Mark> marks = new ArrayList<TTSService.Mark>();
+		List<String> expectedMarks = new ArrayList<String>();
+		if (engine.endingMark() != null)
+			expectedMarks.add(engine.endingMark());
 		try {
 			timeout.enableForCurrentThread(interrupter, 2);
 			audioBuffers = engine.synthesize(ttsInput, testingXML, firstVoice, res, marks,
-			        new StraightBufferAllocator(), false);
+			        expectedMarks, new StraightBufferAllocator(), false);
 		} catch (Exception e) {
 			String msg = "Error while testing " + TTSServiceUtil.displayName(service) + "; "
 			        + e.getMessage() + ": " + getStack(e);
@@ -341,7 +348,7 @@ class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 	/**
 	 * The SSML is assumed to be pushed in document order.
 	 **/
-	void dispatchSSML(XdmNode ssml) throws SynthesisException {
+	public void dispatchSSML(XdmNode ssml) throws SynthesisException {
 		String voiceEngine = ssml.getAttributeValue(Sentence_attr_select1);
 		String voiceName = ssml.getAttributeValue(Sentence_attr_select2);
 		String gender = ssml.getAttributeValue(Sentence_attr_gender);
@@ -350,7 +357,7 @@ class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 		String lang = ssml.getAttributeValue(Sentence_attr_lang);
 
 		TTSLog.Entry logEntry = mTTSlog.getOrCreateEntry(id);
-		logEntry.ssml = ssml;
+		logEntry.setSSML(ssml);
 
 		if (age != null) {
 			try {
@@ -368,9 +375,9 @@ class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 		boolean[] exactMatch = new boolean[1];
 		Voice voice = mVoiceManager.findAvailableVoice(voiceEngine, voiceName, lang, gender,
 		        exactMatch);
-		logEntry.selectedVoice = voice;
+		logEntry.setSelectedVoice(voice);
 		if (voice == null) {
-			logEntry.errors.add(new TTSLog.Error(TTSLog.ErrorCode.AUDIO_MISSING,
+			logEntry.addError(new TTSLog.Error(TTSLog.ErrorCode.AUDIO_MISSING,
 			        "could not find any installed voice matching with "
 			                + new Voice(voiceEngine, voiceName)
 			                + " or providing the language '" + lang + "'"));
@@ -384,7 +391,7 @@ class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 			 * Should not happen since findAvailableVoice() returns only a
 			 * non-null voice if a TTSService can provide it
 			 */
-			logEntry.errors.add(new TTSLog.Error(TTSLog.ErrorCode.AUDIO_MISSING,
+			logEntry.addError(new TTSLog.Error(TTSLog.ErrorCode.AUDIO_MISSING,
 			        "could not find any TTS engine for the voice "
 			                + new Voice(voiceEngine, voiceName)));
 			endSection();
@@ -392,7 +399,7 @@ class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 		}
 
 		if (!exactMatch[0]) {
-			logEntry.errors.add(new TTSLog.Error(TTSLog.ErrorCode.UNEXPECTED_VOICE,
+			logEntry.addError(new TTSLog.Error(TTSLog.ErrorCode.UNEXPECTED_VOICE,
 			        "no voice matches exactly with the requested characteristics"));
 		}
 
@@ -420,7 +427,6 @@ class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 		if (mCurrentSection == null) {
 			//happen the first time and whenever endSection() is called
 			mCurrentSection = new ContiguousText(mDocumentPosition++, mAudioDir);
-
 			List<ContiguousText> listOfSections = mOrganizedText.get(poolkey);
 			if (listOfSections == null) {
 				listOfSections = new ArrayList<ContiguousText>();
@@ -428,20 +434,19 @@ class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 			}
 
 			listOfSections.add(mCurrentSection);
-
 		}
 		mCurrentSection.sentences.add(new Sentence(newSynth, voice, ssml));
 	}
 
-	void endSection() {
+	public void endSection() {
 		mCurrentSection = null;
 	}
 
-	Iterable<SoundFileLink> blockingRun(AudioServices audioServices)
+	public Iterable<SoundFileLink> blockingRun(AudioServices audioServices)
 	        throws SynthesisException, InterruptedException {
 
 		//SSML mark splitter shared by the threads:
-		SSMLMarkSplitter ssmlSplitter = new DefaultSSMLMarkSplitter(mProc);
+		SSMLMarkSplitter ssmlSplitter = new StructuredSSMLSplitter(mProc);
 
 		reorganizeSections();
 		mProgress = 0;
@@ -554,7 +559,7 @@ class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 				mTotalTextSize += section.getStringSize();
 			}
 			//split up the sections that are too big
-			int maxSize = (int) (mTotalTextSize / 15);
+			int maxSize = (int) (mTotalTextSize / 15); //should it depend on the total size or be an absolute max?
 			List<ContiguousText> newSections = new ArrayList<ContiguousText>();
 			List<ContiguousText> toRemove = new ArrayList<ContiguousText>();
 			for (ContiguousText section : sections) {
@@ -579,6 +584,8 @@ class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 		mLogger.printInfo("Number of synthesizable TTS sections: " + sectionCount);
 	}
 
+	//we can dispense with this function as soon as we take into consideration the size of the SSML
+	//sentences, rather than creating a new section every 10 sentences or so.
 	private void splitSection(ContiguousText section, int maxSize,
 	        List<ContiguousText> newSections) {
 		int left = 0;
