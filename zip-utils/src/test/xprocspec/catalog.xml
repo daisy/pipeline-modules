@@ -1,0 +1,6 @@
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="public">
+    <uri name="http://www.daisy.org/pipeline/modules/file-utils/library.xpl" uri="mock/file-utils.xpl"/>
+    <uri name="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl" uri="mock/fileset-utils.xpl"/>
+    <uri name="http://www.daisy.org/pipeline/modules/common-utils/library.xpl" uri="mock/common-utils.xpl"/>
+    <uri name="http://www.daisy.org/pipeline/modules/file-utils/uri-functions.xsl" uri="mock/uri-functions.xsl"/>
+</catalog>
