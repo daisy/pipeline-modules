@@ -13,7 +13,6 @@ import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
 
 import org.daisy.common.xproc.calabash.XProcStepProvider;
-//import org.daisy.common.xproc.calabash.steps.PeekProvider.Peek;
 
 import org.daisy.common.xproc.calabash.steps.PeekProvider.Peek;
 
