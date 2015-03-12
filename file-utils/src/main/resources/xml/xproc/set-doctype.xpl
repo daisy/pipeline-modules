@@ -8,10 +8,18 @@
             `c:result` document with the URI to the file as its text node.</p>
     </p:documentation>
 
-    <p:output port="result"/>
-    <p:option name="href" required="true"/>
-    <p:option name="doctype" required="true"/>
-    <p:option name="encoding" select="'utf-8'"/>
+    <p:output port="result">
+        <p:documentation>A document containing the URI to the file, same as the output of a `p:store` operation.</p:documentation>
+    </p:output>
+    <p:option name="href" required="true">
+        <p:documentation>URI to the file you want to set the doctype of.</p:documentation>
+    </p:option>
+    <p:option name="doctype" required="true">
+        <p:documentation>The doctype.</p:documentation>
+    </p:option>
+    <p:option name="encoding" select="'utf-8'">
+        <p:documentation>The encoding to use when reading and writing from and to the file (default: 'utf-8').</p:documentation>
+    </p:option>
 
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
 
