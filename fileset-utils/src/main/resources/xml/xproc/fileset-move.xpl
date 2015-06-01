@@ -36,7 +36,7 @@
     <p:viewport match="/*/d:file" name="file">
         <p:choose>
             <p:when test="not(/*/@original-href)">
-                <p:variable name="on-disk" select="resolve-uri(/*/@href,base-uri(/*))"/>
+                <p:variable name="on-disk" select="resolve-uri(/*/(@original-href,@href)[1],base-uri(/*))"/>
                 <p:try>
                     <p:group>
                         <px:info>
