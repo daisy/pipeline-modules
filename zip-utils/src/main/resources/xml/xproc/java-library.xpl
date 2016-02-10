@@ -45,8 +45,7 @@
             <p:documentation>A file:/ URL to the destination folder. Will be created if it does not exist (subject to the $overwrite option).</p:documentation>
         </p:option>
         <p:option name="overwrite" required="false" select="'no'">
-            <p:documentation>Whether existing directories and files will be overwritten. The step will fail if set to 'no' and there is 
-                an existing file/dir with the target name.</p:documentation>
+            <p:documentation>Whether existing directories and files will be overwritten.</p:documentation>
         </p:option>
         <p:option name="file" required="false">
             <p:documentation>Optionally, a specific relative path to a file within the zip file. Will be restored to its 

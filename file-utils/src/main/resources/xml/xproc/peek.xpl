@@ -25,6 +25,9 @@
     <p:option name="use-base64" select="'false'">
         <p:documentation>By default, the output will be hex-ecoded, which is normally easier to manipulate. If you want base64-encoded output then you can set this to true.</p:documentation>
     </p:option>
+    <p:option name="use-java-implementation" select="'true'">
+        <p:documentation>If the Java implementation of this step is available but you don't want to use it; set this to false (default 'true').</p:documentation>
+    </p:option>
 
     <p:output port="result"/>
 
@@ -38,7 +41,7 @@
     </p:declare-step>
 
     <p:choose>
-        <p:when test="p:step-available('pxi:file-peek')">
+        <p:when test="p:step-available('pxi:file-peek') and $use-java-implementation = 'true'">
             <pxi:file-peek>
                 <p:with-option name="href" select="$href"/>
                 <p:with-option name="offset" select="$offset"/>

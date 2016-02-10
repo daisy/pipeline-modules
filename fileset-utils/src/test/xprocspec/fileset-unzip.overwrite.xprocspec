@@ -6,17 +6,17 @@
     <x:script>
         <p:declare-step type="test:test" version="1.0">
             <p:output port="result" sequence="true">
-                <p:pipe port="result" step="unzip-fileset"/>
+                <p:pipe port="result" step="fileset-unzip"/>
             </p:output>
             <p:output port="fileset">
-                <p:pipe port="fileset" step="unzip-fileset"/>
+                <p:pipe port="fileset" step="fileset-unzip"/>
             </p:output>
             <p:option name="href" required="true"/>
             <p:option name="file" required="true"/>
             <p:option name="unzipped-basedir" required="true"/>
             <p:option name="overwrite" required="true"/>
             <p:option name="file-should-exist" required="true"/>
-            <p:import href="../../../src/main/resources/xml/xproc/unzip-fileset.xpl"/>
+            <p:import href="../../../src/main/resources/xml/xproc/fileset-unzip.xpl"/>
             <p:add-attribute match="/*" attribute-name="file">
                 <p:with-option name="attribute-value" select="$file"/>
                 <p:input port="source">
@@ -28,7 +28,7 @@
             <p:choose>
                 <p:when test="$file-should-exist = 'true'">
                     <p:store name="store">
-                        <p:with-option name="href" select="concat($unzipped-basedir,replace(/*/@file,'.*/',''))"/>
+                        <p:with-option name="href" select="concat($unzipped-basedir,/*/@file)"/>
                     </p:store>
                     <p:identity>
                         <p:input port="source">
@@ -40,16 +40,16 @@
                     <p:identity/>
                 </p:otherwise>
             </p:choose>
-            <px:unzip-fileset name="unzip-fileset" load-to-memory="false" store-to-disk="true">
+            <px:fileset-unzip name="fileset-unzip" load-to-memory="false" store-to-disk="true">
                 <p:with-option name="href" select="$href"/>
                 <p:with-option name="file" select="$file"/>
                 <p:with-option name="unzipped-basedir" select="$unzipped-basedir"/>
                 <p:with-option name="overwrite" select="$overwrite"/>
-            </px:unzip-fileset>
+            </px:fileset-unzip>
         </p:declare-step>
     </x:script>
 
-    <x:scenario label="Scenario for testing px:unzip-fileset">
+    <x:scenario label="Scenario for testing px:fileset-unzip">
         <x:call step="test:test">
             <x:option name="href" select="resolve-uri('samples/test.epub', base-uri(.))"/>
             <x:option name="file" select="'EPUB/package.opf'"/>
@@ -69,7 +69,7 @@
             <x:document type="port" port="fileset"/>
         </x:context>
         <x:expect label="There must be exactly 1 file in the fileset" type="xpath" test="count(/*/*)" equals="1"/>
-        <x:expect label="The file 'package.opf' must exist in the fileset" type="xpath" test="/*/*/@href" equals="'package.opf'"/>
+        <x:expect label="The file 'package.opf' must exist in the fileset" type="xpath" test="/*/*/@href" equals="'EPUB/package.opf'"/>
 
         <x:context label="the output directory">
             <x:document type="directory" base-uri="temp-dir" href="test1/" recursive="true"/>
@@ -85,7 +85,7 @@
     </x:scenario>
 
 
-    <x:scenario label="Scenario for testing px:unzip-fileset">
+    <x:scenario label="Scenario for testing px:fileset-unzip">
 
         <x:call step="test:test">
             <x:option name="href" select="resolve-uri('samples/test.epub', base-uri(.))"/>
@@ -106,23 +106,25 @@
             <x:document type="port" port="fileset"/>
         </x:context>
         <x:expect label="There must be exactly 1 file in the fileset" type="xpath" test="count(/*/*)" equals="1"/>
-        <x:expect label="The file 'package.opf' must exist in the fileset" type="xpath" test="/*/*/@href" equals="'package.opf'"/>
+        <x:expect label="The file 'package.opf' must exist in the fileset" type="xpath" test="/*/*/@href" equals="'EPUB/package.opf'"/>
 
         <x:context label="the output directory">
             <x:document type="directory" base-uri="temp-dir" href="test2/" recursive="true"/>
         </x:context>
-        <x:expect label="The output directory should contain 0 subdirectories" type="xpath" test="count(/*/c:directory)" equals="0"/>
-        <x:expect label="The output directory should contain 1 file" type="xpath" test="count(/*/c:file)" equals="1"/>
-        <x:expect label="The file 'package.opf' must exist in the output directory" type="xpath" test="/*/c:file/@name" equals="'package.opf'"/>
+        <x:expect label="The output directory should contain 1 subdirectories" type="xpath" test="count(/*/c:directory)" equals="1"/>
+        <x:expect label="The top-level output directory should contain 0 files" type="xpath" test="count(/*/c:file)" equals="0"/>
+        <x:expect label="The sub-directory of the output directory should contain 1 file" type="xpath" test="count(/*/c:directory/c:file)" equals="1"/>
+        <x:expect label="The sub-directory of the output directory should contain 0 directories" type="xpath" test="count(/*/c:directory/c:directory)" equals="0"/>
+        <x:expect label="The file 'package.opf' must exist in the output directory" type="xpath" test="/*/c:directory/c:file/@name" equals="'package.opf'"/>
 
         <x:context label="the output file">
-            <x:document type="file" base-uri="temp-dir" href="test2/package.opf"/>
+            <x:document type="file" base-uri="temp-dir" href="test2/EPUB/package.opf"/>
         </x:context>
         <x:expect label="The document should *not* be a OPF (i.e. the existing document should not be overwritten)" type="xpath" test="concat('{',namespace-uri(/*),'}',local-name(/*))"
             equals="'{http://www.idpf.org/2007/opf}package'" xfail="true"/>
     </x:scenario>
 
-    <x:scenario label="Scenario for testing px:unzip-fileset">
+    <x:scenario label="Scenario for testing px:fileset-unzip">
         <x:call step="test:test">
             <x:option name="href" select="resolve-uri('samples/test.epub', base-uri(.))"/>
             <x:option name="file" select="'EPUB/package.opf'"/>

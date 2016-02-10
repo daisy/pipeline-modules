@@ -74,7 +74,7 @@
             <p:pipe step="fileset.in-memory" port="result"/>
         </p:input>
         <p:input port="stylesheet">
-            <p:document href="zip-manifests-from-fileset.xsl"/>
+            <p:document href="../xslt/fileset-to-zip-manifests.xsl"/>
         </p:input>
         <p:input port="parameters">
             <p:empty/>

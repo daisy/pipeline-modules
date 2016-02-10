@@ -13,6 +13,9 @@
     <p:output port="prolog">
         <p:pipe port="result" step="prolog"/>
     </p:output>
+    <p:option name="use-java-implementation" select="'true'">
+        <p:documentation>If the Java implementation of this step is available but you don't want to use it; set this to false (default 'true').</p:documentation>
+    </p:option>
 
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
 
@@ -22,7 +25,7 @@
     </p:declare-step>
 
     <p:choose name="choose">
-        <p:when test="p:step-available('pxi:file-xml-peek')">
+        <p:when test="p:step-available('pxi:file-xml-peek') and $use-java-implementation = 'true'">
             <pxi:file-xml-peek>
                 <p:with-option name="href" select="$href"/>
             </pxi:file-xml-peek>

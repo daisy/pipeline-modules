@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-model href="http://www.daisy.org/ns/xprocspec/xprocspec.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
-<x:description script="../../../src/main/resources/xml/xproc/unzip-fileset.xpl" xmlns:x="http://www.daisy.org/ns/xprocspec" xmlns:p="http://www.w3.org/ns/xproc"
+<x:description script="../../../src/main/resources/xml/xproc/fileset-unzip.xpl" xmlns:x="http://www.daisy.org/ns/xprocspec" xmlns:p="http://www.w3.org/ns/xproc"
     xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:px="http://www.daisy.org/ns/pipeline/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:xs="http://www.w3.org/2001/XMLSchema">
     
-    <x:scenario label="Scenario for testing px:unzip-fileset - XProc test suite unzip-001">
-        <x:call step="px:unzip-fileset">
+    <x:scenario label="Scenario for testing px:fileset-unzip - XProc test suite unzip-001">
+        <x:call step="px:fileset-unzip">
             <x:option name="href" select="resolve-uri('samples/sample-tests.zip', base-uri(.))"/>
         </x:call>
 
@@ -15,8 +15,8 @@
         <x:expect label="There must be exactly 4 /c:zipfile/c:file elements in the result" type="xpath" test="count(/c:zipfile/c:file)" equals="4"/>
     </x:scenario>
 
-    <x:scenario label="Scenario for testing px:unzip-fileset - XProc test suite unzip-002">
-        <x:call step="px:unzip-fileset">
+    <x:scenario label="Scenario for testing px:fileset-unzip - XProc test suite unzip-002">
+        <x:call step="px:fileset-unzip">
             <x:option name="href" select="resolve-uri('samples/sample-tests.zip', base-uri(.))"/>
             <x:option name="file" select="'pipe.xpl'"/>
         </x:call>
@@ -38,8 +38,8 @@
         </x:expect>
     </x:scenario>
 
-    <x:scenario label="Scenario for testing px:unzip-fileset">
-        <x:call step="px:unzip-fileset">
+    <x:scenario label="Scenario for testing px:fileset-unzip">
+        <x:call step="px:fileset-unzip">
             <x:option name="href" select="resolve-uri('samples/test.epub', base-uri(.))"/>
             <x:option name="file" select="'EPUB/package.opf'"/>
             <x:option name="load-to-memory" select="'false'"/>
@@ -70,10 +70,10 @@
         <x:expect label="There should be no files in the output directory" type="xpath" test="count(/*/*)" equals="0"/>
     </x:scenario>
 
-    <x:scenario label="Scenario for testing px:unzip-fileset">
-        <x:call step="px:unzip-fileset">
+    <x:scenario label="Scenario for testing px:fileset-unzip">
+        <x:call step="px:fileset-unzip">
             <x:option name="href" select="resolve-uri('samples/test.epub', base-uri(.))"/>
-            <x:option name="unzipped-basedir" select="$temp-dir"/>
+            <x:option name="unzipped-basedir" select="replace($temp-dir,'//+','/')"/>
             <x:option name="load-to-memory" select="'true'"/>
         </x:call>
 
@@ -81,7 +81,7 @@
             <x:document type="port" port="result"/>
         </x:context>
         <x:expect label="There must be exactly 9 documents on the result port" type="count" min="9" max="9"/>
-        <x:expect label="The documents must be based in the `unzipped-basedir` directory" type="xpath" test="substring(base-uri(), 1, string-length($temp-dir))" equals="$temp-dir"/>
+        <x:expect label="The documents must be based in the `unzipped-basedir` directory" type="xpath" test="substring(base-uri(), 1, string-length(replace($temp-dir,'//+','/')))" equals="replace($temp-dir,'//+','/')"/>
 
         <x:context label="the fileset port">
             <x:document type="port" port="fileset"/>
@@ -103,8 +103,8 @@
         <x:expect label="There should be no files in the output directory" type="xpath" test="count(/*/*)" equals="0"/>
     </x:scenario>
 
-    <x:scenario label="Scenario for testing px:unzip-fileset">
-        <x:call step="px:unzip-fileset">
+    <x:scenario label="Scenario for testing px:fileset-unzip">
+        <x:call step="px:fileset-unzip">
             <x:option name="href" select="resolve-uri('samples/test.epub', base-uri(.))"/>
             <x:option name="load-to-memory" select="'true'"/>
         </x:call>
@@ -113,7 +113,7 @@
             <x:document type="port" port="result"/>
         </x:context>
         <x:expect label="There must be exactly 9 documents on the result port" type="count" min="9" max="9"/>
-        <x:expect label="The documents should not have been rebased into the `unzipped-basedir` directory" type="xpath" test="substring(base-uri(), 1, string-length($temp-dir))" equals="$temp-dir"
+        <x:expect label="The documents should not have been rebased into the `unzipped-basedir` directory" type="xpath" test="substring(base-uri(), 1, string-length(replace($temp-dir,'//+','/')))" equals="replace($temp-dir,'//+','/')"
             xfail="true"/>
 
         <x:context label="the fileset port">
@@ -136,8 +136,8 @@
         <x:expect label="There should be no files in the output directory" type="xpath" test="count(/*/*)" equals="0"/>
     </x:scenario>
 
-    <x:scenario label="Scenario for testing px:unzip-fileset">
-        <x:call step="px:unzip-fileset">
+    <x:scenario label="Scenario for testing px:fileset-unzip">
+        <x:call step="px:fileset-unzip">
             <x:option name="href" select="resolve-uri('samples/test.epub', base-uri(.))"/>
             <x:option name="load-to-memory" select="'false'"/>
         </x:call>
@@ -179,11 +179,11 @@
         <x:expect label="There should be no files in the output directory" type="xpath" test="count(/*/*)" equals="0"/>
     </x:scenario>
 
-    <x:scenario label="Scenario for testing px:unzip-fileset">
-        <x:call step="px:unzip-fileset">
+    <x:scenario label="Scenario for testing px:fileset-unzip">
+        <x:call step="px:fileset-unzip">
             <x:option name="href" select="resolve-uri('samples/test.epub', base-uri(.))"/>
             <x:option name="file" select="'EPUB/package.opf'"/>
-            <x:option name="unzipped-basedir" select="$temp-dir"/>
+            <x:option name="unzipped-basedir" select="replace($temp-dir,'//+','/')"/>
         </x:call>
 
         <x:context label="the result port">
@@ -191,8 +191,8 @@
         </x:context>
         <x:expect label="There must be exactly one document on the result port" type="count" min="1" max="1"/>
         <x:expect label="The document should be a OPF" type="xpath" test="concat('{',namespace-uri(/*),'}',local-name(/*))" equals="'{http://www.idpf.org/2007/opf}package'"/>
-        <x:expect label="The documents base URI should place the document in the `unzipped-basedir` directory" type="xpath" test="substring(base-uri(/*), 1, string-length($temp-dir))"
-            equals="$temp-dir"/>
+        <x:expect label="The documents base URI should place the document in the `unzipped-basedir` directory" type="xpath" test="substring(base-uri(/*), 1, string-length(replace($temp-dir,'//+','/')))"
+            equals="replace($temp-dir,'//+','/')"/>
 
         <x:context label="the result port">
             <x:document type="port" port="result" select="/*/*"/>
@@ -230,8 +230,8 @@
         <x:expect label="There should be no files in the output directory" type="xpath" test="count(/*/*)" equals="0"/>
     </x:scenario>
 
-    <x:scenario label="Scenario for testing px:unzip-fileset">
-        <x:call step="px:unzip-fileset">
+    <x:scenario label="Scenario for testing px:fileset-unzip">
+        <x:call step="px:fileset-unzip">
             <x:option name="href" select="resolve-uri('samples/test.epub', base-uri(.))"/>
             <x:option name="file" select="'EPUB/package.opf'"/>
             <x:option name="content-type" select="'application/octet-stream'"/>
@@ -241,8 +241,8 @@
             <x:document type="port" port="result"/>
         </x:context>
         <x:expect label="There must be exactly one document on the result port" type="count" min="1" max="1"/>
-        <x:expect label="The documents base URI should not place the document in the `unzipped-basedir` directory" type="xpath" test="substring(base-uri(/*), 1, string-length($temp-dir))"
-            equals="$temp-dir" xfail="true"/>
+        <x:expect label="The documents base URI should not place the document in the `unzipped-basedir` directory" type="xpath" test="substring(base-uri(/*), 1, string-length(replace($temp-dir,'//+','/')))"
+            equals="replace($temp-dir,'//+','/')" xfail="true"/>
         <x:expect label="The contents of the OPF should be base64 encoded" type="compare">
             <x:document xml:space="preserve" type="inline">
 <c:data name="EPUB/package.opf" content-type="application/octet-stream" encoding="base64">77u/PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjxwYWNrYWdlIHhtbG5z
@@ -278,8 +278,8 @@ CjwvcGFja2FnZT4NCg==
         <x:expect label="There should be no files in the output directory" type="xpath" test="count(/*/*)" equals="0"/>
     </x:scenario>
 
-    <x:scenario label="Scenario for testing px:unzip-fileset">
-        <x:call step="px:unzip-fileset">
+    <x:scenario label="Scenario for testing px:fileset-unzip">
+        <x:call step="px:fileset-unzip">
             <x:option name="href" select="resolve-uri('samples/test.epub', base-uri(.))"/>
             <x:option name="load-to-memory" select="'false'"/>
             <x:option name="store-to-disk" select="'true'"/>
