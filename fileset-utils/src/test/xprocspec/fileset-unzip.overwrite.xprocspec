@@ -74,12 +74,14 @@
         <x:context label="the output directory">
             <x:document type="directory" base-uri="temp-dir" href="test1/" recursive="true"/>
         </x:context>
-        <x:expect label="The output directory should contain 0 subdirectories" type="xpath" test="count(/*/c:directory)" equals="0"/>
-        <x:expect label="The output directory should contain 1 file" type="xpath" test="count(/*/c:file)" equals="1"/>
-        <x:expect label="The file 'package.opf' must exist in the output directory" type="xpath" test="/*/c:file/@name" equals="'package.opf'"/>
+        <x:expect label="The output directory should contain 1 subdirectory" type="xpath" test="count(/*/c:directory)" equals="1"/>
+        <x:expect label="The output directory should contain 0 files" type="xpath" test="count(/*/c:file)" equals="0"/>
+        <x:expect label="The output subdirectory should contain 0 subdirectories" type="xpath" test="count(/*/*/c:directory)" equals="0"/>
+        <x:expect label="The output subdirectory should contain 1 file" type="xpath" test="count(/*/*/c:file)" equals="1"/>
+        <x:expect label="The file 'package.opf' must exist in the output directory" type="xpath" test="/*/*/c:file/@name" equals="'package.opf'"/>
 
         <x:context label="the output file">
-            <x:document type="file" base-uri="temp-dir" href="test1/package.opf"/>
+            <x:document type="file" base-uri="temp-dir" href="test1/EPUB/package.opf"/>
         </x:context>
         <x:expect label="The document should be a OPF" type="xpath" test="concat('{',namespace-uri(/*),'}',local-name(/*))" equals="'{http://www.idpf.org/2007/opf}package'"/>
     </x:scenario>
@@ -144,17 +146,19 @@
             <x:document type="port" port="fileset"/>
         </x:context>
         <x:expect label="There must be exactly 1 file in the fileset" type="xpath" test="count(/*/*)" equals="1"/>
-        <x:expect label="The file 'package.opf' must exist in the fileset" type="xpath" test="/*/*/@href" equals="'package.opf'"/>
+        <x:expect label="The file 'package.opf' must exist in the fileset" type="xpath" test="/*/*/@href" equals="'EPUB/package.opf'"/>
 
         <x:context label="the output directory">
             <x:document type="directory" base-uri="temp-dir" href="test3/" recursive="true"/>
         </x:context>
-        <x:expect label="The output directory should contain 0 subdirectories" type="xpath" test="count(/*/c:directory)" equals="0"/>
-        <x:expect label="The output directory should contain 1 file" type="xpath" test="count(/*/c:file)" equals="1"/>
-        <x:expect label="The file 'package.opf' must exist in the output directory" type="xpath" test="/*/c:file/@name" equals="'package.opf'"/>
+        <x:expect label="The output directory should contain 1 subdirectory" type="xpath" test="count(/*/c:directory)" equals="1"/>
+        <x:expect label="The output directory should contain 0 files" type="xpath" test="count(/*/c:file)" equals="0"/>
+        <x:expect label="The output subdirectory should contain 0 subdirectories" type="xpath" test="count(/*/*/c:directory)" equals="0"/>
+        <x:expect label="The output subdirectory should contain 1 file" type="xpath" test="count(/*/*/c:file)" equals="1"/>
+        <x:expect label="The file 'package.opf' must exist in the output directory" type="xpath" test="/*/*/c:file/@name" equals="'package.opf'"/>
 
         <x:context label="the output file">
-            <x:document type="file" base-uri="temp-dir" href="test3/package.opf"/>
+            <x:document type="file" base-uri="temp-dir" href="test3/EPUB/package.opf"/>
         </x:context>
         <x:expect label="The document should be a OPF (i.e. the existing document should be overwritten)" type="xpath" test="concat('{',namespace-uri(/*),'}',local-name(/*))"
             equals="'{http://www.idpf.org/2007/opf}package'"/>
