@@ -6,7 +6,6 @@ import org.daisy.maven.xproc.xprocspec.XProcSpecRunner;
 
 import static org.daisy.pipeline.pax.exam.Options.brailleModule;
 import static org.daisy.pipeline.pax.exam.Options.calabashConfigFile;
-import static org.daisy.pipeline.pax.exam.Options.domTraversalPackage;
 import static org.daisy.pipeline.pax.exam.Options.felixDeclarativeServices;
 import static org.daisy.pipeline.pax.exam.Options.logbackClassic;
 import static org.daisy.pipeline.pax.exam.Options.mavenBundle;
@@ -41,7 +40,6 @@ public class XProcSpecTest {
 		return options(
 			logbackConfigFile(),
 			calabashConfigFile(),
-	        domTraversalPackage(),
 			felixDeclarativeServices(),
 			thisBundle(),
 			junitBundles(),
@@ -49,10 +47,9 @@ public class XProcSpecTest {
 				pipelineModule("common-utils"),
 				logbackClassic(),
 				xprocspec(),
-	            mavenBundle("org.daisy.maven:xproc-engine-daisy-pipeline:?")
-            )
-    	);
-
+				mavenBundle("org.daisy.maven:xproc-engine-daisy-pipeline:?")
+			)
+		);
 	}
 	
 	@Inject
