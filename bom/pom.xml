@@ -37,6 +37,11 @@
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
+        <artifactId>html-utils</artifactId>
+        <version>2.0.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>image-utils</artifactId>
         <version>1.0.1-SNAPSHOT</version>
       </dependency>
