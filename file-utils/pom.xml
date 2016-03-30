@@ -277,4 +277,15 @@
     </pluginManagement>
   </build>
   
+  <!--
+      for javax.persistence
+  -->
+  <repositories>
+    <repository>
+      <id>eclipselink</id>
+      <name>EclipseLink Releases</name>
+      <url>http://download.eclipse.org/rt/eclipselink/maven.repo</url>
+    </repository>
+  </repositories>
+  
 </project>
