@@ -5,7 +5,7 @@
 
   <parent>
     <groupId>org.daisy.pipeline.modules</groupId>
-    <artifactId>common-utils-parent</artifactId>
+    <artifactId>scripts-utils-parent</artifactId>
     <version>1.10.0-SNAPSHOT</version>
     <relativePath>../parent/</relativePath>
   </parent>
@@ -17,14 +17,10 @@
   <name>DAISY Pipeline 2 module :: metadata-utils</name>
   
   <dependencies>
+    <!-- runtime dependencies -->
     <dependency>
       <groupId>org.daisy.pipeline.modules</groupId>
       <artifactId>validation-utils</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.daisy.pipeline.modules</groupId>
-      <artifactId>dtbook-validator</artifactId>
       <scope>runtime</scope>
     </dependency>
   </dependencies>
