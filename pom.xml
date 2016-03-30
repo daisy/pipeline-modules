@@ -31,6 +31,7 @@
     <module>epub3-pub-utils</module>
     <module>epubcheck-adapter</module>
     <module>mediaoverlay-utils</module>
+    <module>metadata-utils</module>
     <module>odt-utils</module>
     <module>zedai-utils</module>
   </modules>
@@ -92,6 +93,11 @@
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>mediaoverlay-utils</artifactId>
         <version>1.1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.daisy.pipeline.modules</groupId>
+        <artifactId>metadata-utils</artifactId>
+        <version>1.0.1-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
