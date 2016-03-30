@@ -52,11 +52,6 @@
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
-        <artifactId>metadata-utils</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-        <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>validation-utils</artifactId>
         <version>1.0.2-SNAPSHOT</version>
       </dependency>

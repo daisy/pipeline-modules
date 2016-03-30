@@ -28,7 +28,6 @@
     <module>html-utils</module>
     <module>image-utils</module>
     <module>mediatype-utils</module>
-    <module>metadata-utils</module>
     <module>validation-utils</module>
     <module>zip-utils</module>
   </modules>
