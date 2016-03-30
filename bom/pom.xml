@@ -17,7 +17,7 @@
 
   <name>DAISY Pipeline 2 :: Common Utility Modules BoM</name>
 
- <!-- BoM of the default script modules (for use in assemblies) -->
+  <!-- BoM of the modules (for use in assemblies) -->
   <dependencyManagement>
     <dependencies>
       <dependency>
