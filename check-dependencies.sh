@@ -1,9 +1,20 @@
 #!/bin/bash
 
 # run from whatever directory you'd like; will check all projects with a catalog.xml file under current directory
+SHORT="no"
+if [ "$1" = "short" ]; then
+    SHORT="yes"
+fi
 
+function debug_echo() {
+    if [ "$SHORT" = "no" ]; then
+        echo $1
+    fi
+}
+
+SUMMARY_STATUS="ok"
 for catalog in $(find -type f | grep -v "\s" | grep src/main/resources/META-INF/catalog.xml); do
-    echo
+    debug_echo ""
     resource_dir=$(cd `dirname $catalog` && cd .. && pwd)
     pom_dir="`echo $resource_dir | sed 's/\/src\/.*//'`"
     module_name="`echo $resource_dir | sed 's/\/src\/main\/.*//' | sed 's/.*\///'`"
@@ -12,7 +23,7 @@ for catalog in $(find -type f | grep -v "\s" | grep src/main/resources/META-INF/
     HAS_DEPENDENCIES="`cat /tmp/check-dependencies.catalog | wc -l`"
     if [ "$HAS_DEPENDENCIES" = "0" ]; then
         echo "$module_name: ok"
-        echo "    - module has no dependencies in catalog.xml; no further checking will be performed"
+        debug_echo "    - module has no dependencies in catalog.xml; no further checking will be performed"
         continue
     fi
     
@@ -50,12 +61,16 @@ for catalog in $(find -type f | grep -v "\s" | grep src/main/resources/META-INF/
         fi
     fi
     echo "$module_name: $STATUS"
-    echo "    - $pom_dir/pom.xml"
-    cat /tmp/check-dependencies.code | sed 's/^/    - depends on: /'
+    debug_echo "    - $pom_dir/pom.xml"
+    debug_echo "`cat /tmp/check-dependencies.code | sed 's/^/    - depends on: /'`"
     diff /tmp/check-dependencies.catalog /tmp/check-dependencies.code | grep "[><]" | sed 's/>/    - in code but not catalog: /' | sed 's/</    - in catalog but not in code: /'
     diff /tmp/check-dependencies.catalog /tmp/check-dependencies.pom-runtime-modules | grep "[><]" | sed 's/>/    - as pom runtime dependency but not catalog: /' | sed 's/</    - in catalog but not as pom runtime dependency: /'
     if [ "$HAS_XPROCSPEC_TEST" -gt 0 ]; then
         diff /tmp/check-dependencies.catalog /tmp/check-dependencies.xproc-maven-plugin | grep "[><]" | sed 's/>/    - imported in xproc-maven-plugin java test but not catalog: /' | sed 's/</    - in catalog but not in xproc-maven-plugin java test: /'
     fi
+    if [ "$STATUS" != "ok" ]; then
+        SUMMARY_STATUS=$STATUS
+    fi
 done
-echo
+debug_echo ""
+echo "Summary: $SUMMARY_STATUS"
