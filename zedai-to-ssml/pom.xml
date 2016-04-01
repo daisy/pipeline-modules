@@ -16,5 +16,19 @@
 
   <name>DAISY Pipeline 2 module :: ZedAI to SSML</name>
   <description>Generates SSML fragments to prepare the TTS narration of a ZedAI document.</description>
+  
+  <dependencies>
+    <!-- runtime dependencies -->
+    <dependency>
+      <groupId>org.daisy.pipeline.modules</groupId>
+      <artifactId>common-utils</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.daisy.pipeline.modules</groupId>
+      <artifactId>text-to-ssml</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
 
 </project>
