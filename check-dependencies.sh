@@ -8,9 +8,10 @@ fi
 
 function debug_echo() {
     if [ "$SHORT" = "no" ]; then
-        echo $1
+        echo "$1"
     fi
 }
+export -f debug_echo
 
 SUMMARY_STATUS="ok"
 for catalog in $(find -type f | grep -v "\s" | grep src/main/resources/META-INF/catalog.xml); do
@@ -62,7 +63,9 @@ for catalog in $(find -type f | grep -v "\s" | grep src/main/resources/META-INF/
     fi
     echo "$module_name: $STATUS"
     debug_echo "    - $pom_dir/pom.xml"
-    debug_echo "`cat /tmp/check-dependencies.code | sed 's/^/    - depends on: /'`"
+    if [ "$SHORT" = "no" ]; then
+        cat /tmp/check-dependencies.code | sed 's/^/    - depends on: /'
+    fi
     diff /tmp/check-dependencies.catalog /tmp/check-dependencies.code | grep "[><]" | sed 's/>/    - in code but not catalog: /' | sed 's/</    - in catalog but not in code: /'
     diff /tmp/check-dependencies.catalog /tmp/check-dependencies.pom-runtime-modules | grep "[><]" | sed 's/>/    - as pom runtime dependency but not catalog: /' | sed 's/</    - in catalog but not as pom runtime dependency: /'
     if [ "$HAS_XPROCSPEC_TEST" -gt 0 ]; then
