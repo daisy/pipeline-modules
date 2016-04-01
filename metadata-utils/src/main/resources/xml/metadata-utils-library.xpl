@@ -21,7 +21,7 @@
         </p:documentation>
     </p:import>
     
-    <p:import href="http://www.daisy.org/pipeline/modules/dtbook-validator/library.xpl">
+    <p:import href="http://www.daisy.org/pipeline/modules/dtbook-utils/library.xpl">
         <p:documentation>
             Schema selector used for DTBook validation.
         </p:documentation>

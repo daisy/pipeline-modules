@@ -44,7 +44,10 @@ public class XProcSpecTest {
             thisBundle(),
             junitBundles(),
             mavenBundlesWithDependencies(
+                mavenBundle().groupId("org.daisy.libs").artifactId("jing").versionAsInProject(),
+                pipelineModule("common-utils"),
                 pipelineModule("validation-utils"),
+                pipelineModule("dtbook-utils"),
                 // logging
                 logbackClassic(),
                 // xprocspec
