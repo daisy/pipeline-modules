@@ -10,13 +10,13 @@
                 <x:document type="inline">
                     <c:directory name="tmp" xml:base="file:/tmp/">
                         <c:other name="socket"/>
-                        <c:file name=".hidden"/>
                         <c:file name="file.txt"/>
+                        <c:file name=".hidden"/>
                         <c:directory name="sub1" xml:base="file:/tmp/sub1/">
-                            <c:file name="other.txt"/>
                             <c:directory name="sub2" xml:base="file:/tmp/sub1/sub2/">
                                 <c:file name="other.txt"/>
                             </c:directory>
+                            <c:file name="other.txt"/>
                         </c:directory>
                     </c:directory>
                 </x:document>
