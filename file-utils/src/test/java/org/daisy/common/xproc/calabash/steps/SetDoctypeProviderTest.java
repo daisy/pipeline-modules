@@ -9,6 +9,8 @@ import java.io.Writer;
 import org.daisy.common.xproc.calabash.steps.SetDoctypeProvider.SetDoctype;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SetDoctypeProviderTest {
 	
@@ -16,6 +18,8 @@ public class SetDoctypeProviderTest {
 	Writer writer = null;
 	
 	String input = null, doctype = null, expected = null, actual = null;
+	
+	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Test
 	public void test() {
@@ -28,7 +32,7 @@ public class SetDoctypeProviderTest {
 			
 			reader = new StringReader(input);
 			writer = new StringWriter();
-			SetDoctype.setDoctypeOnStream(reader, writer, doctype, null, null);
+			SetDoctype.setDoctypeOnStream(reader, writer, doctype, null, logger);
 			
 			actual = writer.toString();
 			
@@ -58,7 +62,7 @@ public class SetDoctypeProviderTest {
 			
 			reader = new StringReader(input);
 			writer = new StringWriter();
-			SetDoctype.setDoctypeOnStream(reader, writer, doctype, null, null);
+			SetDoctype.setDoctypeOnStream(reader, writer, doctype, null, logger);
 			
 			actual = writer.toString();
 			
@@ -91,7 +95,7 @@ public class SetDoctypeProviderTest {
 			
 			reader = new StringReader(input);
 			writer = new StringWriter();
-			SetDoctype.setDoctypeOnStream(reader, writer, doctype, null, null);
+			SetDoctype.setDoctypeOnStream(reader, writer, doctype, null, logger);
 			
 			actual = writer.toString();
 			
@@ -122,7 +126,7 @@ public class SetDoctypeProviderTest {
 			
 			reader = new StringReader(input);
 			writer = new StringWriter();
-			SetDoctype.setDoctypeOnStream(reader, writer, doctype, null, null);
+			SetDoctype.setDoctypeOnStream(reader, writer, doctype, null, logger);
 			
 			actual = writer.toString();
 			
@@ -174,7 +178,7 @@ public class SetDoctypeProviderTest {
 			
 			reader = new StringReader(input);
 			writer = new StringWriter();
-			SetDoctype.setDoctypeOnStream(reader, writer, doctype, null, null);
+			SetDoctype.setDoctypeOnStream(reader, writer, doctype, null, logger);
 			
 			actual = writer.toString();
 			
@@ -202,7 +206,7 @@ public class SetDoctypeProviderTest {
 			
 			reader = new StringReader(input);
 			writer = new StringWriter();
-			SetDoctype.setDoctypeOnStream(reader, writer, doctype, null, null);
+			SetDoctype.setDoctypeOnStream(reader, writer, doctype, null, logger);
 			
 			actual = writer.toString();
 			
@@ -230,7 +234,7 @@ public class SetDoctypeProviderTest {
 			
 			reader = new StringReader(input);
 			writer = new StringWriter();
-			SetDoctype.setDoctypeOnStream(reader, writer, doctype, null, null);
+			SetDoctype.setDoctypeOnStream(reader, writer, doctype, null, logger);
 			
 			actual = writer.toString();
 			
@@ -258,7 +262,7 @@ public class SetDoctypeProviderTest {
 			
 			reader = new StringReader(input);
 			writer = new StringWriter();
-			SetDoctype.setDoctypeOnStream(reader, writer, doctype, null, null);
+			SetDoctype.setDoctypeOnStream(reader, writer, doctype, null, logger);
 			
 			actual = writer.toString();
 			

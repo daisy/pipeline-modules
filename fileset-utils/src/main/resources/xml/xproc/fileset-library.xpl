@@ -14,5 +14,6 @@
     <p:import href="fileset-add-ref.xpl"/>
     <p:import href="fileset-rebase.xpl"/>
     <p:import href="fileset-move.xpl"/>
+    <p:import href="fileset-unzip.xpl"/>
 
 </p:library>

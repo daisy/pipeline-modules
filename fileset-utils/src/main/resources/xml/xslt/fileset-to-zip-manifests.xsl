@@ -2,7 +2,10 @@
 <xsl:stylesheet version="2.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
-                xmlns:c="http://www.w3.org/ns/xproc-step">
+                xmlns:c="http://www.w3.org/ns/xproc-step"
+                xmlns:pf="http://www.daisy.org/ns/pipeline/functions">
+	
+	<xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/uri-functions.xsl"/>
 	
 	<xsl:output method="xml" encoding="UTF-8" indent="yes" name="zip-manifest"/>
 	
@@ -25,7 +28,7 @@
 	<xsl:template match="d:file">
 		<xsl:element name="c:entry">
 			<xsl:variable name="target" select="resolve-uri(@href, base-uri(.))"/>
-			<xsl:attribute name="name" select="substring-after($target,'!/')"/>
+			<xsl:attribute name="name" select="pf:unescape-uri(substring-after($target,'!/'))"/>
 			<xsl:choose>
 				<xsl:when test="$fileset.in-memory//d:file[resolve-uri(@href,base-uri(.))=$target]">
 					<xsl:attribute name="href" select="@href"/>

@@ -20,6 +20,9 @@
     <p:option name="encoding" select="'utf-8'">
         <p:documentation>The encoding to use when reading and writing from and to the file (default: 'utf-8').</p:documentation>
     </p:option>
+    <p:option name="use-java-implementation" select="'true'">
+        <p:documentation>If the Java implementation of this step is available but you don't want to use it; set this to false (default 'true').</p:documentation>
+    </p:option>
 
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
 
@@ -31,7 +34,7 @@
     </p:declare-step>
     
     <p:choose>
-        <p:when test="p:step-available('pxi:set-doctype')">
+        <p:when test="p:step-available('pxi:set-doctype') and $use-java-implementation = 'true'">
             <pxi:set-doctype>
                 <p:with-option name="href" select="$href"/>
                 <p:with-option name="doctype" select="$doctype"/>
@@ -40,7 +43,6 @@
             
         </p:when>
         <p:otherwise>
-            
             <p:variable name="doctype-regex" select="'^&lt;!DOCTYPE\s+\w+\s*(|SYSTEM\s+(&quot;[^&quot;]*&quot;|''[^'']*'')|PUBLIC\s+(&quot;[\s\w\-''()+,\./:=?;!*#@$_%]*&quot;|''[\s\w\-()+,\./:=?;!*#@$_%]*'')\s+(&quot;[^&quot;]*&quot;|''[^'']*''))(\s*\[[^\]]+\])?>$'"/>
         
             <p:add-attribute match="/*" attribute-name="href">

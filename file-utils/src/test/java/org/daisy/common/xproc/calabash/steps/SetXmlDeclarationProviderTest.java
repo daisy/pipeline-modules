@@ -10,6 +10,8 @@ import org.daisy.common.xproc.calabash.steps.SetDoctypeProvider.SetDoctype;
 import org.daisy.common.xproc.calabash.steps.SetXmlDeclarationProvider.SetXmlDeclaration;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SetXmlDeclarationProviderTest {
 	
@@ -17,6 +19,8 @@ public class SetXmlDeclarationProviderTest {
 	Writer writer = null;
 	
 	String input = null, xmlDeclaration = null, expected = null, actual = null;
+	
+	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Test
 	public void testReplaceXmlDeclaration() {
@@ -29,7 +33,7 @@ public class SetXmlDeclarationProviderTest {
 			
 			reader = new StringReader(input);
 			writer = new StringWriter();
-			SetXmlDeclaration.setXmlDeclarationOnStream(reader, writer, xmlDeclaration, null, null);
+			SetXmlDeclaration.setXmlDeclarationOnStream(reader, writer, xmlDeclaration, null, logger);
 			
 			actual = writer.toString();
 			
@@ -58,7 +62,7 @@ public class SetXmlDeclarationProviderTest {
 			
 			reader = new StringReader(input);
 			writer = new StringWriter();
-			SetXmlDeclaration.setXmlDeclarationOnStream(reader, writer, xmlDeclaration, null, null);
+			SetXmlDeclaration.setXmlDeclarationOnStream(reader, writer, xmlDeclaration, null, logger);
 			
 			actual = writer.toString();
 			
@@ -87,7 +91,7 @@ public class SetXmlDeclarationProviderTest {
 			
 			reader = new StringReader(input);
 			writer = new StringWriter();
-			SetXmlDeclaration.setXmlDeclarationOnStream(reader, writer, xmlDeclaration, null, null);
+			SetXmlDeclaration.setXmlDeclarationOnStream(reader, writer, xmlDeclaration, null, logger);
 			
 			actual = writer.toString();
 			
@@ -115,7 +119,7 @@ public class SetXmlDeclarationProviderTest {
 			
 			reader = new StringReader(input);
 			writer = new StringWriter();
-			SetDoctype.setDoctypeOnStream(reader, writer, xmlDeclaration, null, null);
+			SetDoctype.setDoctypeOnStream(reader, writer, xmlDeclaration, null, logger);
 			
 			actual = writer.toString();
 			
@@ -143,7 +147,7 @@ public class SetXmlDeclarationProviderTest {
 			
 			reader = new StringReader(input);
 			writer = new StringWriter();
-			SetDoctype.setDoctypeOnStream(reader, writer, xmlDeclaration, null, null);
+			SetDoctype.setDoctypeOnStream(reader, writer, xmlDeclaration, null, logger);
 			
 			actual = writer.toString();
 			
@@ -171,7 +175,7 @@ public class SetXmlDeclarationProviderTest {
 			
 			reader = new StringReader(input);
 			writer = new StringWriter();
-			SetDoctype.setDoctypeOnStream(reader, writer, xmlDeclaration, null, null);
+			SetDoctype.setDoctypeOnStream(reader, writer, xmlDeclaration, null, logger);
 			
 			actual = writer.toString();
 			

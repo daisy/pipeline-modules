@@ -30,7 +30,6 @@ import com.xmlcalabash.model.RuntimeValue;
 import com.xmlcalabash.runtime.XAtomicStep;
 import com.xmlcalabash.util.TreeWriter;
 
-@SuppressWarnings("serial")
 public class SetXmlDeclarationProvider implements XProcStepProvider {
 
 	@Override
@@ -81,9 +80,12 @@ public class SetXmlDeclarationProvider implements XProcStepProvider {
 			tree.startContent();
 			
 			if (ok) {
+				logger.debug("SetXmlDeclaration: successfully set the XML declaration");
 				tree.addText(file.toURI().toString());
 			} else {
-				tree.addAttribute(new QName("error"), "px:set-xml-declaration failed to read from "+file+" (xml declaration: "+xmlDeclaration+", filesize: "+(file==null?'?':file.length())+")");
+				String errorMessage = "px:set-xml-declaration failed to read from "+file+" (xml declaration: "+xmlDeclaration+", filesize: "+(file==null?'?':file.length())+")";
+				logger.warn("SetXmlDeclaration: "+errorMessage);
+				tree.addAttribute(new QName("error"), errorMessage);
 			}
 
 			tree.addEndElement();
@@ -93,6 +95,10 @@ public class SetXmlDeclarationProvider implements XProcStepProvider {
 		}
 		
 		public static boolean setXmlDeclaration(File file, String encoding, String xmlDeclaration, Logger logger) {
+			
+			logger.debug("SetXmlDeclaration: file=["+file+"]");
+			logger.debug("SetXmlDeclaration: encoding=["+encoding+"]");
+			logger.debug("SetXmlDeclaration: xmlDeclaration=["+xmlDeclaration+"]");
 			
 			Reader reader = null;
 			InputStream in = null;
@@ -114,6 +120,11 @@ public class SetXmlDeclarationProvider implements XProcStepProvider {
 				writer = new OutputStreamWriter(new FileOutputStream(tempFile), encoding);
 				
 				success = setXmlDeclarationOnStream(reader, writer, xmlDeclaration, file.toString(), logger);
+				try {
+					writer.close();
+				} catch (IOException e) {
+					logger.error("SetXmlDeclaration: unable to close OutputStreamWriter", e);
+				}
 				
 				if (success) {
 				    Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -121,7 +132,7 @@ public class SetXmlDeclarationProvider implements XProcStepProvider {
 				
 			} catch (IOException e) {
 				if (logger != null) {
-					logger.error("px:set-xml-declaration failed to read from "+file, e);
+					logger.error("SetXmlDeclaration: px:set-xml-declaration failed to read from "+file, e);
 				}
 				e.printStackTrace();
 
@@ -165,6 +176,8 @@ public class SetXmlDeclarationProvider implements XProcStepProvider {
 				
 				if (offset == 1 && !(currentCharacter == '<' && nextCharacter == '?')) {
 					// no existing xml declaration
+					logger.debug("SetXmlDeclaration: no existing xml declaration");
+					
 					if (!"".equals(xmlDeclaration)) {
 						writer.write(xmlDeclaration);
 						writer.write("\n");
@@ -176,6 +189,7 @@ public class SetXmlDeclarationProvider implements XProcStepProvider {
 				
 				if (offset > 1 && (currentCharacter == '?' && nextCharacter == '>')) {
 					// found end of existing xml declaration
+					logger.debug("SetXmlDeclaration: found end of existing xml declaration");
 					
 					if ("".equals(xmlDeclaration) && (r = reader.read()) != -1) {
 						offset++;
@@ -203,6 +217,7 @@ public class SetXmlDeclarationProvider implements XProcStepProvider {
 			}
 			
 			// Write remaining characters from reader to writer
+			logger.debug("SetXmlDeclaration: Write remaining characters from reader to writer");
 			int bufferSize = 1024;
 			char[] buffer = new char[bufferSize];
 			int length = 0;

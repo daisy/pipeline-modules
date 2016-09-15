@@ -17,7 +17,7 @@ package org.daisy.common.xproc.calabash.steps;
  * Configure letex:unzip step by passing options to it:
  * zip (required):      file name (not URI) of a zip file
  * dest-dir (required): directory (relative or absolute; not an URI)
- * overwrite ('yes'/'no', optional, default 'no'): delete dest-dir (if it exists) prior to unzip 
+ * overwrite ('yes'/'no', optional, default 'no'): overwrite individual files even if they already exist
  * file (optional):     file name relative to zip root. If omitted, extract complete zip file
  * 
  * The directory (and missing subdirectories) will be created if
@@ -28,10 +28,12 @@ package org.daisy.common.xproc.calabash.steps;
  * DO NOT USE THIS AS A USER WITH ADMIN PRIVILEGES.
  * 
  *
- * 2015-02-27, Jostein Austvik Jacobsen (NLB):
+ * 2015-02-27, Jostein Austvik Jacobsen (NLB - Norwegian library of talking books and braille):
  *     - Wrapped into a org.daisy.common.xproc.calabash.XProcStepProvider
  *     - removed Apache Commons dependency
  *     - Use file URIs instead of OS-specific paths for options
+ * 2016-02-10, Jostein Austvik Jacobsen (NLB - Norwegian library of talking books and braille):
+ *     - slightly changed the meaning of the 'overwrite' option
  */
 
 import org.daisy.common.xproc.calabash.XProcStepProvider;
@@ -140,11 +142,11 @@ public class UnZipProvider implements XProcStepProvider {
     				}
     			}
     			
-                String removeS = getOption(new QName("overwrite")).getString();
-                boolean remove = false; 
-                if (removeS != null) {
-                    if (removeS.matches("yes")) {
-                        remove = true;
+                String overwriteS = getOption(new QName("overwrite")).getString();
+                boolean overwrite = false; 
+                if (overwriteS != null) {
+                    if (overwriteS.matches("yes")) {
+                        overwrite = true;
                     }
                 }
 
@@ -153,10 +155,7 @@ public class UnZipProvider implements XProcStepProvider {
                     filename = getOption(new QName("file")).getString();
     			}
     			
-                if (remove) {
-                    UnZip.deleteDirectory(folder);
-                }
-    			if(! folder.exists()) { 
+                if(! folder.exists()) { 
                     folder.mkdirs(); 
                 }
     			
@@ -178,12 +177,19 @@ public class UnZipProvider implements XProcStepProvider {
                         	File dir = new File(folder, entry.getName());
                             if (!dir.exists()) { dir.mkdirs(); }
                         } else {
-                        	File destFile = new File(folder, entry.getName());
+                            numFiles++;
+                            result += "<c:file name=\"" + entry.getName() + "\"/>";
+                            File destFile = new File(folder, entry.getName());
+                            if (destFile.exists()) {
+                                if (overwrite) {
+                                    deleteDirectory(destFile);
+                                } else {
+                                    continue;
+                                }
+                            }
                             File destdir = destFile.getParentFile();
                             if (!destdir.exists()) { destdir.mkdirs(); }
                             FileOutputStream fos = new FileOutputStream(destFile);
-                            numFiles++;
-                            result += "<c:file name=\"" + entry.getName() + "\"/>";
                             dest = new BufferedOutputStream(fos, BUFFER);
                             while ((count = zis.read(data, 0, BUFFER)) != -1) {
                                 dest.write(data, 0, count);
@@ -198,12 +204,19 @@ public class UnZipProvider implements XProcStepProvider {
                             int count;
                             byte data[] = new byte[BUFFER];
                             
+                            numFiles++;
+                            result += "<c:file name=\"" + entry.getName() + "\"/>";
                             File destFile = new File(folder, entry.getName());
+                            if (destFile.exists()) {
+                                if (overwrite) {
+                                    deleteDirectory(destFile);
+                                } else {
+                                    continue;
+                                }
+                            }
                             File destdir = destFile.getParentFile();
                             if (!destdir.exists()) { destdir.mkdirs(); }
                             FileOutputStream fos = new FileOutputStream(destFile);
-                            numFiles++;
-                            result += "<c:file name=\"" + entry.getName() + "\"/>";
                             dest = new BufferedOutputStream(fos, BUFFER);
                             while ((count = zis.read(data, 0, BUFFER)) != -1) {
                                 dest.write(data, 0, count);

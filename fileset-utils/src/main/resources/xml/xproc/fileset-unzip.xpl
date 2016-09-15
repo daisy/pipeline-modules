@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step type="px:unzip-fileset" xmlns:p="http://www.w3.org/ns/xproc" xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:d="http://www.daisy.org/ns/pipeline/data"
+<p:declare-step type="px:fileset-unzip" xmlns:p="http://www.w3.org/ns/xproc" xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:d="http://www.daisy.org/ns/pipeline/data"
     xmlns:px="http://www.daisy.org/ns/pipeline/xproc" version="1.0" name="main" xmlns:letex="http://www.le-tex.de/namespace" xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
     xmlns:cx="http://xmlcalabash.com/ns/extensions">
     
@@ -26,9 +26,9 @@
     <p:option name="store-to-disk" select="'false'"/>          <!-- boolean (default: false) -->
     <p:option name="overwrite" select="'false'"/>              <!-- boolean (default: false) -->
     
-    <p:import href="java-library.xpl"/>
+    <p:import href="fileset-library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/zip-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
     
     <!--

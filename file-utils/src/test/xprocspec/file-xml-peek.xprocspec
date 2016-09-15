@@ -39,11 +39,11 @@
             <x:expect label="There must be exactly one document on the escaped port" type="count" min="1" max="1"/>
             <x:expect label="The content should be as expected" type="compare">
                 <x:document type="inline">
-                    <c:body content-type="text/plain; charset=utf-8"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+                    <c:result content-type="text/plain; charset=utf-8"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <?xml-model href="http://www.daisy.org/ns/xprocspec/xprocspec.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
 <x:description xmlns:x="http://www.daisy.org/ns/xprocspec" script="../../../src/main/resources/xml/xproc/xml-peek.xpl" xmlns:test="http://www.daisy.org/ns/xprocspec/inline-script"
     xmlns:p="http://www.w3.org/ns/xproc" xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:px="http://www.daisy.org/ns/pipeline/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"/>]]></c:body>
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"/>]]></c:result>
                 </x:document>
             </x:expect>
 
@@ -84,9 +84,9 @@
             <x:expect label="There must be exactly one document on the escaped port" type="count" min="1" max="1"/>
             <x:expect label="The content should be as expected" type="compare">
                 <x:document type="inline">
-                    <c:body content-type="text/plain; charset=utf-8"><![CDATA[<?xml version="1.0" encoding="utf-8"?>
+                    <c:result content-type="text/plain; charset=utf-8"><![CDATA[<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"/>]]></c:body>
+<html xmlns="http://www.w3.org/1999/xhtml"/>]]></c:result>
                 </x:document>
             </x:expect>
 

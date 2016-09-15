@@ -4,13 +4,16 @@ import javax.inject.Inject;
 
 import org.daisy.maven.xproc.xprocspec.XProcSpecRunner;
 
+import static org.daisy.pipeline.pax.exam.Options.brailleModule;
 import static org.daisy.pipeline.pax.exam.Options.calabashConfigFile;
 import static org.daisy.pipeline.pax.exam.Options.felixDeclarativeServices;
-import static org.daisy.pipeline.pax.exam.Options.logbackBundles;
+import static org.daisy.pipeline.pax.exam.Options.logbackClassic;
+import static org.daisy.pipeline.pax.exam.Options.mavenBundle;
+import static org.daisy.pipeline.pax.exam.Options.mavenBundlesWithDependencies;
 import static org.daisy.pipeline.pax.exam.Options.logbackConfigFile;
 import static org.daisy.pipeline.pax.exam.Options.pipelineModule;
 import static org.daisy.pipeline.pax.exam.Options.thisBundle;
-import static org.daisy.pipeline.pax.exam.Options.xprocspecBundles;
+import static org.daisy.pipeline.pax.exam.Options.xprocspec;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,26 +33,21 @@ import static org.ops4j.pax.exam.CoreOptions.options;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
-public class FilesetUtilsTest {
-	
-	@Inject
-	private XProcSpecRunner runner;
+public class XProcSpecTest {
 	
 	@Configuration
 	public Option[] config() {
 		return options(
 			logbackConfigFile(),
 			calabashConfigFile(),
-			logbackBundles(),
 			felixDeclarativeServices(),
-			pipelineModule("file-utils"),
-			pipelineModule("common-utils"),
-			pipelineModule("html-utils"),
-			pipelineModule("zip-utils"),
-			pipelineModule("mediatype-utils"),
-			xprocspecBundles(),
 			thisBundle(),
-			junitBundles()
+			junitBundles(),
+			mavenBundlesWithDependencies(
+				logbackClassic(),
+				xprocspec(),
+				mavenBundle("org.daisy.maven:xproc-engine-daisy-pipeline:?")
+			)
 		);
 	}
 	
