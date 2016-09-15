@@ -22,7 +22,7 @@
   <modules>
     <module>common-utils</module>
     <module>file-utils</module>
-    <!-- <module>fileset-utils</module> -->
+    <module>fileset-utils</module>
     <!-- <module>image-utils</module> -->
     <!-- <module>mediatype-utils</module> -->
     <!-- <module>metadata-utils</module> -->
@@ -46,7 +46,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>fileset-utils</artifactId>
-        <version>1.1.0</version>
+        <version>1.1.1-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
