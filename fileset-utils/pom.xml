@@ -107,6 +107,16 @@
           </execution>
         </executions>
       </plugin>
+      <!-- TODO temporary disbling of XProcSpec tests -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/XProcSpecTest.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
     </plugins>
     <pluginManagement>
       <plugins>
