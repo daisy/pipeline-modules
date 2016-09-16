@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.daisy</groupId>
     <artifactId>daisy</artifactId>
-    <version>3</version>
+    <version>4</version>
     <relativePath />
   </parent>
 
@@ -24,7 +24,7 @@
     <module>parent</module>
     <module>asciimath-utils</module>
     <module>common-entities</module>
-    <module>css-utils</module>
+    <!-- <module>css-utils</module> -->
     <module>daisy202-utils</module>
     <module>daisy3-utils</module>
     <module>dtbook-utils</module>
