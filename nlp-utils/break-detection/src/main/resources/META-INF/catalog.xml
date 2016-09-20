@@ -4,5 +4,7 @@
        uri="../xml/library.xpl"/>
 
   <nextCatalog catalog="org:daisy:pipeline:modules:common-utils" />
+  <nextCatalog catalog="org:daisy:pipeline:modules:nlp-common" />
+  <nextCatalog catalog="org:daisy:pipeline:modules:nlp-lexing" />
 
 </catalog>
