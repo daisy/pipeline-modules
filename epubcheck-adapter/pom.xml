@@ -11,7 +11,7 @@
 
   <groupId>org.daisy.pipeline.modules</groupId>
   <artifactId>epubcheck-adapter</artifactId>
-  <version>1.1.1-SNAPSHOT</version>
+  <version>1.1.1</version>
   <packaging>bundle</packaging>
 
   <name>DAISY Pipeline 2 module :: EpubCheck Adapter</name>
@@ -58,4 +58,8 @@
       </plugin>
     </plugins>
   </build>
+
+  <scm>
+    <tag>v1.10.1</tag>
+  </scm>
 </project>
