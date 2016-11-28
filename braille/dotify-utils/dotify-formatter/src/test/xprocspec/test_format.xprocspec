@@ -480,9 +480,6 @@
                   <string value=""/>
                 </field>
                 <field>
-                  <string value=""/>
-                </field>
-                <field>
                   <current-page number-format="default"/>
                 </field>
               </footer>
@@ -497,9 +494,6 @@
           <layout-master name="c" page-width="15" page-height="5" duplex="true" page-number-variable="page">
             <default-template>
               <header>
-                <field>
-                  <string value=""/>
-                </field>
                 <field>
                   <string value=""/>
                 </field>
@@ -655,9 +649,6 @@
                   <string value=""/>
                 </field>
                 <field>
-                  <string value=""/>
-                </field>
-                <field>
                   <string value="⠏"/>
                   <current-page number-format="default"/>
                 </field>
@@ -672,9 +663,6 @@
                   <string value=""/>
                 </field>
                 <field>
-                  <string value=""/>
-                </field>
-                <field>
                   <current-page number-format="default"/>
                 </field>
               </footer>
@@ -684,9 +672,6 @@
             <default-template>
               <header/>
               <footer>
-                <field>
-                  <string value=""/>
-                </field>
                 <field>
                   <string value=""/>
                 </field>
@@ -2154,9 +2139,6 @@
                   <string value=""/>
                 </field>
                 <field>
-                  <string value=""/>
-                </field>
-                <field>
                   <current-page number-format="default"/>
                 </field>
               </footer>
@@ -2342,9 +2324,6 @@
             <default-template>
               <header/>
               <footer>
-                <field>
-                  <string value=""/>
-                </field>
                 <field>
                   <string value=""/>
                 </field>
@@ -3256,9 +3235,6 @@
                 <field>
                   <string value=""/>
                 </field>
-                <field>
-                  <string value=""/>
-                </field>
               </header>
               <footer/>
             </default-template>
@@ -3327,14 +3303,8 @@
                 <field>
                   <string value=""/>
                 </field>
-                <field>
-                  <string value=""/>
-                </field>
               </header>
               <header>
-                <field>
-                  <string value=""/>
-                </field>
                 <field>
                   <string value=""/>
                 </field>
@@ -3410,9 +3380,6 @@
                 <field>
                   <string value=""/>
                 </field>
-                <field>
-                  <string value=""/>
-                </field>
               </header>
               <footer/>
             </default-template>
@@ -3481,14 +3448,8 @@
                 <field>
                   <string value=""/>
                 </field>
-                <field>
-                  <string value=""/>
-                </field>
               </header>
               <header>
-                <field>
-                  <string value=""/>
-                </field>
                 <field>
                   <string value=""/>
                 </field>
@@ -3565,9 +3526,6 @@
                 <field>
                   <string value=""/>
                 </field>
-                <field>
-                  <string value=""/>
-                </field>
               </header>
               <footer/>
             </template>
@@ -3579,14 +3537,8 @@
                 <field>
                   <string value=""/>
                 </field>
-                <field>
-                  <string value=""/>
-                </field>
               </header>
               <header>
-                <field>
-                  <string value=""/>
-                </field>
                 <field>
                   <string value=""/>
                 </field>
@@ -3985,9 +3937,6 @@
                 <field>
                   <string value=""/>
                 </field>
-                <field>
-                  <string value=""/>
-                </field>
               </footer>
             </default-template>
           </layout-master>
@@ -4072,14 +4021,8 @@
                 <field>
                   <string value=""/>
                 </field>
-                <field>
-                  <string value=""/>
-                </field>
               </footer>
               <footer>
-                <field>
-                  <string value=""/>
-                </field>
                 <field>
                   <string value=""/>
                 </field>
@@ -4171,9 +4114,6 @@
                 <field>
                   <string value=""/>
                 </field>
-                <field>
-                  <string value=""/>
-                </field>
               </footer>
             </default-template>
           </layout-master>
@@ -4259,16 +4199,10 @@
                 <field>
                   <string value=""/>
                 </field>
-                <field>
-                  <string value=""/>
-                </field>
               </footer>
               <footer>
                 <field>
                   <string value="⠆"/>
-                </field>
-                <field>
-                  <string value=""/>
                 </field>
                 <field>
                   <string value=""/>
@@ -4359,16 +4293,10 @@
                 <field>
                   <string value=""/>
                 </field>
-                <field>
-                  <string value=""/>
-                </field>
               </footer>
               <footer>
                 <field>
                   <string value="⠆⠆"/>
-                </field>
-                <field>
-                  <string value=""/>
                 </field>
                 <field>
                   <string value=""/>
@@ -4459,16 +4387,10 @@
                 <field>
                   <string value=""/>
                 </field>
-                <field>
-                  <string value=""/>
-                </field>
               </footer>
               <footer>
                 <field>
                   <string value="⠆⠆"/>
-                </field>
-                <field>
-                  <string value=""/>
                 </field>
                 <field>
                   <string value=""/>
@@ -4638,9 +4560,6 @@
                   <marker-reference marker="print-page/entry" direction="backward" scope="sequence" text-style="/-dotify-ifndef:tmp_.+/"/>
                 </field>
                 <field>
-                  <string value=""/>
-                </field>
-                <field>
                   <marker-reference marker="print-page-dash/prev" direction="forward" scope="spread-content" start-offset="-1"/>
                   <marker-reference marker="print-page" direction="backward" scope="sequence" text-style="/-dotify-def:tmp_.+/"/>
                   <marker-reference marker="print-page/entry" direction="backward" scope="sequence" text-style="/-dotify-ifndef:tmp_.+/"/>
@@ -4655,9 +4574,6 @@
                   <marker-reference marker="dash-print-page" direction="backward" scope="page"/>
                 </field>
                 -->
-                <field>
-                  <string value=""/>
-                </field>
                 <field>
                   <string value=""/>
                 </field>
@@ -4684,9 +4600,6 @@
                 <field>
                   <string value=""/>
                 </field>
-                <field>
-                  <string value=""/>
-                </field>
               </header>
               <footer>
                 <!--
@@ -4697,9 +4610,6 @@
                   <marker-reference marker="dash-print-page" direction="backward" scope="page"/>
                 </field>
                 -->
-                <field>
-                  <string value=""/>
-                </field>
                 <field>
                   <string value=""/>
                 </field>
@@ -4930,9 +4840,6 @@
                 <field>
                   <string value=""/>
                 </field>
-                <field>
-                  <string value=""/>
-                </field>
               </footer>
             </default-template>
           </layout-master>
@@ -5076,9 +4983,6 @@
                   <marker-reference marker="print-page/prev" direction="forward" scope="page-content" text-style="/-dotify-def:tmp_.+/"/>
                   <marker-reference marker="print-page" direction="backward" scope="sequence" text-style="/-dotify-defifndef:tmp_.+/"/>
                   <marker-reference marker="print-page/entry" direction="backward" scope="sequence" text-style="/-dotify-ifndef:tmp_.+/"/>
-                </field>
-                <field>
-                  <string value=""/>
                 </field>
                 <field>
                   <string value=""/>
@@ -5689,9 +5593,6 @@
                   <marker-reference marker="foo" direction="forward" scope="page" text-style="/-dotify-def:tmp_.+/"/>
                   <marker-reference marker="foo" direction="backward" scope="sequence" text-style="/-dotify-defifndef:tmp_.+/"/>
                   <marker-reference marker="foo/entry" direction="backward" scope="sequence" text-style="/-dotify-ifndef:tmp_.+/"/>
-                </field>
-                <field>
-                  <string value=""/>
                 </field>
                 <field>
                   <marker-reference marker="foo/prev" direction="forward" scope="page-content" text-style="/-dotify-def:tmp_.+/"/>
@@ -7479,9 +7380,6 @@
                   <string value=""/>
                 </field>
                 <field>
-                  <string value=""/>
-                </field>
-                <field>
                   <current-page number-format="default"/>
                 </field>
               </footer>
@@ -7812,9 +7710,6 @@
             <default-template>
               <header/>
               <footer>
-                <field>
-                  <string value=""/>
-                </field>
                 <field>
                   <string value=""/>
                 </field>
@@ -8194,9 +8089,6 @@
                   <string value=""/>
                 </field>
                 <field>
-                  <string value=""/>
-                </field>
-                <field>
                   <current-page number-format="default"/>
                 </field>
               </header>
@@ -8394,9 +8286,6 @@
                   <string value=""/>
                 </field>
                 <field>
-                  <string value=""/>
-                </field>
-                <field>
                   <current-page number-format="default"/>
                 </field>
               </footer>
@@ -8410,9 +8299,6 @@
             <template use-when="(= (% $page 2) 0)">
               <header/>
               <footer>
-                <field>
-                  <string value=""/>
-                </field>
                 <field>
                   <string value=""/>
                 </field>
@@ -8769,9 +8655,6 @@
             <default-template>
               <header/>
               <footer>
-                <field>
-                  <string value=""/>
-                </field>
                 <field>
                   <string value=""/>
                 </field>
@@ -10789,9 +10672,6 @@
                   <string value=""/>
                 </field>
                 <field>
-                  <string value=""/>
-                </field>
-                <field>
                   <current-page number-format="default"/>
                 </field>
               </footer>
@@ -11012,14 +10892,8 @@
                 <field>
                   <string value=""/>
                 </field>
-                <field>
-                  <string value=""/>
-                </field>
               </header>
               <footer>
-                <field>
-                    <string value=""/>
-                </field>
                 <field>
                     <string value=""/>
                 </field>
@@ -11917,9 +11791,6 @@
                   <string value=""/>
                 </field>
                 <field>
-                  <string value=""/>
-                </field>
-                <field>
                   <current-page number-format="default"/>
                 </field>
               </footer>
@@ -11929,9 +11800,6 @@
             <default-template>
               <header/>
               <footer>
-                <field>
-                  <string value=""/>
-                </field>
                 <field>
                   <string value=""/>
                 </field>
@@ -12065,9 +11933,6 @@
             <default-template>
               <header/>
               <footer>
-                <field>
-                  <string value=""/>
-                </field>
                 <field>
                   <string value=""/>
                 </field>
@@ -12622,9 +12487,6 @@
                   <marker-reference marker="print-page" direction="forward" scope="page" text-style="/-dotify-def:tmp_.+/"/>
                   <marker-reference marker="print-page" direction="backward" scope="sequence" text-style="/-dotify-defifndef:tmp_.+/"/>
                   <marker-reference marker="print-page/entry" direction="backward" scope="sequence" text-style="/-dotify-ifndef:tmp_.+/"/>
-                </field>
-                <field>
-                  <string value=""/>
                 </field>
                 <field>
                   <marker-reference marker="print-page" direction="backward" scope="sequence" text-style="/-dotify-def:tmp_.*/"/>
