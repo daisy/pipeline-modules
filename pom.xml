@@ -32,7 +32,7 @@
     <!-- <module>epub3-to-ssml</module> -->
     <!-- <module>ssml-to-audio</module> -->
     <!-- <module>text-to-ssml</module> -->
-    <!-- <module>tts-utils/tts-common</module> -->
+    <module>tts-utils/tts-common</module>
     <!-- <module>tts-utils/tts-adapter-espeak</module> -->
     <module>tts-utils/tts-adapter-acapela</module>
     <!-- <module>tts-utils/tts-adapter-osx</module> -->
