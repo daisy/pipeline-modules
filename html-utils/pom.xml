@@ -47,6 +47,14 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.daisy.pipeline</groupId>
+      <artifactId>modules-registry</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.daisy.pipeline</groupId>
+      <artifactId>xmlcatalog</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.compendium</artifactId>
       <scope>provided</scope>
@@ -78,6 +86,13 @@
     </dependency>
   </dependencies>
   
+  <properties>
+    <expose-services>
+      org.daisy.pipeline.modules.impl.Module_html_utils,
+      org.daisy.common.xproc.calabash.steps.ChunkerStep$Provider
+    </expose-services>
+  </properties>
+  
   <build>
     <plugins>
       <plugin>
@@ -107,10 +122,10 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <_dsannotations>
-              org.daisy.common.xproc.calabash.steps.ChunkerStep$Provider
-            </_dsannotations>
-            <Private-Package>org.daisy.common.xproc.calabash.steps</Private-Package>
+            <Private-Package>
+              org.daisy.pipeline.modules.impl;-split-package:=first,
+              org.daisy.common.xproc.calabash.steps;-split-package:=first
+            </Private-Package>
           </instructions>
         </configuration>
         <executions>
