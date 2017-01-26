@@ -18,6 +18,14 @@
   <description>Break Detection Xproc Step based on any Lexer implementation</description>
 
  <dependencies>
+   <dependency>
+     <groupId>org.daisy.pipeline</groupId>
+     <artifactId>modules-registry</artifactId>
+   </dependency>
+   <dependency>
+     <groupId>org.daisy.pipeline</groupId>
+     <artifactId>xmlcatalog</artifactId>
+   </dependency>
 
    <dependency>
      <groupId>junit</groupId>
@@ -77,6 +85,7 @@
   
   <properties>
     <expose-services>
+      org.daisy.pipeline.modules.impl.Module_nlp_break_detection,
       org.daisy.pipeline.nlp.breakdetect.BreakDetectProvider
     </expose-services>
   </properties>
@@ -94,7 +103,8 @@
               *
             </Import-Package>
             <Private-Package>
-              org.daisy.pipeline.nlp.breakdetect
+              org.daisy.pipeline.nlp.breakdetect,
+              org.daisy.pipeline.modules.impl;-split-package:=first
             </Private-Package>
           </instructions>
         </configuration>
