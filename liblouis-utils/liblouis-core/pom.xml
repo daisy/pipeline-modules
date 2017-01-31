@@ -97,6 +97,18 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  
+  <properties>
+    <expose-services>
+      org.daisy.pipeline.braille.liblouis.impl.LiblouisHyphenatorJnaImplProvider,
+      org.daisy.pipeline.braille.liblouis.impl.LiblouisTableJnaImplProvider,
+      org.daisy.pipeline.braille.liblouis.impl.LiblouisTableRegistry,
+      org.daisy.pipeline.braille.liblouis.impl.LiblouisTranslatorJnaImplProvider,
+      org.daisy.pipeline.braille.liblouis.impl.LiblouisutdmlProcessBuilderImpl,
+      org.daisy.pipeline.braille.liblouis.impl.LiblouisutdmlConfigRegistry,
+      org.daisy.pipeline.braille.liblouis.pef.impl.LiblouisDisplayTableProvider
+    </expose-services>
+  </properties>
 
   <build>
     <plugins>
@@ -118,17 +130,10 @@
         <configuration>
           <instructions>
             <Bundle-Activator>org.daisy.pipeline.braille.liblouis.impl.Activator</Bundle-Activator>
-            <_dsannotations>
-              org.daisy.pipeline.braille.liblouis.impl.LiblouisHyphenatorJnaImplProvider,
-              org.daisy.pipeline.braille.liblouis.impl.LiblouisTableJnaImplProvider,
-              org.daisy.pipeline.braille.liblouis.impl.LiblouisTableRegistry,
-              org.daisy.pipeline.braille.liblouis.impl.LiblouisTranslatorJnaImplProvider,
-              org.daisy.pipeline.braille.liblouis.impl.LiblouisutdmlProcessBuilderImpl,
-              org.daisy.pipeline.braille.liblouis.pef.impl.LiblouisDisplayTableProvider
-            </_dsannotations>
-            <Service-Component>
-              OSGI-INF/liblouisutdml-config-registry.xml
-            </Service-Component>
+            <Private-Package>
+              org.daisy.pipeline.braille.liblouis.impl,
+              org.daisy.pipeline.braille.liblouis.pef.impl
+            </Private-Package>
           </instructions>
         </configuration>
         <executions>

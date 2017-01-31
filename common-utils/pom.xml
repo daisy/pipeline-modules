@@ -78,6 +78,15 @@
     </dependency>
   </dependencies>
   
+  <properties>
+    <expose-services>
+      org.daisy.pipeline.braille.common.saxon.impl.TextTransformDefinition,
+      org.daisy.pipeline.braille.common.saxon.impl.MessageDefinition,
+      org.daisy.pipeline.braille.common.saxon.impl.ProgressDefinition,
+      org.daisy.pipeline.braille.common.calabash.impl.PxTransformStep$StepProvider
+    </expose-services>
+  </properties>
+  
   <build>
     <plugins>
       <plugin>
@@ -101,12 +110,10 @@
               net.sf.saxon.*;version="${saxon.versionRange}",
               *
             </Import-Package>
-            <_dsannotations>
-              org.daisy.pipeline.braille.common.saxon.impl.TextTransformDefinition,
-              org.daisy.pipeline.braille.common.saxon.impl.MessageDefinition,
-              org.daisy.pipeline.braille.common.saxon.impl.ProgressDefinition,
-              org.daisy.pipeline.braille.common.calabash.impl.PxTransformStep$StepProvider
-            </_dsannotations>
+            <Private-Package>
+              org.daisy.pipeline.braille.common.calabash.impl,
+              org.daisy.pipeline.braille.common.saxon.impl
+            </Private-Package>
           </instructions>
         </configuration>
         <executions>

@@ -39,6 +39,13 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
+  
+  <properties>
+    <expose-services>
+      org.daisy.pipeline.braille.pef.saxon.impl.DecodeDefinition,
+      org.daisy.pipeline.braille.pef.saxon.impl.EncodeDefinition
+    </expose-services>
+  </properties>
 
   <build>
     <plugins>
@@ -51,7 +58,9 @@
               net.sf.saxon.*;version="${saxon.versionRange}",
               *
             </Import-Package>
-            <_dsannotations>*</_dsannotations>
+            <Private-Package>
+              org.daisy.pipeline.braille.pef.saxon.impl
+            </Private-Package>
             <Provide-Capability>
               xpath.function;name="{http://www.daisy.org/ns/2008/pef}encode",
               xpath.function;name="{http://www.daisy.org/ns/2008/pef}decode"

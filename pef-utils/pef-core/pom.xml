@@ -57,6 +57,14 @@
     </dependency>
   </dependencies>
   
+  <properties>
+    <expose-services>
+      org.daisy.pipeline.braille.pef.impl.BrailleUtilsFileFormatCatalog,
+      org.daisy.pipeline.braille.pef.impl.BrailleUtilsTableCatalog,
+      org.daisy.pipeline.braille.pef.impl.LocaleBasedTableProvider
+    </expose-services>
+  </properties>
+  
   <build>
     <plugins>
       <plugin>
@@ -76,7 +84,9 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <_dsannotations>*</_dsannotations>
+            <Private-Package>
+              org.daisy.pipeline.braille.pef.impl
+            </Private-Package>
           </instructions>
         </configuration>
         <executions>

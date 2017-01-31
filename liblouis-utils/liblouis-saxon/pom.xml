@@ -62,6 +62,13 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  
+  <properties>
+    <expose-services>
+      org.daisy.pipeline.braille.liblouis.saxon.impl.HyphenateDefinition,
+      org.daisy.pipeline.braille.liblouis.saxon.impl.TranslateDefinition
+    </expose-services>
+  </properties>
 
   <build>
     <plugins>
@@ -86,7 +93,9 @@
               net.sf.saxon.*;version="${saxon.versionRange}",
               *
             </Import-Package>
-            <_dsannotations>*</_dsannotations>
+            <Private-Package>
+              org.daisy.pipeline.braille.liblouis.saxon.impl
+            </Private-Package>
             <Provide-Capability>
               xpath.function;name="{http://liblouis.org/liblouis}translate",
               xpath.function;name="{http://liblouis.org/liblouis}hyphenate"

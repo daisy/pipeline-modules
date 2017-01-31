@@ -127,6 +127,12 @@
     </dependency>
   </dependencies>
   
+  <properties>
+    <expose-services>
+      org.daisy.pipeline.braille.liblouis.impl.LiblouisCSSBlockTransform$Provider
+    </expose-services>
+  </properties>
+  
   <build>
     <plugins>
       <plugin>
@@ -146,12 +152,9 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <!--
-                in order to avoid including services in the same package in other bundles
-            -->
-            <_dsannotations>
-              org.daisy.pipeline.braille.liblouis.impl.LiblouisCSSBlockTransform$Provider
-            </_dsannotations>
+            <Private-Package>
+              org.daisy.pipeline.braille.liblouis.impl;-split-package:=first
+            </Private-Package>
             <Require-Capability>
               xproc.step;filter:="(name={http://liblouis.org/liblouis}translate-file)",
               xpath.function;filter:="(name={http://liblouis.org/liblouis}translate)",

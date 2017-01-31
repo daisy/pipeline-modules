@@ -81,6 +81,13 @@
     </dependency>
   </dependencies>
   
+  <properties>
+    <expose-services>
+      org.daisy.pipeline.braille.libhyphen.impl.LibhyphenJnaImpl,
+      org.daisy.pipeline.braille.libhyphen.impl.LibhyphenTableRegistry
+    </expose-services>
+  </properties>
+  
   <build>
     <plugins>
       <plugin>
@@ -101,8 +108,9 @@
         <configuration>
           <instructions>
             <Export-Package>org.daisy.pipeline.braille.libhyphen</Export-Package>
-            <Private-Package>org.daisy.pipeline.braille.libhyphen.impl</Private-Package>
-            <_dsannotations>*</_dsannotations>
+            <Private-Package>
+              org.daisy.pipeline.braille.libhyphen.impl;-split-package:=first
+            </Private-Package>
           </instructions>
         </configuration>
         <executions>

@@ -1,4 +1,4 @@
-package org.daisy.pipeline.braille.liblouis.impl;
+package org.daisy.pipeline.braille.libhyphen.impl;
 
 import java.util.Map;
 
@@ -10,17 +10,18 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.ComponentContext;
 
 @Component(
-	name = "org.daisy.pipeline.braille.liblouis.impl.LiblouisNativePathForLinux",
-	service = { NativePath.class },
+	name = "org.daisy.pipeline.braille.libhyphen.impl.LibhyphenNativePathForWindows",
+	service = {
+		NativePath.class
+	},
 	property = {
-		"identifier:String=http://www.liblouis.org/native/linux/",
-		"path:String=/native/linux",
-		"os.family:String=linux"
+		"identifier:String=http://hunspell.sourceforge.net/Hyphen/native/windows/",
+		"path:String=/native/windows",
+		"os.family:String=windows"
 	}
 )
-public class LiblouisNativePathForLinux extends BundledNativePath {
+public class LibhyphenNativePathForWindows extends BundledNativePath {
 	
-	@Override
 	@Activate
 	protected void activate(ComponentContext context, Map<?,?> properties) throws Exception {
 		super.activate(context, properties);

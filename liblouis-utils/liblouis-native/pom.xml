@@ -53,6 +53,11 @@
 
   <properties>
     <liblouisutdml.liblouis.version>2.6.3</liblouisutdml.liblouis.version>
+    <expose-services>
+      org.daisy.pipeline.braille.liblouis.impl.LiblouisNativePathForMacOS,
+      org.daisy.pipeline.braille.liblouis.impl.LiblouisNativePathForLinux,
+      org.daisy.pipeline.braille.liblouis.impl.LiblouisNativePathForWindows
+    </expose-services>
   </properties>
 
   <build>
@@ -260,6 +265,13 @@
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Private-Package>
+              org.daisy.pipeline.braille.liblouis.impl
+            </Private-Package>
+          </instructions>
+        </configuration>
         <executions>
           <execution>
             <id>default-bundle</id>
@@ -275,6 +287,9 @@
               <classifier>linux</classifier>
               <instructions>
                 <_dsannotations>org.daisy.pipeline.braille.liblouis.impl.LiblouisNativePathForLinux</_dsannotations>
+                <Private-Package>
+                  org.daisy.pipeline.braille.liblouis.impl
+                </Private-Package>
                 <Bundle-SymbolicName>org.daisy.pipeline.modules.braille.liblouis-native-linux</Bundle-SymbolicName>
                 <Include-Resource>
                   native/linux/x86=target/generated-resources/native/liblouis/i386-Linux-gpp,
@@ -295,6 +310,9 @@
               <classifier>mac</classifier>
               <instructions>
                 <_dsannotations>org.daisy.pipeline.braille.liblouis.impl.LiblouisNativePathForMacOS</_dsannotations>
+                <Private-Package>
+                  org.daisy.pipeline.braille.liblouis.impl
+                </Private-Package>
                 <Bundle-SymbolicName>org.daisy.pipeline.modules.braille.liblouis-native-mac</Bundle-SymbolicName>
                 <Include-Resource>
                   native/macosx/x86=target/generated-resources/native/liblouis/i386-MacOSX-gpp,
@@ -315,6 +333,9 @@
               <classifier>windows</classifier>
               <instructions>
                 <_dsannotations>org.daisy.pipeline.braille.liblouis.impl.LiblouisNativePathForWindows</_dsannotations>
+                <Private-Package>
+                  org.daisy.pipeline.braille.liblouis.impl
+                </Private-Package>
                 <Bundle-SymbolicName>org.daisy.pipeline.modules.braille.liblouis-native-windows</Bundle-SymbolicName>
                 <Include-Resource>
                   native/windows/x86=target/generated-resources/native/liblouis/i686-w64-mingw32-gpp,

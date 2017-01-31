@@ -83,6 +83,12 @@
     -->
   </dependencies>
   
+  <properties>
+    <expose-services>
+      org.daisy.pipeline.braille.dotify.impl.DotifyCSSBlockTransform$Provider
+    </expose-services>
+  </properties>
+  
   <build>
     <plugins>
       <plugin>
@@ -90,12 +96,9 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <!--
-                in order to avoid including services in the same package in other bundles
-            -->
-            <_dsannotations>
-              org.daisy.pipeline.braille.dotify.impl.DotifyCSSBlockTransform$Provider
-            </_dsannotations>
+            <Private-Package>
+              org.daisy.pipeline.braille.dotify.impl;-split-package:=first
+            </Private-Package>
             <Require-Capability>
               xproc.step;filter:="(name={http://code.google.com/p/dotify/}obfl-to-pef)",
               xproc.step;filter:="(name={http://code.google.com/p/dotify/}file-to-obfl)",

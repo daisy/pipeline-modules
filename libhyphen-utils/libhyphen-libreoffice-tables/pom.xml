@@ -27,21 +27,6 @@
     </dependency>
   </dependencies>
   
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>
-            <Import-Package>org.daisy.pipeline.braille.libhyphen</Import-Package>
-            <Service-Component>OSGI-INF/libhyphen-libreoffice-tables.xml</Service-Component>
-          </instructions>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-  
   <profiles>
     <profile>
       <id>generate-table-files</id>

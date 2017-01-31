@@ -136,6 +136,17 @@
     </dependency>
   </dependencies>
 
+  <properties>
+    <expose-services>
+      org.daisy.pipeline.braille.dotify.impl.BrailleFilterFactoryImpl,
+      org.daisy.pipeline.braille.dotify.impl.MarkerProcessorFactoryServiceImpl,
+      org.daisy.pipeline.braille.dotify.impl.BrailleTranslatorFactoryServiceImpl,
+      org.daisy.pipeline.braille.dotify.impl.DotifyCSSStyledDocumentTransform$Provider,
+      org.daisy.pipeline.braille.dotify.impl.DotifyOBFLTransform$Provider,
+      org.daisy.pipeline.braille.dotify.calabash.impl.ShiftObflMarkerStep$Provider
+    </expose-services>
+  </properties>
+
   <build>
     <plugins>
       <plugin>
@@ -162,14 +173,10 @@
             <!--
                 in order to avoid including services in the same package in other bundles
             -->
-            <_dsannotations>
-              org.daisy.pipeline.braille.dotify.impl.BrailleFilterFactoryImpl,
-              org.daisy.pipeline.braille.dotify.impl.MarkerProcessorFactoryServiceImpl,
-              org.daisy.pipeline.braille.dotify.impl.BrailleTranslatorFactoryServiceImpl,
-              org.daisy.pipeline.braille.dotify.impl.DotifyCSSStyledDocumentTransform$Provider,
-              org.daisy.pipeline.braille.dotify.impl.DotifyOBFLTransform$Provider,
-              org.daisy.pipeline.braille.dotify.calabash.impl.ShiftObflMarkerStep$Provider
-            </_dsannotations>
+            <Private-Package>
+              org.daisy.pipeline.braille.dotify.impl;-split-package:=first,
+              org.daisy.pipeline.braille.dotify.calabash.impl;-split-package:=first
+            </Private-Package>
           </instructions>
         </configuration>
         <executions>

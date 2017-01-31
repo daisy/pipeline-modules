@@ -49,6 +49,12 @@
     </dependency>
   </dependencies>
   
+  <properties>
+    <expose-services>
+      org.daisy.pipeline.braille.tex.saxon.impl.HyphenateDefinition
+    </expose-services>
+  </properties>
+  
   <build>
     <plugins>
       <plugin>
@@ -72,7 +78,9 @@
               net.sf.saxon.*;version="${saxon.versionRange}",
               *
             </Import-Package>
-            <_dsannotations>*</_dsannotations>
+            <Private-Package>
+              org.daisy.pipeline.braille.tex.saxon.impl
+            </Private-Package>
             <Provide-Capability>xpath.function;name="{http://code.google.com/p/texhyphj/}hyphenate"</Provide-Capability>
           </instructions>
         </configuration>
