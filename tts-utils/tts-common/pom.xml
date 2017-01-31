@@ -28,7 +28,6 @@
               net.sf.saxon.*;version="${saxon.versionRange}",
               *
             </Import-Package>
-            <Service-Component>OSGI-INF/tts-registry.xml</Service-Component>
           </instructions>
         </configuration>
       </plugin>
@@ -97,5 +96,11 @@
       <artifactId>tts-helpers</artifactId>
     </dependency>
   </dependencies>
+  
+  <properties>
+    <expose-services>
+      org.daisy.pipeline.tts.TTSRegistry
+    </expose-services>
+  </properties>
 
 </project>

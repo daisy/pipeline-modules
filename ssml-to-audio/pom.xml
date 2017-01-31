@@ -53,6 +53,11 @@
       <groupId>org.daisy.libs</groupId>
       <artifactId>saxon-he</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+      <scope>provided</scope>
+    </dependency>
     <!--
         test dependencies
     -->
@@ -72,16 +77,17 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.daisy.pipeline</groupId>
       <artifactId>framework-volatile</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
+  
+  <properties>
+    <expose-services>
+      org.daisy.pipeline.tts.synthesize.SynthesizeProvider
+    </expose-services>
+  </properties>
 
   <build>
     <plugins>
@@ -106,8 +112,7 @@
               net.sf.saxon.*;version="${saxon.versionRange}",
               *
             </Import-Package>
-            <Service-Component>OSGI-INF/synthesize.xml</Service-Component>
-            <Export-Package/>
+            <Private-Package>org.daisy.pipeline.tts.synthesize</Private-Package>
           </instructions>
         </configuration>
         <executions>
