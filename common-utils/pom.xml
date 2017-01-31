@@ -30,6 +30,11 @@
       <groupId>org.daisy.libs</groupId>
       <artifactId>saxon-he</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+      <scope>provided</scope>
+    </dependency>
     <!--
         test dependencies
     -->
@@ -45,6 +50,12 @@
     </dependency>
   </dependencies>
 
+  <properties>
+    <expose-services>
+      org.daisy.common.xproc.calabash.steps.Message
+    </expose-services>
+  </properties>
+  
   <build>
     <plugins>
       <plugin>
@@ -68,8 +79,9 @@
               net.sf.saxon.*;version="${saxon.versionRange}",
               *
             </Import-Package>
-            <Service-Component>OSGI-INF/message.xml</Service-Component>
-            <Private-Package>org.daisy.common.xproc.calabash.steps</Private-Package>
+            <Private-Package>
+              org.daisy.common.xproc.calabash.steps;-split-package:=first
+            </Private-Package>
           </instructions>
         </configuration>
         <executions>

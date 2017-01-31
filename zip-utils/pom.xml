@@ -33,6 +33,11 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+      <scope>provided</scope>
+    </dependency>
     <!--
         test dependencies
     -->
@@ -48,6 +53,12 @@
     </dependency>
   </dependencies>
 
+  <properties>
+    <expose-services>
+      org.daisy.common.xproc.calabash.steps.UnZipProvider
+    </expose-services>
+  </properties>
+  
   <build>
     <plugins>
       <plugin>
@@ -72,9 +83,11 @@
               *
             </Import-Package>
             <Service-Component>
-              OSGI-INF/letex-unzip.xml,
               OSGI-INF/config-calabash.xml
             </Service-Component>
+            <Private-Package>
+              org.daisy.common.xproc.calabash.steps;-split-package:=first
+            </Private-Package>
           </instructions>
         </configuration>
         <executions>

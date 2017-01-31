@@ -16,6 +16,12 @@ import net.sf.saxon.type.BuiltInAtomicType;
 import net.sf.saxon.value.SequenceType;
 import net.sf.saxon.value.StringValue;
 
+import org.osgi.service.component.annotations.Component;
+
+@Component(
+	name = "pf:file-expand83",
+	service = { ExtensionFunctionDefinition.class }
+)
 @SuppressWarnings("serial")
 public class Expand83 extends ExtensionFunctionDefinition {
 
@@ -64,6 +70,9 @@ public class Expand83 extends ExtensionFunctionDefinition {
 
 		try {
 			File file = new File(new URI(uri));
+			if (!file.exists()) {
+				return uri;
+			}
 			String expandedUri = expand83(file);
 			if (expandedUri == null) {
 				return uri;

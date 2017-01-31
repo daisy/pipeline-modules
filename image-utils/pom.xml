@@ -43,7 +43,18 @@
       <artifactId>modules-test-helper</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
+  
+  <properties>
+    <expose-services>
+      org.daisy.saxon.functions.image.ImageDimensions
+    </expose-services>
+  </properties>
 
   <build>
     <plugins>
@@ -78,9 +89,9 @@
               net.sf.saxon.*;version="${saxon.versionRange}",
               *
             </Import-Package>
-            <Service-Component>
-              OSGI-INF/image-dimensions.xml
-            </Service-Component>
+            <Private-Package>
+              org.daisy.saxon.functions.image
+            </Private-Package>
           </instructions>
         </configuration>
         <executions>

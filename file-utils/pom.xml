@@ -37,6 +37,11 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+      <scope>provided</scope>
+    </dependency>
     <!--
         runtime dependencies
     -->
@@ -60,6 +65,18 @@
     </dependency>
   </dependencies>
 
+  <properties>
+    <expose-services>
+      org.daisy.common.xproc.calabash.steps.CopyResourceProvider,
+      org.daisy.common.xproc.calabash.steps.PeekProvider,
+      org.daisy.common.xproc.calabash.steps.SetDoctypeProvider,
+      org.daisy.common.xproc.calabash.steps.SetXmlDeclarationProvider,
+      org.daisy.common.xproc.calabash.steps.XMLPeekProvider,
+      org.daisy.saxon.functions.file.Expand83,
+      org.daisy.saxon.functions.file.FileExists
+    </expose-services>
+  </properties>
+  
   <build>
     <plugins>
       <plugin>
@@ -94,16 +111,12 @@
               *
             </Import-Package>
             <Service-Component>
-              OSGI-INF/file-exists.xml,
-              OSGI-INF/file-expand83.xml,
-              OSGI-INF/copy-resource-step.xml,
-              OSGI-INF/peek-step.xml,
-              OSGI-INF/xml-peek-step.xml,
-              OSGI-INF/set-doctype-step.xml,
-              OSGI-INF/set-xml-declaration-step.xml,
               OSGI-INF/config-calabash.xml
             </Service-Component>
-            <Private-Package>org.daisy.common.xproc.calabash.steps</Private-Package>
+            <Private-Package>
+              org.daisy.common.xproc.calabash.steps;-split-package:=first,
+              org.daisy.saxon.functions.file
+            </Private-Package>
           </instructions>
         </configuration>
         <executions>
