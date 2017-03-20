@@ -12,7 +12,7 @@
 
   <groupId>org.daisy.pipeline.modules</groupId>
   <artifactId>common-utils-aggregator</artifactId>
-  <version>1.10.2</version>
+  <version>1.10.3-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>DAISY Pipeline 2 :: Aggregator POM for the Common Utility Modules</name>
@@ -22,14 +22,14 @@
   <modules>
     <module>bom</module>
     <module>parent</module>
-    <!-- <module>common-utils</module> -->
-    <!-- <module>file-utils</module> -->
+    <module>common-utils</module>
+    <module>file-utils</module>
     <module>fileset-utils</module>
-    <!-- <module>html-utils</module> -->
-    <!-- <module>image-utils</module> -->
-    <!-- <module>mediatype-utils</module> -->
-    <!-- <module>validation-utils</module> -->
-    <!-- <module>zip-utils</module> -->
+    <module>html-utils</module>
+    <module>image-utils</module>
+    <module>mediatype-utils</module>
+    <module>validation-utils</module>
+    <module>zip-utils</module>
   </modules>
   
   <!-- don't publish aggregator -->
@@ -51,8 +51,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <scm>
-    <tag>v1.10.2</tag>
-  </scm>
 </project>
