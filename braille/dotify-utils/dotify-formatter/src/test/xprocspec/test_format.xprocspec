@@ -2433,24 +2433,20 @@
     </x:expect>
   </x:scenario>
   
-  <x:scenario label="test_22" pending="xfail doesn't work because of error">
+  <x:scenario label="test_22">
     <x:documentation>
       Tests target-counter() referencing inline element.
-      
-      Broken: "Failed to complete volume division": is this a Dotify bug?
     </x:documentation>
     <x:call step="dotify:format">
       <x:input port="source">
         <x:document type="inline">
           <doc style="text-transform: none; @page { size: 14 8 }">
             <p style="display:block">
-              <a href="foo" style="&amp;::after { content: target-counter(attr(href), page) }"/>
+              <a href="foo" style="&amp;::after { content: target-counter(attr(href), page); text-transform: auto }"/>
             </p>
             <p style="display:block">
               ⠤⠤⠤⠤
-              <a id="foo">
-                ⠿
-              </a>
+              <a id="foo">⠿</a>
             </p>
             <p style="display:block">
               ⠤⠤⠤⠤
@@ -2472,14 +2468,12 @@
             </default-template>
           </layout-master>
           <sequence master="body">
-            <block>
+            <block translate="">
               <page-number ref-id="foo" number-format="default"/>
             </block>
             <block>
               ⠤⠤⠤⠤
-              <span id="foo">
-                ⠿
-              </span>
+              <span id="foo"/>⠿
             </block>
             <block>
               ⠤⠤⠤⠤
@@ -3745,17 +3739,16 @@
     </x:expect>
   </x:scenario>
   
-  <x:scenario label="test_40" pending="xfail doesn't work because of error">
+  <x:scenario label="test_40">
     <x:documentation>
-      Tests target-counter() referencing empty inline element. Broken: "Failed to complete volume
-      division": is this a Dotify bug?
+      Tests target-counter() referencing empty inline element.
     </x:documentation>
     <x:call step="dotify:format">
       <x:input port="source">
         <x:document type="inline">
           <doc style="text-transform:none">
             <p style="display:block">
-              <a href="foo" style="&amp;::after { content: target-counter(attr(href), page) }"/>
+              <a href="foo" style="&amp;::after { content: target-counter(attr(href), page); text-transform: auto }"/>
             </p>
             <p style="display:block">
               <a id="foo"/>
@@ -3780,7 +3773,7 @@
             </default-template>
           </layout-master>
           <sequence master="a">
-            <block>
+            <block translate="">
               <page-number ref-id="foo" number-format="default"/>
             </block>
             <block>
@@ -7901,7 +7894,7 @@
             </pre-content>
           </volume-template>
           <sequence master="main">
-            <block id="x">
+            <block>
               <block>⠤⠤⠤</block>
             </block>
             <block break-before="page"/>
@@ -8007,7 +8000,7 @@
             </pre-content>
           </volume-template>
           <sequence master="main">
-            <block translate="" id="x">
+            <block translate="">
               <block id="a">⠿⠿⠿ 1</block>
               <block>⠤⠤⠤</block>
             </block>
@@ -9055,7 +9048,7 @@
             </pre-content>
           </volume-template>
           <sequence master="main">
-            <block id="x">
+            <block>
               <block id="ch_1" translate=""> 1 </block>
               <block>
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
@@ -9223,7 +9216,7 @@
             </post-content>
           </volume-template>
           <sequence master="main">
-            <block id="x">
+            <block>
               <block id="ch_1" translate=""> 1 </block>
               <block>
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
@@ -9392,7 +9385,7 @@
             </pre-content>
           </volume-template>
           <sequence master="body">
-            <block id="x">
+            <block>
               ⠤⠤⠤⠤⠤
             </block>
           </sequence>
@@ -9551,7 +9544,7 @@
             </pre-content>
           </volume-template>
           <sequence master="main">
-            <block id="x">
+            <block>
               ⠤⠤⠤⠤⠤
             </block>
           </sequence>
@@ -9644,7 +9637,7 @@
             </pre-content>
           </volume-template>
           <sequence master="main">
-            <block id="x">
+            <block>
               ⠤⠤⠤⠤⠤
             </block>
           </sequence>
@@ -9786,7 +9779,7 @@
             </item>
           </collection>
           <sequence master="main">
-            <block id="x">
+            <block>
               ⠤⠤⠤ ⠶
               <anchor item="a"/>
               ⠤⠤⠤ ⠶⠶
@@ -11237,7 +11230,7 @@
             </item>
           </collection>
           <sequence master="main">
-            <block id="x">
+            <block>
               ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠶
               <anchor item="a"/>
               ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
