@@ -104,10 +104,12 @@
         <x:context label="the results">
             <x:document type="port" port="result"/>
         </x:context>
-        <x:expect label="the base-uri of the loaded document is the uri of this xprocspec file" type="xpath"
-                  test="ends-with(/d:results/@document-base-uri-before-xslt,'.xprocspec')"/>
-        <x:expect label="the base-uri of the document element is the value of the requested uri" type="xpath"
+        <x:expect label="the base-uri of the loaded document is the requested uri" type="xpath"
+                  test="/d:results/@document-base-uri-before-xslt" equals="'file:/from-memory/foo.xml'"/>
+        <x:expect label="the base-uri of the document element is the requested uri" type="xpath"
                   test="/d:results/@document-element-base-uri-before-xslt" equals="'file:/from-memory/foo.xml'"/>
+        <x:expect label="the base-uri of the loaded document should remain the same after xslt transformation" type="xpath"
+                  test="/d:results/@document-base-uri-before-xslt" equals="'file:/from-memory/foo.xml'"/>
         <x:expect label="the base-uri of the document element should remain the same after xslt transformation" type="xpath"
                   test="/d:results/@document-element-base-uri-after-xslt" equals="'file:/from-memory/foo.xml'"/>
     </x:scenario>
@@ -126,10 +128,12 @@
         <x:context label="the results">
             <x:document type="port" port="result"/>
         </x:context>
-        <x:expect label="the base-uri of the loaded document is the uri of the file" type="xpath"
+        <x:expect label="the base-uri of the loaded document is the requested uri" type="xpath"
                   test="/d:results/@document-base-uri-before-xslt" equals="resolve-uri('samples/fileset/test.xml')"/>
         <x:expect label="the base-uri of the document element is the requested uri" type="xpath"
                   test="/d:results/@document-element-base-uri-before-xslt" equals="resolve-uri('samples/fileset/test.xml')"/>
+        <x:expect label="the base-uri of the loaded document should remain the same after xslt transformation" type="xpath"
+                  test="/d:results/@document-base-uri-after-xslt" equals="resolve-uri('samples/fileset/test.xml')"/>
         <x:expect label="the base-uri of the document element should remain the same after xslt transformation" type="xpath"
                   test="/d:results/@document-element-base-uri-after-xslt" equals="resolve-uri('samples/fileset/test.xml')"/>
     </x:scenario>
@@ -148,10 +152,12 @@
         <x:context label="the results">
             <x:document type="port" port="result"/>
         </x:context>
-        <x:expect label="the base-uri of the loaded document is the uri of the original file" type="xpath"
-                  test="/d:results/@document-base-uri-before-xslt" equals="resolve-uri('samples/fileset/test.xml')"/>
+        <x:expect label="the base-uri of the loaded document is the requested uri" type="xpath"
+                  test="/d:results/@document-base-uri-before-xslt" equals="resolve-uri('samples/fileset/copy.xml')"/>
         <x:expect label="the base-uri of the document element is the requested uri" type="xpath"
                   test="/d:results/@document-element-base-uri-before-xslt" equals="resolve-uri('samples/fileset/copy.xml')"/>
+        <x:expect label="the base-uri of the loaded document should remain the same after xslt transformation" type="xpath"
+                  test="/d:results/@document-base-uri-after-xslt" equals="resolve-uri('samples/fileset/copy.xml')"/>
         <x:expect label="the base-uri of the document element should remain the same after xslt transformation" type="xpath"
                   test="/d:results/@document-element-base-uri-after-xslt" equals="resolve-uri('samples/fileset/copy.xml')"/>
     </x:scenario>
@@ -170,10 +176,12 @@
         <x:context label="the results">
             <x:document type="port" port="result"/>
         </x:context>
-        <x:expect label="the base-uri of the loaded document is empty" type="xpath"
-                  test="/d:results/@document-base-uri-before-xslt" equals="''"/>
+        <x:expect label="the base-uri of the loaded document is the requested uri" type="xpath"
+                  test="/d:results/@document-base-uri-before-xslt" equals="resolve-uri('samples/fileset2/a.zip!/e.svg')"/>
         <x:expect label="the base-uri of the document element is the requested uri" type="xpath"
                   test="/d:results/@document-element-base-uri-before-xslt" equals="resolve-uri('samples/fileset2/a.zip!/e.svg')"/>
+        <x:expect label="the base-uri of the loaded document should remain the same after xslt transformation" type="xpath"
+                  test="/d:results/@document-base-uri-after-xslt" equals="resolve-uri('samples/fileset2/a.zip!/e.svg')"/>
         <x:expect label="the base-uri of the document element should remain the same after xslt transformation" type="xpath"
                   test="/d:results/@document-element-base-uri-after-xslt" equals="resolve-uri('samples/fileset2/a.zip!/e.svg')"/>
     </x:scenario>
