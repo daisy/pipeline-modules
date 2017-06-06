@@ -51,6 +51,9 @@
         </x:expect>
     </x:scenario>
 
+    <!--
+        FIXME: this test does not work when run offline
+    -->
     <x:scenario label="test-href-zip">
         <x:call step="px:fileset-load">
             <x:input port="fileset">
