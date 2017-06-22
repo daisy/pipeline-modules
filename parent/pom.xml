@@ -102,4 +102,13 @@
       </plugins>
     </pluginManagement>
   </build>
+  
+  <repositories>
+    <repository>
+      <id>restlet-repo</id>
+      <name>Public online Restlet repository</name>
+      <url>http://maven.restlet.org</url>
+    </repository>
+  </repositories>
+
 </project>
