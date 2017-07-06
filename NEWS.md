@@ -1,3 +1,11 @@
+v1.11.3
+=======
+
+Changes
+-------
+- Support for fractional `line-height`
+- Bugfixes
+
 v1.11.2
 =======
 
