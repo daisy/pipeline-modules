@@ -10,7 +10,7 @@
     <relativePath>../../parent</relativePath>
   </parent>
 
-  <version>3.0.1-SNAPSHOT</version>
+  <version>1.0.0</version>
   <artifactId>tts-adapter-qfrency</artifactId>
   <packaging>bundle</packaging>
 
@@ -49,7 +49,7 @@
     </plugins>
   </build>
 
-  <profiles>
+	  <profiles>
     <profile>
       <activation>
         <activeByDefault>true</activeByDefault>
@@ -61,7 +61,7 @@
 	    <artifactId>maven-surefire-plugin</artifactId>
 	    <configuration>
 	      <excludes>
-		<exclude>**/EspeakTest.java</exclude>
+		<exclude>**/QfrencyTest.java</exclude>
 	      </excludes>
 	    </configuration>
 	  </plugin>
