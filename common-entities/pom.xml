@@ -15,4 +15,21 @@
   <packaging>bundle</packaging>
 
   <name>DAISY Pipeline 2 module :: Common Entities</name>
+
+  <dependencies>
+    <!--
+        test dependencies
+    -->
+    <dependency>
+      <groupId>org.daisy.pipeline.build</groupId>
+      <artifactId>modules-test-helper</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.daisy.pipeline</groupId>
+      <artifactId>calabash-adapter</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
 </project>
