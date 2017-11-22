@@ -2,7 +2,7 @@
 <x:description xmlns:x="http://www.jenitennison.com/xslt/xspec" xmlns:pf="http://www.daisy.org/ns/pipeline/functions" xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions"
     stylesheet="../../main/resources/xml/xslt/uri-functions.xsl">
 
-    <x:scenario pending="Not yet implemented" label="function tokenize-uri">
+    <x:scenario label="function tokenize-uri">
         <x:call function="pf:tokenize-uri"/>
         <x:scenario label="example from the RFC">
             <x:call>
