@@ -63,34 +63,21 @@
     <x:expect label="normalized">
       <obfl:block>
         <obfl:marker class="print-page" value="⠤"/>⠤⠤⠤
-        <obfl:marker class="print-page" value="⠤"/>
-        <obfl:marker class="print-page" value="⠤"/>
-        <obfl:block>⠤⠤⠤
-          <obfl:marker class="print-page" value="⠤"/>
-          ⠤⠤⠤
-          <obfl:marker class="print-page" value="⠤"/>
-          <obfl:marker class="print-page" value="⠤"/>
-          ⠤⠤⠤
+        <obfl:marker class="print-page" value="⠤"/><obfl:marker class="print-page" value="⠤"/><obfl:block>⠤⠤⠤
+           ​<obfl:marker class="print-page" value="⠤"/>⠤⠤⠤
+           ​<obfl:marker class="print-page" value="⠤"/><obfl:marker class="print-page" value="⠤"/>⠤⠤⠤
         </obfl:block>
         <obfl:marker class="print-page" value="⠤"/>
         <obfl:block>
           <obfl:marker class="print-page" value="⠤"/>⠤⠤⠤
-          <obfl:marker class="print-page" value="⠤"/>
-          <obfl:marker class="print-page" value="⠤"/>
-          <obfl:block>⠤⠤⠤
-            <obfl:marker class="print-page" value="⠤"/>
-            ⠤⠤⠤
-            <obfl:marker class="print-page" value="⠤"/>
-            <obfl:marker class="print-page" value="⠤"/>
-            ⠤⠤⠤
+          <obfl:marker class="print-page" value="⠤"/><obfl:marker class="print-page" value="⠤"/><obfl:block>⠤⠤⠤
+             ​<obfl:marker class="print-page" value="⠤"/>⠤⠤⠤
+             ​<obfl:marker class="print-page" value="⠤"/><obfl:marker class="print-page" value="⠤"/>⠤⠤⠤
           </obfl:block>
           <obfl:marker class="print-page" value="⠤"/>
           <obfl:block>⠤⠤⠤
-            <obfl:marker class="print-page" value="⠤"/>
-            ⠤⠤⠤
-            <obfl:marker class="print-page" value="⠤"/>
-            <obfl:marker class="print-page" value="⠤"/>
-            ⠤⠤⠤
+             ​<obfl:marker class="print-page" value="⠤"/>⠤⠤⠤
+             ​<obfl:marker class="print-page" value="⠤"/><obfl:marker class="print-page" value="⠤"/>⠤⠤⠤
           </obfl:block>
           <obfl:marker class="print-page" value="⠤"/>
         </obfl:block>
@@ -188,8 +175,7 @@
         <sequence master="master_1">
           <block><marker class="indicator/pagenum" value="x"/>⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
     ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
-    <marker class="indicator/pagenum" value="x"/>
-    ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
+     ​<marker class="indicator/pagenum" value="x"/>⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
     ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
     ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
     <marker class="indicator/pagenum" value="x"/>
@@ -243,8 +229,7 @@
         <sequence master="master_1">
           <block><marker class="indicator/pagenum" value="x"/>⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
     ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
-    <marker class="indicator/pagenum" value="x"/>
-    ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
+     ​<marker class="indicator/pagenum" value="x"/>⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
     ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
     ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
     <marker class="indicator/pagenum" value="x"/>
@@ -342,8 +327,7 @@
         <sequence master="master_1">
           <block><marker class="indicator/pagenum" value="x"/>⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
               ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
-              <marker class="indicator/pagenum" value="x"/>
-              ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
+               ​<marker class="indicator/pagenum" value="x"/>⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
               ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
               ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
               <marker class="indicator/pagenum" value="x"/>
@@ -397,8 +381,7 @@
         <sequence master="master_1">
           <block><marker class="indicator/pagenum" value="x"/>⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
               ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
-              <marker class="indicator/pagenum" value="x"/>
-              ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
+               ​<marker class="indicator/pagenum" value="x"/>⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
               ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
               ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
               <marker class="indicator/pagenum" value="x"/>
