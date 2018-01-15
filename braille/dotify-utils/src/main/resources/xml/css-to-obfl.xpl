@@ -668,17 +668,10 @@
     <p:for-each px:progress=".01">
         <p:choose px:progress="1">
             <p:documentation>
-                Delete css:margin-top from first block and move css:margin-top of other blocks to
-                css:margin-bottom of their preceding block.
+                Delete css:margin-top from first non-empty block and move css:margin-top of other
+                blocks to css:margin-bottom of their preceding block.
             </p:documentation>
-            <p:when test="$skip-margin-top-of-page='true' and not(/*/@css:flow[matches(.,'-obfl-on-(toc|volume)-(start|end)/')])">
-                <p:delete px:progress=".20"
-                          match="css:box
-                                   [@type='block']
-                                   [@css:margin-top]
-                                   [not(preceding::*)]
-                                   [not(ancestor::*[@css:border-top-pattern or @css:border-top-style])]
-                                 /@css:margin-top"/>
+            <p:when test="$skip-margin-top-of-page='true'">
                 <p:label-elements px:progress=".20"
                                   match="css:box
                                            [@type='block']
@@ -698,6 +691,16 @@
                                                     except ancestor::*/preceding-sibling::*/descendant::*)
                                                    [last()][@css:_margin-bottom_]]"/>
                 <p:rename match="@css:_margin-bottom_" new-name="css:margin-bottom"/>
+                <p:rename px:progress=".20"
+                          match="css:box
+                                   [@type='block']
+                                   [@css:margin-top]
+                                   [not(preceding::css:box[@type='inline' and child::node()
+                                                           or @css:border-top-pattern or @css:border-top-style
+                                                           or @css:border-bottom-pattern or @css:border-bottom-style])]
+                                   [not(ancestor::*[@css:border-top-pattern or @css:border-top-style])]
+                                 /@css:margin-top"
+                          new-name="css:margin-top-skip-if-top-of-page"/>
             </p:when>
             <p:otherwise>
                 <p:identity/>
