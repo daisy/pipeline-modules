@@ -94,11 +94,13 @@
     -->
     
     <xsl:template match="obfl:span/text()" mode="#default strip-leading-space">
-        <xsl:if test="not(preceding-sibling::node()) and matches(.,'^\s')">
+        <xsl:if test="not(preceding-sibling::node()) and matches(.,'^\s')
+                      and not(parent::*/preceding-sibling::node()[1]/self::text()[matches(., '\s$')])">
             <xsl:text>&#x200B;</xsl:text>
         </xsl:if>
         <xsl:next-match/>
-        <xsl:if test="not(following-sibling::node()) and matches(.,'\s$')">
+        <xsl:if test="not(following-sibling::node()) and matches(.,'\s$')
+                      and not(parent::*/following-sibling::node()[1]/self::text()[matches(., '^\s')])">
             <xsl:text>&#x200B;</xsl:text>
         </xsl:if>
     </xsl:template>
