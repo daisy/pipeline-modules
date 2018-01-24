@@ -85,7 +85,7 @@ public class LiblouisTableJnaImplProvider extends AbstractTransformProvider<Libl
 		}
 	}
 	
-	private final static boolean LIBLOUIS_EXTERNAL = Boolean.getBoolean("org.daisy.pipeline.liblouis.external");
+	private final static boolean LIBLOUIS_EXTERNAL = Boolean.getBoolean("org.daisy.pipeline.braille.liblouis.external");
 	
 	private LiblouisTableRegistry tableRegistry;
 	

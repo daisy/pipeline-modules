@@ -12,7 +12,7 @@ import org.osgi.framework.BundleContext;
 
 public class Activator implements BundleActivator {
 	
-	private final static boolean LIBLOUIS_EXTERNAL = Boolean.getBoolean("org.daisy.pipeline.liblouis.external");
+	private final static boolean LIBLOUIS_EXTERNAL = Boolean.getBoolean("org.daisy.pipeline.braille.liblouis.external");
 	
 	public void start(BundleContext context) throws Exception {
 		if (LIBLOUIS_EXTERNAL) {
