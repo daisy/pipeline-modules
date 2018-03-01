@@ -135,9 +135,17 @@
                   <url>http://daisy.github.io/pipeline/api/</url>
                   <location>${project.build.directory}/dependencies-package-list/</location>
                 </offlineLink>
+                <offlineLink>
+                  <!-- javadoc.io does not contain package-list file -->
+                  <url>http://javadoc.io/doc/org.slf4j/slf4j-api/1.7.2</url>
+                  <location>https://www.slf4j.org/apidocs</location>
+                </offlineLink>
               </offlineLinks>
               <links>
                 <link>https://google.github.io/guava/releases/15.0/api/docs</link>
+                <link>http://brailleapps.github.io/dotify.api/4.1.0/javadoc</link>
+                <link>https://osgi.org/javadoc/r5/core</link>
+                <link>https://osgi.org/javadoc/r5/cmpn</link>
               </links>
               <excludePackageNames>*.impl:*.impl.*</excludePackageNames>
             </configuration>

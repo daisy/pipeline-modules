@@ -129,6 +129,7 @@
               </offlineLinks>
               <links>
                 <link>https://google.github.io/guava/releases/15.0/api/docs</link>
+                <link>http://brailleapps.github.io/braille-utils.api/3.0.1/javadoc</link>
               </links>
               <excludePackageNames>*.impl:*.impl.*</excludePackageNames>
             </configuration>
