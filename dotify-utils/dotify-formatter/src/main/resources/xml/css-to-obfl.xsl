@@ -410,6 +410,9 @@
                     </xsl:for-each>
                 </xsl:if>
             </xsl:if>
+            <xsl:if test="$sections//@css:volume-break-inside">
+              <volume-transition range="sheet"/>
+            </xsl:if>
             <xsl:apply-templates mode="assert-nil" select="$sections/*[not(self::css:_)]"/>
             <xsl:for-each select="$sections/css:_[@css:flow=$collection-flows]">
                 <xsl:variable name="flow" as="xs:string" select="@css:flow"/>
