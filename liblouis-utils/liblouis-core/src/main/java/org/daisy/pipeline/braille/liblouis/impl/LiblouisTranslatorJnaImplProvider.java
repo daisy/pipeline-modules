@@ -418,25 +418,25 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 				// FIXME: remove duplication!!
 				
 				// convert style into typeform, hyphenate, preserveLines, preserveSpace and letterSpacing arrays
-				byte[] typeform;
-				boolean[] hyphenate;
-				boolean[] preserveLines;
-				boolean[] preserveSpace;
-				int[] letterSpacing;
+				final byte[] typeform;
+				final boolean[] hyphenate;
+				final boolean[] preserveLines;
+				final boolean[] preserveSpace;
+				final int[] letterSpacing;
 				
 				// don't perform a translation at all
-				boolean noTransform;
+				final boolean noTransform;
 				
 				// text with some segments split up into white space segments that need to be preserved
 				// in the output and other segments
-				String[] textWithWs;
+				final String[] textWithWs;
 				
 				// boolean array for tracking which (non-empty white space) segments in textWithWs need
 				// to be preserved
-				boolean[] pre;
+				final boolean[] pre;
 				
 				// mapping from index in textWithWs to index in text
-				int[] textWithWsMapping;
+				final int[] textWithWsMapping;
 				
 				// textWithWs segments joined together with hyphens removed and sequences of preserved
 				// white space replaced with a nbsp
@@ -484,14 +484,15 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 							styles[i] = t.getStyle();
 							i++; }}
 					
+					boolean someTransform = false;
+					boolean someNotTransform = false;
+					
 					{ // compute typeform, hyphenate, preserveLines, preserveSpace and letterSpacing
 						typeform = new byte[size];
 						hyphenate = new boolean[size];
 						preserveLines = new boolean[size];
 						preserveSpace = new boolean[size];
 						letterSpacing = new int[size];
-						boolean someTransform = false;
-						boolean someNotTransform = false;
 						for (int i = 0; i < size; i++) {
 							typeform[i] = Typeform.PLAIN;
 							hyphenate[i] = false;
@@ -544,10 +545,6 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 								typeform[i] |= typeformFromInlineCSS(style); }
 							else
 								someTransform = true; }
-						
-						// FIXME: also handle (someNotTransform && someTransform)
-						if (someNotTransform && !someTransform)
-							noTransform = true;
 					}
 					{ // compute preserved white space segments (textWithWs, textWithWsMapping, pre)
 						List<String> l1 = new ArrayList<String>();
@@ -588,9 +585,8 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 						for (int i = 0; i < textWithWs.length; i++)
 							textWithWsReplaced[i] = pre[i] ? ""+NBSP : textWithWs[i];
 						Tuple2<String,byte[]> t = extractHyphens(join(textWithWsReplaced, RS), SHY, ZWSP);
-						joinedText = t._1;
 						manualHyphens = t._2;
-						String[] nohyph = toArray(SEGMENT_SPLITTER.split(joinedText), String.class);
+						String[] nohyph = toArray(SEGMENT_SPLITTER.split(t._1), String.class);
 						joinedTextMapping = new int[join(nohyph).length()];
 						int i = 0;
 						int j = 0;
@@ -599,14 +595,15 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 							for (int k = 0; k < l; k++)
 								joinedTextMapping[i++] = j;
 							j++; }
-						t = extractHyphens(manualHyphens, joinedText, null, null, null, RS);
+						t = extractHyphens(manualHyphens, t._1, null, null, null, RS);
 						joinedText = t._1;
-						if (joinedText.matches("\\xA0*"))
-							noTransform = true;
 					}
+					
+					// FIXME: also handle (someNotTransform && someTransform)
+					noTransform = joinedText.matches("\\xA0*") || (someNotTransform && !someTransform);
 				}
 				
-				public String next(final int limit, final boolean force) {
+				public String next(final int limit, final boolean force, boolean allowHyphens) {
 					String next = "";
 					if (limit > 0) {
 					int available = limit;
@@ -719,7 +716,7 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 											if (textAvailable < left)
 												break segments;
 											while (true) {
-												String line = lines.nextLine(textAvailable, force && next.isEmpty());
+												String line = lines.nextLine(textAvailable, force && next.isEmpty(), allowHyphens);
 												String replacementWord = line + lines.remainder();
 												if (updateInput(curPos, wordEnd, replacementWord)) {
 													wordEnd = curPos + replacementWord.length();
@@ -730,7 +727,7 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 												lineInBraille = addLetterSpacing(line, lineInBraille, letterSpacing[curSegment]);
 												int lineInBrailleLength = lineInBraille.length();
 												if (lines.lineHasHyphen()) {
-													lineInBraille += "\u2824\u200b";
+													lineInBraille += "\u00ad";
 													lineInBrailleLength++; }
 												if (lineInBrailleLength == available) {
 													bestSolution = new Solution(); {
@@ -814,40 +811,22 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 					return joinedBraille.substring(curPosInBraille);
 				}
 				
-				String save_joinedText;
-				int[] save_joinedTextMapping;
-				byte[] save_manualHyphens;
-				String save_joinedBraille;
-				int[] save_characterIndicesInBraille;
-				int[] save_interCharacterIndicesInBraille;
-				int save_curPos;
-				int save_curPosInBraille;
-				Character save_lastPeek;
-			
-				{ mark(); }
-				
-				public void mark() {
-					save_joinedText = joinedText;
-					save_joinedTextMapping = joinedTextMapping == null ? null : joinedTextMapping.clone();
-					save_manualHyphens = manualHyphens == null ? null : manualHyphens.clone();
-					save_joinedBraille = joinedBraille;
-					save_characterIndicesInBraille = characterIndicesInBraille == null ? null : characterIndicesInBraille.clone();
-					save_interCharacterIndicesInBraille = interCharacterIndicesInBraille == null ? null : interCharacterIndicesInBraille.clone();
-					save_curPos = curPos;
-					save_curPosInBraille = curPosInBraille;
-					save_lastPeek = lastPeek;
-				}
-				
-				public void reset() {
-					joinedText = save_joinedText;
-					joinedTextMapping = save_joinedTextMapping == null ? null : save_joinedTextMapping.clone();
-					manualHyphens = save_manualHyphens == null ? null : save_manualHyphens.clone();
-					joinedBraille = save_joinedBraille;
-					characterIndicesInBraille = save_characterIndicesInBraille == null ? null : save_characterIndicesInBraille.clone();
-					interCharacterIndicesInBraille = save_interCharacterIndicesInBraille == null ? null : save_interCharacterIndicesInBraille.clone();
-					curPos = save_curPos;
-					curPosInBraille = save_curPosInBraille;
-					lastPeek = save_lastPeek;
+				@Override
+				public Object clone() {
+					try {
+						BrailleStreamImpl clone = (BrailleStreamImpl)super.clone();
+						if (joinedTextMapping != null)
+							clone.joinedTextMapping = joinedTextMapping.clone();
+						if (manualHyphens != null)
+							clone.manualHyphens = manualHyphens.clone();
+						if (characterIndicesInBraille != null)
+							clone.characterIndicesInBraille = characterIndicesInBraille.clone();
+						if (interCharacterIndicesInBraille != null)
+							clone.interCharacterIndicesInBraille = interCharacterIndicesInBraille.clone();
+						return clone;
+					} catch (CloneNotSupportedException e) {
+						throw new InternalError("coding error");
+					}
 				}
 				
 				private int positionInBraille(int pos) {

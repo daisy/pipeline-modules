@@ -7,7 +7,7 @@ import java.util.NoSuchElementException;
 
 import static com.google.common.collect.Iterators.concat;
 import static com.google.common.collect.Iterators.peekingIterator;
-import static com.google.common.collect.ImmutableList.copyOf;
+import com.google.common.collect.ImmutableList;
 import static com.google.common.collect.Lists.charactersOf;
 import com.google.common.collect.PeekingIterator;
 
@@ -17,6 +17,7 @@ import cz.vutbr.web.css.TermInteger;
 import org.daisy.braille.css.BrailleCSSProperty.WordSpacing;
 import org.daisy.braille.css.SimpleInlineStyle;
 import org.daisy.dotify.api.translator.UnsupportedMetricException;
+import org.daisy.dotify.api.translator.BrailleTranslatorResult;
 
 import org.slf4j.Logger;
 
@@ -65,24 +66,27 @@ public abstract class AbstractBrailleTranslator extends AbstractTransform implem
 			 * href="http://braillespecs.github.io/braille-css/master/index.html#dfn-white-space-characters">white
 			 * space</a>) and perform line breaking within words (hyphenate). It MAY also collapse
 			 * white space and perform line breaking outside or at the boundaries of words
-			 * (according to the CSS rules), but it doesn't need to because it will be followed by
-			 * white space processing and line breaking anyway. Preserved spaces MUST be converted
-			 * to NBSP characters. Preserved line breaks MAY be converted to LS characters. Line
-			 * breaking can be achieved either directly by indicating that the end of a line has
-			 * been reached (by returning an empty string for a `limit` greater than 0), or
-			 * indirectly by including break characters (SHY, ZWSP, LS) in the result. Hyphen
-			 * characters MAY be inserted but that may also be left up to the additional line
-			 * breaking (by including SHY characters).
+			 * (according to the CSS rules), but it doesn't need to because the result will be
+			 * passed though a white space processing and line breaking stage anyway. Preserved
+			 * spaces MUST be converted to NBSP characters. Line breaking may be achieved "directly"
+			 * by indicating that the end of a line has been reached, by returning an empty string
+			 * when the next() method is called again (with a `limit` &gt; 0). The "allowHyphens"
+			 * argument must be respected in this case. A hyphen character at the end the line MUST
+			 * be inserted when hyphenating. If it's a soft hyphen (SHY) it will be substituted with
+			 * a real hyphen automatically. If line breaking is not done directly, it is left up to
+			 * the line breaking stage. Preserved line breaks MUST be converted to LS characters in
+			 * this case, and other break characters (SHY, ZWSP) MUST be included for all break
+			 * opportunities, including those within words, regardless of the "allowHyphens"
+			 * argument.
 			 */
 			protected abstract BrailleStream translateAndHyphenate(Iterable<CSSStyledText> text);
 			
-			protected interface BrailleStream {
+			protected interface BrailleStream extends Cloneable {
 				public boolean hasNext();
-				public String next(int limit, boolean force);
+				public String next(int limit, boolean force, boolean allowHyphens);
 				public Character peek();
 				public String remainder();
-				public void mark();
-				public void reset();
+				public Object clone();
 			}
 			
 			public LineIterator transform(final Iterable<CSSStyledText> text) throws TransformationException {
@@ -116,14 +120,13 @@ public abstract class AbstractBrailleTranslator extends AbstractTransform implem
 			
 			protected static class FullyHyphenatedAndTranslatedString implements BrailleStream {
 				private String next;
-				private String mark;
 				public FullyHyphenatedAndTranslatedString(String string) {
-					next = mark = string;
+					next = string;
 				}
 				public boolean hasNext() {
 					return (next != null && !next.isEmpty());
 				}
-				public String next(int limit, boolean force) {
+				public String next(int limit, boolean force, boolean allowHyphens) {
 					if (next == null)
 						throw new NoSuchElementException();
 					else {
@@ -145,15 +148,17 @@ public abstract class AbstractBrailleTranslator extends AbstractTransform implem
 					else
 						return next;
 				}
-				public void mark() {
-					mark = next;
-				}
-				public void reset() {
-					next = mark;
+				@Override
+				public Object clone() {
+					try {
+						return super.clone();
+					} catch (CloneNotSupportedException e) {
+						throw new InternalError("coding error");
+					}
 				}
 			}
 			
-			public static class LineIterator implements BrailleTranslator.LineIterator {
+			public static class LineIterator implements BrailleTranslator.LineIterator, Cloneable {
 				
 				private final char blankChar;
 				private final char hyphenChar;
@@ -207,14 +212,14 @@ public abstract class AbstractBrailleTranslator extends AbstractTransform implem
 				 * - or until the current row is full according to the input feed (BrailleStream)
 				 * - and while the remaining input starts with SPACE, LF, CR, TAB, NBSP, BRAILLE PATTERN BLANK, SHY, ZWSP or LS
 				 */
-				private void fillRow(int limit, boolean force) {
+				private void fillRow(int limit, boolean force, boolean allowHyphens) {
 					int bufSize = charBuffer.length();
 				  loop: while (true) {
 						if (inputBuffer == null || !inputBuffer.hasNext()) {
 							inputBuffer = null;
 							if (!inputStream.hasNext()) {} // end of stream
 							else if (bufSize < limit) {
-								String next = inputStream.next(limit - bufSize, force && (bufSize == 0));
+								String next = inputStream.next(limit - bufSize, force && (bufSize == 0), allowHyphens);
 								if (next.isEmpty()) {} // row full according to input feed
 								else
 									inputBuffer = peekingIterator(charactersOf(next).iterator()); }
@@ -229,7 +234,7 @@ public abstract class AbstractBrailleTranslator extends AbstractTransform implem
 								case SPACE:  case NBSP:
 								case LF:     case LS:
 								case CR:
-									String next = inputStream.next(1, true);
+									String next = inputStream.next(1, true, allowHyphens);
 									if (next.isEmpty())
 										throw new RuntimeException("coding error");
 									inputBuffer = peekingIterator(charactersOf(next).iterator());
@@ -297,11 +302,12 @@ public abstract class AbstractBrailleTranslator extends AbstractTransform implem
 				 * @param limit specifies the maximum number of characters allowed in the result
 				 * @param force specifies if the translator should force a break at the limit
 				 *              if no natural break point is found
+				 * @param wholeWordsOnly specifies that the row may not end on a break point inside a word.
 				 * @return returns the translated string preceding the row break, including a translated hyphen
 				 *                 at the end if needed.
 				 */
-				public String nextTranslatedRow(int limit, boolean force) {
-					fillRow(limit, force);
+				public String nextTranslatedRow(int limit, boolean force, boolean wholeWordsOnly) {
+					fillRow(limit, force, !wholeWordsOnly);
 					int bufSize = charBuffer.length();
 					
 					// always break at preserved line breaks
@@ -326,6 +332,10 @@ public abstract class AbstractBrailleTranslator extends AbstractTransform implem
 					// no need to break if remaining text is shorter than line
 					if (bufSize < limit) {
 						String rv = charBuffer.substring(0, bufSize);
+							
+						// replace soft hyphen with real hyphen
+						if (wrapInfo.get(rv.length() - 1) == SOFT_WRAP_WITH_HYPHEN)
+							rv += hyphenChar;
 						charBuffer.setLength(0);
 						wrapInfo.clear();
 						
@@ -348,6 +358,7 @@ public abstract class AbstractBrailleTranslator extends AbstractTransform implem
 						return ""; }
 					
 					// break at SPACE or ZWSP
+					// FIXME: ignore ZWSP if it comes from hyphenation (how to find out?) and wholeWordsOnly==true
 					if ((wrapInfo.get(limit - 1) & SOFT_WRAP_WITHOUT_HYPHEN) == SOFT_WRAP_WITHOUT_HYPHEN) {
 						int cut = limit;
 						
@@ -392,7 +403,9 @@ public abstract class AbstractBrailleTranslator extends AbstractTransform implem
 					for (int i = limit - 1; i > 0; i--) {
 						
 						// break at SPACE, ZWSP or SHY
-						if (wrapInfo.get(i - 1) > 0) {
+						// FIXME: ignore ZWSP if it comes from hyphenation (how to find out?) and wholeWordsOnly==true
+						if ((wrapInfo.get(i - 1) & SOFT_WRAP_WITHOUT_HYPHEN) == SOFT_WRAP_WITHOUT_HYPHEN
+						    || (!wholeWordsOnly && (wrapInfo.get(i - 1) == SOFT_WRAP_WITH_HYPHEN))) {
 							int cut = i;
 							String rv;
 							
@@ -439,19 +452,30 @@ public abstract class AbstractBrailleTranslator extends AbstractTransform implem
 				 * @return returns the characters not yet extracted with nextTranslatedRow
 				 */
 				public String getTranslatedRemainder() {
+					
+					// Note that I could use clone() here, but the current code is slightly more efficient
 					BrailleStream save_inputStream = inputStream;
 					inputStream = emptyBrailleStream;
-					List<Character> save_inputBuffer = inputBuffer != null ? copyOf(inputBuffer) : null;
-					inputBuffer = save_inputBuffer != null ?
-						peekingIterator(concat(save_inputBuffer.iterator(), charactersOf(save_inputStream.remainder()).iterator())) :
-						peekingIterator(charactersOf(save_inputStream.remainder()).iterator());
+					List<Character> save_inputBuffer = inputBuffer != null ? ImmutableList.copyOf(inputBuffer) : null;
+					if (save_inputBuffer != null) {
+						if (save_inputStream.hasNext()) {
+							inputBuffer = peekingIterator(
+									concat(save_inputBuffer.iterator(), charactersOf(save_inputStream.remainder()).iterator()));
+						} else {
+							inputBuffer = peekingIterator(save_inputBuffer.iterator());
+						}
+					} else if (save_inputStream.hasNext()) {
+						inputBuffer = peekingIterator(charactersOf(save_inputStream.remainder()).iterator());
+					} else {
+						inputBuffer = null;
+					}
 					StringBuilder save_charBuffer = charBuffer;
 					charBuffer = new StringBuilder(charBuffer.toString());
 					ArrayList<Byte> save_wrapInfo = wrapInfo;
 					wrapInfo = new ArrayList<Byte>(wrapInfo);
 					boolean save_lastCharIsSpace = lastCharIsSpace;
 					lastCharIsSpace = false;
-					fillRow(Integer.MAX_VALUE, true);
+					fillRow(Integer.MAX_VALUE, true, false);
 					String remainder = charBuffer.toString();
 					inputStream = save_inputStream;
 					inputBuffer = save_inputBuffer != null ? peekingIterator(save_inputBuffer.iterator()) : null;
@@ -468,6 +492,34 @@ public abstract class AbstractBrailleTranslator extends AbstractTransform implem
 					return getTranslatedRemainder().length();
 				}
 				
+				/**
+				 * @return returns a copy of this result in the current state
+				 */
+				public BrailleTranslatorResult copy() {
+					return (BrailleTranslatorResult)clone();
+				}
+				
+				@Override
+				// FIXME: could this be done more efficiently/lazily?
+				public Object clone() {
+					LineIterator clone; {
+						try {
+							clone = (LineIterator)super.clone();
+						} catch (CloneNotSupportedException e) {
+							throw new InternalError("coding error");
+						}
+					}
+					clone.inputStream = (BrailleStream)inputStream.clone();
+					if (inputBuffer != null) {
+						List<Character> list = ImmutableList.copyOf(inputBuffer);
+						inputBuffer = peekingIterator(list.iterator());
+						clone.inputBuffer = peekingIterator(list.iterator());
+					}
+					clone.charBuffer = new StringBuilder(charBuffer.toString());
+					clone.wrapInfo = new ArrayList<Byte>(wrapInfo);
+					return clone;
+				}
+				
 				public boolean supportsMetric(String metric) {
 					return false;
 				}
@@ -478,11 +530,11 @@ public abstract class AbstractBrailleTranslator extends AbstractTransform implem
 				
 				private static final BrailleStream emptyBrailleStream = new BrailleStream() {
 					public boolean hasNext() { return false; }
-					public String next(int limit, boolean force) { throw new NoSuchElementException(); }
+					public String next(int limit, boolean force, boolean allowHyphens) { throw new NoSuchElementException(); }
 					public Character peek() { throw new NoSuchElementException(); }
 					public String remainder() { throw new NoSuchElementException(); }
-					public void mark() {}
-					public void reset() {}
+					@Override
+					public Object clone() { return this; }
 				};
 			}
 		}

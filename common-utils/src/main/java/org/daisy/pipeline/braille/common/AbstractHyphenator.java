@@ -60,6 +60,10 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 					boolean startedAtMark = false;
 					
 					public String nextLine(int limit, boolean force) {
+						return nextLine(limit, force, true);
+					}
+					
+					public String nextLine(int limit, boolean force, boolean allowHyphens) {
 						started = true;
 						String line = "";
 						lineHasHyphen = false;
@@ -78,8 +82,8 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 										line += segment;
 										available -= segment.length();
 										word = !word; }
-									else if (word) {
-										Break brokenWord = breakWord(segment, available, force);
+									else if (word && allowHyphens) {
+										Break brokenWord = breakWord(segment, available, force && (available == limit));
 										line += brokenWord.firstLine();
 										lineHasHyphen = brokenWord.hyphen;
 										r += brokenWord.secondLine();

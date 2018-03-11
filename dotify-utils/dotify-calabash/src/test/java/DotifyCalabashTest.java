@@ -21,9 +21,9 @@ public class DotifyCalabashTest extends AbstractXSpecAndXProcSpecTest {
 	protected String[] testDependencies() {
 		return new String[] {
 			// tasks
+			"org.daisy.streamline:streamline-api:?",
+			"org.daisy.streamline:streamline-engine:?",
 			"org.daisy.dotify:dotify.api:?",
-			"org.daisy.dotify:dotify.task-api:?",
-			"org.daisy.dotify:dotify.task-runner:?",
 			"org.daisy.dotify:dotify.common:?",
 			"org.daisy.dotify:dotify.task.impl:?",
 			// formatter

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -13,19 +14,19 @@ import java.util.Set;
 import javax.xml.transform.stream.StreamSource;
 
 import org.daisy.common.xproc.calabash.XProcStepProvider;
-import org.daisy.dotify.api.identity.IdentityProviderService;
-import org.daisy.dotify.api.tasks.AnnotatedFile;
-import org.daisy.dotify.api.tasks.DefaultAnnotatedFile;
-import org.daisy.dotify.api.tasks.InternalTask;
-import org.daisy.dotify.api.tasks.TaskGroupFactoryMakerService;
-import org.daisy.dotify.api.tasks.TaskGroupInformation;
-import org.daisy.dotify.api.tasks.TaskSystem;
-import org.daisy.dotify.api.tasks.TaskSystemException;
-import org.daisy.dotify.api.tasks.TaskSystemFactoryException;
-import org.daisy.dotify.api.tasks.TaskSystemFactoryMakerService;
+import org.daisy.streamline.api.identity.IdentityProviderService;
+import org.daisy.streamline.api.media.AnnotatedFile;
+import org.daisy.streamline.api.media.DefaultAnnotatedFile;
+import org.daisy.streamline.api.tasks.InternalTask;
+import org.daisy.streamline.api.tasks.TaskGroupFactoryMakerService;
+import org.daisy.streamline.api.tasks.TaskGroupInformation;
+import org.daisy.streamline.api.tasks.TaskSystem;
+import org.daisy.streamline.api.tasks.TaskSystemException;
+import org.daisy.streamline.api.tasks.TaskSystemFactoryException;
+import org.daisy.streamline.api.tasks.TaskSystemFactoryMakerService;
+import org.daisy.streamline.engine.TaskRunner;
 import org.daisy.dotify.common.xml.XMLTools;
 import org.daisy.dotify.common.xml.XMLToolsException;
-import org.daisy.dotify.tasks.runner.TaskRunner;
 
 import org.daisy.pipeline.braille.common.Query.Feature;
 import static org.daisy.pipeline.braille.common.Query.util.query;
@@ -146,7 +147,7 @@ public class FileToOBFLStep extends DefaultStep {
 			
 			params.put("page-width", toInt(params.remove("cols"))+toInt(params.get("inner-margin"))+toInt(params.get("outer-margin")));
 			params.put("page-height", toInt(params.remove("rows")));
-			params.put("row-spacing", 1+(toInt(params.remove("rowgap"))/4d));
+			params.put("row-spacing", new BigDecimal(1+(toInt(params.remove("rowgap"))/4d)));
 			
 			String locale = getOption(_locale, Locale.getDefault().toString());
 			String outputFormat = getOption(_format, "obfl");

@@ -7,7 +7,9 @@ import java.util.regex.Pattern;
 
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
+import org.daisy.dotify.api.translator.BrailleTranslatorResult;
 import org.daisy.pipeline.braille.common.AbstractBrailleTranslator;
 import org.daisy.pipeline.braille.common.AbstractHyphenator;
 import org.daisy.pipeline.braille.common.CSSStyledText;
@@ -64,6 +66,20 @@ public class DefaultLineBreakerTest {
 				assertEquals("", lines.nextTranslatedRow(0, false));
 				assertEquals("ABCDEF", lines.nextTranslatedRow(100, false));
 		}
+	}
+	
+	@Test
+	public void testDisallowHyphenation() {
+		TestHyphenator hyphenator = new TestHyphenator();
+		TestTranslator translator = new TestTranslator(hyphenator);
+		BrailleTranslator.LineIterator i
+			= translator.lineBreakingFromStyledText().transform(text("abc­def abc­def abc­def abc­def"));
+		assertEquals("ABCDEF ABC-", i.nextTranslatedRow(12, true, false));
+		assertEquals("DEF",         i.nextTranslatedRow(6,  true, false));
+		assertEquals("ABCDEF",      i.nextTranslatedRow(12, true, true));
+		assertEquals("ABC-",        i.nextTranslatedRow(5,  true, false));
+		assertEquals("DEF",         i.nextTranslatedRow(5,  true, false));
+		assertFalse(i.hasNext());
 	}
 	
 	private static class TestHyphenator extends AbstractHyphenator {
@@ -128,7 +144,7 @@ public class DefaultLineBreakerTest {
 					public boolean hasNext() {
 						return pos < text.length();
 					}
-					public String next(int limit, boolean force) {
+					public String next(int limit, boolean force, boolean allowHyphens) {
 						String next = "";
 						int start = pos;
 						int end = text.length();
@@ -156,14 +172,14 @@ public class DefaultLineBreakerTest {
 											break;
 										else {
 											Hyphenator.LineIterator lines = hyphenator.asLineBreaker().transform(word);
-											String line = lines.nextLine(available, force);
+											String line = lines.nextLine(available, force, allowHyphens);
 											if (line.length() == available && lines.lineHasHyphen()) {
 												lines.reset();
-												line = lines.nextLine(available - 1, force); }
+												line = lines.nextLine(available - 1, force, allowHyphens); }
 											if (line.length() > 0) {
 												next += line;
 												if (lines.lineHasHyphen())
-													next += "-\u200b";
+													next += "\u00ad";
 												pos += line.length();
 												text = text.substring(0, pos) + lines.remainder(); }
 											break; }}
@@ -180,16 +196,13 @@ public class DefaultLineBreakerTest {
 					public String remainder() {
 						return translate(text.substring(pos));
 					}
-					int markPos;
-					String markText; {
-						mark(); }
-					public void mark() {
-						markPos = pos;
-						markText = text;
-					}
-					public void reset() {
-						pos = markPos;
-						text = markText;
+					@Override
+					public Object clone() {
+						try {
+							return super.clone();
+						} catch (CloneNotSupportedException e) {
+							throw new InternalError("coding error");
+						}
 					}
 					private String translate(String s) {
 						return s.toUpperCase();

@@ -26,12 +26,12 @@
       <artifactId>dotify.common</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.daisy.dotify</groupId>
-      <artifactId>dotify.task-api</artifactId>
+      <groupId>org.daisy.streamline</groupId>
+      <artifactId>streamline-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.daisy.dotify</groupId>
-      <artifactId>dotify.task-runner</artifactId>
+      <groupId>org.daisy.streamline</groupId>
+      <artifactId>streamline-engine</artifactId>
     </dependency>
     <dependency>
       <groupId>org.daisy.pipeline.modules.braille</groupId>

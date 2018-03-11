@@ -60,12 +60,14 @@ public interface Hyphenator extends Transform {
 		public boolean hasNext();
 		
 		/**
-		 * Get the next line of text, with a length as close as possible to,
-		 * but not exceding `limit` characters, breaking a word if
-		 * needed. `limit` must be greater than 0. If `force` is true, may not
-		 * return an empty string. Must throw an exception if there is no
+		 * Get the next line of text, with a length as close as possible to, but not
+		 * exceding `limit` characters, breaking a word if needed. `limit` must be greater
+		 * than 0. If `force` is true, may not return an empty string. If `allowHyphens`
+		 * is false, breaking words is not permitted unless `force` is true and an empty
+		 * string would otherwise be returned. Must throw an exception if there is no
 		 * remaining text to make a new line of.
 		 */
+		public String nextLine(int limit, boolean force, boolean allowHyphens);
 		public String nextLine(int limit, boolean force);
 		
 		/**

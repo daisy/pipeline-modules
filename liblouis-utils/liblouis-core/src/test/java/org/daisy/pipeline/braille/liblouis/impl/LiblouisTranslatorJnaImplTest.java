@@ -115,8 +115,8 @@ public class LiblouisTranslatorJnaImplTest {
 			hyphenator,
 			null,
 			styledText("volleyballederen volleyballederen", "hyphens:auto"));
-		assertEquals("volleyballederen ", stream.next(26, false));
-		assertEquals("volleyballederen", stream.next(26, false));
+		assertEquals("volleyballederen ", stream.next(26, false, true));
+		assertEquals("volleyballederen", stream.next(26, false, true));
 		assertFalse(stream.hasNext());
 	}
 	
