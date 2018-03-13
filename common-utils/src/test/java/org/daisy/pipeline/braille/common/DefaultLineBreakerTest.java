@@ -69,6 +69,28 @@ public class DefaultLineBreakerTest {
 	}
 	
 	@Test
+	public void testEmpty() {
+		TestHyphenator hyphenator = new TestHyphenator();
+		TestTranslator translator = new TestTranslator(hyphenator);
+		assertEquals(
+			" ",
+			fillLines(translator.lineBreakingFromStyledText().transform(text("   ")), 10));
+		assertEquals(
+			"",
+			fillLines(translator.lineBreakingFromStyledText().transform(text("\u200B")), 10));
+	}
+	
+	@Test
+	public void testHardLineBreak() {
+		TestHyphenator hyphenator = new TestHyphenator();
+		TestTranslator translator = new TestTranslator(hyphenator);
+		assertEquals(
+			"ABC\n" +
+			"DEF",
+			fillLines(translator.lineBreakingFromStyledText().transform(text("abc\u2028def")), 10));
+	}
+	
+	@Test
 	public void testDisallowHyphenation() {
 		TestHyphenator hyphenator = new TestHyphenator();
 		TestTranslator translator = new TestTranslator(hyphenator);

@@ -2572,6 +2572,8 @@
         <x:document type="inline">
           <doc style="text-transform:none; display:block">
             ⠤⠤⠤<br style="::before { content: '&#xA;'; white-space: pre-line; }"/>⠤⠤⠤
+            <br style="::before { content: '&#xA;'; white-space: pre-line; }"/>
+            <br style="::before { content: '&#xA;'; white-space: pre-line; }"/>⠤⠤⠤
           </doc>
         </x:document>
       </x:input>
@@ -2591,6 +2593,8 @@
           <sequence master="a">
             <block>
               ⠤⠤⠤&#x200B;<br/>⠤⠤⠤
+              &#x200B;<br/>
+              &#x200B;<br/>⠤⠤⠤
             </block>
           </sequence>
         </obfl>
@@ -2612,6 +2616,8 @@
               <section>
                 <page>
                   <row>⠤⠤⠤</row>
+                  <row>⠤⠤⠤</row>
+                  <row/>
                   <row>⠤⠤⠤</row>
                 </page>
               </section>

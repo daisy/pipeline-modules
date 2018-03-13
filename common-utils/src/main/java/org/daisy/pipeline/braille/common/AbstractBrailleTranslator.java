@@ -310,6 +310,10 @@ public abstract class AbstractBrailleTranslator extends AbstractTransform implem
 					fillRow(limit, force, !wholeWordsOnly);
 					int bufSize = charBuffer.length();
 					
+					// charBuffer may be empty (even if hasNext() was true)
+					if (bufSize == 0)
+						return "";
+					
 					// always break at preserved line breaks
 					for (int i = 0; i < min(bufSize, limit); i++) {
 						if (wrapInfo.get(i) == HARD_WRAP) {
