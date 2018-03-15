@@ -4,6 +4,7 @@
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:c="http://www.w3.org/ns/xproc-step"
                 xmlns:dotify="http://code.google.com/p/dotify/"
+                xmlns:obfl="http://www.daisy.org/ns/2011/obfl"
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                 exclude-inline-prefixes="#all">
 	
@@ -51,18 +52,43 @@
 		<p:with-option name="skip-margin-top-of-page" select="$skip-margin-top-of-page"/>
 	</pxi:css-to-obfl>
 	
-	<pxi:obfl-normalize-space/>
+	<pxi:obfl-normalize-space name="obfl"/>
 	
 	<p:choose>
 		<p:when test="$output='pef'">
 			
 			<!-- for debug info -->
 			<p:for-each><p:identity/></p:for-each>
-				
+
+			<!--
+			    Follow the OBFL standard which says that "when volume-transition is present, the
+			    last page or sheet in each volume may be modified so that the volume break occurs
+			    earlier than usual: preferably between two blocks, or if that is not possible,
+			    between words" (http://braillespecs.github.io/obfl/obfl-specification.html#L8701).
+			    In other words, volumes should by default not be allowed to end on a hyphen.
+			-->
+			<px:add-parameters name="allow-ending-volume-on-hyphen">
+				<p:input port="source">
+					<p:empty/>
+				</p:input>
+				<p:with-param name="allow-ending-volume-on-hyphen"
+				              select="if (/*/obfl:volume-transition) then 'false' else 'true'">
+					<p:pipe step="obfl" port="result"/>
+				</p:with-param>
+			</px:add-parameters>
+			<px:merge-parameters name="parameters">
+				<p:input port="source">
+					<p:pipe step="allow-ending-volume-on-hyphen" port="result"/>
+					<p:pipe step="main" port="parameters"/>
+				</p:input>
+			</px:merge-parameters>
 			<dotify:obfl-to-pef locale="und">
+				<p:input port="source">
+					<p:pipe step="obfl" port="result"/>
+				</p:input>
 				<p:with-option name="mode" select="$text-transform"/>
 				<p:input port="parameters">
-					<p:pipe step="main" port="parameters"/>
+					<p:pipe step="parameters" port="result"/>
 				</p:input>
 			</dotify:obfl-to-pef>
 		</p:when>

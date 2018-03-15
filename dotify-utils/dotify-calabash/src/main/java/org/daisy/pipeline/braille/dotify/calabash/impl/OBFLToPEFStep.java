@@ -124,10 +124,14 @@ public class OBFLToPEFStep extends DefaultStep {
 			boolean removeStyles; {
 				String p = params.get("remove-styles");
 				removeStyles = (p == null) ? false : p.equalsIgnoreCase("true"); }
+			boolean allowEndingVolumeOnHyphen; {
+				String p = params.get("allow-ending-volume-on-hyphen");
+				allowEndingVolumeOnHyphen = (p == null) ? true : p.equalsIgnoreCase("true"); }
 			FormatterConfiguration.Builder config = FormatterConfiguration.with(locale, mode)
 				.markCapitalLetters(markCapitalLetters)
 				.hyphenate(hyphenate)
-				.allowsTextOverflowTrimming(allowTextOverflowTrimming);
+				.allowsTextOverflowTrimming(allowTextOverflowTrimming)
+				.allowsEndingVolumeOnHyphen(allowEndingVolumeOnHyphen);
 			if (removeStyles)
 				config.ignoreStyle("em").ignoreStyle("strong");
 			

@@ -410,6 +410,10 @@
                     </xsl:for-each>
                 </xsl:if>
             </xsl:if>
+            <!--
+                Note that a volume-keep-priority attribute is not needed to prefer volume breaking
+                before a block over inside a block, but for now we have the conditional anyway.
+            -->
             <xsl:if test="$sections//@css:volume-break-inside">
               <volume-transition range="sheet"/>
             </xsl:if>
