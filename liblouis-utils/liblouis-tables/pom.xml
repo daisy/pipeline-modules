@@ -88,6 +88,22 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.daisy.pipeline.build</groupId>
+        <artifactId>modules-build-helper</artifactId>
+        <executions>
+          <execution>
+            <id>htmlize-sources</id>
+            <configuration>
+              <sourceDirectory>${project.basedir}</sourceDirectory>
+              <includes>
+                src/main/resources/tables/,
+                src/main/resources/tables/*
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
   
