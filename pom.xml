@@ -7,7 +7,7 @@
     <groupId>org.daisy</groupId>
     <artifactId>daisy</artifactId>
     <version>4</version>
-    <relativePath />
+    <relativePath/>
   </parent>
 
   <groupId>org.daisy.pipeline.modules</groupId>
@@ -20,7 +20,7 @@
   <modules>
     <module>parent</module>
     <module>bom</module>
-    <module>audio-utils/audio-common</module>
+    <!--<module>audio-utils/audio-common</module>-->
     <module>audio-utils/audio-encoder-lame</module>
   </modules>
 </project>
