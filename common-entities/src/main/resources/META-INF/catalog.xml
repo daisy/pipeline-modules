@@ -10,6 +10,9 @@
 	<public publicId='-//NISO//DTD dtbook 2005-3//EN' uri='../xml/dtbook-2005-3.dtd'/>
 	<system systemId='http://www.daisy.org/z3986/2005/dtbook-2005-3.dtd' uri='../xml/dtbook-2005-3.dtd'/>
 	
+	<public publicId='-//NISO//DTD dtbook v1.1.0//EN' uri='../xml/dtbook110.dtd'/>
+	<system systemId='http://www.loc.gov/nls/z3986/v100/dtbook110.dtd' uri='../xml/dtbook110.dtd'/>
+	
 	<public publicId='-//NISO//DTD ncx 2005-1//EN' uri='../xml/ncx-2005-1.dtd'/>
 	<system systemId='http://www.daisy.org/z3986/2005/ncx-2005-1.dtd' uri='../xml/ncx-2005-1.dtd'/>
 
