@@ -15,7 +15,6 @@
   <name>DAISY Pipeline 2 :: NLP Modules Parent POM</name>
   <description>Parent POM for modules related to Natural Language Processing</description>
 
-
   <dependencyManagement>
     <dependencies>
       <!--
@@ -50,4 +49,13 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+
+  <repositories>
+    <repository>
+      <id>restlet-repo</id>
+      <name>Public online Restlet repository</name>
+      <url>http://maven.restlet.org</url>
+    </repository>
+  </repositories>
+
 </project>
