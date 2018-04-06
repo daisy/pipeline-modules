@@ -17,13 +17,6 @@
   <name>DAISY Pipeline 2 module :: Audio API</name>
   <description>Common API for audio-related functionality</description>
 
-  <dependencies>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-    </dependency>
-  </dependencies>
-
   <build>
     <plugins>
       <plugin>
