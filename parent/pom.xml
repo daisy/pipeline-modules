@@ -35,7 +35,7 @@
       <dependency>
         <groupId>org.daisy.pipeline</groupId>
         <artifactId>framework-bom</artifactId>
-        <version>1.11.1</version>
+        <version>1.11.2-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -45,11 +45,15 @@
       <dependency>
         <groupId>org.daisy.pipeline.build</groupId>
         <artifactId>modules-test-helper</artifactId>
-        <version>1.0.2</version>
+        <version>1.0.3-SNAPSHOT</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
-  
+
+  <properties>
+    <saxon.versionRange>[9.5.1,9.5.2)</saxon.versionRange>
+  </properties>
+
   <build>
     <pluginManagement>
       <plugins>
