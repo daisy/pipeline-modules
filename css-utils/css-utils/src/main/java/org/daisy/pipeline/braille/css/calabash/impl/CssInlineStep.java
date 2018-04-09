@@ -28,7 +28,7 @@ import javax.xml.transform.URIResolver;
 
 import com.google.common.base.Function;
 import com.google.common.base.Splitter;
-import static com.google.common.base.Objects.firstNonNull;
+import static com.google.common.base.MoreObjects.firstNonNull;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import static com.google.common.collect.Iterables.filter;
