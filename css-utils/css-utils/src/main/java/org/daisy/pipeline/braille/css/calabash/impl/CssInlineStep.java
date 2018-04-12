@@ -21,16 +21,16 @@ import java.util.regex.Pattern;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
 import com.google.common.base.Function;
-import com.google.common.base.Splitter;
 import static com.google.common.base.MoreObjects.firstNonNull;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.toArray;
 import static com.google.common.collect.Iterators.forArray;
@@ -102,12 +102,19 @@ import org.daisy.braille.css.SelectorImpl.PseudoElementImpl;
 import org.daisy.braille.css.SimpleInlineStyle;
 import org.daisy.braille.css.SupportedBrailleCSS;
 import org.daisy.common.xproc.calabash.XProcStepProvider;
-import org.daisy.pipeline.braille.common.calabash.DomToStreamTransform;
-import org.daisy.pipeline.braille.common.TransformationException;
+import org.daisy.pipeline.braille.common.calabash.XMLCalabashHelper;
+import org.daisy.pipeline.braille.common.DOMToXMLStreamTransformer;
+import org.daisy.pipeline.braille.common.saxon.SaxonHelper;
 import static org.daisy.pipeline.braille.common.util.Strings.join;
 import static org.daisy.pipeline.braille.common.util.Strings.normalizeSpace;
 import static org.daisy.pipeline.braille.common.util.URIs.asURI;
 import static org.daisy.pipeline.braille.common.util.URLs.asURL;
+import static org.daisy.pipeline.braille.common.XMLStreamWriterHelper.copyAttribute;
+import static org.daisy.pipeline.braille.common.XMLStreamWriterHelper.copyCharacters;
+import static org.daisy.pipeline.braille.common.XMLStreamWriterHelper.copyComment;
+import static org.daisy.pipeline.braille.common.XMLStreamWriterHelper.copyProcessingInstruction;
+import static org.daisy.pipeline.braille.common.XMLStreamWriterHelper.copyStartElement;
+import static org.daisy.pipeline.braille.common.XMLStreamWriterHelper.writeAttribute;
 import org.daisy.pipeline.braille.css.SupportedPrintCSS;
 
 import org.w3c.dom.Document;
@@ -308,7 +315,11 @@ public class CssInlineStep extends DefaultStep {
 			String medium = getOption(_media, DEFAULT_MEDIUM);
 			QName attributeName = getOption(_attribute_name, DEFAULT_ATTRIBUTE_NAME);
 			inMemoryResolver.setContext(contextPipe);
-			resultPipe.write(new CssInlineTransform(runtime, network, defaultSheets, medium, attributeName).transform(source)); }
+			resultPipe.write(
+				XMLCalabashHelper.transform(
+					source,
+					new CssInlineTransformer(network, defaultSheets, medium, SaxonHelper.jaxpQName(attributeName)),
+					runtime)); }
 		catch (Exception e) {
 			logger.error("css:inline failed", e);
 			throw new XProcException(step.getNode(), e); }
@@ -437,20 +448,18 @@ public class CssInlineStep extends DefaultStep {
 	private static final RuleFactory brailleRuleFactory = new BrailleCSSRuleFactory();
 	private static final CSSParserFactory brailleParserFactory = new BrailleCSSParserFactory();
 	
-	private static class CssInlineTransform extends DomToStreamTransform {
+	private static class CssInlineTransformer implements DOMToXMLStreamTransformer {
 		
 		private final NetworkProcessor network;
 		private final URL[] defaultSheets;
 		private final String medium;
-		private final QName attributeName;
+		private final javax.xml.namespace.QName attributeName;
 		private final List<CascadedStyle> styles;
 		
-		public CssInlineTransform(XProcRuntime xproc,
-		                          NetworkProcessor network,
-		                          URL[] defaultSheets,
-		                          String medium,
-		                          QName attributeName) {
-			super(xproc);
+		public CssInlineTransformer(NetworkProcessor network,
+		                            URL[] defaultSheets,
+		                            String medium,
+		                            javax.xml.namespace.QName attributeName) {
 			this.network = network;
 			this.defaultSheets = defaultSheets;
 			this.medium = medium;
@@ -458,9 +467,9 @@ public class CssInlineStep extends DefaultStep {
 			this.styles = new ArrayList<CascadedStyle>();
 		}
 		
-		private Writer writer;
+		private XMLStreamWriter writer;
 		
-		protected void _transform(Document document, Writer writer) throws TransformationException {
+		public void transform(Document document, XMLStreamWriter writer) throws TransformerException {
 			
 			this.writer = writer;
 			
@@ -539,12 +548,12 @@ public class CssInlineStep extends DefaultStep {
 					throw new RuntimeException("medium " + medium + " not supported");
 				}
 				
-				writer.startDocument(baseURI);
+				writer.writeStartDocument();
 				traverse(document.getDocumentElement());
-				writer.endDocument();
+				writer.writeEndDocument();
 				
 			} catch (Exception e) {
-				throw new TransformationException(e);
+				throw new TransformerException(e);
 			}
 		}
 		
@@ -557,16 +566,16 @@ public class CssInlineStep extends DefaultStep {
 		
 		private boolean isRoot = true;
 		
-		private void traverse(Node node) throws XPathException, URISyntaxException {
+		private void traverse(Node node) throws XPathException, URISyntaxException, XMLStreamException {
 			
 			if (node.getNodeType() == Node.ELEMENT_NODE) {
 				Element elem = (Element)node;
-				writer.copyStartElement(elem);
+				copyStartElement(writer, elem);
 				NamedNodeMap attributes = node.getAttributes();
-				for (int i=0; i<attributes.getLength(); i++) {
+				for (int i = 0; i < attributes.getLength(); i++) {
 					Node attr = attributes.item(i);
 					if (!(attr.getPrefix() == null && "style".equals(attr.getLocalName())))
-						writer.copyAttribute(attr); }
+						copyAttribute(writer, attr); }
 				StringBuilder style = new StringBuilder();
 				for (CascadedStyle cs : styles) {
 					NodeData nodeData = cs.styleMap.get(elem);
@@ -593,18 +602,17 @@ public class CssInlineStep extends DefaultStep {
 							for (RuleTextTransform r : cs.textTransformRules)
 								insertTextTransformDefinition(style, r); }}
 				if (normalizeSpace(style).length() > 0) {
-					writer.addAttribute(attributeName, style.toString().trim()); }
+					writeAttribute(writer, attributeName, style.toString().trim()); }
 				isRoot = false;
-				writer.startContent();
 				for (Node child = node.getFirstChild(); child != null; child = child.getNextSibling())
 					traverse(child);
-				writer.endElement(); }
+				writer.writeEndElement(); }
 			else if (node.getNodeType() == Node.COMMENT_NODE)
-				writer.copyComment(node);
+				copyComment(writer, node);
 			else if (node.getNodeType() == Node.TEXT_NODE)
-				writer.copyText(node);
+				copyCharacters(writer, node);
 			else if (node.getNodeType() == Node.PROCESSING_INSTRUCTION_NODE)
-				writer.copyPI(node);
+				copyProcessingInstruction(writer, node);
 			else
 				throw new UnsupportedOperationException("Unexpected node type");
 		}

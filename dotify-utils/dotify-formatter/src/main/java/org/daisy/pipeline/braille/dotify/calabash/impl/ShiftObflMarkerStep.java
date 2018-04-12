@@ -10,6 +10,8 @@ import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
 import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.TransformerException;
 
 import com.google.common.base.Splitter;
 
@@ -21,13 +23,18 @@ import com.xmlcalabash.io.WritablePipe;
 import com.xmlcalabash.library.DefaultStep;
 import com.xmlcalabash.runtime.XAtomicStep;
 
-import net.sf.saxon.Configuration;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.common.xproc.calabash.XProcStepProvider;
-import org.daisy.pipeline.braille.common.saxon.StreamToStreamTransform;
-import org.daisy.pipeline.braille.common.TransformationException;
+import org.daisy.pipeline.braille.common.saxon.SaxonHelper;
+import org.daisy.pipeline.braille.common.XMLStreamToXMLStreamTransformer;
+import org.daisy.pipeline.braille.common.XMLStreamWriterHelper.BufferedXMLStreamWriter;
+import org.daisy.pipeline.braille.common.XMLStreamWriterHelper.FutureWriterEvent;
+import static org.daisy.pipeline.braille.common.XMLStreamWriterHelper.copyAttributes;
+import static org.daisy.pipeline.braille.common.XMLStreamWriterHelper.copyEvent;
+import static org.daisy.pipeline.braille.common.XMLStreamWriterHelper.writeAttribute;
+import static org.daisy.pipeline.braille.common.XMLStreamWriterHelper.writeStartElement;
 import static org.daisy.pipeline.braille.common.util.Strings.join;
 
 import org.osgi.service.component.annotations.Component;
@@ -85,20 +92,18 @@ public class ShiftObflMarkerStep extends DefaultStep {
 		try {
 			XdmNode source = sourcePipe.read();
 			resultPipe.write(
-				new ShiftObflMarkerTransform(runtime.getConfiguration().getProcessor().getUnderlyingConfiguration())
-				.transform(source.getUnderlyingNode())); }
+				SaxonHelper.transform(
+					source.getUnderlyingNode(),
+					new ShiftObflMarkerTransform(),
+					runtime.getConfiguration().getProcessor().getUnderlyingConfiguration())); }
 		catch (Exception e) {
 			logger.error("pxi:shift-obfl-marker failed", e);
 			throw new XProcException(step.getNode(), e); }
 	}
 	
-	private static class ShiftObflMarkerTransform extends StreamToStreamTransform {
+	private static class ShiftObflMarkerTransform implements XMLStreamToXMLStreamTransformer {
 		
-		public ShiftObflMarkerTransform(Configuration configuration) {
-			super(configuration);
-		}
-		
-		protected void _transform(XMLStreamReader reader, BufferedWriter writer) throws TransformationException {
+		public void transform(XMLStreamReader reader, BufferedXMLStreamWriter writer) throws TransformerException {
 			boolean insideInlineBox = false;
 			Stack<Boolean> blockBoxes = new Stack<Boolean>();
 			Stack<Boolean> inlineBoxes = new Stack<Boolean>();
@@ -111,11 +116,11 @@ public class ShiftObflMarkerStep extends DefaultStep {
 						int event = reader.next();
 						switch (event) {
 						case START_ELEMENT: {
-							writer.copyEvent(event, reader);
+							copyEvent(writer, event, reader);
 							boolean isInlineBox = false;
 							boolean isBlockBox = false;
 							if (insideInlineBox)
-								writer.copyAttributes(reader);
+								copyAttributes(writer, reader);
 							else {
 								boolean isBox = CSS_BOX.equals(reader.getName());
 								String marker = null;
@@ -130,7 +135,7 @@ public class ShiftObflMarkerStep extends DefaultStep {
 												isInlineBox = true;
 											else if ("block".equalsIgnoreCase(value))
 												isBlockBox = true;
-										writer.writeAttribute(name, value); }}
+										writeAttribute(writer, name, value); }}
 								if (isBlockBox || isInlineBox)
 									if (shiftedMarker != null) {
 										shiftedMarker.render();
@@ -140,12 +145,12 @@ public class ShiftObflMarkerStep extends DefaultStep {
 										if (!pendingMarker.isEmpty())
 											parseMarker(marker, pendingMarker);
 										else
-											writer.writeAttribute(CSS_OBFL_MARKER, marker);
+											writeAttribute(writer, CSS_OBFL_MARKER, marker);
 									if (!pendingMarker.isEmpty()) {
 										marker = serializeMarker(pendingMarker);
 										pendingMarker.clear();
 										if (marker != null)
-											writer.writeAttribute(CSS_OBFL_MARKER, marker); }}
+											writeAttribute(writer, CSS_OBFL_MARKER, marker); }}
 								else if (marker != null)
 									parseMarker(marker, pendingMarker);
 								if (isInlineBox)
@@ -170,10 +175,10 @@ public class ShiftObflMarkerStep extends DefaultStep {
 								writer.writeEvent(shiftedMarker); }
 							if (isInlineBox)
 								insideInlineBox = false;
-							writer.copyEvent(event, reader);
+							copyEvent(writer, event, reader);
 							break; }
 						default:
-							writer.copyEvent(event, reader); }}
+							copyEvent(writer, event, reader); }}
 					catch (NoSuchElementException e) {
 						break; }
 				if (!pendingMarker.isEmpty())
@@ -185,10 +190,10 @@ public class ShiftObflMarkerStep extends DefaultStep {
 					shiftedMarker.render();
 				writer.flush(); }
 			catch (XMLStreamException e) {
-				throw new TransformationException(e); }
+				throw new TransformerException(e); }
 		}
 		
-		private static class ShiftedMarker implements FutureEvent {
+		private static class ShiftedMarker implements FutureWriterEvent {
 			
 			private List<String> marker;
 			private boolean ready = false;
@@ -207,12 +212,12 @@ public class ShiftObflMarkerStep extends DefaultStep {
 				ready = true;
 			}
 			
-			public void writeTo(Writer writer) throws XMLStreamException {
+			public void writeTo(XMLStreamWriter writer) throws XMLStreamException {
 				if (!ready)
 					throw new XMLStreamException("not ready");
 				if (marker != null) {
-					writer.writeStartElement(CSS__);
-					writer.writeAttribute(CSS_OBFL_MARKER, serializeMarker(marker));
+					writeStartElement(writer, CSS__);
+					writeAttribute(writer, CSS_OBFL_MARKER, serializeMarker(marker));
 					writer.writeEndElement(); }
 			}
 			

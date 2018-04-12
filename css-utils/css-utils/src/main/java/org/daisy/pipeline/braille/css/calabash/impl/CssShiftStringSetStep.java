@@ -10,6 +10,8 @@ import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
 import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.TransformerException;
 
 import com.xmlcalabash.core.XProcException;
 import com.xmlcalabash.core.XProcStep;
@@ -23,15 +25,20 @@ import cz.vutbr.web.css.Term;
 import cz.vutbr.web.css.TermList;
 import cz.vutbr.web.css.TermPair;
 
-import net.sf.saxon.Configuration;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.braille.css.BrailleCSSProperty.StringSet;
 import org.daisy.braille.css.PropertyValue;
 import org.daisy.common.xproc.calabash.XProcStepProvider;
-import org.daisy.pipeline.braille.common.saxon.StreamToStreamTransform;
-import org.daisy.pipeline.braille.common.TransformationException;
+import org.daisy.pipeline.braille.common.saxon.SaxonHelper;
+import org.daisy.pipeline.braille.common.XMLStreamToXMLStreamTransformer;
+import org.daisy.pipeline.braille.common.XMLStreamWriterHelper.BufferedXMLStreamWriter;
+import org.daisy.pipeline.braille.common.XMLStreamWriterHelper.FutureWriterEvent;
+import static org.daisy.pipeline.braille.common.XMLStreamWriterHelper.copyAttributes;
+import static org.daisy.pipeline.braille.common.XMLStreamWriterHelper.copyEvent;
+import static org.daisy.pipeline.braille.common.XMLStreamWriterHelper.writeAttribute;
+import static org.daisy.pipeline.braille.common.XMLStreamWriterHelper.writeStartElement;
 import static org.daisy.pipeline.braille.common.util.Strings.join;
 
 import org.osgi.service.component.annotations.Component;
@@ -89,20 +96,18 @@ public class CssShiftStringSetStep extends DefaultStep {
 		try {
 			XdmNode source = sourcePipe.read();
 			resultPipe.write(
-				new CssShiftStringSetTransform(runtime.getConfiguration().getProcessor().getUnderlyingConfiguration())
-				.transform(source.getUnderlyingNode())); }
+				SaxonHelper.transform(
+					source.getUnderlyingNode(),
+					new CssShiftStringSetTransformer(),
+					runtime.getConfiguration().getProcessor().getUnderlyingConfiguration())); }
 		catch (Exception e) {
 			logger.error("css:shift-string-set failed", e);
 			throw new XProcException(step.getNode(), e); }
 	}
 	
-	private static class CssShiftStringSetTransform extends StreamToStreamTransform {
+	private static class CssShiftStringSetTransformer implements XMLStreamToXMLStreamTransformer {
 		
-		public CssShiftStringSetTransform(Configuration configuration) {
-			super(configuration);
-		}
-		
-		protected void _transform(XMLStreamReader reader, BufferedWriter writer) throws TransformationException {
+		public void transform(XMLStreamReader reader, BufferedXMLStreamWriter writer) throws TransformerException {
 			boolean insideInlineBox = false;
 			Stack<Boolean> blockBoxes = new Stack<Boolean>();
 			Stack<Boolean> inlineBoxes = new Stack<Boolean>();
@@ -115,11 +120,11 @@ public class CssShiftStringSetStep extends DefaultStep {
 						int event = reader.next();
 						switch (event) {
 						case START_ELEMENT: {
-							writer.copyEvent(event, reader);
+							copyEvent(writer, event, reader);
 							boolean isInlineBox = false;
 							boolean isBlockBox = false;
 							if (insideInlineBox)
-								writer.copyAttributes(reader);
+								copyAttributes(writer, reader);
 							else {
 								boolean isBox = CSS_BOX.equals(reader.getName());
 								String stringSet = null;
@@ -134,7 +139,7 @@ public class CssShiftStringSetStep extends DefaultStep {
 												isInlineBox = true;
 											else if ("block".equalsIgnoreCase(value))
 												isBlockBox = true;
-										writer.writeAttribute(name, value); }}
+										writeAttribute(writer, name, value); }}
 								if (isBlockBox || isInlineBox)
 									if (shiftedStringSet != null) {
 										shiftedStringSet.render();
@@ -144,12 +149,12 @@ public class CssShiftStringSetStep extends DefaultStep {
 										if (!pendingStringSet.isEmpty())
 											parseStringSet(stringSet, pendingStringSet);
 										else
-											writer.writeAttribute(CSS_STRING_SET, stringSet);
+											writeAttribute(writer, CSS_STRING_SET, stringSet);
 									if (!pendingStringSet.isEmpty()) {
 										stringSet = serializeStringSet(pendingStringSet);
 										pendingStringSet.clear();
 										if (stringSet != null)
-											writer.writeAttribute(CSS_STRING_SET, stringSet); }}
+											writeAttribute(writer, CSS_STRING_SET, stringSet); }}
 								else if (stringSet != null)
 									parseStringSet(stringSet, pendingStringSet);
 								if (isInlineBox)
@@ -174,10 +179,10 @@ public class CssShiftStringSetStep extends DefaultStep {
 								writer.writeEvent(shiftedStringSet); }
 							if (isInlineBox)
 								insideInlineBox = false;
-							writer.copyEvent(event, reader);
+							copyEvent(writer, event, reader);
 							break; }
 						default:
-							writer.copyEvent(event, reader); }}
+							copyEvent(writer, event, reader); }}
 					catch (NoSuchElementException e) {
 						break; }
 				if (!pendingStringSet.isEmpty())
@@ -189,10 +194,10 @@ public class CssShiftStringSetStep extends DefaultStep {
 					shiftedStringSet.render();
 				writer.flush(); }
 			catch (XMLStreamException e) {
-				throw new TransformationException(e); }
+				throw new TransformerException(e); }
 		}
 		
-		private static class ShiftedStringSet implements FutureEvent {
+		private static class ShiftedStringSet implements FutureWriterEvent {
 			
 			private List<TermPair<String,TermList>> stringSet;
 			private boolean ready = false;
@@ -215,14 +220,14 @@ public class CssShiftStringSetStep extends DefaultStep {
 				ready = true;
 			}
 			
-			public void writeTo(Writer writer) throws XMLStreamException {
+			public void writeTo(XMLStreamWriter writer) throws XMLStreamException {
 				if (!ready)
 					throw new XMLStreamException("not ready");
 				if (stringSet != null) {
 					String value = serializeStringSet(stringSet);
 					if (value != null)
-						writer.writeStartElement(CSS__);
-						writer.writeAttribute(CSS_STRING_SET, value);
+						writeStartElement(writer, CSS__);
+						writeAttribute(writer, CSS_STRING_SET, value);
 						writer.writeEndElement(); }
 			}
 			
