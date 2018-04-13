@@ -344,10 +344,9 @@ public class CssInlineStep extends DefaultStep {
 				documents.resetReader();
 				while (documents.moreDocuments()) {
 					XdmNode doc = documents.read();
-					XdmNode root = S9apiUtils.getDocumentElement(doc);
-					URI docUri = normalizeUri(root.getBaseURI()); // can not use doc.getBaseURI() because it is not modified by
-					                                          // px:fileset-load (when @href != @original-href)
+					URI docUri = normalizeUri(doc.getBaseURI());
 					if (docUri.equals(uri)) {
+						XdmNode root = S9apiUtils.getDocumentElement(doc);
 						if (XProcConstants.c_result.equals(root.getNodeName())
 						    && root.getAttributeValue(_content_type) != null
 						    && root.getAttributeValue(_content_type).startsWith("text/"))
@@ -474,12 +473,7 @@ public class CssInlineStep extends DefaultStep {
 			this.writer = writer;
 			
 			try {
-				
-				// get base URI of document element instead of document because
-				// unzipped files have an empty base URI, but an xml:base
-				// attribute may have been added to their document element
-				URI baseURI = new URI(document.getDocumentElement().getBaseURI());
-				
+				URI baseURI = new URI(document.getBaseURI());
 				CascadedStyle style = new CascadedStyle();
 				styles.add(style);
 				StyleSheet stylesheet;
