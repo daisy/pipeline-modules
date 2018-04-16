@@ -534,7 +534,7 @@
                 Note that a volume-keep-priority attribute is not needed to prefer volume breaking
                 before a block over inside a block, but for now we have the conditional anyway.
             -->
-            <xsl:if test="exists($volume-transition-rule) or $sections//@css:volume-break-inside">
+            <xsl:if test="exists($volume-transition-rule)"> <!-- or $sections//@css:volume-break-inside -->
                 <volume-transition range="sheet">
                     <xsl:for-each select="$volume-transition-rule/css:rule[matches(@selector,'@sequence-(interrupted|resumed)')
                                                                            and css:property[@name='content']]">
