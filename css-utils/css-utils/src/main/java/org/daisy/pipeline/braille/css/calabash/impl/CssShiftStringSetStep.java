@@ -1,6 +1,8 @@
 package org.daisy.pipeline.braille.css.calabash.impl;
 
 import java.util.ArrayList;
+import java.util.function.Supplier;
+import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Stack;
@@ -11,7 +13,8 @@ import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.TransformerException;
+
+import com.google.common.collect.Iterators;
 
 import com.xmlcalabash.core.XProcException;
 import com.xmlcalabash.core.XProcStep;
@@ -26,19 +29,21 @@ import cz.vutbr.web.css.TermList;
 import cz.vutbr.web.css.TermPair;
 
 import net.sf.saxon.s9api.SaxonApiException;
-import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.braille.css.BrailleCSSProperty.StringSet;
 import org.daisy.braille.css.PropertyValue;
+import org.daisy.common.calabash.XMLCalabashHelper;
+import org.daisy.common.stax.BaseURIAwareXMLStreamReader;
+import org.daisy.common.stax.BaseURIAwareXMLStreamWriter;
+import org.daisy.common.stax.XMLStreamWriterHelper.BufferedXMLStreamWriter;
+import org.daisy.common.stax.XMLStreamWriterHelper.FutureWriterEvent;
+import static org.daisy.common.stax.XMLStreamWriterHelper.writeAttribute;
+import static org.daisy.common.stax.XMLStreamWriterHelper.writeAttributes;
+import static org.daisy.common.stax.XMLStreamWriterHelper.writeEvent;
+import static org.daisy.common.stax.XMLStreamWriterHelper.writeStartElement;
+import org.daisy.common.transform.TransformerException;
+import org.daisy.common.transform.XMLStreamToXMLStreamTransformer;
 import org.daisy.common.xproc.calabash.XProcStepProvider;
-import org.daisy.pipeline.braille.common.saxon.SaxonHelper;
-import org.daisy.pipeline.braille.common.XMLStreamToXMLStreamTransformer;
-import org.daisy.pipeline.braille.common.XMLStreamWriterHelper.BufferedXMLStreamWriter;
-import org.daisy.pipeline.braille.common.XMLStreamWriterHelper.FutureWriterEvent;
-import static org.daisy.pipeline.braille.common.XMLStreamWriterHelper.copyAttributes;
-import static org.daisy.pipeline.braille.common.XMLStreamWriterHelper.copyEvent;
-import static org.daisy.pipeline.braille.common.XMLStreamWriterHelper.writeAttribute;
-import static org.daisy.pipeline.braille.common.XMLStreamWriterHelper.writeStartElement;
 import static org.daisy.pipeline.braille.common.util.Strings.join;
 
 import org.osgi.service.component.annotations.Component;
@@ -94,12 +99,11 @@ public class CssShiftStringSetStep extends DefaultStep {
 	public void run() throws SaxonApiException {
 		super.run();
 		try {
-			XdmNode source = sourcePipe.read();
-			resultPipe.write(
-				SaxonHelper.transform(
-					source.getUnderlyingNode(),
-					new CssShiftStringSetTransformer(),
-					runtime.getConfiguration().getProcessor().getUnderlyingConfiguration())); }
+			XMLCalabashHelper.transform(
+				new CssShiftStringSetTransformer(),
+				sourcePipe,
+				resultPipe,
+				runtime); }
 		catch (Exception e) {
 			logger.error("css:shift-string-set failed", e);
 			throw new XProcException(step.getNode(), e); }
@@ -107,7 +111,10 @@ public class CssShiftStringSetStep extends DefaultStep {
 	
 	private static class CssShiftStringSetTransformer implements XMLStreamToXMLStreamTransformer {
 		
-		public void transform(XMLStreamReader reader, BufferedXMLStreamWriter writer) throws TransformerException {
+		public void transform(Iterator<BaseURIAwareXMLStreamReader> input, Supplier<BaseURIAwareXMLStreamWriter> output)
+				throws TransformerException {
+			XMLStreamReader reader = Iterators.getOnlyElement(input);
+			BufferedXMLStreamWriter writer = new BufferedXMLStreamWriter(output.get());
 			boolean insideInlineBox = false;
 			Stack<Boolean> blockBoxes = new Stack<Boolean>();
 			Stack<Boolean> inlineBoxes = new Stack<Boolean>();
@@ -120,11 +127,11 @@ public class CssShiftStringSetStep extends DefaultStep {
 						int event = reader.next();
 						switch (event) {
 						case START_ELEMENT: {
-							copyEvent(writer, event, reader);
+							writeEvent(writer, event, reader);
 							boolean isInlineBox = false;
 							boolean isBlockBox = false;
 							if (insideInlineBox)
-								copyAttributes(writer, reader);
+								writeAttributes(writer, reader);
 							else {
 								boolean isBox = CSS_BOX.equals(reader.getName());
 								String stringSet = null;
@@ -179,10 +186,10 @@ public class CssShiftStringSetStep extends DefaultStep {
 								writer.writeEvent(shiftedStringSet); }
 							if (isInlineBox)
 								insideInlineBox = false;
-							copyEvent(writer, event, reader);
+							writeEvent(writer, event, reader);
 							break; }
 						default:
-							copyEvent(writer, event, reader); }}
+							writeEvent(writer, event, reader); }}
 					catch (NoSuchElementException e) {
 						break; }
 				if (!pendingStringSet.isEmpty())

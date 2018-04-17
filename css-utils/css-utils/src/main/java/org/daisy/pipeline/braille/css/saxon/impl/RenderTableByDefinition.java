@@ -1,8 +1,11 @@
 package org.daisy.pipeline.braille.css.saxon.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
+
 import static java.util.Collections.sort;
 import java.util.Comparator;
+import java.util.function.Supplier;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -25,6 +28,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterators;
 
 import cz.vutbr.web.css.Declaration;
 import cz.vutbr.web.css.RuleBlock;
@@ -52,15 +56,15 @@ import org.daisy.braille.css.InlinedStyle.RulePseudoElementBlock;
 import org.daisy.braille.css.SelectorImpl.PseudoClassImpl;
 import org.daisy.braille.css.SelectorImpl.PseudoElementImpl;
 
+import org.daisy.common.saxon.SaxonHelper;
+import org.daisy.common.stax.XMLStreamWriterHelper.ToStringWriter;
+import org.daisy.common.stax.XMLStreamWriterHelper.WriterEvent;
+import org.daisy.common.stax.BaseURIAwareXMLStreamReader;
+import org.daisy.common.stax.BaseURIAwareXMLStreamWriter;
+import static org.daisy.common.stax.XMLStreamWriterHelper.writeAttribute;
+import static org.daisy.common.stax.XMLStreamWriterHelper.writeStartElement;
+import org.daisy.common.transform.XMLStreamToXMLStreamTransformer;
 import static org.daisy.pipeline.braille.common.util.Strings.join;
-
-import org.daisy.pipeline.braille.common.saxon.SaxonHelper;
-import org.daisy.pipeline.braille.common.XMLStreamToXMLStreamTransformer;
-import org.daisy.pipeline.braille.common.XMLStreamWriterHelper.BufferedXMLStreamWriter;
-import org.daisy.pipeline.braille.common.XMLStreamWriterHelper.ToStringWriter;
-import org.daisy.pipeline.braille.common.XMLStreamWriterHelper.WriterEvent;
-import static org.daisy.pipeline.braille.common.XMLStreamWriterHelper.writeAttribute;
-import static org.daisy.pipeline.braille.common.XMLStreamWriterHelper.writeStartElement;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -112,7 +116,11 @@ public class RenderTableByDefinition extends ExtensionFunctionDefinition {
 					
 					// FIXME: why does this not work?
 					// URI base = new URI(tableElement.getBaseURI());
-					XdmNode result = SaxonHelper.transform(tableElement, new TableAsList(axes), context.getConfiguration());
+					XdmNode result = Iterators.getOnlyElement(
+						SaxonHelper.transform(
+							new TableAsList(axes),
+							Collections.singleton(tableElement).iterator(),
+							context.getConfiguration()));
 					result = (XdmNode)result.axisIterator(Axis.CHILD).next(); // because result is document-node
 					return result.getUnderlyingNode(); }
 				catch (TransformerException e) {
@@ -171,7 +179,9 @@ public class RenderTableByDefinition extends ExtensionFunctionDefinition {
 		Set<CellCoordinates> coveredCoordinates;
 		QName anon;
 		
-		public void transform(XMLStreamReader reader, BufferedXMLStreamWriter writer) {
+		public void transform(Iterator<BaseURIAwareXMLStreamReader> input, Supplier<BaseURIAwareXMLStreamWriter> output) {
+			XMLStreamReader reader = Iterators.getOnlyElement(input);
+			XMLStreamWriter writer = output.get();
 			
 			try {
 			
@@ -391,7 +401,9 @@ public class RenderTableByDefinition extends ExtensionFunctionDefinition {
 				c.rowGroup = newRowGroup;
 				c.row = newRow; }
 			
+			writer.writeStartDocument();
 			write(writer);
+			writer.writeEndDocument();
 			
 			} catch (XMLStreamException e) {
 				throw new RuntimeException(e);
