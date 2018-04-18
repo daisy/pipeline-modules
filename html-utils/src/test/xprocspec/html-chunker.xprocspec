@@ -142,6 +142,9 @@
         <x:context label="the chunks">
             <x:document type="port" port="result"/>
         </x:context>
+        <x:expect label="the base uris of the chunks"
+                  type="xpath" test="collection()/replace(base-uri(.),'.*?([^/]+)$','$1')" equals="('html-chunker-1.xprocspec',
+                                                                                                    'html-chunker-2.xprocspec')"/>
         <x:expect label="links between chunks are corrected" type="compare">
             <x:document type="inline">
                 <html>
