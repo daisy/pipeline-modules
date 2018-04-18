@@ -64,6 +64,7 @@
               *
             </Import-Package>
             <Service-Component>OSGI-INF/message.xml</Service-Component>
+            <Private-Package>org.daisy.common.xproc.calabash.steps</Private-Package>
           </instructions>
         </configuration>
         <executions>

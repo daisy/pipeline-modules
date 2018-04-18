@@ -99,6 +99,7 @@
               OSGI-INF/set-xml-declaration-step.xml,
               OSGI-INF/config-calabash.xml
             </Service-Component>
+            <Private-Package>org.daisy.common.xproc.calabash.steps</Private-Package>
           </instructions>
         </configuration>
         <executions>

@@ -17,14 +17,39 @@
   <name>DAISY Pipeline 2 module :: HTML Utilities</name>
   
   <dependencies>
-    <!--
-        test dependencies
-    -->
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.daisy.pipeline</groupId>
+      <artifactId>common-utils</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.daisy.pipeline</groupId>
       <artifactId>calabash-adapter</artifactId>
-      <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.daisy.libs</groupId>
+      <artifactId>saxon-he</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.daisy.libs</groupId>
+      <artifactId>com.xmlcalabash</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <!--
+        test dependencies
+    -->
     <dependency>
       <groupId>org.daisy.pipeline.build</groupId>
       <artifactId>modules-test-helper</artifactId>
@@ -49,6 +74,14 @@
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <_dsannotations>
+              org.daisy.common.xproc.calabash.steps.ChunkerStep$Provider
+            </_dsannotations>
+            <Private-Package>org.daisy.common.xproc.calabash.steps</Private-Package>
+          </instructions>
+        </configuration>
         <executions>
           <execution>
             <id>bundle-before-test</id>

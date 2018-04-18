@@ -12,36 +12,32 @@
 	</p:documentation>
 	
 	<p:input port="source"/>
-	<p:option name="stylesheet" required="true">
+	
+	<p:option name="is-chunk" required="true">
 		<p:documentation>
-			<p xmlns="http://www.w3.org/1999/xhtml">An XSLT style sheet that specifies the break
-			points. For each node that should be put in its own chunk, the the style sheet must
-			contain a template in the `is-chunk` mode that matches this node and returns
-			`true()`.</p>
+			<p xmlns="http://www.w3.org/1999/xhtml">An XSLTMatchPattern that specifies the break
+			points. Each element that matches this expression will be put in its own chunk.</p>
 		</p:documentation>
 	</p:option>
+	
+	<p:option name="link-attribute-name" select="'href'">
+		<p:documentation>
+			<p xmlns="http://www.w3.org/1999/xhtml">The name of the attribute used for links. Every
+			attribute with this name that points to an element within the same document (URI with
+			only a fragment part) is translated in such a way that in the output the links point to
+			the right chunks.</p>
+		</p:documentation>
+	</p:option>
+	
 	<p:output port="result" sequence="true">
-		<p:pipe step="xslt" port="secondary"/>
+		<p:documentation>
+			<p xmlns="http://www.w3.org/1999/xhtml">Every output document gets a different base URI
+			derived from the input base URI.</p>
+		</p:documentation>
 	</p:output>
 	
-	<p:string-replace match="/xsl:stylesheet/xsl:include/@href[.='$stylesheet']" name="compile">
-		<p:input port="source">
-			<p:document href="../xslt/chunker.xsl"/>
-		</p:input>
-		<p:with-option name="replace" select="concat('&quot;',$stylesheet,'&quot;')"/>
-	</p:string-replace>
-	
-	<p:xslt name="xslt">
-		<p:input port="source">
-			<p:pipe step="main" port="source"/>
-		</p:input>
-		<p:input port="stylesheet">
-			<p:pipe step="compile" port="result"/>
-		</p:input>
-		<p:input port="parameters">
-			<p:empty/>
-		</p:input>
-	</p:xslt>
-	<p:sink/>
+	<!--
+	    implemented in Java
+	-->
 	
 </p:declare-step>
