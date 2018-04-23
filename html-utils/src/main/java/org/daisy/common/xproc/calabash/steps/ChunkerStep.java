@@ -39,7 +39,8 @@ public class ChunkerStep extends DefaultStep {
 	private ReadablePipe sourcePipe = null;
 	private WritablePipe resultPipe = null;
 	
-	private static final QName IS_CHUNK = new QName("is-chunk");
+	private static final QName BREAK_BEFORE = new QName("break-before");
+	private static final QName BREAK_AFTER = new QName("break-after");
 	private static final QName LINK_ATTRIBUTE_NAME = new QName("link-attribute-name");
 	private static final QName DEFAULT_LINK_ATTRIBUTE_NAME = new QName("href");
 	
@@ -69,7 +70,7 @@ public class ChunkerStep extends DefaultStep {
 		try {
 			Configuration configuration = runtime.getProcessor().getUnderlyingConfiguration();
 			XMLCalabashHelper.transform(
-				new Chunker(getOption(IS_CHUNK),
+				new Chunker(getOption(BREAK_BEFORE), getOption(BREAK_AFTER),
 				            SaxonHelper.jaxpQName(getOption(LINK_ATTRIBUTE_NAME, DEFAULT_LINK_ATTRIBUTE_NAME)),
 				            configuration),
 				sourcePipe,

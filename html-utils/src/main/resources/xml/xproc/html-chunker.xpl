@@ -20,8 +20,12 @@
 	
 	<p:delete match="/html:html/html:head"/>
 
-	<px:chunker is-chunk="/html:html/html:body/html:section[not(tokenize(@epub:type,'\s+')='bodymatter' and child::html:section)]|
-	                      /html:html/html:body/html:section[tokenize(@epub:type,'\s+')='bodymatter']/html:section"
+	<px:chunker break-before="/html:html/html:body[child::html:section]|
+	                          /html:html/html:body/html:section[not(tokenize(@epub:type,'\s+')='bodymatter' and child::html:section)]|
+	                          /html:html/html:body/html:section[tokenize(@epub:type,'\s+')='bodymatter']/html:section"
+	            break-after="/html:html/html:body[child::html:section]|
+	                         /html:html/html:body/html:section[not(tokenize(@epub:type,'\s+')='bodymatter' and child::html:section)]|
+	                         /html:html/html:body/html:section[tokenize(@epub:type,'\s+')='bodymatter']/html:section"
 	            link-attribute-name="href"/>
 	
 	<p:for-each name="chunks">

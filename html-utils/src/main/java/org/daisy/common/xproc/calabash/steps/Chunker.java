@@ -3,6 +3,7 @@ package org.daisy.common.xproc.calabash.steps;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -58,15 +59,17 @@ import org.daisy.common.transform.TransformerException;
 class Chunker implements NodeToXMLStreamTransformer {
 	
 	final Configuration config;
-	final RuntimeValue isChunkOption;
+	final RuntimeValue breakBeforeOption;
+	final RuntimeValue breakAfterOption;
 	final QName linkAttributeName;
 	
 	private static final QName _ID = new QName("id");
 	private static final QName XML_ID = new QName("http://www.w3.org/XML/1998/namespace", "id", "xml");
 	
-	Chunker(RuntimeValue isChunkOption, QName linkAttributeName, Configuration config) {
+	Chunker(RuntimeValue breakBeforeOption, RuntimeValue breakAfterOption, QName linkAttributeName, Configuration config) {
 		this.config = config;
-		this.isChunkOption = isChunkOption;
+		this.breakBeforeOption = breakBeforeOption;
+		this.breakAfterOption = breakAfterOption;
 		this.linkAttributeName = linkAttributeName;
 	}
 	
@@ -84,7 +87,7 @@ class Chunker implements NodeToXMLStreamTransformer {
 			reader = SaxonHelper.nodeReader(doc, config);
 			SortedSet<SplitPoint> collectSplitPoints = new TreeSet<>();
 			Map<String,List<Integer>> collectIds = new HashMap<>();
-			getSplitPoints(config, doc, isChunkOption, collectSplitPoints, collectIds);
+			getSplitPoints(doc, collectSplitPoints, collectIds);
 			idToChunk = new HashMap<String,Integer>();
 			int n = 1;
 			for (SplitPoint sp : collectSplitPoints) {
@@ -248,20 +251,32 @@ class Chunker implements NodeToXMLStreamTransformer {
 		return splitPoint.path.subList(0, elementPath.size()).equals(elementPath);
 	}
 	
-	static void getSplitPoints(Configuration configuration, XdmNode source, RuntimeValue isChunkOption,
-	                           SortedSet<SplitPoint> collectSplitPoints, Map<String,List<Integer>> collectIds)
+	void getSplitPoints(XdmNode source, SortedSet<SplitPoint> collectSplitPoints, Map<String,List<Integer>> collectIds)
 			throws XPathException, SaxonApiException {
 		net.sf.saxon.s9api.QName _ID = new net.sf.saxon.s9api.QName(Chunker._ID);
 		net.sf.saxon.s9api.QName XML_ID = new net.sf.saxon.s9api.QName(Chunker.XML_ID);
-		XPathExpression chunkMatcher = SaxonHelper.compileExpression(isChunkOption.getString(),
-		                                                             isChunkOption.getNamespaceBindings(),
-		                                                             configuration);
-		Predicate<XdmNode> isChunk = node -> node.getNodeKind() == XdmNodeKind.ELEMENT && SaxonHelper.evaluateBoolean(chunkMatcher, node);
+		Predicate<XdmNode> breakBefore; {
+			if (!breakBeforeOption.getString().equals("/*")) {
+				XPathExpression matcher = SaxonHelper.compileExpression(breakBeforeOption.getString(),
+				                                                        breakBeforeOption.getNamespaceBindings(),
+				                                                        config);
+				breakBefore = n -> n.getNodeKind() == XdmNodeKind.ELEMENT && SaxonHelper.evaluateBoolean(matcher, n);
+			} else
+				breakBefore = n -> false;
+		}
+		Predicate<XdmNode> breakAfter; {
+			if (!breakAfterOption.getString().equals("/*")) {
+				XPathExpression matcher = SaxonHelper.compileExpression(breakAfterOption.getString(),
+				                                                        breakAfterOption.getNamespaceBindings(),
+				                                                        config);
+				breakAfter = n -> n.getNodeKind() == XdmNodeKind.ELEMENT && SaxonHelper.evaluateBoolean(matcher, n);
+			} else
+				breakAfter = n -> false;
+		}
 		new Consumer<XdmNode>() {
 			Stack<Integer> currentPath = new Stack<>();
 			int elementCount = 0;
 			boolean isRoot = true;
-			boolean idsOnly = false;
 			public void accept(XdmNode node) {
 				if (node.getNodeKind() == XdmNodeKind.DOCUMENT) {
 					for (XdmItem i : SaxonHelper.axisIterable(node, Axis.CHILD))
@@ -281,39 +296,48 @@ class Chunker implements NodeToXMLStreamTransformer {
 						currentPath.add(elementCount * 2);
 						if (id != null)
 							collectIds.put(id, new ArrayList<>(currentPath));
-						boolean _idsOnly = idsOnly;
-						if (!idsOnly && isChunk.test(node)) {
-							getSplitPoints(node, currentPath, collectSplitPoints);
-							idsOnly = true;
-						}
+						if (breakBefore.test(node))
+							addOptionally(collectSplitPoints, propagate(node, currentPath, SplitPoint.Side.BEFORE));
 						elementCount = 0;
 						for (XdmItem i : SaxonHelper.axisIterable(node, Axis.CHILD))
 							accept((XdmNode)i);
+						if (breakAfter.test(node))
+							addOptionally(collectSplitPoints, propagate(node, currentPath, SplitPoint.Side.AFTER));
 						elementCount = currentPath.pop() / 2;
-						idsOnly = _idsOnly;
 					}
 				}
 			}
 		}.accept(source);
 	}
 	
-	static void getSplitPoints(XdmNode element, List<Integer> path, SortedSet<SplitPoint> collect) {
+	static <T> void addOptionally(Collection<T> collection, Optional<T> object) {
+		if (object.isPresent())
+			collection.add(object.get());
+	}
+	
+	static Optional<SplitPoint> propagate(XdmNode element, List<Integer> path, SplitPoint.Side side) {
 		path = new ArrayList<>(path);
 		while (!path.isEmpty()) {
-			if (path.get(path.size() - 1) > 2
-			    || !shouldPropagateBreak(element, SplitPoint.Side.BEFORE))
-				collect.add(new SplitPoint(path, SplitPoint.Side.BEFORE).normalize());
-			if (!shouldPropagateBreak(element, SplitPoint.Side.AFTER)) {
-				if (skipWhiteSpaceNodes(element, SplitPoint.Side.AFTER)) {
-					List<Integer> p = new ArrayList<>(path);
-					p.set(p.size() - 1, p.get(p.size() - 1) + 2);
-					collect.add(new SplitPoint(p, SplitPoint.Side.BEFORE).normalize());
-				} else
-					collect.add(new SplitPoint(path, SplitPoint.Side.AFTER).normalize());
+			switch (side) {
+			case BEFORE:
+				if (path.get(path.size() - 1) > 2 || !shouldPropagateBreak(element, side))
+					return Optional.of(new SplitPoint(path, side).normalize());
+				break;
+			case AFTER:
+				if (!shouldPropagateBreak(element, side)) {
+					if (skipWhiteSpaceNodes(element, SplitPoint.Side.AFTER)) {
+						List<Integer> p = new ArrayList<>(path);
+						p.set(p.size() - 1, p.get(p.size() - 1) + 2);
+						return Optional.of(new SplitPoint(p, SplitPoint.Side.BEFORE).normalize());
+					}
+					return Optional.of(new SplitPoint(path, side).normalize());
+				}
+				break;
 			}
 			element = (XdmNode)element.getParent();
 			path = path.subList(0, path.size() - 1);
 		}
+		return Optional.empty();
 	}
 	
 	static boolean shouldPropagateBreak(XdmNode element, SplitPoint.Side side) {

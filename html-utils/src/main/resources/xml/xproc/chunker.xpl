@@ -13,10 +13,17 @@
 	
 	<p:input port="source"/>
 	
-	<p:option name="is-chunk" required="true">
+	<p:option name="break-before" select="'/*'">
 		<p:documentation>
-			<p xmlns="http://www.w3.org/1999/xhtml">An XSLTMatchPattern that specifies the break
-			points. Each element that matches this expression will be put in its own chunk.</p>
+			<p xmlns="http://www.w3.org/1999/xhtml">An XSLTMatchPattern that specifies break
+			points. Each element that matches this expression will have a break point before it.</p>
+		</p:documentation>
+	</p:option>
+	
+	<p:option name="break-after" select="'/*'">
+		<p:documentation>
+			<p xmlns="http://www.w3.org/1999/xhtml">An XSLTMatchPattern that specifies break
+			points. Each element that matches this expression will have a break point after it.</p>
 		</p:documentation>
 	</p:option>
 	
