@@ -2,14 +2,12 @@ package org.daisy.common.xproc.calabash.steps;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -75,22 +73,22 @@ class Chunker implements NodeToXMLStreamTransformer {
 	
 	private Stack<QName> parents;
 	private Stack<Map<QName,String>> parentAttrs;
-	private Stack<Integer> currentPath;
-	private Iterator<SplitPoint> splitPoints;
+	private Path.Builder currentPath;
+	private Iterator<BreakPosition> splitPoints;
 	private Map<String,Integer> idToChunk;
-	private SplitPoint nextSplitPoint;
+	private BreakPosition nextSplitPoint;
 	
 	public void transform(Iterator<XdmNode> input, Supplier<BaseURIAwareXMLStreamWriter> output) throws TransformerException {
 		XdmNode doc = Iterators.getOnlyElement(input);
 		BaseURIAwareXMLStreamReader reader;
 		try {
 			reader = SaxonHelper.nodeReader(doc, config);
-			SortedSet<SplitPoint> collectSplitPoints = new TreeSet<>();
-			Map<String,List<Integer>> collectIds = new HashMap<>();
+			SortedSet<BreakPosition> collectSplitPoints = new TreeSet<>();
+			Map<String,Path> collectIds = new HashMap<>();
 			getSplitPoints(doc, collectSplitPoints, collectIds);
 			idToChunk = new HashMap<String,Integer>();
 			int n = 1;
-			for (SplitPoint sp : collectSplitPoints) {
+			for (BreakPosition sp : collectSplitPoints) {
 				for (String id : collectIds.keySet()) {
 					if (sp.compareTo(collectIds.get(id)) > 0) {
 						idToChunk.put(id, n);
@@ -128,9 +126,7 @@ class Chunker implements NodeToXMLStreamTransformer {
 		parentAttrs = new Stack<Map<QName,String>>();
 		boolean containsSplitPoint = true;
 		Stack<Boolean> containsSplitPointStack = new Stack<Boolean>();
-		currentPath = new Stack<Integer>();
-		int elementCount = 0;
-		boolean isRoot = true;
+		currentPath = new Path.Builder();
 		BaseURIAwareXMLStreamWriter writer = writers.get();
 		try {
 			URI sourceBaseURI = reader.getBaseURI();
@@ -140,13 +136,10 @@ class Chunker implements NodeToXMLStreamTransformer {
 					int event = reader.next();
 					switch (event) {
 					case START_ELEMENT:
-						elementCount++;
 						containsSplitPointStack.push(containsSplitPoint);
-						if (isRoot)
-							isRoot = false;
-						else {
-							currentPath.add(elementCount * 2);
-							if (containsSplitPoint && isSplitPoint(currentPath, SplitPoint.Side.BEFORE, nextSplitPoint))
+						if (!currentPath.isRoot()) {
+							currentPath.nextElement();
+							if (containsSplitPoint && isSplitPoint(currentPath, BreakPosition.Side.BEFORE, nextSplitPoint))
 								split(writer, writer = writers.get());
 							containsSplitPoint = containsSplitPoint(currentPath, nextSplitPoint);
 						}
@@ -164,7 +157,7 @@ class Chunker implements NodeToXMLStreamTransformer {
 											val = relativize(currentBaseURI, targetBaseURI).toASCIIString() + val; }}
 							writeAttribute(writer, attr, val);
 						}
-						elementCount = 0;
+						currentPath.down();
 						if (containsSplitPoint) {
 							parents.push(reader.getName());
 							parentAttrs.push(getAttributes(reader));
@@ -177,19 +170,18 @@ class Chunker implements NodeToXMLStreamTransformer {
 						}
 						writer.writeEndElement();
 						containsSplitPoint = containsSplitPointStack.pop();
-						if (containsSplitPoint && isSplitPoint(currentPath, SplitPoint.Side.AFTER, nextSplitPoint))
+						if (containsSplitPoint && isSplitPoint(currentPath, BreakPosition.Side.AFTER, nextSplitPoint))
 							split(writer, writer = writers.get());
-						if (!currentPath.isEmpty()) // root element
-							elementCount = currentPath.pop() / 2;
+						currentPath.up();
 						break;
 					case CHARACTERS:
-						currentPath.add(elementCount * 2 + 1);
-						if (containsSplitPoint && isSplitPoint(currentPath, SplitPoint.Side.BEFORE, nextSplitPoint))
+						if (currentPath.isElement())
+							currentPath.inc();
+						if (containsSplitPoint && isSplitPoint(currentPath, BreakPosition.Side.BEFORE, nextSplitPoint))
 							split(writer, writer = writers.get());
 						writeCharacters(writer, reader);
-						if (containsSplitPoint && isSplitPoint(currentPath, SplitPoint.Side.AFTER, nextSplitPoint))
+						if (containsSplitPoint && isSplitPoint(currentPath, BreakPosition.Side.AFTER, nextSplitPoint))
 							split(writer, writer = writers.get());
-						currentPath.pop();
 						break;
 					case START_DOCUMENT:
 					case END_DOCUMENT:
@@ -239,75 +231,58 @@ class Chunker implements NodeToXMLStreamTransformer {
 		return URI.create(sourceBaseURI.toASCIIString().replaceAll("^(.+?)(\\.[^\\.]+)$", "$1-" + chunkNr + "$2"));
 	}
 	
-	final static boolean isSplitPoint(List<Integer> elementPath, SplitPoint.Side side, SplitPoint splitPoint) {
+	final static boolean isSplitPoint(Path elementPath, BreakPosition.Side side, BreakPosition splitPoint) {
 		return splitPoint != null && splitPoint.equals(elementPath, side);
 	}
 	
-	final static boolean containsSplitPoint(List<Integer> elementPath, SplitPoint splitPoint) {
+	final static boolean containsSplitPoint(Path elementPath, BreakPosition splitPoint) {
 		if (splitPoint == null)
 			return false;
-		if (elementPath.size() >= splitPoint.path.size())
-			return false;
-		return splitPoint.path.subList(0, elementPath.size()).equals(elementPath);
+		return elementPath.contains(splitPoint.path);
 	}
 	
-	void getSplitPoints(XdmNode source, SortedSet<SplitPoint> collectSplitPoints, Map<String,List<Integer>> collectIds)
+	void getSplitPoints(XdmNode source, SortedSet<BreakPosition> collectSplitPoints, Map<String,Path> collectIds)
 			throws XPathException, SaxonApiException {
 		net.sf.saxon.s9api.QName _ID = new net.sf.saxon.s9api.QName(Chunker._ID);
 		net.sf.saxon.s9api.QName XML_ID = new net.sf.saxon.s9api.QName(Chunker.XML_ID);
-		Predicate<XdmNode> breakBefore; {
-			if (!breakBeforeOption.getString().equals("/*")) {
-				XPathExpression matcher = SaxonHelper.compileExpression(breakBeforeOption.getString(),
-				                                                        breakBeforeOption.getNamespaceBindings(),
-				                                                        config);
-				breakBefore = n -> n.getNodeKind() == XdmNodeKind.ELEMENT && SaxonHelper.evaluateBoolean(matcher, n);
-			} else
-				breakBefore = n -> false;
-		}
-		Predicate<XdmNode> breakAfter; {
-			if (!breakAfterOption.getString().equals("/*")) {
-				XPathExpression matcher = SaxonHelper.compileExpression(breakAfterOption.getString(),
-				                                                        breakAfterOption.getNamespaceBindings(),
-				                                                        config);
-				breakAfter = n -> n.getNodeKind() == XdmNodeKind.ELEMENT && SaxonHelper.evaluateBoolean(matcher, n);
-			} else
-				breakAfter = n -> false;
-		}
+		Predicate<XdmNode> breakBefore = parseOption(breakBeforeOption);
+		Predicate<XdmNode> breakAfter = parseOption(breakAfterOption);
 		new Consumer<XdmNode>() {
-			Stack<Integer> currentPath = new Stack<>();
-			int elementCount = 0;
-			boolean isRoot = true;
+			Path.Builder currentPath = new Path.Builder();
 			public void accept(XdmNode node) {
 				if (node.getNodeKind() == XdmNodeKind.DOCUMENT) {
 					for (XdmItem i : SaxonHelper.axisIterable(node, Axis.CHILD))
 						accept((XdmNode)i);
 				} else if (node.getNodeKind() == XdmNodeKind.ELEMENT) {
-					elementCount++;
+					if (!currentPath.isRoot())
+						currentPath.nextElement();
 					String id = node.getAttributeValue(XML_ID);
 					if (id == null) id = node.getAttributeValue(_ID);
-					if (isRoot) {
-						if (id != null)
-							collectIds.put(id, new ArrayList<>(currentPath));
-						isRoot = false;
-						elementCount = 0;
-						for (XdmItem i : SaxonHelper.axisIterable(node, Axis.CHILD))
-							accept((XdmNode)i);
-					} else {
-						currentPath.add(elementCount * 2);
-						if (id != null)
-							collectIds.put(id, new ArrayList<>(currentPath));
+					if (id != null)
+						collectIds.put(id, currentPath.build());
+					if (!currentPath.isRoot())
 						if (breakBefore.test(node))
-							addOptionally(collectSplitPoints, propagate(node, currentPath, SplitPoint.Side.BEFORE));
-						elementCount = 0;
-						for (XdmItem i : SaxonHelper.axisIterable(node, Axis.CHILD))
-							accept((XdmNode)i);
+							addOptionally(collectSplitPoints, propagate(node, currentPath, BreakPosition.Side.BEFORE));
+					currentPath.down();
+					for (XdmItem i : SaxonHelper.axisIterable(node, Axis.CHILD))
+						accept((XdmNode)i);
+					currentPath.up();
+					if (!currentPath.isRoot())
 						if (breakAfter.test(node))
-							addOptionally(collectSplitPoints, propagate(node, currentPath, SplitPoint.Side.AFTER));
-						elementCount = currentPath.pop() / 2;
-					}
+							addOptionally(collectSplitPoints, propagate(node, currentPath, BreakPosition.Side.AFTER));
 				}
 			}
 		}.accept(source);
+	}
+	
+	Predicate<XdmNode> parseOption(RuntimeValue option) throws XPathException {
+		if (!option.getString().equals("/*")) {
+			XPathExpression matcher = SaxonHelper.compileExpression(option.getString(),
+			                                                        option.getNamespaceBindings(),
+			                                                        config);
+			return n -> n.getNodeKind() == XdmNodeKind.ELEMENT && SaxonHelper.evaluateBoolean(matcher, n);
+		} else
+			return n -> false;
 	}
 	
 	static <T> void addOptionally(Collection<T> collection, Optional<T> object) {
@@ -315,34 +290,24 @@ class Chunker implements NodeToXMLStreamTransformer {
 			collection.add(object.get());
 	}
 	
-	static Optional<SplitPoint> propagate(XdmNode element, List<Integer> path, SplitPoint.Side side) {
-		path = new ArrayList<>(path);
-		while (!path.isEmpty()) {
-			switch (side) {
-			case BEFORE:
-				if (path.get(path.size() - 1) > 2 || !shouldPropagateBreak(element, side))
-					return Optional.of(new SplitPoint(path, side).normalize());
-				break;
-			case AFTER:
-				if (!shouldPropagateBreak(element, side)) {
-					if (skipWhiteSpaceNodes(element, SplitPoint.Side.AFTER)) {
-						List<Integer> p = new ArrayList<>(path);
-						p.set(p.size() - 1, p.get(p.size() - 1) + 2);
-						return Optional.of(new SplitPoint(p, SplitPoint.Side.BEFORE).normalize());
-					}
-					return Optional.of(new SplitPoint(path, side).normalize());
-				}
-				break;
+	static Optional<BreakPosition> propagate(XdmNode element, Path.Builder path, BreakPosition.Side side) {
+		path = path.builder();
+		while (!path.isRoot()) {
+			if (shouldPropagateBreak(element, side)) {
+				element = (XdmNode)element.getParent();
+				path.up();
+				continue;
 			}
-			element = (XdmNode)element.getParent();
-			path = path.subList(0, path.size() - 1);
+			if (side == BreakPosition.Side.AFTER)
+				skipWhiteSpaceNodes(element, side, path);
+			return Optional.of(new BreakPosition(path, side).normalize());
 		}
 		return Optional.empty();
 	}
 	
-	static boolean shouldPropagateBreak(XdmNode element, SplitPoint.Side side) {
-		for (XdmItem i : SaxonHelper.axisIterable(element, side == SplitPoint.Side.BEFORE ? Axis.PRECEDING_SIBLING
-		                                                                                  : Axis.FOLLOWING_SIBLING)) {
+	static boolean shouldPropagateBreak(XdmNode element, BreakPosition.Side side) {
+		for (XdmItem i : SaxonHelper.axisIterable(element, side == BreakPosition.Side.BEFORE ? Axis.PRECEDING_SIBLING
+		                                                                                     : Axis.FOLLOWING_SIBLING)) {
 			XdmNode n = (XdmNode)i;
 			if (n.getNodeKind() == XdmNodeKind.ELEMENT)
 				return false;
@@ -352,16 +317,20 @@ class Chunker implements NodeToXMLStreamTransformer {
 		return true;
 	}
 	
-	static boolean skipWhiteSpaceNodes(XdmNode element, SplitPoint.Side side) {
-		for (XdmItem i : SaxonHelper.axisIterable(element, side == SplitPoint.Side.BEFORE ? Axis.PRECEDING_SIBLING
-		                                                                                  : Axis.FOLLOWING_SIBLING)) {
+	static void skipWhiteSpaceNodes(XdmNode element, BreakPosition.Side side, Path.Builder path) {
+		for (XdmItem i : SaxonHelper.axisIterable(element, side == BreakPosition.Side.BEFORE ? Axis.PRECEDING_SIBLING
+		                                                                                     : Axis.FOLLOWING_SIBLING)) {
 			XdmNode n = (XdmNode)i;
-			if (n.getNodeKind() == XdmNodeKind.ELEMENT)
-				return true;
-			else if (n.getNodeKind() == XdmNodeKind.TEXT && !isWhiteSpaceNode(n))
-				return false;
+			if (n.getNodeKind() == XdmNodeKind.ELEMENT) {
+				if (side == BreakPosition.Side.AFTER)
+					path.inc();
+				else
+					path.dec();
+				return;
+			} else if (n.getNodeKind() == XdmNodeKind.TEXT && !isWhiteSpaceNode(n))
+				return;
 		}
-		return false;
+		return;
 	}
 	
 	static final Pattern WHITESPACE_RE = Pattern.compile("\\s*");
@@ -423,74 +392,100 @@ class Chunker implements NodeToXMLStreamTransformer {
 	 * http://www.idpf.org/epub/linking/cfi/#sec-epubcfi-def). [x, y, z] corresponds with
 	 * /x/y/z in EPUB CFI.
 	 */
-	static class SplitPoint implements Comparable<SplitPoint> {
+	static class Path implements Comparable<Path> {
 		
-		enum Side { BEFORE, AFTER }
-		final List<Integer> path;
-		final Side side;
+		protected final Stack<Integer> path;
 		
-		SplitPoint(List<Integer> path, Side side) {
-			if (path == null || side == null)
-				throw new NullPointerException();
-			if (path.isEmpty())
-				throw new IllegalArgumentException();
+		private Path(Stack<Integer> path) {
 			this.path = path;
-			this.side = side;
 		}
 		
-		// normalize to BEFORE
-		SplitPoint normalize() {
-			if (side == Side.BEFORE)
-				return this;
-			else {
-				List<Integer> path = new ArrayList<>(this.path);
-				path.set(path.size() - 1, path.get(path.size() - 1) + 1);
-				return new SplitPoint(path, Side.BEFORE);
-			}
+		public boolean isRoot() {
+			return path.isEmpty();
 		}
 		
-		@Override
-		public int compareTo(SplitPoint o) {
-			int minsize = Math.min(path.size(), o.path.size());
-			for (int i = 0; i < minsize; i++) {
-				int c = path.get(i).compareTo(o.path.get(i));
-				if (c != 0)
-					return c;
-			}
-			if (path.size() > minsize)
-				return o.side == Side.BEFORE ? 1 : -1;
-			else if (o.path.size() > minsize)
-				return side == Side.BEFORE ? -1 : 1;
-			else
-				return side.compareTo(o.side);
+		public boolean isElement() {
+			return path.isEmpty() || path.peek() % 2 == 0;
+		}
+		
+		public Builder builder() {
+			return new Builder(this);
 		}
 		
 		/**
-		 * @param path The position of the node
-		 * @return -1 when the split point comes before the node, 0 when the split point lies inside
-		 *         the node, 1 when the split point comes after the node.
+		 * @return -1 when this node comes before the given node, 1 when this node comes after the
+		 *         given node, 0 when the nodes are the same or one is a descendant of the other.
 		 */
-		public int compareTo(List<Integer> path) {
-			int minsize = Math.min(this.path.size(), path.size());
+		@Override
+		public int compareTo(Path o) {
+			int minsize = Math.min(this.path.size(), o.path.size());
 			for (int i = 0; i < minsize; i++) {
-				int c = this.path.get(i).compareTo(path.get(i));
+				int c = this.path.get(i).compareTo(o.path.get(i));
 				if (c != 0)
 					return c;
 			}
-			if (this.path.size() > minsize)
-				return 0;
-			else if (this.side == Side.BEFORE)
-				return -1;
-			else
-				return 1;
+			return 0;
+		}
+		
+		public boolean contains(Path o) {
+			if (compareTo(o) != 0)
+				return false;
+			return o.path.size() > this.path.size();
+		}
+		
+		static class Builder extends Path {
+			
+			public Builder() {
+				super(new Stack<>());
+			}
+			
+			private Builder(Path from) {
+				super(new Stack<Integer>());
+				for (Integer step : from.path)
+					path.add(step);
+			}
+			
+			public Builder down() {
+				path.add(0);
+				return this;
+			}
+			
+			public Builder up() {
+				path.pop();
+				return this;
+			}
+			
+			public Builder inc() {
+				path.add(path.pop() + 1);
+				return this;
+			}
+			
+			public Builder dec() {
+				path.add(path.pop() - 1);
+				return this;
+			}
+			
+			public Builder nextElement() {
+				int step = path.pop() + 1;
+				if (step % 2 == 1)
+					step++;
+				path.add(step);
+				return this;
+			}
+			
+			public Path build() {
+				Stack<Integer> copy = new Stack<Integer>();
+				for (Integer step : path)
+					copy.add(step);
+				return new Path(copy);
+			}
 		}
 		
 		@Override
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
-			result = prime * result + ((path == null) ? 0 : path.hashCode());
-			result = prime * result + ((side == null) ? 0 : side.hashCode());
+			result = prime * result + path.hashCode();
 			return result;
 		}
 		
@@ -502,11 +497,96 @@ class Chunker implements NodeToXMLStreamTransformer {
 				return false;
 			if (getClass() != obj.getClass())
 				return false;
-			SplitPoint other = (SplitPoint)obj;
+			Path other = (Path)obj;
+			return this.path.equals(other.path);
+		}
+		
+		@Override
+		public String toString() {
+			if (isRoot())
+				return "/";
+			StringBuilder b = new StringBuilder();
+			for (Integer i : path)
+				b.append('/').append(i);
+			return b.toString();
+		}
+	}
+	
+	static class BreakPosition implements Comparable<BreakPosition> {
+		
+		enum Side { BEFORE, AFTER }
+		final Path path;
+		final Side side;
+		
+		BreakPosition(Path path, Side side) {
+			if (path == null || side == null)
+				throw new NullPointerException();
+			if (path.isRoot())
+				throw new IllegalArgumentException();
+			this.path = path;
+			this.side = side;
+		}
+		
+		// normalize to BEFORE
+		BreakPosition normalize() {
+			if (side == Side.BEFORE)
+				return this;
+			else
+				return new BreakPosition(path.builder().inc(), Side.BEFORE);
+		}
+		
+		@Override
+		public int compareTo(BreakPosition o) {
+			int c = this.path.compareTo(o.path);
+			if (c != 0)
+				return c;
+			if (this.path.contains(o.path))
+				return this.side == Side.BEFORE ? -1 : 1;
+			else if (o.path.contains(this.path))
+				return o.side == Side.BEFORE ? 1 : -1;
+			else
+				return side.compareTo(o.side);
+		}
+		
+		/**
+		 * @param path The position of the node
+		 * @return -1 when the split point comes before the node, 0 when the split point lies inside
+		 *         the node, 1 when the split point comes after the node.
+		 */
+		public int compareTo(Path path) {
+			int c = this.path.compareTo(path);
+			if (c != 0)
+				return c;
+			if (this.path.contains(path))
+				return 0;
+			else if (this.side == Side.BEFORE)
+				return -1;
+			else
+				return 1;
+		}
+		
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + path.hashCode();
+			result = prime * result + side.hashCode();
+			return result;
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			BreakPosition other = (BreakPosition)obj;
 			return equals(other.path, other.side);
 		}
 		
-		public boolean equals(List<Integer> path, Side side) {
+		public boolean equals(Path path, Side side) {
 			if (path == null)
 				return false;
 			if (this.side != side)
@@ -518,11 +598,7 @@ class Chunker implements NodeToXMLStreamTransformer {
 		
 		@Override
 		public String toString() {
-			StringBuilder b = new StringBuilder();
-			b.append(side).append(' ');
-			for (Integer i : path)
-				b.append('/').append(i);
-			return b.toString();
+			return side + " " + path;
 		}
 	}
 }
