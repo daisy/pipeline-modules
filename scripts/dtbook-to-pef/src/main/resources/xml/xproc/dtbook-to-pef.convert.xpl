@@ -78,22 +78,17 @@
         <px:assert message="More than one DTBook found in fileset." test-count-max="1" error-code="PEZE00"/>
     </p:group>
     
-    <p:xslt px:message="Generating table of contents" px:progress=".01">
-        <p:input port="stylesheet">
-            <p:document href="../xslt/generate-toc.xsl"/>
-        </p:input>
-        <p:input port="parameters">
-            <p:pipe step="parameters" port="result"/>
-        </p:input>
-    </p:xslt>
-    
-    <p:group px:message="Applying style sheets" px:progress=".07">
+    <p:group px:message="Applying style sheets" px:progress=".08">
         <p:variable name="first-css-stylesheet"
                     select="tokenize($stylesheet,'\s+')[matches(.,'\.s?css$')][1]"/>
         <p:variable name="first-css-stylesheet-index"
                     select="(index-of(tokenize($stylesheet,'\s+')[not(.='')], $first-css-stylesheet),10000)[1]"/>
         <p:variable name="stylesheets-to-be-inlined"
                     select="string-join((
+                              if (tokenize($stylesheet,'\s+')
+                                  ='http://www.daisy.org/pipeline/modules/braille/xml-to-pef/generate-toc.xsl')
+                                then ()
+                                else resolve-uri('../xslt/generate-toc.xsl'),
                               (tokenize($stylesheet,'\s+')[not(.='')])[position()&lt;$first-css-stylesheet-index],
                               resolve-uri('../xslt/volume-breaking.xsl'),
                               if ($default-stylesheet!='#default')
