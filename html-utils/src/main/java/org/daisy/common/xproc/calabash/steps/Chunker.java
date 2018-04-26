@@ -2,16 +2,22 @@ package org.daisy.common.xproc.calabash.steps;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.function.Consumer;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.Set;
 import java.util.Stack;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -56,19 +62,33 @@ import org.daisy.common.transform.TransformerException;
 // than once, we use the Saxon specific NodeToXMLStreamTransformer interface.
 class Chunker implements NodeToXMLStreamTransformer {
 	
-	final Configuration config;
-	final RuntimeValue breakBeforeOption;
-	final RuntimeValue breakAfterOption;
+	final RuntimeValue allowBreakBeforeOption;
+	final RuntimeValue allowBreakAfterOption;
+	final RuntimeValue preferBreakBeforeOption;
+	final RuntimeValue preferBreakAfterOption;
+	final RuntimeValue alwaysBreakBeforeOption;
+	final RuntimeValue alwaysBreakAfterOption;
+	
+	final int maxChunkSize;
 	final QName linkAttributeName;
+	final Configuration config;
 	
 	private static final QName _ID = new QName("id");
 	private static final QName XML_ID = new QName("http://www.w3.org/XML/1998/namespace", "id", "xml");
 	
-	Chunker(RuntimeValue breakBeforeOption, RuntimeValue breakAfterOption, QName linkAttributeName, Configuration config) {
-		this.config = config;
-		this.breakBeforeOption = breakBeforeOption;
-		this.breakAfterOption = breakAfterOption;
+	Chunker(RuntimeValue allowBreakBeforeOption, RuntimeValue allowBreakAfterOption,
+	        RuntimeValue preferBreakBeforeOption, RuntimeValue preferBreakAfterOption,
+	        RuntimeValue alwaysBreakBeforeOption, RuntimeValue alwaysBreakAfterOption,
+	        int maxChunkSize, QName linkAttributeName, Configuration config) {
+		this.allowBreakBeforeOption = allowBreakBeforeOption;
+		this.allowBreakAfterOption = allowBreakAfterOption;
+		this.preferBreakBeforeOption = preferBreakBeforeOption;
+		this.preferBreakAfterOption = preferBreakAfterOption;
+		this.alwaysBreakBeforeOption = alwaysBreakBeforeOption;
+		this.alwaysBreakAfterOption = alwaysBreakAfterOption;
+		this.maxChunkSize = maxChunkSize;
 		this.linkAttributeName = linkAttributeName;
+		this.config = config;
 	}
 	
 	private Stack<QName> parents;
@@ -243,16 +263,141 @@ class Chunker implements NodeToXMLStreamTransformer {
 	
 	void getSplitPoints(XdmNode source, SortedSet<BreakPosition> collectSplitPoints, Map<String,Path> collectIds)
 			throws XPathException, SaxonApiException {
+		SortedSet<BreakOpportunity> opportunities = new TreeSet<>();
+		int totalBytes = getBreakOpportunities(source, opportunities, collectIds);
+		collectSplitPoints.addAll(computeSplitPoints(opportunities, totalBytes, maxChunkSize * 1000));
+	}
+	
+	static SortedSet<BreakPosition> computeSplitPoints(SortedSet<BreakOpportunity> opportunities, int totalBytes, int maxSize) {
+		SortedSet<BreakPosition> splitPoints = new TreeSet<>();
+		if (maxSize <= 0) {
+			for (BreakOpportunity o : opportunities)
+				if (o.weight == BreakOpportunity.Weight.ALWAYS)
+					splitPoints.add(o.position);
+		} else {
+			BreakOpportunity BEGIN = new BreakOpportunity(
+				new BreakPosition(Path.ROOT, BreakPosition.Side.BEFORE),
+				BreakOpportunity.Weight.ALWAYS,
+				0);
+			BreakOpportunity END = new BreakOpportunity(
+				new BreakPosition(Path.ROOT, BreakPosition.Side.AFTER),
+				BreakOpportunity.Weight.ALWAYS,
+				totalBytes);
+			opportunities.add(BEGIN);
+			opportunities.add(END);
+			
+			// chunk candidates starting from a certain point
+			int preferredSize = maxSize * 4 / 5;
+			Function<BreakOpportunity,Set<BreakOpportunity>> neighbors = (current) -> {
+				Set<BreakOpportunity> result = new TreeSet<>();
+				if (current.equals(END))
+					return result;
+				Iterator<BreakOpportunity> i = opportunities.iterator();
+				for (;;)
+					try {
+						BreakOpportunity n = i.next();
+						if (n.equals(current))
+							break; }
+					catch (NoSuchElementException e) {
+						throw new IllegalArgumentException(current+" is not a break opportunity"); }
+				while (i.hasNext()) {
+					BreakOpportunity n = i.next();
+					if (n.bytesBefore - current.bytesBefore <= maxSize) {
+						result.add(n);
+						if (n.weight == BreakOpportunity.Weight.ALWAYS)
+							break; // can not be skipped
+					} else {
+						if (result.isEmpty())
+							result.add(n); // chunk exceeds maximum size
+						break;
+					}
+				}
+				return result;
+			};
+			
+			// cost of a single chunk
+			// total cost function can be expressed as the sum of the costs of individual chunks
+			BiFunction<BreakOpportunity,BreakOpportunity,Float> cost = (begin, end) -> {
+				float result = 0;
+				result += .2; // the less chunks the better
+				switch (end.weight) {
+				case ALWAYS:
+				case PREFER:
+					break;
+				case ALLOW:
+					result += .2;
+				}
+				int size = end.bytesBefore - begin.bytesBefore;
+				int diff = Math.abs(preferredSize - size);
+				if (size > maxSize)
+					diff *= 4; // higher penalty
+				result += (float)diff / (float)preferredSize;
+				return result;
+			};
+			
+			// compute optimal chunking
+			List<BreakOpportunity> solution = shortestPath(BEGIN, END, neighbors, cost);
+			for (BreakOpportunity o : solution)
+				splitPoints.add(o.position);
+		}
+		return splitPoints;
+	}
+	
+	// Dijkstra's algorithm
+	static <T> List<T> shortestPath(T from, T to, Function<T,Set<T>> neighbors, BiFunction<T,T,Float> distance) {
+		Map<T,Float> tentativeDistance = new HashMap<>(); // unvisited = tentativeDistance.keySet()
+		Set<T> visited = new TreeSet<>();
+		Map<T,T> bestPredecessor = new HashMap<>();
+		tentativeDistance.put(from, 0f);
+		T current = from;
+		for (;;) {
+			for (T n : neighbors.apply(current)) {
+				if (!visited.contains(n)) {
+					float distFromCurrent = distance.apply(current, n);
+					float distFromBegin = tentativeDistance.get(current) + distFromCurrent;
+					if (!tentativeDistance.containsKey(n) || tentativeDistance.get(n) > distFromBegin) {
+						tentativeDistance.put(n, distFromBegin);
+						bestPredecessor.put(n, current);
+					}}}
+			visited.add(current);
+			tentativeDistance.remove(current);
+			try {
+				current = Collections.min(
+					tentativeDistance.entrySet(),
+					Comparator.comparing(Map.Entry::getValue)).getKey();
+			} catch (NoSuchElementException e) {
+				throw new IllegalArgumentException("neighbors function cannot connect "+from+" and "+to);
+			}
+			if (current.equals(to)) {
+				List<T> path = new ArrayList<>();
+				current = to;
+				for (;;) {
+					current = bestPredecessor.get(current);
+					if (current.equals(from))
+						break;
+					path.add(0, current);
+				}
+				return path;
+			}}
+	}
+	
+	int getBreakOpportunities(XdmNode source, SortedSet<BreakOpportunity> collectBreakOpportunities, Map<String,Path> collectIds)
+			throws XPathException, SaxonApiException {
 		net.sf.saxon.s9api.QName _ID = new net.sf.saxon.s9api.QName(Chunker._ID);
 		net.sf.saxon.s9api.QName XML_ID = new net.sf.saxon.s9api.QName(Chunker.XML_ID);
-		Predicate<XdmNode> breakBefore = parseOption(breakBeforeOption);
-		Predicate<XdmNode> breakAfter = parseOption(breakAfterOption);
-		new Consumer<XdmNode>() {
+		Predicate<XdmNode> allowBreakBefore = parseOption(allowBreakBeforeOption);
+		Predicate<XdmNode> allowBreakAfter = parseOption(allowBreakAfterOption);
+		Predicate<XdmNode> preferBreakBefore = parseOption(preferBreakBeforeOption);
+		Predicate<XdmNode> preferBreakAfter = parseOption(preferBreakAfterOption);
+		Predicate<XdmNode> alwaysBreakBefore = parseOption(alwaysBreakBeforeOption);
+		Predicate<XdmNode> alwaysBreakAfter = parseOption(alwaysBreakAfterOption);
+		return new Function<XdmNode,Integer>() {
 			Path.Builder currentPath = new Path.Builder();
-			public void accept(XdmNode node) {
+			public Integer apply(XdmNode node) {
+				int bytesSeen = 0;
 				if (node.getNodeKind() == XdmNodeKind.DOCUMENT) {
 					for (XdmItem i : SaxonHelper.axisIterable(node, Axis.CHILD))
-						accept((XdmNode)i);
+						bytesSeen += apply((XdmNode)i);
 				} else if (node.getNodeKind() == XdmNodeKind.ELEMENT) {
 					if (!currentPath.isRoot())
 						currentPath.nextElement();
@@ -261,18 +406,37 @@ class Chunker implements NodeToXMLStreamTransformer {
 					if (id != null)
 						collectIds.put(id, currentPath.build());
 					if (!currentPath.isRoot())
-						if (breakBefore.test(node))
-							addOptionally(collectSplitPoints, propagate(node, currentPath, BreakPosition.Side.BEFORE));
+						if (alwaysBreakBefore.test(node))
+							addOptionally(collectBreakOpportunities,
+							              propagate(node, currentPath, BreakPosition.Side.BEFORE, BreakOpportunity.Weight.ALWAYS, bytesSeen));
+						else if (preferBreakBefore.test(node))
+							addOptionally(collectBreakOpportunities,
+							              propagate(node, currentPath, BreakPosition.Side.BEFORE, BreakOpportunity.Weight.PREFER, bytesSeen));
+						else if (allowBreakBefore.test(node))
+							addOptionally(collectBreakOpportunities,
+							              propagate(node, currentPath, BreakPosition.Side.BEFORE, BreakOpportunity.Weight.ALLOW, bytesSeen));
 					currentPath.down();
 					for (XdmItem i : SaxonHelper.axisIterable(node, Axis.CHILD))
-						accept((XdmNode)i);
+						bytesSeen += apply((XdmNode)i);
 					currentPath.up();
 					if (!currentPath.isRoot())
-						if (breakAfter.test(node))
-							addOptionally(collectSplitPoints, propagate(node, currentPath, BreakPosition.Side.AFTER));
+						if (alwaysBreakAfter.test(node))
+							addOptionally(collectBreakOpportunities,
+							              propagate(node, currentPath, BreakPosition.Side.AFTER, BreakOpportunity.Weight.ALWAYS, bytesSeen));
+						else if (preferBreakAfter.test(node))
+							addOptionally(collectBreakOpportunities,
+							              propagate(node, currentPath, BreakPosition.Side.AFTER, BreakOpportunity.Weight.PREFER, bytesSeen));
+						else if (allowBreakAfter.test(node))
+							addOptionally(collectBreakOpportunities,
+							              propagate(node, currentPath, BreakPosition.Side.AFTER, BreakOpportunity.Weight.ALLOW, bytesSeen));
+				} else if (node.getNodeKind() == XdmNodeKind.TEXT) {
+					// FIXME: currently only taking into account character data
+					// FIXME: we need to know the encoding in order to correctly compute the size
+					bytesSeen += node.getStringValue().getBytes().length;
 				}
+				return bytesSeen;
 			}
-		}.accept(source);
+		}.apply(source);
 	}
 	
 	Predicate<XdmNode> parseOption(RuntimeValue option) throws XPathException {
@@ -290,7 +454,8 @@ class Chunker implements NodeToXMLStreamTransformer {
 			collection.add(object.get());
 	}
 	
-	static Optional<BreakPosition> propagate(XdmNode element, Path.Builder path, BreakPosition.Side side) {
+	static Optional<BreakOpportunity> propagate(XdmNode element, Path.Builder path, BreakPosition.Side side,
+	                                            BreakOpportunity.Weight weight, int bytesSeen) {
 		path = path.builder();
 		while (!path.isRoot()) {
 			if (shouldPropagateBreak(element, side)) {
@@ -299,8 +464,8 @@ class Chunker implements NodeToXMLStreamTransformer {
 				continue;
 			}
 			if (side == BreakPosition.Side.AFTER)
-				skipWhiteSpaceNodes(element, side, path);
-			return Optional.of(new BreakPosition(path, side).normalize());
+				bytesSeen += skipWhiteSpaceNodes(element, side, path);
+			return Optional.of(new BreakOpportunity(new BreakPosition(path, side).normalize(), weight, bytesSeen));
 		}
 		return Optional.empty();
 	}
@@ -317,7 +482,8 @@ class Chunker implements NodeToXMLStreamTransformer {
 		return true;
 	}
 	
-	static void skipWhiteSpaceNodes(XdmNode element, BreakPosition.Side side, Path.Builder path) {
+	static int skipWhiteSpaceNodes(XdmNode element, BreakPosition.Side side, Path.Builder path) {
+		int bytesSkipped = 0;
 		for (XdmItem i : SaxonHelper.axisIterable(element, side == BreakPosition.Side.BEFORE ? Axis.PRECEDING_SIBLING
 		                                                                                     : Axis.FOLLOWING_SIBLING)) {
 			XdmNode n = (XdmNode)i;
@@ -326,11 +492,15 @@ class Chunker implements NodeToXMLStreamTransformer {
 					path.inc();
 				else
 					path.dec();
-				return;
-			} else if (n.getNodeKind() == XdmNodeKind.TEXT && !isWhiteSpaceNode(n))
-				return;
+				return bytesSkipped;
+			} else if (n.getNodeKind() == XdmNodeKind.TEXT) {
+				if (isWhiteSpaceNode(n))
+					bytesSkipped += n.getStringValue().getBytes().length;
+				else
+					return 0;
+			}
 		}
-		return;
+		return 0;
 	}
 	
 	static final Pattern WHITESPACE_RE = Pattern.compile("\\s*");
@@ -395,6 +565,8 @@ class Chunker implements NodeToXMLStreamTransformer {
 	static class Path implements Comparable<Path> {
 		
 		protected final Stack<Integer> path;
+		
+		final static Path ROOT = new Builder().build();
 		
 		private Path(Stack<Integer> path) {
 			this.path = path;
@@ -510,6 +682,19 @@ class Chunker implements NodeToXMLStreamTransformer {
 				b.append('/').append(i);
 			return b.toString();
 		}
+		
+		// for testing
+		static Path parse(String string) {
+			Stack<Integer> path = new Stack<>();
+			if ("/".equals(string))
+				return ROOT;
+			if (!string.matches("(/(0|[1-9][0-9]*))+"))
+				throw new IllegalArgumentException();
+			String[] steps = string.split("/");
+			for (int i = 1; i < steps.length; i++)
+				path.add(Integer.parseInt(steps[i]));
+			return new Path(path);
+		}
 	}
 	
 	static class BreakPosition implements Comparable<BreakPosition> {
@@ -521,8 +706,6 @@ class Chunker implements NodeToXMLStreamTransformer {
 		BreakPosition(Path path, Side side) {
 			if (path == null || side == null)
 				throw new NullPointerException();
-			if (path.isRoot())
-				throw new IllegalArgumentException();
 			this.path = path;
 			this.side = side;
 		}
@@ -599,6 +782,61 @@ class Chunker implements NodeToXMLStreamTransformer {
 		@Override
 		public String toString() {
 			return side + " " + path;
+		}
+	}
+	
+	static class BreakOpportunity implements Comparable<BreakOpportunity> {
+		
+		enum Weight { ALWAYS, PREFER, ALLOW }
+		final BreakPosition position;
+		final Weight weight;
+		final int bytesBefore;
+		
+		BreakOpportunity(BreakPosition position, Weight weight, int bytesBefore) {
+			this.position = position;
+			this.weight = weight;
+			this.bytesBefore = bytesBefore;
+		}
+		
+		@Override
+		public int compareTo(BreakOpportunity o) {
+			int c = this.position.compareTo(o.position);
+			if (c != 0)
+				return c;
+			return this.weight.compareTo(o.weight);
+		}
+		
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + bytesBefore;
+			result = prime * result + position.hashCode();
+			result = prime * result + weight.hashCode();
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			BreakOpportunity other = (BreakOpportunity)obj;
+			if (bytesBefore != other.bytesBefore)
+				return false;
+			if (!position.equals(other.position))
+				return false;
+			if (weight != other.weight)
+				return false;
+			return true;
+		}
+		
+		@Override
+		public String toString() {
+			return weight + " " + position;
 		}
 	}
 }

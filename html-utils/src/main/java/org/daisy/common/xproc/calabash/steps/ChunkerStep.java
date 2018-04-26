@@ -39,8 +39,14 @@ public class ChunkerStep extends DefaultStep {
 	private ReadablePipe sourcePipe = null;
 	private WritablePipe resultPipe = null;
 	
-	private static final QName BREAK_BEFORE = new QName("break-before");
-	private static final QName BREAK_AFTER = new QName("break-after");
+	private static final QName ALLOW_BREAK_BEFORE = new QName("allow-break-before");
+	private static final QName ALLOW_BREAK_AFTER = new QName("allow-break-after");
+	private static final QName PREFER_BREAK_BEFORE = new QName("prefer-break-before");
+	private static final QName PREFER_BREAK_AFTER = new QName("prefer-break-after");
+	private static final QName ALWAYS_BREAK_BEFORE = new QName("always-break-before");
+	private static final QName ALWAYS_BREAK_AFTER = new QName("always-break-after");
+	
+	private static final QName MAX_CHUNK_SIZE = new QName("max-chunk-size");
 	private static final QName LINK_ATTRIBUTE_NAME = new QName("link-attribute-name");
 	private static final QName DEFAULT_LINK_ATTRIBUTE_NAME = new QName("href");
 	
@@ -70,7 +76,13 @@ public class ChunkerStep extends DefaultStep {
 		try {
 			Configuration configuration = runtime.getProcessor().getUnderlyingConfiguration();
 			XMLCalabashHelper.transform(
-				new Chunker(getOption(BREAK_BEFORE), getOption(BREAK_AFTER),
+				new Chunker(getOption(ALLOW_BREAK_BEFORE),
+				            getOption(ALLOW_BREAK_AFTER),
+				            getOption(PREFER_BREAK_BEFORE),
+				            getOption(PREFER_BREAK_AFTER),
+				            getOption(ALWAYS_BREAK_BEFORE),
+				            getOption(ALWAYS_BREAK_AFTER),
+				            getOption(MAX_CHUNK_SIZE, -1),
 				            SaxonHelper.jaxpQName(getOption(LINK_ATTRIBUTE_NAME, DEFAULT_LINK_ATTRIBUTE_NAME)),
 				            configuration),
 				sourcePipe,

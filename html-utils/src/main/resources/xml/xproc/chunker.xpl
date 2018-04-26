@@ -13,14 +13,21 @@
 	
 	<p:input port="source"/>
 	
-	<p:option name="break-before" select="'/*'">
+	<p:option name="max-chunk-size" select="'-1'"/>
+	
+	<p:option name="allow-break-before" select="'/*'"/>
+	<p:option name="allow-break-after" select="'/*'"/>
+	<p:option name="prefer-break-before" select="'/*'"/>
+	<p:option name="prefer-break-after" select="'/*'"/>
+	
+	<p:option name="always-break-before" select="'/*'">
 		<p:documentation>
 			<p xmlns="http://www.w3.org/1999/xhtml">An XSLTMatchPattern that specifies break
 			points. Each element that matches this expression will have a break point before it.</p>
 		</p:documentation>
 	</p:option>
 	
-	<p:option name="break-after" select="'/*'">
+	<p:option name="always-break-after" select="'/*'">
 		<p:documentation>
 			<p xmlns="http://www.w3.org/1999/xhtml">An XSLTMatchPattern that specifies break
 			points. Each element that matches this expression will have a break point after it.</p>

@@ -14,19 +14,26 @@
 	</p:documentation>
 	
 	<p:input port="source"/>
+	<p:option name="max-chunk-size" select="'-1'"/>
 	<p:output port="result" sequence="true"/>
 	
 	<p:import href="chunker.xpl"/>
 	
 	<p:delete match="/html:html/html:head"/>
 
-	<px:chunker break-before="/html:html/html:body[child::html:section]|
-	                          /html:html/html:body/html:section[not(tokenize(@epub:type,'\s+')='bodymatter' and child::html:section)]|
-	                          /html:html/html:body/html:section[tokenize(@epub:type,'\s+')='bodymatter']/html:section"
-	            break-after="/html:html/html:body[child::html:section]|
-	                         /html:html/html:body/html:section[not(tokenize(@epub:type,'\s+')='bodymatter' and child::html:section)]|
-	                         /html:html/html:body/html:section[tokenize(@epub:type,'\s+')='bodymatter']/html:section"
-	            link-attribute-name="href"/>
+	<px:chunker allow-break-before="html:section"
+	            allow-break-after="html:section"
+	            prefer-break-before="/html:html/html:body/html:section/html:section|
+	                                 /html:html/html:body/html:section/html:section[tokenize(@epub:type,'\s+')='bodymatter']/html:section"
+	            prefer-break-after="/html:html/html:body/html:section/html:section|
+	                                 /html:html/html:body/html:section/html:section[tokenize(@epub:type,'\s+')='bodymatter']/html:section"
+	            always-break-before="/html:html/html:body/html:section|
+	                                 /html:html/html:body/html:section[tokenize(@epub:type,'\s+')='bodymatter']/html:section"
+	            always-break-after="/html:html/html:body/html:section|
+	                                /html:html/html:body/html:section[tokenize(@epub:type,'\s+')='bodymatter']/html:section"
+	            link-attribute-name="href">
+		<p:with-option name="max-chunk-size" select="$max-chunk-size"/>
+	</px:chunker>
 	
 	<p:for-each name="chunks">
 		<p:xslt>
