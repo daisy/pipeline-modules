@@ -4,6 +4,10 @@
     
     <!-- Returns a fileset of all the resources references from a DTBook (i.e. images and CSS files) -->
     
+    <!--
+        Note: this file is currently not used
+    -->
+    
     <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl"/>
     
     <xsl:template match="/">
