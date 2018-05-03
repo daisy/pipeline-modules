@@ -4,7 +4,7 @@
     
     <!-- Returns a fileset of all the resources references from a DTBook (i.e. images and CSS files) -->
     
-    <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/uri-functions.xsl"/>
+    <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl"/>
     
     <xsl:template match="/">
         <xsl:variable name="base" select="base-uri(/*)"/>
