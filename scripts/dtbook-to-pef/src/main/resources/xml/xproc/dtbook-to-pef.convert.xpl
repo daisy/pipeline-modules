@@ -47,7 +47,6 @@
     <p:import href="http://www.daisy.org/pipeline/modules/braille/common-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/braille/xml-to-pef/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/braille/pef-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/dtbook-to-epub3/library.xpl">
         <p:documentation>
@@ -115,6 +114,9 @@
                     <p:with-option name="query" select="concat('(input:mathml)(locale:',(/*/@xml:lang,'und')[1],')')">
                         <p:pipe step="dtbook" port="result"/>
                     </p:with-option>
+                    <p:input port="parameters">
+                        <p:pipe port="result" step="parameters"/>
+                    </p:input>
                     <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>
                 </px:transform>
             </p:viewport>
