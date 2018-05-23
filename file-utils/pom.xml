@@ -86,7 +86,14 @@
         <configuration>
           <instructions>
             <Service-Component>
-              OSGI-INF/file-exists.xml,OSGI-INF/file-expand83.xml,OSGI-INF/copy-resource-step.xml,OSGI-INF/peek-step.xml,OSGI-INF/xml-peek-step.xml,OSGI-INF/set-doctype-step.xml,OSGI-INF/set-xml-declaration-step.xml
+              OSGI-INF/file-exists.xml,
+              OSGI-INF/file-expand83.xml,
+              OSGI-INF/copy-resource-step.xml,
+              OSGI-INF/peek-step.xml,
+              OSGI-INF/xml-peek-step.xml,
+              OSGI-INF/set-doctype-step.xml,
+              OSGI-INF/set-xml-declaration-step.xml,
+              OSGI-INF/config-calabash.xml
             </Service-Component>
           </instructions>
         </configuration>
