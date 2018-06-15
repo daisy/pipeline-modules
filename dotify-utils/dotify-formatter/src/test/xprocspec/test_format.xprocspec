@@ -897,9 +897,7 @@
                 ⠤⠤⠤⠤⠤⠤⠤⠤⠤
               </block>
             </block>
-          </sequence>
-          <sequence master="body">
-            <block>
+            <block break-before="sheet">
               <block>⠤⠤⠤</block>
               <block>⠤⠤⠤</block>
               <block>⠤⠤⠤</block>
@@ -909,9 +907,7 @@
               <block>⠤⠤⠤</block>
               <block>⠤⠤⠤</block>
             </block>
-          </sequence>
-          <sequence master="body">
-            <block>
+            <block break-before="sheet">
               <block>
                 ⠤⠤⠤⠤⠤⠤⠤⠤⠤
                 ⠤⠤⠤⠤⠤⠤⠤⠤⠤
@@ -925,9 +921,7 @@
                 ⠤⠤⠤⠤⠤⠤⠤⠤⠤
               </block>
             </block>
-          </sequence>
-          <sequence master="body">
-            <block>
+            <block break-before="sheet">
               <block>⠤⠤⠤</block>
               <block>⠤⠤⠤</block>
               <block>⠤⠤⠤</block>
@@ -939,9 +933,7 @@
                 <block keep="page">⠤⠤⠤</block>
               </block>
             </block>
-          </sequence>
-          <sequence master="body">
-            <block>
+            <block break-before="sheet">
               <block>
                 ⠤⠤⠤⠤⠤⠤⠤⠤⠤
                 ⠤⠤⠤⠤⠤⠤⠤⠤⠤
@@ -956,9 +948,7 @@
                 ⠤⠤⠤⠤⠤⠤⠤⠤⠤
               </block>
             </block>
-          </sequence>
-          <sequence master="body">
-            <block>
+            <block break-before="sheet">
               <block>⠤⠤⠤</block>
               <block>⠤⠤⠤</block>
               <block>⠤⠤⠤</block>
@@ -969,9 +959,7 @@
               </block>
               <block>⠤⠤⠤</block>
             </block>
-          </sequence>
-          <sequence master="body">
-            <block>
+            <block break-before="sheet">
               <block>
                 ⠤⠤⠤⠤⠤⠤⠤⠤⠤
                 ⠤⠤⠤⠤⠤⠤⠤⠤⠤
@@ -985,9 +973,7 @@
                 ⠤⠤⠤⠤⠤⠤⠤⠤⠤
               </block>
             </block>
-          </sequence>
-          <sequence master="body">
-            <block>
+            <block break-before="sheet">
               <block>
                 ⠤⠤⠤⠤⠤⠤⠤⠤⠤
                 ⠤⠤⠤⠤⠤⠤⠤⠤⠤
@@ -1031,8 +1017,6 @@
                   <row>⠤⠤⠤⠤⠤⠤⠤⠤⠤</row>
                   <row>⠤⠤⠤⠤⠤⠤⠤⠤⠤</row>
                 </page>
-              </section>
-              <section>
                 <page>
                   <row>⠤⠤⠤</row>
                   <row>⠤⠤⠤</row>
@@ -1045,8 +1029,6 @@
                   <row>⠤⠤⠤</row>
                   <row>⠤⠤⠤</row>
                 </page>
-              </section>
-              <section>
                 <page>
                   <row>⠤⠤⠤⠤⠤⠤⠤⠤⠤</row>
                   <row>⠤⠤⠤⠤⠤⠤⠤⠤⠤</row>
@@ -1059,8 +1041,6 @@
                   <row>⠤⠤⠤⠤⠤⠤⠤⠤⠤</row>
                   <row>⠤⠤⠤⠤⠤⠤⠤⠤⠤</row>
                 </page>
-              </section>
-              <section>
                 <page>
                   <row>⠤⠤⠤</row>
                   <row>⠤⠤⠤</row>
@@ -1073,8 +1053,6 @@
                   <row>⠤⠤⠤</row>
                   <row>⠤⠤⠤</row>
                 </page>
-              </section>
-              <section>
                 <page>
                   <row>⠤⠤⠤⠤⠤⠤⠤⠤⠤</row>
                   <row>⠤⠤⠤⠤⠤⠤⠤⠤⠤</row>
@@ -1086,8 +1064,6 @@
                   <row>⠤⠤⠤⠤⠤⠤⠤⠤⠤</row>
                   <row>⠤⠤⠤⠤⠤⠤⠤⠤⠤</row>
                 </page>
-              </section>
-              <section>
                 <page>
                   <row>⠤⠤⠤</row>
                   <row>⠤⠤⠤</row>
@@ -1099,8 +1075,6 @@
                   <row>⠤⠤⠤</row>
                   <row>⠤⠤⠤</row>
                 </page>
-              </section>
-              <section>
                 <page>
                   <row>⠤⠤⠤⠤⠤⠤⠤⠤⠤</row>
                   <row>⠤⠤⠤⠤⠤⠤⠤⠤⠤</row>
@@ -1113,8 +1087,6 @@
                   <row>⠤⠤⠤⠤⠤⠤⠤⠤⠤</row>
                   <row>⠤⠤⠤⠤⠤⠤⠤⠤⠤</row>
                 </page>
-              </section>
-              <section>
                 <page>
                   <row>⠤⠤⠤⠤⠤⠤⠤⠤⠤</row>
                   <row>⠤⠤⠤⠤⠤⠤⠤⠤⠤</row>
@@ -1202,9 +1174,7 @@
                 ⠿⠿⠿⠿⠿⠿⠿⠿⠿
               </block>
             </block>
-          </sequence>
-          <sequence master="body">
-            <block>
+            <block break-before="sheet">
               <block>
                 ⠿⠿⠿⠿⠿⠿⠿⠿⠿
                 ⠿⠿⠿⠿⠿⠿⠿⠿⠿
@@ -1252,8 +1222,6 @@
                   <row>⠿⠿⠿⠿⠿⠿⠿⠿⠿</row>
                   <row>⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒</row>
                 </page>
-              </section>
-              <section>
                 <page>
                   <row>⠿⠿⠿⠿⠿⠿⠿⠿⠿</row>
                   <row>⠿⠿⠿⠿⠿⠿⠿⠿⠿</row>
@@ -5736,23 +5704,13 @@
               </block>
               ⠤⠤⠤
             </block>
-          </sequence>
-          <sequence master="a">
-            <block>
-              <marker class="foo/entry" value="⠿"/>
-            </block>
-            <block>
+            <block break-before="sheet">
               ⠤⠤⠤
               <marker class="foo/prev" value="⠿"/>
               <marker class="foo" value="⠿⠿"/>
               ⠤⠤⠤
             </block>
-          </sequence>
-          <sequence master="a">
-            <block>
-              <marker class="foo/entry" value="⠿⠿"/>
-            </block>
-            <block>
+            <block break-before="sheet">
               <block>
                 <marker class="foo/prev" value="⠿⠿"/>
                 <marker class="foo" value="⠿⠿⠿"/>
@@ -5784,8 +5742,13 @@
                   <row/>
                   <row>⠿⠀⠀⠀⠀⠀⠀⠀⠀⠿</row>
                 </page>
-              </section>
-              <section>
+                <page>
+                  <row/>
+                  <row/>
+                  <row/>
+                  <row/>
+                  <row>⠿⠀⠀⠀⠀⠀⠀⠀⠀⠿</row>
+                </page>
                 <page>
                   <row>⠤⠤⠤⠀⠤⠤⠤</row>
                   <row/>
@@ -5793,8 +5756,13 @@
                   <row/>
                   <row>⠿⠿⠀⠀⠀⠀⠀⠀⠀⠿</row>
                 </page>
-              </section>
-              <section>
+                <page>
+                  <row/>
+                  <row/>
+                  <row/>
+                  <row/>
+                  <row>⠿⠿⠀⠀⠀⠀⠀⠀⠿⠿</row>
+                </page>
                 <page>
                   <row>⠤⠤⠤</row>
                   <row/>
@@ -7966,6 +7934,9 @@
             <level1 style="display: block; page-break-after: always; flow: foo;">
               <p style="display: block">⠤⠤⠤</p>
             </level1>
+            <level1 style="display: block; page-break-after: always; flow: foo;">
+              <p style="display: block">⠤⠤⠤</p>
+            </level1>
             <level1 style="display: block; page-break-after: right; flow: foo;">
               <p style="display: block">⠤⠤⠤</p>
             </level1>
@@ -8000,8 +7971,10 @@
                 <block break-before="page">
                   <block>⠤⠤⠤</block>
                 </block>
-              </sequence>
-              <sequence master="main">
+                <block break-before="page">
+                  <block>⠤⠤⠤</block>
+                </block>
+                <block break-before="sheet"/>
                 <block>
                   <block>⠤⠤⠤</block>
                 </block>
@@ -8038,8 +8011,10 @@
                 <page>
                   <row>⠤⠤⠤</row>
                 </page>
-              </section>
-              <section>
+                <page>
+                  <row>⠤⠤⠤</row>
+                </page>
+                <page/>
                 <page>
                   <row>⠤⠤⠤</row>
                 </page>
@@ -10404,15 +10379,11 @@
               ⠿⠿⠿⠿⠿ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
               ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
             </block>
-          </sequence>
-          <sequence master="main">
-            <block volume-keep-priority="1">
+            <block volume-keep-priority="1" break-before="sheet">
               ⠿⠿⠿⠿⠿ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
               ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
             </block>
-          </sequence>
-          <sequence master="main">
-            <block volume-keep-priority="1">
+            <block volume-keep-priority="1" break-before="sheet">
               ⠿⠿⠿⠿⠿ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
               ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
             </block>
@@ -12901,11 +12872,7 @@
           <sequence master="main" break-before="volume">
             <block>
               <block> ⠿⠿⠿⠿⠿ </block>
-            </block>
-          </sequence>
-          <sequence master="main">
-            <block>
-              <block> ⠿⠿⠿⠿⠿ </block>
+              <block break-before="sheet"> ⠿⠿⠿⠿⠿ </block>
             </block>
           </sequence>
           <sequence master="main" break-before="volume">
@@ -12945,8 +12912,7 @@
                 <page>
                   <row>⠿⠿⠿⠿⠿</row>
                 </page>
-              </section>
-              <section>
+                <page/>
                 <page>
                   <row>⠿⠿⠿⠿⠿</row>
                 </page>
