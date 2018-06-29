@@ -477,7 +477,9 @@
                                            [@name='counter-increment']
                                            [css:parse-counter-set(@value,1)[@name='page']]"/>
             <xsl:for-each-group select="$sections/css:_[not(@css:flow)]" group-starting-with="*[@css:counter-set]">
+                <xsl:variable name="first-sequence" as="xs:boolean" select="position()=1"/>
                 <xsl:for-each-group select="current-group()" group-adjacent="string(@css:page)">
+                    <xsl:variable name="first-sequence" as="xs:boolean" select="$first-sequence and position()=1"/>
                     <xsl:variable name="page-style" select="current-grouping-key()"/>
                     <xsl:variable name="page-style" as="element()" select="$page-stylesheets[@style=$page-style][1]"/>
                     <xsl:variable name="page-properties" as="element()*"
@@ -495,8 +497,11 @@
                         </xsl:if>
                     </xsl:variable>
                     <xsl:for-each-group select="current-group()" group-starting-with="css:_[*/@css:page-break-before='right']">
+                        <xsl:variable name="first-sequence" as="xs:boolean" select="$first-sequence and position()=1"/>
                         <xsl:for-each-group select="current-group()" group-ending-with="css:_[*/@css:page-break-after='right']">
+                            <xsl:variable name="first-sequence" as="xs:boolean" select="$first-sequence and position()=1"/>
                             <xsl:for-each-group select="current-group()" group-starting-with="css:_[*/@css:volume-break-before='always']">
+                                <xsl:variable name="first-sequence" as="xs:boolean" select="$first-sequence and position()=1"/>
                                 <sequence css:page="{$page-style/@style}">
                                     <xsl:variable name="counter-set" as="element()*"
                                                   select="current-group()[1]/@css:counter-set/css:parse-counter-set(.,0)"/>
@@ -523,7 +528,7 @@
                                                          select="current-group()[1]/(@* except (@css:page|@css:volume|@css:string-entry|@css:counter-set))"/>
                                     <xsl:apply-templates mode="sequence-attr"
                                                          select="current-group()[1]/*/@css:volume-break-before[.='always']">
-                                        <xsl:with-param name="first-sequence" tunnel="yes" select="position()=1"/>
+                                        <xsl:with-param name="first-sequence" tunnel="yes" select="$first-sequence"/>
                                     </xsl:apply-templates>
                                     <xsl:apply-templates mode="sequence"
                                                          select="current-group()[1]/(@css:string-entry|*)"/>
