@@ -33,7 +33,7 @@
       <dependency>
         <groupId>org.liblouis</groupId>
         <artifactId>louis</artifactId>
-        <version>3.0.0-alpha1</version>
+        <version>3.6.0</version>
         <type>nar</type>
       </dependency>
       <dependency>
@@ -96,7 +96,7 @@
                 <artifactItem>
                   <groupId>org.liblouis</groupId>
                   <artifactId>louis</artifactId>
-                  <classifier>i586-mingw32msvc-gpp-executable</classifier>
+                  <classifier>i686-w64-mingw32-gpp-executable</classifier>
                   <type>nar</type>
                 </artifactItem>
                 <artifactItem>
@@ -317,7 +317,7 @@
                 <_dsannotations>org.daisy.pipeline.braille.liblouis.impl.LiblouisNativePathForWindows</_dsannotations>
                 <Bundle-SymbolicName>org.daisy.pipeline.modules.braille.liblouis-native-windows</Bundle-SymbolicName>
                 <Include-Resource>
-                  native/windows/x86=target/generated-resources/native/liblouis/i586-mingw32msvc-gpp,
+                  native/windows/x86=target/generated-resources/native/liblouis/i686-w64-mingw32-gpp,
                   native/windows/x86_64=target/generated-resources/native/liblouis/x86_64-w64-mingw32-gpp,
                   native/windows/x86/liblouisutdml=target/generated-resources/native/liblouisutdml/i586-mingw32msvc-gpp
                 </Include-Resource>
@@ -339,7 +339,7 @@
         <!--
             enable if ${liblouis.version} is a SNAPSHOT
         -->
-        <activeByDefault>true</activeByDefault>
+        <activeByDefault>false</activeByDefault>
       </activation>
       <build>
         <plugins>
