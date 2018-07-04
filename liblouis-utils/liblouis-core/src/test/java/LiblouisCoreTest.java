@@ -518,7 +518,7 @@ public class LiblouisCoreTest extends AbstractTest {
 		// assertEquals(table, tableCatalog.newTable(id));
 	}
 	
-	@Test(expected=ComparisonFailure.class)
+	@Test//(expected=ComparisonFailure.class)
 	public void testTranslatorStatefulBug() {
 		FromStyledTextToBraille translator = provider.withContext(messageBus)
 		                                             .get(query("(table:'stateful.utb')")).iterator().next()
