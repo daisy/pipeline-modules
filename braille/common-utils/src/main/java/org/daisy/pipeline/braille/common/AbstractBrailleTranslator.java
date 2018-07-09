@@ -186,7 +186,8 @@ public abstract class AbstractBrailleTranslator extends AbstractTransform implem
 						} else
 							next = next.substring(0, to);
 					}
-					if (next.length() == 0) next = null;
+					if (next.replaceAll("[\u00ad\u200b]","").isEmpty())
+						next = null;
 					alwaysEmpty = (next == null);
 					this.hyphenChar = hyphenChar;
 				}

@@ -211,7 +211,10 @@ public class DefaultLineBreakerTest {
 					String text; {
 						text = "";
 						for (CSSStyledText t : styledText)
-							text += t.getText(); }
+							text += t.getText();
+						if (text.replaceAll("[\u00ad\u200b]","").isEmpty())
+							text = "";
+					}
 					public boolean hasNext() {
 						return pos < text.length();
 					}
