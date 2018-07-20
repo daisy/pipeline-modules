@@ -50,6 +50,11 @@
       <artifactId>org.osgi.compendium</artifactId>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.daisy.pipeline</groupId>
+      <artifactId>ds-to-spi-runtime</artifactId>
+      <scope>provided</scope>
+    </dependency>
     <!--
         runtime dependencies
     -->
@@ -76,6 +81,7 @@
   <properties>
     <expose-services>
       org.daisy.pipeline.modules.impl.Module_file_utils,
+      org.daisy.common.xproc.calabash.impl.ConfigurationFileProvider_file_utils,
       org.daisy.common.xproc.calabash.steps.CopyResourceProvider,
       org.daisy.common.xproc.calabash.steps.PeekProvider,
       org.daisy.common.xproc.calabash.steps.SetDoctypeProvider,
@@ -117,14 +123,13 @@
           <instructions>
             <Import-Package>
               net.sf.saxon.*;version="${saxon.versionRange}",
+              !org.daisy.common.spi,
               *
             </Import-Package>
-            <Service-Component>
-              OSGI-INF/config-calabash.xml
-            </Service-Component>
             <Private-Package>
               org.daisy.pipeline.modules.impl;-split-package:=first,
               org.daisy.common.xproc.calabash.steps;-split-package:=first,
+              org.daisy.common.xproc.calabash.impl;-split-package:=first,
               org.daisy.saxon.functions.file
             </Private-Package>
           </instructions>
