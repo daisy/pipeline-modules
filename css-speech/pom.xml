@@ -79,6 +79,11 @@
      <artifactId>org.osgi.compendium</artifactId>
      <scope>provided</scope>
    </dependency>
+   <dependency>
+     <groupId>org.daisy.pipeline</groupId>
+     <artifactId>ds-to-spi-runtime</artifactId>
+     <scope>provided</scope>
+   </dependency>
   </dependencies>
 
   <properties>
@@ -109,6 +114,7 @@
           <instructions>
             <Import-Package>
               net.sf.saxon.*;version="${saxon.versionRange}",
+              !org.daisy.common.spi,
               *
             </Import-Package>
             <Private-Package>
