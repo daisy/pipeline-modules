@@ -4,8 +4,8 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Hashtable;
 
+import static org.daisy.common.file.URIs.asURI;
 import org.daisy.pipeline.braille.common.NativePath;
-import static org.daisy.pipeline.braille.common.util.URIs.asURI;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;

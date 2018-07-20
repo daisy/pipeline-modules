@@ -8,6 +8,7 @@ import javax.inject.Inject;
 
 import com.google.common.base.Optional;
 
+import static org.daisy.common.file.URIs.asURI;
 import org.daisy.pipeline.braille.common.AbstractBrailleTranslator;
 import org.daisy.pipeline.braille.common.BrailleTranslator;
 import org.daisy.pipeline.braille.common.BrailleTranslatorProvider;
@@ -15,7 +16,6 @@ import org.daisy.pipeline.braille.common.CSSStyledText;
 import org.daisy.pipeline.braille.common.Query;
 import org.daisy.pipeline.braille.common.TransformProvider;
 import static org.daisy.pipeline.braille.common.util.Strings.extractHyphens;
-import static org.daisy.pipeline.braille.common.util.URIs.asURI;
 
 import org.daisy.pipeline.junit.AbstractXSpecAndXProcSpecTest;
 

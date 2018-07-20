@@ -15,6 +15,8 @@ import static com.google.common.io.Files.createTempDir;
 
 import org.daisy.braille.css.SimpleInlineStyle;
 
+import static org.daisy.common.file.URIs.asURI;
+import static org.daisy.common.file.URLs.asURL;
 import org.daisy.pipeline.braille.common.AbstractHyphenator;
 import org.daisy.pipeline.braille.common.AbstractResourcePath;
 import org.daisy.pipeline.braille.common.CSSStyledText;
@@ -23,8 +25,6 @@ import org.daisy.pipeline.braille.common.NativePath;
 import org.daisy.pipeline.braille.common.ResourcePath;
 import org.daisy.pipeline.braille.common.StandardNativePath;
 import static org.daisy.pipeline.braille.common.util.Files.asFile;
-import static org.daisy.pipeline.braille.common.util.URIs.asURI;
-import static org.daisy.pipeline.braille.common.util.URLs.asURL;
 import org.daisy.pipeline.braille.liblouis.impl.LiblouisNativePathForLinux;
 import org.daisy.pipeline.braille.liblouis.impl.LiblouisTranslatorJnaImplProvider.LiblouisTranslatorImpl;
 import org.daisy.pipeline.braille.liblouis.LiblouisTranslator.Typeform;

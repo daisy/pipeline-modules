@@ -7,21 +7,20 @@ import java.util.Locale;
 
 import com.google.common.base.Predicate;
 
+import static org.daisy.common.file.URIs.asURI;
+import static org.daisy.common.file.URLs.asURL;
 import org.daisy.pipeline.braille.common.Provider;
 import static org.daisy.pipeline.braille.common.Provider.util.dispatch;
 import static org.daisy.pipeline.braille.common.Provider.util.memoize;
 import static org.daisy.pipeline.braille.common.Provider.util.varyLocale;
 import org.daisy.pipeline.braille.common.ResourcePath;
 import org.daisy.pipeline.braille.common.ResourceRegistry;
+import static org.daisy.pipeline.braille.common.util.Files.asFile;
+import static org.daisy.pipeline.braille.common.util.Files.fileName;
+import static org.daisy.pipeline.braille.common.util.Predicates.matchesGlobPattern;
 import org.daisy.pipeline.braille.libhyphen.LibhyphenTablePath;
 import org.daisy.pipeline.braille.libhyphen.LibhyphenTableProvider;
 import org.daisy.pipeline.braille.libhyphen.LibhyphenTableResolver;
-
-import static org.daisy.pipeline.braille.common.util.Files.asFile;
-import static org.daisy.pipeline.braille.common.util.Files.fileName;
-import static org.daisy.pipeline.braille.common.util.URIs.asURI;
-import static org.daisy.pipeline.braille.common.util.URLs.asURL;
-import static org.daisy.pipeline.braille.common.util.Predicates.matchesGlobPattern;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;

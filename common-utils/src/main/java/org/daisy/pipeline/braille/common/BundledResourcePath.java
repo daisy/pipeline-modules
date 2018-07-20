@@ -17,12 +17,12 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 
+import static org.daisy.common.file.URIs.asURI;
+import org.daisy.common.file.URLs;
 import static org.daisy.pipeline.braille.common.util.Iterators.partition;
 import static org.daisy.pipeline.braille.common.util.Predicates.matchesGlobPattern;
 import static org.daisy.pipeline.braille.common.util.Tuple2;
 import static org.daisy.pipeline.braille.common.util.Files.normalize;
-import static org.daisy.pipeline.braille.common.util.URIs.asURI;
-import static org.daisy.pipeline.braille.common.util.URLs.decode;
 
 import org.osgi.framework.Bundle;
 import org.osgi.service.component.ComponentContext;
@@ -69,7 +69,7 @@ public class BundledResourcePath extends AbstractResourcePath {
 			 && !properties.get(INCLUDES).toString().equals("*")) ?
 				Predicates.compose(
 					matchesGlobPattern(properties.get(INCLUDES).toString()),
-					Functions.compose(decode, toStringFunction())) :
+					Functions.compose(URLs::decode, toStringFunction())) :
 				alwaysTrue();
 		Function<String,Collection<String>> getFilePaths = new Function<String,Collection<String>>() {
 			public Collection<String> apply(String path) {

@@ -11,6 +11,7 @@ import com.google.common.base.MoreObjects.ToStringHelper;
 import static com.google.common.collect.Iterables.toArray;
 import static com.google.common.collect.Iterables.transform;
 
+import static org.daisy.common.file.URIs.asURI;
 import org.daisy.pipeline.braille.common.AbstractTransformProvider;
 import org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Iterables;
 import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.logSelect;
@@ -26,9 +27,7 @@ import static org.daisy.pipeline.braille.common.TransformProvider.util.varyLocal
 import static org.daisy.pipeline.braille.common.util.Files.unpack;
 import static org.daisy.pipeline.braille.common.util.Files.asFile;
 import static org.daisy.pipeline.braille.common.util.Strings.join;
-import static org.daisy.pipeline.braille.common.util.URIs.asURI;
 import org.daisy.pipeline.braille.common.WithSideEffect;
-
 import org.daisy.pipeline.braille.liblouis.LiblouisTable;
 import org.daisy.pipeline.braille.liblouis.LiblouisTableResolver;
 

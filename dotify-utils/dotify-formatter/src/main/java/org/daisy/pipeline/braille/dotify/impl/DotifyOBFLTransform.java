@@ -8,6 +8,7 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableMap;
 
+import static org.daisy.common.file.URIs.asURI;
 import org.daisy.pipeline.braille.common.AbstractTransform;
 import org.daisy.pipeline.braille.common.AbstractTransformProvider;
 import org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Iterables;
@@ -18,7 +19,6 @@ import org.daisy.pipeline.braille.common.Query.MutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
 import org.daisy.pipeline.braille.common.Transform;
 import org.daisy.pipeline.braille.common.TransformProvider;
-import static org.daisy.pipeline.braille.common.util.URIs.asURI;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;

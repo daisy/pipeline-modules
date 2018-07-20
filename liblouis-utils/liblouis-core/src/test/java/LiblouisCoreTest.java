@@ -12,6 +12,7 @@ import org.daisy.braille.api.table.BrailleConverter;
 import org.daisy.braille.api.table.Table;
 import org.daisy.braille.api.table.TableCatalogService;
 
+import static org.daisy.common.file.URIs.asURI;
 import org.daisy.pipeline.braille.common.AbstractHyphenator;
 import org.daisy.pipeline.braille.common.AbstractHyphenator.util.DefaultLineBreaker;
 import org.daisy.pipeline.braille.common.AbstractTransformProvider;
@@ -27,7 +28,6 @@ import static org.daisy.pipeline.braille.common.Provider.util.dispatch;
 import org.daisy.pipeline.braille.common.Query;
 import static org.daisy.pipeline.braille.common.Query.util.query;
 import static org.daisy.pipeline.braille.common.util.Files.asFile;
-import static org.daisy.pipeline.braille.common.util.URIs.asURI;
 
 import org.daisy.pipeline.braille.liblouis.LiblouisHyphenator;
 import org.daisy.pipeline.braille.liblouis.LiblouisTable;

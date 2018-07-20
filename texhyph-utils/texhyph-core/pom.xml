@@ -18,6 +18,10 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.daisy.pipeline</groupId>
+      <artifactId>common-utils</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.googlecode.texhyphj</groupId>
       <artifactId>texhyphj</artifactId>
     </dependency>

@@ -18,6 +18,10 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.daisy.pipeline</groupId>
+      <artifactId>common-utils</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.liblouis</groupId>
       <artifactId>liblouis-java</artifactId>
     </dependency>

@@ -5,10 +5,10 @@ import java.net.URL;
 import java.util.Locale;
 import java.util.Map;
 
+import static org.daisy.common.file.URIs.asURI;
 import org.daisy.pipeline.braille.common.BundledResourcePath;
 import org.daisy.pipeline.braille.common.Provider;
 import static org.daisy.pipeline.braille.common.util.Locales.parseLocale;
-import static org.daisy.pipeline.braille.common.util.URIs.asURI;
 
 import org.osgi.service.component.ComponentContext;
 

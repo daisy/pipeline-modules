@@ -11,11 +11,11 @@ import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
 import static com.google.common.collect.Iterables.filter;
 
+import static org.daisy.common.file.URIs.asURI;
+import org.daisy.common.file.URLs;
 import org.daisy.pipeline.braille.common.BundledResourcePath;
 import org.daisy.pipeline.braille.common.Provider;
 import static org.daisy.pipeline.braille.common.util.Predicates.matchesGlobPattern;
-import static org.daisy.pipeline.braille.common.util.URLs.decode;
-import static org.daisy.pipeline.braille.common.util.URIs.asURI;
 
 import org.osgi.service.component.ComponentContext;
 
@@ -60,7 +60,7 @@ public class LibhyphenTablePath extends BundledResourcePath implements Libhyphen
 				listResources(),
 				Predicates.compose(
 					matchesGlobPattern(String.format("hyph_%s_*.dic", locale.getLanguage().toLowerCase())),
-					Functions.compose(decode, toStringFunction())));
+					Functions.compose(URLs::decode, toStringFunction())));
 		}
 	};
 }
