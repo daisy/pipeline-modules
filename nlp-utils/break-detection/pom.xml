@@ -67,9 +67,15 @@
      <groupId>org.daisy.pipeline.modules</groupId>
      <artifactId>nlp-lexing</artifactId>
    </dependency>
+
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.compendium</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.daisy.pipeline</groupId>
+      <artifactId>ds-to-spi-runtime</artifactId>
       <scope>provided</scope>
     </dependency>
 
@@ -100,6 +106,7 @@
             <!-- must match version from framework-bom -->
             <Import-Package>
               net.sf.saxon.*;version="[9.8.0,9.8.1)",
+              !org.daisy.common.spi,
               *
             </Import-Package>
             <Private-Package>
