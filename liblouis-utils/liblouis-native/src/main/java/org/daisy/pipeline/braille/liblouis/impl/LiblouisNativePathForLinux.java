@@ -7,7 +7,6 @@ import org.daisy.pipeline.braille.common.NativePath;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.ComponentContext;
 
 @Component(
 	name = "org.daisy.pipeline.braille.liblouis.impl.LiblouisNativePathForLinux",
@@ -20,9 +19,11 @@ import org.osgi.service.component.ComponentContext;
 )
 public class LiblouisNativePathForLinux extends BundledNativePath {
 	
-	@Override
+	/**
+	 * @throws RuntimeException if the bundle doesn't work on Linux
+	 */
 	@Activate
-	protected void activate(ComponentContext context, Map<?,?> properties) throws Exception {
-		super.activate(context, properties);
+	protected void activate(Map<?,?> properties) throws RuntimeException {
+		activate(properties, LiblouisNativePathForMacOS.class);
 	}
 }

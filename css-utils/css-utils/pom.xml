@@ -74,12 +74,18 @@
       <artifactId>org.osgi.compendium</artifactId>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.daisy.pipeline</groupId>
+      <artifactId>ds-to-spi-runtime</artifactId>
+      <scope>provided</scope>
+    </dependency>
     <!--
         runtime dependencies
     -->
     <dependency>
       <groupId>org.daisy.pipeline.modules</groupId>
       <artifactId>common-utils</artifactId>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.daisy.pipeline.modules</groupId>
@@ -107,7 +113,7 @@
 
   <properties>
     <expose-services>
-      org.daisy.pipeline.modules.impl.Module_css_utils,
+      org.daisy.pipeline.modules.impl.Module_braille_css_utils,
       org.daisy.pipeline.braille.css.calabash.impl.CssInlineStep$Provider,
       org.daisy.pipeline.braille.css.calabash.impl.CssShiftStringSetStep$Provider,
       org.daisy.pipeline.braille.css.calabash.impl.CssSplitStep$Provider,
@@ -123,11 +129,38 @@
         <artifactId>modules-build-helper</artifactId>
         <executions>
           <execution>
+            <id>process-catalog</id>
+            <configuration>
+              <!--
+                  avoid name collision
+              -->
+              <moduleName>braille-${project.artifactId}</moduleName>
+            </configuration>
+          </execution>
+          <execution>
             <id>process-test-catalog</id>
             <phase>generate-test-sources</phase>
             <goals>
               <goal>process-test-catalog</goal>
             </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.daisy.pipeline.build</groupId>
+        <artifactId>ds-to-spi-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>generate-spi-test-classes</id>
+            <phase>process-test-sources</phase>
+            <goals>
+              <goal>generate-spi-test-classes</goal>
+            </goals>
+            <configuration>
+              <includes>
+                org.daisy.pipeline.modules.impl.Module_test_module
+              </includes>
+            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -150,6 +183,7 @@
           <instructions>
             <Import-Package>
               net.sf.saxon.*;version="${saxon.versionRange}",
+              !org.daisy.common.spi,
               *
             </Import-Package>
             <Private-Package>

@@ -21,6 +21,11 @@
       <artifactId>org.osgi.compendium</artifactId>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.daisy.pipeline</groupId>
+      <artifactId>ds-to-spi-runtime</artifactId>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
   <dependencyManagement>
     <dependencies>
@@ -32,6 +37,13 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+  <properties>
+    <expose-services>
+      org.daisy.pipeline.braille.libhyphen.impl.LibhyphenNativePathForMacOS,
+      org.daisy.pipeline.braille.libhyphen.impl.LibhyphenNativePathForLinux,
+      org.daisy.pipeline.braille.libhyphen.impl.LibhyphenNativePathForWindows
+    </expose-services>
+  </properties>
   <build>
     <plugins>
       <plugin>
@@ -112,6 +124,7 @@
                 <_dsannotations>org.daisy.pipeline.braille.libhyphen.impl.LibhyphenNativePathForLinux</_dsannotations>
                 <Bundle-SymbolicName>org.daisy.pipeline.modules.braille.libhyphen-native-linux</Bundle-SymbolicName>
                 <Include-Resource>
+                  META-INF/services=target/generated-resources/spi/META-INF/services,
                   native/linux/x86=target/dependency/lib/i386-Linux-gpp/shared,
                   native/linux/x86_64=target/dependency/lib/amd64-Linux-gpp/shared
                 </Include-Resource>
@@ -130,6 +143,7 @@
                 <_dsannotations>org.daisy.pipeline.braille.libhyphen.impl.LibhyphenNativePathForMacOS</_dsannotations>
                 <Bundle-SymbolicName>org.daisy.pipeline.modules.braille.libhyphen-native-mac</Bundle-SymbolicName>
                 <Include-Resource>
+                  META-INF/services=target/generated-resources/spi/META-INF/services,
                   native/macosx/x86=target/dependency/lib/i386-MacOSX-gpp/shared,
                   native/macosx/x86_64=target/dependency/lib/x86_64-MacOSX-gpp/shared
                 </Include-Resource>
@@ -148,6 +162,7 @@
                 <_dsannotations>org.daisy.pipeline.braille.libhyphen.impl.LibhyphenNativePathForWindows</_dsannotations>
                 <Bundle-SymbolicName>org.daisy.pipeline.modules.braille.libhyphen-native-windows</Bundle-SymbolicName>
                 <Include-Resource>
+                  META-INF/services=target/generated-resources/spi/META-INF/services,
                   native/windows/x86=target/dependency/bin/i586-mingw32msvc-gpp,
                   native/windows/x86_64=target/dependency/bin/x86_64-w64-mingw32-gpp
                 </Include-Resource>

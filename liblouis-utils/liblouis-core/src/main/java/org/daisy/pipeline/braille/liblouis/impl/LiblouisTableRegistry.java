@@ -47,7 +47,7 @@ public class LiblouisTableRegistry extends ResourceRegistry<LiblouisTablePath> i
 		cardinality = ReferenceCardinality.MULTIPLE,
 		policy = ReferencePolicy.DYNAMIC
 	)
-	private void _register(LiblouisTablePath path) {
+	protected void _register(LiblouisTablePath path) {
 		register(path);
 		applyPathChangeCallbacks();
 	}

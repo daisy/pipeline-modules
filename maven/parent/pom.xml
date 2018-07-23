@@ -82,7 +82,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.build</groupId>
         <artifactId>modules-test-helper</artifactId>
-        <version>1.0.4</version>
+        <version>1.1.0-SNAPSHOT</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -107,6 +107,22 @@
           <target>${java.target.version}</target>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.daisy.pipeline.build</groupId>
+        <artifactId>ds-to-spi-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>generate-spi-classes</id>
+            <phase>process-sources</phase>
+            <goals>
+              <goal>generate-spi-classes</goal>
+            </goals>
+            <configuration>
+              <includes>${expose-services}</includes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
     <pluginManagement>
       <plugins>
@@ -125,6 +141,14 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.16</version>
+          <configuration>
+            <systemPropertyVariables>
+              <!--
+                  set this to "OSGiLessRunner" to test without OSGi, or to "PaxExam,OSGiLessRunner" to test both
+              -->
+              <org.daisy.pipeline.junit.runners>PaxExam</org.daisy.pipeline.junit.runners>
+            </systemPropertyVariables>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.felix</groupId>
@@ -132,6 +156,7 @@
           <configuration>
             <instructions>
               <_dsannotations>${expose-services}</_dsannotations>
+              <Import-Package>!org.daisy.common.spi,*</Import-Package>
             </instructions>
           </configuration>
         </plugin>

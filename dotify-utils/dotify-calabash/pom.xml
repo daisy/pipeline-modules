@@ -59,8 +59,25 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>org.daisy.pipeline</groupId>
+      <artifactId>ds-to-spi-runtime</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <!--
+        for processing org.daisy.pipeline.braille.dotify.calabash.impl.IdentifyProvider_SPI and
+        org.daisy.pipeline.braille.dotify.calabash.impl.Integer2TextFactoryMaker_SPI in generate-spi-classes
+        FIXME: in generate-spi-classes, skip compilation of excluded classes completely (currently
+        only the processing of annotations is skipped)
+    -->
+    <dependency>
+      <groupId>biz.aQute.bnd</groupId>
+      <artifactId>annotation</artifactId>
+      <version>2.3.0</version>
+      <scope>provided</scope>
     </dependency>
     <!--
         runtime dependencies
@@ -153,6 +170,7 @@
           <instructions>
             <Import-Package>
               net.sf.saxon.*;version="${saxon.versionRange}",
+              !org.daisy.common.spi,
               *
             </Import-Package>
             <Private-Package>

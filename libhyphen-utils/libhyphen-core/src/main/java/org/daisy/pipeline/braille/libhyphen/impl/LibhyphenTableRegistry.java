@@ -44,12 +44,12 @@ public class LibhyphenTableRegistry extends ResourceRegistry<LibhyphenTablePath>
 		cardinality = ReferenceCardinality.MULTIPLE,
 		policy = ReferencePolicy.DYNAMIC
 	)
-	private void _register(LibhyphenTablePath path) {
+	protected void _register(LibhyphenTablePath path) {
 		register(path);
 		provider.invalidateCache();
 	}
 	
-	private void _unregister (LibhyphenTablePath path) {
+	protected void _unregister (LibhyphenTablePath path) {
 		unregister(path);
 		provider.invalidateCache();
 	}
