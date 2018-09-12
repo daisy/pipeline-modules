@@ -3,6 +3,9 @@
                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                script="http://www.daisy.org/pipeline/modules/dtbook-utils/library.xpl">
     
+    <!--
+        FIXME: ids make test brittle
+    -->
     <x:scenario label="dtbook 1.1.0 to dtbook 2005-3">
         <x:call step="px:upgrade-dtbook">
             <x:input port="source">
@@ -33,10 +36,10 @@
                     <head>
                         <meta name="dc:Title" content="Title"/>
                     </head>
-                    <book id="d2114e11">
+                    <book id="d2115e11">
                         <bodymatter>
                             <level1>
-                                <p id="d2114e17">Blah</p>
+                                <p id="d2115e17">Blah</p>
                             </level1>
                         </bodymatter>
                     </book>
