@@ -18,7 +18,20 @@ import org.daisy.pipeline.tts.synthesize.TTSLog.ErrorCode;
  */
 public class EncodingThread {
 
+	class EncodingException extends RuntimeException {
+		public EncodingException(String message, Throwable cause) {
+			super(message, cause);
+		}
+		public EncodingException(Throwable t) {
+			super(t);
+		}
+		public EncodingException(String message) {
+			super(message);
+		}
+	}
+	
 	private Thread mThread;
+	private Throwable criticalError;
 
 	void start(final AudioServices encoderRegistry,
 	        final BlockingQueue<ContiguousPCM> inputPCM, final IPipelineLogger logger,
@@ -69,63 +82,77 @@ public class EncodingThread {
 		mThread = new Thread() {
 			@Override
 			public void run() {
-				while (!interrupted()) {
-					ContiguousPCM job;
-					try {
-						job = inputPCM.take();
-					} catch (InterruptedException e) {
-						String msg = "encoding thread has been interrupted";
-						logger.printInfo(msg);
-						ttslog.addGeneralError(ErrorCode.CRITICAL_ERROR, msg);
-						break; //warning: encoding bytes are not freed
-					}
-					if (job.isEndOfQueue()) {
-						//nothing to release
-						break;
-					}
-					int jobSize = job.sizeInBytes();
-					if (fencoder != null) {
-						float secs = jobSize / (job.getAudioFormat().getFrameRate());
-						int maxTime = (int) (1.0 + secs / fEncodingSpeed);
+				try {
+					while (!interrupted()) {
+						ContiguousPCM job;
 						try {
-							timeout.enableForCurrentThread(maxTime);
-							Optional<String> destURI = fencoder.encode(job.getBuffers(), job
-							        .getAudioFormat(), job.getDestinationDirectory(), job
-							        .getDestinationFilePrefix(), options);
-							if (destURI.isPresent()) {
-								job.getURIholder().append(destURI.get());
-							} else {
-								String msg = "Audio encoder failed to encode to "
-								        + job.getDestinationFilePrefix();
-								ttslog.addGeneralError(ErrorCode.CRITICAL_ERROR, msg);
-							}
+							job = inputPCM.take();
 						} catch (InterruptedException e) {
-							String msg = "timeout while encoding audio to "
-							        + job.getDestinationFilePrefix() + ": " + getStack(e);
+							String msg = "encoding thread has been interrupted";
+							logger.printInfo(msg);
 							ttslog.addGeneralError(ErrorCode.CRITICAL_ERROR, msg);
-						} catch (Throwable t) {
-							String msg = "error while encoding audio to "
-							        + job.getDestinationFilePrefix() + ": " + getStack(t);
-							ttslog.addGeneralError(ErrorCode.CRITICAL_ERROR, msg);
-						} finally {
-							timeout.disable();
+							break; //warning: encoding bytes are not freed
 						}
+						if (job.isEndOfQueue()) {
+							//nothing to release
+							break;
+						}
+						int jobSize = job.sizeInBytes();
+						if (fencoder != null) {
+							float secs = jobSize / (job.getAudioFormat().getFrameRate());
+							int maxTime = (int) (1.0 + secs / fEncodingSpeed);
+							try {
+								timeout.enableForCurrentThread(maxTime);
+								Optional<String> destURI = fencoder.encode(job.getBuffers(), job
+								                                           .getAudioFormat(), job.getDestinationDirectory(), job
+								                                           .getDestinationFilePrefix(), options);
+								if (destURI.isPresent()) {
+									job.getURIholder().append(destURI.get());
+								} else {
+									String msg = "Audio encoder failed to encode to "
+										+ job.getDestinationFilePrefix();
+									ttslog.addGeneralError(ErrorCode.CRITICAL_ERROR, msg);
+								}
+							} catch (InterruptedException e) {
+								String msg = "timeout while encoding audio to "
+									+ job.getDestinationFilePrefix() + ": " + getStack(e);
+								ttslog.addGeneralError(ErrorCode.CRITICAL_ERROR, msg);
+								audioBufferTracker.releaseEncodersMemory(jobSize);
+								throw new EncodingException(e);
+							} catch (Throwable t) {
+								String msg = "error while encoding audio to "
+									+ job.getDestinationFilePrefix() + ": " + getStack(t);
+								ttslog.addGeneralError(ErrorCode.CRITICAL_ERROR, msg);
+								audioBufferTracker.releaseEncodersMemory(jobSize);
+								throw new EncodingException(t);
+							} finally {
+								timeout.disable();
+							}
+						}
+						audioBufferTracker.releaseEncodersMemory(jobSize);
 					}
-					job = null;
-					audioBufferTracker.releaseEncodersMemory(jobSize);
+				} finally {
+					timeout.close();
 				}
-
-				timeout.close();
 			}
 		};
+		mThread.setUncaughtExceptionHandler(
+			(thread, throwable) -> { criticalError = throwable; }
+		);
 		mThread.start();
 	}
 
-	void waitToFinish() {
+	void waitToFinish() throws EncodingException {
+		if (criticalError != null) {
+			if (criticalError instanceof EncodingException)
+				throw (EncodingException)criticalError;
+			else
+				throw new RuntimeException("coding error");
+		}
 		try {
 			mThread.join();
 		} catch (InterruptedException e) {
-			//should not happen
+			throw new RuntimeException(); // should not happen
 		}
 	}
 
