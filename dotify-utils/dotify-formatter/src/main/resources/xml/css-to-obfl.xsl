@@ -18,10 +18,17 @@
     
     <xsl:param name="braille-translator-query" as="xs:string" required="yes"/> <!-- unused -->
     <xsl:param name="page-counters" as="xs:string" required="yes"/>
+    <xsl:param name="volume-transition" as="xs:string" required="no" select="''"/>
     
     <xsl:variable name="sections" select="collection()[position() &lt; last()]"/>
     <xsl:variable name="page-and-volume-styles" select="collection()[position()=last()]/*/*"/>
     <xsl:variable name="page-counter-names" as="xs:string*" select="tokenize($page-counters,' ')"/>
+    
+    <xsl:variable name="volume-transition-rule" as="element()?">
+        <xsl:if test="not($volume-transition='')">
+            <xsl:sequence select="css:deep-parse-stylesheet(concat('@-obfl-volume-transition { ',$volume-transition,' }'))"/>
+        </xsl:if>
+    </xsl:variable>
     
     <!-- ====================== -->
     <!-- Page and volume styles -->
@@ -501,8 +508,35 @@
                 Note that a volume-keep-priority attribute is not needed to prefer volume breaking
                 before a block over inside a block, but for now we have the conditional anyway.
             -->
-            <xsl:if test="$sections//@css:volume-break-inside">
-              <volume-transition range="sheet"/>
+            <xsl:if test="exists($volume-transition-rule) or $sections//@css:volume-break-inside">
+                <volume-transition range="sheet">
+                    <xsl:for-each select="$volume-transition-rule/css:rule[matches(@selector,'@sequence-(interrupted|resumed)')
+                                                                           and css:property[@name='content']]">
+                        <xsl:variable name="sequence-interrupted-resumed-content" as="xs:string" select="css:property[@name='content'][1]/@value"/>
+                        <xsl:variable name="sequence-interrupted-resumed-content" as="element()*"> <!-- css:_* -->
+                            <xsl:apply-templates mode="css:eval-sequence-interrupted-resumed-content-list"
+                                                 select="css:parse-content-list($sequence-interrupted-resumed-content,())">
+                                <xsl:with-param name="white-space"
+                                                select="(css:property[@name='white-space']/@value,'normal')[1]"/>
+                                <xsl:with-param name="text-transform"
+                                                select="(css:property[@name='text-transform']/@value,'auto')[1]"/>
+                                <xsl:with-param name="hyphens"
+                                                select="(css:property[@name='hyphens']/@value,'manual')[1]"/>
+                                <xsl:with-param name="word-spacing"
+                                                select="(css:property[@name='word-spacing']/@value,1)[1]"/>
+                            </xsl:apply-templates>
+                        </xsl:variable>
+                        <xsl:apply-templates mode="assert-nil-attr" select="$sequence-interrupted-resumed-content/(@* except @css:flow)"/>
+                        <xsl:variable name="sequence" as="element()*"> <!-- css:box* -->
+                            <xsl:apply-templates mode="sequence-interrupted-resumed" select="$sequence-interrupted-resumed-content/*"/>
+                        </xsl:variable>
+                        <xsl:if test="$sequence">
+                            <xsl:element name="{substring-after(@selector,'@')}">
+                                <xsl:sequence select="$sequence"/>
+                            </xsl:element>
+                        </xsl:if>
+                    </xsl:for-each>
+                </volume-transition>
             </xsl:if>
             <xsl:apply-templates mode="assert-nil" select="$sections/*[not(self::css:_)]"/>
             <xsl:for-each select="$sections/css:_[@css:flow=$collection-flows]">
@@ -744,7 +778,8 @@
     <!-- Sequence -->
     <!-- ======== -->
     
-    <xsl:template mode="sequence"
+    <xsl:template mode="sequence
+                        sequence-interrupted-resumed"
                   match="/css:_/@css:string-entry">
         <block>
             <xsl:apply-templates mode="css:parse-string-entry" select="css:parse-string-set(.)"/>
@@ -775,7 +810,7 @@
     <!-- Block boxes -->
     <!-- =========== -->
     
-    <xsl:template mode="sequence item td"
+    <xsl:template mode="sequence item td sequence-interrupted-resumed"
                   match="css:box[@type='block']">
         <xsl:apply-templates mode="block" select="."/>
     </xsl:template>
@@ -2235,7 +2270,7 @@
                   mode="#default sequence item table-of-contents block span table tr td toc-entry assert-nil
                         sequence-attr item-attr table-of-contents-attr block-attr span-attr
                         table-attr tr-attr td-attr toc-entry-attr assert-nil-attr
-                        marker"
+                        marker sequence-interrupted-resumed"
                   match="@*|node()">
         <xsl:call-template name="coding-error"/>
     </xsl:template>
@@ -2297,16 +2332,21 @@
     <xsl:template match="pxi:print-mode" mode="assert-nil-attr">assert-nil-attr</xsl:template>
     <xsl:template match="pxi:print-mode" mode="marker">marker</xsl:template>
     <xsl:template match="pxi:print-mode" mode="xml-data">xml-data</xsl:template>
+    <xsl:template match="pxi:print-mode" mode="sequence-interrupted-resumed">sequence-interrupted-resumed</xsl:template>
     <xsl:template match="pxi:print-mode" mode="#all" priority="-1">?</xsl:template>
     
     <!-- =========== -->
     <!-- Volume area -->
     <!-- =========== -->
     
-    <xsl:template mode="css:eval-volume-area-content-list"
+    <xsl:template mode="css:eval-volume-area-content-list
+                        css:eval-sequence-interrupted-resumed-content-list"
                   match="css:string[@value]">
         <css:_>
-            <css:box type="inline">
+            <!--
+                FIXME: treat strings as inline content and wrap adjacent strings in a single block
+            -->
+            <css:box type="block">
                 <xsl:value-of select="@value"/>
             </css:box>
         </css:_>
@@ -2315,7 +2355,8 @@
     <!--
         default scope within volume area is 'document'
     -->
-    <xsl:template mode="css:eval-volume-area-content-list"
+    <xsl:template mode="css:eval-volume-area-content-list
+                        css:eval-sequence-interrupted-resumed-content-list"
                   match="css:flow[@from and (not(@scope) or @scope='document')]">
         <xsl:variable name="flow" as="xs:string" select="@from"/>
         <xsl:sequence select="$sections/*[@css:flow=$flow]"/>
@@ -2326,7 +2367,8 @@
         <list-of-references collection="{@from}" range="volume"/>
     </xsl:template>
     
-    <xsl:template mode="css:eval-volume-area-content-list"
+    <xsl:template mode="css:eval-volume-area-content-list
+                        css:eval-sequence-interrupted-resumed-content-list"
                   match="css:attr|
                          css:content[@target]|
                          css:content[not(@target)]|
@@ -2339,7 +2381,7 @@
         <xsl:message select="concat(
                                if (@target) then 'target-' else '',
                                local-name(),
-                               '() function not supported in volume area')"/>
+                               '() function not supported in volume area or volume transition')"/>
     </xsl:template>
     
     <xsl:template mode="css:eval-volume-area-content-list"
@@ -2347,7 +2389,13 @@
         <xsl:message>-obfl-evaluate() function not supported in volume area</xsl:message>
     </xsl:template>
     
-    <xsl:template mode="css:eval-volume-area-content-list"
+    <xsl:template mode="css:eval-sequence-interrupted-resumed-content-list"
+                  match="css:custom-func[@name='-obfl-evaluate']">
+        <xsl:message>FIXME</xsl:message>
+    </xsl:template>
+    
+    <xsl:template mode="css:eval-volume-area-content-list
+                        css:eval-sequence-interrupted-resumed-content-list"
                   match="*">
         <xsl:message terminate="yes">Coding error</xsl:message>
     </xsl:template>

@@ -6,7 +6,7 @@
                 version="1.0">
     
     <p:input port="source"/>
-    <p:output port="result" sequence="true"/>
+    <p:output port="result"/>
     
     <p:xslt>
         <p:input port="stylesheet">

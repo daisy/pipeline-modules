@@ -14,8 +14,8 @@
         Convert a document with inline braille CSS to OBFL (Open Braille Formatting Language).
     </p:documentation>
     
-    <p:input port="source" sequence="true"/>
-    <p:output port="result" sequence="false"/>
+    <p:input port="source"/>
+    <p:output port="result"/>
     
     <p:option name="text-transform" required="true"/>
     <p:option name="duplex" select="'true'"/>
@@ -30,13 +30,13 @@
     
     <p:declare-step type="pxi:recursive-parse-stylesheet-and-make-pseudo-elements">
         <p:input port="source"/>
-        <p:output port="result" sequence="true"/>
+        <p:output port="result"/>
         <css:parse-stylesheet>
             <p:documentation>
                 Make css:page, css:volume, css:after, css:before, css:footnote-call, css:duplicate,
                 css:alternate, css:_obfl-alternate-scenario, css:_obfl-on-toc-start,
-                css:_obfl-on-volume-start, css:_obfl-on-volume-end and css:_obfl-on-toc-end
-                attributes.
+                css:_obfl-on-volume-start, css:_obfl-on-volume-end, css:_obfl-on-toc-end and
+                css:_obfl-volume-transition attributes.
             </p:documentation>
         </css:parse-stylesheet>
         <p:delete match="@css:*[matches(local-name(),'^text-transform-')]">
@@ -116,9 +116,10 @@
     
     <pxi:recursive-parse-stylesheet-and-make-pseudo-elements>
         <p:documentation>
-            Make css:page and css:volume attributes, css:after, css:before, css:duplicate,
-            css:alternate, css:footnote-call, css:_obfl-on-toc-start, css:_obfl-on-volume-start,
-            css:_obfl-on-volume-end and css:_obfl-on-toc-end pseudo-elements.
+            Make css:page and css:volume and css:_obfl-volume-transition attributes, css:after,
+            css:before, css:duplicate, css:alternate, css:footnote-call, css:_obfl-on-toc-start,
+            css:_obfl-on-volume-start, css:_obfl-on-volume-end and css:_obfl-on-toc-end
+            pseudo-elements.
         </p:documentation>
     </pxi:recursive-parse-stylesheet-and-make-pseudo-elements>
     
@@ -154,14 +155,17 @@
         <p:sink/>
     </p:group>
     
-    <p:for-each>
-        <pxi:extract-obfl-pseudo-elements>
-            <p:documentation>
-                Extract css:_obfl-on-toc-start, css:_obfl-on-volume-start, css:_obfl-on-volume-end
-                and css:_obfl-on-toc-end pseudo-elements into their own documents.
-            </p:documentation>
-        </pxi:extract-obfl-pseudo-elements>
-    </p:for-each>
+    <p:delete match="@css:_obfl-volume-transition">
+        <p:documentation>
+            Delete @css:_obfl-volume-transition attributes.
+        </p:documentation>
+    </p:delete>
+    <pxi:extract-obfl-pseudo-elements>
+        <p:documentation>
+            Extract css:_obfl-on-toc-start, css:_obfl-on-volume-start, css:_obfl-on-volume-end
+            and css:_obfl-on-toc-end pseudo-elements into their own documents.
+        </p:documentation>
+    </pxi:extract-obfl-pseudo-elements>
     
     <p:for-each>
         <css:parse-properties properties="content string-set counter-reset counter-set counter-increment -obfl-marker">
@@ -686,6 +690,9 @@
         </p:with-param>
         <p:with-param name="page-counters" select="$page-counters">
             <p:empty/>
+        </p:with-param>
+        <p:with-param name="volume-transition" select="(//@css:_obfl-volume-transition)[last()]">
+            <p:pipe step="extract-page-and-volume-styles" port="result"/>
         </p:with-param>
     </p:xslt>
     
