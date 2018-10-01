@@ -4,8 +4,10 @@ v1.11.1
 Changes
 -------
 - Support for extended `leader(<braille-string>[,[<integer>|<percentage>][,[left|center|right]]?]?)`
-  function
+  function (https://github.com/sbsdev/pipeline-mod-sbs/issues/51,
+  https://github.com/nlbdev/pipeline/issues/169)
 - Support for `text-transform: -louis-emph-4` to `-louis-emph-10`
+  (https://github.com/nlbdev/pipeline/issues/107)
 - Support for `::after` and `::before` pseudo-elements inside elements with `display: none`
 - Bugfixes (https://github.com/daisy/pipeline-mod-braille/issues/173, ...)
 - Update to Liblouis 3.6.0
