@@ -109,10 +109,12 @@ class Chunker implements NodeToXMLStreamTransformer {
 			idToChunk = new HashMap<String,Integer>();
 			int n = 1;
 			for (BreakPosition sp : collectSplitPoints) {
-				for (String id : collectIds.keySet()) {
-					if (sp.compareTo(collectIds.get(id)) > 0) {
-						idToChunk.put(id, n);
-						collectIds.remove(id);
+				Iterator<Map.Entry<String,Path>> i = collectIds.entrySet().iterator();
+				while (i.hasNext()) {
+					Map.Entry<String,Path> e = i.next();
+					if (sp.compareTo(e.getValue()) > 0) {
+						idToChunk.put(e.getKey(), n);
+						i.remove();
 					}
 				}
 				n++;
