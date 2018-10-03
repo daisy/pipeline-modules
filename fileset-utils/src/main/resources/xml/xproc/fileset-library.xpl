@@ -30,4 +30,6 @@
         </p:xslt>
     </p:declare-step>
 
+    <p:import href="xprocspec-fileset-compare.xpl"/>
+
 </p:library>
