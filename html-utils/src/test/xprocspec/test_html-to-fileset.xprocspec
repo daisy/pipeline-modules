@@ -26,6 +26,7 @@
 		<x:expect label="the fileset" type="compare">
 			<x:document type="inline">
 				<d:fileset xml:base="file:/tmp/">
+					<d:file href="foo.xhtml" media-type="application/xhtml+xml"/>
 					<d:file href="img.png" original-href="file:/tmp/img.png" media-type="image/png" kind="image"/>
 				</d:fileset>
 			</x:document>

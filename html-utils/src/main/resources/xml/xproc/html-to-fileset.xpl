@@ -18,10 +18,10 @@
 	
 	<p:output port="fileset.out">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			<p>A <code>d:fileset</code> document with all the resources referenced from the XHTML,
-			in the order in which they appear. Some media types are inferred – users may have to
-			apply additional type detection. A <code>@kind</code> attribute is used to annotate the
-			kind of resource:</p>
+			<p>A <code>d:fileset</code> document with the XHTML file itself and all the resources
+			referenced from the XHTML, in the order in which they appear. Some media types are
+			inferred – users may have to apply additional type detection. A <code>@kind</code>
+			attribute is used to annotate the kind of resource:</p>
 			<ul>
 				<li>stylesheet</li>
 				<li>media</li>
