@@ -24,11 +24,28 @@
         <p:label-elements match="*[@href]" attribute="href" replace="true" label="resolve-uri(@href,base-uri(.))"/>
         <p:label-elements match="*[@original-href]" attribute="original-href" replace="true" label="resolve-uri(@href,base-uri(.))"/>
         <p:delete match="@xml:base"/>
-        <!--
-            TODO: sort d:file elements
-        -->
-        <p:delete match="/*/@xml:space"/>
-        <p:string-replace match="text()" replace="normalize-space(.)"/>
+        <p:xslt>
+            <p:input port="stylesheet">
+                <p:inline>
+                    <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0">
+                        <xsl:template match="/*">
+                            <xsl:copy>
+                                <xsl:sequence select="@*"/>
+                                <xsl:apply-templates select="*">
+                                    <xsl:sort select="@href"/>
+                                </xsl:apply-templates>
+                            </xsl:copy>
+                        </xsl:template>
+                        <xsl:template match="*">
+                            <xsl:sequence select="."/>
+                        </xsl:template>
+                    </xsl:stylesheet>
+                </p:inline>
+            </p:input>
+            <p:input port="parameters">
+                <p:empty/>
+            </p:input>
+        </p:xslt>
     </p:declare-step>
     
     <pxi:normalize-fileset name="normalize-source">
