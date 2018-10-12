@@ -15,6 +15,7 @@
     <p:import href="fileset-rebase.xpl"/>
     <p:import href="fileset-move.xpl"/>
     <p:import href="fileset-unzip.xpl"/>
+    <p:import href="fileset-update.xpl"/>
 
     <p:declare-step type="px:zip-manifest-from-fileset">
         <p:input port="source"/>
