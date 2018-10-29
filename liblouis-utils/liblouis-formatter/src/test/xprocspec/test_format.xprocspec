@@ -862,9 +862,9 @@
             <body style="@page { size: 30 2; }">
               <table>
                 <tr style="display: block">
-                  <td style="::after { content: '⠆' } ">⠤⠤⠤</td>
-                  <td style="::after { content: '⠆' } ">⠤⠤⠤</td>
-                  <td style="::after { content: '⠆' } ">⠤⠤⠤</td>
+                  <td style="&amp;::after { content: '⠆' } ">⠤⠤⠤</td>
+                  <td style="&amp;::after { content: '⠆' } ">⠤⠤⠤</td>
+                  <td style="&amp;::after { content: '⠆' } ">⠤⠤⠤</td>
                   <td>⠤⠤⠤</td>
                 </tr>
               </table>
