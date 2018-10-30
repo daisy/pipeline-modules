@@ -1329,13 +1329,10 @@ public class RenderTableByDefinition extends ExtensionFunctionDefinition {
 				if (b == null)
 					b = r;
 				else {
-					if (!b.endsWith("}"))
-						b = "{ " + b + " }";
+					if (!(b.endsWith("}") || b.endsWith(";")))
+						b = b + ";";
 					b += " ";
-					if (!r.endsWith("}"))
-						b += ("{ " + r + " }");
-					else
-						b += r; }
+					b += r; }
 		return b;
 	}
 	
