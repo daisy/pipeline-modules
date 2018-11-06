@@ -61,6 +61,8 @@
   </dependencyManagement>
 
   <properties>
+    <java.source.version>1.7</java.source.version> <!-- if we change this to 9 we also have to change target to 9 -->
+    <java.target.version>1.7</java.target.version>
     <!-- must match version from framework-bom -->
     <saxon.versionRange>[9.8.0,9.8.1)</saxon.versionRange>
   </properties>
@@ -106,6 +108,14 @@
     </plugins>
     <pluginManagement>
       <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <source>${java.source.version}</source>
+            <target>${java.target.version}</target>
+          </configuration>
+        </plugin>
         <plugin>
           <groupId>org.ops4j.pax.exam</groupId>
           <artifactId>maven-paxexam-plugin</artifactId>
