@@ -27,7 +27,7 @@
   <properties>
     <liblouis.version>3.6.0</liblouis.version>
     <!-- must match version from framework-bom -->
-    <saxon.versionRange>[9.5.1,9.5.2)</saxon.versionRange>
+    <saxon.versionRange>[9.8.0,9.8.1)</saxon.versionRange>
   </properties>
 
   <dependencyManagement>
