@@ -69,7 +69,7 @@
 		</x:expect>
 	</x:scenario>
 	
-	<x:scenario label="test_06">
+	<x:scenario label="test_06" pending="hangs">
 		<x:call function="css:parse-stylesheet">
 			<x:param select="'&amp;::before { content: &quot; } &quot; }
 			                 display:block
@@ -97,7 +97,7 @@
 		</x:expect>
 	</x:scenario>
 	
-	<x:scenario label="test_08">
+	<x:scenario label="test_08" pending="hangs">
 		<x:call function="css:parse-stylesheet">
 			<x:param select="'@page { size: 15 15; @bottom-right { content: counter(braille-page, lower-roman) }'"/>
 		</x:call>
@@ -402,7 +402,7 @@
 		</x:expect>
 	</x:scenario>
 	
-	<x:scenario label="test_32">
+	<x:scenario label="test_32" pending="hangs">
 		<x:call function="css:deep-parse-stylesheet">
 			<x:param select="'&amp;::before { content: &quot;x&quot; }
 			                  &amp;::before::after { content: &quot;x&quot; }

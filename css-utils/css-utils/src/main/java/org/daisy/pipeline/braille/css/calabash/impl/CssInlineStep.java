@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.function.Supplier;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -21,16 +22,17 @@ import java.util.regex.Pattern;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
 import com.google.common.base.Function;
-import com.google.common.base.Splitter;
-import static com.google.common.base.Objects.firstNonNull;
+import static com.google.common.base.MoreObjects.firstNonNull;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterators;
+
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.toArray;
 import static com.google.common.collect.Iterators.forArray;
@@ -83,7 +85,6 @@ import io.bit3.jsass.Options;
 import io.bit3.jsass.Output;
 import io.bit3.jsass.OutputStyle;
 
-import net.sf.saxon.dom.DocumentOverNodeInfo;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
@@ -101,9 +102,19 @@ import org.daisy.braille.css.RuleVolumeArea;
 import org.daisy.braille.css.SelectorImpl.PseudoElementImpl;
 import org.daisy.braille.css.SimpleInlineStyle;
 import org.daisy.braille.css.SupportedBrailleCSS;
+
+import org.daisy.common.calabash.XMLCalabashHelper;
+import org.daisy.common.saxon.SaxonHelper;
+import org.daisy.common.stax.BaseURIAwareXMLStreamWriter;
+import static org.daisy.common.stax.XMLStreamWriterHelper.writeAttribute;
+import static org.daisy.common.stax.XMLStreamWriterHelper.writeCharacters;
+import static org.daisy.common.stax.XMLStreamWriterHelper.writeComment;
+import static org.daisy.common.stax.XMLStreamWriterHelper.writeProcessingInstruction;
+import static org.daisy.common.stax.XMLStreamWriterHelper.writeStartElement;
+import org.daisy.common.transform.DOMToXMLStreamTransformer;
+import org.daisy.common.transform.TransformerException;
 import org.daisy.common.xproc.calabash.XProcStepProvider;
-import org.daisy.pipeline.braille.common.calabash.DomToStreamTransform;
-import org.daisy.pipeline.braille.common.TransformationException;
+
 import static org.daisy.pipeline.braille.common.util.Strings.join;
 import static org.daisy.pipeline.braille.common.util.Strings.normalizeSpace;
 import static org.daisy.pipeline.braille.common.util.URIs.asURI;
@@ -165,7 +176,7 @@ public class CssInlineStep extends DefaultStep {
 						Source resolved; {
 							try {
 								resolved = _resolver.resolve(abs.toString(), ""); }
-							catch (TransformerException e) {
+							catch (javax.xml.transform.TransformerException e) {
 								throw new IOException(e); }}
 						if (resolved != null && resolved instanceof StreamSource)
 							is = ((StreamSource)resolved).getInputStream();
@@ -195,7 +206,7 @@ public class CssInlineStep extends DefaultStep {
 					Source resolved; {
 						try {
 							resolved = _resolver.resolve(asURI(url).toString(), ""); }
-						catch (TransformerException e) {
+						catch (javax.xml.transform.TransformerException e) {
 							throw new IOException(e); }}
 					if (resolved != null && resolved instanceof StreamSource)
 						is = ((StreamSource)resolved).getInputStream();
@@ -295,20 +306,14 @@ public class CssInlineStep extends DefaultStep {
 	public void run() throws SaxonApiException {
 		super.run();
 		try {
-			XdmNode source = sourcePipe.read();
-			Document doc = (Document)DocumentOverNodeInfo.wrap(source.getUnderlyingNode());
-			URI base = asURI(doc.getBaseURI());
-			URL[] defaultSheets; {
-				StringTokenizer t = new StringTokenizer(getOption(_default_stylesheet, ""));
-				ArrayList<URL> l = new ArrayList<URL>();
-				while (t.hasMoreTokens())
-					l.add(asURL(base.resolve(asURI(t.nextToken()))));
-				defaultSheets = toArray(l, URL.class);
-			}
 			String medium = getOption(_media, DEFAULT_MEDIUM);
 			QName attributeName = getOption(_attribute_name, DEFAULT_ATTRIBUTE_NAME);
 			inMemoryResolver.setContext(contextPipe);
-			resultPipe.write(new CssInlineTransform(runtime, network, defaultSheets, medium, attributeName).transform(source)); }
+			XMLCalabashHelper.transform(
+				new CssInlineTransformer(network, getOption(_default_stylesheet, ""), medium, SaxonHelper.jaxpQName(attributeName)),
+				sourcePipe,
+				resultPipe,
+				runtime); }
 		catch (Exception e) {
 			logger.error("css:inline failed", e);
 			throw new XProcException(step.getNode(), e); }
@@ -333,10 +338,9 @@ public class CssInlineStep extends DefaultStep {
 				documents.resetReader();
 				while (documents.moreDocuments()) {
 					XdmNode doc = documents.read();
-					XdmNode root = S9apiUtils.getDocumentElement(doc);
-					URI docUri = normalizeUri(root.getBaseURI()); // can not use doc.getBaseURI() because it is not modified by
-					                                          // px:fileset-load (when @href != @original-href)
+					URI docUri = normalizeUri(doc.getBaseURI());
 					if (docUri.equals(uri)) {
+						XdmNode root = S9apiUtils.getDocumentElement(doc);
 						if (XProcConstants.c_result.equals(root.getNodeName())
 						    && root.getAttributeValue(_content_type) != null
 						    && root.getAttributeValue(_content_type).startsWith("text/"))
@@ -382,7 +386,7 @@ public class CssInlineStep extends DefaultStep {
 	
 	private static URIResolver fallback(final URIResolver... resolvers) {
 		return new URIResolver() {
-			public Source resolve(String href, String base) throws TransformerException {
+			public Source resolve(String href, String base) throws javax.xml.transform.TransformerException {
 				Iterator<URIResolver> iterator = forArray(resolvers);
 				while (iterator.hasNext()) {
 					Source source = iterator.next().resolve(href, base);
@@ -437,39 +441,34 @@ public class CssInlineStep extends DefaultStep {
 	private static final RuleFactory brailleRuleFactory = new BrailleCSSRuleFactory();
 	private static final CSSParserFactory brailleParserFactory = new BrailleCSSParserFactory();
 	
-	private static class CssInlineTransform extends DomToStreamTransform {
+	private static class CssInlineTransformer implements DOMToXMLStreamTransformer {
 		
 		private final NetworkProcessor network;
-		private final URL[] defaultSheets;
+		private final String defaultStyleSheet;
 		private final String medium;
-		private final QName attributeName;
+		private final javax.xml.namespace.QName attributeName;
 		private final List<CascadedStyle> styles;
 		
-		public CssInlineTransform(XProcRuntime xproc,
-		                          NetworkProcessor network,
-		                          URL[] defaultSheets,
-		                          String medium,
-		                          QName attributeName) {
-			super(xproc);
+		public CssInlineTransformer(NetworkProcessor network,
+		                            String defaultStyleSheet,
+		                            String medium,
+		                            javax.xml.namespace.QName attributeName) {
 			this.network = network;
-			this.defaultSheets = defaultSheets;
+			this.defaultStyleSheet = defaultStyleSheet;
 			this.medium = medium;
 			this.attributeName = attributeName;
 			this.styles = new ArrayList<CascadedStyle>();
 		}
 		
-		private Writer writer;
+		private BaseURIAwareXMLStreamWriter writer;
 		
-		protected void _transform(Document document, Writer writer) throws TransformationException {
+		public void transform(Iterator<Document> input, Supplier<BaseURIAwareXMLStreamWriter> output) throws TransformerException {
 			
-			this.writer = writer;
+			Document document = Iterators.getOnlyElement(input);
+			this.writer = output.get();
 			
 			try {
-				
-				// get base URI of document element instead of document because
-				// unzipped files have an empty base URI, but an xml:base
-				// attribute may have been added to their document element
-				URI baseURI = new URI(document.getDocumentElement().getBaseURI());
+				URI baseURI = new URI(document.getBaseURI());
 				URL baseURL; {
 					if (baseURI == null || baseURI.toString().equals(""))
 						// handling the case where base URI is empty, although this should in theory never happen
@@ -477,6 +476,13 @@ public class CssInlineStep extends DefaultStep {
 						baseURL = null;
 					else
 						baseURL = asURL(baseURI);
+				}
+				URL[] defaultSheets; {
+					StringTokenizer t = new StringTokenizer(defaultStyleSheet);
+					ArrayList<URL> l = new ArrayList<URL>();
+					while (t.hasMoreTokens())
+						l.add(asURL(baseURI.resolve(asURI(t.nextToken()))));
+					defaultSheets = toArray(l, URL.class);
 				}
 				
 				CascadedStyle style = new CascadedStyle();
@@ -547,12 +553,13 @@ public class CssInlineStep extends DefaultStep {
 					throw new RuntimeException("medium " + medium + " not supported");
 				}
 				
-				writer.startDocument(baseURI);
+				writer.setBaseURI(baseURI);
+				writer.writeStartDocument();
 				traverse(document.getDocumentElement());
-				writer.endDocument();
+				writer.writeEndDocument();
 				
 			} catch (Exception e) {
-				throw new TransformationException(e);
+				throw new TransformerException(e);
 			}
 		}
 		
@@ -565,16 +572,16 @@ public class CssInlineStep extends DefaultStep {
 		
 		private boolean isRoot = true;
 		
-		private void traverse(Node node) throws XPathException, URISyntaxException {
+		private void traverse(Node node) throws XPathException, URISyntaxException, XMLStreamException {
 			
 			if (node.getNodeType() == Node.ELEMENT_NODE) {
 				Element elem = (Element)node;
-				writer.copyStartElement(elem);
+				writeStartElement(writer, elem);
 				NamedNodeMap attributes = node.getAttributes();
-				for (int i=0; i<attributes.getLength(); i++) {
+				for (int i = 0; i < attributes.getLength(); i++) {
 					Node attr = attributes.item(i);
 					if (!(attr.getPrefix() == null && "style".equals(attr.getLocalName())))
-						writer.copyAttribute(attr); }
+						writeAttribute(writer, attr); }
 				StringBuilder style = new StringBuilder();
 				for (CascadedStyle cs : styles) {
 					NodeData nodeData = cs.styleMap.get(elem);
@@ -601,18 +608,17 @@ public class CssInlineStep extends DefaultStep {
 							for (RuleTextTransform r : cs.textTransformRules)
 								insertTextTransformDefinition(style, r); }}
 				if (normalizeSpace(style).length() > 0) {
-					writer.addAttribute(attributeName, style.toString().trim()); }
+					writeAttribute(writer, attributeName, style.toString().trim()); }
 				isRoot = false;
-				writer.startContent();
 				for (Node child = node.getFirstChild(); child != null; child = child.getNextSibling())
 					traverse(child);
-				writer.endElement(); }
+				writer.writeEndElement(); }
 			else if (node.getNodeType() == Node.COMMENT_NODE)
-				writer.copyComment(node);
+				writeComment(writer, node);
 			else if (node.getNodeType() == Node.TEXT_NODE)
-				writer.copyText(node);
+				writeCharacters(writer, node);
 			else if (node.getNodeType() == Node.PROCESSING_INSTRUCTION_NODE)
-				writer.copyPI(node);
+				writeProcessingInstruction(writer, node);
 			else
 				throw new UnsupportedOperationException("Unexpected node type");
 		}
