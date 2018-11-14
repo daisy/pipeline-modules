@@ -69,6 +69,7 @@ import cz.vutbr.web.css.TermIdent;
 import cz.vutbr.web.css.TermInteger;
 import cz.vutbr.web.css.TermList;
 import cz.vutbr.web.css.TermPair;
+import cz.vutbr.web.css.TermString;
 import cz.vutbr.web.csskit.antlr.CSSParserFactory;
 import cz.vutbr.web.csskit.antlr.CSSParserFactory.SourceType;
 import cz.vutbr.web.csskit.DefaultNetworkProcessor;
@@ -670,6 +671,9 @@ public class CssInlineStep extends DefaultStep {
 				TermPair<?,?> pair = (TermPair<?,?>)term;
 				Object val = pair.getValue();
 				return "" + pair.getKey() + " " + (val instanceof Term ? termToString.apply((Term)val) : val.toString()); }
+			else if (term instanceof TermString) {
+				TermString string = (TermString)term;
+				return "'" + string.getValue().replaceAll("\n", "\\\\A") + "'"; }
 			else
 				return term.toString().replaceAll("^[,/ ]+", "");
 		}

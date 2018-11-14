@@ -25,13 +25,13 @@
   <x:scenario label="test_02">
     <x:context>
       <doc xml:lang="en">
-        <br style="&amp;::before {{ content: '&#xA;'; white-space: pre-line }}"/>
+        <br style="&amp;::before {{ content: '\A'; white-space: pre-line }}"/>
       </doc>
     </x:context>
     <x:expect label="result">
       <_ style="text-transform: none">
         <doc xml:lang="en-Brai">
-          <br style="&amp;::before {{ content: &quot;&#xA;&quot;; white-space: pre-line; text-transform: auto }}"/>
+          <br style="&amp;::before {{ content: &quot;\A&quot;; white-space: pre-line; text-transform: auto }}"/>
         </doc>
       </_>
     </x:expect>

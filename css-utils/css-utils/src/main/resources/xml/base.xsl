@@ -479,8 +479,10 @@
                             <string>
                         -->
                         <xsl:when test="regex-group($css:CONTENT_RE_string)!=''">
-                            <css:string value="{substring(regex-group($css:CONTENT_RE_string),
-                                                          2, string-length(regex-group($css:CONTENT_RE_string))-2)}"/>
+                            <css:string value="{replace(
+                                                  substring(regex-group($css:CONTENT_RE_string),
+                                                            2, string-length(regex-group($css:CONTENT_RE_string))-2),
+                                                  '\\A','&#xA;')}"/>
                         </xsl:when>
                         <!--
                             content()
@@ -980,7 +982,7 @@
     </xsl:template>
     
     <xsl:template match="css:string[@value]" mode="css:serialize" as="xs:string">
-        <xsl:sequence select="concat('&quot;',@value,'&quot;')"/>
+        <xsl:sequence select="concat('&quot;',replace(@value,'\n','\\A'),'&quot;')"/>
     </xsl:template>
     
     <xsl:template match="css:content[not(@target)]" mode="css:serialize" as="xs:string">

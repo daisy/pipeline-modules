@@ -299,7 +299,7 @@
     <x:call function="obfl:generate-layout-master">
       <x:param>
         <css:rule selector="@bottom-left">
-          <css:property name="content" value="&quot;⠆&#x0a;⠆⠆&quot;"/>
+          <css:property name="content" value="&quot;⠆\A⠆⠆&quot;"/>
           <css:property name="white-space" value="pre-wrap"/>
         </css:rule>
         <css:rule>
@@ -345,7 +345,7 @@
     <x:call function="obfl:generate-layout-master">
       <x:param>
         <css:rule selector="@bottom-left">
-          <css:property name="content" value="&quot;⠆&#x0a;⠆⠆&quot;"/>
+          <css:property name="content" value="&quot;⠆\A⠆⠆&quot;"/>
           <css:property name="white-space" value="pre-wrap"/>
         </css:rule>
         <css:rule>

@@ -2534,15 +2534,15 @@
   
   <x:scenario label="test_23">
     <x:documentation>
-      Tests generated newline (&#xA;) and white-space:pre-line.
+      Tests generated newline and white-space:pre-line.
     </x:documentation>
     <x:call step="dotify:format">
       <x:input port="source">
         <x:document type="inline">
           <doc style="text-transform: none; display:block">
-            ⠤⠤⠤<br style="&amp;::before { content: '&#xA;'; white-space: pre-line; }"/>⠤⠤⠤
-            <br style="&amp;::before { content: '&#xA;'; white-space: pre-line; }"/>
-            <br style="&amp;::before { content: '&#xA;'; white-space: pre-line; }"/>⠤⠤⠤
+            ⠤⠤⠤<br style="&amp;::before { content: '\A'; white-space: pre-line; }"/>⠤⠤⠤
+            <br style="&amp;::before { content: '\A'; white-space: pre-line; }"/>
+            <br style="&amp;::before { content: '\A'; white-space: pre-line; }"/>⠤⠤⠤
           </doc>
         </x:document>
       </x:input>
@@ -4322,14 +4322,14 @@
   
   <x:scenario label="test_46">
     <x:documentation>
-      Tests newline (&#x0a;) with white-space:pre-wrap in bottom page margin, which results into
+      Tests newline with white-space:pre-wrap in bottom page margin, which results into
       multi-line footer.
     </x:documentation>
     <x:call step="dotify:format">
       <x:input port="source">
         <x:document type="inline">
           <doc style="text-transform: none;
-                      @page { @bottom-left { content: '⠆&#x0a;⠆⠆'; white-space: pre-wrap; } size: 15 5; margin-bottom: 2; }">
+                      @page { @bottom-left { content: '⠆\A⠆⠆'; white-space: pre-wrap; } size: 15 5; margin-bottom: 2; }">
             <p style="display: block"> ⠿ </p>
             <p style="display: block"> ⠿ </p>
             <p style="display: block"> ⠿ </p>
@@ -4422,14 +4422,14 @@
   
   <x:scenario label="test_47">
     <x:documentation>
-      Tests newline (&#x0a;) with white-space:pre-wrap in bottom page margin, which results into
-      multi-line footer, even with margin-bottom:1.
+      Tests newline with white-space:pre-wrap in bottom page margin, which results into multi-line
+      footer, even with margin-bottom:1.
     </x:documentation>
     <x:call step="dotify:format">
       <x:input port="source">
         <x:document type="inline">
           <doc style="text-transform: none;
-                      @page { @bottom-left { content: '⠆&#x0a;⠆⠆'; white-space: pre-wrap; } size: 15 5; margin-bottom: 1; }">
+                      @page { @bottom-left { content: '⠆\A⠆⠆'; white-space: pre-wrap; } size: 15 5; margin-bottom: 1; }">
             <p style="display: block"> ⠿ </p>
             <p style="display: block"> ⠿ </p>
             <p style="display: block"> ⠿ </p>
