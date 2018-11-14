@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Objects.ToStringHelper;
+import com.google.common.base.MoreObjects;
+import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import static com.google.common.collect.Iterables.size;
@@ -257,7 +257,7 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 	
 	@Override
 	public ToStringHelper toStringHelper() {
-		return Objects.toStringHelper("o.d.p.b.liblouis.impl.LiblouisTranslatorJnaImplProvider");
+		return MoreObjects.toStringHelper("o.d.p.b.liblouis.impl.LiblouisTranslatorJnaImplProvider");
 	}
 	
 	static class LiblouisTranslatorImpl extends AbstractBrailleTranslator implements LiblouisTranslator {
@@ -1347,7 +1347,7 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 		
 		@Override
 		public ToStringHelper toStringHelper() {
-			return Objects.toStringHelper("o.d.p.b.liblouis.impl.LiblouisTranslatorJnaImplProvider$LiblouisTranslatorImpl")
+			return MoreObjects.toStringHelper("o.d.p.b.liblouis.impl.LiblouisTranslatorJnaImplProvider$LiblouisTranslatorImpl")
 				.add("translator", translator)
 				.add("hyphenator", hyphenator);
 		}
@@ -1392,7 +1392,7 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 		
 		@Override
 		public ToStringHelper toStringHelper() {
-			return Objects.toStringHelper("o.d.p.b.liblouis.impl.LiblouisTranslatorJnaImplProvider$LiblouisTranslatorImpl")
+			return MoreObjects.toStringHelper("o.d.p.b.liblouis.impl.LiblouisTranslatorJnaImplProvider$LiblouisTranslatorImpl")
 				.add("translator", translator)
 				.add("hyphenator", "self");
 		}

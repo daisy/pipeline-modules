@@ -91,11 +91,12 @@ public class RenderTableByDefinition extends ExtensionFunctionDefinition {
 	public SequenceType[] getArgumentTypes() {
 		return new SequenceType[] {
 			SequenceType.SINGLE_STRING,
-			SequenceType.SINGLE_ELEMENT_NODE};
+			SequenceType.SINGLE_NODE // SINGLE_ELEMENT_NODE
+		};
 	}
 	
 	public SequenceType getResultType(SequenceType[] suppliedArgumentTypes) {
-		return SequenceType.SINGLE_ELEMENT_NODE;
+		return SequenceType.SINGLE_NODE; // SINGLE_ELEMENT_NODE
 	}
 	
 	public ExtensionFunctionCall makeCallExpression() {
