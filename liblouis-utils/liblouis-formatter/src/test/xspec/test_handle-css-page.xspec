@@ -16,7 +16,7 @@
     <x:expect label="result">
       <doc>
         <body style="display: block;"
-              css:page="size: 30 30; @top-center {{ content: string(running-header) }}"
+              css:page="size: 30 30; @top-center {{ content: string(running-header); }}"
               xml:id="...">
           <p>
             foo

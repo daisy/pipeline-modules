@@ -19,10 +19,8 @@
     <x:expect label="result">
       <doc>
         <body>
-          <p style="display: block">
-            <css:before style="display: block;
-                                margin-left: 2;
-                                content: 'bar'"/>
+          <p style="display: block;">
+            <css:before style="display: block; margin-left: 2; content: 'bar';"/>
             foo
           </p>
         </body>
@@ -42,7 +40,7 @@
       <doc>
         <body>
           <p foo="bar">
-            <css:after style="content: attr(foo)"/>
+            <css:after style="content: attr(foo);"/>
           </p>
         </body>
       </doc>

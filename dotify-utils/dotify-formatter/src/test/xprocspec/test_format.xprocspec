@@ -3384,7 +3384,7 @@
     <x:call step="dotify:format">
       <x:input port="source">
         <x:document type="inline">
-          <doc style="text-transform: none; @page { @top-left { content: '⠆' } margin-top: 1; }">
+          <doc style="text-transform: none; @page { margin-top: 1; @top-left { content: '⠆' } }">
             <body>
               <p style="display:block">⠿⠿⠿⠿⠿⠿⠿⠿⠀⠿⠿⠿⠿⠿⠿⠿⠿</p>
             </body>
@@ -3455,7 +3455,7 @@
     <x:call step="dotify:format">
       <x:input port="source">
         <x:document type="inline">
-          <doc style="text-transform: none; @page { @top-left { content: '⠆' } margin-top: 2; }">
+          <doc style="text-transform: none; @page { margin-top: 2; @top-left { content: '⠆' } }">
             <body>
               <p style="display:block">⠿⠿⠿⠿⠿⠿⠿⠿⠀⠿⠿⠿⠿⠿⠿⠿⠿</p>
             </body>
@@ -4141,7 +4141,7 @@
       <x:input port="source">
         <x:document type="inline">
           <doc style="text-transform: none;
-                      @page { @bottom-left { content: '⠆' } size: 15 5; margin-bottom: 1; }">
+                      @page { size: 15 5; margin-bottom: 1; @bottom-left { content: '⠆' } }">
             <p style="display: block"> ⠿ </p>
             <p style="display: block"> ⠿ </p>
             <p style="display: block"> ⠿ </p>
@@ -4229,7 +4229,7 @@
       <x:input port="source">
         <x:document type="inline">
           <doc style="text-transform: none;
-                      @page { @bottom-left { content: '⠆' } size: 15 5; margin-bottom: 2;}">
+                      @page { size: 15 5; margin-bottom: 2; @bottom-left { content: '⠆' } }">
             <p style="display: block"> ⠿ </p>
             <p style="display: block"> ⠿ </p>
             <p style="display: block"> ⠿ </p>
@@ -4329,7 +4329,7 @@
       <x:input port="source">
         <x:document type="inline">
           <doc style="text-transform: none;
-                      @page { @bottom-left { content: '⠆\A⠆⠆'; white-space: pre-wrap; } size: 15 5; margin-bottom: 2; }">
+                      @page { size: 15 5; margin-bottom: 2; @bottom-left { content: '⠆\A⠆⠆'; white-space: pre-wrap; } }">
             <p style="display: block"> ⠿ </p>
             <p style="display: block"> ⠿ </p>
             <p style="display: block"> ⠿ </p>
@@ -4429,7 +4429,7 @@
       <x:input port="source">
         <x:document type="inline">
           <doc style="text-transform: none;
-                      @page { @bottom-left { content: '⠆\A⠆⠆'; white-space: pre-wrap; } size: 15 5; margin-bottom: 1; }">
+                      @page { size: 15 5; margin-bottom: 1; @bottom-left { content: '⠆\A⠆⠆'; white-space: pre-wrap; } }">
             <p style="display: block"> ⠿ </p>
             <p style="display: block"> ⠿ </p>
             <p style="display: block"> ⠿ </p>

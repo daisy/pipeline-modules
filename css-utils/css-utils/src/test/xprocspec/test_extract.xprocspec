@@ -19,7 +19,7 @@
 		</p:declare-step>
 	</x:script>
 	
-	<x:scenario label="test" pending="hangs">
+	<x:scenario label="test">
 		<x:call step="pxi:test">
 			<x:input port="source">
 				<x:document type="inline">
