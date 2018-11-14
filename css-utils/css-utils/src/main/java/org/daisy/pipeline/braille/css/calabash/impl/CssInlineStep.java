@@ -855,7 +855,7 @@ public class CssInlineStep extends DefaultStep {
 		builder.append("@").append(ruleVolumeArea.getVolumeArea().value).append(" { ");
 		StringBuilder innerStyle = new StringBuilder();
 		Map<String,RulePage> pageRule = null;
-		for (Declaration decl : ruleVolumeArea)
+		for (Declaration decl : filter(ruleVolumeArea, Declaration.class))
 			if ("page".equals(decl.getProperty()))
 				pageRule = getPageRule(join(decl, " ", termToString), pageRules);
 			else
@@ -931,7 +931,7 @@ public class CssInlineStep extends DefaultStep {
 						volumeRule.add(volumeAreaRule);
 						volumeAreaRule.replaceAll(a); }
 					else
-						for (Declaration d : a)
+						for (Declaration d : filter(a, Declaration.class))
 							if (getDeclaration(volumeAreaRule, d.getProperty()) == null)
 								volumeAreaRule.add(d); }
 		return volumeRule;
