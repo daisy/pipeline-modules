@@ -3,6 +3,7 @@ package org.daisy.pipeline.tts.synthesize;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 
 import org.daisy.pipeline.audio.AudioEncoder;
@@ -10,8 +11,6 @@ import org.daisy.pipeline.audio.AudioServices;
 import org.daisy.pipeline.tts.AudioBufferTracker;
 import org.daisy.pipeline.tts.TTSTimeout;
 import org.daisy.pipeline.tts.synthesize.TTSLog.ErrorCode;
-
-import com.google.common.base.Optional;
 
 /**
  * Consumes a shared queue of PCM packets. PCM packets are then provided to

@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.sound.sampled.AudioFormat;
@@ -49,8 +50,6 @@ import org.daisy.pipeline.tts.synthesize.TTSLogImpl;
 import org.daisy.pipeline.tts.synthesize.VoiceConfigExtension;
 import org.junit.Test;
 import org.xml.sax.InputSource;
-
-import com.google.common.base.Optional;
 
 /**
  * Those tests are mostly to check the code coverage
