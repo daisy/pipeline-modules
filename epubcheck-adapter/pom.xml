@@ -41,7 +41,6 @@
           <instructions>
             <Import-Package>
               net.sf.saxon.*;version="${saxon.versionRange}",
-              org.daisy.pipeline.script,
               *
             </Import-Package>
             <Service-Component>OSGI-INF/epubcheck.xml,OSGI-INF/column-number.xml,OSGI-INF/line-number.xml,OSGI-INF/system-id.xml</Service-Component>
