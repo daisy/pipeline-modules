@@ -257,6 +257,15 @@
                 <groupId>org.daisy.dotify</groupId>
                 <artifactId>dotify.formatter.impl</artifactId>
                 <version>4.4.0</version>
+                <exclusions>
+                    <exclusion>
+                        <!--
+                            covered by org.codehaus.woodstox:woodstox-core-lgpl (framework dependency)
+                        -->
+                        <groupId>com.fasterxml.woodstox</groupId>
+                        <artifactId>woodstox-core</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.daisy.dotify</groupId>
