@@ -153,7 +153,7 @@ class Chunker implements NodeToXMLStreamTransformer {
 		try {
 			URI sourceBaseURI = reader.getBaseURI();
 			writer.writeStartDocument();
-			while (true)
+		  loop: while (true)
 				try {
 					int event = reader.next();
 					switch (event) {
@@ -206,8 +206,9 @@ class Chunker implements NodeToXMLStreamTransformer {
 							split(writer, writer = writers.get());
 						break;
 					case START_DOCUMENT:
-					case END_DOCUMENT:
 						break;
+					case END_DOCUMENT:
+						break loop;
 					default:
 						writeEvent(writer, event, reader);
 					}
