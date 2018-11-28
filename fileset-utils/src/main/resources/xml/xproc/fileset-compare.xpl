@@ -22,7 +22,7 @@
         <p:input port="source"/>
         <p:output port="result"/>
         <p:label-elements match="*[@href]" attribute="href" replace="true" label="resolve-uri(@href,base-uri(.))"/>
-        <p:label-elements match="*[@original-href]" attribute="original-href" replace="true" label="resolve-uri(@href,base-uri(.))"/>
+        <p:label-elements match="*[@original-href]" attribute="original-href" replace="true" label="resolve-uri(@original-href,base-uri(.))"/>
         <p:delete match="@xml:base"/>
         <p:xslt>
             <p:input port="stylesheet">
