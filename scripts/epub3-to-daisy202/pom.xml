@@ -65,6 +65,14 @@
       <artifactId>epub3-ocf-utils</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <!--
+        test dependencies
+    -->
+    <dependency>
+      <groupId>org.daisy.pipeline.modules</groupId>
+      <artifactId>daisy202-validator</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <properties>
