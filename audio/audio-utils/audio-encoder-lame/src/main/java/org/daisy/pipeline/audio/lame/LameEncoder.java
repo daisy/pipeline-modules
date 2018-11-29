@@ -120,6 +120,7 @@ public class LameEncoder implements AudioEncoder {
 					}
 				}
 			)
+			.consumeError(mLogger)
 			.run();
 
 		return Optional.of(encodedFile.toURI().toString());
