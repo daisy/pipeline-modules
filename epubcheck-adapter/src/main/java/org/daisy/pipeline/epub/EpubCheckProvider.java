@@ -3,6 +3,8 @@ package org.daisy.pipeline.epub;
 import java.io.File;
 import java.io.PrintWriter;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.util.HashMap;
 
 import net.sf.saxon.s9api.QName;
@@ -15,6 +17,7 @@ import com.xmlcalabash.core.XProcRuntime;
 import com.xmlcalabash.core.XProcStep;
 import com.xmlcalabash.io.WritablePipe;
 import com.xmlcalabash.library.DefaultStep;
+import com.xmlcalabash.model.RuntimeValue;
 import com.xmlcalabash.runtime.XAtomicStep;
 
 import com.adobe.epubcheck.api.EpubCheck;
@@ -84,6 +87,7 @@ public class EpubCheckProvider implements XProcStepProvider {
 		private static final QName _epubFile = new QName("epub");
 		private static final QName _epubVersion = new QName("version");
 		private static final QName _mode = new QName("mode"); // epub/opf/xhtml/svg/mo/nav
+		private static final QName _tempDir = new QName("temp-dir");
 
 		private WritablePipe report = null;
 
@@ -136,8 +140,24 @@ public class EpubCheckProvider implements XProcStepProvider {
 
 					if ("expanded".equals(mode) || "exp".equals(mode)) {
 						epub = new Archive(path, false);
-						epub.createArchive();
-
+						String epubName = new File(path).getName() + ".epub";
+						File tempDir; {
+							RuntimeValue o = getOption(_tempDir);
+							String tempDirOpt = o == null ? null : o.getString();
+							if (tempDirOpt != null && !tempDirOpt.equals("")) {
+								try {
+									tempDir = new File(new URI(tempDirOpt));
+								} catch (URISyntaxException e) {
+									throw new IllegalArgumentException("temp-dir option invalid: " + tempDirOpt);
+								}
+								if (tempDir.exists())
+									throw new IllegalArgumentException("temp-dir option must be a non-existing directory: "+tempDirOpt);
+							} else
+								tempDir = Files.createTempDirectory("epubcheck-").toFile();
+						}
+						File zippedEpubFile = new File(tempDir, epubName);
+						tempDir.mkdirs();
+						epub.createArchive(zippedEpubFile);
 						EpubCheck check = new EpubCheck(epub.getEpubFile(), xmlReport);
 						check.validate();
 					}
