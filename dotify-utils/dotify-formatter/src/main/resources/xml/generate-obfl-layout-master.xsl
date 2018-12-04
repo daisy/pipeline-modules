@@ -93,10 +93,7 @@
         <xsl:variable name="duplex" as="xs:boolean" select="$duplex='true'"/>
         <xsl:variable name="right-page-stylesheet" as="element()*" select="$page-stylesheet[@selector='&amp;:right']/*"/>
         <xsl:variable name="left-page-stylesheet" as="element()*" select="$page-stylesheet[@selector='&amp;:left']/*"/>
-        <xsl:variable name="default-page-stylesheet" as="element()*"
-                      select="if ($right-page-stylesheet or $left-page-stylesheet)
-                              then $page-stylesheet[not(@selector)]/*
-                              else $page-stylesheet"/>
+        <xsl:variable name="default-page-stylesheet" as="element()*" select="$page-stylesheet"/>
         <xsl:variable name="default-page-properties" as="element()*"
                       select="if ($default-page-stylesheet/self::css:property)
                               then $default-page-stylesheet/self::css:property

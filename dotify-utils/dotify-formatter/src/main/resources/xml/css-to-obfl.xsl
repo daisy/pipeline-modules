@@ -115,8 +115,7 @@
     <xsl:variable name="collection-flows" as="xs:string*">
         <xsl:for-each select="$page-stylesheets">
             <xsl:sequence select="css:parse-content-list(
-                                    (if (*[matches(@selector,'^&amp;:')]) then css:rule[not(@selector)] else .)
-                                    /css:rule[@selector='@footnotes'][1]
+                                    css:rule[@selector='@footnotes'][1]
                                     /css:property[@name='content'][1]/@value,())
                                   /self::css:flow[@from and (not(@scope) or @scope='page')]/@from"/>
         </xsl:for-each>
