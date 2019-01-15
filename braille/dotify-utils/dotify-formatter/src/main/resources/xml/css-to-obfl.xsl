@@ -2147,10 +2147,17 @@
     <!-- Markers -->
     <!-- ======= -->
     
+    <!--
+        wrap markers at the start of a block in an additional block (in order to support page-start
+        and page-start-except-last)
+    -->
     <xsl:template priority="0.6"
                   mode="marker"
                   match="css:box[@type='block']/css:box[@type='inline'][not(preceding-sibling::css:box)]/@css:string-set|
-                         css:box[@type='block']/css:box[@type='inline'][not(preceding-sibling::css:box)]
+                         css:box[@type='block']/css:box[@type='inline'][not(preceding-sibling::css:box) and
+                                                                        not(@css:id and
+                                                                            not(ancestor::*/@css:flow[not(.='normal')]) and
+                                                                            @css:id=($page-number-references,$toc-entry-references))]
                          /css:_[not(preceding-sibling::*) and
                                 not(preceding-sibling::text()[not(matches(string(),'^[\s&#x2800;]*$'))])]
                          //@css:string-set">
