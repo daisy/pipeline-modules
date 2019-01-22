@@ -7,5 +7,6 @@
     <p:import href="store.xpl"/>
     <p:import href="load.xpl"/>
     <p:import href="opf-manifest-to-fileset.xpl"/>
+    <p:import href="opf-spine-to-fileset.xpl"/>
     
 </p:library>
