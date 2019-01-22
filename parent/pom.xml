@@ -5,11 +5,11 @@
     <groupId>org.daisy.pipeline.modules</groupId>
     <artifactId>modules-parent</artifactId>
     <version>1.7</version>
-    <relativePath/>
+    <relativePath />
   </parent>
 
   <artifactId>tts-modules-parent</artifactId>
-  <version>1.11.2-SNAPSHOT</version>
+  <version>1.11.2</version>
   <packaging>pom</packaging>
 
   <name>DAISY Pipeline 2 :: TTS Modules Parent POM</name>
@@ -23,7 +23,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>tts-modules-bom</artifactId>
-        <version>1.11.2-SNAPSHOT</version>
+        <version>1.11.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -115,4 +115,8 @@
       </snapshots>
     </repository>
   </repositories>
+
+  <scm>
+    <tag>v1.11.2</tag>
+  </scm>
 </project>
