@@ -7,12 +7,12 @@
     <groupId>org.daisy.pipeline.modules</groupId>
     <artifactId>modules-parent</artifactId>
     <version>1.8</version>
-    <relativePath/>
+    <relativePath />
   </parent>
 
   <groupId>org.daisy.pipeline.modules.braille</groupId>
   <artifactId>braille-modules-parent</artifactId>
-  <version>1.11.2-SNAPSHOT</version>
+  <version>1.11.2</version>
   <packaging>pom</packaging>
 
   <name>DAISY Pipeline 2 :: Braille Modules Parent POM</name>
@@ -21,7 +21,7 @@
     <connection>scm:git:git@github.com:daisy/pipeline-mod-braille.git</connection>
     <url>scm:git:git@github.com:daisy/pipeline-mod-braille.git</url>
     <developerConnection>scm:git:git@github.com:daisy/pipeline-mod-braille.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>v1.11.2</tag>
   </scm>
 
   <properties>
@@ -38,7 +38,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>braille-modules-bom</artifactId>
-        <version>1.11.2-SNAPSHOT</version>
+        <version>1.11.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -166,7 +166,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore/>
+                    <ignore />
                   </action>
                 </pluginExecution>
                 <pluginExecution>
@@ -183,7 +183,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore/>
+                    <ignore />
                   </action>
                 </pluginExecution>
                 <pluginExecution>
@@ -196,7 +196,7 @@
                         </goals>
                     </pluginExecutionFilter>
                     <action>
-                        <ignore/>
+                        <ignore />
                     </action>
                 </pluginExecution>
                 <pluginExecution>
@@ -209,7 +209,7 @@
                         </goals>
                     </pluginExecutionFilter>
                     <action>
-                        <ignore/>
+                        <ignore />
                     </action>
                 </pluginExecution>
                 <pluginExecution>
@@ -222,7 +222,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore/>
+                    <ignore />
                   </action>
                 </pluginExecution>
               </pluginExecutions>
