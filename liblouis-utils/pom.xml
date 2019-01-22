@@ -12,7 +12,7 @@
   
   <groupId>org.daisy.pipeline.modules.braille</groupId>
   <artifactId>liblouis-utils-aggregator</artifactId>
-  <version>1.11.2</version>
+  <version>1.11.3-SNAPSHOT</version>
   <packaging>pom</packaging>
   
   <name>DP2 Braille Modules :: liblouis-utils</name>
@@ -23,8 +23,8 @@
     <module>liblouis-tables</module>
     <module>liblouis-calabash</module>
     <module>liblouis-native</module>
-    <!--<module>liblouis-formatter</module>-->
-    <!--<module>liblouis-mathml</module>-->
+    <module>liblouis-formatter</module>
+    <module>liblouis-mathml</module>
     <module>liblouis-utils</module>
   </modules>
   
@@ -44,8 +44,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <scm>
-    <tag>v1.11.2</tag>
-  </scm>
 </project>

@@ -12,13 +12,13 @@
   
   <groupId>org.daisy.pipeline.modules.braille</groupId>
   <artifactId>css-utils-aggregator</artifactId>
-  <version>1.11.2</version>
+  <version>1.11.3-SNAPSHOT</version>
   <packaging>pom</packaging>
   
   <name>DP2 Braille Modules :: css-utils</name>
 
   <modules>
-    <!--<module>css-core</module>-->
+    <module>css-core</module>
     <module>css-utils</module>
   </modules>
   
@@ -40,8 +40,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <scm>
-    <tag>v1.11.2</tag>
-  </scm>
 </project>
