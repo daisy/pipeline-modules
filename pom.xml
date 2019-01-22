@@ -7,7 +7,7 @@
     <groupId>org.daisy</groupId>
     <artifactId>daisy</artifactId>
     <version>4</version>
-    <relativePath />
+    <relativePath/>
   </parent>
 
   <groupId>org.daisy.pipeline.modules</groupId>
@@ -28,14 +28,14 @@
     <module>daisy202-utils</module>
     <module>daisy3-utils</module>
     <module>dtbook-utils</module>
-    <module>epub3-nav-utils</module>
+    <!--<module>epub3-nav-utils</module>-->
     <module>epub3-ocf-utils</module>
     <module>epub3-pub-utils</module>
     <module>epubcheck-adapter</module>
     <module>mediaoverlay-utils</module>
-    <module>metadata-utils</module>
-    <module>odt-utils</module>
-    <module>zedai-utils</module>
+    <!--<module>metadata-utils</module>-->
+    <!--<module>odt-utils</module>-->
+    <!--<module>zedai-utils</module>-->
   </modules>
   
   <!-- don't publish aggregator -->
