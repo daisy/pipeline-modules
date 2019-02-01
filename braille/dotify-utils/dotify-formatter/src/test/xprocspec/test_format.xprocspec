@@ -12069,7 +12069,7 @@
             <p style="display: block; volume-break-inside: -obfl-keep(1)">
               ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
               ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
-              ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
+              ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
             </p>
             <p style="display: block; volume-break-inside: -obfl-keep(1)">
               ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿
@@ -12114,7 +12114,7 @@
               <block volume-keep-priority="1">
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
-                ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
+                ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
               </block>
               <block volume-keep-priority="1">
                 ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿
@@ -12206,14 +12206,9 @@
                   <row>⠤⠤⠤⠤⠤</row>
                   <row>⠤⠤⠤⠤⠤</row>
                 </page>
+                <!-- right-hand page -->
                 <page>
                   <row>⠤⠤⠤⠤⠤</row>
-                  <row>⠤⠤⠤⠤⠤</row>
-                  <row>⠤⠤⠤⠤⠤</row>
-                  <row>⠤⠤⠤⠤⠤</row>
-                  <row>⠤⠤⠤⠤⠤</row>
-                </page>
-                <page>
                   <row>⠤⠤⠤⠤⠤</row>
                   <row>⠤⠤⠤⠤⠤</row>
                   <row>⠤⠤⠤⠤⠤</row>
@@ -12285,6 +12280,7 @@
                   <row>⠤⠤⠤⠤⠤</row>
                   <row>⠤⠤⠤⠤⠤</row>
                 </page>
+                <!-- left-hand page -->
                 <page>
                   <row>⠤⠤⠤⠤⠤</row>
                   <row>⠤⠤⠤⠤⠤</row>
@@ -13486,6 +13482,222 @@
                   <row/>
                   <row>⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠤⠤</row>
                   <row>⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠤⠤</row>
+                </page>
+              </section>
+            </volume>
+          </body>
+        </pef>
+      </x:document>
+    </x:expect>
+  </x:scenario>
+  
+  <x:scenario label="test_120">
+    <x:documentation>
+      Tests that last sheet of volume is modified so that volume break occurs between blocks.
+    </x:documentation>
+    <x:call step="dotify:format">
+      <x:input port="source">
+        <x:document type="inline">
+          <body style="display: block;
+                       text-transform: none;
+                       @page { size: 10 5 }
+                       @volume { max-length: 5 }">
+            <p style="display: block">
+              ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿
+              ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿
+              ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿
+            </p>
+            <p style="display: block">
+              ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
+              ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
+              ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
+            </p>
+            <p style="display: block">
+              ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿
+              ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿
+              ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿
+              ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿
+              ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿
+            </p>
+            <!--
+                this is just to make sure that a volume-transition element is created
+            -->
+            <p style="display:block; volume-break-inside: -obfl-keep(1)">⠤</p>
+          </body>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="obfl">
+      <x:document type="port" port="obfl"/>
+    </x:context>
+    <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
+      <x:document type="inline">
+        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <layout-master name="main" duplex="true" page-number-variable="page" page-width="10" page-height="5">
+            <default-template>
+              <header/>
+              <footer/>
+            </default-template>
+          </layout-master>
+          <volume-template sheets-in-volume-max="5"/>
+          <volume-transition range="sheet"/>
+          <sequence master="main">
+            <block>
+              <block>
+                ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿
+                ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿
+                ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿
+              </block>
+              <block>
+                ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
+                ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
+                ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
+              </block>
+              <block>
+                ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿
+                ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿
+                ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿
+                ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿
+                ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿
+              </block>
+              <block volume-keep-priority="1">⠤</block>
+            </block>
+          </sequence>
+        </obfl>
+      </x:document>
+    </x:expect>
+    <x:context label="pef">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="pef" type="custom" href="http://www.daisy.org/pipeline/modules/braille/pef-utils/library.xpl" step="x:pef-compare">
+      <x:document type="inline">
+        <pef xmlns="http://www.daisy.org/ns/2008/pef" version="2008-1">
+          <head>
+            <meta xmlns:dc="http://purl.org/dc/elements/1.1/">
+              <dc:format>application/x-pef+xml</dc:format>
+            </meta>
+          </head>
+          <body>
+            <volume cols="10" rows="5" rowgap="0" duplex="true">
+              <section>
+                <page>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                </page>
+                <page>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                </page>
+                <page>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                </page>
+                <page>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                </page>
+                <page>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠤⠤⠤⠤⠤</row>
+                </page>
+                <page>
+                  <row>⠤⠤⠤⠤⠤</row>
+                  <row>⠤⠤⠤⠤⠤</row>
+                  <row>⠤⠤⠤⠤⠤</row>
+                  <row>⠤⠤⠤⠤⠤</row>
+                  <row>⠤⠤⠤⠤⠤</row>
+                </page>
+                <page>
+                  <row>⠤⠤⠤⠤⠤</row>
+                  <row>⠤⠤⠤⠤⠤</row>
+                  <row>⠤⠤⠤⠤⠤</row>
+                  <row>⠤⠤⠤⠤⠤</row>
+                  <row>⠤⠤⠤⠤⠤</row>
+                </page>
+                <page>
+                  <row>⠤⠤⠤⠤⠤</row>
+                  <row>⠤⠤⠤⠤⠤</row>
+                  <row>⠤⠤⠤⠤⠤</row>
+                  <row>⠤⠤⠤⠤⠤</row>
+                  <row>⠤⠤⠤⠤⠤</row>
+                </page>
+                <page>
+                  <row>⠤⠤⠤⠤⠤</row>
+                  <row>⠤⠤⠤⠤⠤</row>
+                  <row>⠤⠤⠤⠤⠤</row>
+                  <row>⠤⠤⠤⠤⠤</row>
+                </page>
+              </section>
+            </volume>
+            <volume cols="10" rows="5" rowgap="0" duplex="true">
+              <section>
+                <page>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                </page>
+                <page>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                </page>
+                <page>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                </page>
+                <page>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                </page>
+                <page>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                </page>
+                <page>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                </page>
+                <page>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                </page>
+                <page>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠤</row>
                 </page>
               </section>
             </volume>
