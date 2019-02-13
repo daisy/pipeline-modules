@@ -36,6 +36,7 @@ import com.adobe.epubcheck.util.*;
 public class EpubCheckProvider implements XProcStepProvider {
 
 	private static HashMap<OPSType, String> modeMimeTypeMap;
+	private static Messages messages = Messages.getInstance();
 
 	static {
 		HashMap<OPSType, String> map = new HashMap<OPSType, String>();
@@ -131,7 +132,7 @@ public class EpubCheckProvider implements XProcStepProvider {
 					xmlReport.info(null, FeatureEnum.TOOL_DATE, toolDate);
 
 				if (mode != null) {
-					xmlReport.info(null, FeatureEnum.EXEC_MODE, String.format(Messages.get("single_file"), mode, epubVersion.toString(), EPUBProfile.DEFAULT));
+					xmlReport.info(null, FeatureEnum.EXEC_MODE, String.format(messages.get("single_file"), mode, epubVersion.toString(), EPUBProfile.DEFAULT));
 
 					if ("expanded".equals(mode) || "exp".equals(mode)) {
 						epub = new Archive(path, false);
@@ -156,9 +157,9 @@ public class EpubCheckProvider implements XProcStepProvider {
 					DocumentValidatorFactory factory = (DocumentValidatorFactory) documentValidatorFactoryMap.get(opsType);
 
 					if (factory == null) {
-						xmlReport.message(new Message(null, Severity.FATAL, Messages.get("mode_version_not_supported", mode, epubVersion), null), EPUBLocation.create(PathUtil.removeWorkingDirectory(path), 0, 0), mode, epubVersion);
+						xmlReport.message(new Message(null, Severity.FATAL, messages.get("mode_version_not_supported", mode, epubVersion), null), EPUBLocation.create(PathUtil.removeWorkingDirectory(path), 0, 0), mode, epubVersion);
 
-						throw new RuntimeException(Messages.get("mode_version_not_supported", mode, epubVersion));
+						throw new RuntimeException(messages.get("mode_version_not_supported", mode, epubVersion));
 					}
 					
 					ValidationContext validationContext = new ValidationContext.ValidationContextBuilder()
