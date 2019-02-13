@@ -140,6 +140,7 @@ public class ParseStylesheetDefinition extends ExtensionFunctionDefinition {
 					Style style = new Style();
 					for (RuleBlock<?> rule : new InlineStyle(arg.getStringValue(), styleCtxt)) {
 						if (rule instanceof RuleMainBlock)
+							// Note that the declarations have not been transformed by BrailleCSSDeclarationTransformer yet
 							style.add((List<Declaration>)rule);
 						else if (rule instanceof RuleRelativeBlock) {
 							String[] selector = serializeSelector((RuleRelativeBlock)rule);
@@ -289,7 +290,11 @@ public class ParseStylesheetDefinition extends ExtensionFunctionDefinition {
 					for (Declaration d : declarations) {
 						writeStartElement(w, CSS_PROPERTY);
 						writeAttribute(w, NAME, d.getProperty());
-						writeAttribute(w, VALUE, Strings.join(d, " ", serializeTerm));
+						if (d.getProperty().equals("string-set")) {
+							// FIXME: special handling of string-set because serializeTerm omits the commas
+							writeAttribute(w, VALUE, Strings.join(d, "", Object::toString));
+						} else
+							writeAttribute(w, VALUE, Strings.join(d, " ", serializeTerm));
 						w.writeEndElement();
 					}
 				}
