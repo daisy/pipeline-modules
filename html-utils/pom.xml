@@ -64,6 +64,18 @@
       <artifactId>modules-test-helper</artifactId>
       <scope>test</scope>
     </dependency>
+    <!-- FIXME: circular dependency -->
+    <dependency>
+      <groupId>org.daisy.pipeline.modules</groupId>
+      <artifactId>fileset-utils</artifactId>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.daisy.pipeline.modules</groupId>
+          <artifactId>html-utils</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
   </dependencies>
   
   <build>
