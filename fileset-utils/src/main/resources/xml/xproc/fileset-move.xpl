@@ -26,6 +26,7 @@
     <p:option name="new-base" required="true"/>
 
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/zip-utils/library.xpl"/>
 
     <p:label-elements match="/*/d:file" attribute="href-before-move" label="resolve-uri(@href, base-uri(.))"/>
     <p:xslt name="moved-fileset">
@@ -42,8 +43,26 @@
                 <p:try>
                     <p:group>
                         <px:info>
-                            <p:with-option name="href" select="$on-disk"/>
+                            <p:with-option name="href" select="replace($on-disk,'^([^!]+)(!/.+)?$','$1')"/>
                         </px:info>
+                        <p:choose>
+                            <p:when test="contains($on-disk,'!/')">
+                                <p:sink/>
+                                <px:unzip>
+                                    <p:with-option name="href" select="replace($on-disk,'^([^!]+)!/(.+)$','$1')"/>
+                                </px:unzip>
+                                <p:filter>
+                                    <p:with-option name="select"
+                                                   select="concat(
+                                                             '/c:zipfile/c:file[@name=&quot;',
+                                                             replace($on-disk,'^([^!]+)!/(.+)$','$2'),
+                                                             '&quot;]')"/>
+                                </p:filter>
+                            </p:when>
+                            <p:otherwise>
+                                <p:identity/>
+                            </p:otherwise>
+                        </p:choose>
                         <p:count/>
                     </p:group>
                     <p:catch>
