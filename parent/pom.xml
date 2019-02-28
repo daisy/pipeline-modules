@@ -45,7 +45,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.build</groupId>
         <artifactId>modules-test-helper</artifactId>
-        <version>1.0.4-SNAPSHOT</version>
+        <version>1.0.4</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
