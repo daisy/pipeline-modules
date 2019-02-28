@@ -12,7 +12,7 @@
 
   <groupId>org.daisy.pipeline.modules</groupId>
   <artifactId>script-utils-aggregator</artifactId>
-  <version>1.12.0</version>
+  <version>1.12.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>DAISY Pipeline 2 :: Aggregator POM for the Script Utility Modules</name>
@@ -23,19 +23,19 @@
     <module>bom</module>
     <module>parent</module>
     <module>asciimath-utils</module>
-    <!--<module>common-entities</module>-->
-    <!--<module>css-utils</module>-->
-    <!--<module>daisy202-utils</module>-->
-    <!--<module>daisy3-utils</module>-->
-    <!--<module>dtbook-utils</module>-->
-    <!--<module>epub3-nav-utils</module>-->
-    <!--<module>epub3-ocf-utils</module>-->
-    <!--<module>epub3-pub-utils</module>-->
+    <module>common-entities</module>
+    <module>css-utils</module>
+    <module>daisy202-utils</module>
+    <module>daisy3-utils</module>
+    <module>dtbook-utils</module>
+    <module>epub3-nav-utils</module>
+    <module>epub3-ocf-utils</module>
+    <module>epub3-pub-utils</module>
     <module>epubcheck-adapter</module>
-    <!--<module>mediaoverlay-utils</module>-->
-    <!--<module>metadata-utils</module>-->
-    <!--<module>odt-utils</module>-->
-    <!--<module>zedai-utils</module>-->
+    <module>mediaoverlay-utils</module>
+    <module>metadata-utils</module>
+    <module>odt-utils</module>
+    <module>zedai-utils</module>
   </modules>
   
   <!-- don't publish aggregator -->
@@ -57,8 +57,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <scm>
-    <tag>v1.12.0</tag>
-  </scm>
 </project>
