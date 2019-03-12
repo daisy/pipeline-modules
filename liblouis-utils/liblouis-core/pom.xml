@@ -93,7 +93,7 @@
     <dependency>
       <groupId>org.ops4j.pax.exam</groupId>
       <artifactId>pax-exam-container-forked</artifactId>
-      <version>3.3.0</version>
+      <version>4.12.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -150,6 +150,13 @@
         <groupId>org.daisy.pipeline.build</groupId>
         <artifactId>modules-build-helper</artifactId>
         <executions>
+          <execution>
+            <id>process-test-catalog</id>
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>process-test-catalog</goal>
+            </goals>
+          </execution>
           <execution>
             <id>package-list</id>
             <phase>prepare-package</phase>

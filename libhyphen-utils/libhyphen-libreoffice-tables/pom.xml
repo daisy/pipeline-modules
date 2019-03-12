@@ -17,15 +17,38 @@
   <name>DP2 Braille Modules :: libhyphen-utils :: libhyphen-libreoffice-tables</name>
   
   <dependencies>
-    <!--
-        runtime dependencies
-    -->
     <dependency>
       <groupId>org.daisy.pipeline.modules.braille</groupId>
       <artifactId>libhyphen-core</artifactId>
-      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
+  
+  <properties>
+    <expose-services>
+      org.daisy.pipeline.braille.libhyphen.impl.LibHyphenTablePath
+    </expose-services>
+  </properties>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Private-Package>
+              org.daisy.pipeline.braille.libhyphen.impl;-split-package:=first
+            </Private-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
   
   <profiles>
     <profile>

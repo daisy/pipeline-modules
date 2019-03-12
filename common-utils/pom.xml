@@ -19,6 +19,14 @@
   <dependencies>
     <dependency>
       <groupId>org.daisy.pipeline</groupId>
+      <artifactId>modules-registry</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.daisy.pipeline</groupId>
+      <artifactId>xmlcatalog</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.daisy.pipeline</groupId>
       <artifactId>common-utils</artifactId>
     </dependency>
     <dependency>
@@ -80,6 +88,8 @@
   
   <properties>
     <expose-services>
+      org.daisy.pipeline.modules.impl.Module_common_utils,
+      org.daisy.pipeline.datatypes.impl.Datatype_transform_query,
       org.daisy.pipeline.braille.common.saxon.impl.TextTransformDefinition,
       org.daisy.pipeline.braille.common.saxon.impl.MessageDefinition,
       org.daisy.pipeline.braille.common.saxon.impl.ProgressDefinition,
@@ -111,6 +121,8 @@
               *
             </Import-Package>
             <Private-Package>
+              org.daisy.pipeline.modules.impl;-split-package:=first,
+              org.daisy.pipeline.datatypes.impl;-split-package:=first,
               org.daisy.pipeline.braille.common.calabash.impl,
               org.daisy.pipeline.braille.common.saxon.impl
             </Private-Package>

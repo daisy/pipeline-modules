@@ -85,7 +85,8 @@ public class LiblouisCoreTest extends AbstractTest {
 	
 	@ProbeBuilder
 	public TestProbeBuilder probeConfiguration(TestProbeBuilder probe) {
-		probe.setHeader("Import-Package", "org.daisy.pipeline.braille.liblouis");
+		probe.setHeader("Bundle-Name", "test-module");
+		// FIXME: can not delete this yet because it can not be generated with maven-bundle-plugin
 		probe.setHeader("Service-Component", "OSGI-INF/table_paths.xml");
 		return probe;
 	}

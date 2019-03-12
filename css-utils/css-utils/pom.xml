@@ -18,6 +18,14 @@
   
   <dependencies>
     <dependency>
+      <groupId>org.daisy.pipeline</groupId>
+      <artifactId>modules-registry</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.daisy.pipeline</groupId>
+      <artifactId>xmlcatalog</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.daisy.pipeline.modules.braille</groupId>
       <artifactId>css-core</artifactId>
     </dependency>
@@ -99,6 +107,7 @@
 
   <properties>
     <expose-services>
+      org.daisy.pipeline.modules.impl.Module_css_utils,
       org.daisy.pipeline.braille.css.calabash.impl.CssInlineStep$Provider,
       org.daisy.pipeline.braille.css.calabash.impl.CssShiftStringSetStep$Provider,
       org.daisy.pipeline.braille.css.calabash.impl.CssSplitStep$Provider,
@@ -109,6 +118,19 @@
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.daisy.pipeline.build</groupId>
+        <artifactId>modules-build-helper</artifactId>
+        <executions>
+          <execution>
+            <id>process-test-catalog</id>
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>process-test-catalog</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.ops4j.pax.exam</groupId>
         <artifactId>maven-paxexam-plugin</artifactId>
@@ -131,6 +153,7 @@
               *
             </Import-Package>
             <Private-Package>
+              org.daisy.pipeline.modules.impl;-split-package:=first,
               org.daisy.pipeline.braille.css.calabash.impl,
               org.daisy.pipeline.braille.css.saxon.impl
             </Private-Package>
