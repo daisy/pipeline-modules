@@ -56,6 +56,7 @@ import org.daisy.braille.css.InlineStyle.RuleMainBlock;
 import org.daisy.braille.css.InlineStyle.RuleRelativeBlock;
 import org.daisy.braille.css.InlineStyle.RuleRelativePage;
 import org.daisy.braille.css.InlineStyle.RuleRelativeVolume;
+import org.daisy.braille.css.PropertyValue;
 import org.daisy.braille.css.RuleTextTransform;
 import org.daisy.braille.css.RuleVolume;
 import org.daisy.braille.css.RuleVolumeArea;
@@ -292,10 +293,13 @@ public class ParseStylesheetDefinition extends ExtensionFunctionDefinition {
 					for (Declaration d : declarations) {
 						writeStartElement(w, CSS_PROPERTY);
 						writeAttribute(w, NAME, d.getProperty());
-						if (d.getProperty().equals("string-set")) {
-							// FIXME: special handling of string-set because serializeTerm omits the commas
-							writeAttribute(w, VALUE, Strings.join(d, "", Object::toString));
-						} else
+						if (d.getProperty().equals("string-set")
+						    || d.getProperty().equals("render-table-by"))
+							// Special handling of string-set and render-table-by because
+							// serializeTerm would otherwise omit the commas. PropertyValue.parse()
+							// transforms the declaration with BrailleCSSDeclarationTransformer.
+							writeAttribute(w, VALUE, serializeTerm.apply(PropertyValue.parse(d).getValue()));
+						else
 							writeAttribute(w, VALUE, Strings.join(d, " ", serializeTerm));
 						w.writeEndElement();
 					}
