@@ -136,11 +136,11 @@
 	
 	<x:scenario label="test_11">
 		<x:call function="css:parse-string-set">
-			<x:param select="'print-page &quot;page &quot; attr(num), running-header &quot;foo&quot;'"/>
+			<x:param select="'print-page &quot;page &quot; attr(num), running-header &quot;''foo''&quot;'"/>
 		</x:call>
 		<x:expect label="result">
 			<css:string-set name="print-page" value="&quot;page &quot; attr(num)"/>
-			<css:string-set name="running-header" value="&quot;foo&quot;"/>
+			<css:string-set name="running-header" value="&quot;'foo'&quot;"/>
 		</x:expect>
 	</x:scenario>
 	
@@ -570,11 +570,11 @@
 	
 	<x:scenario label="test_37">
 		<x:call function="css:deep-parse-stylesheet">
-			<x:param select="'string-set: print-page content(), foo &quot;bar&quot;;'"/>
+			<x:param select="'string-set: print-page content(), foo &quot;''bar''&quot;;'"/>
 		</x:call>
 		<x:expect label="result">
 			<css:rule>
-				<css:property name="string-set" value="print-page content(), foo 'bar'"/>
+				<css:property name="string-set" value="print-page content(), foo '\27bar\27'"/>
 			</css:rule>
 		</x:expect>
 	</x:scenario>

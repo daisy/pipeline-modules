@@ -698,7 +698,7 @@ public class CssInlineStep extends DefaultStep {
 				return "" + pair.getKey() + " " + (val instanceof Term ? termToString.apply((Term)val) : val.toString()); }
 			else if (term instanceof TermString) {
 				TermString string = (TermString)term;
-				return "'" + string.getValue().replaceAll("\n", "\\\\A") + "'"; }
+				return "'" + string.getValue().replaceAll("\n", "\\\\A").replaceAll("'", "\\\\27") + "'"; }
 			else
 				return term.toString().replaceAll("^[,/ ]+", "");
 		}
