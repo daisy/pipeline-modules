@@ -88,22 +88,28 @@
                     <xsl:sequence select="obfl:not(obfl:or($stylesheets[position()&lt;$i or @selector[not(.='@volume')]]
                                                                        /obfl:volume-stylesheets-use-when(.)))"/>
                 </xsl:when>
+                <xsl:when test="@selector='&amp;:only'">
+                    <xsl:sequence select="'(= $volumes 1)'"/>
+                </xsl:when>
                 <xsl:when test="@selector='&amp;:first'">
                     <xsl:sequence select="obfl:and((
                                             '(= $volume 1)',
-                                            obfl:not(obfl:or($stylesheets[position()&lt;$i and @selector[not(.='@volume')]]
+                                            obfl:not(obfl:or($stylesheets[(position()&lt;$i and @selector[not(.='@volume')])
+                                                                          or @selector[.='&amp;:only']]
                                                                          /obfl:volume-stylesheets-use-when(.)))))"/>
                 </xsl:when>
                 <xsl:when test="@selector='&amp;:last'">
                     <xsl:sequence select="obfl:and((
                                             '(= $volume $volumes)',
-                                            obfl:not(obfl:or($stylesheets[position()&lt;$i and @selector[not(.='@volume')]]
+                                            obfl:not(obfl:or($stylesheets[(position()&lt;$i and @selector[not(.='@volume')])
+                                                                          or @selector[.='&amp;:only']]
                                                                          /obfl:volume-stylesheets-use-when(.)))))"/>
                 </xsl:when>
                 <xsl:when test="matches(@selector,'^&amp;:nth\([1-9][0-9]*\)$')">
                     <xsl:sequence select="obfl:and((
                                             concat('(= $volume ',substring(@selector,7)),
-                                            obfl:not(obfl:or($stylesheets[position()&lt;$i and @selector[not(.='@volume')]]
+                                            obfl:not(obfl:or($stylesheets[(position()&lt;$i and @selector[not(.='@volume')])
+                                                                          or @selector[.='&amp;:only']]
                                                                          /obfl:volume-stylesheets-use-when(.)))))"/>
                 </xsl:when>
                 <xsl:otherwise>

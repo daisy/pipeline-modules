@@ -406,7 +406,8 @@
 			                  &amp;::before { content: &quot;x&quot; }
 			                  &amp;::before::after { content: &quot;x&quot; }
 			                  @page { size: 40 25 @top-right { content: &quot;x&quot; }}
-			                  @volume { @begin { content: flow(titlepage); @page { size: 15 5; } @page:left { size: 15 5; @top-right { content: none; }}}}'"/>
+			                  @volume { @begin { content: flow(titlepage); @page { size: 15 5; } @page:left { size: 15 5; @top-right { content: none; }}}}
+			                  @volume:only { @begin { content: &quot;single volume&quot;; }}'"/>
 		</x:call>
 		<x:expect label="result">
 			<css:rule>
@@ -437,6 +438,11 @@
 								<css:property name="content" value="none"/>
 							</css:rule>
 						</css:rule>
+					</css:rule>
+				</css:rule>
+				<css:rule selector="&amp;:only">
+					<css:rule selector="@begin">
+						<css:property name="content" value="'single volume'"/>
 					</css:rule>
 				</css:rule>
 			</css:rule>
