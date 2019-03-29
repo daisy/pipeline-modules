@@ -170,9 +170,10 @@
 				<css:rule selector="@volume" style="min-length: 20; max-length: 100; &amp;:nth(2) {{ max-length: 50; }}"/>
 				<css:rule selector="&amp;::before" style="content: &quot;foo&quot; &amp;::after {{ content: &quot;foo&quot; }}"/>
 				<css:rule selector="&amp;::table-by(foo)" style="&amp;::list-item::after {{ content: &quot;, &quot; }} &amp;::list-item:last-child::after {{ content: none }}"/>
+				<css:rule selector="@-obfl-volume-transition" style="@any-interrupted {{ content: -obfl-evaluate('$volume'); }}"/>
 			</x:param>
 		</x:call>
-		<x:expect label="result" select="'display:block @page { size: 40 25 @bottom-center { content: ''foo'' } } @page:left { @bottom-left { content: counter(page) } } @volume { min-length: 20; max-length: 100 } @volume:nth(2) { max-length: 50 } &amp;::before { content: ''foo'' } &amp;::before::after { content: ''foo'' } &amp;::table-by(foo)::list-item::after { content: '', '' } &amp;::table-by(foo)::list-item:last-child::after { content: none }'"/>
+		<x:expect label="result" select="'display:block @page { size: 40 25 @bottom-center { content: ''foo'' } } @page:left { @bottom-left { content: counter(page) } } @volume { min-length: 20; max-length: 100 } @volume:nth(2) { max-length: 50 } @-obfl-volume-transition { @any-interrupted { content: -obfl-evaluate(''$volume'') } } &amp;::before { content: ''foo'' } &amp;::before::after { content: ''foo'' } &amp;::table-by(foo)::list-item::after { content: '', '' } &amp;::table-by(foo)::list-item:last-child::after { content: none }'"/>
 	</x:scenario>
 	
 	<x:scenario label="test_15">

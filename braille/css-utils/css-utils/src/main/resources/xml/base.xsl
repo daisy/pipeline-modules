@@ -349,7 +349,9 @@
                                           then QName('','page')
                                           else if ($stylesheet/parent::*/ancestor-or-self::css:rule[@selector='@volume'])
                                             then QName('','volume')
-                                            else ())"/>
+                                            else if ($stylesheet/parent::*/ancestor-or-self::css:rule[matches(@selector,'^@-')])
+                                              then QName('','vendor-rule')
+                                              else ())"/>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:sequence select="css:parse-stylesheet($stylesheet, true())"/>

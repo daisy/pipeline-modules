@@ -89,6 +89,7 @@ public class ParseStylesheetDefinition extends ExtensionFunctionDefinition {
 	private static final QName VALUE = new QName("value");
 	private static final QName PAGE = new QName("page");
 	private static final QName VOLUME = new QName("volume");
+	private static final QName VENDOR_RULE = new QName("vendor-rule");
 	
 	public StructuredQName getFunctionQName() {
 		return funcname;
@@ -136,6 +137,8 @@ public class ParseStylesheetDefinition extends ExtensionFunctionDefinition {
 								styleCtxt = Context.PAGE;
 							else if (qn.equals(VOLUME))
 								styleCtxt = Context.VOLUME;
+							else if (qn.equals(VENDOR_RULE))
+								styleCtxt = Context.VENDOR_RULE;
 							else
 								throw new RuntimeException(); }}}
 				List<NodeInfo> result = new ArrayList<>();
