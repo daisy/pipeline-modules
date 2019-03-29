@@ -681,7 +681,7 @@ public class CssInlineStep extends DefaultStep {
 					return "" + value.intValue() + "%";
 				else
 					return "" + value + "%"; }
-			else if (term instanceof TermList && !(term instanceof TermFunction)) {
+			else if (term instanceof TermList) {
 				TermList list = (TermList)term;
 				String s = "";
 				for (Term<?> t : list) {
@@ -693,6 +693,9 @@ public class CssInlineStep extends DefaultStep {
 								s += ","; }
 						s += " "; }
 					s += termToString.apply(t); }
+				if (list instanceof TermFunction) {
+					TermFunction function = (TermFunction)term;
+					s = function.getFunctionName() + "(" + s + ")"; }
 				return s; }
 			else if (term instanceof TermPair) {
 				TermPair<?,?> pair = (TermPair<?,?>)term;

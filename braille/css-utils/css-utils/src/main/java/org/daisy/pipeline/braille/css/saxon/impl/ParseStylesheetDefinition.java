@@ -522,7 +522,7 @@ public class ParseStylesheetDefinition extends ExtensionFunctionDefinition {
 					return "" + value.intValue() + "%";
 				else
 					return "" + value + "%"; }
-			else if (term instanceof TermList && !(term instanceof TermFunction)) {
+			else if (term instanceof TermList) {
 				TermList list = (TermList)term;
 				String s = "";
 				for (Term<?> t : list) {
@@ -534,6 +534,9 @@ public class ParseStylesheetDefinition extends ExtensionFunctionDefinition {
 								s += ","; }
 						s += " "; }
 					s += serializeTerm.apply(t); }
+				if (list instanceof TermFunction) {
+					TermFunction function = (TermFunction)term;
+					s = function.getFunctionName() + "(" + s + ")"; }
 				return s; }
 			else if (term instanceof TermPair) {
 				TermPair<?,?> pair = (TermPair<?,?>)term;
