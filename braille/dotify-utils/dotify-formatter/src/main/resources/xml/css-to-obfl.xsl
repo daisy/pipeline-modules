@@ -2033,15 +2033,19 @@
             <xsl:if test="$hyphens='none'">
                 <xsl:sequence select="concat('hyphens: ',$hyphens)"/>
             </xsl:if>
+            <xsl:if test="@css:white-space[not(.='normal')]">
+                <xsl:sequence select="concat('white-space: ',@css:white-space)"/>
+            </xsl:if>
         </xsl:variable>
+        <xsl:variable name="expression" as="xs:string" select="css:parse-string(@arg1)/@value"/>
         <xsl:choose>
             <xsl:when test="exists($style)">
                 <style name="{string-join($style,'; ')}">
-                    <evaluate expression="{substring(@arg1,2,string-length(@arg1)-2)}"/>
+                    <evaluate expression="{$expression}"/>
                 </style>
             </xsl:when>
             <xsl:otherwise>
-                <evaluate expression="{substring(@arg1,2,string-length(@arg1)-2)}"/>
+                <evaluate expression="{$expression}"/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
