@@ -12990,13 +12990,13 @@
                        @page { size: 10 5 }
                        @volume { max-length: 3 }
                        @-obfl-volume-transition {
-                         @sequence-interrupted {
-                           content: '⠒ ⠒ ⠒ ⠒ ⠒' }}">
+                         @any-interrupted {
+                           content: '⠒⠒⠒ ' -obfl-evaluate('(round $volume)') ' ⠒⠒⠒'; }
+                         @any-resumed {
+                           content: '⠒⠒⠒ ' -obfl-evaluate('(round $volume)') ' ⠒⠒⠒'; }}">
             <p style="display: block">
               ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿
               ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿
-            </p>
-            <p style="display: block">
               ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿
               ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿
             </p>
@@ -13018,16 +13018,21 @@
           </layout-master>
           <volume-template sheets-in-volume-max="3"/>
           <volume-transition range="sheet">
-            <sequence-interrupted>
-              <block>⠒ ⠒ ⠒ ⠒ ⠒</block>
-            </sequence-interrupted>
+            <any-interrupted>
+              <block>
+                ⠒⠒⠒ <evaluate expression="(round $volume)"/> ⠒⠒⠒
+              </block>
+            </any-interrupted>
+            <any-resumed>
+              <block>
+                ⠒⠒⠒ <evaluate expression="(round $volume)"/> ⠒⠒⠒
+              </block>
+            </any-resumed>
           </volume-transition>
           <sequence master="main">
             <block>
               ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿
               ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿
-            </block>
-            <block>
               ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿
               ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿
             </block>
@@ -13072,21 +13077,17 @@
                 </page>
                 <page>
                   <row>⠿⠿⠿⠿⠿</row>
-                  <row>⠒⠀⠒⠀⠒⠀⠒⠀⠒</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠒⠒⠒⠀⠼⠁⠀⠒⠒⠒</row>
                 </page>
               </section>
             </volume>
             <volume cols="10" rows="5" rowgap="0" duplex="true">
               <section>
                 <page>
-                  <row>⠿⠿⠿⠿⠿</row>
-                  <row>⠿⠿⠿⠿⠿</row>
-                  <row>⠿⠿⠿⠿⠿</row>
-                  <row>⠿⠿⠿⠿⠿</row>
-                  <row>⠿⠿⠿⠿⠿</row>
-                </page>
-                <page>
-                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠒⠒⠒⠀⠼⠃⠀⠒⠒⠒</row>
                   <row>⠿⠿⠿⠿⠿</row>
                   <row>⠿⠿⠿⠿⠿</row>
                   <row>⠿⠿⠿⠿⠿</row>
@@ -13100,6 +13101,9 @@
                   <row>⠿⠿⠿⠿⠿</row>
                 </page>
                 <page>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
                   <row>⠿⠿⠿⠿⠿</row>
                 </page>
               </section>
