@@ -544,7 +544,7 @@ public class ParseStylesheetDefinition extends ExtensionFunctionDefinition {
 				return "" + pair.getKey() + " " + (val instanceof Term ? serializeTerm.apply((Term)val) : val.toString()); }
 			else if (term instanceof TermString) {
 				TermString string = (TermString)term;
-				return "'" + string.getValue().replaceAll("\n", "\\\\A").replaceAll("'", "\\\\27") + "'"; }
+				return "'" + string.getValue().replaceAll("\n", "\\\\A ").replaceAll("'", "\\\\27 ") + "'"; }
 			else
 				return term.toString().replaceAll("^[,/ ]+", "");
 		}

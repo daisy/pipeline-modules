@@ -374,9 +374,9 @@
         <xsl:if test="matches($string,re:exact($css:STRING_RE))">
             <css:string value="{replace(replace(replace(
                                   substring($string, 2, string-length($string)-2),
-                                  '\\A','&#xA;'),
-                                  '\\27',''''),
-                                  '\\22','&quot;')}"/>
+                                  '\\A\s?','&#xA;'),
+                                  '\\27\s?',''''),
+                                  '\\22\s?','&quot;')}"/>
         </xsl:if>
     </xsl:function>
     
@@ -894,8 +894,8 @@
         <xsl:sequence select="concat('&quot;',
                                      replace(replace(
                                        @value,
-                                       '\n','\\A'),
-                                       '&quot;','\\22'),
+                                       '\n','\\A '),
+                                       '&quot;','\\22 '),
                                      '&quot;')"/>
     </xsl:template>
     

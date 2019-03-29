@@ -65,7 +65,7 @@
       <doc style="@text-transform  foo  {{ system: foo; x: &quot;'y'&quot; }} @text-transform  bar  {{ system: bar }} "/>
     </x:context>
     <x:expect label="result">
-      <doc css:text-transform-foo="system: foo; x: '\27y\27';"
+      <doc css:text-transform-foo="system: foo; x: '\27 y\27 ';"
            css:text-transform-bar="system: bar;"/>
     </x:expect>
   </x:scenario>
