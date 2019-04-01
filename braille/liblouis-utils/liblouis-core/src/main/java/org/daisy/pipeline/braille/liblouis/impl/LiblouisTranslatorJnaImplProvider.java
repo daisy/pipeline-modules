@@ -952,7 +952,8 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 							preserveLines[i] = preserveSpace[i] = true;
 						else if (val == WhiteSpace.PRE_LINE)
 							preserveLines[i] = true;
-						style.removeProperty("white-space"); }
+						// don't remove "white-space" property because it has not been fully handled
+					}
 					val = style.getProperty("text-transform");
 					if (val != null) {
 						if (val == TextTransform.NONE) {
