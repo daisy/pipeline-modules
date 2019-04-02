@@ -91,12 +91,12 @@
             </block>
           </sequence>
           <sequence master="b">
-            <block>
+            <block break-before="sheet">
               ⠤⠤⠤
             </block>
           </sequence>
           <sequence master="a">
-            <block>
+            <block break-before="sheet">
               ⠤⠤⠤
             </block>
           </sequence>
@@ -383,7 +383,7 @@
               <marker class="print-page/entry" value="⠤"/>
               <marker class="running-footer/entry" value="⠤⠤"/>
             </block>
-            <block>
+            <block break-before="sheet">
               ⠤⠤⠤
             </block>
           </sequence>
@@ -511,17 +511,17 @@
             </block>
           </sequence>
           <sequence master="b">
-            <block>
+            <block break-before="sheet">
               ⠤⠤⠤
             </block>
           </sequence>
           <sequence master="a">
-            <block>
+            <block break-before="sheet">
               ⠤⠤⠤
             </block>
           </sequence>
           <sequence master="a" initial-page-number="11">
-            <block>
+            <block break-before="page">
               ⠤⠤⠤
             </block>
             <block break-before="page">
@@ -529,7 +529,7 @@
             </block>
           </sequence>
           <sequence master="c">
-            <block>
+            <block break-before="sheet">
               ⠤⠤⠤
             </block>
           </sequence>
@@ -688,12 +688,12 @@
             </block>
           </sequence>
           <sequence master="body">
-            <block>
+            <block break-before="sheet">
               ⠤⠤⠤
             </block>
           </sequence>
           <sequence master="rear" initial-page-number="1">
-            <block>
+            <block break-before="sheet">
               ⠤⠤⠤
             </block>
           </sequence>
@@ -873,7 +873,7 @@
             </default-template>
           </layout-master>
           <sequence master="body">
-            <block>
+            <block break-before="sheet">
               <block>
                 ⠤⠤⠤⠤⠤⠤⠤⠤⠤
                 ⠤⠤⠤⠤⠤⠤⠤⠤⠤
@@ -1147,7 +1147,7 @@
             </default-template>
           </layout-master>
           <sequence master="body">
-            <block>
+            <block break-before="sheet">
               <block>
                 ⠿⠿⠿⠿⠿⠿⠿⠿⠿
                 ⠿⠿⠿⠿⠿⠿⠿⠿⠿
@@ -6817,7 +6817,7 @@
             </default-template>
           </layout-master>
           <sequence master="main">
-            <block>
+            <block break-before="page">
               <block>
                 ⠤⠤⠤
               </block>
@@ -7999,7 +7999,7 @@
             <pre-content>
               <toc-sequence master="main" range="document" toc="toc">
                 <on-toc-start>
-                  <block translate="">
+                  <block break-before="page" translate="">
                     <block>⠿⠿⠿ 0</block>
                   </block>
                   <block break-before="page"/>
@@ -8008,7 +8008,7 @@
             </pre-content>
           </volume-template>
           <sequence master="main">
-            <block translate="">
+            <block translate="" break-before="page">
               <block><span id="a"/>⠿⠿⠿ 1</block>
               <block>⠤⠤⠤</block>
             </block>
@@ -9390,7 +9390,7 @@
                 </block>
               </sequence>
               <sequence master="toc">
-                <block>
+                <block break-before="sheet">
                   <block> ⠤⠤⠤⠤⠤ </block>
                 </block>
               </sequence>
@@ -10291,7 +10291,7 @@
           <volume-template sheets-in-volume-max="3"/>
           <volume-transition range="sheet"/>
           <sequence master="main">
-            <block volume-keep-priority="1">
+            <block volume-keep-priority="1" break-before="sheet">
               ⠿⠿⠿⠿⠿ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
               ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
             </block>
@@ -11837,12 +11837,12 @@
             </block>
           </sequence>
           <sequence master="b" page-number-counter="page2">
-            <block>
+            <block break-before="sheet">
               ⠤⠤⠤
             </block>
           </sequence>
           <sequence master="a">
-            <block>
+            <block break-before="sheet">
               ⠤⠤⠤
             </block>
           </sequence>
@@ -12755,12 +12755,12 @@
             </block>
           </sequence>
           <sequence master="main" break-before="volume">
-            <block>
+            <block break-before="sheet">
               <block> ⠿⠿⠿⠿⠿ </block>
             </block>
           </sequence>
           <sequence master="last" break-before="volume">
-            <block>
+            <block break-before="sheet">
               <block> ⠿⠿⠿⠿⠿ </block>
             </block>
           </sequence>
