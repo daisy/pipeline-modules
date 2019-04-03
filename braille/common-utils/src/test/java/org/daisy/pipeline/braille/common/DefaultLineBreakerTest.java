@@ -84,9 +84,11 @@ public class DefaultLineBreakerTest {
 		TestHyphenator hyphenator = new TestHyphenator();
 		TestTranslator translator = new TestTranslator(hyphenator);
 		assertEquals(
+			" \n" +
 			"ABC\n" +
+			" \n" +
 			"DEF",
-			fillLines(translator.lineBreakingFromStyledText().transform(text("abc\u2028def")), 10));
+			fillLines(translator.lineBreakingFromStyledText().transform(text("\u2028abc\u2028\u2028def")), 10));
 	}
 	
 	@Test
