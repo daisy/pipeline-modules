@@ -150,7 +150,7 @@ public class OBFLToPEFStep extends DefaultStep {
 			result.write(runtime.getProcessor().newDocumentBuilder().build(new StreamSource(pefStream)));
 			pefStream.close(); }
 			
-		catch (Exception e) {
+		catch (Throwable e) {
 			logger.error("dotify:obfl-to-pef failed", e);
 			throw new XProcException(step.getNode(), e); }
 	}
