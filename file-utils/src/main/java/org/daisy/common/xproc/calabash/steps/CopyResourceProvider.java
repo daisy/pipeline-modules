@@ -92,6 +92,7 @@ public class CopyResourceProvider implements XProcStepProvider {
 
 			boolean failOnError = getOption(_fail_on_error, true);
 
+			// Note that href.getBaseURI() always returns the absolute path of copy-resource.xpl
 			RuntimeValue href = getOption(_href);
 			URI sourceUri= href.getBaseURI().resolve(href.getString());
 
