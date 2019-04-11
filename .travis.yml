@@ -11,6 +11,8 @@ before_install:
   - sudo apt-get install -y lame espeak
 
 install: mvn install -DskipTests=true -Dinvoker.skip=true -Dmaven.javadoc.skip=true -B -V
+                     -Dorg.slf4j.simpleLogger.log.com.xmlcalabash.core.XProcRuntime=warn
+                     -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 
 matrix:
   include:
@@ -22,14 +24,18 @@ matrix:
 # main task, run the verify goal
 script:
   - for d in $SUBDIRS; do
-      mvn -f $d -B verify;
+      mvn -f $d -B verify
+          -Dorg.slf4j.simpleLogger.log.com.xmlcalabash.core.XProcRuntime=warn
+          -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn;
     done
 
 # if the build succeeds, deploy the artifact (tests are skipped)
 after_success:
   - if [ "$TRAVIS_BRANCH" == "master" ] || [[ "$TRAVIS_BRANCH" == super/* ]] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
       for d in $SUBDIRS; do
-        mvn -f $d deploy -B -DskipTests -Dinvoker.skip=true;
+        mvn -f $d deploy -B -DskipTests -Dinvoker.skip=true
+            -Dorg.slf4j.simpleLogger.log.com.xmlcalabash.core.XProcRuntime=warn
+            -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn;
       done;
     else
       echo "Skipping Maven deploy.";
