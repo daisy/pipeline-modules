@@ -89,8 +89,7 @@
             </Private-Package>
             <Require-Capability>
               xproc.step;filter:="(name={http://code.google.com/p/dotify/}obfl-to-pef)",
-              xproc.step;filter:="(name={http://code.google.com/p/dotify/}file-to-obfl)",
-              xpath.function;filter:="(name={http://code.google.com/p/dotify/}translate)"
+              xproc.step;filter:="(name={http://code.google.com/p/dotify/}file-to-obfl)"
             </Require-Capability>
           </instructions>
         </configuration>
