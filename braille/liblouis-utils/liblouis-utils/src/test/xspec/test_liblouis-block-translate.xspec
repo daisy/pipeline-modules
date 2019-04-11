@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <x:description xmlns:x="http://www.jenitennison.com/xslt/xspec"
-               stylesheet="../../main/resources/xml/transform/liblouis-block-translate.xsl">
+               stylesheet="http://www.daisy.org/pipeline/modules/braille/css-utils/transform/block-translator-from-text-transform.xsl">
   
   <x:param name="text-transform" select="'(locale:en-US)(grade:2)'"/>
   <x:param name="main-locale" select="'en'"/>
