@@ -147,11 +147,19 @@ public class ParseStylesheetDefinition extends ExtensionFunctionDefinition {
 							style.add((List<Declaration>)rule);
 						else if (rule instanceof RuleRelativeBlock) {
 							String[] selector = serializeSelector((RuleRelativeBlock)rule);
-							List<Declaration> decls = (List<Declaration>)rule;
+							Style decls = new Style(); {
+								for (Rule<?> r : (RuleRelativeBlock)rule)
+									if (r instanceof Declaration)
+										decls.add((Declaration)r);
+									else if (r instanceof RulePage)
+										decls.add("@page", Style.of((RulePage)r));
+									else
+										throw new RuntimeException("coding error");
+							}
 							style.add(selector[0],
 							          selector.length == 2
-							              ? new Style().add(selector[1], new Style().add(decls))
-							              : new Style().add(decls)); }
+							              ? new Style().add(selector[1], decls)
+							              : decls); }
 						else if (rule instanceof RulePage)
 							style.add("@page", Style.of((RulePage)rule));
 						else if (rule instanceof RuleVolume)
@@ -199,7 +207,7 @@ public class ParseStylesheetDefinition extends ExtensionFunctionDefinition {
 		};
 	}
 	
-	private static class Style implements Comparator<String> {
+	static class Style implements Comparator<String> {
 		
 		List<Declaration> declarations;
 		SortedMap<String,Style> nestedStyles; // sorted by key

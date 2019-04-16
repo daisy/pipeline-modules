@@ -405,6 +405,7 @@
 			<x:param select="'display:block
 			                  &amp;::before { content: &quot;x&quot; }
 			                  &amp;::before::after { content: &quot;x&quot; }
+			                  &amp;::after { @page { size: 10 10 }}
 			                  @page { size: 40 25 @top-right { content: &quot;x&quot; }}
 			                  @volume { @begin { content: flow(titlepage); @page { size: 15 5; } @page:left { size: 15 5; @top-right { content: none; }}}}
 			                  @volume:only { @begin { content: &quot;single volume&quot;; }}'"/>
@@ -444,6 +445,11 @@
 					<css:rule selector="@begin">
 						<css:property name="content" value="'single volume'"/>
 					</css:rule>
+				</css:rule>
+			</css:rule>
+			<css:rule selector="&amp;::after">
+				<css:rule selector="@page">
+					<css:property name="size" value="10 10"/>
 				</css:rule>
 			</css:rule>
 			<css:rule selector="&amp;::before">
