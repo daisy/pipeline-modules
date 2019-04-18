@@ -34,6 +34,10 @@
     <dependency>
       <groupId>net.java.dev.jna</groupId>
       <artifactId>jna</artifactId>
+      <!--
+          does not work with version declared in framework (5.2.0)
+      -->
+      <version>4.0.0</version>
     </dependency>
     <dependency>
       <groupId>org.daisy.libs</groupId>
@@ -56,12 +60,13 @@
           <instructions>
             <Import-Package>
               net.sf.saxon.*;version="${saxon.versionRange}",
+              com.sun.jna.*;version="[4.0.0,4.0.1)",
               !org.daisy.common.spi,
               *
             </Import-Package>
             <Export-Package/>
             <Private-Package>
-              org.daisy.pipeline.tts.acapella,
+              org.daisy.pipeline.tts.acapela,
               ${generated-packages}
               {local-packages}
             </Private-Package>
