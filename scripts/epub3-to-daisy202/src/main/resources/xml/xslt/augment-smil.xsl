@@ -6,7 +6,7 @@
                 xmlns="" xpath-default-namespace=""
                 exclude-result-prefixes="#all">
     
-    <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl"/>
+    <xsl:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xsl"/>
     
     <!--
         the smil
@@ -17,13 +17,13 @@
     -->
     <xsl:variable name="html" select="collection()[position()&gt;1]/*"/>
     
-    <xsl:variable name="smil-base-uri" select="base-uri($smil)"/>
+    <xsl:variable name="smil-base-uri" select="pf:base-uri($smil)"/>
     
-    <xsl:key name="absolute-id" match="*[@id]" use="concat(base-uri(root()/*),'#',@id)"/>
+    <xsl:key name="absolute-id" match="*[@id]" use="concat(pf:normalize-uri(pf:html-base-uri(.)),'#',@id)"/>
     
     <xsl:variable name="referenced-html-elements" as="element()*">
         <xsl:for-each select="//text">
-            <xsl:variable name="absolute-src" select="resolve-uri(@src,$smil-base-uri)"/>
+            <xsl:variable name="absolute-src" select="pf:normalize-uri(pf:resolve-uri(@src,.))"/>
             <xsl:variable name="referenced-element" as="element()*" select="$html/key('absolute-id',$absolute-src)"/>
             <xsl:if test="count($referenced-element)=0">
                 <xsl:message terminate="yes"
@@ -31,18 +31,18 @@
                                             '&quot; references a non-existing element &quot;',$absolute-src,'&quot;')"/>
             </xsl:if>
             <xsl:if test="count($referenced-element)&gt;1">
-                <xsl:message terminate="yes"
-                             select="concat('Reference &quot;',@src,'&quot; in SMIL &quot;',
+                <xsl:message select="concat('Reference &quot;',@src,'&quot; in SMIL &quot;',
                                             replace($smil-base-uri,'^.*/([^/]+)^','$1'),'&quot; is ambiguous')"/>
             </xsl:if>
-            <xsl:sequence select="$referenced-element"/>
+            <xsl:sequence select="$referenced-element[1]"/>
         </xsl:for-each>
     </xsl:variable>
     
     <xsl:template match="/smil/body/seq">
+        <xsl:variable name="seq-base-uri" select="pf:base-uri(.)"/>
         <xsl:variable name="missing-pars" as="element()*">
             <xsl:for-each select="$html">
-                <xsl:variable name="html-base-uri" select="base-uri(.)"/>
+                <xsl:variable name="html-base-uri" select="pf:html-base-uri(.)"/>
                 <xsl:for-each select="//*[self::html:h1 or
                                           self::html:h2 or
                                           self::html:h3 or
@@ -50,8 +50,10 @@
                                           self::html:h5 or
                                           self::html:h6 or
                                           self::html:span[matches(@class,'(^|\s)page-(front|normal|special)(\s|$)')]]">
+                    <!--
+                        we are sure these elements have an id attribute, thanks to add-missing-ids.xsl
+                    -->
                     <xsl:variable name="id" as="xs:string" select="@id"/>
-                    <xsl:variable name="absolute-id" select="concat($html-base-uri,'#',$id)"/>
                     <xsl:choose>
                         <xsl:when test="$referenced-html-elements intersect .">
                             <!-- The SMIL already references the element. No need to do anything. -->
@@ -88,7 +90,7 @@
                                                     ) then concat('_',generate-id(.))
                                                       else '')"/>
                             <par id="{$par-id}">
-                                <text src="{pf:relativize-uri(concat($html-base-uri,'#',$id),$smil-base-uri)}"/>
+                                <text src="{pf:relativize-uri(concat($html-base-uri,'#',$id),$seq-base-uri)}"/>
                             </par>
                         </xsl:otherwise>
                     </xsl:choose>
@@ -98,8 +100,12 @@
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
             <xsl:apply-templates select="(par,$missing-pars)">
-                <xsl:sort select="index-of($html[base-uri(.)=resolve-uri(substring-before(current()/text/@src,'#'),base-uri(.))],$html)"/>
-                <xsl:sort select="$html[base-uri(.)=resolve-uri(substring-before(current()/text/@src,'#'),base-uri(.))]
+                <!-- pf:base-uri will return empty sequence for $missing-pars -->
+                <xsl:sort select="index-of($html[pf:base-uri(.)=current()/pf:resolve-uri(substring-before(text/@src,'#'),
+                                                                                         (pf:base-uri(.),$seq-base-uri)[1])],
+                                           $html)"/>
+                <xsl:sort select="$html[pf:html-base-uri(.)=current()/pf:resolve-uri(substring-before(text/@src,'#'),
+                                                                                     (pf:base-uri(.),$seq-base-uri)[1])]
                                   //*[@id=substring-after(current()/text/@src,'#')][1]/count(preceding::*|ancestor::*)"/>
             </xsl:apply-templates>
         </xsl:copy>
