@@ -186,10 +186,34 @@
 				</x:document>
 			</x:input>
 		</x:call>
-		<x:context label="The error">
-			<x:document type="errors"/>
+		<x:context label="The resulting SMIL">
+			<x:document type="port" port="result"/>
 		</x:context>
-		<x:expect label="Error expected" type="xpath" test="/c:errors/c:error/string(.)" equals="'FIXME'"/>
+		<x:expect label="should be as expected" type="compare">
+			<x:document type="inline">
+				<smil>
+					<body>
+						<seq id="seq1">
+							<par id="par_c1">
+								<text src="chapter_001.xhtml#c1"/>
+								<audio src="audio/chapter_001_002.mp4" clip-begin="0:00:00.000" clip-end="0:00:01.000"/>
+							</par>
+							<par id="paragraph1">
+								<text src="chapter_001.xhtml#c1_p1"/>
+								<audio src="audio/chapter_001_002.mp4" clip-begin="0:00:01.000" clip-end="0:00:02.000"/>
+							</par>
+							<par id="par_c1-1">
+								<text src="chapter_001.xhtml#c1-1"/>
+							</par>
+							<par id="paragraph2">
+								<text src="chapter_001.xhtml#c1_p2"/>
+								<audio src="audio/chapter_001_002.mp4" clip-begin="0:00:03.000" clip-end="0:00:04.000"/>
+							</par>
+						</seq>
+					</body>
+				</smil>
+			</x:document>
+		</x:expect>
 	</x:scenario>
 	
 </x:description>

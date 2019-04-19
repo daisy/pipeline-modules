@@ -58,18 +58,10 @@
                         <xsl:when test="$referenced-html-elements intersect .">
                             <!-- The SMIL already references the element. No need to do anything. -->
                         </xsl:when>
-                        <xsl:when test="$referenced-html-elements/ancestor::* intersect .">
+                        <xsl:when test="$referenced-html-elements/descendant::* intersect .">
                             <!--
                                 The SMIL already references a containing element. FIXME: Unlikely to
                                 happen for headings, but less unlikely for page numbers.
-                            -->
-                            <xsl:message terminate="yes">FIXME</xsl:message>
-                        </xsl:when>
-                        <xsl:when test="$referenced-html-elements/descendant::* intersect .">
-                            <!--
-                                The SMIL already references a contained element. Happens if the
-                                granularity is too fine, e.g. for word-level synchronization.
-                                FIXME: Merge all the segments into a single par.
                             -->
                             <xsl:message terminate="yes">FIXME</xsl:message>
                         </xsl:when>
@@ -89,9 +81,60 @@
                                                       )&gt;1
                                                     ) then concat('_',generate-id(.))
                                                       else '')"/>
-                            <par id="{$par-id}">
-                                <text src="{pf:relativize-uri(concat($html-base-uri,'#',$id),$seq-base-uri)}"/>
-                            </par>
+                            <xsl:choose>
+                                <xsl:when test="$referenced-html-elements/ancestor::* intersect .">
+                                    <!--
+                                        The SMIL already references a contained element. Happens if the
+                                        granularity is too fine, e.g. for word-level synchronization. Merge
+                                        all the segments into a single par.
+                                    -->
+                                    <xsl:variable name="segments" as="element()*"
+                                                  select="$referenced-html-elements[ancestor::* intersect current()]"/>
+                                    <xsl:choose>
+                                        <xsl:when test="replace(string-join($segments/string(.),''),'\s+','')=replace(string(.),'\s+','')">
+                                            <xsl:variable name="audio-segments" as="element()*"
+                                                          select="for $s in $segments return
+                                                                  for $id in $s/concat(pf:normalize-uri(pf:html-base-uri(.)),'#',@id) return
+                                                                  $smil//text[pf:normalize-uri(pf:resolve-uri(@src,.))=$id]/parent::*/audio"/>
+                                            <xsl:choose>
+                                                <xsl:when test="every $i in 1 to count($audio-segments) - 1
+                                                                satisfies ($audio-segments[$i]/@src=$audio-segments[$i + 1]/@src and
+                                                                           $audio-segments[$i]/@clip-end=$audio-segments[$i + 1]/@clip-begin)">
+                                                    <par id="{$par-id}">
+                                                        <text src="{pf:relativize-uri(concat($html-base-uri,'#',$id),$seq-base-uri)}"/>
+                                                        <audio src="{pf:relativize-uri($audio-segments[1]/pf:resolve-uri(@src,.),$seq-base-uri)}"
+                                                               clip-begin="{$audio-segments[1]/@clip-begin}"
+                                                               clip-end="{$audio-segments[last()]/@clip-end}"/>
+                                                    </par>
+                                                </xsl:when>
+                                                <xsl:otherwise>
+                                                  <xsl:message terminate="yes"
+                                                               select="concat(
+                                                                         'SMIL &quot;',replace($smil-base-uri,'^.*/([^/]+)^','$1'),
+                                                                         '&quot; references one or more segments inside a ',
+                                                                         if (starts-with(local-name(),'h')) then 'heading' else 'page number',
+                                                                         ' but the corresponding audio clips can not be combined: ',
+                                                                         string-join($audio-segments/concat(@src,' (',@clip-begin,'-',@clip-end,')'),', '))"/>
+                                                </xsl:otherwise>
+                                            </xsl:choose>
+                                      </xsl:when>
+                                      <xsl:otherwise>
+                                          <xsl:message terminate="yes"
+                                                       select="concat('SMIL &quot;',replace($smil-base-uri,'^.*/([^/]+)^','$1'),
+                                                                      '&quot; references one or more segments inside a ',
+                                                                      if (starts-with(local-name(),'h')) then 'heading' else 'page number',
+                                                                      ' but these segments do not add up to the complete ',
+                                                                      if (starts-with(local-name(),'h')) then 'heading' else 'page number',
+                                                                      ': ',string-join($segments/concat($html-base-uri,'#',@id),', '))"/>
+                                      </xsl:otherwise>
+                                    </xsl:choose>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <par id="{$par-id}">
+                                        <text src="{pf:relativize-uri(concat($html-base-uri,'#',$id),$seq-base-uri)}"/>
+                                    </par>
+                                </xsl:otherwise>
+                            </xsl:choose>
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:for-each>
@@ -109,6 +152,20 @@
                                   //*[@id=substring-after(current()/text/@src,'#')][1]/count(preceding::*|ancestor::*)"/>
             </xsl:apply-templates>
         </xsl:copy>
+    </xsl:template>
+    
+    <xsl:template match="/smil/body/seq/par">
+        <xsl:variable name="absolute-src" select="pf:normalize-uri(pf:resolve-uri(text/@src,.))"/>
+        <xsl:variable name="referenced-element" as="element()" select="($html/key('absolute-id',$absolute-src))[1]"/>
+        <xsl:if test="not($referenced-element/ancestor::*[self::html:h1 or
+                                                          self::html:h2 or
+                                                          self::html:h3 or
+                                                          self::html:h4 or
+                                                          self::html:h5 or
+                                                          self::html:h6 or
+                                                          self::html:span[matches(@class,'(^|\s)page-(front|normal|special)(\s|$)')]])">
+            <xsl:next-match/>
+        </xsl:if>
     </xsl:template>
     
     <xsl:template match="@*|node()">
