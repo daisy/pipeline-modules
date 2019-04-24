@@ -47,4 +47,8 @@
         <p:documentation>Performs RELAX NG validation, and if there are validation errors, sends them to the error listener as warnings. If 'assert-valid' is true, also raises an error.</p:documentation>
     </p:import>
     
+    <p:import href="relax-ng-to-schematron.xpl">
+        <p:documentation>Extracts embedded Schematron rules from a RELAX NG schema (not in compact syntax).</p:documentation>
+    </p:import>
+    
 </p:library>
