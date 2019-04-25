@@ -215,11 +215,6 @@
                 </p:group>
             </p:otherwise>
         </p:choose>
-        <p:identity>
-            <p:input port="source">
-                <p:empty/>
-            </p:input>
-        </p:identity>
     </p:for-each>
     <p:identity name="smil-schema-tests"/>
     <p:sink/>
