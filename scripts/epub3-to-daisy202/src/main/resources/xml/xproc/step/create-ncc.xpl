@@ -334,8 +334,16 @@
             <p:input port="source">
                 <p:inline>
                     <smil>
+                        <head>
+                            <meta name="dc:format" content="Daisy 2.02"/>
+                            <meta name="ncc:generator" content="DAISY Pipeline 2"/>
+                            <meta name="ncc:timeInThisSmil" content="00:00:00"/>
+                            <layout>
+                                <region id="txtView"/>
+                            </layout>
+                        </head>
                         <body>
-                            <seq/>
+                            <seq dur="0.0s"/>
                         </body>
                     </smil>
                 </p:inline>
