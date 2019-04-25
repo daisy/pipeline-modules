@@ -332,7 +332,7 @@
         <p:identity px:message="Creating new SMIL for {$base-uri}" px:message-severity="DEBUG"/>
         <px:set-base-uri name="empty-smil">
             <p:input port="source">
-                <p:inline>
+                <p:inline exclude-inline-prefixes="#all">
                     <smil>
                         <head>
                             <meta name="dc:format" content="Daisy 2.02"/>
