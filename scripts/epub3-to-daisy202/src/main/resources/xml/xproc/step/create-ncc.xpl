@@ -104,9 +104,11 @@
         <p:xslt>
             <p:input port="source">
                 <p:pipe step="main" port="opf"/>
+                <p:pipe step="ncc.body" port="result"/>
+                <p:pipe step="result.smil" port="result"/>
             </p:input>
             <p:input port="stylesheet">
-                <p:document href="../../xslt/opf-to-html-metadata.xsl"/>
+                <p:document href="../../xslt/opf-to-ncc-metadata.xsl"/>
             </p:input>
             <p:input port="parameters">
                 <p:empty/>
