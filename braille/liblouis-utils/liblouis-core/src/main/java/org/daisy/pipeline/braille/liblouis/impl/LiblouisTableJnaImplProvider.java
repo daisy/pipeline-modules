@@ -112,18 +112,23 @@ public class LiblouisTableJnaImplProvider extends AbstractTransformProvider<Libl
 							return asURL(resolved[0]);
 						else {
 							// if it is a comma separated table list, create a single file that includes all the sub-tables
-							if (aggregatorTables.containsKey(table))
-								return aggregatorTables.get(table);
+							if (aggregatorTables.containsKey(table)) {
+								URL u = aggregatorTables.get(table);
+								logger.debug("... aggregated into " + u);
+								return u;
+							}
 							try {
 								StringBuilder b = new StringBuilder();
 								for (File f : resolved)
-									b.append("include ").append(f.getCanonicalPath().replaceAll("\\\\", "\\\\\\\\")).append('\n');
+									b.append("include ").append(asURI(f.getCanonicalFile()).toASCIIString()).append('\n');
 								InputStream in = new ByteArrayInputStream(b.toString().getBytes(StandardCharsets.UTF_8));
 								File f = createTempFile("aggregator-", ".tbl");
 								f.delete();
 								Files.copy(in, f.toPath());
+								f = f.getCanonicalFile();
 								URL u = asURL(f);
 								aggregatorTables.put(table, u);
+								logger.debug("... aggregated into " + u);
 								return u;
 							} catch (IOException e) {
 								throw new RuntimeException(e); // should not happen
