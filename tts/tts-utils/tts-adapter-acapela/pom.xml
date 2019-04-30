@@ -32,14 +32,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>net.java.dev.jna</groupId>
-      <artifactId>jna</artifactId>
       <!--
-          does not work with version declared in framework (5.2.0)
+          includes jna 4.0.0
       -->
-      <version>4.0.0</version>
-    </dependency>
-    <dependency>
       <groupId>org.daisy.libs</groupId>
       <artifactId>jnaerator</artifactId>
     </dependency>
@@ -60,7 +55,6 @@
           <instructions>
             <Import-Package>
               net.sf.saxon.*;version="${saxon.versionRange}",
-              com.sun.jna.*;version="[4.0.0,4.0.1)",
               !org.daisy.common.spi,
               *
             </Import-Package>
