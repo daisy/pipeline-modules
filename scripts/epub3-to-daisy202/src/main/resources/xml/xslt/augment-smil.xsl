@@ -67,6 +67,7 @@
                         </xsl:when>
                         <xsl:otherwise>
                             <!-- in case there are multiple html files and colliding ids, add a suffix -->
+                            <!-- FIXME: check that id does not exist yet -->
                             <xsl:variable name="par-id" as="xs:string"
                                           select="concat(
                                                     'par_',$id,
@@ -81,6 +82,8 @@
                                                       )&gt;1
                                                     ) then concat('_',generate-id(.))
                                                       else '')"/>
+                            <!-- FIXME: check that id does not exist yet -->
+                            <xsl:variable name="text-id" as="xs:string" select="replace($par-id,'par_','text_')"/>
                             <xsl:choose>
                                 <xsl:when test="$referenced-html-elements/ancestor::* intersect .">
                                     <!--
@@ -100,8 +103,8 @@
                                                 <xsl:when test="every $i in 1 to count($audio-segments) - 1
                                                                 satisfies ($audio-segments[$i]/@src=$audio-segments[$i + 1]/@src and
                                                                            $audio-segments[$i]/@clip-end=$audio-segments[$i + 1]/@clip-begin)">
-                                                    <par id="{$par-id}">
-                                                        <text src="{pf:relativize-uri(concat($html-base-uri,'#',$id),$seq-base-uri)}"/>
+                                                    <par id="{$par-id}" endsync="last">
+                                                        <text id="{$text-id}" src="{pf:relativize-uri(concat($html-base-uri,'#',$id),$seq-base-uri)}"/>
                                                         <audio src="{pf:relativize-uri($audio-segments[1]/pf:resolve-uri(@src,.),$seq-base-uri)}"
                                                                clip-begin="{$audio-segments[1]/@clip-begin}"
                                                                clip-end="{$audio-segments[last()]/@clip-end}"/>
@@ -130,8 +133,8 @@
                                     </xsl:choose>
                                 </xsl:when>
                                 <xsl:otherwise>
-                                    <par id="{$par-id}">
-                                        <text src="{pf:relativize-uri(concat($html-base-uri,'#',$id),$seq-base-uri)}"/>
+                                    <par id="{$par-id}" endsync="last">
+                                        <text id="{$text-id}" src="{pf:relativize-uri(concat($html-base-uri,'#',$id),$seq-base-uri)}"/>
                                     </par>
                                 </xsl:otherwise>
                             </xsl:choose>

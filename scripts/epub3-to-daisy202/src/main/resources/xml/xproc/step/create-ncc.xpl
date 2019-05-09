@@ -104,9 +104,11 @@
         <p:xslt>
             <p:input port="source">
                 <p:pipe step="main" port="opf"/>
+                <p:pipe step="ncc.body" port="result"/>
+                <p:pipe step="result.smil" port="result"/>
             </p:input>
             <p:input port="stylesheet">
-                <p:document href="../../xslt/opf-to-html-metadata.xsl"/>
+                <p:document href="../../xslt/opf-to-ncc-metadata.xsl"/>
             </p:input>
             <p:input port="parameters">
                 <p:empty/>
@@ -330,10 +332,18 @@
         <p:identity px:message="Creating new SMIL for {$base-uri}" px:message-severity="DEBUG"/>
         <px:set-base-uri name="empty-smil">
             <p:input port="source">
-                <p:inline>
+                <p:inline exclude-inline-prefixes="#all">
                     <smil>
+                        <head>
+                            <meta name="dc:format" content="Daisy 2.02"/>
+                            <meta name="ncc:generator" content="DAISY Pipeline 2"/>
+                            <meta name="ncc:timeInThisSmil" content="00:00:00"/>
+                            <layout>
+                                <region id="txtView"/>
+                            </layout>
+                        </head>
                         <body>
-                            <seq/>
+                            <seq dur="0.0s"/>
                         </body>
                     </smil>
                 </p:inline>
