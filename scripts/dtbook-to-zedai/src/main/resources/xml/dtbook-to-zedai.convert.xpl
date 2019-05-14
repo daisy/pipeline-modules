@@ -91,44 +91,36 @@
             Converts DTBook 2005-3 to ZedAI
         </p:documentation>
     </p:import>
-
-    <!-- for use with the pipeline framework -->
-    <p:import href="http://www.daisy.org/pipeline/modules/metadata-utils/library.xpl">
+    <p:import href="dtbook-to-zedai-meta.xpl">
         <p:documentation>
-            Collection of utilities for generating metadata.
+            For px:dtbook-to-zedai-meta
         </p:documentation>
     </p:import>
-
     <p:import href="http://www.daisy.org/pipeline/modules/dtbook-utils/library.xpl">
         <p:documentation>
-            Collection of utilities for merging and upgrading DTBook files.
+            For px:dtbook-to-mods-meta
         </p:documentation>
     </p:import>
-
     <p:import href="http://www.daisy.org/pipeline/modules/dtbook-validator/library.xpl">
         <p:documentation>
             Schema selector used for DTBook validation.
         </p:documentation>
     </p:import>
-
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
         <p:documentation>
             For manipulating filesets.
         </p:documentation>
     </p:import>
-
     <p:import href="http://www.daisy.org/pipeline/modules/mediatype-utils/library.xpl">
         <p:documentation>
             For determining the media type of files.
         </p:documentation>
     </p:import>
-
     <p:import href="http://www.daisy.org/pipeline/modules/validation-utils/library.xpl">
         <p:documentation>
             Collection of utilities for validation and reporting.
         </p:documentation>
     </p:import>
-
     <p:import href="http://www.daisy.org/pipeline/modules/css-speech/library.xpl">
         <p:documentation>
             For removing the Aural CSS attributes before validation

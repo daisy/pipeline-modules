@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet xmlns="http://www.idpf.org/2007/opf" xmlns:dc="http://purl.org/dc/elements/1.1/"
-  xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions"
-  xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:z="http://www.daisy.org/ns/z3998/authoring/" version="2.0" exclude-result-prefixes="xs z"
-  xpath-default-namespace="http://www.idpf.org/2007/opf">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:dc="http://purl.org/dc/elements/1.1/"
+                xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions"
+                xmlns:z="http://www.daisy.org/ns/z3998/authoring/"
+                xmlns="http://www.idpf.org/2007/opf"
+                xpath-default-namespace="http://www.idpf.org/2007/opf"
+                exclude-result-prefixes="xs z">
 
   <xsl:output method="xml" indent="yes"/>
 

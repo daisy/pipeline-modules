@@ -43,6 +43,11 @@
         <p:documentation>Set to false to bypass aural CSS processing.</p:documentation>
     </p:option>
 
+    <p:import href="zedai-to-opf-metadata.xpl">
+        <p:documentation>
+            px:zedai-to-opf-metadata
+        </p:documentation>
+    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/epub3-nav-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/epub3-ocf-utils/library.xpl"/>
@@ -112,18 +117,7 @@
     <!--=========================================================================-->
 
     <p:documentation>Extract metadata from ZedAI</p:documentation>
-    <p:group name="metadata">
-        <p:output port="result"/>
-        <p:xslt>
-            <p:input port="parameters">
-                <p:empty/>
-            </p:input>
-            <p:input port="stylesheet">
-                <p:document href="http://www.daisy.org/pipeline/modules/metadata-utils/zedai-to-metadata.xsl"/>
-            </p:input>
-        </p:xslt>
-    </p:group>
-
+    <px:zedai-to-opf-metadata name="metadata"/>
 
     <!--=========================================================================-->
     <!-- CONVERT TO XHTML                                                        -->
