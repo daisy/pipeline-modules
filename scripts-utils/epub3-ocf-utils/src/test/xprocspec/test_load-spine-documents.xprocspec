@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
+               xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+               xmlns:d="http://www.daisy.org/ns/pipeline/data"
+               xmlns:c="http://www.w3.org/ns/xproc-step"
+               script="../../main/resources/xml/xproc/load-spine-documents.xpl">
+
+	<x:scenario label="basic test">
+	    <x:call step="px:epub3-load-spine-documents">
+			<x:input port="fileset">
+				<x:document type="inline">
+				    <d:fileset xml:base="file:/tmp/my-epub/">
+				        <d:file href="META-INF/container.xml" media-type="application/xml"/>
+				        <d:file href="EPUB/css/accessibility.css" media-type="text/css"/>
+				        <d:file href="EPUB/nav.ncx" media-type="application/x-dtbncx+xml"/>
+				        <d:file href="EPUB/nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>
+				        <d:file href="EPUB/561753-001-halftitlepage.xhtml" media-type="application/xhtml+xml"/>
+				        <d:file href="EPUB/561753-004-chapter.xhtml" media-type="application/xhtml+xml"/>
+				        <d:file href="EPUB/561753-005-chapter.xhtml" media-type="application/xhtml+xml"/>
+				        <d:file href="EPUB/561753-002-titlepage.xhtml" media-type="application/xhtml+xml"/>
+				        <d:file href="EPUB/561753-003-part.xhtml" media-type="application/xhtml+xml"/>
+				        <d:file href="EPUB/561753-006-chapter.xhtml" media-type="application/xhtml+xml"/>
+				        <d:file href="EPUB/images/logo.jpg" media-type="image/jpeg"/>
+				        <d:file href="EPUB/package.opf" media-type="application/oebps-package+xml"/>
+				    </d:fileset>
+				</x:document>
+			</x:input>
+		    <x:input port="in-memory">
+		        <x:document type="inline" xml:base="file:/tmp/my-epub/META-INF/container.xml">
+		            <container xmlns="urn:oasis:names:tc:opendocument:xmlns:container" version="1.0">
+		                <rootfiles>
+		                    <rootfile full-path="EPUB/package.opf" media-type="application/oebps-package+xml"/>
+		                </rootfiles>
+		            </container>
+		        </x:document>
+		        <x:document type="inline">
+		            <package xmlns="http://www.idpf.org/2007/opf" version="3.0" xml:base="file:/tmp/my-epub/EPUB/package.opf">
+		                <metadata/>
+		                <manifest>
+		                    <item id="css_1" media-type="text/css" href="css/accessibility.css"/>
+		                    <item id="ncx" href="nav.ncx" media-type="application/x-dtbncx+xml"/>
+		                    <item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>
+		                    <item id="item_1" href="561753-001-halftitlepage.xhtml" media-type="application/xhtml+xml"/>
+		                    <item id="item_4" href="561753-004-chapter.xhtml" media-type="application/xhtml+xml"/>
+		                    <item id="item_5" href="561753-005-chapter.xhtml" media-type="application/xhtml+xml"/>
+		                    <item id="item_2" href="561753-002-titlepage.xhtml" media-type="application/xhtml+xml"/>
+		                    <item id="item_3" href="561753-003-part.xhtml" media-type="application/xhtml+xml"/>
+		                    <item id="item_6" href="561753-006-chapter.xhtml" media-type="application/xhtml+xml"/>
+		                    <item id="item_50" href="images/logo.jpg" media-type="image/jpeg"/>
+		                </manifest>
+		                <spine toc="ncx">
+		                    <itemref idref="item_1" linear="yes"/>
+		                    <itemref idref="item_2" linear="yes"/>
+		                    <itemref idref="item_3" linear="yes"/>
+		                    <itemref idref="item_4" linear="yes"/>
+		                    <itemref idref="item_5" linear="yes"/>
+		                    <itemref idref="item_6" linear="yes"/>
+		                </spine>
+		            </package>
+		        </x:document>
+		        <x:document type="inline"><html xmlns="http://www.w3.org/1999/xhtml" xml:base="file:/tmp/my-epub/EPUB/nav.xhtml"/></x:document>
+		        <x:document type="inline"><html xmlns="http://www.w3.org/1999/xhtml" xml:base="file:/tmp/my-epub/EPUB/561753-001-halftitlepage.xhtml"/></x:document>
+		        <x:document type="inline"><html xmlns="http://www.w3.org/1999/xhtml" xml:base="file:/tmp/my-epub/EPUB/561753-004-chapter.xhtml"/></x:document>
+		        <x:document type="inline"><html xmlns="http://www.w3.org/1999/xhtml" xml:base="file:/tmp/my-epub/EPUB/561753-005-chapter.xhtml"/></x:document>
+		        <x:document type="inline"><html xmlns="http://www.w3.org/1999/xhtml" xml:base="file:/tmp/my-epub/EPUB/561753-002-titlepage.xhtml"/></x:document>
+		        <x:document type="inline"><html xmlns="http://www.w3.org/1999/xhtml" xml:base="file:/tmp/my-epub/EPUB/561753-003-part.xhtml"/></x:document>
+		        <x:document type="inline"><html xmlns="http://www.w3.org/1999/xhtml" xml:base="file:/tmp/my-epub/EPUB/561753-006-chapter.xhtml"/></x:document>
+		    </x:input>
+		</x:call>
+	    
+		<x:context label="the result port">
+			<x:document type="port" port="result"/>
+		</x:context>
+	    
+		<x:expect label="the result" type="compare">
+		    <x:document type="inline"><html xmlns="http://www.w3.org/1999/xhtml" xml:base="file:/tmp/my-epub/EPUB/561753-001-halftitlepage.xhtml"/></x:document>
+		    <x:document type="inline"><html xmlns="http://www.w3.org/1999/xhtml" xml:base="file:/tmp/my-epub/EPUB/561753-002-titlepage.xhtml"/></x:document>
+		    <x:document type="inline"><html xmlns="http://www.w3.org/1999/xhtml" xml:base="file:/tmp/my-epub/EPUB/561753-003-part.xhtml"/></x:document>
+		    <x:document type="inline"><html xmlns="http://www.w3.org/1999/xhtml" xml:base="file:/tmp/my-epub/EPUB/561753-004-chapter.xhtml"/></x:document>
+		    <x:document type="inline"><html xmlns="http://www.w3.org/1999/xhtml" xml:base="file:/tmp/my-epub/EPUB/561753-005-chapter.xhtml"/></x:document>
+		    <x:document type="inline"><html xmlns="http://www.w3.org/1999/xhtml" xml:base="file:/tmp/my-epub/EPUB/561753-006-chapter.xhtml"/></x:document>
+		</x:expect>
+	</x:scenario>
+	
+</x:description>

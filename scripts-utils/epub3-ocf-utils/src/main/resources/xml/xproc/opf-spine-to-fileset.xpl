@@ -16,6 +16,10 @@
 			A fileset manifest of the content items in spine order.
 		</p:documentation>
 	</p:output>
+    
+    <p:option name="base-uri" select="''">
+        <p:documentation>Optional base URI to use for the resulting fileset. The default is the directory of the package document.</p:documentation>
+    </p:option>
 
 	<p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
 		<p:documentation>
@@ -23,7 +27,9 @@
 		</p:documentation>
 	</p:import>
 
-	<px:fileset-create base="/" name="base"/>
+	<px:fileset-create name="base">
+	    <p:with-option name="base" select="if ($base-uri != '') then $base-uri else replace(base-uri(/*), '[^/]+$', '')"/>
+	</px:fileset-create>
 
 	<p:for-each>
 		<p:iteration-source select="/*/opf:spine/opf:itemref">
