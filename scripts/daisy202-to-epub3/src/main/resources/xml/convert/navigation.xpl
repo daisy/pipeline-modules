@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal" xmlns:html="http://www.w3.org/1999/xhtml"
-    xmlns:px="http://www.daisy.org/ns/pipeline/xproc" xmlns:epub="http://www.idpf.org/2007/ops" type="pxi:daisy202-to-epub3-navigation" name="main" version="1.0">
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
+                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
+                xmlns:dc="http://purl.org/dc/elements/1.1/"
+                xmlns:html="http://www.w3.org/1999/xhtml"
+                xmlns:epub="http://www.idpf.org/2007/ops"
+                type="pxi:daisy202-to-epub3-navigation" name="main">
 
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
         <h1 px:role="desc">Make a EPUB3 Navigation Document based on the Content Documents.</h1>
@@ -56,10 +61,29 @@
         </p:documentation>
     </p:option>
 
-    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/epub3-nav-utils/library.xpl"/>
-    <p:import href="resolve-links.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
+        <p:documentation>
+            px:set-base-uri
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
+        <p:documentation>
+            px:message
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
+        <p:documentation>
+            px:fileset-create
+            px:fileset-add-entry
+            px:fileset-join
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/epub3-nav-utils/library.xpl">
+        <p:documentation>
+            px:epub3-nav-create-toc
+            px:epub3-nav-aggregate
+        </p:documentation>
+    </p:import>
 
     <p:variable name="original-href" select="/*/@original-href"/>
 
@@ -180,10 +204,9 @@
             <p:pipe port="ncc-navigation" step="main"/>
         </p:with-option>
     </p:add-attribute>
-    <p:add-attribute match="/*" attribute-name="xml:base">
-        <p:with-option name="attribute-value" select="concat($content-dir,'ncc.xhtml')"/>
-    </p:add-attribute>
-    <p:delete match="/*/@xml:base"/>
+    <px:set-base-uri>
+        <p:with-option name="base-uri" select="concat($content-dir,'ncc.xhtml')"/>
+    </px:set-base-uri>
     <px:message message="Successfully created navigation document (ncc.xhtml)"/>
     <p:identity name="result.navigation"/>
     <p:sink/>
@@ -248,10 +271,9 @@
                     <p:pipe port="result" step="ncx.docauthors"/>
                 </p:input>
             </p:insert>
-            <p:add-attribute attribute-name="xml:base" match="/*">
-                <p:with-option name="attribute-value" select="concat($content-dir,'ncx.xml')"/>
-            </p:add-attribute>
-            <p:delete match="/*/@xml:base"/>
+            <px:set-base-uri>
+                <p:with-option name="base-uri" select="concat($content-dir,'ncx.xml')"/>
+            </px:set-base-uri>
             <px:message message="Successfully created NCX"/>
         </p:when>
         <p:otherwise>
