@@ -123,7 +123,7 @@
     
     <p:add-attribute name="zip-manifest" match="c:entry[@name='mimetype']" attribute-name="compression-method" attribute-value="stored"/>
     
-    <px:zip compression-method="deflated">
+    <px:zip compression-method="deflated" cx:depends-on="fileset-store">
         <p:input port="source">
             <p:empty/>
         </p:input>
