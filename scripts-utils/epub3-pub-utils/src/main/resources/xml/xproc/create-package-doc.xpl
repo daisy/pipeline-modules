@@ -43,6 +43,11 @@
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/mediatype-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/epub3-nav-utils/library.xpl">
+        <p:documentation>
+            px:epub3-nav-to-guide
+        </p:documentation>
+    </p:import>
 
     <px:fileset-join/>
     <px:mediatype-detect name="spine-filesets-with-mediatypes">
@@ -516,12 +521,9 @@
             </p:when>
             <p:otherwise>
                 <px:message severity="DEBUG" message="Creating guide element for package document"/>
-                <p:xslt>
-                    <p:with-param name="opf-base" select="$result-uri"/>
-                    <p:input port="stylesheet">
-                        <p:document href="http://www.daisy.org/pipeline/modules/epub3-nav-utils/nav-to-guide.xsl"/>
-                    </p:input>
-                </p:xslt>
+                <px:epub3-nav-to-guide>
+                    <p:with-option name="opf-base" select="$result-uri"/>
+                </px:epub3-nav-to-guide>
                 <px:message severity="DEBUG" message="guide element created successfully"/>
             </p:otherwise>
         </p:choose>
