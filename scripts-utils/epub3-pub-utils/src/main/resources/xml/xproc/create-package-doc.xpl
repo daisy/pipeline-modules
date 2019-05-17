@@ -38,6 +38,7 @@
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
         <p:documentation>
             px:set-base-uri
+            px:add-xml-base
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
@@ -609,6 +610,7 @@
     <px:set-base-uri>
         <p:with-option name="base-uri" select="$result-uri"/>
     </px:set-base-uri>
+    <px:add-xml-base root="false"/>
     <p:identity name="package-without-mo"/>
     <p:identity>
         <p:input port="source">

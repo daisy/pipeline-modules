@@ -16,6 +16,7 @@
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
         <p:documentation>
             px:set-base-uri
+            px:add-xml-base
         </p:documentation>
     </p:import>
 
@@ -31,9 +32,7 @@
         <p:variable name="mo-uri"
             select="concat($mo-dir,replace(base-uri(/*),'.*?([^/]*)\.x?html$','$1.smil'))"/>
         <p:identity name="content-doc"/>
-
         <p:xslt>
-            <p:with-option name="output-base-uri" select="$mo-uri"/>
             <p:input port="source">
                 <p:pipe port="result" step="content-doc"/>
                 <p:pipe port="audio-map" step="main"/>
@@ -55,6 +54,11 @@
         <px:set-base-uri>
             <p:with-option name="base-uri" select="$mo-uri"/>
         </px:set-base-uri>
+        <px:add-xml-base root="false">
+            <!--
+                otherwise the base URI of some elements would be empty (Calabash bug?)
+            -->
+        </px:add-xml-base>
     </p:for-each>
 
     <p:group name="fileset">
