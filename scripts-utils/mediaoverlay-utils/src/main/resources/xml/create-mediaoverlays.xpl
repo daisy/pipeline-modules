@@ -13,6 +13,12 @@
         <p:pipe port="result" step="media-overlays"/>
     </p:output>
 
+    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
+        <p:documentation>
+            px:set-base-uri
+        </p:documentation>
+    </p:import>
+
     <p:variable name="audio-dir" select="concat($content-dir,'audio/')">
         <p:empty/>
     </p:variable>
@@ -46,11 +52,9 @@
                 <p:empty/>
             </p:input>
         </p:xslt>
-        <!--Hack to set the base URI-->
-        <p:add-attribute attribute-name="xml:base" match="/*">
-            <p:with-option name="attribute-value" select="$mo-uri"/>
-        </p:add-attribute>
-        <p:delete match="/*/@xml:base"/>
+        <px:set-base-uri>
+            <p:with-option name="base-uri" select="$mo-uri"/>
+        </px:set-base-uri>
     </p:for-each>
 
     <p:group name="fileset">

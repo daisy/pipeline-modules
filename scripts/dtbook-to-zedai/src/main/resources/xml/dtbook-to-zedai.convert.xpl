@@ -126,6 +126,11 @@
             For removing the Aural CSS attributes before validation
         </p:documentation>
     </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
+        <p:documentation>
+            For px:set-base-uri
+        </p:documentation>
+    </p:import>
 
 
     <p:variable name="output-dir"
@@ -366,9 +371,10 @@
         </p:input>
         <p:with-option name="assert-valid" select="$opt-assert-valid"/>
     </px:dtbook-to-mods-meta>
-    <p:add-attribute name="generate-mods-metadata" match="/*" attribute-name="xml:base">
-        <p:with-option name="attribute-value" select="$mods-file"/>
-    </p:add-attribute>
+    <px:set-base-uri>
+        <p:with-option name="base-uri" select="$mods-file"/>
+    </px:set-base-uri>
+    <p:add-xml-base name="generate-mods-metadata"/>
 
     <p:documentation>Generate ZedAI metadata</p:documentation>
     <px:dtbook-to-zedai-meta name="generate-zedai-metadata">
@@ -577,12 +583,13 @@
         <px:mediatype-detect/>
     </p:group>
 
-    <p:add-attribute match="/*" attribute-name="xml:base" name="result.zedai">
+    <px:set-base-uri>
         <p:input port="source">
             <p:pipe step="validate-zedai" port="result"/>
         </p:input>
-        <p:with-option name="attribute-value" select="$zedai-file"/>
-    </p:add-attribute>
+        <p:with-option name="base-uri" select="$zedai-file"/>
+    </px:set-base-uri>
+    <p:add-xml-base name="result.zedai"/>
     <p:for-each name="result.in-memory">
         <p:output port="result" sequence="true"/>
         <p:iteration-source>

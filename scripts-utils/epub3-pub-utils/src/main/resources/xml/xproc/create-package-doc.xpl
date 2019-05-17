@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step type="px:epub3-pub-create-package-doc" name="main" xmlns:opf="http://www.idpf.org/2007/opf" xmlns:p="http://www.w3.org/ns/xproc" xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-    xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:html="http://www.w3.org/1999/xhtml"
-    xmlns:epub="http://www.idpf.org/2007/ops" xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions" version="1.0">
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
+                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                xmlns:dc="http://purl.org/dc/elements/1.1/"
+                xmlns:c="http://www.w3.org/ns/xproc-step"
+                xmlns:d="http://www.daisy.org/ns/pipeline/data"
+                xmlns:opf="http://www.idpf.org/2007/opf"
+                xmlns:html="http://www.w3.org/1999/xhtml"
+                xmlns:epub="http://www.idpf.org/2007/ops"
+                type="px:epub3-pub-create-package-doc" name="main">
 
     <!-- Note: all URIs in options and xml:base attributes must be absolute. -->
     <p:input port="spine-filesets" sequence="true" primary="true"/>
@@ -29,6 +35,11 @@
     <p:option name="result-uri" required="true"/>
     <p:output port="result" primary="true"/>
 
+    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
+        <p:documentation>
+            px:set-base-uri
+        </p:documentation>
+    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/mediatype-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
@@ -593,10 +604,9 @@
             <p:identity/>
         </p:otherwise>
     </p:choose>
-    <!--hack to set the base URI-->
-    <p:add-attribute match="*" attribute-name="xml:base">
-        <p:with-option name="attribute-value" select="$result-uri"/>
-    </p:add-attribute>
+    <px:set-base-uri>
+        <p:with-option name="base-uri" select="$result-uri"/>
+    </px:set-base-uri>
     <p:identity name="package-without-mo"/>
     <p:identity>
         <p:input port="source">
@@ -614,6 +624,5 @@
         </p:input>
     </p:xslt>
     <px:message severity="DEBUG" message="Finished assigning media overlays to content documents"/>
-    <p:delete match="@xml:base"/>
 
 </p:declare-step>
