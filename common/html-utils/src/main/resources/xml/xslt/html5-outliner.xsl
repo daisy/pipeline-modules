@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns="http://www.w3.org/1999/xhtml" xpath-default-namespace="http://www.w3.org/1999/xhtml"
-    xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:tts="http://www.daisy.org/ns/pipeline/tts"
-    exclude-result-prefixes="#all">
-    
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions"
+                xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
+                xmlns:tts="http://www.daisy.org/ns/pipeline/tts"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xpath-default-namespace="http://www.w3.org/1999/xhtml"
+                exclude-result-prefixes="#all">
+
+    <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl"/>
+
+    <xsl:param name="output-base-uri" required="yes"/>
 
     <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes" omit-xml-declaration="no"/>
 
@@ -24,6 +29,8 @@
 
     <!-- On the html tag found -->
     <xsl:template match="html">
+        <xsl:variable name="input-base-uri" select="base-uri(.)"/>
+        <xsl:variable name="relative-path" select="pf:relativize-uri($input-base-uri, $output-base-uri)"/>
         <!-- Store a filtered version of the body in "filtered" 
         This versions only contains the headers sections-->
         <xsl:variable name="filtered">
@@ -31,12 +38,15 @@
         </xsl:variable>
         <!-- Reconstruct an ordered list of filtered content -->
         <ol>
-            <xsl:apply-templates select="$filtered/*"/>
+            <xsl:apply-templates select="$filtered/*">
+                <xsl:with-param name="relative-path" tunnel="yes" select="$relative-path"/>
+            </xsl:apply-templates>
         </ol>
     </xsl:template>
 
     <!--  -->
     <xsl:template match="body|article|aside|nav|section">
+        <xsl:param name="relative-path" tunnel="yes" as="xs:string" required="yes"/>
         <xsl:variable name="id" select="@id"/>
         <xsl:variable name="heading" select="(h1|h2|h3|h4|h5|h6|hgroup)[1]" as="element()?"/>
         <xsl:variable name="heading-content" select="f:heading-content($heading,.)" as="item()*"/>
@@ -54,7 +64,7 @@
                     <xsl:if test="empty($heading) or not($heading/descendant-or-self::text())">
                         <xsl:attribute name="data-generated" select="'true'"/>
                     </xsl:if>
-                    <a href="#{$id}">
+                    <a href="{$relative-path}#{$id}">
                         <!-- TODO: try to not "depend" on the TTS namespace here -->
                         <xsl:copy-of select="$heading/ancestor-or-self::*/@tts:*"/>
                         <xsl:copy-of select="$heading-content"/>
@@ -76,7 +86,7 @@
                         <xsl:if test="empty($heading) or not($heading/descendant-or-self::text())">
                             <xsl:attribute name="data-generated" select="'true'"/>
                         </xsl:if>
-                        <a href="#{$id}">
+                        <a href="{$relative-path}#{$id}">
                             <!-- TODO: try to not "depend" on the TTS namespace here -->
                             <xsl:copy-of select="$heading/ancestor-or-self::*/@tts:*"/>
                             <xsl:copy-of select="$heading-content"/>
@@ -100,6 +110,7 @@
 
     <xsl:template name="implicit-section">
         <xsl:param name="elems" as="element()*"/>
+        <xsl:param name="relative-path" tunnel="yes" as="xs:string" required="yes"/>
         <xsl:variable name="children-doc">
             <xsl:copy-of select="$elems[position()>1]"/>
         </xsl:variable>
@@ -109,7 +120,7 @@
             <xsl:if test="$elems[1]/empty(self::h1|self::h2|self::h3|self::h4|self::h5|self::h6|self::hgroup)">
                 <xsl:attribute name="data-generated" select="'true'"/>
             </xsl:if>
-            <a href="#{$elems[1]/@id}">
+            <a href="{$relative-path}#{$elems[1]/@id}">
                 <xsl:copy-of select="f:heading-content($elems[1],())"/>
             </a>
             <!-- Check if a real children exists (children with text node) -->

@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step type="px:epub3-nav-create-toc" name="main" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:p="http://www.w3.org/ns/xproc" xmlns:px="http://www.daisy.org/ns/pipeline/xproc" version="1.0"
-    xmlns:epub="http://www.idpf.org/2007/ops">
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
+                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                xmlns:h="http://www.w3.org/1999/xhtml"
+                xmlns:epub="http://www.idpf.org/2007/ops"
+                type="px:epub3-nav-create-toc" name="main">
 
     <p:input port="source" sequence="true"/>
     <p:output port="result">
         <p:pipe port="result" step="result"/>
     </p:output>
-    <p:option name="base-dir" select="''"/>
+    <p:option name="output-base-uri"/>
 
     <!--TODO honnor the 'untitled' option-->
     <p:option name="untitled" select="'unwrap'"/>
@@ -25,15 +28,9 @@
     <!-- create an ordered list (ol) from an xhtml document -->
     <p:for-each name="tocs">
         <p:output port="result" sequence="true"/>
-        <p:variable name="base-uri" select="p:base-uri(/*)"/>
-        <p:variable name="base-ref" select="if (starts-with($base-uri,$base-dir)) 
-                    then substring-after($base-uri,$base-dir) 
-                    else $base-uri"/>
-        
         <px:html-outline>
-            <p:with-option name="file-uri" select="$base-ref"/>
+            <p:with-option name="output-base-uri" select="$output-base-uri"/>
         </px:html-outline>
-        
         <p:filter select="/h:ol/h:li"/>
     </p:for-each>
 
