@@ -10,6 +10,10 @@
 					<document xmlns="http://www.daisy.org/ns/z3998/authoring/" xml:lang="en-US">
 						<head>
 							<meta>foobar</meta>
+							<meta rel="z3998:meta-record" resource="foo.xml">
+								<meta property="z3998:meta-record-type" content="z3998:mods" />
+								<meta property="z3998:meta-record-version" content="3.3" />
+							</meta>
 						</head>
 						<body>
 							<section>
@@ -32,8 +36,9 @@
 				<metadata xmlns="http://www.idpf.org/2007/opf"
 				          xmlns:dc="http://purl.org/dc/elements/1.1/"
 				          prefix="dc: http://purl.org/dc/elements/1.1/">
-					<dc:title id="d444e13">foo</dc:title>
+					<dc:title id="d444e20">foo</dc:title>
 					<dc:language>en-US</dc:language>
+					<link rel="record" href="foo.xml" media-type="application/mods+xml"/>
 				</metadata>
 			</x:document>
 		</x:expect>
