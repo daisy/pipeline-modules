@@ -28,13 +28,13 @@
 		</p:documentation>
 	</p:option>
 
-    <p:xslt>
-        <p:documentation>Creating the outline</p:documentation>
-        <p:input port="stylesheet">
-            <p:document href="../xslt/html5-outliner.xsl"/>
-        </p:input>
-        <p:with-param name="output-base-uri" select="$output-base-uri"/>
-        <p:with-option name="output-base-uri" select="$output-base-uri"/>
-    </p:xslt>
+	<p:xslt>
+		<p:documentation>Creating the outline</p:documentation>
+		<p:input port="stylesheet">
+			<p:document href="../xslt/html5-outliner.xsl"/>
+		</p:input>
+		<p:with-param name="output-base-uri" select="$output-base-uri"/>
+		<p:with-option name="output-base-uri" select="$output-base-uri"/>
+	</p:xslt>
 
 </p:declare-step>
