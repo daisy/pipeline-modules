@@ -8,14 +8,14 @@
 		<p px:role="desc">Return an outline (ol element) from an (x)html page</p>
 	</p:documentation>
 	
-	<p:input port="source" sequence="true">
+	<p:input port="source">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Input (X)HTML stream</h2>
 			<p px:role="desc">The (X)HTML document from which the outline must be extracted</p>
 		</p:documentation>
 	</p:input>
 
-	<p:output port="result" sequence="true">
+	<p:output port="result">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Outline</h2>
 			<p px:role="desc">This steps output the outline of the html as a hierarchy of ordered lists</p>
