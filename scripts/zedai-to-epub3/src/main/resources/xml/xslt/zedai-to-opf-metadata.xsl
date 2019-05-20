@@ -4,6 +4,7 @@
                 xmlns:dc="http://purl.org/dc/elements/1.1/"
                 xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions"
                 xmlns:z="http://www.daisy.org/ns/z3998/authoring/"
+                xmlns:rdfa="rdfa-functions"
                 xmlns="http://www.idpf.org/2007/opf"
                 xpath-default-namespace="http://www.idpf.org/2007/opf"
                 exclude-result-prefixes="xs z">
@@ -90,10 +91,12 @@
     </metadata>
   </xsl:template>
 
-  <xsl:template match="z:meta[@rel='z3998:meta-record']">
+  <xsl:template match="z:meta[@rel='z3998:meta-record' and @resource]">
     <xsl:variable name="this" select="."/>
     <xsl:variable name="record-type"
-      select="ancestor::z:head//z:meta[@property='z3998:meta-record-type' and @about=$this/@resource][1]/@content"/>
+                  select="ancestor::z:head//z:meta[@property='z3998:meta-record-type']
+                                                  [rdfa:context(.)=$this/@resource]
+                                                  [1]/@content"/>
     <xsl:choose>
       <xsl:when test="$record-type='z3998:mods'">
         <link rel="record" href="{@resource}" media-type="application/mods+xml"/>
@@ -248,4 +251,12 @@
     <xsl:sequence select="f:hasProp($node,$value) or f:hasRole($node,$value)"/>
   </xsl:function>
 
+  <!-- FIXME: move to a rdfa-utils module? -->
+  <xsl:function name="rdfa:context" as="xs:anyURI?">
+    <xsl:param name="elem" as="element()"/>
+    <xsl:sequence select="if (exists($elem/@about))
+                          then $elem/@about
+                          else ($elem/parent::*[@resource|@about])[last()]/(@resource,@about)[1]"/>
+  </xsl:function>
+  
 </xsl:stylesheet>
