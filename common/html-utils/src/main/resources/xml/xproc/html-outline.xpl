@@ -22,21 +22,19 @@
 		</p:documentation>
 	</p:output>
 
-    <p:option name="file-uri" select="''" />
+	<p:option name="output-base-uri" required="true">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p>The base URI of the resulting outline.</p>
+		</p:documentation>
+	</p:option>
 
-	<p:documentation>Creating the outline</p:documentation>
     <p:xslt>
+        <p:documentation>Creating the outline</p:documentation>
         <p:input port="stylesheet">
             <p:document href="../xslt/html5-outliner.xsl"/>
         </p:input>
-        <p:input port="parameters">
-            <p:empty/>
-        </p:input>
+        <p:with-param name="output-base-uri" select="$output-base-uri"/>
+        <p:with-option name="output-base-uri" select="$output-base-uri"/>
     </p:xslt>
-    
-    <p:string-replace match="//@href">
-            <p:with-option name="replace" select="concat('concat(&quot;',$file-uri,'&quot;,.)')"/>
-    </p:string-replace>
-    
 
 </p:declare-step>
