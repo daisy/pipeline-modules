@@ -39,10 +39,27 @@
 
     <p:import href="html-split.xpl"/>
     <p:import href="validation-status.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/epub3-nav-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/epub3-pub-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/epub3-ocf-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/epub3-utils/library.xpl">
+        <p:documentation>
+            px:epub3-nav-create-toc
+            px:epub3-nav-create-page-list
+            px:epub3-nav-aggregate
+            px:epub3-nav-to-ncx
+            px:epub3-pub-create-package-doc
+            px:epub3-ocf-finalize
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
+        <p:documentation>
+            px:fileset-load
+            px:fileset-copy
+            px:fileset-filter
+            px:fileset-create
+            px:fileset-add-entry
+            px:fileset-join
+            px:fileset-rebase
+        </p:documentation>
+    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/mediatype-utils/library.xpl"/>
 
@@ -89,12 +106,12 @@
                     <p:pipe port="in-memory.in" step="main"/>
                 </p:input>
             </px:nordic-html-split-perform>
-            <px:fileset-move name="html-to-epub3.step.html-split.moved">
-                <p:input port="in-memory.in">
+            <px:fileset-copy name="html-to-epub3.step.html-split.moved">
+                <p:input port="source.in-memory">
                     <p:pipe port="in-memory.out" step="html-to-epub3.step.html-split"/>
                 </p:input>
-                <p:with-option name="new-base" select="$publication-dir"/>
-            </px:fileset-move>
+                <p:with-option name="target" select="$publication-dir"/>
+            </px:fileset-copy>
 
             <!-- Create spine -->
             <px:fileset-filter media-types="application/xhtml+xml" name="html-to-epub3.step.filter-html-split-fileset-xhtml"/>
@@ -102,7 +119,7 @@
 
             <px:fileset-load name="html-to-epub3.step.load-spine">
                 <p:input port="in-memory">
-                    <p:pipe port="in-memory.out" step="html-to-epub3.step.html-split.moved"/>
+                    <p:pipe step="html-to-epub3.step.html-split.moved" port="result.in-memory"/>
                 </p:input>
             </px:fileset-load>
             <p:for-each name="html-to-epub3.step.iterate-spine">
@@ -159,7 +176,7 @@
                     </p:xslt>
                     <p:delete match="html:a[tokenize(@epub:type,'\s+')='noteref']" name="html-to-epub3.step.nav.toc.delete-noterefs"/>
                     <px:epub3-nav-create-toc name="html-to-epub3.step.nav.toc.nav-create-toc">
-                        <p:with-option name="base-dir" select="replace(base-uri(/*),'[^/]+$','')">
+                        <p:with-option name="output-base-uri" select="base-uri(/*)">
                             <p:pipe port="result" step="html-to-epub3.step.single-html"/>
                         </p:with-option>
                     </px:epub3-nav-create-toc>
@@ -189,11 +206,9 @@
                 <p:sink/>
 
                 <px:epub3-nav-create-page-list name="html-to-epub3.step.nav.page-list">
-                    <p:with-option name="base-dir" select="replace(base-uri(/*),'[^/]+$','')">
-                        <p:pipe port="result" step="html-to-epub3.step.single-html"/>
-                    </p:with-option>
+                    <p:with-option name="output-base-uri" select="concat($publication-dir,'nav.xhtml')"/>
                     <p:input port="source">
-                        <p:pipe port="in-memory.out" step="html-to-epub3.step.html-split"/>
+                        <p:pipe step="html-to-epub3.step.html-split.moved" port="result.in-memory"/>
                     </p:input>
                 </px:epub3-nav-create-page-list>
                 <p:sink/>
@@ -206,10 +221,8 @@
                     <p:with-option name="language" select="/*/(@xml:lang,@lang)[1]">
                         <p:pipe port="result" step="html-to-epub3.step.single-html"/>
                     </p:with-option>
+                    <p:with-option name="output-base-uri" select="concat($publication-dir,'nav.xhtml')"/>
                 </px:epub3-nav-aggregate>
-                <p:add-attribute match="/*" attribute-name="xml:base" name="html-to-epub3.step.add-nav-xml-base">
-                    <p:with-option name="attribute-value" select="concat($publication-dir,'nav.xhtml')"/>
-                </p:add-attribute>
                 <p:xslt name="html-to-epub3.step.navdoc-nordic-normalization">
                     <p:with-param name="identifier" select="/*/html:head/html:meta[@name='dc:identifier']/@content">
                         <p:pipe port="result" step="html-to-epub3.step.single-html"/>
@@ -238,14 +251,7 @@
                 </p:viewport>
                 <p:identity name="html-to-epub3.step.nav.html"/>
 
-                <p:xslt name="html-to-epub3.step.nav-to-ncx">
-                    <p:input port="parameters">
-                        <p:empty/>
-                    </p:input>
-                    <p:input port="stylesheet">
-                        <p:document href="http://www.daisy.org/pipeline/modules/epub3-nav-utils/nav-to-ncx.xsl"/>
-                    </p:input>
-                </p:xslt>
+                <px:epub3-nav-to-ncx name="html-to-epub3.step.nav-to-ncx"/>
                 <p:xslt name="html-to-epub3.step.ncx-pretty-print">
                     <!-- TODO: remove pretty printing to improve performance -->
                     <p:with-param name="preserve-empty-whitespace" select="'false'"/>
@@ -282,31 +288,39 @@
             <px:mediatype-detect name="html-to-epub3.step.resource-fileset"/>
             <p:sink/>
 
-            <px:epub3-pub-create-package-doc name="html-to-epub3.step.create-package-doc">
-                <p:with-option name="result-uri" select="concat($publication-dir,'package.opf')"/>
+            <px:fileset-join>
+                <p:input port="source">
+                    <p:pipe step="html-to-epub3.step.html-split.moved" port="result.fileset"/>
+                    <p:pipe step="html-to-epub3.step.ncx-fileset" port="result"/>
+                </p:input>
+            </px:fileset-join>
+            <px:fileset-add-entry>
+                <p:input port="entry">
+                    <p:pipe step="html-to-epub3.step.nav" port="html"/>
+                </p:input>
+            </px:fileset-add-entry>
+
+            <px:epub3-pub-create-package-doc name="html-to-epub3.step.create-package-doc"
+                                             reserved-prefixes="dcterms: http://purl.org/dc/terms/">
+                <p:with-option name="output-base-uri" select="concat($publication-dir,'package.opf')"/>
                 <p:with-option name="compatibility-mode" select="$compatibility-mode"/>
                 <p:with-option name="detect-properties" select="'true'"/>
-                <p:input port="spine-filesets">
-                    <p:pipe port="result" step="html-to-epub3.step.spine"/>
+                <p:input port="source.in-memory">
+                    <p:pipe step="html-to-epub3.step.nav" port="html"/>
+                    <p:pipe step="html-to-epub3.step.spine-html" port="result"/>
+                </p:input>
+                <p:input port="spine">
+                    <p:pipe step="html-to-epub3.step.spine" port="result"/>
                 </p:input>
                 <p:input port="metadata">
-                    <p:pipe port="result" step="html-to-epub3.step.opf-metadata"/>
-                </p:input>
-                <p:input port="content-docs">
-                    <p:pipe port="html" step="html-to-epub3.step.nav"/>
-                    <p:pipe port="result" step="html-to-epub3.step.spine-html"/>
-                </p:input>
-                <p:input port="publication-resources">
-                    <p:pipe port="result" step="html-to-epub3.step.resource-fileset"/>
+                    <p:pipe step="html-to-epub3.step.opf-metadata" port="result"/>
                 </p:input>
             </px:epub3-pub-create-package-doc>
             <p:add-attribute match="/*" attribute-name="unique-identifier" attribute-value="pub-identifier" name="html-to-epub3.step.add-opf-attribute.unique-identifier"/>
             <p:add-attribute match="//dc:identifier[not(preceding::dc:identifier)]" attribute-name="id" attribute-value="pub-identifier" name="html-to-epub3.step.add-opf-attribute.dc-identifier-id"/>
-            <p:add-attribute match="/*" attribute-name="prefix" attribute-value="nordic: http://www.mtm.se/epub/" name="html-to-epub3.step.add-opf-attribute.nordic-prefix"/>
             <p:add-attribute match="/*/opf:spine/opf:itemref[/*/opf:manifest/opf:item[matches(@href,'-(cover|rearnotes)(-\d+)?.xhtml')]/@id = @idref]" attribute-name="linear" attribute-value="no"
                 name="html-to-epub3.step.add-opf-attribute.non-linear-spine-items"/>
             <p:add-attribute match="opf:item[matches(@href,'(^|/)cover.jpg')]" attribute-name="properties" attribute-value="cover-image"/>
-            <p:delete match="/*//*/@prefix" name="html-to-epub3.step.delete-non-root-opf-prefix-attributes"/>
             <p:xslt name="html-to-epub3.step.add-dc-namespace">
                 <p:input port="parameters">
                     <p:empty/>
@@ -410,7 +424,7 @@
             <!-- List auxiliary resources (i.e. all non-content files: images, CSS, NCX, etc. as well as content files that are non-primary) -->
             <px:fileset-filter name="html-to-epub3.step.filter-non-linear-content">
                 <p:input port="source">
-                    <p:pipe port="fileset.out" step="html-to-epub3.step.html-split.moved"/>
+                    <p:pipe step="html-to-epub3.step.html-split.moved" port="result.fileset"/>
                 </p:input>
             </px:fileset-filter>
             <p:delete match="//d:file[@media-type='application/xhtml+xml' and not(matches(@href,'-(cover|rearnotes)(-\d+)?.xhtml'))]"

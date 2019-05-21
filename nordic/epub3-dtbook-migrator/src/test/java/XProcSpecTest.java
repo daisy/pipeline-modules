@@ -20,9 +20,7 @@ public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
             pipelineModule("common-utils"),
             pipelineModule("dtbook-utils"),
             pipelineModule("dtbook-validator"),
-            pipelineModule("epub3-nav-utils"),
-            pipelineModule("epub3-ocf-utils"),
-            pipelineModule("epub3-pub-utils"),
+            pipelineModule("epub3-utils"),
             pipelineModule("epubcheck-adapter"),
             pipelineModule("file-utils"),
             pipelineModule("fileset-utils"),
@@ -35,8 +33,6 @@ public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
     @Override @Configuration 
     public Option[] config() { 
         return options( 
-            // FIXME: second version of guava needed for epubcheck-adapter
-            mavenBundle("com.google.guava:guava:14.0.1"),
             // FIXME: epubcheck needs older version of jing
             mavenBundle("org.daisy.libs:jing:20120724.0.0"),
             composite(super.config()));

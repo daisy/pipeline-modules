@@ -6,6 +6,6 @@
 [subrepo]
 	remote = https://github.com/nlbdev/nordic-epub3-dtbook-migrator.git
 	branch = dev
-	commit = b1164ef8c420e98be8c2fc7ca339884f91caf658
-	parent = b1ef1e07b0fb5e2c664b164d5d23e003b67fd966
+	commit = c25e3d4bb93de842fe3fd2d4e3d770e612c59bc8
+	parent = def067069c4d69f7d914d8a89392feb59246d4cf
 	cmdver = 0.3.1
