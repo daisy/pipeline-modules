@@ -111,6 +111,9 @@
             <p:input port="source">
                 <p:pipe port="docs" step="content-docs"/>
             </p:input>
+            <p:with-option name="output-base-uri" select="$nav-base">
+                <p:empty/>
+            </p:with-option>
         </px:epub3-nav-create-page-list>
         <!--TODO create other nav types (configurable ?)-->
 
