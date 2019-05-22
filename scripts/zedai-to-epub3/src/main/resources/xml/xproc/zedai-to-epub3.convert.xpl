@@ -215,6 +215,7 @@
                 <p:pipe port="result" step="navigation-doc.toc"/>
                 <p:pipe port="result" step="navigation-doc.page-list"/>
             </p:input>
+            <p:with-option name="output-base-uri" select="$nav-base"/>
         </px:epub3-nav-aggregate>
         <!--TODO create other nav types (configurable ?)-->
         <px:fileset-create>
@@ -223,12 +224,11 @@
         <px:fileset-add-entry media-type="application/xhtml+xml" name="navigation-doc.result.fileset">
             <p:with-option name="href" select="$nav-base"/>
         </px:fileset-add-entry>
-        <px:set-base-uri>
+        <px:identity>
             <p:input port="source">
                 <p:pipe port="result" step="navigation-doc.html-file"/>
             </p:input>
-            <p:with-option name="base-uri" select="$nav-base"/>
-        </px:set-base-uri>
+        </px:identity>
         <px:message message="Navigation Document Created." name="navigation-doc.result.html-file"/>
     </p:group>
 
