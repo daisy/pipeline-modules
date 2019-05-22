@@ -206,6 +206,9 @@
             <p:input port="source">
                 <p:pipe port="html-files" step="zedai-to-html"/>
             </p:input>
+            <p:with-option name="output-base-uri" select="$nav-base">
+                <p:empty/>
+            </p:with-option>
         </px:epub3-nav-create-page-list>
         <px:epub3-nav-aggregate name="navigation-doc.html-file">
             <p:input port="source">
