@@ -50,8 +50,7 @@
 				</nav>
 			</x:document>
 		</x:expect>
-		<x:expect label="the output base uri" type="xpath" test="base-uri(/*)" equals="'file:/tmp/toc.xhtml'"
-		          xfail="this is currently done in the calling step"/>
+		<x:expect label="the output base uri" type="xpath" test="base-uri(/*)" equals="'file:/tmp/toc.xhtml'"/>
 	</x:scenario>
 	
 </x:description>
