@@ -9,7 +9,11 @@
     <p:output port="result">
         <p:pipe port="result" step="result"/>
     </p:output>
-    <p:option name="output-base-uri"/>
+    <p:option name="output-base-uri">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>The base URI of the resulting document.</p>
+        </p:documentation>
+    </p:option>
 
     <!--TODO honnor the 'untitled' option-->
     <p:option name="untitled" select="'unwrap'"/>
