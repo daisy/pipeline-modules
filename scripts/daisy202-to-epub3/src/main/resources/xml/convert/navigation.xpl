@@ -87,12 +87,15 @@
 
     <p:variable name="original-href" select="/*/@original-href"/>
 
-    <px:epub3-nav-create-toc name="content-nav-toc">
+    <!--<px:epub3-nav-create-toc name="content-nav-toc">
         <p:input port="source">
             <p:pipe port="content" step="main"/>
         </p:input>
+        <p:with-option name="output-base-uri" select="...">
+            <p:empty/>
+        </p:with-option>
     </px:epub3-nav-create-toc>
-    <p:sink/>
+    <p:sink/>-->
 
     <!-- TODO: create nav with html-lot-annotator.xsl here when it's done -->
     <!-- TODO: create nav with html-loi-annotator.xsl here when it's done -->
