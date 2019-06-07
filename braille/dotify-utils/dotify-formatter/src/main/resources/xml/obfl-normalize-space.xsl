@@ -6,6 +6,9 @@
     
     <!--
         Anticipate bugs/shortcomings in Dotify's white space processing.
+        
+        Note that it is possible that some rules have become unneeded after the refactoring of
+        SegmentProcessor and the move to the new translator API. This needs to be verified.
     -->
     
     <xsl:template match="@*|node()">

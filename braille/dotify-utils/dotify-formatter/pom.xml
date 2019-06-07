@@ -78,6 +78,11 @@
     </dependency>
     <dependency>
       <groupId>org.daisy.pipeline.modules.braille</groupId>
+      <artifactId>libhyphen-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.daisy.pipeline.modules.braille</groupId>
       <artifactId>pef-utils</artifactId>
       <scope>test</scope>
     </dependency>
@@ -114,7 +119,6 @@
   <properties>
     <expose-services>
       org.daisy.pipeline.braille.dotify.impl.BrailleFilterFactoryImpl,
-      org.daisy.pipeline.braille.dotify.impl.MarkerProcessorFactoryServiceImpl,
       org.daisy.pipeline.braille.dotify.impl.BrailleTranslatorFactoryServiceImpl,
       org.daisy.pipeline.braille.dotify.impl.DotifyCSSStyledDocumentTransform$Provider,
       org.daisy.pipeline.braille.dotify.impl.DotifyOBFLTransform$Provider,
@@ -202,6 +206,12 @@
           <classifier>mac</classifier>
           <scope>test</scope>
         </dependency>
+        <dependency>
+          <groupId>org.daisy.pipeline.modules.braille</groupId>
+          <artifactId>libhyphen-native</artifactId>
+          <classifier>mac</classifier>
+          <scope>test</scope>
+        </dependency>
       </dependencies>
     </profile>
     <profile>
@@ -218,6 +228,12 @@
           <classifier>linux</classifier>
           <scope>test</scope>
         </dependency>
+        <dependency>
+          <groupId>org.daisy.pipeline.modules.braille</groupId>
+          <artifactId>libhyphen-native</artifactId>
+          <classifier>linux</classifier>
+          <scope>test</scope>
+        </dependency>
       </dependencies>
     </profile>
     <profile>
@@ -231,6 +247,12 @@
         <dependency>
           <groupId>org.daisy.pipeline.modules.braille</groupId>
           <artifactId>liblouis-native</artifactId>
+          <classifier>windows</classifier>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.daisy.pipeline.modules.braille</groupId>
+          <artifactId>libhyphen-native</artifactId>
           <classifier>windows</classifier>
           <scope>test</scope>
         </dependency>

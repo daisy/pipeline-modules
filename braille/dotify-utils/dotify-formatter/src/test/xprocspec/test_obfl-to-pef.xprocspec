@@ -36,7 +36,7 @@
               <block>
                 <page-number ref-id="x" number-format="default"/>
               </block>
-              <block break-before="page" id="x">
+              <block break-before="page" id="x" translate="pre-translated-text-css">
                 ⠤⠤⠤
               </block>
             </sequence>
@@ -674,6 +674,146 @@
               <section>
                 <page>
                   <row>⠿⠿⠿⠀⠿⠿⠿⠀⠿⠿⠿⠀⠿⠿⠿⠀⠿⠿⠿</row>
+                </page>
+              </section>
+            </volume>
+          </body>
+        </pef>
+      </x:document>
+    </x:expect>
+  </x:scenario>
+  
+  <x:scenario label="translate-multiple-segments">
+    <x:documentation>
+      Tests that multiple segments are translated as a whole.
+    </x:documentation>
+    <x:call step="pxi:test">
+      <x:input port="source">
+        <x:document type="inline">
+          <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="true">
+            <layout-master name="body" page-width="25" page-height="10" duplex="true">
+              <default-template>
+                <header/>
+                <footer/>
+              </default-template>
+            </layout-master>
+            <sequence master="body">
+              <block>
+                ONE TWO
+              </block>
+              <block>
+                ONE TWO THREE
+              </block>
+              <block>
+                ONE TWO <marker class="x" value="y"/> THREE
+              </block>
+              <block>
+                ONE <evaluate expression="(round 2)"/> THREE
+              </block>
+              <block>
+                ONE <evaluate expression="TWO"/> THREE
+              </block>
+              <block>
+                ONE <page-number ref-id="x"/> THREE
+              </block>
+              <block break-before="page" id="x"/>
+              <!--
+                  "FOOBAR" was added to show that it also works when some segments contains words with non-standard hyphenation
+              -->
+              <block>
+                ONE <evaluate expression="TWO"/> THREE FOOBAR
+              </block>
+              <block>
+                ONE <evaluate expression="TWO"/> THREE FOUR FOOBAR
+              </block>
+            </sequence>
+          </obfl>
+        </x:document>
+      </x:input>
+      <x:option name="text-transform"
+                select="concat('(liblouis-table:&quot;', resolve-uri('../resources/capsphrase.utb'), '&quot;)
+                                (hyphenator:&quot;', resolve-uri('../resources/non-standard-hyph.dic'), '&quot;)')"/>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="result" type="custom" href="http://www.daisy.org/pipeline/modules/braille/pef-utils/library.xpl" step="x:pef-compare">
+      <x:document type="inline">
+        <pef xmlns="http://www.daisy.org/ns/2008/pef" version="2008-1">
+          <head xmlns:dc="http://purl.org/dc/elements/1.1/">
+            <meta>
+              <dc:format>application/x-pef+xml</dc:format>
+            </meta>
+          </head>
+          <body>
+            <volume cols="25" rows="10" rowgap="0" duplex="true">
+              <section>
+                <page>
+                  <row>⠠⠠⠕⠝⠑⠀⠠⠠⠞⠺⠕</row>
+                  <row>⠠⠠⠠⠕⠝⠑⠀⠞⠺⠕⠀⠞⠓⠗⠑⠑⠠⠄</row>
+                  <row>⠠⠠⠠⠕⠝⠑⠀⠞⠺⠕⠀⠞⠓⠗⠑⠑⠠⠄</row>
+                  <row>⠠⠠⠠⠕⠝⠑⠀⠞⠺⠕⠀⠞⠓⠗⠑⠑⠠⠄</row>
+                  <row>⠠⠠⠠⠕⠝⠑⠀⠞⠺⠕⠀⠞⠓⠗⠑⠑⠠⠄</row>
+                  <row>⠠⠠⠠⠕⠝⠑⠀⠞⠺⠕⠀⠞⠓⠗⠑⠑⠠⠄</row>
+                </page>
+                <page>
+                  <row>⠠⠠⠠⠕⠝⠑⠀⠞⠺⠕⠀⠞⠓⠗⠑⠑⠀⠋⠕⠕⠃⠁⠗⠠⠄</row>
+                  <row>⠠⠠⠠⠕⠝⠑⠀⠞⠺⠕⠀⠞⠓⠗⠑⠑⠀⠋⠕⠥⠗⠀⠋⠥⠤</row>
+                  <row>⠃⠁⠗⠠⠄</row>
+                </page>
+              </section>
+            </volume>
+          </body>
+        </pef>
+      </x:document>
+    </x:expect>
+  </x:scenario>
+  
+  <x:scenario label="keep-segments-without-white-space-together">
+    <x:documentation>
+      Tests that two segments that are not separated with white space are not broken across
+      lines.
+    </x:documentation>
+    <x:call step="pxi:test">
+      <x:input port="source">
+        <x:document type="inline">
+          <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false">
+            <layout-master name="body" page-width="15" page-height="10" duplex="true">
+              <default-template>
+                <header/>
+                <footer/>
+              </default-template>
+            </layout-master>
+            <sequence master="body">
+              <block>
+                ⠤⠤⠤⠤⠤⠤⠤⠤⠤ ⠤⠤<evaluate expression="(round 1)"/>
+              </block>
+              <block>
+                ⠤⠤⠤⠤⠤⠤⠤⠤⠤ ⠤⠤⠤⠤<evaluate expression="(round 1)"/>
+              </block>
+            </sequence>
+          </obfl>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="result" type="custom" href="http://www.daisy.org/pipeline/modules/braille/pef-utils/library.xpl" step="x:pef-compare">
+      <x:document type="inline">
+        <pef xmlns="http://www.daisy.org/ns/2008/pef" version="2008-1">
+          <head xmlns:dc="http://purl.org/dc/elements/1.1/">
+            <meta>
+              <dc:format>application/x-pef+xml</dc:format>
+            </meta>
+          </head>
+          <body>
+            <volume cols="15" rows="10" rowgap="0" duplex="true">
+              <section>
+                <page>
+                  <row>⠤⠤⠤⠤⠤⠤⠤⠤⠤⠀⠤⠤⠼⠁</row>
+                  <row>⠤⠤⠤⠤⠤⠤⠤⠤⠤</row>
+                  <row>⠤⠤⠤⠤⠼⠁</row>
                 </page>
               </section>
             </volume>

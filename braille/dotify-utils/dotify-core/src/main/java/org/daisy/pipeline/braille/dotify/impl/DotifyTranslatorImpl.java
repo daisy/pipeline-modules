@@ -21,6 +21,8 @@ import org.daisy.dotify.api.translator.BrailleTranslatorFactory;
 import org.daisy.dotify.api.translator.Translatable;
 import org.daisy.dotify.api.translator.TranslationException;
 import org.daisy.dotify.api.translator.TranslatorConfigurationException;
+import org.daisy.dotify.api.translator.TranslatorMode;
+import org.daisy.dotify.api.translator.TranslatorType;
 
 import org.daisy.pipeline.braille.common.AbstractBrailleTranslator;
 import org.daisy.pipeline.braille.common.AbstractBrailleTranslator.util.DefaultLineBreaker;
@@ -84,12 +86,15 @@ public class DotifyTranslatorImpl extends AbstractBrailleTranslator implements D
 	}
 	
 	private final FromStyledTextToBraille fromStyledTextToBraille = new FromStyledTextToBraille() {
-		public java.lang.Iterable<String> transform(java.lang.Iterable<CSSStyledText> styledText) {
+		public java.lang.Iterable<String> transform(java.lang.Iterable<CSSStyledText> styledText, int from, int to) {
 			int size = size(styledText);
-			String[] braille = new String[size];
+			if (to < 0) to = size;
+			String[] braille = new String[to - from];
 			int i = 0;
-			for (CSSStyledText t : styledText)
-				braille[i++] = DotifyTranslatorImpl.this.transform(t.getText(), t.getStyle());
+			for (CSSStyledText t : styledText) {
+				if (i >= from && i < to)
+					braille[i - from] = DotifyTranslatorImpl.this.transform(t.getText(), t.getStyle());
+				i++; }
 			return Arrays.asList(braille);
 		}
 	};
@@ -101,8 +106,8 @@ public class DotifyTranslatorImpl extends AbstractBrailleTranslator implements D
 		
 	private final LineBreakingFromStyledText lineBreakingFromStyledText
 	= new DefaultLineBreaker() {
-		protected BrailleStream translateAndHyphenate(final java.lang.Iterable<CSSStyledText> styledText) {
-			return new FullyHyphenatedAndTranslatedString(join(fromStyledTextToBraille.transform(styledText)));
+		protected BrailleStream translateAndHyphenate(final java.lang.Iterable<CSSStyledText> styledText, int from, int to) {
+			return new FullyHyphenatedAndTranslatedString(join(fromStyledTextToBraille.transform(styledText)), from, to);
 		}
 	};
 	
@@ -176,7 +181,7 @@ public class DotifyTranslatorImpl extends AbstractBrailleTranslator implements D
 								logger.error("Invalid locale", e);
 								return empty; }
 						}
-						final String mode = BrailleTranslatorFactory.MODE_UNCONTRACTED;
+						final String mode = TranslatorMode.Builder.withType(TranslatorType.UNCONTRACTED).build().toString();
 						String v = null;
 						if (q.containsKey("hyphenator"))
 							v = q.removeOnly("hyphenator").getValue().get();

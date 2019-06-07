@@ -8409,7 +8409,11 @@
             </default-template>
           </layout-master>
           <sequence master="main">
-            <block>⠤⠤⠤  ​⠤⠤⠤  ​⠤⠤⠤  ​⠤⠤⠤  ​⠤⠤⠤  ​⠤⠤⠤  ​⠤⠤⠤  ​⠤⠤⠤  ​⠤⠤⠤</block>
+            <block>
+              <style name="word-spacing: 2">
+                ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
+              </style>
+            </block>
           </sequence>
         </obfl>
       </x:document>
