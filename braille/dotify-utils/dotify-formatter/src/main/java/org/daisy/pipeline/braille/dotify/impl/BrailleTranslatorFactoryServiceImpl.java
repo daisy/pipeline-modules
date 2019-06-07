@@ -5,9 +5,12 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.regex.Matcher;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 import cz.vutbr.web.css.CSSProperty;
 import cz.vutbr.web.css.TermInteger;
@@ -22,6 +25,7 @@ import org.daisy.dotify.api.translator.BrailleTranslatorFactory;
 import org.daisy.dotify.api.translator.BrailleTranslatorFactoryService;
 import org.daisy.dotify.api.translator.BrailleTranslatorResult;
 import org.daisy.dotify.api.translator.Translatable;
+import org.daisy.dotify.api.translator.TranslatableWithContext;
 import org.daisy.dotify.api.translator.TranslationException;
 import org.daisy.dotify.api.translator.TranslatorConfigurationException;
 import org.daisy.dotify.api.translator.TranslatorSpecification;
@@ -32,11 +36,12 @@ import org.daisy.pipeline.braille.common.CSSStyledText;
 import org.daisy.pipeline.braille.common.Provider;
 import static org.daisy.pipeline.braille.common.Provider.util.memoize;
 import org.daisy.pipeline.braille.common.Query;
+import org.daisy.pipeline.braille.common.Query.Feature;
+import org.daisy.pipeline.braille.common.Query.MutableQuery;
+import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.query;
 import static org.daisy.pipeline.braille.common.Query.util.QUERY;
 import static org.daisy.pipeline.braille.common.Provider.util.dispatch;
-import static org.daisy.pipeline.braille.common.util.Strings.join;
-import static org.daisy.pipeline.braille.dotify.impl.BrailleFilterFactoryImpl.BRAILLE;
 import static org.daisy.pipeline.braille.dotify.impl.BrailleFilterFactoryImpl.cssStyledTextFromTranslatable;
 
 import org.osgi.service.component.annotations.Component;
@@ -129,6 +134,18 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 			Query query = query(mode);
 			for (org.daisy.pipeline.braille.common.BrailleTranslator t : brailleTranslatorProvider.get(query))
 				return new BrailleTranslatorFromBrailleTranslator(mode, t);
+			try {
+				MutableQuery q = mutableQuery(query);
+				for (Feature f : q.removeAll("input"))
+					if (!"text-css".equals(f.getValue().get()))
+						throw new NoSuchElementException();
+				for (Feature f : q.removeAll("output"))
+					if (!"braille".equals(f.getValue().get()))
+						throw new NoSuchElementException();
+				if (!q.isEmpty())
+					throw new NoSuchElementException();
+				return new BrailleTranslatorFromBrailleTranslator(mode, NumberBrailleTranslator.getInstance());
+			} catch (NoSuchElementException e) {}
 			return new BrailleTranslatorFromFilter(mode, filterFactory.newFilter(locale, mode));
 		}
 	}
@@ -166,8 +183,19 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 			return new DefaultLineBreaker.LineIterator(filter.filter(input), '\u2800', '\u2824', 1);
 		}
 		
+		public BrailleTranslatorResult translate(TranslatableWithContext input) throws TranslationException {
+			return new DefaultLineBreaker.LineIterator(filter.filter(input), '\u2800', '\u2824', 1);
+		}
+		
 		public String getTranslatorMode() {
 			return mode;
+		}
+		
+		@Override
+		public String toString() {
+			return MoreObjects.toStringHelper("o.d.p.b.dotify.impl.BrailleTranslatorFactoryServiceImpl$BrailleTranslatorFromFilter")
+				.add("filter", filter)
+				.toString();
 		}
 	}
 	
@@ -195,17 +223,29 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 		public BrailleTranslatorResult translate(Translatable input) throws TranslationException {
 			if (input.getAttributes() == null && input.isHyphenating() == false) {
 				String text = input.getText();
+				if ("".equals(text))
+					return new DefaultLineBreaker.LineIterator("", '\u2800', '\u2824', 1);
 				if (" ".equals(text))
-					return new DefaultLineBreaker.LineIterator("\u2800", '\u2800', '\u2824', 1);
-				if ("??".equals(text))
-					return new DefaultLineBreaker.LineIterator("??", '\u2800', '\u2824', 1);
-				if (BRAILLE.matcher(text).matches())
-					return new DefaultLineBreaker.LineIterator(text, '\u2800', '\u2824', 1); }
-			Iterable<CSSStyledText> styledText = cssStyledTextFromTranslatable(input);
+					return new DefaultLineBreaker.LineIterator("\u2800", '\u2800', '\u2824', 1); }
+			return translate(cssStyledTextFromTranslatable(input), 0, -1);
+		}
+		
+		public BrailleTranslatorResult translate(TranslatableWithContext input) throws TranslationException {
+			List<CSSStyledText> styledText = Lists.newArrayList(cssStyledTextFromTranslatable(input));
+			int from = input.getPrecedingText().size();
+			int to = from + input.getTextToTranslate().size();
+			for (int i = 0; i < styledText.size(); i++)
+				if ("??".equals(styledText.get(i).getText())
+				    && (styledText.get(i).getStyle() == null || styledText.get(i).getStyle().isEmpty()))
+					styledText.set(i, new CSSStyledText("0"));
+			return translate(styledText, from, to);
+		}
+		
+		public BrailleTranslatorResult translate(Iterable<CSSStyledText> styledText, int from, int to) throws TranslationException {
 			if (lineBreakingFromStyledText != null)
-				return lineBreakingFromStyledText.transform(styledText);
+				return lineBreakingFromStyledText.transform(styledText, from, to);
 			else {
-				StringBuilder result = new StringBuilder();
+				List<String> braille = new ArrayList<>();
 				Iterator<CSSStyledText> style = styledText.iterator();
 				for (String s : fromStyledTextToBraille.transform(styledText)) {
 					SimpleInlineStyle st = style.next().getStyle();
@@ -217,9 +257,19 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 							else if (ws == WhiteSpace.PRE_LINE)
 								s = s.replaceAll("[\\n\\r]", "\u2028");
 							st.removeProperty("white-space"); }}
-					result.append(s);
+					braille.add(s);
 				}
-				return new DefaultLineBreaker.LineIterator(result.toString(), '\u2800', '\u2824', 1);
+				StringBuilder brailleString = new StringBuilder();
+				int fromChar = 0;
+				int toChar = to >= 0 ? 0 : -1;
+				for (String s : braille) {
+					brailleString.append(s);
+					if (--from == 0)
+						fromChar = brailleString.length();
+					if (--to == 0)
+						toChar = brailleString.length();
+				}
+				return new DefaultLineBreaker.LineIterator(brailleString.toString(), fromChar, toChar, '\u2800', '\u2824', 1);
 			}
 		}
 		
@@ -237,10 +287,20 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 		private PreTranslatedBrailleTranslator() {}
 		
 		public BrailleTranslatorResult translate(Translatable input) throws TranslationException {
-			String braille = "";
+			return translate(cssStyledTextFromTranslatable(input), 0, -1);
+		}
+			
+		public BrailleTranslatorResult translate(TranslatableWithContext input) throws TranslationException {
+			int from = input.getPrecedingText().size();
+			int to = from + input.getTextToTranslate().size();
+			return translate(cssStyledTextFromTranslatable(input), from, to);
+		}
+		
+		private BrailleTranslatorResult translate(Iterable<CSSStyledText> input, int from, int to) throws TranslationException {
+			List<String> braille = new ArrayList<>();
 			int wordSpacing; {
 				wordSpacing = -1;
-				for (CSSStyledText styledText : cssStyledTextFromTranslatable(input)) {
+				for (CSSStyledText styledText : input) {
 					SimpleInlineStyle style = styledText.getStyle();
 					int spacing = 1;
 					if (style != null) {
@@ -266,9 +326,19 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 					if (attrs != null)
 						for (String k : attrs.keySet())
 							logger.warn("Text attribute \"{}:{}\" ignored", k, attrs.get(k));
-					braille += styledText.getText(); }
+					braille.add(styledText.getText()); }
 				if (wordSpacing < 0) wordSpacing = 1; }
-			return new DefaultLineBreaker.LineIterator(braille, '\u2800', '\u2824', wordSpacing);
+			StringBuilder brailleString = new StringBuilder();
+			int fromChar = 0;
+			int toChar = to >= 0 ? 0 : -1;
+			for (String s : braille) {
+				brailleString.append(s);
+				if (--from == 0)
+					fromChar = brailleString.length();
+				if (--to == 0)
+					toChar = brailleString.length();
+			}
+			return new DefaultLineBreaker.LineIterator(brailleString.toString(), fromChar, toChar, '\u2800', '\u2824', wordSpacing);
 		}
 		
 		public String getTranslatorMode() {

@@ -2244,6 +2244,7 @@
             <xsl:choose>
                 <!--
                     For 'hyphens:none' all SHY and ZWSP characters are removed from the text in advance.
+                    FIXME: handle this with a style element
                 -->
                 <xsl:when test="$hyphens='none'">
                     <xsl:sequence select="replace($text,'[&#x00AD;&#x200B;]','')"/>
@@ -2253,58 +2254,22 @@
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
-        <xsl:variable name="text" as="xs:string">
-            <xsl:choose>
-                <xsl:when test="$word-spacing=1">
-                    <xsl:sequence select="$text"/>
-                </xsl:when>
-                <!--
-                    FIXME: style elements are currently processed in a step before line breaking (in
-                    MarkerProcessorFactoryServiceImpl) so that they can't be used for passing
-                    word-spacing to a "LineBreakingFromStyledText". Performing word spacing in XSLT
-                    instead. Alternatively this could be implemented in a "FromStyledTextToBraille".
-                -->
-                <xsl:otherwise>
-                    <xsl:variable name="words" as="xs:string*">
-                        <xsl:analyze-string select="$text" regex="[&#x00AD;&#x200B;]*[ \t\n\r][&#x00AD;&#x200B; \t\n\r]*">
-                            <xsl:matching-substring/>
-                            <xsl:non-matching-substring>
-                                <xsl:sequence select="."/>
-                            </xsl:non-matching-substring>
-                        </xsl:analyze-string>
-                    </xsl:variable>
-                    <xsl:variable name="spacing" as="xs:string" select="concat(string-join(for $x in 1 to $word-spacing return '&#x00A0;',''),'&#x200B;')"/>
-                    <xsl:sequence select="string-join($words, $spacing)"/>
-                </xsl:otherwise>
-            </xsl:choose>
-        </xsl:variable>
-        <xsl:choose>
+        <xsl:variable name="style" as="xs:string*">
             <!--
                 text-transform values 'none' and 'auto' are handled through the translate attribute.
             -->
-            <xsl:when test="$text-transform=('none','auto')">
+            <xsl:if test="not($text-transform=('none','auto'))">
+                <xsl:sequence select="concat('text-transform: ',$text-transform)"/>
+            </xsl:if>
+            <xsl:if test="not($word-spacing=1)">
+                <xsl:sequence select="concat('word-spacing: ',format-number($word-spacing, '0'))"/>
+            </xsl:if>
+        </xsl:variable>
+        <xsl:choose>
+            <xsl:when test="not(exists($style))">
                 <xsl:value-of select="$text"/>
             </xsl:when>
-            <!--
-                Other values are handled through the style element
-            -->
             <xsl:otherwise>
-                <xsl:variable name="style" as="xs:string*">
-                    <xsl:sequence select="concat('text-transform: ',$text-transform)"/>
-                    <xsl:if test="$hyphens='auto'">
-                        <!--
-                            The translation of a style always happens in two stages (result of
-                            Dotify implementation). We have to make sure that the first translation
-                            has all the information needed (and ideally make the second a
-                            no-op). This includes whether to hyphenate or not. In the case we need
-                            to hyphenate, a "hyphenate" attribute has been added to a ancestor block
-                            or span. However, since that attribute is processed only during the
-                            second translation stage, we have to add a 'hyphens' style as well. This
-                            leads to some duplication, but that's alright.
-                        -->
-                        <xsl:sequence select="concat('hyphens: ',$hyphens)"/>
-                    </xsl:if>
-                </xsl:variable>
                 <style name="{string-join($style,'; ')}">
                     <xsl:value-of select="$text"/>
                 </style>
