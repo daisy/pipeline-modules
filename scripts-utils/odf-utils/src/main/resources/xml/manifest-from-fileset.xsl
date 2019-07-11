@@ -5,15 +5,22 @@
         xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
         xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">
     
-    <xsl:variable name="base" select="//d:file[starts-with(@media-type,'application/vnd.oasis.opendocument')]
-                                      /resolve-uri(@href, base-uri(.))"/>
+    <xsl:param name="param-base" required="no" select="''"/>
+    
+    <xsl:variable name="base" select="if ($param-base!='')
+                                      then $param-base
+                                      else (//d:file[starts-with(@media-type,'application/vnd.oasis.opendocument')]
+                                            /resolve-uri(@href, base-uri(.)),
+                                            base-uri(/*))[1]"/>
     
     <xsl:include href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl"/>
     
     <xsl:template match="d:fileset">
-        <xsl:if test="not($base)">
+        <xsl:if test="not(exists(//d:file[resolve-uri(@href,base-uri(.))=$base][@media-type]))">
             <xsl:message terminate="yes">
-                <xsl:text>[odf-utils] ERROR: manifest could not be created from fileset, no entry with media-type application/vnd.oasis.opendocument*</xsl:text>
+                <xsl:text>[odf-utils] ERROR: manifest could not be created from fileset, no entry with media-type application/vnd.oasis.opendocument* and no entry with href="</xsl:text>
+                <xsl:value-of select="$base"/>
+                <xsl:text>" and that has a media-type</xsl:text>
             </xsl:message>
         </xsl:if>
         <xsl:element name="manifest:manifest">
@@ -32,8 +39,10 @@
     <xsl:template match="d:file[resolve-uri(@href,base-uri(.))=$base]">
         <xsl:element name="manifest:file-entry">
             <xsl:attribute name="manifest:full-path" select="'/'"/>
-            <xsl:attribute name="manifest:version" select="'1.2'"/>
             <xsl:attribute name="manifest:media-type" select="@media-type"/>
+            <xsl:if test="starts-with(@media-type,'application/vnd.oasis.opendocument')">
+                <xsl:attribute name="manifest:version" select="'1.2'"/>
+            </xsl:if>
         </xsl:element>
     </xsl:template>
     

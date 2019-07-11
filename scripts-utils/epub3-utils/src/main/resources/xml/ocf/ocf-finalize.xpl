@@ -32,10 +32,19 @@
         <p:pipe port="signature" step="main"/>
     </p:output>
     
-    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
+        <p:documentation>
+            px:fileset-add-entry
+        </p:documentation>
+    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
         <p:documentation>
             px:set-base-uri
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/odf-utils/library.xpl">
+        <p:documentation>
+            px:odf-manifest-from-fileset
         </p:documentation>
     </p:import>
     
@@ -134,14 +143,8 @@
         </p:identity>
         <p:choose>
             <p:when test="$create-odf-manifest = 'true'">
-                <p:xslt>
-                    <p:input port="stylesheet">
-                        <p:document href="fileset-to-odf-manifest.xsl"/>
-                    </p:input>
-                    <p:input port="parameters">
-                        <p:empty/>
-                    </p:input>
-                </p:xslt>
+                <px:fileset-add-entry media-type="application/epub+zip" href="."/>
+                <px:odf-manifest-from-fileset/>
                 <px:set-base-uri>
                     <p:with-option name="base-uri" select="resolve-uri('META-INF/manifest.xml',/*/@result-base)">
                         <p:pipe port="result" step="result-base"/>

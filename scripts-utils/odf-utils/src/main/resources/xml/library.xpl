@@ -6,5 +6,7 @@
   <p:import href="get-file.xpl"/>
   <p:import href="embed-images.xpl"/>
   <p:import href="separate-mathml.xpl"/>
+  <p:import href="manifest-to-fileset.xpl"/>
+  <p:import href="manifest-from-fileset.xpl"/>
   
 </p:library>

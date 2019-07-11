@@ -3,6 +3,7 @@
                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                xmlns:d="http://www.daisy.org/ns/pipeline/data"
                xmlns:c="http://www.w3.org/ns/xproc-step"
+               xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
                script="../../../main/resources/xml/ocf/ocf-finalize.xpl">
 
 	<x:scenario label="test-default">
@@ -83,6 +84,43 @@
 		<x:expect label="the error" type="xpath"
 		          test="/c:errors/c:error/concat('[',@code,'] ',normalize-space(string(.)))"
 		          equals="'[err:EOU002] No OPF was found in the source file set.'"/>
+	</x:scenario>
+	
+	<x:scenario label="test-create-odf-manifest">
+		<x:call step="px:epub3-ocf-finalize">
+			<x:input port="source">
+				<x:document type="inline">
+					<d:fileset xml:base="file:/tmp/dir/">
+						<d:file href="Content/package.opf" media-type="application/oebps-package+xml"/>
+					</d:fileset>
+				</x:document>
+			</x:input>
+			<x:option name="create-odf-manifest" select="true()"/>
+		</x:call>
+		<x:context label="the result port">
+			<x:document type="port" port="result"/>
+		</x:context>
+		<x:expect label="the result" type="compare">
+			<x:document type="inline">
+				<d:fileset xml:base="file:/tmp/dir/">
+					<d:file href="Content/package.opf" media-type="application/oebps-package+xml"/>
+					<d:file href="META-INF/container.xml"/>
+					<d:file href="META-INF/manifest.xml"/>
+				</d:fileset>
+			</x:document>
+		</x:expect>
+		<x:context label="the manifest document on the in-memory.out port">
+			<x:document type="port" port="in-memory.out" select="/*[base-uri()='file:/tmp/dir/META-INF/manifest.xml']"/>
+		</x:context>
+		<x:expect label="the manifest document" type="compare">
+			<x:document type="inline">
+				<manifest:manifest manifest:version="1.2">
+					<manifest:file-entry manifest:full-path="Content/package.opf" manifest:media-type="application/oebps-package+xml"/>
+					<manifest:file-entry manifest:full-path="META-INF/container.xml" manifest:media-type=""/>
+					<manifest:file-entry manifest:full-path="/" manifest:media-type="application/epub+zip"/>
+				</manifest:manifest>
+			</x:document>
+		</x:expect>
 	</x:scenario>
 	
 </x:description>
