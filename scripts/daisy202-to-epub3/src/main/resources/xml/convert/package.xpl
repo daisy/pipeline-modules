@@ -56,7 +56,11 @@
 
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/mediatype-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/epub3-pub-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/epub3-utils/pub/library.xpl">
+        <p:documentation>
+            px:epub3-pub-create-package-doc
+        </p:documentation>
+    </p:import>
 
     <p:variable name="result-uri" select="concat($publication-dir,'package.opf')"/>
 

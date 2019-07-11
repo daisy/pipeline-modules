@@ -78,7 +78,7 @@
             px:fileset-join
         </p:documentation>
     </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/epub3-nav-utils/library.xpl">
+    <p:import href="http://www.daisy.org/pipeline/modules/epub3-utils/nav/library.xpl">
         <p:documentation>
             px:epub3-nav-create-toc
             px:epub3-nav-aggregate
