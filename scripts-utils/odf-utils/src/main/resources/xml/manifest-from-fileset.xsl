@@ -1,17 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="2.0"
-        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-        xmlns:d="http://www.daisy.org/ns/pipeline/data"
-        xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
-        xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:d="http://www.daisy.org/ns/pipeline/data"
+                xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
+                xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">
     
-    <xsl:param name="param-base" required="no" select="''"/>
-    
-    <xsl:variable name="base" select="if ($param-base!='')
-                                      then $param-base
-                                      else (//d:file[starts-with(@media-type,'application/vnd.oasis.opendocument')]
-                                            /resolve-uri(@href, base-uri(.)),
-                                            base-uri(/*))[1]"/>
+    <xsl:param name="base" required="yes"/>
     
     <xsl:include href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl"/>
     
@@ -25,7 +19,6 @@
         </xsl:if>
         <xsl:element name="manifest:manifest">
             <xsl:attribute name="manifest:version" select="'1.2'"/>
-            <xsl:attribute name="xml:base" select="resolve-uri('META-INF/manifest.xml', $base)"/>
             <xsl:apply-templates select="d:file"/>
             <xsl:if test="d:file[starts-with(pf:relativize-uri(resolve-uri(@href, base-uri(.)), $base), 'Configurations2/')]">
                 <xsl:element name="manifest:file-entry">

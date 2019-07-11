@@ -2,6 +2,7 @@
 <p:declare-step type="px:odf-manifest-from-fileset" version="1.0"
                 xmlns:p="http://www.w3.org/ns/xproc"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 exclude-inline-prefixes="#all"
                 name="main">
 	
@@ -26,11 +27,28 @@
 		</p:documentation>
 	</p:option>
 	
+	<p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
+		<p:documentation>
+			px:set-base-uri
+		</p:documentation>
+	</p:import>
+	
+	<p:variable name="base2"
+	            select="if ($base!='')
+	                    then $base
+	                    else (
+	                      //d:file[starts-with(@media-type,'application/vnd.oasis.opendocument')]/resolve-uri(@href,base-uri(.)),
+	                      base-uri(/*))[1]"/>
+	
 	<p:xslt>
 		<p:input port="stylesheet">
 			<p:document href="manifest-from-fileset.xsl"/>
 		</p:input>
-		<p:with-param name="param-base" select="$base"/>
+		<p:with-param name="base" select="$base2"/>
 	</p:xslt>
+	
+	<px:set-base-uri>
+		<p:with-option name="base-uri" select="resolve-uri('META-INF/manifest.xml',$base2)"/>
+	</px:set-base-uri>
 	
 </p:declare-step>
