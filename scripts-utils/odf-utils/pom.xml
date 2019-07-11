@@ -10,11 +10,11 @@
     <relativePath>../../parent/</relativePath>
   </parent>
 
-  <artifactId>odt-utils</artifactId>
+  <artifactId>odf-utils</artifactId>
   <version>1.0.4-SNAPSHOT</version>
   <packaging>bundle</packaging>
 
-  <name>DAISY Pipeline 2 module :: ODT Utils</name>
+  <name>DAISY Pipeline 2 module :: ODF (Open Document Format) Utils</name>
 
   <dependencies>
     <dependency>
@@ -48,7 +48,7 @@
   
   <properties>
     <expose-services>
-      org.daisy.pipeline.modules.impl.Module_odt_utils
+      org.daisy.pipeline.modules.impl.Module_odf_utils
     </expose-services>
   </properties>
   

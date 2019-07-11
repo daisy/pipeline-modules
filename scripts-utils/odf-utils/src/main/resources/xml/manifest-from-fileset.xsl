@@ -13,7 +13,7 @@
     <xsl:template match="d:fileset">
         <xsl:if test="not($base)">
             <xsl:message terminate="yes">
-                <xsl:text>[odt-utils] ERROR: manifest could not be created from fileset, no entry with media-type application/vnd.oasis.opendocument*</xsl:text>
+                <xsl:text>[odf-utils] ERROR: manifest could not be created from fileset, no entry with media-type application/vnd.oasis.opendocument*</xsl:text>
             </xsl:message>
         </xsl:if>
         <xsl:element name="manifest:manifest">
@@ -63,7 +63,7 @@
             </xsl:when>
             <xsl:otherwise>
                 <xsl:message>
-                    <xsl:text>[odt-utils] WARNING: the file </xsl:text>
+                    <xsl:text>[odf-utils] WARNING: the file </xsl:text>
                     <xsl:value-of select="$absolute-uri"/>
                     <xsl:text> will not be included in the manifest because it falls outside of the base directory </xsl:text>
                     <xsl:value-of select="$base"/>
