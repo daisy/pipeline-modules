@@ -28,6 +28,7 @@
     <module>dtbook-utils</module>
     <module>epub3-utils</module>
     <module>epubcheck-adapter</module>
+    <module>mathml-utils</module>
     <module>mediaoverlay-utils</module>
     <module>metadata-utils</module>
     <module>odf-utils</module>
