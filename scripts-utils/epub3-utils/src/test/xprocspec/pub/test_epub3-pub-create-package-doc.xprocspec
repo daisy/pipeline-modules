@@ -222,10 +222,10 @@
 		<x:expect label="the result" type="custom" href="../../../main/resources/xml/pub/compare-package-doc.xpl"
 		          step="x:epub3-pub-compare-package-doc">
 			<x:document type="inline">
-				<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="d1077e13" version="3.0">
+				<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="d1590e13" version="3.0">
 					<metadata>
 						<dc:title>Minimal DTBook</dc:title>
-						<dc:identifier id="d1077e13">my-id</dc:identifier>
+						<dc:identifier id="d1590e13">my-id</dc:identifier>
 						<dc:language>en</dc:language>
 						<meta property="dcterms:modified">2019-05-20T18:14:36Z</meta>
 						<dc:publisher>unknown</dc:publisher>
