@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:html="http://www.w3.org/1999/xhtml" xmlns="http://www.daisy.org/z3986/2005/ncx/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:epub="http://www.idpf.org/2007/ops" exclude-result-prefixes="#all" version="2.0" xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions" xmlns:d="http://www.daisy.org/ns/pipeline/data"
-    xmlns:pf="http://www.daisy.org/ns/pipeline/functions">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:html="http://www.w3.org/1999/xhtml"
+                xmlns:epub="http://www.idpf.org/2007/ops"
+                xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
+                xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions"
+                xmlns="http://www.daisy.org/z3986/2005/ncx/"
+                exclude-result-prefixes="#all">
 
-    <!-- Creates a text-only NCX based on a EPUB3 Navigation Document -->
     <!-- TODO: pages and landmarks will not be in reading order. to determine their reading order, the content documents would have to be inspected. -->
 
     <xsl:import href="http://www.daisy.org/pipeline/modules/common-utils/i18n.xsl"/>

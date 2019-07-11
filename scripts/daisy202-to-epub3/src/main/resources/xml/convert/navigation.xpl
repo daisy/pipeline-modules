@@ -82,6 +82,7 @@
         <p:documentation>
             px:epub3-nav-create-toc
             px:epub3-nav-aggregate
+            px:epub3-nav-to-ncx
         </p:documentation>
     </p:import>
 
@@ -238,14 +239,7 @@
                 </p:input>
             </p:insert>
             <px:message message="Creating NCX..."/>
-            <p:xslt name="ncx.ncx-without-docauthors">
-                <p:input port="parameters">
-                    <p:empty/>
-                </p:input>
-                <p:input port="stylesheet">
-                    <p:document href="http://www.daisy.org/pipeline/modules/epub3-nav-utils/nav-to-ncx.xsl"/>
-                </p:input>
-            </p:xslt>
+            <px:epub3-nav-to-ncx name="ncx.ncx-without-docauthors"/>
             <p:for-each>
                 <p:iteration-source select="//html:meta[@name='dc:creator']">
                     <p:pipe port="ncc-navigation" step="main"/>
