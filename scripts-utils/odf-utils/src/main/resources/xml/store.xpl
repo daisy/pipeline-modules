@@ -36,6 +36,11 @@
             px:zip
         </p:documentation>
     </p:import>
+    <p:import href="manifest-from-fileset.xpl">
+        <p:documentation>
+            px:odf-manifest-from-fileset
+        </p:documentation>
+    </p:import>
     
     <p:variable name="base" select="//d:file[starts-with(@media-type, 'application/vnd.oasis.opendocument')]
                                     /resolve-uri(@href, base-uri(.))"/>
@@ -48,14 +53,7 @@
     <!-- Generate manifest -->
     <!-- ================= -->
     
-    <p:xslt name="manifest">
-        <p:input port="stylesheet">
-            <p:document href="manifest-from-fileset.xsl"/>
-        </p:input>
-        <p:input port="parameters">
-            <p:empty/>
-        </p:input>
-    </p:xslt>
+    <px:odf-manifest-from-fileset name="manifest"/>
     <p:sink/>
     
     <!-- Remove directories from fileset -->

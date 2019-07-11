@@ -22,6 +22,11 @@
     </p:output>
     
     <p:import href="http://www.daisy.org/pipeline/modules/zip-utils/library.xpl"/>
+    <p:import href="manifest-to-fileset.xpl">
+        <p:documentation>
+            px:odf-manifest-to-fileset
+        </p:documentation>
+    </p:import>
     
     <!-- ==================== -->
     <!-- Extract ODT manifest -->
@@ -42,12 +47,9 @@
     <!-- Convert manifest to fileset -->
     <!-- =========================== -->
     
-    <p:xslt name="fileset">
-        <p:input port="stylesheet">
-            <p:document href="manifest-as-fileset.xsl"/>
-        </p:input>
-        <p:with-param name="base" select="$target"/>
-        <p:with-param name="original-base" select="concat($href, '!/')"/>
-    </p:xslt>
+    <px:odf-manifest-to-fileset name="fileset">
+        <p:with-option name="base" select="$target"/>
+        <p:with-option name="original-base" select="concat($href, '!/')"/>
+    </px:odf-manifest-to-fileset>
     
 </p:declare-step>

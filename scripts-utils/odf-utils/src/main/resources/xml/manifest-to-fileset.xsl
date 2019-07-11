@@ -4,7 +4,7 @@
         xmlns:d="http://www.daisy.org/ns/pipeline/data"
         xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">
     
-    <xsl:param name="base"/>
+    <xsl:param name="base" required="yes"/>
     <xsl:param name="original-base" select="''"/>
     
     <xsl:template match="manifest:manifest">
