@@ -71,7 +71,7 @@
 			px:unzip
 		</p:documentation>
 	</p:import>
-	<p:import href="opf-manifest-to-fileset.xpl"/>
+	<p:import href="../pub/opf-manifest-to-fileset.xpl"/>
 	
 	<px:assert message="When store-to-disk='true' then temp-dir must also be defined" error-code="PZU001">
 		<p:with-option name="test" select="$store-to-disk='false' or p:value-available('temp-dir')"/>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <x:description xmlns:x="http://www.jenitennison.com/xslt/xspec"
-               stylesheet="../../../main/resources/xml/ocf/opf-manifest-to-fileset.xsl">
+               stylesheet="../../../main/resources/xml/pub/opf-manifest-to-fileset.xsl">
 
     <x:scenario label="Scenario for testing a function">
         <x:context>

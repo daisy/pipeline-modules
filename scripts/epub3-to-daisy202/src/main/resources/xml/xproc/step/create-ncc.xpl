@@ -48,7 +48,7 @@
             px:fileset-intersect
         </p:documentation>
     </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/epub3-utils/ocf/library.xpl">
+    <p:import href="http://www.daisy.org/pipeline/modules/epub3-utils/pub/library.xpl">
         <p:documentation>
             px:opf-spine-to-fileset
         </p:documentation>
