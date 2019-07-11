@@ -22,8 +22,12 @@
     <!-- IMPORTS                                                                 -->
     <!--=========================================================================-->
 
-    <p:import href="http://www.daisy.org/pipeline/modules/epub3-ocf-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/epub3-pub-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/epub3-utils/library.xpl">
+        <p:documentation>
+            px:epub3-pub-create-package-doc
+            px:epub3-ocf-finalize
+        </p:documentation>
+    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/library.xpl"/>
