@@ -104,7 +104,11 @@ See [Templating](http://daisy.github.io/pipeline/modules/dtbook-to-odt#templatin
     
     <p:import href="dtbook-to-odt.convert.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/dtbook-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/odt-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/odf-utils/library.xpl">
+        <p:documentation>
+            odt:store
+        </p:documentation>
+    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl"/>
     
     <!-- =============== -->

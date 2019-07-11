@@ -17,7 +17,7 @@
       <p:output port="result">
         <p:pipe step="store" port="result"/>
       </p:output>
-      <p:import href="http://www.daisy.org/pipeline/modules/odt-utils/library.xpl"/>
+      <p:import href="http://www.daisy.org/pipeline/modules/odf-utils/library.xpl"/>
       <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
       <px:fileset-create name="base">
         <p:with-option name="base" select="$fileset-base"/>

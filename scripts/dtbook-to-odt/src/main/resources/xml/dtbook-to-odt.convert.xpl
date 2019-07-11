@@ -48,7 +48,14 @@
     
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/odt-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/odf-utils/library.xpl">
+        <p:documentation>
+            odt:load
+            odt:get-file
+            odt:embed-images
+            odt:separate-mathml
+        </p:documentation>
+    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/asciimath-utils/library.xpl"/>
     
     <!-- =========== -->
