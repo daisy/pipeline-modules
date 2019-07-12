@@ -38,7 +38,7 @@
     <xsl:template match="manifest:file-entry[@manifest:full-path='/' and starts-with(@manifest:media-type, 'application/vnd.oasis.opendocument')]"
                   priority="0.7">
         <xsl:element name="d:file">
-            <xsl:attribute name="href" select="'.'"/>
+            <xsl:attribute name="href" select="'./'"/>
             <xsl:if test="not(string(@manifest:media-type)='')">
                 <xsl:attribute name="media-type" select="@manifest:media-type"/>
             </xsl:if>

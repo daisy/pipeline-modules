@@ -51,7 +51,7 @@
       <x:input port="fileset.in">
         <x:document type="inline">
           <d:fileset>
-            <d:file href="" media-type="application/vnd.oasis.opendocument.text"/>
+            <d:file href="./" media-type="application/vnd.oasis.opendocument.text"/>
             <d:file href="content.xml" original-href="../resources/test.odt/content.xml" media-type="text/xml"/>
             <d:file href="styles.xml" original-href="../resources/test.odt/styles.xml" media-type="text/xml"/>
             <d:file href="meta.xml" original-href="../resources/test.odt/meta.xml" media-type="text/xml"/>
