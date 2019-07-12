@@ -80,7 +80,6 @@
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/epub3-utils/nav/library.xpl">
         <p:documentation>
-            px:epub3-nav-create-toc
             px:epub3-nav-aggregate
             px:epub3-nav-to-ncx
         </p:documentation>
