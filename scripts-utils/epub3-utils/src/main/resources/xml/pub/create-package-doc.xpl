@@ -9,29 +9,119 @@
                 xmlns:epub="http://www.idpf.org/2007/ops"
                 type="px:epub3-pub-create-package-doc" name="main">
 
+    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+        <p>Create a <a href="http://www.idpf.org/epub/301/spec/epub-publications.html">EPUB Package
+        Document</a></p>
+    </p:documentation>
+    
     <!-- Note: all URIs in options and xml:base attributes must be absolute. -->
-    <p:input port="spine-filesets" sequence="true" primary="true"/>
+    <p:input port="spine-filesets" sequence="true" primary="true">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Fileset that will make up the primary <a
+            href="http://www.idpf.org/epub/301/spec/epub-publications.html#sec-spine-elem">spine</a>
+            items.</p>
+            <p>The content documents in publication-resources (that are not in spine-filesets)
+            become auxiliary spine items.</p>
+        </p:documentation>
+    </p:input>
     <p:input port="publication-resources">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Fileset of other resources to be included in the publication.</p>
+        </p:documentation>
         <p:inline>
             <d:fileset/>
         </p:inline>
     </p:input>
     <p:input port="metadata" sequence="true">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Sequence of <code>metadata</code> elements in the OPF namespace from which the <a
+            href="http://www.idpf.org/epub/301/spec/epub-publications.html#sec-metadata-elem"><code>metadata</code>
+            element</a> for the package document will be constructed</p>.
+            <p>Will be augmented with "duration" metadata that is extracted from the mediaoverlays
+            input.</p>
+            <p>If not specified, a metadata element with the minimal required metadata will be
+            included.</p>
+        </p:documentation>
         <p:inline>
             <opf:metadata/>
         </p:inline>
     </p:input>
     <p:input port="bindings" sequence="true">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Fileset from which to contruct the <a
+            href="http://www.idpf.org/epub/301/spec/epub-publications.html#sec-bindings-elem"><code>bindings</code></a>
+            element of the package document.</p>
+            <p>Ignored if compatibility-mode is not true.</p>
+        </p:documentation>
         <p:empty/>
     </p:input>
-    <p:input port="content-docs" sequence="true"/>
+    <p:input port="content-docs" sequence="true">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>The <a
+            href="http://www.idpf.org/epub/301/spec/epub-publications.html#gloss-content-document-epub">content
+            documents</a></p>
+        </p:documentation>
+    </p:input>
     <p:input port="mediaoverlays" sequence="true">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>The <a
+            href="http://www.idpf.org/epub/301/spec/epub-publications.html#gloss-media-overlay-document">media
+            overlay documents</a></p>
+        </p:documentation>
         <p:empty/>
     </p:input>
-    <p:option name="nav-uri" select="''"/>
-    <p:option name="cover-image" required="false" select="''"/>
-    <p:option name="compatibility-mode" required="false" select="'true'"/>
-    <p:option name="detect-properties" required="false" select="'true'"/>
+    <p:option name="nav-uri" select="''">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>URI of the file from content-docs that is to be used as the navigation document.</p>
+            <p>If not specified, the file that contains a <code>nav[@epub:type='toc']</code> element
+            is picked.</p>
+        </p:documentation>
+    </p:option>
+    <p:option name="cover-image" required="false" select="''">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>URI of the file that is to be marked as the <a
+            href="http://www.idpf.org/epub/301/spec/epub-publications.html#cover-image"><code>cover-image</code></a>.</p>
+        </p:documentation>
+    </p:option>
+    <p:option name="compatibility-mode" required="false" select="'true'">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Whether to be backward compatible with <a
+            href="http://idpf.org/epub/20/spec/OPF_2.0.1_draft.htm">Open Package Format
+            2.0.1</a>.</p>
+        </p:documentation>
+    </p:option>
+    <p:option name="detect-properties" required="false" select="'true'">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Whether to automatically detect <a
+            href="http://www.idpf.org/epub/301/spec/epub-publications.html#sec-item-property-values">manifest
+            item properties</a>:</p>
+            <ul>
+                <ol><a
+                href="http://www.idpf.org/epub/301/spec/epub-publications.html#mathml"><code>mathml</code></a>:
+                when a document contains instances of MathML markup</ol>
+                <ol><a
+                href="http://www.idpf.org/epub/301/spec/epub-publications.html#remote-resources"><code>remote-resources</code></a>:
+                when a document contains references to other publication resources that are <a
+                href="http://www.idpf.org/epub/301/spec/epub-publications.html#sec-resource-locations">located
+                outside of the EPUB container</a></ol>
+                <ol><a
+                href="http://www.idpf.org/epub/301/spec/epub-publications.html#scripted"><code>scripted</code></a>:
+                when a document is a <a
+                href="http://www.idpf.org/epub/301/spec/epub-publications.html#gloss-content-document-epub-scripted">scripted
+                content document</a> (contains scripted content and/or elements from HTML5 forms)</ol>
+                <ol><a
+                href="http://www.idpf.org/epub/301/spec/epub-publications.html#svg"><code>svg</code></a>:
+                when a document is a <a
+                href="http://www.idpf.org/epub/301/spec/epub-publications.html#gloss-content-document-epub-svg">SVG
+                content document</a> or contains instances of SVG markup</ol>
+                <ol><a
+                href="http://www.idpf.org/epub/301/spec/epub-publications.html#switch"><code>switch</code></a>:
+                when a document contains <a
+                href="http://www.idpf.org/epub/301/spec/epub-contentdocs.html#elemdef-switch"><code>epub:switch</code></a>
+                elements</ol>
+            </ul>
+        </p:documentation>
+    </p:option>
     <p:option name="result-uri" required="true"/>
     <p:output port="result" primary="true"/>
 
