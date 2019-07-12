@@ -46,6 +46,9 @@
     <data type="IDREF"></data>
   </define>
     
+  <start>
+    <ref name="math"/>
+  </start>
   <include href="mathml2-qname-1.mod.rng"/>
   <!--
     if %NS.prefixed; is INCLUDE, include all NS attributes, 
