@@ -13,4 +13,5 @@
    <nextCatalog catalog="org:daisy:pipeline:modules:common-utils" />
    <nextCatalog catalog="org:daisy:pipeline:modules:css-utils" />
    <nextCatalog catalog="org:daisy:pipeline:modules:metadata-utils"/>
+   <nextCatalog catalog="org:daisy:pipeline:modules:mathml-utils"/>
 </catalog>
