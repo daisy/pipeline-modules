@@ -48,7 +48,12 @@
             px:zedai-to-opf-metadata
         </p:documentation>
     </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
+        <p:documentation>
+            px:html-id-fixer
+            px:html-chunker
+        </p:documentation>
+    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/epub3-utils/library.xpl">
         <p:documentation>
             px:epub3-nav-create-toc
@@ -157,14 +162,9 @@
         <px:set-base-uri>
             <p:with-option name="base-uri" select="$result-basename"/>
         </px:set-base-uri>
-        <p:xslt name="zedai-to-html.html-with-ids">
-            <p:input port="stylesheet">
-                <p:document href="http://www.daisy.org/pipeline/modules/html-utils/html-id-fixer.xsl"/>
-            </p:input>
-            <p:input port="parameters">
-                <p:empty/>
-            </p:input>
-        </p:xslt>
+        <px:html-id-fixer name="zedai-to-html.html-with-ids">
+            <p:documentation>Add missing IDs</p:documentation>
+        </px:html-id-fixer>
         <px:html-chunker name="zedai-to-html.html-chunks">
             <p:with-option name="max-chunk-size" select="$chunk-size"/>
         </px:html-chunker>
