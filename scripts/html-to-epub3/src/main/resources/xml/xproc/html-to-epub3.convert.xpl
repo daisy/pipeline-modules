@@ -33,6 +33,7 @@
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
     <p:import href="html-to-epub3.content.xpl"/>
+    <p:import href="html-to-opf-metadata.xpl"/>
 
     <p:variable name="epub-dir" select="concat($output-dir,'epub/')">
         <p:empty/>
@@ -128,17 +129,11 @@
     <p:group name="metadata">
         <p:output port="result"/>
         <!--TODO adapt to multiple XHTML input docs-->
-        <p:xslt>
+        <pxi:html-to-opf-metadata>
             <p:input port="source">
-                <p:pipe port="docs" step="content-docs"/>
+                <p:pipe step="content-docs" port="docs"/>
             </p:input>
-            <p:input port="parameters">
-                <p:empty/>
-            </p:input>
-            <p:input port="stylesheet">
-                <p:document href="../xslt/html-to-metadata.xsl"/>
-            </p:input>
-        </p:xslt>
+        </pxi:html-to-opf-metadata>
     </p:group>
     <p:sink/>
 
