@@ -56,9 +56,7 @@
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/epub3-utils/library.xpl">
         <p:documentation>
-            px:epub3-nav-create-toc
-            px:epub3-nav-create-page-list
-            px:epub3-nav-aggregate
+            px:epub3-nav-create-navigation-doc
             px:epub3-pub-create-package-doc
             px:epub3-ocf-finalize
         </p:documentation>
@@ -197,38 +195,22 @@
         <p:output port="html-file">
             <p:pipe port="result" step="navigation-doc.result.html-file"/>
         </p:output>
-        <p:variable name="nav-base" select="concat($content-dir,'toc.xhtml')">
-            <p:empty/>
-        </p:variable>
-        <px:epub3-nav-create-toc name="navigation-doc.toc">
-            <p:input port="source">
-                <p:pipe port="html-files" step="zedai-to-html"/>
-            </p:input>
-            <p:with-option name="output-base-uri" select="$nav-base">
-                <p:empty/>
-            </p:with-option>
-        </px:epub3-nav-create-toc>
-        <px:epub3-nav-create-page-list name="navigation-doc.page-list">
-            <p:input port="source">
-                <p:pipe port="html-files" step="zedai-to-html"/>
-            </p:input>
-            <p:with-option name="output-base-uri" select="$nav-base">
-                <p:empty/>
-            </p:with-option>
-        </px:epub3-nav-create-page-list>
-        <px:epub3-nav-aggregate name="navigation-doc.html-file">
-            <p:input port="source">
-                <p:pipe port="result" step="navigation-doc.toc"/>
-                <p:pipe port="result" step="navigation-doc.page-list"/>
-            </p:input>
-            <p:with-option name="output-base-uri" select="$nav-base"/>
-        </px:epub3-nav-aggregate>
         <!--TODO create other nav types (configurable ?)-->
+        <px:epub3-nav-create-navigation-doc name="navigation-doc.html-file">
+            <p:input port="source">
+                <p:pipe port="html-files" step="zedai-to-html"/>
+            </p:input>
+            <p:with-option name="output-base-uri" select="concat($content-dir,'toc.xhtml')">
+                <p:empty/>
+            </p:with-option>
+        </px:epub3-nav-create-navigation-doc>
         <px:fileset-create>
             <p:with-option name="base" select="$content-dir"/>
         </px:fileset-create>
         <px:fileset-add-entry media-type="application/xhtml+xml" name="navigation-doc.result.fileset">
-            <p:with-option name="href" select="$nav-base"/>
+            <p:with-option name="href" select="base-uri(/*)">
+                <p:pipe step="navigation-doc.html-file" port="result"/>
+            </p:with-option>
         </px:fileset-add-entry>
         <p:identity>
             <p:input port="source">

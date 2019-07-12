@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step type="px:epub3-nav-aggregate" name="main" xmlns:p="http://www.w3.org/ns/xproc" xmlns:px="http://www.daisy.org/ns/pipeline/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data"
-    xmlns:html="http://www.w3.org/1999/xhtml" version="1.0">
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
+                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                xmlns:d="http://www.daisy.org/ns/pipeline/data"
+                xmlns:html="http://www.w3.org/1999/xhtml"
+                type="px:epub3-nav-aggregate" name="main">
 
     <p:input port="source" sequence="true"/>
     <p:output port="result"/>

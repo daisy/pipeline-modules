@@ -5,7 +5,6 @@
                 xmlns:epub="http://www.idpf.org/2007/ops"
                 type="px:epub3-nav-create-page-list" name="main">
 
-
     <p:input port="source" sequence="true"/>
     <p:output port="result">
         <p:pipe port="result" step="result"/>
