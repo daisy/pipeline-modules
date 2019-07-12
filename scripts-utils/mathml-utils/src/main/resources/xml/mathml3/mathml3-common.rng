@@ -170,7 +170,7 @@
       </attribute>
     </optional>
   </define>
-  <define name="annotation">
+  <define name="mathml-annotation">
     <element name="annotation">
       <ref name="annotation.attributes"/>
       <text/>
@@ -239,7 +239,7 @@
       <ref name="MathExpression"/>
       <zeroOrMore>
         <choice>
-          <ref name="annotation"/>
+          <ref name="mathml-annotation"/>
           <ref name="annotation-xml"/>
         </choice>
       </zeroOrMore>

@@ -53,7 +53,7 @@
       </choice>
       <zeroOrMore>
         <choice>
-          <ref name="annotation"/>
+          <ref name="mathml-annotation"/>
           <ref name="annotation-xml"/>
         </choice>
       </zeroOrMore>
@@ -65,7 +65,7 @@
       <ref name="ContExp"/>
       <zeroOrMore>
         <choice>
-          <ref name="annotation"/>
+          <ref name="mathml-annotation"/>
           <ref name="annotation-xml"/>
         </choice>
       </zeroOrMore>

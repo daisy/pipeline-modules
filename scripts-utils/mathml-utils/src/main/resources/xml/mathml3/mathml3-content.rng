@@ -855,7 +855,7 @@
   <define name="nary-setlist-constructor.class">
     <choice>
       <ref name="set"/>
-      <ref name="list"/>
+      <ref name="mathml-list"/>
     </choice>
   </define>
   <define name="ContExp" combine="choice">
@@ -879,7 +879,7 @@
       </zeroOrMore>
     </element>
   </define>
-  <define name="list">
+  <define name="mathml-list">
     <element name="list">
       <ref name="CommonAtt"/>
       <ref name="DefEncAtt"/>
