@@ -4,6 +4,7 @@
    <uri name="http://www.daisy.org/pipeline/modules/epub3-utils/pub/library.xpl" uri="../xml/pub/epub3-pub-library.xpl"/>
    <uri name="http://www.daisy.org/pipeline/modules/epub3-utils/nav/library.xpl" uri="../xml/nav/epub3-nav-library.xpl"/>
    <uri name="http://www.daisy.org/pipeline/modules/epub3-utils/ocf/library.xpl" uri="../xml/ocf/epub3-ocf-library.xpl"/>
+   <uri name="http://www.daisy.org/pipeline/modules/epub3-utils/epub3-vocab.xsl" uri="../xml/epub3-vocab.xsl"/>
    <nextCatalog catalog="org:daisy:pipeline:modules:fileset-utils"/>
    <nextCatalog catalog="org:daisy:pipeline:modules:mediatype-utils"/>
    <nextCatalog catalog="org:daisy:pipeline:modules:smil-utils"/>
