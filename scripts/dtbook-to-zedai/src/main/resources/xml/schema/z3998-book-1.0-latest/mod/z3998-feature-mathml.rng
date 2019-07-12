@@ -29,7 +29,7 @@
         </revhistory>
     </info>
     <div>
-        <include href="mathml3-content.rng">
+        <include href="http://www.daisy.org/pipeline/modules/mathml-utils/mathml3-content.rng">
             <define name="MathExpression" combine="choice">
                 <notAllowed/>
             </define>
@@ -37,7 +37,7 @@
                 <empty/>
             </define>
         </include>
-        <include href="mathml3-presentation.rng">
+        <include href="http://www.daisy.org/pipeline/modules/mathml-utils/mathml3-presentation.rng">
             <define name="mglyph.deprecatedattributes">
                 <empty/>
             </define>
@@ -48,7 +48,7 @@
                 <empty/>
             </define>
         </include>
-        <include href="mathml3-common.rng">
+        <include href="http://www.daisy.org/pipeline/modules/mathml-utils/mathml3-common.rng">
             <start combine="choice">
                 <notAllowed/>
             </start>
