@@ -29,6 +29,11 @@
             px:set-base-uri
         </p:documentation>
     </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
+        <p:documentation>
+            px:html-id-fixer
+        </p:documentation>
+    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
     <p:import href="convert-diagram-descriptions.xpl"/>
@@ -145,14 +150,7 @@
             <!--–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
              |   ADD MISSING IDS                                                           |
             <|–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––-->
-            <p:xslt>
-                <p:input port="stylesheet">
-                    <p:document href="http://www.daisy.org/pipeline/modules/html-utils/html-id-fixer.xsl"/>
-                </p:input>
-                <p:input port="parameters">
-                    <p:empty/>
-                </p:input>
-            </p:xslt>
+            <px:html-id-fixer/>
 
             <!--–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
              |   CLEAN OUTLINE                                                        |
