@@ -21,7 +21,7 @@
 	<p:option name="base" required="false" select="''">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>The base directory for which to make the manifest. Defaults to the file that has a
-			media-type that starts with application/vnd.oasis.opendocument, or if no such file
+			media-type that starts with "application/vnd.oasis.opendocument", or if no such file
 			exists, the base-uri of the d:fileset element. Files that are not inside the base
 			directory are not included in the manifest.</p>
 		</p:documentation>
