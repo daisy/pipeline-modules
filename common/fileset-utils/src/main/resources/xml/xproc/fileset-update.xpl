@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-                xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                 xmlns:c="http://www.w3.org/ns/xproc-step"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 type="px:fileset-update" name="main">
@@ -42,14 +41,14 @@
 	<p:import href="fileset-load.xpl"/>
 	<p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
 	
-	<pxi:fileset-filter-in-memory name="filter-in-memory">
+	<px:fileset-filter-in-memory name="filter-in-memory">
 		<p:input port="source.fileset">
 			<p:pipe step="main" port="source.fileset"/>
 		</p:input>
 		<p:input port="source.in-memory">
 			<p:pipe step="main" port="update"/>
 		</p:input>
-	</pxi:fileset-filter-in-memory>
+	</px:fileset-filter-in-memory>
 	<p:group>
 		<p:variable name="document-not-in-manifest" select="/*/d:file[1]/@href">
 			<p:pipe step="filter-in-memory" port="diff"/>
@@ -61,14 +60,14 @@
 	</p:group>
 	<p:identity name="update.fileset"/>
 	
-	<pxi:fileset-filter-in-memory>
+	<px:fileset-filter-in-memory>
 		<p:input port="source.fileset">
 			<p:pipe step="main" port="source.fileset"/>
 		</p:input>
 		<p:input port="source.in-memory">
 			<p:pipe step="main" port="source.in-memory"/>
 		</p:input>
-	</pxi:fileset-filter-in-memory>
+	</px:fileset-filter-in-memory>
 	<px:fileset-diff>
 		<p:input port="secondary">
 			<p:pipe step="update.fileset" port="result"/>

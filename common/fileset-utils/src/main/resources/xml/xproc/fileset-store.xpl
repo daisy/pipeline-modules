@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-                xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                 xmlns:cx="http://xmlcalabash.com/ns/extensions"
                 xmlns:err="http://www.w3.org/ns/xproc-error"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
@@ -27,11 +26,11 @@
         <p:pipe port="fileset.in" step="main"/>
     </p:variable>
 
-    <pxi:fileset-filter-in-memory name="fileset.in-memory.in">
+    <px:fileset-filter-in-memory name="fileset.in-memory.in">
         <p:input port="source.in-memory">
             <p:pipe step="main" port="in-memory.in"/>
         </p:input>
-    </pxi:fileset-filter-in-memory>
+    </px:fileset-filter-in-memory>
     <p:sink/>
 
     <p:documentation>Load zipped files into memory (including `bundle:' and `jar:' files).</p:documentation>
