@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-                xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
-                type="pxi:fileset-filter-in-memory" name="main">
+                type="px:fileset-filter-in-memory" name="main">
 	
 	<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 		<p>Remove the entries from a fileset that are not loaded into memory.</p>
@@ -16,11 +15,11 @@
 		</p:documentation>
 		<p:pipe step="intersect" port="result"/>
 	</p:output>
-	<p:output port="diff">
+	<p:output port="not-in-manifest">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			<p>Fileset with only the entries that are not loaded into memory.</p>
+			<p>Fileset of in-memory documents that are not contained in the input fileset.</p>
 		</p:documentation>
-		<p:pipe step="diff" port="result"/>
+		<p:pipe step="not-in-manifest" port="result"/>
 	</p:output>
 	
 	<p:import href="fileset-create.xpl"/>
@@ -53,7 +52,7 @@
 	</px:fileset-intersect>
 	<p:sink/>
 	
-	<px:fileset-diff name="diff">
+	<px:fileset-diff name="not-in-manifest">
 		<p:input port="source">
 			<p:pipe step="fileset-from-in-memory" port="result"/>
 		</p:input>

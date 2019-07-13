@@ -9,6 +9,7 @@
     <p:import href="fileset-intersect.xpl"/>
     <p:import href="fileset-join.xpl"/>
     <p:import href="fileset-filter.xpl"/>
+    <p:import href="fileset-filter-in-memory.xpl"/>
     <p:import href="fileset-load.xpl"/>
     <p:import href="fileset-store.xpl"/>
     <p:import href="fileset-add-ref.xpl"/>
