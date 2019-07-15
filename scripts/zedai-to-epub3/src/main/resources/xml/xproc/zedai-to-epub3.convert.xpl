@@ -19,10 +19,10 @@
     </p:input>
 
     <p:output port="fileset.out" primary="true">
-        <p:pipe port="result" step="ocf"/>
+        <p:pipe step="ocf" port="fileset"/>
     </p:output>
     <p:output port="in-memory.out" sequence="true">
-        <p:pipe port="result" step="in-memory.result"/>
+        <p:pipe step="ocf" port="in-memory"/>
     </p:output>
 
     <p:output port="validation-status" px:media-type="application/vnd.pipeline.status+xml">
@@ -37,9 +37,16 @@
         case a temporary directory will be automaticall created.</p:documentation>
     </p:option>
     <p:option name="chunk-size" required="false" select="'-1'"/>
-    <p:option name="audio" required="false" select="'false'"/>
+    <p:option name="audio" required="false" select="'false'">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <h2 px:role="name">Enable Text-To-Speech</h2>
+            <p px:role="desc">Whether to use a speech synthesizer to produce audio files.</p>
+        </p:documentation>
+    </p:option>
     <p:option name="process-css" required="false" select="'true'">
-        <p:documentation>Set to false to bypass aural CSS processing.</p:documentation>
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Set to false to bypass aural CSS processing.</p>
+        </p:documentation>
     </p:option>
 
     <p:import href="zedai-to-opf-metadata.xpl">
@@ -47,10 +54,14 @@
             px:zedai-to-opf-metadata
         </p:documentation>
     </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/zedai-to-html/library.xpl">
+        <p:documentation>
+            px:zedai-to-html
+        </p:documentation>
+    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
         <p:documentation>
             px:html-id-fixer
-            px:html-chunker
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/epub3-utils/library.xpl">
@@ -60,17 +71,42 @@
             px:epub3-ocf-finalize
         </p:documentation>
     </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
+    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
         <p:documentation>
-            px:set-base-uri
+            px:fileset-load
+            px:fileset-add-entry
+            px:fileset-join
+            px:fileset-rebase
+            px:fileset-update
+            px:fileset-filter
         </p:documentation>
     </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/tts-helpers/library.xpl" />
-    <p:import href="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/library.xpl" />
-    <p:import href="http://www.daisy.org/pipeline/modules/epub3-tts/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/css-speech/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
+        <p:documentation>
+            px:assert
+            px:message
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/tts-helpers/library.xpl">
+        <p:documentation>
+            px:create-audio-fileset
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/library.xpl">
+        <p:documentation>
+            px:create-mediaoverlays
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/epub3-tts/library.xpl">
+        <p:documentation>
+            px:epub3-for-tts
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/css-speech/library.xpl">
+        <p:documentation>
+            px:inline-css-speech
+        </p:documentation>
+    </p:import>
 
     <p:variable name="epub-dir" select="concat($output-dir,'epub/')"/>
     <p:variable name="content-dir" select="concat($epub-dir,'EPUB/')"/>
@@ -92,7 +128,6 @@
         <px:assert message="More than one XML document with the ZedAI media type ('application/z3998-auth+xml') found in the fileset; there can only be one ZedAI document."
                    test-count-max="1" error-code="PEZE00"/>
     </p:group>
-    <p:identity name="first-zedai"/>
 
     <!--=========================================================================-->
     <!-- CSS INLINING                                                            -->
@@ -103,9 +138,6 @@
         </p:xpath-context>
         <p:when test="$audio='true' and $process-css='true'">
             <px:inline-css-speech content-type="application/z3998-auth+xml">
-                <p:input port="source">
-                    <p:pipe step="first-zedai" port="result"/>
-                </p:input>
                 <p:input port="fileset.in">
                     <p:pipe step="main" port="fileset.in"/>
                 </p:input>
@@ -115,11 +147,7 @@
             </px:inline-css-speech>
         </p:when>
         <p:otherwise>
-            <p:identity>
-                <p:input port="source">
-                    <p:pipe step="first-zedai" port="result"/>
-                </p:input>
-            </p:identity>
+            <p:identity/>
         </p:otherwise>
     </p:choose>
     <p:identity name="zedai-with-css"/>
@@ -130,121 +158,116 @@
 
     <p:documentation>Extract metadata from ZedAI</p:documentation>
     <px:zedai-to-opf-metadata name="metadata"/>
+    <p:sink/>
 
     <!--=========================================================================-->
     <!-- CONVERT TO XHTML                                                        -->
     <!--=========================================================================-->
 
-    <p:documentation>Convert the ZedAI Document into several XHTML Documents</p:documentation>
-    <p:group name="zedai-to-html">
-        <p:output port="result" primary="true" sequence="true"/>
-        <p:output port="html-files" sequence="true">
-            <p:pipe port="html-files" step="zedai-to-html.iterate"/>
-        </p:output>
-        <p:variable name="zedai-basename" select="replace(replace(//*[@media-type='application/z3998-auth+xml']/@href,'^.+/([^/]+)$','$1'),'^(.+)\.[^\.]+$','$1')">
-            <p:pipe port="fileset.in" step="main"/>
-        </p:variable>
-        <p:variable name="result-basename" select="concat($content-dir,$zedai-basename,'.xhtml')"/>
-        <p:xslt name="zedai-to-html.html-single">
-            <p:input port="source">
-                <p:pipe step="zedai-with-css" port="result"/>
-            </p:input>
-            <p:input port="stylesheet">
-                <p:document href="http://www.daisy.org/pipeline/modules/zedai-to-html/xslt/zedai-to-html.xsl"/>
-            </p:input>
-            <p:input port="parameters">
-                <p:empty/>
-            </p:input>
-        </p:xslt>
-        <px:set-base-uri>
-            <p:with-option name="base-uri" select="$result-basename"/>
-        </px:set-base-uri>
-        <px:html-id-fixer name="zedai-to-html.html-with-ids">
-            <p:documentation>Add missing IDs</p:documentation>
-        </px:html-id-fixer>
-        <px:html-chunker name="zedai-to-html.html-chunks">
-            <p:with-option name="max-chunk-size" select="$chunk-size"/>
-        </px:html-chunker>
-        <p:for-each name="zedai-to-html.iterate">
-            <p:output port="fileset" primary="true"/>
-            <p:output port="html-files" sequence="true">
-                <p:pipe port="result" step="zedai-to-html.iterate.html"/>
-            </p:output>
-            <p:variable name="result-uri" select="base-uri(/*)"/>
-            <p:identity name="zedai-to-html.iterate.html"/>
-            <px:fileset-create>
-                <p:with-option name="base" select="$content-dir"/>
-            </px:fileset-create>
-            <px:fileset-add-entry media-type="application/xhtml+xml">
-                <p:with-option name="href" select="$result-uri"/>
-            </px:fileset-add-entry>
-        </p:for-each>
-        <px:message message="Converted to XHTML."/>
-    </p:group>
+    <px:fileset-update name="fileset-with-css">
+        <p:input port="source.fileset">
+            <p:pipe step="main" port="fileset.in"/>
+        </p:input>
+        <p:input port="source.in-memory">
+            <p:pipe step="main" port="in-memory.in"/>
+        </p:input>
+        <p:input port="update">
+            <p:pipe step="zedai-with-css" port="result"/>
+        </p:input>
+    </px:fileset-update>
+
+    <px:zedai-to-html chunk="true" name="zedai-to-html">
+        <p:input port="in-memory.in">
+            <p:pipe step="fileset-with-css" port="result.in-memory"/>
+        </p:input>
+        <p:with-option name="output-dir" select="$content-dir"/>
+        <p:with-option name="chunk-size" select="$chunk-size"/>
+    </px:zedai-to-html>
 
     <!--=========================================================================-->
     <!-- GENERATE THE NAVIGATION DOCUMENT                                        -->
     <!--=========================================================================-->
 
     <p:documentation>Generate the EPUB 3 navigation document</p:documentation>
-    <p:group name="navigation-doc">
-        <p:output port="result" primary="true">
-            <p:pipe port="result" step="navigation-doc.result.fileset"/>
+    <p:group name="add-navigation-doc">
+        <p:output port="fileset" primary="true"/>
+        <p:output port="in-memory" sequence="true">
+            <p:pipe step="add-entry" port="result.in-memory"/>
         </p:output>
-        <p:output port="html-file">
-            <p:pipe port="result" step="navigation-doc.result.html-file"/>
+        <p:output port="doc">
+            <p:pipe step="navigation-doc" port="result"/>
         </p:output>
-        <!--TODO create other nav types (configurable ?)-->
-        <px:epub3-nav-create-navigation-doc name="navigation-doc.html-file">
-            <p:input port="source">
-                <p:pipe port="html-files" step="zedai-to-html"/>
+        <px:fileset-load media-types="application/xhtml+xml">
+            <p:input port="in-memory">
+                <p:pipe step="zedai-to-html" port="in-memory.out"/>
             </p:input>
+        </px:fileset-load>
+        <p:for-each name="fix-ids">
+            <p:documentation>Add missing IDs</p:documentation>
+            <p:output port="result" sequence="true"/>
+            <px:html-id-fixer/>
+        </p:for-each>
+        <!--TODO create other nav types (configurable ?)-->
+        <px:epub3-nav-create-navigation-doc>
             <p:with-option name="output-base-uri" select="concat($content-dir,'toc.xhtml')">
                 <p:empty/>
             </p:with-option>
         </px:epub3-nav-create-navigation-doc>
-        <px:fileset-create>
-            <p:with-option name="base" select="$content-dir"/>
-        </px:fileset-create>
-        <px:fileset-add-entry media-type="application/xhtml+xml" name="navigation-doc.result.fileset">
-            <p:with-option name="href" select="base-uri(/*)">
-                <p:pipe step="navigation-doc.html-file" port="result"/>
-            </p:with-option>
-        </px:fileset-add-entry>
-        <p:identity>
-            <p:input port="source">
-                <p:pipe port="result" step="navigation-doc.html-file"/>
+        <px:message message="Navigation Document Created." name="navigation-doc"/>
+        <p:sink/>
+        <px:fileset-update name="update">
+            <p:input port="source.fileset">
+                <p:pipe step="zedai-to-html" port="fileset.out"/>
             </p:input>
-        </p:identity>
-        <px:message message="Navigation Document Created." name="navigation-doc.result.html-file"/>
+            <p:input port="source.in-memory">
+                <p:pipe step="zedai-to-html" port="in-memory.out"/>
+            </p:input>
+            <p:input port="update">
+                <p:pipe step="fix-ids" port="result"/>
+            </p:input>
+        </px:fileset-update>
+        <px:fileset-add-entry media-type="application/xhtml+xml" name="add-entry">
+            <p:input port="source.in-memory">
+                <p:pipe step="update" port="result.in-memory"/>
+            </p:input>
+            <p:input port="entry">
+                <p:pipe step="navigation-doc" port="result"/>
+            </p:input>
+        </px:fileset-add-entry>
     </p:group>
 
     <!--=========================================================================-->
     <!-- Call the TTS                                                            -->
     <!--=========================================================================-->
 
-    <px:fileset-join name="fileset-for-tts">
-        <!-- TODO: include resources such as lexicons -->
-        <p:input port="source">
-            <p:pipe port="result" step="zedai-to-html"/>
-            <p:pipe port="result" step="navigation-doc"/>
-        </p:input>
-    </px:fileset-join>
     <px:tts-for-epub3 name="tts">
-        <p:input port="in-memory.in">
-            <p:pipe port="html-file" step="navigation-doc"/>
-            <p:pipe port="html-files" step="zedai-to-html"/>
-        </p:input>
-        <p:input port="fileset.in">
-            <p:pipe port="result" step="fileset-for-tts"/>
-        </p:input>
-        <p:input port="config">
-            <p:pipe port="tts-config" step="main"/>
-        </p:input>
-        <p:with-option name="audio" select="$audio"/>
-        <p:with-option name="output-dir" select="$output-dir"/>
-        <p:with-option name="temp-dir" select="$temp-dir"/>
+      <p:input port="in-memory.in">
+          <p:pipe step="add-navigation-doc" port="in-memory"/>
+      </p:input>
+      <p:input port="fileset.in">
+          <!-- TODO: include resources such as lexicons -->
+          <p:pipe step="add-navigation-doc" port="fileset"/>
+      </p:input>
+      <p:input port="config">
+          <p:pipe step="main" port="tts-config"/>
+      </p:input>
+      <p:with-option name="audio" select="$audio"/>
+      <p:with-option name="output-dir" select="$output-dir"/>
+      <p:with-option name="temp-dir" select="$temp-dir"/>
     </px:tts-for-epub3>
+
+    <p:documentation>Update the fileset with the enriched HTML files.</p:documentation>
+    <px:fileset-update name="add-enriched-html">
+        <p:input port="source.fileset">
+            <p:pipe step="add-navigation-doc" port="fileset"/>
+        </p:input>
+        <p:input port="source.in-memory">
+            <p:pipe step="add-navigation-doc" port="in-memory"/>
+        </p:input>
+        <p:input port="update">
+            <p:pipe step="tts" port="content.out"/>
+        </p:input>
+    </px:fileset-update>
 
     <!--=========================================================================-->
     <!-- GENERATE THE MEDIA-OVERLAYS                                             -->
@@ -252,28 +275,28 @@
 
     <p:choose name="mo-work">
         <p:xpath-context>
-            <p:pipe port="audio-map" step="tts"/>
+            <p:pipe step="tts" port="audio-map"/>
         </p:xpath-context>
         <p:when test="count(/d:audio-clips/*) = 0">
-            <p:output port="audio-filesets" sequence="true">
+            <p:output port="audio.fileset">
+                <p:inline><d:fileset/></p:inline>
+            </p:output>
+            <p:output port="smil.fileset">
                 <p:empty/>
             </p:output>
-            <p:output port="smil-fileset">
-                <p:empty/>
-            </p:output>
-            <p:output port="smils" sequence="true">
+            <p:output port="smil.in-memory" sequence="true">
                 <p:empty/>
             </p:output>
             <p:sink/>
         </p:when>
         <p:otherwise>
-            <p:output port="smil-fileset">
-                <p:pipe port="fileset.out" step="create-mo"/>
-            </p:output>
-            <p:output port="audio-filesets" sequence="true">
+            <p:output port="audio.fileset">
                 <p:pipe port="fileset.out" step="audio-fileset"/>
             </p:output>
-            <p:output port="smils" sequence="true">
+            <p:output port="smil.fileset">
+                <p:pipe port="fileset.out" step="create-mo"/>
+            </p:output>
+            <p:output port="smil.in-memory" sequence="true">
                 <p:pipe port="in-memory.out" step="create-mo"/>
             </p:output>
 
@@ -298,10 +321,10 @@
 
             <px:create-mediaoverlays name="create-mo">
                 <p:input port="content-docs">
-                    <p:pipe port="content.out" step="tts"/>
+                    <p:pipe step="tts" port="content.out"/>
                 </p:input>
                 <p:input port="audio-map">
-                    <p:pipe port="audio-map" step="tts"/>
+                    <p:pipe step="tts" port="audio-map"/>
                 </p:input>
                 <p:with-option name="content-dir" select="$content-dir">
                     <p:empty/>
@@ -310,195 +333,136 @@
         </p:otherwise>
     </p:choose>
 
+    <p:documentation>Add SMIL and audio files</p:documentation>
+    <p:group name="add-mediaoverlays">
+        <p:output port="fileset" primary="true"/>
+        <p:output port="in-memory" sequence="true">
+            <p:pipe step="add-enriched-html" port="result.in-memory"/>
+            <p:pipe step="mo-work" port="smil.in-memory"/>
+        </p:output>
+        <px:fileset-join>
+            <p:input port="source">
+                <p:pipe step="add-enriched-html" port="result.fileset"/>
+                <p:pipe step="mo-work" port="smil.fileset"/>
+                <p:pipe step="mo-work" port="audio.fileset"/>
+            </p:input>
+        </px:fileset-join>
+    </p:group>
 
     <!--=========================================================================-->
     <!-- GENERATE THE PACKAGE DOCUMENT                                           -->
     <!--=========================================================================-->
+
     <p:documentation>Generate the EPUB 3 package document</p:documentation>
-    <p:group name="package-doc">
-        <p:output port="result" primary="true"/>
+    <p:group name="add-package-doc">
+        <p:output port="fileset" primary="true"/>
+        <p:output port="in-memory" sequence="true">
+            <p:pipe step="add-entry" port="result.in-memory"/>
+        </p:output>
         <p:output port="opf">
-            <p:pipe port="result" step="package-doc.create"/>
+            <p:pipe port="result" step="package-doc"/>
         </p:output>
 
-        <p:variable name="opf-base" select="concat($content-dir,'package.opf')"/>
-
-        <p:identity>
-            <p:input port="source">
-                <p:pipe port="fileset.in" step="main"/>
-            </p:input>
-        </p:identity>
-        <p:group name="resources">
-            <p:output port="result"/>
-            <p:variable name="zedai-uri" select="(//d:file[@media-type='application/z3998-auth+xml'])[1]/resolve-uri(@href,base-uri(.))"/>
-            <p:delete match="d:file[@media-type='application/z3998-auth+xml']"/>
-            <p:viewport match="/*/*">
-                <p:documentation>Make sure that the files in the fileset is relative to the ZedAI file.</p:documentation>
-                <p:xslt>
-                    <p:with-param name="uri" select="/*/resolve-uri(@href,base-uri(.))"/>
-                    <p:with-param name="base" select="$zedai-uri"/>
-                    <p:input port="stylesheet">
-                        <p:inline>
-                            <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pf="http://www.daisy.org/ns/pipeline/functions" version="2.0">
-                                <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/uri-functions.xsl"/>
-                                <xsl:param name="uri" required="yes"/>
-                                <xsl:param name="base" required="yes"/>
-                                <xsl:template match="/*">
-                                    <xsl:copy>
-                                        <xsl:copy-of select="@*"/>
-                                        <xsl:attribute name="href" select="pf:relativize-uri($uri,$base)"/>
-                                    </xsl:copy>
-                                </xsl:template>
-                            </xsl:stylesheet>
-                        </p:inline>
-                    </p:input>
-                </p:xslt>
-                <p:identity/>
-            </p:viewport>
-            <px:set-base-uri>
-                <p:with-option name="base-uri" select="$content-dir"/>
-            </px:set-base-uri>
-            <!-- TODO: remove resources from fileset that are not referenced from any of the in-memory files -->
+        <p:group name="content-docs">
+            <p:output port="fileset" primary="true">
+                <p:pipe step="fileset" port="result"/>
+            </p:output>
+            <p:output port="in-memory" sequence="true">
+                <p:pipe step="in-memory" port="result"/>
+            </p:output>
+            <px:fileset-filter media-types="application/xhtml+xml" name="fileset"/>
+            <px:fileset-load name="in-memory">
+                <p:input port="in-memory">
+                    <p:pipe step="add-mediaoverlays" port="in-memory"/>
+                </p:input>
+            </px:fileset-load>
         </p:group>
-
-        <px:fileset-join name="package-doc.join-filesets">
-            <p:input port="source">
-                <p:pipe port="result" step="zedai-to-html"/>
-                <p:pipe port="result" step="navigation-doc"/>
-                <p:pipe port="result" step="resources"/>
-                <p:pipe port="smil-fileset" step="mo-work"/>
-                <p:pipe port="audio-filesets" step="mo-work"/>
-            </p:input>
-        </px:fileset-join>
+        <p:sink/>
+        <p:group name="publication-resources">
+            <p:output port="fileset"/>
+            <px:fileset-filter not-media-types="application/xhtml+xml application/smil+xml">
+                <p:input port="source">
+                    <p:pipe step="add-mediaoverlays" port="fileset"/>
+                </p:input>
+            </px:fileset-filter>
+        </p:group>
         <p:sink/>
 
-        <px:fileset-join name="publication-resources">
-            <p:input port="source">
-              <p:pipe port="result" step="resources"/>
-              <p:pipe port="audio-filesets" step="mo-work"/>
-            </p:input>
-        </px:fileset-join>
-
-        <px:epub3-pub-create-package-doc name="package-doc.create">
+        <px:epub3-pub-create-package-doc compatibility-mode="false">
             <p:input port="spine-filesets">
-                <p:pipe port="result" step="navigation-doc"/>
-                <p:pipe port="result" step="zedai-to-html"/>
+                <p:pipe step="content-docs" port="fileset"/>
             </p:input>
             <p:input port="publication-resources">
-                <p:pipe port="result" step="publication-resources"/>
+                <p:pipe step="publication-resources" port="fileset"/>
             </p:input>
             <p:input port="mediaoverlays">
-                <p:pipe port="smils" step="mo-work"/>
+                <p:pipe step="mo-work" port="smil.in-memory"/>
             </p:input>
             <p:input port="metadata">
-                <p:pipe port="result" step="metadata"/>
+                <p:pipe step="metadata" port="result"/>
             </p:input>
             <p:input port="content-docs">
-                <p:pipe port="content.out" step="tts"/>
+                <p:pipe step="content-docs" port="in-memory"/>
             </p:input>
-            <p:with-option name="result-uri" select="$opf-base"/>
-            <p:with-option name="compatibility-mode" select="'false'"/>
+            <p:with-option name="result-uri" select="concat($content-dir,'package.opf')"/>
             <p:with-option name="nav-uri" select="base-uri(/*)">
-                <p:pipe port="html-file" step="navigation-doc"/>
+                <p:pipe step="add-navigation-doc" port="doc"/>
             </p:with-option>
-            <!--TODO configurability for other META-INF files ?-->
         </px:epub3-pub-create-package-doc>
-
-        <px:fileset-add-entry media-type="application/oebps-package+xml">
-            <p:input port="source">
-                <p:pipe port="result" step="package-doc.join-filesets"/>
-            </p:input>
-            <p:with-option name="href" select="$opf-base"/>
-        </px:fileset-add-entry>
-
         <px:message message="Package Document Created."/>
+        <p:identity name="package-doc"/>
+        <p:sink/>
+
+        <px:fileset-add-entry media-type="application/oebps-package+xml" name="add-entry">
+            <p:input port="source">
+                <p:pipe step="add-mediaoverlays" port="fileset"/>
+            </p:input>
+            <p:input port="source.in-memory">
+                <p:pipe step="add-mediaoverlays" port="in-memory"/>
+            </p:input>
+            <p:input port="entry">
+                <p:pipe step="package-doc" port="result"/>
+            </p:input>
+        </px:fileset-add-entry>
     </p:group>
 
-    <p:group name="fileset.without-ocf">
-        <p:output port="result"/>
+    <!--=========================================================================-->
+    <!-- GENERATE THE OCF DOCUMENTS                                              -->
+    <!-- (container.xml, manifest.xml, metadata.xml, rights.xml, signature.xml)  -->
+    <!--=========================================================================-->
 
-        <p:identity name="fileset.dirty"/>
-        <p:wrap-sequence wrapper="wrapper">
-            <p:input port="source">
-                <p:pipe step="package-doc" port="opf"/>
-                <p:pipe step="tts" port="content.out"/>
-                <p:pipe port="smils" step="mo-work"/>
+    <!--
+        change fileset base from EPUB/ directory to top directory because this is what
+        px:epub3-ocf-finalize expects
+    -->
+    <px:fileset-rebase>
+        <p:with-option name="new-base" select="$epub-dir"/>
+    </px:fileset-rebase>
+    
+    <p:group name="ocf">
+        <p:output port="fileset" primary="true">
+            <p:pipe step="ocf-finalize" port="result"/>
+        </p:output>
+        <p:output port="in-memory" sequence="true">
+            <p:pipe step="in-memory" port="result.in-memory"/>
+        </p:output>
+        <px:epub3-ocf-finalize name="ocf-finalize"/>
+        <!--
+            Remove files from memory that are not in fileset
+        -->
+        <px:fileset-update name="in-memory">
+            <p:input port="source.in-memory">
+                <p:pipe step="ocf-finalize" port="in-memory.out"/>
+                <p:pipe step="add-package-doc" port="in-memory"/>
             </p:input>
-        </p:wrap-sequence>
-        <p:delete match="/*/*/*" name="wrapped-in-memory"/>
-        <p:identity>
-            <p:input port="source">
-                <p:pipe port="result" step="fileset.dirty"/>
+             <p:input port="update">
+                 <!-- update empty because only calling px:fileset-update for purging in-memory port -->
+                <p:empty/>
             </p:input>
-        </p:identity>
-        <p:viewport match="//d:file" name="fileset.clean">
-            <p:variable name="file-href" select="/*/resolve-uri(@href,base-uri(.))"/>
-            <p:variable name="file-original" select="if (/*/@original-href) then resolve-uri(/*/@original-href) else ''"/>
-            <p:choose>
-                <p:xpath-context>
-                    <p:pipe port="result" step="wrapped-in-memory"/>
-                </p:xpath-context>
-                <p:when test="not($file-original) and not(/*/*[base-uri(.) = $file-href])">
-                    <!-- Fileset contains file reference to a file that is neither stored on disk nor in memory; discard it -->
-                    <p:sink/>
-                    <p:identity>
-                        <p:input port="source">
-                            <p:empty/>
-                        </p:input>
-                    </p:identity>
-                </p:when>
-                <p:otherwise>
-                    <!-- File refers to a document on disk or in memory; keep it -->
-                    <p:identity/>
-                </p:otherwise>
-            </p:choose>
-        </p:viewport>
-        <px:fileset-create name="fileset.with-epub-base">
-            <p:with-option name="base" select="$epub-dir"/>
-        </px:fileset-create>
-        <px:fileset-join>
-            <p:input port="source">
-                <p:pipe port="result" step="fileset.with-epub-base"/>
-                <p:pipe port="result" step="fileset.clean"/>
-            </p:input>
-        </px:fileset-join>
+        </px:fileset-update>
+        <p:sink/>
     </p:group>
     <p:sink/>
-
-    <px:epub3-ocf-finalize name="ocf">
-        <p:input port="source">
-            <p:pipe port="result" step="fileset.without-ocf"/>
-        </p:input>
-    </px:epub3-ocf-finalize>
-
-    <p:for-each name="in-memory.result">
-        <p:output port="result" sequence="true"/>
-        <p:iteration-source>
-            <p:pipe step="ocf" port="in-memory.out"/>
-            <p:pipe step="package-doc" port="opf"/>
-            <p:pipe step="tts" port="content.out"/>
-            <p:pipe port="smils" step="mo-work"/>
-        </p:iteration-source>
-        <p:variable name="doc-base" select="base-uri(/*)"/>
-        <p:choose>
-            <p:xpath-context>
-                <p:pipe port="result" step="ocf"/>
-            </p:xpath-context>
-            <p:when test="//d:file[resolve-uri(@href,base-uri(.)) = $doc-base]">
-                <!-- document is in fileset; keep it -->
-                <p:identity/>
-            </p:when>
-            <p:otherwise>
-                <!-- document is not in fileset; discard it -->
-                <p:sink/>
-                <p:identity>
-                    <p:input port="source">
-                        <p:empty/>
-                    </p:input>
-                </p:identity>
-            </p:otherwise>
-        </p:choose>
-    </p:for-each>
 
     <!--=========================================================================-->
     <!-- Status                                                                  -->
