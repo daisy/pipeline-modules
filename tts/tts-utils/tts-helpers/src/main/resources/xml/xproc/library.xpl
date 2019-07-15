@@ -5,6 +5,5 @@
     <p:import href="rm-audio-files.xpl"/>
     <p:import href="get-tts-annotations.xpl"/>
     <p:import href="get-tts-lexicons.xpl"/>
-    <p:import href="rm-audio-files.xpl"/>
 
 </p:library>
