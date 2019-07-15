@@ -128,12 +128,13 @@
 				</d:fileset>
 			</x:document>
 		</x:expect>
-		<x:context label="the audio-map port">
-			<x:document type="port" port="audio-map"/>
+		<x:context label="the temp-audio-files port">
+			<x:document type="port" port="temp-audio-files"/>
 		</x:context>
-		<x:expect label="audio-map port" type="compare">
+		<x:expect label="the temp-audio-files port"
+		          type="custom" href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl" step="x:fileset-compare">
 			<x:document type="inline">
-				<d:audio-clips/>
+				<d:fileset/>
 			</x:document>
 		</x:expect>
 	</x:scenario>
