@@ -6,5 +6,7 @@
     <p:import href="rearrange.xpl"/>
     <p:import href="upgrade-smil.xpl"/>
     <p:import href="create-mediaoverlays.xpl"/>
+    <p:import href="smil-to-text-fileset.xpl"/>
+    <p:import href="smil-to-audio-fileset.xpl"/>
 
 </p:library>
