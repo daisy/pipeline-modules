@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step name="rearrange" type="px:mediaoverlay-rearrange" version="1.0" xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:epub="http://www.idpf.org/2007/ops"
-    xmlns:err="http://www.w3.org/ns/xproc-error" xmlns:mo="http://www.w3.org/ns/SMIL" xmlns:p="http://www.w3.org/ns/xproc" xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-    xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal">
-
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
+                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                xmlns:mo="http://www.w3.org/ns/SMIL"
+                type="px:mediaoverlay-rearrange" name="rearrange">
+    
     <p:input port="mediaoverlay" primary="true" sequence="true"/>
     <p:input port="content" sequence="true"/>
     <p:output port="result" sequence="true" primary="true"/>

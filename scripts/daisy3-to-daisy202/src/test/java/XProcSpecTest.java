@@ -9,7 +9,7 @@ public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 			pipelineModule("daisy3-utils"),
 			pipelineModule("fileset-utils"),
 			pipelineModule("file-utils"),
-			pipelineModule("mediaoverlay-utils"),
+			pipelineModule("smil-utils"),
 			pipelineModule("mediatype-utils"),
 			pipelineModule("common-entities"),
 		};

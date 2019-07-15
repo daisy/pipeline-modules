@@ -38,7 +38,7 @@
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">For manipulating
             filesets.</p:documentation>
     </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/library.xpl">
+    <p:import href="http://www.daisy.org/pipeline/modules/smil-utils/library.xpl">
         <p:documentation>
             px:smil-to-text-fileset
         </p:documentation>

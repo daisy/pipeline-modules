@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step type="px:mediaoverlay-join" version="1.0" xmlns:c="http://www.w3.org/ns/xproc-step"
-    xmlns:epub="http://www.idpf.org/2007/ops" xmlns:err="http://www.w3.org/ns/xproc-error"
-    xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions"
-    xmlns:mo="http://www.w3.org/ns/SMIL" xmlns:p="http://www.w3.org/ns/xproc"
-    xmlns:px="http://www.daisy.org/ns/pipeline/xproc">
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
+                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                xmlns:mo="http://www.w3.org/ns/SMIL"
+                type="px:mediaoverlay-join">
+
     <p:input port="source" sequence="true"/>
     <p:output port="result"/>
 
@@ -40,4 +40,5 @@
         </p:input>
     </p:xslt>
     <p:delete match="/*//*/@xml:base"/>
+
 </p:declare-step>

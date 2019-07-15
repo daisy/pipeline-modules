@@ -25,7 +25,7 @@
             px:set-base-uri
         </p:documentation>
     </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/library.xpl">
+    <p:import href="http://www.daisy.org/pipeline/modules/smil-utils/library.xpl">
         <p:documentation>
             px:smil-to-audio-fileset
         </p:documentation>

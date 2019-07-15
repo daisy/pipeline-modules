@@ -11,7 +11,7 @@ public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 			pipelineModule("epub3-utils"),
 			pipelineModule("fileset-utils"),
 			pipelineModule("file-utils"),
-			pipelineModule("mediaoverlay-utils"),
+			pipelineModule("smil-utils"),
 			pipelineModule("common-entities"),
 		};
 	}

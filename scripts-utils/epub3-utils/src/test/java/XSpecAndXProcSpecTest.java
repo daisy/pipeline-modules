@@ -11,7 +11,7 @@ public class XSpecAndXProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 			pipelineModule("file-utils"),
 			pipelineModule("html-utils"),
 			pipelineModule("fileset-utils"),
-			pipelineModule("mediaoverlay-utils"),
+			pipelineModule("smil-utils"),
 			pipelineModule("mediatype-utils"),
 			pipelineModule("zip-utils"),
 			pipelineModule("odf-utils"),

@@ -20,7 +20,7 @@ public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 			pipelineModule("mediatype-utils"),
 			pipelineModule("epub3-validator"),
 			pipelineModule("epub3-utils"),
-			pipelineModule("mediaoverlay-utils"),
+			pipelineModule("smil-utils"),
 			pipelineModule("daisy202-validator"),
 		};
 	}

@@ -29,7 +29,7 @@
     <module>epub3-utils</module>
     <module>epubcheck-adapter</module>
     <module>mathml-utils</module>
-    <module>mediaoverlay-utils</module>
+    <module>smil-utils</module>
     <module>metadata-utils</module>
     <module>odf-utils</module>
     <module>zedai-utils</module>
