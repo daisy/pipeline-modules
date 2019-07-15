@@ -76,6 +76,7 @@
     <p:import href="http://www.daisy.org/pipeline/modules/epub3-utils/library.xpl">
         <p:documentation>
             px:epub3-nav-create-navigation-doc
+            px:epub3-create-mediaoverlays
             px:epub3-pub-create-package-doc
             px:epub3-ocf-finalize
         </p:documentation>
@@ -99,11 +100,6 @@
     <p:import href="http://www.daisy.org/pipeline/modules/tts-helpers/library.xpl">
         <p:documentation>
             px:create-audio-fileset
-        </p:documentation>
-    </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/library.xpl">
-        <p:documentation>
-            px:create-mediaoverlays
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/epub3-tts/library.xpl">
@@ -331,7 +327,7 @@
             <!-- CREATE THE SMILS FROM THE AUDIO MAP                                     -->
             <!--=========================================================================-->
 
-            <px:create-mediaoverlays name="create-mo">
+            <px:epub3-create-mediaoverlays name="create-mo">
                 <p:input port="content-docs">
                     <p:pipe step="tts" port="content.out"/>
                 </p:input>
@@ -341,7 +337,7 @@
                 <p:with-option name="content-dir" select="$content-dir">
                     <p:empty/>
                 </p:with-option>
-            </px:create-mediaoverlays>
+            </px:epub3-create-mediaoverlays>
         </p:otherwise>
     </p:choose>
 

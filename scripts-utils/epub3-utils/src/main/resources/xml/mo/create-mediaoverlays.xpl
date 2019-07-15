@@ -1,12 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step name="main" type="px:create-mediaoverlays" xmlns:p="http://www.w3.org/ns/xproc"
-    xmlns:d="http://www.daisy.org/ns/pipeline/data"
-    xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-    version="1.0">
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
+                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                type="px:epub3-create-mediaoverlays" name="main">
 
-    <p:input port="content-docs" primary="true" sequence="true"/>
-    <p:input port="audio-map"/>
-    <p:option name="content-dir"/>
+    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+        <p>Create SMIL documents from a set of HTML documents and audio clips.</p>
+    </p:documentation>
+
+    <p:input port="content-docs" primary="true" sequence="true">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>The HTML documents</p>
+        </p:documentation>
+    </p:input>
+    <p:input port="audio-map">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>The d:audio-clips document from the TTS step</p>
+        </p:documentation>
+    </p:input>
+    <p:option name="content-dir">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>The content directory of the EPUB publication</p>
+        </p:documentation>
+    </p:option>
 
     <p:output port="fileset.out" primary="true"/>
     <p:output port="in-memory.out" sequence="true">
