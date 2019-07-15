@@ -83,6 +83,11 @@ split up if they exceed the given maximum size.</p>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/zedai-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/tts-helpers/library.xpl">
+      <p:documentation>
+        px:rm-audio-files
+      </p:documentation>
+    </p:import>
 
     <p:variable name="input-uri" select="base-uri(/)"/>
 
@@ -143,6 +148,12 @@ split up if they exceed the given maximum size.</p>
                 <p:pipe port="in-memory.out" step="convert"/>
             </p:input>
         </px:epub3-store>
+
+        <px:rm-audio-files>
+          <p:input port="source">
+            <p:pipe step="convert" port="temp-audio-files"/>
+          </p:input>
+        </px:rm-audio-files>
     </p:group>
 
 </p:declare-step>
