@@ -21,4 +21,9 @@
 			file, etc.)</p>
 		</p:documentation>
 	</p:import>
+	<p:import href="mo/create-mediaoverlays.xpl">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p>Steps related to EPUB 3 Media Overlays.</p>
+		</p:documentation>
+	</p:import>
 </p:library>

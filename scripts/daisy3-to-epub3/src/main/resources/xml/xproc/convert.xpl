@@ -29,13 +29,13 @@
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/epub3-utils/library.xpl">
         <p:documentation>
+            px:epub3-create-mediaoverlays
             px:epub3-pub-create-package-doc
             px:epub3-ocf-finalize
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/library.xpl"/>
     <p:import href="../internal/ncx-to-nav.xpl"/>
     <p:import href="../internal/list-audio-clips.xpl"/>
 
@@ -210,7 +210,7 @@
             <p:output port="in-memory.out" sequence="true">
                 <p:pipe port="in-memory.out" step="media-overlays.inner"/>
             </p:output>
-            <px:create-mediaoverlays name="media-overlays.inner">
+            <px:epub3-create-mediaoverlays name="media-overlays.inner">
                 <p:input port="content-docs">
                     <p:pipe port="result.in-memory" step="content-docs"/>
                 </p:input>
@@ -218,7 +218,7 @@
                     <p:pipe port="audio-clips" step="audio-clips"/>
                 </p:input>
                 <p:with-option name="content-dir" select="$content-dir"/>
-            </px:create-mediaoverlays>
+            </px:epub3-create-mediaoverlays>
         </p:when>
         <p:otherwise>
             <p:output port="fileset.out" primary="true"/>
