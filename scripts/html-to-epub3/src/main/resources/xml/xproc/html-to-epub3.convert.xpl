@@ -9,16 +9,24 @@
     <p:documentation>Transforms XHTML into an EPUB 3 publication.</p:documentation>
 
     <p:input port="input.fileset" primary="true"/>
-    <p:input port="input.in-memory" sequence="true"/>
+    <p:input port="input.in-memory" sequence="true">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>HTML document(s)</p>
+        </p:documentation>
+    </p:input>
     <p:input port="metadata" sequence="true">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>HTML documents to extract metadata from</p>
+        </p:documentation>
         <p:empty/>
     </p:input>
 
-    <p:output port="fileset.out" primary="true">
-        <p:pipe port="result" step="ocf"/>
-    </p:output>
+    <p:output port="fileset.out" primary="true"/>
     <p:output port="in-memory.out" sequence="true">
-        <p:pipe port="result" step="in-memory.result"/>
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>The EPUB 3 publication (not zipped)</p>
+        </p:documentation>
+        <p:pipe step="ocf" port="in-memory"/>
     </p:output>
 
     <p:option name="output-dir" required="true"/>
@@ -30,8 +38,21 @@
             px:epub3-ocf-finalize
         </p:documentation>
     </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
+        <p:documentation>
+            px:fileset-load
+            px:fileset-filter
+            px:fileset-add-entry
+            px:fileset-join
+            px:fileset-rebase
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
+        <p:documentation>
+            px:assert
+            px:message
+        </p:documentation>
+    </p:import>
     <p:import href="html-to-epub3.content.xpl"/>
     <p:import href="html-to-opf-metadata.xpl"/>
 
@@ -86,12 +107,13 @@
     <!--=========================================================================-->
 
     <p:documentation>Generate the EPUB 3 navigation document</p:documentation>
-    <p:group name="navigation">
-        <p:output port="fileset" primary="true">
-            <p:pipe port="result" step="navigation.fileset"/>
+    <p:group name="add-navigation-doc">
+        <p:output port="fileset" primary="true"/>
+        <p:output port="in-memory" sequence="true">
+            <p:pipe step="add-entry" port="result.in-memory"/>
         </p:output>
         <p:output port="doc">
-            <p:pipe port="result" step="navigation.doc"/>
+            <p:pipe step="navigation-doc" port="result"/>
         </p:output>
 
         <!--TODO create other nav types (configurable ?)-->
@@ -103,142 +125,122 @@
                 <p:empty/>
             </p:with-option>
         </px:epub3-nav-create-navigation-doc>
-        <p:identity name="navigation.doc"/>
+        <px:message message="Navigation Document Created."/>
+        <p:identity name="navigation-doc"/>
+        <p:sink/>
 
-        <p:group name="navigation.fileset">
-            <p:output port="result"/>
-            <px:fileset-create>
-                <p:with-option name="base" select="$content-dir"/>
-            </px:fileset-create>
-            <px:fileset-add-entry media-type="application/xhtml+xml">
-                <p:with-option name="href" select="base-uri(/*)">
-                    <p:pipe step="navigation.doc" port="result"/>
-                </p:with-option>
-            </px:fileset-add-entry>
-            <px:message message="Navigation Document Created."/>
-        </p:group>
+        <px:fileset-join>
+            <p:input port="source">
+                <p:pipe step="content-docs" port="fileset.out.docs"/>
+                <p:pipe step="content-docs" port="fileset.out.resources"/>
+            </p:input>
+        </px:fileset-join>
+        <px:fileset-add-entry media-type="application/xhtml+xml" name="add-entry">
+            <p:input port="source.in-memory">
+                <p:pipe step="content-docs" port="docs"/>
+                <p:pipe step="content-docs" port="resources"/>
+            </p:input>
+            <p:input port="entry">
+                <p:pipe step="navigation-doc" port="result"/>
+            </p:input>
+        </px:fileset-add-entry>
     </p:group>
     <p:sink/>
-
 
     <!--=========================================================================-->
     <!-- METADATA                                                                -->
     <!--=========================================================================-->
 
     <p:documentation>Extract metadata</p:documentation>
-    <p:group name="metadata">
-        <p:output port="result"/>
-        <!--TODO adapt to multiple XHTML input docs-->
-        <pxi:html-to-opf-metadata>
-            <p:input port="source">
-                <p:pipe step="content-docs" port="docs"/>
-            </p:input>
-        </pxi:html-to-opf-metadata>
-    </p:group>
+    <!--TODO adapt to multiple XHTML input docs-->
+    <pxi:html-to-opf-metadata name="metadata">
+        <p:input port="source">
+            <p:pipe step="content-docs" port="docs"/>
+        </p:input>
+    </pxi:html-to-opf-metadata>
     <p:sink/>
 
     <!--=========================================================================-->
     <!-- GENERATE THE PACKAGE DOCUMENT                                           -->
     <!--=========================================================================-->
     <p:documentation>Generate the EPUB 3 package document</p:documentation>
-    <p:group name="package-doc">
+    <p:group name="add-package-doc">
         <p:output port="fileset" primary="true"/>
-        <p:output port="doc">
-            <p:pipe port="result" step="package-doc.create"/>
+        <p:output port="in-memory" sequence="true">
+            <p:pipe step="add-entry" port="result.in-memory"/>
         </p:output>
 
-        <p:variable name="opf-base" select="concat($content-dir,'package.opf')"/>
-
-        <px:epub3-pub-create-package-doc name="package-doc.create">
+        <px:epub3-pub-create-package-doc compatibility-mode="false">
             <p:input port="spine-filesets">
-                <p:pipe port="fileset.out.docs" step="content-docs"/>
+                <p:pipe step="content-docs" port="fileset.out.docs"/>
             </p:input>
             <p:input port="publication-resources">
-                <p:pipe port="fileset.out.resources" step="content-docs"/>
+                <p:pipe step="content-docs" port="fileset.out.resources"/>
             </p:input>
             <p:input port="metadata">
-                <p:pipe port="metadata" step="main"/>
-                <p:pipe port="result" step="metadata"/>
+                <p:pipe step="main" port="metadata"/>
+                <p:pipe step="metadata" port="result"/>
             </p:input>
             <p:input port="content-docs">
-                <p:pipe port="doc" step="navigation"/>
-                <p:pipe port="docs" step="content-docs"/>
+                <p:pipe step="add-navigation-doc" port="doc"/>
+                <p:pipe step="content-docs" port="docs"/>
             </p:input>
-            <p:with-option name="result-uri" select="$opf-base"/>
-            <p:with-option name="compatibility-mode" select="'false'"/>
-            <!--TODO configurability for other META-INF files ?-->
+            <p:with-option name="result-uri" select="concat($content-dir,'package.opf')"/>
         </px:epub3-pub-create-package-doc>
-
-        <px:fileset-join name="package-doc.join-filesets">
-            <p:input port="source">
-                <p:pipe port="fileset.out.docs" step="content-docs"/>
-                <p:pipe port="fileset.out.resources" step="content-docs"/>
-                <p:pipe port="fileset" step="navigation"/>
-            </p:input>
-        </px:fileset-join>
-
-        <px:fileset-add-entry media-type="application/oebps-package+xml">
-            <p:input port="source">
-                <p:pipe port="result" step="package-doc.join-filesets"/>
-            </p:input>
-            <p:with-option name="href" select="$opf-base"/>
-        </px:fileset-add-entry>
-
         <px:message message="Package Document Created."/>
-    </p:group>
-    <p:sink/>
+        <p:identity name="package-doc"/>
+        <p:sink/>
 
-    <p:group name="fileset.without-ocf">
-        <p:output port="result"/>
-        <!--TODO clean file set for non-existing files ?-->
-        <px:fileset-create name="fileset.with-epub-base">
-            <p:with-option name="base" select="$epub-dir"/>
-        </px:fileset-create>
-        <px:fileset-join>
+        <px:fileset-add-entry media-type="application/oebps-package+xml" name="add-entry">
             <p:input port="source">
-                <p:pipe port="result" step="fileset.with-epub-base"/>
-                <p:pipe port="fileset" step="package-doc"/>
+                <p:pipe step="add-navigation-doc" port="fileset"/>
             </p:input>
-        </px:fileset-join>
+            <p:input port="source.in-memory">
+                <p:pipe step="add-navigation-doc" port="in-memory"/>
+            </p:input>
+            <p:input port="entry">
+                <p:pipe step="package-doc" port="result"/>
+            </p:input>
+        </px:fileset-add-entry>
     </p:group>
-    <p:sink/>
 
-    <px:epub3-ocf-finalize name="ocf">
-        <p:input port="source">
-            <p:pipe port="result" step="fileset.without-ocf"/>
-        </p:input>
-    </px:epub3-ocf-finalize>
+    <!--=========================================================================-->
+    <!-- GENERATE THE OCF DOCUMENTS                                              -->
+    <!-- (container.xml, manifest.xml, metadata.xml, rights.xml, signature.xml)  -->
+    <!--=========================================================================-->
 
+    <!--
+        change fileset base from EPUB/ directory to top directory because this is what
+        px:epub3-ocf-finalize expects
+    -->
+    <px:fileset-rebase>
+        <p:with-option name="new-base" select="$epub-dir"/>
+    </px:fileset-rebase>
 
-    <p:for-each name="in-memory.result">
-        <p:output port="result" sequence="true"/>
-        <p:iteration-source>
-            <p:pipe step="ocf" port="in-memory.out"/>
-            <p:pipe step="package-doc" port="doc"/>
-            <p:pipe step="navigation" port="doc"/>
-            <p:pipe step="content-docs" port="docs"/>
-            <p:pipe step="content-docs" port="resources"/>
-        </p:iteration-source>
-        <p:variable name="doc-base" select="base-uri(/*)"/>
-        <p:choose>
-            <p:xpath-context>
-                <p:pipe port="result" step="ocf"/>
-            </p:xpath-context>
-            <p:when test="//d:file[resolve-uri(@href,base-uri(.)) = $doc-base]">
-                <!-- document is in fileset; keep it -->
-                <p:identity/>
-            </p:when>
-            <p:otherwise>
-                <!-- document is not in fileset; discard it -->
-                <p:sink/>
-                <p:identity>
-                    <p:input port="source">
-                        <p:empty/>
-                    </p:input>
-                </p:identity>
-            </p:otherwise>
-        </p:choose>
-    </p:for-each>
+    <!--TODO clean file set for non-existing files ?-->
 
+    <p:group name="ocf">
+        <p:output port="fileset" primary="true">
+            <p:pipe step="ocf-finalize" port="result"/>
+        </p:output>
+        <p:output port="in-memory" sequence="true">
+            <p:pipe step="in-memory" port="result.in-memory"/>
+        </p:output>
+        <px:epub3-ocf-finalize name="ocf-finalize"/>
+        <p:documentation>
+            Remove files from memory that are not in fileset
+        </p:documentation>
+        <px:fileset-update name="in-memory">
+            <p:input port="source.in-memory">
+                <p:pipe step="ocf-finalize" port="in-memory.out"/>
+                <p:pipe step="add-package-doc" port="in-memory"/>
+            </p:input>
+             <p:input port="update">
+                 <!-- update empty because only calling px:fileset-update for purging in-memory port -->
+                <p:empty/>
+            </p:input>
+        </px:fileset-update>
+        <p:sink/>
+    </p:group>
 
 </p:declare-step>
