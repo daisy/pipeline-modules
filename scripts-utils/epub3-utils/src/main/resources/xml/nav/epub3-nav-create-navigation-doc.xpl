@@ -8,6 +8,11 @@
 	<p:input port="source" sequence="true">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>The content documents</p>
+			<p>All <code>body</code>, <code>article</code>, <code>aside</code>, <code>nav</code>,
+			<code>section</code>, <code>h1</code>, <code>h2</code>, <code>h3</code>,
+			<code>h4</code>, <code>h5</code>, <code>h6</code>, <code>hgroup</code> and
+			<code>epub:type='pagebreak'</code> elements must have an <code>id</code> attribute (see
+			also px:html-id-fixer).</p>
 		</p:documentation>
 	</p:input>
 	<p:output port="result">
