@@ -13,7 +13,7 @@
     <!--     adjust-dateTime-to-timezone(current-dateTime(),xs:dayTimeDuration('PT0H')), -->
     <!--     '[Y0001]-[M01]-[D01]T[H01]:[m01]:[s01][Z]')"/> -->
 
-    <xsl:import href="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/clock-functions.xsl"/>
+    <xsl:import href="http://www.daisy.org/pipeline/modules/smil-utils/clock-functions.xsl"/>
 
     <xsl:variable name="ncc.body" select="collection()[position()=2]/*"/>
     <xsl:variable name="smil" select="collection()[position()&gt;2]/*"/>

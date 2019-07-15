@@ -5,7 +5,7 @@
   <nextCatalog catalog="org:daisy:pipeline:modules:epub3-utils"/>
   <nextCatalog catalog="org:daisy:pipeline:modules:fileset-utils"/>
   <nextCatalog catalog="org:daisy:pipeline:modules:html-utils"/>
-  <nextCatalog catalog="org:daisy:pipeline:modules:mediaoverlay-utils"/>
+  <nextCatalog catalog="org:daisy:pipeline:modules:smil-utils"/>
   <nextCatalog catalog="org:daisy:pipeline:modules:mediatype-utils"/>
   <nextCatalog catalog="org:daisy:pipeline:modules:file-utils"/>
   <nextCatalog catalog="org:daisy:pipeline:modules:daisy202-utils"/>

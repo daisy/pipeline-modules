@@ -37,7 +37,7 @@
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
     <!--    <p:import href="http://www.daisy.org/pipeline/modules/daisy3-utils/library.xpl"/>-->
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
-    <!--    <p:import href="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/library.xpl"/>-->
+    <!--    <p:import href="http://www.daisy.org/pipeline/modules/smil-utils/library.xpl"/>-->
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
         <p:documentation>
             px:set-base-uri

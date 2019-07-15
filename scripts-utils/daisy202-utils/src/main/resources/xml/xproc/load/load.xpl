@@ -36,7 +36,7 @@
     <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/mediatype-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/library.xpl">
+    <p:import href="http://www.daisy.org/pipeline/modules/smil-utils/library.xpl">
         <p:documentation>
             px:smil-to-audio-fileset
             px:smil-to-text-fileset
