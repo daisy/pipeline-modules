@@ -36,6 +36,12 @@
     <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/mediatype-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/library.xpl">
+        <p:documentation>
+            px:smil-to-audio-fileset
+            px:smil-to-text-fileset
+        </p:documentation>
+    </p:import>
 
     <px:normalize-uri name="ncc">
         <p:with-option name="href" select="$ncc"/>
@@ -86,30 +92,13 @@
                 <p:pipe port="result" step="fileset.html-and-audio.text"/>
             </p:output>
             <p:identity name="smil"/>
-            <p:xslt name="fileset.html-and-audio.audio">
-                <p:input port="parameters">
-                    <p:empty/>
-                </p:input>
-                <p:input port="stylesheet">
-                    <p:document
-                        href="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/smil-to-audio-fileset.xsl"
-                    />
-                </p:input>
-            </p:xslt>
+            <px:smil-to-audio-fileset name="fileset.html-and-audio.audio"/>
             <p:sink/>
-            <p:xslt name="fileset.html-and-audio.text">
+            <px:smil-to-text-fileset name="fileset.html-and-audio.text">
                 <p:input port="source">
                     <p:pipe step="smil" port="result"/>
                 </p:input>
-                <p:input port="parameters">
-                    <p:empty/>
-                </p:input>
-                <p:input port="stylesheet">
-                    <p:document
-                        href="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/smil-to-text-fileset.xsl"
-                    />
-                </p:input>
-            </p:xslt>
+            </px:smil-to-text-fileset>
             <p:sink/>
         </p:for-each>
         <px:fileset-join name="fileset.html-and-audio"/>

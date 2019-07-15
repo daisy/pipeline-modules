@@ -38,6 +38,11 @@
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">For manipulating
             filesets.</p:documentation>
     </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/library.xpl">
+        <p:documentation>
+            px:smil-to-text-fileset
+        </p:documentation>
+    </p:import>
 
     <p:xslt name="fileset">
         <p:input port="stylesheet">
@@ -76,16 +81,7 @@
                     <p:iteration-source>
                         <p:pipe port="result" step="load-smils"/>
                     </p:iteration-source>
-                    <p:xslt>
-                        <p:input port="stylesheet">
-                            <p:document
-                                href="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/smil-to-text-fileset.xsl"
-                            />
-                        </p:input>
-                        <p:input port="parameters">
-                            <p:empty/>
-                        </p:input>
-                    </p:xslt>
+                    <px:smil-to-text-fileset/>
                     <p:add-attribute attribute-name="media-type"
                         attribute-value="application/x-dtbook+xml" match="d:file"/>
                 </p:for-each>

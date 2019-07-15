@@ -25,6 +25,11 @@
             px:set-base-uri
         </p:documentation>
     </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/library.xpl">
+        <p:documentation>
+            px:smil-to-audio-fileset
+        </p:documentation>
+    </p:import>
 
 
     <!--NCX smilCustomTest elements used for SMIL conversion-->
@@ -124,19 +129,11 @@
         <!--Fileset of the audio files used in this SMIL-->
         <p:group>
             <p:output port="result" primary="true"/>
-            <p:xslt>
+            <px:smil-to-audio-fileset>
                 <p:input port="source">
                     <p:pipe port="result" step="smil-to-smil"/>
                 </p:input>
-                <p:input port="parameters">
-                    <p:empty/>
-                </p:input>
-                <p:input port="stylesheet">
-                    <p:document
-                        href="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/smil-to-audio-fileset.xsl"
-                    />
-                </p:input>
-            </p:xslt>
+            </px:smil-to-audio-fileset>
             <px:mediatype-detect/>
             <!--TODO use px:fileset-move instead of the following-->
             <p:viewport match="//d:file">
