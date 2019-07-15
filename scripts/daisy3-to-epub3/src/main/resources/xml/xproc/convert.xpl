@@ -22,6 +22,11 @@
     <!-- IMPORTS                                                                 -->
     <!--=========================================================================-->
 
+    <p:import href="http://www.daisy.org/pipeline/modules/dtbook-to-html/library.xpl">
+        <p:documentation>
+            px:dtbook-to-html
+        </p:documentation>
+    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/epub3-utils/library.xpl">
         <p:documentation>
             px:epub3-pub-create-package-doc
@@ -32,7 +37,6 @@
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/mediaoverlay-utils/library.xpl"/>
     <p:import href="../internal/ncx-to-nav.xpl"/>
-    <p:import href="../internal/dtbook-to-html.xpl"/>
     <p:import href="../internal/list-audio-clips.xpl"/>
 
 
@@ -157,11 +161,11 @@
     <!-- CONVERT DTBOOK TO XHTML                                                 -->
     <!--=========================================================================-->
 
-    <pxi:dtbook-to-html name="content-docs">
-        <p:input port="fileset.in">
+    <px:dtbook-to-html name="content-docs" chunk="true">
+        <p:input port="source.fileset">
             <p:pipe step="source.fileset" port="result"/>
         </p:input>
-        <p:input port="in-memory.in">
+        <p:input port="source.in-memory">
             <p:pipe port="result" step="dtbooks"/>
         </p:input>
         <p:with-option name="output-dir" select="$content-dir"/>
@@ -171,7 +175,7 @@
                        select="replace(replace(base-uri(/),'^.*/([^/]+)$','$1'),'\.[^\.]*$','')">
             <p:pipe step="opf" port="result"/>
         </p:with-option>
-    </pxi:dtbook-to-html>
+    </px:dtbook-to-html>
     <p:sink/>
 
     <!--=========================================================================-->
@@ -188,7 +192,7 @@
             <p:pipe port="result" step="dtbooks"/>
         </p:input>
         <p:input port="htmls">
-            <p:pipe port="in-memory.out" step="content-docs"/>
+            <p:pipe port="result.in-memory" step="content-docs"/>
         </p:input>
         <p:with-option name="result-uri" select="concat($content-dir,'nav.xhtml')"/>
         <!--TODO make sure that the name is unused-->
@@ -208,7 +212,7 @@
             </p:output>
             <px:create-mediaoverlays name="media-overlays.inner">
                 <p:input port="content-docs">
-                    <p:pipe port="in-memory.out" step="content-docs"/>
+                    <p:pipe port="result.in-memory" step="content-docs"/>
                 </p:input>
                 <p:input port="audio-map">
                     <p:pipe port="audio-clips" step="audio-clips"/>
@@ -264,7 +268,7 @@
 
         <px:fileset-join name="package-doc.join-filesets">
             <p:input port="source">
-                <p:pipe port="fileset.out" step="content-docs"/>
+                <p:pipe port="result.fileset" step="content-docs"/>
                 <p:pipe port="fileset.out" step="nav-doc"/>
                 <p:pipe port="fileset.out" step="media-overlays"/>
                 <p:pipe port="fileset.out" step="audio-clips"/>
@@ -274,7 +278,7 @@
 
         <px:epub3-pub-create-package-doc name="package-doc.create">
             <p:input port="spine-filesets">
-                <p:pipe port="fileset.out" step="content-docs"/>
+                <p:pipe port="result.fileset" step="content-docs"/>
             </p:input>
             <p:input port="publication-resources">
                 <p:pipe port="result" step="package-doc.join-filesets"/>
@@ -284,7 +288,7 @@
             </p:input>
             <p:input port="content-docs">
                 <p:pipe port="in-memory.out" step="nav-doc"/>
-                <p:pipe port="in-memory.out" step="content-docs"/>
+                <p:pipe port="result.in-memory" step="content-docs"/>
             </p:input>
             <p:input port="mediaoverlays">
                 <p:pipe port="in-memory.out" step="media-overlays"/>
@@ -336,7 +340,7 @@
         <p:identity name="finalize.in-memory">
             <p:input port="source">
                 <p:pipe port="in-memory.out" step="nav-doc"/>
-                <p:pipe port="in-memory.out" step="content-docs"/>
+                <p:pipe port="result.in-memory" step="content-docs"/>
                 <p:pipe port="in-memory.out" step="package-doc"/>
                 <p:pipe port="in-memory.out" step="media-overlays"/>
                 <p:pipe port="in-memory.out" step="finalize.ocf"/>

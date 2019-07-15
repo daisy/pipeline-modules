@@ -12,8 +12,9 @@
 		<p:pipe step="to-html" port="in-memory.out"/>
 	</p:output>
 	
-	<p:option name="language" required="true"/>
+	<p:option name="language" required="false" select="''"/>
 	<p:option name="assert-valid" required="true"/>
+	<p:option name="chunk" required="false" select="'false'"/>
 	<p:option name="chunk-size" required="false" select="'-1'"/>
 	<p:option name="filename" required="true"/>
 	<p:option name="output-dir" required="true"/>
@@ -39,6 +40,7 @@
 			<p:pipe step="to-zedai" port="in-memory.out"/>
 		</p:input>
 		<p:with-option name="output-dir" select="$output-dir"/>
+		<p:with-option name="chunk" select="$chunk"/>
 		<p:with-option name="chunk-size" select="$chunk-size"/>
 	</px:zedai-to-html>
 

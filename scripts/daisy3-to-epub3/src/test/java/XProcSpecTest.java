@@ -7,12 +7,11 @@ public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 		return new String[] {
 			pipelineModule("common-utils"),
 			pipelineModule("daisy3-utils"),
-			pipelineModule("dtbook-to-zedai"),
+			pipelineModule("dtbook-to-html"),
 			pipelineModule("epub3-utils"),
 			pipelineModule("fileset-utils"),
 			pipelineModule("file-utils"),
 			pipelineModule("mediaoverlay-utils"),
-			pipelineModule("zedai-to-html"),
 			pipelineModule("common-entities"),
 		};
 	}
