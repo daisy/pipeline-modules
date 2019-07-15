@@ -5,7 +5,13 @@
                 xmlns:epub="http://www.idpf.org/2007/ops"
                 type="px:epub3-nav-create-page-list" name="main">
 
-    <p:input port="source" sequence="true"/>
+    <p:input port="source" sequence="true">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>The content documents</p>
+            <p>All <code>epub:type='pagebreak'</code> elements must have an <code>id</code>
+            attribute (see also px:html-id-fixer).</p>
+        </p:documentation>
+    </p:input>
     <p:output port="result">
         <p:pipe port="result" step="result"/>
     </p:output>

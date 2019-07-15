@@ -11,7 +11,11 @@
 	<p:input port="source">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Input (X)HTML stream</h2>
-			<p px:role="desc">The (X)HTML document from which the outline must be extracted</p>
+			<p px:role="desc">The (X)HTML document from which the outline must be extracted. All
+			<code>body</code>, <code>article</code>, <code>aside</code>, <code>nav</code>,
+			<code>section</code>, <code>h1</code>, <code>h2</code>, <code>h3</code>,
+			<code>h4</code>, <code>h5</code>, <code>h6</code> and <code>hgroup</code> elements must
+			have an <code>id</code> attribute (see also px:html-id-fixer).</p>
 		</p:documentation>
 	</p:input>
 
