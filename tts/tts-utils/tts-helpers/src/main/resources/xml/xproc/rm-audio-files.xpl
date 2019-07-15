@@ -1,21 +1,30 @@
-<p:declare-step version="1.0" type="px:rm-audio-files"
-		xmlns:p="http://www.w3.org/ns/xproc"
-		xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-		xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal">
+<?xml version="1.0" encoding="UTF-8"?>
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
+                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                xmlns:d="http://www.daisy.org/ns/pipeline/data"
+                type="px:rm-audio-files">
 
-  <p:input port="source" primary="true" /> <!-- audio clips -->
-  <p:output port="result" primary="false" sequence="true">
-    <p:empty/>
-  </p:output>
+  <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+    <p>Delete audio files.</p>
+  </p:documentation>
 
-  <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl"/>
-  <p:import href="internal/list-audio-files.xpl"/>
+  <p:input port="source" primary="true">
+    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <p>A d:fileset document that was returned by px:create-audio-fileset which lists the original
+      files of which copies were made.</p>
+    </p:documentation>
+  </p:input>
 
-  <pxi:list-audio-files/>
+  <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
+    <p:documentation>
+      px:delete
+    </p:documentation>
+  </p:import>
+
   <p:for-each>
-    <p:iteration-source select="//*[@src]"/>
+    <p:iteration-source select="//d:file[@temp-audio-file]"/>
     <px:delete>
-      <p:with-option name="href" select="/*/@src"/>
+      <p:with-option name="href" select="/*/@href"/>
     </px:delete>
   </p:for-each>
 

@@ -307,11 +307,8 @@
                 <p:input port="source">
                     <p:pipe step="tts" port="audio-map"/>
                 </p:input>
-                <p:with-option name="output-dir" select="$content-dir">
+                <p:with-option name="output-dir" select="concat($content-dir,'audio/')">
                     <p:empty/>
-                </p:with-option>
-                <p:with-option name="audio-relative-dir" select="'audio/'">
-                    <p:empty/> <!-- TODO: make it an px:create-mediaoverlays' option as well so as to avoid inconsistencies  -->
                 </p:with-option>
             </px:create-audio-fileset>
 
