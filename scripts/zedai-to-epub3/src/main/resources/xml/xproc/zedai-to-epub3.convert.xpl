@@ -11,12 +11,11 @@
     <p:input port="in-memory.in" sequence="true"/>
 
     <p:input port="tts-config">
-      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-	<h2 px:role="name">Text-To-Speech configuration file</h2>
-	<p px:role="desc">Configuration file that contains Text-To-Speech
-	properties, links to aural CSS stylesheets and links to PLS
-	lexicons.</p>
-      </p:documentation>
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <h2 px:role="name">Text-To-Speech configuration file</h2>
+            <p px:role="desc">Configuration file that contains Text-To-Speech properties, links to
+            aural CSS stylesheets and links to PLS lexicons.</p>
+        </p:documentation>
     </p:input>
 
     <p:output port="fileset.out" primary="true">
@@ -124,7 +123,7 @@
         </p:otherwise>
     </p:choose>
     <p:identity name="zedai-with-css"/>
-    
+
     <!--=========================================================================-->
     <!-- METADATA                                                                -->
     <!--=========================================================================-->
@@ -221,30 +220,30 @@
     </p:group>
 
     <!--=========================================================================-->
-    <!-- Call the TTS								 -->
+    <!-- Call the TTS                                                            -->
     <!--=========================================================================-->
 
     <px:fileset-join name="fileset-for-tts">
-      <!-- TODO: include resources such as lexicons -->
-      <p:input port="source">
-	<p:pipe port="result" step="zedai-to-html"/>
-	<p:pipe port="result" step="navigation-doc"/>
-      </p:input>
+        <!-- TODO: include resources such as lexicons -->
+        <p:input port="source">
+            <p:pipe port="result" step="zedai-to-html"/>
+            <p:pipe port="result" step="navigation-doc"/>
+        </p:input>
     </px:fileset-join>
     <px:tts-for-epub3 name="tts">
-      <p:input port="in-memory.in">
-	<p:pipe port="html-file" step="navigation-doc"/>
-	<p:pipe port="html-files" step="zedai-to-html"/>
-      </p:input>
-      <p:input port="fileset.in">
-	<p:pipe port="result" step="fileset-for-tts"/>
-      </p:input>
-      <p:input port="config">
-	<p:pipe port="tts-config" step="main"/>
-      </p:input>
-      <p:with-option name="audio" select="$audio"/>
-      <p:with-option name="output-dir" select="$output-dir"/>
-      <p:with-option name="temp-dir" select="$temp-dir"/>
+        <p:input port="in-memory.in">
+            <p:pipe port="html-file" step="navigation-doc"/>
+            <p:pipe port="html-files" step="zedai-to-html"/>
+        </p:input>
+        <p:input port="fileset.in">
+            <p:pipe port="result" step="fileset-for-tts"/>
+        </p:input>
+        <p:input port="config">
+            <p:pipe port="tts-config" step="main"/>
+        </p:input>
+        <p:with-option name="audio" select="$audio"/>
+        <p:with-option name="output-dir" select="$output-dir"/>
+        <p:with-option name="temp-dir" select="$temp-dir"/>
     </px:tts-for-epub3>
 
     <!--=========================================================================-->
@@ -252,63 +251,63 @@
     <!--=========================================================================-->
 
     <p:choose name="mo-work">
-      <p:xpath-context>
-	<p:pipe port="audio-map" step="tts"/>
-      </p:xpath-context>
-      <p:when test="count(/d:audio-clips/*) = 0">
-	<p:output port="audio-filesets" sequence="true">
-	  <p:empty/>
-	</p:output>
-	<p:output port="smil-fileset">
-	  <p:empty/>
-	</p:output>
-	<p:output port="smils" sequence="true">
-	  <p:empty/>
-	</p:output>
-	<p:sink/>
-      </p:when>
-      <p:otherwise>
-	<p:output port="smil-fileset">
-	  <p:pipe port="fileset.out" step="create-mo"/>
-	</p:output>
-	<p:output port="audio-filesets" sequence="true">
-	  <p:pipe port="fileset.out" step="audio-fileset"/>
-	</p:output>
-	<p:output port="smils" sequence="true">
-	  <p:pipe port="in-memory.out" step="create-mo"/>
-	</p:output>
+        <p:xpath-context>
+            <p:pipe port="audio-map" step="tts"/>
+        </p:xpath-context>
+        <p:when test="count(/d:audio-clips/*) = 0">
+            <p:output port="audio-filesets" sequence="true">
+                <p:empty/>
+            </p:output>
+            <p:output port="smil-fileset">
+                <p:empty/>
+            </p:output>
+            <p:output port="smils" sequence="true">
+                <p:empty/>
+            </p:output>
+            <p:sink/>
+        </p:when>
+        <p:otherwise>
+            <p:output port="smil-fileset">
+                <p:pipe port="fileset.out" step="create-mo"/>
+            </p:output>
+            <p:output port="audio-filesets" sequence="true">
+                <p:pipe port="fileset.out" step="audio-fileset"/>
+            </p:output>
+            <p:output port="smils" sequence="true">
+                <p:pipe port="in-memory.out" step="create-mo"/>
+            </p:output>
 
-	<!--=========================================================================-->
-	<!-- CREATE THE FILESET THAT LINKS TO THE AUDIO FILES                        -->
-	<!--=========================================================================-->
-	<px:create-audio-fileset name="audio-fileset">
-	  <p:input port="source">
-	    <p:pipe step="tts" port="audio-map"/>
-	  </p:input>
-	  <p:with-option name="output-dir" select="$content-dir">
-	    <p:empty/>
-	  </p:with-option>
-	  <p:with-option name="audio-relative-dir" select="'audio/'">
-	    <p:empty/> <!-- TODO: make it an px:create-mediaoverlays' option as well so as to avoid inconsistencies  -->
-	  </p:with-option>
-	</px:create-audio-fileset>
+            <!--=========================================================================-->
+            <!-- CREATE THE FILESET THAT LINKS TO THE AUDIO FILES                        -->
+            <!--=========================================================================-->
+            <px:create-audio-fileset name="audio-fileset">
+                <p:input port="source">
+                    <p:pipe step="tts" port="audio-map"/>
+                </p:input>
+                <p:with-option name="output-dir" select="$content-dir">
+                    <p:empty/>
+                </p:with-option>
+                <p:with-option name="audio-relative-dir" select="'audio/'">
+                    <p:empty/> <!-- TODO: make it an px:create-mediaoverlays' option as well so as to avoid inconsistencies  -->
+                </p:with-option>
+            </px:create-audio-fileset>
 
-	<!--=========================================================================-->
-	<!-- CREATE THE SMILS FROM THE AUDIO MAP		                     -->
-	<!--=========================================================================-->
+            <!--=========================================================================-->
+            <!-- CREATE THE SMILS FROM THE AUDIO MAP                                     -->
+            <!--=========================================================================-->
 
-	<px:create-mediaoverlays name="create-mo">
-	  <p:input port="content-docs">
-	    <p:pipe port="content.out" step="tts"/>
-	  </p:input>
-	  <p:input port="audio-map">
-	    <p:pipe port="audio-map" step="tts"/>
-	  </p:input>
-	  <p:with-option name="content-dir" select="$content-dir">
-	    <p:empty/>
-	  </p:with-option>
-	</px:create-mediaoverlays>
-      </p:otherwise>
+            <px:create-mediaoverlays name="create-mo">
+                <p:input port="content-docs">
+                    <p:pipe port="content.out" step="tts"/>
+                </p:input>
+                <p:input port="audio-map">
+                    <p:pipe port="audio-map" step="tts"/>
+                </p:input>
+                <p:with-option name="content-dir" select="$content-dir">
+                    <p:empty/>
+                </p:with-option>
+            </px:create-mediaoverlays>
+        </p:otherwise>
     </p:choose>
 
 
@@ -367,30 +366,30 @@
                 <p:pipe port="result" step="zedai-to-html"/>
                 <p:pipe port="result" step="navigation-doc"/>
                 <p:pipe port="result" step="resources"/>
-		<p:pipe port="smil-fileset" step="mo-work"/>
-		<p:pipe port="audio-filesets" step="mo-work"/>
+                <p:pipe port="smil-fileset" step="mo-work"/>
+                <p:pipe port="audio-filesets" step="mo-work"/>
             </p:input>
         </px:fileset-join>
         <p:sink/>
 
-	<px:fileset-join name="publication-resources">
-	    <p:input port="source">
-	      <p:pipe port="result" step="resources"/>
-	      <p:pipe port="audio-filesets" step="mo-work"/>
-	    </p:input>
-	</px:fileset-join>
+        <px:fileset-join name="publication-resources">
+            <p:input port="source">
+              <p:pipe port="result" step="resources"/>
+              <p:pipe port="audio-filesets" step="mo-work"/>
+            </p:input>
+        </px:fileset-join>
 
         <px:epub3-pub-create-package-doc name="package-doc.create">
             <p:input port="spine-filesets">
-		<p:pipe port="result" step="navigation-doc"/>
+                <p:pipe port="result" step="navigation-doc"/>
                 <p:pipe port="result" step="zedai-to-html"/>
             </p:input>
             <p:input port="publication-resources">
                 <p:pipe port="result" step="publication-resources"/>
             </p:input>
-	    <p:input port="mediaoverlays">
-	      <p:pipe port="smils" step="mo-work"/>
-	    </p:input>
+            <p:input port="mediaoverlays">
+                <p:pipe port="smils" step="mo-work"/>
+            </p:input>
             <p:input port="metadata">
                 <p:pipe port="result" step="metadata"/>
             </p:input>
@@ -399,7 +398,7 @@
             </p:input>
             <p:with-option name="result-uri" select="$opf-base"/>
             <p:with-option name="compatibility-mode" select="'false'"/>
-	    <p:with-option name="nav-uri" select="base-uri(/*)">
+            <p:with-option name="nav-uri" select="base-uri(/*)">
                 <p:pipe port="html-file" step="navigation-doc"/>
             </p:with-option>
             <!--TODO configurability for other META-INF files ?-->
@@ -423,7 +422,7 @@
             <p:input port="source">
                 <p:pipe step="package-doc" port="opf"/>
                 <p:pipe step="tts" port="content.out"/>
-		<p:pipe port="smils" step="mo-work"/>
+                <p:pipe port="smils" step="mo-work"/>
             </p:input>
         </p:wrap-sequence>
         <p:delete match="/*/*/*" name="wrapped-in-memory"/>
@@ -478,7 +477,7 @@
             <p:pipe step="ocf" port="in-memory.out"/>
             <p:pipe step="package-doc" port="opf"/>
             <p:pipe step="tts" port="content.out"/>
-	    <p:pipe port="smils" step="mo-work"/>
+            <p:pipe port="smils" step="mo-work"/>
         </p:iteration-source>
         <p:variable name="doc-base" select="base-uri(/*)"/>
         <p:choose>
@@ -502,7 +501,7 @@
     </p:for-each>
 
     <!--=========================================================================-->
-    <!-- Status								 -->
+    <!-- Status                                                                  -->
     <!--=========================================================================-->
 
     <p:rename match="/*" new-name="d:validation-status" name="validation-status">
