@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step name="main" type="pxi:list-audio-clips" xmlns:p="http://www.w3.org/ns/xproc"
-    xmlns:d="http://www.daisy.org/ns/pipeline/data"
-    xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-    xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal/daisy3-to-epub3" version="1.0">
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
+                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal/daisy3-to-epub3"
+                xmlns:d="http://www.daisy.org/ns/pipeline/data"
+                type="pxi:list-audio-clips" name="main">
 
     <p:input port="fileset.in" primary="true"/>
     <p:input port="dtbooks" sequence="true"/>
     <p:input port="smils" sequence="true"/>
 
-    <p:option name="content-dir" required="true"/>
+    <p:option name="audio-dir" required="true"/>
 
     <p:output port="fileset.out" primary="true"/>
     <p:output port="audio-clips" sequence="true">
@@ -39,7 +40,7 @@
         </p:viewport>
         <!--re-base the file set-->
         <p:add-attribute match="/*" attribute-name="xml:base">
-            <p:with-option name="attribute-value" select="concat($content-dir,'audio/')"/>
+            <p:with-option name="attribute-value" select="$audio-dir"/>
         </p:add-attribute>
     </p:group>
 
