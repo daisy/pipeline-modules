@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step version="1.0" name="main" type="px:tts-for-epub3"
-		xmlns:p="http://www.w3.org/ns/xproc"
-		xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-		xmlns:d="http://www.daisy.org/ns/pipeline/data"
-		exclude-inline-prefixes="#all">
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
+                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                xmlns:d="http://www.daisy.org/ns/pipeline/data"
+                exclude-inline-prefixes="#all"
+                type="px:tts-for-epub3" name="main">
 
   <p:input port="in-memory.in" primary="true" sequence="true">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -137,25 +137,25 @@
     <p:variable name="doc-uri" select="base-uri(/*)"/>
     <p:choose name="is.html">
       <p:xpath-context>
-	<p:pipe port="fileset.in" step="main"/>
+        <p:pipe port="fileset.in" step="main"/>
       </p:xpath-context>
       <p:when test="//*[@media-type='application/xhtml+xml']/resolve-uri(@href, $fileset-base)=$doc-uri">
-	<p:output port="html">
-	  <p:pipe port="result" step="id"/>
-	</p:output>
-	<p:output port="non-html">
-	  <p:empty/>
-	</p:output>
-	<p:identity name="id"/>
+        <p:output port="html">
+          <p:pipe port="result" step="id"/>
+        </p:output>
+        <p:output port="non-html">
+          <p:empty/>
+        </p:output>
+        <p:identity name="id"/>
       </p:when>
       <p:otherwise>
-	<p:output port="html">
-	  <p:empty/>
-	</p:output>
-	<p:output port="non-html">
-	  <p:pipe port="result" step="id"/>
-	</p:output>
-	<p:identity name="id"/>
+        <p:output port="html">
+          <p:empty/>
+        </p:output>
+        <p:output port="non-html">
+          <p:pipe port="result" step="id"/>
+        </p:output>
+        <p:identity name="id"/>
       </p:otherwise>
     </p:choose>
   </p:for-each>
@@ -164,23 +164,23 @@
     <!-- ====== TTS OFF ====== -->
     <p:when test="$audio = 'false'">
       <p:xpath-context>
-	<p:empty/>
+        <p:empty/>
       </p:xpath-context>
       <p:output port="audio-map">
-	<p:inline>
-	  <d:audio-clips/>
-	</p:inline>
+        <p:inline>
+          <d:audio-clips/>
+        </p:inline>
       </p:output>
       <p:output port="content.out" primary="true" sequence="true">
-	<p:pipe port="html" step="html-filter"/>
+        <p:pipe port="html" step="html-filter"/>
       </p:output>
       <p:output port="sentence-ids" sequence="true">
-	<p:empty/>
+        <p:empty/>
       </p:output>
       <p:output port="status">
-	<p:inline>
-	  <d:status result="ok"/>
-	</p:inline>
+        <p:inline>
+          <d:status result="ok"/>
+        </p:inline>
       </p:output>
       <p:sink/>
     </p:when>
@@ -188,60 +188,60 @@
     <!-- ====== TTS ON ====== -->
     <p:otherwise>
       <p:output port="audio-map">
-	<p:pipe port="result" step="to-audio"/>
+        <p:pipe port="result" step="to-audio"/>
       </p:output>
       <p:output port="content.out" primary="true" sequence="true">
-	<p:pipe port="content.out" step="loop"/>
+        <p:pipe port="content.out" step="loop"/>
       </p:output>
       <p:output port="sentence-ids" sequence="true">
-	<p:pipe port="sentence-ids" step="loop"/>
+        <p:pipe port="sentence-ids" step="loop"/>
       </p:output>
       <p:output port="status">
-	<p:pipe step="to-audio" port="status"/>
+        <p:pipe step="to-audio" port="status"/>
       </p:output>
       <p:for-each name="loop">
-	<p:output port="ssml.out" primary="true" sequence="true">
-	  <p:pipe port="result" step="ssml-gen"/>
-	</p:output>
-	<p:output port="content.out">
-	  <p:pipe port="result" step="rm-css"/>
-	</p:output>
-	<p:output port="sentence-ids">
-	  <p:pipe port="sentence-ids" step="lexing"/>
-	</p:output>
-	<px:html-break-detect name="lexing">
-	  <p:with-option name="id-prefix" select="concat($anti-conflict-prefix, p:iteration-position(), '-')"/>
-	</px:html-break-detect>
-	<px:epub3-to-ssml name="ssml-gen">
-	  <p:input port="content.in">
-	    <p:pipe port="result" step="lexing"/>
-	  </p:input>
-	  <p:input port="sentence-ids">
-	    <p:pipe port="sentence-ids" step="lexing"/>
-	  </p:input>
-	  <p:input port="fileset.in">
-	    <p:pipe port="fileset.in" step="main"/>
-	  </p:input>
-	  <p:input port="config">
-	    <p:pipe port="config" step="main"/>
-	  </p:input>
-	</px:epub3-to-ssml>
-	<px:remove-inline-css-speech name="rm-css">
-	  <p:input port="source">
-	    <p:pipe port="result" step="lexing"/>
-	  </p:input>
-	</px:remove-inline-css-speech>
+        <p:output port="ssml.out" primary="true" sequence="true">
+          <p:pipe port="result" step="ssml-gen"/>
+        </p:output>
+        <p:output port="content.out">
+          <p:pipe port="result" step="rm-css"/>
+        </p:output>
+        <p:output port="sentence-ids">
+          <p:pipe port="sentence-ids" step="lexing"/>
+        </p:output>
+        <px:html-break-detect name="lexing">
+          <p:with-option name="id-prefix" select="concat($anti-conflict-prefix, p:iteration-position(), '-')"/>
+        </px:html-break-detect>
+        <px:epub3-to-ssml name="ssml-gen">
+          <p:input port="content.in">
+            <p:pipe port="result" step="lexing"/>
+          </p:input>
+          <p:input port="sentence-ids">
+            <p:pipe port="sentence-ids" step="lexing"/>
+          </p:input>
+          <p:input port="fileset.in">
+            <p:pipe port="fileset.in" step="main"/>
+          </p:input>
+          <p:input port="config">
+            <p:pipe port="config" step="main"/>
+          </p:input>
+        </px:epub3-to-ssml>
+        <px:remove-inline-css-speech name="rm-css">
+          <p:input port="source">
+            <p:pipe port="result" step="lexing"/>
+          </p:input>
+        </px:remove-inline-css-speech>
       </p:for-each>
       <px:ssml-to-audio name="to-audio">
-	<p:input port="config">
-	  <p:pipe port="config" step="main"/>
-	</p:input>
-	<p:with-option name="output-dir" select="$output-dir">
-	  <p:empty/>
-	</p:with-option>
-	<p:with-option name="temp-dir" select="if ($temp-dir!='') then concat($temp-dir,'audio/') else ''">
-	  <p:empty/>
-	</p:with-option>
+        <p:input port="config">
+          <p:pipe port="config" step="main"/>
+        </p:input>
+        <p:with-option name="output-dir" select="$output-dir">
+          <p:empty/>
+        </p:with-option>
+        <p:with-option name="temp-dir" select="if ($temp-dir!='') then concat($temp-dir,'audio/') else ''">
+          <p:empty/>
+        </p:with-option>
       </px:ssml-to-audio>
     </p:otherwise>
   </p:choose>
