@@ -355,6 +355,15 @@
                 </p:try>
             </p:otherwise>
         </p:choose>
+        
+        <p:documentation>Add original-href attribute so that the in-memory documents can be
+        discarded and px:fileset-store called again without resulting in a "neither stored on disk
+        nor in memory" error.</p:documentation>
+        <p:add-attribute match="/d:file" attribute-name="original-href">
+            <p:with-option name="attribute-value" select="$target">
+                <p:empty/>
+            </p:with-option>
+        </p:add-attribute>
     </p:viewport>
 
 </p:declare-step>
