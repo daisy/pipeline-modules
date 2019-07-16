@@ -334,7 +334,10 @@
                 <p:input port="audio-map">
                     <p:pipe step="tts" port="audio-map"/>
                 </p:input>
-                <p:with-option name="content-dir" select="$content-dir">
+                <p:with-option name="audio-dir" select="concat($content-dir,'audio/')">
+                    <p:empty/>
+                </p:with-option>
+                <p:with-option name="mediaoverlay-dir" select="concat($content-dir,'mo/')">
                     <p:empty/>
                 </p:with-option>
             </px:epub3-create-mediaoverlays>

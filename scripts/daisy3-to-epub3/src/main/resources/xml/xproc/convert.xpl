@@ -142,7 +142,7 @@
                 <p:input port="smils">
                     <p:pipe port="result" step="smils"/>
                 </p:input>
-                <p:with-option name="content-dir" select="$content-dir"/>
+                <p:with-option name="audio-dir" select="concat($content-dir,'audio/')"/>
             </pxi:list-audio-clips>
         </p:when>
         <p:otherwise>
@@ -217,7 +217,8 @@
                 <p:input port="audio-map">
                     <p:pipe port="audio-clips" step="audio-clips"/>
                 </p:input>
-                <p:with-option name="content-dir" select="$content-dir"/>
+                <p:with-option name="audio-dir" select="concat($content-dir,'audio/')"/>
+                <p:with-option name="mediaoverlay-dir" select="concat($content-dir,'mo/')"/>
             </px:epub3-create-mediaoverlays>
         </p:when>
         <p:otherwise>

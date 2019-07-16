@@ -17,9 +17,14 @@
             <p>The d:audio-clips document from the TTS step</p>
         </p:documentation>
     </p:input>
-    <p:option name="content-dir">
+    <p:option name="audio-dir">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <p>The content directory of the EPUB publication</p>
+            <p>Directory for the audio files.</p>
+        </p:documentation>
+    </p:option>
+    <p:option name="mediaoverlay-dir">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Directory for the SMIL files.</p>
         </p:documentation>
     </p:option>
 
@@ -35,17 +40,10 @@
         </p:documentation>
     </p:import>
 
-    <p:variable name="audio-dir" select="concat($content-dir,'audio/')">
-        <p:empty/>
-    </p:variable>
-    <p:variable name="mo-dir" select="concat($content-dir,'mo/')">
-        <p:empty/>
-    </p:variable>
-
     <p:for-each name="media-overlays">
         <p:output port="result"/>
         <p:variable name="mo-uri"
-            select="concat($mo-dir,replace(base-uri(/*),'.*?([^/]*)\.x?html$','$1.smil'))"/>
+            select="concat($mediaoverlay-dir,replace(base-uri(/*),'.*?([^/]*)\.x?html$','$1.smil'))"/>
         <p:identity name="content-doc"/>
         <p:xslt>
             <p:input port="source">
@@ -55,7 +53,7 @@
             <p:input port="stylesheet">
                 <p:document href="create-mediaoverlay.xsl"/>
             </p:input>
-            <p:with-param name="mo-dir" select="$mo-dir"/>
+            <p:with-param name="mo-dir" select="$mediaoverlay-dir"/>
             <p:with-param name="audio-dir" select="$audio-dir"/>
         </p:xslt>
         <p:xslt>
@@ -81,7 +79,7 @@
             <p:output port="result" sequence="true"/>
             <p:variable name="mo-uri" select="base-uri(/*)"/>
             <px:fileset-create>
-                <p:with-option name="base" select="$mo-dir"/>
+                <p:with-option name="base" select="$mediaoverlay-dir"/>
             </px:fileset-create>
             <px:fileset-add-entry media-type="application/smil+xml">
                 <p:with-option name="href" select="$mo-uri"/>
