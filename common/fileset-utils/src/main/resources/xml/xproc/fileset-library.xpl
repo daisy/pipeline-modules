@@ -3,6 +3,7 @@
     <p:import href="fileset-add-entry.xpl"/>
     <p:import href="fileset-copy.xpl"/>
     <p:import href="fileset-create.xpl"/>
+    <p:import href="fileset-delete.xpl"/>
     <p:import href="fileset-diff.xpl"/>
     <p:import href="fileset-from-dir.xpl"/>
     <p:import href="fileset-from-dir-list.xpl"/>

@@ -113,7 +113,15 @@
 
   <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
   <p:import href="http://www.daisy.org/pipeline/modules/daisy3-utils/library.xpl"/>
-  <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
+  <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
+    <p:documentation>
+      px:fileset-load
+      px:fileset-copy
+      px:fileset-create
+      px:fileset-add-entry
+      px:fileset-join
+    </p:documentation>
+  </p:import>
   <p:import href="http://www.daisy.org/pipeline/modules/dtbook-tts/library.xpl"/>
   <p:import href="http://www.daisy.org/pipeline/modules/tts-helpers/library.xpl">
     <p:documentation>
@@ -190,9 +198,9 @@
     </p:input>
   </p:delete>
 
-  <px:fileset-move name="fileset.moved">
-    <p:with-option name="new-base" select="$output-fileset-base"/>
-  </px:fileset-move>
+  <px:fileset-copy name="fileset.moved">
+    <p:with-option name="target" select="$output-fileset-base"/>
+  </px:fileset-copy>
 
   <p:group name="convert">
     <p:output port="in-memory.out" sequence="true">
@@ -420,7 +428,7 @@
 	  <p:input port="source">
 	    <p:pipe port="fileset.out" step="create-mo"/>
 	    <p:pipe port="fileset.out" step="fileset.audio"/>
-	    <p:pipe port="fileset.out" step="fileset.moved"/>
+	    <p:pipe port="result.fileset" step="fileset.moved"/>
       <p:pipe port="fileset.out" step="math-additions"/>
 	    <p:pipe port="result" step="fileset.ncx"/>
 	    <p:pipe port="result" step="fileset.doc"/>

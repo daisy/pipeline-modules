@@ -14,24 +14,34 @@
         <p:pipe step="result.fileset" port="result"/>
     </p:output>
     
-    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
+        <p:documentation>
+            px:fileset-copy
+            px:fileset-store
+            px:fileset-load
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
+        <p:documentation>
+            px:assert
+        </p:documentation>
+    </p:import>
     
-    <px:fileset-move name="move">
-        <p:with-option name="new-base" select="concat($output-dir,replace(/*/@content,'[^a-zA-Z0-9]','_'),'/')">
+    <px:fileset-copy name="move">
+        <p:with-option name="target" select="concat($output-dir,replace(/*/@content,'[^a-zA-Z0-9]','_'),'/')">
             <p:pipe step="identifier" port="result"/>
         </p:with-option>
-        <p:input port="in-memory.in">
+        <p:input port="source.in-memory">
             <p:pipe step="main" port="source.in-memory"/>
         </p:input>
-    </px:fileset-move>
+    </px:fileset-copy>
 
     <px:fileset-store name="fileset-store" fail-on-error="true">
         <p:input port="fileset.in">
-            <p:pipe step="move" port="fileset.out"/>
+            <p:pipe step="move" port="result.fileset"/>
         </p:input>
         <p:input port="in-memory.in">
-            <p:pipe step="move" port="in-memory.out"/>
+            <p:pipe step="move" port="result.in-memory"/>
         </p:input>
     </px:fileset-store>
     <p:identity>

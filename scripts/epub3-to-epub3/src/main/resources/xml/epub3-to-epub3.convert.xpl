@@ -33,7 +33,17 @@
     
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
+        <p:documentation>
+            px:fileset-create
+            px:fileset-add-entry
+            px:fileset-join
+            px:fileset-rebase
+            px:fileset-copy
+            px:fileset-load
+            px:fileset-filter
+        </p:documentation>
+    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/braille/common-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/braille/css-utils/library.xpl"/>
     
@@ -78,7 +88,7 @@
     <!--
         Make sure that the base uri of the fileset is the directory containing the mimetype
         file. This will normally also eliminate any relative hrefs starting with "..", which is
-        needed because px:fileset-move doesn't handle these correctly.
+        needed because px:fileset-copy errors when it encounters these.
     -->
     <p:choose>
         <p:when test="//d:file[matches(@href,'^(.+/)?mimetype$')]">
@@ -93,12 +103,12 @@
         </p:otherwise>
     </p:choose>
     
-    <px:fileset-move name="move">
-        <p:with-option name="new-base" select="$result-base"/>
-        <p:input port="in-memory.in">
+    <px:fileset-copy name="move">
+        <p:with-option name="target" select="$result-base"/>
+        <p:input port="source.in-memory">
             <p:pipe step="main" port="epub.in.in-memory"/>
         </p:input>
-    </px:fileset-move>
+    </px:fileset-copy>
     
     <!--
         container.xml
@@ -106,7 +116,7 @@
     
     <px:fileset-load name="original-container">
         <p:input port="in-memory">
-            <p:pipe step="move" port="in-memory.out"/>
+            <p:pipe step="move" port="result.in-memory"/>
         </p:input>
         <p:with-option name="href" select="resolve-uri('META-INF/container.xml',$result-base)"/>
     </px:fileset-load>
@@ -117,10 +127,10 @@
     
     <px:fileset-load media-types="application/oebps-package+xml">
         <p:input port="fileset">
-            <p:pipe step="move" port="fileset.out"/>
+            <p:pipe step="move" port="result.fileset"/>
         </p:input>
         <p:input port="in-memory">
-            <p:pipe step="move" port="in-memory.out"/>
+            <p:pipe step="move" port="result.in-memory"/>
         </p:input>
     </px:fileset-load>
     <p:split-sequence test="position()=1"/>
@@ -133,7 +143,7 @@
     <p:xslt name="braille-rendition.fileset">
         <p:input port="source">
             <p:pipe step="default-rendition.package-document" port="result"/>
-            <p:pipe step="move" port="fileset.out"/>
+            <p:pipe step="move" port="result.fileset"/>
         </p:input>
         <p:input port="stylesheet">
             <p:document href="braille-rendition.fileset.xsl"/>
@@ -202,7 +212,7 @@
     </px:fileset-filter>
     <px:fileset-load>
         <p:input port="in-memory">
-            <p:pipe step="move" port="in-memory.out"/>
+            <p:pipe step="move" port="result.in-memory"/>
         </p:input>
     </px:fileset-load>
     <p:for-each name="braille-rendition.html">
@@ -226,7 +236,7 @@
                 <px:message severity="DEBUG" message="Inlining document-specific CSS"/>
                 <css:apply-stylesheets>
                     <p:input port="context">
-                        <p:pipe step="move" port="in-memory.out"/>
+                        <p:pipe step="move" port="result.in-memory"/>
                     </p:input>
                 </css:apply-stylesheets>
             </p:when>
@@ -402,7 +412,7 @@
     </px:fileset-filter>
     <px:fileset-load>
         <p:input port="in-memory">
-            <p:pipe step="move" port="in-memory.out"/>
+            <p:pipe step="move" port="result.in-memory"/>
         </p:input>
     </px:fileset-load>
     <p:for-each>
@@ -487,7 +497,7 @@
     
     <px:fileset-join>
         <p:input port="source">
-            <p:pipe step="move" port="fileset.out"/>
+            <p:pipe step="move" port="result.fileset"/>
             <p:pipe step="braille-rendition.html.fileset" port="result"/>
             <p:pipe step="braille-rendition.css.fileset" port="result"/>
             <p:pipe step="braille-rendition.smil.fileset" port="result"/>
@@ -514,7 +524,7 @@
     
     <px:select-by-base name="remove-container-from-memory">
         <p:input port="source">
-            <p:pipe step="move" port="in-memory.out"/>
+            <p:pipe step="move" port="result.in-memory"/>
         </p:input>
         <p:with-option name="base" select="resolve-uri('META-INF/container.xml',$result-base)"/>
     </px:select-by-base>
