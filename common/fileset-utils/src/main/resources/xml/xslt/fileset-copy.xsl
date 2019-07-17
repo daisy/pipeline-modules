@@ -25,10 +25,10 @@
                                           select="if ($filename='') then concat($path[last()-1],'/') else $filename"/>
                             <xsl:attribute name="href" select="concat($prefix,$filename)"/>
                         </xsl:when>
-                        <xsl:when test="@xml:base">
+                        <xsl:otherwise>
                             <!-- make sure that href is relative to the fileset base -->
                             <xsl:attribute name="href" select="pf:relativize-uri(resolve-uri(@href,base-uri(.)),base-uri(/*))"/>
-                        </xsl:when>
+                        </xsl:otherwise>
                     </xsl:choose>
                     <xsl:if test="@original-href">
                         <!-- make sure that original-href is absolute -->

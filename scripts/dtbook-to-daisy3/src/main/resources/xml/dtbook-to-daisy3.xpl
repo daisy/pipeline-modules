@@ -79,10 +79,10 @@ When text-to-speech is enabled, the conversion may output a (incomplete) DAISY 3
   <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
   <p:import href="http://www.daisy.org/pipeline/modules/dtbook-utils/library.xpl"/>
   <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl"/>
-  <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
-  <p:import href="http://www.daisy.org/pipeline/modules/tts-helpers/library.xpl">
+  <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
     <p:documentation>
-      px:rm-audio-files
+      px:fileset-store
+      px:fileset-delete
     </p:documentation>
   </p:import>
   <p:import href="dtbook-to-daisy3.convert.xpl"/>
@@ -137,10 +137,10 @@ When text-to-speech is enabled, the conversion may output a (incomplete) DAISY 3
     </p:input>
   </px:fileset-store>
 
-  <px:rm-audio-files cx:depends-on="store">
+  <px:fileset-delete cx:depends-on="store">
     <p:input port="source">
       <p:pipe step="convert" port="temp-audio-files"/>
     </p:input>
-  </px:rm-audio-files>
+  </px:fileset-delete>
 
 </p:declare-step>

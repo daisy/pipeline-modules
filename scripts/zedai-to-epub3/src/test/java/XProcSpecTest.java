@@ -12,7 +12,7 @@ public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 			pipelineModule("fileset-utils"),
 			pipelineModule("file-utils"),
 			pipelineModule("html-utils"),
-			pipelineModule("tts-helpers"),
+			pipelineModule("smil-utils"),
 			pipelineModule("zedai-to-html"),
 			pipelineModule("zedai-utils")
 		};
