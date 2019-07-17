@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns="http://www.daisy.org/ns/pipeline/data"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
-    xmlns:d="http://www.daisy.org/z3986/2005/dtbook/" xmlns:s="http://www.w3.org/2001/SMIL20/"
-    exclude-result-prefixes="#all" version="2.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
+                xmlns:dtb="http://www.daisy.org/z3986/2005/dtbook/"
+                xmlns:s="http://www.w3.org/2001/SMIL20/"
+                xmlns="http://www.daisy.org/ns/pipeline/data"
+                exclude-result-prefixes="#all">
 
     <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl"/>
 
-    <xsl:param name="audio-base"/>
+    <xsl:param name="output-base-uri"/>
 
     <xsl:key name="smil-fragments" match="s:par|s:text" use="@id"/>
 
     <xsl:template name="create-map">
         <audio-clips>
-            <xsl:for-each select="collection()[/d:dtbook]">
+            <xsl:for-each select="collection()[/dtb:dtbook]">
                 <xsl:apply-templates>
                     <xsl:with-param name="id-prefix"
                         select="if (last()>1) then concat(position(),'_') else ''" tunnel="yes"/>
@@ -22,7 +24,7 @@
         </audio-clips>
     </xsl:template>
 
-    <xsl:template match="d:*[@smilref]">
+    <xsl:template match="dtb:*[@smilref]">
         <xsl:param name="id-prefix" tunnel="yes"/>
         <xsl:variable name="smil-uri"
             select="resolve-uri(substring-before(@smilref,'#'),base-uri(.))"/>
@@ -52,7 +54,7 @@
         <xsl:if test="count($audios)>0">
             <!--TODO normalize clock values-->
             <clip idref="{$idref}"
-                src="{pf:relativize-uri(resolve-uri($audios[1]/@src,base-uri(.)),$audio-base)}"
+                src="{pf:relativize-uri(resolve-uri($audios[1]/@src,base-uri(.)),$output-base-uri)}"
                 clipBegin="{$audios[1]/@clipBegin}"
                 clipEnd="{$audios[@src=$audios[1]/@src][last()]/@clipEnd}"/>
         </xsl:if>
@@ -60,7 +62,5 @@
     </xsl:template>
 
     <xsl:template match="text()|@*"/>
-
-
 
 </xsl:stylesheet>
