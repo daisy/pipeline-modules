@@ -21,9 +21,16 @@
     <p:declare-step type="pxi:normalize-fileset">
         <p:input port="source"/>
         <p:output port="result"/>
+        <!--
+            FIXME: The idea of this p:add-xml-base step is to work around a Calabash bug where
+            certain steps mess up the base URI of documents with a relative root xml:base
+            attribute. However it does not work in the case where px:fileset-compare is called from
+            XProcSpec because XProcSpec performs some actions on the documents before they end up
+            here.
+        -->
+        <p:add-xml-base/>
         <p:label-elements match="*[@href]" attribute="href" replace="true" label="resolve-uri(@href,base-uri(.))"/>
         <p:label-elements match="*[@original-href]" attribute="original-href" replace="true" label="resolve-uri(@original-href,base-uri(.))"/>
-        <p:delete match="@xml:base"/>
         <p:xslt>
             <p:input port="stylesheet">
                 <p:inline>
@@ -46,6 +53,7 @@
                 <p:empty/>
             </p:input>
         </p:xslt>
+        <p:delete match="@xml:base"/>
     </p:declare-step>
     
     <pxi:normalize-fileset name="normalize-source">
