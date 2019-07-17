@@ -18,6 +18,12 @@
     </p:documentation>
   </p:output>
 
+  <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
+    <p:documentation>
+      px:fileset-join
+    </p:documentation>
+  </p:import>
+
   <p:xslt>
     <p:input port="stylesheet">
       <p:document href="audio-clips-to-fileset.xsl"/>
@@ -26,5 +32,8 @@
       <p:empty/>
     </p:input>
   </p:xslt>
+
+  <p:documentation>Normalize the hrefs</p:documentation>
+  <px:fileset-join/>
 
 </p:declare-step>

@@ -2,6 +2,7 @@
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal/daisy3-to-epub3"
+                xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 type="px:daisy3-to-epub3" version="1.0" name="main">
 
     <p:input port="source.fileset" primary="true"/>
@@ -34,10 +35,24 @@
             px:epub3-ocf-finalize
         </p:documentation>
     </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
+        <p:documentation>
+            px:fileset-join
+            px:fileset-load
+            px:fileset-rebase
+            px:fileset-add-entry
+            px:fileset-create
+            px:fileset-copy
+        </p:documentation>
+    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/smil-utils/library.xpl">
+        <p:documentation>
+            px:audio-clips-to-fileset
+        </p:documentation>
+    </p:import>
     <p:import href="../internal/ncx-to-nav.xpl"/>
-    <p:import href="../internal/list-audio-clips.xpl"/>
+    <p:import href="../internal/smil-to-audio-clips.xpl"/>
 
 
     <!--=========================================================================-->
@@ -128,33 +143,41 @@
     <!--TODO conditionally, if the MO option is set-->
     <p:choose name="audio-clips">
         <p:when test="$mediaoverlays and $type='text+mo'">
-            <p:output port="fileset.out" primary="true"/>
-            <p:output port="audio-clips" sequence="true">
-                <p:pipe port="audio-clips" step="audio-clips.inner"/>
-            </p:output>
-            <pxi:list-audio-clips name="audio-clips.inner">
-                <p:input port="fileset.in">
-                    <p:pipe step="source.fileset" port="result"/>
-                </p:input>
+            <p:output port="result"/>
+            <pxi:smil-to-audio-clips>
                 <p:input port="dtbooks">
-                    <p:pipe port="result" step="dtbooks"/>
+                    <p:pipe step="dtbooks" port="result"/>
                 </p:input>
                 <p:input port="smils">
-                    <p:pipe port="result" step="smils"/>
+                    <p:pipe step="smils" port="result"/>
                 </p:input>
-                <p:with-option name="audio-dir" select="concat($content-dir,'audio/')"/>
-            </pxi:list-audio-clips>
+                <p:with-option name="output-base-uri" select="base-uri(/*)">
+                    <p:pipe step="source.fileset" port="result"/>
+                </p:with-option>
+            </pxi:smil-to-audio-clips>
         </p:when>
         <p:otherwise>
-            <p:output port="fileset.out" primary="true"/>
-            <p:output port="audio-clips" sequence="true">
-                <p:empty/>
-            </p:output>
+            <p:output port="result"/>
             <p:identity>
-                <p:input port="source"><p:empty/></p:input>
+                <p:input port="source">
+                    <p:inline><d:audio-clips/></p:inline>
+                </p:input>
             </p:identity>
         </p:otherwise>
     </p:choose>
+
+    <p:documentation>Copy the audio files to the EPUB/audio directory</p:documentation>
+    <px:audio-clips-to-fileset>
+        <p:documentation>Referenced audio files</p:documentation>
+    </px:audio-clips-to-fileset>
+    <!--
+        FIXME: add warning if audio is not an EPUB 3 core media type
+        FIXME: or better, add support for audio transcoding
+    -->
+    <!-- <px:fileset-filter not-media-types="audio/mpeg audio/mp4"/> -->
+    <px:fileset-copy flatten="false" name="audio-fileset">
+        <p:with-option name="target" select="concat($content-dir,'audio/')"/>
+    </px:fileset-copy>
     <p:sink/>
 
     <!--=========================================================================-->
@@ -215,7 +238,7 @@
                     <p:pipe port="result.in-memory" step="content-docs"/>
                 </p:input>
                 <p:input port="audio-map">
-                    <p:pipe port="audio-clips" step="audio-clips"/>
+                    <p:pipe step="audio-clips" port="result"/>
                 </p:input>
                 <p:with-option name="audio-dir" select="concat($content-dir,'audio/')"/>
                 <p:with-option name="mediaoverlay-dir" select="concat($content-dir,'mo/')"/>
@@ -272,7 +295,7 @@
                 <p:pipe port="result.fileset" step="content-docs"/>
                 <p:pipe port="fileset.out" step="nav-doc"/>
                 <p:pipe port="fileset.out" step="media-overlays"/>
-                <p:pipe port="fileset.out" step="audio-clips"/>
+                <p:pipe step="audio-fileset" port="result.fileset"/>
             </p:input>
         </px:fileset-join>
         <p:sink/>
