@@ -7,11 +7,8 @@
   <xsl:template match="/">
     <d:fileset>
       <xsl:for-each-group select="//d:clip" group-by="@src">
-        <!--
-            Add "temp-audio-file" attribute as a safety so that px:rm-audio-files, to which this
-            d:fileset document is passed later on, does not delete just any files.
-        -->
-        <d:file href="{current-grouping-key()}" temp-audio-file=""/>
+        <!-- FIXME: deal with other format than audio/mpeg -->
+        <d:file href="{current-grouping-key()}" media-type="audio/mpeg"/>
       </xsl:for-each-group>
     </d:fileset>
   </xsl:template>

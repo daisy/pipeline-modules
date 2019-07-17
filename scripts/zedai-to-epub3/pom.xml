@@ -62,7 +62,7 @@
     </dependency>
     <dependency>
       <groupId>org.daisy.pipeline.modules</groupId>
-      <artifactId>tts-helpers</artifactId>
+      <artifactId>smil-utils</artifactId>
       <scope>runtime</scope>
     </dependency>
     <dependency>

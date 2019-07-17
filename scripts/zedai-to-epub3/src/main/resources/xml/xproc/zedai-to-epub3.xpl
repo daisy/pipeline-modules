@@ -80,14 +80,13 @@ split up if they exceed the given maximum size.</p>
       </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/zedai-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/tts-helpers/library.xpl">
+    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
       <p:documentation>
-        px:rm-audio-files
+        px:fileset-delete
       </p:documentation>
     </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/zedai-utils/library.xpl"/>
 
     <p:variable name="input-uri" select="base-uri(/)"/>
 
@@ -149,11 +148,11 @@ split up if they exceed the given maximum size.</p>
             </p:input>
         </px:epub3-store>
 
-        <px:rm-audio-files>
+        <px:fileset-delete>
           <p:input port="source">
             <p:pipe step="convert" port="temp-audio-files"/>
           </p:input>
-        </px:rm-audio-files>
+        </px:fileset-delete>
     </p:group>
 
 </p:declare-step>

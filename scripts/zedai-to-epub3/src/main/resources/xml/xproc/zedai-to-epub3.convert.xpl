@@ -89,6 +89,7 @@
             px:fileset-rebase
             px:fileset-update
             px:fileset-filter
+            px:fileset-move
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
@@ -97,9 +98,9 @@
             px:message
         </p:documentation>
     </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/tts-helpers/library.xpl">
+    <p:import href="http://www.daisy.org/pipeline/modules/smil-utils/library.xpl">
         <p:documentation>
-            px:create-audio-fileset
+            px:audio-clips-to-fileset
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/epub3-tts/library.xpl">
@@ -299,10 +300,10 @@
         </p:when>
         <p:otherwise>
             <p:output port="audio.fileset">
-                <p:pipe port="fileset.out" step="audio-fileset"/>
+                <p:pipe step="audio-fileset" port="result.fileset"/>
             </p:output>
             <p:output port="temp-audio.fileset">
-                <p:pipe step="audio-fileset" port="original-files"/>
+                <p:pipe step="audio-fileset" port="delete.fileset"/>
             </p:output>
             <p:output port="smil.fileset">
                 <p:pipe port="fileset.out" step="create-mo"/>
@@ -314,14 +315,16 @@
             <!--=========================================================================-->
             <!-- CREATE THE FILESET THAT LINKS TO THE AUDIO FILES                        -->
             <!--=========================================================================-->
-            <px:create-audio-fileset name="audio-fileset">
+            <px:audio-clips-to-fileset>
                 <p:input port="source">
                     <p:pipe step="tts" port="audio-map"/>
                 </p:input>
-                <p:with-option name="output-dir" select="concat($content-dir,'audio/')">
+            </px:audio-clips-to-fileset>
+            <px:fileset-move name="audio-fileset" flatten="true">
+                <p:with-option name="target" select="concat($content-dir,'audio/')">
                     <p:empty/>
                 </p:with-option>
-            </px:create-audio-fileset>
+            </px:fileset-move>
 
             <!--=========================================================================-->
             <!-- CREATE THE SMILS FROM THE AUDIO MAP                                     -->
