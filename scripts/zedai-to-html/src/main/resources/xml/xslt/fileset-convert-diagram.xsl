@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:d="http://www.daisy.org/ns/pipeline/data"
-    xmlns:diagram="http://www.daisy.org/ns/z3998/authoring/features/description/"
-    xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions"
-    xmlns:pf="http://www.daisy.org/ns/pipeline/functions" exclude-result-prefixes="#all"
-    version="2.0">
-
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:d="http://www.daisy.org/ns/pipeline/data"
+                xmlns:diagram="http://www.daisy.org/ns/z3998/authoring/features/description/"
+                exclude-result-prefixes="#all">
+    
     <!--
         
         This XSLT receives a resource fileset as the primary documenet and XML documents (possibly containing
@@ -29,7 +28,7 @@
     </xsl:template>
 
     <xsl:template
-        match="d:file[ tokenize(@kind,'\s+') = 'description' 
+        match="d:file[ tokenize(@kind,'\s+') = 'description'
                        and @media-type=('application/xml','application/z3998-auth-diagram+xml')]"
         mode="fileset">
         <xsl:variable name="doc"
