@@ -36,7 +36,11 @@
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
-    <p:import href="convert-diagram-descriptions.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/zedai-to-html/library.xpl">
+        <p:documentation>
+            px:diagram-to-html
+        </p:documentation>
+    </p:import>
 
 
     <!--TODO if single doc, chunk; else keep original chunking-->
@@ -49,7 +53,7 @@
     <p:group name="resources">
         <p:output port="fileset.out" primary="true"/>
         <p:output port="in-memory.out">
-            <p:pipe port="in-memory.out" step="diagram-descriptions"/>
+            <p:pipe step="diagram-descriptions" port="result.in-memory"/>
         </p:output>
         <p:xslt>
             <p:input port="source">
@@ -62,9 +66,9 @@
                 <p:empty/>
             </p:input>
         </p:xslt>
-        <pxi:convert-diagram-descriptions name="diagram-descriptions">
+        <px:diagram-to-html name="diagram-descriptions">
             <p:with-option name="content-dir" select="$content-dir"/>
-        </pxi:convert-diagram-descriptions>
+        </px:diagram-to-html>
         <px:set-base-uri>
             <p:with-option name="base-uri" select="$content-dir"/>
         </px:set-base-uri>
