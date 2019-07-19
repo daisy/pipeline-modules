@@ -274,31 +274,29 @@
 
         <px:fileset-join name="package-doc.join-filesets">
             <p:input port="source">
-                <p:pipe port="result.fileset" step="content-docs"/>
-                <p:pipe port="fileset.out" step="nav-doc"/>
+                <p:pipe step="content-docs" port="result.fileset"/>
+                <p:pipe step="nav-doc" port="fileset.out"/>
                 <p:pipe step="media-overlays" port="fileset.out"/>
             </p:input>
         </px:fileset-join>
         <p:sink/>
 
         <px:epub3-pub-create-package-doc name="package-doc.create">
-            <p:input port="spine-filesets">
-                <p:pipe port="result.fileset" step="content-docs"/>
+            <p:input port="source.fileset">
+                <p:pipe step="package-doc.join-filesets" port="result"/>
             </p:input>
-            <p:input port="publication-resources">
-                <p:pipe port="result" step="package-doc.join-filesets"/>
+            <p:input port="source.in-memory">
+                <p:pipe step="nav-doc" port="in-memory.out"/>
+                <p:pipe step="content-docs" port="result.in-memory"/>
+                <p:pipe step="media-overlays" port="in-memory.out"/>
+            </p:input>
+            <p:input port="spine">
+                <p:pipe step="content-docs" port="result.fileset"/>
             </p:input>
             <p:input port="metadata">
-                <p:pipe port="result" step="metadata"/>
+                <p:pipe step="metadata" port="result"/>
             </p:input>
-            <p:input port="content-docs">
-                <p:pipe port="in-memory.out" step="nav-doc"/>
-                <p:pipe port="result.in-memory" step="content-docs"/>
-            </p:input>
-            <p:input port="mediaoverlays">
-                <p:pipe port="in-memory.out" step="media-overlays"/>
-            </p:input>
-            <p:with-option name="result-uri" select="$opf-uri"/>
+            <p:with-option name="output-base-uri" select="$opf-uri"/>
             <p:with-option name="compatibility-mode" select="'false'"/>
             <!--TODO configurability for other META-INF files ?-->
         </px:epub3-pub-create-package-doc>
