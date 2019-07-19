@@ -42,16 +42,9 @@
             px:fileset-rebase
             px:fileset-add-entry
             px:fileset-create
-            px:fileset-copy
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/smil-utils/library.xpl">
-        <p:documentation>
-            px:audio-clips-to-fileset
-            px:audio-clips-update-files
-        </p:documentation>
-    </p:import>
     <p:import href="../internal/ncx-to-nav.xpl"/>
     <p:import href="../internal/smil-to-audio-clips.xpl"/>
 
@@ -166,28 +159,6 @@
             </p:identity>
         </p:otherwise>
     </p:choose>
-
-    <p:documentation>Copy the audio files to the EPUB/audio directory</p:documentation>
-    <px:audio-clips-to-fileset>
-        <p:documentation>Referenced audio files</p:documentation>
-    </px:audio-clips-to-fileset>
-    <!--
-        FIXME: add warning if audio is not an EPUB 3 core media type
-        FIXME: or better, add support for audio transcoding
-    -->
-    <!-- <px:fileset-filter not-media-types="audio/mpeg audio/mp4"/> -->
-    <px:fileset-copy flatten="false" name="audio-fileset">
-        <p:with-option name="target" select="concat($content-dir,'audio/')"/>
-    </px:fileset-copy>
-    <p:sink/>
-    <px:audio-clips-update-files name="audio-clips.moved">
-        <p:input port="source">
-            <p:pipe step="audio-clips" port="result"/>
-        </p:input>
-        <p:input port="mapping">
-            <p:pipe step="audio-fileset" port="result.fileset"/>
-        </p:input>
-    </px:audio-clips-update-files>
     <p:sink/>
 
     <!--=========================================================================-->
@@ -236,20 +207,20 @@
     <!-- GENERATE MEDIA OVERLAYS                                                 -->
     <!--=========================================================================-->
 
-    <!--TODO conditionally, if the MO option is set-->
     <p:choose name="media-overlays">
         <p:when test="$mediaoverlays and $type='text+mo'">
             <p:output port="fileset.out" primary="true"/>
             <p:output port="in-memory.out" sequence="true">
                 <p:pipe port="in-memory.out" step="media-overlays.inner"/>
             </p:output>
-            <px:epub3-create-mediaoverlays name="media-overlays.inner">
+            <px:epub3-create-mediaoverlays flatten="false" name="media-overlays.inner">
                 <p:input port="content-docs">
                     <p:pipe port="result.in-memory" step="content-docs"/>
                 </p:input>
                 <p:input port="audio-map">
-                    <p:pipe step="audio-clips.moved" port="result"/>
+                    <p:pipe step="audio-clips" port="result"/>
                 </p:input>
+                <p:with-option name="audio-dir" select="concat($content-dir,'audio/')"/>
                 <p:with-option name="mediaoverlay-dir" select="concat($content-dir,'mo/')"/>
             </px:epub3-create-mediaoverlays>
         </p:when>
@@ -259,7 +230,9 @@
                 <p:empty/>
             </p:output>
             <p:identity>
-                <p:input port="source"><p:empty/></p:input>
+                <p:input port="source">
+                    <p:inline><d:fileset/></p:inline>
+                </p:input>
             </p:identity>
         </p:otherwise>
     </p:choose>
@@ -303,8 +276,7 @@
             <p:input port="source">
                 <p:pipe port="result.fileset" step="content-docs"/>
                 <p:pipe port="fileset.out" step="nav-doc"/>
-                <p:pipe port="fileset.out" step="media-overlays"/>
-                <p:pipe step="audio-fileset" port="result.fileset"/>
+                <p:pipe step="media-overlays" port="fileset.out"/>
             </p:input>
         </px:fileset-join>
         <p:sink/>

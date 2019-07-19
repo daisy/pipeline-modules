@@ -17,6 +17,13 @@
             <p>The d:audio-clips document from the TTS step</p>
         </p:documentation>
     </p:input>
+    <p:option name="audio-dir">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Directory for the audio files.</p>
+        </p:documentation>
+    </p:option>
+    <p:option name="flatten" select="'true'"/>
+    <p:option name="anti-conflict-prefix" select="''"/>
     <p:option name="mediaoverlay-dir">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>Directory for the SMIL files.</p>
@@ -25,7 +32,19 @@
 
     <p:output port="fileset.out" primary="true"/>
     <p:output port="in-memory.out" sequence="true">
-        <p:pipe port="result" step="media-overlays"/>
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>The result fileset with the SMIL and audio files.</p>
+        </p:documentation>
+        <p:pipe step="smil.in-memory" port="result"/>
+    </p:output>
+    <p:output port="original-audio.fileset">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>The original audio files</p>
+            <p>Copies of the audio files are added to "fileset.out". Later on, when the EPUB is
+            stored, the document on this port can be passed to px:fileset-delete to clean up the
+            original files (or skip it to keep the original files).</p>
+        </p:documentation>
+        <p:pipe step="audio" port="delete.fileset"/>
     </p:output>
 
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
@@ -34,16 +53,64 @@
             px:add-xml-base
         </p:documentation>
     </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/smil-utils/library.xpl">
+        <p:documentation>
+            px:audio-clips-to-fileset
+            px:audio-clips-update-files
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
+        <p:documentation>
+            px:fileset-move
+            px:fileset-create
+            px:fileset-add-entry
+            px:fileset-join
+        </p:documentation>
+    </p:import>
 
-    <p:for-each name="media-overlays">
-        <p:output port="result"/>
+    <!--
+        FIXME: add warning if audio is not an EPUB 3 core media type
+        FIXME: or better, add support for audio transcoding
+    -->
+    <p:documentation>Copy the audio files</p:documentation>
+    <px:audio-clips-to-fileset>
+        <p:input port="source">
+            <p:pipe step="main" port="audio-map"/>
+        </p:input>
+    </px:audio-clips-to-fileset>
+    <!-- <px:fileset-filter not-media-types="audio/mpeg audio/mp4"/> -->
+    <px:fileset-move name="audio">
+        <p:with-option name="target" select="$audio-dir">
+            <p:empty/>
+        </p:with-option>
+        <p:with-option name="flatten" select="$flatten"/>
+        <p:with-option name="prefix" select="$anti-conflict-prefix"/>
+    </px:fileset-move>
+    <p:sink/>
+    <px:audio-clips-update-files name="audio-map">
+        <p:input port="source">
+            <p:pipe step="main" port="audio-map"/>
+        </p:input>
+        <p:input port="mapping">
+            <!-- no audio files are loaded in memory, so they all have a original-href attribute -->
+            <p:pipe step="audio" port="result.fileset"/>
+        </p:input>
+    </px:audio-clips-update-files>
+    <p:sink/>
+
+    <p:documentation>Generate the SMIL files</p:documentation>
+    <p:for-each name="smil.in-memory">
+        <p:iteration-source>
+            <p:pipe step="main" port="content-docs"/>
+        </p:iteration-source>
+        <p:output port="result" sequence="true"/>
         <p:variable name="mo-uri"
-            select="concat($mediaoverlay-dir,replace(base-uri(/*),'.*?([^/]*)\.x?html$','$1.smil'))"/>
+                    select="concat($mediaoverlay-dir,replace(base-uri(/*),'.*?([^/]*)\.x?html$','$1.smil'))"/>
         <p:identity name="content-doc"/>
         <p:xslt>
             <p:input port="source">
-                <p:pipe port="result" step="content-doc"/>
-                <p:pipe port="audio-map" step="main"/>
+                <p:pipe step="smil.in-memory" port="current"/>
+                <p:pipe step="audio-map" port="result"/>
             </p:input>
             <p:input port="stylesheet">
                 <p:document href="create-mediaoverlay.xsl"/>
@@ -68,18 +135,25 @@
         </px:add-xml-base>
     </p:for-each>
 
-    <p:group name="fileset">
-        <p:for-each>
-            <p:output port="result" sequence="true"/>
-            <p:variable name="mo-uri" select="base-uri(/*)"/>
-            <px:fileset-create>
-                <p:with-option name="base" select="$mediaoverlay-dir"/>
-            </px:fileset-create>
-            <px:fileset-add-entry media-type="application/smil+xml">
-                <p:with-option name="href" select="$mo-uri"/>
-            </px:fileset-add-entry>
-        </p:for-each>
-        <px:fileset-join name="manifest"/>
-    </p:group>
+    <p:for-each>
+        <p:variable name="mo-uri" select="base-uri(/*)"/>
+        <px:fileset-create>
+            <p:with-option name="base" select="$mediaoverlay-dir"/>
+        </px:fileset-create>
+        <px:fileset-add-entry media-type="application/smil+xml">
+            <p:with-option name="href" select="$mo-uri"/>
+        </px:fileset-add-entry>
+    </p:for-each>
+    <px:fileset-join/>
+    <p:identity name="smil.fileset"/>
+    <p:sink/>
+
+    <p:documentation>Put the SMIL and audio files in a fileset</p:documentation>
+    <px:fileset-join>
+        <p:input port="source">
+            <p:pipe step="smil.fileset" port="result"/>
+            <p:pipe step="audio" port="result.fileset"/>
+        </p:input>
+    </px:fileset-join>
 
 </p:declare-step>
