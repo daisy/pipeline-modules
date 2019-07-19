@@ -101,6 +101,7 @@
     <p:import href="http://www.daisy.org/pipeline/modules/smil-utils/library.xpl">
         <p:documentation>
             px:audio-clips-to-fileset
+            px:audio-clips-update-files
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/epub3-tts/library.xpl">
@@ -325,6 +326,15 @@
                     <p:empty/>
                 </p:with-option>
             </px:fileset-move>
+            <px:audio-clips-update-files name="audio-map.moved">
+                <p:input port="source">
+                    <p:pipe step="tts" port="audio-map"/>
+                </p:input>
+                <p:input port="mapping">
+                    <p:pipe step="audio-fileset" port="result.fileset"/>
+                </p:input>
+            </px:audio-clips-update-files>
+            <p:sink/>
 
             <!--=========================================================================-->
             <!-- CREATE THE SMILS FROM THE AUDIO MAP                                     -->
@@ -335,11 +345,8 @@
                     <p:pipe step="tts" port="content.out"/>
                 </p:input>
                 <p:input port="audio-map">
-                    <p:pipe step="tts" port="audio-map"/>
+                    <p:pipe step="audio-map.moved" port="result"/>
                 </p:input>
-                <p:with-option name="audio-dir" select="concat($content-dir,'audio/')">
-                    <p:empty/>
-                </p:with-option>
                 <p:with-option name="mediaoverlay-dir" select="concat($content-dir,'mo/')">
                     <p:empty/>
                 </p:with-option>
