@@ -335,49 +335,14 @@
         <p:output port="opf">
             <p:pipe port="result" step="package-doc"/>
         </p:output>
-
-        <p:group name="content-docs">
-            <p:output port="fileset" primary="true">
-                <p:pipe step="fileset" port="result"/>
-            </p:output>
-            <p:output port="in-memory" sequence="true">
-                <p:pipe step="in-memory" port="result"/>
-            </p:output>
-            <px:fileset-filter media-types="application/xhtml+xml" name="fileset"/>
-            <px:fileset-load name="in-memory">
-                <p:input port="in-memory">
-                    <p:pipe step="add-mediaoverlays" port="in-memory"/>
-                </p:input>
-            </px:fileset-load>
-        </p:group>
-        <p:sink/>
-        <p:group name="publication-resources">
-            <p:output port="fileset"/>
-            <px:fileset-filter not-media-types="application/xhtml+xml application/smil+xml">
-                <p:input port="source">
-                    <p:pipe step="add-mediaoverlays" port="fileset"/>
-                </p:input>
-            </px:fileset-filter>
-        </p:group>
-        <p:sink/>
-
         <px:epub3-pub-create-package-doc compatibility-mode="false">
-            <p:input port="spine-filesets">
-                <p:pipe step="content-docs" port="fileset"/>
-            </p:input>
-            <p:input port="publication-resources">
-                <p:pipe step="publication-resources" port="fileset"/>
-            </p:input>
-            <p:input port="mediaoverlays">
+            <p:input port="source.in-memory">
                 <p:pipe step="add-mediaoverlays" port="in-memory"/>
             </p:input>
             <p:input port="metadata">
                 <p:pipe step="metadata" port="result"/>
             </p:input>
-            <p:input port="content-docs">
-                <p:pipe step="content-docs" port="in-memory"/>
-            </p:input>
-            <p:with-option name="result-uri" select="concat($content-dir,'package.opf')"/>
+            <p:with-option name="output-base-uri" select="concat($content-dir,'package.opf')"/>
             <p:with-option name="nav-uri" select="base-uri(/*)">
                 <p:pipe step="add-navigation-doc" port="doc"/>
             </p:with-option>
@@ -385,7 +350,6 @@
         <px:message message="Package Document Created."/>
         <p:identity name="package-doc"/>
         <p:sink/>
-
         <px:fileset-add-entry media-type="application/oebps-package+xml" name="add-entry">
             <p:input port="source">
                 <p:pipe step="add-mediaoverlays" port="fileset"/>

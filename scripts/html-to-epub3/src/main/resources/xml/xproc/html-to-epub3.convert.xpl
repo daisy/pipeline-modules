@@ -171,21 +171,20 @@
         </p:output>
 
         <px:epub3-pub-create-package-doc compatibility-mode="false">
-            <p:input port="spine-filesets">
-                <p:pipe step="content-docs" port="fileset.out.docs"/>
+            <p:input port="source.fileset">
+                <p:pipe step="add-navigation-doc" port="fileset"/>
             </p:input>
-            <p:input port="publication-resources">
-                <p:pipe step="content-docs" port="fileset.out.resources"/>
+            <p:input port="source.in-memory">
+                <p:pipe step="add-navigation-doc" port="in-memory"/>
+            </p:input>
+            <p:input port="spine">
+                <p:pipe step="content-docs" port="fileset.out.docs"/>
             </p:input>
             <p:input port="metadata">
                 <p:pipe step="main" port="metadata"/>
                 <p:pipe step="metadata" port="result"/>
             </p:input>
-            <p:input port="content-docs">
-                <p:pipe step="add-navigation-doc" port="doc"/>
-                <p:pipe step="content-docs" port="docs"/>
-            </p:input>
-            <p:with-option name="result-uri" select="concat($content-dir,'package.opf')"/>
+            <p:with-option name="output-base-uri" select="concat($content-dir,'package.opf')"/>
         </px:epub3-pub-create-package-doc>
         <px:message message="Package Document Created."/>
         <p:identity name="package-doc"/>

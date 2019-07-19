@@ -8,15 +8,7 @@
 
 	<x:scenario label="test">
 		<x:call step="px:epub3-pub-create-package-doc">
-			<x:input port="spine-filesets">
-				<x:document type="inline">
-					<d:fileset xml:base="file:/tmp/epub/EPUB/">
-						<d:file href="book-1.xhtml" media-type="application/xhtml+xml"/>
-						<d:file href="book-2.xhtml" media-type="application/xhtml+xml"/>
-					</d:fileset>
-				</x:document>
-			</x:input>
-			<x:input port="publication-resources">
+			<x:input port="source.fileset">
 				<x:document type="inline">
 					<d:fileset xml:base="file:/tmp/epub/EPUB/">
 						<d:file href="book-1.xhtml" media-type="application/xhtml+xml"/>
@@ -28,18 +20,7 @@
 					</d:fileset>
 				</x:document>
 			</x:input>
-			<x:input port="metadata">
-				<x:document type="inline">
-					<metadata xmlns="http://www.idpf.org/2007/opf" prefix="dc: http://purl.org/dc/elements/1.1/">
-						<dc:title>Minimal DTBook</dc:title>
-						<dc:language>en</dc:language>
-						<dc:publisher>unknown</dc:publisher>
-						<dc:identifier>my-id</dc:identifier>
-					</metadata>
-				</x:document>
-			</x:input>
-			<x:input port="bindings"/>
-			<x:input port="content-docs">
+			<x:input port="source.in-memory">
 				<x:document type="inline" xml:base="file:/tmp/epub/EPUB/nav.xhtml">
 					<html xmlns="http://www.w3.org/1999/xhtml">
 						<head>
@@ -119,8 +100,6 @@
 						</body>
 					</html>
 				</x:document>
-			</x:input>
-			<x:input port="mediaoverlays">
 				<x:document type="inline" xml:base="file:/tmp/epub/EPUB/mo/book-1.smil">
 					<smil xmlns="http://www.w3.org/ns/SMIL" version="3.0">
 						<body epub:type="frontmatter">
@@ -176,11 +155,30 @@
 					</smil>
 				</x:document>
 			</x:input>
+			<x:input port="spine">
+				<x:document type="inline">
+					<d:fileset xml:base="file:/tmp/epub/EPUB/">
+						<d:file href="book-1.xhtml" media-type="application/xhtml+xml"/>
+						<d:file href="book-2.xhtml" media-type="application/xhtml+xml"/>
+					</d:fileset>
+				</x:document>
+			</x:input>
+			<x:input port="metadata">
+				<x:document type="inline">
+					<metadata xmlns="http://www.idpf.org/2007/opf" prefix="dc: http://purl.org/dc/elements/1.1/">
+						<dc:title>Minimal DTBook</dc:title>
+						<dc:language>en</dc:language>
+						<dc:publisher>unknown</dc:publisher>
+						<dc:identifier>my-id</dc:identifier>
+					</metadata>
+				</x:document>
+			</x:input>
+			<x:input port="bindings"/>
 			<x:option name="nav-uri" select="''"/>
 			<x:option name="cover-image" select="''"/>
 			<x:option name="compatibility-mode" select="'false'"/>
 			<x:option name="detect-properties" select="'true'"/>
-			<x:option name="result-uri" select="'file:/tmp/epub/EPUB/package.opf'"/>
+			<x:option name="output-base-uri" select="'file:/tmp/epub/EPUB/package.opf'"/>
 		</x:call>
 		<x:context label="the result port">
 			<x:document type="port" port="result"/>
