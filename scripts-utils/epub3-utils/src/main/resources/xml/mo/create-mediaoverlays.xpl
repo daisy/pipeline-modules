@@ -17,11 +17,6 @@
             <p>The d:audio-clips document from the TTS step</p>
         </p:documentation>
     </p:input>
-    <p:option name="audio-dir">
-        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <p>Directory for the audio files.</p>
-        </p:documentation>
-    </p:option>
     <p:option name="mediaoverlay-dir">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>Directory for the SMIL files.</p>
@@ -54,7 +49,6 @@
                 <p:document href="create-mediaoverlay.xsl"/>
             </p:input>
             <p:with-param name="mo-dir" select="$mediaoverlay-dir"/>
-            <p:with-param name="audio-dir" select="$audio-dir"/>
         </p:xslt>
         <p:xslt>
             <p:input port="stylesheet">

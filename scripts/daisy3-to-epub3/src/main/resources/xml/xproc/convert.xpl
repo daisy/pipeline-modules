@@ -49,6 +49,7 @@
     <p:import href="http://www.daisy.org/pipeline/modules/smil-utils/library.xpl">
         <p:documentation>
             px:audio-clips-to-fileset
+            px:audio-clips-update-files
         </p:documentation>
     </p:import>
     <p:import href="../internal/ncx-to-nav.xpl"/>
@@ -179,6 +180,15 @@
         <p:with-option name="target" select="concat($content-dir,'audio/')"/>
     </px:fileset-copy>
     <p:sink/>
+    <px:audio-clips-update-files name="audio-clips.moved">
+        <p:input port="source">
+            <p:pipe step="audio-clips" port="result"/>
+        </p:input>
+        <p:input port="mapping">
+            <p:pipe step="audio-fileset" port="result.fileset"/>
+        </p:input>
+    </px:audio-clips-update-files>
+    <p:sink/>
 
     <!--=========================================================================-->
     <!-- CONVERT DTBOOK TO XHTML                                                 -->
@@ -238,9 +248,8 @@
                     <p:pipe port="result.in-memory" step="content-docs"/>
                 </p:input>
                 <p:input port="audio-map">
-                    <p:pipe step="audio-clips" port="result"/>
+                    <p:pipe step="audio-clips.moved" port="result"/>
                 </p:input>
-                <p:with-option name="audio-dir" select="concat($content-dir,'audio/')"/>
                 <p:with-option name="mediaoverlay-dir" select="concat($content-dir,'mo/')"/>
             </px:epub3-create-mediaoverlays>
         </p:when>
