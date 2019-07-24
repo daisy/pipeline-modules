@@ -31,6 +31,7 @@
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
         <p:documentation>
+            px:html-fixer
             px:html-id-fixer
             px:html-upgrade
         </p:documentation>
@@ -136,15 +137,8 @@
              |   FIX CONTENT MODELS                                                        |
             <|–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––-->
 
-            <p:xslt>
-                <p:input port="stylesheet">
-                    <p:document href="http://www.daisy.org/pipeline/modules/html-utils/html-fixer.xsl"/>
-                </p:input>
-                <p:input port="parameters">
-                    <p:empty/>
-                </p:input>
-            </p:xslt>
-
+            <px:html-fixer/>
+            
             <!--–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
              |   ADD MISSING IDS                                                           |
             <|–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––-->
