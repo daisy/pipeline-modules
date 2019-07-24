@@ -6,18 +6,22 @@
 
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
         <p>Converts any DIAGRAM descriptions in the input fileset into HTML.</p>
-        <p>The primary port returns a fileset where old DIAGRAM entries have been replaced by
-        entries representing the newly produced HTML documents.</p>
-        <p>The secondary port returns the sequence of newly produced HTML documents.</p>
     </p:documentation>
 
     <p:input port="source.fileset"/>
-    <p:option name="content-dir" required="true"/>
-
     <p:output port="result.fileset" primary="true">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>A fileset where old DIAGRAM entries have been replaced by entries representing the
+            newly produced HTML documents.</p>
+            <p>The HTML files have the same location of the DIAGRAM files and have the file
+            extension ".xhtml".</p>
+        </p:documentation>
         <p:pipe step="convert" port="result"/>
     </p:output>
     <p:output port="result.in-memory" sequence="true">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Sequence of newly produced HTML documents.</p>
+        </p:documentation>
         <p:pipe step="convert" port="secondary"/>
     </p:output>
 
@@ -31,6 +35,7 @@
             <p:with-option name="href" select="/*/@original-href"/>
         </p:load>
     </p:for-each>
+
     <p:xslt name="convert" initial-mode="fileset">
         <p:input port="source">
             <p:pipe step="main" port="source.fileset"/>
@@ -39,9 +44,9 @@
         <p:input port="stylesheet">
             <p:document href="../xslt/fileset-convert-diagram.xsl"/>
         </p:input>
-        <p:with-param name="content-dir" select="$content-dir">
+        <p:input port="parameters">
             <p:empty/>
-        </p:with-param>
+        </p:input>
     </p:xslt>
 
 </p:declare-step>
