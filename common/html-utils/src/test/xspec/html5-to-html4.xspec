@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<x:description xmlns:x="http://www.jenitennison.com/xslt/xspec" stylesheet="../../main/resources/xml/xslt/html5-to-html4.xsl" xmlns:html="http://www.w3.org/1999/xhtml" xslt-version="2.0"
-    xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions">
+<x:description xmlns:x="http://www.jenitennison.com/xslt/xspec"
+               xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions"
+               xmlns:html="http://www.w3.org/1999/xhtml"
+               stylesheet="../../main/resources/xml/xslt/html5-to-html4.xsl"
+               xslt-version="2.0">
 
     <!-- coreattrs -->
     <x:scenario label="when processing a span element with the coreattrs attributes (id, class, title)">
