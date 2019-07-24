@@ -44,6 +44,7 @@
     <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
         <p:documentation>
             px:html-upgrade
+            px:html-downgrade
         </p:documentation>
     </p:import>
     <p:import href="create-ncc.xpl">
@@ -121,20 +122,9 @@
             <p:documentation>Normalize HTML5.</p:documentation>
             <!-- hopefully this preserves all IDs -->
         </px:html-upgrade>
-        <!--
-            FIXME: move this to html-utils?
-        -->
-        <p:xslt>
-            <p:documentation>
-                Downgrade to HTML4. This preserves all ID.
-            </p:documentation>
-            <p:input port="parameters">
-                <p:empty/>
-            </p:input>
-            <p:input port="stylesheet">
-                <p:document href="../../xslt/html5-to-html4.xsl"/>
-            </p:input>
-        </p:xslt>
+        <px:html-downgrade>
+            <p:documentation>Downgrade to HTML4. This preserves all ID.</p:documentation>
+        </px:html-downgrade>
     </p:for-each>
     <p:identity name="daisy202.xhtml.in-memory"/>
     <p:sink/>

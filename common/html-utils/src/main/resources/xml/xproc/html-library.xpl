@@ -7,5 +7,6 @@
     <p:import href="html-outline.xpl"/>
     <p:import href="html-id-fixer.xpl"/>
     <p:import href="html-upgrade.xpl"/>
+    <p:import href="html-downgrade.xpl"/>
 
 </p:library>
