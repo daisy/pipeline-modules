@@ -22,6 +22,12 @@
 	</p:input>
 	<p:output port="result.fileset"/>
 
+	<p:option name="purge" select="'false'">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p>Whether to remove files that are neither on disk or exist in memory.</p>
+		</p:documentation>
+	</p:option>
+
 	<p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
 		<p:documentation>
 			px:info
@@ -150,9 +156,22 @@
 							<p:xpath-context>
 								<p:pipe step="original-href-on-disk" port="on-disk"/>
 							</p:xpath-context>
-							<p:documentation>Else if it does not exist on disk, remove original-href</p:documentation>
+							<p:documentation>
+								Else if it does not exist on disk, remove original-href or remove file if purge is set.
+							</p:documentation>
 							<p:when test="not(string(/*)='true')">
-								<p:delete match="@original-href"/>
+								<p:choose>
+									<p:when test="$purge='true'">
+										<p:identity>
+											<p:input port="source">
+												<p:empty/>
+											</p:input>
+										</p:identity>
+									</p:when>
+									<p:otherwise>
+										<p:delete match="@original-href"/>
+									</p:otherwise>
+								</p:choose>
 							</p:when>
 							<p:otherwise>
 								<p:identity/>
@@ -160,7 +179,19 @@
 						</p:choose>
 					</p:when>
 					<p:otherwise>
-						<p:identity/>
+						<p:documentation>File does not exist. Remove it if purge is set.</p:documentation>
+						<p:choose>
+							<p:when test="$purge='true'">
+								<p:identity>
+									<p:input port="source">
+										<p:empty/>
+									</p:input>
+								</p:identity>
+							</p:when>
+							<p:otherwise>
+								<p:identity/>
+							</p:otherwise>
+						</p:choose>
 					</p:otherwise>
 				</p:choose>
 			</p:otherwise>
