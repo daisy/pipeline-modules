@@ -32,6 +32,7 @@
     <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
         <p:documentation>
             px:html-id-fixer
+            px:html-upgrade
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
@@ -91,14 +92,7 @@
             <!--–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
              |   UPGRADE TO XHTML5                                                         |
             <|–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––-->
-            <p:xslt name="html-upgrade">
-                <p:input port="stylesheet">
-                    <p:document href="http://www.daisy.org/pipeline/modules/html-utils/html5-upgrade.xsl"/>
-                </p:input>
-                <p:input port="parameters">
-                    <p:empty/>
-                </p:input>
-            </p:xslt>
+            <px:html-upgrade name="html-upgrade"/>
 
             <!--–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
              |   CLEAN RESOURCE REFERENCES                                                        |

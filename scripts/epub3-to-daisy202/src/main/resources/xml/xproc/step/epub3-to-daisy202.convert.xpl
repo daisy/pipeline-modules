@@ -41,6 +41,11 @@
             px:opf-spine-to-fileset
         </p:documentation>
     </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
+        <p:documentation>
+            px:html-upgrade
+        </p:documentation>
+    </p:import>
     <p:import href="create-ncc.xpl">
         <p:documentation>
             pxi:create-ncc
@@ -112,18 +117,10 @@
     <p:for-each px:message="Converting HTML5 to HTML4">
         <p:variable name="base-uri" select="base-uri()"/>
         <p:identity px:message="- {$base-uri}" px:message-severity="DEBUG"/>
-        <p:xslt>
-            <p:documentation>
-                Normalize HTML5.
-            </p:documentation>
+        <px:html-upgrade>
+            <p:documentation>Normalize HTML5.</p:documentation>
             <!-- hopefully this preserves all IDs -->
-            <p:input port="parameters">
-                <p:empty/>
-            </p:input>
-            <p:input port="stylesheet">
-                <p:document href="http://www.daisy.org/pipeline/modules/html-utils/html5-upgrade.xsl"/>
-            </p:input>
-        </p:xslt>
+        </px:html-upgrade>
         <!--
             FIXME: move this to html-utils?
         -->
