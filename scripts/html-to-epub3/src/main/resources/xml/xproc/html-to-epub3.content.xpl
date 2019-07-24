@@ -11,15 +11,14 @@
         <p:pipe port="result" step="docs"/>
     </p:output>
     <p:output port="resources" sequence="true">
-        <p:pipe port="in-memory.out" step="resources"/>
+        <p:pipe step="resources" port="in-memory"/>
     </p:output>
     <p:output port="fileset.out.docs" primary="false">
         <p:pipe port="result" step="fileset.docs"/>
     </p:output>
     <p:output port="fileset.out.resources" primary="false">
-        <p:pipe port="fileset.out" step="resources"/>
+        <p:pipe step="resources" port="fileset"/>
     </p:output>
-
 
     <p:option name="publication-dir" required="true"/>
     <p:option name="content-dir" required="true"/>
@@ -53,9 +52,9 @@
     <!--=========================================================================-->
 
     <p:group name="resources">
-        <p:output port="fileset.out" primary="true"/>
-        <p:output port="in-memory.out">
-            <p:pipe step="diagram-descriptions" port="result.in-memory"/>
+        <p:output port="fileset" primary="true"/>
+        <p:output port="in-memory" sequence="true">
+            <p:pipe step="copy" port="result.in-memory"/>
         </p:output>
         <p:xslt>
             <p:input port="source">
@@ -68,13 +67,15 @@
                 <p:empty/>
             </p:input>
         </p:xslt>
-        <px:diagram-to-html name="diagram-descriptions">
-            <p:with-option name="content-dir" select="$content-dir"/>
-        </px:diagram-to-html>
-        <px:set-base-uri>
-            <p:with-option name="base-uri" select="$content-dir"/>
-        </px:set-base-uri>
-        <p:add-xml-base/>
+        <p:documentation>Convert DIAGRAM to HTML</p:documentation>
+        <px:diagram-to-html name="diagram-descriptions"/>
+        <p:documentation>Copy fileset to new location</p:documentation>
+        <px:fileset-copy name="copy">
+            <p:input port="source.in-memory">
+                <p:pipe step="diagram-descriptions" port="result.in-memory"/>
+            </p:input>
+            <p:with-option name="target" select="$content-dir"/>
+        </px:fileset-copy>
     </p:group>
     <p:sink/>
 
@@ -100,8 +101,8 @@
             <|–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––-->
             <p:xslt>
                 <p:input port="source">
-                    <p:pipe port="result" step="html-upgrade"/>
-                    <p:pipe port="fileset.out" step="resources"/>
+                    <p:pipe step="html-upgrade" port="result"/>
+                    <p:pipe step="resources" port="fileset"/>
                 </p:input>
                 <p:input port="stylesheet">
                     <p:document href="../xslt/html-clean-resources.xsl"/>
