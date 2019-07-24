@@ -8,6 +8,7 @@
   
     <x:scenario label="test">
         <x:call step="pxi:fileset-fix-original-hrefs">
+            <x:option name="purge" select="true()"/>
             <x:input port="source.fileset">
                 <x:document type="inline">
                     <d:fileset xml:base="samples/fileset2/">                          <!-- href                  - original-href         -->
@@ -48,13 +49,13 @@
                     <d:file href="samples/fileset2/a/a.html" original-href="samples/fileset2/a/a.html"/>
                     <d:file href="samples/fileset2/e.svg" original-href="samples/fileset2/e.svg"/>
                     <d:file href="samples/fileset2/e%5Bxml%5D" original-href="samples/fileset2/e%5Bxml%5D"/>
-                    <d:file href="samples/fileset2/x/b.jpg"/>
-                    <d:file href="samples/fileset2/x/c.gif"/>
+                    <!-- <d:file href="samples/fileset2/x/b.jpg"/> -->
+                    <!-- <d:file href="samples/fileset2/x/c.gif"/> -->
                     <d:file href="samples/fileset2/x/c-gif.img" original-href="samples/fileset2/c.gif"/>
                     <d:file href="samples/fileset2/x/a.zip!/e.svg" original-href="samples/fileset2/e.svg"/>
                     <d:file href="samples/fileset2/x/a/a.html" original-href="samples/fileset2/a.zip!/a.html"/>
-                    <d:file href="samples/fileset2/x/e.svg"/>
-                    <d:file href="samples/fileset2/x/e.xml"/>
+                    <!-- <d:file href="samples/fileset2/x/e.svg"/> -->
+                    <!-- <d:file href="samples/fileset2/x/e.xml"/> -->
                 </d:fileset>
             </x:document>
         </x:expect>
