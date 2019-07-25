@@ -26,4 +26,5 @@
 			<p>Steps related to EPUB 3 Media Overlays.</p>
 		</p:documentation>
 	</p:import>
+	<p:import href="epub3-safe-uris.xpl"/>
 </p:library>
