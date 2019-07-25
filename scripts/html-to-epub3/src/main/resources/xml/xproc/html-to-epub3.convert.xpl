@@ -127,7 +127,7 @@
             <p:xslt>
                 <p:input port="source">
                     <p:pipe step="html-upgrade" port="result"/>
-                    <p:pipe step="main" port="input.fileset"/>
+                    <p:pipe step="safe-uris" port="result.fileset"/>
                 </p:input>
                 <p:input port="stylesheet">
                     <p:document href="../xslt/html-clean-resources.xsl"/>
@@ -166,10 +166,10 @@
         <p:sink/>
         <px:fileset-update name="update">
             <p:input port="source.fileset">
-                <p:pipe step="main" port="input.fileset"/>
+                <p:pipe step="safe-uris" port="result.fileset"/>
             </p:input>
             <p:input port="source.in-memory">
-                <p:pipe step="main" port="input.in-memory"/>
+                <p:pipe step="safe-uris" port="result.in-memory"/>
             </p:input>
             <p:input port="update">
                 <p:pipe step="cleaned" port="result"/>
