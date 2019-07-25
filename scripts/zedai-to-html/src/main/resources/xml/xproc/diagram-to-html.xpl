@@ -8,33 +8,39 @@
         <p>Converts any DIAGRAM descriptions in the input fileset into HTML.</p>
     </p:documentation>
 
-    <p:input port="source.fileset"/>
-    <p:output port="result.fileset" primary="true">
+    <p:input port="source.fileset" primary="true"/>
+    <p:input port="source.in-memory" sequence="true">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Input fileset</p>
+        </p:documentation>
+        <p:empty/>
+    </p:input>
+
+    <p:output port="result.fileset" primary="true"/>
+    <p:output port="result.in-memory" sequence="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>A fileset where old DIAGRAM entries have been replaced by entries representing the
             newly produced HTML documents.</p>
-            <p>The HTML files have the same location of the DIAGRAM files and have the file
+            <p>The HTML documents have the same location of the DIAGRAM files and have the file
             extension ".xhtml".</p>
         </p:documentation>
-        <p:pipe step="convert" port="result"/>
-    </p:output>
-    <p:output port="result.in-memory" sequence="true">
-        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <p>Sequence of newly produced HTML documents.</p>
-        </p:documentation>
-        <p:pipe step="convert" port="secondary"/>
+        <p:pipe step="update" port="result.in-memory"/>
     </p:output>
 
-    <p:for-each name="descriptions">
-        <p:output port="result"/>
-        <p:iteration-source
-            select="/d:fileset/d:file
-            [ tokenize(@kind,'\s+') = 'description'
-            and @media-type=('application/xml','application/z3998-auth-diagram+xml')]"/>
-        <p:load>
-            <p:with-option name="href" select="/*/@original-href"/>
-        </p:load>
-    </p:for-each>
+    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
+        <p:documentation>
+            px:fileset-load
+            px:fileset-update
+        </p:documentation>
+    </p:import>
+
+    <p:delete match="d:file[not(tokenize(@kind,'\s+') = 'description')]"/>
+    <px:fileset-load name="descriptions" media-types="application/xml application/z3998-auth-diagram+xml">
+        <p:input port="in-memory">
+            <p:pipe step="main" port="source.in-memory"/>
+        </p:input>
+    </px:fileset-load>
+    <p:sink/>
 
     <p:xslt name="convert" initial-mode="fileset">
         <p:input port="source">
@@ -48,5 +54,14 @@
             <p:empty/>
         </p:input>
     </p:xslt>
+
+    <px:fileset-update name="update">
+        <p:input port="source.in-memory">
+            <p:pipe step="main" port="source.in-memory"/>
+        </p:input>
+        <p:input port="update">
+            <p:pipe step="convert" port="secondary"/>
+        </p:input>
+    </px:fileset-update>
 
 </p:declare-step>
