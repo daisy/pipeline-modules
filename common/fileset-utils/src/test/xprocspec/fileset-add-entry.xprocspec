@@ -15,7 +15,7 @@
             <x:option name="href" select="'doc.html'"/>
             <x:input port="source">
                 <x:document type="inline">
-                    <d:fileset xml:base="file:/users/me/dir/"/>
+                    <d:fileset xml:base="file:/Users/me/dir/"/>
                 </x:document>
             </x:input>
         </x:call>
@@ -24,7 +24,7 @@
         </x:context>
         <x:expect type="compare" label="the result should be as expected">
             <x:document type="inline">
-                <d:fileset xml:base="file:/users/me/dir/">
+                <d:fileset xml:base="file:/Users/me/dir/">
                     <d:file href="doc.html"/>
                 </d:fileset>
             </x:document>
@@ -37,7 +37,7 @@
             <x:option name="media-type" select="'text/html'"/>
             <x:input port="source">
                 <x:document type="inline">
-                    <d:fileset xml:base="file:/users/me/dir/"/>
+                    <d:fileset xml:base="file:/Users/me/dir/"/>
                 </x:document>
             </x:input>
         </x:call>
@@ -46,7 +46,7 @@
         </x:context>
         <x:expect type="compare" label="the result should be as expected">
             <x:document type="inline">
-                <d:fileset xml:base="file:/users/me/dir/">
+                <d:fileset xml:base="file:/Users/me/dir/">
                     <d:file href="doc.html" media-type="text/html"/>
                 </d:fileset>
             </x:document>
@@ -59,7 +59,7 @@
             <x:option name="first" select="'true'"/>
             <x:input port="source">
                 <x:document type="inline">
-                    <d:fileset xml:base="file:/users/me/dir/">
+                    <d:fileset xml:base="file:/Users/me/dir/">
                         <d:file href="other"/>
                     </d:fileset>
                 </x:document>
@@ -70,7 +70,7 @@
         </x:context>
         <x:expect type="compare" label="the result should be as expected">
             <x:document type="inline">
-                <d:fileset xml:base="file:/users/me/dir/">
+                <d:fileset xml:base="file:/Users/me/dir/">
                     <d:file href="doc.html"/>
                     <d:file href="other"/>
                 </d:fileset>
@@ -83,7 +83,7 @@
             <x:option name="href" select="'file:/doc.html'"/>
             <x:input port="source">
                 <x:document type="inline">
-                    <d:fileset xml:base="file:/users/me/dir/"/>
+                    <d:fileset xml:base="file:/Users/me/dir/"/>
                 </x:document>
             </x:input>
         </x:call>
@@ -92,7 +92,7 @@
         </x:context>
         <x:expect type="compare" label="the result should be as expected">
             <x:document type="inline">
-                <d:fileset xml:base="file:/users/me/dir/">
+                <d:fileset xml:base="file:/Users/me/dir/">
                     <d:file href="../../../doc.html"/>
                 </d:fileset>
             </x:document>
@@ -101,10 +101,10 @@
 
     <x:scenario label="add-entry-absolute-same-base">
         <x:call step="px:fileset-add-entry">
-            <x:option name="href" select="'file:/users/me/dir/doc.html'"/>
+            <x:option name="href" select="'file:/Users/me/dir/doc.html'"/>
             <x:input port="source">
                 <x:document type="inline">
-                    <d:fileset xml:base="file:/users/me/dir/"/>
+                    <d:fileset xml:base="file:/Users/me/dir/"/>
                 </x:document>
             </x:input>
         </x:call>
@@ -113,7 +113,7 @@
         </x:context>
         <x:expect type="compare" label="the result should be as expected">
             <x:document type="inline">
-                <d:fileset xml:base="file:/users/me/dir/">
+                <d:fileset xml:base="file:/Users/me/dir/">
                     <d:file href="doc.html"/>
                 </d:fileset>
             </x:document>
@@ -122,10 +122,10 @@
     
     <x:scenario label="add-entry-absolute-same-base-triple-slash">
         <x:call step="px:fileset-add-entry">
-            <x:option name="href" select="'file:///users/me/dir/doc.html'"/>
+            <x:option name="href" select="'file:///Users/me/dir/doc.html'"/>
             <x:input port="source">
                 <x:document type="inline">
-                    <d:fileset xml:base="file:/users/me/dir/"/>
+                    <d:fileset xml:base="file:/Users/me/dir/"/>
                 </x:document>
             </x:input>
         </x:call>
@@ -134,7 +134,7 @@
         </x:context>
         <x:expect type="compare" label="the result should be as expected">
             <x:document type="inline">
-                <d:fileset xml:base="file:/users/me/dir/">
+                <d:fileset xml:base="file:/Users/me/dir/">
                     <d:file href="doc.html"/>
                 </d:fileset>
             </x:document>
@@ -143,7 +143,7 @@
     
     <x:scenario label="add-entry-absolute-root-directory">
         <x:call step="px:fileset-add-entry">
-            <x:option name="href" select="'file:/users/me/dir/doc.html'"/>
+            <x:option name="href" select="'file:/Users/me/dir/doc.html'"/>
             <x:input port="source">
                 <x:document type="inline">
                     <d:fileset xml:base="file:/"/>
@@ -156,7 +156,7 @@
         <x:expect type="compare" label="the result should be as expected">
             <x:document type="inline">
                 <d:fileset xml:base="file:/">
-                    <d:file href="users/me/dir/doc.html"/>
+                    <d:file href="Users/me/dir/doc.html"/>
                 </d:fileset>
             </x:document>
         </x:expect>
@@ -164,7 +164,7 @@
     
     <x:scenario label="add-entry-absolute-root-directory-triple-slash">
         <x:call step="px:fileset-add-entry">
-            <x:option name="href" select="'file:///users/me/dir/doc.html'"/>
+            <x:option name="href" select="'file:///Users/me/dir/doc.html'"/>
             <x:input port="source">
                 <x:document type="inline">
                     <d:fileset xml:base="file:/"/>
@@ -177,7 +177,7 @@
         <x:expect type="compare" label="the result should be as expected">
             <x:document type="inline">
                 <d:fileset xml:base="file:/">
-                    <d:file href="users/me/dir/doc.html"/>
+                    <d:file href="Users/me/dir/doc.html"/>
                 </d:fileset>
             </x:document>
         </x:expect>
@@ -185,7 +185,7 @@
     
     <x:scenario label="add-absolute-entry-no-fileset-base">
         <x:call step="px:fileset-add-entry">
-            <x:option name="href" select="'file:/users/me/dir/doc.html'"/>
+            <x:option name="href" select="'file:/Users/me/dir/doc.html'"/>
             <x:input port="source">
                 <x:document type="inline">
                     <d:fileset/>
@@ -198,7 +198,7 @@
         <x:expect type="compare" label="the result should be a fileset still without a xml:base, and a file with an absolute href">
             <x:document type="inline">
                 <d:fileset>
-                    <d:file href="file:/users/me/dir/doc.html"/>
+                    <d:file href="file:/Users/me/dir/doc.html"/>
                 </d:fileset>
             </x:document>
         </x:expect>
@@ -207,10 +207,10 @@
     <x:scenario label="add-entry-original-href">
         <x:call step="px:fileset-add-entry">
             <x:option name="href" select="'doc.html'"/>
-            <x:option name="original-href" select="'file:/var/folders/mr/f6s9zqtn03d8rgzxb96_2bh00000gn/T/-1kf6683sr37ic7r60abkgeaant/doc.html'"/>
+            <x:option name="original-href" select="'file:/private/var/folders/mr/f6s9zqtn03d8rgzxb96_2bh00000gn/T/-1kf6683sr37ic7r60abkgeaant/doc.html'"/>
             <x:input port="source">
                 <x:document type="inline">
-                    <d:fileset xml:base="file:/users/me/dir/"/>
+                    <d:fileset xml:base="file:/Users/me/dir/"/>
                 </x:document>
             </x:input>
         </x:call>
@@ -219,9 +219,9 @@
         </x:context>
         <x:expect type="compare" label="the result should have a original-href attribute">
             <x:document type="inline">
-                <d:fileset xml:base="file:/users/me/dir/">
+                <d:fileset xml:base="file:/Users/me/dir/">
                     <d:file href="doc.html"
-                            original-href="file:/var/folders/mr/f6s9zqtn03d8rgzxb96_2bh00000gn/T/-1kf6683sr37ic7r60abkgeaant/doc.html"/>
+                            original-href="file:/private/var/folders/mr/f6s9zqtn03d8rgzxb96_2bh00000gn/T/-1kf6683sr37ic7r60abkgeaant/doc.html"/>
                 </d:fileset>
             </x:document>
         </x:expect>
@@ -229,8 +229,8 @@
     
     <x:scenario label="add-entry-original-href-no-fileset-base">
         <x:call step="px:fileset-add-entry">
-            <x:option name="href" select="'file:/users/me/dir/doc.html'"/>
-            <x:option name="original-href" select="'file:/var/folders/mr/f6s9zqtn03d8rgzxb96_2bh00000gn/T/-1kf6683sr37ic7r60abkgeaant/doc.html'"/>
+            <x:option name="href" select="'file:/Users/me/dir/doc.html'"/>
+            <x:option name="original-href" select="'file:/private/var/folders/mr/f6s9zqtn03d8rgzxb96_2bh00000gn/T/-1kf6683sr37ic7r60abkgeaant/doc.html'"/>
             <x:input port="source">
                 <x:document type="inline">
                     <d:fileset/>
@@ -243,8 +243,8 @@
         <x:expect type="compare" label="the result file should have a original-href attribute">
             <x:document type="inline">
                 <d:fileset>
-                    <d:file href="file:/users/me/dir/doc.html"
-                            original-href="file:/var/folders/mr/f6s9zqtn03d8rgzxb96_2bh00000gn/T/-1kf6683sr37ic7r60abkgeaant/doc.html"/>
+                    <d:file href="file:/Users/me/dir/doc.html"
+                            original-href="file:/private/var/folders/mr/f6s9zqtn03d8rgzxb96_2bh00000gn/T/-1kf6683sr37ic7r60abkgeaant/doc.html"/>
                 </d:fileset>
             </x:document>
         </x:expect>
@@ -253,14 +253,14 @@
     <x:scenario label="add-entry-document">
         <x:call step="px:fileset-add-entry">
             <x:input port="entry">
-                <x:document type="inline" xml:base="file:/users/me/dir/doc.html">
+                <x:document type="inline" xml:base="file:/Users/me/dir/doc.html">
                     <doc/>
                 </x:document>
             </x:input>
             <x:option name="media-type" select="'text/html'"/>
             <x:input port="source">
                 <x:document type="inline">
-                    <d:fileset xml:base="file:/users/me/dir/"/>
+                    <d:fileset xml:base="file:/Users/me/dir/"/>
                 </x:document>
             </x:input>
         </x:call>
@@ -269,7 +269,7 @@
         </x:context>
         <x:expect label="the href of the new entry should be the base URI of the given document" type="compare">
             <x:document type="inline">
-                <d:fileset xml:base="file:/users/me/dir/">
+                <d:fileset xml:base="file:/Users/me/dir/">
                     <d:file href="doc.html" media-type="text/html"/>
                 </d:fileset>
             </x:document>

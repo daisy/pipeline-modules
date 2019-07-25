@@ -43,8 +43,9 @@
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
         <p:documentation>
             px:fileset-load
-            px:fileset-add-entry,
-            px:fileset-join,
+            px:fileset-create
+            px:fileset-add-entry
+            px:fileset-join
             px:fileset-intersect
         </p:documentation>
     </p:import>
@@ -54,6 +55,23 @@
         </p:documentation>
     </p:import>
 
+    <p:group name="opf">
+        <p:documentation>Normalize base URI of OPF</p:documentation>
+        <p:output port="result"/>
+        <px:fileset-create/>
+        <px:fileset-add-entry>
+            <p:input port="entry">
+                <p:pipe step="main" port="opf"/>
+            </p:input>
+        </px:fileset-add-entry>
+        <px:fileset-load>
+            <p:input port="in-memory">
+                <p:pipe step="main" port="opf"/>
+            </p:input>
+        </px:fileset-load>
+    </p:group>
+    <p:sink/>
+
     <p:documentation>
         Load content documents in spine order.
         <!-- assumes px:fileset-load loads documents in order defined in fileset and
@@ -61,7 +79,7 @@
     </p:documentation>
     <px:opf-spine-to-fileset name="spine.fileset">
         <p:input port="source">
-            <p:pipe step="main" port="opf"/>
+            <p:pipe step="opf" port="result"/>
         </p:input>
     </px:opf-spine-to-fileset>
     <px:fileset-intersect>
@@ -98,12 +116,12 @@
     </p:documentation>
     <p:group>
         <p:variable name="ncc-base-uri" select="concat(replace(base-uri(/*),'[^/]+$',''),'ncc.html')">
-            <p:pipe step="main" port="opf"/>
+            <p:pipe step="opf" port="result"/>
         </p:variable>
         <p:variable name="ncc-base-dir-string-length" select="string-length(replace($ncc-base-uri,'[^/]+$',''))"/>
         <p:xslt>
             <p:input port="source">
-                <p:pipe step="main" port="opf"/>
+                <p:pipe step="opf" port="result"/>
                 <p:pipe step="ncc.body" port="result"/>
                 <p:pipe step="result.smil" port="result"/>
             </p:input>
@@ -215,7 +233,7 @@
         <p:variable name="smil-base" select="base-uri(/)"/>
         <p:filter>
             <p:input port="source">
-                <p:pipe step="main" port="opf"/>
+                <p:pipe step="opf" port="result"/>
             </p:input>
             <p:with-option name="select"
                            select="concat('
@@ -296,7 +314,7 @@
     <p:filter select="for $itemref in /opf:package/opf:spine/opf:itemref/@idref
                       return /opf:package/opf:manifest/opf:item[@id=$itemref][not(@media-overlay)]">
         <p:input port="source">
-            <p:pipe step="main" port="opf"/>
+            <p:pipe step="opf" port="result"/>
         </p:input>
     </p:filter>
     <p:for-each>

@@ -73,7 +73,10 @@
       </px:fileset-filter>
     </p:otherwise>
   </p:choose>
-  <p:identity name="filtered"/>
+  <px:fileset-join>
+    <p:documentation>Normalize @href</p:documentation>
+  </px:fileset-join>
+  <p:identity name="filtered-normalized"/>
   <p:for-each>
     <p:iteration-source select="/*/*"/>
     <p:identity/>
@@ -81,7 +84,7 @@
   <p:count limit="1" name="filtered.count"/>
   <p:identity>
     <p:input port="source">
-      <p:pipe port="result" step="filtered"/>
+      <p:pipe port="result" step="filtered-normalized"/>
     </p:input>
   </p:identity>
 

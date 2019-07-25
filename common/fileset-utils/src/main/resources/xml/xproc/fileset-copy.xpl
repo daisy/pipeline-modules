@@ -59,11 +59,16 @@
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
         <p:documentation>
             px:set-base-uri
+            px:normalize-uri
         </p:documentation>
     </p:import>
     <p:import href="fileset-fix-original-hrefs.xpl"/>
 
-    <p:documentation>Make the original-href attributes reflect what is actually stored on disk</p:documentation>
+    <p:documentation>
+        Make the original-href attributes reflect what is actually stored on disk. Also normalizes
+        @xml:base, @href and @original-href, relativizes @href against @xml:base, makes
+        @original-href absolute, and removes @xml:base from d:file.
+    </p:documentation>
     <pxi:fileset-fix-original-hrefs>
         <p:input port="source.in-memory">
             <p:pipe step="main" port="source.in-memory"/>
@@ -72,14 +77,20 @@
 
     <p:label-elements match="/*/d:file" attribute="href-before-move" label="resolve-uri(@href, base-uri(.))"/>
 
-    <p:documentation>Normalize the fileset and optionally flatten</p:documentation>
-    <p:xslt>
-        <p:input port="stylesheet">
-            <p:document href="../xslt/fileset-copy.xsl"/>
-        </p:input>
-        <p:with-param name="flatten" select="$flatten"/>
-        <p:with-param name="prefix" select="$prefix"/>
-    </p:xslt>
+    <p:documentation>Flatten fileset</p:documentation>
+    <p:choose>
+        <p:when test="$flatten='true'">
+            <p:xslt>
+                <p:input port="stylesheet">
+                    <p:document href="../xslt/fileset-flatten.xsl"/>
+                </p:input>
+                <p:with-param name="prefix" select="$prefix"/>
+            </p:xslt>
+        </p:when>
+        <p:otherwise>
+            <p:identity/>
+        </p:otherwise>
+    </p:choose>
 
     <p:viewport match="d:file" name="add-original-href">
         <p:documentation>Fail if the file is outside of the base directory (URI is absolute or
@@ -113,22 +124,29 @@
         <p:iteration-source>
             <p:pipe step="main" port="source.in-memory"/>
         </p:iteration-source>
-        <p:variable name="base-uri" select="base-uri(/*)"/>
-        <p:choose>
-            <p:xpath-context>
-                <p:pipe step="fileset.with-href-before-move" port="result"/>
-            </p:xpath-context>
-            <p:when test="$base-uri=/*/d:file/@href-before-move">
-                <px:set-base-uri>
-                    <p:with-option name="base-uri" select="(/*/d:file[@href-before-move=$base-uri])[1]/resolve-uri(@href,base-uri(.))">
-                        <p:pipe step="fileset.with-href-before-move" port="result"/>
-                    </p:with-option>
-                </px:set-base-uri>
-            </p:when>
-            <p:otherwise>
-                <p:identity/>
-            </p:otherwise>
-        </p:choose>
+        <px:normalize-uri name="normalize-uri">
+            <p:with-option name="href" select="base-uri(/*)"/>
+        </px:normalize-uri>
+        <p:group>
+            <p:variable name="base-uri" select="string(/*)">
+                <p:pipe step="normalize-uri" port="normalized"/>
+            </p:variable>
+            <p:choose>
+                <p:xpath-context>
+                    <p:pipe step="fileset.with-href-before-move" port="result"/>
+                </p:xpath-context>
+                <p:when test="$base-uri=/*/d:file/@href-before-move">
+                    <px:set-base-uri>
+                        <p:with-option name="base-uri" select="(/*/d:file[@href-before-move=$base-uri])[1]/resolve-uri(@href,base-uri(.))">
+                            <p:pipe step="fileset.with-href-before-move" port="result"/>
+                        </p:with-option>
+                    </px:set-base-uri>
+                </p:when>
+                <p:otherwise>
+                    <p:identity/>
+                </p:otherwise>
+            </p:choose>
+        </p:group>
     </p:for-each>
     <p:identity name="in-memory"/>
 
