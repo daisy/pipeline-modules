@@ -129,6 +129,7 @@
         <p:documentation>
             px:set-base-uri
             px:add-xml-base
+            px:normalize-uri
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
@@ -155,6 +156,10 @@
             px:epub3-nav-to-guide
         </p:documentation>
     </p:import>
+
+    <px:normalize-uri name="output-base-uri">
+        <p:with-option name="href" select="$output-base-uri"/>
+    </px:normalize-uri>
 
     <px:mediatype-detect name="source.fileset">
         <p:input port="in-memory">
@@ -528,8 +533,12 @@
             <p:input port="stylesheet">
                 <p:document href="create-package-doc.fileset-to-manifest.xsl"/>
             </p:input>
-            <p:with-param name="output-base-uri" select="$output-base-uri"/>
-            <p:with-option name="output-base-uri" select="$output-base-uri"/>
+            <p:with-param name="output-base-uri" select="string(/*)">
+                <p:pipe step="output-base-uri" port="normalized"/>
+            </p:with-param>
+            <p:with-option name="output-base-uri" select="string(/*)">
+                <p:pipe step="output-base-uri" port="normalized"/>
+            </p:with-option>
         </p:xslt>
 
         <p:documentation>Assign media overlays</p:documentation>
@@ -638,7 +647,9 @@
                     <p:input port="source">
                         <p:pipe step="guide.landmarks" port="result"/>
                     </p:input>
-                    <p:with-option name="opf-base" select="$output-base-uri"/>
+                    <p:with-option name="opf-base" select="string(/*)">
+                        <p:pipe step="output-base-uri" port="normalized"/>
+                    </p:with-option>
                 </px:epub3-nav-to-guide>
                 <px:message severity="DEBUG" message="guide element created successfully"/>
             </p:otherwise>
@@ -725,7 +736,9 @@
         </p:otherwise>
     </p:choose>
     <px:set-base-uri>
-        <p:with-option name="base-uri" select="$output-base-uri"/>
+        <p:with-option name="base-uri" select="string(/*)">
+            <p:pipe step="output-base-uri" port="normalized"/>
+        </p:with-option>
     </px:set-base-uri>
     <px:add-xml-base root="false"/>
     <px:message severity="DEBUG" message="Finished assigning media overlays to content documents"/>

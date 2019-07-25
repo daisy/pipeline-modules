@@ -38,6 +38,11 @@
 			px:unzip
 		</p:documentation>
 	</p:import>
+	<p:import href="fileset-join.xpl">
+		<p:documentation>
+			px:fileset-join
+		</p:documentation>
+	</p:import>
 	<p:import href="fileset-filter-in-memory.xpl">
 		<p:documentation>
 			px:fileset-filter-in-memory
@@ -104,6 +109,7 @@
 	</p:declare-step>
 
 	<px:fileset-filter-in-memory name="in-memory-fileset">
+		<p:documentation>Also normalizes @href</p:documentation>
 		<p:input port="source.in-memory">
 			<p:pipe step="main" port="source.in-memory"/>
 		</p:input>
@@ -119,6 +125,10 @@
 			<p:pipe step="main" port="source.fileset"/>
 		</p:input>
 	</p:add-xml-base>
+
+	<px:fileset-join name="source.fileset">
+		<p:documentation>Normalize @href and @original-href</p:documentation>
+	</px:fileset-join>
 	
 	<p:documentation>Delete original-href that equal href</p:documentation>
 	<p:delete match="d:file/@original-href[resolve-uri(.,base-uri(.))=parent::*/@href/resolve-uri(.,base-uri(.))]"/>

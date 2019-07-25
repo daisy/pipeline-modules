@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet exclude-result-prefixes="#all" version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
-    xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
+                xmlns:d="http://www.daisy.org/ns/pipeline/data"
+                exclude-result-prefixes="#all">
 
     <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl"/>
 
@@ -32,6 +35,12 @@
             </xsl:for-each-group>
         </d:fileset>
     </xsl:template>
+
+    <xsl:template match="d:file/@original-href">
+        <xsl:attribute name="original-href" select="pf:normalize-uri(resolve-uri(.,base-uri(.)))"/>
+    </xsl:template>
+
+    <xsl:template match="d:file/@xml:base"/>
 
     <xsl:template match="node() | @*">
         <xsl:copy>

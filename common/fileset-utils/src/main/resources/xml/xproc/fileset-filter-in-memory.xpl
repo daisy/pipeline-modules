@@ -43,12 +43,21 @@
 			</p:input>
 		</px:fileset-add-entry>
 	</p:for-each>
-	<px:fileset-join name="fileset-from-in-memory"/>
+	<px:fileset-join name="fileset-from-in-memory">
+		<p:documentation>Also normalizes @href</p:documentation>
+	</px:fileset-join>
 	<p:sink/>
+	
+	<px:fileset-join name="fileset-normalized">
+		<p:documentation>Normalize @href, so that px:fileset-intersect and px:fileset-diff work correctly.</p:documentation>
+		<p:input port="source">
+			<p:pipe step="main" port="source.fileset"/>
+		</p:input>
+	</px:fileset-join>
 	
 	<px:fileset-intersect name="intersect">
 		<p:input port="source">
-			<p:pipe step="main" port="source.fileset"/>
+			<p:pipe step="fileset-normalized" port="result"/>
 			<p:pipe step="fileset-from-in-memory" port="result"/>
 		</p:input>
 	</px:fileset-intersect>
@@ -59,7 +68,7 @@
 			<p:pipe step="fileset-from-in-memory" port="result"/>
 		</p:input>
 		<p:input port="secondary">
-			<p:pipe step="main" port="source.fileset"/>
+			<p:pipe step="fileset-normalized" port="result"/>
 		</p:input>
 	</px:fileset-diff>
 	<p:sink/>

@@ -33,6 +33,7 @@
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
         <p:documentation>
             px:set-base-uri
+            px:normalize-uri
         </p:documentation>
     </p:import>
 
@@ -54,22 +55,29 @@
         <p:iteration-source>
             <p:pipe step="main" port="source.in-memory"/>
         </p:iteration-source>
-        <p:variable name="base-uri" select="base-uri(/*)"/>
-        <p:choose>
-            <p:xpath-context>
-                <p:pipe step="fileset-with-href-before-move" port="result"/>
-            </p:xpath-context>
-            <p:when test="$base-uri=/*/d:file/@href-before-move">
-                <px:set-base-uri>
-                    <p:with-option name="base-uri" select="(/*/d:file[@href-before-move=$base-uri])[1]/resolve-uri(@href,base-uri(.))">
-                        <p:pipe step="fileset-with-href-before-move" port="result"/>
-                    </p:with-option>
-                </px:set-base-uri>
-            </p:when>
-            <p:otherwise>
-                <p:identity/>
-            </p:otherwise>
-        </p:choose>
+        <px:normalize-uri name="normalize-uri">
+            <p:with-option name="href" select="base-uri(/*)"/>
+        </px:normalize-uri>
+        <p:group>
+            <p:variable name="base-uri" select="string(/*)">
+                <p:pipe step="normalize-uri" port="normalized"/>
+            </p:variable>
+            <p:choose>
+                <p:xpath-context>
+                    <p:pipe step="fileset-with-href-before-move" port="result"/>
+                </p:xpath-context>
+                <p:when test="$base-uri=/*/d:file/@href-before-move">
+                    <px:set-base-uri>
+                        <p:with-option name="base-uri" select="(/*/d:file[@href-before-move=$base-uri])[1]/resolve-uri(@href,base-uri(.))">
+                            <p:pipe step="fileset-with-href-before-move" port="result"/>
+                        </p:with-option>
+                    </px:set-base-uri>
+                </p:when>
+                <p:otherwise>
+                    <p:identity/>
+                </p:otherwise>
+            </p:choose>
+        </p:group>
     </p:for-each>
     <p:identity name="in-memory"/>
 
