@@ -1,26 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns="http://www.w3.org/1999/xhtml" xpath-default-namespace="http://www.w3.org/1999/xhtml"
-    xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions"
-    xmlns:d="http://www.daisy.org/ns/pipeline/data"
-    xmlns:pf="http://www.daisy.org/ns/pipeline/functions" xmlns:svg="http://www.w3.org/2000/svg"
-    xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:m="http://www.w3.org/1998/Math/MathML"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema" version="2.0" exclude-result-prefixes="#all">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
+                xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions"
+                xmlns:d="http://www.daisy.org/ns/pipeline/data"
+                xmlns:svg="http://www.w3.org/2000/svg"
+                xmlns:xlink="http://www.w3.org/1999/xlink"
+                xmlns:m="http://www.w3.org/1998/Math/MathML"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xpath-default-namespace="http://www.w3.org/1999/xhtml"
+                exclude-result-prefixes="#all">
+
+    <!--
+        * Fix references to external descriptions (longdesc, aria-describedby, aria-describedat)
+        * Drop unsupported link elements (unsupported relation type or non-core stylesheet/lexicon type)
+        * Drop unsupported script elements (non-core script type)
+        * Drop unsupported img elements (non-core image type)
+        * Drop unsupported audio elements (non-core audio type)
+        * Drop unsupported embed elements (non-core image/audio type)
+        * Drop video elements without fallback
+        * Drop/fix elements that reference unexisting resources (link, script, a, img, iframe, embed,
+          audio, video, svg:image, svg:font-face-uri, math:math, math:mglyph, ...)
+        * Clean up SVG (convert to SVG 1.1 + restrictions)
+        * Clean up MathML
+        * Normalize URLs
+        * ...
+    -->
 
     <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl"/>
     <!--    <xsl:import href="../../../../test/xspec/mock-functions.xsl"/>-->
 
     <xsl:output indent="yes"/>
 
-
     <!--TODO implement a custom HTML-compliant base-uri() function ?-->
     <xsl:variable name="doc-base"
         select="if (/html/head/base[@href][1]) then resolve-uri(normalize-space(/html/head/base[@href][1]/@href),base-uri(/)) else base-uri(/)"/>
 
-    <!--A fileset is available in the default collection, to check if rsesources exist or are renamed-->
+    <!--A fileset is available in the default collection, to check if resources exist or are renamed-->
     <xsl:variable name="fileset" select="collection()[/d:fileset][1]" as="document-node()?"/>
     <xsl:key name="resources" match="/d:fileset/d:file" use="@original-href"/>
-
 
     <xsl:template match="node() | @*">
         <xsl:copy>
@@ -28,10 +46,10 @@
         </xsl:copy>
     </xsl:template>
 
-
     <!--–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
      |  External Descriptions                                                      |
     <|–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––-->
+
     <xsl:template match="head">
         <xsl:copy>
             <xsl:apply-templates select="node() | @*"/>
@@ -129,12 +147,9 @@
     </xsl:template>
     <xsl:template match="@longdesc|@aria-describedat" mode="iframe"/>
 
-
-
     <!--–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
      |  Other Resources                                                            |
     <|–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––-->
-
 
     <!--<xsl:template match="/processing-instruction('xml-stylesheet')">
         <xsl:variable name="href" select="replace(.,'^.*href=(&amp;apos;|&quot;)(.*?)\1.*$','$2')"/>
@@ -388,9 +403,7 @@
     </xsl:template>
 
     <xsl:template match="svg:font-face-uri">
-
         <xsl:sequence select="f:copy-if-clean(@xlink:href)"/>
-
     </xsl:template>
 
     <xsl:template match="svg:handler">
@@ -407,11 +420,9 @@
         <xsl:message select="'[WARNING] Discarding SVG ''video'' element, not part of SVG 1.1'"/>
     </xsl:template>
 
-
     <!--–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
      |  MathML                                                                     |
     <|–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––-->
-
 
     <xsl:template match="m:math[@altimg]">
         <xsl:variable name="clean-uri" select="f:clean-uri(@altimg)"/>
@@ -455,7 +466,6 @@
             or pf:get-extension($uri)=('mp3','m4a','aac')"
         />
     </xsl:function>
-
 
     <!--–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
      |  Resource Resolver                                                          |
@@ -514,4 +524,5 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:function>
+
 </xsl:stylesheet>
