@@ -2,6 +2,7 @@
 <x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                xmlns:d="http://www.daisy.org/ns/pipeline/data"
+               xmlns:diagram="http://www.daisy.org/ns/z3998/authoring/features/description/"
                script="../../main/resources/xml/xproc/html-to-epub3.convert.xpl">
 
 	<x:scenario label="minimal">
@@ -10,6 +11,7 @@
 				<x:document type="inline" xml:base="file:/tmp/">
 					<d:fileset>
 						<d:file href="foo.xhtml" media-type="application/xhtml+xml"/>
+						<d:file href="desc.xml" media-type="application/z3998-auth-diagram+xml" kind="description"/>
 					</d:fileset>
 				</x:document>
 			</x:input>
@@ -29,6 +31,14 @@
 						</body>
 					</html>
 				</x:document>
+				<x:document type="inline" xml:base="file:/tmp/desc.xml">
+					<description xmlns="http://www.daisy.org/ns/z3998/authoring/features/description/" xml:id="desc">
+						<body>
+							<summary>Summary text</summary>
+							<longdesc>Lengthier description</longdesc>
+						</body>
+					</description>
+				</x:document>
 			</x:input>
 			<x:option name="output-dir" select="resolve-uri('output-dir/')"/>
 		</x:call>
@@ -39,6 +49,7 @@
 		          type="custom" href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl" step="x:fileset-compare">
 			<x:document type="inline">
 				<d:fileset>
+					<d:file href="output-dir/epub/EPUB/desc.xhtml" media-type="application/xhtml+xml" kind="description"/>
 					<d:file href="output-dir/epub/EPUB/foo.xhtml" media-type="application/xhtml+xml"/>
 					<d:file href="output-dir/epub/EPUB/toc.xhtml" media-type="application/xhtml+xml"/>
 					<d:file href="output-dir/epub/EPUB/package.opf" media-type="application/oebps-package+xml"/>
@@ -46,10 +57,10 @@
 				</d:fileset>
 			</x:document>
 		</x:expect>
-		<x:context label="the result XHTML document">
+		<x:context label="the result foo.xhtml XHTML document">
 			<x:document type="port" port="in-memory.out" select="/*[base-uri()=resolve-uri('output-dir/epub/EPUB/foo.xhtml')]"/>
 		</x:context>
-		<x:expect label="the result XHTML document"
+		<x:expect label="the result foo.xhtml XHTML document"
 		          type="custom" href="http://www.daisy.org/xprocspec/custom-assertion-steps.xpl" step="x:compare-except-ids">
 			<x:document type="inline">
 				<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -63,6 +74,31 @@
 							<p>Paragraph</p>
 							<p>Another paragraph</p>
 						</section>
+					</body>
+				</html>
+			</x:document>
+		</x:expect>
+		<x:context label="the result desc.xhtml XHTML document">
+			<x:document type="port" port="in-memory.out" select="/*[base-uri()=resolve-uri('output-dir/epub/EPUB/desc.xhtml')]"/>
+		</x:context>
+		<x:expect label="the result desc.xhtml XHTML document"
+		          type="custom" href="http://www.daisy.org/xprocspec/custom-assertion-steps.xpl" step="x:compare-except-ids">
+			<x:document type="inline">
+				<html xmlns="http://www.w3.org/1999/xhtml">
+					<head>
+						<style type="text/css">body{ font-family:arial, sans-serif; font-size:1em } h1{ font-size:1.2em; } h2{ font-size:1.1em; color:rgb(0, 0, 110) } h2.about{ font-size:1em; color:rgb(0, 0, 0) } div.container{ border-top:solid 1px rgb(0, 0, 255); width:80%; padding:5px; margin-bottom:10px; background-color:rgb(255, 255, 255) } div.about, div.access{ font-size:0.9em } div.annotation{ font-size:0.8em; font-weight:bold; width:60%; border-top:1px solid rgb(0, 0, 0) } p.anno-hd{ color:rgb(0, 0, 110) } img{ color:rgb(0, 0, 255) } ul{ list-style-type:none } .center{ text-align:center }
+						</style>
+					</head>
+					<body>
+						<h1>DIAGRAM Description</h1>
+						<details>
+							<div id="" class="container">
+								<h2>Summary</h2>Summary text
+							</div>
+							<div id="" class="container">
+								<h2>Long Description</h2>Lengthier description
+							</div>
+						</details>
 					</body>
 				</html>
 			</x:document>
