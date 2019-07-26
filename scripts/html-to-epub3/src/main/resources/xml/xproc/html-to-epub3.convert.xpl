@@ -84,12 +84,16 @@
 
     <p:documentation>Remove resources that do not exist on disk or in memory</p:documentation>
     <px:fileset-purge>
+        <p:documentation>Also normalizes @href, @original-href and @xml:base</p:documentation>
         <p:input port="source.in-memory">
             <p:pipe step="main" port="input.in-memory"/>
         </p:input>
     </px:fileset-purge>
 
     <p:documentation>Change @href with EPUB-safe URIs</p:documentation>
+    <p:label-elements match="d:file" attribute="unsafe-href" label="resolve-uri(@href,base-uri(.))">
+        <p:documentation>Save the original URIs, need for html-clean-resources.xsl later</p:documentation>
+    </p:label-elements>
     <px:epub3-safe-uris name="safe-uris">
         <p:input port="source.in-memory">
             <p:pipe step="main" port="input.in-memory"/>
@@ -164,10 +168,12 @@
 
         </p:for-each>
         <p:sink/>
-        <px:fileset-update name="update">
-            <p:input port="source.fileset">
+        <p:delete match="d:file/@unsafe-href">
+            <p:input port="source">
                 <p:pipe step="safe-uris" port="result.fileset"/>
             </p:input>
+        </p:delete>
+        <px:fileset-update name="update">
             <p:input port="source.in-memory">
                 <p:pipe step="safe-uris" port="result.in-memory"/>
             </p:input>
