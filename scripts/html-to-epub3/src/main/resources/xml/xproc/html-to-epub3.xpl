@@ -18,8 +18,11 @@
     
     <p:input port="metadata" primary="false" sequence="true" px:media-type="application/xhtml+xml">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h2 px:role="name">HTML document(s)</h2>
-            <p px:role="desc">List of the HTML documents to extract metadata from.</p>
+            <h2 px:role="name">Metadata</h2>
+            <p px:role="desc" xml:space="preserve">Metadata to be included in the EPUB.
+
+If specified, the document must be a [`metadata`](http://www.idpf.org/epub/301/spec/epub-publications.html#sec-metadata-elem)
+element in the OPF namespace. If not specified, metadata is extracted from the HTML documents.</p>
         </p:documentation>
         <p:empty/>
     </p:input>
