@@ -3,8 +3,13 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:x="http://www.daisy.org/ns/xprocspec"
                 xmlns:opf="http://www.idpf.org/2007/opf"
-                type="x:compare-package-doc" name="main">
-  
+                type="x:epub3-pub-compare-package-doc" name="main">
+
+  <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+    <p>Custom <a href="http://josteinaj.github.io/xprocspec">XProcSpec</a> assertion that compares
+    two EPUB 3 package documents.</p>
+  </p:documentation>
+
   <p:input port="context" primary="false"/>
   <p:input port="expect" primary="false"/>
   <p:input port="parameters" kind="parameter" primary="true"/>

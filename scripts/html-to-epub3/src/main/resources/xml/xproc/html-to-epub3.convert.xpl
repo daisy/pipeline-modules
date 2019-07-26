@@ -17,7 +17,7 @@
     </p:input>
     <p:input port="metadata" sequence="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <p>HTML documents to extract metadata from</p>
+            <p>Metadata</p>
         </p:documentation>
         <p:empty/>
     </p:input>

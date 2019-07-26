@@ -216,7 +216,8 @@
 		<x:context label="the result port">
 			<x:document type="port" port="result"/>
 		</x:context>
-		<x:expect label="the result" type="custom" href="../compare-package-doc.xpl" step="x:compare-package-doc">
+		<x:expect label="the result" type="custom" href="../../../main/resources/xml/pub/compare-package-doc.xpl"
+		          step="x:epub3-pub-compare-package-doc">
 			<x:document type="inline">
 				<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="pub-id" version="3.0">
 					<metadata>
