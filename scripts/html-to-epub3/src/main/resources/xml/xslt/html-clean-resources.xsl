@@ -36,9 +36,12 @@
     <xsl:variable name="doc-base"
         select="if (/html/head/base[@href][1]) then resolve-uri(normalize-space(/html/head/base[@href][1]/@href),base-uri(/)) else base-uri(/)"/>
 
-    <!--A fileset is available in the default collection, to check if resources exist or are renamed-->
+    <!--
+        A fileset is available in the default collection, to check if resources exist.
+        We know that fileset has been previously normalized.
+    -->
     <xsl:variable name="fileset" select="collection()[/d:fileset][1]" as="document-node()?"/>
-    <xsl:key name="resources" match="/d:fileset/d:file" use="@original-href"/>
+    <xsl:key name="resources" match="/d:fileset/d:file" use="@unsafe-href"/>
 
     <xsl:template match="node() | @*">
         <xsl:copy>
@@ -221,24 +224,7 @@
     </xsl:template>
 
     <xsl:template match="a[@href]">
-        <xsl:choose>
-            <xsl:when
-                test="pf:is-relative(@href) and pf:get-path(@href) and not(pf:file-exists(pf:unescape-uri(pf:get-path(@href))))"
-                use-when="function-available('pf:file-exists')">
-                <xsl:message
-                    select="concat('[WARNING] Discarding link to non-existing resource ''',@href,'''.')"/>
-                <span>
-                    <xsl:copy-of select="@* except (@href|@target|@rel|@media|@targetlang|@type)"/>
-                    <xsl:apply-templates select="node()"/>
-                </span>
-            </xsl:when>
-            <xsl:when test="false()"> </xsl:when>
-            <xsl:otherwise>
-                <xsl:copy>
-                    <xsl:apply-templates select="@* | node()"/>
-                </xsl:copy>
-            </xsl:otherwise>
-        </xsl:choose>
+        <xsl:sequence select="f:copy-if-clean(@href,(),(@target|@rel|@media|@targetlang|@type))"/>
     </xsl:template>
 
     <xsl:template match="img[@src]">
