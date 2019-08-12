@@ -164,7 +164,6 @@
 						<itemref idref="item_1" id="itemref_1"/>
 						<itemref idref="item_2" id="itemref_2" linear="no"/>
 						<itemref idref="item_3" id="itemref_3" linear="no"/>
-						<itemref idref="item_5" id="itemref_4" linear="no"/>
 					</spine>
 				</package>
 			</x:document>

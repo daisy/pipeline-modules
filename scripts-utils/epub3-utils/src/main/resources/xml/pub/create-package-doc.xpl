@@ -565,11 +565,13 @@
         <p:output port="result"/>
         <p:group name="spine.secondary">
             <p:output port="result"/>
+            <px:fileset-create/>
             <px:fileset-add-entry name="nav-doc.fileset">
                 <p:input port="entry">
                     <p:pipe step="nav-doc" port="result"/>
                 </p:input>
             </px:fileset-add-entry>
+            <p:sink/>
             <px:fileset-diff>
                 <p:input port="source">
                     <p:pipe step="content-docs" port="fileset"/>
