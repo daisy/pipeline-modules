@@ -32,9 +32,10 @@
             items.</p>
             <p>If not specified, defaults to all <a
             href="http://www.idpf.org/epub/301/spec/epub-publications.html#gloss-content-document-epub">content
-            documents</a>, in the order in which they are specified in "source.fileset".</p>
-            <p>The content documents in "source.fileset" that are not in "spine" become auxiliary
-            spine items.</p>
+            documents</a>, in the order in which they are specified in "source.fileset", and except
+            the navigation document.</p>
+            <p>The content documents in "source.fileset" that are not in "spine" and are not the
+            navigation document become auxiliary spine items.</p>
         </p:documentation>
         <p:empty/>
     </p:input>
@@ -564,10 +565,20 @@
         <p:output port="result"/>
         <p:group name="spine.secondary">
             <p:output port="result"/>
+            <px:fileset-add-entry name="nav-doc.fileset">
+                <p:input port="entry">
+                    <p:pipe step="nav-doc" port="result"/>
+                </p:input>
+            </px:fileset-add-entry>
             <px:fileset-diff>
                 <p:input port="source">
                     <p:pipe step="content-docs" port="fileset"/>
                 </p:input>
+                <p:input port="secondary">
+                    <p:pipe step="nav-doc.fileset" port="result"/>
+                </p:input>
+            </px:fileset-diff>
+            <px:fileset-diff>
                 <p:input port="secondary">
                     <p:pipe step="spine.primary" port="result"/>
                 </p:input>
