@@ -24,6 +24,7 @@ public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 			pipelineModule("file-utils"),
 			pipelineModule("html-utils"),
 			pipelineModule("common-utils"),
+			pipelineModule("html-to-epub3"),
 			"org.daisy.pipeline:logging-activator:?",
 			"org.daisy.pipeline:logging-appender:?",
 		};
