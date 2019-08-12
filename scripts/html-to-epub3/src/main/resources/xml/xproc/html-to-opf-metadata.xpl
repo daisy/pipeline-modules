@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
-                xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
-                type="pxi:html-to-opf-metadata"
+                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                type="px:html-to-opf-metadata"
                 exclude-inline-prefixes="#all">
 	
 	<p:documentation>

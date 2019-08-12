@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-                xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:html="http://www.w3.org/1999/xhtml"
                 type="px:html-to-epub3" name="main"
@@ -330,7 +329,7 @@
             <p:pipe step="content-docs" port="in-memory"/>
         </p:input>
     </p:split-sequence>
-    <pxi:html-to-opf-metadata name="metadata"/>
+    <px:html-to-opf-metadata name="metadata"/>
     <p:sink/>
 
     <!--=========================================================================-->
