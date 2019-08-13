@@ -152,6 +152,7 @@
 						<dc:language>en</dc:language>
 						<meta property="dcterms:modified">2019-07-26T15:44:52Z</meta>
 						<dc:publisher>Me</dc:publisher>
+						<dc:format id="format2">EPUB3</dc:format>
 					</metadata>
 					<manifest>
 						<item href="foo.xhtml" media-type="application/xhtml+xml" id="item_1"/>
