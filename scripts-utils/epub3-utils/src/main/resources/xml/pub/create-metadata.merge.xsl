@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
-    xmlns="http://www.idpf.org/2007/opf" xmlns:dc="http://purl.org/dc/elements/1.1/"
-    xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema" exclude-result-prefixes="#all"
-    xpath-default-namespace="http://www.idpf.org/2007/opf">
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:dc="http://purl.org/dc/elements/1.1/"
+                xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions"
+                xmlns="http://www.idpf.org/2007/opf"
+                xpath-default-namespace="http://www.idpf.org/2007/opf"
+                exclude-result-prefixes="#all">
+
+    <xsl:include href="../epub3-vocab.xsl"/>
 
     <!--=========================================-->
     <!-- Merges EPUB Publications Metadata
@@ -19,8 +23,6 @@
     -->
     <!--TODO: document merge rules. For now, see the tests.-->
     <!--=========================================-->
-
-    <xsl:output indent="yes"/>
 
     <xsl:key name="refines" match="//meta[@refines]" use="f:unified-id(@refines)"/>
 
@@ -247,47 +249,22 @@
         <xsl:variable name="vocab"
             select="
             ($all-prefix-decl[@id=generate-id($property/ancestor::metadata)]/f:vocab[@prefix=$prefix]/@uri,
-            if ($prefix='') then 'http://idpf.org/epub/vocab/package/#'
-            else if ($prefix='dcterms') then 'http://purl.org/dc/terms/'
-            else if ($prefix='marc') then 'http://id.loc.gov/vocabulary/'
-            else if ($prefix='media') then 'http://www.idpf.org/epub/vocab/overlays/#'
-            else if ($prefix='onix') then 'http://www.editeur.org/ONIX/book/codelists/current.html#'
-            else if ($prefix='xsd') then 'http://www.w3.org/2001/XMLSchema#'
-            else '')[1]
+            if ($prefix='') then $vocab-package-uri
+            else $f:default-prefixes[@prefix=$prefix]/@uri,
+            '')[1]
             "
             as="xs:string"/>
         <xsl:variable name="unified-prefix"
             select="
-            if ($vocab='http://idpf.org/epub/vocab/package/#') then '' 
-            else if ($vocab='http://purl.org/dc/terms/') then 'dcterms' 
-            else if ($vocab='http://id.loc.gov/vocabulary/') then 'marc'
-            else if ($vocab='http://www.idpf.org/epub/vocab/overlays/#') then 'media'
-            else if ($vocab='http://www.editeur.org/ONIX/book/codelists/current.html#') then 'onix'
-            else if ($vocab='http://www.w3.org/2001/XMLSchema#') then 'xsd'
-            else $unified-prefix-decl[@uri=$vocab]/@prefix"
+            (if ($vocab=$vocab-package-uri) then ''
+            else $f:default-prefixes[@uri=$vocab]/@prefix,
+            $unified-prefix-decl[@uri=$vocab]/@prefix)[1]"
             as="xs:string?"/>
         <f:property prefix="{$unified-prefix}"
             uri="{if($vocab) then concat($vocab,$reference) else ''}"
             name="{if ($unified-prefix) then concat($unified-prefix,':',$reference)  else $reference}"
         />
     </xsl:function>
-
-    <!--
-        Returns a sequence of `f:vocab` elements representing vocab declarations
-        in a `@prefix` attribute where:
-        
-         * @prefix contains the declared prefix
-         * @uri contains the vocab URI
-    -->
-    <xsl:function name="f:parse-prefix-decl" as="element(f:vocab)*">
-        <xsl:param name="prefix-declaration" as="xs:string?"/>
-        <xsl:for-each-group select="tokenize($prefix-declaration,'\s+')"
-            group-adjacent="(position()+1) idiv 2">
-            <f:vocab prefix="{substring-before(current-group()[1],':')}" uri="{current-group()[2]}"
-            />
-        </xsl:for-each-group>
-    </xsl:function>
-
 
     <!--
         Returns all the vocabs declared in the various metadata sets, as `f:vocab` elements
@@ -319,44 +296,12 @@
     -->
     <xsl:function name="f:unified-prefix-decl" as="element()*">
         <xsl:param name="doc" as="document-node()"/>
-        <xsl:variable name="all-decl" select="f:all-prefix-decl($doc)//f:vocab"
-            as="element(f:vocab)*"/>
-        <xsl:for-each-group select="$all-decl" group-by="@uri">
-            <xsl:if
-                test="not(current-grouping-key()=
-                ('http://idpf.org/epub/vocab/package/#',
-                'http://purl.org/dc/terms/',
-                'http://id.loc.gov/vocabulary/',
-                'http://www.idpf.org/epub/vocab/overlays/#',
-                'http://www.editeur.org/ONIX/book/codelists/current.html#',
-                'http://www.w3.org/2001/XMLSchema#'))">
-                <xsl:choose>
-                    <xsl:when test="@prefix=('dcterms','marc','media','onix','xsd')">
-                        <f:vocab
-                            prefix="{f:unique-prefix(concat(@prefix,position()+1),$all-decl/@prefix)}"
-                            uri="{@uri}"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:copy-of select="current()"/>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </xsl:if>
+        <xsl:for-each-group select="f:merge-prefix-decl(f:all-prefix-decl($doc)//f:vocab)
+                                    [not(@uri=($vocab-package-uri,
+                                               $f:default-prefixes/@uri))]"
+                            group-by="@uri">
+            <xsl:sequence select="current()"/>
         </xsl:for-each-group>
-    </xsl:function>
-
-    <!--
-        Returns a unique prefix from a given prefix and a sequence of existing prefixes.
-        The unique prefix is generated by appending the needed amount of '_'.
-    -->
-    <xsl:function name="f:unique-prefix" as="xs:string">
-        <xsl:param name="prefix" as="xs:string"/>
-        <xsl:param name="existing" as="xs:string*"/>
-        <xsl:sequence
-            select="
-            if (not($prefix=$existing)) then $prefix
-            else f:unique-prefix(concat($prefix,'_'),$existing)
-            "
-        />
     </xsl:function>
 
 </xsl:stylesheet>
