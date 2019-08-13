@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:dc="http://purl.org/dc/elements/1.1/"
                 xmlns:html="http://www.w3.org/1999/xhtml"
                 xmlns="http://www.idpf.org/2007/opf"
@@ -14,7 +15,7 @@
                                                                            'dcterms:identifier',
                                                                            'dtb:uid')][1]"/>
             <dc:identifier id="pub-id">
-                <xsl:copy-of select="$identifier/@scheme"/>
+                <xsl:copy-of select="$identifier/@scheme" exclude-result-prefixes="#all"/>
                 <xsl:value-of select="($identifier/@content,replace(replace(string(current-dateTime()),'\+.*',''),'[^\d]',''))[1]"/>
             </dc:identifier>
             
@@ -23,6 +24,8 @@
                     <xsl:value-of select="(/*/@lang,/*/@xml:lang,'zxx')[1]"/>
                 </dc:language>
             </xsl:if>
+
+            <dc:format id="format">EPUB3</dc:format>
 
             <xsl:if test="not(/html:html/html:head/html:meta[lower-case(@name)='dc:title'])">
                 <dc:title>
@@ -50,12 +53,12 @@
                     </xsl:when>
                     <xsl:when test="$lcname=('dc:identifier','dct:identifier','dcterms:identifier','dtb:uid')"/>
                     <xsl:when test="$lcname=('dcterms:modified','dc:format')">
-                        <xsl:message select="concat('Discarding pre-existing meta element: ',@name)"/>
+                        <xsl:message select="concat('Discarding pre-existing meta element (it will be replaced with a new one): ',@name)"/>
                     </xsl:when>
                     <xsl:when test="matches($lcname,'^dc:')">
                         <xsl:element name="{$lcname}">
                             <xsl:attribute name="id" select="$id"/>
-                            <xsl:copy-of select="@scheme"/>
+                            <xsl:copy-of select="@scheme" exclude-result-prefixes="#all"/>
                             <xsl:value-of select="@content"/>
                         </xsl:element>
                         <xsl:if test="@role">
@@ -67,14 +70,14 @@
                     <xsl:when test="matches($lcname,'^dct:') or matches($lcname,'^dcterms:')">
                         <meta property="{replace($lcname,'^dct:','dcterms:')}">
                             <xsl:attribute name="id" select="$id"/>
-                            <xsl:copy-of select="@scheme"/>
+                            <xsl:copy-of select="@scheme" exclude-result-prefixes="#all"/>
                             <xsl:value-of select="@content"/>
                         </meta>
                     </xsl:when>
                     <xsl:when test="@name='dtb:narrator'">
                         <dc:contributor id="{$id}">
                             <xsl:attribute name="id" select="$id"/>
-                            <xsl:copy-of select="@scheme"/>
+                            <xsl:copy-of select="@scheme" exclude-result-prefixes="#all"/>
                             <xsl:value-of select="@content"/>
                         </dc:contributor>
                         <meta refines="#{$id}" property="role" scheme="marc:relators">nrt</meta>
@@ -82,24 +85,33 @@
                     <xsl:when test="@name='dtb:producer'">
                         <dc:contributor id="{$id}">
                             <xsl:attribute name="id" select="$id"/>
-                            <xsl:copy-of select="@scheme"/>
+                            <xsl:copy-of select="@scheme" exclude-result-prefixes="#all"/>
                             <xsl:value-of select="@content"/>
                         </dc:contributor>
                         <meta refines="#{$id}" property="role" scheme="marc:relators">pro</meta>
                     </xsl:when>
-                    <xsl:when test="tokenize($lcname,':')[1]=('dc','dcterms','dtb')">
-                        <!-- NOTE: we could potentially add more namespace prefixes to the metadata element and allow more prefixes here -->
+                    <xsl:otherwise>
                         <meta property="{@name}">
                             <xsl:attribute name="id" select="$id"/>
-                            <xsl:copy-of select="@scheme"/>
+                            <xsl:copy-of select="@scheme" exclude-result-prefixes="#all"/>
                             <xsl:value-of select="@content"/>
                         </meta>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:message select="concat('Discarding meta element: ',@name)"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:for-each>
+
+            <meta property="dcterms:modified">
+                <xsl:value-of
+                    select="format-dateTime(
+                    adjust-dateTime-to-timezone(current-dateTime(),xs:dayTimeDuration('PT0H')),
+                    '[Y0001]-[M01]-[D01]T[H01]:[m01]:[s01][Z]')"
+                />
+            </meta>
+            <meta name="dcterms:modified"
+                content="{format-dateTime(
+                    adjust-dateTime-to-timezone(current-dateTime(),xs:dayTimeDuration('PT0H')),
+                    '[Y0001]-[M01]-[D01]T[H01]:[m01]:[s01][Z]')}"
+            />
         </metadata>
     </xsl:template>
     
