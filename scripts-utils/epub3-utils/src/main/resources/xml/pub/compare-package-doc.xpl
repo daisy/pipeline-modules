@@ -7,23 +7,38 @@
 
   <p:documentation xmlns="http://www.w3.org/1999/xhtml">
     <p>Custom <a href="http://josteinaj.github.io/xprocspec">XProcSpec</a> assertion that compares
-    two EPUB 3 package documents.</p>
+    two EPUB 3 package documents or elements thereof.</p>
   </p:documentation>
 
   <p:input port="context" primary="false"/>
   <p:input port="expect" primary="false"/>
   <p:input port="parameters" kind="parameter" primary="true"/>
   <p:output port="result" primary="true"/>
-  
-  <p:string-replace match="/opf:package/opf:metadata/opf:meta[@property='dcterms:modified']/text()"
-                    replace="'3000-01-01T00:00:00Z'">
+
+  <p:identity>
     <p:input port="source">
       <p:pipe step="main" port="context"/>
     </p:input>
-  </p:string-replace>
+  </p:identity>
+  <p:choose>
+    <p:xpath-context>
+      <p:pipe step="main" port="expect"/>
+    </p:xpath-context>
+    <p:when test="/opf:metadata">
+      <p:filter select="//opf:metadata"/>
+    </p:when>
+    <p:otherwise>
+      <p:identity/>
+    </p:otherwise>
+  </p:choose>
+
+  <p:string-replace match="opf:meta[@property='dcterms:modified']/text()|
+                           opf:meta[@name='dcterms:modified']/@content"
+                    replace="'3000-01-01T00:00:00Z'"/>
   <p:string-replace name="normalize-context" match="text()" replace="normalize-space(.)"/>
   
-  <p:string-replace match="/opf:package/opf:metadata/opf:meta[@property='dcterms:modified']/text()"
+  <p:string-replace match="opf:meta[@property='dcterms:modified']/text()|
+                           opf:meta[@name='dcterms:modified']/@content"
                     replace="'3000-01-01T00:00:00Z'">
     <p:input port="source">
       <p:pipe step="main" port="expect"/>
