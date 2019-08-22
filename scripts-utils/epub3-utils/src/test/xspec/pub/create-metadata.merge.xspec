@@ -5,6 +5,16 @@
                xmlns="http://www.idpf.org/2007/opf"
                stylesheet="../../../main/resources/xml/pub/create-metadata.merge.xsl">
 
+    <x:param name="reserved-prefixes" select="'a11y:      http://www.idpf.org/epub/vocab/package/a11y/#
+                                               dcterms:   http://purl.org/dc/terms/
+                                               epubsc:    http://idpf.org/epub/vocab/sc/#
+                                               marc:      http://id.loc.gov/vocabulary/
+                                               media:     http://www.idpf.org/epub/vocab/overlays/#
+                                               onix:      http://www.editeur.org/ONIX/book/codelists/current.html#
+                                               rendition: http://www.idpf.org/vocab/rendition/#
+                                               schema:    http://schema.org/
+                                               xsd:       http://www.w3.org/2001/XMLSchema#'"/>
+
     <x:scenario label="IDs :: ">
         <x:scenario label="conflicting IDs">
             <x:context>

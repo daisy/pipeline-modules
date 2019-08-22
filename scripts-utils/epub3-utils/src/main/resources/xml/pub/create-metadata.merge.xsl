@@ -9,6 +9,8 @@
 
     <xsl:include href="../epub3-vocab.xsl"/>
 
+    <xsl:param name="reserved-prefixes" required="yes"/>
+
     <!--=========================================-->
     <!-- Merges EPUB Publications Metadata
         
@@ -26,13 +28,32 @@
 
     <xsl:key name="refines" match="//meta[@refines]" use="f:unified-id(@refines)"/>
 
+    <xsl:template match="/">
+        <xsl:apply-templates select="/*">
+            <xsl:with-param tunnel="yes" name="manifest" select="collection()[2]"/>
+        </xsl:apply-templates>
+    </xsl:template>
+
+    <xsl:template match="/*" priority="1">
+        <xsl:variable name="implicit" as="element(f:vocab)*" select="f:parse-prefix-decl($reserved-prefixes)"/>
+        <xsl:variable name="all" as="element()*" select="f:all-prefix-decl(/)"/>
+        <xsl:variable name="unified" as="element(f:vocab)*" select="f:unified-prefix-decl($all//f:vocab,$implicit)"/>
+        <xsl:next-match>
+            <xsl:with-param name="implicit" tunnel="yes" select="$implicit"/>
+            <xsl:with-param name="all" tunnel="yes" select="$all"/>
+            <xsl:with-param name="unified" tunnel="yes" select="$unified"/>
+        </xsl:next-match>
+    </xsl:template>
+
     <xsl:template match="/*">
+        <xsl:param name="implicit" as="element(f:vocab)*" tunnel="yes" required="yes"/>
+        <xsl:param name="all" as="element()*" tunnel="yes" required="yes"/>
+        <xsl:param name="unified" as="element(f:vocab)*" tunnel="yes" required="yes"/>
+        <xsl:param name="manifest" tunnel="yes" as="document-node()?" select="()"/>
         <metadata>
-            <xsl:variable name="unified-prefix-decl" as="element()*"
-                select="f:unified-prefix-decl(/)"/>
-            <xsl:if test="exists($unified-prefix-decl)">
+            <xsl:if test="exists($unified)">
                 <xsl:attribute name="prefix"
-                    select="for $vocab in $unified-prefix-decl return concat($vocab/@prefix,': ',$vocab/@uri)"
+                    select="for $vocab in $unified return concat($vocab/@prefix,': ',$vocab/@uri)"
                 />
             </xsl:if>
 
@@ -85,13 +106,18 @@
 
             <!--meta [0 or more]-->
             <xsl:for-each-group select="//meta[empty(@refines)]"
-                group-by="f:expand-property(@property)/@uri">
+                group-by="f:expand-property(@property,$implicit,$all,$unified)/@uri">
                 <xsl:if test="current-grouping-key()">
                     <xsl:apply-templates
                         select="current-group()[ancestor::metadata is current()/ancestor::metadata]"
                     />
                 </xsl:if>
             </xsl:for-each-group>
+
+            <!-- process meta that refine manifest items -->
+            <xsl:apply-templates select="//meta[replace(@refines,'^#','')=$manifest//item/@id]">
+                <xsl:with-param name="copy-refines" tunnel="yes" select="true()"/>
+            </xsl:apply-templates>
 
             <xsl:apply-templates select="//link"/>
         </metadata>
@@ -110,7 +136,10 @@
     </xsl:template>
 
     <xsl:template match="meta">
-        <xsl:variable name="property" select="f:expand-property(@property)"/>
+        <xsl:param name="implicit" as="element(f:vocab)*" tunnel="yes" required="yes"/>
+        <xsl:param name="all" as="element()*" tunnel="yes" required="yes"/>
+        <xsl:param name="unified" as="element(f:vocab)*" tunnel="yes" required="yes"/>
+        <xsl:variable name="property" select="f:expand-property(@property,$implicit,$all,$unified)"/>
         <xsl:choose>
             <xsl:when test="$property/@uri='http://purl.org/dc/terms/modified'"/>
             <xsl:when test="not(normalize-space())">
@@ -141,7 +170,10 @@
     </xsl:template>
 
     <xsl:template match="link">
-        <xsl:variable name="rel" select="f:expand-property(@rel)"/>
+        <xsl:param name="implicit" as="element(f:vocab)*" tunnel="yes" required="yes"/>
+        <xsl:param name="all" as="element()*" tunnel="yes" required="yes"/>
+        <xsl:param name="unified" as="element(f:vocab)*" tunnel="yes" required="yes"/>
+        <xsl:variable name="rel" select="f:expand-property(@rel,$implicit,$all,$unified)"/>
         <xsl:choose>
             <xsl:when test="not(@href) or not(@rel)">
                 <xsl:message>[WARNING] Discarding link with no @href or @rel
@@ -172,16 +204,30 @@
     </xsl:template>
 
     <xsl:template match="@property">
-        <xsl:attribute name="property" select="f:expand-property(.)/@name"/>
+        <xsl:param name="implicit" as="element(f:vocab)*" tunnel="yes" required="yes"/>
+        <xsl:param name="all" as="element()*" tunnel="yes" required="yes"/>
+        <xsl:param name="unified" as="element(f:vocab)*" tunnel="yes" required="yes"/>
+        <xsl:attribute name="property" select="f:expand-property(.,$implicit,$all,$unified)/@name"/>
     </xsl:template>
     <xsl:template match="@scheme">
-        <xsl:attribute name="scheme" select="f:expand-property(.)/@name"/>
+        <xsl:param name="implicit" as="element(f:vocab)*" tunnel="yes" required="yes"/>
+        <xsl:param name="all" as="element()*" tunnel="yes" required="yes"/>
+        <xsl:param name="unified" as="element(f:vocab)*" tunnel="yes" required="yes"/>
+        <xsl:attribute name="scheme" select="f:expand-property(.,$implicit,$all,$unified)/@name"/>
     </xsl:template>
     <xsl:template match="@id">
         <xsl:attribute name="id" select="f:unified-id(.)"/>
     </xsl:template>
     <xsl:template match="@refines">
-        <xsl:attribute name="refines" select="concat('#',f:unified-id(.))"/>
+        <xsl:param name="copy-refines" tunnel="yes" as="xs:boolean?" select="false()"/>
+        <xsl:choose>
+            <xsl:when test="$copy-refines">
+                <xsl:sequence select="."/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:attribute name="refines" select="concat('#',f:unified-id(.))"/>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
 
@@ -239,26 +285,23 @@
     <!--TODO move to a generic util ?-->
     <xsl:function name="f:expand-property" as="element(f:property)">
         <xsl:param name="property" as="attribute()?"/>
-        <!--TODO move to a global variable when XSpec supports it-->
-        <xsl:variable name="all-prefix-decl" as="element()*"
-            select="f:all-prefix-decl($property/ancestor::node()[. instance of document-node()])"/>
-        <xsl:variable name="unified-prefix-decl" as="element()*"
-            select="f:unified-prefix-decl($property/ancestor::node()[. instance of document-node()])"/>
+        <xsl:param name="implicit" as="element(f:vocab)*"/>
+        <xsl:param name="all" as="element()*"/>
+        <xsl:param name="unified" as="element(f:vocab)*"/>
         <xsl:variable name="prefix" select="substring-before($property,':')" as="xs:string"/>
         <xsl:variable name="reference" select="replace($property,'(.+:)','')" as="xs:string"/>
         <xsl:variable name="vocab"
-            select="
-            ($all-prefix-decl[@id=generate-id($property/ancestor::metadata)]/f:vocab[@prefix=$prefix]/@uri,
-            if ($prefix='') then $vocab-package-uri
-            else $f:default-prefixes[@prefix=$prefix]/@uri,
-            '')[1]
-            "
+            select="($all[@id=generate-id($property/ancestor::metadata)]/f:vocab[@prefix=$prefix]/@uri,
+                     if ($prefix='') then $vocab-package-uri else (),
+                     $f:default-prefixes[@prefix=$prefix]/@uri,
+                     ''
+                     )[1]"
             as="xs:string"/>
         <xsl:variable name="unified-prefix"
-            select="
-            (if ($vocab=$vocab-package-uri) then ''
-            else $f:default-prefixes[@uri=$vocab]/@prefix,
-            $unified-prefix-decl[@uri=$vocab]/@prefix)[1]"
+            select="(if ($vocab=$vocab-package-uri) then '' else (),
+                     $implicit[@uri=$vocab]/@prefix,
+                     $unified[@uri=$vocab]/@prefix
+                     )[1]"
             as="xs:string?"/>
         <f:property prefix="{$unified-prefix}"
             uri="{if($vocab) then concat($vocab,$reference) else ''}"
@@ -269,7 +312,7 @@
     <!--
         Returns all the vocabs declared in the various metadata sets, as `f:vocab` elements
         grouped by `metadata` elements (these latter having `@id` attributes generated by
-        `generate-id()`. 
+        `generate-id()`.
         
         Vocabs that are not used in `@property`, `@scheme` or `@rel` are discarded.
     -->
@@ -277,11 +320,13 @@
         <xsl:param name="doc" as="document-node()?"/>
         <xsl:for-each select="$doc//metadata">
             <metadata id="{generate-id(.)}">
-                <xsl:sequence
-                    select="f:parse-prefix-decl(@prefix)
-                    [some $prop in $doc//meta/(@property|@scheme)|$doc//link/@rel
-                     satisfies starts-with($prop,concat(@prefix,':'))]"
-                />
+                <xsl:variable name="used-prefixes" as="xs:string*"
+                              select="distinct-values(
+                                        for $prop in distinct-values(.//meta/(@property|@scheme)|.//link/@rel)[contains(.,':')]
+                                        return substring-before($prop,':'))"/>
+                <xsl:variable name="parsed-prefix-attr" as="element(f:vocab)*" select="f:parse-prefix-decl(@prefix)"/>
+                <xsl:sequence select="for $prefix in $used-prefixes return
+                                      ($parsed-prefix-attr[@prefix=$prefix],$f:default-prefixes[@prefix=$prefix])[1]"/>
             </metadata>
         </xsl:for-each>
     </xsl:function>
@@ -295,10 +340,11 @@
         
     -->
     <xsl:function name="f:unified-prefix-decl" as="element()*">
-        <xsl:param name="doc" as="document-node()"/>
-        <xsl:for-each-group select="f:merge-prefix-decl(f:all-prefix-decl($doc)//f:vocab)
+        <xsl:param name="all" as="element(f:vocab)*"/>
+        <xsl:param name="implicit" as="element(f:vocab)*"/>
+        <xsl:for-each-group select="f:merge-prefix-decl($all)
                                     [not(@uri=($vocab-package-uri,
-                                               $f:default-prefixes/@uri))]"
+                                               $implicit/@uri))]"
                             group-by="@uri">
             <xsl:sequence select="current()"/>
         </xsl:for-each-group>

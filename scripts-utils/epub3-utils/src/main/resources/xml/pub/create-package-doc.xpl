@@ -115,6 +115,25 @@
             </ul>
         </p:documentation>
     </p:option>
+    <p:option name="reserved-prefixes" required="false" select="'a11y:      http://www.idpf.org/epub/vocab/package/a11y/#
+                                                                 dcterms:   http://purl.org/dc/terms/
+                                                                 epubsc:    http://idpf.org/epub/vocab/sc/#
+                                                                 marc:      http://id.loc.gov/vocabulary/
+                                                                 media:     http://www.idpf.org/epub/vocab/overlays/#
+                                                                 onix:      http://www.editeur.org/ONIX/book/codelists/current.html#
+                                                                 rendition: http://www.idpf.org/vocab/rendition/#
+                                                                 schema:    http://schema.org/
+                                                                 xsd:       http://www.w3.org/2001/XMLSchema#'">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>
+                The <a
+                href="http://www.idpf.org/epub/301/spec/epub-publications.html#sec-metadata-default-vocab">reserved
+                prefix mappings</a> of the resulting package document. Set to the empty string to
+                make all prefixes used in the package document explicit in the <code>prefix</code>
+                attribute on the root element.
+            </p>
+        </p:documentation>
+    </p:option>
     <p:option name="output-base-uri" required="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>The base URI of the result document.</p>
@@ -253,89 +272,108 @@
                 </p:inline>
             </p:input>
         </p:uuid>
-        <p:wrap-sequence wrapper="_">
-            <p:input port="source">
+        <p:sink/>
+
+        <p:group name="generated-metadata">
+            <p:documentation>Extract "duration" metadata from media overlay documents.</p:documentation>
+            <p:output port="result"/>
+            <p:for-each name="metadata.durations">
+                <p:output port="result" sequence="true"/>
+                <p:iteration-source>
+                    <p:pipe step="mediaoverlays" port="in-memory"/>
+                </p:iteration-source>
+                <p:variable name="base" select="base-uri(/*)"/>
+                <p:xslt>
+                    <p:input port="parameters">
+                        <p:empty/>
+                    </p:input>
+                    <p:input port="stylesheet">
+                        <p:document href="create-package-doc.estimate-mediaoverlay-duration.xsl"/>
+                    </p:input>
+                </p:xslt>
+                <p:add-attribute match="/*" attribute-name="refines">
+                    <p:with-option name="attribute-value"
+                                   select="concat('#',/*/d:file[resolve-uri(@href,base-uri(.))=$base]/@id)">
+                        <p:pipe step="manifest" port="as-fileset"/>
+                    </p:with-option>
+                </p:add-attribute>
+            </p:for-each>
+            <p:sink/>
+            <p:group name="metadata.total-duration">
+                <p:output port="result" sequence="true"/>
+                <p:count>
+                    <p:input port="source">
+                        <p:pipe step="metadata.durations" port="result"/>
+                    </p:input>
+                </p:count>
+                <p:choose>
+                    <p:when test="/*=0">
+                        <p:identity>
+                            <p:input port="source">
+                                <p:empty/>
+                            </p:input>
+                        </p:identity>
+                    </p:when>
+                    <p:otherwise>
+                        <p:wrap-sequence wrapper="_">
+                            <p:input port="source">
+                                <p:pipe step="metadata.durations" port="result"/>
+                            </p:input>
+                        </p:wrap-sequence>
+                        <p:xslt>
+                            <p:input port="parameters">
+                                <p:empty/>
+                            </p:input>
+                            <p:input port="stylesheet">
+                                <p:document href="create-package-doc.sum-mediaoverlay-durations.xsl"/>
+                            </p:input>
+                        </p:xslt>
+                    </p:otherwise>
+                </p:choose>
+            </p:group>
+            <p:sink/>
+            <p:insert match="/*" position="last-child">
+                <p:input port="source">
+                    <p:inline>
+                        <opf:metadata/>
+                    </p:inline>
+                </p:input>
+                <p:input port="insertion">
+                    <p:pipe step="metadata.durations" port="result"/>
+                    <p:pipe step="metadata.total-duration" port="result"/>
+                </p:input>
+            </p:insert>
+        </p:group>
+        <p:sink/>
+
+        <p:for-each>
+            <p:iteration-source>
                 <p:pipe step="main" port="metadata"/>
+            </p:iteration-source>
+            <p:delete match="opf:meta[@property='media:duration']"/>
+        </p:for-each>
+        <p:identity name="input-metadata"/>
+        <p:sink/>
+
+        <p:wrap-sequence wrapper="_" name="wrapped-metadata">
+            <p:input port="source">
+                <p:pipe step="input-metadata" port="result"/>
                 <p:pipe step="default-metadata" port="result"/>
+                <p:pipe step="generated-metadata" port="result"/>
             </p:input>
         </p:wrap-sequence>
         <p:xslt>
+            <p:input port="source">
+                <p:pipe step="wrapped-metadata" port="result"/>
+                <p:pipe step="manifest" port="result"/>
+            </p:input>
             <p:input port="stylesheet">
                 <p:document href="create-metadata.merge.xsl"/>
             </p:input>
-            <p:input port="parameters">
+            <p:with-param name="reserved-prefixes" select="$reserved-prefixes">
                 <p:empty/>
-            </p:input>
+            </p:with-param>
         </p:xslt>
-
-        <p:documentation>Extract "duration" metadata from media overlay documents.</p:documentation>
-        <p:delete match="opf:meta[@property='media:duration']"/>
-        <p:identity name="metadata.without-duration"/>
-        <p:sink/>
-        <p:for-each name="metadata.durations">
-            <p:output port="result" sequence="true"/>
-            <p:iteration-source>
-                <p:pipe step="mediaoverlays" port="in-memory"/>
-            </p:iteration-source>
-            <p:variable name="base" select="base-uri(/*)"/>
-            <p:xslt>
-                <p:input port="parameters">
-                    <p:empty/>
-                </p:input>
-                <p:input port="stylesheet">
-                    <p:document href="create-package-doc.estimate-mediaoverlay-duration.xsl"/>
-                </p:input>
-            </p:xslt>
-            <p:add-attribute match="/*" attribute-name="refines">
-                <p:with-option name="attribute-value"
-                               select="concat('#',/*/d:file[resolve-uri(@href,base-uri(.))=$base]/@id)">
-                    <p:pipe step="manifest" port="as-fileset"/>
-                </p:with-option>
-            </p:add-attribute>
-        </p:for-each>
-        <p:sink/>
-        <p:group name="metadata.total-duration">
-            <p:output port="result" sequence="true"/>
-            <p:count>
-                <p:input port="source">
-                    <p:pipe step="metadata.durations" port="result"/>
-                </p:input>
-            </p:count>
-            <p:choose>
-                <p:when test="/*=0">
-                    <p:identity>
-                        <p:input port="source">
-                            <p:empty/>
-                        </p:input>
-                    </p:identity>
-                </p:when>
-                <p:otherwise>
-                    <p:wrap-sequence wrapper="_">
-                        <p:input port="source">
-                            <p:pipe step="metadata.durations" port="result"/>
-                        </p:input>
-                    </p:wrap-sequence>
-                    <p:xslt>
-                        <p:input port="parameters">
-                            <p:empty/>
-                        </p:input>
-                        <p:input port="stylesheet">
-                            <p:document href="create-package-doc.sum-mediaoverlay-durations.xsl"/>
-                        </p:input>
-                    </p:xslt>
-                </p:otherwise>
-            </p:choose>
-        </p:group>
-        <p:sink/>
-        <p:insert match="/*" position="last-child">
-            <p:input port="source">
-                <p:pipe step="metadata.without-duration" port="result"/>
-            </p:input>
-            <p:input port="insertion">
-                <p:pipe step="metadata.durations" port="result"/>
-                <p:pipe step="metadata.total-duration" port="result"/>
-            </p:input>
-        </p:insert>
 
         <p:documentation>For compatibility with OPF 2, add a second meta element with "name" and
         "content" attributes for every meta element.</p:documentation>
