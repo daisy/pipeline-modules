@@ -12,6 +12,10 @@
     <p:input port="input.in-memory" sequence="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>Input HTML document(s) and resources</p>
+            <p>If the fileset includes a navigation document, it should be marked with a
+            <code>nav</code> attribute with value <code>true</code>, and it should be a HTML
+            document. At most one navigation document may be specified. If no navigation document is
+            specified, one is generated from all the HTML documents.</p>
         </p:documentation>
     </p:input>
     <p:input port="metadata" sequence="true">
@@ -269,53 +273,67 @@
     </p:group>
 
     <p:documentation>Generate the EPUB 3 navigation document</p:documentation>
-    <p:group name="add-navigation-doc">
-        <p:output port="fileset" primary="true"/>
-        <p:output port="in-memory" sequence="true">
-            <p:pipe step="add-entry" port="result.in-memory"/>
-        </p:output>
-        <p:output port="doc">
-            <p:pipe step="navigation-doc" port="result"/>
-        </p:output>
-        <p:identity>
-            <p:input port="source">
-                <p:pipe step="content-docs" port="in-memory"/>
-            </p:input>
-        </p:identity>
-        <p:for-each name="fix-ids">
-            <p:documentation>Add missing IDs</p:documentation>
-            <p:output port="result" sequence="true"/>
-            <px:html-id-fixer/>
-        </p:for-each>
-        <!--TODO create other nav types (configurable ?)-->
-        <px:epub3-nav-create-navigation-doc>
-            <p:with-option name="output-base-uri" select="concat($content-dir,'toc.xhtml')">
-                <p:empty/>
-            </p:with-option>
-        </px:epub3-nav-create-navigation-doc>
-        <px:message message="Navigation Document Created."/>
-        <p:identity name="navigation-doc"/>
-        <p:sink/>
-        <px:fileset-update name="update">
-            <p:input port="source.fileset">
-                <p:pipe step="move" port="result.fileset"/>
-            </p:input>
-            <p:input port="source.in-memory">
+    <p:choose name="add-navigation-doc">
+        <p:xpath-context>
+            <p:pipe step="move" port="result.fileset"/>
+        </p:xpath-context>
+        <p:when test="//d:file[@nav='true']">
+            <p:output port="fileset" primary="true"/>
+            <p:output port="in-memory" sequence="true">
                 <p:pipe step="move" port="result.in-memory"/>
-            </p:input>
-            <p:input port="update">
-                <p:pipe step="fix-ids" port="result"/>
-            </p:input>
-        </px:fileset-update>
-        <px:fileset-add-entry media-type="application/xhtml+xml" name="add-entry">
-            <p:input port="source.in-memory">
-                <p:pipe step="update" port="result.in-memory"/>
-            </p:input>
-            <p:input port="entry">
-                <p:pipe step="navigation-doc" port="result"/>
-            </p:input>
-        </px:fileset-add-entry>
-    </p:group>
+            </p:output>
+            <p:identity>
+                <p:input port="source">
+                    <p:pipe step="move" port="result.fileset"/>
+                </p:input>
+            </p:identity>
+        </p:when>
+        <p:otherwise>
+            <p:output port="fileset" primary="true"/>
+            <p:output port="in-memory" sequence="true">
+                <p:pipe step="add-entry" port="result.in-memory"/>
+            </p:output>
+            <p:identity>
+                <p:input port="source">
+                    <p:pipe step="content-docs" port="in-memory"/>
+                </p:input>
+            </p:identity>
+            <p:for-each name="fix-ids">
+                <p:documentation>Add missing IDs</p:documentation>
+                <p:output port="result" sequence="true"/>
+                <px:html-id-fixer/>
+            </p:for-each>
+            <!--TODO create other nav types (configurable ?)-->
+            <px:epub3-nav-create-navigation-doc>
+                <p:with-option name="output-base-uri" select="concat($content-dir,'toc.xhtml')">
+                    <p:empty/>
+                </p:with-option>
+            </px:epub3-nav-create-navigation-doc>
+            <px:message message="Navigation Document Created."/>
+            <p:identity name="navigation-doc"/>
+            <p:sink/>
+            <px:fileset-update name="update">
+                <p:input port="source.fileset">
+                    <p:pipe step="move" port="result.fileset"/>
+                </p:input>
+                <p:input port="source.in-memory">
+                    <p:pipe step="move" port="result.in-memory"/>
+                </p:input>
+                <p:input port="update">
+                    <p:pipe step="fix-ids" port="result"/>
+                </p:input>
+            </px:fileset-update>
+            <px:fileset-add-entry media-type="application/xhtml+xml" name="add-entry">
+                <p:input port="source.in-memory">
+                    <p:pipe step="update" port="result.in-memory"/>
+                </p:input>
+                <p:input port="entry">
+                    <p:pipe step="navigation-doc" port="result"/>
+                </p:input>
+                <p:with-param port="file-attributes" name="nav" select="'true'"/>
+            </px:fileset-add-entry>
+        </p:otherwise>
+    </p:choose>
     <p:sink/>
 
     <!--=========================================================================-->
@@ -452,17 +470,16 @@
                 <p:pipe step="metadata" port="result"/>
             </p:input>
             <p:with-option name="output-base-uri" select="concat($content-dir,'package.opf')"/>
-            <p:with-option name="nav-uri" select="base-uri(/*)">
-                <p:pipe step="add-navigation-doc" port="doc"/>
-            </p:with-option>
         </px:epub3-pub-create-package-doc>
         <px:message message="Package Document Created."/>
         <p:identity name="package-doc"/>
         <p:sink/>
-        <px:fileset-add-entry media-type="application/oebps-package+xml" name="add-entry">
+        <p:delete match="d:file/@nav">
             <p:input port="source">
                 <p:pipe step="add-mediaoverlays" port="fileset"/>
             </p:input>
+        </p:delete>
+        <px:fileset-add-entry media-type="application/oebps-package+xml" name="add-entry">
             <p:input port="source.in-memory">
                 <p:pipe step="add-mediaoverlays" port="in-memory"/>
             </p:input>

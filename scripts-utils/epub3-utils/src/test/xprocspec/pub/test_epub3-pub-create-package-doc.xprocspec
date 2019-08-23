@@ -207,7 +207,6 @@
 					</d:fileset>
 				</x:document>
 			</x:input>
-			<x:option name="nav-uri" select="''"/>
 			<x:option name="cover-image" select="''"/>
 			<x:option name="compatibility-mode" select="'false'"/>
 			<x:option name="detect-properties" select="'true'"/>
