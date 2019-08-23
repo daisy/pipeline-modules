@@ -22,6 +22,12 @@
             documents</a>, <a
             href="http://www.idpf.org/epub/301/spec/epub-publications.html#gloss-media-overlay-document">media
             overlay documents</a> and other resources.</p>
+            <p>If this fileset includes a navigation document, it should be marked with a
+            <code>nav</code> attribute with value <code>true</code>, and this file should be a
+            content document. At most one navigation document may be specified. If no navigation
+            document is specified, the content document that contains a
+            <code>nav[@epub:type='toc']</code> element is picked. It is an error if there is no such
+            document.</p>
         </p:documentation>
     </p:input>
 
@@ -73,14 +79,6 @@
         </p:documentation>
         <p:empty/>
     </p:input>
-    <p:option name="nav-uri" select="''">
-        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <p>URI of the file that is to be used as the navigation document.</p>
-            <p>Must be a content document.</p>
-            <p>If not specified, the content document that contains a
-            <code>nav[@epub:type='toc']</code> element is picked.</p>
-        </p:documentation>
-    </p:option>
     <p:option name="cover-image" required="false" select="''">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>URI of the file that is to be marked as the <a
@@ -225,17 +223,19 @@
     <p:group name="nav-doc">
         <p:output port="result"/>
         <p:choose>
-            <p:when test="not($nav-uri='')">
-                <px:fileset-load>
-                    <p:input port="fileset">
+            <p:xpath-context>
+                <p:pipe step="content-docs" port="fileset"/>
+            </p:xpath-context>
+            <p:when test="//d:file[@nav='true']">
+                <p:delete match="d:file[not(@nav='true')]">
+                    <p:input port="source">
                         <p:pipe step="content-docs" port="fileset"/>
                     </p:input>
+                </p:delete>
+                <px:fileset-load>
                     <p:input port="in-memory">
                         <p:pipe step="content-docs" port="in-memory"/>
                     </p:input>
-                    <p:with-option name="href" select="resolve-uri($nav-uri,base-uri(/*))">
-                        <p:pipe step="main" port="source.fileset"/>
-                    </p:with-option>
                 </px:fileset-load>
             </p:when>
             <p:otherwise>
@@ -246,7 +246,8 @@
                 </p:split-sequence>
             </p:otherwise>
         </p:choose>
-        <px:assert message="There must be exactly one navigation document in the fileset" test-count-min="1" test-count-max="1" error-code="PEPU14"/>
+        <px:assert message="There must be exactly one navigation document in the fileset"
+                   test-count-min="1" test-count-max="1" error-code="PEPU14"/>
         <px:message severity="DEBUG" message="Navigation document extracted from fileset"/>
     </p:group>
     <p:sink/>
