@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
+                xmlns:c="http://www.w3.org/ns/xproc-step"
                 exclude-inline-prefixes="px"
                 type="px:fileset-add-entry" name="main">
 
@@ -50,9 +52,32 @@
   <p:option name="ref" select="''"><!-- if relative; will be resolved relative to the file --></p:option>
   <p:option name="original-href" select="''"><!-- if relative; will be resolved relative to the file --></p:option>
   <p:option name="first" select="'false'"/>
+  <p:option name="replace-attributes" select="'false'"/>
 
-  <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
-  <p:import href="fileset-add-ref.xpl"/>
+  <p:input port="file-attributes" kind="parameter" primary="false">
+    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <p>Additional attributes to add to the new d:file entry, or to the existing entry if the
+      fileset already contained a file with the same URI as the provided entry and if
+      <code>replace-attributes</code> is set to <code>true</code>.</p>
+      <p>Attributes named <code>href</code>, <code>original-href</code> or <code>media-type</code>
+      are not allowed.</p>
+    </p:documentation>
+    <p:inline>
+      <c:param-set/>
+    </p:inline>
+  </p:input>
+
+  <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
+    <p:documentation>
+      px:assert
+      px:message
+    </p:documentation>
+  </p:import>
+  <p:import href="fileset-add-ref.xpl">
+    <p:documentation>
+      px:fileset-add-ref
+    </p:documentation>
+  </p:import>
 
   <p:variable name="fileset-base" select="/*/@xml:base"/>
 
@@ -155,6 +180,44 @@
   </p:choose>
   <p:delete match="/*/@xml:base"/>
   </p:group>
+  <!--
+      add custom attributes
+  -->
+  <p:identity name="entry-without-attributes"/>
+  <p:sink/>
+  <p:xslt>
+    <p:input port="source">
+      <p:pipe step="main" port="file-attributes"/>
+    </p:input>
+    <p:input port="stylesheet">
+      <p:inline>
+        <xsl:stylesheet version="2.0">
+          <xsl:template match="/*">
+            <d:file>
+              <xsl:for-each select="*">
+                <xsl:attribute name="{@name}" select="@value"/>
+              </xsl:for-each>
+            </d:file>
+          </xsl:template>
+        </xsl:stylesheet>
+      </p:inline>
+    </p:input>
+    <p:input port="parameters">
+      <p:empty/>
+    </p:input>
+  </p:xslt>
+  <px:assert message="href, original-href and media-type are not allowed file attributes" error-code="XXXXX" name="attributes">
+    <p:with-option name="test" select="not(exists(/d:file[@href or @original-href or @media-type]))"/>
+  </px:assert>
+  <p:sink/>
+  <p:set-attributes match="/*">
+    <p:input port="source">
+      <p:pipe step="entry-without-attributes" port="result"/>
+    </p:input>
+    <p:input port="attributes">
+      <p:pipe step="attributes" port="result"/>
+    </p:input>
+  </p:set-attributes>
   <p:identity name="new-entry"/>
 
   <!-- Insert the entry as the last or first child of the file set - unless it already exists -->
@@ -179,6 +242,19 @@
         <p:output port="in-memory" sequence="true">
           <p:pipe step="main" port="source.in-memory"/>
         </p:output>
+        <p:choose>
+          <p:when test="$replace-attributes='true'">
+            <p:set-attributes>
+              <p:input port="attributes">
+                <p:pipe step="new-entry" port="result"/>
+              </p:input>
+              <p:with-option name="match" select="concat('d:file[@href=&quot;',$href-normalized,'&quot;]')"/>
+            </p:set-attributes>
+          </p:when>
+          <p:otherwise>
+            <p:identity/>
+          </p:otherwise>
+        </p:choose>
         <p:identity/>
       </p:when>
       <p:otherwise>
