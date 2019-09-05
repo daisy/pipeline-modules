@@ -15,6 +15,7 @@ import org.daisy.pipeline.braille.common.Query.MutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractTransformProvider<T extends Transform> implements TransformProvider<T> {
 	
@@ -189,11 +190,15 @@ public abstract class AbstractTransformProvider<T extends Transform> implements 
 			);
 		}
 		
+		private static final Logger fallbackLogger = LoggerFactory.getLogger(AbstractTransformProvider.class);
+		
 		public static com.google.common.base.Function<Logger,Void> debug(final String message) {
 			return new com.google.common.base.Function<Logger,Void>() {
 				public Void apply(Logger logger) {
 					if (logger != null)
 						logger.debug(message);
+					else
+						fallbackLogger.debug(message);
 					return null;
 				}
 			};
@@ -204,6 +209,8 @@ public abstract class AbstractTransformProvider<T extends Transform> implements 
 				public Void apply(Logger logger) {
 					if (logger != null)
 						logger.info(message);
+					else
+						fallbackLogger.debug(message);
 					return null;
 				}
 			};
@@ -214,6 +221,8 @@ public abstract class AbstractTransformProvider<T extends Transform> implements 
 				public Void apply(Logger logger) {
 					if (logger != null)
 						logger.warn(message);
+					else
+						fallbackLogger.debug(message);
 					return null;
 				}
 			};
