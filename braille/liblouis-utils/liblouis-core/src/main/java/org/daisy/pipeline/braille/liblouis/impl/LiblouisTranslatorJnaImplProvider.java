@@ -326,6 +326,10 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 						}
 						return LiblouisTranslatorImpl.this.transform(text, typeform);
 					}
+					@Override
+					public String toString() {
+						return LiblouisTranslatorImpl.this.toString();
+					}
 				};
 			return fromTypeformedTextToBraille;
 		}
@@ -343,6 +347,10 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 							return result.subList(from, to);
 						else
 							return result;
+					}
+					@Override
+					public String toString() {
+						return LiblouisTranslatorImpl.this.toString();
 					}
 				};
 			return fromStyledTextToBraille;
@@ -367,7 +375,12 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 							else
 								return result;
 						}
-					});
+					}) {
+						@Override
+						public String toString() {
+							return LiblouisTranslatorImpl.this.toString();
+						}
+					};
 			return lineBreakingFromStyledText;
 		}
 		
