@@ -25,6 +25,7 @@ import org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Function
 import org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Iterables;
 import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.debug;
 import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Iterables.fromNullable;
+import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Iterables.intersection;
 import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Iterables.of;
 import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Iterables.transform;
 import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.logCreate;
@@ -128,12 +129,16 @@ public class LibhyphenJnaImpl extends AbstractTransformProvider<LibhyphenHyphena
 		if (q.containsKey("hyphenator")) {
 			String v = q.removeOnly("hyphenator").getValue().get();
 			if (!"hyphen".equals(v)) {
-				if (!q.isEmpty())
-					return empty;
+				Iterable<LibhyphenHyphenator> ret;
 				LibhyphenHyphenator h = fromId(v);
 				if (h != null)
-					return fromNullable(h);
-				return of(get(asURI(v))); }}
+					ret = fromNullable(h);
+				else
+					ret = of(get(asURI(v)));
+				if (q.isEmpty())
+					return ret;
+				else
+					return intersection(_get(q), ret); }}
 		String table = null;
 		if (q.containsKey("libhyphen-table"))
 			table = q.removeOnly("libhyphen-table").getValue().get();
@@ -276,6 +281,20 @@ public class LibhyphenJnaImpl extends AbstractTransformProvider<LibhyphenHyphena
 		public ToStringHelper toStringHelper() {
 			return MoreObjects.toStringHelper("o.d.p.b.libhyphen.impl.LibhyphenJnaImpl$LibhyphenHyphenatorImpl")
 				.add("table", table);
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if (this == o)
+				return true;
+			if (o == null)
+				return false;
+			if (getClass() != o.getClass())
+				return false;
+			LibhyphenHyphenatorImpl that = (LibhyphenHyphenatorImpl)o;
+			if (!this.table.equals(that.table))
+				return false;
+			return true;
 		}
 	}
 	
