@@ -228,6 +228,12 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 								if (locale != null)
 									hyphenatorQuery.add("locale", locale);
 								Iterable<Hyphenator> hyphenators = logSelect(hyphenatorQuery.asImmutable(), hyphenatorProvider);
+								if (locale != null && !"auto".equals(hyphenator)) {
+									// also search without locale because locale might only refer to translator itself
+									hyphenatorQuery.removeAll("locale");
+									hyphenators = concat(
+										hyphenators,
+										logSelect(hyphenatorQuery.asImmutable(), hyphenatorProvider)); }
 								translators = concat(
 									translators,
 									transform(
