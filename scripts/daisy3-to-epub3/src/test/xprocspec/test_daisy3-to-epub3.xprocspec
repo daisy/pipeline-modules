@@ -38,7 +38,7 @@
 					<d:file href="result/epub/EPUB/mo/book-1.smil" media-type="application/smil+xml"/>
 					<d:file href="result/epub/EPUB/mo/book-2.smil" media-type="application/smil+xml"/>
 					<d:file href="result/epub/EPUB/package.opf" media-type="application/oebps-package+xml"/>
-					<d:file href="result/epub/META-INF/container.xml"/>
+					<d:file href="result/epub/META-INF/container.xml" media-type="application/xml"/>
 				</d:fileset>
 			</x:document>
 		</x:expect>

@@ -83,7 +83,7 @@
 					<d:file href="output-dir/epub/EPUB/style_1.css" media-type="text/css"/>
 					<d:file href="output-dir/epub/EPUB/toc.xhtml" media-type="application/xhtml+xml"/>
 					<d:file href="output-dir/epub/EPUB/package.opf" media-type="application/oebps-package+xml"/>
-					<d:file href="output-dir/epub/META-INF/container.xml"/>
+					<d:file href="output-dir/epub/META-INF/container.xml" media-type="application/xml"/>
 				</d:fileset>
 			</x:document>
 		</x:expect>

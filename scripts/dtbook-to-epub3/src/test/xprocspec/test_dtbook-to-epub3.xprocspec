@@ -65,7 +65,7 @@
 					<d:file href="epub3/out/epub/EPUB/mo/minimal-1.smil" media-type="application/smil+xml"/>
 					<d:file href="epub3/out/epub/EPUB/mo/minimal-2.smil" media-type="application/smil+xml"/>
 					<d:file href="epub3/out/epub/EPUB/package.opf" media-type="application/oebps-package+xml"/>
-					<d:file href="epub3/out/epub/META-INF/container.xml"/>
+					<d:file href="epub3/out/epub/META-INF/container.xml" media-type="application/xml"/>
 				</d:fileset>
 			</x:document>
 		</x:expect>
