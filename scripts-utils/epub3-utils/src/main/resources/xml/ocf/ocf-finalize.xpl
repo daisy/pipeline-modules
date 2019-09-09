@@ -179,29 +179,29 @@
             </p:identity>
         </p:otherwise>
     </p:choose>
-    <pxi:fileset-add-ocf-entry path="META-INF/container.xml">
+    <pxi:fileset-add-ocf-entry path="META-INF/container.xml" media-type="application/xml">
         <p:input port="source">
             <p:pipe port="result" step="create-container-descriptor"/>
         </p:input>
     </pxi:fileset-add-ocf-entry>
-    <pxi:fileset-add-ocf-entry path="META-INF/metadata.xml">
+    <pxi:fileset-add-ocf-entry path="META-INF/metadata.xml" media-type="application/xml">
         <p:input port="source">
             <p:pipe port="metadata" step="main"/>
         </p:input>
     </pxi:fileset-add-ocf-entry>
-    <pxi:fileset-add-ocf-entry path="META-INF/rights.xml">
+    <pxi:fileset-add-ocf-entry path="META-INF/rights.xml" media-type="application/xml">
         <p:input port="source">
             <p:pipe port="rights" step="main"/>
         </p:input>
     </pxi:fileset-add-ocf-entry>
-    <pxi:fileset-add-ocf-entry path="META-INF/signature.xml">
+    <pxi:fileset-add-ocf-entry path="META-INF/signature.xml" media-type="application/xml">
         <p:input port="source">
             <p:pipe port="signature" step="main"/>
         </p:input>
     </pxi:fileset-add-ocf-entry>
     <p:identity name="before-odf"/>
     <!-- Finally -->
-    <pxi:fileset-add-ocf-entry path="META-INF/manifest.xml">
+    <pxi:fileset-add-ocf-entry path="META-INF/manifest.xml" media-type="application/xml">
         <p:input port="source">
             <p:pipe port="result" step="create-odf-manifest"/>
         </p:input>
