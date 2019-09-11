@@ -8,6 +8,9 @@
     <p:input port="in-memory.in" sequence="true"/>
 
     <p:output port="result" primary="false">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>A <code>c:result</code> document containing the URI of the ZIP file.</p>
+        </p:documentation>
         <p:pipe port="result" step="zip"/>
     </p:output>
 
