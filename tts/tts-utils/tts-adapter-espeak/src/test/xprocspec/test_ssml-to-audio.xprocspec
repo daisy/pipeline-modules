@@ -28,12 +28,11 @@
 				<x:document type="inline">
 					<config>
 						<voice engine="espeak" name="dutch" gender="male-adult" priority="100" lang="en"/>
-						<!-- log can be found in output-dir/tts-log.xml -->
+						<!-- log can be found in "log" output -->
 						<property key="log" value="true"/>
 					</config>
 				</x:document>
 			</x:input>
-			<x:option name="output-dir" select="resolve-uri('output-dir/',$temp-dir)"/>
 		</x:call>
 		<x:context label="the result port">
 			<x:document type="port" port="result"/>

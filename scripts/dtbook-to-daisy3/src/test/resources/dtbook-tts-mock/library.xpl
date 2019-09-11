@@ -27,8 +27,11 @@
       </p:inline>
     </p:output>
 	
+    <p:output port="log" sequence="true">
+      <p:empty/>
+    </p:output>
+
     <p:option name="audio" required="false" px:type="boolean" select="'true'"/>
-    <p:option name="output-dir" required="false" select="''"/>
 
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/dtbook-break-detection/library.xpl"/>

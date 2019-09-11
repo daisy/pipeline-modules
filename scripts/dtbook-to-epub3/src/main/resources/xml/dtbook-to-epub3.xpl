@@ -33,6 +33,17 @@ When text-to-speech is enabled, the conversion may output a (incomplete) EPUB 3 
       <p:pipe step="convert-and-store" port="validation-status"/>
     </p:output>
 
+    <p:output port="tts-log" sequence="true">
+      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+        <h2 px:role="name">TTS log</h2>
+        <p px:role="desc" xml:space="preserve">Log file with information about text-to-speech process.
+
+Can be enabled or disabled with the [`org.daisy.pipeline.tts.log`](http://daisy.github.io/pipeline/modules/tts-common/doc/tts-config.html#common-settings) property.
+        </p>
+      </p:documentation>
+      <p:pipe step="convert-and-store" port="tts-log"/>
+    </p:output>
+
     <p:option name="language" required="false" px:type="string" select="''">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h2 px:role="name">Language code</h2>
@@ -108,6 +119,9 @@ split up if they exceed the given maximum size.</p>
     <p:group name="convert-and-store">
         <p:output port="validation-status">
           <p:pipe step="convert" port="validation-status"/>
+        </p:output>
+        <p:output port="tts-log">
+          <p:pipe step="convert" port="tts-log"/>
         </p:output>
 
         <p:variable name="output-name" select="replace(replace(base-uri(/),'^.*/([^/]+)$','$1'),'\.[^\.]*$','')">

@@ -68,6 +68,10 @@
     <p:pipe step="synthesize" port="status"/>
   </p:output>
 
+  <p:output port="log" sequence="true">
+    <p:pipe step="synthesize" port="log"/>
+  </p:output>
+
   <p:option name="audio" required="false" px:type="boolean" select="'true'">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
       <h2 px:role="name">Enable Text-To-Speech</h2>
@@ -100,17 +104,10 @@
     </p:documentation>
   </p:option>
 
-  <p:option name="output-dir" required="true">
-    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-      <h2 px:role="name">Output directory</h2>
-      <p px:role="desc">Output directory for log files or other things.</p>
-    </p:documentation>
-  </p:option>
-
   <p:option name="temp-dir" select="''">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
       <p>Empty directory dedicated to this conversion. May be left empty in which case a temporary
-      directory will be automaticall created.</p>
+      directory will be automatically created.</p>
     </p:documentation>
   </p:option>
 
@@ -182,6 +179,9 @@
           <d:status result="ok"/>
         </p:inline>
       </p:output>
+      <p:output port="log" sequence="true">
+        <p:empty/>
+      </p:output>
       <p:sink/>
     </p:when>
 
@@ -198,6 +198,9 @@
       </p:output>
       <p:output port="status">
         <p:pipe step="to-audio" port="status"/>
+      </p:output>
+      <p:output port="log" sequence="true">
+        <p:pipe step="to-audio" port="log"/>
       </p:output>
       <p:for-each name="loop">
         <p:output port="ssml.out" primary="true" sequence="true">
@@ -236,9 +239,6 @@
         <p:input port="config">
           <p:pipe port="config" step="main"/>
         </p:input>
-        <p:with-option name="output-dir" select="$output-dir">
-          <p:empty/>
-        </p:with-option>
         <p:with-option name="temp-dir" select="if ($temp-dir!='') then concat($temp-dir,'audio/') else ''">
           <p:empty/>
         </p:with-option>
