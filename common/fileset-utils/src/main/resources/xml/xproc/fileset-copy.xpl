@@ -33,6 +33,13 @@
         </p:documentation>
         <p:pipe step="in-memory" port="result"/>
     </p:output>
+    <p:output port="mapping">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>A <code>d:fileset</code> document that contains the mapping from the source files
+            (<code>@original-href</code>)to the copied files (<code>@href</code>).</p>
+        </p:documentation>
+        <p:pipe step="mapping" port="result"/>
+    </p:output>
 
     <p:option name="target" required="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -118,6 +125,16 @@
 
     <p:delete match="/*/*/@href-before-move"/>
     <p:identity name="fileset"/>
+    <p:sink/>
+
+    <p:label-elements match="d:file" attribute="original-href" label="@href-before-move" replace="true">
+        <p:input port="source">
+            <p:pipe step="fileset.with-href-before-move" port="result"/>
+        </p:input>
+    </p:label-elements>
+    <p:delete match="/*/*[not(self::d:file)]"/>
+    <p:delete match="d:file/@*[not(name()=('href','original-href'))]" name="mapping"/>
+    <p:sink/>
 
     <p:documentation>Update the base URI of the in-memory documents</p:documentation>
     <p:for-each>
@@ -133,12 +150,12 @@
             </p:variable>
             <p:choose>
                 <p:xpath-context>
-                    <p:pipe step="fileset.with-href-before-move" port="result"/>
+                    <p:pipe step="mapping" port="result"/>
                 </p:xpath-context>
-                <p:when test="$base-uri=/*/d:file/@href-before-move">
+                <p:when test="$base-uri=/*/d:file/@original-href">
                     <px:set-base-uri>
-                        <p:with-option name="base-uri" select="(/*/d:file[@href-before-move=$base-uri])[1]/resolve-uri(@href,base-uri(.))">
-                            <p:pipe step="fileset.with-href-before-move" port="result"/>
+                        <p:with-option name="base-uri" select="(/*/d:file[@original-href=$base-uri])[1]/resolve-uri(@href,base-uri(.))">
+                            <p:pipe step="mapping" port="result"/>
                         </p:with-option>
                     </px:set-base-uri>
                 </p:when>
@@ -149,5 +166,6 @@
         </p:group>
     </p:for-each>
     <p:identity name="in-memory"/>
+    <p:sink/>
 
 </p:declare-step>

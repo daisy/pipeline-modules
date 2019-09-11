@@ -11,7 +11,7 @@
 
 	<p:input port="source">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			<p>A d:fileset document that was returned on the "delete" port of px:fileset-move.</p>
+			<p>A d:fileset document that was returned on the "mapping" port of px:fileset-move.</p>
 		</p:documentation>
 	</p:input>
 
@@ -22,10 +22,10 @@
 	</p:import>
 
 	<p:for-each>
-		<p:iteration-source select="//d:file[@original-href]"/>
+		<p:iteration-source select="//d:file[@original-href and @to-delete]"/>
 		<p:variable name="href" select="/*/@original-href"/>
 		<p:choose>
-			<p:when test="/*/@to-delete and not(contains($href,'!/'))">
+			<p:when test="not(contains($href,'!/'))">
 				<px:delete px:message="Deleting {$href}">
 					<p:with-option name="href" select="$href"/>
 				</px:delete>
