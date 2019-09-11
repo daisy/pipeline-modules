@@ -24,14 +24,14 @@
 
     <xsl:template match="d:clip/@src">
         <xsl:variable name="src" select="resolve-uri(.,pf:base-uri(.))"/>
-        <xsl:variable name="file" as="element()?" select="$mapping[@original-href=$src]"/>
+        <xsl:variable name="file" as="element()?" select="$mapping//d:file[@original-href=$src]"/>
         <xsl:variable name="src" select="($file/@href,$src)[1]"/>
         <xsl:attribute name="src" select="pf:relativize-uri($src,$output-base-uri)"/>
     </xsl:template>
 
     <xsl:template mode="#default absolute-hrefs" match="@*|node()">
         <xsl:copy>
-            <xsl:apply-templates select="@*|node()"/>
+            <xsl:apply-templates mode="#current" select="@*|node()"/>
         </xsl:copy>
     </xsl:template>
 
