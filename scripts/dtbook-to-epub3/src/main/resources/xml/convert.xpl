@@ -14,6 +14,9 @@
 	<p:output port="validation-status" px:media-type="application/vnd.pipeline.status+xml">
 		<p:pipe step="zedai-to-epub3" port="validation-status"/>
 	</p:output>
+	<p:output port="tts-log" sequence="true">
+		<p:pipe step="zedai-to-epub3" port="tts-log"/>
+	</p:output>
 
 	<p:input port="tts-config"/>
 

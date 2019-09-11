@@ -35,6 +35,17 @@ When text-to-speech is enabled, the conversion may output a (incomplete) DAISY 3
     <p:pipe step="convert" port="validation-status"/>
   </p:output>
 
+  <p:output port="tts-log" sequence="true">
+    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <h2 px:role="name">TTS log</h2>
+      <p px:role="desc" xml:space="preserve">Log file with information about text-to-speech process.
+
+      Can be enabled or disabled with the [`org.daisy.pipeline.tts.log`](http://daisy.github.io/pipeline/modules/tts-common/doc/tts-config.html#common-settings) property.
+      </p>
+    </p:documentation>
+    <p:pipe step="convert" port="tts-log"/>
+  </p:output>
+
   <p:option name="publisher" required="false" px:type="string" select="''">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
       <h2 px:role="name">Publisher</h2>

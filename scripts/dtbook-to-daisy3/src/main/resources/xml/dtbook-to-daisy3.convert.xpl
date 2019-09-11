@@ -54,6 +54,10 @@
     <p:pipe step="validation-status" port="result"/>
   </p:output>
 
+  <p:output port="tts-log" sequence="true">
+    <p:pipe step="tts" port="log"/>
+  </p:output>
+
   <p:input port="fileset.in">
     <p:documentation>
       A fileset containing references to all the DTBook files and any
@@ -123,7 +127,11 @@
       px:fileset-join
     </p:documentation>
   </p:import>
-  <p:import href="http://www.daisy.org/pipeline/modules/dtbook-tts/library.xpl"/>
+  <p:import href="http://www.daisy.org/pipeline/modules/dtbook-tts/library.xpl">
+    <p:documentation>
+      px:tts-for-dtbook
+    </p:documentation>
+  </p:import>
   <p:import href="http://www.daisy.org/pipeline/modules/smil-utils/library.xpl">
     <p:documentation>
       px:audio-clips-to-fileset
@@ -179,7 +187,6 @@
       <p:pipe step="main" port="tts-config"/>
     </p:input>
     <p:with-option name="audio" select="$audio"/>
-    <p:with-option name="output-dir" select="$output-fileset-base"/>
   </px:tts-for-dtbook>
 
   <!-- ===== MP3/OGG FILESET ENTRIES (THE FILES ARE ALREADY STORED) ==== -->

@@ -35,6 +35,9 @@
         </p:documentation>
         <p:pipe step="html-to-epub3" port="temp-audio-files"/>
     </p:output>
+    <p:output port="tts-log" sequence="true">
+        <p:pipe step="html-to-epub3" port="tts-log"/>
+    </p:output>
   
     <p:option name="output-dir" required="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">

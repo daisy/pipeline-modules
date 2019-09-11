@@ -51,6 +51,9 @@
         </p:documentation>
         <p:pipe step="add-mediaoverlays" port="temp-audio.fileset"/>
     </p:output>
+    <p:output port="tts-log" sequence="true">
+        <p:pipe step="tts" port="log"/>
+    </p:output>
 
     <p:option name="output-dir" required="true"/>
     <p:option name="temp-dir" select="''">
@@ -379,7 +382,6 @@
           <p:pipe step="main" port="tts-config"/>
       </p:input>
       <p:with-option name="audio" select="$audio"/>
-      <p:with-option name="output-dir" select="$output-dir"/>
       <p:with-option name="temp-dir" select="$temp-dir"/>
     </px:tts-for-epub3>
 
