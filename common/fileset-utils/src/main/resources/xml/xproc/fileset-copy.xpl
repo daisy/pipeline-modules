@@ -75,6 +75,8 @@
         </p:input>
     </pxi:fileset-fix-original-hrefs>
 
+    <p:label-elements match="/*/d:file" attribute="href-before-move" label="resolve-uri(@href, base-uri(.))"/>
+
     <p:documentation>Flatten fileset</p:documentation>
     <p:choose>
         <p:when test="$flatten='true'">
@@ -107,8 +109,6 @@
             </p:otherwise>
         </p:choose>
     </p:viewport>
-
-    <p:label-elements match="/*/d:file" attribute="href-before-move" label="resolve-uri(@href, base-uri(.))"/>
 
     <p:documentation>Set the base directory to the target directory</p:documentation>
     <px:set-base-uri>
