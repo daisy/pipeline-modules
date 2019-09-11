@@ -55,7 +55,11 @@
         <p:pipe step="tts" port="log"/>
     </p:output>
 
-    <p:option name="output-dir" required="true"/>
+    <p:option name="output-dir" required="true">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Root directory of the (expanded) EPUB 3.</p>
+        </p:documentation>
+    </p:option>
     <p:option name="temp-dir" select="''">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>Empty directory dedicated to this conversion. May be left empty in which
@@ -119,10 +123,7 @@
     </p:import>
     <p:import href="html-to-opf-metadata.xpl"/>
 
-    <p:variable name="epub-dir" select="concat($output-dir,'epub/')">
-        <p:empty/>
-    </p:variable>
-    <p:variable name="content-dir" select="concat($epub-dir,'EPUB/')">
+    <p:variable name="content-dir" select="concat($output-dir,'EPUB/')">
         <p:empty/>
     </p:variable>
 
@@ -501,7 +502,7 @@
         px:epub3-ocf-finalize expects
     -->
     <px:fileset-rebase>
-        <p:with-option name="new-base" select="$epub-dir"/>
+        <p:with-option name="new-base" select="$output-dir"/>
     </px:fileset-rebase>
 
     <!--TODO clean file set for non-existing files ?-->

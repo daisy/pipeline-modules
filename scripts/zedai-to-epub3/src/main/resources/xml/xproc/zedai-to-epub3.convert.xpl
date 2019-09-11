@@ -186,7 +186,7 @@
             <p:pipe step="main" port="tts-config"/>
         </p:input>
         <p:with-option name="audio" select="$audio"/>
-        <p:with-option name="output-dir" select="$output-dir"/>
+        <p:with-option name="output-dir" select="concat($output-dir,'epub/')"/>
         <p:with-option name="temp-dir" select="$temp-dir"/>
     </px:html-to-epub3>
     <p:sink/>

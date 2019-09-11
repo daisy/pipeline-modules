@@ -88,7 +88,7 @@ element in the OPF namespace. If not specified, metadata is extracted from the H
             <p:input port="input.in-memory">
                 <p:pipe step="html" port="result"/>
             </p:input>
-            <p:with-option name="output-dir" select="$output-dir-uri">
+            <p:with-option name="output-dir" select="concat($output-dir-uri,'epub/')">
                 <p:empty/>
             </p:with-option>
             <p:input port="metadata">
