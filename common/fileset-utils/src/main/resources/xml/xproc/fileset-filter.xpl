@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step version="1.0" type="px:fileset-filter" name="main" xmlns:p="http://www.w3.org/ns/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data"
-    xmlns:px="http://www.daisy.org/ns/pipeline/xproc" xmlns:c="http://www.w3.org/ns/xproc-step" exclude-inline-prefixes="px" xpath-version="2.0">
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
+                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                xmlns:d="http://www.daisy.org/ns/pipeline/data"
+                exclude-inline-prefixes="px" xpath-version="2.0"
+                type="px:fileset-filter" name="main">
 
     <p:input port="source"/>
-    <p:output port="result"/>
+    <p:output port="result" primary="true">
+        <p:pipe step="result" port="result"/>
+    </p:output>
+    <p:output port="not-matched">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Files from "source" that are not included in "result", i.e. the files that were
+            filtered out.</p>
+        </p:documentation>
+        <p:pipe step="diff" port="result"/>
+    </p:output>
 
     <p:option name="href" select="''">
         <!-- href to the file in the fileset you want to retrieve. suppports the glob characters '*' and '?', i.e. "*.txt" or "application/*+xml". -->
@@ -15,7 +27,7 @@
         <!-- space separated list of blacklisted media types. suppports the glob characters '*' and '?', i.e. "image/*" or "application/*+xml". -->
     </p:option>
 
-    <p:import href="fileset-library.xpl"/>
+    <p:import href="fileset-diff.xpl"/>
 
     <p:choose>
         <p:when test="$href=''">
@@ -58,5 +70,17 @@
             </p:delete>
         </p:otherwise>
     </p:choose>
+    <p:identity name="result"/>
+    <p:sink/>
+
+    <px:fileset-diff name="diff">
+        <p:input port="source">
+            <p:pipe step="main" port="source"/>
+        </p:input>
+        <p:input port="secondary">
+            <p:pipe step="result" port="result"/>
+        </p:input>
+    </px:fileset-diff>
+    <p:sink/>
 
 </p:declare-step>
