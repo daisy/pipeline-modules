@@ -31,13 +31,14 @@
         </p:documentation>
         <p:pipe step="copy" port="result.in-memory"/>
     </p:output>
-    <p:output port="delete.fileset">
+    <p:output port="mapping">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <p>The files to delete after the copy has been performed.</p>
+            <p>A <code>d:fileset</code> document that contains the mapping from the source files
+            (<code>@original-href</code>)to the moved files (<code>@href</code>).</p>
             <p>Pass this output to px:fileset-delete after the "result" output has been passed to
             px:fileset-store.</p>
         </p:documentation>
-        <p:pipe step="delete" port="result"/>
+        <p:pipe step="mapping" port="result"/>
     </p:output>
 
     <p:option name="target" required="true">
@@ -57,6 +58,7 @@
         </p:documentation>
     </p:option>
 
+    <p:import href="fileset-join.xpl"/>
     <p:import href="fileset-copy.xpl"/>
 
     <p:documentation>Copy the fileset</p:documentation>
@@ -70,9 +72,17 @@
     </px:fileset-copy>
 
     <p:documentation>Mark original files for removal</p:documentation>
-    <p:delete match="d:file[not(@original-href)]"/>
-    <p:label-elements match="d:file" attribute="href" label="@original-href" replace="true"/>
+    <p:delete match="d:file[not(@original-href)]|
+                     d:file/@*[not(name()=('href','original-href'))]"/>
     <p:add-attribute match="d:file" attribute-name="to-delete" attribute-value="true" name="delete"/>
+    <p:sink/>
+
+    <px:fileset-join name="mapping">
+        <p:input port="source">
+            <p:pipe step="copy" port="mapping"/>
+            <p:pipe step="delete" port="result"/>
+        </p:input>
+    </px:fileset-join>
     <p:sink/>
 
 </p:declare-step>

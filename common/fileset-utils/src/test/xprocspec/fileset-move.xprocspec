@@ -43,17 +43,19 @@
         </x:context>
         <x:expect type="xpath" label="should have the expected base-uri" test="base-uri(/)"
                   equals="resolve-uri('output-dir/a/a.html',$test-base-uri)"/>
-        <x:context label="the delete.fileset port">
-            <x:document type="port" port="delete.fileset"/>
+        <x:context label="the mapping port">
+            <x:document type="port" port="mapping"/>
         </x:context>
         <x:expect label="should be as expected" type="custom"
                   href="../../main/resources/xml/xproc/xprocspec-fileset-compare.xpl" step="x:fileset-compare">
             <x:document type="inline">
                 <d:fileset>
-                    <d:file href="samples/fileset2/c.gif"
+                    <d:file href="output-dir/c.gif"
                             original-href="samples/fileset2/c.gif"
                             to-delete="true"/>
-                    <d:file href="samples/fileset2/a/MimeDetector.java"
+                    <d:file href="output-dir/a/a.html"
+                            original-href="samples/fileset2/a/a.html"/>
+                    <d:file href="output-dir/a/MimeDetector.java"
                             original-href="samples/fileset2/a/MimeDetector.java"
                             to-delete="true"/>
                 </d:fileset>
@@ -99,17 +101,19 @@
         </x:context>
         <x:expect type="xpath" label="should have the expected base-uri" test="base-uri(/)"
                   equals="resolve-uri('output-dir/a/b.html',$test-base-uri)"/>
-        <x:context label="the delete.fileset port">
-            <x:document type="port" port="delete.fileset"/>
+        <x:context label="the mapping port">
+            <x:document type="port" port="mapping"/>
         </x:context>
         <x:expect label="should be as expected" type="custom"
                   href="../../main/resources/xml/xproc/xprocspec-fileset-compare.xpl" step="x:fileset-compare">
             <x:document type="inline">
                 <d:fileset>
-                    <d:file href="samples/fileset2/c.gif"
+                    <d:file href="output-dir/c.gif"
                             original-href="samples/fileset2/c.gif"
                             to-delete="true"/>
-                    <d:file href="samples/fileset2/a/MimeDetector.java"
+                    <d:file href="output-dir/a/b.html"
+                            original-href="samples/fileset2/a/b.html"/>
+                    <d:file href="output-dir/a/MimeDetector.java"
                             original-href="samples/fileset2/a/MimeDetector.java"
                             to-delete="true"/>
                 </d:fileset>
@@ -147,20 +151,20 @@
                 </d:fileset>
             </x:document>
         </x:expect>
-        <x:context label="the delete.fileset port">
-            <x:document type="port" port="delete.fileset"/>
+        <x:context label="the mapping port">
+            <x:document type="port" port="mapping"/>
         </x:context>
         <x:expect label="should be as expected" type="custom"
                   href="../../main/resources/xml/xproc/xprocspec-fileset-compare.xpl" step="x:fileset-compare">
             <x:document type="inline">
                 <d:fileset>
-                    <d:file href="samples/fileset2/c.gif"
+                    <d:file href="output-dir/c.gif"
                             original-href="samples/fileset2/c.gif"
                             to-delete="true"/>
-                    <d:file href="samples/fileset2/a.zip!/a.html"
+                    <d:file href="output-dir/a.zip!/a.html"
                             original-href="samples/fileset2/a.zip!/a.html"
                             to-delete="true"/>
-                    <d:file href="samples/fileset2/a/MimeDetector.java"
+                    <d:file href="output-dir/a/MimeDetector.java"
                             original-href="samples/fileset2/a/MimeDetector.java"
                             to-delete="true"/>
                 </d:fileset>

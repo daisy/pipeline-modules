@@ -44,7 +44,7 @@
             stored, the document on this port can be passed to px:fileset-delete to clean up the
             original files (or skip it to keep the original files).</p>
         </p:documentation>
-        <p:pipe step="audio" port="delete.fileset"/>
+        <p:pipe step="audio" port="mapping"/>
     </p:output>
 
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
@@ -92,8 +92,7 @@
             <p:pipe step="main" port="audio-map"/>
         </p:input>
         <p:input port="mapping">
-            <!-- no audio files are loaded in memory, so they all have a original-href attribute -->
-            <p:pipe step="audio" port="result.fileset"/>
+            <p:pipe step="audio" port="mapping"/>
         </p:input>
     </px:audio-clips-update-files>
     <p:sink/>

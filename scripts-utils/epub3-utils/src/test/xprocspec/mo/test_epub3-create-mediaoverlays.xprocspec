@@ -73,9 +73,9 @@
 		          type="custom" href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl" step="x:fileset-compare">
 			<x:document type="inline">
 				<d:fileset>
-					<d:file href="part_1.mp3" original-href="part_1.mp3" media-type="audio/mpeg" to-delete="true"/>
-					<d:file href="part_2.mp3" original-href="part_2.mp3" media-type="audio/mpeg" to-delete="true"/>
-					<d:file href="part_3.mp3" original-href="part_3.mp3" media-type="audio/mpeg" to-delete="true"/>
+					<d:file href="out/EPUB/audio/part_1.mp3" original-href="part_1.mp3" to-delete="true"/>
+					<d:file href="out/EPUB/audio/part_2.mp3" original-href="part_2.mp3" to-delete="true"/>
+					<d:file href="out/EPUB/audio/part_3.mp3" original-href="part_3.mp3" to-delete="true"/>
 				</d:fileset>
 			</x:document>
 		</x:expect>
