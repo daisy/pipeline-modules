@@ -22,6 +22,7 @@
 						<d:file href="images/Pict2.jpg" media-type="image/jpeg"/>
 						<d:file href="images/Pict3.jpg" media-type="image/jpeg"/>
 						<d:file href="images/Pict4.jpg" media-type="image/jpeg"/>
+						<d:file href="images/cover.jpg" media-type="image/jpeg"/>
 						<d:file href="scripts/impl.xhtml" media-type="application/xhtml+xml"/>
 					</d:fileset>
 				</x:document>
@@ -207,7 +208,7 @@
 					</d:fileset>
 				</x:document>
 			</x:input>
-			<x:option name="cover-image" select="''"/>
+			<x:option name="cover-image" select="'file:/tmp/epub/EPUB/images/cover.jpg'"/>
 			<x:option name="compatibility-mode" select="'true'"/>
 			<x:option name="detect-properties" select="'true'"/>
 			<x:option name="output-base-uri" select="'file:/tmp/epub/EPUB/package.opf'"/>
@@ -245,12 +246,13 @@
 						<item id="item_9" href="images/Pict2.jpg" media-type="image/jpeg"/>
 						<item id="item_10" href="images/Pict3.jpg" media-type="image/jpeg"/>
 						<item id="item_11" href="images/Pict4.jpg" media-type="image/jpeg"/>
-						<item id="item_12" href="scripts/impl.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+						<item id="item_12" href="images/cover.jpg" media-type="image/jpeg" properties="cover-image"/>
+						<item id="item_13" href="scripts/impl.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
 					</manifest>
 					<spine>
 						<itemref idref="item_1" id="itemref_1"/>
 						<itemref idref="item_2" id="itemref_2"/>
-						<itemref idref="item_12" id="itemref_3" linear="no"/>
+						<itemref idref="item_13" id="itemref_3" linear="no"/>
 					</spine>
 					<bindings>
 						<mediaType handler="item_13" media-type="application/x-demo-slideshow"/>
