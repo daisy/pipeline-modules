@@ -7,6 +7,7 @@ public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 		return new String[] {
 			pipelineModule("file-utils"),
 			pipelineModule("fileset-utils"),
+			pipelineModule("mediatype-utils"),
 		};
 	}
 }

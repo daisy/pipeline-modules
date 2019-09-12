@@ -70,11 +70,6 @@ element in the OPF namespace. If not specified, metadata is extracted from the H
             px:html-to-fileset
         </p:documentation>
     </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/mediatype-utils/library.xpl">
-        <p:documentation>
-            px:mediatype-detect
-        </p:documentation>
-    </p:import>
     <p:import href="html-to-epub3.convert.xpl">
         <p:documentation>
             px:html-to-epub3
@@ -110,7 +105,6 @@ element in the OPF namespace. If not specified, metadata is extracted from the H
                 <px:html-to-fileset/>
             </p:for-each>
             <px:fileset-join/>
-            <px:mediatype-detect/>
         </p:group>
 
         <px:html-to-epub3 name="convert">
