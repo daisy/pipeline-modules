@@ -8,7 +8,9 @@
                 exclude-inline-prefixes="px">
 
   <p:input port="fileset" primary="true"/>
-  <p:input port="in-memory" sequence="true"/>
+  <p:input port="in-memory" sequence="true">
+    <p:empty/>
+  </p:input>
   <p:output port="result" sequence="true">
     <p:pipe port="result" step="load"/>
   </p:output>
