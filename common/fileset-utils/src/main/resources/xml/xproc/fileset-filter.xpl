@@ -73,7 +73,7 @@
             <p:variable name="media-types-regexes" select="if ($media-types='') then '' else replace(replace(replace($media-types,'\+','\\+'),'\?','.'),'\*','.*')"/>
             <p:delete>
                 <p:with-option name="match"
-                    select="concat(&quot;//d:file[@media-type='' or not(some $media-type-regex in tokenize('&quot;,$media-types-regexes,&quot;',' ') satisfies matches(@media-type,$media-type-regex))]&quot;)"
+                    select="concat(&quot;//d:file[@media-type='' or not(some $media-type-regex in tokenize('&quot;,$media-types-regexes,&quot;','\s+')[not(.='')] satisfies matches(@media-type,$media-type-regex))]&quot;)"
                 />
             </p:delete>
         </p:otherwise>
@@ -87,7 +87,7 @@
             <p:variable name="not-media-types-regexes" select="if ($not-media-types='') then '' else replace(replace(replace($not-media-types,'\+','\\+'),'\?','.'),'\*','.*')"/>
             <p:delete>
                 <p:with-option name="match"
-                    select="concat(&quot;//d:file[not(@media-type='') and (some $not-media-type-regex in tokenize('&quot;,$not-media-types-regexes,&quot;',' ') satisfies matches(@media-type,$not-media-type-regex))]&quot;)"
+                    select="concat(&quot;//d:file[not(@media-type='') and (some $not-media-type-regex in tokenize('&quot;,$not-media-types-regexes,&quot;','\s+')[not(.='')] satisfies matches(@media-type,$not-media-type-regex))]&quot;)"
                 />
             </p:delete>
         </p:otherwise>
