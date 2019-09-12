@@ -22,7 +22,7 @@
 						<d:file href="images/Pict2.jpg" media-type="image/jpeg"/>
 						<d:file href="images/Pict3.jpg" media-type="image/jpeg"/>
 						<d:file href="images/Pict4.jpg" media-type="image/jpeg"/>
-						<d:file href="images/cover.jpg" media-type="image/jpeg"/>
+						<d:file href="images/cover.jpg" media-type="image/jpeg" cover-image="true"/>
 						<d:file href="scripts/impl.xhtml" media-type="application/xhtml+xml"/>
 					</d:fileset>
 				</x:document>
@@ -208,7 +208,6 @@
 					</d:fileset>
 				</x:document>
 			</x:input>
-			<x:option name="cover-image" select="'file:/tmp/epub/EPUB/images/cover.jpg'"/>
 			<x:option name="compatibility-mode" select="'true'"/>
 			<x:option name="detect-properties" select="'true'"/>
 			<x:option name="output-base-uri" select="'file:/tmp/epub/EPUB/package.opf'"/>
