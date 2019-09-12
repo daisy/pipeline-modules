@@ -9,9 +9,7 @@
     <p>Add a new entry to a fileset.</p>
   </p:documentation>
 
-  <p:input port="source" primary="true">
-    <!-- FIXME: rename to source.fileset -->
-  </p:input>
+  <p:input port="source" primary="true"/>
   <p:input port="source.in-memory" sequence="true">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
       <p>The input fileset</p>
@@ -19,9 +17,7 @@
     <p:empty/>
   </p:input>
 
-  <p:output port="result" primary="true">
-    <!-- FIXME: rename to result.fileset -->
-  </p:output>
+  <p:output port="result" primary="true"/>
   <p:output port="result.in-memory" sequence="true">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
       <p>The fileset with the new entry added</p>
