@@ -11,7 +11,11 @@
     <p>Add a new entry to a fileset.</p>
   </p:documentation>
 
-  <p:input port="source" primary="true"/>
+  <p:input port="source" primary="true">
+    <p:inline exclude-inline-prefixes="#all">
+      <d:fileset/>
+    </p:inline>
+  </p:input>
   <p:input port="source.in-memory" sequence="true">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
       <p>The input fileset</p>
