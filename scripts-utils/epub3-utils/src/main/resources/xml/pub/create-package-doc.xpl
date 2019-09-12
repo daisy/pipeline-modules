@@ -161,6 +161,9 @@
     <px:normalize-uri name="output-base-uri">
         <p:with-option name="href" select="$output-base-uri"/>
     </px:normalize-uri>
+    <px:normalize-uri name="cover-image-uri">
+        <p:with-option name="href" select="resolve-uri($cover-image,base-uri(/*))"/>
+    </px:normalize-uri>
 
     <px:mediatype-detect name="source.fileset">
         <p:input port="in-memory">
@@ -517,12 +520,10 @@
         </p:group>
 
         <p:documentation>Add 'cover-image' property</p:documentation>
-        <p:add-attribute attribute-name="href" attribute-value="true">
-            <p:with-option name="match" select="concat(
-                                                  'd:file[resolve-uri(@href,base-uri(.))=&quot;',
-                                                  resolve-uri($cover-image,base-uri(/*)),
-                                                  '&quot;]')"/>
-            
+        <p:add-attribute attribute-name="cover-image" attribute-value="true">
+            <p:with-option name="match" select="concat('d:file[resolve-uri(@href,base-uri(.))=&quot;',string(/*),'&quot;]')">
+                <p:pipe step="cover-image-uri" port="normalized"/>
+            </p:with-option>
         </p:add-attribute>
 
         <p:documentation>Add id attributes</p:documentation>
