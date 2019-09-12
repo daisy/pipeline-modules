@@ -6,6 +6,8 @@
                 xmlns="http://www.idpf.org/2007/opf"
                 exclude-result-prefixes="#all">
 
+    <xsl:param name="identifier-id" as="xs:string" required="true"/>
+
     <xsl:template match="/*">
         <metadata prefix="dc: http://purl.org/dc/elements/1.1/">
             
@@ -14,7 +16,7 @@
                                                                            'dct:identifier',
                                                                            'dcterms:identifier',
                                                                            'dtb:uid')][1]"/>
-            <dc:identifier id="pub-id">
+            <dc:identifier id="{$identifier-id}">
                 <xsl:copy-of select="$identifier/@scheme" exclude-result-prefixes="#all"/>
                 <xsl:value-of select="($identifier/@content,replace(replace(string(current-dateTime()),'\+.*',''),'[^\d]',''))[1]"/>
             </dc:identifier>
