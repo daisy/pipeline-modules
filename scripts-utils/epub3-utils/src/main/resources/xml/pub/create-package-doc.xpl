@@ -28,6 +28,10 @@
             document is specified, the content document that contains a
             <code>nav[@epub:type='toc']</code> element is picked. It is an error if there is no such
             document.</p>
+            <p>If the fileset includes a <a
+            href="http://www.idpf.org/epub/301/spec/epub-publications.html#cover-image"><code>cover-image</code></a>,
+            it should be marked with a <code>cover-image</code> attribute with value
+            <code>true</code>.</p>
         </p:documentation>
     </p:input>
 
@@ -68,12 +72,6 @@
         </p:documentation>
         <p:empty/>
     </p:input>
-    <p:option name="cover-image" required="false" select="''">
-        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <p>URI of the file that is to be marked as the <a
-            href="http://www.idpf.org/epub/301/spec/epub-publications.html#cover-image"><code>cover-image</code></a>.</p>
-        </p:documentation>
-    </p:option>
     <p:option name="compatibility-mode" required="false" select="'true'">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>Whether to be backward compatible with <a
@@ -177,9 +175,6 @@
 
     <px:normalize-uri name="output-base-uri">
         <p:with-option name="href" select="$output-base-uri"/>
-    </px:normalize-uri>
-    <px:normalize-uri name="cover-image-uri">
-        <p:with-option name="href" select="resolve-uri($cover-image,base-uri(/*))"/>
     </px:normalize-uri>
 
     <px:mediatype-detect name="source.fileset">
@@ -557,13 +552,6 @@
                 </p:input>
             </px:fileset-join>
         </p:group>
-
-        <p:documentation>Add 'cover-image' property</p:documentation>
-        <p:add-attribute attribute-name="cover-image" attribute-value="true">
-            <p:with-option name="match" select="concat('d:file[resolve-uri(@href,base-uri(.))=&quot;',string(/*),'&quot;]')">
-                <p:pipe step="cover-image-uri" port="normalized"/>
-            </p:with-option>
-        </p:add-attribute>
 
         <p:documentation>Add id attributes</p:documentation>
         <p:label-elements name="manifest-with-ids"

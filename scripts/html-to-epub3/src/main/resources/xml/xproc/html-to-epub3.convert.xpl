@@ -16,6 +16,10 @@
             <code>nav</code> attribute with value <code>true</code>, and it should be a HTML
             document. At most one navigation document may be specified. If no navigation document is
             specified, one is generated from all the HTML documents.</p>
+            <p>If the fileset includes a <a
+            href="http://www.idpf.org/epub/301/spec/epub-publications.html#cover-image"><code>cover-image</code></a>,
+            it should be marked with a <code>cover-image</code> attribute with value
+            <code>true</code>.</p>
         </p:documentation>
     </p:input>
     <p:input port="metadata" sequence="true">
