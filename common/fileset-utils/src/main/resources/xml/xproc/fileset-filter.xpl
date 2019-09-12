@@ -5,16 +5,36 @@
                 exclude-inline-prefixes="px" xpath-version="2.0"
                 type="px:fileset-filter" name="main">
 
-    <p:input port="source"/>
+    <p:input port="source" primary="true"/>
+    <p:input port="source.in-memory" sequence="true">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>The input fileset</p>
+        </p:documentation>
+        <p:empty/>
+    </p:input>
+
     <p:output port="result" primary="true">
         <p:pipe step="result" port="result"/>
     </p:output>
+    <p:output port="result.in-memory" sequence="true">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>The filtered fileset</p>
+            <p>The "result.in-memory" port contains all the documents from the "source.in-memory"
+            port that are listed in the "result" fileset manifest.</p>
+        </p:documentation>
+        <p:pipe step="result.in-memory" port="result"/>
+    </p:output>
     <p:output port="not-matched">
+        <p:pipe step="not-matched" port="result"/>
+    </p:output>
+    <p:output port="not-matched.in-memory" sequence="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>Files from "source" that are not included in "result", i.e. the files that were
             filtered out.</p>
+            <p>The "not-matched.in-memory" port contains all the documents from the
+            "source.in-memory" port that are listed in the "not-matched" fileset manifest.</p>
         </p:documentation>
-        <p:pipe step="diff" port="result"/>
+        <p:pipe step="not-matched.in-memory" port="result"/>
     </p:output>
 
     <p:option name="href" select="''">
@@ -27,6 +47,8 @@
         <!-- space separated list of blacklisted media types. suppports the glob characters '*' and '?', i.e. "image/*" or "application/*+xml". -->
     </p:option>
 
+    <p:import href="fileset-filter-in-memory.xpl"/>
+    <p:import href="fileset-load.xpl"/>
     <p:import href="fileset-diff.xpl"/>
 
     <p:choose>
@@ -71,9 +93,22 @@
         </p:otherwise>
     </p:choose>
     <p:identity name="result"/>
+
+    <px:fileset-filter-in-memory>
+        <p:input port="source.in-memory">
+            <p:pipe step="main" port="source.in-memory"/>
+        </p:input>
+    </px:fileset-filter-in-memory>
+    <px:fileset-load>
+        <!-- this will just pick documents, everything is already loaded -->
+        <p:input port="in-memory">
+            <p:pipe step="main" port="source.in-memory"/>
+        </p:input>
+    </px:fileset-load>
+    <p:identity name="result.in-memory"/>
     <p:sink/>
 
-    <px:fileset-diff name="diff">
+    <px:fileset-diff name="not-matched">
         <p:input port="source">
             <p:pipe step="main" port="source"/>
         </p:input>
@@ -81,6 +116,18 @@
             <p:pipe step="result" port="result"/>
         </p:input>
     </px:fileset-diff>
+    <px:fileset-filter-in-memory>
+        <p:input port="source.in-memory">
+            <p:pipe step="main" port="source.in-memory"/>
+        </p:input>
+    </px:fileset-filter-in-memory>
+    <px:fileset-load>
+        <!-- this will just pick documents, everything is already loaded -->
+        <p:input port="in-memory">
+            <p:pipe step="main" port="source.in-memory"/>
+        </p:input>
+    </px:fileset-load>
+    <p:identity name="not-matched.in-memory"/>
     <p:sink/>
 
 </p:declare-step>
