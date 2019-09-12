@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:c="http://www.w3.org/ns/xproc-step"
                 type="px:fileset-load" name="main"
@@ -29,9 +30,9 @@
       px:fileset-join
     </p:documentation>
   </p:import>
-  <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
+  <p:import href="load-html.xpl">
     <p:documentation>
-      px:html-load
+      pxi:load-html
     </p:documentation>
   </p:import>
   <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
@@ -201,9 +202,9 @@
 
                   <!-- Force HTML -->
                   <p:when test="$method='html'">
-                    <px:html-load>
+                    <pxi:load-html>
                       <p:with-option name="href" select="$on-disk"/>
-                    </px:html-load>
+                    </pxi:load-html>
                   </p:when>
 
                   <!-- Force XML -->
@@ -241,9 +242,9 @@
 
                   <!-- HTML -->
                   <p:when test="$media-type='text/html' or $media-type='application/xhtml+xml'">
-                    <px:html-load>
+                    <pxi:load-html>
                       <p:with-option name="href" select="$on-disk"/>
-                    </px:html-load>
+                    </pxi:load-html>
                   </p:when>
 
                   <!-- XML -->
