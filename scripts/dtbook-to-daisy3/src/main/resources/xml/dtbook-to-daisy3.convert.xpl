@@ -125,6 +125,7 @@
       px:fileset-create
       px:fileset-add-entry
       px:fileset-join
+      px:fileset-filter
     </p:documentation>
   </p:import>
   <p:import href="http://www.daisy.org/pipeline/modules/dtbook-tts/library.xpl">
@@ -200,13 +201,19 @@
   </px:fileset-move>
   <p:sink/>
 
-  <p:delete name="filtered-dtbook-fileset"
-	match="d:file[not(@media-type=('image/gif','image/jpeg','image/png','image/svg+xml',
-	       'application/pls+xml', 'audio/mpeg','audio/mp4', 'text/css'))]">
+  <px:fileset-filter media-types="image/gif
+                                  image/jpeg
+                                  image/png
+                                  image/svg+xml
+                                  application/pls+xml
+                                  audio/mpeg
+                                  audio/mp4
+                                  text/css"
+                     name="filtered-dtbook-fileset">
     <p:input port="source">
-      <p:pipe port="fileset.in" step="main"/>
+      <p:pipe step="main" port="fileset.in"/>
     </p:input>
-  </p:delete>
+  </px:fileset-filter>
 
   <px:fileset-copy name="fileset.moved">
     <p:with-option name="target" select="$output-fileset-base"/>
