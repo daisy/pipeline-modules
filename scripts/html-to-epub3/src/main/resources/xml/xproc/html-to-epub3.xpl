@@ -42,18 +42,44 @@ element in the OPF namespace. If not specified, metadata is extracted from the H
         </p:documentation>
     </p:option>
 
-    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
+        <p:documentation>
+            px:normalize-uri
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
+        <p:documentation>
+            px:fileset-create
+            px:fileset-add-entry
+            px:fileset-load
+            px:fileset-join
+        </p:documentation>
+    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/epub3-utils/ocf/library.xpl">
         <p:documentation>
             px:epub3-store
         </p:documentation>
     </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/mediatype-utils/library.xpl"/>
-    <p:import href="html-to-epub3.convert.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
+        <p:documentation>
+            px:tokenize
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
+        <p:documentation>
+            px:html-to-fileset
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/mediatype-utils/library.xpl">
+        <p:documentation>
+            px:mediatype-detect
+        </p:documentation>
+    </p:import>
+    <p:import href="html-to-epub3.convert.xpl">
+        <p:documentation>
+            px:html-to-epub3
+        </p:documentation>
+    </p:import>
 
     <px:normalize-uri name="output-dir-uri">
         <p:with-option name="href" select="concat($output-dir,'/')"/>
@@ -72,9 +98,12 @@ element in the OPF namespace. If not specified, metadata is extracted from the H
         </px:tokenize>
         <p:for-each name="html">
             <p:output port="result" sequence="true"/>
-            <px:html-load>
-                <p:with-option name="href" select="."/>
-            </px:html-load>
+            <p:variable name="single-html" select="."/>
+            <px:fileset-create/>
+            <px:fileset-add-entry media-type="application/xhtml+xml">
+                <p:with-option name="href" select="$single-html"/>
+            </px:fileset-add-entry>
+            <px:fileset-load/>
         </p:for-each>
         <p:group>
             <p:for-each>
