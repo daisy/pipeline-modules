@@ -2,7 +2,6 @@
 <p:declare-step type="px:epub3-to-epub3" version="1.0"
                 xmlns:p="http://www.w3.org/ns/xproc"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-                xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                 xmlns:c="http://www.w3.org/ns/xproc-step"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:css="http://www.daisy.org/ns/pipeline/braille-css"
@@ -47,37 +46,11 @@
     <p:import href="http://www.daisy.org/pipeline/modules/braille/common-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/braille/css-utils/library.xpl"/>
     
-    <p:declare-step type="pxi:fileset-from-in-memory" name="fileset-from-in-memory">
-        <p:input port="source" sequence="true"/>
-        <p:output port="result"/>
-        <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
-        <px:fileset-create name="base" base="/"/>
-        <p:for-each>
-            <p:iteration-source>
-                <p:pipe step="fileset-from-in-memory" port="source"/>
-            </p:iteration-source>
-            <px:fileset-add-entry>
-                <p:with-option name="href" select="resolve-uri(base-uri(/*))"/>
-                <p:input port="source">
-                    <p:pipe port="result" step="base"/>
-                </p:input>
-            </px:fileset-add-entry>
-        </p:for-each>
-        <px:fileset-join/>
-    </p:declare-step>
-    
     <p:variable name="default-stylesheet" select="resolve-uri('../css/default.css')">
         <p:inline>
             <irrelevant/>
         </p:inline>
     </p:variable>
-    
-    <pxi:fileset-from-in-memory name="epub.in.in-memory.fileset">
-        <p:input port="source">
-            <p:pipe step="main" port="epub.in.in-memory"/>
-        </p:input>
-    </pxi:fileset-from-in-memory>
-    <p:sink/>
     
     <p:identity>
         <p:input port="source">
