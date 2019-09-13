@@ -209,12 +209,13 @@
     </x:expect>
   </x:scenario>
   
-  <x:scenario label="store with doctype from memory">
+  <x:scenario label="store with doctype and xml declaration from memory">
     <x:call step="pxi:fileset-store">
       <x:input port="source.fileset">
         <x:document type="inline">
           <d:fileset>
-            <d:file href="e.xml" media-type="application/xml" doctype="&lt;!DOCTYPE foo&gt;" omit-xml-declaration="true"/>
+            <d:file href="e.xml" media-type="application/xml"
+                    doctype="&lt;!DOCTYPE foo&gt;" xml-declaration="&lt;?xml version=&quot;1.0&quot; encoding=&quot;bar&quot;?&gt;"/>
           </d:fileset>
         </x:document>
       </x:input>
@@ -233,7 +234,8 @@
               href="../../main/resources/xml/xproc/xprocspec-fileset-compare.xpl" step="x:fileset-compare">
       <x:document type="inline" base-uri="temp-dir">
         <d:fileset>
-          <d:file href="5/e.xml" original-href="5/e.xml" media-type="application/xml" doctype="&lt;!DOCTYPE foo&gt;" omit-xml-declaration="true"/>
+          <d:file href="5/e.xml" original-href="5/e.xml" media-type="application/xml"
+                  doctype="&lt;!DOCTYPE foo&gt;" xml-declaration="&lt;?xml version=&quot;1.0&quot; encoding=&quot;bar&quot;?&gt;"/>
         </d:fileset>
       </x:document>
     </x:expect>
@@ -251,7 +253,7 @@
       <x:document type="file" base-uri="temp-dir" href="5/e.xml" method="text"/>
     </x:context>
     <x:expect label="The stored file" type="compare">
-      <x:document type="inline" xml:space="preserve"><body xmlns="http://www.w3.org/ns/xproc-step">&lt;!DOCTYPE foo&gt;
+      <x:document type="inline" xml:space="preserve"><body xmlns="http://www.w3.org/ns/xproc-step">&lt;?xml version="1.0" encoding="bar"?&gt;&lt;!DOCTYPE foo&gt;
 &lt;root xmlns:px="http://www.daisy.org/ns/pipeline/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal" xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns:x="http://www.daisy.org/ns/xprocspec" xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:dpx="http://www.daisy.org/ns/pipeline/xproc"&gt;
 	&lt;node&gt;
 	&lt;/node&gt;
