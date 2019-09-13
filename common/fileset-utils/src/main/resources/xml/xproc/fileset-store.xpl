@@ -123,6 +123,7 @@
         <p:variable name="standalone" select="if (/*/@standalone) then /*/@standalone else 'omit'"/>
         <p:variable name="undeclare-prefixes" select="if (/*/@undeclare-prefixes) then /*/@undeclare-prefixes else 'false'"/>
         <p:variable name="version" select="if (/*/@version) then /*/@version else '1.0'"/>
+        <p:variable name="xml-declaration" select="/*/@xml-declaration"/>
 
         <p:choose>
             <p:xpath-context>
@@ -199,21 +200,37 @@
                             <p:with-option name="undeclare-prefixes" select="$undeclare-prefixes"/>
                             <p:with-option name="version" select="$version"/>
                         </p:store>
+                        <p:identity>
+                            <p:input port="source">
+                                <p:pipe step="store-xml" port="result"/>
+                            </p:input>
+                        </p:identity>
                         <p:choose>
                             <p:when test="$doctype">
-                                <px:set-doctype>
-                                    <p:with-option name="href" select="/*/text()">
-                                        <p:pipe port="result" step="store-xml"/>
-                                    </p:with-option>
+                                <p:variable name="stored-file" select="/*/text()"/>
+                                <p:sink/>
+                                <px:set-doctype px:message="Setting doctype of {$stored-file} to {$doctype}" px:message-severity="DEBUG">
+                                    <p:with-option name="href" select="$stored-file"/>
                                     <p:with-option name="doctype" select="$doctype"/>
                                 </px:set-doctype>
                             </p:when>
                             <p:otherwise>
-                                <p:identity>
-                                    <p:input port="source">
-                                        <p:pipe port="result" step="store-xml"/>
-                                    </p:input>
-                                </p:identity>
+                                <p:identity/>
+                            </p:otherwise>
+                        </p:choose>
+                        <p:choose>
+                            <p:when test="$xml-declaration">
+                                <p:variable name="stored-file" select="/*/text()"/>
+                                <p:sink/>
+                                <px:set-xml-declaration px:message="Setting XML declaration of {$stored-file} to {$xml-declaration}"
+                                                        px:message-severity="DEBUG">
+                                    <p:with-option name="href" select="$stored-file"/>
+                                    <p:with-option name="xml-declaration" select="$xml-declaration"/>
+                                    <p:with-option name="encoding" select="$encoding"/>
+                                </px:set-xml-declaration>
+                            </p:when>
+                            <p:otherwise>
+                                <p:identity/>
                             </p:otherwise>
                         </p:choose>
                     </p:otherwise>
