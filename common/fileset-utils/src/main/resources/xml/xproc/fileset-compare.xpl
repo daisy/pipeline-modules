@@ -18,6 +18,12 @@
     
     <p:option name="fail-if-not-equal" select="'false'"/>
     
+    <p:import href="fileset-join.xpl">
+        <p:documentation>
+            px:fileset-join
+        </p:documentation>
+    </p:import>
+    
     <p:declare-step type="pxi:normalize-fileset">
         <p:input port="source"/>
         <p:output port="result"/>
@@ -29,8 +35,11 @@
             here.
         -->
         <p:add-xml-base/>
+        <!-- normalize href and original-href -->
+        <px:fileset-join/>
+        <!-- make href absolute -->
         <p:label-elements match="*[@href]" attribute="href" replace="true" label="resolve-uri(@href,base-uri(.))"/>
-        <p:label-elements match="*[@original-href]" attribute="original-href" replace="true" label="resolve-uri(@original-href,base-uri(.))"/>
+        <!-- sort entries -->
         <p:xslt>
             <p:input port="stylesheet">
                 <p:inline>

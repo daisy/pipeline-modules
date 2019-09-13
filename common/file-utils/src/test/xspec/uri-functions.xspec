@@ -396,6 +396,26 @@
             <x:call><x:param name="uri" select="'file:/foo//dir/file.xml'"/></x:call>
             <x:expect label="slash should not be added" select="'file:/foo/dir/file.xml'"/>
         </x:scenario>
+        
+        <!-- don't add trailing slash when file is not a directory -->
+        <x:scenario label="no trailing slash - simple file">
+            <x:call>
+                <x:param name="uri" select="'file:/dir/file.epub'"/>
+            </x:call>
+            <x:expect label="slash should not be added"  select="'file:/dir/file.epub'"/>
+        </x:scenario>
+        <x:scenario label="no trailing slash - path inside zip file">
+            <x:call>
+                <x:param name="uri" select="'file:/dir/file.epub!/package.opf'"/>
+            </x:call>
+            <x:expect label="slash should not be added"  select="'file:/dir/file.epub!/package.opf'"/>
+        </x:scenario>
+        <x:scenario label="no trailing slash - empty path inside zip file">
+            <x:call>
+                <x:param name="uri" select="'file:/dir/file.epub!/'"/>
+            </x:call>
+            <x:expect label="slash should not be added"  select="'file:/dir/file.epub!/'"/>
+        </x:scenario>
     </x:scenario>
     
     

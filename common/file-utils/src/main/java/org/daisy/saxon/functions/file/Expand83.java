@@ -82,13 +82,13 @@ public class Expand83 extends ExtensionFunctionDefinition {
 			String query = url.getQuery();
 			String fragment = url.getRef();
 			File file = new File(new URI(protocol, null, path, null, null));
-			URI expandedUri = expand83(file, uri.endsWith("/"));
+			URI expandedUri = expand83(file, path.endsWith("/"));
 			if (expandedUri == null) {
 				return uri;
 			} else {
 				path = expandedUri.getPath();
 				if (zipPath != null)
-					path = path + "!" + zipPath;
+					path = path + "!" + URI.create(zipPath).getPath();
 				return new URI(protocol, null, path, query, fragment).toString();
 			}
 		} catch (Exception e) {
