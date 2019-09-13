@@ -4,6 +4,7 @@
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:c="http://www.w3.org/ns/xproc-step"
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 type="px:fileset-load" name="main"
                 exclude-inline-prefixes="px">
 
@@ -183,21 +184,40 @@
 
                   <!-- Load from ZIP -->
                   <p:when test="contains($on-disk, '!/')">
-                    <px:message severity="DEBUG">
+                    <p:variable name="file"        select="replace($on-disk, '^([^!]+)!/(.+)$', '$1')"/>
+                    <p:variable name="path-in-zip" select="replace($on-disk, '^([^!]+)!/(.+)$', '$2')"/>
+                    <p:sink/>
+                    <p:xslt template-name="main">
                       <p:input port="source">
                         <p:empty/>
                       </p:input>
-                      <p:with-option name="message" select="replace($on-disk, '^([^!]+)!/(.+)$', 'Loading $2 from ZIP $1')"/>
-                    </px:message>
-                    <p:sink/>
-                    <px:unzip>
-                      <p:with-option name="href" select="replace($on-disk, '^([^!]+)!/(.+)$', '$1')"/>
-                      <p:with-option name="file" select="replace($on-disk, '^([^!]+)!/(.+)$', '$2')"/>
-                      <p:with-option name="content-type" select="$media-type"/>
-                    </px:unzip>
-                    <px:set-base-uri>
-                      <p:with-option name="base-uri" select="$target"/>
-                    </px:set-base-uri>
+                      <p:input port="stylesheet">
+                        <p:inline>
+                          <xsl:stylesheet version="2.0" xmlns:pf="http://www.daisy.org/ns/pipeline/functions">
+                            <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/uri-functions.xsl"/>
+                            <xsl:param name="uri" required="yes"/>
+                            <xsl:template name="main">
+                              <c:result>
+                                <xsl:value-of select="pf:unescape-uri($uri)"/>
+                              </c:result>
+                            </xsl:template>
+                          </xsl:stylesheet>
+                        </p:inline>
+                      </p:input>
+                      <p:with-param name="uri" select="$path-in-zip"/>
+                    </p:xslt>
+                    <p:group>
+                      <p:variable name="escaped-path-in-zip" select="."/>
+                      <p:sink/>
+                      <px:unzip px:message="Loading {$escaped-path-in-zip} from ZIP {$file}" px:message-severity="DEBUG">
+                        <p:with-option name="href" select="$file"/>
+                        <p:with-option name="file" select="$escaped-path-in-zip"/>
+                        <p:with-option name="content-type" select="$media-type"/>
+                      </px:unzip>
+                      <px:set-base-uri>
+                        <p:with-option name="base-uri" select="$target"/>
+                      </px:set-base-uri>
+                    </p:group>
                   </p:when>
 
                   <!-- Force HTML -->

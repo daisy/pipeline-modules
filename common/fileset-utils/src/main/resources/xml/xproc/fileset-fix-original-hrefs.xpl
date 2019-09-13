@@ -2,6 +2,7 @@
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:c="http://www.w3.org/ns/xproc-step"
                 exclude-inline-prefixes="#all"
@@ -66,21 +67,45 @@
 		<p:sink/>
 		<p:try>
 			<p:group>
+				<p:variable name="file" select="replace($href, '^([^!]+)!/(.+)$', '$1')"/>
 				<px:info>
-					<p:with-option name="href" select="replace($href,'^([^!]+)(!/.+)?$','$1')"/>
+					<p:with-option name="href" select="$file"/>
 				</px:info>
 				<p:choose>
 					<p:when test="contains($href,'!/')">
-						<px:unzip>
-							<p:with-option name="href" select="replace($href,'^([^!]+)!/(.+)$','$1')"/>
-						</px:unzip>
-						<p:filter>
-							<p:with-option name="select"
-							               select="concat(
-							                        '/c:zipfile/c:file[@name=&quot;',
-							                        replace($href,'^([^!]+)!/(.+)$','$2'),
-							                        '&quot;]')"/>
-						</p:filter>
+						<p:xslt template-name="main">
+							<p:input port="source">
+								<p:empty/>
+							</p:input>
+							<p:input port="stylesheet">
+								<p:inline>
+									<xsl:stylesheet version="2.0" xmlns:pf="http://www.daisy.org/ns/pipeline/functions">
+										<xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/uri-functions.xsl"/>
+										<xsl:param name="uri" required="yes"/>
+										<xsl:template name="main">
+											<c:result>
+												<xsl:value-of select="pf:unescape-uri($uri)"/>
+											</c:result>
+										</xsl:template>
+									</xsl:stylesheet>
+								</p:inline>
+							</p:input>
+							<p:with-param name="uri" select="replace($href, '^([^!]+)!/(.+)$', '$2')"/>
+						</p:xslt>
+						<p:group>
+							<p:variable name="escaped-path-in-zip" select="."/>
+							<p:sink/>
+							<px:unzip>
+								<p:with-option name="href" select="$file"/>
+							</px:unzip>
+							<p:filter>
+								<p:with-option name="select"
+								               select="concat(
+								                        '/c:zipfile/c:file[@name=&quot;',
+								                        $escaped-path-in-zip,
+								                        '&quot;]')"/>
+							</p:filter>
+						</p:group>
 					</p:when>
 					<p:otherwise>
 						<p:identity/>

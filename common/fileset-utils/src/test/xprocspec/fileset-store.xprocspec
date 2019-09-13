@@ -83,6 +83,7 @@
         <x:document type="inline">
           <d:fileset>
             <d:file href="c.gif" original-href="samples/fileset2/c.gif" media-type="image/gif"/>
+            <d:file href="e.xml" original-href="samples/fileset2/a.zip!/e%5Bxml%5D" media-type="application/xml"/>
             <d:file href="a/a.html" original-href="samples/fileset2/a.zip!/a.html" media-type="text/html"/>
             <d:file href="a/MimeDetector.java" original-href="samples/fileset2/a.zip!/MimeDetector.java" media-type="application/octet-stream"/>
           </d:fileset>
@@ -99,6 +100,7 @@
       <x:document type="inline" base-uri="temp-dir">
         <d:fileset>
           <d:file href="2/c.gif" original-href="2/c.gif" media-type="image/gif"/>
+          <d:file href="2/e.xml" original-href="2/e.xml" media-type="application/xml"/>
           <d:file href="2/a/a.html" original-href="2/a/a.html" media-type="text/html"/>
           <d:file href="2/a/MimeDetector.java" original-href="2/a/MimeDetector.java" media-type="application/octet-stream"/>
         </d:fileset>
@@ -115,6 +117,7 @@
             <c:file name="a.html"/>
           </c:directory>
           <c:file name="c.gif"/>
+          <c:file name="e.xml"/>
         </c:directory>
       </x:document>
     </x:expect>
