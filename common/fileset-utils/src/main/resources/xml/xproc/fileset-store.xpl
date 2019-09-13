@@ -9,7 +9,9 @@
                 exclude-inline-prefixes="#all">
 
     <p:input port="fileset.in" primary="true"/>
-    <p:input port="in-memory.in" sequence="true"/>
+    <p:input port="in-memory.in" sequence="true">
+        <p:empty/>
+    </p:input>
     <p:output port="fileset.out" primary="false">
         <p:pipe port="result" step="store"/>
     </p:output>
