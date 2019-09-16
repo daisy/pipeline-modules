@@ -18,7 +18,7 @@
 
 	<p:import href="fileset-fix-original-hrefs.xpl"/>
 
-	<pxi:fileset-fix-original-hrefs purge="true">
+	<pxi:fileset-fix-original-hrefs purge="true" detect-existing="true">
 		<p:input port="source.in-memory">
 			<p:pipe step="main" port="source.in-memory"/>
 		</p:input>
