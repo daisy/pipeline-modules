@@ -15,13 +15,11 @@
 		</p:documentation>
 		<p:pipe step="intersect" port="result"/>
 	</p:output>
-	<!-- FIXME: diff is a confusing name because you would expect it to contain the files that were
-	     removed from the input fileset -->
-	<p:output port="diff">
+	<p:output port="not-in-manifest">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>Fileset of in-memory documents that are not contained in the input fileset.</p>
 		</p:documentation>
-		<p:pipe step="diff" port="result"/>
+		<p:pipe step="not-in-manifest" port="result"/>
 	</p:output>
 	
 	<p:import href="fileset-create.xpl"/>
@@ -63,7 +61,7 @@
 	</px:fileset-intersect>
 	<p:sink/>
 	
-	<px:fileset-diff name="diff">
+	<px:fileset-diff name="not-in-manifest">
 		<p:input port="source">
 			<p:pipe step="fileset-from-in-memory" port="result"/>
 		</p:input>

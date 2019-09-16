@@ -20,7 +20,6 @@
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/zip-utils/library.xpl"/>
-    <p:import href="fileset-filter-in-memory.xpl"/>
 
     <p:variable name="fileset-base" select="base-uri(/*)">
         <p:pipe port="fileset.in" step="main"/>

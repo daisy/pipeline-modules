@@ -51,7 +51,7 @@
 	</px:fileset-filter-in-memory>
 	<p:group>
 		<p:variable name="document-not-in-manifest" select="/*/d:file[1]/@href">
-			<p:pipe step="filter-in-memory" port="diff"/>
+			<p:pipe step="filter-in-memory" port="not-in-manifest"/>
 		</p:variable>
 		<px:assert message="Trying to update a fileset with a document that is not in the manifest: $1" error-code="XXXXX">
 			<p:with-option name="test" select="$document-not-in-manifest=''"/>
