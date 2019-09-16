@@ -120,10 +120,12 @@
 
     <x:scenario label="test-method-xml">
         <x:call step="px:fileset-load">
-            <x:option name="href" select="'fileset2/wrong-extensions/opf.txt'"/>
-            <x:option name="method" select="'xml'"/>
             <x:input port="fileset">
-                <x:document type="file" href="samples/fileset2.xml"/>
+                <x:document type="inline">
+                    <d:fileset>
+                        <d:file href="samples/fileset2/wrong-extensions/opf.txt" method="xml"/>
+                    </d:fileset>
+                </x:document>
             </x:input>
             <x:input port="in-memory"/>
         </x:call>
@@ -135,12 +137,14 @@
         </x:expect>
     </x:scenario>
 
-    <x:scenario label="test-method-html" pending="validator.nu not in classpath (might work with pax-exam?)">
+    <x:scenario label="test-method-html">
         <x:call step="px:fileset-load">
-            <x:option name="href" select="'fileset2/wrong-extensions/html.bin'"/>
-            <x:option name="method" select="'html'"/>
             <x:input port="fileset">
-                <x:document type="file" href="samples/fileset2.xml"/>
+                <x:document type="inline">
+                    <d:fileset>
+                        <d:file href="samples/fileset2/wrong-extensions/html.bin" method="html"/>
+                    </d:fileset>
+                </x:document>
             </x:input>
             <x:input port="in-memory"/>
         </x:call>
@@ -154,10 +158,12 @@
 
     <x:scenario label="test-method-text">
         <x:call step="px:fileset-load">
-            <x:option name="href" select="'fileset2/wrong-extensions/html.bin'"/>
-            <x:option name="method" select="'text'"/>
             <x:input port="fileset">
-                <x:document type="file" href="samples/fileset2.xml"/>
+                <x:document type="inline">
+                    <d:fileset>
+                        <d:file href="samples/fileset2/wrong-extensions/html.bin" method="text"/>
+                    </d:fileset>
+                </x:document>
             </x:input>
             <x:input port="in-memory"/>
         </x:call>
@@ -181,10 +187,12 @@
 
     <x:scenario label="test-method-binary">
         <x:call step="px:fileset-load">
-            <x:option name="href" select="'fileset2/wrong-extensions/txt.xml'"/>
-            <x:option name="method" select="'binary'"/>
             <x:input port="fileset">
-                <x:document type="file" href="samples/fileset2.xml"/>
+                <x:document type="inline">
+                    <d:fileset>
+                        <d:file href="samples/fileset2/wrong-extensions/txt.xml" method="binary"/>
+                    </d:fileset>
+                </x:document>
             </x:input>
             <x:input port="in-memory"/>
         </x:call>

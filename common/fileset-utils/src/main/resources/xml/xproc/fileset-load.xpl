@@ -21,7 +21,6 @@
   <p:option name="not-media-types" select="''"/>
   <p:option name="fail-on-not-found" select="'false'"/>
   <p:option name="load-if-not-in-memory" select="'true'"/>
-  <p:option name="method" select="''"/>
 
   <p:import href="fileset-library.xpl">
     <p:documentation>
@@ -104,6 +103,7 @@
         <p:variable name="target" select="/*/resolve-uri(@href, base-uri(.))"/>
         <p:variable name="on-disk" select="/*/resolve-uri((@original-href,@href)[1], base-uri(.))"/>
         <p:variable name="media-type" select="/*/@media-type"/>
+        <p:variable name="method" select="/*/@method"/>
 
         <p:choose>
           <p:xpath-context>
