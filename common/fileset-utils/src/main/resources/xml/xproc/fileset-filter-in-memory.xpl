@@ -15,6 +15,13 @@
 		</p:documentation>
 		<p:pipe step="intersect" port="result"/>
 	</p:output>
+	<p:output port="not-in-memory">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p>Files from "source" that are not included in "result", i.e. the files that were
+			filtered out.</p>
+		</p:documentation>
+		<p:pipe step="not-in-memory" port="result"/>
+	</p:output>
 	<p:output port="not-in-manifest">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>Fileset of in-memory documents that are not contained in the input fileset.</p>
@@ -67,6 +74,16 @@
 		</p:input>
 		<p:input port="secondary">
 			<p:pipe step="fileset-normalized" port="result"/>
+		</p:input>
+	</px:fileset-diff>
+	<p:sink/>
+	
+	<px:fileset-diff name="not-in-memory">
+		<p:input port="source">
+			<p:pipe step="fileset-normalized" port="result"/>
+		</p:input>
+		<p:input port="secondary">
+			<p:pipe step="fileset-from-in-memory" port="result"/>
 		</p:input>
 	</px:fileset-diff>
 	<p:sink/>
