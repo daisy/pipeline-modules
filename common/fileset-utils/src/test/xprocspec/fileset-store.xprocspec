@@ -300,7 +300,7 @@
       <x:document type="file" base-uri="temp-dir" href="6/e.xml" method="text"/>
     </x:context>
     <x:expect label="The stored file should be identical to the file in the zip; it should not have the specified doctype"
-              xfail="true" type="compare">
+              type="compare">
       <x:document type="inline" xml:space="preserve"><body xmlns="http://www.w3.org/ns/xproc-step">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;root&gt;
 	&lt;node&gt;

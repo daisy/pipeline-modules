@@ -12,7 +12,8 @@
 		<p>Make the original-href attributes reflect what is actually stored on disk.</p>
 		<ul>
 			<li>Remove original-href attributes of files that do not exist on disk according to @original-href.</li>
-			<li>Set original-href attributes of files that exist on disk according to @href.</li>
+			<li>If <code>detect-existing</code> is true, set original-href attributes of files that exist on disk
+			according to @href.</li>
 			<li>Remove original-href attributes of files that exist in memory.</li>
 		</ul>
 	</p:documentation>
@@ -23,6 +24,19 @@
 	</p:input>
 	<p:output port="result.fileset"/>
 
+	<p:option name="detect-existing" select="'false'">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p>Whether to set original-href attributes of files that exist on disk according to
+			@href. Any existing original-href attributes will be overwritten, so by setting this
+			option you prevent that files are being overwritten by other files (but not by in-memory
+			documents).</p>
+		</p:documentation>
+	</p:option>
+	<p:option name="fail-on-missing" select="'false'">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p>Whether to raise an error for files that are neither on disk or exist in memory.</p>
+		</p:documentation>
+	</p:option>
 	<p:option name="purge" select="'false'">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>Whether to remove files that are neither on disk or exist in memory.</p>
@@ -37,6 +51,12 @@
 	<p:import href="http://www.daisy.org/pipeline/modules/zip-utils/library.xpl">
 		<p:documentation>
 			px:unzip
+		</p:documentation>
+	</p:import>
+	<p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
+		<p:documentation>
+			px:message
+			px:error
 		</p:documentation>
 	</p:import>
 	<p:import href="fileset-join.xpl">
@@ -170,9 +190,24 @@
 				<p:delete match="@original-href"/>
 			</p:when>
 			<p:otherwise>
-				<pxi:file-on-disk name="href-on-disk">
-					<p:with-option name="href" select="$href"/>
-				</pxi:file-on-disk>
+				<p:choose name="href-on-disk">
+					<p:when test="$detect-existing='true'">
+						<p:output port="result" primary="true"/>
+						<p:output port="on-disk">
+							<p:pipe step="file-on-disk" port="on-disk"/>
+						</p:output>
+						<pxi:file-on-disk name="file-on-disk">
+							<p:with-option name="href" select="$href"/>
+						</pxi:file-on-disk>
+					</p:when>
+					<p:otherwise>
+						<p:output port="result" primary="true"/>
+						<p:output port="on-disk">
+							<p:inline><c:result>false</c:result></p:inline>
+						</p:output>
+						<p:identity/>
+					</p:otherwise>
+				</p:choose>
 				<p:choose>
 					<p:xpath-context>
 						<p:pipe step="href-on-disk" port="on-disk"/>
@@ -195,15 +230,29 @@
 								Else if it does not exist on disk, remove original-href or remove file if purge is set.
 							</p:documentation>
 							<p:when test="not(string(/*)='true')">
+								<p:variable name="message"
+								            select="concat('Found document in fileset that was declared as being on disk but was neither stored on disk nor in memory: ',
+								                           $original-href)"/>
 								<p:choose>
+									<p:when test="$fail-on-missing='true'">
+										<px:error code="PEZE01">
+											<p:with-option name="message" select="$message"/>
+										</px:error>
+									</p:when>
 									<p:when test="$purge='true'">
 										<p:identity>
 											<p:input port="source">
 												<p:empty/>
 											</p:input>
 										</p:identity>
+										<px:message severity="WARN">
+											<p:with-option name="message" select="$message"/>
+										</px:message>
 									</p:when>
 									<p:otherwise>
+										<px:message severity="WARN">
+											<p:with-option name="message" select="$message"/>
+										</px:message>
 										<p:delete match="@original-href"/>
 									</p:otherwise>
 								</p:choose>
@@ -215,16 +264,28 @@
 					</p:when>
 					<p:otherwise>
 						<p:documentation>File does not exist. Remove it if purge is set.</p:documentation>
+						<p:variable name="message"
+						            select="concat('Found document in fileset that is neither stored on disk nor in memory: ', $href)"/>
 						<p:choose>
+							<p:when test="$fail-on-missing='true'">
+								<px:error code="PEZE00">
+									<p:with-option name="message" select="$message"/>
+								</px:error>
+							</p:when>
 							<p:when test="$purge='true'">
 								<p:identity>
 									<p:input port="source">
 										<p:empty/>
 									</p:input>
 								</p:identity>
+								<px:message severity="WARN">
+									<p:with-option name="message" select="$message"/>
+								</px:message>
 							</p:when>
 							<p:otherwise>
-								<p:identity/>
+								<px:message severity="WARN">
+									<p:with-option name="message" select="$message"/>
+								</px:message>
 							</p:otherwise>
 						</p:choose>
 					</p:otherwise>

@@ -76,7 +76,7 @@
         @xml:base, @href and @original-href, relativizes @href against @xml:base, makes
         @original-href absolute, and removes @xml:base from d:file.
     </p:documentation>
-    <pxi:fileset-fix-original-hrefs>
+    <pxi:fileset-fix-original-hrefs detect-existing="true">
         <p:input port="source.in-memory">
             <p:pipe step="main" port="source.in-memory"/>
         </p:input>

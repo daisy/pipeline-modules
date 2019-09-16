@@ -39,9 +39,6 @@
         </p:documentation>
     </p:import>
     
-    <!--
-        setting store-to-disk="true" is currently more memory efficient
-    -->
     <px:epub3-load name="load" store-to-disk="true">
         <p:with-option name="href" select="$epub"/>
         <p:with-option name="temp-dir" select="$temp-dir"/>

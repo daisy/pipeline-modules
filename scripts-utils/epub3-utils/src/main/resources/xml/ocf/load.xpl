@@ -22,12 +22,6 @@
 			option is true and the value of the <code>temp-dir</code> option does not identify a
 			directory.</p>
 		</p:documentation>
-		<!--
-		    Note that setting this option to true is currently more memory efficient in case the
-		    fileset is later stored, because the current implementation of px:fileset-store
-		    loads all zipped files into memory before storing them to a location on disk or
-		    zipping them up again, which can be slow when we're dealing with a lot of big files.
-		-->
 	</p:option>
 	<p:option name="temp-dir" required="false">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">

@@ -9,6 +9,7 @@
     <x:scenario label="test">
         <x:call step="pxi:fileset-fix-original-hrefs">
             <x:option name="purge" select="true()"/>
+            <x:option name="detect-existing" select="true()"/>
             <x:input port="source.fileset">
                 <x:document type="inline">
                     <d:fileset xml:base="samples/fileset2/">                          <!-- href                  - original-href         -->
