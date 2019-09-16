@@ -13,6 +13,7 @@
     </p:documentation>
     
     <p:option name="href" required="false"/>
+    <p:option name="delete-on-exit" required="false" select="'false'"/>
     
     <p:output port="result"/>
     
@@ -46,13 +47,16 @@
                 <p:with-option name="href" select="string(/c:result)">
                     <p:pipe step="make-parent-dir" port="result"/>
                 </p:with-option>
+                <p:with-option name="delete-on-exit" select="$delete-on-exit"/>
             </px:tempfile>
         </p:when>
         <p:otherwise>
             <p:output port="result">
                 <p:pipe step="temp-file" port="result"/>
             </p:output>
-            <px:tempfile name="temp-file" suffix=""/>
+            <px:tempfile name="temp-file" suffix="">
+                <p:with-option name="delete-on-exit" select="$delete-on-exit"/>
+            </px:tempfile>
         </p:otherwise>
     </p:choose>
     
