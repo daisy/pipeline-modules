@@ -149,7 +149,7 @@ public class EpubCheckProvider implements XProcStepProvider {
 					xmlReport.info(null, FeatureEnum.EXEC_MODE, String.format(messages.get("single_file"), mode, epubVersion.toString(), EPUBProfile.DEFAULT));
 
 					if ("expanded".equals(mode) || "exp".equals(mode)) {
-						epub = new Archive(path, false);
+						epub = new Archive(path, true);
 						String epubName = new File(path).getName() + ".epub";
 						File tempDir; {
 							RuntimeValue o = getOption(_tempDir);
@@ -218,7 +218,9 @@ public class EpubCheckProvider implements XProcStepProvider {
 			}
 
 			finally {
-				if (epub != null)
+				// delete temporary epub file (expanded mode)
+				// but not if temp-dir option was passed
+				if (epub != null && getOption(_tempDir, "").isEmpty())
 					epub.deleteEpubFile();
 			}
 		}
