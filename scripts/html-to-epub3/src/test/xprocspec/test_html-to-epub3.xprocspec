@@ -64,7 +64,7 @@
 						<dc:title>My title</dc:title>
 						<dc:language>en</dc:language>
 						<dc:publisher>Me</dc:publisher>
-						<dc:identifier>my-id</dc:identifier>
+						<dc:identifier id="id-id">my-id</dc:identifier>
 					</metadata>
 				</x:document>
 			</x:input>
@@ -139,16 +139,13 @@
 		<x:context label="the package document">
 			<x:document type="port" port="in-memory.out" select="/*[base-uri()=resolve-uri('output-dir/EPUB/package.opf')]"/>
 		</x:context>
-		<!--
-		    FIXME: generated IDs make test brittle
-		-->
 		<x:expect label="the result" type="custom" href="http://www.daisy.org/pipeline/modules/epub3-utils/pub/library.xpl"
 		          step="x:epub3-pub-compare-package-doc">
 			<x:document type="inline">
-				<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="d6970e13" version="3.0">
+				<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="id-id" version="3.0">
 					<metadata>
 						<dc:title>My title</dc:title>
-						<dc:identifier id="d6970e13">my-id</dc:identifier>
+						<dc:identifier id="id-id">my-id</dc:identifier>
 						<dc:language>en</dc:language>
 						<meta property="dcterms:modified">2019-07-26T15:44:52Z</meta>
 						<dc:publisher>Me</dc:publisher>
