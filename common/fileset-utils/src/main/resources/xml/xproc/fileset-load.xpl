@@ -184,7 +184,7 @@
 
                   <!-- Load from ZIP -->
                   <p:when test="contains($on-disk, '!/')">
-                    <p:variable name="file"        select="replace($on-disk, '^([^!]+)!/(.+)$', '$1')"/>
+                    <p:variable name="file" select="replace($on-disk, '^(jar:)?([^!]+)!/(.+)$', '$2')"/>
                     <p:variable name="path-in-zip" select="replace($on-disk, '^([^!]+)!/(.+)$', '$2')"/>
                     <p:sink/>
                     <p:xslt template-name="main">
@@ -209,14 +209,34 @@
                     <p:group>
                       <p:variable name="escaped-path-in-zip" select="."/>
                       <p:sink/>
-                      <px:unzip px:message="Loading {$escaped-path-in-zip} from ZIP {$file}" px:message-severity="DEBUG">
-                        <p:with-option name="href" select="$file"/>
-                        <p:with-option name="file" select="$escaped-path-in-zip"/>
-                        <p:with-option name="content-type" select="$media-type"/>
-                      </px:unzip>
-                      <px:set-base-uri>
-                        <p:with-option name="base-uri" select="$target"/>
-                      </px:set-base-uri>
+                      <p:choose px:message="Loading {$escaped-path-in-zip} from ZIP {$file}" px:message-severity="DEBUG">
+                        <p:when test="$method='html' or ($method='' and $media-type='text/html')">
+                          <!-- can not use px:unzip; use workaround instead -->
+                          <pxi:load-html>
+                            <p:with-option name="href" select="concat('jar:',$on-disk)"/>
+                          </pxi:load-html>
+                        </p:when>
+                        <p:when test="$method='text' or ($method=''
+                                                         and matches($media-type,'^text/')
+                                                         and not(matches($media-type,'.*/xml$') or matches($media-type,'.*\+xml$')))">
+                          <!-- can not use px:unzip; use workaround instead -->
+                          <px:data content-type="text/plain; charset=utf-8">
+                            <p:with-option name="href" select="concat('jar:',$on-disk)"/>
+                          </px:data>
+                        </p:when>
+                        <p:otherwise>
+                          <px:unzip>
+                            <p:with-option name="href" select="$file"/>
+                            <p:with-option name="file" select="$escaped-path-in-zip"/>
+                            <p:with-option name="content-type" select="if ($method='xml') then 'application/xml'
+                                                                       else if ($method='binary') then 'binary/octet-stream'
+                                                                       else $media-type"/>
+                          </px:unzip>
+                          <px:set-base-uri>
+                            <p:with-option name="base-uri" select="$target"/>
+                          </px:set-base-uri>
+                        </p:otherwise>
+                      </p:choose>
                     </p:group>
                   </p:when>
 
