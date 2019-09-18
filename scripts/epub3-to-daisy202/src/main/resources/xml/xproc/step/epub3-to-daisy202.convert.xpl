@@ -11,11 +11,9 @@
     <p:input port="source.fileset" primary="true"/>
     <p:input port="source.in-memory" sequence="true"/>
 
-    <p:output port="result.fileset" primary="true">
-        <p:pipe step="result" port="result.fileset"/>
-    </p:output>
+    <p:output port="result.fileset" primary="true"/>
     <p:output port="result.in-memory" sequence="true">
-        <p:pipe step="result" port="result.in-memory"/>
+        <p:pipe step="rename-xhtml" port="in-memory"/>
     </p:output>
 
     <p:option name="bundle-dtds" select="'false'"/>
@@ -32,8 +30,10 @@
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
         <p:documentation>
+            px:fileset-filter
             px:fileset-load
-            px:fileset-update
+            px:fileset-join
+            px:fileset-rebase
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/epub3-utils/pub/library.xpl">
@@ -99,7 +99,7 @@
     <p:documentation>
         Convert from EPUB 3 HTML to DAISY 2.02 HTML.
     </p:documentation>
-    <px:opf-spine-to-fileset name="epub3.xhtml.fileset">
+    <px:opf-spine-to-fileset>
         <p:documentation>
             Get spine.
         </p:documentation>
@@ -107,7 +107,7 @@
             <p:pipe step="opf" port="result"/>
         </p:input>
     </px:opf-spine-to-fileset>
-    <px:fileset-load name="epub3.xhtml.in-memory">
+    <px:fileset-load>
         <p:documentation>
             Load content documents.
         </p:documentation>
@@ -185,12 +185,12 @@
         Rename content documents to .html.
     </p:documentation>
     <p:group name="rename-xhtml" px:message="Renaming content documents to .html">
-        <p:output port="result.fileset" primary="true"/>
-        <p:output port="result.in-memory" sequence="true">
-            <p:pipe step="xhtml" port="result"/>
-            <p:pipe step="smil" port="result"/>
+        <p:output port="fileset" primary="true"/>
+        <p:output port="in-memory" sequence="true">
+            <p:pipe step="in-memory" port="result"/>
         </p:output>
-        <px:fileset-load media-types="application/xhtml+xml">
+        <px:fileset-filter media-types="application/xhtml+xml" name="xhtml"/>
+        <px:fileset-load>
             <p:input port="in-memory">
                 <p:pipe step="create-ncc" port="result.in-memory"/>
             </p:input>
@@ -243,12 +243,14 @@
                 </p:viewport>
             </p:group>
         </p:for-each>
-        <p:identity name="xhtml"/>
+        <p:identity name="processed-xhtml"/>
         <p:sink/>
-        <px:fileset-load media-types="application/smil+xml">
-            <p:input port="fileset">
+        <px:fileset-filter media-types="application/smil+xml" name="smil">
+            <p:input port="source">
                 <p:pipe step="create-ncc" port="result.fileset"/>
             </p:input>
+        </px:fileset-filter>
+        <px:fileset-load>
             <p:input port="in-memory">
                 <p:pipe step="create-ncc" port="result.in-memory"/>
             </p:input>
@@ -263,42 +265,49 @@
                 </p:add-attribute>
             </p:viewport>
         </p:for-each>
-        <p:identity name="smil"/>
+        <p:identity name="processed-smil"/>
         <p:sink/>
-        <p:viewport match="//d:file[@media-type='application/xhtml+xml']">
+        <p:documentation>Rename files in XHTML fileset</p:documentation>
+        <p:viewport match="d:file" name="xhtml-renamed.fileset">
             <p:viewport-source>
-                <p:pipe step="create-ncc" port="result.fileset"/>
+                <p:pipe step="xhtml" port="result"/>
             </p:viewport-source>
             <p:add-attribute attribute-name="href" match="/*">
                 <p:with-option name="attribute-value" select="replace(/*/@href,'^(.*)\.([^/\.]*)$','$1.html')"/>
             </p:add-attribute>
         </p:viewport>
+        <p:sink/>
+        <p:documentation>Combine filesets</p:documentation>
+        <p:identity name="in-memory">
+            <p:input port="source">
+                <p:pipe step="processed-xhtml" port="result"/>
+                <p:pipe step="processed-smil" port="result"/>
+                <p:pipe step="smil" port="not-matched.in-memory"/>
+            </p:input>
+        </p:identity>
+        <p:sink/>
+        <px:fileset-join>
+            <p:input port="source">
+                <p:pipe step="xhtml-renamed.fileset" port="result"/>
+                <p:pipe step="xhtml" port="not-matched"/>
+            </p:input>
+        </px:fileset-join>
     </p:group>
 
     <p:documentation>
-        Finalize DAISY 2.02 fileset manifest.
+        Finalize DAISY 2.02 fileset manifest: set DOCTYPE on XHTML and SMIL files
     </p:documentation>
-    <p:add-attribute match="//d:file[@media-type='application/xhtml+xml']"
+    <p:add-attribute match="d:file[@media-type='application/xhtml+xml']"
                      attribute-name="doctype-public"
                      attribute-value="-//W3C//DTD XHTML 1.0 Transitional//EN"/>
-    <p:add-attribute match="//d:file[@media-type='application/xhtml+xml']"
+    <p:add-attribute match="d:file[@media-type='application/xhtml+xml']"
                      attribute-name="doctype-system"
                      attribute-value="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"/>
-    <p:viewport match="//d:file[@media-type='application/smil+xml']">
-        <p:add-attribute match="/*" attribute-name="doctype-public" attribute-value="-//W3C//DTD SMIL 1.0//EN"/>
-        <p:add-attribute match="/*" attribute-name="doctype-system" attribute-value="http://www.w3.org/TR/REC-SMIL/SMIL10.dtd"/>
-    </p:viewport>
-
-    <p:documentation>
-        Combine DAISY 2.02 HTML, NCC and SMIL files with resources from input EPUB 3 fileset.
-    </p:documentation>
-    <px:fileset-update name="result">
-        <p:input port="source.in-memory">
-            <p:pipe step="main" port="source.in-memory"/>
-        </p:input>
-        <p:input port="update">
-            <p:pipe step="rename-xhtml" port="result.in-memory"/>
-        </p:input>
-    </px:fileset-update>
+    <p:add-attribute match="d:file[@media-type='application/smil+xml']"
+                     attribute-name="doctype-public"
+                     attribute-value="-//W3C//DTD SMIL 1.0//EN"/>
+    <p:add-attribute match="d:file[@media-type='application/smil+xml']"
+                     attribute-name="doctype-system"
+                     attribute-value="http://www.w3.org/TR/REC-SMIL/SMIL10.dtd"/>
 
 </p:declare-step>

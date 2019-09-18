@@ -99,6 +99,7 @@
             px:fileset-rebase
             px:fileset-purge
             px:fileset-update
+            px:fileset-filter-in-memory
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
@@ -174,13 +175,12 @@
             <!-- XHTML CLEANUP                                                           -->
             <!--=========================================================================-->
 
-            <px:fileset-load media-types="application/xhtml+xml">
+            <px:fileset-load media-types="application/xhtml+xml" name="html">
                 <p:input port="in-memory">
                     <p:pipe step="safe-uris" port="result.in-memory"/>
                 </p:input>
             </px:fileset-load>
             <px:assert message="No XHTML documents found." test-count-min="1" error-code="PEZE00"/>
-            <p:identity name="html"/>
 
             <p:group name="clean-html">
                 <p:output port="fileset" primary="true"/>
@@ -231,19 +231,21 @@
 
                 </p:for-each>
                 <p:sink/>
-                <p:delete match="d:file/@unsafe-href">
-                    <p:input port="source">
+                <px:fileset-update name="update">
+                    <p:input port="source.fileset">
                         <p:pipe step="safe-uris" port="result.fileset"/>
                     </p:input>
-                </p:delete>
-                <px:fileset-update name="update">
                     <p:input port="source.in-memory">
                         <p:pipe step="safe-uris" port="result.in-memory"/>
                     </p:input>
-                    <p:input port="update">
+                    <p:input port="update.fileset">
+                        <p:pipe step="html" port="result.fileset"/>
+                    </p:input>
+                    <p:input port="update.in-memory">
                         <p:pipe step="cleaned" port="result"/>
                     </p:input>
                 </px:fileset-update>
+                <p:delete match="d:file/@unsafe-href"/>
             </p:group>
         </p:otherwise>
     </p:choose>
@@ -312,7 +314,10 @@
                 <p:input port="source.in-memory">
                     <p:pipe step="move" port="result.in-memory"/>
                 </p:input>
-                <p:input port="update">
+                <p:input port="update.fileset">
+                    <p:pipe step="content-docs" port="result.fileset"/>
+                </p:input>
+                <p:input port="update.in-memory">
                     <p:pipe step="fix-ids" port="result"/>
                 </p:input>
             </px:fileset-update>
@@ -376,6 +381,16 @@
     </px:tts-for-epub3>
 
     <p:documentation>Update the fileset with the enriched HTML files.</p:documentation>
+    <px:fileset-filter-in-memory name="enriched-html.fileset">
+        <p:documentation>Create fileset from enriched HTML files</p:documentation>
+        <p:input port="source.fileset">
+            <p:pipe step="diagram-to-html" port="result.fileset"/>
+        </p:input>
+        <p:input port="source.in-memory">
+            <p:pipe step="tts" port="content.out"/>
+        </p:input>
+    </px:fileset-filter-in-memory>
+    <p:sink/>
     <px:fileset-update name="add-enriched-html">
         <p:input port="source.fileset">
             <p:pipe step="diagram-to-html" port="result.fileset"/>
@@ -383,7 +398,10 @@
         <p:input port="source.in-memory">
             <p:pipe step="diagram-to-html" port="result.in-memory"/>
         </p:input>
-        <p:input port="update">
+        <p:input port="update.fileset">
+            <p:pipe step="enriched-html.fileset" port="result"/>
+        </p:input>
+        <p:input port="update.in-memory">
             <p:pipe step="tts" port="content.out"/>
         </p:input>
     </px:fileset-update>
@@ -512,7 +530,10 @@
                 <p:pipe step="ocf-finalize" port="in-memory.out"/>
                 <p:pipe step="add-package-doc" port="in-memory"/>
             </p:input>
-             <p:input port="update">
+            <p:input port="update.fileset">
+                <p:inline><d:fileset/></p:inline>
+            </p:input>
+            <p:input port="update.in-memory">
                  <!-- update empty because only calling px:fileset-update for purging in-memory port -->
                 <p:empty/>
             </p:input>

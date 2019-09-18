@@ -94,7 +94,10 @@
 	</p:viewport>
 	
 	<px:fileset-update name="update">
-		<p:input port="update">
+		<p:input port="update.fileset">
+			<p:pipe step="content" port="result.fileset"/>
+		</p:input>
+		<p:input port="update.in-memory">
 			<p:pipe step="content.new" port="result"/>
 		</p:input>
 		<p:input port="source.fileset">

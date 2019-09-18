@@ -42,14 +42,14 @@
 		<p:when test="$audio = 'true'">
 			
 			<!-- first load DTBook into memory -->
-			<px:fileset-load media-types="application/x-dtbook+xml">
+			<px:fileset-load media-types="application/x-dtbook+xml" name="dtbook">
 				<p:input port="in-memory">
 					<p:pipe step="main" port="source.in-memory"/>
 				</p:input>
 			</px:fileset-load>
 			
 			<!-- process -->
-			<px:inline-css-speech content-type="application/x-dtbook+xml" name="processed-xml">
+			<px:inline-css-speech content-type="application/x-dtbook+xml" name="processed-dtbook">
 				<p:input port="fileset.in">
 					<p:pipe step="main" port="source.fileset"/>
 				</p:input>
@@ -67,8 +67,11 @@
 				<p:input port="source.in-memory">
 					<p:pipe step="main" port="source.in-memory"/>
 				</p:input>
-				<p:input port="update">
-					<p:pipe step="processed-xml" port="result"/>
+				<p:input port="update.fileset">
+					<p:pipe step="dtbook" port="result.fileset"/>
+				</p:input>
+				<p:input port="update.in-memory">
+					<p:pipe step="processed-dtbook" port="result"/>
 				</p:input>
 			</px:fileset-update>
 			<p:sink/>

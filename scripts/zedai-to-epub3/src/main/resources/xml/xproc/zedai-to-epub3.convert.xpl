@@ -103,18 +103,16 @@
     <!--=========================================================================-->
 
     <p:documentation>Retreive the ZedAI document from the input fileset.</p:documentation>
-    <p:group>
-        <px:fileset-load media-types="application/z3998-auth+xml">
-            <p:input port="in-memory">
-                <p:pipe step="main" port="in-memory.in"/>
-            </p:input>
-        </px:fileset-load>
-        <!-- TODO: describe the error on the wiki and insert correct error code -->
-        <px:assert message="No XML documents with the ZedAI media type ('application/z3998-auth+xml') found in the fileset."
-                   test-count-min="1" error-code="PEZE00"/>
-        <px:assert message="More than one XML document with the ZedAI media type ('application/z3998-auth+xml') found in the fileset; there can only be one ZedAI document."
-                   test-count-max="1" error-code="PEZE00"/>
-    </p:group>
+    <px:fileset-load media-types="application/z3998-auth+xml" name="zedai">
+        <p:input port="in-memory">
+            <p:pipe step="main" port="in-memory.in"/>
+        </p:input>
+    </px:fileset-load>
+    <!-- TODO: describe the error on the wiki and insert correct error code -->
+    <px:assert message="No XML documents with the ZedAI media type ('application/z3998-auth+xml') found in the fileset."
+               test-count-min="1" error-code="PEZE00"/>
+    <px:assert message="More than one XML document with the ZedAI media type ('application/z3998-auth+xml') found in the fileset; there can only be one ZedAI document."
+               test-count-max="1" error-code="PEZE00"/>
 
     <!--=========================================================================-->
     <!-- CSS INLINING                                                            -->
@@ -158,7 +156,10 @@
         <p:input port="source.in-memory">
             <p:pipe step="main" port="in-memory.in"/>
         </p:input>
-        <p:input port="update">
+        <p:input port="update.fileset">
+            <p:pipe step="zedai" port="result.fileset"/>
+        </p:input>
+        <p:input port="update.in-memory">
             <p:pipe step="zedai-with-css" port="result"/>
         </p:input>
     </px:fileset-update>

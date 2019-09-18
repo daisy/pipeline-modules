@@ -58,9 +58,14 @@
     <px:fileset-update name="update">
         <p:input port="source.in-memory">
             <p:pipe step="main" port="source.in-memory"/>
-        </p:input>
-        <p:input port="update">
             <p:pipe step="convert" port="secondary"/>
+        </p:input>
+        <p:input port="update.fileset">
+            <p:inline><d:fileset/></p:inline>
+        </p:input>
+        <p:input port="update.in-memory">
+            <!-- update empty because only calling px:fileset-update for purging in-memory port -->
+            <p:empty/>
         </p:input>
     </px:fileset-update>
 

@@ -9,7 +9,10 @@
 	<p:input port="fileset.in" primary="true"/>
 	<p:input port="in-memory.in" sequence="true"/>
 	<p:option name="href"/>
-	<p:output port="result"/>
+	<p:output port="result" primary="true"/>
+	<p:output port="result.fileset">
+		<p:pipe step="load" port="result.fileset"/>
+	</p:output>
 	
 	<p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
 		<p:documentation>
@@ -19,7 +22,7 @@
 	
 	<p:variable name="base" select="//d:file[starts-with(@media-type,'application/vnd.oasis.opendocument')]/resolve-uri(@href, base-uri(.))"/>
 	
-	<px:fileset-load>
+	<px:fileset-load name="load">
 		<p:with-option name="href" select="resolve-uri($href, $base)"/>
 		<p:input port="in-memory">
 			<p:pipe step="main" port="in-memory.in"/>

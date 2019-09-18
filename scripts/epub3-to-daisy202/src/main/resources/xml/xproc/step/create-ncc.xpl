@@ -31,8 +31,7 @@
         </p:documentation>
     </p:output>
     <p:output port="result.in-memory" sequence="true">
-        <p:pipe step="result.xhtml" port="result"/>
-        <p:pipe step="result.smil" port="result"/>
+        <p:pipe step="update-html" port="result.in-memory"/>
     </p:output>
 
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
@@ -47,6 +46,7 @@
             px:fileset-add-entry
             px:fileset-join
             px:fileset-intersect
+            px:fileset-update
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/epub3-utils/pub/library.xpl">
@@ -123,7 +123,8 @@
             <p:input port="source">
                 <p:pipe step="opf" port="result"/>
                 <p:pipe step="ncc.body" port="result"/>
-                <p:pipe step="result.smil" port="result"/>
+                <p:pipe step="augment-smils" port="smil"/>
+                <p:pipe step="new-smils" port="smil"/>
             </p:input>
             <p:input port="stylesheet">
                 <p:document href="../../xslt/opf-to-ncc-metadata.xsl"/>
@@ -214,7 +215,8 @@
     <p:documentation>
         Augment SMIL files with references to heading elements.
     </p:documentation>
-    <px:fileset-load media-types="application/smil+xml">
+    <px:fileset-load media-types="application/smil+xml" name="smils">
+        <p:documentation>Load SMIL files</p:documentation>
         <p:input port="fileset">
             <p:pipe step="main" port="source.fileset"/>
         </p:input>
@@ -229,8 +231,12 @@
         <p:output port="xhtml" sequence="true">
             <p:pipe step="xhtml-with-linkbacks" port="result"/>
         </p:output>
+        <p:output port="xhtml.fileset">
+            <p:pipe step="associated-xhtml" port="result.fileset"/>
+        </p:output>
         <p:documentation>Get the HTML file(s) that corresponds with this SMIL.</p:documentation>
         <p:variable name="smil-base" select="base-uri(/)"/>
+        <!-- get manifest items with media-overlay attribute pointing to the SMIL -->
         <p:filter>
             <p:input port="source">
                 <p:pipe step="opf" port="result"/>
@@ -241,6 +247,7 @@
                                      return /opf:package/opf:manifest/opf:item[@media-overlay=$mo]
                                      ')"/>
         </p:filter>
+        <!-- create fileset from the items -->
         <p:for-each>
             <px:fileset-add-entry>
                 <p:with-option name="href" select="/*/resolve-uri(@href,base-uri())"/>
@@ -252,13 +259,22 @@
             </px:fileset-add-entry>
         </p:for-each>
         <px:fileset-join name="associated-xhtml.fileset"/>
-        <px:fileset-intersect>
+        <p:sink/>
+        <!-- load in spine order -->
+        <px:fileset-intersect name="xhtml-without-mo.fileset.sorted">
             <p:input port="source">
                 <p:pipe step="spine.fileset" port="result"/>
                 <p:pipe step="associated-xhtml.fileset" port="result"/>
             </p:input>
         </px:fileset-intersect>
-        <!-- load HTML in spine order -->
+        <p:sink/>
+        <!-- add file attributes from source fileset -->
+        <px:fileset-intersect>
+            <p:input port="source">
+                <p:pipe step="main" port="source.fileset"/>
+                <p:pipe step="xhtml-without-mo.fileset.sorted" port="result"/>
+            </p:input>
+        </px:fileset-intersect>
         <px:fileset-load name="associated-xhtml" fail-on-not-found="true">
             <p:input port="in-memory">
                 <p:pipe step="xhtml-with-ids" port="result"/>
@@ -328,13 +344,14 @@
         </px:fileset-add-entry>
     </p:for-each>
     <px:fileset-join name="xhtml-without-mo.fileset"/>
+    <!-- add file attributes from source fileset -->
     <px:fileset-intersect>
         <p:input port="source">
-            <p:pipe step="xhtml-without-mo.fileset" port="result"/>
             <p:pipe step="main" port="source.fileset"/>
+            <p:pipe step="xhtml-without-mo.fileset" port="result"/>
         </p:input>
     </px:fileset-intersect>
-    <px:fileset-load fail-on-not-found="true">
+    <px:fileset-load fail-on-not-found="true" name="xhtml-without-mo">
         <p:input port="in-memory">
             <p:pipe step="xhtml-with-ids" port="result"/>
         </p:input>
@@ -437,14 +454,6 @@
     <px:fileset-join name="new-smils.fileset"/>
     <p:sink/>
 
-    <p:identity name="result.smil">
-        <p:input port="source">
-            <p:pipe step="augment-smils" port="smil"/>
-            <p:pipe step="new-smils" port="smil"/>
-        </p:input>
-    </p:identity>
-    <p:sink/>
-
     <p:documentation>
         Make anchors in NCC point to SMILs.
     </p:documentation>
@@ -452,7 +461,8 @@
         <p:xslt>
             <p:input port="source">
                 <p:pipe step="ncc" port="result"/>
-                <p:pipe step="result.smil" port="result"/>
+                <p:pipe step="augment-smils" port="smil"/>
+                <p:pipe step="new-smils" port="smil"/>
             </p:input>
             <p:input port="stylesheet">
                 <p:document href="../../xslt/create-linkbacks.xsl"/>
@@ -470,39 +480,64 @@
     </p:group>
     <p:identity name="ncc-with-linkbacks"/>
     <p:sink/>
-    
-    <p:identity name="result.xhtml">
+
+    <p:documentation>Fileset of all updated HTML</p:documentation>
+    <px:fileset-join name="xhtml.fileset">
         <p:input port="source">
+            <p:pipe step="augment-smils" port="xhtml.fileset"/>
+            <p:pipe step="xhtml-without-mo" port="result.fileset"/>
+        </p:input>
+    </px:fileset-join>
+    <p:sink/>
+    
+    <p:group name="add-smils">
+        <p:documentation>Add new SMILs and update with augmented SMILs</p:documentation>
+        <p:output port="fileset" primary="true"/>
+        <p:output port="in-memory" sequence="true">
+            <p:pipe step="update" port="result.in-memory"/>
+        </p:output>
+        <px:fileset-join>
+            <p:input port="source">
+                <p:pipe step="main" port="source.fileset"/>
+                <p:pipe step="new-smils.fileset" port="result"/>
+            </p:input>
+        </px:fileset-join>
+        <px:fileset-update name="update">
+            <p:input port="source.in-memory">
+                <p:pipe step="main" port="source.in-memory"/>
+                <p:pipe step="new-smils" port="smil"/>
+            </p:input>
+            <p:input port="update.fileset">
+                <p:pipe step="smils" port="result.fileset"/>
+            </p:input>
+            <p:input port="update.in-memory">
+                <p:pipe step="augment-smils" port="smil"/>
+            </p:input>
+        </px:fileset-update>
+    </p:group>
+
+    <px:fileset-add-entry media-type="application/xhtml+xml" name="add-ncc">
+        <p:documentation>Add generated NCC</p:documentation>
+        <p:input port="source.in-memory">
+            <p:pipe step="add-smils" port="in-memory"/>
+        </p:input>
+        <p:input port="entry">
             <p:pipe step="ncc-with-linkbacks" port="result"/>
+        </p:input>
+    </px:fileset-add-entry>
+
+    <px:fileset-update name="update-html">
+        <p:documentation>Update HTML</p:documentation>
+        <p:input port="source.in-memory">
+            <p:pipe step="add-ncc" port="result.in-memory"/>
+        </p:input>
+        <p:input port="update.fileset">
+            <p:pipe step="xhtml.fileset" port="result"/>
+        </p:input>
+        <p:input port="update.in-memory">
             <p:pipe step="augment-smils" port="xhtml"/>
             <p:pipe step="new-smils" port="xhtml"/>
         </p:input>
-    </p:identity>
-    <p:sink/>
-    
-    <px:fileset-join>
-        <p:documentation>Add SMILs to fileset</p:documentation>
-        <p:input port="source">
-            <p:pipe step="main" port="source.fileset"/>
-            <p:pipe step="new-smils.fileset" port="result"/>
-        </p:input>
-    </px:fileset-join>
-    <px:fileset-add-entry name="result.fileset"
-                          media-type="application/xhtml+xml">
-        <p:documentation>Add generated NCC</p:documentation>
-        <p:with-option name="href" select="base-uri(/*)">
-            <p:pipe step="ncc" port="result"/>
-        </p:with-option>
-    </px:fileset-add-entry>
-    
-    <px:fileset-update name="result.in-memory">
-        <p:input port="update">
-            <p:pipe step="result.xhtml" port="result"/>
-            <p:pipe step="result.smil" port="result"/>
-        </p:input>
-        <p:input port="source.in-memory">
-            <p:pipe step="main" port="source.in-memory"/>
-        </p:input>
     </px:fileset-update>
-    
+
 </p:declare-step>
