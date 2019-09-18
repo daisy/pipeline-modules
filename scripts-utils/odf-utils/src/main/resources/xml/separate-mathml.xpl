@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step version="1.0"
-                xmlns:p="http://www.w3.org/ns/xproc"
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:odt="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
@@ -8,8 +7,7 @@
                 xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
                 xmlns:xlink="http://www.w3.org/1999/xlink"
                 exclude-inline-prefixes="#all"
-                type="odt:separate-mathml"
-                name="separate-mathml">
+                type="odt:separate-mathml" name="main">
 	
 	<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 		<p>Extract MathML formula's from the main content document and put each one in its
@@ -30,22 +28,15 @@
 	<p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
 	<p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
 	
-	<p:variable name="base" select="//d:file[starts-with(@media-type,'application/vnd.oasis.opendocument')]/resolve-uri(@href, base-uri(.))">
-		<p:pipe step="separate-mathml" port="fileset.in"/>
-	</p:variable>
+	<p:variable name="base" select="//d:file[starts-with(@media-type,'application/vnd.oasis.opendocument')]/resolve-uri(@href, base-uri(.))"/>
 	<p:variable name="numbering-offset"
 	            select="max((0, for $x in (//d:file[@media-type='application/mathml+xml']/substring-after(resolve-uri(@href, base-uri(.)), $base))
 	                                      [matches(., '^Math/mathml_([0-9]+)/content\.xml$')]
-	                              return number(replace($x, '^Math/mathml_([0-9]+)/content\.xml$', '$1'))))">
-		<p:pipe step="separate-mathml" port="fileset.in"/>
-	</p:variable>
+	                              return number(replace($x, '^Math/mathml_([0-9]+)/content\.xml$', '$1'))))"/>
 	
 	<odt:get-file href="content.xml" name="content">
-		<p:input port="fileset.in">
-			<p:pipe step="separate-mathml" port="fileset.in"/>
-		</p:input>
 		<p:input port="in-memory.in">
-			<p:pipe step="separate-mathml" port="in-memory.in"/>
+			<p:pipe step="main" port="in-memory.in"/>
 		</p:input>
 	</odt:get-file>
 	
@@ -93,7 +84,7 @@
 	
 	<px:fileset-join name="fileset.with-mathml">
 		<p:input port="source">
-			<p:pipe step="separate-mathml" port="fileset.in"/>
+			<p:pipe step="main" port="fileset.in"/>
 			<p:pipe step="fileset.mathml" port="result"/>
 		</p:input>
 	</px:fileset-join>
@@ -107,7 +98,7 @@
 			<p:pipe step="fileset.with-mathml" port="result"/>
 		</p:input>
 		<p:input port="source.in-memory">
-			<p:pipe step="separate-mathml" port="in-memory.in"/>
+			<p:pipe step="main" port="in-memory.in"/>
 			<p:pipe step="mathml" port="result"/>
 		</p:input>
 	</px:fileset-update>
