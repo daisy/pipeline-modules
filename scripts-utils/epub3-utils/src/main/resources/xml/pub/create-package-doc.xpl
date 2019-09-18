@@ -162,7 +162,6 @@
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
         <p:documentation>
             px:fileset-load
-            px:fileset-filter
             px:fileset-join
             px:fileset-intersect
             px:fileset-diff
@@ -198,20 +197,11 @@
     </px:mediatype-detect>
 
     <p:documentation>Get content documents</p:documentation>
-    <p:group name="content-docs">
-        <p:output port="fileset" primary="true">
-            <p:pipe step="fileset" port="result"/>
-        </p:output>
-        <p:output port="in-memory" sequence="true">
-            <p:pipe step="in-memory" port="result"/>
-        </p:output>
-        <px:fileset-filter media-types="application/xhtml+xml image/svg+xml" name="fileset"/>
-        <px:fileset-load name="in-memory">
-            <p:input port="in-memory">
-                <p:pipe step="main" port="source.in-memory"/>
-            </p:input>
-        </px:fileset-load>
-    </p:group>
+    <px:fileset-load media-types="application/xhtml+xml image/svg+xml" name="content-docs">
+        <p:input port="in-memory">
+            <p:pipe step="main" port="source.in-memory"/>
+        </p:input>
+    </px:fileset-load>
     <p:sink/>
 
     <p:documentation>Get navigation document</p:documentation>
@@ -219,24 +209,24 @@
         <p:output port="result"/>
         <p:choose>
             <p:xpath-context>
-                <p:pipe step="content-docs" port="fileset"/>
+                <p:pipe step="content-docs" port="result.fileset"/>
             </p:xpath-context>
             <p:when test="//d:file[@nav='true']">
                 <p:delete match="d:file[not(@nav='true')]">
                     <p:input port="source">
-                        <p:pipe step="content-docs" port="fileset"/>
+                        <p:pipe step="content-docs" port="result.fileset"/>
                     </p:input>
                 </p:delete>
                 <px:fileset-load>
                     <p:input port="in-memory">
-                        <p:pipe step="content-docs" port="in-memory"/>
+                        <p:pipe step="content-docs" port="result"/>
                     </p:input>
                 </px:fileset-load>
             </p:when>
             <p:otherwise>
                 <p:split-sequence test="//html:nav[@epub:type='toc']">
                     <p:input port="source">
-                        <p:pipe step="content-docs" port="in-memory"/>
+                        <p:pipe step="content-docs" port="result"/>
                     </p:input>
                 </p:split-sequence>
             </p:otherwise>
@@ -248,24 +238,14 @@
     <p:sink/>
 
     <p:documentation>Get media overlay documents</p:documentation>
-    <p:group name="mediaoverlays">
-        <p:output port="fileset" primary="true">
-            <p:pipe step="fileset" port="result"/>
-        </p:output>
-        <p:output port="in-memory" sequence="true">
-            <p:pipe step="in-memory" port="result"/>
-        </p:output>
-        <px:fileset-filter media-types="application/smil+xml" name="fileset">
-            <p:input port="source">
-                <p:pipe step="main" port="source.fileset"/>
-            </p:input>
-        </px:fileset-filter>
-        <px:fileset-load name="in-memory">
-            <p:input port="in-memory">
-                <p:pipe step="main" port="source.in-memory"/>
-            </p:input>
-        </px:fileset-load>
-    </p:group>
+    <px:fileset-load media-types="application/smil+xml" name="mediaoverlays">
+        <p:input port="fileset">
+            <p:pipe step="main" port="source.fileset"/>
+        </p:input>
+        <p:input port="in-memory">
+            <p:pipe step="main" port="source.in-memory"/>
+        </p:input>
+    </px:fileset-load>
     <p:sink/>
 
     <p:documentation>Construct metadata element</p:documentation>
@@ -290,7 +270,7 @@
             <p:for-each name="metadata.durations">
                 <p:output port="result" sequence="true"/>
                 <p:iteration-source>
-                    <p:pipe step="mediaoverlays" port="in-memory"/>
+                    <p:pipe step="mediaoverlays" port="result"/>
                 </p:iteration-source>
                 <p:variable name="base" select="base-uri(/*)"/>
                 <p:xslt>
@@ -418,7 +398,7 @@
         <p:sink/>
         <px:fileset-diff>
             <p:input port="source">
-                <p:pipe step="content-docs" port="fileset"/>
+                <p:pipe step="content-docs" port="result.fileset"/>
             </p:input>
             <p:input port="secondary">
                 <p:pipe step="nav-doc.fileset" port="result"/>
@@ -439,7 +419,7 @@
             <p:when test="/*=1">
                 <px:fileset-intersect>
                     <p:input port="source">
-                        <p:pipe step="content-docs" port="fileset"/>
+                        <p:pipe step="content-docs" port="result.fileset"/>
                         <p:pipe step="main" port="spine"/>
                     </p:input>
                 </px:fileset-intersect>
@@ -509,7 +489,7 @@
         <p:group name="manifest-with-content-doc-properties">
             <p:for-each>
                 <p:iteration-source>
-                    <p:pipe step="content-docs" port="in-memory"/>
+                    <p:pipe step="content-docs" port="result"/>
                 </p:iteration-source>
                 <p:variable name="doc-base" select="p:base-uri(/*)"/>
                 <p:identity name="current"/>
@@ -607,7 +587,7 @@
         <p:xslt px:message="Assigning media overlays to their corresponding content documents..." px:message-severity="DEBUG">
             <p:input port="source">
                 <p:pipe step="fileset-to-manifest" port="result"/>
-                <p:pipe step="mediaoverlays" port="in-memory"/>
+                <p:pipe step="mediaoverlays" port="result"/>
             </p:input>
             <p:input port="stylesheet">
                 <p:document href="assign-media-overlays.xsl"/>

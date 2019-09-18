@@ -94,7 +94,6 @@
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
         <p:documentation>
             px:fileset-load
-            px:fileset-filter
             px:fileset-add-entry
             px:fileset-join
             px:fileset-rebase
@@ -265,20 +264,11 @@
     <!-- GENERATE THE NAVIGATION DOCUMENT                                        -->
     <!--=========================================================================-->
 
-    <p:group name="content-docs">
-        <p:output port="fileset" primary="true">
-            <p:pipe step="fileset" port="result"/>
-        </p:output>
-        <p:output port="in-memory" sequence="true">
-            <p:pipe step="in-memory" port="result"/>
-        </p:output>
-        <px:fileset-filter media-types="application/xhtml+xml" name="fileset"/>
-        <px:fileset-load name="in-memory">
-            <p:input port="in-memory">
-                <p:pipe step="move" port="result.in-memory"/>
-            </p:input>
-        </px:fileset-load>
-    </p:group>
+    <px:fileset-load media-types="application/xhtml+xml" name="content-docs">
+        <p:input port="in-memory">
+            <p:pipe step="move" port="result.in-memory"/>
+        </p:input>
+    </px:fileset-load>
 
     <p:documentation>Generate the EPUB 3 navigation document</p:documentation>
     <p:choose name="add-navigation-doc">
@@ -301,11 +291,6 @@
             <p:output port="in-memory" sequence="true">
                 <p:pipe step="add-entry" port="result.in-memory"/>
             </p:output>
-            <p:identity>
-                <p:input port="source">
-                    <p:pipe step="content-docs" port="in-memory"/>
-                </p:input>
-            </p:identity>
             <p:for-each name="fix-ids">
                 <p:documentation>Add missing IDs</p:documentation>
                 <p:output port="result" sequence="true"/>
@@ -352,7 +337,7 @@
     <!-- FIXME: adapt to multiple XHTML input docs -->
     <p:split-sequence test="position()=1">
         <p:input port="source">
-            <p:pipe step="content-docs" port="in-memory"/>
+            <p:pipe step="content-docs" port="result"/>
         </p:input>
     </p:split-sequence>
     <px:html-to-opf-metadata name="metadata"/>
@@ -470,7 +455,7 @@
                 <p:pipe step="add-mediaoverlays" port="in-memory"/>
             </p:input>
             <p:input port="spine">
-                <p:pipe step="content-docs" port="fileset"/>
+                <p:pipe step="content-docs" port="result.fileset"/>
             </p:input>
             <p:input port="metadata">
                 <p:pipe step="main" port="metadata"/>

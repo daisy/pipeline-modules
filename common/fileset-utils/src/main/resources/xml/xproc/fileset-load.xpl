@@ -12,8 +12,19 @@
   <p:input port="in-memory" sequence="true">
     <p:empty/>
   </p:input>
-  <p:output port="result" sequence="true">
-    <p:pipe port="result" step="load"/>
+
+  <p:output port="result.fileset">
+    <p:pipe step="result.fileset" port="result"/>
+  </p:output>
+  <p:output port="result" sequence="true" primary="true">
+    <p:pipe step="load" port="result"/>
+    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <p>The filtered and loaded fileset.</p>
+      <p>All files are loaded into memory, unless if the "load-if-not-in-memory" option is set, then
+      the "result" port will only contain documents that were already present in the "in-memory"
+      input.</p>
+      <p>"original-href" attributes are removed from the manifest.</p>
+    </p:documentation>
   </p:output>
 
   <p:option name="href" select="''"/>
@@ -80,6 +91,7 @@
     <p:documentation>Normalize @href</p:documentation>
   </px:fileset-join>
   <p:identity name="filtered-normalized"/>
+  <p:delete match="@original-href" name="result.fileset"/>
   <p:for-each>
     <p:iteration-source select="/*/*"/>
     <p:identity/>
