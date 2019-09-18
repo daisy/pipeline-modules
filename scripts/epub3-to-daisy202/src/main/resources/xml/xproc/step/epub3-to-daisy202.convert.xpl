@@ -288,12 +288,6 @@
         <p:add-attribute match="/*" attribute-name="doctype-public" attribute-value="-//W3C//DTD SMIL 1.0//EN"/>
         <p:add-attribute match="/*" attribute-name="doctype-system" attribute-value="http://www.w3.org/TR/REC-SMIL/SMIL10.dtd"/>
     </p:viewport>
-    <p:xslt>
-        <p:with-param name="preserve-empty-whitespace" select="'false'"/>
-        <p:input port="stylesheet">
-            <p:document href="../../xslt/pretty-print.xsl"/>
-        </p:input>
-    </p:xslt>
 
     <p:documentation>
         Combine DAISY 2.02 HTML, NCC and SMIL files with resources from input EPUB 3 fileset.
