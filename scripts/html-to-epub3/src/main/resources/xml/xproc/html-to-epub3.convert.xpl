@@ -519,25 +519,18 @@
             <p:pipe step="ocf-finalize" port="result"/>
         </p:output>
         <p:output port="in-memory" sequence="true">
-            <p:pipe step="in-memory" port="result.in-memory"/>
+            <p:pipe step="filter-in-memory" port="result.in-memory"/>
         </p:output>
         <px:epub3-ocf-finalize name="ocf-finalize"/>
         <p:documentation>
             Remove files from memory that are not in fileset
         </p:documentation>
-        <px:fileset-update name="in-memory">
+        <px:fileset-filter-in-memory name="filter-in-memory">
             <p:input port="source.in-memory">
                 <p:pipe step="ocf-finalize" port="in-memory.out"/>
                 <p:pipe step="add-package-doc" port="in-memory"/>
             </p:input>
-            <p:input port="update.fileset">
-                <p:inline><d:fileset/></p:inline>
-            </p:input>
-            <p:input port="update.in-memory">
-                 <!-- update empty because only calling px:fileset-update for purging in-memory port -->
-                <p:empty/>
-            </p:input>
-        </px:fileset-update>
+        </px:fileset-filter-in-memory>
         <p:sink/>
     </p:group>
 

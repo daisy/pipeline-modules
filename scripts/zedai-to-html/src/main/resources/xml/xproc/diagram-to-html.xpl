@@ -16,7 +16,9 @@
         <p:empty/>
     </p:input>
 
-    <p:output port="result.fileset" primary="true"/>
+    <p:output port="result.fileset" primary="true">
+        <p:pipe step="convert" port="result"/>
+    </p:output>
     <p:output port="result.in-memory" sequence="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>A fileset where old DIAGRAM entries have been replaced by entries representing the
@@ -24,13 +26,13 @@
             <p>The HTML documents have the same location of the DIAGRAM files and have the file
             extension ".xhtml".</p>
         </p:documentation>
-        <p:pipe step="update" port="result.in-memory"/>
+        <p:pipe step="in-memory" port="result.in-memory"/>
     </p:output>
 
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
         <p:documentation>
             px:fileset-load
-            px:fileset-update
+            px:fileset-filter-in-memory
         </p:documentation>
     </p:import>
 
@@ -55,18 +57,12 @@
         </p:input>
     </p:xslt>
 
-    <px:fileset-update name="update">
+    <px:fileset-filter-in-memory name="in-memory">
         <p:input port="source.in-memory">
             <p:pipe step="main" port="source.in-memory"/>
             <p:pipe step="convert" port="secondary"/>
         </p:input>
-        <p:input port="update.fileset">
-            <p:inline><d:fileset/></p:inline>
-        </p:input>
-        <p:input port="update.in-memory">
-            <!-- update empty because only calling px:fileset-update for purging in-memory port -->
-            <p:empty/>
-        </p:input>
-    </px:fileset-update>
+    </px:fileset-filter-in-memory>
+    <p:sink/>
 
 </p:declare-step>

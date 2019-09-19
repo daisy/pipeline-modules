@@ -10,10 +10,16 @@
 	<p:input port="source.fileset" primary="true"/>
 	<p:input port="source.in-memory" sequence="true"/>
 	<p:output port="result" primary="true">
+		<p:pipe step="result" port="result"/>
+	</p:output>
+	<p:output port="result.in-memory" sequence="true">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			<p>The pruned fileset manifest.</p>
+			<p>The pruned fileset</p>
+			<p>The manifest contains only the files from "source.fileset" for which a document
+			exists on the "source.in-memory port", and the "result.in-memory" port contains only
+			documents that are present in the manifest. No documents are loaded from disk.</p>
 		</p:documentation>
-		<p:pipe step="intersect" port="result"/>
+		<p:pipe step="result.in-memory" port="result"/>
 	</p:output>
 	<p:output port="not-in-memory">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -34,8 +40,9 @@
 	<p:import href="fileset-join.xpl"/>
 	<p:import href="fileset-intersect.xpl"/>
 	<p:import href="fileset-diff.xpl"/>
+	<p:import href="fileset-load.xpl"/>
 	
-	<px:fileset-create name="base" base="/"/>
+	<px:fileset-create name="base"/>
 	
 	<p:for-each>
 		<p:iteration-source>
@@ -51,12 +58,18 @@
 	<px:fileset-join name="fileset-from-in-memory"/>
 	<p:sink/>
 	
-	<px:fileset-intersect name="intersect">
+	<px:fileset-intersect name="result">
 		<p:input port="source">
 			<p:pipe step="main" port="source.fileset"/>
 			<p:pipe step="fileset-from-in-memory" port="result"/>
 		</p:input>
 	</px:fileset-intersect>
+	<px:fileset-load name="result.in-memory">
+		<!-- this will just pick documents, everything is already loaded -->
+		<p:input port="in-memory">
+			<p:pipe step="main" port="source.in-memory"/>
+		</p:input>
+	</px:fileset-load>
 	<p:sink/>
 	
 	<px:fileset-diff name="not-in-manifest">
