@@ -69,6 +69,8 @@
             px:fileset-create
             px:fileset-add-entry
             px:fileset-load
+            px:fileset-copy
+            px:fileset-update
         </p:documentation>
     </p:import>
     <p:import href="fileset-fix-original-hrefs.xpl">
@@ -91,6 +93,7 @@
             px:set-doctype
             px:set-xml-declaration
             px:normalize-uri
+            px:set-base-uri
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/zip-utils/library.xpl">
@@ -186,6 +189,112 @@
         <p:when test="//d:file[contains(resolve-uri(@href, base-uri(.)),'!/')]">
             <p:identity name="fileset"/>
             <p:delete match="d:file[not(contains(resolve-uri(@href, base-uri(.)),'!/'))]"/>
+            <p:choose name="maybe-unzip">
+                <p:documentation>When there are files with a doctype or xml-declaration attribute,
+                first store them to a temporary location on disk.</p:documentation>
+                <p:when test="//d:file[not(@original-href) and (@doctype|@xml-declaration)]">
+                    <p:output port="fileset" primary="true"/>
+                    <p:output port="in-memory" sequence="true">
+                        <p:pipe step="update" port="result.in-memory"/>
+                    </p:output>
+                    <p:identity name="zip-fileset"/>
+                    <p:sink/>
+                    <px:tempdir delete-on-exit="true"/>
+                    <px:normalize-uri name="unzip-dir">
+                        <p:with-option name="href" select="string(/*)"/>
+                    </px:normalize-uri>
+                    <p:sink/>
+                    <p:identity>
+                        <p:input port="source">
+                            <p:pipe step="zip-fileset" port="result"/>
+                        </p:input>
+                    </p:identity>
+                    <p:delete match="d:file[not(not(@original-href) and (@doctype|@xml-declaration))]"/>
+                    <!-- store to temporarily location on disk (with a recursive call) -->
+                    <p:group name="copy-to-temp">
+                        <p:output port="result.fileset" primary="true">
+                            <p:pipe step="result.fileset" port="result"/>
+                        </p:output>
+                        <p:output port="result.in-memory" sequence="true">
+                            <p:pipe step="result.in-memory" port="result"/>
+                        </p:output>
+                        <p:output port="mapping">
+                            <p:pipe step="mapping" port="result"/>
+                        </p:output>
+                        <!-- move to temporary directory -->
+                        <px:fileset-copy name="copy">
+                            <p:with-option name="target" select="string(/*)">
+                                <p:pipe step="unzip-dir" port="normalized"/>
+                            </p:with-option>
+                            <p:input port="source.in-memory">
+                                <p:pipe step="fix" port="result.in-memory"/>
+                            </p:input>
+                        </px:fileset-copy>
+                        <!-- change zip files to directories -->
+                        <p:label-elements match="d:file" attribute="href" label="replace(@href,'!','')" name="result.fileset"/>
+                        <p:sink/>
+                        <p:label-elements match="d:file" attribute="href" label="replace(@href,'!','')" name="mapping">
+                            <p:input port="source">
+                                <p:pipe step="copy" port="mapping"/>
+                            </p:input>
+                        </p:label-elements>
+                        <p:sink/>
+                        <p:for-each name="result.in-memory">
+                            <p:iteration-source>
+                                <p:pipe step="copy" port="result.in-memory"/>
+                            </p:iteration-source>
+                            <p:output port="result"/>
+                            <px:set-base-uri>
+                                <p:with-option name="base-uri" select="replace(base-uri(/*),'!','')"></p:with-option>
+                            </px:set-base-uri>
+                        </p:for-each>
+                        <p:sink/>
+                    </p:group>
+                    <px:fileset-store name="store-to-temp">
+                        <p:input port="in-memory.in">
+                            <p:pipe step="copy-to-temp" port="result.in-memory"/>
+                        </p:input>
+                        <p:with-option name="fail-on-error" select="$fail-on-error"/>
+                    </px:fileset-store>
+                    <p:identity>
+                        <p:input port="source">
+                            <p:pipe step="store-to-temp" port="fileset.out"/>
+                        </p:input>
+                    </p:identity>
+                    <!-- apply the inverse of the previous copy -->
+                    <p:viewport match="d:file">
+                        <p:variable name="href" select="/*/resolve-uri(@href,base-uri(.))"/>
+                        <p:add-attribute match="/*" attribute-name="href">
+                            <p:with-option name="attribute-value" select="//d:file[resolve-uri(@href,base-uri(.))=$href]/@original-href">
+                                <p:pipe step="copy-to-temp" port="mapping"/>
+                            </p:with-option>
+                        </p:add-attribute>
+                    </p:viewport>
+                    <p:identity name="zip-from-temp"/>
+                    <p:sink/>
+                    <px:fileset-update name="update">
+                        <p:input port="source.fileset">
+                            <p:pipe step="zip-fileset" port="result"/>
+                        </p:input>
+                        <p:input port="source.in-memory">
+                            <p:pipe step="fix" port="result.in-memory"/>
+                        </p:input>
+                        <p:input port="update.fileset">
+                            <p:pipe step="zip-from-temp" port="result"/>
+                        </p:input>
+                        <p:input port="update.in-memory">
+                            <p:empty/>
+                        </p:input>
+                    </px:fileset-update>
+                </p:when>
+                <p:otherwise>
+                    <p:output port="fileset" primary="true"/>
+                    <p:output port="in-memory" sequence="true">
+                        <p:pipe step="fix" port="result.in-memory"/>
+                    </p:output>
+                    <p:identity/>
+                </p:otherwise>
+            </p:choose>
             <p:xslt name="zip-manifests">
                 <p:input port="stylesheet">
                     <p:document href="../xslt/fileset-to-zip-manifests.xsl"/>
@@ -201,7 +310,7 @@
                 </p:iteration-source>
                 <px:zip>
                     <p:input port="source">
-                        <p:pipe step="fix" port="result.in-memory"/>
+                        <p:pipe step="maybe-unzip" port="in-memory"/>
                     </p:input>
                     <p:input port="manifest">
                         <p:pipe step="zip" port="current"/>

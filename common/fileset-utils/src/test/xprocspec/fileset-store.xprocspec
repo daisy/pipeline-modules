@@ -468,7 +468,7 @@
     <x:context label="The stored file">
       <x:document type="file" base-uri="temp-dir" href="9/c.zip!/e.xml" method="text"/>
     </x:context>
-    <x:expect label="The stored file" type="compare" xfail="true">
+    <x:expect label="The stored file" type="compare">
       <x:document type="inline" xml:space="preserve"><body xmlns="http://www.w3.org/ns/xproc-step">&lt;!DOCTYPE foo&gt;
 &lt;root xmlns:px="http://www.daisy.org/ns/pipeline/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal" xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns:x="http://www.daisy.org/ns/xprocspec" xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:dpx="http://www.daisy.org/ns/pipeline/xproc"&gt;
 	&lt;node&gt;
