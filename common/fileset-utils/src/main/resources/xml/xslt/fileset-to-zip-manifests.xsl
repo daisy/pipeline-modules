@@ -40,12 +40,21 @@
 			<xsl:variable name="target" select="resolve-uri(@href, base-uri(.))"/>
 			<xsl:attribute name="name" select="pf:unescape-uri(substring-after($target,'!/'))"/>
 			<xsl:attribute name="href" select="(@original-href,@href)[1]"/>
-			<xsl:sequence select="@compression-method|       @encoding|                @normalization-form|
-			                      @compression-level|        @escape-uri-attributes|   @omit-xml-declaration|
-			                      @byte-order-mark|          @include-content-type|    @standalone|
-			                      @cdata-section-elements|   @indent|                  @undeclare-prefixes|
-			                      @doctype-public|           @media-type|              @version|
-			                      @doctype-system|           @method"/>
+			<!--
+				serialization attributes
+				
+				Note that px:zip ignores these when the c:entry does not point to a document in
+				memory (i.e. when @original-href exists).
+			-->
+			<xsl:sequence select="@byte-order-mark        | @escape-uri-attributes | @normalization-form   |
+			                      @cdata-section-elements | @include-content-type  | @omit-xml-declaration |
+			                      @doctype-public         | @indent                | @standalone           |
+			                      @doctype-system         | @media-type            | @undeclare-prefixes   |
+			                      @encoding               | @method                | @version"/>
+			<!--
+			    attributes specific for px:zip
+			-->
+			<xsl:sequence select="@compression-method | @compression-level"/>
 		</xsl:element>
 	</xsl:template>
 	

@@ -22,6 +22,31 @@
 
     <p:input port="fileset.in" primary="true"/>
     <p:input port="in-memory.in" sequence="true">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>The input fileset</p>
+            <p>A number of serialization parameters can be specified with attributes on the
+            <code>d:file</code> elements:</p>
+            <ul>
+                <li>byte-order-mark</li>
+                <li>cdata-section-elements</li>
+                <li>doctype</li>
+                <li>doctype-public</li>
+                <li>doctype-system</li>
+                <li>encoding</li>
+                <li>escape-uri-attributes</li>
+                <li>include-content-type</li>
+                <li>indent</li>
+                <li>media-type</li>
+                <li>method</li>
+                <li>normalization-form</li>
+                <li>omit-xml-declaration</li>
+                <li>standalone</li>
+                <li>undeclare-prefixes</li>
+                <li>version</li>
+                <li>xml-declaration</li>
+            </ul>
+            <p>These parameters only have effect when the file exists in memory.</p>
+        </p:documentation>
         <p:empty/>
     </p:input>
     <p:output port="fileset.out" primary="false">
