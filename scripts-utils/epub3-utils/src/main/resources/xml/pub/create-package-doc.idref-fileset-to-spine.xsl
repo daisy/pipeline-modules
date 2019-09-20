@@ -6,7 +6,7 @@
         <spine>
             <xsl:for-each select="*">
                 <itemref idref="{@idref}" id="itemref_{position()}">
-                    <xsl:if test="@linear">
+                    <xsl:if test="@linear='no'">
                         <xsl:attribute name="linear" select="@linear"/>
                     </xsl:if>
                 </itemref>

@@ -40,7 +40,8 @@
             <p>Fileset that will make up the primary <a
             href="http://www.idpf.org/epub/301/spec/epub-publications.html#sec-spine-elem">spine</a>
             items.</p>
-            <p>Items that are not <a
+            <p>The order of the spine items is determined by the "source.fileset" input. Items that
+            are not <a
             href="http://www.idpf.org/epub/301/spec/epub-publications.html#gloss-content-document-epub">content
             documents</a> are omitted.</p>
             <!-- The latter is because the EPUB spec says: "Each referenced manifest item [from the
@@ -49,8 +50,8 @@
                  Resource, must include an EPUB Content Document in its fallback chain." For now we
                  don't provide a way to specify fallbacks, so we have to disallow non-content
                  documents altogether. -->
-            <p>If not specified, defaults to all content documents, in the order in which they are
-            specified in "source.fileset", and except the navigation document.</p>
+            <p>If not specified, defaults to all content documents except the navigation
+            document.</p>
             <p>The content documents in "source.fileset" that are not in "spine" and are not the
             navigation document become auxiliary spine items.</p>
             <!-- This is because the EPUB spec says: "All EPUB Content Documents that are linked to
@@ -190,6 +191,7 @@
         <p:with-option name="href" select="$output-base-uri"/>
     </px:normalize-uri>
 
+    <p:delete match="d:file/@linear"/>
     <px:mediatype-detect name="source.fileset">
         <p:input port="in-memory">
             <p:pipe step="main" port="source.in-memory"/>
@@ -432,6 +434,7 @@
                 </p:identity>
             </p:otherwise>
         </p:choose>
+        <p:add-attribute match="d:file" attribute-name="linear" attribute-value="yes"/>
     </p:group>
 
     <p:documentation>Create manifest</p:documentation>
@@ -604,24 +607,23 @@
     <p:documentation>Get spine</p:documentation>
     <p:group name="spine">
         <p:output port="result"/>
-        <p:group name="spine.secondary">
-            <p:output port="result"/>
-            <px:fileset-diff>
-                <p:input port="source">
-                    <p:pipe step="content-docs-except-nav" port="result"/>
-                </p:input>
-                <p:input port="secondary">
-                    <p:pipe step="spine.primary" port="result"/>
-                </p:input>
-            </px:fileset-diff>
-            <p:add-attribute match="/d:fileset/d:file" attribute-name="linear" attribute-value="no"/>
-        </p:group>
-        <px:fileset-join>
+
+        <p:documentation>Add secondary spine items and sort</p:documentation>
+        <p:add-attribute match="d:file" attribute-name="linear" attribute-value="no" name="spine.secondary-if-not-primary">
             <p:input port="source">
-                <p:pipe step="spine.primary" port="result"/>
-                <p:pipe step="spine.secondary" port="result"/>
+                <p:pipe step="content-docs-except-nav" port="result"/>
+            </p:input>
+        </p:add-attribute>
+        <p:sink/>
+        <px:fileset-join>
+            <!-- when file attributes are merged the last occurence wins -->
+            <p:input port="source">
+                <p:pipe step="source.fileset" port="result"/>
+                <p:pipe step="spine.secondary-if-not-primary" port="result"/> <!-- linear="no" -->
+                <p:pipe step="spine.primary" port="result"/> <!-- linear="yes" -->
             </p:input>
         </px:fileset-join>
+        <p:delete match="d:file[not(@linear)]"/>
 
         <p:documentation>Add idref attributes</p:documentation>
         <p:group>

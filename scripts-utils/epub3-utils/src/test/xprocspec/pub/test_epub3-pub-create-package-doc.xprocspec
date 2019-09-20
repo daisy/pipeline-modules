@@ -11,11 +11,11 @@
 			<x:input port="source.fileset">
 				<x:document type="inline">
 					<d:fileset xml:base="file:/tmp/epub/EPUB/">
-						<d:file href="book-1.xhtml" media-type="application/xhtml+xml"/>
-						<d:file href="book-2.xhtml" media-type="application/xhtml+xml"/>
+						<d:file href="cover.xhtml" media-type="application/xhtml+xml"/>
+						<d:file href="chapter.xhtml" media-type="application/xhtml+xml"/>
 						<d:file href="nav.xhtml" media-type="application/xhtml+xml"/>
-						<d:file href="mo/book-1.smil" media-type="application/smil+xml"/>
-						<d:file href="mo/book-2.smil" media-type="application/smil+xml"/>
+						<d:file href="mo/cover.smil" media-type="application/smil+xml"/>
+						<d:file href="mo/chapter.smil" media-type="application/smil+xml"/>
 						<d:file href="audio/audio.mp3" media-type="audio/mpeg"/>
 						<d:file href="slideshow.xml" media-type="application/x-demo-slideshow"/>
 						<d:file href="images/Pict1.jpg" media-type="image/jpeg"/>
@@ -56,7 +56,7 @@
 						</body>
 					</html>
 				</x:document>
-				<x:document type="inline" xml:base="file:/tmp/epub/EPUB/book-1.xhtml">
+				<x:document type="inline" xml:base="file:/tmp/epub/EPUB/cover.xhtml">
 					<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 						<head>
 							<meta charset="UTF-8"/>
@@ -78,7 +78,7 @@
 						</body>
 					</html>
 				</x:document>
-				<x:document type="inline" xml:base="file:/tmp/epub/EPUB/book-2.xhtml">
+				<x:document type="inline" xml:base="file:/tmp/epub/EPUB/chapter.xhtml">
 					<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 						<head>
 							<meta charset="UTF-8"/>
@@ -113,19 +113,19 @@
 						</body>
 					</html>
 				</x:document>
-				<x:document type="inline" xml:base="file:/tmp/epub/EPUB/mo/book-1.smil">
+				<x:document type="inline" xml:base="file:/tmp/epub/EPUB/mo/cover.smil">
 					<smil xmlns="http://www.w3.org/ns/SMIL" version="3.0">
 						<body epub:type="frontmatter">
-							<seq epub:textref="../book-1.xhtml#d4460e14">
-								<seq epub:textref="../book-1.xhtml#forsmil-d1386e16" epub:type="title">
+							<seq epub:textref="../cover.xhtml#d4460e14">
+								<seq epub:textref="../cover.xhtml#forsmil-d1386e16" epub:type="title">
 									<par>
-										<text src="../book-1.xhtml#std1325e17"/>
+										<text src="../cover.xhtml#std1325e17"/>
 										<audio src="../audio/audio.mp3" clipBegin="00:00:00" clipEnd="00:00:04.292"/>
 									</par>
 								</seq>
-								<seq epub:textref="../book-1.xhtml#forsmil-d1386e24">
+								<seq epub:textref="../cover.xhtml#forsmil-d1386e24">
 									<par>
-										<text src="../book-1.xhtml#std1325e25"/>
+										<text src="../cover.xhtml#std1325e25"/>
 										<audio src="../audio/audio.mp3" clipBegin="00:00:04.292" clipEnd="00:00:08.585"/>
 									</par>
 								</seq>
@@ -133,33 +133,33 @@
 						</body>
 					</smil>
 				</x:document>
-				<x:document type="inline" xml:base="file:/tmp/epub/EPUB/mo/book-2.smil">
+				<x:document type="inline" xml:base="file:/tmp/epub/EPUB/mo/chapter.smil">
 					<smil xmlns="http://www.w3.org/ns/SMIL" version="3.0">
 						<body epub:type="bodymatter">
-							<seq epub:textref="../book-2.xhtml#d4460e32">
+							<seq epub:textref="../chapter.xhtml#d4460e32">
 								<par epub:type="pagebreak">
-									<text src="../book-2.xhtml#page_1"/>
+									<text src="../chapter.xhtml#page_1"/>
 									<audio src="../audio/audio.mp3" clipBegin="00:00:08.585" clipEnd="00:00:12.878"/>
 								</par>
-								<seq epub:textref="../book-2.xhtml#forsmil-d1386e37">
+								<seq epub:textref="../chapter.xhtml#forsmil-d1386e37">
 									<par>
-										<text src="../book-2.xhtml#std1325e38"/>
+										<text src="../chapter.xhtml#std1325e38"/>
 										<audio src="../audio/audio.mp3" clipBegin="00:00:12.878" clipEnd="00:00:17.170"/>
 									</par>
 								</seq>
-								<seq epub:textref="../book-2.xhtml#forsmil-d1386e42">
+								<seq epub:textref="../chapter.xhtml#forsmil-d1386e42">
 									<par>
-										<text src="../book-2.xhtml#std1325e43"/>
+										<text src="../chapter.xhtml#std1325e43"/>
 										<audio src="../audio/audio.mp3" clipBegin="00:00:17.170" clipEnd="00:00:21.463"/>
 									</par>
 								</seq>
 								<par epub:type="pagebreak">
-									<text src="../book-2.xhtml#page_2"/>
+									<text src="../chapter.xhtml#page_2"/>
 									<audio src="../audio/audio.mp3" clipBegin="00:00:21.463" clipEnd="00:00:25.756"/>
 								</par>
-								<seq epub:textref="../book-2.xhtml#forsmil-d1386e50">
+								<seq epub:textref="../chapter.xhtml#forsmil-d1386e50">
 									<par>
-										<text src="../book-2.xhtml#std1325e51"/>
+										<text src="../chapter.xhtml#std1325e51"/>
 										<audio src="../audio/audio.mp3" clipBegin="00:00:25.756" clipEnd="00:00:30.048"/>
 									</par>
 								</seq>
@@ -186,8 +186,7 @@
 			<x:input port="spine">
 				<x:document type="inline">
 					<d:fileset xml:base="file:/tmp/epub/EPUB/">
-						<d:file href="book-1.xhtml" media-type="application/xhtml+xml"/>
-						<d:file href="book-2.xhtml" media-type="application/xhtml+xml"/>
+						<d:file href="chapter.xhtml" media-type="application/xhtml+xml"/>
 					</d:fileset>
 				</x:document>
 			</x:input>
@@ -234,11 +233,11 @@
 						<meta property="media:duration" refines="#item_5">00:00:21.463</meta>
 					</metadata>
 					<manifest>
-						<item id="item_1" href="book-1.xhtml" media-type="application/xhtml+xml" media-overlay="item_4"/>
-						<item id="item_2" href="book-2.xhtml" media-type="application/xhtml+xml" media-overlay="item_5"/>
+						<item id="item_1" href="cover.xhtml" media-type="application/xhtml+xml" media-overlay="item_4"/>
+						<item id="item_2" href="chapter.xhtml" media-type="application/xhtml+xml" media-overlay="item_5"/>
 						<item id="item_3" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>
-						<item id="item_4" href="mo/book-1.smil" media-type="application/smil+xml"/>
-						<item id="item_5" href="mo/book-2.smil" media-type="application/smil+xml"/>
+						<item id="item_4" href="mo/cover.smil" media-type="application/smil+xml"/>
+						<item id="item_5" href="mo/chapter.smil" media-type="application/smil+xml"/>
 						<item id="item_6" href="audio/audio.mp3" media-type="audio/mpeg"/>
 						<item id="item_7" href="slideshow.xml" media-type="application/x-demo-slideshow"/>
 						<item id="item_8" href="images/Pict1.jpg" media-type="image/jpeg"/>
@@ -249,7 +248,7 @@
 						<item id="item_13" href="scripts/impl.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
 					</manifest>
 					<spine>
-						<itemref idref="item_1" id="itemref_1"/>
+						<itemref idref="item_1" id="itemref_1" linear="no"/>
 						<itemref idref="item_2" id="itemref_2"/>
 						<itemref idref="item_13" id="itemref_3" linear="no"/>
 					</spine>
