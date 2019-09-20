@@ -72,28 +72,9 @@
     <x:context label="the output directory">
       <x:document type="directory" base-uri="temp-dir" href="store/" recursive="true"/>
     </x:context>
-    <x:expect label="the output directory contains the temporary files and the result ODT file" type="compare">
+    <x:expect label="the output directory contains result ODT file" type="compare">
       <x:document type="inline">
         <c:directory name="store">
-          <c:directory name="unzipped">
-            <c:directory name="Configurations2">
-              <c:directory name="accelerator">
-                <c:file name="current.xml"/>
-              </c:directory>
-            </c:directory>
-            <c:directory name="META-INF">
-              <c:file name="manifest.xml"/>
-            </c:directory>
-            <c:directory name="Thumbnails">
-              <c:file name="thumbnail.png"/>
-            </c:directory>
-            <c:file name="content.xml"/>
-            <c:file name="manifest.rdf"/>
-            <c:file name="meta.xml"/>
-            <c:file name="mimetype"/>
-            <c:file name="settings.xml"/>
-            <c:file name="styles.xml"/>
-          </c:directory>
           <c:file name="zipped.odt"/>
         </c:directory>
       </x:document>
@@ -116,6 +97,10 @@
         </c:zipfile>
       </x:document>
     </x:expect>
+    <x:context label="the ODT contents, ordered as in the ZIP">
+      <x:document type="zip" href="store/zipped.odt" base-uri="temp-dir"/>
+    </x:context>
+    <x:expect label="the mimetype should be the first entry" type="xpath" test="//c:file[1]/@name" equals="'mimetype'"/>
     <x:context label="the manifest file">
       <x:document type="file" base-uri="temp-dir" href="store/zipped.odt!/META-INF/manifest.xml"/>
     </x:context>

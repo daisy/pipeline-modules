@@ -6,7 +6,8 @@
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
                 exclude-inline-prefixes="#all"
-                type="px:odf-store" name="store">
+                type="px:odf-store"
+                name="main">
     
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
         <p>Store a ODF fileset in a ZIP</p>
@@ -47,14 +48,9 @@
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
         <p:documentation>
-            px:zip-manifest-from-fileset
             px:fileset-add-entry
+            px:fileset-copy
             px:fileset-store
-        </p:documentation>
-    </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/zip-utils/library.xpl">
-        <p:documentation>
-            px:zip
         </p:documentation>
     </p:import>
     <p:import href="manifest-from-fileset.xpl">
@@ -79,7 +75,7 @@
     <!-- Remove directories from fileset -->
     <p:delete match="//d:file[ends-with(resolve-uri(@href, base-uri(.)), '/')]">
         <p:input port="source">
-            <p:pipe step="store" port="source.fileset"/>
+            <p:pipe step="main" port="source.fileset"/>
         </p:input>
     </p:delete>
     
@@ -87,7 +83,7 @@
         <p:when test="$skip-manifest='true'">
             <p:output port="fileset" primary="true"/>
             <p:output port="in-memory" sequence="true">
-                <p:pipe step="store" port="source.in-memory"/>
+                <p:pipe step="main" port="source.in-memory"/>
             </p:output>
             <p:identity/>
         </p:when>
@@ -99,7 +95,7 @@
             <p:identity/>
             <px:fileset-add-entry media-type="application/xml" name="add-entry">
                 <p:input port="source.in-memory">
-                    <p:pipe step="store" port="source.in-memory"/>
+                    <p:pipe step="main" port="source.in-memory"/>
                 </p:input>
                 <p:input port="entry">
                     <p:pipe step="manifest" port="result"/>
@@ -143,49 +139,37 @@
         <p:input port="entry">
             <p:pipe step="mimetype" port="result"/>
         </p:input>
+        <p:with-param port="file-attributes" name="compression-method" select="'stored'"/>
     </px:fileset-add-entry>
-    
-    <!-- =================== -->
-    <!-- Store files to disk -->
-    <!-- =================== -->
-    
-    <px:fileset-store name="fileset-store">
-        <p:input port="in-memory.in">
-            <p:pipe step="add-mimetype" port="result.in-memory"/>
-        </p:input>
-    </px:fileset-store>
     
     <!-- ====== -->
     <!-- Zip up -->
     <!-- ====== -->
     
-    <px:zip-manifest-from-fileset>
-        <p:input port="source">
-            <p:pipe step="add-mimetype" port="result"/>
+    <px:fileset-copy name="copy">
+        <p:input port="source.in-memory">
+            <p:pipe step="add-mimetype" port="result.in-memory"/>
         </p:input>
-    </px:zip-manifest-from-fileset>
-    
-    <p:add-attribute name="zip-manifest" match="c:entry[@name='mimetype']" attribute-name="compression-method" attribute-value="stored"/>
-    
-    <px:zip compression-method="deflated" cx:depends-on="fileset-store">
-        <p:input port="source">
-            <p:empty/>
-        </p:input>
-        <p:input port="manifest">
-            <p:pipe port="result" step="zip-manifest"/>
-        </p:input>
-        <p:with-option name="href" select="/c:result/string()">
+        <p:with-option name="target" select="concat(/c:result/string(),'!/')">
             <p:pipe step="href" port="normalized"/>
         </p:with-option>
-    </px:zip>
+    </px:fileset-copy>
     
-    <p:string-replace match="/c:result/text()" name="result">
+    <px:fileset-store name="store">
+        <p:input port="in-memory.in">
+            <p:pipe step="copy" port="result.in-memory"/>
+        </p:input>
+    </px:fileset-store>
+    
+    <p:string-replace match="/c:result/text()" name="result" cx:depends-on="store">
         <p:input port="source">
             <p:inline>
                 <c:result>$href</c:result>
             </p:inline>
         </p:input>
-        <p:with-option name="replace" select="concat('&quot;', /c:zipfile/@href, '&quot;')"/>
+        <p:with-option name="replace" select="concat('&quot;',/c:result/string(),'&quot;')">
+            <p:pipe step="href" port="normalized"/>
+        </p:with-option>
     </p:string-replace>
     
 </p:declare-step>

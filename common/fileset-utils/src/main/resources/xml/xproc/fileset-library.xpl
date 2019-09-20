@@ -20,19 +20,6 @@
     <p:import href="fileset-update.xpl"/>
     <p:import href="fileset-purge.xpl"/>
 
-    <p:declare-step type="px:zip-manifest-from-fileset">
-        <p:input port="source"/>
-        <p:output port="result"/>
-        <p:xslt>
-            <p:input port="stylesheet">
-                <p:document href="../xslt/fileset-to-zip-manifest.xsl"/>
-            </p:input>
-            <p:input port="parameters">
-                <p:empty/>
-            </p:input>
-        </p:xslt>
-    </p:declare-step>
-
     <p:import href="xprocspec-fileset-compare.xpl"/>
 
 </p:library>
