@@ -9,7 +9,8 @@
     <xsl:param name="identifier-id" as="xs:string" required="true"/>
 
     <xsl:template match="/*">
-        <metadata prefix="dc: http://purl.org/dc/elements/1.1/">
+        <metadata>
+            <xsl:namespace name="dc" select="'http://purl.org/dc/elements/1.1/'"/>
             
             <xsl:variable name="identifier"
                           select="//html:head/html:meta[lower-case(@name)=('dc:identifier',

@@ -51,6 +51,8 @@
         <xsl:param name="unified" as="element(f:vocab)*" tunnel="yes" required="yes"/>
         <xsl:param name="manifest" tunnel="yes" as="document-node()?" select="()"/>
         <metadata>
+            <xsl:namespace name="dc" select="'http://purl.org/dc/elements/1.1/'"/>
+
             <xsl:if test="exists($unified)">
                 <xsl:attribute name="prefix"
                     select="for $vocab in $unified return concat($vocab/@prefix,': ',$vocab/@uri)"
