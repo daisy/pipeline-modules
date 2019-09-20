@@ -477,4 +477,118 @@
     </x:expect>
   </x:scenario>
   
+  <x:scenario label="store text from memory to zip">
+    <x:call step="pxi:fileset-store">
+      <x:input port="source.fileset">
+        <x:document type="inline">
+          <d:fileset>
+            <d:file href="c.epub!/mimetype" media-type="text/plain"/>
+          </d:fileset>
+        </x:document>
+      </x:input>
+      <x:input port="source.in-memory">
+        <x:document type="inline" xml:space="preserve" xml:base="c.epub!/mimetype">
+          <c:data content-type="text/plain">application/epub+zip</c:data>
+        </x:document>
+      </x:input>
+      <x:option name="target-base" select="resolve-uri('10/', $temp-dir)"/>
+    </x:call>
+    <x:context label="The result fileset">
+      <x:document type="port" port="result.fileset"/>
+    </x:context>
+    <x:expect label="The result fileset" type="custom"
+              href="../../main/resources/xml/xproc/xprocspec-fileset-compare.xpl" step="x:fileset-compare">
+      <x:document type="inline" base-uri="temp-dir">
+        <d:fileset>
+          <d:file href="10/c.epub!/mimetype" original-href="10/c.epub!/mimetype" media-type="text/plain"/>
+        </d:fileset>
+      </x:document>
+    </x:expect>
+    <x:context label="The directory content">
+      <x:document type="directory" base-uri="temp-dir" href="10/" recursive="true"/>
+    </x:context>
+    <x:expect label="The directory content" type="compare">
+      <x:document type="inline">
+        <c:directory name="10">
+          <c:file name="c.epub"/>
+        </c:directory>
+      </x:document>
+    </x:expect>
+    <x:context label="The zip content">
+      <x:document type="zip" base-uri="temp-dir" href="10/c.epub"/>
+    </x:context>
+    <x:expect label="The zip content" type="compare">
+      <x:document type="inline">
+        <c:zipfile name="c.epub">
+          <c:file name="mimetype"/>
+        </c:zipfile>
+      </x:document>
+    </x:expect>
+    <x:context label="The stored file">
+      <x:document type="file" base-uri="temp-dir" href="10/c.epub!/mimetype" method="text"/>
+    </x:context>
+    <x:expect label="The stored file" type="compare">
+      <x:document type="inline" xml:space="preserve">
+        <c:body>application/epub+zip</c:body>
+      </x:document>
+    </x:expect>
+  </x:scenario>
+  
+  <x:scenario label="store binary from memory to zip">
+    <x:call step="pxi:fileset-store">
+      <x:input port="source.fileset">
+        <x:document type="inline">
+          <d:fileset>
+            <d:file href="c.epub!/mimetype" media-type="text/plain"/>
+          </d:fileset>
+        </x:document>
+      </x:input>
+      <x:input port="source.in-memory">
+        <x:document type="inline" xml:space="preserve" xml:base="c.epub!/mimetype">
+          <c:data content-type="binary/octet-stream" encoding="base64">YXBwbGljYXRpb24vZXB1Yit6aXANCg==</c:data>
+        </x:document>
+      </x:input>
+      <x:option name="target-base" select="resolve-uri('11/', $temp-dir)"/>
+    </x:call>
+    <x:context label="The result fileset">
+      <x:document type="port" port="result.fileset"/>
+    </x:context>
+    <x:expect label="The result fileset" type="custom"
+              href="../../main/resources/xml/xproc/xprocspec-fileset-compare.xpl" step="x:fileset-compare">
+      <x:document type="inline" base-uri="temp-dir">
+        <d:fileset>
+          <d:file href="11/c.epub!/mimetype" original-href="11/c.epub!/mimetype" media-type="text/plain"/>
+        </d:fileset>
+      </x:document>
+    </x:expect>
+    <x:context label="The directory content">
+      <x:document type="directory" base-uri="temp-dir" href="11/" recursive="true"/>
+    </x:context>
+    <x:expect label="The directory content" type="compare">
+      <x:document type="inline">
+        <c:directory name="11">
+          <c:file name="c.epub"/>
+        </c:directory>
+      </x:document>
+    </x:expect>
+    <x:context label="The zip content">
+      <x:document type="zip" base-uri="temp-dir" href="11/c.epub"/>
+    </x:context>
+    <x:expect label="The zip content" type="compare">
+      <x:document type="inline">
+        <c:zipfile name="c.epub">
+          <c:file name="mimetype"/>
+        </c:zipfile>
+      </x:document>
+    </x:expect>
+    <x:context label="The stored file">
+      <x:document type="file" base-uri="temp-dir" href="11/c.epub!/mimetype" method="text"/>
+    </x:context>
+    <x:expect label="The stored file" type="compare">
+      <x:document type="inline" xml:space="preserve">
+        <c:body>application/epub+zip</c:body>
+      </x:document>
+    </x:expect>
+  </x:scenario>
+  
 </x:description>

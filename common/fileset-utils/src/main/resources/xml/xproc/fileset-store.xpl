@@ -190,9 +190,13 @@
             <p:identity name="fileset"/>
             <p:delete match="d:file[not(contains(resolve-uri(@href, base-uri(.)),'!/'))]"/>
             <p:choose name="maybe-unzip">
-                <p:documentation>When there are files with a doctype or xml-declaration attribute,
-                first store them to a temporary location on disk.</p:documentation>
-                <p:when test="//d:file[not(@original-href) and (@doctype|@xml-declaration)]">
+                <p:documentation>When there are non-XML files in memory, or XML files with a doctype
+                or xml-declaration attribute in memory, first store them to a temporary location on
+                disk.</p:documentation>
+                <!-- for the sake of convenience store all non-xml to disk, even though px:zip supports binary encoding -->
+                <p:when test="//d:file[not(@original-href)
+                                       and (@doctype|@xml-declaration
+                                            or not(@method='xml' or @media-type[matches(.,'.*/xml$') or matches(.,'.*\+xml$')]))]">
                     <p:output port="fileset" primary="true"/>
                     <p:output port="in-memory" sequence="true">
                         <p:pipe step="update" port="result.in-memory"/>
@@ -209,7 +213,10 @@
                             <p:pipe step="zip-fileset" port="result"/>
                         </p:input>
                     </p:identity>
-                    <p:delete match="d:file[not(not(@original-href) and (@doctype|@xml-declaration))]"/>
+                    <p:delete match="d:file[not(
+                                              not(@original-href)
+                                              and (@doctype|@xml-declaration
+                                                   or not(@method='xml' or @media-type[matches(.,'.*/xml$') or matches(.,'.*\+xml$')])))]"/>
                     <!-- store to temporarily location on disk (with a recursive call) -->
                     <p:group name="copy-to-temp">
                         <p:output port="result.fileset" primary="true">
