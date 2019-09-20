@@ -20,7 +20,6 @@ public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 			pipelineModule("file-utils"),
 			pipelineModule("fileset-utils"),
 			pipelineModule("common-utils"),
-			pipelineModule("zip-utils"),
 			pipelineModule("epub3-utils"),
 			"org.daisy.pipeline:calabash-adapter:?"
 		};
