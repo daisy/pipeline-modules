@@ -3,7 +3,6 @@
     <nextCatalog catalog="./xml-to-pef/src/main/resources/META-INF/catalog.xml"/>
     <nextCatalog catalog="./common-utils/src/main/resources/META-INF/catalog.xml"/>
     <nextCatalog catalog="./css-utils/css-utils/src/main/resources/META-INF/catalog.xml"/>
-    <nextCatalog catalog="./dotify-utils/dotify-formatter/src/main/resources/META-INF/catalog.xml"/>
     <nextCatalog catalog="./dotify-utils/dotify-utils/src/main/resources/META-INF/catalog.xml"/>
     <nextCatalog catalog="./libhyphen-utils/libhyphen-utils/src/main/resources/META-INF/catalog.xml"/>
     <nextCatalog catalog="./liblouis-utils/liblouis-formatter/src/main/resources/META-INF/catalog.xml"/>

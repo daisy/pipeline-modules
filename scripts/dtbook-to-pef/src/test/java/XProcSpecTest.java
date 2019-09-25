@@ -21,7 +21,6 @@ public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 			brailleModule("dotify-utils"),
 			brailleModule("liblouis-tables"),
 			"org.daisy.pipeline.modules.braille:liblouis-native:jar:" + thisPlatform() + ":?",
-			brailleModule("dotify-formatter"),
 			pipelineModule("file-utils"),
 			pipelineModule("fileset-utils"),
 			pipelineModule("metadata-utils"),
