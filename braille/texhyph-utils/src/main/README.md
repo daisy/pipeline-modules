@@ -1,4 +1,4 @@
-# texhyph-core API
+# texhyph-utils API
 
 ## Java API
 
@@ -35,7 +35,16 @@
   - `locale`: Matches only hyphenators with that locale.
   
   No other features are allowed.
-  
+
+## <a href="resources/META-INF/catalog.xml" class="source">catalog.xml</a>
+
+- <a href="resources/xml/library.xsl" class="apidoc">`http://www.daisy.org/pipeline/modules/braille/texhyph-utils/library.xsl`</a>
+
+## OSGi services
+
+### Saxon functions (`net.sf.saxon.lib.ExtensionFunctionDefinition`)
+
+- [`{http://code.google.com/p/texhyphj/}hyphenate`](java/org/daisy/pipeline/braille/tex/saxon/impl/HyphenateDefinition.java)
 
 
 <link rev="dp2:doc" href="./"/>
