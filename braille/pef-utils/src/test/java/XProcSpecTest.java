@@ -1,27 +1,25 @@
 import org.daisy.pipeline.junit.AbstractXSpecAndXProcSpecTest;
 
 import static org.daisy.pipeline.pax.exam.Options.mavenBundle;
-import static org.daisy.pipeline.pax.exam.Options.thisPlatform;
 
 import org.ops4j.pax.exam.Configuration;
 import static org.ops4j.pax.exam.CoreOptions.composite;
 import static org.ops4j.pax.exam.CoreOptions.options;
 import org.ops4j.pax.exam.Option;
 
-public class LiblouisUtilsTest extends AbstractXSpecAndXProcSpecTest {
+public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 	
 	@Override
 	protected String[] testDependencies() {
 		return new String[] {
-			brailleModule("liblouis-core"),
 			brailleModule("common-utils"),
-			brailleModule("liblouis-saxon"),
-			brailleModule("liblouis-calabash"),
-			brailleModule("css-utils"),
-			brailleModule("libhyphen-core"),
-			brailleModule("liblouis-tables"),
-			"org.daisy.pipeline.modules.braille:liblouis-native:jar:" + thisPlatform() + ":?",
-			"org.daisy.pipeline.modules.braille:libhyphen-native:jar:" + thisPlatform() + ":?"
+			pipelineModule("file-utils"),
+			"org.daisy.braille:braille-utils.api:?",
+			"org.daisy.braille:braille-utils.impl:?",
+			"org.daisy.braille:braille-utils.pef-tools:?",
+			"org.daisy.pipeline:calabash-adapter:?",
+			"org.daisy.pipeline:logging-activator:?",
+			"org.daisy.pipeline:logging-appender:?",
 		};
 	}
 	

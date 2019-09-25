@@ -40,7 +40,7 @@
     </dependency>
     <dependency>
       <groupId>org.daisy.pipeline.modules.braille</groupId>
-      <artifactId>pef-core</artifactId>
+      <artifactId>pef-utils</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>

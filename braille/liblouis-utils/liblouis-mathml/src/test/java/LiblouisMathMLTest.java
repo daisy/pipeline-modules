@@ -6,11 +6,16 @@ import org.daisy.maven.xproc.xprocspec.XProcSpecRunner;
 
 import org.daisy.pipeline.junit.AbstractXSpecAndXProcSpecTest;
 
+import static org.daisy.pipeline.pax.exam.Options.mavenBundle;
 import static org.daisy.pipeline.pax.exam.Options.thisPlatform;
 
 import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 
+import org.ops4j.pax.exam.Configuration;
+import static org.ops4j.pax.exam.CoreOptions.composite;
+import static org.ops4j.pax.exam.CoreOptions.options;
+import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.util.PathUtils;
 
 public class LiblouisMathMLTest extends AbstractXSpecAndXProcSpecTest {
@@ -24,6 +29,14 @@ public class LiblouisMathMLTest extends AbstractXSpecAndXProcSpecTest {
 			pipelineModule("file-utils"),
 			pipelineModule("fileset-utils")
 		};
+	}
+	
+	@Override @Configuration
+	public Option[] config() {
+		return options(
+			// FIXME: BrailleUtils needs older version of jing
+			mavenBundle("org.daisy.libs:jing:20120724.0.0"),
+			composite(super.config()));
 	}
 	
 	@Override @Test

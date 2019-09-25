@@ -29,6 +29,7 @@ import org.daisy.pipeline.braille.liblouis.LiblouisTranslator;
 
 import org.daisy.pipeline.junit.AbstractTest;
 
+import static org.daisy.pipeline.pax.exam.Options.mavenBundle;
 import static org.daisy.pipeline.pax.exam.Options.thisPlatform;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -36,6 +37,10 @@ import static org.junit.Assert.assertEquals;
 import org.junit.ComparisonFailure;
 import org.junit.Test;
 
+import org.ops4j.pax.exam.Configuration;
+import static org.ops4j.pax.exam.CoreOptions.composite;
+import static org.ops4j.pax.exam.CoreOptions.options;
+import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.ProbeBuilder;
 import org.ops4j.pax.exam.TestProbeBuilder;
 
@@ -64,7 +69,7 @@ public class LiblouisCoreTest extends AbstractTest {
 			"org.liblouis:liblouis-java:?",
 			"org.daisy.braille:braille-utils.api:?",
 			brailleModule("common-utils"),
-			brailleModule("pef-core"),
+			brailleModule("pef-utils"),
 			"org.daisy.pipeline.modules.braille:liblouis-native:jar:" + thisPlatform() + ":?"
 		};
 	}
@@ -77,6 +82,14 @@ public class LiblouisCoreTest extends AbstractTest {
 		                                   + "OSGI-INF/dispatching-table-provider.xml,"
 		                                   + "OSGI-INF/table-path.xml");
 		return probe;
+	}
+	
+	@Override @Configuration
+	public Option[] config() {
+		return options(
+			// FIXME: BrailleUtils needs older version of jing
+			mavenBundle("org.daisy.libs:jing:20120724.0.0"),
+			composite(super.config()));
 	}
 	
 	@Test

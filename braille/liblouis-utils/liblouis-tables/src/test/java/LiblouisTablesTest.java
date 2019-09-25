@@ -11,11 +11,16 @@ import org.daisy.pipeline.braille.liblouis.LiblouisTranslator;
 
 import org.daisy.pipeline.junit.AbstractXSpecAndXProcSpecTest;
 
+import static org.daisy.pipeline.pax.exam.Options.mavenBundle;
 import static org.daisy.pipeline.pax.exam.Options.thisPlatform;
 
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
+import org.ops4j.pax.exam.Configuration;
+import static org.ops4j.pax.exam.CoreOptions.composite;
+import static org.ops4j.pax.exam.CoreOptions.options;
+import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.util.PathUtils;
 
 public class LiblouisTablesTest extends AbstractXSpecAndXProcSpecTest {
@@ -58,8 +63,16 @@ public class LiblouisTablesTest extends AbstractXSpecAndXProcSpecTest {
 			brailleModule("liblouis-core"),
 			"org.daisy.pipeline.modules.braille:liblouis-native:jar:" + thisPlatform() + ":?",
 			brailleModule("libhyphen-core"),
-			brailleModule("pef-core"),
+			brailleModule("pef-utils"),
 			"org.daisy.pipeline:calabash-adapter:?"
 		};
+	}
+	
+	@Override @Configuration
+	public Option[] config() {
+		return options(
+			// FIXME: BrailleUtils needs older version of jing
+			mavenBundle("org.daisy.libs:jing:20120724.0.0"),
+			composite(super.config()));
 	}
 }
