@@ -39,7 +39,6 @@ public class TexHyphenatorCoreTest extends AbstractTest {
 	protected String[] testDependencies() {
 		return new String[] {
 			brailleModule("common-utils"),
-			brailleModule("css-core"),
 			"com.googlecode.texhyphj:texhyphj:?",
 			"org.daisy.pipeline:calabash-adapter:?"
 		};

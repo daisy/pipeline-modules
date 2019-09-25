@@ -44,11 +44,6 @@
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
-        <artifactId>css-core</artifactId>
-        <version>3.0.2-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-        <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>css-utils</artifactId>
         <version>4.0.0-SNAPSHOT</version>
       </dependency>

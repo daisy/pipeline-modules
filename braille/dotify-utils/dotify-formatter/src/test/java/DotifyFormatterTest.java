@@ -15,7 +15,6 @@ public class DotifyFormatterTest extends AbstractXSpecAndXProcSpecTest {
 	@Override
 	protected String[] testDependencies() {
 		return new String[] {
-			brailleModule("css-core"),
 			brailleModule("css-utils"),
 			brailleModule("pef-utils"),
 			brailleModule("obfl-utils"),

@@ -28,7 +28,6 @@ public class DotifyCoreTest extends AbstractTest {
 	protected String[] testDependencies() {
 		return new String[] {
 			brailleModule("common-utils"),
-			brailleModule("css-core"),
 			"org.daisy.dotify:dotify.api:?",
 			"org.daisy.dotify:dotify.translator.impl:?",
 			"org.daisy.dotify:dotify.hyphenator.impl:?",

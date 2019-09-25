@@ -6,7 +6,6 @@
        uri="../xml/transform/abstract-block-translator.xsl"/>
   <uri name="http://www.daisy.org/pipeline/modules/braille/css-utils/transform/block-translator-from-text-transform.xsl"
        uri="../xml/transform/block-translator-from-text-transform.xsl"/>
-  <nextCatalog catalog="org:daisy:pipeline:modules:braille:css-core"/>
   <nextCatalog catalog="org:daisy:pipeline:modules:common-utils"/>
   <nextCatalog catalog="org:daisy:pipeline:modules:file-utils"/>
 </catalog>

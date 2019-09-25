@@ -69,7 +69,6 @@ public class PefCoreTest extends AbstractTest {
 	protected String[] testDependencies() {
 		return new String[] {
 			brailleModule("common-utils"),
-			brailleModule("css-core"),
 			"org.daisy.braille:braille-utils.api:?",
 			"org.daisy.braille:braille-utils.impl:?"
 		};

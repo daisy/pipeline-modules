@@ -19,7 +19,6 @@ public class LiblouisMathMLTest extends AbstractXSpecAndXProcSpecTest {
 	protected String[] testDependencies() {
 		return new String[] {
 			brailleModule("common-utils"),
-			brailleModule("css-core"),
 			brailleModule("liblouis-utils"),
 			"org.daisy.pipeline.modules.braille:liblouis-native:jar:" + thisPlatform() + ":?",
 			pipelineModule("file-utils"),

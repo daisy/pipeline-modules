@@ -9,7 +9,6 @@ public class LiblouisUtilsTest extends AbstractXSpecAndXProcSpecTest {
 		return new String[] {
 			brailleModule("liblouis-core"),
 			brailleModule("common-utils"),
-			brailleModule("css-core"),
 			brailleModule("liblouis-saxon"),
 			brailleModule("liblouis-calabash"),
 			brailleModule("css-utils"),

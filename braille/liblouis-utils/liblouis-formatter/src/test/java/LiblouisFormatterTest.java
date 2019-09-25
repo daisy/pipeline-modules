@@ -14,7 +14,6 @@ public class LiblouisFormatterTest extends AbstractXSpecAndXProcSpecTest {
 	protected String[] testDependencies() {
 		return new String[] {
 			brailleModule("common-utils"),
-			brailleModule("css-core"),
 			"org.daisy.braille:braille-utils.api:?",
 			brailleModule("pef-utils"),
 			brailleModule("css-utils"),

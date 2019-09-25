@@ -21,7 +21,6 @@ public class PaxExamConfig extends AbstractXSpecAndXProcSpecTest {
 			"org.daisy.pipeline.modules:common-utils:?",
 			"org.daisy.pipeline.modules:file-utils:?",
 			brailleModule("common-utils"),
-			brailleModule("css-core"),
 			"org.daisy.pipeline:logging-appender:?",
 		};
 	}

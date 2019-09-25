@@ -39,7 +39,6 @@ public class DotifyCalabashTest extends AbstractXSpecAndXProcSpecTest {
 			"org.daisy.dotify:dotify.hyphenator.impl:?",
 			"org.daisy.dotify:dotify.translator.impl:?",
 			// for the query syntax
-			brailleModule("css-core"),
 			// other
 			"org.daisy.pipeline:calabash-adapter:?",
 			"org.codehaus.woodstox:stax2-api:jar:?", // FIXME: because otherwise the exclusion of com.fasterxml.woodstox:woodstox-core

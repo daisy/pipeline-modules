@@ -28,10 +28,6 @@
     </dependency>
     <dependency>
       <groupId>org.daisy.pipeline.modules.braille</groupId>
-      <artifactId>css-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.daisy.pipeline.modules.braille</groupId>
       <artifactId>liblouis-core</artifactId>
     </dependency>
     <dependency>

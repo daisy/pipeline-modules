@@ -95,7 +95,6 @@ public class LibhyphenCoreTest extends AbstractTest {
 		return new String[] {
 			"org.daisy.bindings:jhyphen:?",
 			brailleModule("common-utils"),
-			brailleModule("css-core"),
 			"org.daisy.pipeline.modules.braille:libhyphen-native:jar:" + thisPlatform() + ":?"
 		};
 	}

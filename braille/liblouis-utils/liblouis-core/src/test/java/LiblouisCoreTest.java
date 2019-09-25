@@ -65,7 +65,6 @@ public class LiblouisCoreTest extends AbstractTest {
 			"org.daisy.braille:braille-utils.api:?",
 			brailleModule("common-utils"),
 			brailleModule("pef-core"),
-			brailleModule("css-core"),
 			"org.daisy.pipeline.modules.braille:liblouis-native:jar:" + thisPlatform() + ":?"
 		};
 	}
