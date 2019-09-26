@@ -62,7 +62,7 @@
   <properties>
     <expose-services>
       org.daisy.pipeline.modules.impl.Module_html_utils,
-      org.daisy.common.xproc.calabash.steps.ChunkerStep$Provider
+      org.daisy.pipeline.html.calabash.impl.ChunkerStep$Provider
     </expose-services>
   </properties>
   
@@ -77,19 +77,6 @@
             <phase>none</phase>
           </execution>
         </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>
-            <Private-Package>
-              org.daisy.common.xproc.calabash.steps;-split-package:=first,
-              ${generated-packages}
-              {local-packages}
-            </Private-Package>
-          </instructions>
-        </configuration>
       </plugin>
     </plugins>
   </build>

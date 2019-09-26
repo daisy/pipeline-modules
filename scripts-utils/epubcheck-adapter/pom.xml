@@ -38,7 +38,7 @@
   <properties>
     <expose-services>
       org.daisy.pipeline.modules.impl.Module_epubcheck_adapter,
-      org.daisy.pipeline.epub.EpubCheckProvider,
+      org.daisy.pipeline.epub.calabash.impl.EpubCheckProvider,
       org.idpf.epubcheck.util.saxon95.ColumnNumberFunction,
       org.idpf.epubcheck.util.saxon95.LineNumberFunction,
       org.idpf.epubcheck.util.saxon95.SystemIdFunction
@@ -59,7 +59,6 @@
             </Import-Package>
             <Export-Package/>
             <Private-Package>
-              org.daisy.pipeline.epub,
               org.idpf.epubcheck.util.saxon95,
               ${generated-packages}
               {local-packages}

@@ -60,8 +60,8 @@
 
   <properties>
     <expose-services>
-      org.daisy.pipeline.cssinlining.InlineCSSProvider,
-      org.daisy.pipeline.modules.impl.Module_css_speech
+      org.daisy.pipeline.modules.impl.Module_css_speech,
+      org.daisy.pipeline.tts.css.calabash.impl.InlineCSSProvider,
     </expose-services>
   </properties>
   
@@ -77,12 +77,6 @@
               !org.daisy.common.spi,
               *
             </Import-Package>
-            <Export-Package/>
-            <Private-Package>
-              org.daisy.pipeline.cssinlining,
-              ${generated-packages}
-              {local-packages}
-            </Private-Package>
           </instructions>
         </configuration>
       </plugin>

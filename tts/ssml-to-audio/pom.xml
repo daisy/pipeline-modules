@@ -75,7 +75,7 @@
   
   <properties>
     <expose-services>
-      org.daisy.pipeline.tts.synthesize.SynthesizeProvider,
+      org.daisy.pipeline.tts.synthesize.calabash.impl.SynthesizeProvider,
       org.daisy.pipeline.modules.impl.Module_ssml_to_audio
     </expose-services>
   </properties>
@@ -92,12 +92,6 @@
               !org.daisy.common.spi,
               *
             </Import-Package>
-            <Export-Package/>
-            <Private-Package>
-              org.daisy.pipeline.tts.synthesize,
-              ${generated-packages}
-              {local-packages}
-            </Private-Package>
           </instructions>
         </configuration>
       </plugin>

@@ -35,7 +35,7 @@
   
   <properties>
     <expose-services>
-      org.daisy.pipeline.tts.att.ATTBin
+      org.daisy.pipeline.tts.att.impl.ATTBin
     </expose-services>
   </properties>
 
@@ -51,12 +51,6 @@
               !org.daisy.common.spi,
               *
             </Import-Package>
-            <Export-Package/>
-            <Private-Package>
-              org.daisy.pipeline.tts.att,
-              ${generated-packages}
-              {local-packages}
-            </Private-Package>
           </instructions>
         </configuration>
       </plugin>

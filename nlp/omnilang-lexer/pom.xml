@@ -40,27 +40,8 @@
   
   <properties>
     <expose-services>
-      org.daisy.pipeline.nlp.lexing.omni.OmnilangLexer
+      org.daisy.pipeline.nlp.lexing.omni.impl.OmnilangLexer
     </expose-services>
   </properties>
-
-   <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>
-            <Export-Package/>
-            <Private-Package>
-              org.daisy.pipeline.nlp.lexing.omni,
-              ${generated-packages}
-              {local-packages}
-            </Private-Package>
-          </instructions>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 
 </project>

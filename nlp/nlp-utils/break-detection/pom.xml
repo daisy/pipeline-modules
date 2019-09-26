@@ -59,7 +59,7 @@
   <properties>
     <expose-services>
       org.daisy.pipeline.modules.impl.Module_nlp_break_detection,
-      org.daisy.pipeline.nlp.breakdetect.BreakDetectProvider
+      org.daisy.pipeline.nlp.breakdetect.calabash.impl.BreakDetectProvider
     </expose-services>
   </properties>
 
@@ -75,12 +75,6 @@
               !org.daisy.common.spi,
               *
             </Import-Package>
-            <Export-Package/>
-            <Private-Package>
-              org.daisy.pipeline.nlp.breakdetect,
-              ${generated-packages}
-              {local-packages}
-            </Private-Package>
           </instructions>
         </configuration>
       </plugin>
