@@ -581,7 +581,26 @@
         <version>2.2.0</version>
       </dependency>
       <!--
-          for common-utils (braille) and css-utils (braille)
+          for css-utils (braille) and css-speech
+      -->
+      <dependency>
+        <groupId>org.daisy.libs</groupId>
+        <artifactId>jstyleparser</artifactId>
+        <version>1.20-p13-SNAPSHOT</version>
+        <exclusions>
+          <exclusion>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.unbescape</groupId>
+        <artifactId>unbescape</artifactId>
+        <version>1.1.0.RELEASE</version>
+      </dependency>
+      <!--
+          for braille/common-utils and braille/css-utils
       -->
       <dependency>
         <groupId>org.daisy.braille</groupId>
@@ -594,7 +613,7 @@
         <version>3.5.2_1</version>
       </dependency>
       <!--
-          for css-utils
+          for braille/css-utils
       -->
       <dependency>
         <groupId>org.daisy.libs</groupId>
@@ -607,7 +626,7 @@
         <version>3.7</version>
       </dependency>
       <!--
-          for common-utils (braille) and dotify-utils
+          for braille/common-utils and dotify-utils
       -->
       <dependency>
         <groupId>org.daisy.dotify</groupId>
@@ -674,6 +693,11 @@
         <artifactId>liblouis-java</artifactId>
         <version>4.2.0</version>
       </dependency>
+      <dependency>
+        <groupId>net.java.dev.jna</groupId>
+        <artifactId>jna</artifactId>
+        <version>5.2.0</version>
+      </dependency>
       <!--
           for libhyphen-utils
       -->
@@ -689,6 +713,14 @@
         <groupId>com.googlecode.texhyphj</groupId>
         <artifactId>texhyphj</artifactId>
         <version>1.2</version>
+      </dependency>
+      <!--
+          for tts-adapter-acapela (includes jna 4.0.0)
+      -->
+      <dependency>
+        <groupId>org.daisy.libs</groupId>
+        <artifactId>jnaerator</artifactId>
+        <version>0.11-p1-SNAPSHOT</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
