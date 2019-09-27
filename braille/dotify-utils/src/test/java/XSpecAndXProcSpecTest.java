@@ -34,10 +34,8 @@ public class XSpecAndXProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 			brailleModule("pef-utils"),
 			brailleModule("obfl-utils"),
 			brailleModule("common-utils"),
-			brailleModule("liblouis-core"),
-			"org.daisy.pipeline.modules.braille:liblouis-native:jar:" + thisPlatform() + ":?",
-			// because of bug in lou_indexTables we need to include liblouis-tables even though we're not using it
-			brailleModule("liblouis-tables"),
+			brailleModule("liblouis-utils"),
+			"org.daisy.pipeline.modules.braille:liblouis-utils:jar:" + thisPlatform() + ":?",
 			brailleModule("libhyphen-utils"),
 			"org.daisy.pipeline.modules.braille:libhyphen-utils:jar:" + thisPlatform() + ":?",
 			"com.google.guava:guava:?",

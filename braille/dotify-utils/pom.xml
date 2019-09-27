@@ -122,7 +122,7 @@
     </dependency>
     <dependency>
       <groupId>org.daisy.pipeline.modules.braille</groupId>
-      <artifactId>liblouis-core</artifactId>
+      <artifactId>liblouis-utils</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -143,14 +143,6 @@
     <dependency>
       <groupId>org.daisy.pipeline</groupId>
       <artifactId>logging-appender</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <!--
-        because of bug in lou_indexTables we need to include liblouis-tables even though we're not using it
-    -->
-    <dependency>
-      <groupId>org.daisy.pipeline.modules.braille</groupId>
-      <artifactId>liblouis-tables</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -285,7 +277,7 @@
       <dependencies>
         <dependency>
           <groupId>org.daisy.pipeline.modules.braille</groupId>
-          <artifactId>liblouis-native</artifactId>
+          <artifactId>liblouis-utils</artifactId>
           <classifier>mac</classifier>
           <scope>test</scope>
         </dependency>
@@ -307,7 +299,7 @@
       <dependencies>
         <dependency>
           <groupId>org.daisy.pipeline.modules.braille</groupId>
-          <artifactId>liblouis-native</artifactId>
+          <artifactId>liblouis-utils</artifactId>
           <classifier>linux</classifier>
           <scope>test</scope>
         </dependency>
@@ -329,7 +321,7 @@
       <dependencies>
         <dependency>
           <groupId>org.daisy.pipeline.modules.braille</groupId>
-          <artifactId>liblouis-native</artifactId>
+          <artifactId>liblouis-utils</artifactId>
           <classifier>windows</classifier>
           <scope>test</scope>
         </dependency>

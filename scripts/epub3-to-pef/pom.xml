@@ -89,11 +89,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.daisy.pipeline.modules.braille</groupId>
-      <artifactId>liblouis-tables</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.daisy.pipeline</groupId>
       <artifactId>calabash-adapter</artifactId>
       <scope>test</scope>
@@ -139,7 +134,7 @@
       <dependencies>
         <dependency>
           <groupId>org.daisy.pipeline.modules.braille</groupId>
-          <artifactId>liblouis-native</artifactId>
+          <artifactId>liblouis-utils</artifactId>
           <classifier>mac</classifier>
           <scope>test</scope>
         </dependency>
@@ -155,7 +150,7 @@
       <dependencies>
         <dependency>
           <groupId>org.daisy.pipeline.modules.braille</groupId>
-          <artifactId>liblouis-native</artifactId>
+          <artifactId>liblouis-utils</artifactId>
           <classifier>linux</classifier>
           <scope>test</scope>
         </dependency>
@@ -171,7 +166,7 @@
       <dependencies>
         <dependency>
           <groupId>org.daisy.pipeline.modules.braille</groupId>
-          <artifactId>liblouis-native</artifactId>
+          <artifactId>liblouis-utils</artifactId>
           <classifier>windows</classifier>
           <scope>test</scope>
         </dependency>
