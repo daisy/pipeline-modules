@@ -62,7 +62,7 @@ public class LiblouisTablesTest extends AbstractXSpecAndXProcSpecTest {
 		return new String[] {
 			brailleModule("liblouis-core"),
 			"org.daisy.pipeline.modules.braille:liblouis-native:jar:" + thisPlatform() + ":?",
-			brailleModule("libhyphen-core"),
+			brailleModule("libhyphen-utils"),
 			brailleModule("pef-utils"),
 			"org.daisy.pipeline:calabash-adapter:?"
 		};

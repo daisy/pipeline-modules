@@ -17,7 +17,7 @@ public class ZedaiToPefTest extends AbstractXSpecAndXProcSpecTest {
 			brailleModule("common-utils"),
 			brailleModule("liblouis-utils"),
 			brailleModule("liblouis-tables"),
-			brailleModule("libhyphen-core"),
+			brailleModule("libhyphen-utils"),
 			brailleModule("dotify-utils"),
 			brailleModule("css-utils"),
 			brailleModule("pef-utils"),

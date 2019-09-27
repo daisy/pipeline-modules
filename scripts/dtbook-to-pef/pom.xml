@@ -80,7 +80,7 @@
     </dependency>
     <dependency>
       <groupId>org.daisy.pipeline.modules.braille</groupId>
-      <artifactId>libhyphen-libreoffice-tables</artifactId>
+      <artifactId>libhyphen-utils</artifactId>
       <scope>runtime</scope>
     </dependency>
     <dependency>

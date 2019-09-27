@@ -18,10 +18,10 @@ public class LiblouisUtilsTest extends AbstractXSpecAndXProcSpecTest {
 			brailleModule("liblouis-saxon"),
 			brailleModule("liblouis-calabash"),
 			brailleModule("css-utils"),
-			brailleModule("libhyphen-core"),
+			brailleModule("libhyphen-utils"),
 			brailleModule("liblouis-tables"),
 			"org.daisy.pipeline.modules.braille:liblouis-native:jar:" + thisPlatform() + ":?",
-			"org.daisy.pipeline.modules.braille:libhyphen-native:jar:" + thisPlatform() + ":?"
+			"org.daisy.pipeline.modules.braille:libhyphen-utils:jar:" + thisPlatform() + ":?"
 		};
 	}
 	

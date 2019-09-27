@@ -127,7 +127,7 @@
     </dependency>
     <dependency>
       <groupId>org.daisy.pipeline.modules.braille</groupId>
-      <artifactId>libhyphen-core</artifactId>
+      <artifactId>libhyphen-utils</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -291,7 +291,7 @@
         </dependency>
         <dependency>
           <groupId>org.daisy.pipeline.modules.braille</groupId>
-          <artifactId>libhyphen-native</artifactId>
+          <artifactId>libhyphen-utils</artifactId>
           <classifier>mac</classifier>
           <scope>test</scope>
         </dependency>
@@ -313,7 +313,7 @@
         </dependency>
         <dependency>
           <groupId>org.daisy.pipeline.modules.braille</groupId>
-          <artifactId>libhyphen-native</artifactId>
+          <artifactId>libhyphen-utils</artifactId>
           <classifier>linux</classifier>
           <scope>test</scope>
         </dependency>
@@ -335,7 +335,7 @@
         </dependency>
         <dependency>
           <groupId>org.daisy.pipeline.modules.braille</groupId>
-          <artifactId>libhyphen-native</artifactId>
+          <artifactId>libhyphen-utils</artifactId>
           <classifier>windows</classifier>
           <scope>test</scope>
         </dependency>
