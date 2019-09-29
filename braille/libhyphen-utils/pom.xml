@@ -60,7 +60,7 @@
       org.daisy.pipeline.modules.impl.Module_libhyphen_utils,
       org.daisy.pipeline.braille.libhyphen.impl.LibhyphenJnaImpl,
       org.daisy.pipeline.braille.libhyphen.impl.LibhyphenTableRegistry,
-      org.daisy.pipeline.braille.libhyphen.impl.LibhyphenTablePath,
+      org.daisy.pipeline.braille.libhyphen.impl.LibhyphenTablePath_libreoffice_hyphen_tables,
       org.daisy.pipeline.braille.libhyphen.saxon.impl.HyphenateDefinition,
     </expose-services>
   </properties>
