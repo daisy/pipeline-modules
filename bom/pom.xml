@@ -12,7 +12,7 @@
 
   <groupId>org.daisy.pipeline.modules</groupId>
   <artifactId>modules-bom</artifactId>
-  <version>1.12.1-SNAPSHOT</version>
+  <version>1.13.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>DAISY Pipeline 2 :: Modules BoM</name>
@@ -546,7 +546,7 @@
       <dependency>
         <groupId>org.daisy.libs</groupId>
         <artifactId>jstyleparser</artifactId>
-        <version>1.20-p13-SNAPSHOT</version>
+        <version>1.20-p13</version>
         <exclusions>
           <exclusion>
             <groupId>xerces</groupId>
@@ -565,7 +565,7 @@
       <dependency>
         <groupId>org.daisy.braille</groupId>
         <artifactId>braille-css</artifactId>
-        <version>1.15.0-SNAPSHOT</version>
+        <version>1.15.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>
@@ -664,7 +664,7 @@
       <dependency>
         <groupId>org.daisy.bindings</groupId>
         <artifactId>jhyphen</artifactId>
-        <version>1.0.2-SNAPSHOT</version>
+        <version>1.0.2</version>
       </dependency>
       <!--
           for texhyph-utils
@@ -680,7 +680,7 @@
       <dependency>
         <groupId>org.daisy.libs</groupId>
         <artifactId>jnaerator</artifactId>
-        <version>0.11-p1-SNAPSHOT</version>
+        <version>0.11-p1</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

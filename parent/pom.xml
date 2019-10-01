@@ -12,7 +12,7 @@
 
   <groupId>org.daisy.pipeline.modules</groupId>
   <artifactId>modules-parent</artifactId>
-  <version>1.12.1-SNAPSHOT</version>
+  <version>1.13.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>DAISY Pipeline 2 :: Modules Parent POM</name>
@@ -149,7 +149,7 @@
         <plugin>
           <groupId>org.daisy.pipeline.build</groupId>
           <artifactId>modules-build-helper</artifactId>
-          <version>2.3.0-SNAPSHOT</version>
+          <version>2.3.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -159,7 +159,7 @@
         <plugin>
           <groupId>org.daisy.pipeline.build</groupId>
           <artifactId>ds-to-spi-maven-plugin</artifactId>
-          <version>1.0.0-SNAPSHOT</version>
+          <version>1.0.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.felix</groupId>
@@ -201,7 +201,7 @@
         <plugin>
           <groupId>org.daisy.maven</groupId>
           <artifactId>xproc-maven-plugin</artifactId>
-          <version>1.0.1-SNAPSHOT</version>
+          <version>1.0.1</version>
           <dependencies>
             <!--
                 provided dependencies of xprocspec-runner
@@ -213,22 +213,22 @@
             <dependency>
               <groupId>org.daisy.pipeline</groupId>
               <artifactId>modules-registry</artifactId>
-              <version>3.0.0-SNAPSHOT</version>
+              <version>3.0.0</version>
             </dependency>
             <dependency>
               <groupId>org.daisy.pipeline</groupId>
               <artifactId>xmlcatalog</artifactId>
-              <version>2.0.5-SNAPSHOT</version>
+              <version>2.0.5</version>
             </dependency>
             <dependency>
               <groupId>org.daisy.pipeline</groupId>
               <artifactId>calabash-adapter</artifactId>
-              <version>3.0.2-SNAPSHOT</version>
+              <version>3.0.2</version>
             </dependency>
             <dependency>
               <groupId>org.daisy.pipeline</groupId>
               <artifactId>ds-to-spi-runtime</artifactId>
-              <version>1.0.0-SNAPSHOT</version>
+              <version>1.0.0</version>
             </dependency>
           </dependencies>
         </plugin>
@@ -410,21 +410,21 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>modules-bom</artifactId>
-        <version>1.12.1-SNAPSHOT</version>
+        <version>1.13.0-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline</groupId>
         <artifactId>framework-bom</artifactId>
-        <version>1.12.1-SNAPSHOT</version>
+        <version>1.13.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline</groupId>
         <artifactId>ds-to-spi-runtime</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.0</version>
       </dependency>
       <!--
           test dependencies
@@ -437,12 +437,12 @@
       <dependency>
         <groupId>org.daisy.pipeline.build</groupId>
         <artifactId>modules-test-helper</artifactId>
-        <version>1.1.0-SNAPSHOT</version>
+        <version>1.1.0</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.maven</groupId>
         <artifactId>xproc-engine-daisy-pipeline</artifactId>
-        <version>1.12.1-SNAPSHOT</version>
+        <version>1.13.0</version>
         <scope>test</scope>
       </dependency>
     </dependencies>
