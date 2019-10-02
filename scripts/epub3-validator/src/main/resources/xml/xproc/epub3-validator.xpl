@@ -68,7 +68,7 @@ option is only available for zipped EPUBs.</p>
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/epubcheck-adapter/library.xpl"/>
 
-    <px:epubcheck>
+    <px:epubcheck px:message="Running EPUBCheck" px:progress=".8">
         <p:with-option name="epub" select="$epub"/>
         <p:with-option name="mode" select="if (ends-with(lower-case($epub),'.epub')) then 'epub' else 'expanded'"/>
         <p:with-option name="version" select="'3'"/>
@@ -157,7 +157,7 @@ option is only available for zipped EPUBs.</p>
             <p:output port="result">
                 <p:pipe step="ace-check" port="html-report" />
             </p:output>
-            <px:ace name="ace-check">
+            <px:ace name="ace-check" px:message="Running Ace">
                 <p:with-option name="epub" select="$epub"/>
             </px:ace>
             <p:sink/>
