@@ -20,16 +20,52 @@
     
     <p:option name="temp-dir" required="true"/>
     
-    <p:import href="utils/xslt-for-each.xpl"/>
-    <p:import href="utils/extract.xpl"/>
-    <p:import href="utils/select-by-base.xpl"/>
-    <p:import href="split-into-sections.xpl"/>
-    <p:import href="attach-liblouis-config.xpl"/>
-    <p:import href="translate-files.xpl"/>
-    <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/braille/pef-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/braille/common-utils/library.xpl"/>
+    <p:import href="utils/xslt-for-each.xpl">
+        <p:documentation>
+            pxi:xslt-for-each
+        </p:documentation>
+    </p:import>
+    <p:import href="utils/extract.xpl">
+        <p:documentation>
+            pxi:extract
+        </p:documentation>
+    </p:import>
+    <p:import href="utils/select-by-base.xpl">
+        <p:documentation>
+            pxi:select-by-base
+        </p:documentation>
+    </p:import>
+    <p:import href="split-into-sections.xpl">
+        <p:documentation>
+            pxi:split-into-sections
+        </p:documentation>
+    </p:import>
+    <p:import href="attach-liblouis-config.xpl">
+        <p:documentation>
+            pxi:attach-liblouis-config
+        </p:documentation>
+    </p:import>
+    <p:import href="translate-files.xpl">
+        <p:documentation>
+            pxi:translate-files
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
+        <p:documentation>
+            px:mkdir
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/braille/pef-utils/library.xpl">
+        <p:documentation>
+            pef:text2pef
+            pef:merge
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/braille/common-utils/library.xpl">
+        <p:documentation>
+            px:validate-braille
+        </p:documentation>
+    </p:import>
     
     <p:variable name="pef-table" select="'org.daisy.pipeline.braille.pef.impl.NabccEightDotTable'">
         <p:empty/>
