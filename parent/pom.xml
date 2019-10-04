@@ -12,7 +12,7 @@
 
   <groupId>org.daisy.pipeline.modules</groupId>
   <artifactId>modules-parent</artifactId>
-  <version>1.13.0-SNAPSHOT</version>
+  <version>1.13.0</version>
   <packaging>pom</packaging>
 
   <name>DAISY Pipeline 2 :: Modules Parent POM</name>
@@ -410,7 +410,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>modules-bom</artifactId>
-        <version>1.13.0-SNAPSHOT</version>
+        <version>1.13.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -432,7 +432,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>obfl-utils</artifactId>
-        <version>1.1.4-SNAPSHOT</version>
+        <version>1.1.4</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.build</groupId>
@@ -836,4 +836,8 @@
       </snapshots>
     </repository>
   </repositories>
+
+  <scm>
+    <tag>v1.13.0</tag>
+  </scm>
 </project>
