@@ -7,7 +7,7 @@
     <groupId>org.daisy</groupId>
     <artifactId>daisy</artifactId>
     <version>4</version>
-    <relativePath />
+    <relativePath/>
   </parent>
 
   <groupId>org.daisy.pipeline.modules</groupId>
@@ -37,7 +37,7 @@
     <module>tts-utils/tts-adapter-sapinative</module>
     <module>tts-utils/tts-adapter-qfrency</module>
     <module>tts-utils/tts-helpers</module>
-    <module>zedai-to-ssml</module>
+    <!--<module>zedai-to-ssml</module>-->
     <module>mathml-to-ssml</module>
   </modules>
 </project>
