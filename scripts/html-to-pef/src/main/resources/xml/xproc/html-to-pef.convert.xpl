@@ -212,21 +212,31 @@
         </p:otherwise>
     </p:choose>
     
-    <p:identity name="pef"/>
-    
-    <p:identity>
-        <p:input port="source">
-            <p:pipe step="html" port="result"/>
-        </p:input>
-    </p:identity>
-    <px:html-to-opf-metadata name="metadata" px:message="Extracting metadata from HTML" px:progress=".01"/>
-    <pef:add-metadata px:message="Adding metadata to PEF" px:progress=".01">
-        <p:input port="source">
-            <p:pipe step="pef" port="result"/>
-        </p:input>
-        <p:input port="metadata">
-            <p:pipe step="metadata" port="result"/>
-        </p:input>
-    </pef:add-metadata>
+    <p:choose px:progress=".02">
+        <p:xpath-context>
+            <p:pipe step="transform" port="status"/>
+        </p:xpath-context>
+        <p:when test="/*/@result='ok'">
+            <p:identity name="pef"/>
+            <p:sink/>
+            <p:identity>
+                <p:input port="source">
+                    <p:pipe step="html" port="result"/>
+                </p:input>
+            </p:identity>
+            <px:html-to-opf-metadata name="metadata" px:message="Extracting metadata from HTML" px:progress="1/2"/>
+            <pef:add-metadata px:message="Adding metadata to PEF" px:progress="1/2">
+                <p:input port="source">
+                    <p:pipe step="pef" port="result"/>
+                </p:input>
+                <p:input port="metadata">
+                    <p:pipe step="metadata" port="result"/>
+                </p:input>
+            </pef:add-metadata>
+        </p:when>
+        <p:otherwise>
+            <p:identity/>
+        </p:otherwise>
+    </p:choose>
     
 </p:declare-step>
