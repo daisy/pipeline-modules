@@ -746,6 +746,7 @@
                       <artifactId>louis</artifactId>
                       <classifier>noarch</classifier>
                       <type>nar</type>
+                      <version>3.11.0-1-SNAPSHOT</version>
                     </artifactItem>
                   </artifactItems>
                 </configuration>
