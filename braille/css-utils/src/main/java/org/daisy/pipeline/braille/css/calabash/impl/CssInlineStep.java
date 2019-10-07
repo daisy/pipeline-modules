@@ -108,8 +108,8 @@ import org.daisy.braille.css.SimpleInlineStyle;
 import org.daisy.braille.css.SupportedBrailleCSS;
 
 import org.daisy.common.calabash.XMLCalabashHelper;
-import static org.daisy.common.file.URIs.asURI;
-import static org.daisy.common.file.URLs.asURL;
+import org.daisy.common.file.URIs;
+import org.daisy.common.file.URLs;
 import org.daisy.common.saxon.SaxonHelper;
 import org.daisy.common.stax.BaseURIAwareXMLStreamWriter;
 import static org.daisy.common.stax.XMLStreamWriterHelper.writeAttribute;
@@ -172,10 +172,10 @@ public class CssInlineStep extends DefaultStep {
 		importer = new Importer() {
 			public Collection<Import> apply(String url, Import previous) {
 				try {
-					URI uri = asURI(url);
+					URI uri = URIs.asURI(url);
 					URI base = previous.getAbsoluteUri();
 					logger.debug("Importing SASS style sheet: " + uri + " (base = " + base + ")");
-					URI abs = base.resolve(uri);
+					URI abs = URIs.resolve(base, uri);
 					InputStream is; {
 						Source resolved; {
 							try {
@@ -186,9 +186,9 @@ public class CssInlineStep extends DefaultStep {
 							is = ((StreamSource)resolved).getInputStream();
 						else {
 							if (resolved != null) {
-								abs = asURI(resolved.getSystemId());
+								abs = URIs.asURI(resolved.getSystemId());
 								logger.debug("Resolved to: " + abs); }
-							is = asURL(abs).openStream(); }}
+							is = URLs.asURL(abs).openStream(); }}
 					try {
 						return ImmutableList.of(
 							new Import(uri, abs,
@@ -209,7 +209,7 @@ public class CssInlineStep extends DefaultStep {
 				InputStream is; {
 					Source resolved; {
 						try {
-							resolved = _resolver.resolve(asURI(url).toString(), ""); }
+							resolved = _resolver.resolve(URIs.asURI(url).toString(), ""); }
 						catch (javax.xml.transform.TransformerException e) {
 							throw new IOException(e); }}
 					if (resolved != null && resolved instanceof StreamSource)
@@ -248,7 +248,7 @@ public class CssInlineStep extends DefaultStep {
 					}
 					scss += byteSource(is).asCharSource(StandardCharsets.UTF_8).read();
 					try {
-						Output result = sassCompiler.compileString(scss, StandardCharsets.UTF_8, asURI(url), null, options);
+						Output result = sassCompiler.compileString(scss, StandardCharsets.UTF_8, URIs.asURI(url), null, options);
 						if (result.getErrorStatus() != 0)
 							throw new IOException("Could not compile SASS style sheet: " + result.getErrorMessage());
 						String css = result.getCss();
@@ -479,13 +479,13 @@ public class CssInlineStep extends DefaultStep {
 						// FIXME: find out why it happens
 						baseURL = null;
 					else
-						baseURL = asURL(baseURI);
+						baseURL = URLs.asURL(baseURI);
 				}
 				URL[] defaultSheets; {
 					StringTokenizer t = new StringTokenizer(defaultStyleSheet);
 					ArrayList<URL> l = new ArrayList<URL>();
 					while (t.hasMoreTokens())
-						l.add(asURL(baseURI.resolve(asURI(t.nextToken()))));
+						l.add(URLs.asURL(baseURI.resolve(URIs.asURI(t.nextToken()))));
 					defaultSheets = toArray(l, URL.class);
 				}
 				
