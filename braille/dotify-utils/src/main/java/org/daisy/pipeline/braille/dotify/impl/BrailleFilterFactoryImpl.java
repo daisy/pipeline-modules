@@ -310,7 +310,7 @@ public class BrailleFilterFactoryImpl implements BrailleFilterFactory {
 				return concat(
 					cssStyledTextFromTranslatable(preceding.subList(0, w), null, null, a, parentStyle),
 					cssStyledTextFromTranslatable(preceding.subList(w, precedingSize), text, following, attributes, parentStyle));
-			else if (w - precedingSize < textSize)
+			else if (w - precedingSize <= textSize)
 				return concat(
 					cssStyledTextFromTranslatable(preceding, text.subList(0, w - precedingSize), null, a, parentStyle),
 					cssStyledTextFromTranslatable(null, text.subList(w - precedingSize, textSize), following, attributes, parentStyle));
