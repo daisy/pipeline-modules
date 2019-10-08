@@ -24,6 +24,8 @@ Changes
   https://github.com/brailleapps/dotify.formatter.impl/pull/99)
 - Support for `::alternate(2)`, `::alternate(3)`,
   etc. (https://github.com/sbsdev/pipeline-mod-sbs/issues/68)
+- Support for `text-transform: -louis-foo` when `foo` is the name of an emphasis class in the
+  Liblouis table.
 - Avoid line breaks between segments that are not separated by white space, such as a text node and
   an immediately following note reference (https://github.com/sbsdev/pipeline-mod-sbs/issues/63)
 - Enhanced the CSS module for volume breaking so that preference is
