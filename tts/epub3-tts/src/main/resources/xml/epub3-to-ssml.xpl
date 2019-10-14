@@ -19,9 +19,21 @@
       <p:pipe port="result" step="ssml-gen" />
     </p:output>
 
-    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/text-to-ssml/library.xpl" />
-    <p:import href="http://www.daisy.org/pipeline/modules/tts-helpers/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
+      <p:documentation>
+        px:message
+      </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/text-to-ssml/library.xpl">
+      <p:documentation>
+        px:text-to-ssml
+      </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/tts-helpers/library.xpl">
+      <p:documentation>
+        px:get-tts-lexicons
+      </p:documentation>
+    </p:import>
 
     <px:get-tts-lexicons name="user-lexicons">
       <p:input port="config">

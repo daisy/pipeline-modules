@@ -111,11 +111,26 @@
     </p:documentation>
   </p:option>
 
-  <p:import href="http://www.daisy.org/pipeline/modules/ssml-to-audio/library.xpl" />
-  <p:import href="http://www.daisy.org/pipeline/modules/epub3-to-ssml/library.xpl" />
-  <p:import href="http://www.daisy.org/pipeline/modules/html-break-detection/library.xpl"/>
-  <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
-  <p:import href="http://www.daisy.org/pipeline/modules/css-speech/library.xpl"/>
+  <p:import href="epub3-to-ssml.xpl">
+    <p:documentation>
+      px:epub3-to-ssml
+    </p:documentation>
+  </p:import>
+  <p:import href="http://www.daisy.org/pipeline/modules/ssml-to-audio/library.xpl">
+    <p:documentation>
+      px:ssml-to-audio
+    </p:documentation>
+  </p:import>
+  <p:import href="http://www.daisy.org/pipeline/modules/html-break-detection/library.xpl">
+    <p:documentation>
+      px:html-break-detect
+    </p:documentation>
+  </p:import>
+  <p:import href="http://www.daisy.org/pipeline/modules/css-speech/library.xpl">
+    <p:documentation>
+      px:remove-inline-css-speech
+    </p:documentation>
+  </p:import>
 
   <p:variable name="fileset-base" select="base-uri(/*)">
     <p:pipe port="fileset.in" step="main"/>
