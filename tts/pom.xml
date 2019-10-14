@@ -31,12 +31,12 @@
     <module>ssml-to-audio</module>
     <module>text-to-ssml</module>
     <module>tts-utils/tts-common</module>
-    <module>tts-utils/tts-adapter-espeak</module>
-    <module>tts-utils/tts-adapter-acapela</module>
-    <module>tts-utils/tts-adapter-osx</module>
-    <module>tts-utils/tts-adapter-sapinative</module>
-    <module>tts-utils/tts-adapter-qfrency</module>
     <module>tts-utils/tts-helpers</module>
+    <module>tts-adapters/tts-adapter-espeak</module>
+    <module>tts-adapters/tts-adapter-acapela</module>
+    <module>tts-adapters/tts-adapter-osx</module>
+    <module>tts-adapters/tts-adapter-sapinative</module>
+    <module>tts-adapters/tts-adapter-qfrency</module>
     <module>zedai-to-ssml</module>
     <module>mathml-to-ssml</module>
   </modules>
