@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
+                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                 xmlns:c="http://www.w3.org/ns/xproc-step"
                 exclude-inline-prefixes="#all"
@@ -17,26 +18,20 @@
         <p:output port="result"/>
         <p:option name="href"/>
         <p:option name="encoding" select="'utf-8'"/>
-        <p:identity>
-            <p:input port="source">
-                <p:inline exclude-inline-prefixes="#all">
-                    <c:request method="GET"/>
-                </p:inline>
-            </p:input>
-        </p:identity>
-        <p:add-attribute match="c:request" attribute-name="href">
-            <p:with-option name="attribute-value" select="$href"/>
-        </p:add-attribute>
-        <p:add-attribute match="c:request" attribute-name="override-content-type">
-            <p:with-option name="attribute-value" select="concat('text/plain; charset=',$encoding)"
-            />
-        </p:add-attribute>
-        <p:http-request/>
+        <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
+            <p:documentation>
+                px:data
+            </p:documentation>
+        </p:import>
+        <px:data>
+            <p:with-option name="href" select="$href"/>
+            <p:with-option name="content-type" select="concat('text/plain; charset=',$encoding)"/>
+        </px:data>
         <!--  remove doctypes etc (<!DOCTYPE html> doesn't work with p:unescape-markup)  -->
         <p:string-replace match="/*/text()[1]"
             replace="replace(/*/text()[1],'^&lt;[!\?].*?(&lt;[^!\?])','$1','s')"/>
         <p:unescape-markup content-type="text/html" namespace="http://www.w3.org/1999/xhtml"/>
-        <p:unwrap match="c:body"/>
+        <p:unwrap match="c:data"/>
     </p:declare-step>
 
     <p:try>
