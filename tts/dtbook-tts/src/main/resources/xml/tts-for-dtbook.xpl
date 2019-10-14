@@ -65,12 +65,31 @@
     </p:documentation>
   </p:option>
 
-  <p:import href="http://www.daisy.org/pipeline/modules/ssml-to-audio/library.xpl" />
-  <p:import href="http://www.daisy.org/pipeline/modules/dtbook-to-ssml/library.xpl" />
-  <p:import href="http://www.daisy.org/pipeline/modules/dtbook-break-detection/library.xpl"/>
-  <p:import href="http://www.daisy.org/pipeline/modules/daisy3-utils/library.xpl"/>
-  <p:import href="http://www.daisy.org/pipeline/modules/tts-helpers/library.xpl"/>
-  <p:import href="http://www.daisy.org/pipeline/modules/css-speech/library.xpl"/>
+  <p:import href="dtbook-to-ssml.xpl">
+    <p:documentation>
+      px:dtbook-to-ssml
+    </p:documentation>
+  </p:import>
+  <p:import href="http://www.daisy.org/pipeline/modules/ssml-to-audio/library.xpl">
+    <p:documentation>
+      px:ssml-to-audio
+    </p:documentation>
+  </p:import>
+  <p:import href="http://www.daisy.org/pipeline/modules/dtbook-break-detection/library.xpl">
+    <p:documentation>
+      px:dtbook-break-detect
+    </p:documentation>
+  </p:import>
+  <p:import href="http://www.daisy.org/pipeline/modules/daisy3-utils/library.xpl">
+    <p:documentation>
+      px:isolate-daisy3-skippable
+    </p:documentation>
+  </p:import>
+  <p:import href="http://www.daisy.org/pipeline/modules/css-speech/library.xpl">
+    <p:documentation>
+      px:remove-inline-css-speech
+    </p:documentation>
+  </p:import>
 
   <!-- Find the sentences and the words, even if the Text-To-Speech is off. -->
   <p:for-each name="lexing">

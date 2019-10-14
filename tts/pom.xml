@@ -24,7 +24,6 @@
     <!-- too, because it depends on att-nar which cannot be publicly deployed -->
     <!-- according to the AT&T's license. -->
     <module>css-speech</module>
-    <module>dtbook-to-ssml</module>
     <module>dtbook-tts</module>
     <module>epub3-tts</module>
     <module>epub3-to-ssml</module>
