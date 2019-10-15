@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
 	
-	<public publicId='-//NISO//DTD ncx 2005-1//EN' uri='../xml/ncx-2005-1.dtd'/>
-	<system systemId='http://www.daisy.org/z3986/2005/ncx-2005-1.dtd' uri='../xml/ncx-2005-1.dtd'/>
-
 	<public publicId='-//W3C//DTD XHTML 1.0 Frameset//EN' uri='../xml/xhtml1-frameset.dtd'/>
 	<system systemId='http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd' uri='../xml/xhtml1-frameset.dtd'/>
 
@@ -22,12 +19,6 @@
 	<public publicId='-//W3C//ENTITIES Symbols for XHTML//EN' uri='../xml/xhtml-symbol.ent'/>
 	<system systemId='http://www.w3.org/TR/xhtml1/DTD/xhtml-symbol.ent' uri='../xml/xhtml-symbol.ent'/>
 
-	<public publicId='+//ISBN 0-9673008-1-9//DTD OEB 1.2 Package//EN' uri='../xml/oebpkg12.dtd'/>
-	<system systemId='http://openebook.org/dtds/oeb-1.2/oebpkg12.dtd' uri='../xml/oebpkg12.dtd'/>
-
-	<public publicId='+//ISBN 0-9673008-1-9//DTD OEB 1.2 Entities//EN' uri='../xml/oeb12.ent'/>
-	<system systemId='http://openebook.org/dtds/oeb-1.2/oeb12.ent' uri='../xml/oeb12.ent'/>
-	
 	<group> <!-- RDFa 1.1 -->
 		<public publicId="-//W3C//DTD XHTML+RDFa 1.1//EN" uri="../xml/rdfa11/xhtml-rdfa-2.dtd" />
 		<public publicId="-//W3C//ENTITIES XHTML+RDFa Document Model 1.1//EN" uri="../xml/rdfa11/xhtml-rdfa-model-2.mod" />
