@@ -22,7 +22,6 @@
   <modules>
     <module>ace-adapter</module>
     <module>asciimath-utils</module>
-    <module>common-entities</module>
     <module>css-utils</module>
     <module>daisy202-utils</module>
     <module>daisy3-utils</module>

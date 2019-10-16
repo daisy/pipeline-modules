@@ -15,7 +15,6 @@ public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 			pipelineModule("epub3-utils"),
 			pipelineModule("file-utils"),
 			pipelineModule("zedai-to-epub3"),
-			pipelineModule("common-entities"),
 			pipelineModule("nlp-omnilang-lexer"),
 			pipelineModule("audio-encoder-lame"),
 			pipelineModule("tts-common"),

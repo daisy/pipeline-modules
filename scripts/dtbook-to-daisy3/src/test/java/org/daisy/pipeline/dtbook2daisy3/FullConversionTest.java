@@ -88,7 +88,6 @@ public class FullConversionTest extends AbstractTest implements DifferenceListen
 			pipelineModule("file-utils"),
 			pipelineModule("smil-utils"),
 			pipelineModule("mathml-utils"),
-			pipelineModule("common-entities"),
 			"commons-io:commons-io:?",
 			"org.daisy.pipeline:xproc-api:?",
 			// for dtbook-tss mock
