@@ -101,6 +101,14 @@
       <x:document type="zip" href="store/zipped.odt" base-uri="temp-dir"/>
     </x:context>
     <x:expect label="the mimetype should be the first entry" type="xpath" test="//c:file[1]/@name" equals="'mimetype'"/>
+    <x:context label="the mimetype file">
+      <x:document type="file" base-uri="temp-dir" href="store/zipped.odt!/mimetype" method="text"/>
+    </x:context>
+    <x:expect label="the mimetype file" type="compare">
+      <x:document type="inline" xml:space="preserved">
+        <c:body>application/vnd.oasis.opendocument.text</c:body>
+      </x:document>
+    </x:expect>
     <x:context label="the manifest file">
       <x:document type="file" base-uri="temp-dir" href="store/zipped.odt!/META-INF/manifest.xml"/>
     </x:context>
