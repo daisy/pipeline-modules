@@ -103,7 +103,10 @@
         <p:documentation>
             Get spine.
         </p:documentation>
-        <p:input port="source">
+        <p:input port="source.fileset">
+            <p:pipe step="main" port="source.fileset"/>
+        </p:input>
+        <p:input port="source.in-memory">
             <p:pipe step="opf" port="result"/>
         </p:input>
     </px:opf-spine-to-fileset>

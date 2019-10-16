@@ -77,17 +77,20 @@
         <!-- assumes px:fileset-load loads documents in order defined in fileset and
              px:fileset-intersect does not alter order -->
     </p:documentation>
-    <px:opf-spine-to-fileset name="spine.fileset">
+    <px:fileset-add-entry name="daisy202-with-opf"
+                          media-type="application/oebps-package+xml">
         <p:input port="source">
-            <p:pipe step="opf" port="result"/>
-        </p:input>
-    </px:opf-spine-to-fileset>
-    <px:fileset-intersect>
-        <p:input port="source">
-            <p:pipe step="spine.fileset" port="result"/>
             <p:pipe step="main" port="source.fileset"/>
         </p:input>
-    </px:fileset-intersect>
+        <p:input port="entry">
+            <p:pipe step="opf" port="result"/>
+        </p:input>
+    </px:fileset-add-entry>
+    <px:opf-spine-to-fileset ignore-missing="true" name="spine.fileset">
+        <p:input port="source.in-memory">
+            <p:pipe step="daisy202-with-opf" port="result.in-memory"/>
+        </p:input>
+    </px:opf-spine-to-fileset>
     <px:fileset-load>
         <p:input port="in-memory">
             <p:pipe step="main" port="source.in-memory"/>
@@ -261,18 +264,10 @@
         <px:fileset-join name="associated-xhtml.fileset"/>
         <p:sink/>
         <!-- load in spine order -->
-        <px:fileset-intersect name="xhtml-without-mo.fileset.sorted">
+        <px:fileset-intersect>
             <p:input port="source">
                 <p:pipe step="spine.fileset" port="result"/>
                 <p:pipe step="associated-xhtml.fileset" port="result"/>
-            </p:input>
-        </px:fileset-intersect>
-        <p:sink/>
-        <!-- add file attributes from source fileset -->
-        <px:fileset-intersect>
-            <p:input port="source">
-                <p:pipe step="main" port="source.fileset"/>
-                <p:pipe step="xhtml-without-mo.fileset.sorted" port="result"/>
             </p:input>
         </px:fileset-intersect>
         <px:fileset-load name="associated-xhtml" fail-on-not-found="true">
