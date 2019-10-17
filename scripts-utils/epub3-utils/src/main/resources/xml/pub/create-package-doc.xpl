@@ -716,24 +716,11 @@
                 </p:identity>
             </p:when>
             <p:otherwise>
-                <p:identity>
+                <p:xslt px:message="Creating bindings element for package document" px:message-severity="DEBUG">
                     <p:input port="source">
                         <p:pipe step="main" port="bindings"/>
+                        <p:pipe step="manifest" port="as-fileset"/>
                     </p:input>
-                </p:identity>
-                <px:message severity="DEBUG" message="Creating bindings element for package document"/>
-                <p:group>
-                    <p:viewport match="d:file">
-                        <p:variable name="href" select="/*/resolve-uri(@href,base-uri(.))"/>
-                        <p:add-attribute match="/*" attribute-name="handler">
-                            <p:with-option name="attribute-value"
-                                           select="concat('#',/*/d:file[resolve-uri(@href,base-uri(.))=$href]/@id)">
-                                <p:pipe step="manifest" port="as-fileset"/>
-                            </p:with-option>
-                        </p:add-attribute>
-                    </p:viewport>
-                </p:group>
-                <p:xslt>
                     <p:input port="stylesheet">
                         <p:document href="create-package-doc.handler-fileset-to-bindings.xsl"/>
                     </p:input>
