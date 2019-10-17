@@ -476,8 +476,8 @@
                     </p:set-attributes>
                     <px:fileset-join>
                         <p:input port="source">
-                            <p:pipe step="bindings-with-media-type-xhtml" port="result"/>
                             <p:pipe step="source.fileset" port="result"/>
+                            <p:pipe step="bindings-with-media-type-xhtml" port="result"/>
                         </p:input>
                     </px:fileset-join>
                 </p:otherwise>
@@ -560,8 +560,8 @@
             <px:fileset-join name="content-docs-with-properties"/>
             <px:fileset-join>
                 <p:input port="source">
-                    <p:pipe step="content-docs-with-properties" port="result"/>
                     <p:pipe step="manifest-with-bindings" port="result"/>
+                    <p:pipe step="content-docs-with-properties" port="result"/>
                 </p:input>
             </px:fileset-join>
         </p:group>
