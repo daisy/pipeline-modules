@@ -44,6 +44,11 @@
         </p:documentation>
     </p:import>
     <p:import href="convert-smils.xpl"/>
+    <p:import href="oebps-to-ncc-metadata.xpl">
+        <p:documentation>
+            px:oebps-to-ncc-metadata
+        </p:documentation>
+    </p:import>
 
     <!--=========================================================================-->
     <!-- LOAD THE DAISY 3 FILESET                                                -->
@@ -92,17 +97,11 @@
     <!-- CONVERT METADATA                                                        -->
     <!--=========================================================================-->
     <p:documentation>Convert OPF metadata to NCC metadata</p:documentation>
-    <p:xslt name="metadata">
+    <px:oebps-to-ncc-metadata name="metadata">
         <p:input port="source">
             <p:pipe port="result" step="opf"/>
         </p:input>
-        <p:input port="stylesheet">
-            <p:document href="opf-to-metadata.xsl"/>
-        </p:input>
-        <p:input port="parameters">
-            <p:empty/>
-        </p:input>
-    </p:xslt>
+    </px:oebps-to-ncc-metadata>
 
 
     <!--=========================================================================-->
@@ -167,27 +166,6 @@
         <p:with-option name="output-dir" select="$output-dir"/>
     </pxi:daisy3-to-daisy202-smils>
 
-
-    <!--=========================================================================-->
-    <!-- METADATA                                                                -->
-    <!--=========================================================================-->
-
-    <!--<p:documentation>Extract metadata from the DAISY 3 OPF document</p:documentation>
-            <p:group name="metadata">
-                <p:output port="result"/>
-                <p:xslt>
-                    <p:input port="source">
-                        <p:pipe port="source" step="main"/>
-                    </p:input>
-                    <p:input port="stylesheet">
-                        <p:document href="../internal/opf-to-metadata.xsl"/>
-                    </p:input>
-                    <p:input port="parameters">
-                        <p:empty/>
-                    </p:input>
-                </p:xslt>
-            </p:group>
-            <p:sink/>-->
 
     <!--=========================================================================-->
     <!-- CONSOLIDATE THE OUTPUT                                                  -->

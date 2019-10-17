@@ -47,6 +47,11 @@
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
     <p:import href="../internal/ncx-to-nav.xpl"/>
     <p:import href="../internal/smil-to-audio-clips.xpl"/>
+    <p:import href="../internal/oebps-to-opf-metadata.xpl">
+        <p:documentation>
+            px:oebps-to-opf-metadata
+        </p:documentation>
+    </p:import>
 
 
     <!--=========================================================================-->
@@ -243,20 +248,11 @@
     <!--=========================================================================-->
 
     <p:documentation>Extract metadata from the DAISY 3 OPF document</p:documentation>
-    <p:group name="metadata">
-        <p:output port="result"/>
-        <p:xslt>
-            <p:input port="source">
-                <p:pipe port="result" step="opf"/>
-            </p:input>
-            <p:input port="stylesheet">
-                <p:document href="../internal/opf-to-metadata.xsl"/>
-            </p:input>
-            <p:input port="parameters">
-                <p:empty/>
-            </p:input>
-        </p:xslt>
-    </p:group>
+    <px:oebps-to-opf-metadata name="metadata">
+        <p:input port="source">
+            <p:pipe step="opf" port="result"/>
+        </p:input>
+    </px:oebps-to-opf-metadata>
     <p:sink/>
 
 

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns="http://www.idpf.org/2007/opf" xmlns:dc="http://purl.org/dc/elements/1.1/"
-    xmlns:dtb="http://www.daisy.org/z3986/2005/dtbook/" version="2.0" exclude-result-prefixes="#all">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
+                xmlns:dc="http://purl.org/dc/elements/1.1/"
+                xmlns:dtb="http://www.daisy.org/z3986/2005/dtbook/"
+                xmlns="http://www.idpf.org/2007/opf"
+                exclude-result-prefixes="#all">
 
     <xsl:output indent="yes" method="xml"/>
     

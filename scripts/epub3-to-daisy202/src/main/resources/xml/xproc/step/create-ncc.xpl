@@ -54,6 +54,11 @@
             px:opf-spine-to-fileset
         </p:documentation>
     </p:import>
+    <p:import href="opf-to-ncc-metadata.xpl">
+        <p:documentation>
+            px:opf-to-ncc-metadata
+        </p:documentation>
+    </p:import>
 
     <p:group name="opf">
         <p:documentation>Normalize base URI of OPF</p:documentation>
@@ -122,20 +127,18 @@
             <p:pipe step="opf" port="result"/>
         </p:variable>
         <p:variable name="ncc-base-dir-string-length" select="string-length(replace($ncc-base-uri,'[^/]+$',''))"/>
-        <p:xslt>
+        <px:opf-to-ncc-metadata>
             <p:input port="source">
                 <p:pipe step="opf" port="result"/>
+            </p:input>
+            <p:input port="ncc-body">
                 <p:pipe step="ncc.body" port="result"/>
+            </p:input>
+            <p:input port="smil">
                 <p:pipe step="augment-smils" port="smil"/>
                 <p:pipe step="new-smils" port="smil"/>
             </p:input>
-            <p:input port="stylesheet">
-                <p:document href="../../xslt/opf-to-ncc-metadata.xsl"/>
-            </p:input>
-            <p:input port="parameters">
-                <p:empty/>
-            </p:input>
-        </p:xslt>
+        </px:opf-to-ncc-metadata>
         <p:identity name="ncc.head"/>
         <p:for-each name="ncc-items">
             <p:iteration-source

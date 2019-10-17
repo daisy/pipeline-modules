@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:html="http://www.w3.org/1999/xhtml"
                 xmlns:opf="http://www.idpf.org/2007/opf"
-                xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:dc="http://purl.org/dc/elements/1.1/"
                 xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
+                xmlns="http://www.w3.org/1999/xhtml"
                 xpath-default-namespace=""
                 exclude-result-prefixes="#all">
 

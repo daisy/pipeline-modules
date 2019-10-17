@@ -69,24 +69,22 @@
             px:epub3-pub-create-package-doc
         </p:documentation>
     </p:import>
+    <p:import href="ncc-to-opf-metadata.xpl">
+        <p:documentation>
+            px:ncc-to-opf-metadata
+        </p:documentation>
+    </p:import>
 
     <p:variable name="result-uri" select="concat($publication-dir,'package.opf')"/>
 
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">Compile OPF metadata.</p:documentation>
-    <p:identity>
+    <px:ncc-to-opf-metadata px:message="Extracting metadata from NCC...">
         <p:input port="source">
-            <p:pipe port="ncc" step="package"/>
+            <p:pipe step="package" port="ncc"/>
         </p:input>
-    </p:identity>
-    <px:message message="Extracting metadata from NCC..."/>
-    <p:xslt>
-        <p:with-param name="pub-id" select="$pub-id"/>
-        <p:input port="stylesheet">
-            <p:document href="ncc-metadata-to-opf-metadata.xsl"/>
-        </p:input>
-    </p:xslt>
-    <px:message message="Metadata successfully extracted and converted to OPF"/>
-    <p:identity name="opf-metadata"/>
+        <p:with-option name="pub-id" select="$pub-id"/>
+    </px:ncc-to-opf-metadata>
+    <p:identity name="opf-metadata" px:message="Metadata successfully extracted and converted to OPF"/>
     <p:sink/>
 
     <p:group name="manifest">
