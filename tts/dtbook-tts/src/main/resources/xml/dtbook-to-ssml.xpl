@@ -65,7 +65,7 @@
       </p:when>
       <p:otherwise>
 	<p:output port="result" primary="true" sequence="true"/>
-	<p:load href="http://www.daisy.org/pipeline/modules/text-to-ssml/dtbook-annotating.xsl"/>
+	<p:load href="dtbook-annotating.xsl"/>
       </p:otherwise>
     </p:choose>
 

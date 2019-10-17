@@ -418,7 +418,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>text-to-ssml</artifactId>
-        <version>3.0.2</version>
+        <version>3.0.3-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
