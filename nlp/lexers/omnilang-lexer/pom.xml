@@ -7,15 +7,15 @@
     <groupId>org.daisy.pipeline.modules</groupId>
     <artifactId>modules-parent</artifactId>
     <version>1.13.7-SNAPSHOT</version>
-    <relativePath>../../parent</relativePath>
+    <relativePath>../../../parent</relativePath>
   </parent>
 
-  <artifactId>nlp-light-lexer</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <artifactId>nlp-omnilang-lexer</artifactId>
+  <version>1.0.2-SNAPSHOT</version>
   <packaging>bundle</packaging>
 
-  <name>DAISY Pipeline 2 module :: Light Lexer</name>
-  <description>Lexer implementation with no words detection (sentences only)</description>
+  <name>DAISY Pipeline 2 module :: Omni-lingual Lexer</name>
+  <description>Basic Lexer designed to process any language.</description>
 
   <dependencies>
     <dependency>
@@ -40,7 +40,7 @@
   
   <properties>
     <expose-services>
-      org.daisy.pipeline.nlp.lexing.light.impl.LightLexer
+      org.daisy.pipeline.nlp.lexing.omni.impl.OmnilangLexer
     </expose-services>
   </properties>
 
