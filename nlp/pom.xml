@@ -19,9 +19,7 @@
   <description>Aggregator POM for modules related to Natural Language Processing</description>
 
   <modules>
-    <module>nlp-utils/nlp-common</module>
-    <module>nlp-utils/lexing</module>
-    <module>nlp-utils/break-detection</module>
+    <module>nlp-common</module>
     <module>lexers/ruled-lexer</module>
     <module>lexers/light-lexer</module>
     <module>lexers/omnilang-lexer</module>
