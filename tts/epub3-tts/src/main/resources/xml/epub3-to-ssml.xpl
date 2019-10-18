@@ -29,7 +29,7 @@
         px:text-to-ssml
       </p:documentation>
     </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/tts-helpers/library.xpl">
+    <p:import href="http://www.daisy.org/pipeline/modules/tts-common/library.xpl">
       <p:documentation>
         px:get-tts-lexicons
       </p:documentation>

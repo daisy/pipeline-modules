@@ -28,10 +28,6 @@
     </dependency>
     <dependency>
       <groupId>org.daisy.pipeline.modules</groupId>
-      <artifactId>tts-helpers</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.daisy.pipeline.modules</groupId>
       <artifactId>audio-common</artifactId>
     </dependency>
     <!-- for ProgressMessage -->

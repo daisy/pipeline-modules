@@ -8,7 +8,7 @@ public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 			"org.daisy.libs:jstyleparser:?",
 			"commons-io:commons-io:?",
 			"org.daisy.pipeline:calabash-adapter:?",
-			"org.daisy.pipeline.modules:tts-helpers:?",
+			"org.daisy.pipeline.modules:tts-common:?",
 		};
 	}
 }
