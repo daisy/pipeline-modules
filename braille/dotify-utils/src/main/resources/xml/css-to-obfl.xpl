@@ -26,6 +26,11 @@
         px:error
       </p:documentation>
     </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/css-utils/library.xpl">
+      <p:documentation>
+        px:css-cascade
+      </p:documentation>
+    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/braille/css-utils/library.xpl">
       <p:documentation>
         css:adjust-boxes
@@ -35,7 +40,6 @@
         css:eval-target-text
         css:flow-from
         css:flow-into
-        css:inline
         css:label-targets
         css:make-anonymous-block-boxes
         css:make-anonymous-inline-boxes
@@ -137,7 +141,7 @@
                     <p:documentation>
                         Apply possible relative rules.
                     </p:documentation>
-                    <css:inline/>
+                    <px:css-cascade/>
                 </p:viewport>
                 <pxi:recursive-parse-stylesheet-and-make-pseudo-elements/>
             </p:when>

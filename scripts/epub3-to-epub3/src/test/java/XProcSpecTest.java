@@ -17,6 +17,7 @@ public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 			brailleModule("css-utils"),
 			brailleModule("liblouis-utils"),
 			"org.daisy.pipeline.modules.braille:liblouis-utils:jar:" + thisPlatform() + ":?",
+			pipelineModule("css-utils"),
 			pipelineModule("file-utils"),
 			pipelineModule("fileset-utils"),
 			pipelineModule("common-utils"),

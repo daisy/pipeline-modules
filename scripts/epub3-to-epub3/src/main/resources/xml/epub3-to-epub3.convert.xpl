@@ -35,8 +35,17 @@
         -->
     </p:option>
     
-    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
+        <p:documentation>
+            px:error
+            px:message
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
+        <p:documentation>
+            px:set-base-uri
+        </p:documentation>
+    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
         <p:documentation>
             px:fileset-create
@@ -48,8 +57,24 @@
             px:fileset-filter
         </p:documentation>
     </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/braille/common-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/braille/css-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/braille/common-utils/library.xpl">
+        <p:documentation>
+            px:transform
+            px:select-by-base
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/css-utils/library.xpl">
+        <p:documentation>
+            px:css-cascade
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/braille/css-utils/library.xpl">
+        <p:documentation>
+            css:apply-stylesheets
+            css:delete-stylesheets
+            css:extract
+        </p:documentation>
+    </p:import>
     
     <p:variable name="default-stylesheet" select="resolve-uri('../css/default.css')">
         <p:inline>
@@ -222,9 +247,9 @@
             </p:otherwise>
         </p:choose>
         <css:delete-stylesheets/>
-        <css:inline media="embossed">
+        <px:css-cascade media="embossed">
             <p:with-option name="default-stylesheet" select="($stylesheet,$default-stylesheet)[not(.='')][1]"/>
-        </css:inline>
+        </px:css-cascade>
         <px:transform name="transform">
             <p:with-option name="query" select="concat('(input:html)(input:css)(output:html)(output:css)(output:braille)',
                                                        $braille-translator,

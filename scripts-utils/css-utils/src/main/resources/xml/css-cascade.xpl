@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step version="1.0"
-                type="css:inline"
+                type="px:css-cascade"
                 xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
-                xmlns:css="http://www.daisy.org/ns/pipeline/braille-css"
                 exclude-inline-prefixes="#all"
                 name="main">
 	
@@ -84,7 +84,7 @@
 	<!--
 	    implemented in Java
 	-->
-	<p:declare-step type="pxi:css-inline">
+	<p:declare-step type="pxi:css-cascade">
 		<p:input port="source" primary="true"/>
 		<p:input port="context" sequence="true"/>
 		<p:input port="sass-variables" kind="parameter" primary="false"/>
@@ -94,7 +94,7 @@
 		<p:option name="attribute-name"/>
 	</p:declare-step>
 	
-	<pxi:css-inline>
+	<pxi:css-cascade>
 		<p:input port="context">
 			<p:pipe step="main" port="context"/>
 		</p:input>
@@ -104,6 +104,6 @@
 		<p:with-option name="default-stylesheet" select="$default-stylesheet"/>
 		<p:with-option name="media" select="$media"/>
 		<p:with-option name="attribute-name" select="$attribute-name"/>
-	</pxi:css-inline>
+	</pxi:css-cascade>
 	
 </p:declare-step>
