@@ -124,24 +124,16 @@
 
           <!-- from memory -->
           <p:when test="$target = //d:file/resolve-uri(@href,base-uri(.))">
-            <p:for-each name="for-each-in-memory"
-                        px:message="processing file from memory: {$target}" px:message-severity="DEBUG">
-              <p:iteration-source>
+            <p:split-sequence px:message="processing file from memory: {$target}" px:message-severity="DEBUG">
+              <p:input port="source">
                 <p:pipe port="in-memory" step="normalized"/>
-              </p:iteration-source>
-              <p:choose>
-                <p:when test="base-uri(/*)=$target">
-                  <p:identity/>
-                </p:when>
-                <p:otherwise>
-                  <p:identity>
-                    <p:input port="source">
-                      <p:empty/>
-                    </p:input>
-                  </p:identity>
-                </p:otherwise>
-              </p:choose>
-            </p:for-each>
+              </p:input>
+              <p:with-option name="test" select="concat('base-uri(/*)=&quot;',$target,'&quot;')">
+                <p:empty/>
+              </p:with-option>
+            </p:split-sequence>
+            <!-- take only the first -->
+            <p:split-sequence test="position()=1"/>
           </p:when>
 
           <!-- not in memory, but don't load it from disk -->
