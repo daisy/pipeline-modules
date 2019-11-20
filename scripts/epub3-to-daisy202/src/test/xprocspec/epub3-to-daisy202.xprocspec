@@ -56,7 +56,10 @@
         </x:expect>-->
     </x:scenario>
 
-    <x:scenario label="moby-dick-mo-20120214">
+    <!--
+        FIXME: disabled because it takes so long
+    -->
+    <x:scenario label="moby-dick-mo-20120214" pending="true">
         <x:call step="px:epub3-to-daisy202">
             <x:input port="source.fileset">
                 <x:document type="inline" xml:base="moby-dick-mo-20120214/">
