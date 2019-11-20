@@ -19,6 +19,20 @@
   <p:input port="source" sequence="true"/>
   <p:output port="result" primary="true"/>
 
+  <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
+    <p:documentation>
+      px:add-xml-base
+    </p:documentation>
+  </p:import>
+
+  <!--
+      this px:add-xml-base is to work around a bug that causes the base URI of documents with a
+      relative root xml:base to be messed up
+  -->
+  <p:for-each>
+    <px:add-xml-base root="false"/>
+  </p:for-each>
+
   <p:xslt template-name="main">
     <p:input port="stylesheet">
       <p:document href="../xslt/fileset-join.xsl"/>
