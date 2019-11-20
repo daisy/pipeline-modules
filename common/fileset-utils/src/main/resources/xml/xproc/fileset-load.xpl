@@ -292,7 +292,7 @@
                   </p:when>
 
                   <!-- XML -->
-                  <p:when test="$media-type='application/xml' or matches($media-type,'.*\+xml$')">
+                  <p:when test="matches($media-type,'.*(/|\+)xml$')">
                     <p:try>
                       <p:group>
                         <p:load>

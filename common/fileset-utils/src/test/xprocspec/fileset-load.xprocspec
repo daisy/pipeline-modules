@@ -181,6 +181,36 @@
         </x:expect>
     </x:scenario>
 
+    <x:scenario label="test-media-type-text/xml">
+        <x:call step="px:fileset-load">
+            <x:input port="fileset">
+                <x:document type="inline">
+                    <d:fileset>
+                        <d:file href="samples/fileset2/e.xml" media-type="text/xml"/>
+                    </d:fileset>
+                </x:document>
+            </x:input>
+            <x:input port="in-memory"/>
+        </x:call>
+        <x:context label="the result.fileset port">
+            <x:document type="port" port="result.fileset"/>
+        </x:context>
+        <x:expect label="should be as expected" type="custom"
+                  href="../../main/resources/xml/xproc/xprocspec-fileset-compare.xpl" step="x:fileset-compare">
+            <x:document type="inline">
+                <d:fileset>
+                    <d:file href="samples/fileset2/e.xml" media-type="text/xml"/>
+                </d:fileset>
+            </x:document>
+        </x:expect>
+        <x:context label="result">
+            <x:document type="port" port="result"/>
+        </x:context>
+        <x:expect type="compare" label="should be as expected">
+            <x:document type="file" method="xml" href="samples/fileset2/e.xml"/>
+        </x:expect>
+    </x:scenario>
+
     <x:scenario label="test-method-xml">
         <x:call step="px:fileset-load">
             <x:input port="fileset">
