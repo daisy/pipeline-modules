@@ -142,7 +142,7 @@
 		<x:expect label="the result" type="custom" href="http://www.daisy.org/pipeline/modules/epub3-utils/pub/library.xpl"
 		          step="x:epub3-pub-compare-package-doc">
 			<x:document type="inline">
-				<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="id-id" version="3.0">
+				<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="id-id" version="3.0" prefix="dcterms: http://purl.org/dc/terms/">
 					<metadata>
 						<dc:title>My title</dc:title>
 						<dc:identifier id="id-id">my-id</dc:identifier>

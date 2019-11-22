@@ -123,22 +123,13 @@
             </ul>
         </p:documentation>
     </p:option>
-    <p:option name="reserved-prefixes" required="false" select="'a11y:      http://www.idpf.org/epub/vocab/package/a11y/#
-                                                                 dcterms:   http://purl.org/dc/terms/
-                                                                 epubsc:    http://idpf.org/epub/vocab/sc/#
-                                                                 marc:      http://id.loc.gov/vocabulary/
-                                                                 media:     http://www.idpf.org/epub/vocab/overlays/#
-                                                                 onix:      http://www.editeur.org/ONIX/book/codelists/current.html#
-                                                                 rendition: http://www.idpf.org/vocab/rendition/#
-                                                                 schema:    http://schema.org/
-                                                                 xsd:       http://www.w3.org/2001/XMLSchema#'">
+    <p:option name="reserved-prefixes" required="false" select="''">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>
                 The <a
                 href="http://www.idpf.org/epub/301/spec/epub-publications.html#sec-metadata-default-vocab">reserved
-                prefix mappings</a> of the resulting package document. Set to the empty string to
-                make all prefixes used in the package document explicit in the <code>prefix</code>
-                attribute on the root element.
+                prefix mappings</a> of the resulting package document. By default, prefixes are
+                declared systematically.
             </p>
         </p:documentation>
     </p:option>
