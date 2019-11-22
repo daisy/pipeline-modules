@@ -12,17 +12,6 @@
     <xsl:param name="reserved-prefixes" required="yes"/>
 
     <!--=========================================-->
-    <!-- Merges EPUB Publications Metadata
-        
-         Input: 
-           a set of 'metadata' element in the OPF
-           namespace, wrapped in a common root element
-           (the name of the wrapper is insignificant)
-           
-         Output:
-           a single 'metadata' element in the OPF
-           namespace, containing the 'merged' metadata.
-    -->
     <!--TODO: document merge rules. For now, see the tests.-->
     <!--=========================================-->
 

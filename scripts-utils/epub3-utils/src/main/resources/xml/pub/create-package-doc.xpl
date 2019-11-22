@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                 xmlns:dc="http://purl.org/dc/elements/1.1/"
                 xmlns:c="http://www.w3.org/ns/xproc-step"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
@@ -177,6 +178,11 @@
             px:epub3-nav-to-guide
         </p:documentation>
     </p:import>
+    <p:import href="merge-metadata.xpl">
+        <p:documentation>
+            pxi:merge-metadata
+        </p:documentation>
+    </p:import>
 
     <px:normalize-uri name="output-base-uri">
         <p:with-option name="href" select="$output-base-uri"/>
@@ -338,25 +344,19 @@
         <p:identity name="input-metadata"/>
         <p:sink/>
 
-        <p:wrap-sequence wrapper="_" name="wrapped-metadata">
+        <pxi:merge-metadata>
             <p:input port="source">
                 <p:pipe step="input-metadata" port="result"/>
                 <p:pipe step="default-metadata" port="result"/>
                 <p:pipe step="generated-metadata" port="result"/>
             </p:input>
-        </p:wrap-sequence>
-        <p:xslt>
-            <p:input port="source">
-                <p:pipe step="wrapped-metadata" port="result"/>
+            <p:input port="manifest">
                 <p:pipe step="manifest" port="result"/>
             </p:input>
-            <p:input port="stylesheet">
-                <p:document href="create-metadata.merge.xsl"/>
-            </p:input>
-            <p:with-param name="reserved-prefixes" select="$reserved-prefixes">
+            <p:with-option name="reserved-prefixes" select="$reserved-prefixes">
                 <p:empty/>
-            </p:with-param>
-        </p:xslt>
+            </p:with-option>
+        </pxi:merge-metadata>
 
         <p:documentation>For compatibility with OPF 2, add a second meta element with "name" and
         "content" attributes for every meta element.</p:documentation>
