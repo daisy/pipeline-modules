@@ -30,13 +30,25 @@
 		</p:documentation>
 	</p:output>
 
-	<p:wrap-sequence wrapper="_" name="wrapped-metadata">
+	<p:import href="merge-prefix.xpl">
+		<p:documentation>
+			px:epub3-pub-merge-prefix
+		</p:documentation>
+	</p:import>
+
+	<p:wrap-sequence wrapper="_">
 		<!-- wrap input documents in a common root element (the name of the wrapper is insignificant) -->
 	</p:wrap-sequence>
 
+	<px:epub3-pub-merge-prefix name="metadata-with-single-prefix-attribute">
+		<p:with-option name="reserved-prefixes" select="$reserved-prefixes">
+			<p:empty/>
+		</p:with-option>
+	</px:epub3-pub-merge-prefix>
+
 	<p:xslt>
 		<p:input port="source">
-			<p:pipe step="wrapped-metadata" port="result"/>
+			<p:pipe step="metadata-with-single-prefix-attribute" port="result"/>
 			<p:pipe step="main" port="manifest"/>
 		</p:input>
 		<p:input port="stylesheet">
