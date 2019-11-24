@@ -41,7 +41,7 @@
 	</p:wrap-sequence>
 
 	<px:epub3-pub-merge-prefix name="metadata-with-single-prefix-attribute">
-		<p:with-option name="reserved-prefixes" select="$reserved-prefixes">
+		<p:with-option name="implicit-output-prefixes" select="$reserved-prefixes">
 			<p:empty/>
 		</p:with-option>
 	</px:epub3-pub-merge-prefix>

@@ -9,7 +9,8 @@
 
     <xsl:include href="../epub3-vocab.xsl"/>
 
-    <xsl:param name="reserved-prefixes" required="yes"/>
+    <xsl:param name="implicit-input-prefixes" required="yes"/>
+    <xsl:param name="implicit-output-prefixes" required="yes"/>
 
     <xsl:template match="@*|node()">
         <xsl:copy>
@@ -20,11 +21,13 @@
     <xsl:template match="@prefix"/>
 
     <xsl:template match="/*" priority="1">
-        <xsl:variable name="implicit" as="element(f:vocab)*" select="f:parse-prefix-decl($reserved-prefixes)"/>
-        <xsl:variable name="all" as="element()*" select="f:all-prefix-decl(/)"/>
-        <xsl:variable name="unified" as="element(f:vocab)*" select="f:unified-prefix-decl($all//f:vocab,$implicit)"/>
+        <xsl:variable name="implicit.in" as="element(f:vocab)*" select="f:parse-prefix-decl($implicit-input-prefixes)"/>
+        <xsl:variable name="implicit.out" as="element(f:vocab)*" select="f:parse-prefix-decl($implicit-output-prefixes)"/>
+        <xsl:variable name="all" as="element()*" select="f:all-prefix-decl(/,$implicit.in)"/>
+        <xsl:variable name="unified" as="element(f:vocab)*" select="f:unified-prefix-decl($all//f:vocab,$implicit.in,$implicit.out)"/>
         <xsl:next-match>
-            <xsl:with-param name="implicit" tunnel="yes" select="$implicit"/>
+            <xsl:with-param name="implicit.in" tunnel="yes" select="$implicit.in"/>
+            <xsl:with-param name="implicit.out" tunnel="yes" select="$implicit.out"/>
             <xsl:with-param name="all" tunnel="yes" select="$all"/>
             <xsl:with-param name="unified" tunnel="yes" select="$unified"/>
         </xsl:next-match>
@@ -42,11 +45,12 @@
     </xsl:template>
 
     <xsl:template match="meta/@property|meta/@scheme|link/@rel">
-        <xsl:param name="implicit" as="element(f:vocab)*" tunnel="yes" required="yes"/>
+        <xsl:param name="implicit.in" as="element(f:vocab)*" tunnel="yes" required="yes"/>
+        <xsl:param name="implicit.out" as="element(f:vocab)*" tunnel="yes" required="yes"/>
         <xsl:param name="all" as="element()*" tunnel="yes" required="yes"/>
         <xsl:param name="unified" as="element(f:vocab)*" tunnel="yes" required="yes"/>
         <xsl:variable name="normalized" as="xs:string?"
-                      select="f:expand-property(.,$implicit,$all,$unified)/@name"/>
+                      select="f:expand-property(.,$implicit.in,$implicit.out,$all,$unified)/@name"/>
         <xsl:if test="exists($normalized)">
             <xsl:attribute name="{name(.)}" select="$normalized"/>
         </xsl:if>
@@ -61,7 +65,8 @@
     -->
     <xsl:function name="f:expand-property" as="element(f:property)?">
         <xsl:param name="property" as="attribute()?"/>
-        <xsl:param name="implicit" as="element(f:vocab)*"/>
+        <xsl:param name="implicit.in" as="element(f:vocab)*"/>
+        <xsl:param name="implicit.out" as="element(f:vocab)*"/>
         <xsl:param name="all" as="element()*"/>
         <xsl:param name="unified" as="element(f:vocab)*"/>
         <xsl:variable name="prefix" select="substring-before($property,':')" as="xs:string"/>
@@ -73,7 +78,7 @@
         <xsl:if test="exists($vocab)">
             <xsl:variable name="unified-prefix" as="xs:string?"
                           select="(if ($vocab=$vocab-package-uri) then '' else (),
-                                   $implicit[@uri=$vocab]/@prefix,
+                                   $implicit.out[@uri=$vocab]/@prefix,
                                    $unified[@uri=$vocab]/@prefix
                                   )[1]"/>
             <f:property prefix="{$unified-prefix}"
@@ -90,6 +95,7 @@
     -->
     <xsl:function name="f:all-prefix-decl" as="element()*">
         <xsl:param name="doc" as="document-node()?"/>
+        <xsl:param name="implicit.in" as="element(f:vocab)*"/>
         <xsl:for-each select="$doc//*[@prefix or not(parent::*)]">
             <_ id="{generate-id(.)}">
                 <xsl:variable name="used-prefixes" as="xs:string*"
@@ -98,7 +104,7 @@
                                         return substring-before($prop,':'))"/>
                 <xsl:variable name="parsed-prefix-attr" as="element(f:vocab)*" select="f:parse-prefix-decl(@prefix)"/>
                 <xsl:sequence select="for $prefix in $used-prefixes return
-                                      ($parsed-prefix-attr[@prefix=$prefix],$f:default-prefixes[@prefix=$prefix])[1]"/>
+                                      ($parsed-prefix-attr[@prefix=$prefix],$implicit.in[@prefix=$prefix])[1]"/>
             </_>
         </xsl:for-each>
     </xsl:function>
@@ -112,10 +118,11 @@
     -->
     <xsl:function name="f:unified-prefix-decl" as="element()*">
         <xsl:param name="all" as="element(f:vocab)*"/>
-        <xsl:param name="implicit" as="element(f:vocab)*"/>
-        <xsl:for-each-group select="f:merge-prefix-decl($all)
+        <xsl:param name="implicit.in" as="element(f:vocab)*"/>
+        <xsl:param name="implicit.out" as="element(f:vocab)*"/>
+        <xsl:for-each-group select="f:merge-prefix-decl($all,$implicit.in)
                                     [not(@uri=($vocab-package-uri,
-                                               $implicit/@uri))]"
+                                               $implicit.out/@uri))]"
                             group-by="@uri">
             <xsl:sequence select="current()"/>
         </xsl:for-each-group>

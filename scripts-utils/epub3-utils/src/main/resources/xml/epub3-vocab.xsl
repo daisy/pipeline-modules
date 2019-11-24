@@ -174,6 +174,7 @@
     -->
     <xsl:function name="f:merge-prefix-decl" as="element(f:vocab)*">
         <xsl:param name="mappings" as="element(f:vocab)*"/>
+        <xsl:param name="reserved-prefixes" as="element(f:vocab)*"/>
         <!--
             no prefix may be mapped to default vocabulary
         -->
@@ -194,14 +195,14 @@
         <xsl:variable name="mappings" as="element(f:vocab)*">
             <xsl:choose>
                 <xsl:when test="some $m in $mappings satisfies
-                                $f:default-prefixes[@prefix=$m/@prefix and not(@uri=$m/@uri)]">
+                                $reserved-prefixes[@prefix=$m/@prefix and not(@uri=$m/@uri)]">
                     <xsl:for-each select="$mappings">
-                        <xsl:if test="$f:default-prefixes[@prefix=current()/@prefix and not(@uri=current()/@uri)]">
+                        <xsl:if test="$reserved-prefixes[@prefix=current()/@prefix and not(@uri=current()/@uri)]">
                             <xsl:message select="concat('Warning: reserved prefix ',@prefix,' was overridden to ''',@uri,'''')"/>
                         </xsl:if>
                     </xsl:for-each>
-                    <xsl:sequence select="f:unique-prefixes(($f:default-prefixes,$mappings))
-                                          [position()&gt;count($f:default-prefixes)]"/>
+                    <xsl:sequence select="f:unique-prefixes(($reserved-prefixes,$mappings))
+                                          [position()&gt;count($reserved-prefixes)]"/>
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:sequence select="$mappings"/>
@@ -275,8 +276,9 @@
         </xsl:variable>
         <xsl:variable name="mappings" as="element(f:vocab)*"
                       select="f:merge-prefix-decl((
-                                if (exists($mappings)) then f:parse-prefix-decl($mappings) else (),
-                                $new-mapping))"/>
+                                  if (exists($mappings)) then f:parse-prefix-decl($mappings) else (),
+                                  $new-mapping),
+                                $f:default-prefixes)"/>
         <!--
             serialize
         -->
