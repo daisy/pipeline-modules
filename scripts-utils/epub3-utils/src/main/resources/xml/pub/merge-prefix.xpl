@@ -10,7 +10,8 @@
 
 	<p:input port="source">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			<p>OPF document that may have more than one <code>prefix</code> attribute.</p>
+			<p>OPF or HTML document that may have more than one <code>prefix</code>
+			(<code>epub:prefix</code>) attribute.</p>
 			<p><code>prefix</code> attributes are allowed on any element, not only on
 			<code>package</code> or <code>html</code>, but it is assumed that any element only has
 			one ancestor element with a <code>prefix</code>.</p>
