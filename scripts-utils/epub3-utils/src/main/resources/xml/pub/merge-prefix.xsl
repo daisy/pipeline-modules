@@ -107,7 +107,7 @@
         <xsl:variable name="prefix" select="substring-before($property,':')" as="xs:string"/>
         <xsl:variable name="reference" select="replace($property,'(.+:)','')" as="xs:string"/>
         <xsl:variable name="vocab" as="xs:string?"
-                      select="($all[@id=generate-id($context/ancestor::*[(@prefix|@epub:prefix) or not(parent::*)])]
+                      select="($all[@id=generate-id(($context/ancestor::*[(@prefix|@epub:prefix) or not(parent::*)])[last()])]
                                    /f:vocab[@prefix=$prefix]/@uri,
                                if ($prefix='') then $vocab-package-uri else ()
                               )[1]"/>
@@ -135,13 +135,15 @@
         <xsl:param name="implicit.in" as="element(f:vocab)*"/>
         <xsl:for-each select="$doc//*[(@prefix|@epub:prefix) or not(parent::*)]">
             <_ id="{generate-id(.)}">
+                <xsl:variable name="elements-in-scope" as="element()*"
+                              select="descendant-or-self::* except .//*[@prefix|@epub:prefix]/descendant-or-self::*"/>
                 <xsl:variable name="used-prefixes" as="xs:string*"
                               select="distinct-values(
                                         for $prop in distinct-values(
-                                          .//meta/(@property|@scheme)|
-                                          .//link/@rel|
-                                          .//html:meta/@name|
-                                          .//*/@epub:type)
+                                          $elements-in-scope/self::meta/(@property|@scheme)|
+                                          $elements-in-scope/self::link/@rel|
+                                          $elements-in-scope/self::html:meta/@name|
+                                          $elements-in-scope/@epub:type)
                                           [contains(.,':')]
                                         return substring-before($prop,':'))"/>
                 <xsl:variable name="parsed-prefix-attr" as="element(f:vocab)*" select="f:parse-prefix-decl(@prefix|@epub:prefix)"/>

@@ -13,8 +13,9 @@
 			<p>OPF or HTML document that may have more than one <code>prefix</code>
 			(<code>epub:prefix</code>) attribute.</p>
 			<p><code>prefix</code> attributes are allowed on any element, not only on
-			<code>package</code> or <code>html</code>, but it is assumed that any element only has
-			one ancestor element with a <code>prefix</code>.</p>
+			<code>package</code> or <code>html</code>.</p>
+			<p>If an element has more than one ancestor element with a <code>prefix</code>, all
+			except the closest one are ignored.</p>
 		</p:documentation>
 	</p:input>
 
