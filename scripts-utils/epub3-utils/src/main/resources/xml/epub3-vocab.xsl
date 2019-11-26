@@ -178,13 +178,20 @@
         <!--
             no prefix may be mapped to default vocabulary
         -->
-        <xsl:if test="$mappings[@uri=$vocab-package-uri]">
-            <xsl:message terminate="yes"
-                         select="concat('Error: prefix attibute must not be used to define a prefix (',
-                                        $mappings[@uri=$vocab-package-uri][1]/@prefix,
-                                        ') that maps to the default vocabulary ''',
-                                        $vocab-package-uri,'''')"/>
-        </xsl:if>
+        <xsl:variable name="mappings" as="element(f:vocab)*">
+            <xsl:for-each select="$mappings">
+                <xsl:choose>
+                    <xsl:when test="@uri=$vocab-package-uri">
+                        <xsl:message select="concat('Warning: prefix attibute must not be used to define a prefix (',
+                                                    @prefix, ') that maps to the default vocabulary ''',
+                                                    $vocab-package-uri,'''')"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:sequence select="."/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:for-each>
+        </xsl:variable>
         <!--
             make prefixes unique
         -->

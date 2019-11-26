@@ -21,7 +21,10 @@
 							<xsl:param name="uri"/>
 							<xsl:template match="metadata">
 								<xsl:copy>
-									<xsl:attribute name="prefix" select="pf:epub3-vocab-add-prefix(@prefix,$prefix,$uri)"/>
+									<xsl:variable name="prefix" select="pf:epub3-vocab-add-prefix(@prefix,$prefix,$uri)"/>
+									<xsl:if test="$prefix">
+										<xsl:attribute name="prefix" select="$prefix"/>
+									</xsl:if>
 								</xsl:copy>
 							</xsl:template>
 						</xsl:stylesheet>
@@ -128,6 +131,7 @@
 	</x:scenario>
 	
 	<x:scenario label="add prefix for default vocabulary">
+		<x:documentation>Results in a warning</x:documentation>
 		<x:call step="pf:epub3-vocab-add-prefix">
 			<x:input port="source">
 				<x:document type="inline">
@@ -137,10 +141,14 @@
 			<x:option name="prefix" select="'foo'"/>
 			<x:option name="uri" select="'http://idpf.org/epub/vocab/package/#'"/>
 		</x:call>
-		<x:context label="the error">
-			<x:document type="errors"/>
+		<x:context label="the result">
+			<x:document type="port" port="result"/>
 		</x:context>
-		<x:expect label="should result in error" type="count" min="1"/>
+		<x:expect label="the prefix should not be added" type="compare">
+			<x:document type="inline">
+				<metadata/>
+			</x:document>
+		</x:expect>
 	</x:scenario>
 	
 </x:description>
