@@ -21,7 +21,6 @@
 
 	<p:option name="implicit-input-prefixes" select="'a11y:      http://www.idpf.org/epub/vocab/package/a11y/#
 	                                                  dcterms:   http://purl.org/dc/terms/
-	                                                  epubsc:    http://idpf.org/epub/vocab/sc/#
 	                                                  marc:      http://id.loc.gov/vocabulary/
 	                                                  media:     http://www.idpf.org/epub/vocab/overlays/#
 	                                                  onix:      http://www.editeur.org/ONIX/book/codelists/current.html#

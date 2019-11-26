@@ -136,7 +136,7 @@
     <xsl:variable name="f:default-prefixes" as="element(f:vocab)*">
         <f:vocab prefix="a11y"      uri="http://www.idpf.org/epub/vocab/package/a11y/#"/>
         <f:vocab prefix="dcterms"   uri="http://purl.org/dc/terms/"/>
-        <f:vocab prefix="epubsc"    uri="http://idpf.org/epub/vocab/sc/#"/>
+   <!-- <f:vocab prefix="epubsc"    uri="http://idpf.org/epub/vocab/sc/#"/> -->
         <f:vocab prefix="marc"      uri="http://id.loc.gov/vocabulary/"/>
         <f:vocab prefix="media"     uri="http://www.idpf.org/epub/vocab/overlays/#"/>
         <f:vocab prefix="onix"      uri="http://www.editeur.org/ONIX/book/codelists/current.html#"/>
