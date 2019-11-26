@@ -7,5 +7,6 @@
     <p:import href="opf-spine-to-fileset.xpl"/>
     <p:import href="compare-package-doc.xpl"/>
     <p:import href="merge-prefix.xpl"/>
+    <p:import href="add-prefix.xpl"/>
     
 </p:library>
