@@ -46,8 +46,7 @@
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="*[@epub:type='pagebreak']">
-        <!-- FIXME: epub:type can have several values -->
+    <xsl:template match="*[tokenize(@epub:type,'\s+')='pagebreak']">
         <xsl:copy>
             <xsl:if test="empty(@id)">
                 <xsl:attribute name="id" select="f:generate-new-id(.)"/>
