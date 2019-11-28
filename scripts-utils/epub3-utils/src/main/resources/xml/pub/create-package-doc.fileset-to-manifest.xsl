@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions"
                 xmlns="http://www.idpf.org/2007/opf"
                 exclude-result-prefixes="#all">
@@ -41,22 +42,17 @@
                                        select="f:relative-to(tokenize(concat($output-base-uri-head,'/',$output-base-uri-tail),'/+'),
                                                              tokenize(concat($item-uri-head,'/',$item-uri-tail),'/+'),'')"/>
                     </xsl:if>
-                    <xsl:variable name="cover-image"
-                                  select="if (@cover-image='true') then 'cover-image' else ''"/>
-                    <xsl:variable name="mathml"
-                                  select="if (@mathml='true') then concat($cover-image,' mathml') else $cover-image"/>
-                    <xsl:variable name="nav"
-                                  select="if (@nav='true') then concat($mathml,' nav') else $mathml"/>
-                    <xsl:variable name="remote-resources"
-                                  select="if (@remote-resources='true') then concat($nav,' remote-resources') else $nav"/>
-                    <xsl:variable name="scripted"
-                                  select="if (@scripted='true') then concat($remote-resources,' scripted') else $remote-resources"/>
-                    <xsl:variable name="svg"
-                                  select="if (@svg='true') then concat($scripted,' svg') else $scripted"/>
-                    <xsl:variable name="switch"
-                                  select="if (@switch='true') then concat($svg,' switch') else $svg"/>
-                    <xsl:if test="string-length($switch) &gt; 0">
-                        <xsl:attribute name="properties" select="normalize-space($switch)"/>
+                    <xsl:variable name="properties" as="xs:string*"
+                                  select="(if (@cover-image='true')      then 'cover-image'      else (),
+                                           if (@mathml='true')           then 'mathml'           else (),
+                                           if (@nav='true')              then 'nav'              else (),
+                                           if (@remote-resources='true') then 'remote-resources' else (),
+                                           if (@scripted='true')         then 'scripted'         else (),
+                                           if (@svg='true')              then 'svg'              else (),
+                                           if (@switch='true')           then 'switch'           else ()
+                                           )"/>
+                    <xsl:if test="exists($properties)">
+                        <xsl:attribute name="properties" select="string-join($properties,' ')"/>
                     </xsl:if>
                 </item>
             </xsl:for-each>
