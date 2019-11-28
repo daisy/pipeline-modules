@@ -43,7 +43,7 @@
                                                              tokenize(concat($item-uri-head,'/',$item-uri-tail),'/+'),'')"/>
                     </xsl:if>
                     <xsl:variable name="properties" as="xs:string*"
-                                  select="(if (@cover-image='true')      then 'cover-image'      else (),
+                                  select="(if (@role='cover-image')      then 'cover-image'      else (),
                                            if (@mathml='true')           then 'mathml'           else (),
                                            if (@nav='true')              then 'nav'              else (),
                                            if (@remote-resources='true') then 'remote-resources' else (),

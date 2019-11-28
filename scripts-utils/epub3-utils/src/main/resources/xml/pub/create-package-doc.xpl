@@ -24,15 +24,15 @@
             href="http://www.idpf.org/epub/301/spec/epub-publications.html#gloss-media-overlay-document">media
             overlay documents</a> and other resources.</p>
             <p>If this fileset includes a navigation document, it should be marked with a
-            <code>nav</code> attribute with value <code>true</code>, and this file should be a
+            <code>role</code> attribute with value <code>nav</code>, and this file should be a
             content document. At most one navigation document may be specified. If no navigation
             document is specified, the content document that contains a
             <code>nav[@epub:type='toc']</code> element is picked. It is an error if there is no such
             document.</p>
             <p>If the fileset includes a <a
             href="http://www.idpf.org/epub/301/spec/epub-publications.html#cover-image"><code>cover-image</code></a>,
-            it should be marked with a <code>cover-image</code> attribute with value
-            <code>true</code>.</p>
+            it should be marked with a <code>role</code> attribute with value
+            <code>cover-image</code>.</p>
         </p:documentation>
     </p:input>
 
@@ -210,8 +210,8 @@
             <p:xpath-context>
                 <p:pipe step="content-docs" port="result.fileset"/>
             </p:xpath-context>
-            <p:when test="//d:file[@nav='true']">
-                <p:delete match="d:file[not(@nav='true')]">
+            <p:when test="//d:file[@role='nav']">
+                <p:delete match="d:file[not(@role='nav')]">
                     <p:input port="source">
                         <p:pipe step="content-docs" port="result.fileset"/>
                     </p:input>

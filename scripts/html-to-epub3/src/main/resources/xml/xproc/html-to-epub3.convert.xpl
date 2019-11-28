@@ -13,13 +13,13 @@
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>Input HTML document(s) and resources</p>
             <p>If the fileset includes a navigation document, it should be marked with a
-            <code>nav</code> attribute with value <code>true</code>, and it should be a HTML
+            <code>role</code> attribute with value <code>nav</code>, and it should be a HTML
             document. At most one navigation document may be specified. If no navigation document is
             specified, one is generated from all the HTML documents.</p>
             <p>If the fileset includes a <a
             href="http://www.idpf.org/epub/301/spec/epub-publications.html#cover-image"><code>cover-image</code></a>,
-            it should be marked with a <code>cover-image</code> attribute with value
-            <code>true</code>.</p>
+            it should be marked with a <code>role</code> attribute with value
+            <code>cover-image</code>.</p>
         </p:documentation>
     </p:input>
     <p:input port="metadata" sequence="true">
@@ -277,7 +277,7 @@
         <p:xpath-context>
             <p:pipe step="move" port="result.fileset"/>
         </p:xpath-context>
-        <p:when test="//d:file[@nav='true']">
+        <p:when test="//d:file[@role='nav']">
             <p:output port="fileset" primary="true"/>
             <p:output port="in-memory" sequence="true">
                 <p:pipe step="move" port="result.in-memory"/>
@@ -328,7 +328,7 @@
                 <p:input port="entry">
                     <p:pipe step="navigation-doc" port="result"/>
                 </p:input>
-                <p:with-param port="file-attributes" name="nav" select="'true'"/>
+                <p:with-param port="file-attributes" name="role" select="'nav'"/>
             </px:fileset-add-entry>
         </p:otherwise>
     </p:choose>
@@ -484,7 +484,7 @@
         <px:message message="Package Document Created."/>
         <p:identity name="package-doc"/>
         <p:sink/>
-        <p:delete match="d:file/@nav">
+        <p:delete match="d:file/@role[.='nav']">
             <p:input port="source">
                 <p:pipe step="add-mediaoverlays" port="fileset"/>
             </p:input>

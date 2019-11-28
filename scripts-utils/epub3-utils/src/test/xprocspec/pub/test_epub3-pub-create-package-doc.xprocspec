@@ -22,7 +22,7 @@
 						<d:file href="images/Pict2.jpg" media-type="image/jpeg"/>
 						<d:file href="images/Pict3.jpg" media-type="image/jpeg"/>
 						<d:file href="images/Pict4.jpg" media-type="image/jpeg"/>
-						<d:file href="images/cover.jpg" media-type="image/jpeg" cover-image="true"/>
+						<d:file href="images/cover.jpg" media-type="image/jpeg" role="cover-image"/>
 						<d:file href="scripts/impl.xhtml" media-type="application/xhtml+xml"/>
 					</d:fileset>
 				</x:document>
