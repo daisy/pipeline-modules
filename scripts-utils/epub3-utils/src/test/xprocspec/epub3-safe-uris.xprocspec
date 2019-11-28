@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
+               xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+               xmlns:d="http://www.daisy.org/ns/pipeline/data"
+               script="../../main/resources/xml/epub3-safe-uris.xpl">
+	
+	<x:scenario label="test">
+		<x:call step="px:epub3-safe-uris">
+			<x:input port="source.fileset">
+				<x:document type="inline">
+					<d:fileset>
+						<d:file href="foo.xml"/>
+						<d:file href="foo_bar.xml"/>
+						<d:file href="foo@bar.xml"/>
+						<d:file href="foo_bar"/>
+						<d:file href="foo@bar"/>
+					</d:fileset>
+				</x:document>
+			</x:input>
+		</x:call>
+		<x:context label="the result">
+			<x:document type="port" port="result.fileset"/>
+		</x:context>
+		<x:expect label="should be as expected" type="custom"
+		          href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl" step="x:fileset-compare">
+			<x:document type="inline">
+				<d:fileset>
+					<d:file href="foo.xml"/>
+					<d:file href="foo_bar.xml"/>
+					<d:file href="foo_bar_2.xml"/>
+					<d:file href="foo_bar"/>
+					<d:file href="foo_bar_2"/>
+				</d:fileset>
+			</x:document>
+		</x:expect>
+	</x:scenario>
+	
+</x:description>

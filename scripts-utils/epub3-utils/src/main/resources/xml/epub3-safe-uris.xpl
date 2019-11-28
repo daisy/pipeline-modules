@@ -46,6 +46,13 @@
             <p:empty/>
         </p:input>
     </p:xslt>
+    <p:label-elements match="d:file[@href=preceding-sibling::d:file/@href]" attribute="href" replace="true"
+                      label="for $href in @href
+                             return replace($href,
+                                            '^(.+?)(\.[^\.]+)?$',
+                                            concat('$1_',1+count(preceding-sibling::d:file[@href=$href]),'$2'))">
+        <p:documentation>Because the renaming may have resulted in duplicate file names</p:documentation>
+    </p:label-elements>
     <p:identity name="fileset-with-href-before-move"/>
     <p:delete match="/*/*/@href-before-move"/>
     <p:identity name="fileset"/>
