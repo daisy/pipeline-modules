@@ -1143,6 +1143,26 @@
                   match="css:box[@type='block']">
         <xsl:apply-templates mode="#current"/>
     </xsl:template>
+    <xsl:template priority="0.591"
+                  mode="toc-block"
+                  match="css:box[@type='block'][child::css:box[@type='inline']]">
+        <xsl:param name="toc-entry-ref-id" as="xs:string" tunnel="yes"/>
+        <xsl:choose>
+            <xsl:when test="ancestor-or-self::*/@css:_obfl-on-resumed or descendant::*/@css:_obfl-on-resumed">
+                <toc-entry-on-resumed>
+                    <!--
+                        The range attribute is added later
+                    -->
+                    <xsl:apply-templates mode="toc-entry"/>
+                </toc-entry-on-resumed>
+            </xsl:when>
+            <xsl:otherwise>
+                <toc-entry ref-id="{$toc-entry-ref-id}">
+                    <xsl:apply-templates mode="toc-entry"/>
+                </toc-entry>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
     
     <!--
         Rendering scenarios
@@ -2474,6 +2494,27 @@
         <xsl:message select="concat(
                                '::',replace(local-name(),'^_','-'),
                                ' pseudo-element only allowed on elements with display: -obfl-toc or -obfl-list-of-references.')"/>
+    </xsl:template>
+    
+    <xsl:template priority="0.1"
+                  mode="block-attr span-attr assert-nil-attr"
+                  match="@css:_obfl-on-resumed">
+        <xsl:if test="not(ancestor::css:box[@type='block' and @css:_obfl-toc])">
+            <xsl:message terminate="yes">
+                <xsl:text>::-obfl-on-resumed pseudo-element only allowed within a display:-obfl-toc</xsl:text>
+            </xsl:message>
+        </xsl:if>
+        <xsl:if test="parent::*/ancestor::*/@css:_obfl-on-resumed">
+            <xsl:message terminate="yes">
+                <xsl:text>::-obfl-on-resumed pseudo-elements may not be nested</xsl:text>
+            </xsl:message>
+        </xsl:if>
+        <xsl:if test="parent::*/ancestor-or-self::css:box[@type='block'][1]/descendant::css:box[@type='inline']
+                      except parent::*/descendant-or-self::css:box">
+            <xsl:message terminate="yes">
+                <xsl:text>::-obfl-on-resumed pseudo-element must have its own block box</xsl:text>
+            </xsl:message>
+        </xsl:if>
     </xsl:template>
     
     <xsl:template priority="-10"
