@@ -521,7 +521,7 @@
                 <marker-reference marker="{@name}" direction="forward" scope="page"
                                   text-style="-dotify-def:{$var-name};{$text-transform-decl}"/>
                 <!--
-                    FIXME: replace with scope="document" and remove second marker-reference
+                    FIXME: replace with scope="document" (not implemented yet) and remove second marker-reference
                 -->
                 <marker-reference marker="{@name}" direction="backward" scope="sequence"
                                   text-style="-dotify-defifndef:{$var-name};{$text-transform-decl}"/>
@@ -531,7 +531,7 @@
             <xsl:when test="$scope=('start','page-start')">
                 <!--
                     Note that "start" behaves like "first" when no assignments have been made yet,
-                    which is not exactly according to the spec (see
+                    which is not exactly according to the spec but is needed in practice (see
                     https://github.com/snaekobbi/pipeline-mod-dedicon/issues/49 and
                     https://github.com/sbsdev/pipeline-mod-sbs/issues/42). An alternative solution
                     could be to use "start" inside @page and "first" inside @page:first.
@@ -540,7 +540,7 @@
                                   text-style="-dotify-def:{$var-name};{$text-transform-decl}"/>
                 <!--
                     TODO: check that this does not match too much at the end of the page!
-                    FIXME: replace with scope="document" and remove second marker-reference
+                    FIXME: replace with scope="document" (not implemented yet) and remove second marker-reference
                 -->
                 <marker-reference marker="{@name}" direction="backward" scope="sequence"
                                   text-style="-dotify-defifndef:{$var-name};{$text-transform-decl}"/>
@@ -550,7 +550,9 @@
             <xsl:when test="$scope=('start-except-last','page-start-except-last')">
                 <!--
                     Note that "start" behaves like "first" when no assignments have been made yet,
-                    which is not exactly according to the spec.
+                    which is not exactly according to the spec but is needed in practice (see
+                    https://github.com/snaekobbi/pipeline-mod-dedicon/issues/49 and
+                    https://github.com/sbsdev/pipeline-mod-sbs/issues/42).
                 -->
                 <marker-reference marker="{@name}/prev" direction="forward" scope="page-content">
                     <xsl:if test="not($text-transform=('none','auto'))">
@@ -558,9 +560,24 @@
                     </xsl:if>
                 </marker-reference>
             </xsl:when>
+            <!--
+                FIXME: these keywords are not documented
+            -->
+            <xsl:when test="$scope=('start-except-first','page-start-except-first','volume-start-except-first')">
+                <marker-reference marker="{@name}/if-not-set-next/prev" direction="forward" scope="page-content"
+                                  text-style="-dotify-def:{$var-name};{$text-transform-decl}"/>
+                <!--
+                    FIXME: replace with scope="document" (not implemented yet) and remove second marker-reference
+                -->
+                <marker-reference marker="{@name}/if-not-set-next"
+                                  direction="backward" scope="sequence" offset="-1"
+                                  text-style="-dotify-defifndef:{$var-name};{$text-transform-decl}"/>
+                <marker-reference marker="{@name}/entry" direction="backward" scope="sequence"
+                                  text-style="-dotify-ifndef:{$var-name};{$text-transform-decl}"/>
+            </xsl:when>
             <xsl:when test="$scope=('last','page-last')">
                 <!--
-                    FIXME: replace with scope="document" and remove second marker-reference
+                    FIXME: replace with scope="document" (not implemented yet) and remove second marker-reference
                 -->
                 <marker-reference marker="{@name}" direction="backward" scope="sequence"
                                   text-style="-dotify-def:{$var-name};{$text-transform-decl}"/>
@@ -579,7 +596,7 @@
                     </xsl:if>
                 </marker-reference>
                 <!--
-                    FIXME: replace with scope="document" and remove second marker-reference
+                    FIXME: replace with scope="document" (not implemented yet) and remove second marker-reference
                 -->
                 <marker-reference marker="{@name}" direction="backward" scope="sequence"
                                   text-style="-dotify-defifndef:{$var-name};{$text-transform-decl}">
@@ -593,7 +610,9 @@
             <xsl:when test="$scope='spread-start'">
                 <!--
                     Note that "start" behaves like "first" when no assignments have been made yet,
-                    which is not exactly according to the spec.
+                    which is not exactly according to the spec but is needed in practice (see
+                    https://github.com/snaekobbi/pipeline-mod-dedicon/issues/49 and
+                    https://github.com/sbsdev/pipeline-mod-sbs/issues/42).
                 -->
                 <marker-reference marker="{@name}/prev" direction="forward" scope="spread-content"
                                   text-style="-dotify-def:{$var-name};{$text-transform-decl}">
@@ -603,7 +622,7 @@
                 </marker-reference>
                 <!--
                     TODO: check that this does not match too much at the end of the page!
-                    FIXME: replace with scope="document" and remove second marker-reference
+                    FIXME: replace with scope="document" (not implemented yet) and remove second marker-reference
                 -->
                 <marker-reference marker="{@name}" direction="backward" scope="sequence"
                                   text-style="-dotify-defifndef:{$var-name};{$text-transform-decl}">
@@ -617,7 +636,9 @@
             <xsl:when test="$scope='spread-start-except-last'">
                 <!--
                     Note that "start" behaves like "first" when no assignments have been made yet,
-                    which is not exactly according to the spec.
+                    which is not exactly according to the spec but is needed in practice (see
+                    https://github.com/snaekobbi/pipeline-mod-dedicon/issues/49 and
+                    https://github.com/sbsdev/pipeline-mod-sbs/issues/42).
                 -->
                 <marker-reference marker="{@name}/prev" direction="forward" scope="spread-content">
                     <xsl:if test="$page-side='right'">
@@ -630,7 +651,7 @@
             </xsl:when>
             <xsl:when test="$scope='spread-last'">
                 <!--
-                    FIXME: replace with scope="document" and remove second marker-reference
+                    FIXME: replace with scope="document" (not implemented yet) and remove second marker-reference
                 -->
                 <marker-reference marker="{@name}" direction="backward" scope="sequence"
                                   text-style="-dotify-def:{$var-name};{$text-transform-decl}">

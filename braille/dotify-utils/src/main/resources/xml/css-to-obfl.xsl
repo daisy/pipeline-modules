@@ -995,8 +995,10 @@
     </xsl:template>
     
     <!--
-        wrap content in additional block or toc-block element (depending on context) when
-        page-break-before is combined with padding-top and string-set
+        wrap content in additional (toc-)block element when page-break-before is combined with padding-top and string-set:
+        the marker needs to come before the padding in order to make page-start and page-start-except-last behave correctly
+        
+        FIXME: this probably breaks page-start-except-first
     -->
     <xsl:template priority="0.73"
                   mode="block toc-block"
@@ -1083,8 +1085,8 @@
     </xsl:template>
     
     <!--
-        wrap content in additional block or toc-block element (depending on context) when
-        line-height > 1 is combined with top/bottom margin or border
+        wrap content in additional (toc-)block element when line-height > 1 is combined with
+        top/bottom margin or border
     -->
     <xsl:template priority="0.61"
                   mode="block"
@@ -1392,6 +1394,7 @@
                       select="(@css:text-transform/string(),$pending-text-transform)[1]"/>
         <xsl:variable name="pending-hyphens" as="xs:string?"
                       select="(@css:hyphens/string(),$pending-hyphens)[1]"/>
+        <xsl:apply-templates mode="#current" select="@css:id"/>
         <xsl:apply-templates mode="marker" select="@css:string-set|@css:_obfl-marker"/>
         <xsl:apply-templates mode="assert-nil-attr"
                              select="@* except (@type|
@@ -1399,7 +1402,6 @@
                                                 @css:string-set|
                                                 @css:_obfl-marker|
                                                 @css:text-transform|@css:hyphens)"/>
-        <xsl:apply-templates mode="#current" select="@css:id"/>
         <xsl:for-each-group select="node()" group-adjacent="boolean(
                                                               self::css:box[@type='inline'] or
                                                               self::css:custom-func[@name='-obfl-evaluate'] or
@@ -2255,7 +2257,7 @@
     </xsl:template>
     
     <!--
-        wrap ID spans at the start of a block in an additional block
+        wrap ID spans at the start of a block in an additional block: needed to make toc-entry-on-resumed behave correctly
     -->
     <xsl:template priority="0.6"
                   mode="block td toc-entry"
@@ -2302,6 +2304,7 @@
     <!--
         wrap markers at the start of a block in an additional block (in order to support page-start
         and page-start-except-last)
+        and also clear "if-not-set-next" markers (in order to support page-start-except-first)
     -->
     <xsl:template priority="0.6"
                   mode="marker"
@@ -2314,20 +2317,34 @@
                                 not(preceding-sibling::text()[not(matches(string(),'^[\s&#x2800;]*$'))])]
                          //@css:string-set">
         <block>
-            <xsl:next-match/>
+            <xsl:next-match>
+                <xsl:with-param name="markers-wrapped" tunnel="yes" select="true()"/>
+            </xsl:next-match>
         </block>
+        <xsl:for-each select="css:parse-string-set(.)">
+            <xsl:variable name="value" as="xs:string*">
+                <xsl:apply-templates mode="css:eval-string-set" select="css:parse-content-list(@value, ())"/>
+            </xsl:variable>
+            <marker class="{@name}/if-not-set-next/prev"/>
+            <marker class="{@name}/if-not-set-next"
+                    value="{replace(string-join($value,''),'^\s+|\s+$','')}"/>
+        </xsl:for-each>
     </xsl:template>
     
     <xsl:template mode="marker"
                   match="css:box[@type='inline']/@css:string-set|
                          css:box[@type='inline']/css:_/@css:string-set|
                          css:_/css:_/@css:string-set">
+        <xsl:param name="markers-wrapped" as="xs:boolean" tunnel="yes" select="false()"/>
         <xsl:for-each select="css:parse-string-set(.)">
             <xsl:variable name="value" as="xs:string*">
                 <xsl:apply-templates mode="css:eval-string-set" select="css:parse-content-list(@value, ())"/>
             </xsl:variable>
             <marker class="{@name}/prev"/>
             <marker class="{@name}" value="{replace(string-join($value,''),'^\s+|\s+$','')}"/>
+            <marker class="{@name}/if-not-set-next/prev"/>
+            <marker class="{@name}/if-not-set-next"
+                    value="{if ($markers-wrapped) then '' else replace(string-join($value,''),'^\s+|\s+$','')}"/>
         </xsl:for-each>
     </xsl:template>
     

@@ -2161,10 +2161,10 @@
               <page-number ref-id="chapter_3" number-format="default"/>
             </block>
             <block align="center" break-before="page">
-              <block/>
               <block>
                 <span id="chapter_1"/>
               </block>
+              <block/>
               ⠿
             </block>
             <block>
@@ -2180,10 +2180,10 @@
               ⠤⠤⠤
             </block>
             <block align="center" break-before="page">
-              <block/>
               <block>
                 <span id="chapter_3"/>
               </block>
+              <block/>
               ⠿⠿⠿
             </block>
             <block>
@@ -14248,6 +14248,142 @@
                   <row/>
                   <row/>
                   <row>⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁⠚</row>
+                </page>
+              </section>
+            </volume>
+          </body>
+        </pef>
+      </x:document>
+    </x:expect>
+  </x:scenario>
+  
+  <x:scenario label="test_122">
+    <x:documentation>
+      Tests string(..., start-except-first).
+    </x:documentation>
+    <x:call step="dotify:format">
+      <x:input port="source">
+        <x:document type="inline">
+          <doc style="text-transform: none;
+                      @page {
+                        size: 10 5;
+                        @bottom-left { content: string(foo, start-except-first) }}">
+            <section style="display: block;
+                            string-set: foo '⠿'">
+              ⠤⠤⠤
+            </section>
+            <section style="display: block;
+                            page-break-before: right">
+              ⠤⠤⠤
+              <_ style="display: none; string-set: foo '⠿⠿'"/>
+              ⠤⠤⠤
+            </section>
+            <section style="display: block;
+                            page-break-before: right">
+              <_ style="display: none; string-set: foo '⠿⠿⠿'"/>
+              ⠤⠤⠤
+            </section>
+          </doc>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="obfl">
+      <x:document type="port" port="obfl"/>
+    </x:context>
+    <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
+      <x:document type="inline">
+        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <layout-master name="a" page-width="10" page-height="5" duplex="true">
+            <default-template>
+              <header/>
+              <footer>
+                <field>
+                  <marker-reference marker="foo/if-not-set-next/prev" direction="forward" scope="page-content" text-style="-dotify-def:tmp_1;"/>
+                  <marker-reference marker="foo/if-not-set-next" direction="backward" scope="sequence" offset="-1" text-style="-dotify-defifndef:tmp_1;"/>
+                  <marker-reference marker="foo/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_1;"/>
+                </field>
+                <field>
+                  <string value=""/>
+                </field>
+              </footer>
+            </default-template>
+          </layout-master>
+          <sequence master="a">
+            <block>
+              <block>
+                <marker class="foo/if-not-set-next" value="​"/>
+              </block>
+              <marker class="foo/if-not-set-next/prev" value="​"/>
+              <marker class="foo/if-not-set-next" value="⠿"/>
+              ⠤⠤⠤
+            </block>
+            <block break-before="sheet">
+              ⠤⠤⠤
+              <marker class="foo/if-not-set-next/prev" value="⠿"/>
+              <marker class="foo/if-not-set-next" value="⠿⠿"/>
+              ⠤⠤⠤
+            </block>
+            <block break-before="sheet">
+              <block>
+                <marker class="foo/if-not-set-next/prev" value="⠿⠿"/>
+                <marker class="foo/if-not-set-next" value="​"/>
+              </block>
+              <marker class="foo/if-not-set-next/prev" value="​"/>
+              <marker class="foo/if-not-set-next" value="⠿⠿⠿"/>
+              ⠤⠤⠤
+            </block>
+          </sequence>
+        </obfl>
+      </x:document>
+    </x:expect>
+    <x:context label="pef">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="pef" type="custom" href="http://www.daisy.org/pipeline/modules/braille/pef-utils/library.xpl" step="x:pef-compare">
+      <x:document type="inline">
+        <pef xmlns="http://www.daisy.org/ns/2008/pef" version="2008-1">
+          <head xmlns:dc="http://purl.org/dc/elements/1.1/">
+            <meta>
+              <dc:format>application/x-pef+xml</dc:format>
+            </meta>
+          </head>
+          <body>
+            <volume rows="5" cols="10" rowgap="0" duplex="true">
+              <section>
+                <page>
+                  <row>⠤⠤⠤</row>
+                  <row/>
+                  <row/>
+                  <row/>
+                  <row/>
+                </page>
+                <page>
+                  <row/>
+                  <row/>
+                  <row/>
+                  <row/>
+                  <row>⠿</row>
+                </page>
+                <page>
+                  <row>⠤⠤⠤⠀⠤⠤⠤</row>
+                  <row/>
+                  <row/>
+                  <row/>
+                  <row>⠿</row>
+                </page>
+                <page>
+                  <row/>
+                  <row/>
+                  <row/>
+                  <row/>
+                  <row>⠿⠿</row>
+                </page>
+                <page>
+                  <row>⠤⠤⠤</row>
+                  <row/>
+                  <row/>
+                  <row/>
+                  <row/>
                 </page>
               </section>
             </volume>
