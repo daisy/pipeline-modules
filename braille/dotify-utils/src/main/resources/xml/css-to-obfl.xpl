@@ -755,11 +755,20 @@
     -->
     <p:label-elements px:progress=".005"
                       match="obfl:marker[not(@value)]
-                                        [some $class in @class satisfies preceding::obfl:marker[concat(@class,'/prev')=$class]]"
+                                        [some $class in @class satisfies
+                                         preceding::obfl:marker[concat(@class,'/prev')=$class]]"
                       attribute="value"
-                      label="string-join(for $class in @class return (preceding::obfl:marker[concat(@class,'/prev')=$class])[last()]/@value,'')"/>
+                      label="(for $class in @class return
+                              (preceding::obfl:marker[concat(@class,'/prev')=$class])[last()]/@value)[1]"/>
     <p:delete match="obfl:marker[not(@value)]"/>
     
+    <!--
+        remove markers that are not used
+    -->
+    <p:delete match="obfl:marker[for $class in @class return
+                                 not(//obfl:marker-reference[@marker=$class] or
+                                     //obfl:marker-indicator[tokenize(normalize-space(@markers),' ')=$class])]"/>
+
     <!--
         because empty marker values would be regarded as absent in BrailleFilterImpl
     -->

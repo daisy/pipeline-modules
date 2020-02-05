@@ -230,7 +230,6 @@
             </block>
             <block break-before="page">
               <block>
-                <marker class="print-page/prev" value="⠤"/>
                 <marker class="print-page" value="⠤⠤"/>
                 <marker class="running-footer" value="⠤⠤"/>
               </block>
@@ -238,7 +237,6 @@
             </block>
             <block break-before="page">
               <block>
-                <marker class="print-page/prev" value="⠤⠤"/>
                 <marker class="print-page" value="​"/>
                 <marker class="running-header" value="⠤⠤"/>
               </block>
@@ -246,9 +244,7 @@
             </block>
             <block break-before="page">
               <block>
-                <marker class="print-page/prev" value="​"/>
                 <marker class="print-page" value="⠤⠤⠤"/>
-                <marker class="running-footer/prev" value="⠤⠤"/>
                 <marker class="running-footer" value="​"/>
               </block>
               ⠤⠤⠤
@@ -2165,9 +2161,7 @@
               <page-number ref-id="chapter_3" number-format="default"/>
             </block>
             <block align="center" break-before="page">
-              <block>
-                <marker class="print-page" value="⠤"/>
-              </block>
+              <block/>
               <span id="chapter_1"/>
               ⠿
             </block>
@@ -2182,10 +2176,7 @@
               ⠤⠤⠤
             </block>
             <block align="center" break-before="page">
-              <block>
-                <marker class="print-page/prev" value="⠤"/>
-                <marker class="print-page" value="⠤⠤"/>
-              </block>
+              <block/>
               <span id="chapter_3"/>
               ⠿⠿⠿
             </block>
@@ -4630,8 +4621,6 @@
             <block>
               <block>
                 <marker class="print-page" value="1"/>
-                <marker class="dash-print-page" value="⠒1"/>
-                <marker class="print-page-dash" value="1⠒"/>
               </block>
               ⠁⠁⠁
             </block>
@@ -4642,12 +4631,8 @@
             <!-- begin left page -->
             <block>
               <block>
-                <marker class="print-page/prev" value="1"/>
                 <marker class="print-page" value="2"/>
-                <marker class="dash-print-page/prev" value="⠒1"/>
-                <marker class="dash-print-page" value="⠒2"/>
                 <marker class="print-page-dash/prev" value="1⠒"/>
-                <marker class="print-page-dash" value="2⠒"/>
               </block>
               ⠁⠁⠁
             </block>
@@ -4662,35 +4647,23 @@
             <block>⠁⠁⠁</block>
             <block>
               <block>
-                <marker class="print-page/prev" value="2"/>
                 <marker class="print-page" value="3"/>
-                <marker class="dash-print-page/prev" value="⠒2"/>
-                <marker class="dash-print-page" value="⠒3"/>
                 <marker class="print-page-dash/prev" value="2⠒"/>
-                <marker class="print-page-dash" value="3⠒"/>
               </block>
               ⠁⠁⠁
             </block>
             <!-- begin left page -->
             <block>
               <block>
-                <marker class="print-page/prev" value="3"/>
                 <marker class="print-page" value="4"/>
-                <marker class="dash-print-page/prev" value="⠒3"/>
-                <marker class="dash-print-page" value="⠒4"/>
                 <marker class="print-page-dash/prev" value="3⠒"/>
-                <marker class="print-page-dash" value="4⠒"/>
               </block>
               ⠁⠁⠁
             </block>
             <block>
               <block>
-                <marker class="print-page/prev" value="4"/>
                 <marker class="print-page" value="5"/>
-                <marker class="dash-print-page/prev" value="⠒4"/>
-                <marker class="dash-print-page" value="⠒5"/>
                 <marker class="print-page-dash/prev" value="4⠒"/>
-                <marker class="print-page-dash" value="5⠒"/>
               </block>
               ⠁⠁⠁
             </block>
@@ -4703,12 +4676,8 @@
             <block>⠁⠁⠁</block>
             <block>
               ⠁⠁⠁
-              <marker class="print-page/prev" value="5"/>
               <marker class="print-page" value="6"/>
-              <marker class="dash-print-page/prev" value="⠒5"/>
-              <marker class="dash-print-page" value="⠒6"/>
               <marker class="print-page-dash/prev" value="5⠒"/>
-              <marker class="print-page-dash" value="6⠒"/>
             </block>
           </sequence>
         </obfl>
@@ -6112,7 +6081,6 @@
                   </tr>
                   <tr>
                     <td>
-                      <marker class="print-page" value="⠿⠿"/>
                       ⠤⠤⠤
                     </td>
                     <td>⠤⠤⠤</td>
@@ -10936,8 +10904,6 @@
             <block>
               <block>
                 <marker class="print-page" value="1"/>
-                <marker class="dash-print-page" value="⠒1"/>
-                <marker class="print-page-dash" value="1⠒"/>
               </block>
               ⠁⠁⠁
             </block>
@@ -10948,12 +10914,8 @@
             <!-- begin page -->
             <block break-before="page">
               <block>
-                <marker class="print-page/prev" value="1"/>
                 <marker class="print-page" value="2"/>
-                <marker class="dash-print-page/prev" value="⠒1"/>
-                <marker class="dash-print-page" value="⠒2"/>
                 <marker class="print-page-dash/prev" value="1⠒"/>
-                <marker class="print-page-dash" value="2⠒"/>
               </block>
               <block padding-top="1">
                 ⠁⠁⠁
@@ -12528,7 +12490,6 @@
                 <marker class="print-page" value="1"/>
               </block>
               <block>
-                <marker class="print-page/prev" value="1"/>
                 <marker class="print-page" value="⠿⠿⠿"/>
               </block>
               ⠁⠁⠁⠁⠁ ⠁⠁⠁⠁⠁ ⠁⠁⠁⠁⠁
