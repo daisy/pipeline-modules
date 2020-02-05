@@ -7391,68 +7391,68 @@
             </default-template>
           </layout-master>
           <table-of-contents name="volume-toc">
-            <toc-entry ref-id="ch_1" translate="">
-              <toc-entry ref-id="ch_1">
-                1 ⠄⠄⠄⠄⠄⠄⠄⠄⠄
-                <page-number ref-id="ch_1" number-format="default"/>
-              </toc-entry>
-              <toc-entry ref-id="ch_1_1">
-                <toc-entry ref-id="ch_1_1" padding-left="1">
-                  1 ⠄⠄⠄⠄⠄⠄⠄⠄
-                  <page-number ref-id="ch_1_1" number-format="default"/>
-                </toc-entry>
-                <toc-entry ref-id="ch_1_2" padding-left="1">
-                  2 ⠄⠄⠄⠄⠄⠄⠄⠄
-                  <page-number ref-id="ch_1_2" number-format="default"/>
-                </toc-entry>
-              </toc-entry>
-              <toc-entry ref-id="ch_2">
-                2 ⠄⠄⠄⠄⠄⠄⠄⠄⠄
-                <page-number ref-id="ch_2" number-format="default"/>
-              </toc-entry>
-              <toc-entry ref-id="ch_2_1">
-                <toc-entry ref-id="ch_2_1" padding-left="1">
-                  1 ⠄⠄⠄⠄⠄⠄⠄⠄
-                  <page-number ref-id="ch_2_1" number-format="default"/>
-                </toc-entry>
-                <toc-entry ref-id="ch_2_2" padding-left="1">
-                  2 ⠄⠄⠄⠄⠄⠄⠄⠄
-                  <page-number ref-id="ch_2_2" number-format="default"/>
-                </toc-entry>
-              </toc-entry>
-            </toc-entry>
+            <toc-block translate="">
+              <toc-block>
+                <toc-entry ref-id="ch_1">1 ⠄⠄⠄⠄⠄⠄⠄⠄⠄
+                <page-number ref-id="ch_1" number-format="default"/></toc-entry>
+              </toc-block>
+              <toc-block>
+                <toc-block padding-left="1">
+                  <toc-entry ref-id="ch_1_1">1 ⠄⠄⠄⠄⠄⠄⠄⠄
+                  <page-number ref-id="ch_1_1" number-format="default"/></toc-entry>
+                </toc-block>
+                <toc-block padding-left="1">
+                  <toc-entry ref-id="ch_1_2">2 ⠄⠄⠄⠄⠄⠄⠄⠄
+                  <page-number ref-id="ch_1_2" number-format="default"/></toc-entry>
+                </toc-block>
+              </toc-block>
+              <toc-block>
+                <toc-entry ref-id="ch_2">2 ⠄⠄⠄⠄⠄⠄⠄⠄⠄
+                <page-number ref-id="ch_2" number-format="default"/></toc-entry>
+              </toc-block>
+              <toc-block>
+                <toc-block padding-left="1">
+                  <toc-entry ref-id="ch_2_1">1 ⠄⠄⠄⠄⠄⠄⠄⠄
+                  <page-number ref-id="ch_2_1" number-format="default"/></toc-entry>
+                </toc-block>
+                <toc-block padding-left="1">
+                  <toc-entry ref-id="ch_2_2">2 ⠄⠄⠄⠄⠄⠄⠄⠄
+                  <page-number ref-id="ch_2_2" number-format="default"/></toc-entry>
+                </toc-block>
+              </toc-block>
+            </toc-block>
           </table-of-contents>
           <table-of-contents name="document-toc">
-            <toc-entry ref-id="ch_1" translate="">
-              <toc-entry ref-id="ch_1">
-                1 ⠄⠄⠄⠄⠄⠄⠄⠄⠄
-                <page-number ref-id="ch_1" number-format="default"/>
-              </toc-entry>
-              <toc-entry ref-id="ch_1_1">
-                <toc-entry ref-id="ch_1_1" padding-left="1">
-                  1 ⠄⠄⠄⠄⠄⠄⠄⠄
-                  <page-number ref-id="ch_1_1" number-format="default"/>
-                </toc-entry>
-                <toc-entry ref-id="ch_1_2" padding-left="1">
-                  2 ⠄⠄⠄⠄⠄⠄⠄⠄
-                  <page-number ref-id="ch_1_2" number-format="default"/>
-                </toc-entry>
-              </toc-entry>
-              <toc-entry ref-id="ch_2">
-                2 ⠄⠄⠄⠄⠄⠄⠄⠄⠄
-                <page-number ref-id="ch_2" number-format="default"/>
-              </toc-entry>
-              <toc-entry ref-id="ch_2_1">
-                <toc-entry ref-id="ch_2_1" padding-left="1">
-                  1 ⠄⠄⠄⠄⠄⠄⠄⠄
-                  <page-number ref-id="ch_2_1" number-format="default"/>
-                </toc-entry>
-                <toc-entry ref-id="ch_2_2" padding-left="1">
-                  2 ⠄⠄⠄⠄⠄⠄⠄⠄
-                  <page-number ref-id="ch_2_2" number-format="default"/>
-                </toc-entry>
-              </toc-entry>
-            </toc-entry>
+            <toc-block translate="">
+              <toc-block>
+                <toc-entry ref-id="ch_1">1 ⠄⠄⠄⠄⠄⠄⠄⠄⠄
+                <page-number ref-id="ch_1" number-format="default"/></toc-entry>
+              </toc-block>
+              <toc-block>
+                <toc-block padding-left="1">
+                  <toc-entry ref-id="ch_1_1">1 ⠄⠄⠄⠄⠄⠄⠄⠄
+                  <page-number ref-id="ch_1_1" number-format="default"/></toc-entry>
+                </toc-block>
+                <toc-block padding-left="1">
+                  <toc-entry ref-id="ch_1_2">2 ⠄⠄⠄⠄⠄⠄⠄⠄
+                  <page-number ref-id="ch_1_2" number-format="default"/></toc-entry>
+                </toc-block>
+              </toc-block>
+              <toc-block>
+                <toc-entry ref-id="ch_2">2 ⠄⠄⠄⠄⠄⠄⠄⠄⠄
+                <page-number ref-id="ch_2" number-format="default"/></toc-entry>
+              </toc-block>
+              <toc-block>
+                <toc-block padding-left="1">
+                  <toc-entry ref-id="ch_2_1">1 ⠄⠄⠄⠄⠄⠄⠄⠄
+                  <page-number ref-id="ch_2_1" number-format="default"/></toc-entry>
+                </toc-block>
+                <toc-block padding-left="1">
+                  <toc-entry ref-id="ch_2_2">2 ⠄⠄⠄⠄⠄⠄⠄⠄
+                  <page-number ref-id="ch_2_2" number-format="default"/></toc-entry>
+                </toc-block>
+              </toc-block>
+            </toc-block>
           </table-of-contents>
           <volume-template sheets-in-volume-max="3" use-when="(! (= $volume 1))">
             <pre-content>
@@ -7728,22 +7728,22 @@
             </default-template>
           </layout-master>
           <table-of-contents name="toc">
-            <toc-entry ref-id="ch_1" translate="">
-              <toc-entry ref-id="ch_1">
-                1 ⠄⠄⠄⠄⠄⠄⠄⠄⠄
-                <page-number ref-id="ch_1" number-format="default"/>
-              </toc-entry>
-              <toc-entry ref-id="ch_1_1">
-                <toc-entry ref-id="ch_1_1" padding-left="1">
-                  1 ⠄⠄⠄⠄⠄⠄⠄⠄
-                  <page-number ref-id="ch_1_1" number-format="default"/>
-                </toc-entry>
-                <toc-entry ref-id="ch_1_2" padding-left="1">
-                  2 ⠄⠄⠄⠄⠄⠄⠄⠄
-                  <page-number ref-id="ch_1_2" number-format="default"/>
-                </toc-entry>
-              </toc-entry>
-            </toc-entry>
+            <toc-block translate="">
+              <toc-block>
+                <toc-entry ref-id="ch_1">1 ⠄⠄⠄⠄⠄⠄⠄⠄⠄
+                <page-number ref-id="ch_1" number-format="default"/></toc-entry>
+              </toc-block>
+              <toc-block>
+                <toc-block padding-left="1">
+                  <toc-entry ref-id="ch_1_1">1 ⠄⠄⠄⠄⠄⠄⠄⠄
+                  <page-number ref-id="ch_1_1" number-format="default"/></toc-entry>
+                </toc-block>
+                <toc-block padding-left="1">
+                  <toc-entry ref-id="ch_1_2">2 ⠄⠄⠄⠄⠄⠄⠄⠄
+                  <page-number ref-id="ch_1_2" number-format="default"/></toc-entry>
+                </toc-block>
+              </toc-block>
+            </toc-block>
           </table-of-contents>
           <volume-template sheets-in-volume-max="1000">
             <pre-content>
@@ -7987,11 +7987,11 @@
             </default-template>
           </layout-master>
           <table-of-contents name="toc">
-            <toc-entry ref-id="a" translate="">
-              <toc-entry ref-id="a"> ⠿⠿⠿ 1 ⠄⠄⠄⠄⠄⠄⠄⠄⠄
-              <page-number ref-id="a" number-format="default"/>
-              </toc-entry>
-            </toc-entry>
+            <toc-block translate="" break-before="page">
+              <toc-block> <toc-entry ref-id="a">⠿⠿⠿ 1 ⠄⠄⠄⠄⠄⠄⠄⠄⠄
+              <page-number ref-id="a" number-format="default"/></toc-entry>
+              </toc-block>
+            </toc-block>
           </table-of-contents>
           <volume-template sheets-in-volume-max="1000">
             <pre-content>
@@ -8000,7 +8000,6 @@
                   <block break-before="page" translate="">
                     <block>⠿⠿⠿ 0</block>
                   </block>
-                  <block break-before="page"/>
                 </on-toc-start>
               </toc-sequence>
             </pre-content>
@@ -9059,14 +9058,14 @@
             </default-template>
           </layout-master>
           <table-of-contents name="toc">
-            <toc-entry ref-id="ch_1" translate="">
-              <toc-entry ref-id="ch_1">
-                1 ⠄⠄⠄⠄⠄⠄⠄⠄⠄ <page-number ref-id="ch_1" number-format="default"/>
-              </toc-entry>
-              <toc-entry ref-id="ch_2">
-                2 ⠄⠄⠄⠄⠄⠄⠄⠄⠄ <page-number ref-id="ch_2" number-format="default"/>
-              </toc-entry>
-            </toc-entry>
+            <toc-block translate="">
+              <toc-block>
+                <toc-entry ref-id="ch_1">1 ⠄⠄⠄⠄⠄⠄⠄⠄⠄ <page-number ref-id="ch_1" number-format="default"/></toc-entry>
+              </toc-block>
+              <toc-block>
+                <toc-entry ref-id="ch_2">2 ⠄⠄⠄⠄⠄⠄⠄⠄⠄ <page-number ref-id="ch_2" number-format="default"/></toc-entry>
+              </toc-block>
+            </toc-block>
           </table-of-contents>
           <volume-template sheets-in-volume-max="2" use-when="(! (= $volume $volumes))"/>
           <volume-template sheets-in-volume-max="2" use-when="(= $volume $volumes)">
@@ -9227,14 +9226,14 @@
             </default-template>
           </layout-master>
           <table-of-contents name="toc">
-            <toc-entry ref-id="ch_1" translate="">
-              <toc-entry ref-id="ch_1">
-                1 ⠄⠄⠄⠄⠄⠄⠄⠄⠄ <page-number ref-id="ch_1" number-format="default"/>
-              </toc-entry>
-              <toc-entry ref-id="ch_2">
-                2 ⠄⠄⠄⠄⠄⠄⠄⠄⠄ <page-number ref-id="ch_2" number-format="default"/>
-              </toc-entry>
-            </toc-entry>
+            <toc-block translate="">
+              <toc-block>
+                <toc-entry ref-id="ch_1">1 ⠄⠄⠄⠄⠄⠄⠄⠄⠄ <page-number ref-id="ch_1" number-format="default"/></toc-entry>
+              </toc-block>
+              <toc-block>
+                <toc-entry ref-id="ch_2">2 ⠄⠄⠄⠄⠄⠄⠄⠄⠄ <page-number ref-id="ch_2" number-format="default"/></toc-entry>
+              </toc-block>
+            </toc-block>
           </table-of-contents>
           <volume-template sheets-in-volume-max="2" use-when="(! (= $volume $volumes))"/>
           <volume-template sheets-in-volume-max="2" use-when="(= $volume $volumes)">
