@@ -14,9 +14,4 @@ public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 			pipelineModule("epub3-tts"),
 		};
 	}
-	
-	// XSpec tests are already run with Maven plugin
-	@Override
-	public void runXSpec() throws Exception {
-	}
 }
