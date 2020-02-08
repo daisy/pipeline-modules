@@ -49,6 +49,7 @@
     <p:option name="flatten" required="false" select="'false'">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>Move all files to a single directory.</p>
+            <p>Renames files when needed to avoid that files would overwrite each other.</p>
         </p:documentation>
     </p:option>
     <p:option name="prefix" required="false" select="''">
@@ -93,6 +94,13 @@
                 </p:input>
                 <p:with-param name="prefix" select="$prefix"/>
             </p:xslt>
+            <p:label-elements match="d:file[@href=preceding-sibling::d:file/@href]" attribute="href" replace="true"
+                              label="for $href in @href
+                                     return replace($href,
+                                                    '^(.+?)(\.[^\.]+)?$',
+                                                    concat('$1_',1+count(preceding-sibling::d:file[@href=$href]),'$2'))">
+                <p:documentation>Because the renaming may have resulted in duplicate file names</p:documentation>
+            </p:label-elements>
         </p:when>
         <p:otherwise>
             <p:identity/>
