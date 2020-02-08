@@ -18,7 +18,7 @@
 				</x:document>
 			</x:input>
 		</x:call>
-		<x:context label="the result">
+		<x:context label="the result port">
 			<x:document type="port" port="result.fileset"/>
 		</x:context>
 		<x:expect label="should be as expected" type="custom"
@@ -30,6 +30,21 @@
 					<d:file href="foo_bar_2.xml"/>
 					<d:file href="foo_bar"/>
 					<d:file href="foo_bar_2"/>
+				</d:fileset>
+			</x:document>
+		</x:expect>
+		<x:context label="the mapping port">
+			<x:document type="port" port="mapping"/>
+		</x:context>
+		<x:expect label="should be as expected" type="custom"
+		          href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl" step="x:fileset-compare">
+			<x:document type="inline">
+				<d:fileset>
+					<d:file href="foo.xml" original-href="foo.xml"/>
+					<d:file href="foo_bar.xml" original-href="foo_bar.xml"/>
+					<d:file href="foo_bar_2.xml" original-href="foo@bar.xml"/>
+					<d:file href="foo_bar" original-href="foo_bar"/>
+					<d:file href="foo_bar_2" original-href="foo@bar"/>
 				</d:fileset>
 			</x:document>
 		</x:expect>
