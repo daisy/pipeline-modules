@@ -41,7 +41,7 @@
         We know that fileset has been previously normalized.
     -->
     <xsl:variable name="fileset" select="collection()[/d:fileset][1]" as="document-node()?"/>
-    <xsl:key name="resources" match="/d:fileset/d:file" use="@unsafe-href"/>
+    <xsl:key name="resources" match="/d:fileset/d:file" use="@original-href"/>
 
     <xsl:template match="node() | @*">
         <xsl:copy>

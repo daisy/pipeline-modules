@@ -162,9 +162,6 @@
             </px:fileset-purge>
 
             <p:documentation>Change @href with EPUB-safe URIs</p:documentation>
-            <p:label-elements match="d:file" attribute="unsafe-href" label="resolve-uri(@href,base-uri(.))">
-                <p:documentation>Save the original URIs, need for html-clean-resources.xsl later</p:documentation>
-            </p:label-elements>
             <px:epub3-safe-uris name="safe-uris">
                 <p:input port="source.in-memory">
                     <p:pipe step="main" port="input.in-memory"/>
@@ -197,7 +194,7 @@
                     <p:xslt>
                         <p:input port="source">
                             <p:pipe step="html-upgrade" port="result"/>
-                            <p:pipe step="safe-uris" port="result.fileset"/>
+                            <p:pipe step="safe-uris" port="mapping"/>
                         </p:input>
                         <p:input port="stylesheet">
                             <p:document href="../xslt/html-clean-resources.xsl"/>
@@ -245,7 +242,6 @@
                         <p:pipe step="cleaned" port="result"/>
                     </p:input>
                 </px:fileset-update>
-                <p:delete match="d:file/@unsafe-href"/>
             </p:group>
         </p:otherwise>
     </p:choose>

@@ -11,15 +11,15 @@
 
     <x:param name="fileset">
         <d:fileset>
-            <d:file href="audio.mp3" unsafe-href="file:/example/audio.mp3"/>
-            <d:file href="image.png" unsafe-href="file:/example/image.png"/>
-            <d:file href="otherimage.png" unsafe-href="file:/example/otherimage.png"/>
-            <d:file href="my_image.png" unsafe-href="file:/example/my%20image.png"/>
-            <d:file href="video.mp4" unsafe-href="file:/example/video.mp4"/>
-            <d:file href="sub.srt" unsafe-href="file:/example/sub.srt"/>
-            <d:file href="desc.xhtml" unsafe-href="file:/example/desc.xml"/>
-            <d:file href="otherdesc.xhtml" unsafe-href="file:/example/otherdesc.xml"/>
-            <d:file href="nohtml.xml" unsafe-href="file:/example/nohtml.xml"/>
+            <d:file href="audio.mp3" original-href="file:/example/audio.mp3"/>
+            <d:file href="image.png" original-href="file:/example/image.png"/>
+            <d:file href="otherimage.png" original-href="file:/example/otherimage.png"/>
+            <d:file href="my_image.png" original-href="file:/example/my%20image.png"/>
+            <d:file href="video.mp4" original-href="file:/example/video.mp4"/>
+            <d:file href="sub.srt" original-href="file:/example/sub.srt"/>
+            <d:file href="desc.xhtml" original-href="file:/example/desc.xml"/>
+            <d:file href="otherdesc.xhtml" original-href="file:/example/otherdesc.xml"/>
+            <d:file href="nohtml.xml" original-href="file:/example/nohtml.xml"/>
         </d:fileset>
     </x:param>
 
