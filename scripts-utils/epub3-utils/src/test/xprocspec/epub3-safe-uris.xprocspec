@@ -9,6 +9,7 @@
 			<x:input port="source.fileset">
 				<x:document type="inline">
 					<d:fileset>
+						<d:file href="index.html" media-type="application/xhtml+xml"/>
 						<d:file href="foo.xml"/>
 						<d:file href="foo_bar.xml"/>
 						<d:file href="foo@bar.xml"/>
@@ -17,14 +18,28 @@
 					</d:fileset>
 				</x:document>
 			</x:input>
+			<x:input port="source.in-memory">
+				<x:document type="inline" xml:base="index.html">
+					<html xmlns="http://www.w3.org/1999/xhtml">
+						<ul>
+							<ol> <a href="foo.xml"/> </ol>
+							<ol> <a href="foo_bar.xml"/> </ol>
+							<ol> <a href="foo@bar.xml"/> </ol>
+							<ol> <a href="foo_bar"/> </ol>
+							<ol> <a href="foo@bar"/> </ol>
+						</ul>
+					</html>
+				</x:document>
+			</x:input>
 		</x:call>
-		<x:context label="the result port">
+		<x:context label="the result.fileset port">
 			<x:document type="port" port="result.fileset"/>
 		</x:context>
 		<x:expect label="should be as expected" type="custom"
 		          href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl" step="x:fileset-compare">
 			<x:document type="inline">
 				<d:fileset>
+					<d:file href="index.html" media-type="application/xhtml+xml"/>
 					<d:file href="foo.xml"/>
 					<d:file href="foo_bar.xml"/>
 					<d:file href="foo_bar_2.xml"/>
@@ -40,12 +55,29 @@
 		          href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl" step="x:fileset-compare">
 			<x:document type="inline">
 				<d:fileset>
+					<d:file href="index.html" original-href="index.html"/>
 					<d:file href="foo.xml" original-href="foo.xml"/>
 					<d:file href="foo_bar.xml" original-href="foo_bar.xml"/>
 					<d:file href="foo_bar_2.xml" original-href="foo@bar.xml"/>
 					<d:file href="foo_bar" original-href="foo_bar"/>
 					<d:file href="foo_bar_2" original-href="foo@bar"/>
 				</d:fileset>
+			</x:document>
+		</x:expect>
+		<x:context label="the result.in-memory port">
+			<x:document type="port" port="result.in-memory"/>
+		</x:context>
+		<x:expect label="should be as expected" type="compare">
+			<x:document type="inline">
+				<html xmlns="http://www.w3.org/1999/xhtml">
+					<ul>
+						<ol> <a href="foo.xml"/> </ol>
+						<ol> <a href="foo_bar.xml"/> </ol>
+						<ol> <a href="foo_bar_2.xml"/> </ol>
+						<ol> <a href="foo_bar"/> </ol>
+						<ol> <a href="foo_bar_2"/> </ol>
+					</ul>
+				</html>
 			</x:document>
 		</x:expect>
 	</x:scenario>

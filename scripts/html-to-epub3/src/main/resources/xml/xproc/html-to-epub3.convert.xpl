@@ -194,7 +194,7 @@
                     <p:xslt>
                         <p:input port="source">
                             <p:pipe step="html-upgrade" port="result"/>
-                            <p:pipe step="safe-uris" port="mapping"/>
+                            <p:pipe step="safe-uris" port="result.fileset"/>
                         </p:input>
                         <p:input port="stylesheet">
                             <p:document href="../xslt/html-clean-resources.xsl"/>

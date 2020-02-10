@@ -10,13 +10,19 @@
 
     <x:script>
         <p:declare-step type="x:test" version="1.0" name="main">
-            <p:input port="source"/>
-            <p:input port="mapping" primary="false"/>
+            <p:input port="source" primary="true"/>
+            <p:input port="fileset" primary="false"/>
             <p:output port="result"/>
+            <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl"/>
+            <px:html-update-links name="update-links">
+                <p:input port="mapping">
+                    <p:pipe step="main" port="fileset"/>
+                </p:input>
+            </px:html-update-links>
             <p:xslt>
                 <p:input port="source">
-                    <p:pipe step="main" port="source"/>
-                    <p:pipe step="main" port="mapping"/>
+                    <p:pipe step="update-links" port="result"/>
+                    <p:pipe step="main" port="fileset"/>
                 </p:input>
                 <p:input port="stylesheet">
                     <p:document href="../../main/resources/xml/xslt/html-clean-resources.xsl"/>
@@ -27,10 +33,10 @@
             </p:xslt>
         </p:declare-step>
     </x:script>
- 
+
     <x:scenario>
         <x:call step="x:test">
-            <x:input port="mapping">
+            <x:input port="fileset">
                 <x:document type="inline" xml:base="file:/example/">
                     <d:fileset>
                         <d:file href="audio.mp3" original-href="file:/example/audio.mp3"/>
@@ -377,7 +383,7 @@
                 <x:expect label="is kept as-is, no iframe is created" type="compare">
                     <x:document type="inline">
                         <body>
-                            <img src="image.png" longdesc="desc.xml" aria-describedby="foo"/>
+                            <img src="image.png" longdesc="desc.xhtml" aria-describedby="foo"/>
                         </body>
                     </x:document>
                 </x:expect>

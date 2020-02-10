@@ -28,20 +28,15 @@
     -->
 
     <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl"/>
-    <!--    <xsl:import href="../../../../test/xspec/mock-functions.xsl"/>-->
+    <xsl:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xsl"/>
 
     <xsl:output indent="yes"/>
-
-    <!--TODO implement a custom HTML-compliant base-uri() function ?-->
-    <xsl:variable name="doc-base"
-        select="if (/html/head/base[@href][1]) then resolve-uri(normalize-space(/html/head/base[@href][1]/@href),base-uri(/)) else base-uri(/)"/>
 
     <!--
         A fileset is available in the default collection, to check if resources exist.
         We know that fileset has been previously normalized.
     -->
     <xsl:variable name="fileset" select="collection()[/d:fileset][1]" as="document-node()?"/>
-    <xsl:key name="resources" match="/d:fileset/d:file" use="@original-href"/>
 
     <xsl:template match="node() | @*">
         <xsl:copy>
@@ -465,21 +460,11 @@
         <xsl:param name="fragment" as="xs:boolean?"/>
         <!--FIXME test with fragments, e.g. frag-only, no frag, etc-->
         <xsl:variable name="resolved"
-            select="resolve-uri(pf:normalize-uri($uri,false()),base-uri($uri))"/>
-        <xsl:variable name="clean-path" select="key('resources',$resolved,$fileset)/@href"/>
-        <!--<xsl:message select="'=================='"/>
-        <xsl:message select="concat('uri: ',$uri)"/>
-        <xsl:message select="concat('resolved: ',resolve-uri(pf:normalize-uri($uri,false()),base-uri($uri)))"/>
-        <xsl:message select="concat('cleanpath: ',key('resources',$resolved,$fileset)/@href)"/>
-        <xsl:message select="concat('return: ',if ($clean-path) then pf:replace-path($uri,$clean-path) else ())"/>-->
-        <xsl:sequence
-            select="if ($clean-path) then 
-                        if ($fragment) then
-                            pf:replace-path($uri,$clean-path)
-                        else
-                            $clean-path
-                        else ()"
-        />
+            select="resolve-uri(pf:normalize-uri($uri,false()),pf:html-base-uri($uri))"/>
+        <xsl:if test="$fileset/d:fileset/d:file[resolve-uri(@href,base-uri(.))=$resolved]">
+            <!-- resource exists -->
+            <xsl:sequence select="$uri"/>
+        </xsl:if>
     </xsl:function>
 
     <!--–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>

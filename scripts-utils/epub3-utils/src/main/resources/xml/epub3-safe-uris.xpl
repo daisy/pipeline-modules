@@ -19,15 +19,16 @@
     </p:input>
 
     <p:output port="result.fileset" primary="true">
-        <p:pipe step="fileset" port="result"/>
+        <p:pipe step="updated-references" port="result.fileset"/>
     </p:output>
     <p:output port="result.in-memory" sequence="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>The output fileset</p>
             <p>The xml:base, href and original-href attributes in the fileset manifest or changed to
-            EPUB-safe URIs. The base URIs of the in-memory documents are updated accordingly.</p>
+            EPUB-safe URIs. The base URIs of the in-memory documents are updated
+            accordingly. Cross-references in HTML documents are updated too.</p>
         </p:documentation>
-        <p:pipe step="in-memory" port="result"/>
+        <p:pipe step="updated-references" port="result.in-memory"/>
     </p:output>
     <p:output port="mapping">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -43,7 +44,19 @@
             px:normalize-uri
         </p:documentation>
     </p:import>
-
+    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
+        <p:documentation>
+            px:fileset-filter
+            px:fileset-load
+            px:fileset-update
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
+        <p:documentation>
+            px:html-update-links
+        </p:documentation>
+    </p:import>
+    
     <p:add-xml-base/>
     <p:xslt>
         <p:input port="stylesheet">
@@ -104,5 +117,40 @@
         </p:group>
     </p:for-each>
     <p:identity name="in-memory"/>
+    <p:sink/>
+
+    <p:documentation>Update cross-references in HTML documents</p:documentation>
+    <px:fileset-load media-types="application/xhtml+xml" name="html">
+        <p:input port="fileset">
+            <p:pipe step="fileset" port="result"/>
+        </p:input>
+        <p:input port="in-memory">
+            <p:pipe step="in-memory" port="result"/>
+        </p:input>
+    </px:fileset-load>
+    <p:for-each name="updated-html">
+        <p:output port="result"/>
+        <px:html-update-links>
+            <p:input port="mapping">
+                <p:pipe step="mapping" port="result"/>
+            </p:input>
+        </px:html-update-links>
+    </p:for-each>
+    <p:sink/>
+    <px:fileset-update name="updated-references">
+        <p:input port="source.fileset">
+            <p:pipe step="fileset" port="result"/>
+        </p:input>
+        <p:input port="source.in-memory">
+            <p:pipe step="in-memory" port="result"/>
+        </p:input>
+        <p:input port="update.fileset">
+            <p:pipe step="html" port="result.fileset"/>
+        </p:input>
+        <p:input port="update.in-memory">
+            <p:pipe step="updated-html" port="result"/>
+        </p:input>
+    </px:fileset-update>
+    <p:sink/>
 
 </p:declare-step>
