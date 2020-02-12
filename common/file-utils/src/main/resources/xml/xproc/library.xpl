@@ -26,6 +26,7 @@
     <p:import href="data.xpl"/>
     <p:import href="read-doctype.xpl"/>
     <p:import href="read-xml-declaration.xpl"/>
+    <p:import href="xprocspec-assert-xml-declaration.xpl"/>
     
     <p:import href="java-library.xpl"/>
 
