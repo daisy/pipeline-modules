@@ -17,5 +17,6 @@
     <p:import href="validate-dtbook/dtbook-validator.check-images.xpl"/>
     <p:import href="validate-dtbook/dtbook-validator.select-schema.xpl"/>
     <p:import href="dtbook-to-mods-meta.xpl"/>
+    <p:import href="dtbook-update-links.xpl"/>
     
 </p:library>
