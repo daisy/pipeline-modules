@@ -3,46 +3,27 @@
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
-                xmlns:svg="http://www.w3.org/2000/svg"
-                xmlns:xlink="http://www.w3.org/1999/xlink"
-                xmlns:m="http://www.w3.org/1998/Math/MathML"
-                xmlns="http://www.w3.org/1999/xhtml"
-                xpath-default-namespace="http://www.w3.org/1999/xhtml"
+                xmlns="http://www.idpf.org/2007/opf"
+                xpath-default-namespace="http://www.idpf.org/2007/opf"
                 exclude-result-prefixes="#all">
 
     <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl"/>
-    <xsl:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xsl"/>
 
     <!--
         A fileset defines the relocation of resources.
+        We know that it has been previously normalized.
     -->
     <xsl:variable name="mapping" as="element(d:fileset)">
-        <xsl:apply-templates mode="normalize" select="collection()[/d:fileset][1]"/>
+        <xsl:apply-templates mode="absolute-hrefs" select="collection()[/d:fileset][1]"/>
     </xsl:variable>
 
-    <xsl:variable name="doc-base" select="pf:html-base-uri(/)"/>
+    <xsl:variable name="doc-base" select="base-uri(/)"/>
     <xsl:variable name="original-doc-base"
-                  select="(for $file in $mapping/d:file[resolve-uri(@href,base-uri(.))=base-uri(current())][1] return
-                           pf:html-base-uri(/,$file/@original-href),
+                  select="($mapping/d:file[resolve-uri(@href,base-uri(.))=$doc-base][1]/@original-href,
                            $doc-base)[1]"/>
 
-    <xsl:template match="@aria-describedat |
-                         @longdesc         |
-                         link/@href        |
-                         script/@scr       |
-                         a/@href           |
-                         img/@src          |
-                         iframe/@src       |
-                         embed/@src        |
-                         object/@data      |
-                         audio/@src        |
-                         video/@src        |
-                         source/@src       |
-                         track/@src        |
-                         svg:*/@xlink:href |
-                         svg:*/@href       |
-                         m:math/@altimg    |
-                         m:mglyph/@src     ">
+    <xsl:template match="link/@href    |
+                         item/@href    ">
         <xsl:variable name="uri" as="xs:string" select="pf:normalize-uri(.)"/>
         <xsl:variable name="uri" as="xs:string*" select="pf:tokenize-uri($uri)"/>
         <xsl:variable name="fragment" as="xs:string?" select="$uri[5]"/>
@@ -64,13 +45,13 @@
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template mode="normalize"
+    <xsl:template mode="absolute-hrefs"
                   match="d:file/@href|
                          d:file/@original-href">
-        <xsl:attribute name="{name()}" select="pf:normalize-uri(resolve-uri(.,base-uri(..)))"/>
+        <xsl:attribute name="{name()}" select="resolve-uri(.,base-uri(..))"/>
     </xsl:template>
 
-    <xsl:template mode="#default normalize" match="@*|node()">
+    <xsl:template mode="#default absolute-hrefs" match="@*|node()">
         <xsl:copy>
             <xsl:apply-templates mode="#current" select="@*|node()"/>
         </xsl:copy>

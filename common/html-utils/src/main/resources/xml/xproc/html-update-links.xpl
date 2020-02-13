@@ -7,6 +7,7 @@
 
 	<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 		<p>Update the links in a HTML document after resources have been relocated.</p>
+		<p>Can also be used to process an SVG document.</p>
 	</p:documentation>
 	
 	<p:input port="source" primary="true">

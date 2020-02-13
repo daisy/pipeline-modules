@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-                xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 exclude-inline-prefixes="#all"
                 type="px:epub3-safe-uris" name="main">
@@ -26,7 +25,7 @@
             EPUB-safe URIs. The base URIs of the in-memory documents are updated
             accordingly. Cross-references in HTML and SMIL documents are updated too.</p>
         </p:documentation>
-        <p:pipe step="updated-links-in-smil" port="result.in-memory"/>
+        <p:pipe step="rename" port="result.in-memory"/>
     </p:output>
     <p:output port="mapping">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -38,20 +37,12 @@
 
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
         <p:documentation>
-            px:fileset-filter
-            px:fileset-load
-            px:fileset-update
             px:fileset-apply
         </p:documentation>
     </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
+    <p:import href="epub3-rename-files.xpl">
         <p:documentation>
-            px:html-update-links
-        </p:documentation>
-    </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/smil-utils/library.xpl">
-        <p:documentation>
-            px:smil-update-links
+            px:epub3-rename-files
         </p:documentation>
     </p:import>
 
@@ -77,7 +68,7 @@
               name="mapping"/>
     <p:sink/>
 
-    <px:fileset-apply name="renamed">
+    <px:epub3-rename-files name="rename">
         <p:input port="source.fileset">
             <p:pipe step="main" port="source.fileset"/>
         </p:input>
@@ -87,82 +78,6 @@
         <p:input port="mapping">
             <p:pipe step="mapping" port="result"/>
         </p:input>
-    </px:fileset-apply>
-    <p:sink/>
-
-    <p:documentation>Update cross-references in HTML and SMIL documents</p:documentation>
-    <!--
-        HTML
-    -->
-    <px:fileset-filter media-types="application/xhtml+xml" name="html">
-        <p:input port="source">
-            <p:pipe step="renamed" port="result.fileset"/>
-        </p:input>
-    </px:fileset-filter>
-    <px:fileset-load>
-        <p:input port="in-memory">
-            <p:pipe step="renamed" port="result.in-memory"/>
-        </p:input>
-    </px:fileset-load>
-    <p:for-each name="updated-links-in-html.in-memory">
-        <p:output port="result"/>
-        <px:html-update-links>
-            <p:input port="mapping">
-                <p:pipe step="mapping" port="result"/>
-            </p:input>
-        </px:html-update-links>
-    </p:for-each>
-    <p:sink/>
-    <px:fileset-update name="updated-links-in-html">
-        <p:input port="source.fileset">
-            <p:pipe step="renamed" port="result.fileset"/>
-        </p:input>
-        <p:input port="source.in-memory">
-            <p:pipe step="renamed" port="result.in-memory"/>
-        </p:input>
-        <p:input port="update.fileset">
-            <p:pipe step="html" port="result"/>
-        </p:input>
-        <p:input port="update.in-memory">
-            <p:pipe step="updated-links-in-html.in-memory" port="result"/>
-        </p:input>
-    </px:fileset-update>
-    <p:sink/>
-    <!--
-        SMIL
-    -->
-    <px:fileset-filter media-types="application/smil+xml" name="smil">
-        <p:input port="source">
-            <p:pipe step="html" port="not-matched"/>
-        </p:input>
-    </px:fileset-filter>
-    <px:fileset-load>
-        <p:input port="in-memory">
-            <p:pipe step="html" port="not-matched.in-memory"/>
-        </p:input>
-    </px:fileset-load>
-    <p:for-each name="updated-links-in-smil.in-memory">
-        <p:output port="result"/>
-        <px:smil-update-links>
-            <p:input port="mapping">
-                <p:pipe step="mapping" port="result"/>
-            </p:input>
-        </px:smil-update-links>
-    </p:for-each>
-    <p:sink/>
-    <px:fileset-update name="updated-links-in-smil">
-        <p:input port="source.fileset">
-            <p:pipe step="updated-links-in-html" port="result.fileset"/>
-        </p:input>
-        <p:input port="source.in-memory">
-            <p:pipe step="updated-links-in-html" port="result.in-memory"/>
-        </p:input>
-        <p:input port="update.fileset">
-            <p:pipe step="smil" port="result"/>
-        </p:input>
-        <p:input port="update.in-memory">
-            <p:pipe step="updated-links-in-smil.in-memory" port="result"/>
-        </p:input>
-    </px:fileset-update>
+    </px:epub3-rename-files>
 
 </p:declare-step>
