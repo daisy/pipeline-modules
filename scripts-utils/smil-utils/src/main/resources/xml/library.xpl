@@ -6,6 +6,7 @@
     <p:import href="upgrade-smil.xpl"/>
     <p:import href="smil-to-text-fileset.xpl"/>
     <p:import href="smil-to-audio-fileset.xpl"/>
+    <p:import href="smil-update-links.xpl"/>
 
     <!--
         Steps related to the internal d:audio-clips format that is a simplified version of SMIL.
