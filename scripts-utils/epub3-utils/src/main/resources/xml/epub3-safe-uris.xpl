@@ -36,17 +36,12 @@
         <p:pipe step="mapping" port="result"/>
     </p:output>
 
-    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
-        <p:documentation>
-            px:set-base-uri
-            px:normalize-uri
-        </p:documentation>
-    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
         <p:documentation>
             px:fileset-filter
             px:fileset-load
             px:fileset-update
+            px:fileset-apply
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
@@ -76,50 +71,23 @@
                                             concat('$1_',1+count(preceding-sibling::d:file[@href=$href]),'$2'))">
         <p:documentation>Because the renaming may have resulted in duplicate file names</p:documentation>
     </p:label-elements>
-    <p:identity name="fileset-with-href-before-move"/>
-    <p:delete match="/*/*/@href-before-move"/>
-    <p:identity name="updated.fileset"/>
+    <p:label-elements match="d:file" attribute="original-href" label="@href-before-move" replace="true"/>
+    <p:delete match="/*/*[not(self::d:file)]|
+                     d:file/@*[not(name()=('href','original-href'))]"
+              name="mapping"/>
     <p:sink/>
 
-    <p:label-elements match="d:file" attribute="original-href" label="@href-before-move" replace="true">
-        <p:input port="source">
-            <p:pipe step="fileset-with-href-before-move" port="result"/>
+    <px:fileset-apply name="renamed">
+        <p:input port="source.fileset">
+            <p:pipe step="main" port="source.fileset"/>
         </p:input>
-    </p:label-elements>
-    <p:delete match="/*/*[not(self::d:file)]"/>
-    <p:delete match="d:file/@*[not(name()=('href','original-href'))]" name="mapping"/>
-    <p:sink/>
-
-    <p:documentation>Update the base URI of the in-memory documents</p:documentation>
-    <p:for-each>
-        <p:iteration-source>
+        <p:input port="source.in-memory">
             <p:pipe step="main" port="source.in-memory"/>
-        </p:iteration-source>
-        <px:normalize-uri name="normalize-uri">
-            <p:with-option name="href" select="base-uri(/*)"/>
-        </px:normalize-uri>
-        <p:group>
-            <p:variable name="base-uri" select="string(/*)">
-                <p:pipe step="normalize-uri" port="normalized"/>
-            </p:variable>
-            <p:choose>
-                <p:xpath-context>
-                    <p:pipe step="fileset-with-href-before-move" port="result"/>
-                </p:xpath-context>
-                <p:when test="$base-uri=/*/d:file/@href-before-move">
-                    <px:set-base-uri>
-                        <p:with-option name="base-uri" select="(/*/d:file[@href-before-move=$base-uri])[1]/resolve-uri(@href,base-uri(.))">
-                            <p:pipe step="fileset-with-href-before-move" port="result"/>
-                        </p:with-option>
-                    </px:set-base-uri>
-                </p:when>
-                <p:otherwise>
-                    <p:identity/>
-                </p:otherwise>
-            </p:choose>
-        </p:group>
-    </p:for-each>
-    <p:identity name="updated-base-uris.in-memory"/>
+        </p:input>
+        <p:input port="mapping">
+            <p:pipe step="mapping" port="result"/>
+        </p:input>
+    </px:fileset-apply>
     <p:sink/>
 
     <p:documentation>Update cross-references in HTML and SMIL documents</p:documentation>
@@ -128,12 +96,12 @@
     -->
     <px:fileset-filter media-types="application/xhtml+xml" name="html">
         <p:input port="source">
-            <p:pipe step="updated.fileset" port="result"/>
+            <p:pipe step="renamed" port="result.fileset"/>
         </p:input>
     </px:fileset-filter>
     <px:fileset-load>
         <p:input port="in-memory">
-            <p:pipe step="updated-base-uris.in-memory" port="result"/>
+            <p:pipe step="renamed" port="result.in-memory"/>
         </p:input>
     </px:fileset-load>
     <p:for-each name="updated-links-in-html.in-memory">
@@ -147,10 +115,10 @@
     <p:sink/>
     <px:fileset-update name="updated-links-in-html">
         <p:input port="source.fileset">
-            <p:pipe step="updated.fileset" port="result"/>
+            <p:pipe step="renamed" port="result.fileset"/>
         </p:input>
         <p:input port="source.in-memory">
-            <p:pipe step="updated-base-uris.in-memory" port="result"/>
+            <p:pipe step="renamed" port="result.in-memory"/>
         </p:input>
         <p:input port="update.fileset">
             <p:pipe step="html" port="result"/>

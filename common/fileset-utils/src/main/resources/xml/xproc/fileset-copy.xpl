@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-                xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 exclude-inline-prefixes="#all"
                 type="px:fileset-copy" name="main">
@@ -20,9 +19,7 @@
         <p:empty/>
     </p:input>
 
-    <p:output port="result.fileset" primary="true">
-        <p:pipe step="fileset" port="result"/>
-    </p:output>
+    <p:output port="result.fileset" primary="true"/>
     <p:output port="result.in-memory" sequence="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>The output fileset at the new location.</p>
@@ -31,12 +28,12 @@
             in-memory documents are changed accordingly, and "original-href"-attributes are added
             for files that exist on disk.</p>
         </p:documentation>
-        <p:pipe step="in-memory" port="result"/>
+        <p:pipe step="apply" port="result.in-memory"/>
     </p:output>
     <p:output port="mapping">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>A <code>d:fileset</code> document that contains the mapping from the source files
-            (<code>@original-href</code>)to the copied files (<code>@href</code>).</p>
+            (<code>@original-href</code>) to the copied files (<code>@href</code>).</p>
         </p:documentation>
         <p:pipe step="mapping" port="result"/>
     </p:output>
@@ -67,21 +64,14 @@
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
         <p:documentation>
             px:set-base-uri
-            px:normalize-uri
         </p:documentation>
     </p:import>
-    <p:import href="fileset-fix-original-hrefs.xpl"/>
+    <p:import href="fileset-join.xpl"/>
+    <p:import href="fileset-apply.xpl"/>
 
-    <p:documentation>
-        Make the original-href attributes reflect what is actually stored on disk. Also normalizes
-        @xml:base, @href and @original-href, relativizes @href against @xml:base, makes
-        @original-href absolute, and removes @xml:base from d:file.
-    </p:documentation>
-    <pxi:fileset-fix-original-hrefs detect-existing="true">
-        <p:input port="source.in-memory">
-            <p:pipe step="main" port="source.in-memory"/>
-        </p:input>
-    </pxi:fileset-fix-original-hrefs>
+    <p:documentation>Add xml:base and normalize fileset</p:documentation>
+    <p:add-xml-base/>
+    <px:fileset-join/>
 
     <p:label-elements match="/*/d:file" attribute="href-before-move" label="resolve-uri(@href, base-uri(.))"/>
 
@@ -129,51 +119,21 @@
     <px:set-base-uri>
         <p:with-option name="base-uri" select="$target"/>
     </px:set-base-uri>
-    <p:identity name="fileset.with-href-before-move"/>
-
-    <p:delete match="/*/*/@href-before-move"/>
-    <p:identity name="fileset"/>
-    <p:sink/>
-
-    <p:label-elements match="d:file" attribute="original-href" label="@href-before-move" replace="true">
-        <p:input port="source">
-            <p:pipe step="fileset.with-href-before-move" port="result"/>
-        </p:input>
-    </p:label-elements>
+    <p:label-elements match="d:file" attribute="original-href" label="@href-before-move" replace="true"/>
     <p:delete match="/*/*[not(self::d:file)]"/>
     <p:delete match="d:file/@*[not(name()=('href','original-href'))]" name="mapping"/>
     <p:sink/>
 
-    <p:documentation>Update the base URI of the in-memory documents</p:documentation>
-    <p:for-each>
-        <p:iteration-source>
+    <px:fileset-apply name="apply">
+        <p:input port="source.fileset">
+            <p:pipe step="main" port="source.fileset"/>
+        </p:input>
+        <p:input port="source.in-memory">
             <p:pipe step="main" port="source.in-memory"/>
-        </p:iteration-source>
-        <px:normalize-uri name="normalize-uri">
-            <p:with-option name="href" select="base-uri(/*)"/>
-        </px:normalize-uri>
-        <p:group>
-            <p:variable name="base-uri" select="string(/*)">
-                <p:pipe step="normalize-uri" port="normalized"/>
-            </p:variable>
-            <p:choose>
-                <p:xpath-context>
-                    <p:pipe step="mapping" port="result"/>
-                </p:xpath-context>
-                <p:when test="$base-uri=/*/d:file/@original-href">
-                    <px:set-base-uri>
-                        <p:with-option name="base-uri" select="(/*/d:file[@original-href=$base-uri])[1]/resolve-uri(@href,base-uri(.))">
-                            <p:pipe step="mapping" port="result"/>
-                        </p:with-option>
-                    </px:set-base-uri>
-                </p:when>
-                <p:otherwise>
-                    <p:identity/>
-                </p:otherwise>
-            </p:choose>
-        </p:group>
-    </p:for-each>
-    <p:identity name="in-memory"/>
-    <p:sink/>
+        </p:input>
+        <p:input port="mapping">
+            <p:pipe step="mapping" port="result"/>
+        </p:input>
+    </px:fileset-apply>
 
 </p:declare-step>

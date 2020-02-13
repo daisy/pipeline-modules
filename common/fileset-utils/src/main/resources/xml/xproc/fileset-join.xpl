@@ -10,9 +10,10 @@
     not contribute to the new base. If none of the input fileset have an <code>xml:base</code> the
     joint fileset has no <code>xml:base</code> either. The <code>href</code> and
     <code>original-href</code> attributes are normalized. <code>href</code> are relativized against
-    the new base, and <code>original-href</code> are made absolute. Files that have the same
-    resolved <code>href</code> are merged, i.e. their attributes are combined. In case of
-    conflicting attributes the last occurence wins.</p> Files are listed in the order in which their
+    the new base, and <code>original-href</code> are made absolute. <code>@xml:base</code>
+    attributes are removed from <code>d:file</code>. Files that have the same resolved
+    <code>href</code> are merged, i.e. their attributes are combined. In case of conflicting
+    attributes the last occurence wins.</p> Files are listed in the order in which their
     <code>href</code> occurs first in the source documents.
   </p:documentation>
 
