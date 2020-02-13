@@ -26,23 +26,33 @@
                            pf:html-base-uri(/,$file/@original-href),
                            $doc-base)[1]"/>
 
-    <xsl:template match="@aria-describedat |
-                         @longdesc         |
-                         link/@href        |
-                         script/@scr       |
-                         a/@href           |
-                         img/@src          |
-                         iframe/@src       |
-                         embed/@src        |
-                         object/@data      |
-                         audio/@src        |
-                         video/@src        |
-                         source/@src       |
-                         track/@src        |
-                         svg:*/@xlink:href |
-                         svg:*/@href       |
-                         m:math/@altimg    |
-                         m:mglyph/@src     ">
+    <xsl:template match="@aria-describedat  |
+                         @longdesc          |
+                         link/@href         |
+                         a/@href            |
+                         area/@href         |
+                         script/@scr        |
+                         img/@src           |
+                         iframe/@src        |
+                         embed/@src         |
+                         object/@data       |
+                         audio/@src         |
+                         video/@src         |
+                         source/@src        |
+                         track/@src         |
+                         input/@src         |
+                         input/@formaction  |
+                         button/@formaction |
+                         form/@action       |
+                         blockquote/@cite   |
+                         q/@cite            |
+                         ins/@cite          |
+                         del/@cite          |
+                         head/@profile      |
+                         svg:*/@xlink:href  |
+                         svg:*/@href        |
+                         m:math/@altimg     |
+                         m:mglyph/@src      ">
         <xsl:variable name="uri" as="xs:string" select="pf:normalize-uri(.)"/>
         <xsl:variable name="uri" as="xs:string*" select="pf:tokenize-uri($uri)"/>
         <xsl:variable name="fragment" as="xs:string?" select="$uri[5]"/>

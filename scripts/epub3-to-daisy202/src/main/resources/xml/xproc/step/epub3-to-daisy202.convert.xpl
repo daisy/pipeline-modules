@@ -23,16 +23,10 @@
             px:assert
         </p:documentation>
     </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
-        <p:documentation>
-            px:set-base-uri
-        </p:documentation>
-    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
         <p:documentation>
             px:fileset-filter
             px:fileset-load
-            px:fileset-join
             px:fileset-rebase
         </p:documentation>
     </p:import>
@@ -45,6 +39,11 @@
         <p:documentation>
             px:html-upgrade
             px:html-downgrade
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/daisy202-utils/library.xpl">
+        <p:documentation>
+            px:daisy202-rename-files
         </p:documentation>
     </p:import>
     <p:import href="create-ncc.xpl">
@@ -190,111 +189,27 @@
     <p:group name="rename-xhtml" px:message="Renaming content documents to .html">
         <p:output port="fileset" primary="true"/>
         <p:output port="in-memory" sequence="true">
-            <p:pipe step="in-memory" port="result"/>
+            <p:pipe step="rename" port="result.in-memory"/>
         </p:output>
-        <px:fileset-filter media-types="application/xhtml+xml" name="xhtml"/>
-        <px:fileset-load>
-            <p:input port="in-memory">
-                <p:pipe step="create-ncc" port="result.in-memory"/>
-            </p:input>
-        </px:fileset-load>
-        <p:for-each>
-            <px:set-base-uri>
-                <p:documentation>
-                    Change base URI.
-                </p:documentation>
-                <p:with-option name="base-uri" select="replace(base-uri(/*),'^(.*)\.([^/\.]*)$','$1.html')"/>
-            </px:set-base-uri>
-            <p:group>
-                <p:documentation>
-                    Update links to other HTML files.
-                </p:documentation>
-                <p:viewport match="//html:*[matches(@href,'\.xhtml(#|$)')]">
-                    <p:add-attribute match="/*" attribute-name="href">
-                        <p:with-option name="attribute-value" select="replace(/*/@href,'.xhtml(#|$)','.html$1')"/>
-                    </p:add-attribute>
-                </p:viewport>
-                <p:viewport match="//html:*[matches(@src,'\.xhtml(#|$)')]">
-                    <p:add-attribute match="/*" attribute-name="src">
-                        <p:with-option name="attribute-value" select="replace(/*/@src,'.xhtml(#|$)','.html$1')"/>
-                    </p:add-attribute>
-                </p:viewport>
-                <p:viewport match="//html:*[matches(@cite,'\.xhtml(#|$)')]">
-                    <p:add-attribute match="/*" attribute-name="cite">
-                        <p:with-option name="attribute-value" select="replace(/*/@cite,'.xhtml(#|$)','.html$1')"/>
-                    </p:add-attribute>
-                </p:viewport>
-                <p:viewport match="//html:*[matches(@longdesc,'\.xhtml(#|$)')]">
-                    <p:add-attribute match="/*" attribute-name="longdesc">
-                        <p:with-option name="attribute-value" select="replace(/*/@longdesc,'.xhtml(#|$)','.html$1')"/>
-                    </p:add-attribute>
-                </p:viewport>
-                <p:viewport match="//html:object[matches(@data,'\.xhtml(#|$)')]">
-                    <p:add-attribute match="/*" attribute-name="data">
-                        <p:with-option name="attribute-value" select="replace(/*/@data,'.xhtml(#|$)','.html$1')"/>
-                    </p:add-attribute>
-                </p:viewport>
-                <p:viewport match="//html:form[matches(@action,'\.xhtml(#|$)')]">
-                    <p:add-attribute match="/*" attribute-name="action">
-                        <p:with-option name="attribute-value" select="replace(/*/@action,'.xhtml(#|$)','.html$1')"/>
-                    </p:add-attribute>
-                </p:viewport>
-                <p:viewport match="//html:head[matches(@profile,'\.xhtml(#|$)')]">
-                    <p:add-attribute match="/*" attribute-name="profile">
-                        <p:with-option name="attribute-value" select="replace(/*/@profile,'.xhtml(#|$)','.html$1')"/>
-                    </p:add-attribute>
-                </p:viewport>
-            </p:group>
-        </p:for-each>
-        <p:identity name="processed-xhtml"/>
+        <px:fileset-filter media-types="application/xhtml+xml"/>
+        <p:label-elements match="d:file" attribute="original-href" replace="true"
+                          label="resolve-uri(@href,base-uri(.))"/>
+        <p:label-elements match="d:file" attribute="href" replace="true"
+                          label="replace(@href,'^(.*)\.([^/\.]*)$','$1.html')"/>
+        <p:delete match="/*/*[not(self::d:file)]"/>
+        <p:delete match="d:file/@*[not(name()=('href','original-href'))]" name="rename-xhtml-mapping"/>
         <p:sink/>
-        <px:fileset-filter media-types="application/smil+xml" name="smil">
-            <p:input port="source">
+        <px:daisy202-rename-files name="rename">
+            <p:input port="source.fileset">
                 <p:pipe step="create-ncc" port="result.fileset"/>
             </p:input>
-        </px:fileset-filter>
-        <px:fileset-load>
-            <p:input port="in-memory">
+            <p:input port="source.in-memory">
                 <p:pipe step="create-ncc" port="result.in-memory"/>
             </p:input>
-        </px:fileset-load>
-        <p:for-each>
-            <p:documentation>
-                Update links from SMIL to HTML.
-            </p:documentation>
-            <p:viewport match="//text[@src]" xmlns="">
-                <p:add-attribute match="/*" attribute-name="src">
-                    <p:with-option name="attribute-value" select="replace(/*/@src,'\.xhtml(#|$)','.html$1','i')"/>
-                </p:add-attribute>
-            </p:viewport>
-        </p:for-each>
-        <p:identity name="processed-smil"/>
-        <p:sink/>
-        <p:documentation>Rename files in XHTML fileset</p:documentation>
-        <p:viewport match="d:file" name="xhtml-renamed.fileset">
-            <p:viewport-source>
-                <p:pipe step="xhtml" port="result"/>
-            </p:viewport-source>
-            <p:add-attribute attribute-name="href" match="/*">
-                <p:with-option name="attribute-value" select="replace(/*/@href,'^(.*)\.([^/\.]*)$','$1.html')"/>
-            </p:add-attribute>
-        </p:viewport>
-        <p:sink/>
-        <p:documentation>Combine filesets</p:documentation>
-        <p:identity name="in-memory">
-            <p:input port="source">
-                <p:pipe step="processed-xhtml" port="result"/>
-                <p:pipe step="processed-smil" port="result"/>
-                <p:pipe step="smil" port="not-matched.in-memory"/>
+            <p:input port="mapping">
+                <p:pipe step="rename-xhtml-mapping" port="result"/>
             </p:input>
-        </p:identity>
-        <p:sink/>
-        <px:fileset-join>
-            <p:input port="source">
-                <p:pipe step="xhtml-renamed.fileset" port="result"/>
-                <p:pipe step="xhtml" port="not-matched"/>
-            </p:input>
-        </px:fileset-join>
+        </px:daisy202-rename-files>
     </p:group>
 
     <p:documentation>
