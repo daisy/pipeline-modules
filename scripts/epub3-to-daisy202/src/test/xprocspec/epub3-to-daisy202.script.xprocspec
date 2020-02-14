@@ -18,9 +18,6 @@
             <x:document type="inline">
                 <c:directory name="output-dir">
                     <c:directory name="urn_isbn_9780316000000">
-                        <c:directory name="audio">
-                            <c:file name="mobydick_001_002_melville.mp4"/>
-                        </c:directory>
                         <c:file name="chapter_001.html"/>
                         <c:file name="chapter_001_overlay.smil"/>
                         <c:file name="chapter_002.html"/>
@@ -40,6 +37,7 @@
                             <c:file name="9780316000000.jpg"/>
                             <c:file name="Moby-Dick_FE_title_page.jpg"/>
                         </c:directory>
+                        <c:file name="mobydick_001_002_melville.mp4"/>
                         <c:file name="ncc.html"/>
                     </c:directory>
                 </c:directory>
@@ -72,9 +70,12 @@
             <x:document type="inline">
                 <c:directory name="output-dir">
                     <c:directory name="urn_isbn_9780316000000">
-                        <c:directory name="audio">
-                            <c:file name="mobydick_001_002_melville.mp4"/>
-                        </c:directory>
+                        <c:file name="chapter_001.html"/>
+                        <c:file name="chapter_001_overlay.smil"/>
+                        <c:file name="chapter_002.html"/>
+                        <c:file name="chapter_002_overlay.smil"/>
+                        <c:file name="chapter_003.html"/>
+                        <c:file name="chapter_003.smil"/>
                         <c:directory name="css">
                             <c:file name="stylesheet.css"/>
                         </c:directory>
@@ -84,17 +85,8 @@
                             <c:file name="STIXGeneralBolIta.otf"/>
                             <c:file name="STIXGeneralItalic.otf"/>
                         </c:directory>
+                        <c:file name="mobydick_001_002_melville.mp4"/>
                         <c:file name="ncc.html"/>
-                        <c:directory name="smil">
-                            <c:file name="chapter_001_overlay.smil"/>
-                            <c:file name="chapter_002_overlay.smil"/>
-                        </c:directory>
-                        <c:directory name="text">
-                            <c:file name="chapter_001.html"/>
-                            <c:file name="chapter_002.html"/>
-                            <c:file name="chapter_003.html"/>
-                            <c:file name="chapter_003.smil"/>
-                        </c:directory>
                     </c:directory>
                 </c:directory>
             </x:document>

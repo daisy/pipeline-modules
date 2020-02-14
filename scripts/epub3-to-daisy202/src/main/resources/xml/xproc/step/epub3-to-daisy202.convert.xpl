@@ -31,6 +31,7 @@
             px:fileset-filter
             px:fileset-load
             px:fileset-rebase
+            px:fileset-copy
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/epub-utils/library.xpl">
@@ -214,6 +215,38 @@
     </p:group>
 
     <p:documentation>
+        Flatten DAISY 2.02 directory structure.
+        Don't rename CSS, images and font files because that could break links in CSS.
+    </p:documentation>
+    <p:group name="flatten-daisy202">
+        <p:output port="fileset" primary="true"/>
+        <p:output port="in-memory" sequence="true">
+            <p:pipe step="rename" port="result.in-memory"/>
+        </p:output>
+        <px:fileset-filter media-types="application/xhtml+xml
+                                        application/smil+xml
+                                        audio/mpeg
+                                        audio/mp4"/>
+        <px:fileset-copy flatten="true" dry-run="true" name="flatten">
+            <p:with-option name="target" select="base-uri(/*)">
+                <p:pipe step="opf" port="result"/>
+            </p:with-option>
+        </px:fileset-copy>
+        <p:sink/>
+        <px:daisy202-rename-files name="rename">
+            <p:input port="source.fileset">
+                <p:pipe step="rename-xhtml" port="fileset"/>
+            </p:input>
+            <p:input port="source.in-memory">
+                <p:pipe step="rename-xhtml" port="in-memory"/>
+            </p:input>
+            <p:input port="mapping">
+                <p:pipe step="flatten" port="mapping"/>
+            </p:input>
+        </px:daisy202-rename-files>
+    </p:group>
+
+    <p:documentation>
         Finalize DAISY 2.02 fileset manifest: set DOCTYPE on XHTML and SMIL files
     </p:documentation>
     <p:add-attribute match="d:file[@media-type='application/xhtml+xml']"
@@ -237,7 +270,7 @@
             <p:pipe step="identifier" port="result"/>
         </p:with-option>
         <p:input port="source.in-memory">
-            <p:pipe step="rename-xhtml" port="in-memory"/>
+            <p:pipe step="flatten-daisy202" port="in-memory"/>
         </p:input>
     </px:fileset-copy>
     <p:sink/>
