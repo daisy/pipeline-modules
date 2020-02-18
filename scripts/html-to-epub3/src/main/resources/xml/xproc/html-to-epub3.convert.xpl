@@ -361,13 +361,10 @@
     <!-- CALL THE TTS                                                            -->
     <!--=========================================================================-->
 
+    <!-- FIXME: include resources such as lexicons in input -->
     <px:tts-for-epub3 name="tts">
-      <p:input port="in-memory.in">
+      <p:input port="source.in-memory">
           <p:pipe step="diagram-to-html" port="result.in-memory"/>
-      </p:input>
-      <p:input port="fileset.in">
-          <!-- TODO: include resources such as lexicons -->
-          <p:pipe step="diagram-to-html" port="result.fileset"/>
       </p:input>
       <p:input port="config">
           <p:pipe step="main" port="tts-config"/>
@@ -376,37 +373,23 @@
       <p:with-option name="temp-dir" select="$temp-dir"/>
     </px:tts-for-epub3>
 
-    <p:documentation>Update the fileset with the enriched HTML files.</p:documentation>
-    <px:fileset-filter-in-memory name="enriched-html.fileset">
-        <p:documentation>Create fileset from enriched HTML files</p:documentation>
-        <p:input port="source.fileset">
-            <p:pipe step="diagram-to-html" port="result.fileset"/>
+    <px:fileset-load media-types="application/xhtml+xml" name="tts.enriched-html">
+        <p:input port="in-memory">
+            <p:pipe step="tts" port="result.in-memory"/>
         </p:input>
-        <p:input port="source.in-memory">
-            <p:pipe step="tts" port="content.out"/>
-        </p:input>
-    </px:fileset-filter-in-memory>
+    </px:fileset-load>
     <p:sink/>
-    <px:fileset-update name="add-enriched-html">
-        <p:input port="source.fileset">
-            <p:pipe step="diagram-to-html" port="result.fileset"/>
-        </p:input>
-        <p:input port="source.in-memory">
-            <p:pipe step="diagram-to-html" port="result.in-memory"/>
-        </p:input>
-        <p:input port="update.fileset">
-            <p:pipe step="enriched-html.fileset" port="result"/>
-        </p:input>
-        <p:input port="update.in-memory">
-            <p:pipe step="tts" port="content.out"/>
-        </p:input>
-    </px:fileset-update>
 
     <!--=========================================================================-->
     <!-- GENERATE THE MEDIA-OVERLAYS                                             -->
     <!--=========================================================================-->
 
     <p:documentation>Add SMIL and audio files</p:documentation>
+    <p:identity>
+        <p:input port="source">
+            <p:pipe step="tts" port="result.fileset"/>
+        </p:input>
+    </p:identity>
     <p:choose name="add-mediaoverlays">
         <p:xpath-context>
             <p:pipe step="tts" port="audio-map"/>
@@ -414,7 +397,7 @@
         <p:when test="count(/d:audio-clips/*) = 0">
             <p:output port="fileset" primary="true"/>
             <p:output port="in-memory" sequence="true">
-                <p:pipe step="add-enriched-html" port="result.in-memory"/>
+                <p:pipe step="tts" port="result.in-memory"/>
             </p:output>
             <p:output port="temp-audio.fileset">
                 <p:inline><d:fileset/></p:inline>
@@ -424,7 +407,7 @@
         <p:otherwise>
             <p:output port="fileset" primary="true"/>
             <p:output port="in-memory" sequence="true">
-                <p:pipe step="add-enriched-html" port="result.in-memory"/>
+                <p:pipe step="tts" port="result.in-memory"/>
                 <p:pipe step="mo" port="in-memory.out"/>
             </p:output>
             <p:output port="temp-audio.fileset">
@@ -433,7 +416,7 @@
             <p:documentation>Generate SMIL files and copy audio files</p:documentation>
             <px:epub3-create-mediaoverlays flatten="true" name="mo">
                 <p:input port="content-docs">
-                    <p:pipe step="tts" port="content.out"/>
+                    <p:pipe step="tts.enriched-html" port="result"/>
                 </p:input>
                 <p:input port="audio-map">
                     <p:pipe step="tts" port="audio-map"/>
@@ -448,7 +431,7 @@
             <p:sink/>
             <px:fileset-join>
                 <p:input port="source">
-                    <p:pipe step="add-enriched-html" port="result.fileset"/>
+                    <p:pipe step="tts" port="result.fileset"/>
                     <p:pipe step="mo" port="fileset.out"/>
                 </p:input>
             </px:fileset-join>

@@ -5,17 +5,10 @@
                 exclude-inline-prefixes="#all"
                 type="px:tts-for-epub3" name="main">
 
-  <p:input port="in-memory.in" primary="true" sequence="true">
+  <p:input port="source.fileset" primary="true"/>
+  <p:input port="source.in-memory" sequence="true">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-      <p>List of documents in memory, including one or more HTML
-      documents and lexicons.</p>
-    </p:documentation>
-  </p:input>
-
-  <p:input port="fileset.in">
-    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-       <p>Input filesets including HTML documents, lexicons and CSS
-       stylesheets.</p>
+      <p>The source fileset with HTML documents, lexicons and CSS stylesheets.</p>
     </p:documentation>
   </p:input>
 
@@ -36,19 +29,15 @@
     </p:documentation>
   </p:output>
 
-  <p:output port="content.out" primary="true" sequence="true">
-    <p:pipe port="content.out" step="synthesize"/>
-    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-       <p>Copy of HTML documents of in-memory.in enriched with IDs,
-       words and sentences.</p>
-    </p:documentation>
+  <p:output port="result.fileset" primary="true">
+    <p:pipe step="main" port="source.fileset"/>
   </p:output>
-
-  <p:output port="in-memory.out" sequence="true">
-    <p:pipe port="non-html" step="html-filter"/>
+  <p:output port="result.in-memory" sequence="true">
+    <p:pipe step="html-filter" port="non-html"/>
+    <p:pipe step="synthesize" port="content.out"/>
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-       <p>Copy of in-memory.out without the HTML documents of
-       content.out</p>
+       <p>The result fileset.</p>
+       <p>HTML documents are enriched with IDs, words and sentences.</p>
     </p:documentation>
   </p:output>
 
@@ -133,7 +122,7 @@
   </p:import>
 
   <p:variable name="fileset-base" select="base-uri(/*)">
-    <p:pipe port="fileset.in" step="main"/>
+    <p:pipe step="main" port="source.fileset"/>
   </p:variable>
 
   <p:for-each name="html-filter">
@@ -144,12 +133,12 @@
       <p:pipe port="non-html" step="is.html"/>
     </p:output>
     <p:iteration-source>
-      <p:pipe port="in-memory.in" step="main"/>
+      <p:pipe step="main" port="source.in-memory"/>
     </p:iteration-source>
     <p:variable name="doc-uri" select="base-uri(/*)"/>
     <p:choose name="is.html">
       <p:xpath-context>
-        <p:pipe port="fileset.in" step="main"/>
+        <p:pipe step="main" port="source.fileset"/>
       </p:xpath-context>
       <p:when test="//*[@media-type='application/xhtml+xml']/resolve-uri(@href, $fileset-base)=$doc-uri">
         <p:output port="html">
@@ -238,7 +227,7 @@
             <p:pipe port="sentence-ids" step="lexing"/>
           </p:input>
           <p:input port="fileset.in">
-            <p:pipe port="fileset.in" step="main"/>
+            <p:pipe step="main" port="source.fileset"/>
           </p:input>
           <p:input port="config">
             <p:pipe port="config" step="main"/>
