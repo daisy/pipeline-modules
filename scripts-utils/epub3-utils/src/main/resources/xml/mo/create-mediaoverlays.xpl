@@ -8,9 +8,10 @@
         <p>Create SMIL documents from a set of HTML documents and audio clips.</p>
     </p:documentation>
 
-    <p:input port="content-docs" primary="true" sequence="true">
+    <p:input port="source.fileset" primary="true"/>
+    <p:input port="source.in-memory" sequence="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <p>The HTML documents</p>
+            <p>The source fileset with HTML documents.</p>
         </p:documentation>
     </p:input>
     <p:input port="audio-map">
@@ -31,8 +32,8 @@
         </p:documentation>
     </p:option>
 
-    <p:output port="fileset.out" primary="true"/>
-    <p:output port="in-memory.out" sequence="true">
+    <p:output port="result.fileset" primary="true"/>
+    <p:output port="result.in-memory" sequence="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>The result fileset with the SMIL and audio files.</p>
         </p:documentation>
@@ -63,6 +64,7 @@
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
         <p:documentation>
             px:fileset-move
+            px:fileset-load
             px:fileset-create
             px:fileset-add-entry
             px:fileset-join
@@ -124,17 +126,23 @@
             <p:sink/>
 
             <p:documentation>Generate the SMIL files</p:documentation>
+            <px:fileset-load media-types="application/xhtml+xml">
+                <p:input port="fileset">
+                    <p:pipe step="main" port="source.fileset"/>
+                </p:input>
+                <p:input port="in-memory">
+                    <p:pipe step="main" port="source.in-memory"/>
+                </p:input>
+            </px:fileset-load>
             <p:for-each name="smil.in-memory">
-                <p:iteration-source>
-                    <p:pipe step="main" port="content-docs"/>
-                </p:iteration-source>
                 <p:output port="result" sequence="true"/>
                 <p:variable name="mo-uri"
                             select="concat($mediaoverlay-dir,replace(base-uri(/*),'.*?([^/]*)\.x?html$','$1.smil'))"/>
                 <p:identity name="content-doc"/>
+                <p:sink/>
                 <p:xslt>
                     <p:input port="source">
-                        <p:pipe step="smil.in-memory" port="current"/>
+                        <p:pipe step="content-doc" port="result"/>
                         <p:pipe step="audio-map" port="result"/>
                     </p:input>
                     <p:input port="stylesheet">

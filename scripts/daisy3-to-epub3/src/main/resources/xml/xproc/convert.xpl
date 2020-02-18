@@ -216,11 +216,14 @@
         <p:when test="$mediaoverlays and $type='text+mo'">
             <p:output port="fileset.out" primary="true"/>
             <p:output port="in-memory.out" sequence="true">
-                <p:pipe port="in-memory.out" step="media-overlays.inner"/>
+                <p:pipe port="result.in-memory" step="media-overlays.inner"/>
             </p:output>
             <px:epub3-create-mediaoverlays flatten="false" name="media-overlays.inner">
-                <p:input port="content-docs">
-                    <p:pipe port="result.in-memory" step="content-docs"/>
+                <p:input port="source.fileset">
+                    <p:pipe step="content-docs" port="result.fileset"/>
+                </p:input>
+                <p:input port="source.in-memory">
+                    <p:pipe step="content-docs" port="result.in-memory"/>
                 </p:input>
                 <p:input port="audio-map">
                     <p:pipe step="audio-clips" port="result"/>

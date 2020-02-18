@@ -7,7 +7,14 @@
 
 	<x:scenario label="test">
 		<x:call step="px:epub3-create-mediaoverlays">
-			<x:input port="content-docs">
+			<x:input port="source.fileset">
+				<x:document type="inline">
+					<d:fileset>
+						<d:file href="out/EPUB/foo.xhtml" media-type="application/xhtml+xml"/>
+					</d:fileset>
+				</x:document>
+			</x:input>
+			<x:input port="source.in-memory">
 				<x:document type="inline" xmlns="http://www.w3.org/1999/xhtml" xml:base="out/EPUB/foo.xhtml">
 					<html xml:lang="en">
 						<head>
@@ -52,10 +59,10 @@
 			<x:option name="flatten" select="'true'"/>
 			<x:option name="anti-conflict-prefix" select="''"/>
 		</x:call>
-		<x:context label="the fileset.out port">
-			<x:document type="port" port="fileset.out"/>
+		<x:context label="the result.fileset port">
+			<x:document type="port" port="result.fileset"/>
 		</x:context>
-		<x:expect label="the fileset.out port"
+		<x:expect label="the result.fileset port"
 		          type="custom" href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl" step="x:fileset-compare">
 			<x:document type="inline">
 				<d:fileset>
@@ -80,7 +87,7 @@
 			</x:document>
 		</x:expect>
 		<x:context label="the foo.smil document">
-			<x:document type="port" port="in-memory.out" select="/*[tokenize(base-uri(.),'[\\/]')[last()]='foo.smil']"/>
+			<x:document type="port" port="result.in-memory" select="/*[tokenize(base-uri(.),'[\\/]')[last()]='foo.smil']"/>
 		</x:context>
 		<x:expect label="the foo.smil document" type="compare">
 			<x:document type="inline" xmlns="http://www.w3.org/ns/SMIL">

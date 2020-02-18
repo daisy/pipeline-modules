@@ -373,13 +373,6 @@
       <p:with-option name="temp-dir" select="$temp-dir"/>
     </px:tts-for-epub3>
 
-    <px:fileset-load media-types="application/xhtml+xml" name="tts.enriched-html">
-        <p:input port="in-memory">
-            <p:pipe step="tts" port="result.in-memory"/>
-        </p:input>
-    </px:fileset-load>
-    <p:sink/>
-
     <!--=========================================================================-->
     <!-- GENERATE THE MEDIA-OVERLAYS                                             -->
     <!--=========================================================================-->
@@ -389,15 +382,15 @@
         <p:output port="fileset" primary="true"/>
         <p:output port="in-memory" sequence="true">
             <p:pipe step="tts" port="result.in-memory"/>
-            <p:pipe step="mo" port="in-memory.out"/>
+            <p:pipe step="mo" port="result.in-memory"/>
         </p:output>
         <p:output port="temp-audio.fileset">
             <p:pipe step="mo" port="original-audio.fileset"/>
         </p:output>
         <p:documentation>Generate SMIL files and copy audio files</p:documentation>
         <px:epub3-create-mediaoverlays flatten="true" name="mo">
-            <p:input port="content-docs">
-                <p:pipe step="tts.enriched-html" port="result"/>
+            <p:input port="source.in-memory">
+                <p:pipe step="tts" port="result.in-memory"/>
             </p:input>
             <p:input port="audio-map">
                 <p:pipe step="tts" port="audio-map"/>
@@ -413,7 +406,7 @@
         <px:fileset-join>
             <p:input port="source">
                 <p:pipe step="tts" port="result.fileset"/>
-                <p:pipe step="mo" port="fileset.out"/>
+                <p:pipe step="mo" port="result.fileset"/>
             </p:input>
         </px:fileset-join>
     </p:group>
