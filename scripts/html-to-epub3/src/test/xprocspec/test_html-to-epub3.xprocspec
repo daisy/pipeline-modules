@@ -32,7 +32,10 @@
 								<h1>Chapter</h1>
 								<p>Paragraph</p>
 								<p>Another paragraph</p>
-								<p><img src="image.svg"/></p>
+								<p>
+									<img src="image.svg" alt="image"/>
+									<a href="desc.xml">image description</a>
+								</p>
 								<p><img src="missing-image.svg"/></p>
 							</section>
 						</body>
@@ -104,7 +107,10 @@
 							<h1 id="c">Chapter</h1>
 							<p>Paragraph</p>
 							<p>Another paragraph</p>
-							<p><img src="image.svg"/></p>
+							<p>
+								<img src="image.svg" alt="image"/>
+								<a href="desc.xhtml">image description</a>
+							</p>
 							<p/>
 						</section>
 					</body>
@@ -153,15 +159,15 @@
 					</metadata>
 					<manifest>
 						<item href="foo.xhtml" media-type="application/xhtml+xml" id="item_1"/>
-						<item href="desc.xhtml" media-type="application/xhtml+xml" id="item_2"/>
-						<item href="image.svg" media-type="application/xhtml+xml" id="item_3" properties="svg"/>
-						<item href="style_1.css" media-type="text/css" id="item_4"/>
-						<item href="toc.xhtml" media-type="application/xhtml+xml" id="item_5" properties="nav"/>
+						<item href="image.svg" media-type="application/xhtml+xml" id="item_2" properties="svg"/>
+						<item href="style_1.css" media-type="text/css" id="item_3"/>
+						<item href="toc.xhtml" media-type="application/xhtml+xml" id="item_4" properties="nav"/>
+						<item href="desc.xhtml" media-type="application/xhtml+xml" id="item_5"/>
 					</manifest>
 					<spine>
 						<itemref idref="item_1" id="itemref_1"/>
 						<itemref idref="item_2" id="itemref_2" linear="no"/>
-						<itemref idref="item_3" id="itemref_3" linear="no"/>
+						<itemref idref="item_5" id="itemref_3" linear="no"/>
 					</spine>
 				</package>
 			</x:document>
