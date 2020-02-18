@@ -385,58 +385,38 @@
     <!--=========================================================================-->
 
     <p:documentation>Add SMIL and audio files</p:documentation>
-    <p:identity>
-        <p:input port="source">
-            <p:pipe step="tts" port="result.fileset"/>
-        </p:input>
-    </p:identity>
-    <p:choose name="add-mediaoverlays">
-        <p:xpath-context>
-            <p:pipe step="tts" port="audio-map"/>
-        </p:xpath-context>
-        <p:when test="count(/d:audio-clips/*) = 0">
-            <p:output port="fileset" primary="true"/>
-            <p:output port="in-memory" sequence="true">
-                <p:pipe step="tts" port="result.in-memory"/>
-            </p:output>
-            <p:output port="temp-audio.fileset">
-                <p:inline><d:fileset/></p:inline>
-            </p:output>
-            <p:identity/>
-        </p:when>
-        <p:otherwise>
-            <p:output port="fileset" primary="true"/>
-            <p:output port="in-memory" sequence="true">
-                <p:pipe step="tts" port="result.in-memory"/>
-                <p:pipe step="mo" port="in-memory.out"/>
-            </p:output>
-            <p:output port="temp-audio.fileset">
-                <p:pipe step="mo" port="original-audio.fileset"/>
-            </p:output>
-            <p:documentation>Generate SMIL files and copy audio files</p:documentation>
-            <px:epub3-create-mediaoverlays flatten="true" name="mo">
-                <p:input port="content-docs">
-                    <p:pipe step="tts.enriched-html" port="result"/>
-                </p:input>
-                <p:input port="audio-map">
-                    <p:pipe step="tts" port="audio-map"/>
-                </p:input>
-                <p:with-option name="mediaoverlay-dir" select="concat($content-dir,'mo/')">
-                    <p:empty/>
-                </p:with-option>
-                <p:with-option name="audio-dir" select="concat($content-dir,'audio/')">
-                    <p:empty/>
-                </p:with-option>
-            </px:epub3-create-mediaoverlays>
-            <p:sink/>
-            <px:fileset-join>
-                <p:input port="source">
-                    <p:pipe step="tts" port="result.fileset"/>
-                    <p:pipe step="mo" port="fileset.out"/>
-                </p:input>
-            </px:fileset-join>
-        </p:otherwise>
-    </p:choose>
+    <p:group name="add-mediaoverlays">
+        <p:output port="fileset" primary="true"/>
+        <p:output port="in-memory" sequence="true">
+            <p:pipe step="tts" port="result.in-memory"/>
+            <p:pipe step="mo" port="in-memory.out"/>
+        </p:output>
+        <p:output port="temp-audio.fileset">
+            <p:pipe step="mo" port="original-audio.fileset"/>
+        </p:output>
+        <p:documentation>Generate SMIL files and copy audio files</p:documentation>
+        <px:epub3-create-mediaoverlays flatten="true" name="mo">
+            <p:input port="content-docs">
+                <p:pipe step="tts.enriched-html" port="result"/>
+            </p:input>
+            <p:input port="audio-map">
+                <p:pipe step="tts" port="audio-map"/>
+            </p:input>
+            <p:with-option name="mediaoverlay-dir" select="concat($content-dir,'mo/')">
+                <p:empty/>
+            </p:with-option>
+            <p:with-option name="audio-dir" select="concat($content-dir,'audio/')">
+                <p:empty/>
+            </p:with-option>
+        </px:epub3-create-mediaoverlays>
+        <p:sink/>
+        <px:fileset-join>
+            <p:input port="source">
+                <p:pipe step="tts" port="result.fileset"/>
+                <p:pipe step="mo" port="fileset.out"/>
+            </p:input>
+        </px:fileset-join>
+    </p:group>
 
     <!--=========================================================================-->
     <!-- GENERATE THE PACKAGE DOCUMENT                                           -->
