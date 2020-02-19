@@ -29,12 +29,9 @@
     </p:documentation>
   </p:output>
 
-  <p:output port="result.fileset" primary="true">
-    <p:pipe step="main" port="source.fileset"/>
-  </p:output>
+  <p:output port="result.fileset" primary="true"/>
   <p:output port="result.in-memory" sequence="true">
-    <p:pipe step="html-filter" port="non-html"/>
-    <p:pipe step="synthesize" port="content.out"/>
+    <p:pipe step="update-fileset" port="result.in-memory"/>
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
        <p>The result fileset.</p>
        <p>HTML documents are enriched with IDs, words and sentences.</p>
@@ -120,46 +117,22 @@
       px:remove-inline-css-speech
     </p:documentation>
   </p:import>
+  <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
+    <p:documentation>
+      px:fileset-load
+      px:fileset-update
+    </p:documentation>
+  </p:import>
 
   <p:variable name="fileset-base" select="base-uri(/*)">
     <p:pipe step="main" port="source.fileset"/>
   </p:variable>
 
-  <p:for-each name="html-filter">
-    <p:output port="html" sequence="true" primary="true">
-      <p:pipe port="html" step="is.html"/>
-    </p:output>
-    <p:output port="non-html" sequence="true">
-      <p:pipe port="non-html" step="is.html"/>
-    </p:output>
-    <p:iteration-source>
+  <px:fileset-load media-types="application/xhtml+xml" name="html">
+    <p:input port="in-memory">
       <p:pipe step="main" port="source.in-memory"/>
-    </p:iteration-source>
-    <p:variable name="doc-uri" select="base-uri(/*)"/>
-    <p:choose name="is.html">
-      <p:xpath-context>
-        <p:pipe step="main" port="source.fileset"/>
-      </p:xpath-context>
-      <p:when test="//*[@media-type='application/xhtml+xml']/resolve-uri(@href, $fileset-base)=$doc-uri">
-        <p:output port="html">
-          <p:pipe port="result" step="id"/>
-        </p:output>
-        <p:output port="non-html">
-          <p:empty/>
-        </p:output>
-        <p:identity name="id"/>
-      </p:when>
-      <p:otherwise>
-        <p:output port="html">
-          <p:empty/>
-        </p:output>
-        <p:output port="non-html">
-          <p:pipe port="result" step="id"/>
-        </p:output>
-        <p:identity name="id"/>
-      </p:otherwise>
-    </p:choose>
-  </p:for-each>
+    </p:input>
+  </px:fileset-load>
 
   <p:choose name="synthesize">
     <!-- ====== TTS OFF ====== -->
@@ -172,9 +145,7 @@
           <d:audio-clips/>
         </p:inline>
       </p:output>
-      <p:output port="content.out" primary="true" sequence="true">
-        <p:pipe port="html" step="html-filter"/>
-      </p:output>
+      <p:output port="html" primary="true" sequence="true"/>
       <p:output port="sentence-ids" sequence="true">
         <p:empty/>
       </p:output>
@@ -186,7 +157,7 @@
       <p:output port="log" sequence="true">
         <p:empty/>
       </p:output>
-      <p:sink/>
+      <p:identity/>
     </p:when>
 
     <!-- ====== TTS ON ====== -->
@@ -194,8 +165,8 @@
       <p:output port="audio-map">
         <p:pipe port="result" step="to-audio"/>
       </p:output>
-      <p:output port="content.out" primary="true" sequence="true">
-        <p:pipe port="content.out" step="loop"/>
+      <p:output port="html" primary="true" sequence="true">
+        <p:pipe step="loop" port="html"/>
       </p:output>
       <p:output port="sentence-ids" sequence="true">
         <p:pipe port="sentence-ids" step="loop"/>
@@ -207,10 +178,10 @@
         <p:pipe step="to-audio" port="log"/>
       </p:output>
       <p:for-each name="loop">
-        <p:output port="ssml.out" primary="true" sequence="true">
-          <p:pipe port="result" step="ssml-gen"/>
+        <p:output port="ssml" primary="true" sequence="true">
+          <p:pipe step="ssml" port="result"/>
         </p:output>
-        <p:output port="content.out">
+        <p:output port="html">
           <p:pipe port="result" step="rm-css"/>
         </p:output>
         <p:output port="sentence-ids">
@@ -219,7 +190,7 @@
         <px:html-break-detect name="lexing">
           <p:with-option name="id-prefix" select="concat($anti-conflict-prefix, p:iteration-position(), '-')"/>
         </px:html-break-detect>
-        <px:epub3-to-ssml name="ssml-gen">
+        <px:epub3-to-ssml name="ssml">
           <p:input port="content.in">
             <p:pipe port="result" step="lexing"/>
           </p:input>
@@ -249,5 +220,21 @@
       </px:ssml-to-audio>
     </p:otherwise>
   </p:choose>
+  <p:sink/>
+
+  <px:fileset-update name="update-fileset">
+    <p:input port="source.fileset">
+      <p:pipe step="main" port="source.fileset"/>
+    </p:input>
+    <p:input port="source.in-memory">
+      <p:pipe step="main" port="source.in-memory"/>
+    </p:input>
+    <p:input port="update.fileset">
+      <p:pipe step="html" port="result.fileset"/>
+    </p:input>
+    <p:input port="update.in-memory">
+      <p:pipe step="synthesize" port="html"/>
+    </p:input>
+  </px:fileset-update>
 
 </p:declare-step>
