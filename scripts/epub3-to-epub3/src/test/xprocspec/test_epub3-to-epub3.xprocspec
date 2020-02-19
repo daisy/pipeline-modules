@@ -2,6 +2,8 @@
 <x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                xmlns:d="http://www.daisy.org/ns/pipeline/data"
+               xmlns:html="http://www.w3.org/1999/xhtml"
+               xmlns:epub="http://www.idpf.org/2007/ops"
                script="../../main/resources/xml/epub3-to-epub3.convert.xpl">
 	
 	<x:scenario label="valentin">
@@ -91,7 +93,7 @@
 					<d:file href="result/EPUB/C00000-9-footnotes_braille.css" media-type="text/plain"/>
 					<d:file href="result/EPUB/nav_braille.css" media-type="text/plain"/>
 					<d:file href="result/META-INF/metadata.xml"/>
-					<d:file href="result/EPUB/package-braille.opf"/>
+					<d:file href="result/EPUB/package-braille.opf" media-type="application/oebps-package+xml"/>
 					<d:file href="result/EPUB/renditionMapping.html" indent="true"/>
 				</d:fileset>
 			</x:document>
@@ -111,6 +113,99 @@
 					</rootfiles>
 					<link href="EPUB/renditionMapping.html" rel="mapping" media-type="application/xhtml+xml"/>
 				</container>
+			</x:document>
+		</x:expect>
+		<x:context label="the first content document">
+			<x:document type="port" port="epub.out.in-memory" select="/*[base-uri()=resolve-uri('result/EPUB/C00000-1-cover_braille.xhtml')]"/>
+		</x:context>
+		<x:expect label="cross-references should be correct" type="xpath"
+		          test="/html:html/html:head/html:link[@rel='next']/@href" equals="'C00000-2-frontmatter_braille.xhtml'"/>
+		<x:context label="the renditionMapping document">
+			<x:document type="port" port="epub.out.in-memory" select="/*[base-uri()=resolve-uri('result/EPUB/renditionMapping.html')]"/>
+		</x:context>
+		<x:expect label="the renditionMapping document should be as expected" type="compare">
+			<x:document type="inline">
+				<html xmlns="http://www.w3.org/1999/xhtml">
+					<head>
+						<meta charset="utf-8"/>
+					</head>
+					<body>
+						<nav epub:type="resource-map">
+							<ul>
+								<li>
+									<a href="package.opf#epubcfi(/6/2[itemref_1])"/>
+								</li>
+								<li>
+									<a href="package-braille.opf#epubcfi(/6/2[itemref_1])"/>
+								</li>
+							</ul>
+							<ul>
+								<li>
+									<a href="package.opf#epubcfi(/6/18[itemref_9])"/>
+								</li>
+								<li>
+									<a href="package-braille.opf#epubcfi(/6/18[itemref_9])"/>
+								</li>
+							</ul>
+							<ul>
+								<li>
+									<a href="package.opf#epubcfi(/6/10[itemref_5])"/>
+								</li>
+								<li>
+									<a href="package-braille.opf#epubcfi(/6/10[itemref_5])"/>
+								</li>
+							</ul>
+							<ul>
+								<li>
+									<a href="package.opf#epubcfi(/6/12[itemref_6])"/>
+								</li>
+								<li>
+									<a href="package-braille.opf#epubcfi(/6/12[itemref_6])"/>
+								</li>
+							</ul>
+							<ul>
+								<li>
+									<a href="package.opf#epubcfi(/6/14[itemref_7])"/>
+								</li>
+								<li>
+									<a href="package-braille.opf#epubcfi(/6/14[itemref_7])"/>
+								</li>
+							</ul>
+							<ul>
+								<li>
+									<a href="package.opf#epubcfi(/6/16[itemref_8])"/>
+								</li>
+								<li>
+									<a href="package-braille.opf#epubcfi(/6/16[itemref_8])"/>
+								</li>
+							</ul>
+							<ul>
+								<li>
+									<a href="package.opf#epubcfi(/6/8[itemref_4])"/>
+								</li>
+								<li>
+									<a href="package-braille.opf#epubcfi(/6/8[itemref_4])"/>
+								</li>
+							</ul>
+							<ul>
+								<li>
+									<a href="package.opf#epubcfi(/6/4[itemref_2])"/>
+								</li>
+								<li>
+									<a href="package-braille.opf#epubcfi(/6/4[itemref_2])"/>
+								</li>
+							</ul>
+							<ul>
+								<li>
+									<a href="package.opf#epubcfi(/6/6[itemref_3])"/>
+								</li>
+								<li>
+									<a href="package-braille.opf#epubcfi(/6/6[itemref_3])"/>
+								</li>
+							</ul>
+						</nav>
+					</body>
+				</html>
 			</x:document>
 		</x:expect>
 	</x:scenario>

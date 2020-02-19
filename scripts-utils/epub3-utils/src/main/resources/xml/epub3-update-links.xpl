@@ -3,7 +3,7 @@
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc-internal"
                 exclude-inline-prefixes="#all"
-                type="pxi:epub3-update-links" name="main">
+                type="px:epub3-update-links" name="main">
 
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
         <p>Update cross-references in HTML and SMIL documents and package document</p>

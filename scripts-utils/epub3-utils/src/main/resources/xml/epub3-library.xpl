@@ -28,4 +28,5 @@
 	</p:import>
 	<p:import href="epub3-safe-uris.xpl"/>
 	<p:import href="epub3-rename-files.xpl"/>
+	<p:import href="epub3-update-links.xpl"/>
 </p:library>
