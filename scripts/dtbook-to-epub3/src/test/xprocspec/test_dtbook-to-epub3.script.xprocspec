@@ -257,7 +257,14 @@
             <x:input port="source">
                 <x:document type="file" href="../resources/minimal.xml"/>
             </x:input>
-            <x:option name="tts-config" select="resolve-uri('tts-config.xml')"/>
+            <x:input port="tts-config">
+                <x:document type="inline">
+                    <config>
+                        <voice engine="mock-tts" name="alex" lang="en" gender="male-adult"/>
+                        <!-- <property key="log" value="true"/> -->
+                    </config>
+                </x:document>
+            </x:input>
             <x:option name="audio" select="true()"/>
             <x:option name="output-dir" select="resolve-uri('tts/output-dir/',$temp-dir)"/>
             <x:option name="temp-dir" select="resolve-uri('tts/temp-dir/',$temp-dir)"/>

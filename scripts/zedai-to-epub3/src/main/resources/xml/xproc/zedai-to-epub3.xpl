@@ -57,14 +57,15 @@ Can be enabled or disabled with the [`org.daisy.pipeline.tts.log`](http://daisy.
         </p:documentation>
     </p:option>
 
-    <p:option name="tts-config" required="false" px:type="anyFileURI" select="''">
+    <p:input port="tts-config">
       <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-	<h2 px:role="name">Text-To-Speech configuration file</h2>
-	<p px:role="desc" xml:space="preserve">Configuration file for the Text-To-Speech.
+        <h2 px:role="name">Text-To-Speech configuration file</h2>
+        <p px:role="desc" xml:space="preserve">Configuration file for the Text-To-Speech.
 
 [More details on the configuration file format](http://daisy.github.io/pipeline/modules/tts-common/doc/tts-config.html).</p>
       </p:documentation>
-    </p:option>
+      <p:inline><d:config/></p:inline>
+    </p:input>
 
     <p:option name="audio" required="false" px:type="boolean" select="'false'">
       <p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -124,33 +125,13 @@ split up if they exceed the given maximum size.</p>
             </p:input>
         </px:zedai-load>
 
-	<p:choose name="tts-config">
-	  <p:when test="$tts-config != ''">
-	    <p:output port="result"/>
-	    <p:load>
-	      <p:with-option name="href" select="$tts-config"/>
-	    </p:load>
-	  </p:when>
-	  <p:otherwise>
-	    <p:output port="result">
-	      <p:inline>
-		<d:config/>
-	      </p:inline>
-	    </p:output>
-	    <p:sink/>
-	  </p:otherwise>
-	</p:choose>
-	
         <px:zedai-to-epub3 name="convert">
-	    <p:input port="fileset.in">
-	        <p:pipe step="load" port="fileset.out"/>
-	    </p:input>
             <p:input port="in-memory.in">
                 <p:pipe step="load" port="in-memory.out"/>
             </p:input>
-	    <p:input port="tts-config">
-	      <p:pipe step="tts-config" port="result"/>
-	    </p:input>
+            <p:input port="tts-config">
+              <p:pipe step="main" port="tts-config"/>
+            </p:input>
             <p:with-option name="output-dir" select="$temp-dir"/>
 	    <p:with-option name="audio" select="$audio"/>
         </px:zedai-to-epub3>

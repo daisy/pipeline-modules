@@ -62,14 +62,15 @@ When text-to-speech is enabled, the conversion may output a (incomplete) DAISY 3
     </p:documentation>
   </p:option>
 
-  <p:option name="tts-config" required="false" px:type="anyFileURI" select="''">
+  <p:input port="tts-config">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
       <h2 px:role="name">Text-To-Speech configuration file</h2>
       <p px:role="desc" xml:space="preserve">Configuration file for the Text-To-Speech.
 
 [More details on the configuration file format](http://daisy.github.io/pipeline/modules/tts-common/doc/tts-config.html).</p>
     </p:documentation>
-  </p:option>
+    <p:inline><d:config/></p:inline>
+  </p:input>
 
   <p:option name="audio" required="false" px:type="boolean" select="'false'">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -104,23 +105,6 @@ When text-to-speech is enabled, the conversion may output a (incomplete) DAISY 3
   
   <px:dtbook-load name="load"/>
 
-  <p:choose name="tts-config">
-    <p:when test="$tts-config != ''">
-      <p:output port="result"/>
-      <p:load>
-	<p:with-option name="href" select="$tts-config"/>
-      </p:load>
-    </p:when>
-    <p:otherwise>
-      <p:output port="result">
-	<p:inline>
-	  <d:config/>
-	</p:inline>
-      </p:output>
-      <p:sink/>
-    </p:otherwise>
-  </p:choose>
-
   <px:dtbook-to-daisy3 name="convert" px:progress="1">
     <p:input port="fileset.in">
       <p:pipe step="load" port="fileset.out"/>
@@ -129,7 +113,7 @@ When text-to-speech is enabled, the conversion may output a (incomplete) DAISY 3
       <p:pipe step="load" port="in-memory.out"/>
     </p:input>
     <p:input port="tts-config">
-      <p:pipe step="tts-config" port="result"/>
+      <p:pipe step="main" port="tts-config"/>
     </p:input>
     <p:with-option name="publisher" select="$publisher"/>
     <p:with-option name="output-fileset-base" select="/c:result/string()">

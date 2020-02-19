@@ -72,14 +72,15 @@ Can be enabled or disabled with the [`org.daisy.pipeline.tts.log`](http://daisy.
         </p:documentation>
     </p:option>
 
-    <p:option name="tts-config" required="false" px:type="anyFileURI" select="''">
+    <p:input port="tts-config">
       <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-	<h2 px:role="name">Text-To-Speech configuration file</h2>
-	<p px:role="desc" xml:space="preserve">Configuration file for the Text-To-Speech.
+        <h2 px:role="name">Text-To-Speech configuration file</h2>
+        <p px:role="desc" xml:space="preserve">Configuration file for the Text-To-Speech.
 
 [More details on the configuration file format](http://daisy.github.io/pipeline/modules/tts-common/doc/tts-config.html).</p>
       </p:documentation>
-    </p:option>
+      <p:inline><d:config/></p:inline>
+    </p:input>
 
     <p:option name="chunk-size" required="false" px:type="integer" select="'-1'">
       <p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -138,35 +139,12 @@ split up if they exceed the given maximum size.</p>
             </p:input>
         </px:dtbook-load>
 
-	<p:choose name="tts-config">
-	  <p:when test="$tts-config != ''">
-	    <p:xpath-context>
-	      <p:empty/>
-	    </p:xpath-context>
-	    <p:output port="result"/>
-	    <p:load>
-	      <p:with-option name="href" select="$tts-config"/>
-	    </p:load>
-	  </p:when>
-	  <p:otherwise>
-	    <p:output port="result">
-	      <p:inline>
-		<d:config/>
-	      </p:inline>
-	    </p:output>
-	    <p:sink/>
-	  </p:otherwise>
-	</p:choose>
-
 	<px:dtbook-to-epub3 name="convert">
-	  <p:input port="source.fileset">
-	    <p:pipe step="load" port="fileset.out"/>
-	  </p:input>
 	  <p:input port="source.in-memory">
 	    <p:pipe step="load" port="in-memory.out"/>
 	  </p:input>
 	  <p:input port="tts-config">
-	    <p:pipe step="tts-config" port="result"/>
+	    <p:pipe step="dtbook-to-epub3" port="tts-config"/>
 	  </p:input>
 	  <p:with-option name="audio" select="$audio"/>
 	  <p:with-option name="language" select="$language"/>
