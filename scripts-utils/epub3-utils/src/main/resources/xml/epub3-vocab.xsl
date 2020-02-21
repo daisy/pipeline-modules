@@ -170,7 +170,8 @@
     <!--
         Merge a sequence of f:vocab elements. The result is a sequence of valid mappings where every
         prefix is unique, no prefix is mapped to the default vocabulary, no reserved prefixes are
-        overridden, and duplicates are removed.
+        overridden, and duplicates are removed. URIs may be non-unique (different prefixes may map
+        to the same URI).
     -->
     <xsl:function name="f:merge-prefix-decl" as="element(f:vocab)*">
         <xsl:param name="mappings" as="element(f:vocab)*"/>

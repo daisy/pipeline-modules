@@ -21,7 +21,7 @@
 		</p:documentation>
 	</p:input>
 
-	<p:option name="reserved-prefixes" required="true"/>
+	<p:option name="reserved-prefixes" required="false" select="'#default'"/>
 
 	<p:output port="result">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">

@@ -30,7 +30,12 @@
 
     <xsl:template match="/*" priority="1">
         <xsl:variable name="prefix-attr" as="element(f:vocab)*" select="f:parse-prefix-decl(@prefix)"/>
-        <xsl:variable name="implicit-prefixes" as="element(f:vocab)*" select="f:parse-prefix-decl($reserved-prefixes)"/>
+        <xsl:variable name="implicit-prefixes" as="element(f:vocab)*"
+                      select="if ($reserved-prefixes='#default')
+                              then for $used in distinct-values(
+                                                  //meta/(@property|@scheme)[contains(.,':')]/substring-before(.,':'))
+                                   return $f:default-prefixes[@prefix=$used]
+                              else f:parse-prefix-decl($reserved-prefixes)"/>
         <xsl:next-match>
             <xsl:with-param name="prefix-attr" tunnel="yes" select="$prefix-attr"/>
             <xsl:with-param name="implicit-prefixes" tunnel="yes" select="$implicit-prefixes"/>

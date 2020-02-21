@@ -25,9 +25,21 @@
                          @epub:prefix"/>
 
     <xsl:template match="/*" priority="1">
-        <xsl:variable name="implicit.in" as="element(f:vocab)*" select="f:parse-prefix-decl($implicit-input-prefixes)"/>
-        <xsl:variable name="implicit.out" as="element(f:vocab)*" select="f:parse-prefix-decl($implicit-output-prefixes)"/>
+        <xsl:variable name="implicit.in" as="element(f:vocab)*">
+            <xsl:for-each select="f:parse-prefix-decl($implicit-input-prefixes)">
+                <xsl:copy>
+                    <xsl:attribute name="implicit" select="'implicit'"/>
+                    <xsl:sequence select="@*"/>
+                </xsl:copy>
+            </xsl:for-each>
+        </xsl:variable>
         <xsl:variable name="all" as="element()*" select="f:all-prefix-decl(/,$implicit.in)"/>
+        <xsl:variable name="implicit.out" as="element(f:vocab)*"
+                      select="if ($implicit-output-prefixes='#default')
+                              then $implicit.in[some $v1 in . satisfies
+                                                some $v2 in $all//f:vocab[@implicit] satisfies
+                                                $v1/@prefix=$v2/@prefix and $v1/@uri=$v2/@uri]
+                              else f:parse-prefix-decl($implicit-output-prefixes)"/>
         <xsl:variable name="unified" as="element(f:vocab)*" select="f:unified-prefix-decl($all//f:vocab,$implicit.in,$implicit.out)"/>
         <xsl:next-match>
             <xsl:with-param name="implicit.in" tunnel="yes" select="$implicit.in"/>
@@ -157,8 +169,12 @@
         Returns a sequence of `f:vocab` elements representing unified vocab declarations
         throughout the document passed as argument.
 
-        * reserved vocabs are discarded (don't have to be declared)
-        * @prefix are unified, if it is overriding a reserved prefix, a new prefix is defined
+        * URIs from reserved prefixes (according to $implicit-output-prefixes) are discarded
+        * vocabs are unified:
+          - prefixes are unique
+          - URIs are unique
+          - if the list contains a reserved prefix (according to $implicit-input-prefixes), it is mapped to the right URI
+          - if the list contains a URI from a reserved prefix, it is mapped to the right prefix
     -->
     <xsl:function name="f:unified-prefix-decl" as="element()*">
         <xsl:param name="all" as="element(f:vocab)*"/>
@@ -168,7 +184,8 @@
                                     [not(@uri=($vocab-package-uri,
                                                $implicit.out/@uri))]"
                             group-by="@uri">
-            <xsl:sequence select="current()"/>
+            <xsl:variable name="uri" select="current-grouping-key()"/>
+            <xsl:sequence select="($implicit.in[@uri=$uri],current-group())[1]"/>
         </xsl:for-each-group>
     </xsl:function>
 

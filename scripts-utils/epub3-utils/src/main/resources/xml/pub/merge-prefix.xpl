@@ -33,9 +33,11 @@
 		</p:documentation>
 	</p:option>
 
-	<p:option name="implicit-output-prefixes" select="''">
+	<p:option name="implicit-output-prefixes" select="'#default'">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>Prefix declarations that will be omitted from the output.</p>
+			<p>By default (#default) prefixes that are used but not declared (i.e. implied) in the
+			input are also implied in the output.</p>
 		</p:documentation>
 	</p:option>
 
