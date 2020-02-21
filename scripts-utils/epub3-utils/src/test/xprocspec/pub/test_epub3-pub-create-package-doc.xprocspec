@@ -229,31 +229,31 @@
 						<meta name="dcterms:modified" content="2019-10-17T17:37:04Z"/>
 						<meta property="media:duration">00:00:30.048</meta>
 						<meta name="media:duration" content="00:00:30.048"/>
-						<meta property="media:duration" refines="#item_4">00:00:08.585</meta>
-						<meta property="media:duration" refines="#item_5">00:00:21.463</meta>
+						<meta property="media:duration" refines="#item_12">00:00:08.585</meta>
+						<meta property="media:duration" refines="#item_13">00:00:21.463</meta>
 					</metadata>
 					<manifest>
-						<item id="item_1" href="cover.xhtml" media-type="application/xhtml+xml" media-overlay="item_4"/>
-						<item id="item_2" href="chapter.xhtml" media-type="application/xhtml+xml" media-overlay="item_5"/>
+						<item id="item_1" href="cover.xhtml" media-type="application/xhtml+xml" media-overlay="item_12"/>
+						<item id="item_2" href="chapter.xhtml" media-type="application/xhtml+xml" media-overlay="item_13"/>
 						<item id="item_3" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>
-						<item id="item_4" href="mo/cover.smil" media-type="application/smil+xml"/>
-						<item id="item_5" href="mo/chapter.smil" media-type="application/smil+xml"/>
-						<item id="item_6" href="audio/audio.mp3" media-type="audio/mpeg"/>
-						<item id="item_7" href="slideshow.xml" media-type="application/x-demo-slideshow"/>
-						<item id="item_8" href="images/Pict1.jpg" media-type="image/jpeg"/>
-						<item id="item_9" href="images/Pict2.jpg" media-type="image/jpeg"/>
-						<item id="item_10" href="images/Pict3.jpg" media-type="image/jpeg"/>
-						<item id="item_11" href="images/Pict4.jpg" media-type="image/jpeg"/>
-						<item id="item_12" href="images/cover.jpg" media-type="image/jpeg" properties="cover-image"/>
-						<item id="item_13" href="scripts/impl.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+						<item id="item_4" href="audio/audio.mp3" media-type="audio/mpeg"/>
+						<item id="item_5" href="slideshow.xml" media-type="application/x-demo-slideshow"/>
+						<item id="item_6" href="images/Pict1.jpg" media-type="image/jpeg"/>
+						<item id="item_7" href="images/Pict2.jpg" media-type="image/jpeg"/>
+						<item id="item_8" href="images/Pict3.jpg" media-type="image/jpeg"/>
+						<item id="item_9" href="images/Pict4.jpg" media-type="image/jpeg"/>
+						<item id="item_10" href="images/cover.jpg" media-type="image/jpeg" properties="cover-image"/>
+						<item id="item_11" href="scripts/impl.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+						<item id="item_12" href="mo/cover.smil" media-type="application/smil+xml"/>
+						<item id="item_13" href="mo/chapter.smil" media-type="application/smil+xml"/>
 					</manifest>
 					<spine>
 						<itemref idref="item_1" id="itemref_1" linear="no"/>
 						<itemref idref="item_2" id="itemref_2"/>
-						<itemref idref="item_13" id="itemref_3" linear="no"/>
+						<itemref idref="item_11" id="itemref_3" linear="no"/>
 					</spine>
 					<bindings>
-						<mediaType handler="item_13" media-type="application/x-demo-slideshow"/>
+						<mediaType handler="item_11" media-type="application/x-demo-slideshow"/>
 					</bindings>
 				</package>
 			</x:document>

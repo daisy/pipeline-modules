@@ -178,6 +178,11 @@
             px:epub3-nav-to-guide
         </p:documentation>
     </p:import>
+    <p:import href="add-mediaoverlays.xpl">
+        <p:documentation>
+            px:epub3-pub-add-mediaoverlays
+        </p:documentation>
+    </p:import>
     <p:import href="merge-metadata.xpl">
         <p:documentation>
             pxi:merge-metadata
@@ -189,11 +194,18 @@
     </px:normalize-uri>
 
     <p:delete match="d:file/@linear"/>
-    <px:mediatype-detect name="source.fileset">
+    <px:mediatype-detect>
         <p:input port="in-memory">
             <p:pipe step="main" port="source.in-memory"/>
         </p:input>
     </px:mediatype-detect>
+
+    <p:documentation>Filter out SMIL files, they are handled separately in px:epub3-pub-add-mediaoverlays</p:documentation>
+    <px:fileset-filter not-media-types="application/smil+xml" name="fileset-except-smil">
+        <p:input port="source.in-memory">
+            <p:pipe step="main" port="source.in-memory"/>
+        </p:input>
+    </px:fileset-filter>
 
     <p:documentation>Get content documents</p:documentation>
     <px:fileset-load media-types="application/xhtml+xml image/svg+xml" name="content-docs">
@@ -236,18 +248,7 @@
     </p:group>
     <p:sink/>
 
-    <p:documentation>Get media overlay documents</p:documentation>
-    <px:fileset-load media-types="application/smil+xml" name="mediaoverlays">
-        <p:input port="fileset">
-            <p:pipe step="main" port="source.fileset"/>
-        </p:input>
-        <p:input port="in-memory">
-            <p:pipe step="main" port="source.in-memory"/>
-        </p:input>
-    </px:fileset-load>
-    <p:sink/>
-
-    <p:documentation>Construct metadata element</p:documentation>
+    <p:documentation>Construct initial metadata element</p:documentation>
     <p:group name="metadata">
         <p:output port="result"/>
         <p:uuid name="default-metadata" match="dc:identifier/text()">
@@ -263,92 +264,10 @@
         </p:uuid>
         <p:sink/>
 
-        <p:group name="generated-metadata">
-            <p:documentation>Extract "duration" metadata from media overlay documents.</p:documentation>
-            <p:output port="result"/>
-            <p:for-each name="metadata.durations">
-                <p:output port="result" sequence="true"/>
-                <p:iteration-source>
-                    <p:pipe step="mediaoverlays" port="result"/>
-                </p:iteration-source>
-                <p:variable name="base" select="base-uri(/*)"/>
-                <p:xslt>
-                    <p:input port="parameters">
-                        <p:empty/>
-                    </p:input>
-                    <p:input port="stylesheet">
-                        <p:document href="create-package-doc.estimate-mediaoverlay-duration.xsl"/>
-                    </p:input>
-                </p:xslt>
-                <p:add-attribute match="/*" attribute-name="refines">
-                    <p:with-option name="attribute-value"
-                                   select="concat('#',/*/d:file[resolve-uri(@href,base-uri(.))=$base]/@id)">
-                        <p:pipe step="manifest" port="as-fileset"/>
-                    </p:with-option>
-                </p:add-attribute>
-            </p:for-each>
-            <p:sink/>
-            <p:group name="metadata.total-duration">
-                <p:output port="result" sequence="true"/>
-                <p:count>
-                    <p:input port="source">
-                        <p:pipe step="metadata.durations" port="result"/>
-                    </p:input>
-                </p:count>
-                <p:choose>
-                    <p:when test="/*=0">
-                        <p:identity>
-                            <p:input port="source">
-                                <p:empty/>
-                            </p:input>
-                        </p:identity>
-                    </p:when>
-                    <p:otherwise>
-                        <p:wrap-sequence wrapper="_">
-                            <p:input port="source">
-                                <p:pipe step="metadata.durations" port="result"/>
-                            </p:input>
-                        </p:wrap-sequence>
-                        <p:xslt>
-                            <p:input port="parameters">
-                                <p:empty/>
-                            </p:input>
-                            <p:input port="stylesheet">
-                                <p:document href="create-package-doc.sum-mediaoverlay-durations.xsl"/>
-                            </p:input>
-                        </p:xslt>
-                    </p:otherwise>
-                </p:choose>
-            </p:group>
-            <p:sink/>
-            <p:insert match="/*" position="last-child">
-                <p:input port="source">
-                    <p:inline>
-                        <opf:metadata/>
-                    </p:inline>
-                </p:input>
-                <p:input port="insertion">
-                    <p:pipe step="metadata.durations" port="result"/>
-                    <p:pipe step="metadata.total-duration" port="result"/>
-                </p:input>
-            </p:insert>
-        </p:group>
-        <p:sink/>
-
-        <p:for-each>
-            <p:iteration-source>
-                <p:pipe step="main" port="metadata"/>
-            </p:iteration-source>
-            <p:delete match="opf:meta[@property='media:duration']"/>
-        </p:for-each>
-        <p:identity name="input-metadata"/>
-        <p:sink/>
-
         <pxi:merge-metadata>
             <p:input port="source">
-                <p:pipe step="input-metadata" port="result"/>
+                <p:pipe step="main" port="metadata"/>
                 <p:pipe step="default-metadata" port="result"/>
-                <p:pipe step="generated-metadata" port="result"/>
             </p:input>
             <p:input port="manifest">
                 <p:pipe step="manifest" port="result"/>
@@ -427,6 +346,7 @@
         </p:choose>
         <p:add-attribute match="d:file" attribute-name="linear" attribute-value="yes"/>
     </p:group>
+    <p:sink/>
 
     <p:documentation>Create manifest</p:documentation>
     <p:group name="manifest"
@@ -450,14 +370,14 @@
                 <p:when test="/*=0">
                     <p:identity>
                         <p:input port="source">
-                            <p:pipe step="source.fileset" port="result"/>
+                            <p:pipe step="fileset-except-smil" port="result"/>
                         </p:input>
                     </p:identity>
                 </p:when>
                 <p:otherwise>
                     <px:fileset-intersect>
                         <p:input port="source">
-                            <p:pipe step="source.fileset" port="result"/>
+                            <p:pipe step="fileset-except-smil" port="result"/>
                             <p:pipe step="main" port="bindings"/>
                         </p:input>
                     </px:fileset-intersect>
@@ -470,7 +390,7 @@
                     </p:set-attributes>
                     <px:fileset-join>
                         <p:input port="source">
-                            <p:pipe step="source.fileset" port="result"/>
+                            <p:pipe step="fileset-except-smil" port="result"/>
                             <p:pipe step="bindings-with-media-type-xhtml" port="result"/>
                         </p:input>
                     </px:fileset-join>
@@ -577,20 +497,6 @@
             </p:with-option>
         </p:xslt>
 
-        <p:documentation>Assign media overlays</p:documentation>
-        <p:xslt px:message="Assigning media overlays to their corresponding content documents..." px:message-severity="DEBUG">
-            <p:input port="source">
-                <p:pipe step="fileset-to-manifest" port="result"/>
-                <p:pipe step="mediaoverlays" port="result"/>
-            </p:input>
-            <p:input port="stylesheet">
-                <p:document href="assign-media-overlays.xsl"/>
-            </p:input>
-            <p:input port="parameters">
-                <p:empty/>
-            </p:input>
-        </p:xslt>
-
         <px:message severity="DEBUG" message="Successfully created package document manifest"/>
     </p:group>
     <p:sink/>
@@ -609,7 +515,7 @@
         <px:fileset-join>
             <!-- when file attributes are merged the last occurence wins -->
             <p:input port="source">
-                <p:pipe step="source.fileset" port="result"/>
+                <p:pipe step="fileset-except-smil" port="result"/>
                 <p:pipe step="spine.secondary-if-not-primary" port="result"/> <!-- linear="no" -->
                 <p:pipe step="spine.primary" port="result"/> <!-- linear="yes" -->
             </p:input>
@@ -764,5 +670,46 @@
     </px:set-base-uri>
     <px:add-xml-base root="false"/>
     <px:message severity="DEBUG" message="Finished assigning media overlays to content documents"/>
+
+    <p:documentation>Add mediaoverlays</p:documentation>
+    <p:group>
+        <p:documentation>Add package doc</p:documentation>
+        <p:identity name="package-doc"/>
+        <p:sink/>
+        <px:fileset-add-entry media-type="application/oebps-package+xml" name="add-package-doc">
+            <p:input port="source">
+                <p:pipe step="fileset-except-smil" port="result"/>
+            </p:input>
+            <p:input port="source.in-memory">
+                <p:pipe step="main" port="source.in-memory"/>
+            </p:input>
+            <p:input port="entry">
+                <p:pipe step="package-doc" port="result"/>
+            </p:input>
+        </px:fileset-add-entry>
+        <p:sink/>
+        <p:documentation>Add media overlays</p:documentation>
+        <px:epub3-pub-add-mediaoverlays name="add-mediaoverlays">
+            <p:input port="source.fileset">
+                <p:pipe step="add-package-doc" port="result"/>
+            </p:input>
+            <p:input port="source.in-memory">
+                <p:pipe step="add-package-doc" port="result.in-memory"/>
+            </p:input>
+            <p:input port="mo.fileset">
+                <p:pipe step="fileset-except-smil" port="not-matched"/>
+            </p:input>
+            <p:input port="mo.in-memory">
+                <p:pipe step="fileset-except-smil" port="not-matched.in-memory"/>
+            </p:input>
+            <p:with-option name="compatibility-mode" select="$compatibility-mode"/>
+            <p:with-option name="reserved-prefixes" select="$reserved-prefixes"/>
+        </px:epub3-pub-add-mediaoverlays>
+        <px:fileset-load media-types="application/oebps-package+xml">
+            <p:input port="in-memory">
+                <p:pipe step="add-mediaoverlays" port="result.in-memory"/>
+            </p:input>
+        </px:fileset-load>
+    </p:group>
 
 </p:declare-step>
