@@ -1014,14 +1014,21 @@
                               $first-inline/css:_[not(preceding-sibling::*) and
                                                   not(preceding-sibling::text()[not(matches(string(),'^[\s&#x2800;]*$'))])]
                                            //@css:string-set"/>
+        <xsl:variable name="id-on-first-inline" as="attribute()*"
+                      select="$first-inline/@css:id|
+                              $first-inline/css:_[not(preceding-sibling::*) and
+                                                  not(preceding-sibling::text()[not(matches(string(),'^[\s&#x2800;]*$'))])]
+                                           //@css:id"/>
         <xsl:choose>
-            <xsl:when test="$string-set-on-first-inline
+            <xsl:when test="($string-set-on-first-inline or $id-on-first-inline)
                             and (descendant-or-self::css:box[@type='block'] intersect $first-inline/ancestor::*)/@css:padding-top
                             and not((descendant::css:box[@type='block'] intersect $first-inline/ancestor::*)/@css:page-break-before)">
                 <xsl:apply-templates mode="marker" select="$string-set-on-first-inline"/>
+                <xsl:apply-templates mode="#current" select="$id-on-first-inline"/>
                 <block>
                     <xsl:next-match>
                         <xsl:with-param name="string-set-handled" tunnel="yes" select="$string-set-on-first-inline"/>
+                        <xsl:with-param name="id-handled" tunnel="yes" select="$id-on-first-inline"/>
                     </xsl:next-match>
                 </block>
             </xsl:when>
@@ -1039,14 +1046,21 @@
                               $first-inline/css:_[not(preceding-sibling::*) and
                                                   not(preceding-sibling::text()[not(matches(string(),'^[\s&#x2800;]*$'))])]
                                            //@css:string-set"/>
+        <xsl:variable name="id-on-first-inline" as="attribute()*"
+                      select="$first-inline/@css:id|
+                              $first-inline/css:_[not(preceding-sibling::*) and
+                                                  not(preceding-sibling::text()[not(matches(string(),'^[\s&#x2800;]*$'))])]
+                                           //@css:id"/>
         <xsl:choose>
-            <xsl:when test="$string-set-on-first-inline
+            <xsl:when test="($string-set-on-first-inline or $id-on-first-inline)
                             and (descendant-or-self::css:box[@type='block'] intersect $first-inline/ancestor::*)/@css:padding-top
                             and not((descendant::css:box[@type='block'] intersect $first-inline/ancestor::*)/@css:page-break-before)">
                 <xsl:apply-templates mode="marker" select="$string-set-on-first-inline"/>
+                <xsl:apply-templates mode="#current" select="$id-on-first-inline"/>
                 <toc-block>
                     <xsl:next-match>
                         <xsl:with-param name="string-set-handled" tunnel="yes" select="$string-set-on-first-inline"/>
+                        <xsl:with-param name="id-handled" tunnel="yes" select="$id-on-first-inline"/>
                     </xsl:next-match>
                 </toc-block>
             </xsl:when>
@@ -1059,6 +1073,12 @@
     <xsl:template priority="0.7" mode="marker" match="@css:string-set">
         <xsl:param name="string-set-handled" as="attribute()*" tunnel="yes" select="()"/>
         <xsl:if test="not(. intersect $string-set-handled)">
+            <xsl:next-match/>
+        </xsl:if>
+    </xsl:template>
+    <xsl:template priority="0.7" mode="block td toc-entry" match="@css:id">
+        <xsl:param name="id-handled" as="attribute()*" tunnel="yes" select="()"/>
+        <xsl:if test="not(. intersect $id-handled)">
             <xsl:next-match/>
         </xsl:if>
     </xsl:template>
@@ -2212,6 +2232,26 @@
         <xsl:variable name="id" as="xs:string" select="."/>
         <xsl:if test="not(ancestor::*/@css:flow[not(.='normal')]) and $id=($page-number-references,$toc-entry-references)">
             <xsl:attribute name="id" select="$id"/>
+        </xsl:if>
+    </xsl:template>
+    
+    <!--
+        wrap ID spans at the start of a block in an additional block
+    -->
+    <xsl:template priority="0.6"
+                  mode="block td toc-entry"
+                  match="css:box[@type='block']/css:box[@type='inline'][not(preceding-sibling::css:box)]/@css:id|
+                         css:box[@type='block']/css:box[@type='inline'][not(preceding-sibling::css:box)]
+                         /css:_[not(preceding-sibling::*) and
+                                not(preceding-sibling::text()[not(matches(string(),'^[\s&#x2800;]*$'))])]
+                         //@css:id">
+        <xsl:variable name="span" as="node()*">
+            <xsl:next-match/>
+        </xsl:variable>
+        <xsl:if test="exists($span)">
+            <block>
+                <xsl:sequence select="$span"/>
+            </block>
         </xsl:if>
     </xsl:template>
     

@@ -456,7 +456,7 @@
     
     <css:shift-id px:progress=".01">
         <p:documentation>
-            Move css:id attributes to css:box elements.
+            Move css:id attributes to inline css:box elements.
         </p:documentation>
     </css:shift-id>
     

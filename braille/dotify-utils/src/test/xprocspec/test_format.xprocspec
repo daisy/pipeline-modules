@@ -2162,14 +2162,18 @@
             </block>
             <block align="center" break-before="page">
               <block/>
-              <span id="chapter_1"/>
+              <block>
+                <span id="chapter_1"/>
+              </block>
               ⠿
             </block>
             <block>
               ⠤⠤⠤
             </block>
             <block align="center" break-before="page">
-              <span id="chapter_2"/>
+              <block>
+                <span id="chapter_2"/>
+              </block>
               ⠿⠿
             </block>
             <block>
@@ -2177,7 +2181,9 @@
             </block>
             <block align="center" break-before="page">
               <block/>
-              <span id="chapter_3"/>
+              <block>
+                <span id="chapter_3"/>
+              </block>
               ⠿⠿⠿
             </block>
             <block>
@@ -2341,23 +2347,33 @@
             </block>
             <block break-before="page">
               <block>
-                <span id="chapter_1"/>
+                <block>
+                  <span id="chapter_1"/>
+                </block>
                 ⠿
               </block>
               <block>
-                <span id="x"/>
+                <block>
+                  <span id="x"/>
+                </block>
                 ⠤⠤⠤
               </block>
               <block>
-                <span id="chapter_2"/>
+                <block>
+                  <span id="chapter_2"/>
+                </block>
                 ⠿⠿
               </block>
               <block>
-                <span id="y"/>
+                <block>
+                  <span id="y"/>
+                </block>
                 ⠤⠤⠤
               </block>
               <block>
-                <span id="z"/>
+                <block>
+                  <span id="z"/>
+                </block>
                 ⠤⠤⠤
               </block>
             </block>
@@ -3776,7 +3792,9 @@
               <page-number ref-id="foo" number-format="default"/>
             </block>
             <block>
-              <span id="foo"/>
+              <block>
+                <span id="foo"/>
+              </block>
             </block>
             <block>
               ⠿
@@ -7452,24 +7470,54 @@
           <sequence master="main">
             <block translate=""/>
             <block>
-              <block translate=""><span id="ch_1"/> 1 </block>
-              <block translate=""><span id="ch_1_1"/> 1 </block>
+              <block translate="">
+                <block>
+                  <span id="ch_1"/>
+                </block>
+                1
+              </block>
+              <block translate="">
+                <block>
+                  <span id="ch_1_1"/>
+                </block>
+                1
+              </block>
               <block>
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
               </block>
-              <block translate=""><span id="ch_1_2"/> 2 </block>
+              <block translate="">
+                <block>
+                  <span id="ch_1_2"/>
+                </block>
+                2
+              </block>
               <block>
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
               </block>
-              <block translate=""><span id="ch_2"/> 2 </block>
-              <block translate=""><span id="ch_2_1"/> 1 </block>
+              <block translate="">
+                <block>
+                  <span id="ch_2"/>
+                </block>
+                2
+              </block>
+              <block translate="">
+                <block>
+                  <span id="ch_2_1"/>
+                </block>
+                1
+              </block>
               <block>
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
               </block>
-              <block translate=""><span id="ch_2_2"/> 2 </block>
+              <block translate="">
+                <block>
+                  <span id="ch_2_2"/>
+                </block>
+                2
+              </block>
               <block>
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
@@ -7725,13 +7773,28 @@
           <sequence master="main">
             <block translate=""/>
             <block>
-              <block translate=""><span id="ch_1"/> 1 </block>
-              <block translate=""><span id="ch_1_1"/> 1 </block>
+              <block translate="">
+                <block>
+                  <span id="ch_1"/>
+                </block>
+                1
+              </block>
+              <block translate="">
+                <block>
+                  <span id="ch_1_1"/>
+                </block>
+                1
+              </block>
               <block>
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
               </block>
-              <block translate=""><span id="ch_1_2"/> 2 </block>
+              <block translate="">
+                <block>
+                  <span id="ch_1_2"/>
+                </block>
+                2
+              </block>
               <block>
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
@@ -7974,7 +8037,12 @@
           </volume-template>
           <sequence master="main">
             <block translate="" break-before="page">
-              <block><span id="a"/>⠿⠿⠿ 1</block>
+              <block>
+                <block>
+                  <span id="a"/>
+                </block>
+                ⠿⠿⠿ 1
+              </block>
               <block>⠤⠤⠤</block>
             </block>
           </sequence>
@@ -8728,7 +8796,12 @@
                   <page-number ref-id="a" number-format="default"/>
                 </style>
               </block>
-              <block break-before="page"><span id="a"/> ⠤⠤⠤ </block>
+              <block break-before="page">
+                <block>
+                  <span id="a"/>
+                </block>
+                ⠤⠤⠤
+              </block>
             </block>
           </sequence>
         </obfl>
@@ -9043,14 +9116,24 @@
           </volume-template>
           <sequence master="main">
             <block>
-              <block translate=""><span id="ch_1"/> 1 </block>
+              <block translate="">
+                <block>
+                  <span id="ch_1"/>
+                </block>
+                1
+              </block>
               <block>
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
               </block>
-              <block translate=""><span id="ch_2"/> 2 </block>
+              <block translate="">
+                <block>
+                  <span id="ch_2"/>
+                </block>
+                2
+              </block>
               <block>
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
@@ -9211,14 +9294,24 @@
           </volume-template>
           <sequence master="main">
             <block>
-              <block translate=""><span id="ch_1"/> 1 </block>
+              <block translate="">
+                <block>
+                  <span id="ch_1"/>
+                </block>
+                1
+              </block>
               <block>
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
               </block>
-              <block translate=""><span id="ch_2"/> 2 </block>
+              <block translate="">
+                <block>
+                  <span id="ch_2"/>
+                </block>
+                2
+              </block>
               <block>
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
