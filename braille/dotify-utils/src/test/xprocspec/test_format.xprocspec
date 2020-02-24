@@ -13810,7 +13810,9 @@
                   <a href="ch_1" style="&amp;::after { content: ' ⠐⠐⠐⠐⠐⠐⠐⠐⠐ ' target-counter(attr(href), page) }
                                         &amp;::-obfl-on-resumed {
                                           display: block;
-                                          content: '1 ⠄⠄⠄'}"
+                                          content: '1 ⠄⠄⠄'}
+                                        &amp;::-obfl-on-resumed::after {
+                                          content: ' ⠐⠐⠐⠐⠐ ' -obfl-evaluate('$started-volume-first-content-page') }"
                      >1</a>
                   <ol style="display: block; margin-left: 1">
                     <li style="display: block">
@@ -13827,21 +13829,27 @@
                   <a href="ch_2" style="&amp;::after { content: ' ⠐⠐⠐⠐⠐⠐⠐⠐⠐ ' target-counter(attr(href), page) }
                                         &amp;::-obfl-on-resumed {
                                           display: block;
-                                          content: '2 ⠄⠄⠄'}"
+                                          content: '2 ⠄⠄⠄'}
+                                        &amp;::-obfl-on-resumed::after {
+                                          content: ' ⠐⠐⠐⠐⠐ ' -obfl-evaluate('$started-volume-first-content-page') }"
                      >2</a>
                   <ol style="display: block; margin-left: 1">
                     <li style="display: block">
                       <a href="ch_2_1" style="&amp;::after { content: ' ⠐⠐⠐⠐⠐⠐ ' target-counter(attr(href), page) }
                                               &amp;::-obfl-on-resumed {
                                                 display: block;
-                                                content: '2.1 ⠄⠄⠄'}"
+                                                content: '2.1 ⠄⠄⠄'}
+                                              &amp;::-obfl-on-resumed::after {
+                                                content: ' ⠐⠐ ' -obfl-evaluate('$started-volume-first-content-page') }"
                          >2.1</a>
                     </li>
                     <li style="display: block">
                       <a href="ch_2_2" style="&amp;::after { content: ' ⠐⠐⠐⠐⠐⠐ ' target-counter(attr(href), page) }
                                               &amp;::-obfl-on-resumed {
                                                 display: block;
-                                                content: '2.2 ⠄⠄⠄'}"
+                                                content: '2.2 ⠄⠄⠄'}
+                                              &amp;::-obfl-on-resumed::after {
+                                                content: ' ⠐⠐⠐⠐⠐ ' -obfl-evaluate('$started-volume-first-content-page') }"
                          >2.2</a>
                     </li>
                   </ol>
@@ -13899,7 +13907,8 @@
                   <page-number ref-id="ch_1" number-format="default"/></toc-entry>
                 </toc-block>
                 <toc-block>
-                  <toc-entry-on-resumed range="[ch_1,ch_2)">1 ⠄⠄⠄</toc-entry-on-resumed>
+                  <toc-entry-on-resumed range="[ch_1,ch_2)">1 ⠄⠄⠄ ⠐⠐⠐⠐⠐
+                  <evaluate expression="$started-volume-first-content-page"/></toc-entry-on-resumed>
                 </toc-block>
                 <toc-block>
                   <toc-block padding-left="1">
@@ -13918,7 +13927,8 @@
                   <page-number ref-id="ch_2" number-format="default"/></toc-entry>
                 </toc-block>
                 <toc-block>
-                  <toc-entry-on-resumed range="[ch_2,ch_2_1)">2 ⠄⠄⠄</toc-entry-on-resumed>
+                  <toc-entry-on-resumed range="[ch_2,ch_2_1)">2 ⠄⠄⠄ ⠐⠐⠐⠐⠐
+                  <evaluate expression="$started-volume-first-content-page"/></toc-entry-on-resumed>
                 </toc-block>
                 <toc-block>
                   <toc-block>
@@ -13927,7 +13937,8 @@
                       <page-number ref-id="ch_2_1" number-format="default"/></toc-entry>
                     </toc-block>
                     <toc-block padding-left="1">
-                      <toc-entry-on-resumed range="[ch_2_1,ch_2_2)">2.1 ⠄⠄⠄</toc-entry-on-resumed>
+                      <toc-entry-on-resumed range="[ch_2_1,ch_2_2)">2.1 ⠄⠄⠄ ⠐⠐
+                      <evaluate expression="$started-volume-first-content-page"/></toc-entry-on-resumed>
                     </toc-block>
                   </toc-block>
                   <toc-block>
@@ -13936,7 +13947,8 @@
                       <page-number ref-id="ch_2_2" number-format="default"/></toc-entry>
                     </toc-block>
                     <toc-block padding-left="1">
-                      <toc-entry-on-resumed range="[ch_2_2,)">2.2 ⠄⠄⠄</toc-entry-on-resumed>
+                      <toc-entry-on-resumed range="[ch_2_2,)">2.2 ⠄⠄⠄ ⠐⠐⠐⠐⠐
+                      <evaluate expression="$started-volume-first-content-page"/></toc-entry-on-resumed>
                     </toc-block>
                   </toc-block>
                 </toc-block>
@@ -13951,7 +13963,8 @@
                   <page-number ref-id="ch_1" number-format="default"/></toc-entry>
                 </toc-block>
                 <toc-block>
-                  <toc-entry-on-resumed range="[ch_1,ch_2)">1 ⠄⠄⠄</toc-entry-on-resumed>
+                  <toc-entry-on-resumed range="[ch_1,ch_2)">1 ⠄⠄⠄ ⠐⠐⠐⠐⠐
+                  <evaluate expression="$started-volume-first-content-page"/></toc-entry-on-resumed>
                 </toc-block>
                 <toc-block>
                   <toc-block padding-left="1">
@@ -13970,7 +13983,8 @@
                   <page-number ref-id="ch_2" number-format="default"/></toc-entry>
                 </toc-block>
                 <toc-block>
-                  <toc-entry-on-resumed range="[ch_2,ch_2_1)">2 ⠄⠄⠄</toc-entry-on-resumed>
+                  <toc-entry-on-resumed range="[ch_2,ch_2_1)">2 ⠄⠄⠄ ⠐⠐⠐⠐⠐
+                  <evaluate expression="$started-volume-first-content-page"/></toc-entry-on-resumed>
                 </toc-block>
                 <toc-block>
                   <toc-block>
@@ -13979,7 +13993,8 @@
                       <page-number ref-id="ch_2_1" number-format="default"/></toc-entry>
                     </toc-block>
                     <toc-block padding-left="1">
-                      <toc-entry-on-resumed range="[ch_2_1,ch_2_2)">2.1 ⠄⠄⠄</toc-entry-on-resumed>
+                      <toc-entry-on-resumed range="[ch_2_1,ch_2_2)">2.1 ⠄⠄⠄ ⠐⠐
+                      <evaluate expression="$started-volume-first-content-page"/></toc-entry-on-resumed>
                     </toc-block>
                   </toc-block>
                   <toc-block>
@@ -13988,7 +14003,8 @@
                       <page-number ref-id="ch_2_2" number-format="default"/></toc-entry>
                     </toc-block>
                     <toc-block padding-left="1">
-                      <toc-entry-on-resumed range="[ch_2_2,)">2.2 ⠄⠄⠄</toc-entry-on-resumed>
+                      <toc-entry-on-resumed range="[ch_2_2,)">2.2 ⠄⠄⠄ ⠐⠐⠐⠐⠐
+                      <evaluate expression="$started-volume-first-content-page"/></toc-entry-on-resumed>
                     </toc-block>
                   </toc-block>
                 </toc-block>
@@ -14099,9 +14115,9 @@
                 <page>
                   <row>⠼⠁⠀⠐⠐⠐⠐⠐⠐⠐⠐⠐⠀⠼⠁</row>
                   <row>⠀⠼⠁⠲⠁⠀⠐⠐⠐⠐⠐⠐⠀⠼⠁</row>
-                  <row>⠼⠁⠀⠄⠄⠄</row>
+                  <row>⠼⠁⠀⠄⠄⠄⠀⠐⠐⠐⠐⠐⠀⠼⠑</row>
                   <row>⠀⠼⠁⠲⠃⠀⠐⠐⠐⠐⠐⠐⠀⠼⠉</row>
-                  <row>⠼⠁⠀⠄⠄⠄</row>
+                  <row>⠼⠁⠀⠄⠄⠄⠀⠐⠐⠐⠐⠐⠀⠼⠑</row>
                   <row>⠼⠃⠀⠐⠐⠐⠐⠐⠐⠐⠐⠐⠀⠼⠑</row>
                   <row>⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁</row>
                 </page>
@@ -14139,7 +14155,7 @@
             <volume cols="15" rows="7" rowgap="0" duplex="true">
               <section>
                 <page>
-                  <row>⠼⠁⠀⠄⠄⠄</row>
+                  <row>⠼⠁⠀⠄⠄⠄⠀⠐⠐⠐⠐⠐⠀⠼⠉</row>
                   <row>⠀⠼⠁⠲⠃⠀⠐⠐⠐⠐⠐⠐⠀⠼⠉</row>
                   <row/>
                   <row/>
@@ -14163,7 +14179,7 @@
             <volume cols="15" rows="7" rowgap="0" duplex="true">
               <section>
                 <page>
-                  <row>⠼⠁⠀⠄⠄⠄</row>
+                  <row>⠼⠁⠀⠄⠄⠄⠀⠐⠐⠐⠐⠐⠀⠼⠑</row>
                   <row>⠼⠃⠀⠐⠐⠐⠐⠐⠐⠐⠐⠐⠀⠼⠑</row>
                   <row/>
                   <row/>

@@ -2135,7 +2135,7 @@
         -obfl-evaluate
     -->
     <xsl:template priority="1"
-                  mode="block"
+                  mode="block toc-entry"
                   match="css:custom-func[@name='-obfl-evaluate'][matches(@arg1,$css:STRING_RE) and not (@arg2)]">
         <xsl:param name="text-transform" as="xs:string" tunnel="yes"/>
         <xsl:param name="hyphens" as="xs:string" tunnel="yes"/>
@@ -2172,7 +2172,7 @@
         </xsl:choose>
     </xsl:template>
     
-    <xsl:template mode="block span"
+    <xsl:template mode="block toc-entry span"
                   match="css:custom-func[@name='-obfl-evaluate'][@arg2]">
         <xsl:call-template name="pf:warn">
             <xsl:with-param name="msg">-obfl-evaluate() function requires exactly one string argument</xsl:with-param>
