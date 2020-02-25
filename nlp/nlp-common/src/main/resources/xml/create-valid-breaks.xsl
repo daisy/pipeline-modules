@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:d="http://www.daisy.org/ns/pipeline/data"
-    xmlns:xml="http://www.w3.org/XML/1998/namespace"
-    exclude-result-prefixes="xs"
-    version="2.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:d="http://www.daisy.org/ns/pipeline/data"
+                exclude-result-prefixes="xs">
 
   <xsl:param name="tmp-word-tag"/>
   <xsl:param name="tmp-sentence-tag"/>
@@ -24,31 +22,38 @@
   <xsl:param name="word-attr" select="''"/>
   <xsl:param name="word-attr-val" select="''"/>
 
-  <xsl:key name="sentences" match="*[@id]" use="@id"/>
+  <xsl:key name="sentence-for-element" match="d:sentence" use="@element"/>
 
   <xsl:variable name="special-list" select="concat(',', $special-sentences, ',')"/>
-
-  <xsl:function name="d:sentid">
-    <xsl:param name="node"/>
-    <xsl:value-of select="if ($node/@id) then $node/@id else concat('st', $id-prefix, generate-id($node))"/>
-  </xsl:function>
 
   <!--========================================================= -->
   <!-- FIND ALL THE SENTENCES' ID                               -->
   <!--========================================================= -->
 
   <xsl:variable name="sentence-ids-tree">
-    <d:sentences>
-      <xsl:apply-templates select="/*" mode="sentence-ids"/>
-    </d:sentences>
+    <xsl:variable name="sentence-ids-tree">
+      <d:sentences>
+        <xsl:apply-templates select="/*" mode="sentence-ids"/>
+      </d:sentences>
+    </xsl:variable>
+    <xsl:for-each select="$sentence-ids-tree/*">
+      <xsl:copy>
+        <xsl:for-each select="*">
+          <xsl:copy>
+            <xsl:attribute name="id" select="concat('st', $id-prefix, position())"/>
+            <xsl:sequence select="@*"/>
+          </xsl:copy>
+        </xsl:for-each>
+      </xsl:copy>
+    </xsl:for-each>
   </xsl:variable>
 
   <xsl:template match="*" mode="sentence-ids" priority="1">
-    <xsl:apply-templates select="*" mode="sentence-ids"/>
+    <xsl:apply-templates select="*" mode="#current"/>
   </xsl:template>
 
   <xsl:template match="*[local-name() = $tmp-sentence-tag]" mode="sentence-ids" priority="2">
-    <d:sentence id="{d:sentid(.)}">
+    <d:sentence element="{generate-id(.)}">
       <xsl:copy-of select="@xml:lang"/> <!-- doesn't always exist -->
     </d:sentence>
   </xsl:template>
@@ -62,7 +67,7 @@
       match="*[contains($special-list, concat(',', local-name(), ',')) or
 	     ($exclusive-sentence-tag = 'true' and local-name() = $output-sentence-tag)]">
     <!-- TODO: copy the @xml:lang -->
-    <d:sentence id="{d:sentid(.)}" recycled="1"/>
+    <d:sentence element="{generate-id(.)}" recycled="1"/>
     <!-- Warning: a 'special-sentence', such as noteref, is unlikely
          to be stamped as 'recycled' because it is usually the child
          of a tmp:sentence (not the other way around). -->
@@ -77,13 +82,20 @@
     <xsl:apply-templates select="node()"/>
     <!-- Write the list of sentences on the secondary port. -->
     <xsl:result-document href="{concat('sids', $id-prefix, generate-id(), '.xml')}" method="xml">
-     <xsl:copy-of select="$sentence-ids-tree"/>
+      <xsl:for-each select="$sentence-ids-tree/*">
+        <xsl:copy>
+          <xsl:for-each select="*">
+            <xsl:copy>
+              <xsl:sequence select="@* except @element"/>
+            </xsl:copy>
+          </xsl:for-each>
+        </xsl:copy>
+      </xsl:for-each>
     </xsl:result-document>
   </xsl:template>
 
   <xsl:template match="@*|node()" priority="1">
-    <xsl:variable name="myid" select="d:sentid(.)"/>
-    <xsl:variable name="entry" select="key('sentences', $myid, $sentence-ids-tree)"/>
+    <xsl:variable name="entry" select="key('sentence-for-element', generate-id(.), $sentence-ids-tree)"/>
     <xsl:choose>
       <xsl:when test="$entry and $entry/@recycled">
   	<xsl:copy copy-namespaces="no">

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
-	       xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-	       xmlns="http://www.daisy.org/z3986/2005/dtbook/"
-	       xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp">
+               xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+               xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp"
+               xmlns="http://www.daisy.org/z3986/2005/dtbook/">
 
   <x:script>
     <p:declare-step version="1.0" xmlns:p="http://www.w3.org/ns/xproc" type="px:reshape-testing-wrapper">
@@ -21,10 +21,6 @@
 	<p:with-option name="output-sentence-tag" select="'sent'"/>
 	<p:with-option name="output-subsentence-tag" select="'span'"/>
       </px:reshape>
-      <!-- The @id cannot be compared because most of them are randomly
-	   generated. This is why they are deleted before running any
-	   test. This method is simpler than a custom cmp function.-->
-      <p:delete match="@id"/>
     </p:declare-step>
   </x:script>
 
@@ -44,7 +40,7 @@
     <x:expect label="result" type="compare">
       <x:document type="inline">
     	<dtbook>
-    	  <level><p><sent>Simple sentence</sent></p></level>
+    	  <level><p><sent id="st1">Simple sentence</sent></p></level>
     	</dtbook>
       </x:document>
     </x:expect>
@@ -66,7 +62,7 @@
     <x:expect label="result" type="compare">
       <x:document type="inline">
     	<dtbook>
-    	  <level><p><sent xml:lang="en">Simple sentence</sent></p></level>
+    	  <level><p><sent id="st1" xml:lang="en">Simple sentence</sent></p></level>
     	</dtbook>
       </x:document>
     </x:expect>
@@ -89,7 +85,7 @@
     <x:expect label="result" type="compare">
       <x:document type="inline">
     	<dtbook>
-    	  <level><p><sent><w>Simple sentence</w></sent></p></level>
+    	  <level><p><sent id="st1"><w>Simple sentence</w></sent></p></level>
     	</dtbook>
       </x:document>
     </x:expect>
@@ -111,7 +107,7 @@
     <x:expect label="result" type="compare">
       <x:document type="inline">
     	<dtbook>
-    	  <level><p><sent><span><span><w>word</w></span></span></sent></p></level>
+    	  <level><p><sent id="st1"><span><span><w>word</w></span></span></sent></p></level>
     	</dtbook>
       </x:document>
     </x:expect>
@@ -137,7 +133,7 @@
       <x:document type="inline">
 	<dtbook>
 	  <level><p>
-	    <sent><span><w>left1</w><w>left2</w></span><w>right1</w><w>right2</w></sent>
+	    <sent id="st1"><span><w>left1</w><w>left2</w></span><w>right1</w><w>right2</w></sent>
 	  </p></level>
 	</dtbook>
       </x:document>
@@ -166,8 +162,8 @@
       <x:document type="inline">
 	<dtbook>
 	  <level>
-	    <p><sent><w>Simple</w><w>sentence1</w></sent></p>
-	    <p><sent><w>Another</w><w>sentence2</w></sent></p>
+	    <p><sent id="st1"><w>Simple</w><w>sentence1</w></sent></p>
+	    <p><sent id="st2"><w>Another</w><w>sentence2</w></sent></p>
 	  </level>
 	</dtbook>
       </x:document>
@@ -196,8 +192,8 @@
       <x:document type="inline">
 	<dtbook>
 	  <level>
-	    <p><sent xml:lang="en"><w>Simple</w></sent></p>
-	    <p><sent xml:lang="en"><w>Sentence</w></sent></p>
+	    <p><sent id="st1" xml:lang="en"><w>Simple</w></sent></p>
+	    <p><sent id="st2" xml:lang="en"><w>Sentence</w></sent></p>
 	  </level>
 	</dtbook>
       </x:document>
@@ -226,7 +222,7 @@
       <x:document type="inline">
 	<dtbook>
 	  <level><p>
-	    <pagenum>1</pagenum>
+	    <pagenum id="st1">1</pagenum>
 	  </p></level>
 	</dtbook>
       </x:document>
@@ -254,7 +250,7 @@
       <x:document type="inline">
 	<dtbook>
 	  <level><p>
-	    <sent>
+	    <sent id="st1">
 	      <pagenum>1</pagenum>
 	    </sent>
 	  </p></level>
@@ -282,7 +278,7 @@
       <x:document type="inline">
 	<dtbook>
 	  <level><p>
-	    <sent>  <pagenum>1</pagenum>  </sent>
+	    <sent id="st1">  <pagenum>1</pagenum>  </sent>
 	  </p></level>
 	</dtbook>
       </x:document>
@@ -308,7 +304,7 @@
       <x:document type="inline">
 	<dtbook>
 	  <level><p>
-	    <sent>?!:;!.{}()¡…/@<pagenum>1</pagenum></sent>
+	    <sent id="st1">?!:;!.{}()¡…/@<pagenum>1</pagenum></sent>
 	  </p></level>
 	</dtbook>
       </x:document>
@@ -334,7 +330,7 @@
       <x:document type="inline">
 	<dtbook>
 	  <level><p>
-	    <sent>left<pagenum>1</pagenum></sent>
+	    <sent id="st1">left<pagenum>1</pagenum></sent>
 	  </p></level>
 	</dtbook>
       </x:document>
@@ -360,7 +356,7 @@
       <x:document type="inline">
 	<dtbook>
 	  <level><p>
-	    <sent><span><w>left</w></span><w>right</w><pagenum>1</pagenum></sent>
+	    <sent id="st1"><span><w>left</w></span><w>right</w><pagenum>1</pagenum></sent>
 	  </p></level>
 	</dtbook>
       </x:document>
@@ -386,7 +382,7 @@
       <x:document type="inline">
 	<dtbook>
 	  <level><p>
-	    <sent><span><w>left</w></span><pagenum>1</pagenum></sent>
+	    <sent id="st1"><span><w>left</w></span><pagenum>1</pagenum></sent>
 	  </p></level>
 	</dtbook>
       </x:document>
@@ -412,7 +408,7 @@
       <x:document type="inline">
 	<dtbook>
 	  <level><p>
-	    <sent><w>existing</w> <w>sentence</w></sent>
+	    <sent id="st1"><w>existing</w> <w>sentence</w></sent>
 	  </p></level>
 	</dtbook>
       </x:document>
@@ -438,7 +434,7 @@
       <x:document type="inline">
 	<dtbook>
 	  <level><p>
-	    <sent><span><span><w>existing</w> <w>sentence</w></span></span></sent>
+	    <sent id="st1"><span><span><w>existing</w> <w>sentence</w></span></span></sent>
 	  </p></level>
 	</dtbook>
       </x:document>
@@ -464,7 +460,7 @@
       <x:document type="inline">
 	<dtbook>
 	  <level><p>
-	    <sent><w>existing</w> <w>sentence</w></sent>
+	    <sent id="st1"><w>existing</w> <w>sentence</w></sent>
 	  </p></level>
 	</dtbook>
       </x:document>
@@ -490,7 +486,7 @@
       <x:document type="inline">
   	<dtbook>
   	  <level><p>
-	    <sent><span><span><w>existing</w> <w>sentence</w></span></span></sent>
+	    <sent id="st1"><span><span><w>existing</w> <w>sentence</w></span></span></sent>
   	  </p></level>
   	</dtbook>
       </x:document>
@@ -516,7 +512,7 @@
       <x:document type="inline">
   	<dtbook>
   	  <level><p>
-	    <sent><w>existing</w></sent>
+	    <sent id="st1"><w>existing</w></sent>
   	  </p></level>
   	</dtbook>
       </x:document>
@@ -542,7 +538,7 @@
       <x:document type="inline">
   	<dtbook>
   	  <level><p>
-	    <sent><w>existing</w></sent>
+	    <sent id="st1"><w>existing</w></sent>
   	  </p></level>
   	</dtbook>
       </x:document>
@@ -568,7 +564,7 @@
       <x:document type="inline">
   	<dtbook>
   	  <level><p>
-	    <sent><w><span attr="id">existing</span></w></sent>
+	    <sent id="st1"><w><span attr="id">existing</span></w></sent>
   	  </p></level>
   	</dtbook>
       </x:document>
@@ -594,12 +590,12 @@
       <x:document type="inline">
 	<dtbook>
 	  <line>
-	    <sent>
+	    <sent id="st1">
 	      <w>before</w>
 	      <w>text</w>
 	    </sent>
-	    <linenum>2</linenum>
-	    <sent>
+	    <linenum id="st2">2</linenum>
+	    <sent id="st3">
 	      <w>after</w>
 	      <w>text</w>
 	    </sent>
@@ -628,17 +624,17 @@
       <x:document type="inline">
 	<dtbook>
 	  <td>
-	    <sent>
+	    <sent id="st1">
 	      <w>before</w>
 	      <w>text</w>
 	    </sent>
 	    <epigraph>
-	      <sent>
+	      <sent id="st2">
 		<w>inside</w>
 		<w>epigraph</w>
 	      </sent>
 	    </epigraph>
-	    <sent>
+	    <sent id="st3">
 	      <w>after</w>
 	      <w>text</w>
 	    </sent>
