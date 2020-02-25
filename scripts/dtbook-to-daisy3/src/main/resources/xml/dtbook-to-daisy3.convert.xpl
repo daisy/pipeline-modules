@@ -200,17 +200,28 @@
       <p:identity/>
     </p:otherwise>
   </p:choose>
+  <p:identity name="dtbook-with-css"/>
+  <p:sink/>
 
   <!-- ===== PERFORM TTS ==== -->
   <px:tts-for-dtbook name="tts" px:progress="1">
-    <p:input port="fileset.in">
-      <p:pipe port="fileset.in" step="main"/>
+    <p:input port="source.fileset">
+      <p:pipe step="main" port="fileset.in"/>
+    </p:input>
+    <p:input port="source.in-memory">
+      <p:pipe step="dtbook-with-css" port="result"/>
     </p:input>
     <p:input port="config">
       <p:pipe step="main" port="tts-config"/>
     </p:input>
     <p:with-option name="audio" select="$audio"/>
   </px:tts-for-dtbook>
+  <px:fileset-load media-types="application/x-dtbook+xml" name="tts-enriched-dtbook">
+    <p:input port="in-memory">
+      <p:pipe step="tts" port="result.in-memory"/>
+    </p:input>
+  </px:fileset-load>
+  <p:sink/>
 
   <!-- ===== MP3/OGG FILESET ENTRIES (THE FILES ARE ALREADY STORED) ==== -->
   <px:audio-clips-to-fileset>
@@ -255,7 +266,7 @@
     </p:output>
 
     <p:variable name="output-name" select="replace(base-uri(/),'^.*/([^/]+)$','$1')">
-      <p:pipe port="content.out" step="tts"/>
+      <p:pipe step="tts-enriched-dtbook" port="result"/>
     </p:variable>
     <p:variable name="daisy3-dtbook-uri" select="concat($output-fileset-base, $output-name)"/>
     <p:variable name="opf-uri" select="concat($output-fileset-base, 'book.opf')"/>
@@ -289,10 +300,17 @@
 					 else (if ($dcpublisher) then $dcpublisher else 'unknown')"/>
     <p:variable name="mathml-fallback-uri" select="concat($output-fileset-base, 'mathml-fallback.xsl')"/>
     <p:variable name="math-presence-check" select="(//m:math)[1]/name()">
-      <p:pipe port="content.out" step="tts"/>
+      <p:pipe step="tts-enriched-dtbook" port="result"/>
     </p:variable>
     <p:variable name="math-img" select="'math-formulae.png'"/>
     <p:variable name="math-img-in-bundle" select="resolve-uri('../images/math_formulae.png', static-base-uri())"/>
+
+    <p:sink/>
+    <p:identity>
+      <p:input port="source">
+        <p:pipe step="tts-enriched-dtbook" port="result"/>
+      </p:input>
+    </p:identity>
 
     <!-- TODO: automatic upgrade? -->
     <!-- TODO: it could be moved or copied to dtbook-to-daisy3.xpl -->
@@ -306,19 +324,15 @@
 	     </p:inline>
 	   </p:input>
 	 </p:error>
-	 <p:sink/>
       </p:when>
       <p:otherwise>
-	<p:sink/>
+	<p:identity/>
       </p:otherwise>
     </p:choose>
 
     <!-- ===== ADD WHAT IS MAYBE MISSING IN THE DTBOOK ===== -->
     <!-- (todo: peform this before the TTS so that the extra text will be synthesized) -->
     <px:daisy3-prepare-dtbook>
-      <p:input port="source">
-    	<p:pipe port="content.out" step="tts"/>
-      </p:input>
       <p:with-option name="mathml-formulae-img" select="$math-img"/>
     </px:daisy3-prepare-dtbook>
 
@@ -433,7 +447,7 @@
 	<p:choose name="fallback-fileset">
 	  <p:when test="//m:math[not(@altimg)]">
 	    <p:xpath-context>
-	      <p:pipe port="content.out" step="tts"/>
+	      <p:pipe step="tts-enriched-dtbook" port="result"/>
 	    </p:xpath-context>
 	    <p:output port="result" primary="true">
 	      <p:pipe port="result" step="fileset.mathml"/>

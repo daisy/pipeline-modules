@@ -1,21 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step version="1.0" name="main" type="px:tts-for-dtbook"
-		xmlns:p="http://www.w3.org/ns/xproc"
-		xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-		xmlns:d="http://www.daisy.org/ns/pipeline/data"
-		exclude-inline-prefixes="#all">
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
+                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                xmlns:d="http://www.daisy.org/ns/pipeline/data"
+                type="px:tts-for-dtbook" name="main"
+                exclude-inline-prefixes="#all">
 
-  <p:input port="content.in" primary="true" sequence="true">
+  <p:input port="source.fileset" primary="true">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-      <p>List of DTBook documents.</p>
+      <p>The source fileset with Dtbook documents, lexicons and CSS stylesheets.</p>
     </p:documentation>
   </p:input>
-
-  <p:input port="fileset.in">
-    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-       <p>Input fileset including DTBook documents, lexicons and CSS stylesheets.</p>
-    </p:documentation>
-  </p:input>
+  <p:input port="source.in-memory" sequence="true"/>
 
   <p:input port="config">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -30,23 +25,23 @@
     </p:documentation>
   </p:output>
 
-  <p:output port="content.out" primary="true" sequence="true">
-    <p:pipe port="result" step="remove-css"/>
+  <p:output port="result.fileset" primary="true"/>
+  <p:output port="result.in-memory" sequence="true">
+    <p:pipe step="update-fileset" port="result.in-memory"/>
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-       <p>Copy of the DTBook documents enriched with ids, words and
-       sentences, and without inlined aural CSS.</p>
+      <p>The result fileset.</p>
+      <p>DTBook documents are enriched with IDs, words and sentences. Inlined aural CSS is
+      removed.</p>
     </p:documentation>
   </p:output>
 
   <p:output port="sentence-ids" sequence="true">
     <p:pipe port="sentence-ids" step="lexing"/>
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-      <p>Every document of this port is a list of nodes whose id
-      attribute refers to elements of the 'content.out'
-      documents. Grammatically speaking, the referred elements are
-      sentences even if the underlying XML elements are not meant to
-      be so. Documents are listed in the same order as in
-      'content.out'.</p>
+      <p>Every document of this port is a list of nodes whose id attribute refers to elements of the
+      'content.out' documents. Grammatically speaking, the referred elements are sentences even if
+      the underlying XML elements are not meant to be so. Documents are listed in the same order as
+      in 'content.out'.</p>
     </p:documentation>
   </p:output>
 
@@ -90,14 +85,21 @@
       px:css-speech-clean
     </p:documentation>
   </p:import>
+  <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
+    <p:documentation>
+      px:fileset-load
+      px:fileset-update
+    </p:documentation>
+  </p:import>
+
+  <px:fileset-load media-types="application/x-dtbook+xml" name="dtbook">
+    <p:input port="in-memory">
+      <p:pipe step="main" port="source.in-memory"/>
+    </p:input>
+  </px:fileset-load>
 
   <!-- Find the sentences and the words, even if the Text-To-Speech is off. -->
   <p:for-each name="lexing">
-    <p:iteration-source>
-      <!-- For now, the for-each is actually not needed since there is
-           only one DTBook. -->
-      <p:pipe port="content.in" step="main"/>
-    </p:iteration-source>
     <p:output port="result" primary="true"/>
     <p:output port="sentence-ids">
       <p:pipe port="sentence-ids" step="break"/>
@@ -171,7 +173,7 @@
 	    <p:pipe port="matched" step="skippable-ids"/>
 	  </p:input>
 	  <p:input port="fileset.in">
-	    <p:pipe port="fileset.in" step="main"/>
+	    <p:pipe step="main" port="source.fileset"/>
 	  </p:input>
 	  <p:input port="config">
 	    <p:pipe port="config" step="main"/>
@@ -190,8 +192,24 @@
     <p:iteration-source>
       <p:pipe port="result" step="lexing"/>
     </p:iteration-source>
-    <p:output port="result" primary="true"/>
+    <p:output port="result"/>
     <px:css-speech-clean/>
   </p:for-each>
+  <p:sink/>
+
+  <px:fileset-update name="update-fileset">
+    <p:input port="source.fileset">
+      <p:pipe step="main" port="source.fileset"/>
+    </p:input>
+    <p:input port="source.in-memory">
+      <p:pipe step="main" port="source.in-memory"/>
+    </p:input>
+    <p:input port="update.fileset">
+      <p:pipe step="dtbook" port="result.fileset"/>
+    </p:input>
+    <p:input port="update.in-memory">
+      <p:pipe step="remove-css" port="result"/>
+    </p:input>
+  </px:fileset-update>
 
 </p:declare-step>
