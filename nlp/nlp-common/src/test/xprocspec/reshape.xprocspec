@@ -334,7 +334,7 @@
       <x:document type="inline">
 	<dtbook>
 	  <level><p>
-	    <sent><span>left</span><pagenum>1</pagenum></sent>
+	    <sent>left<pagenum>1</pagenum></sent>
 	  </p></level>
 	</dtbook>
       </x:document>
@@ -360,7 +360,7 @@
       <x:document type="inline">
 	<dtbook>
 	  <level><p>
-	    <sent><span><span><w>left</w></span><w>right</w></span><pagenum>1</pagenum></sent>
+	    <sent><span><w>left</w></span><w>right</w><pagenum>1</pagenum></sent>
 	  </p></level>
 	</dtbook>
       </x:document>
