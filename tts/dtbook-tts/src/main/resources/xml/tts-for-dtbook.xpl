@@ -87,7 +87,7 @@
   </p:import>
   <p:import href="http://www.daisy.org/pipeline/modules/css-speech/library.xpl">
     <p:documentation>
-      px:remove-inline-css-speech
+      px:css-speech-clean
     </p:documentation>
   </p:import>
 
@@ -191,7 +191,7 @@
       <p:pipe port="result" step="lexing"/>
     </p:iteration-source>
     <p:output port="result" primary="true"/>
-    <px:remove-inline-css-speech/>
+    <px:css-speech-clean/>
   </p:for-each>
 
 </p:declare-step>

@@ -5,6 +5,7 @@ public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 	@Override
 	protected String[] testDependencies() {
 		return new String[] {
+			pipelineModule("fileset-utils"),
 			"org.daisy.libs:jstyleparser:?",
 			"commons-io:commons-io:?",
 			"org.daisy.pipeline:calabash-adapter:?",

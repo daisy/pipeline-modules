@@ -144,7 +144,11 @@
       px:set-base-uri
     </p:documentation>
   </p:import>
-  <p:import href="http://www.daisy.org/pipeline/modules/css-speech/library.xpl"/>
+  <p:import href="http://www.daisy.org/pipeline/modules/css-speech/library.xpl">
+    <p:documentation>
+      px:css-speech-cascade
+    </p:documentation>
+  </p:import>
 
 
   <!-- Find the first and only DTBook file within the input documents. -->
@@ -165,14 +169,24 @@
   <!-- CSS inlining -->
   <p:choose>
     <p:when test="$audio = 'true'">
-      <px:inline-css-speech content-type="application/x-dtbook+xml">
-        <p:input port="fileset.in">
+      <p:sink/>
+      <px:css-speech-cascade content-type="application/x-dtbook+xml" name="cascade">
+        <p:input port="source.fileset">
           <p:pipe step="main" port="fileset.in"/>
+        </p:input>
+        <p:input port="source.in-memory">
+          <p:pipe step="first-dtbook" port="result"/>
         </p:input>
         <p:input port="config">
           <p:pipe step="main" port="tts-config"/>
         </p:input>
-      </px:inline-css-speech>
+      </px:css-speech-cascade>
+      <p:sink/>
+      <p:identity>
+        <p:input port="source">
+          <p:pipe step="cascade" port="result.in-memory"/>
+        </p:input>
+      </p:identity>
     </p:when>
     <p:otherwise>
       <p:identity/>

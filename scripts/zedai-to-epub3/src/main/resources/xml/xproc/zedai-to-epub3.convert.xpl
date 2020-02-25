@@ -91,7 +91,7 @@
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/css-speech/library.xpl">
         <p:documentation>
-            px:inline-css-speech
+            px:css-speech-cascade
         </p:documentation>
     </p:import>
 
@@ -103,7 +103,7 @@
     <!--=========================================================================-->
 
     <p:documentation>Retreive the ZedAI document from the input fileset.</p:documentation>
-    <px:fileset-load media-types="application/z3998-auth+xml" name="zedai">
+    <px:fileset-load media-types="application/z3998-auth+xml" name="load-zedai">
         <p:input port="in-memory">
             <p:pipe step="main" port="in-memory.in"/>
         </p:input>
@@ -113,23 +113,31 @@
                test-count-min="1" error-code="PEZE00"/>
     <px:assert message="More than one XML document with the ZedAI media type ('application/z3998-auth+xml') found in the fileset; there can only be one ZedAI document."
                test-count-max="1" error-code="PEZE00"/>
+    <p:identity name="zedai"/>
 
     <!--=========================================================================-->
     <!-- CSS INLINING                                                            -->
     <!--=========================================================================-->
     <p:choose>
-        <p:xpath-context>
-            <p:empty/>
-        </p:xpath-context>
         <p:when test="$audio='true' and $process-css='true'">
-            <px:inline-css-speech content-type="application/z3998-auth+xml">
-                <p:input port="fileset.in">
-                    <p:pipe step="main" port="fileset.in"/>
+            <p:sink/>
+            <px:css-speech-cascade content-type="application/z3998-auth+xml" name="cascade">
+                <p:input port="source.fileset">
+                    <p:pipe step="load-zedai" port="result.fileset"/>
+                </p:input>
+                <p:input port="source.in-memory">
+                    <p:pipe step="zedai" port="result"/>
                 </p:input>
                 <p:input port="config">
                     <p:pipe step="main" port="tts-config"/>
                 </p:input>
-            </px:inline-css-speech>
+            </px:css-speech-cascade>
+            <p:sink/>
+            <p:identity>
+                <p:input port="source">
+                    <p:pipe step="cascade" port="result.in-memory"/>
+                </p:input>
+            </p:identity>
         </p:when>
         <p:otherwise>
             <p:identity/>
@@ -157,7 +165,7 @@
             <p:pipe step="main" port="in-memory.in"/>
         </p:input>
         <p:input port="update.fileset">
-            <p:pipe step="zedai" port="result.fileset"/>
+            <p:pipe step="load-zedai" port="result.fileset"/>
         </p:input>
         <p:input port="update.in-memory">
             <p:pipe step="zedai-with-css" port="result"/>

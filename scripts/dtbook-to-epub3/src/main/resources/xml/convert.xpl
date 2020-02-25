@@ -29,55 +29,29 @@
 	<p:option name="output-dir" required="true"/>
 	<p:option name="temp-dir" required="true"/>
 	
-	<p:import href="http://www.daisy.org/pipeline/modules/css-speech/library.xpl"/>
-	<p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
+	<p:import href="http://www.daisy.org/pipeline/modules/css-speech/library.xpl">
+		<p:documentation>
+			px:css-speech-cascade
+		</p:documentation>
+	</p:import>
 	<p:import href="http://www.daisy.org/pipeline/modules/dtbook-to-zedai/library.xpl"/>
 	<p:import href="http://www.daisy.org/pipeline/modules/zedai-to-epub3/library.xpl"/>
 
 	<!-- CSS inlining -->
 	<p:choose>
-		<p:xpath-context>
-			<p:empty/>
-		</p:xpath-context>
 		<p:when test="$audio = 'true'">
-			
-			<!-- first load DTBook into memory -->
-			<px:fileset-load media-types="application/x-dtbook+xml" name="dtbook">
-				<p:input port="in-memory">
+			<px:css-speech-cascade content-type="application/x-dtbook+xml" name="cascade">
+				<p:input port="source.in-memory">
 					<p:pipe step="main" port="source.in-memory"/>
-				</p:input>
-			</px:fileset-load>
-			
-			<!-- process -->
-			<px:inline-css-speech content-type="application/x-dtbook+xml" name="processed-dtbook">
-				<p:input port="fileset.in">
-					<p:pipe step="main" port="source.fileset"/>
 				</p:input>
 				<p:input port="config">
 					<p:pipe step="main" port="tts-config"/>
 				</p:input>
-			</px:inline-css-speech>
-			<p:sink/>
-			
-			<!-- combine with other documents from fileset -->
-			<px:fileset-update name="updated">
-				<p:input port="source.fileset">
-					<p:pipe step="main" port="source.fileset"/>
-				</p:input>
-				<p:input port="source.in-memory">
-					<p:pipe step="main" port="source.in-memory"/>
-				</p:input>
-				<p:input port="update.fileset">
-					<p:pipe step="dtbook" port="result.fileset"/>
-				</p:input>
-				<p:input port="update.in-memory">
-					<p:pipe step="processed-dtbook" port="result"/>
-				</p:input>
-			</px:fileset-update>
+			</px:css-speech-cascade>
 			<p:sink/>
 			<p:identity>
 				<p:input port="source">
-					<p:pipe step="updated" port="result.in-memory"/>
+					<p:pipe step="cascade" port="result.in-memory"/>
 				</p:input>
 			</p:identity>
 		</p:when>

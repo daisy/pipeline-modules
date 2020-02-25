@@ -34,7 +34,8 @@
     <p:pipe step="update-fileset" port="result.in-memory"/>
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
        <p>The result fileset.</p>
-       <p>HTML documents are enriched with IDs, words and sentences.</p>
+       <p>HTML documents are enriched with IDs, words and sentences. Inlined aural CSS is
+       removed.</p>
     </p:documentation>
   </p:output>
 
@@ -114,7 +115,7 @@
   </p:import>
   <p:import href="http://www.daisy.org/pipeline/modules/css-speech/library.xpl">
     <p:documentation>
-      px:remove-inline-css-speech
+      px:css-speech-clean
     </p:documentation>
   </p:import>
   <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
@@ -204,11 +205,11 @@
             <p:pipe port="config" step="main"/>
           </p:input>
         </px:epub3-to-ssml>
-        <px:remove-inline-css-speech name="rm-css">
+        <px:css-speech-clean name="rm-css">
           <p:input port="source">
             <p:pipe port="result" step="lexing"/>
           </p:input>
-        </px:remove-inline-css-speech>
+        </px:css-speech-clean>
       </p:for-each>
       <px:ssml-to-audio name="to-audio">
         <p:input port="config">

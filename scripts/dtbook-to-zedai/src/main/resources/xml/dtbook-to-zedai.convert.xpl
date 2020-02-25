@@ -138,7 +138,7 @@
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/css-speech/library.xpl">
         <p:documentation>
-            px:remove-inline-css-speech
+            px:css-speech-clean
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
@@ -254,7 +254,7 @@
     <p:documentation>Validate the DTBook input</p:documentation>
 
     <p:documentation>Remove the Aural CSS attributes before validation</p:documentation>
-    <px:remove-inline-css-speech name="dtbook-validation-input"/>
+    <px:css-speech-clean name="dtbook-validation-input"/>
     <p:documentation>Schema selector for DTBook validation</p:documentation>
     <px:dtbook-validator.select-schema name="dtbook-schema" dtbook-version="2005-3" mathml-version="2.0"/>
     <px:validate-with-relax-ng-and-report name="validate-dtbook">
