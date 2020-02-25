@@ -116,7 +116,15 @@
 
 
   <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
-  <p:import href="http://www.daisy.org/pipeline/modules/daisy3-utils/library.xpl"/>
+  <p:import href="http://www.daisy.org/pipeline/modules/daisy3-utils/library.xpl">
+    <p:documentation>
+      px:daisy3-prepare-dtbook
+      px:daisy3-create-ncx
+      px:daisy3-create-opf
+      px:daisy3-create-res-file
+      px:daisy3-create-smils
+    </p:documentation>
+  </p:import>
   <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
     <p:documentation>
       px:fileset-load
@@ -307,16 +315,16 @@
 
     <!-- ===== ADD WHAT IS MAYBE MISSING IN THE DTBOOK ===== -->
     <!-- (todo: peform this before the TTS so that the extra text will be synthesized) -->
-    <px:fix-dtbook-structure>
+    <px:daisy3-prepare-dtbook>
       <p:input port="source">
     	<p:pipe port="content.out" step="tts"/>
       </p:input>
       <p:with-option name="mathml-formulae-img" select="$math-img"/>
-    </px:fix-dtbook-structure>
+    </px:daisy3-prepare-dtbook>
 
     <!-- ===== SMIL FILES AND THEIR FILESET ENTRIES ===== -->
     <px:message message="Generating SMIL files..."/>
-    <px:create-daisy3-smils name="create-mo">
+    <px:daisy3-create-smils name="create-mo">
       <p:input port="audio-map">
 	<p:pipe port="audio-map" step="tts"/>
       </p:input>
@@ -326,7 +334,7 @@
       <p:with-option name="smil-dir" select="$smil-dir"/>
       <p:with-option name="uid" select="$uid"/>
       <p:with-option name="audio-only" select="$audio-only"/>
-    </px:create-daisy3-smils>
+    </px:daisy3-create-smils>
 
     <!-- ===== CONTENT DOCUMENT FILE AND ITS FILESET ENTRY ==== -->
     <px:set-base-uri>
@@ -351,7 +359,7 @@
     </px:fileset-add-entry>
 
     <!-- ===== NCX FILE AND ITS FILESET ENTRY ==== -->
-    <px:create-ncx name="create-ncx">
+    <px:daisy3-create-ncx name="create-ncx">
       <p:input port="content">
 	<p:pipe port="updated-content" step="create-mo"/>
       </p:input>
@@ -362,7 +370,7 @@
       <p:with-option name="audio-dir" select="$audio-dir"/>
       <p:with-option name="smil-dir" select="$smil-dir"/>
       <p:with-option name="uid" select="$uid"/>
-    </px:create-ncx>
+    </px:daisy3-create-ncx>
     <px:fileset-create>
       <p:with-option name="base" select="$output-fileset-base"/>
     </px:fileset-create>
@@ -374,10 +382,10 @@
     <p:sink/>
 
     <!-- ===== RESOURCE FILE AND ITS FILESET ENTRIES ==== -->
-    <px:create-res-file name="create-resources">
+    <px:daisy3-create-res-file name="create-resources">
       <p:with-option name="output-dir" select="$output-fileset-base"/>
       <p:with-option name="lang" select="$lang"/>
-    </px:create-res-file>
+    </px:daisy3-create-res-file>
     <px:fileset-create>
       <p:with-option name="base" select="$output-fileset-base"/>
     </px:fileset-create>
@@ -555,7 +563,7 @@
     	</p:otherwise>
       </p:choose>
     </p:viewport>
-    <px:create-daisy3-opf name="create-opf">
+    <px:daisy3-create-opf name="create-opf">
       <p:with-option name="output-dir" select="$output-fileset-base"/>
       <p:with-option name="uid" select="$uid"/>
       <p:with-option name="title" select="$title"/>
@@ -568,7 +576,7 @@
       <p:with-option name="total-time" select="//*[@duration]/@duration">
       	<p:pipe port="duration" step="create-mo"/>
       </p:with-option>
-    </px:create-daisy3-opf>
+    </px:daisy3-create-opf>
   </p:group>
 
   <p:rename match="/*" new-name="d:validation-status" name="validation-status">

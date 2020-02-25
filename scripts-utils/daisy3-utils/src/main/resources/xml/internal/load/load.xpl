@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step name="main" type="px:daisy3-load" xmlns:p="http://www.w3.org/ns/xproc"
-    xmlns:d="http://www.daisy.org/ns/pipeline/data"
-    xmlns:px="http://www.daisy.org/ns/pipeline/xproc" version="1.0">
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
+                xmlns:d="http://www.daisy.org/ns/pipeline/data"
+                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                name="main" type="px:daisy3-load">
 
     <p:documentation>
         <p px:role="desc">Creates a fileset document based on a DAISY 3 package file.</p>

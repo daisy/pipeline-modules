@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-model href="http://www.daisy.org/ns/xprocspec/xprocspec.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
-<x:description script="../../main/resources/xml/internal/smils/create-daisy3-smils.xpl"
-	       xmlns:x="http://www.daisy.org/ns/xprocspec"
-	       xmlns:p="http://www.w3.org/ns/xproc"
-	       xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-	       xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
-	       xmlns:dt="http://www.daisy.org/z3986/2005/dtbook/"
-	       xmlns:d="http://www.daisy.org/ns/pipeline/data">
+<x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
+               xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+               xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
+               xmlns:d="http://www.daisy.org/ns/pipeline/data"
+               script="../../main/resources/xml/internal/smils/create-daisy3-smils.xpl">
 
   <x:scenario label="Scenarii for testing the @smilref generation">
-    <x:call step="px:create-daisy3-smils">
+    <x:call step="px:daisy3-create-smils">
       <x:input port="audio-map">
   	<x:document type="inline">
   	  <d:audio-clips>

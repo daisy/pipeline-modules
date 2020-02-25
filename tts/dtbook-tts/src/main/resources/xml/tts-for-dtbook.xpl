@@ -82,7 +82,7 @@
   </p:import>
   <p:import href="http://www.daisy.org/pipeline/modules/daisy3-utils/library.xpl">
     <p:documentation>
-      px:isolate-daisy3-skippable
+      px:daisy3-isolate-skippable
     </p:documentation>
   </p:import>
   <p:import href="http://www.daisy.org/pipeline/modules/css-speech/library.xpl">
@@ -106,12 +106,12 @@
       <p:pipe port="skippable-ids" step="isolate-skippable"/>
     </p:output>
     <px:dtbook-break-detect name="break"/>
-    <px:isolate-daisy3-skippable name="isolate-skippable">
+    <px:daisy3-isolate-skippable name="isolate-skippable">
       <p:input port="sentence-ids">
 	<p:pipe port="sentence-ids" step="break"/>
       </p:input>
       <p:with-option name="id-prefix" select="concat('i', p:iteration-position())"/>
-    </px:isolate-daisy3-skippable>
+    </px:daisy3-isolate-skippable>
   </p:for-each>
 
   <p:choose name="synthesize" px:progress="1">

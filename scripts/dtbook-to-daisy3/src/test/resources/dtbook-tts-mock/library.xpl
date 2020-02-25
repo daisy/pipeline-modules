@@ -74,11 +74,11 @@
 	    <p:pipe port="content.in" step="main"/>
 	  </p:input>
 	</px:dtbook-break-detect>
-	<px:isolate-daisy3-skippable name="isolate">
+	<px:daisy3-isolate-skippable name="isolate">
 	  <p:input port="sentence-ids">
 	    <p:pipe port="sentence-ids" step="break"/>
 	  </p:input>
-	</px:isolate-daisy3-skippable>
+	</px:daisy3-isolate-skippable>
 	<p:xslt name="audio-map">
 	  <p:with-param port="parameters" name="mp3-path" select="string(.)">
 	    <p:pipe step="copy-mp3" port="result"/>

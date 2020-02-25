@@ -7,8 +7,6 @@
 
   <xsl:param name="mathml-formulae-img" select="''"/>
 
-  <!-- This script add missing elements so as to make the NCX/OPF/SMIL generation easier. -->
-
   <xsl:variable name="title" select="(//meta[@name='dc:Title'])[1]"/>
   <xsl:variable name="safe-title">
     <xsl:choose>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step name="main" type="px:create-res-file" version="1.0"
-                xmlns:p="http://www.w3.org/ns/xproc"
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                type="px:daisy3-create-res-file" name="main"
                 exclude-inline-prefixes="#all">
 
   <p:output port="result" primary="true">

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step name="main" type="px:create-daisy3-smils" xmlns:p="http://www.w3.org/ns/xproc"
-    xmlns:d="http://www.daisy.org/ns/pipeline/data"
-    xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-    xmlns:smil="http://www.w3.org/2001/SMIL20/"
-    version="1.0">
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
+                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                xmlns:d="http://www.daisy.org/ns/pipeline/data"
+                xmlns:smil="http://www.w3.org/2001/SMIL20/"
+                type="px:daisy3-create-smils" name="main">
 
     <p:input port="content" primary="true" sequence="false">
       <p:documentation xmlns="http://www.w3.org/1999/xhtml">
