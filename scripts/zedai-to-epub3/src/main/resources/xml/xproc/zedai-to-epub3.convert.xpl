@@ -184,7 +184,7 @@
     <!-- CREATE EPUB                                                             -->
     <!--=========================================================================-->
 
-    <px:html-to-epub3 name="html-to-epub3" skip-cleanup="true">
+    <px:html-to-epub3 name="html-to-epub3" skip-cleanup="true" process-css="false">
         <p:input port="input.in-memory">
             <p:pipe step="zedai-to-html" port="in-memory.out"/>
         </p:input>

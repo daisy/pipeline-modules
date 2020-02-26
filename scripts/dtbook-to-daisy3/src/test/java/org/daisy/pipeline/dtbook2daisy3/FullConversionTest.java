@@ -80,7 +80,6 @@ public class FullConversionTest extends AbstractTest implements DifferenceListen
 	public String[] testDependencies() {
 		return new String[]{
 			pipelineModule("common-utils"),
-			pipelineModule("css-speech"),
 			pipelineModule("css-utils"),
 			pipelineModule("daisy3-utils"),
 			pipelineModule("dtbook-utils"),

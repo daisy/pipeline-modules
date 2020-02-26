@@ -60,6 +60,12 @@
     </p:documentation>
   </p:option>
 
+  <p:option name="process-css" required="false" select="'true'">
+    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <p>Set to false to bypass aural CSS processing.</p>
+    </p:documentation>
+  </p:option>
+
   <p:import href="dtbook-to-ssml.xpl">
     <p:documentation>
       px:dtbook-to-ssml
@@ -82,6 +88,7 @@
   </p:import>
   <p:import href="http://www.daisy.org/pipeline/modules/css-speech/library.xpl">
     <p:documentation>
+	  px:css-speech-cascade
       px:css-speech-clean
     </p:documentation>
   </p:import>
@@ -92,9 +99,33 @@
     </p:documentation>
   </p:import>
 
+  <p:choose name="process-css">
+    <p:when test="$audio='true' and $process-css='true'">
+      <p:output port="fileset" primary="true"/>
+      <p:output port="in-memory" sequence="true">
+        <p:pipe step="cascade" port="result.in-memory"/>
+      </p:output>
+      <px:css-speech-cascade content-type="application/x-dtbook+xml" name="cascade">
+        <p:input port="source.in-memory">
+          <p:pipe step="main" port="source.in-memory"/>
+        </p:input>
+        <p:input port="config">
+          <p:pipe step="main" port="config"/>
+        </p:input>
+      </px:css-speech-cascade>
+    </p:when>
+    <p:otherwise>
+      <p:output port="fileset" primary="true"/>
+      <p:output port="in-memory" sequence="true">
+        <p:pipe step="main" port="source.in-memory"/>
+      </p:output>
+      <p:identity/>
+    </p:otherwise>
+  </p:choose>
+
   <px:fileset-load media-types="application/x-dtbook+xml" name="dtbook">
     <p:input port="in-memory">
-      <p:pipe step="main" port="source.in-memory"/>
+      <p:pipe step="process-css" port="in-memory"/>
     </p:input>
   </px:fileset-load>
 
@@ -173,7 +204,7 @@
 	    <p:pipe port="matched" step="skippable-ids"/>
 	  </p:input>
 	  <p:input port="fileset.in">
-	    <p:pipe step="main" port="source.fileset"/>
+	    <p:pipe step="process-css" port="fileset"/>
 	  </p:input>
 	  <p:input port="config">
 	    <p:pipe port="config" step="main"/>
@@ -199,10 +230,10 @@
 
   <px:fileset-update name="update-fileset">
     <p:input port="source.fileset">
-      <p:pipe step="main" port="source.fileset"/>
+      <p:pipe step="process-css" port="fileset"/>
     </p:input>
     <p:input port="source.in-memory">
-      <p:pipe step="main" port="source.in-memory"/>
+      <p:pipe step="process-css" port="in-memory"/>
     </p:input>
     <p:input port="update.fileset">
       <p:pipe step="dtbook" port="result.fileset"/>

@@ -33,6 +33,9 @@
     </p:output>
 
     <p:option name="audio" required="false" px:type="boolean" select="'true'"/>
+    <p:option name="process-css" required="false" px:type="boolean" select="'true'">
+      <!-- ignored -->
+    </p:option>
 
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>

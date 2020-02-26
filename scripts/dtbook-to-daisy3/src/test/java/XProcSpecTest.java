@@ -9,7 +9,6 @@ public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 	protected String[] testDependencies() {
 		return new String[] {
 			pipelineModule("common-utils"),
-			pipelineModule("css-speech"),
 			pipelineModule("css-utils"),
 			pipelineModule("daisy3-utils"),
 			// pipelineModule("dtbook-tts"),

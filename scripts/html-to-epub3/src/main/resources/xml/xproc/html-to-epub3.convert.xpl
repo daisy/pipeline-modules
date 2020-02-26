@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:html="http://www.w3.org/1999/xhtml"
                 type="px:html-to-epub3" name="main"
-                exclude-inline-prefixes="#all" version="1.0">
+                exclude-inline-prefixes="#all">
 
     <p:documentation>Transforms XHTML into an EPUB 3 publication.</p:documentation>
 
@@ -79,6 +79,11 @@
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>Enable TTS</p>
             <p>Whether to use a speech synthesizer to produce audio files.</p>
+        </p:documentation>
+    </p:option>
+    <p:option name="process-css" required="false" select="'true'">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Set to false to bypass aural CSS processing.</p>
         </p:documentation>
     </p:option>
 
@@ -370,6 +375,7 @@
           <p:pipe step="main" port="tts-config"/>
       </p:input>
       <p:with-option name="audio" select="$audio"/>
+      <p:with-option name="process-css" select="$process-css"/>
       <p:with-option name="temp-dir" select="$temp-dir"/>
     </px:tts-for-epub3>
 

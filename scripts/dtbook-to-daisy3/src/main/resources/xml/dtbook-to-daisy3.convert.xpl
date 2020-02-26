@@ -152,11 +152,6 @@
       px:set-base-uri
     </p:documentation>
   </p:import>
-  <p:import href="http://www.daisy.org/pipeline/modules/css-speech/library.xpl">
-    <p:documentation>
-      px:css-speech-cascade
-    </p:documentation>
-  </p:import>
 
 
   <!-- Find the first and only DTBook file within the input documents. -->
@@ -174,42 +169,13 @@
     <px:assert message="More than one DTBook found in fileset." test-count-max="1" error-code="PEZE00"/>
   </p:group>
 
-  <!-- CSS inlining -->
-  <p:choose>
-    <p:when test="$audio = 'true'">
-      <p:sink/>
-      <px:css-speech-cascade content-type="application/x-dtbook+xml" name="cascade">
-        <p:input port="source.fileset">
-          <p:pipe step="main" port="fileset.in"/>
-        </p:input>
-        <p:input port="source.in-memory">
-          <p:pipe step="first-dtbook" port="result"/>
-        </p:input>
-        <p:input port="config">
-          <p:pipe step="main" port="tts-config"/>
-        </p:input>
-      </px:css-speech-cascade>
-      <p:sink/>
-      <p:identity>
-        <p:input port="source">
-          <p:pipe step="cascade" port="result.in-memory"/>
-        </p:input>
-      </p:identity>
-    </p:when>
-    <p:otherwise>
-      <p:identity/>
-    </p:otherwise>
-  </p:choose>
-  <p:identity name="dtbook-with-css"/>
-  <p:sink/>
-
   <!-- ===== PERFORM TTS ==== -->
-  <px:tts-for-dtbook name="tts" px:progress="1">
+  <px:tts-for-dtbook process-css="true" name="tts" px:progress="1">
     <p:input port="source.fileset">
       <p:pipe step="main" port="fileset.in"/>
     </p:input>
     <p:input port="source.in-memory">
-      <p:pipe step="dtbook-with-css" port="result"/>
+      <p:pipe step="first-dtbook" port="result"/>
     </p:input>
     <p:input port="config">
       <p:pipe step="main" port="tts-config"/>
