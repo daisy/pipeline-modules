@@ -4,17 +4,18 @@
                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                xmlns:d="http://www.daisy.org/ns/pipeline/data"
+               xmlns:s="http://www.w3.org/2001/SMIL20/"
                script="../../main/resources/xml/internal/smils/create-daisy3-smils.xpl">
 
-  <x:scenario label="Scenarii for testing the @smilref generation">
+  <x:scenario label="Scenario for testing the smil and @smilref generation">
     <x:call step="px:daisy3-create-smils">
       <x:input port="audio-map">
   	<x:document type="inline">
   	  <d:audio-clips>
-	    <d:clip idref="s1"/>
-	    <d:clip idref="s2"/>
-	    <d:clip idref="s3"/>
-	    <d:clip idref="h1"/>
+	    <d:clip idref="s1" src="part_1.mp3"/>
+	    <d:clip idref="s2" src="part_2.mp3"/>
+	    <d:clip idref="s3" src="part_3.mp3"/>
+	    <d:clip idref="h1" src="part_4.mp3"/>
   	  </d:audio-clips>
   	</x:document>
       </x:input>
@@ -37,13 +38,22 @@
       </x:call>
       <x:context label="context">
   	<x:document type="port" port="updated-content"/>
+  	<x:document type="port" port="smil.out" select="//s:body"/>
       </x:context>
-      <x:expect label="result" type="custom" href="../resources/dtbook-compare.xpl" step="pxi:dtbook-compare">
+      <x:expect label="result" type="compare">
 	<x:document type="inline">
 	  <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
-	    <sent smilref="mo0.smil#xxx" id="s1">test</sent>
+	    <sent smilref="mo0.smil#ss1" id="s1">test</sent>
 	  </dtbook>
 	</x:document>
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <body>
+            <par id="ss1" class="sent">
+              <text src="../dtbook.xml#s1"/>
+              <audio src="part_1.mp3"/>
+            </par>
+          </body>
+        </x:document>
       </x:expect>
     </x:scenario>
 
@@ -59,15 +69,25 @@
       </x:call>
       <x:context label="context">
     	<x:document type="port" port="updated-content"/>
+    	<x:document type="port" port="smil.out" select="//s:body"/>
       </x:context>
-      <x:expect label="result" type="custom" href="../resources/dtbook-compare.xpl" step="pxi:dtbook-compare">
+      <x:expect label="result" type="compare">
     	<x:document type="inline">
     	  <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
-    	    <h1 id="i1" smilref="a">
-    	      <sent id="i2" smilref="a">test</sent>
+    	    <h1 id="i1" smilref="mo0.smil#si1">
+    	      <sent id="i2" smilref="mo0.smil#si2">test</sent>
             </h1>
     	  </dtbook>
     	</x:document>
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <body>
+            <seq id="si1" class="h1">
+              <par id="si2" class="sent">
+                <text src="../dtbook.xml#i2"/>
+              </par>
+            </seq>
+          </body>
+        </x:document>
       </x:expect>
     </x:scenario>
 
@@ -83,15 +103,24 @@
       </x:call>
       <x:context label="context">
     	<x:document type="port" port="updated-content"/>
+    	<x:document type="port" port="smil.out" select="//s:body"/>
       </x:context>
-      <x:expect label="result" type="custom" href="../resources/dtbook-compare.xpl" step="pxi:dtbook-compare">
+      <x:expect label="result" type="compare">
     	<x:document type="inline">
     	  <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
-    	    <h1 smilref="a" id="h1">
+    	    <h1 smilref="mo0.smil#sh1" id="h1">
     	      <sent id="i2">test</sent>
             </h1>
     	  </dtbook>
     	</x:document>
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <body>
+            <par id="sh1" class="h1">
+              <text src="../dtbook.xml#h1"/>
+              <audio src="part_4.mp3"/>
+            </par>
+          </body>
+        </x:document>
       </x:expect>
     </x:scenario>
 
@@ -113,7 +142,39 @@
       <x:context label="context">
     	<x:document type="port" port="updated-content"/>
       </x:context>
-      <x:expect label="result" type="custom" href="../resources/info-document.xpl" step="pxi:info-document"/>
+      <x:expect label="result" type="compare">
+    	<x:document type="inline">
+    	  <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+            <level>
+              <sent smilref="mo0.smil#ss1" id="s1">test</sent>
+            </level>
+            <level>
+              <sent smilref="mo1.smil#ss2" id="s2">test</sent>
+            </level>
+          </dtbook>
+        </x:document>
+      </x:expect>
+      <x:context label="context">
+        <x:document type="port" port="smil.out" select="//s:body"/>
+      </x:context>
+      <x:expect label="result" type="compare">
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <body>
+            <par id="ss1" class="sent">
+              <text src="../dtbook.xml#s1"/>
+              <audio src="part_1.mp3"/>
+            </par>
+          </body>
+        </x:document>
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <body>
+            <par id="ss2" class="sent">
+              <text src="../dtbook.xml#s2"/>
+              <audio src="part_2.mp3"/>
+            </par>
+          </body>
+        </x:document>
+      </x:expect>
     </x:scenario>
 
     <x:scenario label="level separator">
@@ -135,7 +196,44 @@
       <x:context label="context">
     	<x:document type="port" port="updated-content"/>
       </x:context>
-      <x:expect label="result" type="custom" href="../resources/info-document.xpl" step="pxi:info-document"/>
+      <x:expect label="result" type="compare">
+    	<x:document type="inline">
+    	  <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+            <level>
+              <sent smilref="mo0.smil#ss1" id="s1">test</sent>
+              <level>
+                <sent smilref="mo0.smil#ss2" id="s2">test</sent>
+              </level>
+              <sent smilref="mo2.smil#ss3" id="s3">test</sent>
+            </level>
+          </dtbook>
+        </x:document>
+      </x:expect>
+      <x:context label="context">
+        <x:document type="port" port="smil.out" select="//s:body"/>
+      </x:context>
+      <x:expect label="result" type="compare">
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <body>
+            <par id="ss1" class="sent">
+              <text src="../dtbook.xml#s1"/>
+              <audio src="part_1.mp3"/>
+            </par>
+            <par id="ss2" class="sent">
+              <text src="../dtbook.xml#s2"/>
+              <audio src="part_2.mp3"/>
+            </par>
+          </body>
+        </x:document>
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <body>
+            <par id="ss3" class="sent">
+              <text src="../dtbook.xml#s3"/>
+              <audio src="part_3.mp3"/>
+            </par>
+          </body>
+        </x:document>
+      </x:expect>
     </x:scenario>
 
     <x:scenario label="nested levels">
@@ -166,7 +264,62 @@
       <x:context label="context">
     	<x:document type="port" port="updated-content"/>
       </x:context>
-      <x:expect label="result" type="custom" href="../resources/info-document.xpl" step="pxi:info-document"/>
+      <x:expect label="result" type="compare">
+    	<x:document type="inline">
+    	  <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+            <level1>
+              <sent smilref="mo0.smil#ss1" id="s1">test</sent>
+              <level2>
+                <sent smilref="mo0.smil#ss2" id="s2">test</sent>
+                <sent smilref="mo0.smil#ss3" id="s3">test</sent>
+                <level3>
+                  <level4>
+                    <level5>
+                      <sent smilref="mo0.smil#ss4" id="s4">test</sent>
+                    </level5>
+                    <sent smilref="mo5.smil#ss5" id="s5">test</sent>
+                  </level4>
+                </level3>
+              </level2>
+              <sent smilref="mo5.smil#ss6" id="s6">test</sent>
+            </level1>
+          </dtbook>
+        </x:document>
+      </x:expect>
+      <x:context label="context">
+        <x:document type="port" port="smil.out" select="//s:body"/>
+      </x:context>
+      <x:expect label="result" type="compare">
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <body>
+            <par id="ss1" class="sent">
+              <text src="../dtbook.xml#s1"/>
+              <audio src="part_1.mp3"/>
+            </par>
+            <par id="ss2" class="sent">
+              <text src="../dtbook.xml#s2"/>
+              <audio src="part_2.mp3"/>
+            </par>
+            <par id="ss3" class="sent">
+              <text src="../dtbook.xml#s3"/>
+              <audio src="part_3.mp3"/>
+            </par>
+            <par id="ss4" class="sent">
+              <text src="../dtbook.xml#s4"/>
+            </par>
+          </body>
+        </x:document>
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <body>
+            <par id="ss5" class="sent">
+              <text src="../dtbook.xml#s5"/>
+            </par>
+            <par id="ss6" class="sent">
+              <text src="../dtbook.xml#s6"/>
+            </par>
+          </body>
+        </x:document>
+      </x:expect>
     </x:scenario>
 
 
@@ -176,7 +329,7 @@
     	  <x:document type="inline">
     	    <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
     	      <level>
-    		<p>
+    		<p id="p1">
     		  <sent id="s1">test</sent>
     		  <sent id="s2">test</sent>
     		</p>
@@ -184,7 +337,7 @@
     		  <level>
     		    <sent id="s3">test</sent>
     		  </level>
-    		  <p>
+    		  <p id="p2">
     		    <sent id="s4">test</sent>
     		    <sent id="s5">test</sent>
     		  </p>
@@ -200,7 +353,65 @@
       <x:context label="context">
     	<x:document type="port" port="updated-content"/>
       </x:context>
-      <x:expect label="result" type="custom" href="../resources/info-document.xpl" step="pxi:info-document"/>
+      <x:expect label="result" type="compare">
+    	<x:document type="inline">
+    	  <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+            <level>
+              <p smilref="mo0.smil#sp1" id="p1">
+                <sent smilref="mo0.smil#ss1" id="s1">test</sent>
+              <sent smilref="mo0.smil#ss2" id="s2">test</sent></p>
+              <level>
+                <level>
+                  <sent smilref="mo0.smil#ss3" id="s3">test</sent>
+                </level>
+                <p smilref="mo3.smil#sp2" id="p2">
+                  <sent smilref="mo3.smil#ss4" id="s4">test</sent>
+                  <sent smilref="mo3.smil#ss5" id="s5">test</sent>
+                </p>
+                <level>
+                  <sent smilref="mo3.smil#ss6" id="s6">test</sent>
+                </level>
+              </level>
+            </level>
+          </dtbook>
+        </x:document>
+      </x:expect>
+      <x:context label="context">
+        <x:document type="port" port="smil.out" select="//s:body"/>
+      </x:context>
+      <x:expect label="result" type="compare">
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <body>
+            <seq id="sp1" class="p">
+              <par id="ss1" class="sent">
+                <text src="../dtbook.xml#s1"/>
+                <audio src="part_1.mp3"/>
+              </par>
+              <par id="ss2" class="sent">
+                <text src="../dtbook.xml#s2"/>
+                <audio src="part_2.mp3"/>
+              </par>
+            </seq>
+            <par id="ss3" class="sent">
+              <text src="../dtbook.xml#s3"/>
+              <audio src="part_3.mp3"/>
+            </par>
+          </body>
+        </x:document>
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <body>
+            <seq id="sp2" class="p">
+              <par id="ss4" class="sent">
+              <text src="../dtbook.xml#s4"/></par>
+              <par id="ss5" class="sent">
+              <text src="../dtbook.xml#s5"/></par>
+            </seq>
+            <par id="ss6" class="sent">
+              <text src="../dtbook.xml#s6"/>
+            </par>
+          </body>
+        </x:document>
+      </x:expect>
     </x:scenario>
 
     <x:scenario label="noteref outside sentence">
@@ -220,20 +431,36 @@
       </x:call>
       <x:context label="context">
     	<x:document type="port" port="updated-content"/>
+    	<x:document type="port" port="smil.out" select="//s:body"/>
       </x:context>
-      <x:expect label="result" type="custom" href="../resources/dtbook-compare.xpl" step="pxi:dtbook-compare">
+      <x:expect label="result" type="compare">
     	<x:document type="inline">
     	  <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
     	    <level>
-    	      <noteref smilref="a" id="ref1" idref="#n1">ref</noteref>
+    	      <noteref smilref="mo0.smil#sref1" id="ref1" idref="#n1">ref</noteref>
     	    </level>
             <level>
-    	      <note smilref="a" id="n1">
-    		<sent smilref="a" id="s1">note</sent>
+    	      <note smilref="mo0.smil#sn1" id="n1">
+    		<sent smilref="mo0.smil#ss1" id="s1">note</sent>
     	      </note>
             </level>
     	  </dtbook>
     	</x:document>
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <body>
+            <par id="sref1" class="noteref" customTest="noteref">
+              <a external="false" href="mo0.smil#sn1">
+                <text src="../dtbook.xml#ref1"/>
+              </a>
+            </par>
+            <seq id="sn1" class="note" customTest="note">
+              <par id="ss1" class="sent">
+                <text src="../dtbook.xml#s1"/>
+                <audio src="part_1.mp3"/>
+              </par>
+            </seq>
+          </body>
+        </x:document>
       </x:expect>
     </x:scenario>
 
@@ -256,20 +483,35 @@
       </x:call>
       <x:context label="context">
     	<x:document type="port" port="updated-content"/>
+    	<x:document type="port" port="smil.out" select="//s:body"/>
       </x:context>
-      <x:expect label="result" type="custom" href="../resources/dtbook-compare.xpl" step="pxi:dtbook-compare">
+      <x:expect label="result" type="compare">
     	<x:document type="inline">
     	  <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
             <level>
-    	      <sent smilref="a" id="s8">
-    		<noteref smilref="a" id="ref1" idref="#n1">ref</noteref>
+    	      <sent smilref="mo0.smil#ss8" id="s8">
+    		<noteref smilref="mo0.smil#sref1" id="ref1" idref="#n1">ref</noteref>
     	      </sent>
             </level>
             <level>
-    	      <note smilref="a" id="n1">note</note>
+    	      <note smilref="mo0.smil#sn1" id="n1">note</note>
             </level>
         </dtbook>
     	</x:document>
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <body>
+            <seq id="ss8" class="sent">
+              <par id="sref1" class="noteref" customTest="noteref">
+                <a external="false" href="mo0.smil#sn1">
+                  <text src="../dtbook.xml#ref1"/>
+                </a>
+              </par>
+              <par id="sn1" class="note" customTest="note">
+                <text src="../dtbook.xml#n1"/>
+              </par>
+            </seq>
+          </body>
+        </x:document>
       </x:expect>
     </x:scenario>
 
@@ -295,23 +537,46 @@
       </x:call>
       <x:context label="context">
     	<x:document type="port" port="updated-content"/>
+    	<x:document type="port" port="smil.out" select="//s:body"/>
       </x:context>
-      <x:expect label="result" type="custom" href="../resources/dtbook-compare.xpl" step="pxi:dtbook-compare">
+      <x:expect label="result" type="compare">
     	<x:document type="inline">
     	  <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
     	    <level>
-    	      <noteref smilref="a#x" id="ref1" idref="#n1">ref</noteref>
+    	      <noteref smilref="mo0.smil#sref1" id="ref1" idref="#n1">ref</noteref>
     	    </level>
     	    <level>
-    	      <note smilref="a#x" id="n1">
-    		<p smilref="a#x" id="p1"><p id="p2" smilref="a#x">
-    		  <p smilref="a#x" id="p3">test</p>
-    		  <sent smilref="a#x" id="s1">note</sent>
+    	      <note smilref="mo0.smil#sn1" id="n1">
+    		<p smilref="mo0.smil#sp1" id="p1"><p id="p2" smilref="mo0.smil#sp2">
+    		  <p smilref="mo0.smil#sp3" id="p3">test</p>
+    		  <sent smilref="mo0.smil#ss1" id="s1">note</sent>
     		</p></p>
     	      </note>
     	    </level>
     	  </dtbook>
     	</x:document>
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <body>
+            <par id="sref1" class="noteref" customTest="noteref">
+              <a external="false" href="mo0.smil#sn1">
+                <text src="../dtbook.xml#ref1"/>
+              </a>
+            </par>
+            <seq id="sn1" class="note" customTest="note">
+              <seq id="sp1" class="p">
+                <seq id="sp2" class="p">
+                  <par id="sp3" class="p">
+                    <text src="../dtbook.xml#p3"/>
+                  </par>
+                  <par id="ss1" class="sent">
+                    <text src="../dtbook.xml#s1"/>
+                    <audio src="part_1.mp3"/>
+                  </par>
+                </seq>
+              </seq>
+            </seq>
+          </body>
+        </x:document>
       </x:expect>
     </x:scenario>
 
@@ -337,23 +602,43 @@
       </x:call>
       <x:context label="context">
     	<x:document type="port" port="updated-content"/>
+    	<x:document type="port" port="smil.out" select="//s:body"/>
       </x:context>
-      <x:expect label="result" type="custom" href="../resources/dtbook-compare.xpl" step="pxi:dtbook-compare">
+      <x:expect label="result" type="compare">
     	<x:document type="inline">
     	  <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
     	    <level>
-    	      <noteref smilref="a" id="ref1" idref="#n1">ref</noteref>
+    	      <noteref smilref="mo0.smil#sref1" id="ref1" idref="#n1">ref</noteref>
     	    </level>
     	    <level>
-    	      <note smilref="a" id="n1">
-    		<noteref smilref="a" id="ref2" idref="#n2"/>
+    	      <note smilref="mo0.smil#sn1" id="n1">
+    		<noteref smilref="mo0.smil#sref2" id="ref2" idref="#n2"/>
     	      </note>
     	    </level>
     	    <level>
-    	      <note smilref="a" id="n2">note</note>
+    	      <note smilref="mo0.smil#sn2" id="n2">note</note>
     	    </level>
     	  </dtbook>
     	</x:document>
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <body>
+            <par id="sref1" class="noteref" customTest="noteref">
+              <a external="false" href="mo0.smil#sn1">
+                <text src="../dtbook.xml#ref1"/>
+              </a>
+            </par>
+            <seq id="sn1" class="note" customTest="note">
+              <par id="sref2" class="noteref" customTest="noteref">
+                <a external="false" href="mo0.smil#sn2">
+                  <text src="../dtbook.xml#ref2"/>
+                </a>
+              </par>
+              <par id="sn2" class="note" customTest="note">
+                <text src="../dtbook.xml#n2"/>
+              </par>
+            </seq>
+          </body>
+        </x:document>
       </x:expect>
     </x:scenario>
 
@@ -377,21 +662,46 @@
       </x:call>
       <x:context label="context">
   	<x:document type="port" port="updated-content"/>
+  	<x:document type="port" port="smil.out" select="//s:body"/>
       </x:context>
-      <x:expect label="result" type="custom" href="../resources/dtbook-compare.xpl" step="pxi:dtbook-compare">
+      <x:expect label="result" type="compare">
 	<x:document type="inline">
 	  <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
 	    <level>
-	      <sent smilref="mo0.smil#xxx" id="s1">test</sent>
+	      <sent smilref="mo0.smil#ss1" id="s1">test</sent>
 	    </level>
 	    <level>
-	      <sent smilref="mo1.smil#xxx" id="s2">test</sent>
+	      <sent smilref="mo1.smil#ss2" id="s2">test</sent>
 	    </level>
 	    <level>
-	      <sent smilref="mo2.smil#xxx" id="s3">test</sent>
+	      <sent smilref="mo2.smil#ss3" id="s3">test</sent>
 	    </level>
 	  </dtbook>
 	</x:document>
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <body>
+            <par id="ss1" class="sent">
+              <text src="../dtbook.xml#s1"/>
+              <audio src="part_1.mp3"/>
+            </par>
+          </body>
+        </x:document>
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <body>
+            <par id="ss2" class="sent">
+              <text src="../dtbook.xml#s2"/>
+              <audio src="part_2.mp3"/>
+            </par>
+          </body>
+        </x:document>
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <body>
+            <par id="ss3" class="sent">
+              <text src="../dtbook.xml#s3"/>
+              <audio src="part_3.mp3"/>
+            </par>
+          </body>
+        </x:document>
       </x:expect>
     </x:scenario>
 
@@ -414,20 +724,37 @@
       </x:call>
       <x:context label="context">
   	<x:document type="port" port="updated-content"/>
+  	<x:document type="port" port="smil.out" select="//s:body"/>
       </x:context>
-      <x:expect label="result" type="custom" href="../resources/dtbook-compare.xpl" step="pxi:dtbook-compare">
+      <x:expect label="result" type="compare">
 	<x:document type="inline">
 	  <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
 	    <level>
-	      <sent smilref="x.smil#tt" id="s1">test</sent>
+	      <sent smilref="mo0.smil#ss1" id="s1">test</sent>
 	    </level>
 	    <bodymatter id="top">
 	      <level>
-		<sent smilref="y.smil#tt" id="s2">test</sent>
+		<sent smilref="mo1.smil#ss2" id="s2">test</sent>
 	      </level>
 	    </bodymatter>
 	  </dtbook>
 	</x:document>
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <body>
+            <par id="ss1" class="sent">
+              <text src="../dtbook.xml#s1"/>
+              <audio src="part_1.mp3"/>
+            </par>
+          </body>
+        </x:document>
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <body>
+            <par id="ss2" class="sent">
+              <text src="../dtbook.xml#s2"/>
+              <audio src="part_2.mp3"/>
+            </par>
+          </body>
+        </x:document>
       </x:expect>
     </x:scenario>
 
@@ -449,19 +776,37 @@
       </x:call>
       <x:context label="context">
   	<x:document type="port" port="updated-content"/>
+  	<x:document type="port" port="smil.out" select="//s:body"/>
       </x:context>
-      <x:expect label="result" type="custom" href="../resources/dtbook-compare.xpl" step="pxi:dtbook-compare">
+      <x:expect label="result" type="compare">
 	<x:document type="inline">
 	  <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
 	    <level>
-	      <noteref id="n1" smilref="x.smil#tt" idref="#n"/>
-	      <noteref id="n2" smilref="x.smil#tt" idref="#n"/>
+	      <noteref id="n1" smilref="mo0.smil#sn1" idref="#n"/>
+	      <noteref id="n2" smilref="mo0.smil#sn2" idref="#n"/>
 	    </level>
 	    <level>
-	      <note id="n" smilref="x.smil#tt">text</note>
+	      <note id="n" smilref="mo0.smil#sn">text</note>
 	    </level>
 	  </dtbook>
 	</x:document>
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <body>
+            <par id="sn1" class="noteref" customTest="noteref">
+              <a external="false" href="mo0.smil#sn">
+                <text src="../dtbook.xml#n1"/>
+              </a>
+            </par>
+            <par id="sn" class="note" customTest="note">
+              <text src="../dtbook.xml#n"/>
+            </par>
+            <par id="sn2" class="noteref" customTest="noteref">
+              <a external="false" href="mo0.smil#sn">
+                <text src="../dtbook.xml#n2"/>
+              </a>
+            </par>
+          </body>
+        </x:document>
       </x:expect>
     </x:scenario>
 
@@ -484,6 +829,7 @@
       </x:call>
       <x:context label="context">
   	<x:document type="port" port="updated-content"/>
+  	<x:document type="port" port="smil.out" select="//s:body"/>
       </x:context>
       <x:expect type="compare" label="result">
 	<x:document type="inline">
@@ -500,6 +846,20 @@
 	    </level>
 	  </dtbook>
 	</x:document>
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <body>
+            <par id="ss1" class="span">
+            <audio src="part_1.mp3"/></par>
+            <seq id="sn" class="note" customTest="note">
+              <par id="ss1" class="span">
+                <audio src="part_1.mp3"/>
+              </par>
+              <par id="ss2" class="span">
+                <audio src="part_2.mp3"/>
+              </par>
+            </seq>
+          </body>
+        </x:document>
       </x:expect>
     </x:scenario>
 
@@ -542,7 +902,7 @@
 	    </level>
     	  </dtbook>
         </x:document>
-    	  <x:document type="inline">
+    	<x:document type="inline">
 	  <smil xmlns="http://www.w3.org/2001/SMIL20/">
 	    <head>
               <meta content="uid" name="dtb:uid"/>
@@ -561,11 +921,11 @@
 	    <body>
               <seq id="sheader" class="h1">
 		<par id="ss1" class="span">
-                  <audio src=""/>
+                  <audio src="part_1.mp3"/>
 		</par>
 		<seq id="sn" class="note" customTest="note">
                   <par id="ss2" class="span">
-                    <audio src=""/>
+                    <audio src="part_2.mp3"/>
                   </par>
 		</seq>
               </seq>
@@ -597,7 +957,7 @@
     <!--   <x:context label="context"> -->
     <!-- 	<x:document type="port" port="updated-content"/> -->
     <!--   </x:context> -->
-    <!--   <x:expect label="result" type="custom" href="../resources/dtbook-compare.xpl" step="pxi:dtbook-compare"> -->
+    <!--   <x:expect label="result" type="compare"> -->
     <!-- 	<x:document type="inline"> -->
     <!-- 	  <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/"> -->
     <!-- 	    <level> -->
