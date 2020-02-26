@@ -55,6 +55,8 @@
 	</x-metadata>
       </metadata>
       <manifest>
+	<!-- list OPF itself -->
+	<item href="{pf:relativize-uri($output-base-uri, $output-base-uri)}" id="opf" media-type="text/xml"/>
 	<xsl:call-template name="manifest"/>
       </manifest>
       <spine>

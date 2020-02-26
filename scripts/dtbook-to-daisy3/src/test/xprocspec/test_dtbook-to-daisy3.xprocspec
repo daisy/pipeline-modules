@@ -195,7 +195,8 @@
 					<d:file href="result/dtbook.xml" media-type="application/x-dtbook+xml"
 					        doctype="&lt;!DOCTYPE dtbook PUBLIC &quot;-//NISO//DTD dtbook 2005-3//EN&quot; &quot;http://www.daisy.org/z3986/2005/dtbook-2005-3.dtd&quot; [           &lt;!ENTITY % MATHML.prefixed &quot;INCLUDE&quot;&gt;           &lt;!ENTITY % MATHML.prefix &quot;m&quot;&gt;           &lt;!ENTITY % MATHML.Common.attrib           &quot;xlink:href    CDATA       #IMPLIED           xlink:type     CDATA       #IMPLIED           class          CDATA       #IMPLIED           style          CDATA       #IMPLIED           id             ID          #IMPLIED           xref           IDREF       #IMPLIED           other          CDATA       #IMPLIED           xmlns:ns0   CDATA       #FIXED 'http://www.daisy.org/z3986/2005/dtbook/'           ns0:smilref CDATA       #IMPLIED&quot;&gt;           &lt;!ENTITY % mathML3 PUBLIC &quot;-//W3C//DTD MathML 3.0//EN&quot;           &quot;http://www.w3.org/Math/DTD/mathml3/mathml3.dtd&quot;&gt;           %mathML3;           &lt;!ENTITY % externalFlow &quot;| m:math&quot;&gt;           &lt;!ENTITY % externalNamespaces &quot;xmlns:m CDATA #FIXED           'http://www.w3.org/1998/Math/MathML'&quot;&gt;]&gt;"/>
 					<d:file href="result/mathml-fallback.xsl" media-type="application/xslt+xml"/>
-					<d:file href="result/math-formulae.png" media-type="image/png"/>
+					<d:file href="result/math-formulae.png" media-type="image/png"
+					        original-href="../../main/resources/images/math_formulae.png"/>
 					<d:file href="result/mo0.smil" media-type="application/smil"
 					        indent="true"
 					        doctype-public="-//NISO//DTD dtbsmil 2005-2//EN"
@@ -303,13 +304,13 @@
 						</x-metadata>
 					</metadata>
 					<manifest>
+						<item href="book.opf" id="opf" media-type="text/xml"/>
 						<item href="mo0.smil" id="mo0" media-type="application/smil"/>
 						<item href="mathml-fallback.xsl" id="opf-2" media-type="application/xslt+xml"/>
 						<item href="math-formulae.png" id="opf-3" media-type="image/png"/>
 						<item href="navigation.ncx" id="ncx" media-type="application/x-dtbncx+xml"/>
 						<item href="dtbook.xml" id="opf-5" media-type="application/x-dtbook+xml"/>
 						<item href="resources.res" id="resource" media-type="application/x-dtbresource+xml"/>
-						<item href="book.opf" id="opf-7" media-type="text/xml"/>
 					</manifest>
 					<spine>
 						<itemref idref="mo0"/>
