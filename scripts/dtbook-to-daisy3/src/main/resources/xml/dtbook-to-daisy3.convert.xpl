@@ -29,6 +29,7 @@
       properties, links to aural CSS stylesheets and links to PLS
       lexicons.</p>
     </p:documentation>
+    <p:inline><d:config/></p:inline>
   </p:input>
 
   <p:output port="in-memory.out" primary="true" sequence="true">
