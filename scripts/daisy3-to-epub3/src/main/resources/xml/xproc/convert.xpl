@@ -40,7 +40,6 @@
             px:fileset-join
             px:fileset-load
             px:fileset-rebase
-            px:fileset-add-entry
             px:fileset-create
         </p:documentation>
     </p:import>
@@ -299,13 +298,14 @@
             <p:with-option name="compatibility-mode" select="'false'"/>
             <!--TODO configurability for other META-INF files ?-->
         </px:epub3-pub-create-package-doc>
+        <p:sink/>
 
-        <px:fileset-add-entry media-type="application/oebps-package+xml">
+        <px:fileset-join>
             <p:input port="source">
                 <p:pipe port="result" step="package-doc.join-filesets"/>
+                <p:pipe step="package-doc.create" port="result.fileset"/>
             </p:input>
-            <p:with-option name="href" select="$opf-uri"/>
-        </px:fileset-add-entry>
+        </px:fileset-join>
 
         <px:message message="Package Document Created."/>
     </p:group>

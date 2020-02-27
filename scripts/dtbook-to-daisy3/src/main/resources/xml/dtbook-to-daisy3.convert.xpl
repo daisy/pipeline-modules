@@ -249,23 +249,13 @@
     <p:variable name="publisher" select="if ($publisher) then $publisher
 					 else (if ($dcpublisher) then $dcpublisher else 'unknown')"/>
 
-    <!-- TODO: automatic upgrade? -->
-    <!-- TODO: it could be moved or copied to dtbook-to-daisy3.xpl -->
-    <p:choose>
-      <p:when test="not(starts-with($dtd-version, '2005'))">
-	<!-- TODO: correct error code. -->
-	 <p:error xmlns:err="http://www.w3.org/ns/xproc-error" code="C0051">
-	   <p:input port="source">
-	     <p:inline>
-	       <message>Other versions than DTBook-2005 are not supported.</message>
-	     </p:inline>
-	   </p:input>
-	 </p:error>
-      </p:when>
-      <p:otherwise>
-	<p:identity/>
-      </p:otherwise>
-    </p:choose>
+    <!--
+        FIXME: automatic upgrade?
+        FIXME: correct error code
+    -->
+    <px:assert message="Other versions than DTBook-2005 are not supported." error-code="C0051">
+      <p:with-option name="test" select="starts-with($dtd-version, '2005')"/>
+    </px:assert>
 
     <!-- ===== ADD WHAT IS MAYBE MISSING IN THE DTBOOK ===== -->
     <!-- (todo: peform this before the TTS so that the extra text will be synthesized) -->
@@ -274,23 +264,50 @@
     </px:daisy3-prepare-dtbook>
 
     <!-- ===== SMIL FILES ===== -->
-    <px:message message="Generating SMIL files..."/>
-    <px:daisy3-create-smils name="mo">
-      <p:input port="audio-map">
-	<p:pipe port="audio-map" step="tts"/>
-      </p:input>
-      <p:with-option name="root-dir" select="$output-fileset-base"/>
-      <p:with-option name="daisy3-dtbook-uri" select="$daisy3-dtbook-uri"/>
-      <p:with-option name="audio-dir" select="$output-fileset-base"/>
-      <!-- <p:with-option name="audio-dir" select="concat($output-fileset-base, 'audio/')"/> -->
-      <p:with-option name="smil-dir" select="$output-fileset-base"/>
-      <!-- <p:with-option name="smil-dir" select="concat($output-fileset-base, 'mo/')"/> -->
-      <p:with-option name="uid" select="$uid"/>
-      <p:with-option name="audio-only" select="$audio-only"/>
-    </px:daisy3-create-smils>
-
+    <p:group name="mo">
+      <p:output port="fileset" primary="true"/>
+      <p:output port="in-memory" sequence="true">
+        <p:pipe step="create-mo" port="smil.out"/>
+      </p:output>
+      <p:output port="dtbook">
+        <p:pipe step="create-mo" port="updated-content"/>
+      </p:output>
+      <p:output port="duration">
+        <p:pipe step="create-mo" port="duration"/>
+      </p:output>
+      <px:daisy3-create-smils name="create-mo" px:message="Generating SMIL files...">
+        <p:input port="audio-map">
+          <p:pipe step="tts" port="audio-map"/>
+        </p:input>
+        <p:with-option name="root-dir" select="$output-fileset-base"/>
+        <p:with-option name="daisy3-dtbook-uri" select="$daisy3-dtbook-uri"/>
+        <p:with-option name="audio-dir" select="$output-fileset-base"/>
+        <!-- <p:with-option name="audio-dir" select="concat($output-fileset-base, 'audio/')"/> -->
+        <p:with-option name="smil-dir" select="$output-fileset-base"/>
+        <!-- <p:with-option name="smil-dir" select="concat($output-fileset-base, 'mo/')"/> -->
+        <p:with-option name="uid" select="$uid"/>
+        <p:with-option name="audio-only" select="$audio-only"/>
+      </px:daisy3-create-smils>
+      <p:sink/>
+      <p:add-attribute match="d:file"  attribute-name="indent" attribute-value="true">
+        <p:input port="source">
+          <p:pipe step="create-mo" port="fileset.out"/>
+        </p:input>
+      </p:add-attribute>
+      <p:add-attribute match="d:file"
+                       attribute-name="doctype-public"
+                       attribute-value="-//NISO//DTD dtbsmil 2005-2//EN"/>
+      <p:add-attribute match="d:file"
+                       attribute-name="doctype-system"
+                       attribute-value="http://www.daisy.org/z3986/2005/dtbsmil-2005-2.dtd"/>
+    </p:group>
 
     <!-- ===== CONTENT DOCUMENT FILE ===== -->
+    <p:identity>
+      <p:input port="source">
+        <p:pipe step="mo" port="dtbook"/>
+      </p:input>
+    </p:identity>
     <p:group name="content-doc">
       <p:output port="fileset" primary="true"/>
       <p:output port="in-memory">
@@ -362,7 +379,7 @@
       </p:output>
       <px:daisy3-create-ncx name="create-ncx">
         <p:input port="content">
-          <p:pipe step="mo" port="updated-content"/>
+          <p:pipe step="mo" port="dtbook"/>
         </p:input>
         <p:input port="audio-map">
           <p:pipe port="audio-map" step="tts"/>
@@ -382,6 +399,9 @@
         <p:input port="entry">
           <p:pipe step="create-ncx" port="result"/>
         </p:input>
+        <p:with-param port="file-attributes" name="indent" select="'true'"/>
+        <p:with-param port="file-attributes" name="doctype-public" select="'-//NISO//DTD ncx 2005-1//EN'"/>
+        <p:with-param port="file-attributes" name="doctype-system" select="'http://www.daisy.org/z3986/2005/ncx-2005-1.dtd'"/>
       </px:fileset-add-entry>
     </p:group>
     <p:sink/>
@@ -404,31 +424,39 @@
         <p:input port="entry">
           <p:pipe step="create-res-file" port="result"/>
         </p:input>
+        <p:with-param port="file-attributes" name="indent" select="'true'"/>
+        <p:with-param port="file-attributes" name="doctype-public" select="'-//NISO//DTD resource 2005-1//EN'"/>
+        <p:with-param port="file-attributes" name="doctype-system" select="'http://www.daisy.org/z3986/2005/resource-2005-1.dtd'"/>
       </px:fileset-add-entry>
     </p:group>
     <p:sink/>
 
     <!-- ===== MATHML XSLT AND ALTIMG FALLBACKS ===== -->
-    <!-- (todo: move this to daisy3-utils?) -->
+    <!--
+        FIXME: move to daisy3-utils
+    -->
     <p:choose name="mathml-fallbacks">
       <p:xpath-context>
         <p:pipe step="tts-enriched-dtbook" port="result"/>
       </p:xpath-context>
-      <p:when test="not(exists(//m:math))">
+      <p:when test="not(exists(//m:math))" px:message="No MathML found in DTBook">
 	<p:output port="fileset" primary="true">
 	  <p:empty/>
 	</p:output>
 	<p:output port="in-memory">
 	  <p:empty/>
 	</p:output>
-	<px:message message="No MathML found in DTBook"/><p:sink/>
+        <p:sink>
+          <p:input port="source">
+            <p:empty/>
+          </p:input>
+        </p:sink>
       </p:when>
-      <p:otherwise>
+      <p:otherwise px:message="Adding MathML resources...">
 	<p:output port="fileset" primary="true"/>
 	<p:output port="in-memory">
 	  <p:pipe step="mathml-xslt-fallback" port="result"/>
 	</p:output>
-	<px:message message="Adding MathML resources..."/>
 
 	<!-- xslt fallback -->
 	<p:load href="mathml-fallback.xsl"/>
@@ -470,7 +498,7 @@
       <p:when test="$audio-only='false'">
 	<px:fileset-join>
 	  <p:input port="source">
-	    <p:pipe step="mo" port="fileset.out"/>
+	    <p:pipe step="mo" port="fileset"/>
 	    <p:pipe step="audio" port="result.fileset"/>
 	    <p:pipe step="fileset.moved" port="result.fileset"/>
 	    <p:pipe step="mathml-fallbacks" port="fileset"/>
@@ -483,7 +511,7 @@
       <p:otherwise>
 	<px:fileset-join>
 	  <p:input port="source">
-	    <p:pipe step="mo" port="fileset.out"/>
+	    <p:pipe step="mo" port="fileset"/>
 	    <p:pipe step="audio" port="result.fileset"/>
 	    <p:pipe step="ncx" port="fileset"/>
 	    <p:pipe step="res-file" port="fileset"/>
@@ -491,84 +519,8 @@
 	</px:fileset-join>
       </p:otherwise>
     </p:choose>
-    <px:fileset-add-entry media-type="text/xml">
-      <p:with-option name="href" select="$opf-uri"/>
-    </px:fileset-add-entry>
-    <p:viewport match="d:file" name="fileset.with-opf">
-      <p:choose>
-    	<p:when test="contains(/*/@media-type, 'smil')">
-    	  <p:add-attribute match="/*" attribute-name="doctype-public"
-    			   attribute-value="-//NISO//DTD dtbsmil 2005-2//EN"/>
-    	  <p:add-attribute match="/*" attribute-name="doctype-system"
-    			   attribute-value="http://www.daisy.org/z3986/2005/dtbsmil-2005-2.dtd"/>
-    	  <p:add-attribute match="/*" attribute-name="indent" attribute-value="true"/>
-    	</p:when>
-    	<p:when test="contains(/*/@media-type, 'dtbook')">
-	  <p:variable name="math-prefix" select="substring-before((//m:math)[1]/name(), ':')">
-            <!-- Hopefully, the MathML namespace prefixes are all the same. -->
-            <p:pipe port="updated-content" step="create-mo"/>
-          </p:variable>
-          <p:variable name="smilref-prefix" select="substring-before(name((//m:*[@dtbook:smilref])[1]/@dtbook:smilref), ':')">
-            <!-- Hopefully, the DTBook namespace prefixes are all the same for MathML elements. -->
-            <p:pipe port="updated-content" step="create-mo"/>
-          </p:variable>
-          <p:variable name="dtbook-prefix" select="if ($smilref-prefix) then $smilref-prefix else 'dtbook'"/>
-          <!-- TODO: use MathML2 DTD instead of MathML3 DTD when MathML2 detected -->
-          <p:variable name="math-extension" select="if (not($math-prefix)) then '' else concat(' [
-						    &lt;!ENTITY % MATHML.prefixed &quot;INCLUDE&quot;&gt;
-						    &lt;!ENTITY % MATHML.prefix &quot;', $math-prefix, '&quot;&gt;
-						    &lt;!ENTITY % MATHML.Common.attrib
-						    &quot;xlink:href    CDATA       #IMPLIED
-						    xlink:type     CDATA       #IMPLIED
-						    class          CDATA       #IMPLIED
-						    style          CDATA       #IMPLIED
-						    id             ID          #IMPLIED
-						    xref           IDREF       #IMPLIED
-						    other          CDATA       #IMPLIED
-						    xmlns:', $dtbook-prefix, '   CDATA       #FIXED ''http://www.daisy.org/z3986/2005/dtbook/''
-						    ',$dtbook-prefix,':smilref CDATA       #IMPLIED&quot;&gt;
-						    &lt;!ENTITY % mathML3 PUBLIC &quot;-//W3C//DTD MathML 3.0//EN&quot;
-						    &quot;http://www.w3.org/Math/DTD/mathml3/mathml3.dtd&quot;&gt;
-						    %mathML3;
-						    &lt;!ENTITY % externalFlow &quot;| ', $math-prefix, ':math&quot;&gt;
-						    &lt;!ENTITY % externalNamespaces &quot;xmlns:', $math-prefix, ' CDATA #FIXED
-						    ''http://www.w3.org/1998/Math/MathML''&quot;&gt;]')"/>
-          <p:variable name="doctype-public" select="concat('-//NISO//DTD dtbook ', $dtd-version, '//EN')"/>
-          <p:variable name="doctype-system" select="concat('http://www.daisy.org/z3986/2005/dtbook-', $dtd-version, '.dtd')"/>
-          <p:add-attribute match="/*" attribute-name="doctype">
-            <p:with-option name="attribute-value"
-			   select="concat('&lt;!DOCTYPE dtbook PUBLIC &quot;',
-				   $doctype-public, '&quot; &quot;', $doctype-system,
-				   '&quot;', $math-extension, '&gt;')"/>
-          </p:add-attribute>
-    	</p:when>
-	<p:when test="contains(/*/@media-type, 'ncx')">
-	  <p:add-attribute match="/*" attribute-name="doctype-public"
-    			   attribute-value="-//NISO//DTD ncx 2005-1//EN"/>
-    	  <p:add-attribute match="/*" attribute-name="doctype-system"
-    			   attribute-value="http://www.daisy.org/z3986/2005/ncx-2005-1.dtd"/>
-    	  <p:add-attribute match="/*" attribute-name="indent" attribute-value="true"/>
-    	</p:when>
-	<p:when test="contains(/*/@media-type, 'res')">
-	  <p:add-attribute match="/*" attribute-name="doctype-public"
-    			   attribute-value="-//NISO//DTD resource 2005-1//EN"/>
-    	  <p:add-attribute match="/*" attribute-name="doctype-system"
-    			   attribute-value="http://www.daisy.org/z3986/2005/resource-2005-1.dtd"/>
-    	  <p:add-attribute match="/*" attribute-name="indent" attribute-value="true"/>
-    	</p:when>
-    	<p:when test="ends-with(/*/@href, '.opf')">
-    	  <p:add-attribute match="/*" attribute-name="doctype-public"
-    			   attribute-value="+//ISBN 0-9673008-1-9//DTD OEB 1.2 Package//EN"/>
-    	  <p:add-attribute match="/*" attribute-name="doctype-system"
-    			   attribute-value="http://openebook.org/dtds/oeb-1.2/oebpkg12.dtd"/>
-    	  <p:add-attribute match="/*" attribute-name="indent" attribute-value="true"/>
-    	</p:when>
-    	<p:otherwise>
-    	  <p:identity/>
-    	</p:otherwise>
-      </p:choose>
-    </p:viewport>
-    <px:daisy3-create-opf name="create-opf">
+    <p:identity name="daisy3.fileset"/>
+    <px:daisy3-create-opf name="opf">
       <p:with-option name="opf-uri" select="concat($output-fileset-base, 'book.opf')"/>
       <p:with-option name="output-dir" select="$output-fileset-base"/>
       <p:with-option name="uid" select="$uid"/>
@@ -590,15 +542,17 @@
       </p:input>
       <p:input port="source.in-memory">
         <p:pipe step="content-doc" port="in-memory"/>
-        <p:pipe step="opf" port="result"/>
         <p:pipe step="ncx" port="in-memory"/>
         <p:pipe step="res-file" port="in-memory"/>
-        <p:pipe step="mo" port="smil.out"/>
+        <p:pipe step="mo" port="in-memory"/>
         <p:pipe step="mathml-fallbacks" port="in-memory"/>
       </p:input>
       <p:input port="entry">
         <p:pipe step="opf" port="result"/>
       </p:input>
+      <p:with-param port="file-attributes" name="indent" select="'true'"/>
+      <p:with-param port="file-attributes" name="doctype-public" select="'+//ISBN 0-9673008-1-9//DTD OEB 1.2 Package//EN'"/>
+      <p:with-param port="file-attributes" name="doctype-system" select="'http://openebook.org/dtds/oeb-1.2/oebpkg12.dtd'"/>
     </px:fileset-add-entry>
   </p:group>
   <p:sink/>

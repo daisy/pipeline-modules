@@ -99,7 +99,6 @@
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
         <p:documentation>
             px:fileset-load
-            px:fileset-add-entry
             px:fileset-join
             px:fileset-rebase
             px:fileset-purge
@@ -110,7 +109,6 @@
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
         <p:documentation>
             px:assert
-            px:message
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
@@ -292,7 +290,8 @@
         <p:otherwise>
             <p:output port="fileset" primary="true"/>
             <p:output port="in-memory" sequence="true">
-                <p:pipe step="add-entry" port="result.in-memory"/>
+                <p:pipe step="update" port="result.in-memory"/>
+                <p:pipe step="navigation-doc" port="result"/>
             </p:output>
             <p:for-each name="fix-ids">
                 <p:documentation>Add missing IDs</p:documentation>
@@ -300,13 +299,19 @@
                 <px:html-id-fixer/>
             </p:for-each>
             <!--TODO create other nav types (configurable ?)-->
-            <px:epub3-nav-create-navigation-doc>
+            <px:epub3-nav-create-navigation-doc name="create-navigation-doc">
                 <p:with-option name="output-base-uri" select="concat($content-dir,'toc.xhtml')">
                     <p:empty/>
                 </p:with-option>
             </px:epub3-nav-create-navigation-doc>
-            <px:message message="Navigation Document Created."/>
-            <p:identity name="navigation-doc"/>
+            <p:identity name="navigation-doc" px:message="Navigation Document Created."/>
+            <p:sink/>
+            <p:add-attribute match="d:file" attribute-name="role" attribute-value="nav"
+                             name="navigation-doc.fileset">
+                <p:input port="source">
+                    <p:pipe step="create-navigation-doc" port="result.fileset"/>
+                </p:input>
+            </p:add-attribute>
             <p:sink/>
             <px:fileset-update name="update">
                 <p:input port="source.fileset">
@@ -322,15 +327,13 @@
                     <p:pipe step="fix-ids" port="result"/>
                 </p:input>
             </px:fileset-update>
-            <px:fileset-add-entry media-type="application/xhtml+xml" name="add-entry">
-                <p:input port="source.in-memory">
-                    <p:pipe step="update" port="result.in-memory"/>
+            <p:sink/>
+            <px:fileset-join>
+                <p:input port="source">
+                    <p:pipe step="update" port="result.fileset"/>
+                    <p:pipe step="navigation-doc.fileset" port="result"/>
                 </p:input>
-                <p:input port="entry">
-                    <p:pipe step="navigation-doc" port="result"/>
-                </p:input>
-                <p:with-param port="file-attributes" name="role" select="'nav'"/>
-            </px:fileset-add-entry>
+            </px:fileset-join>
         </p:otherwise>
     </p:choose>
     <p:sink/>
@@ -424,9 +427,10 @@
     <p:group name="add-package-doc">
         <p:output port="fileset" primary="true"/>
         <p:output port="in-memory" sequence="true">
-            <p:pipe step="add-entry" port="result.in-memory"/>
+            <p:pipe step="add-mediaoverlays" port="in-memory"/>
+            <p:pipe step="package-doc" port="result"/>
         </p:output>
-        <px:epub3-pub-create-package-doc compatibility-mode="false">
+        <px:epub3-pub-create-package-doc compatibility-mode="false" name="create-package-doc">
             <p:input port="source.in-memory">
                 <p:pipe step="add-mediaoverlays" port="in-memory"/>
             </p:input>
@@ -439,22 +443,15 @@
             </p:input>
             <p:with-option name="output-base-uri" select="concat($content-dir,'package.opf')"/>
         </px:epub3-pub-create-package-doc>
-        <px:message message="Package Document Created."/>
-        <p:identity name="package-doc"/>
+        <p:identity name="package-doc" px:message="Package Document Created."/>
         <p:sink/>
-        <p:delete match="d:file/@role[.='nav']">
+        <px:fileset-join>
             <p:input port="source">
                 <p:pipe step="add-mediaoverlays" port="fileset"/>
+                <p:pipe step="create-package-doc" port="result.fileset"/>
             </p:input>
-        </p:delete>
-        <px:fileset-add-entry media-type="application/oebps-package+xml" name="add-entry">
-            <p:input port="source.in-memory">
-                <p:pipe step="add-mediaoverlays" port="in-memory"/>
-            </p:input>
-            <p:input port="entry">
-                <p:pipe step="package-doc" port="result"/>
-            </p:input>
-        </px:fileset-add-entry>
+        </px:fileset-join>
+        <p:delete match="d:file/@role[.='nav']"/>
     </p:group>
 
     <!--=========================================================================-->

@@ -144,6 +144,12 @@
             <p>The package document.</p>
         </p:documentation>
     </p:output>
+    <p:output port="result.fileset">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>The result fileset with the package document as single file.</p>
+        </p:documentation>
+        <p:pipe step="result" port="fileset"/>
+    </p:output>
 
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
         <p:documentation>
@@ -672,8 +678,12 @@
     <px:message severity="DEBUG" message="Finished assigning media overlays to content documents"/>
 
     <p:documentation>Add mediaoverlays</p:documentation>
-    <p:group>
+    <p:group name="result">
         <p:documentation>Add package doc</p:documentation>
+        <p:output port="result" primary="true"/>
+        <p:output port="fileset">
+            <p:pipe step="load" port="result.fileset"/>
+        </p:output>
         <p:identity name="package-doc"/>
         <p:sink/>
         <px:fileset-add-entry media-type="application/oebps-package+xml" name="add-package-doc">
@@ -705,7 +715,7 @@
             <p:with-option name="compatibility-mode" select="$compatibility-mode"/>
             <p:with-option name="reserved-prefixes" select="$reserved-prefixes"/>
         </px:epub3-pub-add-mediaoverlays>
-        <px:fileset-load media-types="application/oebps-package+xml">
+        <px:fileset-load media-types="application/oebps-package+xml" name="load">
             <p:input port="in-memory">
                 <p:pipe step="add-mediaoverlays" port="result.in-memory"/>
             </p:input>
