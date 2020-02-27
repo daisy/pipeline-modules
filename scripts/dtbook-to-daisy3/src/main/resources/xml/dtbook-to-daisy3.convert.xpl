@@ -148,6 +148,7 @@
   <p:import href="http://www.daisy.org/pipeline/modules/smil-utils/library.xpl">
     <p:documentation>
       px:audio-clips-to-fileset
+      px:audio-clips-update-files
     </p:documentation>
   </p:import>
   <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
@@ -198,6 +199,15 @@
     <!-- <p:with-option name="target" select="concat($output-fileset-base, 'audio/')"/> -->
   </px:fileset-move>
   <p:sink/>
+  <px:audio-clips-update-files name="audio-map">
+    <p:input port="source">
+      <p:pipe step="tts" port="audio-map"/>
+    </p:input>
+    <p:input port="mapping">
+      <p:pipe step="audio" port="mapping"/>
+    </p:input>
+  </px:audio-clips-update-files>
+  <p:sink/>
 
   <!-- ===== COPY RESOURCE FILES ==== -->
   <px:fileset-rebase>
@@ -233,7 +243,6 @@
       <p:pipe step="daisy3.in-memory" port="result"/>
     </p:output>
 
-    <p:variable name="daisy3-dtbook-uri" select="concat($output-fileset-base, replace(base-uri(/),'^.*/([^/]+)$','$1'))"/>
     <p:variable name="mathml-fallback-uri" select="concat($output-fileset-base, 'mathml-fallback.xsl')"/>
     <p:variable name="math-img" select="'math-formulae.png'"/>
 
@@ -263,38 +272,46 @@
       <p:with-option name="mathml-formulae-img" select="$math-img"/>
     </px:daisy3-prepare-dtbook>
 
+    <px:set-base-uri>
+      <p:with-option name="base-uri" select="concat($output-fileset-base, replace(base-uri(/),'^.*/([^/]+)$','$1'))"/>
+    </px:set-base-uri>
+
     <!-- ===== SMIL FILES ===== -->
     <p:group name="mo">
-      <p:output port="fileset" primary="true"/>
+      <p:output port="fileset" primary="true">
+        <p:pipe step="filter-dtbook" port="not-matched"/>
+      </p:output>
       <p:output port="in-memory" sequence="true">
-        <p:pipe step="create-mo" port="smil.out"/>
+        <p:pipe step="filter-dtbook" port="not-matched.in-memory"/>
       </p:output>
       <p:output port="dtbook">
-        <p:pipe step="create-mo" port="updated-content"/>
+        <p:pipe step="dtbook-with-smilrefs" port="result"/>
       </p:output>
       <p:output port="duration">
         <p:pipe step="create-mo" port="duration"/>
       </p:output>
       <px:daisy3-create-smils name="create-mo" px:message="Generating SMIL files...">
         <p:input port="audio-map">
-          <p:pipe step="tts" port="audio-map"/>
+          <p:pipe step="audio-map" port="result"/>
         </p:input>
-        <p:with-option name="root-dir" select="$output-fileset-base"/>
-        <p:with-option name="daisy3-dtbook-uri" select="$daisy3-dtbook-uri"/>
-        <p:with-option name="audio-dir" select="$output-fileset-base"/>
-        <!-- <p:with-option name="audio-dir" select="concat($output-fileset-base, 'audio/')"/> -->
         <p:with-option name="smil-dir" select="$output-fileset-base"/>
         <!-- <p:with-option name="smil-dir" select="concat($output-fileset-base, 'mo/')"/> -->
         <p:with-option name="uid" select="$uid"/>
         <p:with-option name="audio-only" select="$audio-only"/>
       </px:daisy3-create-smils>
-      <p:sink/>
-      <p:identity>
-        <p:input port="source">
-          <p:pipe step="create-mo" port="fileset.out"/>
+      <px:fileset-filter media-types="application/x-dtbook+xml" name="filter-dtbook">
+        <p:input port="source.in-memory">
+          <p:pipe step="create-mo" port="result.in-memory"/>
         </p:input>
-      </p:identity>
+      </px:fileset-filter>
+      <px:fileset-load name="dtbook-with-smilrefs">
+        <p:input port="in-memory">
+          <p:pipe step="create-mo" port="result.in-memory"/>
+        </p:input>
+      </px:fileset-load>
+      <p:sink/>
     </p:group>
+    <p:sink/>
 
     <!-- ===== CONTENT DOCUMENT FILE ===== -->
     <p:identity>
@@ -336,9 +353,6 @@
 						    ''http://www.w3.org/1998/Math/MathML''&quot;&gt;]')"/>
       <p:variable name="doctype-public" select="concat('-//NISO//DTD dtbook ', $dtd-version, '//EN')"/>
       <p:variable name="doctype-system" select="concat('http://www.daisy.org/z3986/2005/dtbook-', $dtd-version, '.dtd')"/>
-      <px:set-base-uri>
-        <p:with-option name="base-uri" select="$daisy3-dtbook-uri"/>
-      </px:set-base-uri>
       <!-- add some metadata -->
       <p:add-attribute match="//dtbook:meta[@name='dtb:uid']" attribute-name="content">
         <p:with-option name="attribute-value" select="$uid"/>
@@ -371,7 +385,7 @@
         <p:pipe step="mo" port="dtbook"/>
       </p:input>
       <p:input port="audio-map">
-        <p:pipe port="audio-map" step="tts"/>
+        <p:pipe step="audio-map" port="result"/>
       </p:input>
       <p:with-option name="ncx-dir" select="$output-fileset-base"/>
       <p:with-option name="audio-dir" select="$output-fileset-base"/>
