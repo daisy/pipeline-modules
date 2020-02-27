@@ -82,7 +82,13 @@
     </p:option>
 
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
+      <p:documentation>
+        px:fileset-create
+        px:fileset-add-entry
+        px:fileset-join
+      </p:documentation>
+    </p:import>
 
     <!-- They cannot hold a smilref attribute or they can contain
          levels (which would make them wrongly dispatched over
@@ -219,17 +225,22 @@
       <p:iteration-source>
 	<p:pipe port="result" step="all-smils"/>
       </p:iteration-source>
-      <p:output port="result" sequence="true"/>
-      <p:variable name="mo-uri" select="base-uri(/*)"/>
+      <p:identity name="smil"/>
+      <p:sink/>
       <px:fileset-create>
 	<p:with-option name="base" select="$smil-dir"/>
       </px:fileset-create>
       <px:fileset-add-entry media-type="application/smil">
-	<p:with-option name="href" select="$mo-uri"/>
+        <p:input port="entry">
+          <p:pipe step="smil" port="result"/>
+        </p:input>
+        <p:with-param port="file-attributes" name="indent" select="'true'"/>
+        <p:with-param port="file-attributes" name="doctype-public" select="'-//NISO//DTD dtbsmil 2005-2//EN'"/>
+        <p:with-param port="file-attributes" name="doctype-system" select="'http://www.daisy.org/z3986/2005/dtbsmil-2005-2.dtd'"/>
       </px:fileset-add-entry>
     </p:for-each>
-    <px:fileset-join name="smil-in-fileset"/>
-
-    <px:message severity="DEBUG" message="SMIL fileset created."/><p:sink/>
+    <px:fileset-join name="smil-in-fileset"
+                     px:message="SMIL fileset created." px:message-severity="DEBUG"/>
+    <p:sink/>
 
 </p:declare-step>

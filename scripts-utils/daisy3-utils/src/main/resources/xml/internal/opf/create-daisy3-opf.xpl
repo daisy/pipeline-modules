@@ -4,11 +4,23 @@
                 type="px:daisy3-create-opf" name="main">
 
     <p:input port="source" primary="true">
-      <p:documentation>The fileset.</p:documentation>
+      <p:documentation>The DAISY 3 fileset.</p:documentation>
     </p:input>
 
     <p:output port="result" primary="true">
-      <p:documentation>The OPF file.</p:documentation>
+      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+        <p>The <a
+        href="http://web.archive.org/web/20101221093536/http://www.idpf.org/oebps/oebps1.2/download/oeb12-xhtml.htm">OEBPS</a>
+        package document</p>
+      </p:documentation>
+      <p:pipe step="opf" port="result"/>
+    </p:output>
+
+    <p:output port="result.fileset">
+      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+        <p>Result fileset with a single file, the package document.</p>
+      </p:documentation>
+      <p:pipe step="fileset" port="result"/>
     </p:output>
 
     <p:option name="output-dir">
@@ -66,6 +78,12 @@
             px:set-base-uri
         </p:documentation>
     </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
+        <p:documentation>
+            px:fileset-create
+            px:fileset-add-entry
+        </p:documentation>
+    </p:import>
 
     <p:xslt>
       <p:input port="stylesheet">
@@ -84,5 +102,20 @@
     <px:set-base-uri>
       <p:with-option name="base-uri" select="$opf-uri"/>
     </px:set-base-uri>
+    <p:identity name="opf"/>
+    <p:sink/>
+
+    <px:fileset-create>
+      <p:with-option name="base" select="$output-dir"/>
+    </px:fileset-create>
+    <px:fileset-add-entry media-type="text/xml" name="fileset">
+      <p:input port="entry">
+        <p:pipe step="opf" port="result"/>
+      </p:input>
+      <p:with-param port="file-attributes" name="indent" select="'true'"/>
+      <p:with-param port="file-attributes" name="doctype-public" select="'+//ISBN 0-9673008-1-9//DTD OEB 1.2 Package//EN'"/>
+      <p:with-param port="file-attributes" name="doctype-system" select="'http://openebook.org/dtds/oeb-1.2/oebpkg12.dtd'"/>
+    </px:fileset-add-entry>
+    <p:sink/>
 
 </p:declare-step>

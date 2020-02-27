@@ -5,7 +5,9 @@
                 exclude-inline-prefixes="#all">
 	
 	<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-		<p>Extract NCC metadata from a OEBPS package document</p>
+		<p>Extract NCC metadata from a <a
+		href="http://web.archive.org/web/20101221093536/http://www.idpf.org/oebps/oebps1.2/download/oeb12-xhtml.htm">OEBPS</a>
+		package document</p>
 	</p:documentation>
 	
 	<p:input port="source"/>

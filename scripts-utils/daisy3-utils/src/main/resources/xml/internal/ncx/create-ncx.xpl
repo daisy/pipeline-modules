@@ -39,12 +39,23 @@
       </p:documentation>
     </p:option>
 
-    <p:output port="result" primary="true"/>
+    <p:output port="result" primary="true">
+      <p:pipe step="ncx" port="result"/>
+    </p:output>
+    <p:output port="result.fileset">
+      <p:pipe step="fileset" port="result"/>
+    </p:output>
 
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
         <p:documentation>
             px:set-base-uri
         </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
+      <p:documentation>
+        px:fileset-create
+        px:fileset-add-entry
+      </p:documentation>
     </p:import>
 
     <p:xslt>
@@ -64,5 +75,20 @@
     <px:set-base-uri>
       <p:with-option name="base-uri" select="concat($ncx-dir, 'navigation.ncx')"/>
     </px:set-base-uri>
+    <p:identity name="ncx"/>
+    <p:sink/>
+
+    <px:fileset-create>
+      <p:with-option name="base" select="$ncx-dir"/>
+    </px:fileset-create>
+    <px:fileset-add-entry media-type="application/x-dtbncx+xml" name="fileset">
+      <p:input port="entry">
+        <p:pipe step="ncx" port="result"/>
+      </p:input>
+      <p:with-param port="file-attributes" name="indent" select="'true'"/>
+      <p:with-param port="file-attributes" name="doctype-public" select="'-//NISO//DTD ncx 2005-1//EN'"/>
+      <p:with-param port="file-attributes" name="doctype-system" select="'http://www.daisy.org/z3986/2005/ncx-2005-1.dtd'"/>
+    </px:fileset-add-entry>
+    <p:sink/>
 
 </p:declare-step>

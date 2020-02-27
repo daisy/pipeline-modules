@@ -230,7 +230,7 @@
   <p:group name="convert">
     <p:output port="fileset" primary="true"/>
     <p:output port="in-memory" sequence="true">
-      <p:pipe step="daisy3" port="result.in-memory"/>
+      <p:pipe step="daisy3.in-memory" port="result"/>
     </p:output>
 
     <p:variable name="daisy3-dtbook-uri" select="concat($output-fileset-base, replace(base-uri(/),'^.*/([^/]+)$','$1'))"/>
@@ -289,17 +289,11 @@
         <p:with-option name="audio-only" select="$audio-only"/>
       </px:daisy3-create-smils>
       <p:sink/>
-      <p:add-attribute match="d:file"  attribute-name="indent" attribute-value="true">
+      <p:identity>
         <p:input port="source">
           <p:pipe step="create-mo" port="fileset.out"/>
         </p:input>
-      </p:add-attribute>
-      <p:add-attribute match="d:file"
-                       attribute-name="doctype-public"
-                       attribute-value="-//NISO//DTD dtbsmil 2005-2//EN"/>
-      <p:add-attribute match="d:file"
-                       attribute-name="doctype-system"
-                       attribute-value="http://www.daisy.org/z3986/2005/dtbsmil-2005-2.dtd"/>
+      </p:identity>
     </p:group>
 
     <!-- ===== CONTENT DOCUMENT FILE ===== -->
@@ -372,63 +366,27 @@
     <p:sink/>
 
     <!-- ===== NCX FILE ===== -->
-    <p:group name="ncx">
-      <p:output port="fileset" primary="true"/>
-      <p:output port="in-memory">
-        <p:pipe step="add-entry" port="result.in-memory"/>
-      </p:output>
-      <px:daisy3-create-ncx name="create-ncx">
-        <p:input port="content">
-          <p:pipe step="mo" port="dtbook"/>
-        </p:input>
-        <p:input port="audio-map">
-          <p:pipe port="audio-map" step="tts"/>
-        </p:input>
-        <p:with-option name="ncx-dir" select="$output-fileset-base"/>
-        <p:with-option name="audio-dir" select="$output-fileset-base"/>
-        <!-- <p:with-option name="audio-dir" select="concat($output-fileset-base, 'audio/')"/> -->
-        <p:with-option name="smil-dir" select="$output-fileset-base"/>
-        <!-- <p:with-option name="smil-dir" select="concat($output-fileset-base, 'mo/')"/> -->
-        <p:with-option name="uid" select="$uid"/>
-      </px:daisy3-create-ncx>
-      <p:sink/>
-      <px:fileset-create>
-        <p:with-option name="base" select="$output-fileset-base"/>
-      </px:fileset-create>
-      <px:fileset-add-entry media-type='application/x-dtbncx+xml' name="add-entry">
-        <p:input port="entry">
-          <p:pipe step="create-ncx" port="result"/>
-        </p:input>
-        <p:with-param port="file-attributes" name="indent" select="'true'"/>
-        <p:with-param port="file-attributes" name="doctype-public" select="'-//NISO//DTD ncx 2005-1//EN'"/>
-        <p:with-param port="file-attributes" name="doctype-system" select="'http://www.daisy.org/z3986/2005/ncx-2005-1.dtd'"/>
-      </px:fileset-add-entry>
-    </p:group>
+    <px:daisy3-create-ncx name="ncx">
+      <p:input port="content">
+        <p:pipe step="mo" port="dtbook"/>
+      </p:input>
+      <p:input port="audio-map">
+        <p:pipe port="audio-map" step="tts"/>
+      </p:input>
+      <p:with-option name="ncx-dir" select="$output-fileset-base"/>
+      <p:with-option name="audio-dir" select="$output-fileset-base"/>
+      <!-- <p:with-option name="audio-dir" select="concat($output-fileset-base, 'audio/')"/> -->
+      <p:with-option name="smil-dir" select="$output-fileset-base"/>
+      <!-- <p:with-option name="smil-dir" select="concat($output-fileset-base, 'mo/')"/> -->
+      <p:with-option name="uid" select="$uid"/>
+    </px:daisy3-create-ncx>
     <p:sink/>
 
     <!-- ===== RESOURCE FILE ===== -->
-    <p:group name="res-file">
-      <p:output port="fileset" primary="true"/>
-      <p:output port="in-memory">
-        <p:pipe step="add-entry" port="result.in-memory"/>
-      </p:output>
-      <px:daisy3-create-res-file name="create-res-file">
-        <p:with-option name="output-dir" select="$output-fileset-base"/>
-        <p:with-option name="lang" select="$lang"/>
-      </px:daisy3-create-res-file>
-      <p:sink/>
-      <px:fileset-create>
-        <p:with-option name="base" select="$output-fileset-base"/>
-      </px:fileset-create>
-      <px:fileset-add-entry media-type='application/x-dtbresource+xml' name="add-entry">
-        <p:input port="entry">
-          <p:pipe step="create-res-file" port="result"/>
-        </p:input>
-        <p:with-param port="file-attributes" name="indent" select="'true'"/>
-        <p:with-param port="file-attributes" name="doctype-public" select="'-//NISO//DTD resource 2005-1//EN'"/>
-        <p:with-param port="file-attributes" name="doctype-system" select="'http://www.daisy.org/z3986/2005/resource-2005-1.dtd'"/>
-      </px:fileset-add-entry>
-    </p:group>
+    <px:daisy3-create-res-file name="res-file">
+      <p:with-option name="output-dir" select="$output-fileset-base"/>
+      <p:with-option name="lang" select="$lang"/>
+    </px:daisy3-create-res-file>
     <p:sink/>
 
     <!-- ===== MATHML XSLT AND ALTIMG FALLBACKS ===== -->
@@ -502,9 +460,9 @@
 	    <p:pipe step="audio" port="result.fileset"/>
 	    <p:pipe step="fileset.moved" port="result.fileset"/>
 	    <p:pipe step="mathml-fallbacks" port="fileset"/>
-	    <p:pipe step="ncx" port="fileset"/>
+	    <p:pipe step="ncx" port="result.fileset"/>
 	    <p:pipe step="content-doc" port="fileset"/>
-	    <p:pipe step="res-file" port="fileset"/>
+	    <p:pipe step="res-file" port="result.fileset"/>
 	  </p:input>
 	</px:fileset-join>
       </p:when>
@@ -513,13 +471,13 @@
 	  <p:input port="source">
 	    <p:pipe step="mo" port="fileset"/>
 	    <p:pipe step="audio" port="result.fileset"/>
-	    <p:pipe step="ncx" port="fileset"/>
-	    <p:pipe step="res-file" port="fileset"/>
+	    <p:pipe step="ncx" port="result.fileset"/>
+	    <p:pipe step="res-file" port="result.fileset"/>
 	  </p:input>
 	</px:fileset-join>
       </p:otherwise>
     </p:choose>
-    <p:identity name="daisy3.fileset"/>
+    <p:identity name="daisy3.fileset-without-opf"/>
     <px:daisy3-create-opf name="opf">
       <p:with-option name="opf-uri" select="concat($output-fileset-base, 'book.opf')"/>
       <p:with-option name="output-dir" select="$output-fileset-base"/>
@@ -536,24 +494,23 @@
       </p:with-option>
     </px:daisy3-create-opf>
     <p:sink/>
-    <px:fileset-add-entry media-type="text/xml" name="daisy3">
+    <p:identity name="daisy3.in-memory">
       <p:input port="source">
-        <p:pipe step="daisy3.fileset" port="result"/>
-      </p:input>
-      <p:input port="source.in-memory">
         <p:pipe step="content-doc" port="in-memory"/>
-        <p:pipe step="ncx" port="in-memory"/>
-        <p:pipe step="res-file" port="in-memory"/>
+        <p:pipe step="ncx" port="result"/>
+        <p:pipe step="res-file" port="result"/>
         <p:pipe step="mo" port="in-memory"/>
         <p:pipe step="mathml-fallbacks" port="in-memory"/>
-      </p:input>
-      <p:input port="entry">
         <p:pipe step="opf" port="result"/>
       </p:input>
-      <p:with-param port="file-attributes" name="indent" select="'true'"/>
-      <p:with-param port="file-attributes" name="doctype-public" select="'+//ISBN 0-9673008-1-9//DTD OEB 1.2 Package//EN'"/>
-      <p:with-param port="file-attributes" name="doctype-system" select="'http://openebook.org/dtds/oeb-1.2/oebpkg12.dtd'"/>
-    </px:fileset-add-entry>
+    </p:identity>
+    <p:sink/>
+    <px:fileset-join>
+      <p:input port="source">
+        <p:pipe step="daisy3.fileset-without-opf" port="result"/>
+        <p:pipe step="opf" port="result.fileset"/>
+      </p:input>
+    </px:fileset-join>
   </p:group>
   <p:sink/>
 

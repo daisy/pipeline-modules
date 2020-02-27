@@ -55,6 +55,20 @@
           </body>
         </x:document>
       </x:expect>
+      <x:context label="fileset.out">
+        <x:document type="port" port="fileset.out"/>
+      </x:context>
+      <x:expect label="the result fileset"
+                type="custom" href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl" step="x:fileset-compare">
+        <x:document type="inline">
+          <d:fileset>
+            <d:file href="file:/output/mo0.smil" media-type="application/smil"
+                    indent="true"
+                    doctype-public="-//NISO//DTD dtbsmil 2005-2//EN"
+                    doctype-system="http://www.daisy.org/z3986/2005/dtbsmil-2005-2.dtd"/>
+          </d:fileset>
+        </x:document>
+      </x:expect>
     </x:scenario>
 
     <x:scenario label="headings without audio">
