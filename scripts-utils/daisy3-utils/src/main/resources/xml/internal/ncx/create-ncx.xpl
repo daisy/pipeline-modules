@@ -64,6 +64,5 @@
     <px:set-base-uri>
       <p:with-option name="base-uri" select="concat($ncx-dir, 'navigation.ncx')"/>
     </px:set-base-uri>
-    <p:add-xml-base/>
 
 </p:declare-step>

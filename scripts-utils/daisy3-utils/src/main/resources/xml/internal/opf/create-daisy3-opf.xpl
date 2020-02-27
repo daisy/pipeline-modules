@@ -84,6 +84,5 @@
     <px:set-base-uri>
       <p:with-option name="base-uri" select="$opf-uri"/>
     </px:set-base-uri>
-    <p:add-xml-base/>
 
 </p:declare-step>

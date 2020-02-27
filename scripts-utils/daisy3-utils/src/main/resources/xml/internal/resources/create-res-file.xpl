@@ -98,6 +98,5 @@
     </p:input>
     <p:with-option name="base-uri" select="concat($output-dir, 'resources.res')"/>
   </px:set-base-uri>
-  <p:add-xml-base/>
 
 </p:declare-step>
