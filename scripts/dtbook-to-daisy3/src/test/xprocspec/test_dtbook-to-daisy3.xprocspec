@@ -306,11 +306,11 @@
 					</metadata>
 					<manifest>
 						<item href="book.opf" id="opf" media-type="text/xml"/>
+						<item href="dtbook.xml" id="opf-1" media-type="application/x-dtbook+xml"/>
+						<item href="math-formulae.png" id="opf-2" media-type="image/png"/>
 						<item href="mo0.smil" id="mo0" media-type="application/smil"/>
-						<item href="mathml-fallback.xsl" id="opf-2" media-type="application/xslt+xml"/>
-						<item href="math-formulae.png" id="opf-3" media-type="image/png"/>
+						<item href="mathml-fallback.xsl" id="opf-4" media-type="application/xslt+xml"/>
 						<item href="navigation.ncx" id="ncx" media-type="application/x-dtbncx+xml"/>
-						<item href="dtbook.xml" id="opf-5" media-type="application/x-dtbook+xml"/>
 						<item href="resources.res" id="resource" media-type="application/x-dtbresource+xml"/>
 					</manifest>
 					<spine>

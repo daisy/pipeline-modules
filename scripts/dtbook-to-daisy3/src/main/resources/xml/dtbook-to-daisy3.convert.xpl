@@ -209,29 +209,6 @@
   </px:audio-clips-update-files>
   <p:sink/>
 
-  <!-- ===== COPY RESOURCE FILES ==== -->
-  <px:fileset-rebase>
-    <!-- to make sure relative paths from DTBook to resource files remain the same -->
-    <p:input port="source">
-      <p:pipe step="main" port="fileset.in"/>
-    </p:input>
-    <p:with-option name="new-base" select="base-uri(/*)">
-      <p:pipe step="tts-enriched-dtbook" port="result"/>
-    </p:with-option>
-  </px:fileset-rebase>
-  <px:fileset-filter media-types="image/gif
-                                  image/jpeg
-                                  image/png
-                                  image/svg+xml
-                                  application/pls+xml
-                                  audio/mpeg
-                                  audio/mp4
-                                  text/css"/>
-  <px:fileset-copy name="fileset.moved">
-    <p:with-option name="target" select="$output-fileset-base"/>
-  </px:fileset-copy>
-  <p:sink/>
-
   <p:identity>
     <p:input port="source">
       <p:pipe step="tts-enriched-dtbook" port="result"/>
@@ -244,8 +221,6 @@
     </p:output>
 
     <p:variable name="mathml-fallback-uri" select="concat($output-fileset-base, 'mathml-fallback.xsl')"/>
-    <p:variable name="math-img" select="'math-formulae.png'"/>
-
     <!-- Those variables could be used for structuring the output
          package but some DAISY players can only read flat
          package. -->
@@ -272,7 +247,9 @@
     <px:daisy3-prepare-dtbook name="prepare-dtbook">
       <p:with-option name="uid" select="$uid"/>
       <p:with-option name="output-base-uri" select="concat($output-fileset-base, replace(base-uri(/),'^.*/([^/]+)$','$1'))"/>
-      <p:with-option name="mathml-formulae-img" select="$math-img"/>
+      <p:input port="mathml-altimg-fallback">
+        <p:pipe step="mathml-altimg-fallback" port="result"/>
+      </p:input>
     </px:daisy3-prepare-dtbook>
 
     <!-- ===== SMIL FILES ===== -->
@@ -314,11 +291,12 @@
     <!--
         FIXME: move to daisy3-utils
     -->
-    <p:choose name="mathml-fallbacks">
+    <!-- xslt fallback -->
+    <p:choose name="mathml-xslt-fallback">
       <p:xpath-context>
         <p:pipe step="tts-enriched-dtbook" port="result"/>
       </p:xpath-context>
-      <p:when test="not(exists(//m:math))" px:message="No MathML found in DTBook">
+      <p:when test="$audio-only='true' or not(exists(//m:math))">
 	<p:output port="fileset" primary="true">
 	  <p:empty/>
 	</p:output>
@@ -331,13 +309,12 @@
           </p:input>
         </p:sink>
       </p:when>
-      <p:otherwise px:message="Adding MathML resources...">
+      <p:otherwise>
 	<p:output port="fileset" primary="true"/>
 	<p:output port="in-memory">
 	  <p:pipe step="mathml-xslt-fallback" port="result"/>
 	</p:output>
 
-	<!-- xslt fallback -->
 	<p:load href="mathml-fallback.xsl"/>
 	<px:set-base-uri name="mathml-xslt-fallback">
 	  <p:with-option name="base-uri" select="$mathml-fallback-uri"/>
@@ -352,50 +329,66 @@
 	  </p:input>
 	</px:fileset-add-entry>
 
-	<!-- altimg fallback -->
-	<p:choose>
-	  <p:when test="//m:math[not(@altimg)]">
-	    <p:xpath-context>
-	      <p:pipe step="tts-enriched-dtbook" port="result"/>
-	    </p:xpath-context>
-	    <p:output port="result" primary="true"/>
-	    <px:fileset-add-entry media-type="image/png">
-	      <p:with-option name="href" select="$math-img"/>
-	      <p:with-option name="original-href" select="resolve-uri('../images/math_formulae.png', static-base-uri())"/>
-	    </px:fileset-add-entry>
-	  </p:when>
-	  <p:otherwise>
-	    <p:output port="result" primary="true"/>
-	    <p:identity/>
-	  </p:otherwise>
-	</p:choose>
       </p:otherwise>
     </p:choose>
+    <p:sink/>
+
+    <!-- altimg fallback -->
+    <px:fileset-create>
+      <p:with-option name="base" select="$output-fileset-base"/>
+    </px:fileset-create>
+    <px:fileset-add-entry media-type="image/png" name="mathml-altimg-fallback">
+      <p:with-option name="href" select="'math-formulae.png'"/>
+      <p:with-option name="original-href" select="resolve-uri('../images/math_formulae.png', static-base-uri())"/>
+    </px:fileset-add-entry>
+    <p:sink/>
 
     <!-- ===== OPF FILE AND DAISY 3 FILESET ==== -->
+    <px:fileset-join>
+      <p:input port="source">
+        <p:pipe step="mo" port="result.fileset"/>
+        <p:pipe step="audio" port="result.fileset"/>
+        <p:pipe step="mathml-xslt-fallback" port="fileset"/>
+        <p:pipe step="ncx" port="result.fileset"/>
+        <p:pipe step="res-file" port="result.fileset"/>
+      </p:input>
+    </px:fileset-join>
     <p:choose>
-      <p:when test="$audio-only='false'">
-	<px:fileset-join>
-	  <p:input port="source">
-	    <p:pipe step="mo" port="smil.fileset"/>
-	    <p:pipe step="audio" port="result.fileset"/>
-	    <p:pipe step="fileset.moved" port="result.fileset"/>
-	    <p:pipe step="mathml-fallbacks" port="fileset"/>
-	    <p:pipe step="ncx" port="result.fileset"/>
-	    <p:pipe step="mo" port="dtbook.fileset"/>
-	    <p:pipe step="res-file" port="result.fileset"/>
-	  </p:input>
-	</px:fileset-join>
+      <p:when test="$audio-only='true'">
+        <!-- remove DTBook -->
+        <px:fileset-filter not-media-types="application/x-dtbook+xml"/>
       </p:when>
       <p:otherwise>
-	<px:fileset-join>
-	  <p:input port="source">
-	    <p:pipe step="mo" port="smil.fileset"/>
-	    <p:pipe step="audio" port="result.fileset"/>
-	    <p:pipe step="ncx" port="result.fileset"/>
-	    <p:pipe step="res-file" port="result.fileset"/>
-	  </p:input>
-	</px:fileset-join>
+        <p:identity name="fileset"/>
+        <p:sink/>
+        <!-- copy resource files -->
+        <px:fileset-rebase>
+          <!-- to make sure relative paths from DTBook to resource files remain the same -->
+          <p:input port="source">
+            <p:pipe step="main" port="fileset.in"/>
+          </p:input>
+          <p:with-option name="new-base" select="base-uri(/*)">
+            <p:pipe step="tts-enriched-dtbook" port="result"/>
+          </p:with-option>
+        </px:fileset-rebase>
+        <px:fileset-filter media-types="image/gif
+                                        image/jpeg
+                                        image/png
+                                        image/svg+xml
+                                        application/pls+xml
+                                        audio/mpeg
+                                        audio/mp4
+                                        text/css"/>
+        <px:fileset-copy name="resources-fileset">
+          <p:with-option name="target" select="$output-fileset-base"/>
+        </px:fileset-copy>
+        <p:sink/>
+        <px:fileset-join>
+          <p:input port="source">
+            <p:pipe step="fileset" port="result"/>
+            <p:pipe step="resources-fileset" port="result.fileset"/>
+          </p:input>
+        </px:fileset-join>
       </p:otherwise>
     </p:choose>
     <p:identity name="daisy3.fileset-without-opf"/>
@@ -417,11 +410,10 @@
     <p:sink/>
     <p:identity name="daisy3.in-memory">
       <p:input port="source">
-        <p:pipe step="mo" port="dtbook.in-memory"/>
+        <p:pipe step="mo" port="result.in-memory"/>
         <p:pipe step="ncx" port="result"/>
         <p:pipe step="res-file" port="result"/>
-        <p:pipe step="mo" port="smil.in-memory"/>
-        <p:pipe step="mathml-fallbacks" port="in-memory"/>
+        <p:pipe step="mathml-xslt-fallback" port="in-memory"/>
         <p:pipe step="opf" port="result"/>
       </p:input>
     </p:identity>

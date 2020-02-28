@@ -10,7 +10,9 @@
     <p:input port="source.fileset" primary="true"/>
     <p:input port="source.in-memory" sequence="false">
       <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-        <p>DAISY 3 fileset with exactly one DTBook (loaded into memory)</p>
+        <p>DAISY 3 fileset with the DTBook</p>
+        <p>May contain other files but exactly one document must be loaded into memory: the
+        DTBook.</p>
       </p:documentation>
     </p:input>
 
@@ -27,8 +29,8 @@
     </p:output>
     <p:output port="result.in-memory" sequence="true">
       <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-        <p>Result fileset with the SMIL files, and the modified DTBook with smilref attributes and
-        possibly an updated DOCTYPE.</p>
+        <p>Copy of the input fileset with the SMIL files added, and the modified DTBook with smilref
+        attributes and possibly an updated DOCTYPE.</p>
       </p:documentation>
       <p:pipe step="copy-smilrefs" port="result"/>
       <p:pipe step="smil-with-durations" port="result"/>
@@ -39,7 +41,7 @@
     </p:output>
     <p:output port="dtbook.in-memory" sequence="false">
       <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-        <p>Fileset with only modified DTBook (loaded into memory).</p>
+        <p>Fileset with only the modified DTBook (loaded into memory).</p>
       </p:documentation>
       <p:pipe step="copy-smilrefs" port="result"/>
     </p:output>
@@ -256,7 +258,7 @@
         <p:pipe step="main" port="source.fileset"/>
       </p:input>
     </p:identity>
-    <p:group>
+    <p:viewport match="d:file[@media-type='application/x-dtbook+xml']">
       <p:variable name="math-prefix" select="substring-before((//mathml:math)[1]/name(), ':')">
         <!-- Hopefully, the MathML namespace prefixes are all the same. -->
         <p:pipe step="copy-smilrefs" port="result"/>
@@ -300,7 +302,7 @@
           <p:identity/>
         </p:otherwise>
       </p:choose>
-    </p:group>
+    </p:viewport>
     <p:identity name="dtbook-fileset"/>
     <p:sink/>
 
