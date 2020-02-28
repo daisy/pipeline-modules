@@ -2,7 +2,6 @@
 <?xml-model href="http://www.daisy.org/ns/xprocspec/xprocspec.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
 <x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-               xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                xmlns:d="http://www.daisy.org/ns/pipeline/data"
                xmlns:dtb="http://www.daisy.org/z3986/2005/dtbook/"
                xmlns:s="http://www.w3.org/2001/SMIL20/"
@@ -20,13 +19,20 @@
   	  </d:audio-clips>
   	</x:document>
       </x:input>
+      <x:input port="source.fileset">
+        <x:document type="inline">
+          <d:fileset>
+            <d:file href="dtbook.xml" media-type="application/x-dtbook+xml"/>
+          </d:fileset>
+        </x:document>
+      </x:input>
       <x:option name="smil-dir" select="resolve-uri('smil/')"/>
       <x:option name="uid" select="'uid'"/>
     </x:call>
 
     <x:scenario label="simple sentence">
       <x:call>
-  	<x:input port="content">
+  	<x:input port="source.in-memory">
   	  <x:document type="inline" xml:base="dtbook.xml">
 	    <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
 	      <sent id="s1">test</sent>
@@ -81,7 +87,7 @@
 
     <x:scenario label="headings without audio">
       <x:call>
-    	<x:input port="content">
+    	<x:input port="source.in-memory">
     	  <x:document type="inline" xml:base="dtbook.xml">
     	    <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
     	      <h1 id="i1"><sent id="i2">test</sent></h1>
@@ -114,7 +120,7 @@
 
     <x:scenario label="headings with audio">
       <x:call>
-    	<x:input port="content">
+    	<x:input port="source.in-memory">
     	  <x:document type="inline" xml:base="dtbook.xml">
     	    <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
     	      <h1 id="h1"><sent id="i2">test</sent></h1>
@@ -146,7 +152,7 @@
 
     <x:scenario label="two levels">
       <x:call>
-    	<x:input port="content">
+    	<x:input port="source.in-memory">
     	  <x:document type="inline" xml:base="dtbook.xml">
     	    <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
     	      <level>
@@ -194,7 +200,7 @@
 
     <x:scenario label="level separator">
       <x:call>
-    	<x:input port="content">
+    	<x:input port="source.in-memory">
     	  <x:document type="inline" xml:base="dtbook.xml">
     	    <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
     	      <level>
@@ -248,7 +254,7 @@
 
     <x:scenario label="nested levels">
       <x:call>
-    	<x:input port="content">
+    	<x:input port="source.in-memory">
     	  <x:document type="inline" xml:base="dtbook.xml">
     	    <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
     	      <level1>
@@ -330,7 +336,7 @@
 
     <x:scenario label="mixed levels">
       <x:call>
-    	<x:input port="content">
+    	<x:input port="source.in-memory">
     	  <x:document type="inline" xml:base="dtbook.xml">
     	    <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
     	      <level>
@@ -416,7 +422,7 @@
 
     <x:scenario label="noteref outside sentence">
       <x:call>
-    	<x:input port="content">
+    	<x:input port="source.in-memory">
     	  <x:document type="inline" xml:base="dtbook.xml">
     	    <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
     	      <level>
@@ -465,7 +471,7 @@
 
     <x:scenario label="noteref inside sentence">
       <x:call>
-    	<x:input port="content">
+    	<x:input port="source.in-memory">
     	  <x:document type="inline" xml:base="dtbook.xml">
     	    <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
     	      <level>
@@ -515,7 +521,7 @@
 
     <x:scenario label="deep content note">
       <x:call>
-    	<x:input port="content">
+    	<x:input port="source.in-memory">
     	  <x:document type="inline" xml:base="dtbook.xml">
     	    <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
     	      <level>
@@ -579,7 +585,7 @@
 
     <x:scenario label="noteref inside note">
       <x:call>
-    	<x:input port="content">
+    	<x:input port="source.in-memory">
     	  <x:document type="inline" xml:base="dtbook.xml">
     	    <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
     	      <level>
@@ -640,7 +646,7 @@
 
     <x:scenario label="three smils">
       <x:call>
-  	<x:input port="content">
+  	<x:input port="source.in-memory">
   	  <x:document type="inline" xml:base="dtbook.xml">
 	    <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
 	      <level>
@@ -702,7 +708,7 @@
 
     <x:scenario label="no smilref for top elements">
       <x:call>
-  	<x:input port="content">
+  	<x:input port="source.in-memory">
   	  <x:document type="inline" xml:base="dtbook.xml">
 	    <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
 	      <level>
@@ -754,7 +760,7 @@
 
     <x:scenario label="duplicate noteref">
       <x:call>
-  	<x:input port="content">
+  	<x:input port="source.in-memory">
   	  <x:document type="inline" xml:base="dtbook.xml">
 	    <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
 	      <level>
@@ -806,7 +812,7 @@
     <x:scenario label="audio only [simple]">
       <x:call>
 	<x:option name="audio-only" select="'true'"/>
-  	<x:input port="content">
+  	<x:input port="source.in-memory">
   	  <x:document type="inline" xml:base="dtbook.xml">
 	    <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
 	      <level>
@@ -858,7 +864,7 @@
     <x:scenario label="audio only: noteref in heading">
       <x:call>
     	<x:option name="audio-only" select="'true'"/>
-    	<x:input port="content">
+    	<x:input port="source.in-memory">
     	  <x:document type="inline" xml:base="dtbook.xml">
     	    <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/">
     	      <level>
@@ -932,7 +938,7 @@
     <!-- Depending on the implementation: -->
     <!-- <x:scenario label="empty list: no smilref"> -->
     <!--   <x:call> -->
-    <!-- 	<x:input port="content"> -->
+    <!-- 	<x:input port="source.in-memory"> -->
     <!-- 	  <x:document type="inline" xml:base="dtbook.xml"> -->
     <!-- 	    <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/"> -->
     <!-- 	      <level> -->

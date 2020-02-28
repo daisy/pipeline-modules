@@ -2,12 +2,15 @@
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
+                xmlns:dtb="http://www.daisy.org/z3986/2005/dtbook/"
                 xmlns:smil="http://www.w3.org/2001/SMIL20/"
+                xmlns:mathml="http://www.w3.org/1998/Math/MathML"
                 type="px:daisy3-create-smils" name="main">
 
-    <p:input port="content" primary="true">
+    <p:input port="source.fileset" primary="true"/>
+    <p:input port="source.in-memory" sequence="false">
       <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-        <p>DTBook</p>
+        <p>DAISY 3 fileset with exactly one DTBook (loaded into memory)</p>
       </p:documentation>
     </p:input>
 
@@ -19,13 +22,36 @@
        </p:documentation>
     </p:input>
 
-    <p:output port="result.fileset" primary="true"/>
+    <p:output port="result.fileset">
+      <p:pipe step="daisy3-fileset" port="result"/>
+    </p:output>
     <p:output port="result.in-memory" sequence="true">
       <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-        <p>Result fileset with the SMIL files and the modified DTBook with smilref attributes.</p>
+        <p>Result fileset with the SMIL files, and the modified DTBook with smilref attributes and
+        possibly an updated DOCTYPE.</p>
       </p:documentation>
-      <p:pipe port="result" step="copy-smilrefs"/>
-      <p:pipe port="result" step="smil-with-durations"/>
+      <p:pipe step="copy-smilrefs" port="result"/>
+      <p:pipe step="smil-with-durations" port="result"/>
+    </p:output>
+
+    <p:output port="dtbook.fileset">
+      <p:pipe step="dtbook-fileset" port="result"/>
+    </p:output>
+    <p:output port="dtbook.in-memory" sequence="false">
+      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+        <p>Fileset with only modified DTBook (loaded into memory).</p>
+      </p:documentation>
+      <p:pipe step="copy-smilrefs" port="result"/>
+    </p:output>
+
+    <p:output port="smil.fileset" primary="true">
+      <p:pipe step="smil-fileset" port="result"/>
+    </p:output>
+    <p:output port="smil.in-memory" sequence="true">
+      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+        <p>Fileset with only the SMIL files.</p>
+      </p:documentation>
+      <p:pipe step="smil-with-durations" port="result"/>
     </p:output>
 
     <p:output port="duration">
@@ -74,6 +100,11 @@
     <p:variable name="no-smilref"
 		select="' level level1 level2 level3 level4 level5 level6 dtbook frontmatter bodymatter rearmatter br head title meta style book bdo hr w '"/>
 
+    <p:identity>
+      <p:input port="source">
+        <p:pipe step="main" port="source.in-memory"/>
+      </p:input>
+    </p:identity>
     <p:delete match="@smilref"/>
 
     <p:xslt name="add-ids">
@@ -213,11 +244,72 @@
         <p:with-param port="file-attributes" name="doctype-system" select="'http://www.daisy.org/z3986/2005/dtbsmil-2005-2.dtd'"/>
       </px:fileset-add-entry>
     </p:for-each>
-    <px:fileset-join px:message="SMIL fileset created." px:message-severity="DEBUG"/>
-    <px:fileset-add-entry media-type="application/x-dtbook+xml">
-      <p:input port="entry">
-        <p:pipe step="main" port="content"/>
+    <px:fileset-join px:message="SMIL fileset created." px:message-severity="DEBUG"
+                     name="smil-fileset"/>
+    <p:sink/>
+
+    <!--
+        update DTBook DOCTYPE if needed
+    -->
+    <p:identity>
+      <p:input port="source">
+        <p:pipe step="main" port="source.fileset"/>
       </p:input>
-    </px:fileset-add-entry>
+    </p:identity>
+    <p:group>
+      <p:variable name="math-prefix" select="substring-before((//mathml:math)[1]/name(), ':')">
+        <!-- Hopefully, the MathML namespace prefixes are all the same. -->
+        <p:pipe step="copy-smilrefs" port="result"/>
+      </p:variable>
+      <p:choose>
+        <p:when test="$math-prefix">
+          <p:variable name="smilref-prefix" select="substring-before(name((//mathml:*[@dtb:smilref])[1]/@dtb:smilref), ':')">
+            <!-- Hopefully, the DTBook namespace prefixes are all the same for MathML elements. -->
+            <p:pipe step="copy-smilrefs" port="result"/>
+          </p:variable>
+          <p:variable name="dtbook-prefix" select="if ($smilref-prefix) then $smilref-prefix else 'dtbook'"/>
+          <!-- FIXME: use MathML2 DTD instead of MathML3 DTD when MathML2 detected -->
+          <p:variable name="math-extension" select="concat(' [
+						    &lt;!ENTITY % MATHML.prefixed &quot;INCLUDE&quot;&gt;
+						    &lt;!ENTITY % MATHML.prefix &quot;', $math-prefix, '&quot;&gt;
+						    &lt;!ENTITY % MATHML.Common.attrib
+						    &quot;xlink:href    CDATA       #IMPLIED
+						    xlink:type     CDATA       #IMPLIED
+						    class          CDATA       #IMPLIED
+						    style          CDATA       #IMPLIED
+						    id             ID          #IMPLIED
+						    xref           IDREF       #IMPLIED
+						    other          CDATA       #IMPLIED
+						    xmlns:', $dtbook-prefix, '   CDATA       #FIXED ''http://www.daisy.org/z3986/2005/dtbook/''
+						    ',$dtbook-prefix,':smilref CDATA       #IMPLIED&quot;&gt;
+						    &lt;!ENTITY % mathML3 PUBLIC &quot;-//W3C//DTD MathML 3.0//EN&quot;
+						    &quot;http://www.w3.org/Math/DTD/mathml3/mathml3.dtd&quot;&gt;
+						    %mathML3;
+						    &lt;!ENTITY % externalFlow &quot;| ', $math-prefix, ':math&quot;&gt;
+						    &lt;!ENTITY % externalNamespaces &quot;xmlns:', $math-prefix, ' CDATA #FIXED
+						    ''http://www.w3.org/1998/Math/MathML''&quot;&gt;]')"/>
+          <!-- assuming doctype-public and doctype-system attributes are present -->
+          <p:add-attribute match="d:file" attribute-name="doctype">
+            <p:with-option name="attribute-value" select="concat('&lt;!DOCTYPE dtbook PUBLIC &quot;',
+				   //d:file/@doctype-public, '&quot; &quot;', //d:file/@doctype-system,
+				   '&quot;', $math-extension, '&gt;')"/>
+          </p:add-attribute>
+          <p:delete match="@doctype-public|@doctype-system"/>
+        </p:when>
+        <p:otherwise>
+          <p:identity/>
+        </p:otherwise>
+      </p:choose>
+    </p:group>
+    <p:identity name="dtbook-fileset"/>
+    <p:sink/>
+
+    <px:fileset-join name="daisy3-fileset">
+      <p:input port="source">
+        <p:pipe step="dtbook-fileset" port="result"/>
+        <p:pipe step="smil-fileset" port="result"/>
+      </p:input>
+    </px:fileset-join>
+    <p:sink/>
 
 </p:declare-step>

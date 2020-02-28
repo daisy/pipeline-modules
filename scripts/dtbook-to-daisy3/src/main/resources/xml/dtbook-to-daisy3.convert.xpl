@@ -251,7 +251,6 @@
          package. -->
     <p:variable name="uid" select="concat((//dtbook:meta[@name='dtb:uid'])[1]/@content, '-packaged')"/>
     <p:variable name="title" select="normalize-space((//dtbook:meta[@name='dc:Title'])[1]/@content)"/>
-    <p:variable name="dtd-version" select="(//dtbook:dtbook)[1]/@version"/>
     <p:variable name="dclang" select="(//dtbook:meta[@name='dc:Language'])[1]/@content"/>
     <p:variable name="lang" select="if ($dclang) then $dclang else //@*[name()='xml:lang'][1]"/>
     <p:variable name="dcpublisher" select="(//dtbook:meta[@name='dc:Publisher'])[1]/@content"/>
@@ -263,7 +262,7 @@
         FIXME: correct error code
     -->
     <px:assert message="Other versions than DTBook-2005 are not supported." error-code="C0051">
-      <p:with-option name="test" select="starts-with($dtd-version, '2005')"/>
+      <p:with-option name="test" select="(//dtbook:dtbook)[1]/@version/starts-with(., '2005')"/>
     </px:assert>
 
     <!-- ===== ADD WHAT IS MAYBE MISSING IN THE DTBOOK ===== -->
@@ -275,112 +274,26 @@
       <p:with-option name="output-base-uri" select="concat($output-fileset-base, replace(base-uri(/),'^.*/([^/]+)$','$1'))"/>
       <p:with-option name="mathml-formulae-img" select="$math-img"/>
     </px:daisy3-prepare-dtbook>
-    <p:sink/>
-    <p:identity>
-      <p:input port="source">
-        <p:pipe step="prepare-dtbook" port="result.in-memory"/>
-      </p:input>
-    </p:identity>
 
     <!-- ===== SMIL FILES ===== -->
-    <p:group name="mo">
-      <p:output port="fileset" primary="true">
-        <p:pipe step="filter-dtbook" port="not-matched"/>
-      </p:output>
-      <p:output port="in-memory" sequence="true">
-        <p:pipe step="filter-dtbook" port="not-matched.in-memory"/>
-      </p:output>
-      <p:output port="dtbook">
-        <p:pipe step="dtbook-with-smilrefs" port="result"/>
-      </p:output>
-      <p:output port="duration">
-        <p:pipe step="create-mo" port="duration"/>
-      </p:output>
-      <px:daisy3-create-smils name="create-mo" px:message="Generating SMIL files...">
-        <p:input port="audio-map">
-          <p:pipe step="audio-map" port="result"/>
-        </p:input>
-        <p:with-option name="smil-dir" select="$output-fileset-base"/>
-        <!-- <p:with-option name="smil-dir" select="concat($output-fileset-base, 'mo/')"/> -->
-        <p:with-option name="uid" select="$uid"/>
-        <p:with-option name="audio-only" select="$audio-only"/>
-      </px:daisy3-create-smils>
-      <px:fileset-filter media-types="application/x-dtbook+xml" name="filter-dtbook">
-        <p:input port="source.in-memory">
-          <p:pipe step="create-mo" port="result.in-memory"/>
-        </p:input>
-      </px:fileset-filter>
-      <px:fileset-load name="dtbook-with-smilrefs">
-        <p:input port="in-memory">
-          <p:pipe step="create-mo" port="result.in-memory"/>
-        </p:input>
-      </px:fileset-load>
-      <p:sink/>
-    </p:group>
-    <p:sink/>
-
-    <!-- ===== CONTENT DOCUMENT FILE ===== -->
-    <p:identity>
-      <p:input port="source">
-        <p:pipe step="mo" port="dtbook"/>
+    <px:daisy3-create-smils name="mo" px:message="Generating SMIL files...">
+      <p:input port="source.in-memory">
+        <p:pipe step="prepare-dtbook" port="result.in-memory"/>
       </p:input>
-    </p:identity>
-    <p:group name="content-doc">
-      <p:output port="fileset" primary="true"/>
-      <p:output port="in-memory">
-        <p:pipe step="add-entry" port="result.in-memory"/>
-      </p:output>
-      <p:variable name="math-prefix" select="substring-before((//m:math)[1]/name(), ':')">
-        <!-- Hopefully, the MathML namespace prefixes are all the same. -->
-      </p:variable>
-      <p:variable name="smilref-prefix" select="substring-before(name((//m:*[@dtbook:smilref])[1]/@dtbook:smilref), ':')">
-        <!-- Hopefully, the DTBook namespace prefixes are all the same for MathML elements. -->
-      </p:variable>
-      <p:variable name="dtbook-prefix" select="if ($smilref-prefix) then $smilref-prefix else 'dtbook'"/>
-      <!-- FIXME: use MathML2 DTD instead of MathML3 DTD when MathML2 detected -->
-      <p:variable name="math-extension" select="if (not($math-prefix)) then '' else concat(' [
-						    &lt;!ENTITY % MATHML.prefixed &quot;INCLUDE&quot;&gt;
-						    &lt;!ENTITY % MATHML.prefix &quot;', $math-prefix, '&quot;&gt;
-						    &lt;!ENTITY % MATHML.Common.attrib
-						    &quot;xlink:href    CDATA       #IMPLIED
-						    xlink:type     CDATA       #IMPLIED
-						    class          CDATA       #IMPLIED
-						    style          CDATA       #IMPLIED
-						    id             ID          #IMPLIED
-						    xref           IDREF       #IMPLIED
-						    other          CDATA       #IMPLIED
-						    xmlns:', $dtbook-prefix, '   CDATA       #FIXED ''http://www.daisy.org/z3986/2005/dtbook/''
-						    ',$dtbook-prefix,':smilref CDATA       #IMPLIED&quot;&gt;
-						    &lt;!ENTITY % mathML3 PUBLIC &quot;-//W3C//DTD MathML 3.0//EN&quot;
-						    &quot;http://www.w3.org/Math/DTD/mathml3/mathml3.dtd&quot;&gt;
-						    %mathML3;
-						    &lt;!ENTITY % externalFlow &quot;| ', $math-prefix, ':math&quot;&gt;
-						    &lt;!ENTITY % externalNamespaces &quot;xmlns:', $math-prefix, ' CDATA #FIXED
-						    ''http://www.w3.org/1998/Math/MathML''&quot;&gt;]')"/>
-      <p:variable name="doctype-public" select="concat('-//NISO//DTD dtbook ', $dtd-version, '//EN')"/>
-      <p:variable name="doctype-system" select="concat('http://www.daisy.org/z3986/2005/dtbook-', $dtd-version, '.dtd')"/>
-      <p:identity name="in-memory"/>
-      <p:sink/>
-      <px:fileset-create>
-        <p:with-option name="base" select="$output-fileset-base"/>
-      </px:fileset-create>
-      <px:fileset-add-entry media-type="application/x-dtbook+xml" name="add-entry">
-        <p:input port="entry">
-          <p:pipe step="in-memory" port="result"/>
-        </p:input>
-        <p:with-param port="file-attributes" name="doctype"
-                      select="concat('&lt;!DOCTYPE dtbook PUBLIC &quot;',
-				   $doctype-public, '&quot; &quot;', $doctype-system,
-				   '&quot;', $math-extension, '&gt;')">
-        </p:with-param>
-      </px:fileset-add-entry>
-    </p:group>
+      <p:input port="audio-map">
+        <p:pipe step="audio-map" port="result"/>
+      </p:input>
+      <p:with-option name="smil-dir" select="$output-fileset-base"/>
+      <!-- <p:with-option name="smil-dir" select="concat($output-fileset-base, 'mo/')"/> -->
+      <p:with-option name="uid" select="$uid"/>
+      <p:with-option name="audio-only" select="$audio-only"/>
+    </px:daisy3-create-smils>
     <p:sink/>
 
     <!-- ===== NCX FILE ===== -->
     <px:daisy3-create-ncx name="ncx">
       <p:input port="content">
-        <p:pipe step="mo" port="dtbook"/>
+        <p:pipe step="mo" port="dtbook.in-memory"/>
       </p:input>
       <p:input port="audio-map">
         <p:pipe step="audio-map" port="result"/>
@@ -464,12 +377,12 @@
       <p:when test="$audio-only='false'">
 	<px:fileset-join>
 	  <p:input port="source">
-	    <p:pipe step="mo" port="fileset"/>
+	    <p:pipe step="mo" port="smil.fileset"/>
 	    <p:pipe step="audio" port="result.fileset"/>
 	    <p:pipe step="fileset.moved" port="result.fileset"/>
 	    <p:pipe step="mathml-fallbacks" port="fileset"/>
 	    <p:pipe step="ncx" port="result.fileset"/>
-	    <p:pipe step="content-doc" port="fileset"/>
+	    <p:pipe step="mo" port="dtbook.fileset"/>
 	    <p:pipe step="res-file" port="result.fileset"/>
 	  </p:input>
 	</px:fileset-join>
@@ -477,7 +390,7 @@
       <p:otherwise>
 	<px:fileset-join>
 	  <p:input port="source">
-	    <p:pipe step="mo" port="fileset"/>
+	    <p:pipe step="mo" port="smil.fileset"/>
 	    <p:pipe step="audio" port="result.fileset"/>
 	    <p:pipe step="ncx" port="result.fileset"/>
 	    <p:pipe step="res-file" port="result.fileset"/>
@@ -504,10 +417,10 @@
     <p:sink/>
     <p:identity name="daisy3.in-memory">
       <p:input port="source">
-        <p:pipe step="content-doc" port="in-memory"/>
+        <p:pipe step="mo" port="dtbook.in-memory"/>
         <p:pipe step="ncx" port="result"/>
         <p:pipe step="res-file" port="result"/>
-        <p:pipe step="mo" port="in-memory"/>
+        <p:pipe step="mo" port="smil.in-memory"/>
         <p:pipe step="mathml-fallbacks" port="in-memory"/>
         <p:pipe step="opf" port="result"/>
       </p:input>

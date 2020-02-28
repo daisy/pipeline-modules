@@ -41,7 +41,8 @@
 					        doctype-public="-//NISO//DTD dtbsmil 2005-2//EN"
 					        doctype-system="http://www.daisy.org/z3986/2005/dtbsmil-2005-2.dtd"/>
 					<d:file href="result/shuffled_7019_xmldtbook_1.xml" media-type="application/x-dtbook+xml"
-					        doctype="&lt;!DOCTYPE dtbook PUBLIC &quot;-//NISO//DTD dtbook 2005-3//EN&quot; &quot;http://www.daisy.org/z3986/2005/dtbook-2005-3.dtd&quot;&gt;"/>
+					        doctype-public="-//NISO//DTD dtbook 2005-3//EN"
+					        doctype-system="http://www.daisy.org/z3986/2005/dtbook-2005-3.dtd"/>
 					<d:file href="result/navigation.ncx" media-type="application/x-dtbncx+xml"
 					        indent="true"
 					        doctype-public="-//NISO//DTD ncx 2005-1//EN"
