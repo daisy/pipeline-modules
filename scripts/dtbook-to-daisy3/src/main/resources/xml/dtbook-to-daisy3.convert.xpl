@@ -388,10 +388,6 @@
         <p:pipe step="audio-map" port="result"/>
       </p:input>
       <p:with-option name="ncx-dir" select="$output-fileset-base"/>
-      <p:with-option name="audio-dir" select="$output-fileset-base"/>
-      <!-- <p:with-option name="audio-dir" select="concat($output-fileset-base, 'audio/')"/> -->
-      <p:with-option name="smil-dir" select="$output-fileset-base"/>
-      <!-- <p:with-option name="smil-dir" select="concat($output-fileset-base, 'mo/')"/> -->
       <p:with-option name="uid" select="$uid"/>
     </px:daisy3-create-ncx>
     <p:sink/>
