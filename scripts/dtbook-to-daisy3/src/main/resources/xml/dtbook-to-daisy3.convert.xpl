@@ -267,14 +267,20 @@
     </px:assert>
 
     <!-- ===== ADD WHAT IS MAYBE MISSING IN THE DTBOOK ===== -->
-    <!-- (todo: peform this before the TTS so that the extra text will be synthesized) -->
-    <px:daisy3-prepare-dtbook>
+    <!--
+        FIXME: perform this before the TTS so that the extra text will be synthesized
+    -->
+    <px:daisy3-prepare-dtbook name="prepare-dtbook">
+      <p:with-option name="uid" select="$uid"/>
+      <p:with-option name="output-base-uri" select="concat($output-fileset-base, replace(base-uri(/),'^.*/([^/]+)$','$1'))"/>
       <p:with-option name="mathml-formulae-img" select="$math-img"/>
     </px:daisy3-prepare-dtbook>
-
-    <px:set-base-uri>
-      <p:with-option name="base-uri" select="concat($output-fileset-base, replace(base-uri(/),'^.*/([^/]+)$','$1'))"/>
-    </px:set-base-uri>
+    <p:sink/>
+    <p:identity>
+      <p:input port="source">
+        <p:pipe step="prepare-dtbook" port="result.in-memory"/>
+      </p:input>
+    </p:identity>
 
     <!-- ===== SMIL FILES ===== -->
     <p:group name="mo">
@@ -353,15 +359,7 @@
 						    ''http://www.w3.org/1998/Math/MathML''&quot;&gt;]')"/>
       <p:variable name="doctype-public" select="concat('-//NISO//DTD dtbook ', $dtd-version, '//EN')"/>
       <p:variable name="doctype-system" select="concat('http://www.daisy.org/z3986/2005/dtbook-', $dtd-version, '.dtd')"/>
-      <!-- add some metadata -->
-      <p:add-attribute match="//dtbook:meta[@name='dtb:uid']" attribute-name="content">
-        <p:with-option name="attribute-value" select="$uid"/>
-      </p:add-attribute>
-      <p:add-attribute match="//dtbook:meta[@name='dc:Identifier' and count(@*)=2]"
-		       attribute-name="content"
-		       name="in-memory">
-        <p:with-option name="attribute-value" select="$uid"/>
-      </p:add-attribute>
+      <p:identity name="in-memory"/>
       <p:sink/>
       <px:fileset-create>
         <p:with-option name="base" select="$output-fileset-base"/>
