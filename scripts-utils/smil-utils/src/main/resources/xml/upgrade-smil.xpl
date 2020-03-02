@@ -2,11 +2,36 @@
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:c="http://www.w3.org/ns/xproc-step"
-                xmlns:err="http://www.w3.org/ns/xproc-error"
-                type="px:mediaoverlay-upgrade-smil">
+                type="px:smil-upgrade">
 
-    <p:output port="result"/>
-    <p:input port="source"/>
+    <p:input port="source">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Input SMIL</p>
+            <p>Must be a version 1.0, 2.0 or 3.0 SMIL document</p>
+        </p:documentation>
+    </p:input>
+    <p:output port="result">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Output SMIL</p>
+        </p:documentation>
+    </p:output>
+    <p:option name="version" select="'3.0'">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Version of the output SMIL</p>
+            <p>Only supported value is 3.0</p>
+        </p:documentation>
+    </p:option>
+
+    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
+        <p:documentation>
+            px:assert
+            px:error
+        </p:documentation>
+    </p:import>
+
+    <px:assert error-code="XXX" message="The output SMIL version must be 3.0">
+        <p:with-option name="test" select="$version='3.0'"/>
+    </px:assert>
 
     <p:choose>
         <p:when test="local-name(/*)='smil' and namespace-uri(/*)='http://www.w3.org/ns/SMIL' and /*/@version='3.0'">
@@ -38,15 +63,10 @@
             </p:xslt>
         </p:when>
         <p:otherwise>
-            <p:error code="err:PMU0001">
-                <p:input port="source">
-                    <p:inline>
-                        <c:message>It is a dynamic error if the document arriving on the input port
+            <px:error code="PMU0001" code-prefix="err" code-namespace="http://www.w3.org/ns/xproc-error"
+                      message="It is a dynamic error if the document arriving on the input port
                             is not a valid DAISY 2.02, DAISY 3 (DTBook) or EPUB3 Media Overlay
-                            document.</c:message>
-                    </p:inline>
-                </p:input>
-            </p:error>
+                            document."/>
         </p:otherwise>
 
     </p:choose>

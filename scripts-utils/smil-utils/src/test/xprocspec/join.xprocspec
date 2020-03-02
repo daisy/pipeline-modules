@@ -11,7 +11,7 @@
             <p:import href="../../main/resources/xml/join.xpl"/>
             <p:import href="../../main/resources/xml/upgrade-smil.xpl"/>
             <p:for-each>
-                <px:mediaoverlay-upgrade-smil/>
+                <px:smil-upgrade version="3.0"/>
             </p:for-each>
             <px:mediaoverlay-join/>
             <p:delete match="/*/@xml:base"/>

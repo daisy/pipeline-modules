@@ -57,7 +57,7 @@
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>For manipulating media overlays.</p>
             <ol>
-                <li>px:mediaoverlay-upgrade-smil</li>
+                <li>px:smil-upgrade</li>
                 <li>px:mediaoverlay-join</li>
                 <li>px:mediaoverlay-rearrange</li>
             </ol>
@@ -74,7 +74,7 @@
             <p:pipe port="daisy-smil" step="mediaoverlay"/>
         </p:iteration-source>
         <p:variable name="original-uri" select="base-uri(/*)"/>
-        <px:mediaoverlay-upgrade-smil/>
+        <px:smil-upgrade version="3.0"/>
         <px:message message="upgraded the SMIL file $1">
             <p:with-option name="param1" select="$original-uri"/>
         </px:message>
