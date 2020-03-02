@@ -2,6 +2,7 @@
 <p:library xmlns:p="http://www.w3.org/ns/xproc" version="1.0">
 
     <p:import href="upgrade-smil.xpl"/>
+    <p:import href="downgrade-smil.xpl"/>
     <p:import href="smil-to-text-fileset.xpl"/>
     <p:import href="smil-to-audio-fileset.xpl"/>
     <p:import href="smil-to-audio-clips.xpl"/>

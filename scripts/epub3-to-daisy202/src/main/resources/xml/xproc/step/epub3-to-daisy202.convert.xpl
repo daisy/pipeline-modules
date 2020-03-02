@@ -46,6 +46,11 @@
             px:daisy202-rename-files
         </p:documentation>
     </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/smil-utils/library.xpl">
+        <p:documentation>
+            px:smil-downgrade
+        </p:documentation>
+    </p:import>
     <p:import href="create-ncc.xpl">
         <p:documentation>
             pxi:create-ncc
@@ -83,14 +88,7 @@
     </px:fileset-load>
     <p:for-each px:message="Converting SMIL-file from 3.0 (EPUB3 MO profile) to 1.0 (DAISY 2.02 profile)">
         <p:variable name="smil-original-base" select="base-uri(/*)"/>
-        <p:xslt px:message="- {$smil-original-base}" px:message-severity="DEBUG">
-            <p:input port="parameters">
-                <p:empty/>
-            </p:input>
-            <p:input port="stylesheet">
-                <p:document href="../../xslt/smil3-to-smil1.xsl"/>
-            </p:input>
-        </p:xslt>
+        <px:smil-downgrade version="1.0" px:message="- {$smil-original-base}" px:message-severity="DEBUG"/>
     </p:for-each>
     <p:identity name="daisy202.smil.in-memory"/>
     <p:sink/>

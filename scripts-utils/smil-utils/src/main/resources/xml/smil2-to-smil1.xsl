@@ -2,29 +2,60 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions"
+                xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:ncx="http://www.daisy.org/z3986/2005/ncx/"
                 xpath-default-namespace="http://www.w3.org/2001/SMIL20/"
                 exclude-result-prefixes="#all">
 
-    <xsl:output indent="yes"/>
-    <xsl:param name="ncc-uri" select="'ncc.html'"/>
+    <xsl:include href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl"/>
 
-    <xsl:variable name="ncx-idrefs" as="document-node()" select="collection()[/d:doc]"/>
     <xsl:variable name="test-note-ids"
-        select="collection()/ncx:smilCustomTest[@bookStruct='NOTE']/string(@id)" as="xs:string*"/>
+        select="collection()/ncx:ncx/ncx:head/ncx:smilCustomTest[@bookStruct='NOTE']/string(@id)" as="xs:string*"/>
     <xsl:variable name="test-noteref-ids"
-        select="collection()/ncx:smilCustomTest[@bookStruct='NOTE_REFERENCE']/string(@id)"
+        select="collection()/ncx:ncx/ncx:head/ncx:smilCustomTest[@bookStruct='NOTE_REFERENCE']/string(@id)"
         as="xs:string*"/>
     <xsl:variable name="test-page-ids"
-        select="collection()/ncx:smilCustomTest[@bookStruct='PAGE_NUMBER']/string(@id)"
+        select="collection()/ncx:ncx/ncx:head/ncx:smilCustomTest[@bookStruct='PAGE_NUMBER']/string(@id)"
         as="xs:string*"/>
     <xsl:variable name="test-prodnote-ids"
-        select="collection()/ncx:smilCustomTest[@bookStruct='OPTIONAL_PRODUCER_NOTE']/string(@id)"
+        select="collection()/ncx:ncx/ncx:head/ncx:smilCustomTest[@bookStruct='OPTIONAL_PRODUCER_NOTE']/string(@id)"
         as="xs:string*"/>
     <xsl:variable name="test-sidebar-ids"
-        select="collection()/ncx:smilCustomTest[@bookStruct='OPTIONAL_SIDEBAR']/string(@id)"
+        select="collection()/ncx:ncx/ncx:head/ncx:smilCustomTest[@bookStruct='OPTIONAL_SIDEBAR']/string(@id)"
         as="xs:string*"/>
+    <xsl:variable name="ncx-idrefs" as="document-node()">
+        <!--
+            Get the ID references to a SMIL document from the NCX. The result has the form:
+
+            <d:idrefs xmlns:d="http://www.daisy.org/ns/pipeline/data">
+               <d:idref id="navPoint_001" idref="par_0001" navmap="true"/>
+               <d:idref id="pageTarget_001" idref="par_0003"/>
+               <d:idref id="navTarget_001" idref="par_0002"/>
+               ...
+            </d:idrefs>
+
+            These are used as fallback if a text elements are missing in the input (if part of audio-only DAISY 3)
+        -->
+        <xsl:document>
+            <d:idrefs>
+                <xsl:if test="collection()/ncx:ncx">
+                    <xsl:variable name="smil-relative-uri"
+                                  select="pf:relativize-uri(base-uri(collection()[1]/*), base-uri(collection()/ncx:ncx))"/>
+                    <xsl:for-each select="collection()/ncx:ncx//ncx:content[substring-before(@src,'#')=$smil-relative-uri]">
+                        <d:idref idref="{substring-after(@src,'#')}"
+                                 id="{../@id}">
+                            <xsl:if test="exists(ancestor::ncx:navMap)">
+                                <xsl:attribute name="navmap" select="'true'"/>
+                            </xsl:if>
+                        </d:idref>
+                    </xsl:for-each>
+                </xsl:if>
+            </d:idrefs>
+        </xsl:document>
+    </xsl:variable>
+    <xsl:variable name="ncx-relative-uri" as="xs:string?"
+                  select="collection()/ncx:ncx/pf:relativize-uri(base-uri(.), base-uri(collection()[1]/*))"/>
 
     <xsl:key name="ncx-idrefs" match="d:idref" use="@idref"/>
     <xsl:key name="ids" match="*" use="@id"/>
@@ -64,7 +95,12 @@
     </xsl:template>
 
     <xsl:template name="add-text-ref">
-        <text id="{generate-id()}" src="{concat($ncc-uri,'#',f:get-ncc-ref(.))}"/>
+        <xsl:if test="exists($ncx-relative-uri)">
+            <xsl:variable name="ncc-ref" as="xs:string?" select="f:get-ncc-ref(.)"/>
+            <xsl:if test="exists($ncc-ref)">
+                <text id="{generate-id()}" src="{concat($ncx-relative-uri,'#',$ncc-ref)}"/>
+            </xsl:if>
+        </xsl:if>
     </xsl:template>
     <xsl:template match="par[empty(text)]" mode="media">
         <xsl:call-template name="add-text-ref"/>

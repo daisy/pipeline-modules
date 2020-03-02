@@ -48,16 +48,32 @@
     <p:import href="http://www.daisy.org/pipeline/modules/smil-utils/library.xpl">
         <p:documentation>
             px:smil-to-audio-fileset
+            px:smil-downgrade
+            px:smil-update-links
         </p:documentation>
     </p:import>
 
-    <px:fileset-load media-types="application/smil+xml" name="input-smils">
+    <px:fileset-load media-types="application/x-dtbncx+xml" name="ncx">
         <p:input port="in-memory">
             <p:pipe step="main" port="source.in-memory"/>
         </p:input>
     </px:fileset-load>
+    <p:identity>
+        <p:input port="source">
+            <p:pipe step="ncx" port="result.fileset"/>
+        </p:input>
+    </p:identity>
+    <px:assert error-code="XXXX"
+               message="The input DTB must contain exactly one NCX file (media-type 'application/x-dtbncx+xml')">
+        <p:with-option name="test" select="count(//d:file)=1"/>
+    </px:assert>
+    <p:label-elements match="d:file" attribute="original-href" label="resolve-uri(@href,base-uri(.))"/>
+    <p:add-attribute match="d:file" attribute-name="href" name="ncx-to-ncc-mapping">
+        <p:with-option name="attribute-value" select="resolve-uri('ncc.html',$input-dir)"/>
+    </p:add-attribute>
     <p:sink/>
-    <px:fileset-load media-types="application/x-dtbncx+xml">
+
+    <px:fileset-load media-types="application/smil+xml" name="input-smils">
         <p:input port="fileset">
             <p:pipe step="main" port="source.fileset"/>
         </p:input>
@@ -65,74 +81,30 @@
             <p:pipe step="main" port="source.in-memory"/>
         </p:input>
     </px:fileset-load>
-    <px:assert error-code="XXXX" test-count-min="1" test-count-max="1" name="ncx"
-               message="The input DTB must contain exactly one NCX file (media-type 'application/x-dtbncx+xml')"/>
-    <p:sink/>
-
-    <!--NCX smilCustomTest elements used for SMIL conversion-->
-    <p:filter name="custom-tests" select="/ncx:ncx/ncx:head/ncx:smilCustomTest">
-        <p:input port="source">
-            <p:pipe step="ncx" port="result"/>
-        </p:input>
-    </p:filter>
-    <p:sink/>
-    <!--NCX references to SMIL docs, grouped by doc URIs.-->
-    <p:xslt name="ncx-idrefs">
-        <p:input port="source">
-            <p:pipe step="ncx" port="result"/>
-        </p:input>
-        <p:input port="stylesheet">
-            <p:document href="ncx-to-smil-id-map.xsl"/>
-        </p:input>
-        <p:input port="parameters">
-            <!--FIXME pass the relative URI to the NCC-->
-            <p:empty/>
-        </p:input>
-    </p:xslt>
-    <p:sink/>
 
     <!--Main iteration over input SMIL docs-->
     <p:for-each name="iter-smils">
-        <p:iteration-source>
-            <p:pipe step="input-smils" port="result"/>
-        </p:iteration-source>
         <p:output port="audio.fileset" primary="true"/>
         <p:output port="smil.in-memory">
-            <p:pipe step="smil-to-smil" port="result"/>
+            <p:pipe step="smil-downgrade" port="result"/>
         </p:output>
 
-        <!--Get the list of NCX ID references to this SMIL-->
-        <p:filter name="idrefs">
-            <p:input port="source">
-                <p:pipe port="result" step="ncx-idrefs"/>
+        <!--Convert DAISY 3 SMIL to DAISY 2.02 SMIL-->
+        <px:smil-downgrade version="1.0">
+            <p:input port="ncx">
+                <p:pipe step="ncx" port="result"/>
             </p:input>
-            <p:with-option name="select" select="concat('/*/d:doc[@href=''',base-uri(/),''']')">
-                <p:pipe step="iter-smils" port="current"/>
-            </p:with-option>
-        </p:filter>
+        </px:smil-downgrade>
 
-        <!--Convert DAISY 2.02 SMIL to DAISY 3 SMIL-->
-        <p:xslt name="smil-to-smil">
-            <p:input port="source">
-                <p:pipe port="current" step="iter-smils"/>
-                <p:pipe port="result" step="custom-tests"/>
-                <p:pipe port="result" step="idrefs"/>
+        <!--Replace NCX with NCC-->
+        <px:smil-update-links name="smil-downgrade">
+            <p:input port="mapping">
+                <p:pipe step="ncx-to-ncc-mapping" port="result"/>
             </p:input>
-            <p:input port="stylesheet">
-                <p:document href="smil-to-smil.xsl"/>
-            </p:input>
-            <p:input port="parameters">
-                <p:empty/>
-            </p:input>
-        </p:xslt>
-        <p:sink/>
+        </px:smil-update-links>
 
         <!--Fileset of the audio files used in this SMIL-->
-        <px:smil-to-audio-fileset>
-            <p:input port="source">
-                <p:pipe port="result" step="smil-to-smil"/>
-            </p:input>
-        </px:smil-to-audio-fileset>
+        <px:smil-to-audio-fileset/>
         <px:mediatype-detect/>
     </p:for-each>
     <px:fileset-join name="audio-fileset"/>
