@@ -220,7 +220,6 @@
       <p:pipe step="daisy3.in-memory" port="result"/>
     </p:output>
 
-    <p:variable name="mathml-fallback-uri" select="concat($output-fileset-base, 'mathml-fallback.xsl')"/>
     <!-- Those variables could be used for structuring the output
          package but some DAISY players can only read flat
          package. -->
@@ -288,47 +287,29 @@
     <p:sink/>
 
     <!-- ===== MATHML XSLT AND ALTIMG FALLBACKS ===== -->
-    <!--
-        FIXME: move to daisy3-utils
-    -->
     <!-- xslt fallback -->
     <p:choose name="mathml-xslt-fallback">
       <p:xpath-context>
         <p:pipe step="tts-enriched-dtbook" port="result"/>
       </p:xpath-context>
       <p:when test="$audio-only='true' or not(exists(//m:math))">
-	<p:output port="fileset" primary="true">
-	  <p:empty/>
-	</p:output>
-	<p:output port="in-memory">
-	  <p:empty/>
-	</p:output>
-        <p:sink>
+        <p:output port="fileset" sequence="true"/>
+        <p:identity>
           <p:input port="source">
             <p:empty/>
           </p:input>
-        </p:sink>
+        </p:identity>
       </p:when>
       <p:otherwise>
-	<p:output port="fileset" primary="true"/>
-	<p:output port="in-memory">
-	  <p:pipe step="mathml-xslt-fallback" port="result"/>
-	</p:output>
-
-	<p:load href="mathml-fallback.xsl"/>
-	<px:set-base-uri name="mathml-xslt-fallback">
-	  <p:with-option name="base-uri" select="$mathml-fallback-uri"/>
-	</px:set-base-uri>
-	<p:sink/>
-	<px:fileset-create>
-	  <p:with-option name="base" select="$output-fileset-base"/>
-	</px:fileset-create>
-	<px:fileset-add-entry media-type="application/xslt+xml">
-	  <p:input port="entry">
-	    <p:pipe step="mathml-xslt-fallback" port="result"/>
-	  </p:input>
-	</px:fileset-add-entry>
-
+        <p:output port="fileset" sequence="true"/>
+        <px:fileset-create>
+          <p:with-option name="base" select="$output-fileset-base"/>
+        </px:fileset-create>
+        <px:fileset-add-entry media-type="application/xslt+xml">
+          <p:with-option name="href" select="'mathml-fallback.xsl'"/>
+          <p:with-option name="original-href" select="resolve-uri('mathml-fallback.xsl', static-base-uri())"/>
+          <p:with-param port="file-attributes" name="role" select="'mathml-xslt-fallback'"/>
+        </px:fileset-add-entry>
       </p:otherwise>
     </p:choose>
     <p:sink/>
@@ -394,15 +375,11 @@
     <p:identity name="daisy3.fileset-without-opf"/>
     <px:daisy3-create-opf name="opf">
       <p:with-option name="opf-uri" select="concat($output-fileset-base, 'book.opf')"/>
-      <p:with-option name="output-dir" select="$output-fileset-base"/>
       <p:with-option name="uid" select="$uid"/>
       <p:with-option name="title" select="$title"/>
       <p:with-option name="lang" select="$lang"/>
       <p:with-option name="publisher" select="$publisher"/>
       <p:with-option name="audio-only" select="$audio-only"/>
-      <p:with-option name="mathml-xslt-fallback" select="if (exists(//m:math)) then $mathml-fallback-uri else ''">
-        <p:pipe step="tts-enriched-dtbook" port="result"/>
-      </p:with-option>
       <p:with-option name="total-time" select="//*[@duration]/@duration">
       	<p:pipe step="mo" port="duration"/>
       </p:with-option>
@@ -413,7 +390,6 @@
         <p:pipe step="mo" port="result.in-memory"/>
         <p:pipe step="ncx" port="result"/>
         <p:pipe step="res-file" port="result"/>
-        <p:pipe step="mathml-xslt-fallback" port="in-memory"/>
         <p:pipe step="opf" port="result"/>
       </p:input>
     </p:identity>

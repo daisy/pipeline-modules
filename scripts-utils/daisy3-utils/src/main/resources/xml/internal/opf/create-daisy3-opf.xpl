@@ -4,7 +4,12 @@
                 type="px:daisy3-create-opf" name="main">
 
     <p:input port="source" primary="true">
-      <p:documentation>The DAISY 3 fileset.</p:documentation>
+      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+        <p>The DAISY 3 fileset.</p>
+        <p>It the fileset contains a file marked with a <code>role</code> attribute with value
+        <code>mathml-xslt-fallback</code>, it will be used as the "DTBook-XSLTFallback" for
+        MathML.</p>
+      </p:documentation>
     </p:input>
 
     <p:output port="result" primary="true">
@@ -22,12 +27,6 @@
       </p:documentation>
       <p:pipe step="fileset" port="result"/>
     </p:output>
-
-    <p:option name="output-dir">
-      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-	<p>Root directory URI common to all the files to package (NCX, smil etc.)</p>
-      </p:documentation>
-    </p:option>
 
     <p:option name="title">
       <p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -67,12 +66,6 @@
 
     <p:option name="publisher"/>
 
-    <p:option name="mathml-xslt-fallback" select="''">
-      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-        <p>Fallback stylesheet for DAISY players (see DAISY specifications). Empty if no MathML</p>
-      </p:documentation>
-    </p:option>
-
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
         <p:documentation>
             px:set-base-uri
@@ -91,12 +84,11 @@
       </p:input>
       <p:with-param name="lang" select="$lang"/>
       <p:with-param name="publisher" select="$publisher"/>
-      <p:with-param name="output-dir" select="$output-dir"/>
+      <p:with-param name="output-base-uri" select="$opf-uri"/>
       <p:with-param name="uid" select="$uid"/>
       <p:with-param name="title" select="$title"/>
       <p:with-param name="total-time" select="$total-time"/>
       <p:with-param name="audio-only" select="$audio-only"/>
-      <p:with-param name="mathml-xslt-fallback" select="$mathml-xslt-fallback"/>
     </p:xslt>
 
     <px:set-base-uri>
@@ -106,7 +98,7 @@
     <p:sink/>
 
     <px:fileset-create>
-      <p:with-option name="base" select="$output-dir"/>
+      <p:with-option name="base" select="resolve-uri('./',$opf-uri)"/>
     </px:fileset-create>
     <px:fileset-add-entry media-type="text/xml" name="fileset">
       <p:input port="entry">
