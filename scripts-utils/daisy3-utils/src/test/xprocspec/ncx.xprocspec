@@ -2,6 +2,7 @@
 <x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                xmlns:d="http://www.daisy.org/ns/pipeline/data"
+               xmlns:c="http://www.w3.org/ns/xproc-step"
                script="../../main/resources/xml/internal/ncx/create-ncx.xpl">
 
   <x:scenario label="h1 with smilref and audio, h2 with smilref without audio">
@@ -107,43 +108,59 @@
       <x:option name="ncx-dir" select="resolve-uri('./')"/>
       <x:option name="uid" select="'uid'"/>
     </x:call>
-    <x:context label="result port">
-      <x:document type="port" port="result"/>
-    </x:context>
-    <x:expect label="result" type="compare">
-      <x:document type="inline">
-        <ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">
-          <head>
-            <meta content="DAISY Pipeline 2" name="dtb:generator"/>
-            <meta name="dtb:uid" content="uid"/>
-            <meta name="dtb:depth" content="02"/>
-            <meta name="dtb:totalPageCount" content="0"/>
-            <meta name="dtb:maxPageNumber" content="0"/>
-            <smilCustomTest bookStruct="PAGE_NUMBER" defaultState="false" id="pagenum" override="visible"/>
-            <smilCustomTest bookStruct="NOTE" defaultState="false" id="note" override="visible"/>
-            <smilCustomTest bookStruct="NOTE_REFERENCE" defaultState="false" id="noteref" override="visible"/>
-            <smilCustomTest bookStruct="ANNOTATION" defaultState="false" id="annotation" override="visible"/>
-            <smilCustomTest bookStruct="LINE_NUMBER" defaultState="false" id="linenum" override="visible"/>
-            <smilCustomTest bookStruct="OPTIONAL_SIDEBAR" defaultState="false" id="sidebar" override="visible"/>
-            <smilCustomTest bookStruct="OPTIONAL_PRODUCER_NOTE" defaultState="false" id="prodnote" override="visible"/>
-          </head>
-          <docTitle/>
-          <navMap>
-            <navPoint playOrder="1" id="ncx-1">
-              <navLabel>
-                <text>Part 1</text>
-              </navLabel>
-              <content src="smil/mo0.smil#sh1"/>
-              <navPoint playOrder="2" id="ncx-2">
+    <x:scenario label="fail-if-missing-smilref not set">
+      <x:call>
+        <x:option name="fail-if-missing-smilref" select="false()"/>
+      </x:call>
+      <x:context label="result port">
+        <x:document type="port" port="result"/>
+      </x:context>
+      <x:expect label="result" type="compare">
+        <x:document type="inline">
+          <ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">
+            <head>
+              <meta content="DAISY Pipeline 2" name="dtb:generator"/>
+              <meta name="dtb:uid" content="uid"/>
+              <meta name="dtb:depth" content="02"/>
+              <meta name="dtb:totalPageCount" content="0"/>
+              <meta name="dtb:maxPageNumber" content="0"/>
+              <smilCustomTest bookStruct="PAGE_NUMBER" defaultState="false" id="pagenum" override="visible"/>
+              <smilCustomTest bookStruct="NOTE" defaultState="false" id="note" override="visible"/>
+              <smilCustomTest bookStruct="NOTE_REFERENCE" defaultState="false" id="noteref" override="visible"/>
+              <smilCustomTest bookStruct="ANNOTATION" defaultState="false" id="annotation" override="visible"/>
+              <smilCustomTest bookStruct="LINE_NUMBER" defaultState="false" id="linenum" override="visible"/>
+              <smilCustomTest bookStruct="OPTIONAL_SIDEBAR" defaultState="false" id="sidebar" override="visible"/>
+              <smilCustomTest bookStruct="OPTIONAL_PRODUCER_NOTE" defaultState="false" id="prodnote" override="visible"/>
+            </head>
+            <docTitle/>
+            <navMap>
+              <navPoint playOrder="1" id="ncx-1">
                 <navLabel>
-                  <text>Chapter 1.1</text>
+                  <text>Part 1</text>
                 </navLabel>
+                <content src="smil/mo0.smil#sh1"/>
+                <navPoint playOrder="2" id="ncx-2">
+                  <navLabel>
+                    <text>Chapter 1.1</text>
+                  </navLabel>
+                </navPoint>
               </navPoint>
-            </navPoint>
-          </navMap>
-        </ncx>
-      </x:document>
-    </x:expect>
+            </navMap>
+          </ncx>
+        </x:document>
+      </x:expect>
+    </x:scenario>
+    <x:scenario label="fail-if-missing-smilref set">
+      <x:call>
+        <x:option name="fail-if-missing-smilref" select="true()"/>
+      </x:call>
+      <x:context label="the errors">
+        <x:document type="errors"/>
+      </x:context>
+      <x:expect label="the error" type="xpath" test="//c:error/string()"
+                equals="'ERROR: NCX contains entry without content link'">
+      </x:expect>
+    </x:scenario>
   </x:scenario>
 
   <x:scenario label="h1 with smilref, one sent inside h1 with smilref and audio">

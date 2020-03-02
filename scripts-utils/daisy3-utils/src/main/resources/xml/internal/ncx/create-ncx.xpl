@@ -27,6 +27,15 @@
       </p:documentation>
     </p:option>
 
+    <p:option name="fail-if-missing-smilref" select="'false'">
+      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+        <p>If this option is set, <code>h1</code>, <code>h2</code>, <code>h3</code>,
+        <code>h4</code>, <code>h5</code>, <code>h6</code>, <code>levelhd</code>, <code>hd</code> and
+        <code>pagenum</code> elements with a missing <code>smilref</code> attribute will result in
+        an error.</p>
+      </p:documentation>
+    </p:option>
+
     <p:output port="result" primary="true">
       <p:pipe step="ncx" port="result"/>
     </p:output>
@@ -56,6 +65,7 @@
       </p:input>
       <p:with-param name="ncx-dir" select="$ncx-dir"/>
       <p:with-param name="uid" select="$uid"/>
+      <p:with-param name="fail-if-missing-smilref" select="$fail-if-missing-smilref"/>
     </p:xslt>
 
     <px:set-base-uri>

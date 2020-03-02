@@ -15,6 +15,7 @@
 
   <xsl:param name="ncx-dir"/>
   <xsl:param name="uid"/>
+  <xsl:param name="fail-if-missing-smilref"/>
 
   <xsl:variable name="titles" select="' levelhd hd h1 h2 h3 h4 h5 h6 '"/>
   <xsl:variable name="navPoints" select="' level level1 level2 level3 level4 level5 level6 '"/>
@@ -217,9 +218,14 @@
   </xsl:template>
 
   <xsl:template match="*" mode="add-content-link">
-    <xsl:if test="@smilref">
-      <content src="{pf:relativize-uri(resolve-uri(@smilref,$content-doc-uri),$ncx-dir)}"/>
-    </xsl:if>
+    <xsl:choose>
+      <xsl:when test="@smilref">
+	<content src="{pf:relativize-uri(resolve-uri(@smilref,$content-doc-uri),$ncx-dir)}"/>
+      </xsl:when>
+      <xsl:when test="$fail-if-missing-smilref='true'">
+	<xsl:message terminate="yes">ERROR: NCX contains entry without content link</xsl:message>
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="*" mode="add-text">
