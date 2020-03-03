@@ -43,9 +43,13 @@
             px:fileset-create
         </p:documentation>
     </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/smil-utils/library.xpl">
+        <p:documentation>
+            px:smil-to-audio-clips
+        </p:documentation>
+    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
     <p:import href="../internal/ncx-to-nav.xpl"/>
-    <p:import href="../internal/smil-to-audio-clips.xpl"/>
     <p:import href="../internal/oebps-to-opf-metadata.xpl">
         <p:documentation>
             px:oebps-to-opf-metadata
@@ -142,17 +146,14 @@
     <p:choose name="audio-clips">
         <p:when test="$mediaoverlays and $type='text+mo'">
             <p:output port="result"/>
-            <pxi:smil-to-audio-clips>
-                <p:input port="dtbooks">
-                    <p:pipe step="dtbooks" port="result"/>
-                </p:input>
-                <p:input port="smils">
+            <px:smil-to-audio-clips>
+                <p:input port="source">
                     <p:pipe step="smils" port="result"/>
                 </p:input>
                 <p:with-option name="output-base-uri" select="base-uri(/*)">
                     <p:pipe step="source.fileset" port="result"/>
                 </p:with-option>
-            </pxi:smil-to-audio-clips>
+            </px:smil-to-audio-clips>
         </p:when>
         <p:otherwise>
             <p:output port="result"/>

@@ -5,8 +5,12 @@
     xmlns:dtbook="http://www.daisy.org/z3986/2005/dtbook/" xmlns:html="http://www.w3.org/1999/xhtml"
     exclude-result-prefixes="#all" version="2.0">
 
+    <!--
+        It is assumed that SMIL and content documents have been prepared so that all ID attributes
+        are unique in the whole publication.
+    -->
+
     <xsl:variable name="smils" select="collection()[/smil:smil]"/>
-    <xsl:variable name="dtbook-uris" select="collection()[/dtbook:dtbook]/base-uri(*)"/>
     <xsl:variable name="htmls" select="collection()[/html:html]"/>
     
     <xsl:key name="ids" match="*[@id]" use="@id"/>
@@ -23,13 +27,10 @@
     </xsl:template>
 
     <xsl:template match="smil:text[@id]|smil:*[@id][count(smil:text)=1]">
-        <xsl:variable name="dtbook-ref"
-            select="resolve-uri(substring-before(descendant-or-self::smil:text/@src,'#'),base-uri(.))"/>
         <xsl:variable name="idref" select="substring-after(descendant-or-self::smil:text/@src,'#')"/>
-        <xsl:variable name="new-idref" select="if(count($dtbook-uris)=1) then $idref else concat(index-of($dtbook-ref,$dtbook-uris),'_',$idref)"/>
         <d:id old-id="{@id}"
-            new-id="{$new-idref}"
-            new-src="{$htmls[key('ids',$new-idref,.)][1]/base-uri(*)}"/>
+            new-id="{$idref}"
+            new-src="{$htmls[key('ids',$idref,.)][1]/base-uri(*)}"/>
     </xsl:template>
 
 </xsl:stylesheet>

@@ -4,6 +4,7 @@
     <p:import href="upgrade-smil.xpl"/>
     <p:import href="smil-to-text-fileset.xpl"/>
     <p:import href="smil-to-audio-fileset.xpl"/>
+    <p:import href="smil-to-audio-clips.xpl"/>
     <p:import href="smil-update-links.xpl"/>
 
     <!--

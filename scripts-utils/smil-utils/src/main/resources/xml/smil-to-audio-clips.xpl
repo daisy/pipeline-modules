@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
-                xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal/daisy3-to-epub3"
-                type="pxi:smil-to-audio-clips" name="main">
+                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                type="px:smil-to-audio-clips">
 
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-        <p>Create a d:audio-clips document from a set of SMIL and content documents.</p>
+        <p>Create a d:audio-clips document from a set of SMIL documents.</p>
     </p:documentation>
 
-    <p:input port="smils" sequence="true" primary="true"/>
-    <p:input port="dtbooks" sequence="true"/>
+    <p:input port="source" sequence="true">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>SMIL 2.0 documents</p>
+            <p>It is assumed that SMIL and content documents have been prepared so that all ID
+            attributes are unique in the whole publication.</p>
+        </p:documentation>
+    </p:input>
 
     <p:output port="result">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -23,10 +28,6 @@
     </p:option>
 
     <p:xslt template-name="create-map">
-        <p:input port="source">
-            <p:pipe step="main" port="dtbooks"/>
-            <p:pipe step="main" port="smils"/>
-        </p:input>
         <p:input port="stylesheet">
             <p:document href="smil-to-audio-clips.xsl"/>
         </p:input>
