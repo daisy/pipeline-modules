@@ -134,8 +134,8 @@
 								<!--
 								    FIXME: generated ids make test brittle
 								-->
-								<text id="d4039e23" src="ncc.html#ncx_2"/>
-								<audio id="d4039e25" src="aud001.mp3" clip-begin="00:00:00" clip-end="00:00:02.4829932"/>
+								<text id="d4099e23" src="ncc.html#ncx_2"/>
+								<audio id="d4099e25" src="aud001.mp3" clip-begin="00:00:00" clip-end="00:00:02.4829932"/>
 							</par>
 						</seq>
 					</body>
