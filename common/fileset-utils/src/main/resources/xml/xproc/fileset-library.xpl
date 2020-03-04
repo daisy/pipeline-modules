@@ -20,6 +20,7 @@
     <p:import href="fileset-update.xpl"/>
     <p:import href="fileset-purge.xpl"/>
     <p:import href="fileset-apply.xpl"/>
+    <p:import href="fileset-compose.xpl"/>
 
     <p:import href="xprocspec-fileset-compare.xpl"/>
 
