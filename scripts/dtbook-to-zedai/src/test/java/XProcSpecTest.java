@@ -9,7 +9,6 @@ public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 			pipelineModule("css-speech"),
 			pipelineModule("dtbook-utils"),
 			pipelineModule("zedai-utils"),
-			pipelineModule("dtbook-validator"),
 			pipelineModule("fileset-utils"),
 			pipelineModule("file-utils"),
 			pipelineModule("mediatype-utils"),

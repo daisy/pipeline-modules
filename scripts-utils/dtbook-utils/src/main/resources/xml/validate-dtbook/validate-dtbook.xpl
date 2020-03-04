@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
-                xmlns:c="http://www.w3.org/ns/xproc-step"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
+                xmlns:c="http://www.w3.org/ns/xproc-step"
                 xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:l="http://xproc.org/library"
                 xmlns:m="http://www.w3.org/1998/Math/MathML"
-                type="px:dtbook-validator" name="main"
+                type="px:dtbook-validate" name="main"
                 exclude-inline-prefixes="#all">
     
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
         <h1 px:role="name">DTBook Validator</h1>
         <p px:role="desc">Validates DTBook documents. Supports inclusion of MathML.</p>
-        <a px:role="homepage" href="http://code.google.com/p/daisy-pipeline/wiki/DTBookValidator">
-            http://code.google.com/p/daisy-pipeline/wiki/DTBookValidator
-        </a>
         <div px:role="author maintainer">
             <p px:role="name">Marisa DeMeglio</p>
             <a px:role="contact" href="mailto:marisa.demeglio@gmail.com">marisa.demeglio@gmail.com</a>
@@ -65,20 +63,39 @@
     
     <p:option name="mathml-version"/>
     <p:option name="check-images"/>
-    <p:option name="base-uri"/>
     <p:option name="nimas"/>
     
-    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
-    
-    <p:import
-        href="http://www.daisy.org/pipeline/modules/validation-utils/library.xpl">
-        <p:documentation>Collection of utilities for validation and reporting. </p:documentation>
+    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
+        <p:documentation>
+            px:message
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
+        <p:documentation>
+            px:fileset-rebase
+            px:fileset-load
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/validation-utils/library.xpl">
+        <p:documentation>
+            px:check-files-wellformed
+            px:combine-validation-reports
+            px:validation-status
+            px:validation-report-to-html
+        </p:documentation>
+    </p:import>
+    <p:import href="dtbook-validator.check-images.xpl">
+        <p:documentation>
+            pxi:dtbook-validator.check-images
+        </p:documentation>
+    </p:import>
+    <p:import href="dtbook-validator.select-schema.xpl">
+        <p:documentation>
+            px:dtbook-validator.select-schema
+        </p:documentation>
     </p:import>
     
-    <p:import href="http://www.daisy.org/pipeline/modules/dtbook-utils/library.xpl">
-        <p:documentation>Helper steps: select schema for given document type and check that referenced images exist on disk.</p:documentation>
-    </p:import>
+    <p:variable name="base-uri" select="/*/d:file[@media-type='application/x-dtbook+xml']/resolve-uri(@href,base-uri(.))"/>
     
     <!--
         Make sure that the base uri of the fileset is the directory containing the DTBook. This
@@ -86,8 +103,7 @@
         step to work.
     -->
     <px:fileset-rebase>
-        <p:with-option name="new-base"
-                       select="/*/d:file[@media-type='application/x-dtbook+xml']/resolve-uri(@href,base-uri(.))"/>
+        <p:with-option name="new-base" select="$base-uri"/>
     </px:fileset-rebase>
     <p:identity name="source.fileset"/>
     
@@ -234,11 +250,11 @@
                 <p:choose name="check-images-exist">
                     <p:when test="$check-images = 'true'">
                         <p:output port="result"/>
-                        <px:dtbook-validator.check-images>
+                        <pxi:dtbook-validator.check-images>
                             <p:input port="source">
                                 <p:pipe step="load-dtbook-doc" port="result"/>
                             </p:input>
-                        </px:dtbook-validator.check-images>
+                        </pxi:dtbook-validator.check-images>
                     </p:when>
                     <p:otherwise>
                         <p:output port="result"/>
@@ -279,7 +295,6 @@
                 </p:inline>
             </p:output>
             <p:output port="xml-report" primary="true"/>
-
             <px:message message="DTBook Validator: DTBook document is missing or not well-formed">
                 <p:input port="source">
                     <p:inline>
@@ -288,7 +303,6 @@
                 </p:input>
             </px:message>
             <p:sink/>
-            
             <px:combine-validation-reports>
                 <p:with-option name="document-name" select="tokenize($base-uri, '/')[last()]"/>
                 <p:with-option name="document-type" select="'N/A'"/>
@@ -297,22 +311,17 @@
                     <p:pipe port="report" step="check-dtbook-wellformed"/>
                 </p:input>
             </px:combine-validation-reports>
-            
         </p:otherwise>
     </p:choose>
     
-    <!-- ***************************************************** -->
-    <!-- REPORT(S) TO HTML -->
-    <!-- ***************************************************** -->
-    
-    <p:identity name="xml-report"/>
-    <px:validation-report-to-html name="html-report"/>
+    <px:validation-status name="validation-status"/>
     <p:sink/>
     
-    <px:validation-status name="validation-status">
+    <px:validation-report-to-html name="html-report">
         <p:input port="source">
-            <p:pipe step="xml-report" port="result"/>
+            <p:pipe step="if-dtbook-wellformed" port="xml-report"/>
         </p:input>
-    </px:validation-status>
+    </px:validation-report-to-html>
+    <p:sink/>
     
 </p:declare-step>

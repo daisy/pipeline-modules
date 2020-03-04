@@ -106,16 +106,12 @@
             px:dtbook-to-mods-meta
             px:upgrade-dtbook
             px:merge-dtbook
+            px:dtbook-validator.select-schema
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/zedai-utils/library.xpl">
         <p:documentation>
             px:zedai-validate
-        </p:documentation>
-    </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/dtbook-validator/library.xpl">
-        <p:documentation>
-            px:dtbook-validator.select-schema
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">

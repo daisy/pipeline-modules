@@ -2,10 +2,10 @@
 <x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                xmlns:d="http://www.daisy.org/ns/pipeline/data"
-               script="../../main/resources/xml/dtbook-validator.validate.xpl">
+               script="../../main/resources/xml/validate-dtbook/validate-dtbook.xpl">
 
     <x:scenario label="dtbook_valid_2005-3">
-        <x:call step="px:dtbook-validator">
+        <x:call step="px:dtbook-validate">
             <x:input port="source.fileset">
                 <x:document type="inline">
                     <d:fileset>
@@ -16,7 +16,6 @@
             <x:input port="source.in-memory">
                 <x:document type="file" href="../resources/dtbook_valid_2005-3.xml"/>
             </x:input>
-            <x:option name="base-uri" select="resolve-uri('../resources/dtbook_valid_2005-3.xml')"/>
             <x:option name="mathml-version" select="'3.0'"/>
             <x:option name="check-images" select="false()"/>
             <x:option name="nimas" select="false()"/>
@@ -43,9 +42,9 @@
                   type="xpath" test="/d:document-validation-report/d:reports/d:report/@type"
                   equals="('relaxng','schematron','filecheck')"/>
     </x:scenario>
-    
+
     <x:scenario label="not well-formed">
-        <x:call step="px:dtbook-validator">
+        <x:call step="px:dtbook-validate">
             <x:input port="source.fileset">
                 <x:document type="inline">
                     <d:fileset>
@@ -54,7 +53,6 @@
                 </x:document>
             </x:input>
             <x:input port="source.in-memory"/>
-            <x:option name="base-uri" select="resolve-uri('../resources/dtbook_not_well_formed.xml')"/>
             <x:option name="mathml-version" select="'3.0'"/>
             <x:option name="check-images" select="false()"/>
             <x:option name="nimas" select="false()"/>
@@ -81,5 +79,5 @@
         <x:expect label="the report should indicate that the file in not well-formed XML" type="xpath"
                   test="/d:document-validation-report/d:reports/d:report/d:errors/d:error[@type='file-not-wellformed']"/>
     </x:scenario>
-    
+
 </x:description>
