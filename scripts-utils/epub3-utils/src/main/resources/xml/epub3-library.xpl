@@ -26,6 +26,11 @@
 			<p>Steps related to EPUB 3 Media Overlays.</p>
 		</p:documentation>
 	</p:import>
+	<p:import href="validate/epub3-validate.xpl">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p>Validation with EpubCheck and Ace.</p>
+		</p:documentation>
+	</p:import>
 	<p:import href="epub3-safe-uris.xpl"/>
 	<p:import href="epub3-rename-files.xpl"/>
 	<p:import href="epub3-update-links.xpl"/>

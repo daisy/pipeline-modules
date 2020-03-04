@@ -28,14 +28,10 @@
             px:message
         </p:documentation>
     </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/epub3-utils/ocf/library.xpl">
+    <p:import href="http://www.daisy.org/pipeline/modules/epub3-utils/library.xpl">
         <p:documentation>
             px:epub3-load
-        </p:documentation>
-    </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/epub3-validator/library.xpl">
-        <p:documentation>
-            px:epub3-validator
+            px:epub3-validate
         </p:documentation>
     </p:import>
     
@@ -69,7 +65,7 @@
             <p:output port="status">
                 <p:pipe step="status-and-report" port="status"/>
             </p:output>
-            <px:epub3-validator name="epub3-validator">
+            <px:epub3-validate name="epub3-validator">
                 <!--
                     epub option must point to a file that exists on disk (and may not be a file inside a ZIP)
                 -->
@@ -77,7 +73,7 @@
                     <p:pipe step="load" port="result.fileset"/>
                 </p:with-option>
                 <p:with-option name="temp-dir" select="concat($temp-dir,'validate/')"/>
-            </px:epub3-validator>
+            </px:epub3-validate>
             <p:identity>
                 <p:input port="source">
                     <p:pipe step="epub3-validator" port="validation-status"/>
