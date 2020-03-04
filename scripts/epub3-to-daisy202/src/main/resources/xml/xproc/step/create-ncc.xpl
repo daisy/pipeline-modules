@@ -33,6 +33,9 @@
     <p:output port="result.in-memory" sequence="true">
         <p:pipe step="update-html" port="result.in-memory"/>
     </p:output>
+    <p:output port="ncc">
+        <p:pipe step="ncc-with-linkbacks" port="result"/>
+    </p:output>
 
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
         <p:documentation>

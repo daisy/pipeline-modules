@@ -11,12 +11,15 @@
     <p:input port="source.fileset" primary="true"/>
     <p:input port="source.in-memory" sequence="true"/>
 
-    <p:output port="result.fileset" primary="true"/>
+    <p:output port="result.fileset" primary="true">
+        <p:pipe step="move" port="result.fileset"/>
+    </p:output>
     <p:output port="result.in-memory" sequence="true">
-        <p:pipe step="rename-xhtml" port="in-memory"/>
+        <p:pipe step="move" port="result.in-memory"/>
     </p:output>
 
     <p:option name="bundle-dtds" select="'false'"/>
+    <p:option name="output-dir" required="true"/>
 
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
         <p:documentation>
@@ -225,5 +228,37 @@
     <p:add-attribute match="d:file[@media-type='application/smil+xml']"
                      attribute-name="doctype-system"
                      attribute-value="http://www.w3.org/TR/REC-SMIL/SMIL10.dtd"/>
+
+    <p:documentation>
+        Move to final location
+    </p:documentation>
+    <px:fileset-copy name="move">
+        <p:with-option name="target" select="concat($output-dir,replace(/*/@content,'[^a-zA-Z0-9]','_'),'/')">
+            <p:pipe step="identifier" port="result"/>
+        </p:with-option>
+        <p:input port="source.in-memory">
+            <p:pipe step="rename-xhtml" port="in-memory"/>
+        </p:input>
+    </px:fileset-copy>
+    <p:sink/>
+
+    <p:group name="identifier">
+        <p:output port="result"/>
+        <p:identity>
+            <p:input port="source">
+                <p:pipe step="create-ncc" port="ncc"/>
+            </p:input>
+        </p:identity>
+        <!--
+            these assertions should normally never fail
+        -->
+        <px:assert test-count-min="1" test-count-max="1" error-code="PED01"
+                   message="There must be exactly one ncc.html in the resulting DAISY 2.02 fileset"/>
+        <p:filter select="/*/*/*[@name='dc:identifier']"/>
+        <px:assert test-count-min="1" error-code="PED02"
+                   message="There must be at least one dc:identifier meta element in the resulting ncc.html"/>
+        <p:split-sequence test="position()=1"/>
+    </p:group>
+    <p:sink/>
 
 </p:declare-step>

@@ -188,4 +188,61 @@
 		</x:scenario>
 	</x:scenario>
 	
+	<x:scenario label="with validation">
+		<x:call step="px:epub3-load">
+			<x:option name="href" select="resolve-uri('../../resources/moby-dick-mo-20120214.OK.epub')"/>
+			<x:option name="temp-dir" select="resolve-uri('validation',$temp-dir)"/>
+			<x:option name="validation" select="'abort'"/>
+		</x:call>
+		<x:context label="the validation status">
+			<x:document type="port" port="validation-status"/>
+		</x:context>
+		<x:expect label="the validation should succeed" type="compare">
+			<x:document type="inline">
+				<d:validation-status result="ok"/>
+			</x:document>
+		</x:expect>
+		<x:context label="the result fileset">
+			<x:document type="port"  port="result.fileset"/>
+		</x:context>
+		<x:expect label="the result fileset"
+		          type="custom" href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl" step="x:fileset-compare">
+			<x:document type="inline">
+				<d:fileset>
+					<d:file href="../../resources/moby-dick-mo-20120214.OK.epub!/META-INF/container.xml"
+					        media-type="application/xml"/>
+					<d:file href="../../resources/moby-dick-mo-20120214.OK.epub!/mimetype"/>
+					<d:file href="../../resources/moby-dick-mo-20120214.OK.epub!/OPS/audio/mobydick_001_002_melville.mp4"
+					        media-type="audio/mp4"/>
+					<d:file href="../../resources/moby-dick-mo-20120214.OK.epub!/OPS/chapter_001.xhtml"
+					        media-type="application/xhtml+xml"/>
+					<d:file href="../../resources/moby-dick-mo-20120214.OK.epub!/OPS/chapter_001_overlay.smil"
+					        media-type="application/smil+xml"/>
+					<d:file href="../../resources/moby-dick-mo-20120214.OK.epub!/OPS/chapter_002.xhtml"
+					        media-type="application/xhtml+xml"/>
+					<d:file href="../../resources/moby-dick-mo-20120214.OK.epub!/OPS/chapter_002_overlay.smil"
+					        media-type="application/smil+xml"/>
+					<d:file href="../../resources/moby-dick-mo-20120214.OK.epub!/OPS/chapter_003.xhtml"
+					        media-type="application/xhtml+xml"/>
+					<d:file href="../../resources/moby-dick-mo-20120214.OK.epub!/OPS/css/stylesheet.css"
+					        media-type="text/css"/>
+					<d:file href="../../resources/moby-dick-mo-20120214.OK.epub!/OPS/fonts/STIXGeneralItalic.otf"
+					        media-type="application/vnd.ms-opentype"/>
+					<d:file href="../../resources/moby-dick-mo-20120214.OK.epub!/OPS/fonts/STIXGeneral.otf"
+					        media-type="application/vnd.ms-opentype"/>
+					<d:file href="../../resources/moby-dick-mo-20120214.OK.epub!/OPS/fonts/STIXGeneralBol.otf"
+					        media-type="application/vnd.ms-opentype"/>
+					<d:file href="../../resources/moby-dick-mo-20120214.OK.epub!/OPS/fonts/STIXGeneralBolIta.otf"
+					        media-type="application/vnd.ms-opentype"/>
+					<d:file href="../../resources/moby-dick-mo-20120214.OK.epub!/OPS/images/Moby-Dick_FE_title_page.jpg"/>
+					<d:file href="../../resources/moby-dick-mo-20120214.OK.epub!/OPS/images/9780316000000.jpg"/>
+					<d:file href="../../resources/moby-dick-mo-20120214.OK.epub!/OPS/package.opf"
+					        media-type="application/oebps-package+xml"/>
+					<d:file href="../../resources/moby-dick-mo-20120214.OK.epub!/OPS/toc.xhtml"
+					        media-type="application/xhtml+xml"/>
+				</d:fileset>
+			</x:document>
+		</x:expect>
+	</x:scenario>
+	
 </x:description>

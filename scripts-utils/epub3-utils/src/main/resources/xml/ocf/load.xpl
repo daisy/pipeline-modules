@@ -23,10 +23,23 @@
 			directory.</p>
 		</p:documentation>
 	</p:option>
+	<p:option name="validation" select="'off'">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p>Whether to perform validation of the input:</p>
+			<dl>
+				<dt>off</dt>
+				<dd>No validation</dd>
+				<dt>report</dt>
+				<dd>Report validation issues</dd>
+				<dt>abort</dt>
+				<dd>Abort on validation issues</dd>
+			</dl>
+		</p:documentation>
+	</p:option>
 	<p:option name="temp-dir" required="false">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>Empty directory dedicated to this step. Mandatory when <code>store-to-disk</code>
-			option is true.</p>
+			option is 'true' or when <code>validation</code> option is not 'off'.</p>
 		</p:documentation>
 	</p:option>
 	
@@ -35,14 +48,33 @@
 			<p>The result fileset. If a .opf file was specified for the <code>href</code> option,
 			the fileset does not contain the "mimetype" and "META-INF/container.xml" files.</p>
 		</p:documentation>
+		<p:pipe step="result" port="result.fileset"/>
 	</p:output>
 	<p:output port="result.in-memory" sequence="true">
 		<p:pipe step="result" port="result.in-memory"/>
+	</p:output>
+	<p:output port="validation-report" sequence="true" px:media-type="application/vnd.pipeline.report+xml">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p>The validation report</p>
+			<p>The port is empty if the <code>validation</code> option is 'off' or if the input is a
+			valid EPUB 3.</p>
+		</p:documentation>
+		<p:pipe step="validate" port="report"/>
+	</p:output>
+	<p:output port="validation-status" px:media-type="application/vnd.pipeline.status+xml">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p>The <a href="http://daisy.github.io/pipeline/ValidationStatusXML">validation
+			status</a> document</p>
+			<p>'ok' if the <code>validation</code> option not 'abort' or if the input is a valid
+			EPUB 3, 'error' otherwise.</p>
+		</p:documentation>
+		<p:pipe step="validate" port="status"/>
 	</p:output>
 	
 	<p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			px:error
+			px:message
 		</p:documentation>
 	</p:import>
 	<p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
@@ -65,7 +97,16 @@
 			px:unzip
 		</p:documentation>
 	</p:import>
-	<p:import href="../pub/opf-manifest-to-fileset.xpl"/>
+	<p:import href="../validate/epub3-validate.xpl">
+		<p:documentation>
+			px:epub3-validate
+		</p:documentation>
+	</p:import>
+	<p:import href="../pub/opf-manifest-to-fileset.xpl">
+		<p:documentation>
+			px:opf-manifest-to-fileset
+		</p:documentation>
+	</p:import>
 	
 	<px:assert message="When store-to-disk='true' then temp-dir must also be defined" error-code="PZU001">
 		<p:with-option name="test" select="$store-to-disk='false' or p:value-available('temp-dir')"/>
@@ -230,6 +271,80 @@
 				</p:input>
 			</px:fileset-join>
 			
+		</p:otherwise>
+	</p:choose>
+	
+	<p:choose name="validate">
+		<p:when test="$validation='off'">
+			<p:output port="report" sequence="true">
+				<p:empty/>
+			</p:output>
+			<p:output port="status">
+				<p:inline>
+					<d:validation-status result="ok"/>
+				</p:inline>
+			</p:output>
+			<p:sink>
+				<p:input port="source">
+					<p:empty/>
+				</p:input>
+			</p:sink>
+		</p:when>
+		<p:otherwise>
+			<p:output port="report" sequence="true">
+				<p:pipe step="status-and-report" port="report"/>
+			</p:output>
+			<p:output port="status">
+				<p:pipe step="status-and-report" port="status"/>
+			</p:output>
+			<px:epub3-validate name="epub3-validator">
+				<!--
+					epub option must point to a file that exists on disk (and may not be a file inside a ZIP)
+				-->
+				<p:with-option name="epub" select="$href">
+					<p:pipe step="result" port="result.fileset"/>
+				</p:with-option>
+				<p:with-option name="temp-dir" select="concat($temp-dir,'validate/')"/>
+			</px:epub3-validate>
+			<p:identity>
+				<p:input port="source">
+					<p:pipe step="epub3-validator" port="validation-status"/>
+				</p:input>
+			</p:identity>
+			<p:choose name="status-and-report">
+				<p:when test="/d:validation-status[@result='ok']">
+					<p:output port="status" primary="true"/>
+					<p:output port="report" sequence="true">
+						<p:empty/>
+					</p:output>
+					<p:identity/>
+				</p:when>
+				<p:when test="$validation='report'">
+					<p:output port="status" primary="true">
+						<!--
+							Return OK here even though validation failed.
+						-->
+						<p:inline>
+							<d:validation-status result="ok"/>
+						</p:inline>
+					</p:output>
+					<p:output port="report">
+						<p:pipe step="epub3-validator" port="html-report"/>
+					</p:output>
+					<p:sink>
+						<p:input port="source">
+							<p:empty/>
+						</p:input>
+					</p:sink>
+				</p:when>
+				<p:otherwise>
+					<p:output port="status" primary="true"/>
+					<p:output port="report" sequence="true">
+						<p:pipe step="epub3-validator" port="html-report"/>
+					</p:output>
+					<px:message message="The EPUB 3 input is invalid. Aborting."/>
+				</p:otherwise>
+			</p:choose>
 		</p:otherwise>
 	</p:choose>
 	
