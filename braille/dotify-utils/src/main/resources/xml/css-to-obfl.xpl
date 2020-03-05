@@ -811,15 +811,18 @@
         It is assumed that a ::-obfl-on-resumed pseudo-element is used on an element that represents
         a single regular toc entry (a block element that generates only a single block box with
         inline content), in which case the first preceding toc-entry element gives us the start of
-        the range and the first following toc-entry gives us the end of the range. This is the only
-        sensible way to use ::-obfl-on-resumed pseudo-element.
+        the range and the last toc-entry before the first following toc-entry-on-resumed gives us
+        the end of the range. This is the only sensible way to use ::-obfl-on-resumed
+        pseudo-element.
     -->
     <p:label-elements match="obfl:toc-entry-on-resumed"
                       attribute="range"
                       label="concat('[',
-                                    (preceding::obfl:toc-entry intersect ancestor::obfl:table-of-contents/descendant::*)[last()]/@ref-id,
+                                    ((preceding::obfl:toc-entry)[last()] intersect ancestor::obfl:table-of-contents/descendant::*)/@ref-id,
                                     ',',
-                                    (following::obfl:toc-entry intersect ancestor::obfl:table-of-contents/descendant::*)[1]/@ref-id,
+                                    ((following::obfl:toc-entry-on-resumed[1]/preceding::obfl:toc-entry)[last()]
+                                      intersect ancestor::obfl:table-of-contents/descendant::*
+                                      intersect following::*)/@ref-id,
                                     ')')"/>
     <p:choose>
       <p:when test="//obfl:toc-entry-on-resumed[starts-with(@range,'[,')]">

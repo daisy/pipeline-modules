@@ -1,3 +1,10 @@
+v1.13.4
+=======
+
+Changes
+-------
+- Changed behavior of `::obfl-on-resumed` pseudo-element
+
 v1.13.3
 =======
 
