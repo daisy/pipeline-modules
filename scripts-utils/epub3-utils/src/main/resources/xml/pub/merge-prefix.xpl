@@ -20,6 +20,7 @@
 	</p:input>
 
 	<p:option name="implicit-input-prefixes" select="'a11y:      http://www.idpf.org/epub/vocab/package/a11y/#
+	                                                  dc:        http://purl.org/dc/elements/1.1/
 	                                                  dcterms:   http://purl.org/dc/terms/
 	                                                  marc:      http://id.loc.gov/vocabulary/
 	                                                  media:     http://www.idpf.org/epub/vocab/overlays/#
