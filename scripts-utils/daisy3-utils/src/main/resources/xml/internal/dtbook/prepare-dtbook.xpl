@@ -23,9 +23,10 @@
       <p:pipe step="dtbook" port="result"/>
     </p:output>
 
-    <p:option name="output-base-uri" required="true">
+    <p:option name="output-base-uri" select="''">
       <p:documentation xmlns="http://www.w3.org/1999/xhtml">
         <p>The base URI of the result DTBook</p>
+        <p>Defaults to the base URI of the input DTBook.</p>
       </p:documentation>
     </p:option>
     <p:input port="mathml-altimg-fallback" sequence="true">
@@ -40,11 +41,6 @@
       </p:documentation>
     </p:option>
 
-    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
-      <p:documentation>
-        px:set-base-uri
-      </p:documentation>
-    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
       <p:documentation>
         px:fileset-create
@@ -63,7 +59,12 @@
       <p:input port="stylesheet">
         <p:document href="fix-dtbook-structure.xsl"/>
       </p:input>
-      <p:with-param name="output-base-uri" select="$output-base-uri"/>
+      <p:with-param name="output-base-uri" select="($output-base-uri[not(.='')],base-uri(/*))[1]">
+        <p:pipe step="main" port="source"/>
+      </p:with-param>
+      <p:with-option name="output-base-uri" select="($output-base-uri[not(.='')],base-uri(/*))[1]">
+        <p:pipe step="main" port="source"/>
+      </p:with-option>
     </p:xslt>
 
     <!-- add metadata -->
@@ -75,15 +76,13 @@
       <p:with-option name="attribute-value" select="$uid"/>
     </p:add-attribute>
 
-    <!-- set base uri -->
-    <px:set-base-uri>
-      <p:with-option name="base-uri" select="$output-base-uri"/>
-    </px:set-base-uri>
     <p:identity name="dtbook"/>
     <p:sink/>
 
     <px:fileset-create>
-      <p:with-option name="base" select="resolve-uri('./',$output-base-uri)"/>
+      <p:with-option name="base" select="resolve-uri('./',base-uri(/*))">
+        <p:pipe step="dtbook" port="result"/>
+      </p:with-option>
     </px:fileset-create>
     <px:fileset-add-entry media-type="application/x-dtbook+xml" name="fileset">
       <p:input port="entry">
