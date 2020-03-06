@@ -9,7 +9,7 @@
 
     <p:input port="source" sequence="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <p>SMIL 2.0 documents</p>
+            <p>SMIL documents (all versions)</p>
             <p>It is assumed that SMIL and content documents have been prepared so that all ID
             attributes are unique in the whole publication.</p>
         </p:documentation>

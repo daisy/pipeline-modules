@@ -2,8 +2,9 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
+                xmlns:mo="http://www.w3.org/ns/SMIL"
+                xmlns:s="http://www.w3.org/2001/SMIL20/"
                 xmlns="http://www.daisy.org/ns/pipeline/data"
-                xpath-default-namespace="http://www.w3.org/2001/SMIL20/"
                 exclude-result-prefixes="#all">
 
     <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl"/>
@@ -16,20 +17,24 @@
         </audio-clips>
     </xsl:template>
 
-    <xsl:template match="text[@src]">
+    <xsl:template match="mo:text[@src]|
+                         s:text[@src]|
+                         text[@src]">
         <xsl:variable name="text" select="."/>
-        <xsl:for-each select="parent::par[descendant::audio]">
-            <xsl:variable name="audio" select="descendant::audio"/>
-            <xsl:if test="count(distinct-values($audio/@src))>1">
+        <xsl:for-each select="parent::*[local-name()='par']">
+            <xsl:variable name="audio" select="descendant::*[local-name()='audio']"/>
+            <xsl:if test="exists($audio)">
+              <xsl:if test="count(distinct-values($audio/@src))>1">
                 <!-- FIXME: support audio merge -->
                 <xsl:message>WARNING: the audio for the fragment <xsl:sequence
-                select="(@src|text/@src)[1]"/> spans over multiple files.</xsl:message>
+                select="(@src|*[local-name()='text']/@src)[1]"/> spans over multiple files.</xsl:message>
+              </xsl:if>
+              <!-- FIXME: normalize clock values -->
+              <clip idref="{substring-after($text/@src,'#')}"
+                    src="{pf:relativize-uri(resolve-uri($audio[1]/@src,base-uri(.)),$output-base-uri)}"
+                    clipBegin="{$audio[1]/@clipBegin}"
+                    clipEnd="{$audio[@src=$audio[1]/@src][last()]/@clipEnd}"/>
             </xsl:if>
-            <!-- FIXME: normalize clock values -->
-            <clip idref="{substring-after($text/@src,'#')}"
-                  src="{pf:relativize-uri(resolve-uri($audio[1]/@src,base-uri(.)),$output-base-uri)}"
-                  clipBegin="{$audio[1]/@clipBegin}"
-                  clipEnd="{$audio[@src=$audio[1]/@src][last()]/@clipEnd}"/>
         </xsl:for-each>
     </xsl:template>
 
