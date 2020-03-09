@@ -9,14 +9,30 @@
             <x:input port="source">
                 <x:document type="inline">
                     <d:fileset xml:base="file:/Users/me/in/">
-                        <d:file href="doc1.xml" original-href="doc1.html"/>
-                        <d:file href="doc2.xml" original-href="doc2.html"/>
+                        <d:file href="part1.xml" original-href="part1.html"/>
+                        <d:file href="part2.xml" original-href="part2.html">
+                            <d:anchor id="b" original-id="a"/>
+                        </d:file>
+                        <d:file href="part3.xml">
+                            <d:anchor id="d" original-id="c"/>
+                        </d:file>
+                        <d:file href="other.xml">
+                            <d:anchor id="f" original-id="e"/>
+                        </d:file>
                     </d:fileset>
                 </x:document>
                 <x:document type="inline">
                     <d:fileset xml:base="file:/Users/me/out/">
-                        <d:file href="doc.xml" original-href="file:/Users/me/in/doc1.xml"/>
-                        <d:file href="doc.xml" original-href="../in/doc2.xml"/>
+                        <d:file href="merged.html" original-href="file:/Users/me/in/part1.html"/>
+                        <d:file href="merged.xml" original-href="file:/Users/me/in/part1.xml"/>
+                        <d:file href="merged.xml" original-href="../in/part2.xml">
+                            <d:anchor id="g" original-id="b"/>
+                        </d:file>
+                        <d:file href="merged.xml" original-href="../in/part3.xml"/>
+                        <d:file href="../in/other.xml">
+                            <d:anchor id="h" original-id="f"/>
+                            <d:anchor id="i" original-id="e"/>
+                        </d:file>
                         <d:file href="images/img.png" original-href="../in/img.png"/>
                     </d:fileset>
                 </x:document>
@@ -28,8 +44,16 @@
         <x:expect type="compare" label="the result should be as expected">
             <x:document type="inline">
                 <d:fileset xml:base="file:/Users/me/out/">
-                    <d:file href="doc.xml" original-href="file:/Users/me/in/doc1.html"/>
-                    <d:file href="doc.xml" original-href="file:/Users/me/in/doc2.html"/>
+                    <d:file href="merged.xml" original-href="file:/Users/me/in/part1.html"/>
+                    <d:file href="merged.xml" original-href="file:/Users/me/in/part2.html">
+                        <d:anchor id="g" original-id="a"/>
+                    </d:file>
+                    <d:file href="merged.xml" original-href="file:/Users/me/in/part3.xml">
+                        <d:anchor id="d" original-id="c"/>
+                    </d:file>
+                    <d:file href="../in/other.xml">
+                        <d:anchor id="h" original-id="e"/>
+                    </d:file>
                     <d:file href="images/img.png" original-href="file:/Users/me/in/img.png"/>
                 </d:fileset>
             </x:document>

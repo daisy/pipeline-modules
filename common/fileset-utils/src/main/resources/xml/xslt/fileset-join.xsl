@@ -36,7 +36,8 @@
                 <xsl:variable name="href" select="current-grouping-key()"/>
                 <d:file href="{if ($base) then pf:relativize-uri($href, $base) else $href}">
                     <!-- last occurence of an attribute wins -->
-                    <xsl:apply-templates select="current-group()/(@* except @href) | current-group()/*"/>
+                    <xsl:apply-templates select="current-group()/(@* except @href)"/>
+                    <xsl:apply-templates select="current-group()/*"/>
                 </d:file>
             </xsl:for-each-group>
         </d:fileset>

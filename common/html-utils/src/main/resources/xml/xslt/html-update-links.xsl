@@ -22,8 +22,10 @@
 
     <xsl:variable name="original-doc-base" select="pf:html-base-uri(/)"/>
     <xsl:variable name="doc-base"
-                  select="(for $file in $mapping/d:file[resolve-uri(@original-href,base-uri(.))=base-uri(current())][1] return
-                           pf:html-base-uri(/,$file/@href),
+                  select="(for $file in $mapping/d:file[@original-href]
+                                                       [resolve-uri(@original-href,base-uri(.))=base-uri(current())]
+                                                       [1]
+                           return pf:html-base-uri(/,$file/@href),
                            $original-doc-base)[1]"/>
 
     <xsl:template match="@aria-describedat  |
@@ -58,15 +60,29 @@
         <xsl:variable name="fragment" as="xs:string?" select="$uri[5]"/>
         <xsl:variable name="file" as="xs:string" select="pf:recompose-uri($uri[position()&lt;5])"/>
         <xsl:variable name="resolved-file" as="xs:anyURI" select="resolve-uri($file,$original-doc-base)"/>
-        <xsl:variable name="new-file" as="xs:string?" select="$mapping/d:file[@original-href=$resolved-file][1]/@href"/>
+        <xsl:variable name="new-file" as="element(d:file)?" select="$mapping/d:file[@original-href=$resolved-file][1]"/>
+        <xsl:variable name="new-fragment" as="xs:string?" select="if (exists($fragment))
+                                                                  then if (exists($new-file))
+                                                                       then $new-file/d:anchor[@original-id=$fragment]/@id
+                                                                       else $mapping/d:file[not(@original-href)][@href=$resolved-file][1]
+                                                                                    /d:anchor[@original-id=$fragment]/@id
+                                                                  else ()"/>
+        <xsl:variable name="new-file" as="xs:string?" select="$new-file/@href"/>
         <xsl:choose>
             <xsl:when test="exists($new-file)">
-                <xsl:variable name="new-uri" select="string-join(($new-file,$fragment),'#')"/>
-                <xsl:attribute name="{name(.)}" select="pf:relativize-uri($new-uri,$doc-base)"/>
+                <xsl:variable name="new-uri" select="string-join(($new-file,($new-fragment,$fragment)[1]),'#')"/>
+                <xsl:attribute name="{name(.)}" select="if (starts-with($new-uri,concat($doc-base,'#')))
+                                                        then concat('#',substring-after($new-uri,'#'))
+                                                        else pf:relativize-uri($new-uri,$doc-base)"/>
             </xsl:when>
             <xsl:when test="$doc-base!=$original-doc-base and pf:is-relative(.)">
-                <xsl:variable name="new-uri" select="string-join(($resolved-file,$fragment),'#')"/>
-                <xsl:attribute name="{name(.)}" select="pf:relativize-uri($new-uri,$doc-base)"/>
+                <xsl:variable name="new-uri" select="string-join(($resolved-file,($new-fragment,$fragment)[1]),'#')"/>
+                <xsl:attribute name="{name(.)}" select="if (starts-with($new-uri,concat($doc-base,'#')))
+                                                        then concat('#',substring-after($new-uri,'#'))
+                                                        else pf:relativize-uri($new-uri,$doc-base)"/>
+            </xsl:when>
+            <xsl:when test="exists($new-fragment)">
+                <xsl:attribute name="{name(.)}" select="string-join(($file,$new-fragment),'#')"/>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:sequence select="."/>
