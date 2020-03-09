@@ -7,13 +7,14 @@
                 xmlns:d="http://www.daisy.org/ns/pipeline/data">
 	
 	<xsl:include href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl"/>
+	<xsl:include href="http://www.daisy.org/pipeline/modules/common-utils/generate-id.xsl"/>
 	
 	<xsl:variable name="css.fileset" select="collection()[2]"/>
 	<xsl:variable name="html" select="collection()[position() &gt; 2]"/>
 	
-	<xsl:template match="@*|node()">
+	<xsl:template mode="#default add-ids" match="@*|node()">
 		<xsl:copy>
-			<xsl:apply-templates select="@*|node()"/>
+			<xsl:apply-templates mode="#current" select="@*|node()"/>
 		</xsl:copy>
 	</xsl:template>
 	
@@ -56,52 +57,35 @@
 	    Add CSS files
 	-->
 	<xsl:template match="opf:manifest">
-		<xsl:variable name="ids" as="xs:string*">
-			<xsl:call-template name="generate-ids">
-				<xsl:with-param name="amount" select="count($css.fileset//d:file)"/>
-				<xsl:with-param name="prefix" tunnel="yes" select="'item_'"/>
-				<xsl:with-param name="in-use" tunnel="yes" select="opf:item/@id"/>
-			</xsl:call-template>
+		<xsl:variable name="output-base-uri" select="pf:base-uri(/*)"/>
+		<xsl:variable name="manifest-with-css">
+			<xsl:copy>
+				<xsl:sequence select="@*|node()"/>
+				<xsl:for-each select="$css.fileset//d:file">
+					<xsl:element name="item" xmlns="http://www.idpf.org/2007/opf">
+						<xsl:attribute name="href" select="pf:relativize-uri(
+						                                     resolve-uri(@href,base-uri(.)),
+						                                     $output-base-uri)"/>
+						<xsl:attribute name="media-type" select="'text/css'"/>
+					</xsl:element>
+				</xsl:for-each>
+			</xsl:copy>
 		</xsl:variable>
-		<xsl:variable name="output-base-uri" select="base-uri(/*)"/>
-		<xsl:copy>
-			<xsl:apply-templates select="@*|node()"/>
-			<xsl:for-each select="$css.fileset//d:file">
-				<xsl:variable name="i" select="position()"/>
-				<xsl:element name="item" xmlns="http://www.idpf.org/2007/opf">
-					<xsl:attribute name="href" select="pf:relativize-uri(
-					                                     resolve-uri(@href,base-uri(.)),
-					                                     $output-base-uri)"/>
-					<xsl:attribute name="id" select="$ids[$i]"/>
-					<xsl:attribute name="media-type" select="'text/css'"/>
-				</xsl:element>
-			</xsl:for-each>
-		</xsl:copy>
+		<xsl:apply-templates mode="add-ids" select="$manifest-with-css"/>
 	</xsl:template>
 	
-	<xsl:template name="generate-ids">
-		<xsl:param name="amount" as="xs:integer" required="yes"/>
-		<xsl:param name="prefix" as="xs:string" tunnel="yes" required="yes"/>
-		<xsl:param name="in-use" as="xs:string*" tunnel="yes" select="()"/>
-		<xsl:param name="_feed" as="xs:integer" select="1"/>
-		<xsl:variable name="id" select="concat($prefix,$_feed)"/>
-		<xsl:choose>
-			<xsl:when test="$id=$in-use">
-				<xsl:call-template name="generate-ids">
-					<xsl:with-param name="amount" select="$amount"/>
-					<xsl:with-param name="_feed" select="$_feed + 1"/>
-				</xsl:call-template>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:sequence select="$id"/>
-				<xsl:if test="$amount &gt; 1">
-					<xsl:call-template name="generate-ids">
-						<xsl:with-param name="amount" select="$amount - 1"/>
-						<xsl:with-param name="_feed" select="$_feed + 1"/>
-					</xsl:call-template>
-				</xsl:if>
-			</xsl:otherwise>
-		</xsl:choose>
+	<xsl:template mode="add-ids" match="opf:manifest">
+		<xsl:call-template name="pf:next-match-with-generated-ids">
+			<xsl:with-param name="prefix" select="'item_'"/>
+			<xsl:with-param name="for-elements" select="opf:item[not(@id)]"/>
+		</xsl:call-template>
+	</xsl:template>
+	
+	<xsl:template mode="add-ids" match="opf:item[not(@id)]">
+		<xsl:copy>
+			<xsl:call-template name="pf:generate-id"/>
+			<xsl:apply-templates mode="add-ids" select="@*|node()"/>
+		</xsl:copy>
 	</xsl:template>
 	
 </xsl:stylesheet>
