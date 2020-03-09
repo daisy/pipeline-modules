@@ -13,6 +13,8 @@
 	<p:input port="source" primary="true">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>The input HTML document</p>
+			<p>If the HTML document itself is being relocated, the base URI of this document is
+			assumed to correspond with the original location.</p>
 		</p:documentation>
 	</p:input>
 	

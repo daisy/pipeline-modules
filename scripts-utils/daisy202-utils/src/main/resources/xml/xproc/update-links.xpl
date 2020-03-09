@@ -12,7 +12,7 @@
     <p:input port="source.fileset" primary="true"/>
     <p:input port="source.in-memory" sequence="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <p>DAISY 2.02 fileset</p>
+            <p>DAISY 2.02 fileset before the relocation of files.</p>
         </p:documentation>
         <p:empty/>
     </p:input>

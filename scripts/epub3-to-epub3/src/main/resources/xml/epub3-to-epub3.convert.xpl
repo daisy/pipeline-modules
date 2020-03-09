@@ -152,12 +152,26 @@
                           select="resolve-uri('EPUB/package-braille.opf',$result-base)"/>
         </p:xslt>
         <p:sink/>
-        <px:fileset-apply name="apply">
+        <!--
+            update cross references
+        -->
+        <px:epub3-update-links name="update-links">
             <p:input port="source.fileset">
                 <p:pipe step="move" port="result.fileset"/>
             </p:input>
             <p:input port="source.in-memory">
                 <p:pipe step="move" port="result.in-memory"/>
+            </p:input>
+            <p:input port="mapping">
+                <p:pipe step="mapping" port="result"/>
+            </p:input>
+        </px:epub3-update-links>
+        <!--
+            perform rename
+        -->
+        <px:fileset-apply name="apply">
+            <p:input port="source.in-memory">
+                <p:pipe step="update-links" port="result.in-memory"/>
             </p:input>
             <p:input port="mapping">
                 <p:pipe step="mapping" port="result"/>
@@ -384,24 +398,11 @@
     </p:group>
     
     <!--
-        update cross references in braille rendition
-    -->
-    
-    <px:epub3-update-links name="braille-rendition.update-links">
-        <p:input port="source.in-memory">
-            <p:pipe step="braille-rendition.process-package-doc" port="in-memory"/>
-        </p:input>
-        <p:input port="mapping">
-            <p:pipe step="braille-rendition.fileset" port="mapping"/>
-        </p:input>
-    </px:epub3-update-links>
-    
-    <!--
         final braille rendition package document
     -->
     <px:fileset-load media-types="application/oebps-package+xml" name="braille-rendition.package-document">
         <p:input port="in-memory">
-            <p:pipe step="braille-rendition.update-links" port="result.in-memory"/>
+            <p:pipe step="braille-rendition.process-package-doc" port="in-memory"/>
         </p:input>
     </px:fileset-load>
     <p:sink/>
@@ -414,12 +415,12 @@
         <p:output port="fileset" primary="true"/>
         <p:output port="in-memory" sequence="true">
             <p:pipe step="move" port="result.in-memory"/>
-            <p:pipe step="braille-rendition.update-links" port="result.in-memory"/>
+            <p:pipe step="braille-rendition.process-package-doc" port="in-memory"/>
         </p:output>
         <px:fileset-join>
             <p:input port="source">
                 <p:pipe step="move" port="result.fileset"/>
-                <p:pipe step="braille-rendition.update-links" port="result.fileset"/>
+                <p:pipe step="braille-rendition.process-package-doc" port="fileset"/>
             </p:input>
         </px:fileset-join>
     </p:group>

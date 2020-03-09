@@ -20,11 +20,11 @@
         <xsl:apply-templates mode="normalize" select="collection()[/d:fileset][1]"/>
     </xsl:variable>
 
-    <xsl:variable name="doc-base" select="pf:html-base-uri(/)"/>
-    <xsl:variable name="original-doc-base"
-                  select="(for $file in $mapping/d:file[resolve-uri(@href,base-uri(.))=base-uri(current())][1] return
-                           pf:html-base-uri(/,$file/@original-href),
-                           $doc-base)[1]"/>
+    <xsl:variable name="original-doc-base" select="pf:html-base-uri(/)"/>
+    <xsl:variable name="doc-base"
+                  select="(for $file in $mapping/d:file[resolve-uri(@original-href,base-uri(.))=base-uri(current())][1] return
+                           pf:html-base-uri(/,$file/@href),
+                           $original-doc-base)[1]"/>
 
     <xsl:template match="@aria-describedat  |
                          @longdesc          |

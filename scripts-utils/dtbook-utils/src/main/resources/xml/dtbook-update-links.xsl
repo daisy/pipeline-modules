@@ -18,10 +18,10 @@
         <xsl:apply-templates mode="absolute-hrefs" select="collection()[/d:fileset][1]"/>
     </xsl:variable>
 
-    <xsl:variable name="doc-base" select="base-uri(/)"/>
-    <xsl:variable name="original-doc-base"
-                  select="($mapping/d:file[resolve-uri(@href,base-uri(.))=$doc-base][1]/@original-href,
-                           $doc-base)[1]"/>
+    <xsl:variable name="original-doc-base" select="base-uri(/)"/>
+    <xsl:variable name="doc-base"
+                  select="($mapping/d:file[resolve-uri(@original-href,base-uri(.))=$original-doc-base][1]/@href,
+                           $original-doc-base)[1]"/>
 
     <xsl:template match="a/@href           |
                          img/@src          |

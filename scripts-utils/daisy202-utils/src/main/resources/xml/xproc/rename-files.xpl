@@ -31,7 +31,7 @@
             documents are updated accordingly. Cross-references in HTML (including NCC) and SMIL
             documents are updated too.</p>
         </p:documentation>
-        <p:pipe step="update-links" port="result.in-memory"/>
+        <p:pipe step="rename" port="result.in-memory"/>
     </p:output>
 
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
@@ -44,25 +44,25 @@
             pxi:daisy202-update-links
         </p:documentation>
     </p:import>
-    
-    <p:documentation>Perform the renaming</p:documentation>
-    <px:fileset-apply name="rename">
+
+    <p:documentation>Update cross-references</p:documentation>
+    <pxi:daisy202-update-links name="update-links">
         <p:input port="source.in-memory">
             <p:pipe step="main" port="source.in-memory"/>
         </p:input>
         <p:input port="mapping">
             <p:pipe step="main" port="mapping"/>
         </p:input>
-    </px:fileset-apply>
+    </pxi:daisy202-update-links>
 
-    <p:documentation>Update cross-references</p:documentation>
-    <pxi:daisy202-update-links name="update-links">
+    <p:documentation>Perform the renaming</p:documentation>
+    <px:fileset-apply name="rename">
         <p:input port="source.in-memory">
-            <p:pipe step="rename" port="result.in-memory"/>
+            <p:pipe step="update-links" port="result.in-memory"/>
         </p:input>
         <p:input port="mapping">
             <p:pipe step="main" port="mapping"/>
         </p:input>
-    </pxi:daisy202-update-links>
+    </px:fileset-apply>
 
 </p:declare-step>
