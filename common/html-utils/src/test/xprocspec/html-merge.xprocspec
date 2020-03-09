@@ -8,27 +8,29 @@
     <x:scenario label="test">
         <x:call step="px:html-merge">
             <x:input port="source">
-                <x:document type="inline" xml:base="part1.html">
+                <x:document type="inline" xml:base="file:/part1.html">
                     <html xmlns="http://www.w3.org/1999/xhtml">
                         <body epub:type="frontmatter">
                             <a href="part2.html#x"/>
                         </body>
                     </html>
                 </x:document>
-                <x:document type="inline" xml:base="part2.html">
+                <x:document type="inline" xml:base="file:/part2.html">
                     <html xmlns="http://www.w3.org/1999/xhtml">
                         <body epub:type="bodymatter">
                             <a id="x"/>
                         </body>
                     </html>
                 </x:document>
-                <x:document type="inline" xml:base="part3.html">
+                <x:document type="inline" xml:base="file:/part3.html">
                     <html xmlns="http://www.w3.org/1999/xhtml">
-                        <body epub:type="bodymatter"/>
+                        <body epub:type="bodymatter">
+                            <a id="x"/>
+                        </body>
                     </html>
                 </x:document>
             </x:input>
-            <x:option name="output-base-uri" select="resolve-uri('merged.html')"/>
+            <x:option name="output-base-uri" select="'file:/merged.html'"/>
         </x:call>
         <x:context label="the result">
             <x:document type="port" port="result"/>
@@ -38,13 +40,15 @@
                 <html xmlns="http://www.w3.org/1999/xhtml">
                     <head/>
                     <body>
-                        <section epub:type="frontmatter">
-                            <a href="merged.html#x"/>
+                        <section id="id_1" epub:type="frontmatter">
+                            <a href="#x"/>
                         </section>
-                        <section epub:type="bodymatter">
+                        <section id="id_2" epub:type="bodymatter">
                             <a id="x"/>
                         </section>
-                        <section epub:type="bodymatter"/>
+                        <section id="id_3" epub:type="bodymatter">
+                            <a id="id_4"/>
+                        </section>
                     </body>
                 </html>
             </x:document>
@@ -52,13 +56,14 @@
         <x:context label="the mapping">
             <x:document type="port" port="mapping"/>
         </x:context>
-        <x:expect label="should be as expected"
-                  type="custom" href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl" step="x:fileset-compare">
+        <x:expect label="should be as expected" type="compare">
             <x:document type="inline">
                 <d:fileset>
-                    <d:file href="merged.html" original-href="part1.html"/>
-                    <d:file href="merged.html" original-href="part2.html"/>
-                    <d:file href="merged.html" original-href="part3.html"/>
+                    <d:file href="file:/merged.html" original-href="file:/part3.html">
+                        <d:anchor id="id_4" original-id="x"/>
+                    </d:file>
+                    <d:file href="file:/merged.html" original-href="file:/part1.html"/>
+                    <d:file href="file:/merged.html" original-href="file:/part2.html"/>
                 </d:fileset>
             </x:document>
         </x:expect>

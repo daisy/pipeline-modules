@@ -27,7 +27,7 @@
 			<p><code>d:fileset</code> document that contains a mapping from input to output
 			files.</p>
 		</p:documentation>
-		<p:pipe step="skip-if-single" port="mapping"/>
+		<p:pipe step="mapping" port="result"/>
 	</p:output>
 
 	<p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
@@ -35,36 +35,88 @@
 			px:set-base-uri
 		</p:documentation>
 	</p:import>
+	<p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
+		<p:documentation>
+			px:fileset-compose
+		</p:documentation>
+	</p:import>
 	<p:import href="html-update-links.xpl">
 		<p:documentation>
 			px:html-update-links
 		</p:documentation>
 	</p:import>
+	<p:import href="html-add-ids.xpl">
+		<p:documentation>
+			px:html-add-ids
+		</p:documentation>
+	</p:import>
 
+	<!--
+	    fix duplicate ids
+	-->
+	<px:html-add-ids name="fix-ids"/>
 	<p:count name="html-count"/>
+	<p:sink/>
 
-	<p:choose name="skip-if-single">
-		<p:when test="/*=1">
-			<p:output port="result" primary="true"/>
-			<p:output port="mapping">
-				<p:inline>
-					<d:fileset/>
-				</p:inline>
-			</p:output>
-			<p:sink/>
-			<p:identity>
-				<p:input port="source">
-					<p:pipe step="main" port="source"/>
+	<!--
+	    file mapping
+	-->
+	<p:group name="file-mapping">
+		<p:output port="result"/>
+		<p:for-each>
+			<p:iteration-source>
+				<p:pipe step="main" port="source"/>
+			</p:iteration-source>
+			<p:template>
+				<p:input port="template">
+					<p:inline>
+						<d:file href="{$output-base-uri}" original-href="{base-uri(/*)}"/>
+					</p:inline>
 				</p:input>
-			</p:identity>
+				<p:with-param name="output-base-uri" select="$output-base-uri"/>
+			</p:template>
+		</p:for-each>
+		<p:wrap-sequence wrapper="d:fileset"/>
+	</p:group>
+	<p:sink/>
+
+	<!--
+	    file mapping + id mapping
+	-->
+	<px:fileset-compose name="mapping">
+		<p:input port="source">
+			<p:pipe step="fix-ids" port="mapping"/>
+			<p:pipe step="file-mapping" port="result"/>
+		</p:input>
+	</px:fileset-compose>
+	<p:sink/>
+
+	<!--
+	    update links
+	-->
+	<p:for-each name="update-links">
+		<p:iteration-source>
+			<p:pipe step="fix-ids" port="result"/>
+		</p:iteration-source>
+		<p:output port="result"/>
+		<px:html-update-links>
+			<p:input port="mapping">
+				<p:pipe step="mapping" port="result"/>
+			</p:input>
+		</px:html-update-links>
+	</p:for-each>
+
+	<!--
+	    merge
+	-->
+	<p:choose>
+		<p:xpath-context>
+			<p:pipe step="html-count" port="result"/>
+		</p:xpath-context>
+		<p:when test="/*=1">
+			<p:identity/>
 		</p:when>
 		<p:otherwise>
-			<p:output port="result" primary="true">
-				<p:pipe step="result" port="result"/>
-			</p:output>
-			<p:output port="mapping">
-				<p:pipe step="mapping" port="result"/>
-			</p:output>
 			<p:sink/>
 			<p:identity name="head">
 				<p:input port="source">
@@ -76,7 +128,7 @@
 			<p:sink/>
 			<p:for-each>
 				<p:iteration-source>
-					<p:pipe step="main" port="source"/>
+					<p:pipe step="update-links" port="result"/>
 				</p:iteration-source>
 				<p:filter select="//html:body"/>
 				<p:rename match="/*" new-name="html:section"/>
@@ -89,35 +141,10 @@
 					<p:pipe step="body" port="result"/>
 				</p:input>
 			</p:wrap-sequence>
-			<p:identity name="result"/>
-			<p:sink/>
-			<p:for-each>
-				<p:iteration-source>
-					<p:pipe step="main" port="source"/>
-				</p:iteration-source>
-				<p:template>
-					<p:input port="template">
-						<p:inline>
-							<d:file href="{$output-base-uri}" original-href="{base-uri(/*)}"/>
-						</p:inline>
-					</p:input>
-					<p:with-param name="output-base-uri" select="$output-base-uri"/>
-				</p:template>
-			</p:for-each>
-			<p:wrap-sequence wrapper="d:fileset"/>
-			<p:identity name="mapping"/>
-			<p:sink/>
 		</p:otherwise>
 	</p:choose>
-
 	<px:set-base-uri>
 		<p:with-option name="base-uri" select="$output-base-uri"/>
 	</px:set-base-uri>
-
-	<px:html-update-links>
-		<p:input port="mapping">
-			<p:pipe step="skip-if-single" port="mapping"/>
-		</p:input>
-	</px:html-update-links>
 
 </p:declare-step>
