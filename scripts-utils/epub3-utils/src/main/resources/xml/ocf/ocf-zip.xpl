@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-                type="px:epub3-ocf-zip" name="main">
+                xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc-internal"
+                type="pxi:epub3-ocf-zip" name="main">
 
     <p:input port="source"/>
     <p:output port="result">
