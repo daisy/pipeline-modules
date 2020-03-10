@@ -14,12 +14,12 @@
 	
 	<p:import href="http://www.daisy.org/pipeline/modules/epub-utils/library.xpl">
 		<p:documentation>
-			px:epub3-load
+			px:epub-load
 		</p:documentation>
 	</p:import>
 	
-	<px:epub3-load name="load">
+	<px:epub-load version="3" name="load">
 		<p:with-option name="href" select="$epub"/>
-	</px:epub3-load>
+	</px:epub-load>
 	
 </p:declare-step>

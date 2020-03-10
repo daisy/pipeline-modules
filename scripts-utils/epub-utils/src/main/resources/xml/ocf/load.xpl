@@ -4,10 +4,10 @@
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc-internal"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:ocf="urn:oasis:names:tc:opendocument:xmlns:container"
-                type="px:epub3-load" name="main">
+                type="px:epub-load" name="main">
 	
 	<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-		<p>Create a fileset from a zipped or unzipped EPUB 3.</p>
+		<p>Create a fileset from a zipped or unzipped EPUB.</p>
 	</p:documentation>
 	
 	<p:option name="href" required="true" px:media-type="application/epub+zip application/oebps-package+xml">
@@ -17,6 +17,11 @@
 		</p:documentation>
 	</p:option>
 	
+	<p:option name="version" required="false" select="'3'">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p>EPUB version: "2" or "3"</p>
+		</p:documentation>
+	</p:option>
 	<p:option name="store-to-disk" required="false" select="'false'">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>Ensure that all files from the result fileset exist on disk. It is an error if this
@@ -58,7 +63,7 @@
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>The validation report</p>
 			<p>The port is empty if the <code>validation</code> option is 'off' or if the input is a
-			valid EPUB 3.</p>
+			valid EPUB.</p>
 		</p:documentation>
 		<p:pipe step="validate" port="report"/>
 	</p:output>
@@ -67,15 +72,15 @@
 			<p>The <a href="http://daisy.github.io/pipeline/ValidationStatusXML">validation
 			status</a> document</p>
 			<p>'ok' if the <code>validation</code> option not 'abort' or if the input is a valid
-			EPUB 3, 'error' otherwise.</p>
+			EPUB, 'error' otherwise.</p>
 		</p:documentation>
 		<p:pipe step="validate" port="status"/>
 	</p:output>
 	
 	<p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			px:error
 			px:message
+			px:assert
 		</p:documentation>
 	</p:import>
 	<p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
@@ -98,9 +103,9 @@
 			px:unzip
 		</p:documentation>
 	</p:import>
-	<p:import href="../validate/epub3-validate.xpl">
+	<p:import href="../validate/epub-validate.xpl">
 		<p:documentation>
-			px:epub3-validate
+			px:epub-validate
 		</p:documentation>
 	</p:import>
 	<p:import href="opf-manifest-to-fileset.xpl">
@@ -109,6 +114,10 @@
 		</p:documentation>
 	</p:import>
 	
+	<px:assert message="Version must be '2' or '3', but got '$1'" error-code="XXXXX">
+		<p:with-option name="test" select="$version=('2','3')"/>
+	</px:assert>
+
 	<px:assert message="When store-to-disk='true' then temp-dir must also be defined" error-code="PZU001">
 		<p:with-option name="test" select="$store-to-disk='false' or p:value-available('temp-dir')"/>
 	</px:assert>
@@ -298,15 +307,16 @@
 			<p:output port="status">
 				<p:pipe step="status-and-report" port="status"/>
 			</p:output>
-			<px:epub3-validate name="epub3-validator">
+			<px:epub-validate name="epub3-validator">
 				<!--
 					epub option must point to a file that exists on disk (and may not be a file inside a ZIP)
 				-->
 				<p:with-option name="epub" select="$href">
 					<p:pipe step="result" port="result.fileset"/>
 				</p:with-option>
+				<p:with-option name="version" select="$version"/>
 				<p:with-option name="temp-dir" select="concat($temp-dir,'validate/')"/>
-			</px:epub3-validate>
+			</px:epub-validate>
 			<p:identity>
 				<p:input port="source">
 					<p:pipe step="epub3-validator" port="validation-status"/>
@@ -343,7 +353,7 @@
 					<p:output port="report" sequence="true">
 						<p:pipe step="epub3-validator" port="html-report"/>
 					</p:output>
-					<px:message message="The EPUB 3 input is invalid. Aborting."/>
+					<px:message message="The EPUB input is invalid. Aborting."/>
 				</p:otherwise>
 			</p:choose>
 		</p:otherwise>

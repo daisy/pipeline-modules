@@ -67,14 +67,14 @@ option is only available for zipped EPUBs.</p>
 
     <p:import href="http://www.daisy.org/pipeline/modules/epub-utils/library.xpl">
         <p:documentation>
-            px:epub3-validate
+            px:epub-validate
         </p:documentation>
     </p:import>
 
-    <px:epub3-validate px:progress="1" name="validate">
+    <px:epub-validate px:progress="1" version="3" name="validate">
         <p:with-option name="epub" select="$epub"/>
         <p:with-option name="temp-dir" select="$temp-dir"/>
         <p:with-option name="accessibility-check" select="$accessibility-check"/>
-    </px:epub3-validate>
+    </px:epub-validate>
 
 </p:declare-step>

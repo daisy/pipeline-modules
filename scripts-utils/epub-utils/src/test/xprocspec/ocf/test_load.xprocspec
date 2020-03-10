@@ -5,7 +5,8 @@
                script="../../../main/resources/xml/ocf/load.xpl">
 
 	<x:scenario label="zipped">
-		<x:call step="px:epub3-load">
+		<x:call step="px:epub-load">
+			<x:option name="version" select="'3'"/>
 			<x:option name="href" select="resolve-uri('../../resources/valentin.epub')"/>
 		</x:call>
 		
@@ -100,7 +101,9 @@
 	</x:scenario>
 	
 	<x:scenario label="unzipped">
-		<x:call step="px:epub3-load"/>
+		<x:call step="px:epub-load">
+			<x:option name="version" select="'3'"/>
+		</x:call>
 		
 		<x:scenario label="whole epub">
 			<x:call>
@@ -189,7 +192,8 @@
 	</x:scenario>
 	
 	<x:scenario label="with validation">
-		<x:call step="px:epub3-load">
+		<x:call step="px:epub-load">
+			<x:option name="version" select="'3'"/>
 			<x:option name="href" select="resolve-uri('../../resources/moby-dick-mo-20120214.OK.epub')"/>
 			<x:option name="temp-dir" select="resolve-uri('validation',$temp-dir)"/>
 			<x:option name="validation" select="'abort'"/>

@@ -2,10 +2,10 @@
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
-                type="px:epub3-validate">
+                type="px:epub-validate">
 
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-        <h1 px:role="name">EPUB 3 Validator</h1>
+        <h1 px:role="name">EPUB Validator</h1>
         <p px:role="desc">Validates a EPUB.</p>
         <address px:role="author maintainer">
             <p>Script wrapper for epubcheck maintained by <span px:role="name">Jostein Austvik Jacobsen</span>
@@ -18,6 +18,12 @@
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h2 px:role="name">EPUB</h2>
             <p px:role="desc">Either a *.epub file or a *.opf file.</p>
+        </p:documentation>
+    </p:option>
+
+    <p:option name="version" required="false" select="'3'">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>EPUB version: "2" or "3"</p>
         </p:documentation>
     </p:option>
 
@@ -71,6 +77,11 @@ option is only available for zipped EPUBs.</p>
         <p:pipe port="result" step="ace-report"/>
     </p:output>
     
+    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            px:assert
+        </p:documentation>
+    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/epubcheck-adapter/library.xpl">
         <p:documentation>
             px:epubcheck
@@ -82,10 +93,14 @@ option is only available for zipped EPUBs.</p>
         </p:documentation>
     </p:import>
 
+    <px:assert message="Version must be '2' or '3', but got '$1'" error-code="XXXXX">
+        <p:with-option name="test" select="$version=('2','3')"/>
+    </px:assert>
+
     <px:epubcheck px:message="Running EPUBCheck" px:progress=".8">
         <p:with-option name="epub" select="$epub"/>
         <p:with-option name="mode" select="if (ends-with(lower-case($epub),'.epub')) then 'epub' else 'expanded'"/>
-        <p:with-option name="version" select="'3'"/>
+        <p:with-option name="version" select="$version"/>
         <p:with-option name="temp-dir" select="concat($temp-dir,'/epubcheck')"/>
     </px:epubcheck>
 

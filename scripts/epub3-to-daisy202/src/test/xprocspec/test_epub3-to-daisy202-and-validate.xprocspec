@@ -31,10 +31,10 @@
                     <p:output port="result.in-memory" sequence="true">
                         <p:pipe step="load" port="result.in-memory"/>
                     </p:output>
-                    <px:epub3-load name="load" validation="off" store-to-disk="true">
+                    <px:epub-load name="load" version="3.0" validation="off" store-to-disk="true">
                         <p:with-option name="href" select="$epub"/>
                         <p:with-option name="temp-dir" select="concat($temp-dir,'load/')"/>
-                    </px:epub3-load>
+                    </px:epub-load>
                 </p:when>
                 <p:otherwise>
                     <p:output port="result.fileset" primary="true"/>

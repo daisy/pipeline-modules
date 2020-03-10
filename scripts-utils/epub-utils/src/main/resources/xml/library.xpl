@@ -38,7 +38,7 @@
 	<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 		<p>Validation with EpubCheck and Ace.</p>
 	</p:documentation>
-	<p:import href="validate/epub3-validate.xpl"/>
+	<p:import href="validate/epub-validate.xpl"/>
 	<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 		<p>Other utility steps</p>
 	</p:documentation>

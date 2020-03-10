@@ -2,10 +2,11 @@
 <x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                xmlns:d="http://www.daisy.org/ns/pipeline/data"
-               script="../../main/resources/xml/validate/epub3-validate.xpl">
+               script="../../main/resources/xml/validate/epub-validate.xpl">
 
     <x:scenario label="moby dick">
-        <x:call step="px:epub3-validate">
+        <x:call step="px:epub-validate">
+            <x:option name="version" select="'3'"/>
             <x:option name="epub" select="resolve-uri('../resources/moby-dick-mo-20120214.OK.epub')"/>
             <x:option name="temp-dir" select="resolve-uri('moby-dick',$temp-dir)"/>
             <x:option name="accessibility-check" select="'true'"/>
@@ -25,7 +26,8 @@
     </x:scenario>
     
     <x:scenario label="moby dick unzipped">
-        <x:call step="px:epub3-validate">
+        <x:call step="px:epub-validate">
+            <x:option name="version" select="'3'"/>
             <x:option name="epub" select="resolve-uri('../resources/moby-dick-mo-20120214/OPS/package.opf')"/>
             <x:option name="temp-dir" select="resolve-uri('moby-dick-unzipped',$temp-dir)"/>
         </x:call>

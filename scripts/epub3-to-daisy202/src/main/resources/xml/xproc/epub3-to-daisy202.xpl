@@ -91,7 +91,7 @@ You may alternatively use the EPUB package document (the OPF-file) if your input
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/epub-utils/library.xpl">
         <p:documentation>
-            px:epub3-load
+            px:epub-load
         </p:documentation>
     </p:import>
 
@@ -101,11 +101,11 @@ You may alternatively use the EPUB package document (the OPF-file) if your input
         </p:inline>
     </p:variable>
 
-    <px:epub3-load name="load" store-to-disk="true">
+    <px:epub-load name="load" version="3" store-to-disk="true">
         <p:with-option name="href" select="$epub-href"/>
         <p:with-option name="temp-dir" select="$temp-dir"/>
         <p:with-option name="validation" select="$validation"/>
-    </px:epub3-load>
+    </px:epub-load>
     
     <p:identity>
         <p:input port="source">
