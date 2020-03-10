@@ -7,6 +7,8 @@
 
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
         <p>Change all URIs in a fileset to EPUB-safe URIs.</p>
+        <p>See <a href="http://idpf.org/epub/30/spec/epub30-ocf.html#sec-container-filenames">Open
+        Container Format 3.0 specification</a>.</p>
     </p:documentation>
 
     <p:input port="source.fileset" primary="true"/>
@@ -40,7 +42,7 @@
             px:fileset-apply
         </p:documentation>
     </p:import>
-    <p:import href="epub3-rename-files.xpl">
+    <p:import href="../epub3-rename-files.xpl">
         <p:documentation>
             px:epub3-rename-files
         </p:documentation>

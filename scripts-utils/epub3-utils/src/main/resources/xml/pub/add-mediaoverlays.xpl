@@ -3,7 +3,7 @@
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                 xmlns:opf="http://www.idpf.org/2007/opf"
-                type="px:epub3-pub-add-mediaoverlays" name="main">
+                type="px:epub3-add-mediaoverlays" name="main">
 
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
         <p>Add media overlays to a EPUB publication</p>

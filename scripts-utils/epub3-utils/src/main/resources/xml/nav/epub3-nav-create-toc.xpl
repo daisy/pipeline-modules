@@ -3,7 +3,7 @@
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:h="http://www.w3.org/1999/xhtml"
                 xmlns:epub="http://www.idpf.org/2007/ops"
-                type="px:epub3-nav-create-toc" name="main">
+                type="px:epub3-create-toc" name="main">
 
     <p:input port="source" sequence="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">

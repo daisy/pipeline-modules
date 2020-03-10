@@ -2,7 +2,7 @@
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 exclude-inline-prefixes="#all"
-                type="px:epub3-pub-merge-prefix">
+                type="px:epub3-merge-prefix">
 
 	<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 		<p>Merge <code>prefix</code> attributes</p>

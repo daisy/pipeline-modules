@@ -90,9 +90,9 @@
     <p:import href="http://www.daisy.org/pipeline/modules/epub3-utils/library.xpl">
         <p:documentation>
             px:epub3-safe-uris
-            px:epub3-nav-create-navigation-doc
+            px:epub3-create-navigation-doc
             px:epub3-create-mediaoverlays
-            px:epub3-pub-create-package-doc
+            px:epub3-create-package-doc
             px:epub3-ocf-finalize
         </p:documentation>
     </p:import>
@@ -299,11 +299,11 @@
                 <px:html-id-fixer/>
             </p:for-each>
             <!--TODO create other nav types (configurable ?)-->
-            <px:epub3-nav-create-navigation-doc name="create-navigation-doc">
+            <px:epub3-create-navigation-doc name="create-navigation-doc">
                 <p:with-option name="output-base-uri" select="concat($content-dir,'toc.xhtml')">
                     <p:empty/>
                 </p:with-option>
-            </px:epub3-nav-create-navigation-doc>
+            </px:epub3-create-navigation-doc>
             <p:identity name="navigation-doc" px:message="Navigation Document Created."/>
             <p:sink/>
             <p:add-attribute match="d:file" attribute-name="role" attribute-value="nav"
@@ -430,7 +430,7 @@
             <p:pipe step="add-mediaoverlays" port="in-memory"/>
             <p:pipe step="package-doc" port="result"/>
         </p:output>
-        <px:epub3-pub-create-package-doc compatibility-mode="false" name="create-package-doc">
+        <px:epub3-create-package-doc compatibility-mode="false" name="create-package-doc">
             <p:input port="source.in-memory">
                 <p:pipe step="add-mediaoverlays" port="in-memory"/>
             </p:input>
@@ -442,7 +442,7 @@
                 <p:pipe step="metadata" port="result"/>
             </p:input>
             <p:with-option name="output-base-uri" select="concat($content-dir,'package.opf')"/>
-        </px:epub3-pub-create-package-doc>
+        </px:epub3-create-package-doc>
         <p:identity name="package-doc" px:message="Package Document Created."/>
         <p:sink/>
         <px:fileset-join>

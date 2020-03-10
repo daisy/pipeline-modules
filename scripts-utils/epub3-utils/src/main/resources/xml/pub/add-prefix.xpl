@@ -2,7 +2,7 @@
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 exclude-inline-prefixes="#all"
-                type="px:epub3-pub-add-prefix">
+                type="px:epub3-add-prefix">
 
 	<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 		<p>Add prefix declarations to the <code>prefix</code> attribute</p>

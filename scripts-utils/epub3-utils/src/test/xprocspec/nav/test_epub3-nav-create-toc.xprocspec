@@ -5,7 +5,7 @@
                script="../../../main/resources/xml/nav/epub3-nav-create-toc.xpl">
 
 	<x:scenario label="test">
-		<x:call step="px:epub3-nav-create-toc">
+		<x:call step="px:epub3-create-toc">
 			<x:input port="source">
 				<x:document type="inline" xml:base="file:/tmp/foo.xhtml">
 					<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr">

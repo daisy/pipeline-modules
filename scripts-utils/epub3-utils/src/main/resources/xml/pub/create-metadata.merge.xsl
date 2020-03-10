@@ -7,10 +7,10 @@
                 xpath-default-namespace="http://www.idpf.org/2007/opf"
                 exclude-result-prefixes="#all">
 
-    <xsl:include href="../epub3-vocab.xsl"/>
+    <xsl:include href="epub3-vocab.xsl"/>
 
     <!--
-        prefix declarations have been previously normalized by px:epub3-pub-merge-prefix according
+        prefix declarations have been previously normalized by px:epub3-merge-prefix according
         to $reserved-prefixes
     -->
 

@@ -16,7 +16,7 @@
 				<p:input port="stylesheet">
 					<p:inline>
 						<xsl:stylesheet version="2.0">
-							<xsl:import href="../../main/resources/xml/epub3-vocab.xsl"/>
+							<xsl:import href="../../main/resources/xml/pub/epub3-vocab.xsl"/>
 							<xsl:param name="prefix"/>
 							<xsl:param name="uri"/>
 							<xsl:template match="metadata">

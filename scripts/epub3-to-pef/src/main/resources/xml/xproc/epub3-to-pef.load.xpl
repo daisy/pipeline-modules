@@ -15,7 +15,11 @@
         <p:documentation>Empty temporary directory dedicated to this step.</p:documentation>
     </p:option>
 
-    <p:import href="http://www.daisy.org/pipeline/modules/epub3-utils/ocf/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/epub3-utils/library.xpl">
+        <p:documentation>
+            px:epub3-load
+        </p:documentation>
+    </p:import>
     
     <px:epub3-load name="load" px:progress="1">
         <p:with-option name="href" select="$epub"/>

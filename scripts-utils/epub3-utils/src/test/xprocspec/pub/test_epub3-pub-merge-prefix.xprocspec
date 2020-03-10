@@ -4,8 +4,8 @@
                xmlns="http://www.idpf.org/2007/opf"
                script="../../../main/resources/xml/pub/merge-prefix.xpl">
 
-	<x:scenario label="test px:epub3-pub-merge-prefix">
-		<x:call step="px:epub3-pub-merge-prefix">
+	<x:scenario label="test px:epub3-merge-prefix">
+		<x:call step="px:epub3-merge-prefix">
 			<x:input port="source">
 				<x:document type="inline">
 					<_>

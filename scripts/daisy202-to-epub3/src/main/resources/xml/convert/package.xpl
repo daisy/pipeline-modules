@@ -64,9 +64,9 @@
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/mediatype-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/epub3-utils/pub/library.xpl">
+    <p:import href="http://www.daisy.org/pipeline/modules/epub3-utils/library.xpl">
         <p:documentation>
-            px:epub3-pub-create-package-doc
+            px:epub3-create-package-doc
         </p:documentation>
     </p:import>
     <p:import href="ncc-to-opf-metadata.xpl">
@@ -113,7 +113,7 @@
     </p:group>
     <p:sink/>
 
-    <px:epub3-pub-create-package-doc>
+    <px:epub3-create-package-doc>
         <p:with-option name="output-base-uri" select="$result-uri"/>
         <p:with-option name="compatibility-mode" select="$compatibility-mode"/>
         <p:with-option name="detect-properties" select="'false'"/>
@@ -131,7 +131,7 @@
         <p:input port="metadata">
             <p:pipe step="opf-metadata" port="result"/>
         </p:input>
-    </px:epub3-pub-create-package-doc>
+    </px:epub3-create-package-doc>
     <px:message message="Package document created successfully"/>
     <p:identity name="opf-package"/>
 

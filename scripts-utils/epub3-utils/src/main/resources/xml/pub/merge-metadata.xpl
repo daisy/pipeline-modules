@@ -32,7 +32,7 @@
 
 	<p:import href="merge-prefix.xpl">
 		<p:documentation>
-			px:epub3-pub-merge-prefix
+			px:epub3-merge-prefix
 		</p:documentation>
 	</p:import>
 
@@ -40,11 +40,11 @@
 		<!-- wrap input documents in a common root element (the name of the wrapper is insignificant) -->
 	</p:wrap-sequence>
 
-	<px:epub3-pub-merge-prefix name="metadata-with-single-prefix-attribute">
+	<px:epub3-merge-prefix name="metadata-with-single-prefix-attribute">
 		<p:with-option name="implicit-output-prefixes" select="$reserved-prefixes">
 			<p:empty/>
 		</p:with-option>
-	</px:epub3-pub-merge-prefix>
+	</px:epub3-merge-prefix>
 
 	<p:xslt>
 		<p:input port="source">

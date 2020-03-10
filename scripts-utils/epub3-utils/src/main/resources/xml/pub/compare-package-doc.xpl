@@ -3,7 +3,7 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:x="http://www.daisy.org/ns/xprocspec"
                 xmlns:opf="http://www.idpf.org/2007/opf"
-                type="x:epub3-pub-compare-package-doc" name="main">
+                type="x:epub3-compare-package-doc" name="main">
 
   <p:documentation xmlns="http://www.w3.org/1999/xhtml">
     <p>Custom <a href="http://josteinaj.github.io/xprocspec">XProcSpec</a> assertion that compares

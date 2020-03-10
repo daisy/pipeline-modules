@@ -31,7 +31,7 @@
     <p:import href="http://www.daisy.org/pipeline/modules/epub3-utils/library.xpl">
         <p:documentation>
             px:epub3-create-mediaoverlays
-            px:epub3-pub-create-package-doc
+            px:epub3-create-package-doc
             px:epub3-ocf-finalize
         </p:documentation>
     </p:import>
@@ -280,7 +280,7 @@
         </px:fileset-join>
         <p:sink/>
 
-        <px:epub3-pub-create-package-doc name="package-doc.create">
+        <px:epub3-create-package-doc name="package-doc.create">
             <p:input port="source.fileset">
                 <p:pipe step="package-doc.join-filesets" port="result"/>
             </p:input>
@@ -298,7 +298,7 @@
             <p:with-option name="output-base-uri" select="$opf-uri"/>
             <p:with-option name="compatibility-mode" select="'false'"/>
             <!--TODO configurability for other META-INF files ?-->
-        </px:epub3-pub-create-package-doc>
+        </px:epub3-create-package-doc>
         <p:sink/>
 
         <px:fileset-join>

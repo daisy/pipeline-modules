@@ -102,7 +102,7 @@
 			<x:document type="port" port="epub.out.in-memory" select="/*[base-uri()=resolve-uri('result/EPUB/package-braille.opf')]"/>
 		</x:context>
 		<x:expect label="the package document" type="custom"
-		          href="http://www.daisy.org/pipeline/modules/epub3-utils/library.xpl" step="x:epub3-pub-compare-package-doc">
+		          href="http://www.daisy.org/pipeline/modules/epub3-utils/library.xpl" step="x:epub3-compare-package-doc">
 			<x:document type="inline">
 				<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="pub-identifier" version="3.0"
 				         prefix="nordic: http://www.mtm.se/epub/">

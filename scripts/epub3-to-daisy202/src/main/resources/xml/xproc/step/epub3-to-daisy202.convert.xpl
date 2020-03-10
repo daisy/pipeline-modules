@@ -33,7 +33,7 @@
             px:fileset-rebase
         </p:documentation>
     </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/epub3-utils/pub/library.xpl">
+    <p:import href="http://www.daisy.org/pipeline/modules/epub3-utils/library.xpl">
         <p:documentation>
             px:opf-spine-to-fileset
         </p:documentation>

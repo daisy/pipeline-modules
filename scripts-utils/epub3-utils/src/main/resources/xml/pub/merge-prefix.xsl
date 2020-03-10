@@ -10,7 +10,7 @@
                 xpath-default-namespace="http://www.idpf.org/2007/opf"
                 exclude-result-prefixes="#all">
 
-    <xsl:include href="../epub3-vocab.xsl"/>
+    <xsl:include href="epub3-vocab.xsl"/>
 
     <xsl:param name="implicit-input-prefixes" required="yes"/>
     <xsl:param name="implicit-output-prefixes" required="yes"/>

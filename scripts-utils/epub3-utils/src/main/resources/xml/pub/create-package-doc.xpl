@@ -8,7 +8,7 @@
                 xmlns:opf="http://www.idpf.org/2007/opf"
                 xmlns:html="http://www.w3.org/1999/xhtml"
                 xmlns:epub="http://www.idpf.org/2007/ops"
-                type="px:epub3-pub-create-package-doc" name="main">
+                type="px:epub3-create-package-doc" name="main">
 
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
         <p>Create a <a href="http://www.idpf.org/epub/301/spec/epub-publications.html">EPUB Package
@@ -186,7 +186,7 @@
     </p:import>
     <p:import href="add-mediaoverlays.xpl">
         <p:documentation>
-            px:epub3-pub-add-mediaoverlays
+            px:epub3-add-mediaoverlays
         </p:documentation>
     </p:import>
     <p:import href="merge-metadata.xpl">
@@ -206,7 +206,7 @@
         </p:input>
     </px:mediatype-detect>
 
-    <p:documentation>Filter out SMIL files, they are handled separately in px:epub3-pub-add-mediaoverlays</p:documentation>
+    <p:documentation>Filter out SMIL files, they are handled separately in px:epub3-add-mediaoverlays</p:documentation>
     <px:fileset-filter not-media-types="application/smil+xml" name="fileset-except-smil">
         <p:input port="source.in-memory">
             <p:pipe step="main" port="source.in-memory"/>
@@ -699,7 +699,7 @@
         </px:fileset-add-entry>
         <p:sink/>
         <p:documentation>Add media overlays</p:documentation>
-        <px:epub3-pub-add-mediaoverlays name="add-mediaoverlays">
+        <px:epub3-add-mediaoverlays name="add-mediaoverlays">
             <p:input port="source.fileset">
                 <p:pipe step="add-package-doc" port="result"/>
             </p:input>
@@ -714,7 +714,7 @@
             </p:input>
             <p:with-option name="compatibility-mode" select="$compatibility-mode"/>
             <p:with-option name="reserved-prefixes" select="$reserved-prefixes"/>
-        </px:epub3-pub-add-mediaoverlays>
+        </px:epub3-add-mediaoverlays>
         <px:fileset-load media-types="application/oebps-package+xml" name="load">
             <p:input port="in-memory">
                 <p:pipe step="add-mediaoverlays" port="result.in-memory"/>

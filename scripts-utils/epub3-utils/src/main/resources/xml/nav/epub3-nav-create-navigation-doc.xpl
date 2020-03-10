@@ -3,7 +3,7 @@
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:html="http://www.w3.org/1999/xhtml"
-                type="px:epub3-nav-create-navigation-doc" name="main">
+                type="px:epub3-create-navigation-doc" name="main">
 
 	<p:input port="source" sequence="true">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -58,9 +58,21 @@
 		</p:documentation>
 	</p:option>
 
-	<p:import href="epub3-nav-create-toc.xpl"/>
-	<p:import href="epub3-nav-create-page-list.xpl"/>
-	<p:import href="epub3-nav-aggregate.xpl"/>
+	<p:import href="epub3-nav-create-toc.xpl">
+		<p:documentation>
+			px:epub3-create-toc
+		</p:documentation>
+	</p:import>
+	<p:import href="epub3-nav-create-page-list.xpl">
+		<p:documentation>
+			px:epub3-create-page-list
+		</p:documentation>
+	</p:import>
+	<p:import href="epub3-nav-aggregate.xpl">
+		<p:documentation>
+			px:epub3-nav-aggregate
+		</p:documentation>
+	</p:import>
 	<p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
 		<p:documentation>
 			px:fileset-create
@@ -68,14 +80,14 @@
 		</p:documentation>
 	</p:import>
 	
-	<px:epub3-nav-create-toc name="toc">
+	<px:epub3-create-toc name="toc">
 		<p:with-option name="output-base-uri" select="$output-base-uri">
 			<p:empty/>
 		</p:with-option>
-	</px:epub3-nav-create-toc>
+	</px:epub3-create-toc>
 	<p:sink/>
 	
-	<px:epub3-nav-create-page-list name="page-list">
+	<px:epub3-create-page-list name="page-list">
 		<p:input port="source">
 			<p:pipe step="main" port="source"/>
 		</p:input>
@@ -85,7 +97,7 @@
 		<p:with-option name="hidden" select="$page-list-hidden">
 			<p:empty/>
 		</p:with-option>
-	</px:epub3-nav-create-page-list>
+	</px:epub3-create-page-list>
 	<p:sink/>
 	
 	<px:epub3-nav-aggregate name="aggregate">

@@ -103,9 +103,9 @@ split up if they exceed the given maximum size.</p>
 
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/dtbook-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/epub3-utils/ocf/library.xpl">
+    <p:import href="http://www.daisy.org/pipeline/modules/epub3-utils/library.xpl">
       <p:documentation>
-	px:epub3-store
+        px:epub3-store
       </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
