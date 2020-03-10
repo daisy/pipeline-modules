@@ -12,7 +12,7 @@ public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 			pipelineModule("css-speech"),
 			pipelineModule("dtbook-to-zedai"),
 			pipelineModule("dtbook-utils"),
-			pipelineModule("epub3-utils"),
+			pipelineModule("epub-utils"),
 			pipelineModule("file-utils"),
 			pipelineModule("zedai-to-epub3"),
 			pipelineModule("nlp-omnilang-lexer"),

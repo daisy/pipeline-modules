@@ -65,7 +65,7 @@ option is only available for zipped EPUBs.</p>
         <p:pipe step="validate" port="ace-report"/>
     </p:output>
 
-    <p:import href="http://www.daisy.org/pipeline/modules/epub3-utils/library.xpl">
+    <p:import href="http://www.daisy.org/pipeline/modules/epub-utils/library.xpl">
         <p:documentation>
             px:epub3-validate
         </p:documentation>

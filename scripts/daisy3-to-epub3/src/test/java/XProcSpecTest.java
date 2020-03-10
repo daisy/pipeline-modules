@@ -8,7 +8,7 @@ public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 			pipelineModule("common-utils"),
 			pipelineModule("daisy3-utils"),
 			pipelineModule("dtbook-to-html"),
-			pipelineModule("epub3-utils"),
+			pipelineModule("epub-utils"),
 			pipelineModule("fileset-utils"),
 			pipelineModule("file-utils"),
 			pipelineModule("smil-utils"),

@@ -7,7 +7,7 @@ public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 		return new String[] {
 			pipelineModule("common-utils"),
 			pipelineModule("css-speech"),
-			pipelineModule("epub3-utils"),
+			pipelineModule("epub-utils"),
 			pipelineModule("html-to-epub3"),
 			pipelineModule("fileset-utils"),
 			pipelineModule("file-utils"),

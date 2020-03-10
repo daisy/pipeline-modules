@@ -23,7 +23,7 @@
             </p:output>
             <p:import href="../../main/resources/xml/xproc/library.xpl"/>
             <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
-            <p:import href="http://www.daisy.org/pipeline/modules/epub3-utils/library.xpl"/>
+            <p:import href="http://www.daisy.org/pipeline/modules/epub-utils/library.xpl"/>
             <p:import href="http://www.daisy.org/pipeline/modules/daisy202-validator/library.xpl"/>
             <p:choose name="source">
                 <p:when test="p:value-available('epub')">

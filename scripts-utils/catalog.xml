@@ -4,7 +4,7 @@
   <nextCatalog catalog="./daisy202-utils/src/main/resources/META-INF/catalog.xml"/>
   <nextCatalog catalog="./daisy3-utils/src/main/resources/META-INF/catalog.xml"/>
   <nextCatalog catalog="./dtbook-utils/src/main/resources/META-INF/catalog.xml"/>
-  <nextCatalog catalog="./epub3-utils/src/main/resources/META-INF/catalog.xml"/>
+  <nextCatalog catalog="./epub-utils/src/main/resources/META-INF/catalog.xml"/>
   <nextCatalog catalog="./epubcheck-adapter/src/main/resources/META-INF/catalog.xml"/>
   <nextCatalog catalog="./smil-utils/src/main/resources/META-INF/catalog.xml"/>
   <nextCatalog catalog="./metadata-utils/src/main/resources/META-INF/catalog.xml"/>

@@ -145,7 +145,7 @@
 		<x:context label="the package document">
 			<x:document type="port" port="in-memory.out" select="/*[base-uri()=resolve-uri('output-dir/EPUB/package.opf')]"/>
 		</x:context>
-		<x:expect label="the result" type="custom" href="http://www.daisy.org/pipeline/modules/epub3-utils/library.xpl"
+		<x:expect label="the result" type="custom" href="http://www.daisy.org/pipeline/modules/epub-utils/library.xpl"
 		          step="x:epub3-compare-package-doc">
 			<x:document type="inline">
 				<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="id-id" version="3.0" prefix="dcterms: http://purl.org/dc/terms/">
