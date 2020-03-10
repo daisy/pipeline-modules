@@ -7,7 +7,6 @@
 	</p:documentation>
 	<p:import href="pub/create-package-doc.xpl"/>
 	<p:import href="pub/add-mediaoverlays.xpl"/>
-	<p:import href="pub/opf-manifest-to-fileset.xpl"/>
 	<p:import href="pub/opf-spine-to-fileset.xpl"/>
 	<p:import href="pub/compare-package-doc.xpl"/>
 	<p:import href="pub/merge-prefix.xpl"/>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc-internal"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:ocf="urn:oasis:names:tc:opendocument:xmlns:container"
                 type="px:epub3-load" name="main">
@@ -102,9 +103,9 @@
 			px:epub3-validate
 		</p:documentation>
 	</p:import>
-	<p:import href="../pub/opf-manifest-to-fileset.xpl">
+	<p:import href="opf-manifest-to-fileset.xpl">
 		<p:documentation>
-			px:opf-manifest-to-fileset
+			pxi:opf-manifest-to-fileset
 		</p:documentation>
 	</p:import>
 	
@@ -134,7 +135,7 @@
 			</p:load>
 			
 			<!-- convert manifest -->
-			<px:opf-manifest-to-fileset/>
+			<pxi:opf-manifest-to-fileset/>
 			
 		</p:when>
 		<p:otherwise>
@@ -258,7 +259,7 @@
 				</px:fileset-load>
 				
 				<!-- convert manifest -->
-				<px:opf-manifest-to-fileset/>
+				<pxi:opf-manifest-to-fileset/>
 				
 			</p:for-each>
 			<px:fileset-join name="filesets-from-package-documents"/>
