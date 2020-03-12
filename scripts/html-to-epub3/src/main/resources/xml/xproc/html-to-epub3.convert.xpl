@@ -90,7 +90,7 @@
     <p:import href="http://www.daisy.org/pipeline/modules/epub-utils/library.xpl">
         <p:documentation>
             px:epub3-safe-uris
-            px:epub3-create-navigation-doc
+            px:epub3-add-navigation-doc
             px:epub3-create-mediaoverlays
             px:epub3-create-package-doc
             px:epub3-ocf-finalize
@@ -114,7 +114,6 @@
     <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
         <p:documentation>
             px:html-fixer
-            px:html-id-fixer
             px:html-upgrade
         </p:documentation>
     </p:import>
@@ -265,103 +264,24 @@
     <!-- GENERATE THE NAVIGATION DOCUMENT                                        -->
     <!--=========================================================================-->
 
-    <px:fileset-load media-types="application/xhtml+xml" name="content-docs">
-        <p:input port="in-memory">
+    <p:documentation>Generate the EPUB 3 navigation document</p:documentation>
+    <px:epub3-add-navigation-doc name="add-navigation-doc">
+        <p:input port="source.in-memory">
             <p:pipe step="move" port="result.in-memory"/>
         </p:input>
-    </px:fileset-load>
-
-    <p:documentation>Generate the EPUB 3 navigation document</p:documentation>
-    <p:choose name="add-navigation-doc">
-        <p:xpath-context>
-            <p:pipe step="move" port="result.fileset"/>
-        </p:xpath-context>
-        <p:when test="//d:file[@role='nav']">
-            <p:output port="fileset" primary="true"/>
-            <p:output port="in-memory" sequence="true">
-                <p:pipe step="move" port="result.in-memory"/>
-            </p:output>
-            <p:identity>
-                <p:input port="source">
-                    <p:pipe step="move" port="result.fileset"/>
-                </p:input>
-            </p:identity>
-        </p:when>
-        <p:otherwise>
-            <p:output port="fileset" primary="true"/>
-            <p:output port="in-memory" sequence="true">
-                <p:pipe step="update" port="result.in-memory"/>
-                <p:pipe step="navigation-doc" port="result"/>
-            </p:output>
-            <p:for-each name="fix-ids">
-                <p:documentation>Add missing IDs</p:documentation>
-                <p:output port="result" sequence="true"/>
-                <px:html-id-fixer/>
-            </p:for-each>
-            <!--TODO create other nav types (configurable ?)-->
-            <px:epub3-create-navigation-doc name="create-navigation-doc">
-                <p:with-option name="output-base-uri" select="concat($content-dir,'toc.xhtml')">
-                    <p:empty/>
-                </p:with-option>
-            </px:epub3-create-navigation-doc>
-            <p:identity name="navigation-doc" px:message="Navigation Document Created."/>
-            <p:sink/>
-            <p:add-attribute match="d:file" attribute-name="role" attribute-value="nav"
-                             name="navigation-doc.fileset">
-                <p:input port="source">
-                    <p:pipe step="create-navigation-doc" port="result.fileset"/>
-                </p:input>
-            </p:add-attribute>
-            <p:sink/>
-            <px:fileset-update name="update">
-                <p:input port="source.fileset">
-                    <p:pipe step="move" port="result.fileset"/>
-                </p:input>
-                <p:input port="source.in-memory">
-                    <p:pipe step="move" port="result.in-memory"/>
-                </p:input>
-                <p:input port="update.fileset">
-                    <p:pipe step="content-docs" port="result.fileset"/>
-                </p:input>
-                <p:input port="update.in-memory">
-                    <p:pipe step="fix-ids" port="result"/>
-                </p:input>
-            </px:fileset-update>
-            <p:sink/>
-            <px:fileset-join>
-                <p:input port="source">
-                    <p:pipe step="update" port="result.fileset"/>
-                    <p:pipe step="navigation-doc.fileset" port="result"/>
-                </p:input>
-            </px:fileset-join>
-        </p:otherwise>
-    </p:choose>
-    <p:sink/>
-
-    <!--=========================================================================-->
-    <!-- METADATA                                                                -->
-    <!--=========================================================================-->
-
-    <p:documentation>Extract metadata</p:documentation>
-    <!-- FIXME: adapt to multiple XHTML input docs -->
-    <p:split-sequence test="position()=1">
-        <p:input port="source">
-            <p:pipe step="content-docs" port="result"/>
-        </p:input>
-    </p:split-sequence>
-    <px:html-to-opf-metadata name="metadata"/>
-    <p:sink/>
+        <p:with-option name="output-base-uri" select="concat($content-dir,'toc.xhtml')">
+            <p:empty/>
+        </p:with-option>
+    </px:epub3-add-navigation-doc>
+    <p:identity px:message="Navigation Document Created."/>
 
     <!--=========================================================================-->
     <!-- CONVERT DIAGRAM TO HTML                                                 -->
     <!--=========================================================================-->
 
     <px:diagram-to-html name="diagram-to-html">
-        <p:input port="source.fileset">
-            <p:pipe step="add-navigation-doc" port="fileset"/>
-        </p:input>
         <p:input port="source.in-memory">
-            <p:pipe step="add-navigation-doc" port="in-memory"/>
+            <p:pipe step="add-navigation-doc" port="result.in-memory"/>
         </p:input>
     </px:diagram-to-html>
 
@@ -419,10 +339,27 @@
             </p:input>
         </px:fileset-join>
     </p:group>
+    <p:sink/>
 
     <!--=========================================================================-->
     <!-- GENERATE THE PACKAGE DOCUMENT                                           -->
     <!--=========================================================================-->
+
+    <px:fileset-load media-types="application/xhtml+xml" name="content-docs-except-nav">
+        <p:input port="fileset">
+            <p:pipe step="move" port="result.fileset"/>
+        </p:input>
+        <p:input port="in-memory">
+            <p:pipe step="move" port="result.in-memory"/>
+        </p:input>
+    </px:fileset-load>
+
+    <p:documentation>Extract metadata</p:documentation>
+    <!-- FIXME: adapt to multiple XHTML input docs -->
+    <p:split-sequence test="position()=1"/>
+    <px:html-to-opf-metadata name="metadata"/>
+    <p:sink/>
+
     <p:documentation>Generate the EPUB 3 package document</p:documentation>
     <p:group name="add-package-doc">
         <p:output port="fileset" primary="true"/>
@@ -431,11 +368,14 @@
             <p:pipe step="package-doc" port="result"/>
         </p:output>
         <px:epub3-create-package-doc compatibility-mode="false" name="create-package-doc">
+            <p:input port="source.fileset">
+                <p:pipe step="add-mediaoverlays" port="fileset"/>
+            </p:input>
             <p:input port="source.in-memory">
                 <p:pipe step="add-mediaoverlays" port="in-memory"/>
             </p:input>
             <p:input port="spine">
-                <p:pipe step="content-docs" port="result.fileset"/>
+                <p:pipe step="content-docs-except-nav" port="result.fileset"/>
             </p:input>
             <p:input port="metadata">
                 <p:pipe step="main" port="metadata"/>

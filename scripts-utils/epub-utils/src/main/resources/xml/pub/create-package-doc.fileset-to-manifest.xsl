@@ -45,7 +45,6 @@
                     <xsl:variable name="properties" as="xs:string*"
                                   select="(if (@role='cover-image')      then 'cover-image'      else (),
                                            if (@mathml='true')           then 'mathml'           else (),
-                                           if (@nav='true')              then 'nav'              else (),
                                            if (@remote-resources='true') then 'remote-resources' else (),
                                            if (@scripted='true')         then 'scripted'         else (),
                                            if (@svg='true')              then 'svg'              else (),

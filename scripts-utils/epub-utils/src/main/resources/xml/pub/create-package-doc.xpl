@@ -166,6 +166,7 @@
             px:fileset-diff
             px:fileset-create
             px:fileset-add-entry
+            px:fileset-filter-in-memory
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/mediatype-utils/library.xpl">
@@ -182,6 +183,11 @@
     <p:import href="../nav/epub3-nav-to-guide.xpl">
         <p:documentation>
             px:epub3-nav-to-guide
+        </p:documentation>
+    </p:import>
+    <p:import href="../nav/epub3-nav-create-navigation-doc.xpl">
+        <p:documentation>
+            px:epub3-add-navigation-doc
         </p:documentation>
     </p:import>
     <p:import href="add-mediaoverlays.xpl">
@@ -223,29 +229,51 @@
 
     <p:documentation>Get navigation document</p:documentation>
     <p:group name="nav-doc">
-        <p:output port="result"/>
-        <p:choose>
+        <p:output port="result" primary="true"/>
+        <p:output port="fileset">
+            <p:pipe step="choose" port="fileset"/>
+        </p:output>
+        <p:choose name="choose">
             <p:xpath-context>
                 <p:pipe step="content-docs" port="result.fileset"/>
             </p:xpath-context>
             <p:when test="//d:file[@role='nav']">
+                <p:output port="result" primary="true"/>
+                <p:output port="fileset">
+                    <p:pipe step="load" port="result.fileset"/>
+                </p:output>
                 <p:delete match="d:file[not(@role='nav')]">
                     <p:input port="source">
                         <p:pipe step="content-docs" port="result.fileset"/>
                     </p:input>
                 </p:delete>
-                <px:fileset-load>
+                <px:fileset-load name="load">
                     <p:input port="in-memory">
                         <p:pipe step="content-docs" port="result"/>
                     </p:input>
                 </px:fileset-load>
             </p:when>
             <p:otherwise>
-                <p:split-sequence test="//html:nav[@epub:type='toc']">
+                <p:output port="result" primary="true">
+                    <p:pipe step="filter" port="result.in-memory"/>
+                </p:output>
+                <p:output port="fileset">
+                    <p:pipe step="filter" port="result"/>
+                </p:output>
+                <p:split-sequence test="//html:nav[@epub:type='toc']" name="content-docs-with-toc">
                     <p:input port="source">
                         <p:pipe step="content-docs" port="result"/>
                     </p:input>
                 </p:split-sequence>
+                <p:sink/>
+                <px:fileset-filter-in-memory name="filter">
+                    <p:input port="source.fileset">
+                        <p:pipe step="content-docs" port="result.fileset"/>
+                    </p:input>
+                    <p:input port="source.in-memory">
+                        <p:pipe step="content-docs-with-toc" port="matched"/>
+                    </p:input>
+                </px:fileset-filter-in-memory>
             </p:otherwise>
         </p:choose>
         <px:assert message="There must be exactly one navigation document in the fileset"
@@ -471,11 +499,6 @@
                         <p:identity/>
                     </p:otherwise>
                 </p:choose>
-                <p:add-attribute attribute-name="nav" match="/*/*">
-                    <p:with-option name="attribute-value" select="base-uri(/*)=$doc-base">
-                        <p:pipe step="nav-doc" port="result"/>
-                    </p:with-option>
-                </p:add-attribute>
             </p:for-each>
             <px:fileset-join name="content-docs-with-properties"/>
             <px:fileset-join>
@@ -640,71 +663,99 @@
     <p:sink/>
 
     <p:documentation>Create package document</p:documentation>
-    <p:insert match="/*" position="last-child">
-        <p:input port="source">
-            <p:inline exclude-inline-prefixes="#all">
-                <package xmlns="http://www.idpf.org/2007/opf" version="3.0"/>
-            </p:inline>
-        </p:input>
-        <p:input port="insertion">
-            <!-- TODO declare @prefix -->
-            <p:pipe step="metadata" port="result"/>
-            <p:pipe step="manifest" port="result"/>
-            <p:pipe step="spine" port="result"/>
-            <p:pipe step="guide" port="result"/>
-            <p:pipe step="bindings" port="result"/>
-        </p:input>
-    </p:insert>
-    <p:add-attribute match="/*" attribute-name="unique-identifier">
-        <p:with-option name="attribute-value" select="/opf:package/opf:metadata/dc:identifier/@id"/>
-    </p:add-attribute>
-    <p:choose>
-        <p:when test="/opf:package/opf:metadata/@prefix">
-            <p:add-attribute attribute-name="prefix" match="/*">
-                <p:with-option name="attribute-value" select="/opf:package/opf:metadata/@prefix"/>
-            </p:add-attribute>
-            <p:delete match="/opf:package/opf:metadata/@prefix"/>
-        </p:when>
-        <p:otherwise>
-            <p:identity/>
-        </p:otherwise>
-    </p:choose>
-    <px:set-base-uri>
-        <p:with-option name="base-uri" select="string(/*)">
-            <p:pipe step="output-base-uri" port="normalized"/>
-        </p:with-option>
-    </px:set-base-uri>
-    <px:add-xml-base root="false"/>
-    <px:message severity="DEBUG" message="Finished assigning media overlays to content documents"/>
+    <p:group name="create-package-doc">
+        <p:output port="result" primary="true">
+            <p:pipe step="add-entry" port="result.in-memory"/>
+        </p:output>
+        <p:output port="fileset">
+            <p:pipe step="add-entry" port="result"/>
+        </p:output>
+        <p:insert match="/*" position="last-child">
+            <p:input port="source">
+                <p:inline exclude-inline-prefixes="#all">
+                    <package xmlns="http://www.idpf.org/2007/opf" version="3.0"/>
+                </p:inline>
+            </p:input>
+            <p:input port="insertion">
+                <!-- TODO declare @prefix -->
+                <p:pipe step="metadata" port="result"/>
+                <p:pipe step="manifest" port="result"/>
+                <p:pipe step="spine" port="result"/>
+                <p:pipe step="guide" port="result"/>
+                <p:pipe step="bindings" port="result"/>
+            </p:input>
+        </p:insert>
+        <p:add-attribute match="/*" attribute-name="unique-identifier">
+            <p:with-option name="attribute-value" select="/opf:package/opf:metadata/dc:identifier/@id"/>
+        </p:add-attribute>
+        <p:choose>
+            <p:when test="/opf:package/opf:metadata/@prefix">
+                <p:add-attribute attribute-name="prefix" match="/*">
+                    <p:with-option name="attribute-value" select="/opf:package/opf:metadata/@prefix"/>
+                </p:add-attribute>
+                <p:delete match="/opf:package/opf:metadata/@prefix"/>
+            </p:when>
+            <p:otherwise>
+                <p:identity/>
+            </p:otherwise>
+        </p:choose>
+        <px:set-base-uri>
+            <p:with-option name="base-uri" select="string(/*)">
+                <p:pipe step="output-base-uri" port="normalized"/>
+            </p:with-option>
+        </px:set-base-uri>
+        <px:add-xml-base root="false"/>
+        <px:message severity="DEBUG" message="Finished assigning media overlays to content documents" name="in-memory"/>
+        <p:sink/>
+        <px:fileset-create/>
+        <px:fileset-add-entry media-type="application/oebps-package+xml" name="add-entry">
+            <p:input port="entry">
+                <p:pipe step="in-memory" port="result"/>
+            </p:input>
+        </px:fileset-add-entry>
+        <p:sink/>
+    </p:group>
+
+    <p:documentation>Set navigation document</p:documentation>
+    <p:group>
+        <p:sink/>
+        <px:fileset-join>
+            <p:input port="source">
+                <p:pipe step="create-package-doc" port="fileset"/>
+                <p:pipe step="nav-doc" port="fileset"/>
+            </p:input>
+        </px:fileset-join>
+        <px:epub3-add-navigation-doc name="set-nav-doc">
+            <p:input port="source.in-memory">
+                <p:pipe step="create-package-doc" port="result"/>
+                <p:pipe step="nav-doc" port="result"/>
+            </p:input>
+        </px:epub3-add-navigation-doc>
+        <px:fileset-load media-types="application/oebps-package+xml">
+            <p:input port="in-memory">
+                <p:pipe step="set-nav-doc" port="result.in-memory"/>
+            </p:input>
+        </px:fileset-load>
+    </p:group>
 
     <p:documentation>Add mediaoverlays</p:documentation>
     <p:group name="result">
-        <p:documentation>Add package doc</p:documentation>
         <p:output port="result" primary="true"/>
         <p:output port="fileset">
             <p:pipe step="load" port="result.fileset"/>
         </p:output>
         <p:identity name="package-doc"/>
         <p:sink/>
-        <px:fileset-add-entry media-type="application/oebps-package+xml" name="add-package-doc">
+        <px:fileset-join>
             <p:input port="source">
+                <p:pipe step="create-package-doc" port="fileset"/>
                 <p:pipe step="fileset-except-smil" port="result"/>
             </p:input>
+        </px:fileset-join>
+        <px:epub3-add-mediaoverlays name="add-mediaoverlays">
             <p:input port="source.in-memory">
                 <p:pipe step="main" port="source.in-memory"/>
-            </p:input>
-            <p:input port="entry">
                 <p:pipe step="package-doc" port="result"/>
-            </p:input>
-        </px:fileset-add-entry>
-        <p:sink/>
-        <p:documentation>Add media overlays</p:documentation>
-        <px:epub3-add-mediaoverlays name="add-mediaoverlays">
-            <p:input port="source.fileset">
-                <p:pipe step="add-package-doc" port="result"/>
-            </p:input>
-            <p:input port="source.in-memory">
-                <p:pipe step="add-package-doc" port="result.in-memory"/>
             </p:input>
             <p:input port="mo.fileset">
                 <p:pipe step="fileset-except-smil" port="not-matched"/>
