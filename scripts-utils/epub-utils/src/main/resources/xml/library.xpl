@@ -17,7 +17,6 @@
 		Navigation Documents</a></p>
 	</p:documentation>
 	<p:import href="nav/epub3-nav-create-navigation-doc.xpl"/>
-	<p:import href="nav/epub3-nav-aggregate.xpl"/>
 	<p:import href="nav/epub3-nav-create-toc.xpl"/>
 	<p:import href="nav/epub3-nav-create-page-list.xpl"/>
 	<p:import href="nav/epub3-nav-to-guide.xpl"/>

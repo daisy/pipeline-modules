@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:html="http://www.w3.org/1999/xhtml"
                 xmlns:epub="http://www.idpf.org/2007/ops"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
                 type="px:epub3-add-navigation-doc" name="main">
 
-	<p:input port="source.fileset" primary="true"/>
+	<p:input port="source.fileset" primary="true">
+		<p:inline><d:fileset/></p:inline>
+	</p:input>
 	<p:input port="source.in-memory" sequence="true">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>Input fileset</p>
@@ -16,7 +20,39 @@
 			<p>If the input fileset does not include a navigation document it is generated from the
 			content documents.</p>
 		</p:documentation>
+		<p:empty/>
 	</p:input>
+	<p:input port="toc" sequence="true">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p><a
+			href="http://idpf.org/epub/301/spec/epub-contentdocs.html#sec-xhtml-nav-def-types-toc">"<code>toc</code>"
+			<code>nav</code> element</a> to include in the navigation document.</p>
+			<p>At most one document is allowed and it is an error if a document is present when the
+			input fileset already contains a navigation document.</p>
+		</p:documentation>
+		<p:empty/>
+	</p:input>
+	<p:input port="page-list" sequence="true">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p><a
+			href="http://idpf.org/epub/301/spec/epub-contentdocs.html#sec-xhtml-nav-def-types-pagelist">"<code>page-list</code>"
+			<code>nav</code> element</a> to include in the navigation document.</p>
+			<p>At most one document is allowed and it is an error if a document is present when the
+			input fileset already contains a navigation document.</p>
+		</p:documentation>
+		<p:empty/>
+	</p:input>
+	<p:input port="landmarks" sequence="true">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p><a
+			href="http://idpf.org/epub/301/spec/epub-contentdocs.html#sec-xhtml-nav-def-types-landmarks">"<code>landmarks</code>"
+			<code>nav</code> element</a> to include in the navigation document.</p>
+			<p>At most one document is allowed and it is an error if a document is present when the
+			input fileset already contains a navigation document.</p>
+		</p:documentation>
+		<p:empty/>
+	</p:input>
+
 	<p:output port="nav">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>The EPUB navigation document</p>
@@ -94,7 +130,7 @@
 	</p:import>
 	<p:import href="epub3-nav-aggregate.xpl">
 		<p:documentation>
-			px:epub3-nav-aggregate
+			pxi:epub3-nav-aggregate
 		</p:documentation>
 	</p:import>
 	<p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
@@ -199,11 +235,36 @@
 			<p:output port="nav.in-memory">
 				<p:pipe step="nav-doc-in-input" port="in-memory"/>
 			</p:output>
+			<p:sink/>
+			<px:assert test-count-max="0" error-code="XXXXX" name="assert-no-toc"
+			           message="No document may be present on 'toc' port if navigation document already present in the input">
+				<p:input port="source">
+					<p:pipe step="main" port="toc"/>
+				</p:input>
+			</px:assert>
+			<p:sink/>
+			<px:assert test-count-max="0" error-code="XXXXX" name="assert-no-page-list"
+			           message="No document may be present on 'page-list' port if navigation document already present in the input">
+				<p:input port="source">
+					<p:pipe step="main" port="page-list"/>
+				</p:input>
+			</px:assert>
+			<p:sink/>
+			<px:assert test-count-max="0" error-code="XXXXX" name="assert-no-landmarks"
+			           message="No document may be present on 'landmarks' port if navigation document already present in the input">
+				<p:input port="source">
+					<p:pipe step="main" port="landmarks"/>
+				</p:input>
+			</px:assert>
+			<p:sink/>
 			<p:identity>
 				<p:input port="source">
 					<p:pipe step="main" port="source.fileset"/>
 				</p:input>
 			</p:identity>
+			<p:identity cx:depends-on="assert-no-toc"/>
+			<p:identity cx:depends-on="assert-no-page-list"/>
+			<p:identity cx:depends-on="assert-no-landmarks"/>
 		</p:when>
 		<p:otherwise>
 			<p:output port="result.fileset" primary="true">
@@ -227,37 +288,89 @@
 			<p:identity name="content-docs-with-ids"/>
 
 			<p:documentation>Create toc</p:documentation>
-			<px:epub3-create-toc name="toc">
-				<p:with-option name="output-base-uri" select="$output-base-uri">
-					<p:empty/>
-				</p:with-option>
-			</px:epub3-create-toc>
+			<p:group name="toc">
+				<p:output port="result"/>
+				<px:assert test-count-max="1" error-code="XXXXX" message="At most one document may be present on 'toc' port">
+					<p:input port="source">
+						<p:pipe step="main" port="toc"/>
+					</p:input>
+				</px:assert>
+				<p:count/>
+				<p:choose>
+					<p:when test=".=1">
+						<p:identity>
+							<p:input port="source">
+								<p:pipe step="main" port="toc"/>
+							</p:input>
+						</p:identity>
+					</p:when>
+					<p:otherwise>
+						<px:epub3-create-toc>
+							<p:input port="source">
+								<p:pipe step="content-docs-with-ids" port="result"/>
+							</p:input>
+							<p:with-option name="output-base-uri" select="$output-base-uri">
+								<p:empty/>
+							</p:with-option>
+						</px:epub3-create-toc>
+					</p:otherwise>
+				</p:choose>
+			</p:group>
 			<p:sink/>
 	
 			<p:documentation>Create page list</p:documentation>
-			<px:epub3-create-page-list name="page-list">
-				<p:input port="source">
-					<p:pipe step="content-docs-with-ids" port="result"/>
-				</p:input>
-				<p:with-option name="output-base-uri" select="$output-base-uri">
-					<p:empty/>
-				</p:with-option>
-				<p:with-option name="hidden" select="$page-list-hidden">
-					<p:empty/>
-				</p:with-option>
-			</px:epub3-create-page-list>
+			<p:group name="page-list">
+				<p:output port="result"/>
+				<px:assert test-count-max="1" error-code="XXXXX" message="At most one document may be present on 'page-list' port">
+					<p:input port="source">
+						<p:pipe step="main" port="page-list"/>
+					</p:input>
+				</px:assert>
+				<p:count/>
+				<p:choose>
+					<p:when test=".=1">
+						<p:identity>
+							<p:input port="source">
+								<p:pipe step="main" port="page-list"/>
+							</p:input>
+						</p:identity>
+					</p:when>
+					<p:otherwise>
+						<px:epub3-create-page-list>
+							<p:input port="source">
+								<p:pipe step="content-docs-with-ids" port="result"/>
+							</p:input>
+							<p:with-option name="output-base-uri" select="$output-base-uri">
+								<p:empty/>
+							</p:with-option>
+							<p:with-option name="hidden" select="$page-list-hidden">
+								<p:empty/>
+							</p:with-option>
+						</px:epub3-create-page-list>
+					</p:otherwise>
+				</p:choose>
+			</p:group>
 			<p:sink/>
 
-			<px:epub3-nav-aggregate name="aggregate">
+			<px:assert test-count-max="1" error-code="XXXXX" message="At most one document may be present on 'landmarks' port"
+			           name="landmarks">
+				<p:input port="source">
+					<p:pipe step="main" port="landmarks"/>
+				</p:input>
+			</px:assert>
+			<p:sink/>
+
+			<pxi:epub3-nav-aggregate name="aggregate">
 				<p:input port="source">
 					<p:pipe step="toc" port="result"/>
 					<p:pipe step="page-list" port="result"/>
+					<p:pipe step="landmarks" port="result"/>
 				</p:input>
 				<p:with-option name="output-base-uri" select="$output-base-uri"/>
 				<p:with-option name="title" select="$title"/>
 				<p:with-option name="language" select="$language"/>
 				<p:with-option name="css" select="$css"/>
-			</px:epub3-nav-aggregate>
+			</pxi:epub3-nav-aggregate>
 			<p:sink/>
 
 			<px:fileset-update name="update">
