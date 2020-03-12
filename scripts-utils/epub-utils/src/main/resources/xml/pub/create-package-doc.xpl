@@ -180,9 +180,9 @@
             px:message
         </p:documentation>
     </p:import>
-    <p:import href="../nav/epub3-nav-to-guide.xpl">
+    <p:import href="../nav/landmarks-to-guide.xpl">
         <p:documentation>
-            px:epub3-nav-to-guide
+            px:epub-landmarks-to-guide
         </p:documentation>
     </p:import>
     <p:import href="../nav/epub3-nav-create-navigation-doc.xpl">
@@ -627,14 +627,14 @@
                 </p:identity>
             </p:when>
             <p:otherwise>
-                <px:epub3-nav-to-guide px:message="Creating guide element for package document" px:message-severity="DEBUG">
+                <px:epub-landmarks-to-guide px:message="Creating guide element for package document" px:message-severity="DEBUG">
                     <p:input port="source">
                         <p:pipe step="guide.landmarks" port="result"/>
                     </p:input>
-                    <p:with-option name="opf-base" select="string(/*)">
+                    <p:with-option name="output-base-uri" select="string(/*)">
                         <p:pipe step="output-base-uri" port="normalized"/>
                     </p:with-option>
-                </px:epub3-nav-to-guide>
+                </px:epub-landmarks-to-guide>
                 <px:message severity="DEBUG" message="guide element created successfully"/>
             </p:otherwise>
         </p:choose>

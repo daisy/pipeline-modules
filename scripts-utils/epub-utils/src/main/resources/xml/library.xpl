@@ -20,7 +20,8 @@
 	<p:import href="nav/epub3-nav-create-navigation-doc.xpl"/>
 	<p:import href="nav/epub3-nav-create-toc.xpl"/>
 	<p:import href="nav/epub3-nav-create-page-list.xpl"/>
-	<p:import href="nav/epub3-nav-to-guide.xpl"/>
+	<p:import href="nav/landmarks-to-guide.xpl"/>
+	<p:import href="nav/guide-to-landmarks.xpl"/>
 	<p:import href="nav/epub3-nav-to-ncx.xpl"/>
 	<p:import href="nav/epub3-nav-from-ncx.xpl"/>
 	<p:documentation xmlns="http://www.w3.org/1999/xhtml">
