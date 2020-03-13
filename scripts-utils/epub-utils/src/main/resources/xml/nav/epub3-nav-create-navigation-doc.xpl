@@ -22,6 +22,14 @@
 		</p:documentation>
 		<p:empty/>
 	</p:input>
+	<p:input port="content" sequence="true">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p>Fileset from which to generate the navigation document.</p>
+			<p>Defaults to all the "application/xhtml+xml" documents found in the "source"
+			fileset.</p>
+		</p:documentation>
+		<p:empty/>
+	</p:input>
 	<p:input port="toc" sequence="true">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p><a
@@ -155,7 +163,7 @@
 	</p:import>
 
 	<p:documentation>Get content documents</p:documentation>
-	<px:fileset-load media-types="application/xhtml+xml" name="content-docs">
+	<px:fileset-load media-types="application/xhtml+xml" name="all-content-docs">
 		<p:input port="in-memory">
 			<p:pipe step="main" port="source.in-memory"/>
 		</p:input>
@@ -170,7 +178,7 @@
 		</p:output>
 		<p:choose name="choose">
 			<p:xpath-context>
-				<p:pipe step="content-docs" port="result.fileset"/>
+				<p:pipe step="all-content-docs" port="result.fileset"/>
 			</p:xpath-context>
 			<p:when test="//d:file[@role='nav']">
 				<p:output port="fileset" primary="true">
@@ -181,12 +189,12 @@
 				</p:output>
 				<p:delete match="d:file[not(@role='nav')]">
 					<p:input port="source">
-						<p:pipe step="content-docs" port="result.fileset"/>
+						<p:pipe step="all-content-docs" port="result.fileset"/>
 					</p:input>
 				</p:delete>
 				<px:fileset-load name="load">
 					<p:input port="in-memory">
-						<p:pipe step="content-docs" port="result"/>
+						<p:pipe step="all-content-docs" port="result"/>
 					</p:input>
 				</px:fileset-load>
 			</p:when>
@@ -199,13 +207,13 @@
 				</p:output>
 				<p:split-sequence test="//html:nav[@epub:type='toc']" name="content-docs-with-toc">
 					<p:input port="source">
-						<p:pipe step="content-docs" port="result"/>
+						<p:pipe step="all-content-docs" port="result"/>
 					</p:input>
 				</p:split-sequence>
 				<p:sink/>
 				<px:fileset-filter-in-memory name="filter">
 					<p:input port="source.fileset">
-						<p:pipe step="content-docs" port="result.fileset"/>
+						<p:pipe step="all-content-docs" port="result.fileset"/>
 					</p:input>
 					<p:input port="source.in-memory">
 						<p:pipe step="content-docs-with-toc" port="matched"/>
@@ -279,10 +287,49 @@
 			<p:output port="nav.in-memory">
 				<p:pipe step="nav" port="result.in-memory"/>
 			</p:output>
+
+			<p:documentation>Filter content documents</p:documentation>
+			<px:assert test-count-max="1" error-code="XXXXX" message="At most one document allowed on 'content' port">
+				<p:input port="source">
+					<p:pipe step="main" port="content"/>
+				</p:input>
+			</px:assert>
+			<p:count/>
+			<p:choose name="content-docs">
+				<p:when test="/.=1">
+					<p:output port="in-memory" primary="true" sequence="true">
+						<p:pipe step="filter" port="result.in-memory"/>
+					</p:output>
+					<p:output port="fileset">
+						<p:pipe step="filter" port="result"/>
+					</p:output>
+					<p:sink/>
+					<px:fileset-filter-in-memory name="filter">
+						<p:input port="source.fileset">
+							<p:pipe step="main" port="content"/>
+						</p:input>
+						<p:input port="source.in-memory">
+							<p:pipe step="all-content-docs" port="result"/>
+						</p:input>
+					</px:fileset-filter-in-memory>
+					<p:sink/>
+				</p:when>
+				<p:otherwise>
+					<p:output port="in-memory" primary="true" sequence="true"/>
+					<p:output port="fileset">
+						<p:pipe step="all-content-docs" port="result.fileset"/>
+					</p:output>
+					<p:sink/>
+					<p:identity>
+						<p:input port="source">
+							<p:pipe step="all-content-docs" port="result"/>
+						</p:input>
+					</p:identity>
+				</p:otherwise>
+			</p:choose>
+
+			<p:documentation>Add ID attributes</p:documentation>
 			<p:for-each>
-				<p:iteration-source>
-					<p:pipe step="content-docs" port="result"/>
-				</p:iteration-source>
 				<px:html-id-fixer/>
 			</p:for-each>
 			<p:identity name="content-docs-with-ids"/>
@@ -381,7 +428,7 @@
 					<p:pipe step="main" port="source.in-memory"/>
 				</p:input>
 				<p:input port="update.fileset">
-					<p:pipe step="content-docs" port="result.fileset"/>
+					<p:pipe step="content-docs" port="fileset"/>
 				</p:input>
 				<p:input port="update.in-memory">
 					<p:pipe step="content-docs-with-ids" port="result"/>
