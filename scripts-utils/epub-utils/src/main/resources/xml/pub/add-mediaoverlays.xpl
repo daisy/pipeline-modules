@@ -69,6 +69,11 @@
             pxi:merge-metadata
         </p:documentation>
     </p:import>
+    <p:import href="opf3-to-opf2-metadata.xpl">
+        <p:documentation>
+            pxi:opf3-to-opf2-metadata
+        </p:documentation>
+    </p:import>
 
     <p:documentation>Load package document</p:documentation>
     <px:fileset-filter media-types="application/oebps-package+xml" name="filter-package-doc">
@@ -221,14 +226,7 @@
             </pxi:merge-metadata>
             <p:choose>
                 <p:when test="$compatibility-mode='true'">
-                    <p:xslt>
-                        <p:input port="stylesheet">
-                            <p:document href="create-package-doc.backwards-compatible-metadata.xsl"/>
-                        </p:input>
-                        <p:input port="parameters">
-                            <p:empty/>
-                        </p:input>
-                    </p:xslt>
+                    <pxi:opf3-to-opf2-metadata compatibility-mode="true"/>
                 </p:when>
                 <p:otherwise>
                     <p:identity/>
