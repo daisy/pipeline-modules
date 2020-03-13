@@ -28,6 +28,12 @@
         </p:documentation>
         <p:pipe step="update-links-in-html" port="result.in-memory"/>
     </p:output>
+    <p:output port="mapping">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Mapping document that expresses relation between DIAGRAM input and HTML output files.</p>
+        </p:documentation>
+        <p:pipe step="diagram-to-html" port="mapping"/>
+    </p:output>
 
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
         <p:documentation>
