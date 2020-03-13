@@ -12,18 +12,14 @@
 
   <groupId>org.daisy.pipeline.modules</groupId>
   <artifactId>audio-modules-aggregator</artifactId>
-  <version>1.13.4</version>
+  <version>1.13.5-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>DAISY Pipeline 2 :: Audio Modules Aggregator</name>
   <description>Aggregator for modules providing audio-related functionality</description>
 
   <modules>
-    <!--<module>audio-utils/audio-common</module>-->
-    <!--<module>audio-utils/audio-encoder-lame</module>-->
+    <module>audio-utils/audio-common</module>
+    <module>audio-utils/audio-encoder-lame</module>
   </modules>
-
-  <scm>
-    <tag>v1.13.4</tag>
-  </scm>
 </project>
