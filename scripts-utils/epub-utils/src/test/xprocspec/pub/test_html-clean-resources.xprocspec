@@ -25,7 +25,7 @@
                     <p:pipe step="main" port="fileset"/>
                 </p:input>
                 <p:input port="stylesheet">
-                    <p:document href="../../main/resources/xml/xslt/html-clean-resources.xsl"/>
+                    <p:document href="../../../main/resources/xml/pub/html-clean-resources.xsl"/>
                 </p:input>
                 <p:input port="parameters">
                     <p:empty/>
@@ -34,7 +34,7 @@
         </p:declare-step>
     </x:script>
 
-    <x:scenario>
+    <x:scenario label="test">
         <x:call step="x:test">
             <x:input port="fileset">
                 <x:document type="inline" xml:base="file:/example/">

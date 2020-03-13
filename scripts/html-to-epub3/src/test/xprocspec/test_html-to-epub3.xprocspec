@@ -123,7 +123,7 @@
 		<x:expect label="the result desc.xhtml XHTML document"
 		          type="custom" href="http://www.daisy.org/xprocspec/custom-assertion-steps.xpl" step="x:compare-except-ids">
 			<x:document type="inline">
-				<html xmlns="http://www.w3.org/1999/xhtml">
+				<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="" lang="">
 					<head>
 						<style type="text/css">body{ font-family:arial, sans-serif; font-size:1em } h1{ font-size:1.2em; } h2{ font-size:1.1em; color:rgb(0, 0, 110) } h2.about{ font-size:1em; color:rgb(0, 0, 0) } div.container{ border-top:solid 1px rgb(0, 0, 255); width:80%; padding:5px; margin-bottom:10px; background-color:rgb(255, 255, 255) } div.about, div.access{ font-size:0.9em } div.annotation{ font-size:0.8em; font-weight:bold; width:60%; border-top:1px solid rgb(0, 0, 0) } p.anno-hd{ color:rgb(0, 0, 110) } img{ color:rgb(0, 0, 255) } ul{ list-style-type:none } .center{ text-align:center }
 						</style>
@@ -159,15 +159,15 @@
 					</metadata>
 					<manifest>
 						<item href="foo.xhtml" media-type="application/xhtml+xml" id="item_1"/>
-						<item href="image.svg" media-type="application/xhtml+xml" id="item_2" properties="svg"/>
+						<item href="image.svg" media-type="image/svg+xml" id="item_2" properties="svg"/>
 						<item href="style_1.css" media-type="text/css" id="item_3"/>
-						<item href="toc.xhtml" media-type="application/xhtml+xml" id="item_4" properties="nav"/>
-						<item href="desc.xhtml" media-type="application/xhtml+xml" id="item_5"/>
+						<item href="desc.xhtml" media-type="application/xhtml+xml" id="item_4"/>
+						<item href="toc.xhtml" media-type="application/xhtml+xml" id="item_5" properties="nav"/>
 					</manifest>
 					<spine>
 						<itemref idref="item_1" id="itemref_1"/>
 						<itemref idref="item_2" id="itemref_2" linear="no"/>
-						<itemref idref="item_5" id="itemref_3" linear="no"/>
+						<itemref idref="item_4" id="itemref_3" linear="no"/>
 					</spine>
 				</package>
 			</x:document>

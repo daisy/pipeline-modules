@@ -90,6 +90,7 @@
     <p:import href="http://www.daisy.org/pipeline/modules/epub-utils/library.xpl">
         <p:documentation>
             px:epub3-safe-uris
+            px:epub3-ensure-core-media
             px:epub3-add-navigation-doc
             px:epub3-create-mediaoverlays
             px:epub3-create-package-doc
@@ -134,6 +135,28 @@
     </p:variable>
 
     <!--=========================================================================-->
+    <!-- MOVE FILESET TO NEW LOCATION                                            -->
+    <!--=========================================================================-->
+
+    <p:documentation>Move to EPUB/ directory</p:documentation>
+    <px:fileset-copy name="move">
+        <p:input port="source.in-memory">
+            <p:pipe step="main" port="input.in-memory"/>
+        </p:input>
+        <p:with-option name="target" select="$content-dir"/>
+    </px:fileset-copy>
+
+    <!--=========================================================================-->
+    <!-- CONVERT DIAGRAM TO HTML                                                 -->
+    <!--=========================================================================-->
+
+    <px:diagram-to-html name="diagram-to-html">
+        <p:input port="source.in-memory">
+            <p:pipe step="move" port="result.in-memory"/>
+        </p:input>
+    </px:diagram-to-html>
+
+    <!--=========================================================================-->
     <!-- CLEANUP                                                                 -->
     <!--=========================================================================-->
 
@@ -141,14 +164,14 @@
         <p:when test="$skip-cleanup='true'">
             <p:output port="fileset" primary="true"/>
             <p:output port="in-memory" sequence="true">
-                <p:pipe step="main" port="input.in-memory"/>
+                <p:pipe step="diagram-to-html" port="result.in-memory"/>
             </p:output>
             <p:identity/>
         </p:when>
         <p:otherwise>
             <p:output port="fileset" primary="true"/>
             <p:output port="in-memory" sequence="true">
-                <p:pipe step="clean-html" port="in-memory"/>
+                <p:pipe step="clean-resource-refs" port="result.in-memory"/>
             </p:output>
 
             <!--=========================================================================-->
@@ -159,14 +182,14 @@
             <px:fileset-purge>
                 <p:documentation>Also normalizes @href, @original-href and @xml:base</p:documentation>
                 <p:input port="source.in-memory">
-                    <p:pipe step="main" port="input.in-memory"/>
+                    <p:pipe step="diagram-to-html" port="result.in-memory"/>
                 </p:input>
             </px:fileset-purge>
 
             <p:documentation>Change @href with EPUB-safe URIs</p:documentation>
             <px:epub3-safe-uris name="safe-uris">
                 <p:input port="source.in-memory">
-                    <p:pipe step="main" port="input.in-memory"/>
+                    <p:pipe step="diagram-to-html" port="result.in-memory"/>
                 </p:input>
             </px:epub3-safe-uris>
 
@@ -174,37 +197,24 @@
             <!-- XHTML CLEANUP                                                           -->
             <!--=========================================================================-->
 
-            <px:fileset-load media-types="application/xhtml+xml" name="html">
-                <p:input port="in-memory">
-                    <p:pipe step="safe-uris" port="result.in-memory"/>
-                </p:input>
-            </px:fileset-load>
-            <px:assert message="No XHTML documents found." test-count-min="1" error-code="PEZE00"/>
-
             <p:group name="clean-html">
                 <p:output port="fileset" primary="true"/>
                 <p:output port="in-memory" sequence="true">
                     <p:pipe step="update" port="result.in-memory"/>
                 </p:output>
+
+                <px:fileset-load media-types="application/xhtml+xml" name="html">
+                    <p:input port="in-memory">
+                        <p:pipe step="safe-uris" port="result.in-memory"/>
+                    </p:input>
+                </px:fileset-load>
+                <px:assert message="No XHTML documents found." test-count-min="1" error-code="PEZE00"/>
+
                 <p:for-each name="cleaned">
                     <p:output port="result" sequence="true"/>
 
                     <p:documentation>Upgrade to XHTML 5</p:documentation>
-                    <px:html-upgrade name="html-upgrade"/>
-
-                    <p:documentation>Clean resource references</p:documentation>
-                    <p:xslt>
-                        <p:input port="source">
-                            <p:pipe step="html-upgrade" port="result"/>
-                            <p:pipe step="safe-uris" port="result.fileset"/>
-                        </p:input>
-                        <p:input port="stylesheet">
-                            <p:document href="../xslt/html-clean-resources.xsl"/>
-                        </p:input>
-                        <p:input port="parameters">
-                            <p:empty/>
-                        </p:input>
-                    </p:xslt>
+                    <px:html-upgrade/>
 
                     <p:documentation>Clean http-equiv</p:documentation>
                     <p:delete match="/html:html/html:head/html:meta[matches(@http-equiv,'Content-Type','i')]"/>
@@ -245,45 +255,47 @@
                     </p:input>
                 </px:fileset-update>
             </p:group>
+
+            <p:documentation>Clean resource references</p:documentation>
+            <px:epub3-ensure-core-media name="clean-resource-refs">
+                <p:input port="source.in-memory">
+                    <p:pipe step="clean-html" port="in-memory"/>
+                </p:input>
+            </px:epub3-ensure-core-media>
         </p:otherwise>
     </p:choose>
-
-    <!--=========================================================================-->
-    <!-- MOVE FILESET TO NEW LOCATION                                            -->
-    <!--=========================================================================-->
-
-    <p:documentation>Move to EPUB/ directory</p:documentation>
-    <px:fileset-copy name="move">
-        <p:input port="source.in-memory">
-            <p:pipe step="clean" port="in-memory"/>
-        </p:input>
-        <p:with-option name="target" select="$content-dir"/>
-    </px:fileset-copy>
 
     <!--=========================================================================-->
     <!-- GENERATE THE NAVIGATION DOCUMENT                                        -->
     <!--=========================================================================-->
 
+    <!-- Don't include (converted) DIAGRAM in navigation doc and primary spine -->
+    <px:fileset-diff>
+        <p:input port="secondary">
+            <p:pipe step="diagram-to-html" port="mapping"/>
+        </p:input>
+    </px:fileset-diff>
+    <px:fileset-load media-types="application/xhtml+xml" name="content-docs-except-nav-and-diagram">
+        <p:input port="in-memory">
+            <p:pipe step="clean" port="in-memory"/>
+        </p:input>
+    </px:fileset-load>
+    <p:sink/>
+
     <p:documentation>Generate the EPUB 3 navigation document</p:documentation>
     <px:epub3-add-navigation-doc name="add-navigation-doc">
-        <p:input port="source.in-memory">
-            <p:pipe step="move" port="result.in-memory"/>
+        <p:input port="source.fileset">
+            <p:pipe step="clean" port="fileset"/>
         </p:input>
-        <p:with-option name="output-base-uri" select="concat($content-dir,'toc.xhtml')">
-            <p:empty/>
-        </p:with-option>
+        <p:input port="source.in-memory">
+            <p:pipe step="clean" port="in-memory"/>
+        </p:input>
+        <p:input port="content">
+            <p:pipe step="content-docs-except-nav-and-diagram" port="result.fileset"/>
+        </p:input>
+        <p:with-option name="output-base-uri" select="concat($content-dir,'toc.xhtml')"/>
     </px:epub3-add-navigation-doc>
     <p:identity px:message="Navigation Document Created."/>
-
-    <!--=========================================================================-->
-    <!-- CONVERT DIAGRAM TO HTML                                                 -->
-    <!--=========================================================================-->
-
-    <px:diagram-to-html name="diagram-to-html">
-        <p:input port="source.in-memory">
-            <p:pipe step="add-navigation-doc" port="result.in-memory"/>
-        </p:input>
-    </px:diagram-to-html>
 
     <!--=========================================================================-->
     <!-- CALL THE TTS                                                            -->
@@ -292,7 +304,7 @@
     <!-- FIXME: include resources such as lexicons in input -->
     <px:tts-for-epub3 name="tts">
       <p:input port="source.in-memory">
-          <p:pipe step="diagram-to-html" port="result.in-memory"/>
+          <p:pipe step="add-navigation-doc" port="result.in-memory"/>
       </p:input>
       <p:input port="config">
           <p:pipe step="main" port="tts-config"/>
@@ -345,18 +357,13 @@
     <!-- GENERATE THE PACKAGE DOCUMENT                                           -->
     <!--=========================================================================-->
 
-    <px:fileset-load media-types="application/xhtml+xml" name="content-docs-except-nav">
-        <p:input port="fileset">
-            <p:pipe step="move" port="result.fileset"/>
-        </p:input>
-        <p:input port="in-memory">
-            <p:pipe step="move" port="result.in-memory"/>
-        </p:input>
-    </px:fileset-load>
-
     <p:documentation>Extract metadata</p:documentation>
     <!-- FIXME: adapt to multiple XHTML input docs -->
-    <p:split-sequence test="position()=1"/>
+    <p:split-sequence test="position()=1">
+        <p:input port="source">
+            <p:pipe step="content-docs-except-nav-and-diagram" port="result"/>
+        </p:input>
+    </p:split-sequence>
     <px:html-to-opf-metadata name="metadata"/>
     <p:sink/>
 
@@ -375,7 +382,7 @@
                 <p:pipe step="add-mediaoverlays" port="in-memory"/>
             </p:input>
             <p:input port="spine">
-                <p:pipe step="content-docs-except-nav" port="result.fileset"/>
+                <p:pipe step="content-docs-except-nav-and-diagram" port="result.fileset"/>
             </p:input>
             <p:input port="metadata">
                 <p:pipe step="main" port="metadata"/>

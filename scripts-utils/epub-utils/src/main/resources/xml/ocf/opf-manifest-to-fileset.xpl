@@ -2,7 +2,7 @@
 <p:declare-step type="pxi:opf-manifest-to-fileset" version="1.0"
                 xmlns:p="http://www.w3.org/ns/xproc"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-                xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc-internal"
+                xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                 exclude-inline-prefixes="#all"
                 name="main">
 	

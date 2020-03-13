@@ -11,6 +11,7 @@
 	<p:import href="pub/compare-package-doc.xpl"/>
 	<p:import href="pub/merge-prefix.xpl"/>
 	<p:import href="pub/add-prefix.xpl"/>
+	<p:import href="pub/ensure-core-media.xpl"/>
 	<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 		<p>Steps related to <a
 		href="http://www.idpf.org/epub/30/spec/epub30-contentdocs.html#sec-xhtml-nav">EPUB

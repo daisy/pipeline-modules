@@ -44,4 +44,9 @@
         </xsl:choose>
     </xsl:template>
 
+    <xsl:template mode="fileset" match="d:file/@href">
+        <xsl:sequence select="."/>
+        <xsl:attribute name="href-before-move" select="."/>
+    </xsl:template>
+
 </xsl:stylesheet>

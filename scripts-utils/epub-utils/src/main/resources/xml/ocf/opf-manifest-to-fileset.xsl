@@ -9,7 +9,7 @@
 
     <xsl:template match="opf:package">
         <!-- content files first, and in spine order -->
-        <d:fileset >
+        <d:fileset>
             <xsl:attribute name="xml:base" select="replace(pf:base-uri(/*),'(.*/)[^/]*','$1')"/>
             <d:file href="{replace(pf:base-uri(/*),'.*/','')}" media-type="application/oebps-package+xml"/>
             <xsl:apply-templates select="opf:spine/opf:itemref"/>

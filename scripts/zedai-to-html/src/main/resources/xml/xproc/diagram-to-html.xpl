@@ -52,37 +52,31 @@
 
     <p:group name="diagram">
         <p:output port="result.fileset" primary="true">
-            <p:pipe step="filter" port="result"/>
+            <p:pipe step="load" port="result.fileset"/>
         </p:output>
         <p:output port="result.in-memory" sequence="true">
-            <p:pipe step="filter" port="result.in-memory"/>
+            <p:pipe step="load" port="result"/>
         </p:output>
         <p:output port="not-matched.fileset">
             <p:pipe step="not-matched.fileset" port="result"/>
         </p:output>
         <p:delete match="d:file[not(tokenize(@kind,'\s+')='description')]"/>
-        <px:fileset-filter media-types="application/xml application/z3998-auth-diagram+xml" name="filter">
-            <p:input port="source.in-memory">
+        <px:fileset-load media-types="application/xml application/z3998-auth-diagram+xml" name="load">
+            <p:input port="in-memory">
                 <p:pipe step="main" port="source.in-memory"/>
             </p:input>
-        </px:fileset-filter>
+        </px:fileset-load>
         <p:sink/>
         <px:fileset-diff name="not-matched.fileset">
             <p:input port="source">
                 <p:pipe step="main" port="source.fileset"/>
             </p:input>
             <p:input port="secondary">
-                <p:pipe step="filter" port="result"/>
+                <p:pipe step="load" port="result.fileset"/>
             </p:input>
         </px:fileset-diff>
         <p:sink/>
     </p:group>
-    <px:fileset-load name="diagram.in-memory">
-        <p:input port="in-memory">
-            <p:pipe step="diagram" port="result.in-memory"/>
-        </p:input>
-    </px:fileset-load>
-    <p:sink/>
 
     <p:documentation>Convert DIAGRAM to HTML</p:documentation>
     <p:group name="diagram-to-html">
@@ -93,10 +87,11 @@
         <p:output port="mapping">
             <p:pipe step="mapping" port="result"/>
         </p:output>
+        <p:sink/>
         <p:xslt name="convert" initial-mode="fileset">
             <p:input port="source">
                 <p:pipe step="diagram" port="result.fileset"/>
-                <p:pipe step="diagram.in-memory" port="result"/>
+                <p:pipe step="diagram" port="result.in-memory"/>
             </p:input>
             <p:input port="stylesheet">
                 <p:document href="../xslt/fileset-convert-diagram.xsl"/>
