@@ -48,7 +48,7 @@
               type="custom" href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl" step="x:fileset-compare">
       <x:document type="inline">
         <d:fileset>
-          <d:file href="../resources/C00000.epub!/mimetype"/>
+          <d:file href="../resources/C00000.epub!/mimetype" compression-method="stored"/>
           <d:file href="../resources/C00000.epub!/EPUB/C00000-01-cover.xhtml" media-type="application/xhtml+xml"/>
           <d:file href="../resources/C00000.epub!/EPUB/C00000-02-toc.xhtml" media-type="application/xhtml+xml"/>
           <d:file href="../resources/C00000.epub!/EPUB/C00000-03-frontmatter.xhtml" media-type="application/xhtml+xml"/>

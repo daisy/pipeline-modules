@@ -280,6 +280,9 @@
 					<p:pipe step="filesets-from-package-documents" port="result"/>
 				</p:input>
 			</px:fileset-join>
+			<px:fileset-add-entry href="mimetype" first="true" replace="true">
+				<p:with-param port="file-attributes" name="compression-method" select="'stored'"/>
+			</px:fileset-add-entry>
 			
 		</p:otherwise>
 	</p:choose>
