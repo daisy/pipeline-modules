@@ -22,7 +22,11 @@
         <p:pipe step="add-braille-rendition" port="in-memory"/>
     </p:output>
     
-    <p:option name="result-base" required="true"/>
+    <p:option name="result-base" required="false">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>If not specified, will not copy EPUB before modifying it.</p>
+        </p:documentation>
+    </p:option>
     <p:option name="braille" required="false" select="'true'"/>
     <p:option name="tts" required="false" select="'default'"/>
     <p:option name="braille-translator" required="true" />
@@ -141,13 +145,27 @@
     <!--
         copy EPUB to new location
     -->
-    
-    <px:fileset-copy name="move">
-        <p:with-option name="target" select="$result-base"/>
-        <p:input port="source.in-memory">
-            <p:pipe step="main" port="epub.in.in-memory"/>
-        </p:input>
-    </px:fileset-copy>
+    <p:choose name="maybe-copy">
+        <p:when test="p:value-available('result-base')">
+            <p:output port="fileset" primary="true"/>
+            <p:output port="in-memory" sequence="true">
+                <p:pipe step="copy" port="result.in-memory"/>
+            </p:output>
+            <px:fileset-copy name="copy">
+                <p:with-option name="target" select="$result-base"/>
+                <p:input port="source.in-memory">
+                    <p:pipe step="main" port="epub.in.in-memory"/>
+                </p:input>
+            </px:fileset-copy>
+        </p:when>
+        <p:otherwise>
+            <p:output port="fileset" primary="true"/>
+            <p:output port="in-memory" sequence="true">
+                <p:pipe step="main" port="epub.in.in-memory"/>
+            </p:output>
+            <p:identity/>
+        </p:otherwise>
+    </p:choose>
     
     <p:group name="add-mediaoverlays">
         <p:output port="fileset" primary="true"/>
@@ -164,7 +182,7 @@
         <p:delete match="d:file[preceding::d:file]"/>
         <px:fileset-load name="default-rendition.package-document">
             <p:input port="in-memory">
-                <p:pipe step="move" port="result.in-memory"/>
+                <p:pipe step="maybe-copy" port="in-memory"/>
             </p:input>
         </px:fileset-load>
         
@@ -174,10 +192,10 @@
         
         <px:tts-for-epub3 name="tts">
             <p:input port="source.fileset">
-                <p:pipe step="move" port="result.fileset"/>
+                <p:pipe step="maybe-copy" port="fileset"/>
             </p:input>
             <p:input port="source.in-memory">
-                <p:pipe step="move" port="result.in-memory"/>
+                <p:pipe step="maybe-copy" port="in-memory"/>
             </p:input>
             <p:input port="config">
                 <p:pipe step="main" port="tts-config"/>
@@ -199,8 +217,12 @@
             <p:input port="audio-map">
                 <p:pipe step="tts" port="audio-map"/>
             </p:input>
-            <p:with-option name="mediaoverlay-dir" select="resolve-uri('EPUB/mo/',$result-base)"/>
-            <p:with-option name="audio-dir" select="resolve-uri('EPUB/audio/',$result-base)"/>
+            <p:with-option name="mediaoverlay-dir" select="resolve-uri('EPUB/mo/',base-uri(/*))">
+                <p:pipe step="maybe-copy" port="fileset"/>
+            </p:with-option>
+            <p:with-option name="audio-dir" select="resolve-uri('EPUB/audio/',base-uri(/*))">
+                <p:pipe step="maybe-copy" port="fileset"/>
+            </p:with-option>
         </px:epub3-create-mediaoverlays>
         <p:sink/>
         
@@ -268,7 +290,9 @@
                     </p:input>
                     <p:with-param name="content-media-types" select="$content-media-types"/>
                     <p:with-param name="braille-rendition.package-document.base"
-                                  select="resolve-uri('EPUB/package-braille.opf',$result-base)"/>
+                                  select="resolve-uri('EPUB/package-braille.opf',base-uri(/*))">
+                        <p:pipe step="maybe-copy" port="fileset"/>
+                    </p:with-param>
                 </p:xslt>
                 <p:sink/>
                 <!--
@@ -589,7 +613,9 @@
                         </p:input>
                     </p:insert>
                     <px:set-base-uri>
-                        <p:with-option name="base-uri" select="resolve-uri('META-INF/metadata.xml',$result-base)"/>
+                        <p:with-option name="base-uri" select="resolve-uri('META-INF/metadata.xml',base-uri(/*))">
+                            <p:pipe step="maybe-copy" port="fileset"/>
+                        </p:with-option>
                     </px:set-base-uri>
                 </p:group>
                 <p:sink/>
@@ -638,7 +664,9 @@
                             </p:input>
                             <p:with-param name="default-rendition.html.base" select="$default-rendition.html.base"/>
                             <p:with-param name="braille-rendition.html.base" select="$braille-rendition.html.base"/>
-                            <p:with-param name="rendition-mapping.base" select="resolve-uri('EPUB/renditionMapping.html',$result-base)"/>
+                            <p:with-param name="rendition-mapping.base" select="resolve-uri('EPUB/renditionMapping.html',base-uri(/*))">
+                                <p:pipe step="maybe-copy" port="fileset"/>
+                            </p:with-param>
                         </p:xslt>
                     </p:for-each>
                     <p:sink/>
@@ -659,7 +687,9 @@
                         </p:input>
                     </p:insert>
                     <px:set-base-uri>
-                        <p:with-option name="base-uri" select="resolve-uri('EPUB/renditionMapping.html',$result-base)"/>
+                        <p:with-option name="base-uri" select="resolve-uri('EPUB/renditionMapping.html',base-uri(/*))">
+                            <p:pipe step="maybe-copy" port="fileset"/>
+                        </p:with-option>
                     </px:set-base-uri>
                 </p:group>
                 <p:sink/>
@@ -695,7 +725,9 @@
                     <p:input port="in-memory">
                         <p:pipe step="add-rendition-mapping" port="in-memory"/>
                     </p:input>
-                    <p:with-option name="href" select="resolve-uri('META-INF/container.xml',$result-base)"/>
+                    <p:with-option name="href" select="resolve-uri('META-INF/container.xml',base-uri(/*))">
+                        <p:pipe step="maybe-copy" port="fileset"/>
+                    </p:with-option>
                 </px:fileset-load>
                 <p:group name="container">
                     <p:output port="result"/>
@@ -729,7 +761,9 @@
                         </p:input>
                     </p:insert>
                     <px:set-base-uri>
-                        <p:with-option name="base-uri" select="resolve-uri('META-INF/container.xml',$result-base)"/>
+                        <p:with-option name="base-uri" select="base-uri(/*)">
+                            <p:pipe step="original-container" port="result"/>
+                        </p:with-option>
                     </px:set-base-uri>
                 </p:group>
                 <p:sink/>
