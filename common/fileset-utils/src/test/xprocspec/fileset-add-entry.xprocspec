@@ -396,4 +396,30 @@
         </x:expect>
     </x:scenario>
 
+    <x:scenario label="replace-existing-entry">
+        <x:call step="px:fileset-add-entry">
+            <x:input port="source">
+                <x:document type="inline">
+                    <d:fileset xml:base="file:/Users/me/dir/">
+                        <d:file href="doc.html" media-type="text/html" foo="bar"/>
+                        <d:file href="other"/>
+                    </d:fileset>
+                </x:document>
+            </x:input>
+            <x:option name="href" select="'file:/Users/me/dir/doc.html'"/>
+            <x:option name="replace" select="true()"/>
+        </x:call>
+        <x:context label="the result port">
+            <x:document type="port" port="result"/>
+        </x:context>
+        <x:expect label="the fileset should be unchanged" type="compare">
+            <x:document type="inline">
+                <d:fileset xml:base="file:/Users/me/dir/">
+                    <d:file href="other"/>
+                    <d:file href="doc.html"/>
+                </d:fileset>
+            </x:document>
+        </x:expect>
+    </x:scenario>
+
 </x:description>

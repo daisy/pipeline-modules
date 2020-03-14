@@ -31,7 +31,9 @@
       the new entry was provided via de "entry" port, that document is appended (or prepended,
       depending on the "first" option).</p>
       <p>If the input fileset already contained a file with the same URI as the new entry, it is not
-      added.</p>
+      added, unless when the 'replace' option is set, in which case the old entry is removed and the
+      new one is added to the beginning or the end. If the 'replace-attributes' option is set,
+      attributes of the existing entry may be added or replaced.</p>
     </p:documentation>
     <p:pipe step="result" port="in-memory"/>
   </p:output>
@@ -56,6 +58,7 @@
   <p:option name="ref" select="''"><!-- if relative; will be resolved relative to the file --></p:option>
   <p:option name="original-href" select="''"><!-- if relative; will be resolved relative to the file --></p:option>
   <p:option name="first" select="'false'"/>
+  <p:option name="replace" select="'false'"/>
   <p:option name="replace-attributes" select="'false'"/>
 
   <p:input port="file-attributes" kind="parameter" primary="false">
@@ -241,7 +244,7 @@
       </p:input>
     </p:identity>
     <p:choose name="if-present-in-input">
-      <p:when test="/*/d:file[@href=$href-normalized]">
+      <p:when test="not($replace='true') and /*/d:file[@href=$href-normalized]">
         <p:output port="fileset" primary="true"/>
         <p:output port="in-memory" sequence="true">
           <p:pipe step="main" port="source.in-memory"/>
@@ -268,6 +271,16 @@
         <p:output port="in-memory" sequence="true">
           <p:pipe step="in-memory" port="result"/>
         </p:output>
+        <p:choose>
+          <p:when test="$replace='true'">
+            <p:delete>
+              <p:with-option name="match" select="concat('d:file[@href=&quot;',$href-normalized,'&quot;]')"/>
+            </p:delete>
+          </p:when>
+          <p:otherwise>
+            <p:identity/>
+          </p:otherwise>
+        </p:choose>
         <p:insert match="/*" name="fileset">
           <p:input port="insertion">
             <p:pipe port="result" step="new-entry"/>
