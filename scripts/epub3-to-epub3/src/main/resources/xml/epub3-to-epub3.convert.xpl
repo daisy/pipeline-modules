@@ -29,10 +29,10 @@
     </p:option>
     <p:option name="braille" required="false" select="'true'"/>
     <p:option name="tts" required="false" select="'default'"/>
-    <p:option name="braille-translator" required="true" />
-    <p:option name="stylesheet" required="true"/>
-    <p:option name="apply-document-specific-stylesheets" required="true"/>
-    <p:option name="set-default-rendition-to-braille" required="true"/>
+    <p:option name="braille-translator" select="''"/>
+    <p:option name="stylesheet" select="''"/>
+    <p:option name="apply-document-specific-stylesheets" select="'false'"/>
+    <p:option name="set-default-rendition-to-braille" select="'false'"/>
     <p:option name="content-media-types" select="'application/xhtml+xml'">
         <!--
             space separated list of content document media-types to include in the braille rendition
@@ -170,13 +170,13 @@
     <p:group name="add-mediaoverlays">
         <p:output port="fileset" primary="true"/>
         <p:output port="in-memory" sequence="true">
-            <p:pipe step="add" port="result.in-memory"/>
+            <p:pipe step="skip-if-disabled" port="in-memory"/>
         </p:output>
         <p:output port="temp-audio.fileset">
-            <p:pipe step="mo" port="original-audio.fileset"/>
+            <p:pipe step="skip-if-disabled" port="temp-audio.fileset"/>
         </p:output>
         <p:output port="log">
-            <p:pipe step="tts" port="log"/>
+            <p:pipe step="skip-if-disabled" port="log"/>
         </p:output>
         <px:fileset-filter media-types="application/oebps-package+xml"/>
         <p:delete match="d:file[preceding::d:file]"/>
@@ -185,65 +185,93 @@
                 <p:pipe step="maybe-copy" port="in-memory"/>
             </p:input>
         </px:fileset-load>
-        
-        <!--
-            perform TTS
-        -->
-        
-        <px:tts-for-epub3 name="tts">
-            <p:input port="source.fileset">
-                <p:pipe step="maybe-copy" port="fileset"/>
-            </p:input>
-            <p:input port="source.in-memory">
-                <p:pipe step="maybe-copy" port="in-memory"/>
-            </p:input>
-            <p:input port="config">
-                <p:pipe step="main" port="tts-config"/>
-            </p:input>
-            <p:with-option name="audio" select="$tts='true' or $tts='default' and not(//opf:item/@media-overlay)">
-                <p:pipe step="default-rendition.package-document" port="result"/>
-            </p:with-option>
-            <p:with-option name="temp-dir" select="$temp-dir"/>
-        </px:tts-for-epub3>
-        
-        <!--
-            generate SMIL files and copy audio files
-        -->
-        
-        <px:epub3-create-mediaoverlays flatten="true" name="mo">
-            <p:input port="source.in-memory">
-                <p:pipe step="tts" port="result.in-memory"/>
-            </p:input>
-            <p:input port="audio-map">
-                <p:pipe step="tts" port="audio-map"/>
-            </p:input>
-            <p:with-option name="mediaoverlay-dir" select="resolve-uri('EPUB/mo/',base-uri(/*))">
-                <p:pipe step="maybe-copy" port="fileset"/>
-            </p:with-option>
-            <p:with-option name="audio-dir" select="resolve-uri('EPUB/audio/',base-uri(/*))">
-                <p:pipe step="maybe-copy" port="fileset"/>
-            </p:with-option>
-        </px:epub3-create-mediaoverlays>
-        <p:sink/>
-        
-        <!--
-            update EPUB with mediaoverlays
-        -->
-        
-        <px:epub3-add-mediaoverlays name="add">
-            <p:input port="source.fileset">
-                <p:pipe step="tts" port="result.fileset"/>
-            </p:input>
-            <p:input port="source.in-memory">
-                <p:pipe step="tts" port="result.in-memory"/>
-            </p:input>
-            <p:input port="mo.fileset">
-                <p:pipe step="mo" port="result.fileset"/>
-            </p:input>
-            <p:input port="mo.in-memory">
-                <p:pipe step="mo" port="result.in-memory"/>
-            </p:input>
-        </px:epub3-add-mediaoverlays>
+        <p:choose name="skip-if-disabled">
+            <p:when test="$tts='true' or $tts='default' and not(//opf:item/@media-overlay)" px:message="Performing TTS">
+                <p:output port="fileset" primary="true"/>
+                <p:output port="in-memory" sequence="true">
+                    <p:pipe step="add" port="result.in-memory"/>
+                </p:output>
+                <p:output port="temp-audio.fileset">
+                    <p:pipe step="mo" port="original-audio.fileset"/>
+                </p:output>
+                <p:output port="log">
+                    <p:pipe step="tts" port="log"/>
+                </p:output>
+
+                <!--
+                    perform TTS
+                -->
+
+                <px:tts-for-epub3 name="tts" audio="true">
+                    <p:input port="source.fileset">
+                        <p:pipe step="maybe-copy" port="fileset"/>
+                    </p:input>
+                    <p:input port="source.in-memory">
+                        <p:pipe step="maybe-copy" port="in-memory"/>
+                    </p:input>
+                    <p:input port="config">
+                        <p:pipe step="main" port="tts-config"/>
+                    </p:input>
+                    <p:with-option name="temp-dir" select="$temp-dir"/>
+                </px:tts-for-epub3>
+
+                <!--
+                    generate SMIL files and copy audio files
+                -->
+
+                <px:epub3-create-mediaoverlays flatten="true" name="mo">
+                    <p:input port="source.in-memory">
+                        <p:pipe step="tts" port="result.in-memory"/>
+                    </p:input>
+                    <p:input port="audio-map">
+                        <p:pipe step="tts" port="audio-map"/>
+                    </p:input>
+                    <p:with-option name="mediaoverlay-dir" select="resolve-uri('EPUB/mo/',base-uri(/*))">
+                        <p:pipe step="maybe-copy" port="fileset"/>
+                    </p:with-option>
+                    <p:with-option name="audio-dir" select="resolve-uri('EPUB/audio/',base-uri(/*))">
+                        <p:pipe step="maybe-copy" port="fileset"/>
+                    </p:with-option>
+                </px:epub3-create-mediaoverlays>
+                <p:sink/>
+
+                <!--
+                    update EPUB with mediaoverlays
+                -->
+
+                <px:epub3-add-mediaoverlays name="add">
+                    <p:input port="source.fileset">
+                        <p:pipe step="tts" port="result.fileset"/>
+                    </p:input>
+                    <p:input port="source.in-memory">
+                        <p:pipe step="tts" port="result.in-memory"/>
+                    </p:input>
+                    <p:input port="mo.fileset">
+                        <p:pipe step="mo" port="result.fileset"/>
+                    </p:input>
+                    <p:input port="mo.in-memory">
+                        <p:pipe step="mo" port="result.in-memory"/>
+                    </p:input>
+                </px:epub3-add-mediaoverlays>
+            </p:when>
+            <p:otherwise>
+                <p:output port="fileset" primary="true"/>
+                <p:output port="in-memory" sequence="true">
+                    <p:pipe step="maybe-copy" port="in-memory"/>
+                </p:output>
+                <p:output port="temp-audio.fileset">
+                    <p:inline><d:fileset/></p:inline>
+                </p:output>
+                <p:output port="log" sequence="true">
+                    <p:empty/>
+                </p:output>
+                <p:identity>
+                    <p:input port="source">
+                        <p:pipe step="maybe-copy" port="fileset"/>
+                    </p:input>
+                </p:identity>
+            </p:otherwise>
+        </p:choose>
     </p:group>
     
     <p:choose name="add-braille-rendition">
@@ -326,7 +354,7 @@
                 process braille rendition xhtml documents
             -->
             
-            <p:group name="braille-rendition.process-html">
+            <p:group name="braille-rendition.process-html" px:message="Translating to braille">
                 <p:output port="result.fileset" primary="true"/>
                 <p:output port="result.in-memory" sequence="true">
                     <p:pipe step="update-fileset" port="result.in-memory"/>

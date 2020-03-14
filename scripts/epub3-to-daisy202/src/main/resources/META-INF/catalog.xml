@@ -10,6 +10,7 @@
   <nextCatalog catalog="org:daisy:pipeline:modules:html-utils"/>
   <nextCatalog catalog="org:daisy:pipeline:modules:mediatype-utils"/>
   <nextCatalog catalog="org:daisy:pipeline:modules:epub-utils"/>
+  <nextCatalog catalog="org:daisy:pipeline:modules:daisy202-utils"/>
   <nextCatalog catalog="org:daisy:pipeline:modules:smil-utils"/>
 
 </catalog>

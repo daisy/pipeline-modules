@@ -607,19 +607,30 @@
 					<d:fileset>
 						<d:file href="result/mimetype" compression-method="stored"
 						        original-href="../resources/valentin.epub!/mimetype"/>
-						<d:file href="result/EPUB/C00000-1-cover.xhtml" media-type="application/xhtml+xml"/>
-						<d:file href="result/EPUB/package.opf" media-type="application/oebps-package+xml"/>
-						<d:file href="result/EPUB/nav.xhtml" media-type="application/xhtml+xml"/>
+						<d:file href="result/EPUB/C00000-1-cover.xhtml" media-type="application/xhtml+xml"
+						        original-href="../resources/valentin.epub!/EPUB/C00000-1-cover.xhtml"/>
+						<d:file href="result/EPUB/package.opf" media-type="application/oebps-package+xml"
+						        original-href="../resources/valentin.epub!/EPUB/package.opf"/>
+						<d:file href="result/EPUB/nav.xhtml" media-type="application/xhtml+xml"
+						        original-href="../resources/valentin.epub!/EPUB/nav.xhtml"/>
 						<d:file href="result/EPUB/nav.ncx" media-type="application/x-dtbncx+xml"
 						        original-href="../resources/valentin.epub!/EPUB/nav.ncx"/>
-						<d:file href="result/EPUB/C00000-9-footnotes.xhtml" media-type="application/xhtml+xml"/>
-						<d:file href="result/EPUB/C00000-5-chapter.xhtml" media-type="application/xhtml+xml"/>
-						<d:file href="result/EPUB/C00000-6-rearnotes.xhtml" media-type="application/xhtml+xml"/>
-						<d:file href="result/EPUB/C00000-7-chapter.xhtml" media-type="application/xhtml+xml"/>
-						<d:file href="result/EPUB/C00000-8-conclusion.xhtml" media-type="application/xhtml+xml"/>
-						<d:file href="result/EPUB/C00000-4-chapter.xhtml" media-type="application/xhtml+xml"/>
-						<d:file href="result/EPUB/C00000-2-frontmatter.xhtml" media-type="application/xhtml+xml"/>
-						<d:file href="result/EPUB/C00000-3-chapter.xhtml" media-type="application/xhtml+xml"/>
+						<d:file href="result/EPUB/C00000-9-footnotes.xhtml" media-type="application/xhtml+xml"
+						        original-href="../resources/valentin.epub!/EPUB/C00000-9-footnotes.xhtml"/>
+						<d:file href="result/EPUB/C00000-5-chapter.xhtml" media-type="application/xhtml+xml"
+						        original-href="../resources/valentin.epub!/EPUB/C00000-5-chapter.xhtml"/>
+						<d:file href="result/EPUB/C00000-6-rearnotes.xhtml" media-type="application/xhtml+xml"
+						        original-href="../resources/valentin.epub!/EPUB/C00000-6-rearnotes.xhtml"/>
+						<d:file href="result/EPUB/C00000-7-chapter.xhtml" media-type="application/xhtml+xml"
+						        original-href="../resources/valentin.epub!/EPUB/C00000-7-chapter.xhtml"/>
+						<d:file href="result/EPUB/C00000-8-conclusion.xhtml" media-type="application/xhtml+xml"
+						        original-href="../resources/valentin.epub!/EPUB/C00000-8-conclusion.xhtml"/>
+						<d:file href="result/EPUB/C00000-4-chapter.xhtml" media-type="application/xhtml+xml"
+						        original-href="../resources/valentin.epub!/EPUB/C00000-4-chapter.xhtml"/>
+						<d:file href="result/EPUB/C00000-2-frontmatter.xhtml" media-type="application/xhtml+xml"
+						        original-href="../resources/valentin.epub!/EPUB/C00000-2-frontmatter.xhtml"/>
+						<d:file href="result/EPUB/C00000-3-chapter.xhtml" media-type="application/xhtml+xml"
+						        original-href="../resources/valentin.epub!/EPUB/C00000-3-chapter.xhtml"/>
 						<d:file href="result/EPUB/css/accessibility.css" media-type="text/css"
 						        original-href="../resources/valentin.epub!/EPUB/css/accessibility.css"/>
 						<d:file href="result/EPUB/css/fonts/opendyslexic/LICENSE.txt" media-type="text/plain"
@@ -672,8 +683,8 @@
 					<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="pub-identifier" version="3.0"
 					         prefix="nordic: http://www.mtm.se/epub/">
 						<metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
-							<dc:title>Valentin Haüy - the father of the education for the blind</dc:title>
 							<dc:identifier id="pub-identifier">C00000</dc:identifier>
+							<dc:title>Valentin Haüy - the father of the education for the blind</dc:title>
 							<dc:creator>Beatrice Christensen Sköld</dc:creator>
 							<dc:source>urn:isbn:123456789</dc:source>
 							<dc:format>EPUB3</dc:format>
