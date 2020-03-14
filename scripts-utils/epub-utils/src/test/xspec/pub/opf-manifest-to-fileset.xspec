@@ -31,7 +31,7 @@
         </x:context>
         <x:expect label="The fileset should be as expected">
             <d:fileset xmlns:d="http://www.daisy.org/ns/pipeline/data" xml:base="file:/tmp/">
-                <d:file media-type="application/oebps-package+xml" href="package.opf"/>
+                <d:file media-type="application/oebps-package+xml" href="package.opf" media-version="3.0"/>
                 <d:file media-type="application/xhtml+xml" href="html-1.html"/>
                 <d:file media-type="application/xhtml+xml" href="html-2.html"/>
                 <d:file media-type="application/xhtml+xml" href="html-3.html"/>

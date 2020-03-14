@@ -3,6 +3,8 @@
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
+                xmlns:c="http://www.w3.org/ns/xproc-step"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
                 xmlns:ocf="urn:oasis:names:tc:opendocument:xmlns:container"
                 type="px:epub-load" name="main">
 	
@@ -17,9 +19,10 @@
 		</p:documentation>
 	</p:option>
 	
-	<p:option name="version" required="false" select="'3'">
+	<p:option name="version" required="false">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>EPUB version: "2" or "3"</p>
+			<p>If not specified, the version will be detected automatically.</p>
 		</p:documentation>
 	</p:option>
 	<p:option name="store-to-disk" required="false" select="'false'">
@@ -114,21 +117,17 @@
 		</p:documentation>
 	</p:import>
 	
-	<px:assert message="Version must be '2' or '3', but got '$1'" error-code="XXXXX">
-		<p:with-option name="test" select="$version=('2','3')"/>
-	</px:assert>
-
-	<px:assert message="When store-to-disk='true' then temp-dir must also be defined" error-code="PZU001">
+	<px:assert message="When store-to-disk='true' then temp-dir must also be defined" error-code="PZU001" name="check-temp-dir">
 		<p:with-option name="test" select="$store-to-disk='false' or p:value-available('temp-dir')"/>
 	</px:assert>
 	
 	<px:assert message="Input must either be a .epub file, a .opf file or a file named 'mimetype', but got '$1'."
-	           error-code="XXXXX">
+	           error-code="XXXXX" name="check-href">
 		<p:with-option name="test" select="matches(lower-case($href),'.+\.(epub|opf)$|.*/mimetype$')"/>
 		<p:with-option name="param1" select="$href"/>
 	</px:assert>
 	
-	<p:choose name="result">
+	<p:choose name="result" cx:depends-on="check-href">
 		<p:when test="ends-with(lower-case($href),'.opf')">
 			<p:output port="result.fileset" primary="true"/>
 			<p:output port="result.in-memory" sequence="true">
@@ -180,7 +179,7 @@
 							<p:output port="result">
 								<p:pipe step="unzip" port="fileset"/>
 							</p:output>
-							<px:fileset-unzip store-to-disk="true" name="unzip">
+							<px:fileset-unzip store-to-disk="true" name="unzip" cx:depends-on="check-temp-dir">
 								<p:with-option name="href" select="$href"/>
 								<p:with-option name="unzipped-basedir" select="concat($temp-dir,'unzip/')"/>
 							</px:fileset-unzip>
@@ -287,6 +286,47 @@
 		</p:otherwise>
 	</p:choose>
 	
+	<p:group name="version">
+		<p:output port="result"/>
+		<p:variable name="opf-version" select="//d:file[@media-type='application/oebps-package+xml'][1]/@media-version"/>
+		<p:choose>
+			<p:when test="p:value-available('version')">
+				<px:assert message="Version must be '2' or '3', but got '$1'" error-code="XXXXX">
+					<p:with-option name="test" select="$version=('2','3')"/>
+				</px:assert>
+				<px:assert message="Specified version ($1) is not equal to detected version ($2)">
+					<p:with-option name="test" select="$opf-version=concat($version,'.0')"/>
+					<p:with-option name="param1" select="$version"/>
+					<p:with-option name="param2" select="$opf-version"/>
+				</px:assert>
+				<p:template>
+					<p:input port="template">
+						<p:inline>
+							<c:result>{$version}</c:result>
+						</p:inline>
+					</p:input>
+					<p:with-param name="version" select="$version"/>
+				</p:template>
+			</p:when>
+			<p:otherwise>
+				<px:assert message="Could not detect version: unexpected version attribute found in package document ($1)"
+				           error-code="XXXX">
+					<p:with-option name="test" select="$opf-version=('2.0','3.0')"/>
+					<p:with-option name="param1" select="$opf-version"/>
+				</px:assert>
+				<p:template>
+					<p:input port="template">
+						<p:inline>
+							<c:result>{$version}</c:result>
+						</p:inline>
+					</p:input>
+					<p:with-param name="version" select="substring($opf-version,1,1)"/>
+				</p:template>
+			</p:otherwise>
+		</p:choose>
+	</p:group>
+	<p:sink/>
+
 	<p:choose name="validate">
 		<p:when test="$validation='off'">
 			<p:output port="report" sequence="true">
@@ -317,7 +357,9 @@
 				<p:with-option name="epub" select="$href">
 					<p:pipe step="result" port="result.fileset"/>
 				</p:with-option>
-				<p:with-option name="version" select="$version"/>
+				<p:with-option name="version" select="string(/*)">
+					<p:pipe step="version" port="result"/>
+				</p:with-option>
 				<p:with-option name="temp-dir" select="concat($temp-dir,'validate/')"/>
 			</px:epub-validate>
 			<p:identity>

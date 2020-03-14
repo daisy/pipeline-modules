@@ -11,7 +11,7 @@
         <!-- content files first, and in spine order -->
         <d:fileset>
             <xsl:attribute name="xml:base" select="replace(pf:base-uri(/*),'(.*/)[^/]*','$1')"/>
-            <d:file href="{replace(pf:base-uri(/*),'.*/','')}" media-type="application/oebps-package+xml"/>
+            <d:file href="{replace(pf:base-uri(/*),'.*/','')}" media-type="application/oebps-package+xml" media-version="{@version}"/>
             <xsl:apply-templates select="opf:spine/opf:itemref"/>
             <xsl:apply-templates select="opf:manifest/opf:item[not(@id=/*/opf:spine/opf:itemref/@idref)]"/>
         </d:fileset>
