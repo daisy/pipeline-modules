@@ -129,7 +129,7 @@
     <p:add-xml-base name="mimetype"/>
     <p:sink/>
     
-    <px:fileset-add-entry first="true" media-type="text/plain" name="add-mimetype">
+    <px:fileset-add-entry first="true" media-type="text/plain" name="add-mimetype" replace="true">
         <p:input port="source">
             <p:pipe step="add-manifest" port="fileset"/>
         </p:input>
