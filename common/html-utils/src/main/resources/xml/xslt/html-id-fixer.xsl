@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                 xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
-                xmlns:epub="http://www.idpf.org/2007/ops"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
-                xpath-default-namespace="http://www.w3.org/1999/xhtml"
                 exclude-result-prefixes="#all">
 
     <xsl:include href="http://www.daisy.org/pipeline/modules/common-utils/generate-id.xsl"/>
@@ -16,19 +15,7 @@
             <xsl:with-param name="prefix" select="'id_'"/>
             <xsl:with-param name="for-elements"
                             select="//*[@id][not(key('ids',@id)[1] is .)]|
-                                    //body[not(@id)]|
-                                    //article[not(@id)]|
-                                    //aside[not(@id)]|
-                                    //nav[not(@id)]|
-                                    //section[not(@id)]|
-                                    //h1[not(@id)]|
-                                    //h2[not(@id)]|
-                                    //h3[not(@id)]|
-                                    //h4[not(@id)]|
-                                    //h5[not(@id)]|
-                                    //h6[not(@id)]|
-                                    //hgroup[not(@id)]|
-                                    //*[not(@id)][tokenize(@epub:type,'\s+')='pagebreak']"/>
+                                    //*[@pxi:need-id][not(@id)]"/>
         </xsl:call-template>
     </xsl:template>
 
@@ -47,7 +34,7 @@
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template match="/*">
+    <xsl:template match="/*" priority=".9">
         <xsl:next-match/>
         <xsl:result-document href="mapping">
             <d:fileset>
@@ -67,36 +54,31 @@
 
     <!-- Add missing IDs -->
 
-    <xsl:template match="body|article|aside|nav|section">
-        <xsl:copy>
-            <xsl:if test="empty(@id)">
-                <xsl:call-template name="pf:generate-id"/>
-            </xsl:if>
-            <xsl:apply-templates select="node() | @*"/>
+    <xsl:template match="*[@pxi:need-id][not(@id)]">
+        <xsl:copy copy-namespaces="no">
+            <xsl:for-each select="namespace::*[not(.='http://www.daisy.org/ns/pipeline/xproc/internal')]">
+                <xsl:sequence select="."/>
+            </xsl:for-each>
+            <xsl:call-template name="pf:generate-id"/>
+            <xsl:apply-templates select="@*|node()"/>
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="h1|h2|h3|h4|h5|h6|hgroup">
-        <xsl:copy>
-            <xsl:if test="empty(@id)">
-                <xsl:call-template name="pf:generate-id"/>
-            </xsl:if>
-            <xsl:apply-templates select="node() | @*"/>
-        </xsl:copy>
+    <xsl:template match="@pxi:need-id"/>
+
+    <!-- in order to delete the pxi namespace -->
+    <xsl:template match="/pxi:wrapper">
+        <xsl:element name="_">
+            <xsl:apply-templates select="@*|node()"/>
+        </xsl:element>
     </xsl:template>
 
-    <xsl:template match="*[tokenize(@epub:type,'\s+')='pagebreak']">
-        <xsl:copy>
-            <xsl:if test="empty(@id)">
-                <xsl:call-template name="pf:generate-id"/>
-            </xsl:if>
-            <xsl:apply-templates select="node() | @*"/>
-        </xsl:copy>
-    </xsl:template>
-
-    <xsl:template match="node() | @*">
-        <xsl:copy>
-            <xsl:apply-templates select="node() | @*"/>
+    <xsl:template match="@*|*">
+        <xsl:copy copy-namespaces="no">
+            <xsl:for-each select="namespace::*[not(.='http://www.daisy.org/ns/pipeline/xproc/internal')]">
+                <xsl:sequence select="."/>
+            </xsl:for-each>
+            <xsl:apply-templates select="@*|node()"/>
         </xsl:copy>
     </xsl:template>
 
