@@ -8,12 +8,21 @@
     <p:input port="source" sequence="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>The content documents</p>
-            <p>All <code>epub:type='pagebreak'</code> elements must have an <code>id</code>
-            attribute (see also px:html-id-fixer).</p>
         </p:documentation>
     </p:input>
-    <p:output port="result">
+    <p:output port="result" primary="true">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>The generated page list as a <code>nav</code> document with
+            <code>epub:type="page-list"</code>.</p>
+        </p:documentation>
         <p:pipe port="result" step="result"/>
+    </p:output>
+    <p:output port="content-docs" sequence="true">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>The modified content documents. All <code>epub:type='pagebreak'</code> elements have
+            an <code>id</code> attribute.</p>
+        </p:documentation>
+        <p:pipe step="page-lists" port="content-docs"/>
     </p:output>
     <p:option name="hidden" select="'true'"/>
     <p:option name="output-base-uri" required="true">
@@ -22,15 +31,29 @@
         </p:documentation>
     </p:option>
     
-    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
+        <p:documentation>
+            px:i18n-translate
+        </p:documentation>
+    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
         <p:documentation>
             px:set-base-uri
         </p:documentation>
     </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
+        <p:documentation>
+            px:html-id-fixer
+        </p:documentation>
+    </p:import>
     
     <p:for-each name="page-lists">
-        <p:output port="result"/>
+        <p:output port="result" primary="true"/>
+        <p:output port="content-docs">
+            <p:pipe step="add-ids" port="result"/>
+        </p:output>
+        <p:documentation>Add ID attributes</p:documentation>
+        <px:html-id-fixer match="*[tokenize(@epub:type,'\s+')='pagebreak']" name="add-ids"/>
         <p:xslt>
             <p:input port="stylesheet">
                 <p:document href="html5-to-page-list.xsl"/>

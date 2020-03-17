@@ -146,11 +146,6 @@
 			px:assert
 		</p:documentation>
 	</p:import>
-	<p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
-		<p:documentation>
-			px:html-id-fixer
-		</p:documentation>
-	</p:import>
 	<p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
 		<p:documentation>
 			px:fileset-load
@@ -328,23 +323,24 @@
 				</p:otherwise>
 			</p:choose>
 
-			<p:documentation>Add ID attributes</p:documentation>
-			<p:for-each>
-				<px:html-id-fixer/>
-			</p:for-each>
-			<p:identity name="content-docs-with-ids"/>
-
 			<p:documentation>Create toc</p:documentation>
 			<p:group name="toc">
-				<p:output port="result"/>
+				<p:output port="result" primary="true"/>
+				<p:output port="content-docs" sequence="true">
+					<p:pipe step="skip-if-provided" port="content-docs"/>
+				</p:output>
 				<px:assert test-count-max="1" error-code="XXXXX" message="At most one document may be present on 'toc' port">
 					<p:input port="source">
 						<p:pipe step="main" port="toc"/>
 					</p:input>
 				</px:assert>
 				<p:count/>
-				<p:choose>
+				<p:choose name="skip-if-provided">
 					<p:when test=".=1">
+						<p:output port="result" primary="true"/>
+						<p:output port="content-docs" sequence="true">
+							<p:pipe step="content-docs" port="in-memory"/>
+						</p:output>
 						<p:identity>
 							<p:input port="source">
 								<p:pipe step="main" port="toc"/>
@@ -352,9 +348,13 @@
 						</p:identity>
 					</p:when>
 					<p:otherwise>
-						<px:epub3-create-toc>
+						<p:output port="result" primary="true"/>
+						<p:output port="content-docs" sequence="true">
+							<p:pipe step="create" port="content-docs"/>
+						</p:output>
+						<px:epub3-create-toc name="create">
 							<p:input port="source">
-								<p:pipe step="content-docs-with-ids" port="result"/>
+								<p:pipe step="content-docs" port="in-memory"/>
 							</p:input>
 							<p:with-option name="output-base-uri" select="$output-base-uri">
 								<p:empty/>
@@ -367,15 +367,22 @@
 	
 			<p:documentation>Create page list</p:documentation>
 			<p:group name="page-list">
-				<p:output port="result"/>
+				<p:output port="result" primary="true"/>
+				<p:output port="content-docs" sequence="true">
+					<p:pipe step="skip-if-provided" port="content-docs"/>
+				</p:output>
 				<px:assert test-count-max="1" error-code="XXXXX" message="At most one document may be present on 'page-list' port">
 					<p:input port="source">
 						<p:pipe step="main" port="page-list"/>
 					</p:input>
 				</px:assert>
 				<p:count/>
-				<p:choose>
+				<p:choose name="skip-if-provided">
 					<p:when test=".=1">
+						<p:output port="result" primary="true"/>
+						<p:output port="content-docs" sequence="true">
+							<p:pipe step="toc" port="content-docs"/>
+						</p:output>
 						<p:identity>
 							<p:input port="source">
 								<p:pipe step="main" port="page-list"/>
@@ -383,9 +390,13 @@
 						</p:identity>
 					</p:when>
 					<p:otherwise>
-						<px:epub3-create-page-list>
+						<p:output port="result" primary="true"/>
+						<p:output port="content-docs" sequence="true">
+							<p:pipe step="create" port="content-docs"/>
+						</p:output>
+						<px:epub3-create-page-list name="create">
 							<p:input port="source">
-								<p:pipe step="content-docs-with-ids" port="result"/>
+								<p:pipe step="toc" port="content-docs"/>
 							</p:input>
 							<p:with-option name="output-base-uri" select="$output-base-uri">
 								<p:empty/>
@@ -431,7 +442,7 @@
 					<p:pipe step="content-docs" port="fileset"/>
 				</p:input>
 				<p:input port="update.in-memory">
-					<p:pipe step="content-docs-with-ids" port="result"/>
+					<p:pipe step="page-list" port="content-docs"/>
 				</p:input>
 			</px:fileset-update>
 			<px:fileset-add-entry media-type="application/xhtml+xml" name="result">

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+               xmlns:epub="http://www.idpf.org/2007/ops"
                script="../../main/resources/xml/xproc/html-outline.xpl">
 	
 	<x:scenario label="Outline">
@@ -8,59 +9,105 @@
 			<x:input port="source">
 				<x:document type="inline" xml:base="file:/tmp/foo.xhtml">
 					<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr">
-						<head><meta charset="UTF-8" /><title></title></head>
-						<body xmlns:epub="http://www.idpf.org/2007/ops" id="d862273e7-0" epub:type="frontmatter">
-							<section id="d861827e19">
-								<h1 id="d862273e9-0" epub:type="title"><span class="ftit"></span></h1>
-								<p><span class="auteur"><span class="pc">LOREM IPSUM</span> <span class="pc">LOREM IPSUM</span></span></p>
-								<aside id="d862273e18-0" epub:type="annotation">Lorem ipsum dolor sit amet</aside>
+						<head>
+							<meta charset="UTF-8"/>
+							<title/>
+						</head>
+						<body epub:type="frontmatter">
+							<section>
+								<h1 epub:type="title"><span class="ftit"/></h1>
+								<p>
+									<span class="auteur">
+										<span class="pc">LOREM IPSUM</span> <span class="pc">LOREM IPSUM</span>
+									</span>
+								</p>
+								<aside epub:type="annotation">Lorem ipsum dolor sit amet</aside>
 							</section>
-							<section id="d861827e29"><p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.</p>
-								<aside id="d862273e51-0" epub:type="annotation">Lorem ipsum</aside>
+							<section>
+								<p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.</p>
+								<aside epub:type="annotation">Lorem ipsum</aside>
 							</section>
-							<section id="d861827e87">
-								<h1 id="d862273e78-0"><em>Table des matières</em></h1>
+							<section>
+								<h1>
+									<em>Table des matières</em>
+								</h1>
 								<p>Lorem ipsum dolor sit amet</p>
 							</section>
-							</body>
-						</html>
+						</body>
+					</html>
 				</x:document>
 			</x:input>
 			<x:option name="output-base-uri" select="'file:/tmp/toc.xhtml'"/>
 		</x:call>
-		<x:context label="result-context">
+		<x:context label="the result port">
 			<x:document type="port" port="result"/>
 		</x:context>
-		<x:expect label="result" type="compare">
-			<x:document type="inline">
-				<ol xmlns="http://www.w3.org/1999/xhtml">
+		<x:expect label="the result" type="compare">
+			<x:document type="inline" xmlns="http://www.w3.org/1999/xhtml">
+				<ol>
 					<li data-generated="true">
-						<a href="foo.xhtml#d862273e7-0">Untitled document</a>
+						<a href="foo.xhtml#id_1">Untitled document</a>
 						<ol>
 							<li data-generated="true">
-								<a href="foo.xhtml#d861827e19">Untitled section</a>
+								<a href="foo.xhtml#id_2">Untitled section</a>
 								<ol>
 									<li data-generated="true">
-										<a href="foo.xhtml#d862273e18-0">Sidebar</a>
+										<a href="foo.xhtml#id_4">Sidebar</a>
 									</li>
 								</ol>
 							</li>
 							<li data-generated="true">
-								<a href="foo.xhtml#d861827e29">Untitled section</a>
+								<a href="foo.xhtml#id_5">Untitled section</a>
 								<ol>
 									<li data-generated="true">
-										<a href="foo.xhtml#d862273e51-0">Sidebar</a>
+										<a href="foo.xhtml#id_6">Sidebar</a>
 									</li>
 								</ol>
 							</li>
 							<li>
-							  <a href="foo.xhtml#d861827e87">
-								<em xmlns:epub="http://www.idpf.org/2007/ops">Table des matières</em>
-							  </a>
+								<a href="foo.xhtml#id_7">
+									<em>Table des matières</em>
+								</a>
 							</li>
 						</ol>
 					</li>
 				</ol>
+			</x:document>
+		</x:expect>
+		<x:context label="the content-doc port">
+			<x:document type="port" port="content-doc"/>
+		</x:context>
+		<x:expect label="the content doc with ID attributes" type="compare">
+			<x:document type="inline" xmlns="http://www.w3.org/1999/xhtml">
+				<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr">
+					<head>
+						<meta charset="UTF-8"/>
+						<title/>
+					</head>
+					<body epub:type="frontmatter" id="id_1">
+						<section id="id_2">
+							<h1 epub:type="title" id="id_3">
+								<span class="ftit"/>
+							</h1>
+							<p>
+								<span class="auteur">
+									<span class="pc">LOREM IPSUM</span> <span class="pc">LOREM IPSUM</span>
+								</span>
+							</p>
+							<aside epub:type="annotation" id="id_4">Lorem ipsum dolor sit amet</aside>
+						</section>
+						<section id="id_5">
+							<p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.</p>
+							<aside epub:type="annotation" id="id_6">Lorem ipsum</aside>
+						</section>
+						<section id="id_7">
+							<h1 id="id_8">
+								<em>Table des matières</em>
+							</h1>
+							<p>Lorem ipsum dolor sit amet</p>
+						</section>
+					</body>
+				</html>
 			</x:document>
 		</x:expect>
 	</x:scenario>
