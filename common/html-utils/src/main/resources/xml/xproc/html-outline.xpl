@@ -50,6 +50,19 @@
 			<p>The base URI of the resulting outline.</p>
 		</p:documentation>
 	</p:option>
+	<p:option name="fix-untitled-sections-in-outline" select="'imply-heading'">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p>How to handle sections in the outline without an associated <a
+			href="https://html.spec.whatwg.org/multipage/dom.html#heading-content-2">heading content
+			element</a>.</p>
+			<dl>
+				<dt>imply-heading</dt>
+				<dd>Generate a heading text for a such sections. This is the default value.</dd>
+				<dt>unwrap</dt>
+				<dd>Replace the sections with their subsections.</dd>
+			</dl>
+		</p:documentation>
+	</p:option>
 
 	<p:import href="html-add-ids.xpl">
 		<p:documentation>
@@ -65,6 +78,7 @@
 		<p:input port="stylesheet">
 			<p:document href="../xslt/html5-outliner.xsl"/>
 		</p:input>
+		<p:with-param name="fix-untitled-sections-in-outline" select="$fix-untitled-sections-in-outline"/>
 		<p:with-param name="output-base-uri" select="$output-base-uri"/>
 		<p:with-option name="output-base-uri" select="$output-base-uri"/>
 	</p:xslt>

@@ -33,14 +33,17 @@
     </p:option>
 
     <!--TODO honnor the 'untitled' option-->
-    <p:option name="untitled" select="'unwrap'"/>
-    <!-- "unwrap" (default) | "include" | "exclude" | "hide" -->
+    <p:option name="untitled" select="'unwrap'">
+        <!-- "unwrap" (default) | "include" | "exclude" | "hide" -->
+    </p:option>
     <!--TODO honnor the 'sidebar' option-->
-    <p:option name="sidebars" select="'exclude'"/>
-    <!-- "include" | "exclude" (default) | "hide" -->
+    <p:option name="sidebars" select="'exclude'">
+        <!-- "include" | "exclude" (default) | "hide" -->
+    </p:option>
     <!--TODO honnor the 'visible-depth' option-->
-    <p:option name="visible-depth" select="-1"/>
-    <!-- integer -->
+    <p:option name="visible-depth" select="-1">
+        <!-- integer -->
+    </p:option>
 
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
         <p:documentation>
@@ -66,6 +69,10 @@
         <!-- create an ordered list (ol) from each xhtml document -->
         <px:html-outline name="outline">
             <p:with-option name="output-base-uri" select="$output-base-uri">
+                <p:empty/>
+            </p:with-option>
+            <p:with-option name="fix-untitled-sections-in-outline"
+                           select="if ($untitled='unwrap') then 'unwrap' else 'imply-heading'">
                 <p:empty/>
             </p:with-option>
         </px:html-outline>
@@ -98,14 +105,6 @@
 
     <!-- unwrap the tocs titles subnodes (replace by their children) -->
     <p:unwrap match="//h:nav[@epub:type='toc']/h:h1/*"/>
-
-    <!-- Navigation correction -->
-    <p:xslt>
-        <p:input port="stylesheet">
-            <p:document href="nav-fixer.xsl"/>
-        </p:input>
-        <p:with-param name="untitled" select="$untitled"/>
-    </p:xslt>
 
     <!--TODO better handling of duplicate IDs-->
     <p:delete match="@xml:id|@id"/>

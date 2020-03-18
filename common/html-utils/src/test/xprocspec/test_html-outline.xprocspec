@@ -46,21 +46,21 @@
 		<x:expect label="the result" type="compare">
 			<x:document type="inline" xmlns="http://www.w3.org/1999/xhtml">
 				<ol>
-					<li data-generated="true">
+					<li>
 						<a href="foo.xhtml#id_1">Untitled document</a>
 						<ol>
-							<li data-generated="true">
+							<li>
 								<a href="foo.xhtml#id_2">Untitled section</a>
 								<ol>
-									<li data-generated="true">
+									<li>
 										<a href="foo.xhtml#id_4">Sidebar</a>
 									</li>
 								</ol>
 							</li>
-							<li data-generated="true">
+							<li>
 								<a href="foo.xhtml#id_5">Untitled section</a>
 								<ol>
-									<li data-generated="true">
+									<li>
 										<a href="foo.xhtml#id_6">Sidebar</a>
 									</li>
 								</ol>
