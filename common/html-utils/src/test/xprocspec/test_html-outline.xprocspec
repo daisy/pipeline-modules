@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+               xmlns:d="http://www.daisy.org/ns/pipeline/data"
                xmlns:epub="http://www.idpf.org/2007/ops"
                script="../../main/resources/xml/xproc/html-outline.xpl">
-	
-	<x:scenario label="Outline">
+
+	<x:scenario label="empty headings">
 		<x:call step="px:html-outline">
 			<x:input port="source">
 				<x:document type="inline" xml:base="file:/tmp/foo.xhtml">
@@ -74,6 +75,24 @@
 				</ol>
 			</x:document>
 		</x:expect>
+		<x:context label="the outline port">
+			<x:document type="port" port="outline"/>
+		</x:context>
+		<x:expect label="the raw outline" type="compare">
+			<x:document type="inline" xmlns="http://www.w3.org/1999/xhtml">
+				<d:outline>
+					<d:section owner="id_1">
+						<d:section owner="id_2" heading="id_3">
+							<d:section owner="id_4"/>
+						</d:section>
+						<d:section owner="id_5">
+							<d:section owner="id_6"/>
+						</d:section>
+						<d:section owner="id_7" heading="id_8"/>
+					</d:section>
+				</d:outline>
+			</x:document>
+		</x:expect>
 		<x:context label="the content-doc port">
 			<x:document type="port" port="content-doc"/>
 		</x:context>
@@ -111,5 +130,53 @@
 			</x:document>
 		</x:expect>
 	</x:scenario>
-	
+
+	<x:scenario label="flat html">
+		<x:call step="px:html-outline">
+			<x:input port="source">
+				<x:document type="inline" xml:base="file:/tmp/foo.xhtml">
+					<html xmlns="http://www.w3.org/1999/xhtml">
+						<body>
+							<h1/>
+							<h2/>
+							<h3/>
+							<h2/>
+						</body>
+					</html>
+				</x:document>
+			</x:input>
+			<x:option name="output-base-uri" select="'file:/tmp/toc.xhtml'"/>
+		</x:call>
+		<x:context label="the outline port">
+			<x:document type="port" port="outline"/>
+		</x:context>
+		<x:expect label="the raw outline" type="compare">
+			<x:document type="inline" xmlns="http://www.w3.org/1999/xhtml">
+				<d:outline>
+					<d:section owner="id_1" heading="id_2">
+						<d:section heading="id_3">
+							<d:section heading="id_4"/>
+						</d:section>
+						<d:section heading="id_5"/>
+					</d:section>
+				</d:outline>
+			</x:document>
+		</x:expect>
+		<x:context label="the content-doc port">
+			<x:document type="port" port="content-doc"/>
+		</x:context>
+		<x:expect label="the content doc with ID attributes" type="compare">
+			<x:document type="inline" xmlns="http://www.w3.org/1999/xhtml">
+				<html xmlns="http://www.w3.org/1999/xhtml">
+					<body id="id_1">
+						<h1 id="id_2"/>
+						<h2 id="id_3"/>
+						<h3 id="id_4"/>
+						<h2 id="id_5"/>
+					</body>
+				</html>
+			</x:document>
+		</x:expect>
+	</x:scenario>
+
 </x:description>

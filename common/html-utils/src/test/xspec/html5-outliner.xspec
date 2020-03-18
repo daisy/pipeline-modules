@@ -120,11 +120,12 @@
 		</x:context>
 		<x:expect label="outline">
 			<ol>
-				<li><a href="content.xhtml#body">h12</a>
+				<li data-generated="true"><a href="content.xhtml#body">Untitled document</a>
 				<ol>
 					<li><a href="content.xhtml#section">h11</a></li>
 				</ol>
 				</li>
+				<li><a href="content.xhtml#h12">h12</a></li>
 			</ol>
 		</x:expect>
 	</x:scenario>
@@ -145,9 +146,13 @@
 		</x:context>
 		<x:expect label="outline">
 			<ol>
-				<li><a href="content.xhtml#body">h12</a>
+				<li data-generated="true"><a href="content.xhtml#body">Untitled document</a>
 				<ol>
 					<li><a href="content.xhtml#section1">h11</a></li>
+				</ol>
+				</li>
+				<li><a href="content.xhtml#h12">h12</a>
+				<ol>
 					<li><a href="content.xhtml#section2">h13</a></li>
 				</ol>
 				</li>
@@ -916,11 +921,12 @@
 		</x:context>
 		<x:expect label="outline">
 			<ol>
-				<li><a href="content.xhtml#body">Foo</a>
+				<li data-generated="true"><a href="content.xhtml#body">Untitled document</a>
 				<ol>
 					<li><a href="content.xhtml#section1">Thud</a></li>
 				</ol>
 				</li>
+				<li><a href="content.xhtml#foo">Foo</a></li>
 				<li><a href="content.xhtml#bar">Bar</a>
 				<ol>
 					<li><a href="content.xhtml#quux">Quux</a></li>
@@ -953,11 +959,12 @@
 		</x:context>
 		<x:expect label="outline">
 			<ol>
-				<li><a href="content.xhtml#body">Foo</a>
+				<li data-generated="true"><a href="content.xhtml#body">Untitled document</a>
 				<ol>
 					<li><a href="content.xhtml#section1">Thud</a></li>
 				</ol>
 				</li>
+				<li><a href="content.xhtml#foo">Foo</a></li>
 				<li><a href="content.xhtml#bar1">Bar</a>
 				<ol>
 					<li><a href="content.xhtml#section2">Thud</a></li>
@@ -1057,9 +1064,13 @@
 		</x:context>
 		<x:expect label="outline">
 			<ol>
-				<li><a href="content.xhtml#body">h2</a>
+				<li data-generated="true"><a href="content.xhtml#body">Untitled document</a>
 				<ol>
 					<li><a href="content.xhtml#section">h1</a></li>
+				</ol>
+				</li>
+				<li><a href="content.xhtml#h21">h2</a>
+				<ol>
 					<li><a href="content.xhtml#h31">h3</a></li>
 				</ol>
 				</li>
@@ -1106,7 +1117,7 @@
 		</x:expect>
 	</x:scenario>
 	
-	<x:scenario label="complex 8 - handle empty titles">
+	<x:scenario label="empty titles">
 		<x:context>
 			<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" xml:base="file:/tmp/content.xhtml">
 				<head>

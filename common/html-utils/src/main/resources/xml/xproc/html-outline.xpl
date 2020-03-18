@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 type="px:html-outline">
 
 	<p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -20,8 +21,18 @@
 	<p:output port="result" primary="true">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">The outline</h2>
-			<p px:role="desc">The outline of the HTML document as a hierarchy of ordered lists.</p>
+			<p px:role="desc">The outline of the HTML document as a <code>ol</code> element. Can be
+			used directly as a table of contents.</p>
 		</p:documentation>
+		<p:pipe step="outline" port="result"/>
+	</p:output>
+	<p:output port="outline">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<h2 px:role="name">The raw outline</h2>
+			<p px:role="desc">The unformatted outline of the HTML document as a
+			<code>d:outline</code> document.</p>
+		</p:documentation>
+		<p:pipe step="raw-outline" port="result"/>
 	</p:output>
 	<p:output port="content-doc">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -50,12 +61,21 @@
 	<px:html-id-fixer name="html-with-ids"/>
 
 	<p:documentation>Create the outline</p:documentation>
-	<p:xslt>
+	<p:xslt name="outline">
 		<p:input port="stylesheet">
 			<p:document href="../xslt/html5-outliner.xsl"/>
 		</p:input>
 		<p:with-param name="output-base-uri" select="$output-base-uri"/>
 		<p:with-option name="output-base-uri" select="$output-base-uri"/>
 	</p:xslt>
+	<p:sink/>
+
+	<p:unwrap match="/*//d:outline">
+		<p:input port="source">
+			<p:pipe step="outline" port="secondary"/>
+		</p:input>
+	</p:unwrap>
+	<p:delete match="/d:outline/@owner" name="raw-outline"/>
+	<p:sink/>
 
 </p:declare-step>
