@@ -2,7 +2,7 @@
 <x:description xmlns:x="http://www.jenitennison.com/xslt/xspec"
                xmlns:epub="http://www.idpf.org/2007/ops"
                xmlns="http://www.w3.org/1999/xhtml"
-               stylesheet="../../main/resources/xml/xslt/html5-outliner.xsl">
+               stylesheet="../../main/resources/xml/xslt/html5-outline.xsl">
 
 	<x:param name="output-base-uri" select="'file:/tmp/toc.xhtml'"/>
 	<x:param name="fix-untitled-sections-in-outline" select="'imply-heading'"/>

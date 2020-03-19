@@ -8,7 +8,8 @@
 		<p>Apply the <a
 		href="https://html.spec.whatwg.org/multipage/sections.html#headings-and-sections">HTML5
 		outline algorithm</a>.</p>
-		<p>Returns the outline of a HTML document.</p>
+		<p>Returns the outline of a HTML document and optionally transforms the document in a
+		certain way in relation to the outline.</p>
 	</p:documentation>
 	
 	<p:input port="source">
@@ -37,17 +38,36 @@
 	<p:output port="content-doc">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">The modified HTML document.</h2>
+			<p px:role="desc">Depending on the value of the "fix-sectioning" option, section
+			elements may be inserted, but the outline is guaranteed to be unchanged.</p>
 			<p px:role="desc">All <code>body</code>, <code>article</code>, <code>aside</code>,
 			<code>nav</code>, <code>section</code>, <code>h1</code>, <code>h2</code>,
 			<code>h3</code>, <code>h4</code>, <code>h5</code>, <code>h6</code> and
 			<code>hgroup</code> elements get an <code>id</code> attribute.</p>
 		</p:documentation>
-		<p:pipe step="html-with-ids" port="result"/>
+		<p:pipe step="normalize" port="result"/>
 	</p:output>
 
 	<p:option name="output-base-uri" required="true">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>The base URI of the resulting outline.</p>
+		</p:documentation>
+	</p:option>
+	<p:option name="fix-sectioning" select="'keep'">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p>Whether to insert <a
+			href="https://html.spec.whatwg.org/multipage/dom.html#sectioning-content-2">sectioning
+			content elements</a>.</p>
+			<dl>
+				<dt>outline-depth</dt>
+				<dd>For all nodes, the number of ancestor sectioning content and <a
+				href="https://html.spec.whatwg.org/multipage/sections.html#sectioning-root">sectioning
+				root</a> elements must match the <a
+				href="https://html.spec.whatwg.org/multipage/sections.html#outline-depth">outline
+				depth</a>.</dd>
+				<dt>keep</dt>
+				<dd>Do nothing. Default value.</dd>
+			</dl>
 		</p:documentation>
 	</p:option>
 	<p:option name="fix-untitled-sections-in-outline" select="'imply-heading'">
@@ -76,12 +96,36 @@
 	<p:documentation>Create the outline</p:documentation>
 	<p:xslt name="outline">
 		<p:input port="stylesheet">
-			<p:document href="../xslt/html5-outliner.xsl"/>
+			<p:document href="../xslt/html5-outline.xsl"/>
 		</p:input>
 		<p:with-param name="fix-untitled-sections-in-outline" select="$fix-untitled-sections-in-outline"/>
 		<p:with-param name="output-base-uri" select="$output-base-uri"/>
 		<p:with-option name="output-base-uri" select="$output-base-uri"/>
 	</p:xslt>
+	<p:sink/>
+
+	<p:choose>
+		<p:when test="$fix-sectioning='outline-depth'">
+			<p:xslt>
+				<p:input port="source">
+					<p:pipe step="html-with-ids" port="result"/>
+					<p:pipe step="outline" port="secondary"/>
+				</p:input>
+				<p:input port="stylesheet">
+					<p:document href="../xslt/html5-normalize-sections-headings.xsl"/>
+				</p:input>
+				<p:with-param name="fix-sectioning" select="$fix-sectioning"/>
+			</p:xslt>
+		</p:when>
+		<p:otherwise>
+			<p:identity>
+				<p:input port="source">
+					<p:pipe step="html-with-ids" port="result"/>
+				</p:input>
+			</p:identity>
+		</p:otherwise>
+	</p:choose>
+	<p:identity name="normalize"/>
 	<p:sink/>
 
 	<p:unwrap match="/*//d:outline">
