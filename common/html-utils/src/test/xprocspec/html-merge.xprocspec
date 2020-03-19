@@ -5,12 +5,13 @@
                xmlns:epub="http://www.idpf.org/2007/ops"
                script="../../main/resources/xml/xproc/html-merge.xpl">
 
-    <x:scenario label="test">
+    <x:scenario label="avoid duplicate ids">
         <x:call step="px:html-merge">
             <x:input port="source">
                 <x:document type="inline" xml:base="file:/part1.html">
                     <html xmlns="http://www.w3.org/1999/xhtml">
                         <body epub:type="frontmatter">
+                            <h1/>
                             <a href="part2.html#x"/>
                         </body>
                     </html>
@@ -18,6 +19,7 @@
                 <x:document type="inline" xml:base="file:/part2.html">
                     <html xmlns="http://www.w3.org/1999/xhtml">
                         <body epub:type="bodymatter">
+                            <h1/>
                             <a id="x"/>
                         </body>
                     </html>
@@ -25,6 +27,7 @@
                 <x:document type="inline" xml:base="file:/part3.html">
                     <html xmlns="http://www.w3.org/1999/xhtml">
                         <body epub:type="bodymatter">
+                            <h1/>
                             <a id="x"/>
                         </body>
                     </html>
@@ -38,16 +41,18 @@
         <x:expect label="the result" type="compare">
             <x:document type="inline">
                 <html xmlns="http://www.w3.org/1999/xhtml">
-                    <head/>
                     <body>
                         <section id="id_1" epub:type="frontmatter">
+                            <h1 id="id_2"/>
                             <a href="#x"/>
                         </section>
-                        <section id="id_2" epub:type="bodymatter">
+                        <section id="id_3" epub:type="bodymatter">
+                            <h1 id="id_4"/>
                             <a id="x"/>
                         </section>
-                        <section id="id_3" epub:type="bodymatter">
-                            <a id="id_4"/>
+                        <section id="id_5" epub:type="bodymatter">
+                            <h1 id="id_6"/>
+                            <a id="id_7"/>
                         </section>
                     </body>
                 </html>
@@ -60,7 +65,7 @@
             <x:document type="inline">
                 <d:fileset>
                     <d:file href="file:/merged.html" original-href="file:/part3.html">
-                        <d:anchor id="id_4" original-id="x"/>
+                        <d:anchor id="id_7" original-id="x"/>
                     </d:file>
                     <d:file href="file:/merged.html" original-href="file:/part1.html"/>
                     <d:file href="file:/merged.html" original-href="file:/part2.html">
@@ -102,7 +107,6 @@
         <x:expect label="the result" type="compare">
             <x:document type="inline">
                 <html xmlns="http://www.w3.org/1999/xhtml">
-                    <head/>
                     <body>
                         <section epub:type="bodymatter" id="id_1">
                             <section id="id_2">
@@ -114,6 +118,323 @@
                             <section id="id_5">
                                 <p/>
                             </section>
+                        </section>
+                    </body>
+                </html>
+            </x:document>
+        </x:expect>
+    </x:scenario>
+
+    <x:scenario label="merge untitled section">
+        <x:call step="px:html-merge">
+            <x:input port="source">
+                <x:document type="inline" xml:base="file:/part1.html">
+                    <html xmlns="http://www.w3.org/1999/xhtml">
+                        <body epub:type="bodymatter">
+                            <section>
+                                <h1/>
+                            </section>
+                        </body>
+                    </html>
+                </x:document>
+                <x:document type="inline" xml:base="file:/part2.html">
+                    <html xmlns="http://www.w3.org/1999/xhtml">
+                        <body epub:type="bodymatter">
+                            <section>
+                                <p/>
+                            </section>
+                        </body>
+                    </html>
+                </x:document>
+            </x:input>
+            <x:option name="output-base-uri" select="'file:/merged.html'"/>
+        </x:call>
+        <x:context label="the result">
+            <x:document type="port" port="result"/>
+        </x:context>
+        <x:expect label="the result" type="compare">
+            <x:document type="inline">
+                <html xmlns="http://www.w3.org/1999/xhtml">
+                    <body epub:type="bodymatter" id="id_1">
+                        <section id="id_2">
+                            <h1 id="id_3"/>
+                            <p/>
+                        </section>
+                    </body>
+                </html>
+            </x:document>
+        </x:expect>
+    </x:scenario>
+
+    <x:scenario label="don't merge sections with different name">
+        <x:call step="px:html-merge">
+            <x:input port="source">
+                <x:document type="inline" xml:base="file:/part1.html">
+                    <html xmlns="http://www.w3.org/1999/xhtml">
+                        <body epub:type="bodymatter">
+                            <section>
+                                <h1/>
+                            </section>
+                        </body>
+                    </html>
+                </x:document>
+                <x:document type="inline" xml:base="file:/part2.html">
+                    <html xmlns="http://www.w3.org/1999/xhtml">
+                        <body epub:type="bodymatter">
+                            <nav>
+                                <p/>
+                            </nav>
+                        </body>
+                    </html>
+                </x:document>
+            </x:input>
+            <x:option name="output-base-uri" select="'file:/merged.html'"/>
+        </x:call>
+        <x:context label="the result">
+            <x:document type="port" port="result"/>
+        </x:context>
+        <x:expect label="the result" type="compare">
+            <x:document type="inline">
+                <html xmlns="http://www.w3.org/1999/xhtml">
+                    <body epub:type="bodymatter" id="id_1">
+                        <section id="id_2">
+                            <h1 id="id_3"/>
+                        </section>
+                        <nav id="id_5">
+                            <p/>
+                        </nav>
+                    </body>
+                </html>
+            </x:document>
+        </x:expect>
+    </x:scenario>
+
+    <x:scenario label="don't merge sections within same document">
+        <x:call step="px:html-merge">
+            <x:input port="source">
+                <x:document type="inline" xml:base="file:/part1.html">
+                    <html xmlns="http://www.w3.org/1999/xhtml">
+                        <body epub:type="bodymatter">
+                            <section>
+                                <h1/>
+                            </section>
+                            <section>
+                                <p/>
+                            </section>
+                        </body>
+                    </html>
+                </x:document>
+                <x:document type="inline" xml:base="file:/part2.html">
+                    <html xmlns="http://www.w3.org/1999/xhtml">
+                        <body epub:type="bodymatter">
+                            <section>
+                                <p/>
+                            </section>
+                        </body>
+                    </html>
+                </x:document>
+            </x:input>
+            <x:option name="output-base-uri" select="'file:/merged.html'"/>
+        </x:call>
+        <x:context label="the result">
+            <x:document type="port" port="result"/>
+        </x:context>
+        <x:expect label="the result" type="compare">
+            <x:document type="inline">
+                <html xmlns="http://www.w3.org/1999/xhtml">
+                    <body epub:type="bodymatter" id="id_1">
+                        <section id="id_2">
+                            <h1 id="id_3"/>
+                        </section>
+                        <section id="id_4">
+                            <p/>
+                            <p/>
+                        </section>
+                    </body>
+                </html>
+            </x:document>
+        </x:expect>
+    </x:scenario>
+
+    <x:scenario label="don't merge titled section">
+        <x:call step="px:html-merge">
+            <x:input port="source">
+                <x:document type="inline" xml:base="file:/part1.html">
+                    <html xmlns="http://www.w3.org/1999/xhtml">
+                        <body epub:type="bodymatter">
+                            <section>
+                                <h1/>
+                            </section>
+                        </body>
+                    </html>
+                </x:document>
+                <x:document type="inline" xml:base="file:/part2.html">
+                    <html xmlns="http://www.w3.org/1999/xhtml">
+                        <body epub:type="bodymatter">
+                            <section>
+                                <h1/>
+                            </section>
+                        </body>
+                    </html>
+                </x:document>
+            </x:input>
+            <x:option name="output-base-uri" select="'file:/merged.html'"/>
+        </x:call>
+        <x:context label="the result">
+            <x:document type="port" port="result"/>
+        </x:context>
+        <x:expect label="the result" type="compare">
+            <x:document type="inline">
+                <html xmlns="http://www.w3.org/1999/xhtml">
+                    <body epub:type="bodymatter" id="id_1">
+                        <section id="id_2">
+                            <h1 id="id_3"/>
+                        </section>
+                        <section id="id_5">
+                            <h1 id="id_6"/>
+                        </section>
+                    </body>
+                </html>
+            </x:document>
+        </x:expect>
+    </x:scenario>
+
+    <x:scenario label="don't merge referenced section">
+        <x:call step="px:html-merge">
+            <x:input port="source">
+                <x:document type="inline" xml:base="file:/part1.html">
+                    <html xmlns="http://www.w3.org/1999/xhtml">
+                        <body epub:type="bodymatter">
+                            <section>
+                                <h1/>
+                                <a href="part2.html#x"/>
+                            </section>
+                        </body>
+                    </html>
+                </x:document>
+                <x:document type="inline" xml:base="file:/part2.html">
+                    <html xmlns="http://www.w3.org/1999/xhtml">
+                        <body epub:type="bodymatter">
+                            <section id="x">
+                                <p/>
+                            </section>
+                        </body>
+                    </html>
+                </x:document>
+            </x:input>
+            <x:option name="output-base-uri" select="'file:/merged.html'"/>
+        </x:call>
+        <x:context label="the result">
+            <x:document type="port" port="result"/>
+        </x:context>
+        <x:expect label="the result" type="compare">
+            <x:document type="inline">
+                <html xmlns="http://www.w3.org/1999/xhtml">
+                    <body epub:type="bodymatter" id="id_1">
+                        <section id="id_2">
+                            <h1 id="id_3"/>
+                            <a href="#x"/>
+                        </section>
+                        <section id="x">
+                            <p/>
+                        </section>
+                    </body>
+                </html>
+            </x:document>
+        </x:expect>
+    </x:scenario>
+
+    <x:scenario label="rename and wrap multiple bodies">
+        <x:call step="px:html-merge">
+            <x:input port="source">
+                <x:document type="inline" xml:base="file:/part1.html">
+                    <html xmlns="http://www.w3.org/1999/xhtml">
+                        <body epub:type="bodymatter">
+                            <section>
+                                <h1/>
+                            </section>
+                        </body>
+                    </html>
+                </x:document>
+                <x:document type="inline" xml:base="file:/part2.html">
+                    <html xmlns="http://www.w3.org/1999/xhtml">
+                        <body epub:type="bodymatter">
+                            <h1/>
+                            <section>
+                                <p/>
+                            </section>
+                        </body>
+                    </html>
+                </x:document>
+            </x:input>
+            <x:option name="output-base-uri" select="'file:/merged.html'"/>
+        </x:call>
+        <x:context label="the result">
+            <x:document type="port" port="result"/>
+        </x:context>
+        <x:expect label="the result" type="compare">
+            <x:document type="inline">
+                <html xmlns="http://www.w3.org/1999/xhtml">
+                    <body>
+                        <section epub:type="bodymatter" id="id_1">
+                            <section id="id_2">
+                                <h1 id="id_3"/>
+                            </section>
+                        </section>
+                        <section epub:type="bodymatter" id="id_4">
+                            <h1 id="id_5"/>
+                            <section id="id_6">
+                                <p/>
+                            </section>
+                        </section>
+                    </body>
+                </html>
+            </x:document>
+        </x:expect>
+    </x:scenario>
+
+    <x:scenario label="normalize flat html">
+        <x:call step="px:html-merge">
+            <x:input port="source">
+                <x:document type="inline" xml:base="file:/part1.html">
+                    <html xmlns="http://www.w3.org/1999/xhtml">
+                        <body epub:type="bodymatter">
+                            <h1/>
+                            <h2/>
+                            <h3/>
+                            <h2/>
+                        </body>
+                    </html>
+                </x:document>
+                <x:document type="inline" xml:base="file:/part2.html">
+                    <html xmlns="http://www.w3.org/1999/xhtml">
+                        <body epub:type="bodymatter">
+                            <section>
+                                <p/>
+                            </section>
+                        </body>
+                    </html>
+                </x:document>
+            </x:input>
+            <x:option name="output-base-uri" select="'file:/merged.html'"/>
+        </x:call>
+        <x:context label="the result">
+            <x:document type="port" port="result"/>
+        </x:context>
+        <x:expect label="the result" type="compare">
+            <x:document type="inline">
+                <html xmlns="http://www.w3.org/1999/xhtml">
+                    <body epub:type="bodymatter" id="id_1">
+                        <h1 id="id_2"/>
+                        <section>
+                            <h2 id="id_3"/>
+                            <section>
+                                <h3 id="id_4"/>
+                            </section>
+                        </section>
+                        <section>
+                            <h2 id="id_5"/>
+                            <p/>
                         </section>
                     </body>
                 </html>

@@ -18,8 +18,14 @@
 	</p:option>
 	<p:output port="result" primary="true">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			<p>The result is a simple concatenation of all the <code>body</code> elements, renamed
-			to <code>section</code>. The <code>head</code> element is empty.</p>
+			<p>Before merging, the sectioning hierarchy of each document is normalized. A sequence
+			is then created of all the <code>body</code> elements. The merging process then consists
+			of (recursively) joining consecutive sections whenever they were originally in separate
+			documents and the second section has no associated heading. If after this step there are
+			multiple <code>body</code> elements, they are renamed to <code>section</code> and
+			wrapped in a <code>body</code>.</p>
+			<p>The first document's <code>head</code> element and <code>xml:lang</code> and
+			<code>lang</code> attributes are used, those of the other documents are discarded.</p>
 		</p:documentation>
 	</p:output>
 	<p:output port="mapping">
@@ -50,9 +56,16 @@
 			px:html-add-ids
 		</p:documentation>
 	</p:import>
+	<p:import href="html-outline.xpl">
+		<p:documentation>
+			px:html-outline
+		</p:documentation>
+	</p:import>
 
 	<!--
-	    fix duplicate ids
+	    fix duplicate ids and also add ids to headings and sections so that this doesn't need to
+	    happen anymore in each individual px:html-outline because that would lead to duplicate ids
+	    again
 	-->
 	<px:html-add-ids name="fix-ids"/>
 	<p:count name="html-count"/>
@@ -153,29 +166,29 @@
 		</p:when>
 		<p:otherwise>
 			<p:sink/>
-			<p:identity name="head">
-				<p:input port="source">
-					<p:inline>
-						<html:head/>
-					</p:inline>
-				</p:input>
-			</p:identity>
-			<p:sink/>
 			<p:for-each>
 				<p:iteration-source>
 					<p:pipe step="update-links" port="result"/>
 				</p:iteration-source>
-				<p:filter select="//html:body"/>
-				<p:rename match="/*" new-name="html:section"/>
+				<p:output port="result" sequence="true">
+					<p:pipe step="outline" port="content-doc"/>
+					<p:pipe step="outline" port="outline"/>
+				</p:output>
+				<px:html-outline name="outline" fix-sectioning="outline-depth"
+				                 output-base-uri="file:/tmp/irrelevant.html"/>
+				<p:sink/>
 			</p:for-each>
-			<p:wrap-sequence wrapper="html:body" name="body"/>
-			<p:sink/>
-			<p:wrap-sequence wrapper="html:html">
-				<p:input port="source">
-					<p:pipe step="head" port="result"/>
-					<p:pipe step="body" port="result"/>
+			<p:xslt>
+				<p:input port="stylesheet">
+					<p:document href="../xslt/html-merge.xsl"/>
 				</p:input>
-			</p:wrap-sequence>
+				<p:input port="parameters">
+					<p:empty/>
+				</p:input>
+			</p:xslt>
+			<p:wrap match="/*/html:body[preceding-sibling::html:body|following-sibling::html:body]"
+			        group-adjacent="true()" wrapper="html:body"/>
+			<p:rename match="/*/html:body/html:body" new-name="html:section"/>
 		</p:otherwise>
 	</p:choose>
 	<px:set-base-uri>
