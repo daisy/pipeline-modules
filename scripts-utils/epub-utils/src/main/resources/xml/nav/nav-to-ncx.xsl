@@ -12,29 +12,26 @@
 
     <xsl:import href="http://www.daisy.org/pipeline/modules/common-utils/i18n.xsl"/>
 
-    <xsl:output indent="yes"/>
-
     <xsl:variable name="lang" select="(@xml:lang,@lang,'en')[1]"/>
     <xsl:variable name="translations" select="document('i18n.xml')/*"/>
-
     <xsl:variable name="doc-base" select="base-uri(/*)"/>
-    <xsl:variable name="srcMap1">
-        <xsl:for-each select="//html:li[html:a]">
-            <map href="{./html:a[1]/@href}" content-src="{f:make-content-src(html:a[1])}"/>
-        </xsl:for-each>
-    </xsl:variable>
-    <xsl:variable name="srcMap">
-        <xsl:for-each select="distinct-values($srcMap1/*/@content-src)">
-            <xsl:variable name="content-src" select="."/>
-            <map content-src="{$content-src}" playOrder="{position()}"/>
-        </xsl:for-each>
-    </xsl:variable>
 
     <xsl:template match="@*|node()">
         <xsl:apply-templates/>
     </xsl:template>
 
     <xsl:template match="html:html">
+        <xsl:variable name="srcMap" as="element(map)*">
+            <xsl:variable name="srcMap" as="element(map)*">
+                <xsl:for-each select="//html:li[html:a]">
+                    <map xmlns="" href="{./html:a[1]/@href}" content-src="{f:make-content-src(html:a[1])}"/>
+                </xsl:for-each>
+            </xsl:variable>
+            <xsl:for-each select="distinct-values($srcMap/@content-src)">
+                <xsl:variable name="content-src" select="."/>
+                <map xmlns="" content-src="{$content-src}" playOrder="{position()}"/>
+            </xsl:for-each>
+        </xsl:variable>
         <ncx version="2005-1">
             <xsl:if test="$lang">
                 <xsl:attribute name="xml:lang" select="$lang"/>
@@ -48,7 +45,9 @@
                 </docTitle>
             </xsl:if>
             <!-- NOTE: docAuthor should be added afterwards, since it usually isn't available from the Navigation Document, and there can be mulitple authors. -->
-            <xsl:apply-templates select="html:body"/>
+            <xsl:apply-templates select="html:body">
+                <xsl:with-param name="srcMap" tunnel="yes" select="$srcMap"/>
+            </xsl:apply-templates>
         </ncx>
     </xsl:template>
 
@@ -110,12 +109,13 @@
     </xsl:template>
 
     <xsl:template match="html:li">
+        <xsl:param name="srcMap" tunnel="yes" as="element(map)*" required="yes"/>
         <xsl:choose>
             <xsl:when test="ancestor::html:nav/@epub:type='toc'">
                 <xsl:choose>
                     <xsl:when test="html:a">
                         <xsl:variable name="src" select="f:make-content-src(html:a[1])"/>
-                        <xsl:variable name="playOrder" select="$srcMap/*[./@content-src=$src]/@playOrder"/>
+                        <xsl:variable name="playOrder" select="$srcMap[./@content-src=$src]/@playOrder"/>
                         <navPoint id="navPoint-{count(preceding::html:li | ancestor::html:li)+1}" playOrder="{$playOrder}">
                             <xsl:call-template name="make-label"/>
                             <content src="{$src}"/>
@@ -130,7 +130,7 @@
             <xsl:when test="ancestor::html:nav/@epub:type='page-list'">
                 <xsl:if test="html:a">
                     <xsl:variable name="src" select="f:make-content-src(html:a[1])"/>
-                    <xsl:variable name="playOrder" select="$srcMap/*[./@content-src=$src]/@playOrder"/>
+                    <xsl:variable name="playOrder" select="$srcMap[./@content-src=$src]/@playOrder"/>
                     <pageTarget id="pageTarget-{count(preceding::html:li | ancestor::html:li)+1}" playOrder="{$playOrder}">
                         <xsl:choose>
                             <xsl:when test="string(number(.))=normalize-space(.)">
@@ -150,7 +150,7 @@
             <xsl:otherwise>
                 <xsl:if test="html:a">
                     <xsl:variable name="src" select="f:make-content-src(html:a[1])"/>
-                    <xsl:variable name="playOrder" select="$srcMap/*[./@content-src=$src]/@playOrder"/>
+                    <xsl:variable name="playOrder" select="$srcMap[./@content-src=$src]/@playOrder"/>
                     <navTarget id="navTarget-{count(preceding::html:li | ancestor::html:li)+1}" playOrder="{$playOrder}">
                         <xsl:call-template name="make-label"/>
                         <content src="{$src}"/>
