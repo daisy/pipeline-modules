@@ -46,6 +46,14 @@
         <p:pipe port="result" step="result.in-memory"/>
     </p:output>
 
+    <p:output port="mapping">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>A <code>d:fileset</code> document that contains a mapping from input files (DTBook)
+            to output file (ZedAI) and contained <code>id</code> attributes.</p>
+        </p:documentation>
+        <p:pipe step="choose-to-merge-dtbook-files" port="mapping"/>
+    </p:output>
+
     <p:option name="opt-output-dir" required="true" px:dir="output" px:type="anyDirURI">
         <p:documentation>
             The directory to store the generated files in.
@@ -104,8 +112,8 @@
     <p:import href="http://www.daisy.org/pipeline/modules/dtbook-utils/library.xpl">
         <p:documentation>
             px:dtbook-to-mods-meta
-            px:upgrade-dtbook
-            px:merge-dtbook
+            px:dtbook-upgrade
+            px:dtbook-merge
             px:dtbook-validator.select-schema
         </p:documentation>
     </p:import>
@@ -204,14 +212,14 @@
     <p:documentation>Upgrade the DTBook document(s) to 2005-3</p:documentation>
     <p:for-each name="upgrade-dtbook">
         <p:output port="result"/>
-        <px:upgrade-dtbook>
+        <px:dtbook-upgrade>
             <p:input port="parameters">
                 <p:empty/>
             </p:input>
             <p:with-option name="assert-valid" select="'false'">
                 <p:empty/>
             </p:with-option>
-        </px:upgrade-dtbook>
+        </px:dtbook-upgrade>
     </p:for-each>
 
     <!-- =============================================================== -->
@@ -223,8 +231,11 @@
 
     <p:choose name="choose-to-merge-dtbook-files">
         <p:when test=".//c:result[. > 1]">
-            <p:output port="result"/>
-            <px:merge-dtbook>
+            <p:output port="result" primary="true"/>
+            <p:output port="mapping">
+                <p:pipe step="merge" port="mapping"/>
+            </p:output>
+            <px:dtbook-merge name="merge">
                 <p:input port="parameters">
                     <p:empty/>
                 </p:input>
@@ -232,15 +243,29 @@
                     <p:pipe port="result" step="upgrade-dtbook"/>
                 </p:input>
                 <p:with-option name="assert-valid" select="$opt-assert-valid"/>
-            </px:merge-dtbook>
+                <p:with-option name="output-base-uri" select="$zedai-file"/>
+            </px:dtbook-merge>
         </p:when>
         <p:otherwise>
-            <p:output port="result"/>
-            <p:identity>
-                <p:input port="source">
-                    <p:pipe port="result" step="upgrade-dtbook"/>
+            <p:output port="result" primary="true">
+                <p:pipe step="upgrade-dtbook" port="result"/>
+            </p:output>
+            <p:output port="mapping">
+                <p:pipe step="mapping" port="result" />
+            </p:output>
+            <p:template name="mapping">
+                <p:input port="template">
+                    <p:inline>
+                        <d:fileset>
+                            <d:file href="{$zedai-file}" original-href="{$dtbook-file}"/>
+                        </d:fileset>
+                    </p:inline>
                 </p:input>
-            </p:identity>
+                <p:with-param name="zedai-file" select="$zedai-file"/>
+                <p:with-param name="dtbook-file" select="base-uri(/*)">
+                    <p:pipe step="upgrade-dtbook" port="result"/>
+                </p:with-param>
+            </p:template>
         </p:otherwise>
     </p:choose>
 

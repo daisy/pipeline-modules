@@ -19,6 +19,14 @@
         <p:pipe step="resources" port="in-memory"/>
     </p:output>
 
+    <p:output port="mapping">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>A <code>d:fileset</code> document that contains a mapping from input file (ZedAI) to
+            output files (HTML) and contained <code>id</code> attributes.</p>
+        </p:documentation>
+        <p:pipe step="html" port="mapping"/>
+    </p:output>
+
     <p:option name="output-dir" required="true"/>
     <p:option name="chunk" select="'false'"/>
     <p:option name="chunk-size" required="false" select="'-1'"/>
@@ -41,7 +49,6 @@
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
         <p:documentation>
-            px:message
             px:assert
         </p:documentation>
     </p:import>
@@ -75,55 +82,94 @@
 
     <p:documentation>Convert the ZedAI Document into several XHTML Documents</p:documentation>
     <p:group name="html">
-        <p:output port="fileset" primary="true"/>
+        <p:output port="fileset" primary="true">
+            <p:pipe step="zedai-to-html.fileset" port="result"/>
+        </p:output>
         <p:output port="in-memory" sequence="true">
             <p:pipe step="zedai-to-html.html-chunks" port="result"/>
         </p:output>
-        <p:variable name="zedai-basename"
-            select="replace(replace(//*[@media-type='application/z3998-auth+xml']/@href,'^.+/([^/]+)$','$1'),'^(.+)\.[^\.]+$','$1')">
-            <p:pipe step="main" port="fileset.in"/>
+        <p:output port="mapping">
+            <p:pipe step="compose-mapping" port="result"/>
+        </p:output>
+        <p:variable name="zedai-basename" select="base-uri(/*)">
         </p:variable>
-        <p:variable name="result-basename" select="concat($output-dir,$zedai-basename,'.xhtml')">
+        <p:variable name="result-basename" select="concat(
+                                                     $output-dir,
+                                                     replace(replace($zedai-basename,'^.+/([^/]+)$','$1'),'^(.+)\.[^\.]+$','$1'),
+                                                     '.xhtml')">
             <p:empty/>
         </p:variable>
-        <p:xslt name="zedai-to-html.html-single">
-            <p:input port="stylesheet">
-                <p:document href="../xslt/zedai-to-html.xsl"/>
-            </p:input>
-            <p:input port="parameters">
-                <p:empty/>
-            </p:input>
-        </p:xslt>
-        <px:set-base-uri>
-            <p:with-option name="base-uri" select="$result-basename"/>
-        </px:set-base-uri>
+        <p:group name="zedai-to-html.html-single">
+            <p:output port="result" primary="true">
+                <p:pipe step="result" port="result"/>
+            </p:output>
+            <p:output port="mapping">
+                <p:pipe step="mapping" port="result"/>
+            </p:output>
+            <p:xslt>
+                <p:input port="stylesheet">
+                    <p:document href="../xslt/zedai-to-html.xsl"/>
+                </p:input>
+                <p:input port="parameters">
+                    <p:empty/>
+                </p:input>
+            </p:xslt>
+            <px:set-base-uri name="result">
+                <p:with-option name="base-uri" select="$result-basename"/>
+            </px:set-base-uri>
+            <p:template name="mapping">
+                <p:input port="template">
+                    <p:inline>
+                        <d:fileset>
+                            <d:file href="{base-uri(/*)}" original-href="{$zedai-basename}"/>
+                        </d:fileset>
+                    </p:inline>
+                </p:input>
+                <p:with-param name="zedai-basename" select="$zedai-basename"/>
+            </p:template>
+            <p:sink/>
+        </p:group>
         <p:choose name="zedai-to-html.html-chunks">
             <p:documentation>Split XHTML document</p:documentation>
             <p:when test="$chunk='true'">
-                <p:output port="result" sequence="true"/>
-                <px:html-chunker>
+                <p:output port="result" sequence="true" primary="true"/>
+                <p:output port="mapping">
+                    <p:pipe step="chunker" port="mapping"/>
+                </p:output>
+                <px:html-chunker name="chunker">
                     <p:with-option name="max-chunk-size" select="$chunk-size"/>
                 </px:html-chunker>
             </p:when>
             <p:otherwise>
-                <p:output port="result" sequence="true"/>
+                <p:output port="result" sequence="true" primary="true"/>
+                <p:output port="mapping">
+                    <p:inline><d:fileset/></p:inline>
+                </p:output>
                 <p:identity/>
             </p:otherwise>
         </p:choose>
-        <p:for-each name="zedai-to-html.fileset">
+        <p:for-each>
             <p:documentation>Construct HTML fileset</p:documentation>
-            <p:output port="result" primary="true"/>
+            <p:identity name="chunk"/>
+            <p:sink/>
             <px:fileset-create>
                 <p:with-option name="base" select="$output-dir"/>
             </px:fileset-create>
             <px:fileset-add-entry media-type="application/xhtml+xml">
-                <p:with-option name="href" select="base-uri(/*)">
-                    <p:pipe step="zedai-to-html.fileset" port="current"/>
-                </p:with-option>
+                <p:input port="entry">
+                    <p:pipe step="chunk" port="result"/>
+                </p:input>
             </px:fileset-add-entry>
         </p:for-each>
-        <px:fileset-join/>
-        <px:message message="Converted to XHTML."/>
+        <px:fileset-join px:message="Converted to XHTML." name="zedai-to-html.fileset"/>
+        <p:sink/>
+        <px:fileset-compose name="compose-mapping">
+            <p:input port="source">
+                <p:pipe step="zedai-to-html.html-single" port="mapping"/>
+                <p:pipe step="zedai-to-html.html-chunks" port="mapping"/>
+            </p:input>
+        </px:fileset-compose>
+        <p:sink/>
     </p:group>
     
     <!--=========================================================================-->
