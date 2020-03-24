@@ -25,67 +25,97 @@
     <xsl:template match="d:fileset">
         <xsl:copy>
             <xsl:sequence select="@* except @xml:base"/>
-            <xsl:variable name="files" as="element(d:file)*">
-                <xsl:apply-templates select="d:file"/>
-                <xsl:sequence select="$b/d:file[not((@original-href,@href)[1]=$a/d:file/(@href,@original-href))]"/>
+            <xsl:variable name="files-and-anchors" as="element()*"> <!-- element(d:file|d:anchor)* -->
+                <xsl:for-each select="d:file|d:anchor">
+                    <xsl:choose>
+                        <xsl:when test="self::d:file">
+                            <xsl:variable name="a-file" as="element(d:file)" select="."/>
+                            <xsl:variable name="b-file" as="element(d:file)*"
+                                          select="$b/d:file[@original-href=$a-file/@href]"/>
+                            <xsl:choose>
+                                <xsl:when test="exists($b-file)">
+                                    <xsl:for-each select="$b-file">
+                                        <xsl:copy>
+                                            <xsl:sequence select="@href|$a-file/@original-href"/>
+                                        </xsl:copy>
+                                    </xsl:for-each>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:sequence select="."/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:variable name="a-anchor" as="element(d:anchor)" select="."/>
+                            <xsl:variable name="b-anchor" as="element(d:anchor)?"
+                                          select="$b/d:anchor[@original-id=$a-anchor/@id and
+                                                              @original-href=$a-anchor/@href][1]"/>
+                            <xsl:choose>
+                                <xsl:when test="exists($b-anchor)">
+                                    <xsl:copy>
+                                        <xsl:sequence select="@original-id|@original-href|$b-anchor/(@id|@href)"/>
+                                    </xsl:copy>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:variable name="b-file" as="element(d:file)?"
+                                                  select="$b/d:file[@original-href=$a-anchor/@href][1]"/>
+                                    <xsl:choose>
+                                        <xsl:when test="exists($b-file)">
+                                            <xsl:copy>
+                                                <xsl:sequence select="@original-id|@id|@original-href|$b-file/@href"/>
+                                            </xsl:copy>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:sequence select="."/>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:for-each>
+                <xsl:sequence select="$b/d:file[not(@original-href=$a/d:file/(@href,@original-href))]"/>
+                <xsl:for-each select="$b/d:anchor[not(some $anc in $a/d:anchor
+                                                      satisfies $anc/@href=@original-href and
+                                                                $anc/@id=@original-id)]
+                                                 [not(some $anc in $a/d:anchor
+                                                      satisfies $anc/@original-href=@original-href and
+                                                                $anc/@original-id=@original-id)]">
+                    <xsl:variable name="b-anchor" as="element(d:anchor)" select="."/>
+                    <xsl:variable name="a-file" as="element(d:file)?"
+                                  select="$a/d:file[@href=$b-anchor/@original-href][1]"/>
+                    <xsl:choose>
+                        <xsl:when test="exists($a-file)">
+                            <xsl:copy>
+                                <xsl:sequence select="@original-id|@id|@href|$a-file/@original-href"/>
+                            </xsl:copy>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:sequence select="."/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:for-each>
             </xsl:variable>
-            <xsl:variable name="base" as="xs:string?" select="($b/@xml:base,@xml:base)[1]"/>
-            <xsl:choose>
-                <xsl:when test="exists($base)">
-                    <xsl:attribute name="xml:base" select="$base"/>
-                    <xsl:apply-templates mode="relativize" select="$files">
-                        <xsl:with-param name="base" tunnel="yes" select="$base"/>
-                    </xsl:apply-templates>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:sequence select="$files"/>
-                </xsl:otherwise>
-            </xsl:choose>
+            <xsl:variable name="files-with-anchors" as="element(d:file)*">
+                <xsl:for-each-group select="$files-and-anchors" group-by="@original-href">
+                    <xsl:for-each-group select="current-group()" group-by="@href">
+                        <d:file>
+                            <xsl:sequence select="@href|@original-href"/>
+                            <xsl:sequence select="current-group()[self::d:anchor]"/>
+                        </d:file>
+                    </xsl:for-each-group>
+                </xsl:for-each-group>
+            </xsl:variable>
+            <xsl:variable name="base" as="attribute()?" select="($b/@xml:base,@xml:base)[1]"/>
+            <xsl:sequence select="$base"/>
+            <xsl:apply-templates mode="relativize" select="$files-with-anchors">
+                <xsl:with-param name="base" tunnel="yes" select="$base"/>
+            </xsl:apply-templates>
         </xsl:copy>
-    </xsl:template>
-
-    <xsl:template match="d:file">
-        <xsl:variable name="a-file" as="element(d:file)" select="."/>
-        <xsl:variable name="b-file" as="element(d:file)?" select="$b/d:file[(@original-href,@href)[1]=$a-file/@href][1]"/>
-        <xsl:choose>
-            <xsl:when test="exists($b-file)">
-                <xsl:copy>
-                    <xsl:attribute name="href" select="$b-file/@href"/>
-                    <xsl:sequence select="(@original-href,$b-file/@original-href)[1]"/>
-                    <xsl:apply-templates select="d:anchor">
-                        <xsl:with-param name="b-file" tunnel="yes" select="$b-file"/>
-                    </xsl:apply-templates>
-                    <xsl:sequence select="$b-file/d:anchor[not(@original-id=$a-file/d:anchor/(@id,@original-id))]"/>
-                </xsl:copy>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:sequence select="."/>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-
-    <xsl:template match="d:anchor">
-        <xsl:param name="b-file" as="element(d:file)" tunnel="yes" required="yes"/>
-        <xsl:variable name="a-anchor" as="element(d:anchor)" select="."/>
-        <xsl:variable name="b-anchor" as="element(d:anchor)?" select="$b-file/d:anchor[@original-id=$a-anchor/@id][1]"/>
-        <xsl:choose>
-            <xsl:when test="exists($b-anchor)">
-                <xsl:copy>
-                    <xsl:attribute name="id" select="$b-anchor/@id"/>
-                    <xsl:sequence select="@original-id"/>
-                </xsl:copy>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:sequence select="."/>
-            </xsl:otherwise>
-        </xsl:choose>
     </xsl:template>
 
     <xsl:template mode="normalize"
                   match="/d:fileset|
-                         /d:fileset/d:file[@href]|
-                         /d:fileset/d:file[@original-href or d:anchor[@id and @original-id]]|
-                         /d:fileset/d:file/d:anchor[@id and @original-id]|
                          /d:fileset/d:file/d:anchor/@id|
                          /d:fileset/d:file/d:anchor/@original-id">
         <xsl:copy>
@@ -94,6 +124,38 @@
     </xsl:template>
 
     <xsl:template mode="normalize"
+                  match="/d:fileset/d:file[@href]">
+        <xsl:param name="base" tunnel="yes" required="yes"/>
+        <xsl:variable name="normalized-file" as="element(d:file)">
+            <xsl:copy>
+                <xsl:variable name="normalized-attrs" as="attribute()*">
+                    <xsl:apply-templates mode="#current" select="@*"/>
+                </xsl:variable>
+                <xsl:sequence select="$normalized-attrs"/>
+                <xsl:if test="not(@original-href)">
+                    <xsl:attribute name="original-href" select="$normalized-attrs[name()='href']"/>
+                </xsl:if>
+            </xsl:copy>
+        </xsl:variable>
+        <xsl:sequence select="$normalized-file"/>
+        <xsl:apply-templates mode="#current">
+            <xsl:with-param name="normalized-parent" select="$normalized-file"/>
+        </xsl:apply-templates>
+    </xsl:template>
+
+    <xsl:template mode="normalize"
+                  match="/d:fileset/d:file/d:anchor[@id]">
+        <xsl:param name="normalized-parent" as="element(d:file)" required="yes"/>
+        <xsl:copy>
+            <xsl:apply-templates mode="#current" select="@*"/>
+            <xsl:if test="not(@original-id)">
+                <xsl:attribute name="original-id" select="@id"/>
+            </xsl:if>
+            <xsl:sequence select="$normalized-parent/(@href|@original-href)"/>
+        </xsl:copy>
+    </xsl:template>
+ 
+    <xsl:template mode="normalize"
                   match="d:fileset/@xml:base|
                          d:file/@href|
                          d:file/@original-href">
@@ -101,10 +163,24 @@
         <xsl:attribute name="{name()}" select="pf:normalize-uri(resolve-uri(.,$base))"/>
     </xsl:template>
 
+    <xsl:template mode="relativize" match="d:anchor/@href|
+                                           d:anchor/@original-href|
+                                           d:anchor/@original-id[.=../@id]|
+                                           d:file/@original-href[.=../@href]"/>
+
     <xsl:template mode="relativize" match="d:file/@href">
-        <xsl:param name="base" tunnel="yes" required="yes"/>
-        <xsl:attribute name="href" select="pf:relativize-uri(.,$base)"/>
+        <xsl:param name="base" tunnel="yes" required="yes" as="xs:string?"/>
+        <xsl:choose>
+            <xsl:when test="exists($base)">
+                <xsl:attribute name="href" select="pf:relativize-uri(.,$base)"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:sequence select="."/>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
+
+    <xsl:template mode="normalize" match="@*|node()" priority="0.4"/>
 
     <xsl:template mode="#default relativize" match="@*|node()">
         <xsl:copy>

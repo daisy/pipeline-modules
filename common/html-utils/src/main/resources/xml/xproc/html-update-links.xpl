@@ -24,6 +24,16 @@
 		</p:documentation>
 	</p:input>
 	
+	<p:option name="source-renamed" select="'false'">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p>Whether the source document itself has previously been renamed according to "mapping"
+			or not. In other words, whether the URI of the source document is to be compared with
+			the <code>href</code> rather than the <code>original-href</code> attributes of the
+			"mapping" document. By default it is assumed that the renaming is done after this
+			step.</p>
+		</p:documentation>
+	</p:option>
+
 	<p:output port="result">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>The output HTML document with updated links</p>
@@ -38,9 +48,7 @@
 		<p:input port="stylesheet">
 			<p:document href="../xslt/html-update-links.xsl"/>
 		</p:input>
-		<p:input port="parameters">
-			<p:empty/>
-		</p:input>
+		<p:with-param name="source-renamed" select="$source-renamed"/>
 	</p:xslt>
 
 </p:declare-step>

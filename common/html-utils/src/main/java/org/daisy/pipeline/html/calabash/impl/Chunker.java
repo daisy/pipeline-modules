@@ -1,7 +1,6 @@
 package org.daisy.pipeline.html.calabash.impl;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -28,6 +27,9 @@ import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+
 import com.xmlcalabash.model.RuntimeValue;
 
 import net.sf.saxon.Configuration;
@@ -46,6 +48,7 @@ import org.daisy.common.stax.BaseURIAwareXMLStreamWriter;
 import org.daisy.common.stax.DelegatingXMLStreamWriter;
 import static org.daisy.common.stax.XMLStreamWriterHelper.getAttributes;
 import static org.daisy.common.stax.XMLStreamWriterHelper.writeAttribute;
+import static org.daisy.common.stax.XMLStreamWriterHelper.writeAttributes;
 import static org.daisy.common.stax.XMLStreamWriterHelper.writeCharacters;
 import static org.daisy.common.stax.XMLStreamWriterHelper.writeDocument;
 import static org.daisy.common.stax.XMLStreamWriterHelper.writeEvent;
@@ -73,16 +76,20 @@ class Chunker extends SingleInSingleOutXMLTransformer {
 	final RuntimeValue alwaysBreakAfterOption;
 	
 	final int maxChunkSize;
-	final QName linkAttributeName;
 	final Configuration config;
 	
 	private static final QName _ID = new QName("id");
 	private static final QName XML_ID = new QName("http://www.w3.org/XML/1998/namespace", "id", "xml");
+	private static final QName D_FILESET = new QName("http://www.daisy.org/ns/pipeline/data", "fileset");
+	private static final QName D_FILE = new QName("http://www.daisy.org/ns/pipeline/data", "file");
+	private static final QName D_ANCHOR = new QName("http://www.daisy.org/ns/pipeline/data", "anchor");
+	private static final QName _HREF = new QName("href");
+	private static final QName _ORIGINAL_HREF = new QName("original-href");
 	
 	Chunker(RuntimeValue allowBreakBeforeOption, RuntimeValue allowBreakAfterOption,
 	        RuntimeValue preferBreakBeforeOption, RuntimeValue preferBreakAfterOption,
 	        RuntimeValue alwaysBreakBeforeOption, RuntimeValue alwaysBreakAfterOption,
-	        int maxChunkSize, QName linkAttributeName, Configuration config) {
+	        int maxChunkSize, Configuration config) {
 		this.allowBreakBeforeOption = allowBreakBeforeOption;
 		this.allowBreakAfterOption = allowBreakAfterOption;
 		this.preferBreakBeforeOption = preferBreakBeforeOption;
@@ -90,7 +97,6 @@ class Chunker extends SingleInSingleOutXMLTransformer {
 		this.alwaysBreakBeforeOption = alwaysBreakBeforeOption;
 		this.alwaysBreakAfterOption = alwaysBreakAfterOption;
 		this.maxChunkSize = maxChunkSize;
-		this.linkAttributeName = linkAttributeName;
 		this.config = config;
 	}
 	
@@ -98,7 +104,7 @@ class Chunker extends SingleInSingleOutXMLTransformer {
 	private Stack<Map<QName,String>> parentAttrs;
 	private Path.Builder currentPath;
 	private Iterator<BreakPosition> splitPoints;
-	private Map<String,Integer> idToChunk;
+	private Multimap<Integer,String> idToChunk;
 	private BreakPosition nextSplitPoint;
 
 	public Runnable transform(XMLInputValue<?> source, XMLOutputValue<?> result, InputValue<?> params) throws IllegalArgumentException {
@@ -116,41 +122,78 @@ class Chunker extends SingleInSingleOutXMLTransformer {
 			throw new TransformerException(new IllegalArgumentException());
 		XdmNode doc = (XdmNode)item;
 		BaseURIAwareXMLStreamReader reader = mult.get().asXMLStreamReader();
+		int chunkCount;
 		try {
 			SortedSet<BreakPosition> collectSplitPoints = new TreeSet<>();
 			Map<String,Path> collectIds = new HashMap<>();
 			getSplitPoints(doc, collectSplitPoints, collectIds);
-			idToChunk = new HashMap<String,Integer>();
+			chunkCount = collectSplitPoints.size() + 1;
+			idToChunk = ArrayListMultimap.<Integer,String>create();
 			int n = 1;
 			for (BreakPosition sp : collectSplitPoints) {
 				Iterator<Map.Entry<String,Path>> i = collectIds.entrySet().iterator();
 				while (i.hasNext()) {
 					Map.Entry<String,Path> e = i.next();
 					if (sp.compareTo(e.getValue()) > 0) {
-						idToChunk.put(e.getKey(), n);
+						idToChunk.put(n, e.getKey());
 						i.remove();
 					}
 				}
 				n++;
 			}
 			for (String id : collectIds.keySet())
-				idToChunk.put(id, n);
+				idToChunk.put(n, id);
 			splitPoints = collectSplitPoints.iterator();
 		} catch (XPathException | SaxonApiException e) {
 			throw new TransformerException(e);
 		}
+		URI inputBase = doc.getBaseURI();
+		if (inputBase == null)
+			throw new TransformerException(new RuntimeException("source document must have a base URI"));
 		if (splitPoints.hasNext()) {
-			if (doc.getBaseURI() != null)
-				output = setBaseURI(output, doc.getBaseURI());
-			transform(reader, output);
-		} else
+			// first document is the mapping
 			try {
-				if (doc.getBaseURI() != null)
-					output.setBaseURI(doc.getBaseURI());
+				output.setBaseURI(inputBase);
+				output.writeStartDocument();
+				writeStartElement(output, D_FILESET);
+				for (Integer chunk = 1; chunk <= chunkCount; chunk++) {
+					writeStartElement(output, D_FILE);
+					writeAttribute(output, _HREF, getChunkBaseURI(inputBase, chunk).toASCIIString());
+					writeAttribute(output, _ORIGINAL_HREF, inputBase.toASCIIString());
+					for (String id : idToChunk.get(chunk)) {
+						writeStartElement(output, D_ANCHOR);
+						writeAttribute(output, _ID, id);
+						output.writeEndElement();
+					}
+					output.writeEndElement();
+				}
+				output.writeEndElement();
+				output.writeEndDocument();
+			} catch (XMLStreamException e) {
+				throw new TransformerException(e);
+			}
+			// then output the chunks
+			output = setBaseURI(output, inputBase);
+			transform(reader, output);
+		} else {
+			// first document is the mapping: leave empty
+			try {
+				output.setBaseURI(inputBase);
+				output.writeStartDocument();
+				writeStartElement(output, D_FILESET);
+				output.writeEndElement();
+				output.writeEndDocument();
+			} catch (XMLStreamException e) {
+				throw new TransformerException(e);
+			}
+			// pass on the input to the output
+			try {
+				output.setBaseURI(inputBase);
 				writeDocument(output, reader);
 			} catch (XMLStreamException e) {
 				throw new TransformerException(e);
 			}
+		}
 	}
 	
 	void transform(BaseURIAwareXMLStreamReader reader, BaseURIAwareXMLStreamWriter writer) throws TransformerException {
@@ -163,7 +206,6 @@ class Chunker extends SingleInSingleOutXMLTransformer {
 		Stack<Boolean> containsSplitPointStack = new Stack<Boolean>();
 		currentPath = new Path.Builder();
 		try {
-			URI sourceBaseURI = reader.getBaseURI();
 			int event = reader.getEventType();
 			while (true)
 				try {
@@ -177,19 +219,7 @@ class Chunker extends SingleInSingleOutXMLTransformer {
 							containsSplitPoint = containsSplitPoint(currentPath, nextSplitPoint);
 						}
 						writeStartElement(writer, reader);
-						for (int i = 0; i < reader.getAttributeCount(); i++) {
-							QName attr = reader.getAttributeName(i);
-							String val = reader.getAttributeValue(i);
-							if (sourceBaseURI != null)
-								if (attr.equals(linkAttributeName) && val.startsWith("#")) {
-									String id = val.substring(1);
-									if (idToChunk.containsKey(id)) {
-										URI currentBaseURI = writer.getBaseURI();
-										URI targetBaseURI = getChunkBaseURI(sourceBaseURI, idToChunk.get(id));
-										if (!currentBaseURI.equals(targetBaseURI))
-											val = relativize(currentBaseURI, targetBaseURI).toASCIIString() + val; }}
-							writeAttribute(writer, attr, val);
-						}
+						writeAttributes(writer, reader);
 						currentPath.down();
 						if (containsSplitPoint) {
 							parents.push(reader.getName());
@@ -529,46 +559,6 @@ class Chunker extends SingleInSingleOutXMLTransformer {
 	
 	static boolean isWhiteSpace(String text) {
 		return WHITESPACE_RE.matcher(text).matches();
-	}
-	
-	// FIXME: move to some common utility package
-	static URI relativize(URI base, URI child) {
-		try {
-			if (base.isOpaque() || child.isOpaque()
-			    || !Optional.ofNullable(base.getScheme()).orElse("").equalsIgnoreCase(Optional.ofNullable(child.getScheme()).orElse(""))
-			    || !Optional.ofNullable(base.getAuthority()).equals(Optional.ofNullable(child.getAuthority())))
-				return child;
-			else {
-				String bp = base.normalize().getPath();
-				String cp = child.normalize().getPath();
-				String relativizedPath;
-				if (cp.startsWith("/")) {
-					String[] bpSegments = bp.split("/", -1);
-					String[] cpSegments = cp.split("/", -1);
-					int i = bpSegments.length - 1;
-					int j = 0;
-					while (i > 0) {
-						if (bpSegments[j].equals(cpSegments[j])) {
-							i--;
-							j++; }
-						else
-							break; }
-					relativizedPath = "";
-					while (i > 0) {
-						relativizedPath += "../";
-						i--; }
-					while (j < cpSegments.length) {
-						relativizedPath += cpSegments[j] + "/";
-						j++; }
-					relativizedPath = relativizedPath.substring(0, relativizedPath.length() - 1); }
-				else
-					relativizedPath = cp;
-				if (relativizedPath.isEmpty())
-					relativizedPath = "./";
-				return new URI(null, null, relativizedPath, child.getQuery(), child.getFragment()); }
-		} catch (URISyntaxException e) {
-			throw new RuntimeException(e);
-		}
 	}
 	
 	/*

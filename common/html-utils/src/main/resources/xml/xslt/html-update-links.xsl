@@ -13,6 +13,8 @@
     <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl"/>
     <xsl:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xsl"/>
 
+    <xsl:param name="source-renamed" select="'false'"/>
+
     <!--
         A fileset defines the relocation of resources.
     -->
@@ -20,13 +22,19 @@
         <xsl:apply-templates mode="normalize" select="collection()[/d:fileset][1]"/>
     </xsl:variable>
 
-    <xsl:variable name="original-doc-base" select="pf:html-base-uri(/)"/>
-    <xsl:variable name="doc-base"
-                  select="(for $file in $mapping/d:file[@original-href]
-                                                       [resolve-uri(@original-href,base-uri(.))=base-uri(current())]
-                                                       [1]
-                           return pf:html-base-uri(/,$file/@href),
-                           $original-doc-base)[1]"/>
+    <xsl:variable name="original-doc-base" as="xs:string"
+                  select="if (not($source-renamed='true'))
+                          then pf:html-base-uri(/)
+                          else (for $file in $mapping/d:file[resolve-uri(@href,base-uri(.))=base-uri(current())][1]
+                                  return pf:html-base-uri(/,$file/@original-href),
+                                pf:html-base-uri(/))[1]"/>
+    <xsl:variable name="doc-base" as="xs:string"
+                  select="if ($source-renamed='true')
+                          then pf:html-base-uri(/)
+                          else (for $file in $mapping/d:file[@original-href]
+                                                            [resolve-uri(@original-href,base-uri(.))=base-uri(current())][1]
+                                  return pf:html-base-uri(/,$file/@href),
+                                pf:html-base-uri(/))[1]"/>
 
     <xsl:template match="@aria-describedat  |
                          @longdesc          |
@@ -60,12 +68,16 @@
         <xsl:variable name="fragment" as="xs:string?" select="$uri[5]"/>
         <xsl:variable name="file" as="xs:string" select="pf:recompose-uri($uri[position()&lt;5])"/>
         <xsl:variable name="resolved-file" as="xs:anyURI" select="resolve-uri($file,$original-doc-base)"/>
-        <xsl:variable name="new-file" as="element(d:file)?" select="$mapping/d:file[@original-href=$resolved-file][1]"/>
+        <xsl:variable name="new-file" as="element(d:file)*" select="$mapping/d:file[@original-href=$resolved-file]"/>
+        <xsl:variable name="new-file" as="element(d:file)?" select="(if (exists($fragment))
+                                                                       then $new-file[d:anchor[(@original-id,@id)[1]=$fragment]]
+                                                                       else(),
+                                                                     $new-file)[1]"/>
         <xsl:variable name="new-fragment" as="xs:string?" select="if (exists($fragment))
                                                                   then if (exists($new-file))
-                                                                       then $new-file/d:anchor[@original-id=$fragment]/@id
+                                                                       then $new-file/d:anchor[(@original-id,@id)[1]=$fragment]/@id
                                                                        else $mapping/d:file[not(@original-href)][@href=$resolved-file][1]
-                                                                                    /d:anchor[@original-id=$fragment]/@id
+                                                                                    /d:anchor[(@original-id,@id)[1]=$fragment]/@id
                                                                   else ()"/>
         <xsl:variable name="new-file" as="xs:string?" select="$new-file/@href"/>
         <xsl:choose>
