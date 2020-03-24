@@ -34,9 +34,19 @@
             px:fileset-compose
         </p:documentation>
     </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
+        <p:documentation>
+            px:set-base-uri
+        </p:documentation>
+    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
         <p:documentation>
             px:html-update-links
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/epub-utils/library.xpl">
+        <p:documentation>
+            px:epub3-nav-from-ncx
         </p:documentation>
     </p:import>
     
@@ -82,18 +92,14 @@
 
     <p:group name="nav">
         <p:output port="result"/>
-        <p:xslt>
+        <px:epub3-nav-from-ncx>
             <p:input port="source">
                 <p:pipe step="main" port="source"/>
             </p:input>
-            <p:input port="stylesheet">
-                <p:document href="ncx-to-nav.xsl"/>
-            </p:input>
-            <p:with-option name="output-base-uri" select="$result-uri"/>
-            <p:input port="parameters">
-                <p:empty/>
-            </p:input>
-        </p:xslt>
+        </px:epub3-nav-from-ncx>
+        <px:set-base-uri>
+            <p:with-option name="base-uri" select="$result-uri"/>
+        </px:set-base-uri>
         <px:html-update-links source-renamed="true">
             <p:input port="mapping">
                 <p:pipe step="id-map" port="result"/>

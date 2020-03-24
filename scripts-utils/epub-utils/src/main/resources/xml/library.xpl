@@ -22,6 +22,7 @@
 	<p:import href="nav/epub3-nav-create-page-list.xpl"/>
 	<p:import href="nav/epub3-nav-to-guide.xpl"/>
 	<p:import href="nav/epub3-nav-to-ncx.xpl"/>
+	<p:import href="nav/epub3-nav-from-ncx.xpl"/>
 	<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 		<p>Steps related to the <a href="https://www.w3.org/publishing/epub3/epub-ocf.html">EPUB
 		Open Container Format (OCF)</a> (the ZIP, the mimetype file, the META-INF/container.xml
