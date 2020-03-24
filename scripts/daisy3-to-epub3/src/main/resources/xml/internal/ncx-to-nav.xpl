@@ -14,8 +14,8 @@
     <p:input port="dtbooks" sequence="true">
         <p:documentation>The DAISY 3 DTBook documents.</p:documentation>
     </p:input>
-    <p:input port="htmls" sequence="true">
-        <p:documentation>The EPUB 3 XHTML content documents.</p:documentation>
+    <p:input port="dtbook-html-mapping">
+        <p:documentation>d:fileset with mapping from DTBook to XHTML files.</p:documentation>
     </p:input>
     
     <p:option name="result-uri" required="true"/>
@@ -31,38 +31,75 @@
         <p:documentation>
             px:fileset-create
             px:fileset-add-entry
+            px:fileset-compose
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
+        <p:documentation>
+            px:html-update-links
         </p:documentation>
     </p:import>
     
     <p:group name="id-map">
         <p:output port="result"/>
-        <p:xslt name="smil-to-dtbook-id" template-name="create-id-map">
+        <p:xslt template-name="create-id-map">
             <p:input port="source">
                 <p:pipe step="main" port="smils"/>
                 <p:pipe step="main" port="dtbooks"/>
             </p:input>
             <p:input port="stylesheet">
-                <p:document href="smil-to-html-ids.xsl"/>
+                <p:document href="smil-to-dtbook-ids.xsl"/>
             </p:input>
             <p:input port="parameters">
                 <p:empty/>
             </p:input>
         </p:xslt>
+        <p:identity name="smil-dtbook-mapping"/>
+        <p:sink/>
+        <!-- add the mapping from dtbook to html -->
+        <px:fileset-compose>
+            <p:input port="source">
+                <p:pipe step="smil-dtbook-mapping" port="result"/>
+                <p:pipe step="main" port="dtbook-html-mapping"/>
+            </p:input>
+        </px:fileset-compose>
+        <!-- add the mapping from ncx to nav -->
+        <p:insert position="first-child">
+            <p:input port="insertion">
+                <p:inline><d:file/></p:inline>
+            </p:input>
+        </p:insert>
+        <p:add-attribute match="/*/d:file[1]" attribute-name="href">
+            <p:with-option name="attribute-value" select="$result-uri"/>
+        </p:add-attribute>
+        <p:add-attribute match="/*/d:file[1]" attribute-name="original-href">
+            <p:with-option name="attribute-value" select="base-uri(/*)">
+                <p:pipe step="main" port="source"/>
+            </p:with-option>
+        </p:add-attribute>
     </p:group>
     <p:sink/>
 
-    <p:xslt name="nav">
-        <p:input port="source">
-            <p:pipe step="main" port="source"/>
-            <p:pipe step="id-map" port="result"/>
-            <p:pipe step="main" port="htmls"/>
-        </p:input>
-        <p:input port="stylesheet">
-            <p:document href="ncx-to-nav.xsl"/>
-        </p:input>
-        <p:with-param name="output-base-uri" select="$result-uri"/>
-        <p:with-option name="output-base-uri" select="$result-uri"/>
-    </p:xslt>
+    <p:group name="nav">
+        <p:output port="result"/>
+        <p:xslt>
+            <p:input port="source">
+                <p:pipe step="main" port="source"/>
+            </p:input>
+            <p:input port="stylesheet">
+                <p:document href="ncx-to-nav.xsl"/>
+            </p:input>
+            <p:with-option name="output-base-uri" select="$result-uri"/>
+            <p:input port="parameters">
+                <p:empty/>
+            </p:input>
+        </p:xslt>
+        <px:html-update-links source-renamed="true">
+            <p:input port="mapping">
+                <p:pipe step="id-map" port="result"/>
+            </p:input>
+        </px:html-update-links>
+    </p:group>
 
     <p:group name="fileset">
         <p:output port="result"/>

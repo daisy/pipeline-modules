@@ -1,27 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions"
-                xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
-                xmlns:d="http://www.daisy.org/ns/pipeline/data"
-                xmlns:html="http://www.w3.org/1999/xhtml"
                 xmlns:epub="http://www.idpf.org/2007/ops"
                 xmlns="http://www.w3.org/1999/xhtml"
                 xpath-default-namespace="http://www.daisy.org/z3986/2005/ncx/"
                 exclude-result-prefixes="#all">
 
     <!-- FIXME: produces invalid Nav Doc when nav labels are empty   -->
-
-    <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl"/>
-
-    <xsl:param name="output-base-uri" required="yes"/>
-
-    <xsl:variable name="ncx-uri" select="base-uri(/*)"/>
-    <xsl:variable name="nav-uri" select="$output-base-uri"/>
-    <xsl:variable name="htmls" select="collection()[/html:html]"/>
-    <xsl:variable name="id-map" select="collection()[/d:idmap]"/>
-
-    <xsl:key name="ids" match="*[@id]" use="@id"/>
 
     <xsl:template match="ncx">
         <html>
@@ -96,7 +81,7 @@
         <!--ELEMENT pageTarget (navLabel+, content)-->
         <li>
             <xsl:copy-of select="@id|@class"/>
-            <a href="{f:smil-to-html-link(content/@src)}">
+            <a href="{content/@src}">
                 <xsl:apply-templates select="navLabel"/>
             </a>
             <xsl:if test="navPoint">
@@ -139,15 +124,5 @@
     </xsl:template>
 
     <xsl:template match="text()"/>
-
-    <xsl:function name="f:smil-to-html-link" as="xs:string">
-        <xsl:param name="href" as="attribute()"/>
-        <xsl:variable name="smil-path" select="resolve-uri(substring-before($href,'#'),$ncx-uri)"/>
-        <xsl:variable name="smil-id" select="substring-after($href,'#')"/>
-        <xsl:variable name="mapping" select="$id-map/d:idmap/d:smil[@xml:base=$smil-path]/d:id[@smil-id=$smil-id]"/>
-        <xsl:variable name="html-id" select="$mapping/@html-id"/>
-        <xsl:variable name="html-uri" select="$htmls[key('ids',$html-id,.)][1]/base-uri(*)"/>
-        <xsl:sequence select="concat(pf:relativize-uri($html-uri,$nav-uri),'#',$html-id)"/>
-    </xsl:function>
 
 </xsl:stylesheet>

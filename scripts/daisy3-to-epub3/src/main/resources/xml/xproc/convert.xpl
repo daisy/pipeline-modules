@@ -48,8 +48,16 @@
             px:smil-to-audio-clips
         </p:documentation>
     </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
-    <p:import href="../internal/ncx-to-nav.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
+        <p:documentation>
+            px:message
+        </p:documentation>
+    </p:import>
+    <p:import href="../internal/ncx-to-nav.xpl">
+        <p:documentation>
+            pxi:ncx-to-nav
+        </p:documentation>
+    </p:import>
     <p:import href="../internal/oebps-to-opf-metadata.xpl">
         <p:documentation>
             px:oebps-to-opf-metadata
@@ -200,8 +208,8 @@
         <p:input port="dtbooks">
             <p:pipe port="result" step="dtbooks"/>
         </p:input>
-        <p:input port="htmls">
-            <p:pipe port="result.in-memory" step="content-docs"/>
+        <p:input port="dtbook-html-mapping">
+            <p:pipe step="content-docs" port="mapping"/>
         </p:input>
         <p:with-option name="result-uri" select="concat($content-dir,'nav.xhtml')"/>
         <!--TODO make sure that the name is unused-->
