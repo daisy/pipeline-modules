@@ -2,6 +2,8 @@
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
+                xmlns:html="http://www.w3.org/1999/xhtml"
+                xmlns:epub="http://www.idpf.org/2007/ops"
                 type="px:epub2-to-epub3"
                 name="main">
 
@@ -53,6 +55,7 @@
 			px:epub-upgrade-package-doc
 			px:epub-guide-to-landmarks
 			px:epub3-add-navigation-doc
+			px:epub3-nav-from-ncx
 		</p:documentation>
 	</p:import>
 
@@ -175,6 +178,13 @@
 				<p:pipe step="upgrade-package-doc" port="result.in-memory"/>
 			</p:input>
 		</px:fileset-load>
+
+		<p:documentation>Convert pageList to page-list</p:documentation>
+		<p:group name="page-list">
+			<p:output port="result" sequence="true"/>
+			<px:epub3-nav-from-ncx/>
+			<p:filter select="//html:nav[@epub:type='page-list']"/>
+		</p:group>
 		<p:sink/>
 
 		<p:documentation>Convert guide to landmarks</p:documentation>
@@ -194,6 +204,9 @@
 			</p:input>
 			<p:input port="source.in-memory">
 				<p:pipe step="upgrade-package-doc" port="result.in-memory"/>
+			</p:input>
+			<p:input port="page-list">
+				<p:pipe step="page-list" port="result"/>
 			</p:input>
 			<p:input port="landmarks">
 				<p:pipe step="landmarks" port="result"/>
