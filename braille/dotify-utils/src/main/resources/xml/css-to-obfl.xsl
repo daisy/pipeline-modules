@@ -128,18 +128,16 @@
     -->
     <xsl:variable name="collection-flows" as="xs:string*">
         <xsl:for-each select="$page-stylesheets">
-            <xsl:sequence select="css:parse-content-list(
-                                    css:rule[@selector='@footnotes'][1]
-                                    /css:property[@name='content'][1]/@value,())
-                                  /self::css:flow[@from and (not(@scope) or @scope='page')]/@from"/>
+            <xsl:sequence select="css:rule[@selector='@footnotes'][1]
+                                  /css:property[@name='content'][1]
+                                  /css:flow[@from and (not(@scope) or @scope='page')]/@from"/>
         </xsl:for-each>
         <xsl:for-each select="$volume-stylesheets">
             <xsl:for-each select="(.|*[matches(@selector,'^&amp;:')])
                                   /*[@selector=('@begin','@end')]">
                 <xsl:variable name="volume-area-content" as="element()*"
-                              select="css:parse-content-list(
-                                        (if (css:property) then . else *[not(@selector)])
-                                        /css:property[@name='content'][1]/@value,())"/>
+                              select="(if (css:property) then . else *[not(@selector)])
+                                      /css:property[@name='content'][1]/*"/>
                 <xsl:sequence select="$volume-area-content/self::css:flow[@from and @scope='volume']/@from"/>
                 <xsl:for-each select="distinct-values(
                                         $volume-area-content/self::css:flow[@from][(@scope,'document')[1]='document']/@from)">
@@ -334,7 +332,7 @@
                                     <xsl:variable name="white-space" as="xs:string?" select="$volume-area-properties[@name='white-space']/@value"/>
                                     <xsl:variable name="volume-area-content" as="element()*"> <!-- css:_|obfl:list-of-references -->
                                         <xsl:apply-templates mode="css:eval-volume-area-content-list"
-                                                             select="css:parse-content-list($volume-area-properties[@name='content'][1]/@value,())"/>
+                                                             select="$volume-area-properties[@name='content'][1]/*"/>
                                     </xsl:variable>
                                     <xsl:variable name="space" as="xs:string" select="('pre','post')[index-of(('@begin','@end'),$volume-area)]"/>
                                     <xsl:variable name="default-page-counter-name" as="xs:string" select="concat($space,'-page')"/>
@@ -568,14 +566,15 @@
                 <volume-transition range="sheet">
                     <xsl:for-each select="$volume-transition-rule/css:rule[matches(@selector,'@(sequence|any)-(interrupted|resumed)')
                                                                            and css:property[@name='content']]">
-                        <xsl:variable name="sequence-interrupted-resumed-content" as="xs:string" select="css:property[@name='content'][1]/@value"/>
+                        <xsl:variable name="sequence-interrupted-resumed-content" as="element()*"
+                                      select="css:property[@name='content'][1]/*"/>
                         <xsl:variable name="pending-text-transform" as="xs:string?" select="css:property[@name='text-transform']/@value"/>
                         <xsl:variable name="pending-hyphens" as="xs:string?" select="css:property[@name='hyphens']/@value"/>
                         <xsl:variable name="word-spacing" as="xs:integer" select="(css:property[@name='word-spacing']/@value,$word-spacing)[1]"/>
                         <xsl:variable name="white-space" as="xs:string?" select="css:property[@name='white-space']/@value"/>
                         <xsl:variable name="sequence-interrupted-resumed-content" as="element()*"> <!-- (css:_|css:box)* -->
                             <xsl:apply-templates mode="css:eval-sequence-interrupted-resumed-content-list"
-                                                 select="css:parse-content-list($sequence-interrupted-resumed-content,())"/>
+                                                 select="$sequence-interrupted-resumed-content"/>
                         </xsl:variable>
                         <xsl:apply-templates mode="assert-nil-attr"
                                              select="$sequence-interrupted-resumed-content/self::css:_/(@* except @css:flow)"/>

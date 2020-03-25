@@ -337,36 +337,54 @@
         </xsl:if>
     </xsl:function>
     
-    <xsl:function name="css:deep-parse-stylesheet" as="element()*"> <!-- css:rule* -->
+    <xsl:template name="css:deep-parse-stylesheet" as="element(css:rule)*">
+        <xsl:param name="stylesheet" required="yes"/>
+        <xsl:param name="context" as="element()?" select="."/>
+        <xsl:variable name="stylesheet" as="element(css:rule)*">
+            <xsl:choose>
+                <xsl:when test="not(exists($stylesheet))"/>
+                <xsl:when test="$stylesheet instance of attribute()">
+                    <xsl:sequence select="css:parse-stylesheet(
+                                            $stylesheet,
+                                            true(),
+                                            if ($stylesheet/parent::*/ancestor-or-self::css:rule[@selector='@page'])
+                                              then QName('','page')
+                                              else if ($stylesheet/parent::*/ancestor-or-self::css:rule[@selector='@volume'])
+                                                then QName('','volume')
+                                                else if ($stylesheet/parent::*/ancestor-or-self::css:rule[matches(@selector,'^@-')])
+                                                  then QName('','vendor-rule')
+                                                  else ())"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:sequence select="css:parse-stylesheet($stylesheet, true())"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+        <xsl:apply-templates mode="css:deep-parse" select="$stylesheet">
+            <xsl:with-param name="context" tunnel="yes" select="$context"/>
+        </xsl:apply-templates>
+    </xsl:template>
+    
+    <xsl:function name="css:deep-parse-stylesheet" as="element(css:rule)*">
         <xsl:param name="stylesheet"/>
-        <xsl:choose>
-            <xsl:when test="not(exists($stylesheet))"/>
-            <xsl:when test="$stylesheet instance of attribute()">
-                <xsl:sequence select="css:parse-stylesheet(
-                                        $stylesheet,
-                                        true(),
-                                        if ($stylesheet/parent::*/ancestor-or-self::css:rule[@selector='@page'])
-                                          then QName('','page')
-                                          else if ($stylesheet/parent::*/ancestor-or-self::css:rule[@selector='@volume'])
-                                            then QName('','volume')
-                                            else if ($stylesheet/parent::*/ancestor-or-self::css:rule[matches(@selector,'^@-')])
-                                              then QName('','vendor-rule')
-                                              else ())"/>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:sequence select="css:parse-stylesheet($stylesheet, true())"/>
-            </xsl:otherwise>
-        </xsl:choose>
+        <xsl:call-template name="css:deep-parse-stylesheet">
+            <xsl:with-param name="stylesheet" select="$stylesheet"/>
+            <xsl:with-param name="context" select="()"/>
+        </xsl:call-template>
     </xsl:function>
     
     <xsl:function name="css:deep-parse-page-stylesheet" as="element()*"> <!-- css:rule* -->
         <xsl:param name="stylesheet" as="xs:string?"/>
-        <xsl:sequence select="css:parse-stylesheet($stylesheet, true(), QName('','page'))"/>
+        <xsl:variable name="stylesheet" as="element(css:rule)*"
+                      select="css:parse-stylesheet($stylesheet, true(), QName('','page'))"/>
+        <xsl:apply-templates mode="css:deep-parse" select="$stylesheet"/>
     </xsl:function>
     
     <xsl:function name="css:deep-parse-volume-stylesheet" as="element()*"> <!-- css:rule* -->
         <xsl:param name="stylesheet" as="xs:string?"/>
-        <xsl:sequence select="css:parse-stylesheet($stylesheet, true(), QName('','volume'))"/>
+        <xsl:variable name="stylesheet" as="element(css:rule)*"
+                      select="css:parse-stylesheet($stylesheet, true(), QName('','volume'))"/>
+        <xsl:apply-templates mode="css:deep-parse" select="$stylesheet"/>
     </xsl:function>
     
     <xsl:function name="css:parse-string" as="element()?">
@@ -551,6 +569,23 @@
             </xsl:analyze-string>
         </xsl:if>
     </xsl:function>
+    
+    <xsl:template mode="css:deep-parse" match="css:property[@name='content' and @value]">
+        <xsl:param name="context" as="element()?" tunnel="yes" select="()"/>
+        <xsl:copy>
+            <xsl:apply-templates mode="#current" select="@* except @value"/>
+            <xsl:call-template name="css:parse-content-list">
+                <xsl:with-param name="content-list" select="@value"/>
+                <xsl:with-param name="context" select="$context"/>
+            </xsl:call-template>
+        </xsl:copy>
+    </xsl:template>
+    
+    <xsl:template mode="css:deep-parse" match="@*|node()">
+        <xsl:copy>
+            <xsl:apply-templates mode="#current" select="@*|node()"/>
+        </xsl:copy>
+    </xsl:template>
     
     <!-- ===================================== -->
     <!-- Validating, inheriting and defaulting -->
@@ -828,7 +863,7 @@
     <!-- Serializing -->
     <!-- =========== -->
     
-     <xsl:template match="css:rule" mode="css:serialize" as="xs:string">
+    <xsl:template match="css:rule" mode="css:serialize" as="xs:string">
         <xsl:param name="base" as="xs:string*" select="()"/>
         <xsl:param name="level" as="xs:integer" select="1"/>
         <xsl:param name="indent" as="xs:string?" select="()"/>
@@ -878,8 +913,15 @@
         </xsl:choose>
     </xsl:template>
     
-    <xsl:template match="css:property" mode="css:serialize" as="xs:string">
+    <xsl:template match="css:property[@value]" mode="css:serialize" as="xs:string">
         <xsl:sequence select="concat(@name,': ',@value)"/>
+    </xsl:template>
+    
+    <xsl:template match="css:property[@name='content' and not(@value)]" mode="css:serialize" as="xs:string">
+        <xsl:variable name="value" as="xs:string*">
+            <xsl:apply-templates mode="#current" select="*"/>
+        </xsl:variable>
+        <xsl:sequence select="concat(@name,': ',if (exists($value)) then string-join($value,' ') else 'none')"/>
     </xsl:template>
     
     <xsl:template match="css:string-set" mode="css:serialize" as="xs:string">

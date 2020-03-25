@@ -135,8 +135,7 @@
         <xsl:variable name="page-counter-name" as="xs:string" select="$counter-increment/@name"/>
         <xsl:variable name="footnotes-properties" as="element()*"
                       select="$default-page-stylesheet[@selector='@footnotes'][1]/css:property"/>
-        <xsl:variable name="footnotes-content" as="element()*"
-                      select="css:parse-content-list($footnotes-properties[@name='content'][1]/@value,())"/>
+        <xsl:variable name="footnotes-content" as="element()*" select="$footnotes-properties[@name='content'][1]/*"/>
         <layout-master name="{$name}" duplex="{$duplex}" page-number-variable="page"
                        page-width="{$page-width}" page-height="{$page-height}">
             <xsl:if test="$right-page-stylesheet">
@@ -351,7 +350,7 @@
         <xsl:variable name="white-space" as="xs:string" select="($properties[@name='white-space']/@value,'normal')[1]"/>
         <xsl:variable name="text-transform" as="xs:string" select="($properties[@name='text-transform']/@value,'auto')[1]"/>
         <xsl:variable name="content" as="element()*">
-            <xsl:apply-templates select="css:parse-content-list($properties[@name='content'][1]/@value,())" mode="eval-content-list-top-bottom">
+            <xsl:apply-templates select="$properties[@name='content'][1]/*" mode="eval-content-list-top-bottom">
                 <xsl:with-param name="white-space" select="$white-space"/>
                 <xsl:with-param name="text-transform" select="$text-transform"/>
             </xsl:apply-templates>
@@ -370,7 +369,7 @@
         <xsl:param name="side" as="xs:string" required="yes"/>
         <xsl:param name="min-width" as="xs:integer" required="yes"/>
         <xsl:variable name="indicators" as="element()*">
-            <xsl:apply-templates select="css:parse-content-list($properties[@name='content'][1]/@value,())" mode="eval-content-list-left-right"/>
+            <xsl:apply-templates select="$properties[@name='content'][1]/*" mode="eval-content-list-left-right"/>
         </xsl:variable>
         <xsl:if test="exists($indicators) or $min-width &gt; 0">
             <margin-region align="{$side}" width="{max((count($indicators),$min-width))}">
