@@ -131,11 +131,8 @@
 					<body>
 						<seq dur="00:00:02.4829932">
 							<par endsync="last" id="sm_3" system-required="pagenumber-on">
-								<!--
-								    FIXME: generated ids make test brittle
-								-->
-								<text id="d4973e23" src="ncc.html#ncx_2"/>
-								<audio id="d4973e25" src="aud001.mp3" clip-begin="00:00:00" clip-end="00:00:02.4829932"/>
+								<text id="id_2" src="ncc.html#ncx_2"/>
+								<audio id="id_3" src="aud001.mp3" clip-begin="00:00:00" clip-end="00:00:02.4829932"/>
 							</par>
 						</seq>
 					</body>
@@ -161,60 +158,60 @@
 					<body>
 						<seq dur="00:01:16.7849887">
 							<par endsync="last" id="sm_5">
-								<text id="d4989e21" src="ncc.html#ncx_3"/>
-								<audio id="d4989e23" src="aud002.mp3" clip-begin="00:00:00" clip-end="00:00:02.3460091"/>
+								<text id="id_2" src="ncc.html#ncx_3"/>
+								<audio id="id_3" src="aud002.mp3" clip-begin="00:00:00" clip-end="00:00:02.3460091"/>
 							</par>
 							<par endsync="last" id="sm_6">
-								<text id="d4989e26" src="ncc.html#ncx_3"/>
-								<audio id="d4989e28" src="aud002.mp3" clip-begin="00:00:02.3460091" clip-end="00:00:05.3929932"/>
+								<text id="id_4" src="ncc.html#ncx_3"/>
+								<audio id="id_5" src="aud002.mp3" clip-begin="00:00:02.3460091" clip-end="00:00:05.3929932"/>
 							</par>
 							<par endsync="last" id="sm_7">
-								<text id="d4989e31" src="ncc.html#ncx_3"/>
-								<audio id="d4989e33" src="aud002.mp3" clip-begin="00:00:05.3929932" clip-end="00:00:08.5849887"/>
+								<text id="id_6" src="ncc.html#ncx_3"/>
+								<audio id="id_7" src="aud002.mp3" clip-begin="00:00:05.3929932" clip-end="00:00:08.5849887"/>
 							</par>
 							<par endsync="last" system-required="pagenumber-on" id="sm_9">
-								<text id="d4989e38" src="ncc.html#ncx_4"/>
-								<audio id="d4989e40" src="aud002.mp3" clip-begin="00:00:08.5849887" clip-end="00:00:11.1179819"/>
+								<text id="id_9" src="ncc.html#ncx_4"/>
+								<audio id="id_10" src="aud002.mp3" clip-begin="00:00:08.5849887" clip-end="00:00:11.1179819"/>
 							</par>
 							<par endsync="last" id="sm_10">
-								<text id="d4989e44" src="ncc.html#ncx_3"/>
-								<audio id="d4989e46" src="aud002.mp3" clip-begin="00:00:11.1179819" clip-end="00:00:20.1039909"/>
+								<text id="id_11" src="ncc.html#ncx_3"/>
+								<audio id="id_12" src="aud002.mp3" clip-begin="00:00:11.1179819" clip-end="00:00:20.1039909"/>
 							</par>
 							<par endsync="last" id="sm_11">
-								<text id="d4989e50" src="ncc.html#ncx_3"/>
-								<audio id="d4989e52" src="aud002.mp3" clip-begin="00:00:20.1039909" clip-end="00:00:33.7299773"/>
+								<text id="id_13" src="ncc.html#ncx_3"/>
+								<audio id="id_14" src="aud002.mp3" clip-begin="00:00:20.1039909" clip-end="00:00:33.7299773"/>
 							</par>
 							<par endsync="last" id="sm_12">
-								<text id="d4989e55" src="ncc.html#ncx_3"/>
-								<audio id="d4989e57" src="aud002.mp3" clip-begin="00:00:33.7299773" clip-end="00:00:44.2579819"/>
+								<text id="id_15" src="ncc.html#ncx_3"/>
+								<audio id="id_16" src="aud002.mp3" clip-begin="00:00:33.7299773" clip-end="00:00:44.2579819"/>
 							</par>
 							<par endsync="last" id="sm_13">
-								<text id="d4989e60" src="ncc.html#ncx_3"/>
-								<audio id="d4989e62" src="aud002.mp3" clip-begin="00:00:44.2579819" clip-end="00:00:50.4649887"/>
+								<text id="id_17" src="ncc.html#ncx_3"/>
+								<audio id="id_18" src="aud002.mp3" clip-begin="00:00:44.2579819" clip-end="00:00:50.4649887"/>
 							</par>
 							<par endsync="last" id="sm_14">
-								<text id="d4989e65" src="ncc.html#ncx_3"/>
-								<audio id="d4989e67" src="aud002.mp3" clip-begin="00:00:50.4649887" clip-end="00:00:53.5409751"/>
+								<text id="id_19" src="ncc.html#ncx_3"/>
+								<audio id="id_20" src="aud002.mp3" clip-begin="00:00:50.4649887" clip-end="00:00:53.5409751"/>
 							</par>
 							<par endsync="last" id="sm_15">
-								<text id="d4989e70" src="ncc.html#ncx_3"/>
-								<audio id="d4989e72" src="aud002.mp3" clip-begin="00:00:53.5409751" clip-end="00:00:57.4579819"/>
+								<text id="id_21" src="ncc.html#ncx_3"/>
+								<audio id="id_22" src="aud002.mp3" clip-begin="00:00:53.5409751" clip-end="00:00:57.4579819"/>
 							</par>
 							<par endsync="last" id="sm_16">
-								<text id="d4989e75" src="ncc.html#ncx_3"/>
-								<audio id="d4989e77" src="aud002.mp3" clip-begin="00:00:57.4579819" clip-end="00:01:03.4769841"/>
+								<text id="id_23" src="ncc.html#ncx_3"/>
+								<audio id="id_24" src="aud002.mp3" clip-begin="00:00:57.4579819" clip-end="00:01:03.4769841"/>
 							</par>
 							<par endsync="last" id="sm_17">
-								<text id="d4989e81" src="ncc.html#ncx_3"/>
-								<audio id="d4989e83" src="aud002.mp3" clip-begin="00:01:03.4769841" clip-end="00:01:07.3589796"/>
+								<text id="id_25" src="ncc.html#ncx_3"/>
+								<audio id="id_26" src="aud002.mp3" clip-begin="00:01:03.4769841" clip-end="00:01:07.3589796"/>
 							</par>
 							<par endsync="last" id="sm_18">
-								<text id="d4989e86" src="ncc.html#ncx_3"/>
-								<audio id="d4989e88" src="aud002.mp3" clip-begin="00:01:07.3589796" clip-end="00:01:11.9359864"/>
+								<text id="id_27" src="ncc.html#ncx_3"/>
+								<audio id="id_28" src="aud002.mp3" clip-begin="00:01:07.3589796" clip-end="00:01:11.9359864"/>
 							</par>
 							<par endsync="last" id="sm_19">
-								<text id="d4989e91" src="ncc.html#ncx_3"/>
-								<audio id="d4989e93" src="aud002.mp3" clip-begin="00:01:11.9359864" clip-end="00:01:16.7849887"/>
+								<text id="id_29" src="ncc.html#ncx_3"/>
+								<audio id="id_30" src="aud002.mp3" clip-begin="00:01:11.9359864" clip-end="00:01:16.7849887"/>
 							</par>
 						</seq>
 					</body>

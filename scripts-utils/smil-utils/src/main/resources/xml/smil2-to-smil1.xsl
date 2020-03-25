@@ -9,6 +9,7 @@
                 exclude-result-prefixes="#all">
 
     <xsl:include href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl"/>
+    <xsl:include href="http://www.daisy.org/pipeline/modules/common-utils/generate-id.xsl"/>
 
     <xsl:variable name="test-note-ids"
         select="collection()/ncx:ncx/ncx:head/ncx:smilCustomTest[@bookStruct='NOTE']/string(@id)" as="xs:string*"/>
@@ -60,9 +61,18 @@
     <xsl:key name="ncx-idrefs" match="d:idref" use="@idref"/>
     <xsl:key name="ids" match="*" use="@id"/>
 
+    <xsl:template match="body" priority="1">
+        <xsl:call-template name="pf:next-match-with-generated-ids">
+            <xsl:with-param name="prefix" select="'id_'"/>
+            <xsl:with-param name="for-elements" select="//audio[not(@id)]|
+                                                        //par[empty(text)]|
+                                                        //seq[par]"/>
+        </xsl:call-template>
+    </xsl:template>
+
     <xsl:template match="text()"/>
 
-    <xsl:template match="/">
+    <xsl:template match="/*">
         <smil>
             <head>
                 <meta name="dc:format" content="Daisy 2.02"/>
@@ -98,7 +108,9 @@
         <xsl:if test="exists($ncx-relative-uri)">
             <xsl:variable name="ncc-ref" as="xs:string?" select="f:get-ncc-ref(.)"/>
             <xsl:if test="exists($ncc-ref)">
-                <text id="{generate-id()}" src="{concat($ncx-relative-uri,'#',$ncc-ref)}"/>
+                <text src="{concat($ncx-relative-uri,'#',$ncc-ref)}">
+                    <xsl:call-template name="pf:generate-id"/>
+                </text>
             </xsl:if>
         </xsl:if>
     </xsl:template>
@@ -111,8 +123,12 @@
     </xsl:template>
 
     <xsl:template match="audio" mode="media">
-        <audio id="{if(@id) then @id else generate-id()}" src="{@src}" clip-begin="{@clipBegin}"
-            clip-end="{@clipEnd}"/>
+        <audio src="{@src}" clip-begin="{@clipBegin}" clip-end="{@clipEnd}">
+            <xsl:sequence select="@id"/>
+            <xsl:if test="not(exists(@id))">
+                <xsl:call-template name="pf:generate-id"/>
+            </xsl:if>
+        </audio>
     </xsl:template>
 
     <xsl:template match="seq[count(audio)>1]" mode="media">
