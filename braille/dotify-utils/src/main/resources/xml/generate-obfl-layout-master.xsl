@@ -10,12 +10,13 @@
                 exclude-result-prefixes="#all"
                 version="2.0">
     
+    <xsl:include href="http://www.daisy.org/pipeline/modules/common-utils/generate-id.xsl"/>
     <xsl:include href="http://www.daisy.org/pipeline/modules/braille/common-utils/library.xsl"/>
     <xsl:include href="http://www.daisy.org/pipeline/modules/braille/css-utils/library.xsl"/>
     
     <xsl:param name="duplex" as="xs:string" required="yes"/>
     
-    <xsl:variable name="page-stylesheets" as="element()*" select="/*/css:rule[@selector='@page']"/>
+    <xsl:variable name="page-stylesheets" as="element(css:rule)*" select="/*/css:rule[@selector='@page']"/>
     
     <xsl:function name="pxi:layout-master-name" as="xs:string">
         <xsl:param name="page-stylesheet" as="xs:string"/>
@@ -36,10 +37,10 @@
                                           if ($s/parent::obfl:pre-content) then 'pre-page'
                                           else if ($s/parent::obfl:post-content) then 'post-page'
                                           else 'page')"/>
-                <xsl:sequence select="obfl:generate-layout-master(
-                                        $page-stylesheet/*,
-                                        $layout-master-name,
-                                        $default-page-counter-names[1])"/>
+                <xsl:apply-templates mode="obfl:generate-layout-master" select="$page-stylesheet">
+                    <xsl:with-param name="name" tunnel="yes" select="$layout-master-name"/>
+                    <xsl:with-param name="default-page-counter-name" tunnel="yes" select="$default-page-counter-names[1]"/>
+                </xsl:apply-templates>
                 <!--
                     The result of calling obfl:generate-layout-master is the same regardless of the
                     default-page-counter-name passed. Therefore only the first result is
@@ -49,10 +50,10 @@
                 -->
                 <xsl:for-each select="$default-page-counter-names[position()&gt;1]">
                     <xsl:variable name="_">
-                        <xsl:sequence select="obfl:generate-layout-master(
-                                                $page-stylesheet/*,
-                                                $layout-master-name,
-                                                .)"/>
+                        <xsl:apply-templates mode="obfl:generate-layout-master" select="$page-stylesheet">
+                            <xsl:with-param name="name" tunnel="yes" select="$layout-master-name"/>
+                            <xsl:with-param name="default-page-counter-name" tunnel="yes" select="."/>
+                        </xsl:apply-templates>
                     </xsl:variable>
                 </xsl:for-each>
             </xsl:for-each>
@@ -92,10 +93,18 @@
         <field allow-text-flow="true"/>
     </xsl:variable>
     
-    <xsl:function name="obfl:generate-layout-master">
-        <xsl:param name="page-stylesheet" as="element()*"/> <!-- css:rule* -->
-        <xsl:param name="name" as="xs:string"/>
-        <xsl:param name="default-page-counter-name" as="xs:string"/> <!-- "page"|"pre-page"|"post-page" -->
+    <xsl:template mode="obfl:generate-layout-master" match="css:rule[@selector='@page']" priority="1">
+        <xsl:call-template name="pf:next-match-with-generated-ids">
+            <xsl:with-param name="prefix" select="'tmp_'"/>
+            <xsl:with-param name="for-elements" select="descendant::css:string[@name][not(@target)]"/>
+            <xsl:with-param name="in-use" select="()"/>
+        </xsl:call-template>
+    </xsl:template>
+    
+    <xsl:template mode="obfl:generate-layout-master" match="css:rule[@selector='@page']">
+        <xsl:param name="name" tunnel="yes" as="xs:string"/>
+        <xsl:param name="default-page-counter-name" tunnel="yes" as="xs:string"/> <!-- "page"|"pre-page"|"post-page" -->
+        <xsl:variable name="page-stylesheet" as="element()*" select="*"/>
         <xsl:variable name="duplex" as="xs:boolean" select="$duplex='true'"/>
         <xsl:variable name="right-page-stylesheet" as="element()*" select="$page-stylesheet[@selector='&amp;:right']/*"/>
         <xsl:variable name="left-page-stylesheet" as="element()*" select="$page-stylesheet[@selector='&amp;:left']/*"/>
@@ -219,7 +228,7 @@
                 </page-area>
             </xsl:for-each>
         </layout-master>
-    </xsl:function>
+    </xsl:template>
     
     <xsl:template name="template">
         <xsl:param name="stylesheet" as="element()*" required="yes"/> <!-- css:rule*|css:property* -->
@@ -501,7 +510,9 @@
                                                      $scope)"/>
             </xsl:call-template>
         </xsl:if>
-        <xsl:variable name="var-name" as="xs:string" select="concat('tmp_',generate-id(.))"/>
+        <xsl:variable name="var-name" as="xs:string">
+            <xsl:call-template name="pf:generate-id"/>
+        </xsl:variable>
         <xsl:variable name="text-transform-decl" as="xs:string" select="if (not($text-transform=('none','auto')))
                                                                         then concat(' text-transform:',$text-transform)
                                                                         else ''"/>
@@ -731,6 +742,17 @@
         <xsl:call-template name="pf:error">
             <xsl:with-param name="msg">Coding error</xsl:with-param>
         </xsl:call-template>
+    </xsl:template>
+    
+    <!-- for XSpec -->
+    <xsl:template name="obfl:generate-layout-master">
+        <xsl:param name="page-stylesheet" as="element(css:rule)"/>
+        <xsl:param name="name" as="xs:string"/>
+        <xsl:param name="default-page-counter-name" as="xs:string"/>
+        <xsl:apply-templates mode="obfl:generate-layout-master" select="$page-stylesheet">
+            <xsl:with-param name="name" tunnel="yes" select="$name"/>
+            <xsl:with-param name="default-page-counter-name" tunnel="yes" select="$default-page-counter-name"/>
+        </xsl:apply-templates>
     </xsl:template>
     
 </xsl:stylesheet>
