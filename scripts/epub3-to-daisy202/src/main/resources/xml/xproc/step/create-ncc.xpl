@@ -234,14 +234,14 @@
         </p:input>
     </px:fileset-load>
     <p:for-each name="augment-smils" px:message="Augmenting SMILs" px:message-severity="DEBUG">
-        <p:output port="smil" sequence="true">
-            <p:pipe step="smil" port="result"/>
+        <p:output port="smil">
+            <p:pipe step="drop-smil-without-associated-xhtml" port="smil"/>
         </p:output>
         <p:output port="xhtml" sequence="true">
-            <p:pipe step="xhtml-with-linkbacks" port="result"/>
+            <p:pipe step="drop-smil-without-associated-xhtml" port="xhtml"/>
         </p:output>
-        <p:output port="xhtml.fileset">
-            <p:pipe step="associated-xhtml" port="result.fileset"/>
+        <p:output port="xhtml.fileset" sequence="true">
+            <p:pipe step="drop-smil-without-associated-xhtml" port="xhtml.fileset"/>
         </p:output>
         <p:documentation>Get the HTML file(s) that corresponds with this SMIL.</p:documentation>
         <p:variable name="smil-base" select="base-uri(/)"/>
@@ -269,59 +269,87 @@
         </p:for-each>
         <px:fileset-join name="associated-xhtml.fileset"/>
         <p:sink/>
-        <!-- load in spine order -->
+        <!-- load in spine order (and drop items not in spine) -->
         <px:fileset-intersect>
             <p:input port="source">
                 <p:pipe step="spine.fileset" port="result"/>
                 <p:pipe step="associated-xhtml.fileset" port="result"/>
             </p:input>
         </px:fileset-intersect>
-        <px:fileset-load name="associated-xhtml" fail-on-not-found="true">
-            <p:input port="in-memory">
-                <p:pipe step="xhtml-with-ids" port="result"/>
-            </p:input>
-        </px:fileset-load>
-        <p:documentation>Augment the SMIL.</p:documentation>
-        <p:xslt px:message="- {$smil-base}" px:message-severity="DEBUG">
-            <p:input port="source">
-                <p:pipe step="augment-smils" port="current"/>
-                <p:pipe step="associated-xhtml" port="result"/>
-            </p:input>
-            <p:input port="stylesheet">
-                <p:document href="../../xslt/augment-smil.xsl"/>
-            </p:input>
-            <p:input port="parameters">
-                <p:empty/>
-            </p:input>
-        </p:xslt>
-        <p:xslt name="smil">
-            <p:input port="stylesheet">
-                <p:document href="../../xslt/pretty-print.xsl"/>
-            </p:input>
-            <p:input port="parameters">
-                <p:empty/>
-            </p:input>
-        </p:xslt>
-        <p:sink/>
-        <p:documentation>Add linkbacks from HTML to SMIL.</p:documentation>
-        <p:for-each name="xhtml-with-linkbacks">
-            <p:iteration-source>
-                <p:pipe step="associated-xhtml" port="result"/>
-            </p:iteration-source>
-            <p:output port="result" sequence="true"/>
-            <p:variable name="base-uri" select="base-uri()"/>
-            <p:identity px:message="Adding linkbacks to {$base-uri}" px:message-severity="DEBUG"/>
-            <p:xslt>
-                <p:input port="source">
-                    <p:pipe step="xhtml-with-linkbacks" port="current"/>
+        <p:choose name="drop-smil-without-associated-xhtml">
+            <p:when test="exists(//d:file)">
+                <p:output port="smil">
                     <p:pipe step="smil" port="result"/>
-                </p:input>
-                <p:input port="stylesheet">
-                    <p:document href="../../xslt/create-linkbacks.xsl"/>
-                </p:input>
-                <p:with-param port="parameters" name="is-ncc" select="'false'"/>
-            </p:xslt>
-        </p:for-each>
+                </p:output>
+                <p:output port="xhtml" sequence="true">
+                    <p:pipe step="xhtml-with-linkbacks" port="result"/>
+                </p:output>
+                <p:output port="xhtml.fileset">
+                    <p:pipe step="associated-xhtml" port="result.fileset"/>
+                </p:output>
+                <px:fileset-load name="associated-xhtml" fail-on-not-found="true">
+                    <p:input port="in-memory">
+                        <p:pipe step="xhtml-with-ids" port="result"/>
+                    </p:input>
+                </px:fileset-load>
+                <p:documentation>Augment the SMIL.</p:documentation>
+                <p:xslt px:message="- {$smil-base}" px:message-severity="DEBUG">
+                    <p:input port="source">
+                        <p:pipe step="augment-smils" port="current"/>
+                        <p:pipe step="associated-xhtml" port="result"/>
+                    </p:input>
+                    <p:input port="stylesheet">
+                        <p:document href="../../xslt/augment-smil.xsl"/>
+                    </p:input>
+                    <p:input port="parameters">
+                        <p:empty/>
+                    </p:input>
+                </p:xslt>
+                <p:xslt name="smil">
+                    <p:input port="stylesheet">
+                        <p:document href="../../xslt/pretty-print.xsl"/>
+                    </p:input>
+                    <p:input port="parameters">
+                        <p:empty/>
+                    </p:input>
+                </p:xslt>
+                <p:sink/>
+                <p:documentation>Add linkbacks from HTML to SMIL.</p:documentation>
+                <p:for-each name="xhtml-with-linkbacks">
+                    <p:iteration-source>
+                        <p:pipe step="associated-xhtml" port="result"/>
+                    </p:iteration-source>
+                    <p:output port="result" sequence="true"/>
+                    <p:variable name="base-uri" select="base-uri()"/>
+                    <p:identity px:message="Adding linkbacks to {$base-uri}" px:message-severity="DEBUG"/>
+                    <p:xslt>
+                        <p:input port="source">
+                            <p:pipe step="xhtml-with-linkbacks" port="current"/>
+                            <p:pipe step="smil" port="result"/>
+                        </p:input>
+                        <p:input port="stylesheet">
+                            <p:document href="../../xslt/create-linkbacks.xsl"/>
+                        </p:input>
+                        <p:with-param port="parameters" name="is-ncc" select="'false'"/>
+                    </p:xslt>
+                </p:for-each>
+            </p:when>
+            <p:otherwise>
+                <!-- There are no associated html documents. This could be because the smil is
+                     associated with the navigation document which is not included in the
+                     spine. -->
+                <p:output port="smil">
+                    <p:pipe step="augment-smils" port="current"/>
+                </p:output>
+                <p:output port="xhtml" sequence="true">
+                    <p:empty/>
+                </p:output>
+                <p:output port="xhtml.fileset" sequence="true">
+                    <p:empty/>
+                </p:output>
+                <p:sink/>
+            </p:otherwise>
+        </p:choose>
     </p:for-each>
 
     <p:documentation>
