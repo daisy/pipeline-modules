@@ -60,10 +60,10 @@ You may alternatively use the "mimetype" document if your input is a unzipped/"e
 		<p:pipe step="load" port="validation-report"/>
 	</p:output>
 
-	<p:output port="validation-status" px:media-type="application/vnd.pipeline.status+xml">
+	<p:output port="status" px:media-type="application/vnd.pipeline.status+xml">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			<h1 px:role="name">Input validation status</h1>
-			<p px:role="desc" xml:space="preserve">An XML document describing, briefly, whether the input validation was successful.
+			<h1 px:role="name">Conversion status</h1>
+			<p px:role="desc" xml:space="preserve">An XML document describing whether the conversion was successful.
 
 [More details on the file format](http://daisy.github.io/pipeline/ValidationStatusXML).</p>
 		</p:documentation>

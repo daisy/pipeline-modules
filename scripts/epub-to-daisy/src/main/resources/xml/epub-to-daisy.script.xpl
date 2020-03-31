@@ -79,6 +79,13 @@ This will remove any existing media overlays in the EPUB.</p>
 		</p:documentation>
 	</p:option>
 
+	<p:option name="epub3-output-dir" required="true" px:output="result" px:type="anyDirURI">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<h2 px:role="name">Intermediary EPUB 3 with media-overlays</h2>
+			<p>Note that the conversion may fail but still output a EPUB 3 document.</p>
+		</p:documentation>
+	</p:option>
+
 	<p:option name="daisy202-output-dir" required="true" px:output="result" px:type="anyDirURI">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">DAISY 2.02</h2>
@@ -98,10 +105,10 @@ This will remove any existing media overlays in the EPUB.</p>
 		<p:pipe step="load" port="validation-report"/>
 	</p:output>
 
-	<p:output port="validation-status" px:media-type="application/vnd.pipeline.status+xml">
+	<p:output port="status" px:media-type="application/vnd.pipeline.status+xml">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			<h1 px:role="name">Input validation status</h1>
-			<p px:role="desc" xml:space="preserve">An XML document describing, briefly, whether the input validation was successful.
+			<h1 px:role="name">Conversion status</h1>
+			<p px:role="desc" xml:space="preserve">An XML document describing whether the conversion was successful.
 
 [More details on the file format](http://daisy.github.io/pipeline/ValidationStatusXML).</p>
 		</p:documentation>
@@ -145,13 +152,14 @@ This will remove any existing media overlays in the EPUB.</p>
 		<p:otherwise>
 			<p:output port="result"/>
 
-			<px:epub-to-daisy name="convert" px:message="Converting to DAISY" px:progress="16/19">
+			<px:epub-to-daisy name="convert" px:message="Converting to DAISY" px:progress="15/19">
 				<p:input port="source.fileset">
 					<p:pipe step="load" port="result.fileset"/>
 				</p:input>
 				<p:input port="source.in-memory">
 					<p:pipe step="load" port="result.in-memory"/>
 				</p:input>
+				<p:with-option name="epub3-output-dir" select="$epub3-output-dir"/>
 				<p:with-option name="daisy202-output-dir" select="$daisy202-output-dir"/>
 				<p:with-option name="daisy3-output-dir" select="$daisy3-output-dir"/>
 				<p:with-option name="tts" select="$tts"/>
@@ -161,35 +169,81 @@ This will remove any existing media overlays in the EPUB.</p>
 				<p:with-option name="temp-dir" select="$temp-dir"/>
 			</px:epub-to-daisy>
 
-			<px:fileset-store name="store-daisy202" px:message="Storing DAISY 2.02" px:progress="1/19">
+			<px:fileset-store name="store-epub3" px:message="Storing intermediary EPUB 3" px:progress="1/19">
 				<p:input port="fileset.in">
+					<p:pipe step="convert" port="epub3.fileset"/>
+				</p:input>
+				<p:input port="in-memory.in">
+					<p:pipe step="convert" port="epub3.in-memory"/>
+				</p:input>
+			</px:fileset-store>
+
+			<p:choose name="store-daisy202" px:progress="1/19">
+				<p:xpath-context>
 					<p:pipe step="convert" port="daisy202.fileset"/>
-				</p:input>
-				<p:input port="in-memory.in">
-					<p:pipe step="convert" port="daisy202.in-memory"/>
-				</p:input>
-			</px:fileset-store>
+				</p:xpath-context>
+				<p:when test="//d:file">
+					<p:output port="result">
+						<p:pipe step="store" port="fileset.out"/>
+					</p:output>
+					<px:fileset-store name="store" px:progress="1" px:message="Storing DAISY 2.02">
+						<p:input port="fileset.in">
+							<p:pipe step="convert" port="daisy202.fileset"/>
+						</p:input>
+						<p:input port="in-memory.in">
+							<p:pipe step="convert" port="daisy202.in-memory"/>
+						</p:input>
+					</px:fileset-store>
+				</p:when>
+				<p:otherwise>
+					<p:output port="result"/>
+					<p:identity>
+						<p:input port="source">
+							<p:pipe step="convert" port="daisy202.fileset"/>
+						</p:input>
+					</p:identity>
+				</p:otherwise>
+			</p:choose>
 
-			<px:fileset-store name="store-daisy3" px:message="Storing DAISY 3" px:progress="1/19">
-				<p:input port="fileset.in">
+			<p:choose name="store-daisy3" px:progress="1/19">
+				<p:xpath-context>
 					<p:pipe step="convert" port="daisy3.fileset"/>
-				</p:input>
-				<p:input port="in-memory.in">
-					<p:pipe step="convert" port="daisy3.in-memory"/>
-				</p:input>
-			</px:fileset-store>
+				</p:xpath-context>
+				<p:when test="//d:file">
+					<p:output port="result">
+						<p:pipe step="store" port="fileset.out"/>
+					</p:output>
+					<px:fileset-store name="store" px:progress="1" px:message="Storing DAISY 3">
+						<p:input port="fileset.in">
+							<p:pipe step="convert" port="daisy3.fileset"/>
+						</p:input>
+						<p:input port="in-memory.in">
+							<p:pipe step="convert" port="daisy3.in-memory"/>
+						</p:input>
+					</px:fileset-store>
+				</p:when>
+				<p:otherwise>
+					<p:output port="result"/>
+					<p:identity>
+						<p:input port="source">
+							<p:pipe step="convert" port="daisy3.fileset"/>
+						</p:input>
+					</p:identity>
+				</p:otherwise>
+			</p:choose>
 
-			<p:identity cx:depends-on="store-daisy3">
+			<p:identity cx:depends-on="store-epub3">
 				<p:input port="source">
 					<p:pipe step="convert" port="temp-audio-files"/>
 				</p:input>
 			</p:identity>
+			<p:identity cx:depends-on="store-daisy3"/>
 			<px:fileset-delete cx:depends-on="store-daisy202" name="delete-temp-files" px:progress="1/19"
 			                   px:message="Cleaning up temporary files"/>
 
 			<p:identity cx:depends-on="delete-temp-files">
 				<p:input port="source">
-					<p:pipe step="load" port="validation-status"/>
+					<p:pipe step="convert" port="status"/>
 				</p:input>
 			</p:identity>
 		</p:otherwise>

@@ -19,12 +19,13 @@
 				</x:document>
 			</x:input>
 			<x:option name="validation" select="'off'"/>
+			<x:option name="epub3-output-dir" select="resolve-uri('out/epub3/',$temp-dir)"/>
 			<x:option name="daisy202-output-dir" select="resolve-uri('out/daisy202/',$temp-dir)"/>
 			<x:option name="daisy3-output-dir" select="resolve-uri('out/daisy3/',$temp-dir)"/>
 			<x:option name="temp-dir" select="resolve-uri('tmp/',$temp-dir)"/>
 		</x:call>
 		<x:context label="the status">
-			<x:document type="port" port="validation-status"/>
+			<x:document type="port" port="status"/>
 		</x:context>
 		<x:expect label="the convertion must succeed" type="compare">
 			<x:document type="inline">
@@ -34,7 +35,7 @@
 		<x:context label="The output directory">
 			<x:document type="directory" base-uri="temp-dir" href="out/" recursive="true"/>
 		</x:context>
-		<x:expect label="The output directory contains the EPUB file" type="compare">
+		<x:expect label="The output directory contains the EPUB 3, the DAISY 2.02 and the DAISY 3" type="compare">
 			<x:document type="inline">
 				<c:directory name="out">
 					<c:directory name="daisy202">
@@ -65,6 +66,29 @@
 						<c:file name="mo4.smil"/>
 						<c:file name="navigation.ncx"/>
 						<c:file name="resources.res"/>
+					</c:directory>
+					<c:directory name="epub3">
+						<c:directory name="EPUB">
+							<c:directory name="audio">
+								<c:file name="mock.mp3"/>
+							</c:directory>
+							<c:file name="chapter.xhtml"/>
+							<c:file name="cover.xhtml"/>
+							<c:file name="front.xhtml"/>
+							<c:directory name="mo">
+								<c:file name="chapter.smil"/>
+								<c:file name="cover.smil"/>
+								<c:file name="front.smil"/>
+								<c:file name="nav.smil"/>
+							</c:directory>
+							<c:file name="nav.xhtml"/>
+							<c:file name="package.opf"/>
+							<c:file name="toc.ncx"/>
+						</c:directory>
+						<c:directory name="META-INF">
+							<c:file name="container.xml"/>
+						</c:directory>
+						<c:file name="mimetype"/>
 					</c:directory>
 				</c:directory>
 			</x:document>

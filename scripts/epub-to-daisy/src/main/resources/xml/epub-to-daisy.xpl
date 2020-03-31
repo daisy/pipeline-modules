@@ -16,6 +16,18 @@
 	<p:input port="tts-config">
 		<p:inline><d:config/></p:inline>
 	</p:input>
+	<p:output port="status" px:media-type="application/vnd.pipeline.status+xml" primary="true">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p>Whether or not the conversion was successful.</p>
+		</p:documentation>
+	</p:output>
+	<p:option name="epub3-output-dir" required="false" select="''">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p>Base directory of the intermediary EPUB 3 with media-overlays</p>
+			<p>Defaults to a temporary directory.</p>
+			<p>The conversion may fail but will still output a EPUB 3 document.</p>
+		</p:documentation>
+	</p:option>
 	<p:option name="daisy202-output-dir" required="true">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>Base directory of the DAISY 2.02</p>
@@ -26,23 +38,32 @@
 			<p>Base directory of the DAISY 3</p>
 		</p:documentation>
 	</p:option>
+	<p:output port="epub3.fileset">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p>The intermediary EPUB 3 fileset</p>
+		</p:documentation>
+		<p:pipe step="tts" port="epub.out.fileset"/>
+	</p:output>
+	<p:output port="epub3.in-memory" sequence="true">
+		<p:pipe step="tts" port="epub.out.in-memory"/>
+	</p:output>
 	<p:output port="daisy202.fileset">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>The DAISY 2.02 fileset</p>
 		</p:documentation>
-		<p:pipe step="daisy202" port="result.fileset"/>
+		<p:pipe step="daisy" port="daisy202.fileset"/>
 	</p:output>
 	<p:output port="daisy202.in-memory" sequence="true">
-		<p:pipe step="daisy202" port="result.in-memory"/>
+		<p:pipe step="daisy" port="daisy202.in-memory"/>
 	</p:output>
 	<p:output port="daisy3.fileset">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>The DAISY 3 fileset</p>
 		</p:documentation>
-		<p:pipe step="daisy3" port="result.fileset"/>
+		<p:pipe step="daisy" port="daisy3.fileset"/>
 	</p:output>
 	<p:output port="daisy3.in-memory" sequence="true">
-		<p:pipe step="daisy3" port="result.in-memory"/>
+		<p:pipe step="daisy" port="daisy3.in-memory"/>
 	</p:output>
 	<p:output port="temp-audio-files">
 		<p:documentation>
@@ -61,6 +82,11 @@
 		</p:documentation>
 	</p:option>
 
+	<p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
+		<p:documentation>
+			px:log-error
+		</p:documentation>
+	</p:import>
 	<p:import href="http://www.daisy.org/pipeline/modules/epub2-to-epub3/library.xpl">
 		<p:documentation>
 			px:epub2-to-epub3
@@ -99,7 +125,9 @@
 				<p:input port="source.in-memory">
 					<p:pipe step="main" port="source.in-memory"/>
 				</p:input>
-				<p:with-option name="result-base" select="resolve-uri('epub3/',$temp-dir)"/>
+				<p:with-option name="result-base" select="if ($epub3-output-dir!='')
+				                                          then $epub3-output-dir
+				                                          else resolve-uri('epub3/',$temp-dir)"/>
 			</px:epub2-to-epub3>
 		</p:otherwise>
 	</p:choose>
@@ -113,25 +141,83 @@
 			<p:pipe step="main" port="tts-config"/>
 		</p:input>
 		<p:with-option name="temp-dir" select="$temp-dir"/>
+		<p:with-option name="result-base" select="if ($epub3-output-dir!='')
+		                                          then $epub3-output-dir
+		                                          else resolve-uri('epub3/',$temp-dir)"/>
 	</px:epub3-to-epub3>
 
-	<px:epub3-to-daisy202 name="daisy202" px:progress="1/4" px:message="Converting to DAISY 2.02">
-		<p:input port="source.in-memory">
-			<p:pipe step="tts" port="epub.out.in-memory"/>
-		</p:input>
-		<p:with-option name="output-dir" select="$daisy202-output-dir"/>
-	</px:epub3-to-daisy202>
-	<p:sink/>
+	<p:try name="daisy" px:progress="2/4">
+		<p:group>
+			<p:output port="status" primary="true"/>
+			<p:output port="daisy202.fileset">
+				<p:pipe step="daisy202" port="result.fileset"/>
+			</p:output>
+			<p:output port="daisy202.in-memory" sequence="true">
+				<p:pipe step="daisy202" port="result.in-memory"/>
+			</p:output>
+			<p:output port="daisy3.fileset">
+				<p:pipe step="daisy3" port="result.fileset"/>
+			</p:output>
+			<p:output port="daisy3.in-memory" sequence="true">
+				<p:pipe step="daisy3" port="result.in-memory"/>
+			</p:output>
 
-	<px:epub3-to-daisy3 name="daisy3" px:progress="1/4" px:message="Converting to DAISY 3">
-		<p:input port="source.fileset">
-			<p:pipe step="tts" port="epub.out.fileset"/>
-		</p:input>
-		<p:input port="source.in-memory">
-			<p:pipe step="tts" port="epub.out.in-memory"/>
-		</p:input>
-		<p:with-option name="output-dir" select="$daisy3-output-dir"/>
-	</px:epub3-to-daisy3>
-	<p:sink/>
+			<px:epub3-to-daisy202 name="daisy202" px:progress="1/2" px:message="Converting to DAISY 2.02">
+				<p:input port="source.in-memory">
+					<p:pipe step="tts" port="epub.out.in-memory"/>
+				</p:input>
+				<p:with-option name="output-dir" select="$daisy202-output-dir"/>
+			</px:epub3-to-daisy202>
+			<p:sink/>
+
+			<px:epub3-to-daisy3 name="daisy3" px:progress="1/2" px:message="Converting to DAISY 3">
+				<p:input port="source.fileset">
+					<p:pipe step="tts" port="epub.out.fileset"/>
+				</p:input>
+				<p:input port="source.in-memory">
+					<p:pipe step="tts" port="epub.out.in-memory"/>
+				</p:input>
+				<p:with-option name="output-dir" select="$daisy3-output-dir"/>
+			</px:epub3-to-daisy3>
+			<p:sink/>
+
+			<p:identity>
+				<p:input port="source">
+					<p:inline>
+						<d:validation-status result="ok"/>
+					</p:inline>
+				</p:input>
+			</p:identity>
+		</p:group>
+		<p:catch name="catch">
+			<p:output port="status" primary="true"/>
+			<p:output port="daisy202.fileset">
+				<p:inline><d:fileset/></p:inline>
+			</p:output>
+			<p:output port="daisy202.in-memory" sequence="true">
+				<p:empty/>
+			</p:output>
+			<p:output port="daisy3.fileset">
+				<p:inline><d:fileset/></p:inline>
+			</p:output>
+			<p:output port="daisy3.in-memory" sequence="true">
+				<p:empty/>
+			</p:output>
+			<p:identity>
+				<p:input port="source">
+					<p:inline>
+						<d:validation-status result="error"/>
+					</p:inline>
+				</p:input>
+			</p:identity>
+			<px:log-error severity="ERROR">
+				<p:input port="error">
+					<p:pipe step="catch" port="error"/>
+				</p:input>
+			</px:log-error>
+			<p:identity px:message="Failed to convert to DAISY 2.02 and DAISY 3 (Please see detailed log for more info.)"
+			            px:message-severity="ERROR"/>
+		</p:catch>
+	</p:try>
 
 </p:declare-step>

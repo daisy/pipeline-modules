@@ -13,7 +13,7 @@
 			<x:option name="temp-dir" select="resolve-uri('tmp/',$temp-dir)"/>
 		</x:call>
 		<x:context label="the status">
-			<x:document type="port" port="validation-status"/>
+			<x:document type="port" port="status"/>
 		</x:context>
 		<x:expect label="the convertion must succeed" type="compare">
 			<x:document type="inline">
