@@ -136,7 +136,7 @@
     <p:pipe step="main" port="source.fileset"/>
   </p:variable>
 
-  <p:choose name="process-css">
+  <p:choose name="process-css" px:progress="1/10">
     <p:when test="$audio='true' and $process-css='true'">
       <p:output port="fileset" primary="true"/>
       <p:output port="in-memory" sequence="true">
@@ -166,7 +166,7 @@
     </p:input>
   </px:fileset-load>
 
-  <p:choose name="synthesize">
+  <p:choose name="synthesize" px:progress="9/10">
     <!-- ====== TTS OFF ====== -->
     <p:when test="$audio = 'false'">
       <p:xpath-context>
@@ -209,7 +209,7 @@
       <p:output port="log" sequence="true">
         <p:pipe step="to-audio" port="log"/>
       </p:output>
-      <p:for-each name="loop">
+      <p:for-each name="loop" px:progress="1/9">
         <p:output port="ssml" primary="true" sequence="true">
           <p:pipe step="ssml" port="result"/>
         </p:output>
@@ -219,10 +219,10 @@
         <p:output port="sentence-ids">
           <p:pipe port="sentence-ids" step="lexing"/>
         </p:output>
-        <px:html-break-detect name="lexing">
+        <px:html-break-detect name="lexing" px:progress="1/2">
           <p:with-option name="id-prefix" select="concat($anti-conflict-prefix, p:iteration-position(), '-')"/>
         </px:html-break-detect>
-        <px:epub3-to-ssml name="ssml">
+        <px:epub3-to-ssml name="ssml" px:progress="1/2">
           <p:input port="content.in">
             <p:pipe port="result" step="lexing"/>
           </p:input>
@@ -242,7 +242,7 @@
           </p:input>
         </px:css-speech-clean>
       </p:for-each>
-      <px:ssml-to-audio name="to-audio">
+      <px:ssml-to-audio name="to-audio" px:progress="8/9">
         <p:input port="config">
           <p:pipe port="config" step="main"/>
         </p:input>

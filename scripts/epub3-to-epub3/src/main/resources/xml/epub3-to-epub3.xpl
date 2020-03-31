@@ -141,11 +141,11 @@ specific.
         </p:documentation>
     </p:import>
 
-    <px:epub3-to-epub3.load name="load">
+    <px:epub3-to-epub3.load name="load" px:progress="0.1">
         <p:with-option name="epub" select="$source"/>
     </px:epub3-to-epub3.load>
     
-    <px:epub3-to-epub3 name="convert">
+    <px:epub3-to-epub3 name="convert" px:progress="0.8">
         <p:input port="epub.in.in-memory">
             <p:pipe step="load" port="in-memory"/>
         </p:input>
@@ -163,7 +163,7 @@ specific.
         <p:with-option name="temp-dir" select="$temp-dir"/>
     </px:epub3-to-epub3>
     
-    <px:fileset-store name="store">
+    <px:fileset-store name="store" px:progress="0.1">
         <p:input port="in-memory.in">
             <p:pipe step="convert" port="epub.out.in-memory"/>
         </p:input>

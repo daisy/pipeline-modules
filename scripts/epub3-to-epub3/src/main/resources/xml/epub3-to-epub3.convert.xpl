@@ -167,7 +167,7 @@
         </p:otherwise>
     </p:choose>
     
-    <p:group name="add-mediaoverlays">
+    <p:group name="add-mediaoverlays" px:progress="1/2">
         <p:output port="fileset" primary="true"/>
         <p:output port="in-memory" sequence="true">
             <p:pipe step="skip-if-disabled" port="in-memory"/>
@@ -185,7 +185,7 @@
                 <p:pipe step="maybe-copy" port="in-memory"/>
             </p:input>
         </px:fileset-load>
-        <p:choose name="skip-if-disabled">
+        <p:choose name="skip-if-disabled" px:progress="1">
             <p:when test="$tts='true' or $tts='default' and not(//opf:item/@media-overlay)" px:message="Performing TTS">
                 <p:output port="fileset" primary="true"/>
                 <p:output port="in-memory" sequence="true">
@@ -202,7 +202,7 @@
                     perform TTS
                 -->
 
-                <px:tts-for-epub3 name="tts" audio="true">
+                <px:tts-for-epub3 name="tts" audio="true" px:progress="1">
                     <p:input port="source.fileset">
                         <p:pipe step="maybe-copy" port="fileset"/>
                     </p:input>
@@ -274,7 +274,7 @@
         </p:choose>
     </p:group>
     
-    <p:choose name="add-braille-rendition">
+    <p:choose name="add-braille-rendition" px:progress="1/2">
         <p:when test="not($braille='true')">
             <p:output port="fileset" primary="true"/>
             <p:output port="in-memory" sequence="true">
