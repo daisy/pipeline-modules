@@ -51,7 +51,7 @@
                                           self::html:h6 or
                                           self::html:span[matches(@class,'(^|\s)page-(front|normal|special)(\s|$)')]]">
                     <!--
-                        we are sure these elements have an id attribute, thanks to add-missing-ids.xsl
+                        we know these elements have an id attribute (added in create-ncc.xpl)
                     -->
                     <xsl:variable name="id" as="xs:string" select="@id"/>
                     <xsl:choose>

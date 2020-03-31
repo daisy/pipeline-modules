@@ -57,6 +57,11 @@
             px:opf-spine-to-fileset
         </p:documentation>
     </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
+        <p:documentation>
+            px:html-add-ids
+        </p:documentation>
+    </p:import>
     <p:import href="opf-to-ncc-metadata.xpl">
         <p:documentation>
             px:opf-to-ncc-metadata
@@ -108,17 +113,14 @@
     <p:documentation>
         Add missing IDs to heading and page number elements.
     </p:documentation>
-    <p:for-each>
-        <p:xslt>
-            <p:input port="stylesheet">
-                <p:document href="../../xslt/add-missing-ids.xsl"/>
-            </p:input>
-            <p:input port="parameters">
-                <p:empty/>
-            </p:input>
-        </p:xslt>
-    </p:for-each>
-    <p:identity name="xhtml-with-ids"/>
+    <px:html-add-ids name="xhtml-with-ids"
+                     match="html:h1|
+                            html:h2|
+                            html:h3|
+                            html:h4|
+                            html:h5|
+                            html:h6|
+                            html:span[matches(@class,'(^|\s)page-(front|normal|special)(\s|$)')]"/>
     <p:sink/>
 
     <p:documentation>
