@@ -109,7 +109,7 @@
     </p:identity>
     <p:delete match="@smilref"/>
 
-    <p:xslt name="add-ids">
+    <p:xslt name="add-ids" px:progress="1/6">
       <p:input port="stylesheet">
 	<p:document href="add-ids.xsl"/>
       </p:input>
@@ -118,7 +118,7 @@
     </p:xslt>
     <px:message severity="DEBUG" message="Smil-needed IDs generated"/>
 
-    <p:xslt name="audio-order">
+    <p:xslt name="audio-order" px:progress="1/6">
       <p:input port="stylesheet">
     	<p:document href="audio-order.xsl"/>
       </p:input>
@@ -134,7 +134,7 @@
       		     select="if ($audio-only='true') then 'add-smilrefs-audio-only.xsl' else 'add-smilrefs.xsl'"/>
     </p:load>
 
-    <p:xslt name="add-smilrefs">
+    <p:xslt name="add-smilrefs" px:progress="1/6">
       <p:input port="source">
 	<p:pipe port="result" step="audio-order"/>
 	<p:pipe port="audio-map" step="main"/>
@@ -148,7 +148,7 @@
     <px:message severity="DEBUG" message="Smilref generated"/>
     <p:sink/>
 
-    <p:xslt name="copy-smilrefs">
+    <p:xslt name="copy-smilrefs" px:progress="1/6">
       <p:input port="source">
 	<p:pipe port="result" step="add-ids"/>
 	<p:pipe port="result" step="add-smilrefs"/>
@@ -163,7 +163,7 @@
     <px:message severity="DEBUG" message="Smilrefs copied to the original document"/>
     <p:sink/>
 
-    <p:xslt name="create-smils">
+    <p:xslt name="create-smils" px:progress="1/6">
       <p:input port="source">
 	<p:pipe port="result" step="add-smilrefs"/>
 	<p:pipe port="audio-map" step="main"/>
@@ -191,7 +191,7 @@
       </p:xslt>
     </p:for-each>
 
-    <p:xslt name="compute-durations">
+    <p:xslt name="compute-durations" px:progress="1/6">
       <p:input port="source">
 	<p:pipe port="result" step="all-smils"/>
       </p:input>
