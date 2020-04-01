@@ -120,7 +120,8 @@
                             html:h4|
                             html:h5|
                             html:h6|
-                            html:span[matches(@class,'(^|\s)page-(front|normal|special)(\s|$)')]"/>
+                            html:span[matches(@class,'(^|\s)page-(front|normal|special)(\s|$)')]"
+                     px:progress="1/10"/>
     <p:sink/>
 
     <p:documentation>
@@ -235,7 +236,7 @@
             <p:pipe step="main" port="source.in-memory"/>
         </p:input>
     </px:fileset-load>
-    <p:for-each name="augment-smils" px:message="Augmenting SMILs" px:message-severity="DEBUG">
+    <p:for-each name="augment-smils" px:message="Augmenting SMILs" px:message-severity="DEBUG" px:progress="3/10">
         <p:output port="smil">
             <p:pipe step="drop-smil-without-associated-xhtml" port="smil"/>
         </p:output>
@@ -395,7 +396,7 @@
             <p:pipe step="xhtml-with-ids" port="result"/>
         </p:input>
     </px:fileset-load>
-    <p:for-each name="new-smils">
+    <p:for-each name="new-smils" px:progress="3/10">
         <p:output port="smil" sequence="true" primary="true">
             <p:pipe step="smil" port="result"/>
         </p:output>
@@ -499,7 +500,7 @@
     <p:documentation>
         Make anchors in NCC point to SMILs.
     </p:documentation>
-    <p:group px:message="Creating linkbacks for NCC" px:message-severity="DEBUG">
+    <p:group px:message="Creating linkbacks for NCC" px:message-severity="DEBUG" px:progress="3/10">
         <p:xslt>
             <p:input port="source">
                 <p:pipe step="ncc" port="result"/>

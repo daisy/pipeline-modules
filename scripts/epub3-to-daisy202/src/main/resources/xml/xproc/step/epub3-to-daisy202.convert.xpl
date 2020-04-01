@@ -90,7 +90,7 @@
             <p:pipe step="main" port="source.in-memory"/>
         </p:input>
     </px:fileset-load>
-    <p:for-each px:message="Converting SMIL 3.0 to SMIL 1.0">
+    <p:for-each px:message="Converting SMIL 3.0 to SMIL 1.0" px:progress="1/5">
         <p:variable name="smil-base" select="base-uri(/*)"/>
         <p:variable name="smil-href" select="//d:file[resolve-uri(@href,base-uri(.))=$smil-base]/@href">
             <p:pipe step="epub3.smil.in-memory" port="result.fileset"/>
@@ -122,7 +122,7 @@
             <p:pipe step="main" port="source.in-memory"/>
         </p:input>
     </px:fileset-load>
-    <p:for-each px:message="Converting HTML5 to HTML4">
+    <p:for-each px:message="Converting HTML5 to HTML4" px:progress="1/5">
         <p:variable name="base" select="base-uri()"/>
         <p:variable name="href" select="//d:file[resolve-uri(@href,base-uri(.))=$base]/@href">
             <p:pipe step="epub3.xhtml" port="result.fileset"/>
@@ -181,7 +181,7 @@
     <p:documentation>
         Create NCC file.
     </p:documentation>
-    <pxi:create-ncc name="create-ncc" px:message="Creating NCC">
+    <pxi:create-ncc name="create-ncc" px:message="Creating NCC" px:progress="2/5">
         <p:input port="source.in-memory">
             <p:pipe port="result" step="daisy202.xhtml.in-memory"/>
             <p:pipe port="result" step="daisy202.smil.in-memory"/>
@@ -194,7 +194,7 @@
     <p:documentation>
         Rename content documents to .html.
     </p:documentation>
-    <p:group name="rename-xhtml" px:message="Renaming content documents to .html">
+    <p:group name="rename-xhtml" px:message="Renaming content documents to .html" px:progress="1/5">
         <p:output port="fileset" primary="true"/>
         <p:output port="in-memory" sequence="true">
             <p:pipe step="rename" port="result.in-memory"/>

@@ -101,7 +101,7 @@ You may alternatively use the EPUB package document (the OPF-file) if your input
         </p:inline>
     </p:variable>
 
-    <px:epub-load name="load" version="3" store-to-disk="true">
+    <px:epub-load name="load" version="3" store-to-disk="true" px:progress="0.1">
         <p:with-option name="href" select="$epub-href"/>
         <p:with-option name="temp-dir" select="$temp-dir"/>
         <p:with-option name="validation" select="$validation"/>
@@ -112,7 +112,7 @@ You may alternatively use the EPUB package document (the OPF-file) if your input
             <p:pipe step="load" port="validation-status"/>
         </p:input>
     </p:identity>
-    <p:choose name="status">
+    <p:choose name="status" px:progress="0.9">
         <p:when test="/d:validation-status[@result='error']">
             <p:output port="result"/>
             <p:identity/>
@@ -121,11 +121,11 @@ You may alternatively use the EPUB package document (the OPF-file) if your input
             <p:output port="result">
                 <p:pipe step="try-convert" port="status"/>
             </p:output>
-            <p:try name="try-convert">
+            <p:try name="try-convert" px:progress="1">
                 <p:group>
                     <p:output port="status"/>
                     
-                    <px:epub3-to-daisy202 name="convert">
+                    <px:epub3-to-daisy202 name="convert" px:progress="9/10">
                         <p:input port="source.fileset">
                             <p:pipe step="load" port="result.fileset"/>
                         </p:input>
@@ -135,7 +135,7 @@ You may alternatively use the EPUB package document (the OPF-file) if your input
                         <p:with-option name="output-dir" select="$output-dir"/>
                     </px:epub3-to-daisy202>
 
-                    <px:fileset-store name="store" fail-on-error="true">
+                    <px:fileset-store name="store" fail-on-error="true" px:progress="1/10">
                         <p:input port="fileset.in">
                             <p:pipe step="convert" port="result.fileset"/>
                         </p:input>
