@@ -90,9 +90,12 @@
             <p:pipe step="main" port="source.in-memory"/>
         </p:input>
     </px:fileset-load>
-    <p:for-each px:message="Converting SMIL-file from 3.0 (EPUB3 MO profile) to 1.0 (DAISY 2.02 profile)">
-        <p:variable name="smil-original-base" select="base-uri(/*)"/>
-        <px:smil-downgrade version="1.0" px:message="- {$smil-original-base}" px:message-severity="DEBUG"/>
+    <p:for-each px:message="Converting SMIL 3.0 to SMIL 1.0">
+        <p:variable name="smil-base" select="base-uri(/*)"/>
+        <p:variable name="smil-href" select="//d:file[resolve-uri(@href,base-uri(.))=$smil-base]/@href">
+            <p:pipe step="epub3.smil.in-memory" port="result.fileset"/>
+        </p:variable>
+        <px:smil-downgrade version="1.0" px:message="Processing {$smil-href}"/>
     </p:for-each>
     <p:identity name="daisy202.smil.in-memory"/>
     <p:sink/>
@@ -111,7 +114,7 @@
             <p:pipe step="opf" port="result"/>
         </p:input>
     </px:opf-spine-to-fileset>
-    <px:fileset-load>
+    <px:fileset-load name="epub3.xhtml">
         <p:documentation>
             Load content documents.
         </p:documentation>
@@ -120,8 +123,11 @@
         </p:input>
     </px:fileset-load>
     <p:for-each px:message="Converting HTML5 to HTML4">
-        <p:variable name="base-uri" select="base-uri()"/>
-        <p:identity px:message="- {$base-uri}" px:message-severity="DEBUG"/>
+        <p:variable name="base" select="base-uri()"/>
+        <p:variable name="href" select="//d:file[resolve-uri(@href,base-uri(.))=$base]/@href">
+            <p:pipe step="epub3.xhtml" port="result.fileset"/>
+        </p:variable>
+        <p:identity px:message="Processing {$href}"/>
         <px:html-upgrade>
             <p:documentation>Normalize HTML5.</p:documentation>
             <!-- hopefully this preserves all IDs -->

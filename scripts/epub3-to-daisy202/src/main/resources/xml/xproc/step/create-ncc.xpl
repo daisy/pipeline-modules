@@ -295,18 +295,23 @@
                     </p:input>
                 </px:fileset-load>
                 <p:documentation>Augment the SMIL.</p:documentation>
-                <p:xslt px:message="- {$smil-base}" px:message-severity="DEBUG">
-                    <p:input port="source">
-                        <p:pipe step="augment-smils" port="current"/>
-                        <p:pipe step="associated-xhtml" port="result"/>
-                    </p:input>
-                    <p:input port="stylesheet">
-                        <p:document href="../../xslt/augment-smil.xsl"/>
-                    </p:input>
-                    <p:input port="parameters">
-                        <p:empty/>
-                    </p:input>
-                </p:xslt>
+                <p:group>
+                    <p:variable name="smil-href" select="//d:file[resolve-uri(@href,base-uri(.))=$smil-base]/@href">
+                        <p:pipe step="smils" port="result.fileset"/>
+                    </p:variable>
+                    <p:xslt px:message="Processing {$smil-href}" px:message-severity="DEBUG">
+                        <p:input port="source">
+                            <p:pipe step="augment-smils" port="current"/>
+                            <p:pipe step="associated-xhtml" port="result"/>
+                        </p:input>
+                        <p:input port="stylesheet">
+                            <p:document href="../../xslt/augment-smil.xsl"/>
+                        </p:input>
+                        <p:input port="parameters">
+                            <p:empty/>
+                        </p:input>
+                    </p:xslt>
+                </p:group>
                 <p:xslt name="smil">
                     <p:input port="stylesheet">
                         <p:document href="../../xslt/pretty-print.xsl"/>
@@ -322,8 +327,11 @@
                         <p:pipe step="associated-xhtml" port="result"/>
                     </p:iteration-source>
                     <p:output port="result" sequence="true"/>
-                    <p:variable name="base-uri" select="base-uri()"/>
-                    <p:identity px:message="Adding linkbacks to {$base-uri}" px:message-severity="DEBUG"/>
+                    <p:variable name="base" select="base-uri()"/>
+                    <p:variable name="href" select="//d:file[resolve-uri(@href,base-uri(.))=$base]/@href">
+                        <p:pipe step="associated-xhtml" port="result.fileset"/>
+                    </p:variable>
+                    <p:identity px:message="Adding linkbacks to {$href}" px:message-severity="DEBUG"/>
                     <p:xslt>
                         <p:input port="source">
                             <p:pipe step="xhtml-with-linkbacks" port="current"/>
@@ -394,8 +402,11 @@
         <p:output port="xhtml" sequence="true">
             <p:pipe step="xhtml-with-linkbacks" port="result"/>
         </p:output>
-        <p:variable name="base-uri" select="base-uri()"/>
-        <p:identity px:message="Creating new SMIL for {$base-uri}" px:message-severity="DEBUG"/>
+        <p:variable name="base" select="base-uri()"/>
+        <p:variable name="href" select="//d:file[resolve-uri(@href,base-uri(.))=$base]/@href">
+            <p:pipe step="xhtml-without-mo" port="result.fileset"/>
+        </p:variable>
+        <p:identity px:message="Creating new SMIL for {$href}" px:message-severity="DEBUG"/>
         <px:set-base-uri name="empty-smil">
             <p:input port="source">
                 <p:inline exclude-inline-prefixes="#all">
