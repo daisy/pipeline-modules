@@ -94,7 +94,8 @@
                                     <xsl:variable name="segments" as="element()*"
                                                   select="$referenced-html-elements[ancestor::* intersect current()]"/>
                                     <xsl:choose>
-                                        <xsl:when test="replace(string-join($segments/string(.),''),'\s+','')=replace(string(.),'\s+','')">
+                                        <xsl:when test="replace(string-join($segments/string(.),''),'[\s\p{Z}]+','')
+                                                        =replace(string(.),'[\s\p{Z}]+','')">
                                             <xsl:variable name="audio-segments" as="element()*"
                                                           select="for $s in $segments return
                                                                   for $id in $s/concat(pf:normalize-uri(pf:html-base-uri(.)),'#',@id) return
