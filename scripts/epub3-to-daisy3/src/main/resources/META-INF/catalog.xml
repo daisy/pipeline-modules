@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" xmlns:px="http://www.daisy.org/ns/pipeline">
 
-  <uri uri="../xml/epub3-to-daisy3.script.xpl" px:content-type="script" px:id="epub3-to-daisy3"/>
+  <uri uri="../xml/epub3-to-daisy3.script.xpl" px:content-type="script" px:id="epub3-to-daisy3"
+	   px:extends="../../../../../common-options.xpl"/>
   <uri name="http://www.daisy.org/pipeline/modules/epub3-to-daisy3/library.xpl" uri="../xml/library.xpl"/>
 
   <nextCatalog catalog="org:daisy:pipeline:modules:html-to-dtbook"/>

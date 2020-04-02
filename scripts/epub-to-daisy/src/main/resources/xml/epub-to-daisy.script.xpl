@@ -23,23 +23,8 @@ You may alternatively use the "mimetype" document if your input is a unzipped/"e
 		</p:documentation>
 	</p:option>
 
-	<p:option name="validation" required="false" select="'off'">
-		<p:pipeinfo>
-			<px:type>
-				<choice xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-					<value>off</value>
-					<a:documentation xml:lang="en">No validation</a:documentation>
-					<value>report</value>
-					<a:documentation xml:lang="en">Report validation issues</a:documentation>
-					<value>abort</value>
-					<a:documentation xml:lang="en">Abort on validation issues</a:documentation>
-				</choice>
-			</px:type>
-		</p:pipeinfo>
-		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			<h2 px:role="name">Validation</h2>
-			<p px:role="desc">Whether to abort on validation issues.</p>
-		</p:documentation>
+	<p:option name="validation" select="'off'">
+		<!-- defined in common-options.xpl -->
 	</p:option>
 
 	<p:option name="tts" required="false" px:type="boolean" select="'default'">
@@ -64,12 +49,7 @@ This will remove any existing media overlays in the EPUB.</p>
 	</p:option>
 
 	<p:input port="tts-config" primary="false">
-		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			<h2 px:role="name">Text-to-speech configuration file</h2>
-			<p px:role="desc" xml:space="preserve">Configuration file for the text-to-speech.
-
-[More details on the configuration file format](http://daisy.github.io/pipeline/modules/tts-common/doc/tts-config.html).</p>
-		</p:documentation>
+		<!-- defined in common-options.xpl -->
 		<p:inline><d:config/></p:inline>
 	</p:input>
 
@@ -98,10 +78,8 @@ This will remove any existing media overlays in the EPUB.</p>
 		</p:documentation>
 	</p:option>
 
-	<p:output port="validation-report" sequence="true" px:media-type="application/vnd.pipeline.report+xml">
-		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			<h1 px:role="name">Input validation report</h1>
-		</p:documentation>
+	<p:output port="validation-report" sequence="true">
+		<!-- defined in common-options.xpl -->
 		<p:pipe step="load" port="validation-report"/>
 	</p:output>
 

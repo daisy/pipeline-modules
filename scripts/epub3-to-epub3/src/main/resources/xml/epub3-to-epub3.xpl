@@ -102,12 +102,7 @@ specific.
     </p:option>
     
     <p:input port="tts-config" primary="false">
-        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h2 px:role="name">Text-to-speech configuration file</h2>
-            <p px:role="desc" xml:space="preserve">Configuration file for the text-to-speech.
-
-[More details on the configuration file format](http://daisy.github.io/pipeline/modules/tts-common/doc/tts-config.html).</p>
-        </p:documentation>
+        <!-- defined in common-options.xpl -->
         <p:inline><d:config/></p:inline>
     </p:input>
     

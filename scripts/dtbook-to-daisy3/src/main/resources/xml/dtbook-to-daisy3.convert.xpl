@@ -102,14 +102,14 @@
 
   <p:option name="audio" required="false" px:type="boolean" select="'true'">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-      <h2 px:role="name">Enable Text-To-Speech</h2>
+      <h2 px:role="name">Enable text-to-speech</h2>
       <p px:role="desc">Whether to use a speech synthesizer to produce audio files.</p>
     </p:documentation>
   </p:option>
 
   <p:option name="audio-only" required="false" px:type="boolean" select="'true'">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-      <h2 px:role="name">audio only</h2>
+      <h2 px:role="name">Audio only</h2>
       <p px:role="desc">SMIL files are not attached to any DTBook</p>
     </p:documentation>
   </p:option>
