@@ -51,14 +51,14 @@
 		</p:documentation>
 	</p:option>
 
-	<p:import href="html-id-fixer.xpl">
+	<p:import href="html-add-ids.xpl">
 		<p:documentation>
-			px:html-id-fixer
+			px:html-add-ids
 		</p:documentation>
 	</p:import>
 
 	<p:documentation>Add ID attributes</p:documentation>
-	<px:html-id-fixer name="html-with-ids"/>
+	<px:html-add-ids name="html-with-ids"/>
 
 	<p:documentation>Create the outline</p:documentation>
 	<p:xslt name="outline">

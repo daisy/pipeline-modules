@@ -1,13 +1,13 @@
-package org.daisy.pipeline.html.calabash.impl;
+package org.daisy.pipeline.common.calabash.impl;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.daisy.pipeline.html.calabash.impl.Chunker.BreakOpportunity;
-import org.daisy.pipeline.html.calabash.impl.Chunker.BreakOpportunity.Weight;
-import org.daisy.pipeline.html.calabash.impl.Chunker.BreakPosition;
-import org.daisy.pipeline.html.calabash.impl.Chunker.BreakPosition.Side;
-import org.daisy.pipeline.html.calabash.impl.Chunker.Path;
+import org.daisy.pipeline.common.calabash.impl.Chunker.BreakOpportunity;
+import org.daisy.pipeline.common.calabash.impl.Chunker.BreakOpportunity.Weight;
+import org.daisy.pipeline.common.calabash.impl.Chunker.BreakPosition;
+import org.daisy.pipeline.common.calabash.impl.Chunker.BreakPosition.Side;
+import org.daisy.pipeline.common.calabash.impl.Chunker.Path;
 
 import org.junit.Assert;
 import org.junit.Test;

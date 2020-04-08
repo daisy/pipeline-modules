@@ -1,4 +1,4 @@
-package org.daisy.pipeline.html.calabash.impl;
+package org.daisy.pipeline.common.calabash.impl;
 
 import java.net.URI;
 import java.util.ArrayList;

@@ -7,5 +7,7 @@
     <p:import href="assert.xpl"/>
     <p:import href="tokenize.xpl"/>
     <p:import href="i18n-translate.xpl"/>
+    <p:import href="xml-chunker.xpl"/>
+    <p:import href="add-ids.xpl"/>
     
 </p:library>

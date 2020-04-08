@@ -6,7 +6,7 @@
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 exclude-result-prefixes="#all">
 
-    <xsl:include href="http://www.daisy.org/pipeline/modules/common-utils/generate-id.xsl"/>
+    <xsl:include href="../xslt/generate-id.xsl"/>
 
     <xsl:key name="ids" match="*[@id]" use="@id"/>
     

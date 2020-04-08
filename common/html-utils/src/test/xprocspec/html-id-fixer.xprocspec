@@ -2,10 +2,10 @@
 <x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                xmlns:d="http://www.daisy.org/ns/pipeline/data"
-               script="../../main/resources/xml/xproc/html-id-fixer.xpl">
+               script="../../main/resources/xml/xproc/html-add-ids.xpl">
 
     <x:scenario label="duplicate ids">
-        <x:call step="px:html-id-fixer">
+        <x:call step="px:html-add-ids">
             <x:input port="source">
                 <x:document type="inline" xml:base="part1.html">
                     <html xmlns="http://www.w3.org/1999/xhtml">
@@ -63,7 +63,7 @@
     </x:scenario>
 
     <x:scenario label="match option">
-        <x:call step="px:html-id-fixer">
+        <x:call step="px:html-add-ids">
             <x:input port="source">
                 <x:document type="inline" xml:base="part1.html">
                     <html xmlns="http://www.w3.org/1999/xhtml">

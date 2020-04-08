@@ -24,9 +24,9 @@
 		<p:pipe step="chunker" port="mapping"/>
 	</p:output>
 	
-	<p:import href="chunker.xpl">
+	<p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
 		<p:documentation>
-			px:chunker
+			px:xml-chunker
 		</p:documentation>
 	</p:import>
 	<p:import href="html-update-links.xpl">
@@ -37,19 +37,19 @@
 	
 	<p:delete match="/html:html/html:head"/>
 
-	<px:chunker name="chunker"
-	            allow-break-before="html:section"
-	            allow-break-after="html:section"
-	            prefer-break-before="/html:html/html:body/html:section/html:section|
-	                                 /html:html/html:body/html:section/html:section[tokenize(@epub:type,'\s+')='bodymatter']/html:section"
-	            prefer-break-after="/html:html/html:body/html:section/html:section|
-	                                 /html:html/html:body/html:section/html:section[tokenize(@epub:type,'\s+')='bodymatter']/html:section"
-	            always-break-before="/html:html/html:body/html:section|
-	                                 /html:html/html:body/html:section[tokenize(@epub:type,'\s+')='bodymatter']/html:section"
-	            always-break-after="/html:html/html:body/html:section|
-	                                /html:html/html:body/html:section[tokenize(@epub:type,'\s+')='bodymatter']/html:section">
+	<px:xml-chunker name="chunker"
+	                allow-break-before="html:section"
+	                allow-break-after="html:section"
+	                prefer-break-before="/html:html/html:body/html:section/html:section|
+	                                     /html:html/html:body/html:section/html:section[tokenize(@epub:type,'\s+')='bodymatter']/html:section"
+	                prefer-break-after="/html:html/html:body/html:section/html:section|
+	                                     /html:html/html:body/html:section/html:section[tokenize(@epub:type,'\s+')='bodymatter']/html:section"
+	                always-break-before="/html:html/html:body/html:section|
+	                                     /html:html/html:body/html:section[tokenize(@epub:type,'\s+')='bodymatter']/html:section"
+	                always-break-after="/html:html/html:body/html:section|
+	                                    /html:html/html:body/html:section[tokenize(@epub:type,'\s+')='bodymatter']/html:section">
 		<p:with-option name="max-chunk-size" select="$max-chunk-size"/>
-	</px:chunker>
+	</px:xml-chunker>
 	
 	<p:for-each name="chunks">
 		<p:xslt>

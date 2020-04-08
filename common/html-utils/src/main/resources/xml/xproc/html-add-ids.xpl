@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-                xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                 xmlns:html="http://www.w3.org/1999/xhtml"
                 xmlns:epub="http://www.idpf.org/2007/ops"
-                xmlns:d="http://www.daisy.org/ns/pipeline/data"
-                type="px:html-id-fixer"
-                exclude-inline-prefixes="#all">
+                type="px:html-add-ids"
+                version="1.0">
 
 	<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 		<p>Add missing IDs to HTML documents and fix duplicate IDs.</p>
@@ -49,42 +47,19 @@
 			<p><code>d:fileset</code> document that represents the renaming of <code>id</code>
 			attributes.</p>
 		</p:documentation>
-		<p:pipe step="mapping" port="result"/>
+		<p:pipe step="result" port="mapping"/>
 	</p:output>
 
-	<p:for-each>
-		<p:add-xml-base/>
-	</p:for-each>
-	<p:wrap-sequence wrapper="pxi:wrapper"/>
-	<p:add-attribute attribute-name="pxi:need-id" attribute-value="">
-		<p:with-option name="match" select="$match"/>
-	</p:add-attribute>
-	<p:xslt name="xslt">
-		<p:input port="stylesheet">
-			<p:document href="../xslt/html-id-fixer.xsl"/>
-		</p:input>
-		<p:input port="parameters">
-			<p:empty/>
-		</p:input>
-	</p:xslt>
-	<p:filter select="/*/*"/>
-	<p:for-each>
-		<!--
-		    we don't know for sure that it was not present in the input, but adding the xml:base is
-		    required to preserve the base uri after the wrapping and splitting
-		-->
-		<p:delete match="/*/@xml:base"/>
-	</p:for-each>
-	<p:identity name="result"/>
-	<p:sink/>
+	<p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
+		<p:documentation>
+			px:add-ids
+		</p:documentation>
+	</p:import>
 
-	<p:identity>
-		<p:input port="source">
-			<p:pipe step="xslt" port="secondary"/>
-		</p:input>
-	</p:identity>
-	<p:delete match="d:file[not(d:anchor)]"/>
-	<p:identity name="mapping"/>
-	<p:sink/>
+	<px:add-ids name="result">
+		<p:with-option name="match" select="$match">
+			<p:empty/>
+		</p:with-option>
+	</px:add-ids>
 
 </p:declare-step>

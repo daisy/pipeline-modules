@@ -5,7 +5,7 @@
     <p:import href="html-to-fileset.xpl"/>
     <p:import href="html-outline.xpl"/>
     <p:import href="html-fixer.xpl"/>
-    <p:import href="html-id-fixer.xpl"/>
+    <p:import href="html-add-ids.xpl"/>
     <p:import href="html-upgrade.xpl"/>
     <p:import href="html-downgrade.xpl"/>
     <p:import href="html-update-links.xpl"/>

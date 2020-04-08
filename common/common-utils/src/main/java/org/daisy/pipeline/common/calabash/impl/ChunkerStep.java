@@ -1,4 +1,4 @@
-package org.daisy.pipeline.html.calabash.impl;
+package org.daisy.pipeline.common.calabash.impl;
 
 import com.xmlcalabash.core.XProcException;
 import com.xmlcalabash.core.XProcRuntime;
@@ -27,7 +27,7 @@ public class ChunkerStep extends DefaultStep implements XProcStep {
 	@Component(
 		name = "px:chunker",
 		service = { XProcStepProvider.class },
-		property = { "type:String={http://www.daisy.org/ns/pipeline/xproc}chunker" }
+		property = { "type:String={http://www.daisy.org/ns/pipeline/xproc}xml-chunker" }
 	)
 	public static class Provider implements XProcStepProvider {
 		

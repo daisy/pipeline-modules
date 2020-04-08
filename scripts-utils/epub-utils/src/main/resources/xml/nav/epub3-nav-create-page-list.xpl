@@ -43,7 +43,7 @@
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
         <p:documentation>
-            px:html-id-fixer
+            px:html-add-ids
         </p:documentation>
     </p:import>
     
@@ -53,7 +53,7 @@
             <p:pipe step="add-ids" port="result"/>
         </p:output>
         <p:documentation>Add ID attributes</p:documentation>
-        <px:html-id-fixer match="*[tokenize(@epub:type,'\s+')='pagebreak']" name="add-ids"/>
+        <px:html-add-ids match="*[tokenize(@epub:type,'\s+')='pagebreak']" name="add-ids"/>
         <p:xslt>
             <p:input port="stylesheet">
                 <p:document href="html5-to-page-list.xsl"/>
