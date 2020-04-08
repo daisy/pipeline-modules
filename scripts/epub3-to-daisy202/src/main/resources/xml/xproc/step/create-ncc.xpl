@@ -37,6 +37,11 @@
         <p:pipe step="ncc-with-linkbacks" port="result"/>
     </p:output>
 
+    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
+        <p:documentation>
+            px:add-ids
+        </p:documentation>
+    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
         <p:documentation>
             px:set-base-uri
@@ -313,6 +318,10 @@
                         </p:input>
                     </p:xslt>
                 </p:group>
+                <p:documentation>Make sure pars have an id attribute (needed for create-linkbacks.xsl)</p:documentation>
+                <p:for-each>
+                    <px:add-ids match="par"/>
+                </p:for-each>
                 <p:xslt name="smil">
                     <p:input port="stylesheet">
                         <p:document href="../../xslt/pretty-print.xsl"/>
@@ -447,6 +456,9 @@
         </p:xslt>
         <p:choose>
             <p:when test="exists(//par)">
+                <px:add-ids match="par">
+                    <p:documentation>Make sure pars have an id attribute (needed for create-linkbacks.xsl)</p:documentation>
+                </px:add-ids>
                 <p:xslt>
                     <p:input port="stylesheet">
                         <p:document href="../../xslt/pretty-print.xsl"/>
