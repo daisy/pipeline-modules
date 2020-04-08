@@ -43,6 +43,11 @@
                 </x:document>
                 <x:document type="inline" xml:base="file:/tmp/EPUB/chapter_001.smil">
                     <smil>
+                        <head>
+                            <layout>
+                                <region id="txtView"/>
+                            </layout>
+                        </head>
                         <body>
                             <seq id="seq1" dur="3s">
                                 <par id="heading1">
@@ -189,6 +194,9 @@
                     <head>
                         <meta name="dc:format" content="Daisy 2.02"/>
                         <meta name="ncc:timeInThisSmil" content="00:00:03"/>
+                        <layout>
+                            <region id="txtView"/>
+                        </layout>
                     </head>
                     <body>
                         <seq id="seq1" dur="3s">
@@ -225,6 +233,9 @@
                         <meta name="dc:format" content="Daisy 2.02"/>
                         <meta name="ncc:timeInThisSmil" content="00:00:00"/>
                         <meta name="ncc:generator" content="DAISY Pipeline 2"/>
+                        <layout>
+                            <region id="txtView"/>
+                        </layout>
                     </head>
                     <body>
                         <seq dur="0.0s">
