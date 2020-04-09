@@ -318,6 +318,15 @@
                         </p:input>
                     </p:xslt>
                 </p:group>
+                <p:documentation>Fix metadata</p:documentation>
+                <p:xslt>
+                    <p:input port="stylesheet">
+                        <p:document href="../../xslt/smil-metadata.xsl"/>
+                    </p:input>
+                    <p:input port="parameters">
+                        <p:empty/>
+                    </p:input>
+                </p:xslt>
                 <p:documentation>Make sure pars have an id attribute (needed for create-linkbacks.xsl)</p:documentation>
                 <p:for-each>
                     <px:add-ids match="par"/>
@@ -422,9 +431,7 @@
                 <p:inline exclude-inline-prefixes="#all">
                     <smil>
                         <head>
-                            <meta name="dc:format" content="Daisy 2.02"/>
                             <meta name="ncc:generator" content="DAISY Pipeline 2"/>
-                            <meta name="ncc:timeInThisSmil" content="00:00:00"/>
                             <layout>
                                 <region id="txtView"/>
                             </layout>
@@ -449,6 +456,15 @@
             </p:input>
             <p:input port="stylesheet">
                 <p:document href="../../xslt/augment-smil.xsl"/>
+            </p:input>
+            <p:input port="parameters">
+                <p:empty/>
+            </p:input>
+        </p:xslt>
+        <p:documentation>Fix metadata</p:documentation>
+        <p:xslt>
+            <p:input port="stylesheet">
+                <p:document href="../../xslt/smil-metadata.xsl"/>
             </p:input>
             <p:input port="parameters">
                 <p:empty/>
