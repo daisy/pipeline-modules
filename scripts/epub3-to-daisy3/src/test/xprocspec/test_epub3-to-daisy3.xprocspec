@@ -503,14 +503,16 @@
 		<x:expect label="mo0.smil" type="compare">
 			<x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
 				<body>
-					<par id="sforsmil-1" class="doctitle">
-						<text src="content.xml#forsmil-1"/>
-					</par>
-					<seq id="sforsmil-2" class="p">
-						<par id="sst2-1" class="span">
-							<text src="content.xml#st2-1"/>
-							<audio clipBegin="0:00:00.000" clipEnd="0:00:01.223" src="EPUB/audio/mock.mp3"/>
+					<seq id="root-seq">
+						<par id="sforsmil-1" class="doctitle">
+							<text src="content.xml#forsmil-1"/>
 						</par>
+						<seq id="sforsmil-2" class="p">
+							<par id="sst2-1" class="span">
+								<text src="content.xml#st2-1"/>
+								<audio clipBegin="0:00:00.000" clipEnd="0:00:01.223" src="EPUB/audio/mock.mp3"/>
+							</par>
+						</seq>
 					</seq>
 				</body>
 			</x:document>
@@ -521,30 +523,32 @@
 		<x:expect label="mo1.smil" type="compare">
 			<x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
 				<body>
-					<seq id="sh_1" class="h1">
-						<par id="sst3-1" class="span">
-							<text src="content.xml#st3-1"/>
-							<audio clipBegin="0:00:00.000" clipEnd="0:00:01.223" src="EPUB/audio/mock.mp3"/>
+					<seq id="root-seq">
+						<seq id="sh_1" class="h1">
+							<par id="sst3-1" class="span">
+								<text src="content.xml#st3-1"/>
+								<audio clipBegin="0:00:00.000" clipEnd="0:00:01.223" src="EPUB/audio/mock.mp3"/>
+							</par>
+						</seq>
+						<seq id="sforsmil-4" class="p">
+							<par id="sst3-2" class="span">
+								<text src="content.xml#st3-2"/>
+								<audio clipBegin="0:00:01.223" clipEnd="0:00:02.446" src="EPUB/audio/mock.mp3"/>
+							</par>
+						</seq>
+						<seq id="sh_1_1" class="h2">
+							<par id="sst3-3" class="span">
+								<text src="content.xml#st3-3"/>
+								<audio clipBegin="0:00:00.000" clipEnd="0:00:01.223" src="EPUB/audio/mock.mp3"/>
+							</par>
+						</seq>
+						<par id="sforsmil-8" class="table">
+							<text src="content.xml#forsmil-8"/>
+						</par>
+						<par id="spage_front_4" class="pagenum" customTest="pagenum">
+							<text src="content.xml#page_front_4"/>
 						</par>
 					</seq>
-					<seq id="sforsmil-4" class="p">
-						<par id="sst3-2" class="span">
-							<text src="content.xml#st3-2"/>
-							<audio clipBegin="0:00:01.223" clipEnd="0:00:02.446" src="EPUB/audio/mock.mp3"/>
-						</par>
-					</seq>
-					<seq id="sh_1_1" class="h2">
-						<par id="sst3-3" class="span">
-							<text src="content.xml#st3-3"/>
-							<audio clipBegin="0:00:00.000" clipEnd="0:00:01.223" src="EPUB/audio/mock.mp3"/>
-						</par>
-					</seq>
-					<par id="sforsmil-8" class="table">
-						<text src="content.xml#forsmil-8"/>
-					</par>
-					<par id="spage_front_4" class="pagenum" customTest="pagenum">
-						<text src="content.xml#page_front_4"/>
-					</par>
 				</body>
 			</x:document>
 		</x:expect>
@@ -554,21 +558,23 @@
 		<x:expect label="mo3.smil" type="compare">
 			<x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
 				<body>
-					<seq id="sh_1_2" class="h2">
-						<par id="sst3-4" class="span">
-							<text src="content.xml#st3-4"/>
-							<audio clipBegin="0:00:00.000" clipEnd="0:00:01.223" src="EPUB/audio/mock.mp3"/>
+					<seq id="root-seq">
+						<seq id="sh_1_2" class="h2">
+							<par id="sst3-4" class="span">
+								<text src="content.xml#st3-4"/>
+								<audio clipBegin="0:00:00.000" clipEnd="0:00:01.223" src="EPUB/audio/mock.mp3"/>
+							</par>
+						</seq>
+						<seq id="sforsmil-10" class="p">
+							<par id="sst3-5" class="span">
+								<text src="content.xml#st3-5"/>
+								<audio clipBegin="0:00:01.223" clipEnd="0:00:02.446" src="EPUB/audio/mock.mp3"/>
+							</par>
+						</seq>
+						<par id="spage_front_5" class="pagenum" customTest="pagenum">
+							<text src="content.xml#page_front_5"/>
 						</par>
 					</seq>
-					<seq id="sforsmil-10" class="p">
-						<par id="sst3-5" class="span">
-							<text src="content.xml#st3-5"/>
-							<audio clipBegin="0:00:01.223" clipEnd="0:00:02.446" src="EPUB/audio/mock.mp3"/>
-						</par>
-					</seq>
-					<par id="spage_front_5" class="pagenum" customTest="pagenum">
-						<text src="content.xml#page_front_5"/>
-					</par>
 				</body>
 			</x:document>
 		</x:expect>
@@ -593,20 +599,22 @@
 						</customAttributes>
 					</head>
 					<body>
-						<par id="spage_5" class="pagenum" customTest="pagenum">
-							<text src="content.xml#page_5"/>
-						</par>
-						<seq id="sid_1" class="h1">
-							<par id="sst4-1" class="span">
-								<text src="content.xml#st4-1"/>
-								<audio clipBegin="0:00:00.000" clipEnd="0:00:01.223" src="EPUB/audio/mock.mp3"/>
+						<seq id="root-seq">
+							<par id="spage_5" class="pagenum" customTest="pagenum">
+								<text src="content.xml#page_5"/>
 							</par>
-						</seq>
-						<seq id="sforsmil-13" class="p">
-							<par id="sst4-2" class="span">
-								<text src="content.xml#st4-2"/>
-								<audio clipBegin="0:00:00.000" clipEnd="0:00:01.223" src="EPUB/audio/mock.mp3"/>
-							</par>
+							<seq id="sid_1" class="h1">
+								<par id="sst4-1" class="span">
+									<text src="content.xml#st4-1"/>
+									<audio clipBegin="0:00:00.000" clipEnd="0:00:01.223" src="EPUB/audio/mock.mp3"/>
+								</par>
+							</seq>
+							<seq id="sforsmil-13" class="p">
+								<par id="sst4-2" class="span">
+									<text src="content.xml#st4-2"/>
+									<audio clipBegin="0:00:00.000" clipEnd="0:00:01.223" src="EPUB/audio/mock.mp3"/>
+								</par>
+							</seq>
 						</seq>
 					</body>
 				</smil>

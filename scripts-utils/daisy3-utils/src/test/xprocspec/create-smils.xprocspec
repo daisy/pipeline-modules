@@ -51,10 +51,12 @@
 	</x:document>
         <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
           <body>
-            <par id="ss1" class="sent">
-              <text src="../dtbook.xml#s1"/>
-              <audio src="../audio/part_1.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.500"/>
-            </par>
+            <seq id="root-seq">
+              <par id="ss1" class="sent">
+                <text src="../dtbook.xml#s1"/>
+                <audio src="../audio/part_1.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.500"/>
+              </par>
+            </seq>
           </body>
         </x:document>
       </x:expect>
@@ -108,10 +110,12 @@
     	</x:document>
         <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
           <body>
-            <seq id="si1" class="h1">
-              <par id="si2" class="sent">
-                <text src="../dtbook.xml#i2"/>
-              </par>
+            <seq id="root-seq">
+              <seq id="si1" class="h1">
+                <par id="si2" class="sent">
+                  <text src="../dtbook.xml#i2"/>
+                </par>
+              </seq>
             </seq>
           </body>
         </x:document>
@@ -141,10 +145,12 @@
     	</x:document>
         <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
           <body>
-            <par id="sh1" class="h1">
-              <text src="../dtbook.xml#h1"/>
-              <audio src="../audio/part_2.mp3" clipBegin="0:00:00.000" clipEnd="0:00:00.500"/>
-            </par>
+            <seq id="root-seq">
+              <par id="sh1" class="h1">
+                <text src="../dtbook.xml#h1"/>
+                <audio src="../audio/part_2.mp3" clipBegin="0:00:00.000" clipEnd="0:00:00.500"/>
+              </par>
+            </seq>
           </body>
         </x:document>
       </x:expect>
@@ -181,18 +187,22 @@
         </x:document>
         <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
           <body>
-            <par id="ss1" class="sent">
-              <text src="../dtbook.xml#s1"/>
-              <audio src="../audio/part_1.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.500"/>
-            </par>
+            <seq id="root-seq">
+              <par id="ss1" class="sent">
+                <text src="../dtbook.xml#s1"/>
+                <audio src="../audio/part_1.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.500"/>
+              </par>
+            </seq>
           </body>
         </x:document>
         <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
           <body>
-            <par id="ss2" class="sent">
-              <text src="../dtbook.xml#s2"/>
-              <audio src="../audio/part_1.mp3" clipBegin="0:00:01.500" clipEnd="0:00:04.000"/>
-            </par>
+            <seq id="root-seq">
+              <par id="ss2" class="sent">
+                <text src="../dtbook.xml#s2"/>
+                <audio src="../audio/part_1.mp3" clipBegin="0:00:01.500" clipEnd="0:00:04.000"/>
+              </par>
+            </seq>
           </body>
         </x:document>
       </x:expect>
@@ -231,22 +241,26 @@
         </x:document>
         <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
           <body>
-            <par id="ss1" class="sent">
-              <text src="../dtbook.xml#s1"/>
-              <audio src="../audio/part_1.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.500"/>
-            </par>
-            <par id="ss2" class="sent">
-              <text src="../dtbook.xml#s2"/>
-              <audio src="../audio/part_1.mp3" clipBegin="0:00:01.500" clipEnd="0:00:04.000"/>
-            </par>
+            <seq id="root-seq">
+              <par id="ss1" class="sent">
+                <text src="../dtbook.xml#s1"/>
+                <audio src="../audio/part_1.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.500"/>
+              </par>
+              <par id="ss2" class="sent">
+                <text src="../dtbook.xml#s2"/>
+                <audio src="../audio/part_1.mp3" clipBegin="0:00:01.500" clipEnd="0:00:04.000"/>
+              </par>
+            </seq>
           </body>
         </x:document>
         <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
           <body>
-            <par id="ss3" class="sent">
-              <text src="../dtbook.xml#s3"/>
-              <audio src="../audio/part_1.mp3" clipBegin="0:00:04.000" clipEnd="0:00:04.500"/>
-            </par>
+            <seq id="root-seq">
+              <par id="ss3" class="sent">
+                <text src="../dtbook.xml#s3"/>
+                <audio src="../audio/part_1.mp3" clipBegin="0:00:04.000" clipEnd="0:00:04.500"/>
+              </par>
+            </seq>
           </body>
         </x:document>
       </x:expect>
@@ -303,31 +317,35 @@
         </x:document>
         <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
           <body>
-            <par id="ss1" class="sent">
-              <text src="../dtbook.xml#s1"/>
-              <audio src="../audio/part_1.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.500"/>
-            </par>
-            <par id="ss2" class="sent">
-              <text src="../dtbook.xml#s2"/>
-              <audio src="../audio/part_1.mp3" clipBegin="0:00:01.500" clipEnd="0:00:04.000"/>
-            </par>
-            <par id="ss3" class="sent">
-              <text src="../dtbook.xml#s3"/>
-              <audio src="../audio/part_1.mp3" clipBegin="0:00:04.000" clipEnd="0:00:04.500"/>
-            </par>
-            <par id="ss4" class="sent">
-              <text src="../dtbook.xml#s4"/>
-            </par>
+            <seq id="root-seq">
+              <par id="ss1" class="sent">
+                <text src="../dtbook.xml#s1"/>
+                <audio src="../audio/part_1.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.500"/>
+              </par>
+              <par id="ss2" class="sent">
+                <text src="../dtbook.xml#s2"/>
+                <audio src="../audio/part_1.mp3" clipBegin="0:00:01.500" clipEnd="0:00:04.000"/>
+              </par>
+              <par id="ss3" class="sent">
+                <text src="../dtbook.xml#s3"/>
+                <audio src="../audio/part_1.mp3" clipBegin="0:00:04.000" clipEnd="0:00:04.500"/>
+              </par>
+              <par id="ss4" class="sent">
+                <text src="../dtbook.xml#s4"/>
+              </par>
+            </seq>
           </body>
         </x:document>
         <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
           <body>
-            <par id="ss5" class="sent">
-              <text src="../dtbook.xml#s5"/>
-            </par>
-            <par id="ss6" class="sent">
-              <text src="../dtbook.xml#s6"/>
-            </par>
+            <seq id="root-seq">
+              <par id="ss5" class="sent">
+                <text src="../dtbook.xml#s5"/>
+              </par>
+              <par id="ss6" class="sent">
+                <text src="../dtbook.xml#s6"/>
+              </par>
+            </seq>
           </body>
         </x:document>
       </x:expect>
@@ -388,33 +406,37 @@
         </x:document>
         <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
           <body>
-            <seq id="sp1" class="p">
-              <par id="ss1" class="sent">
-                <text src="../dtbook.xml#s1"/>
-                <audio src="../audio/part_1.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.500"/>
-              </par>
-              <par id="ss2" class="sent">
-                <text src="../dtbook.xml#s2"/>
-                <audio src="../audio/part_1.mp3" clipBegin="0:00:01.500" clipEnd="0:00:04.000"/>
+            <seq id="root-seq">
+              <seq id="sp1" class="p">
+                <par id="ss1" class="sent">
+                  <text src="../dtbook.xml#s1"/>
+                  <audio src="../audio/part_1.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.500"/>
+                </par>
+                <par id="ss2" class="sent">
+                  <text src="../dtbook.xml#s2"/>
+                  <audio src="../audio/part_1.mp3" clipBegin="0:00:01.500" clipEnd="0:00:04.000"/>
+                </par>
+              </seq>
+              <par id="ss3" class="sent">
+                <text src="../dtbook.xml#s3"/>
+                <audio src="../audio/part_1.mp3" clipBegin="0:00:04.000" clipEnd="0:00:04.500"/>
               </par>
             </seq>
-            <par id="ss3" class="sent">
-              <text src="../dtbook.xml#s3"/>
-              <audio src="../audio/part_1.mp3" clipBegin="0:00:04.000" clipEnd="0:00:04.500"/>
-            </par>
           </body>
         </x:document>
         <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
           <body>
-            <seq id="sp2" class="p">
-              <par id="ss4" class="sent">
-              <text src="../dtbook.xml#s4"/></par>
-              <par id="ss5" class="sent">
-              <text src="../dtbook.xml#s5"/></par>
+            <seq id="root-seq">
+              <seq id="sp2" class="p">
+                <par id="ss4" class="sent">
+                <text src="../dtbook.xml#s4"/></par>
+                <par id="ss5" class="sent">
+                <text src="../dtbook.xml#s5"/></par>
+              </seq>
+              <par id="ss6" class="sent">
+                <text src="../dtbook.xml#s6"/>
+              </par>
             </seq>
-            <par id="ss6" class="sent">
-              <text src="../dtbook.xml#s6"/>
-            </par>
           </body>
         </x:document>
       </x:expect>
@@ -453,16 +475,18 @@
     	</x:document>
         <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
           <body>
-            <par id="sref1" class="noteref" customTest="noteref">
-              <a external="false" href="mo0.smil#sn1">
-                <text src="../dtbook.xml#ref1"/>
-              </a>
-            </par>
-            <seq id="sn1" class="note" customTest="note">
-              <par id="ss1" class="sent">
-                <text src="../dtbook.xml#s1"/>
-                <audio src="../audio/part_1.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.500"/>
+            <seq id="root-seq">
+              <par id="sref1" class="noteref" customTest="noteref">
+                <a external="false" href="mo0.smil#sn1">
+                  <text src="../dtbook.xml#ref1"/>
+                </a>
               </par>
+              <seq id="sn1" class="note" customTest="note">
+                <par id="ss1" class="sent">
+                  <text src="../dtbook.xml#s1"/>
+                  <audio src="../audio/part_1.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.500"/>
+                </par>
+              </seq>
             </seq>
           </body>
         </x:document>
@@ -504,15 +528,17 @@
     	</x:document>
         <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
           <body>
-            <seq id="ss8" class="sent">
-              <par id="sref1" class="noteref" customTest="noteref">
-                <a external="false" href="mo0.smil#sn1">
-                  <text src="../dtbook.xml#ref1"/>
-                </a>
-              </par>
-              <par id="sn1" class="note" customTest="note">
-                <text src="../dtbook.xml#n1"/>
-              </par>
+            <seq id="root-seq">
+              <seq id="ss8" class="sent">
+                <par id="sref1" class="noteref" customTest="noteref">
+                  <a external="false" href="mo0.smil#sn1">
+                    <text src="../dtbook.xml#ref1"/>
+                  </a>
+                </par>
+                <par id="sn1" class="note" customTest="note">
+                  <text src="../dtbook.xml#n1"/>
+                </par>
+              </seq>
             </seq>
           </body>
         </x:document>
@@ -560,21 +586,23 @@
     	</x:document>
         <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
           <body>
-            <par id="sref1" class="noteref" customTest="noteref">
-              <a external="false" href="mo0.smil#sn1">
-                <text src="../dtbook.xml#ref1"/>
-              </a>
-            </par>
-            <seq id="sn1" class="note" customTest="note">
-              <seq id="sp1" class="p">
-                <seq id="sp2" class="p">
-                  <par id="sp3" class="p">
-                    <text src="../dtbook.xml#p3"/>
-                  </par>
-                  <par id="ss1" class="sent">
-                    <text src="../dtbook.xml#s1"/>
-                    <audio src="../audio/part_1.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.500"/>
-                  </par>
+            <seq id="root-seq">
+              <par id="sref1" class="noteref" customTest="noteref">
+                <a external="false" href="mo0.smil#sn1">
+                  <text src="../dtbook.xml#ref1"/>
+                </a>
+              </par>
+              <seq id="sn1" class="note" customTest="note">
+                <seq id="sp1" class="p">
+                  <seq id="sp2" class="p">
+                    <par id="sp3" class="p">
+                      <text src="../dtbook.xml#p3"/>
+                    </par>
+                    <par id="ss1" class="sent">
+                      <text src="../dtbook.xml#s1"/>
+                      <audio src="../audio/part_1.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.500"/>
+                    </par>
+                  </seq>
                 </seq>
               </seq>
             </seq>
@@ -624,20 +652,22 @@
     	</x:document>
         <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
           <body>
-            <par id="sref1" class="noteref" customTest="noteref">
-              <a external="false" href="mo0.smil#sn1">
-                <text src="../dtbook.xml#ref1"/>
-              </a>
-            </par>
-            <seq id="sn1" class="note" customTest="note">
-              <par id="sref2" class="noteref" customTest="noteref">
-                <a external="false" href="mo0.smil#sn2">
-                  <text src="../dtbook.xml#ref2"/>
+            <seq id="root-seq">
+              <par id="sref1" class="noteref" customTest="noteref">
+                <a external="false" href="mo0.smil#sn1">
+                  <text src="../dtbook.xml#ref1"/>
                 </a>
               </par>
-              <par id="sn2" class="note" customTest="note">
-                <text src="../dtbook.xml#n2"/>
-              </par>
+              <seq id="sn1" class="note" customTest="note">
+                <par id="sref2" class="noteref" customTest="noteref">
+                  <a external="false" href="mo0.smil#sn2">
+                    <text src="../dtbook.xml#ref2"/>
+                  </a>
+                </par>
+                <par id="sn2" class="note" customTest="note">
+                  <text src="../dtbook.xml#n2"/>
+                </par>
+              </seq>
             </seq>
           </body>
         </x:document>
@@ -681,26 +711,32 @@
 	</x:document>
         <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
           <body>
-            <par id="ss1" class="sent">
-              <text src="../dtbook.xml#s1"/>
-              <audio src="../audio/part_1.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.500"/>
-            </par>
+            <seq id="root-seq">
+              <par id="ss1" class="sent">
+                <text src="../dtbook.xml#s1"/>
+                <audio src="../audio/part_1.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.500"/>
+              </par>
+            </seq>
           </body>
         </x:document>
         <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
           <body>
-            <par id="ss2" class="sent">
-              <text src="../dtbook.xml#s2"/>
-              <audio src="../audio/part_1.mp3" clipBegin="0:00:01.500" clipEnd="0:00:04.000"/>
-            </par>
+            <seq id="root-seq">
+              <par id="ss2" class="sent">
+                <text src="../dtbook.xml#s2"/>
+                <audio src="../audio/part_1.mp3" clipBegin="0:00:01.500" clipEnd="0:00:04.000"/>
+              </par>
+            </seq>
           </body>
         </x:document>
         <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
           <body>
-            <par id="ss3" class="sent">
-              <text src="../dtbook.xml#s3"/>
-              <audio src="../audio/part_1.mp3" clipBegin="0:00:04.000" clipEnd="0:00:04.500"/>
-            </par>
+            <seq id="root-seq">
+              <par id="ss3" class="sent">
+                <text src="../dtbook.xml#s3"/>
+                <audio src="../audio/part_1.mp3" clipBegin="0:00:04.000" clipEnd="0:00:04.500"/>
+              </par>
+            </seq>
           </body>
         </x:document>
       </x:expect>
@@ -741,18 +777,22 @@
 	</x:document>
         <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
           <body>
-            <par id="ss1" class="sent">
-              <text src="../dtbook.xml#s1"/>
-              <audio src="../audio/part_1.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.500"/>
-            </par>
+            <seq id="root-seq">
+              <par id="ss1" class="sent">
+                <text src="../dtbook.xml#s1"/>
+                <audio src="../audio/part_1.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.500"/>
+              </par>
+            </seq>
           </body>
         </x:document>
         <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
           <body>
-            <par id="ss2" class="sent">
-              <text src="../dtbook.xml#s2"/>
-              <audio src="../audio/part_1.mp3" clipBegin="0:00:01.500" clipEnd="0:00:04.000"/>
-            </par>
+            <seq id="root-seq">
+              <par id="ss2" class="sent">
+                <text src="../dtbook.xml#s2"/>
+                <audio src="../audio/part_1.mp3" clipBegin="0:00:01.500" clipEnd="0:00:04.000"/>
+              </par>
+            </seq>
           </body>
         </x:document>
       </x:expect>
@@ -791,19 +831,21 @@
 	</x:document>
         <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
           <body>
-            <par id="sn1" class="noteref" customTest="noteref">
-              <a external="false" href="mo0.smil#sn">
-                <text src="../dtbook.xml#n1"/>
-              </a>
-            </par>
-            <par id="sn" class="note" customTest="note">
-              <text src="../dtbook.xml#n"/>
-            </par>
-            <par id="sn2" class="noteref" customTest="noteref">
-              <a external="false" href="mo0.smil#sn">
-                <text src="../dtbook.xml#n2"/>
-              </a>
-            </par>
+            <seq id="root-seq">
+              <par id="sn1" class="noteref" customTest="noteref">
+                <a external="false" href="mo0.smil#sn">
+                  <text src="../dtbook.xml#n1"/>
+                </a>
+              </par>
+              <par id="sn" class="note" customTest="note">
+                <text src="../dtbook.xml#n"/>
+              </par>
+              <par id="sn2" class="noteref" customTest="noteref">
+                <a external="false" href="mo0.smil#sn">
+                  <text src="../dtbook.xml#n2"/>
+                </a>
+              </par>
+            </seq>
           </body>
         </x:document>
       </x:expect>
@@ -846,15 +888,18 @@
 	</x:document>
         <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
           <body>
-            <par id="ss1" class="span">
-            <audio src="../audio/part_1.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.500"/></par>
-            <seq id="sn" class="note" customTest="note">
+            <seq id="root-seq">
               <par id="ss1" class="span">
                 <audio src="../audio/part_1.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.500"/>
               </par>
-              <par id="ss2" class="span">
-                <audio src="../audio/part_1.mp3" clipBegin="0:00:01.500" clipEnd="0:00:04.000"/>
-              </par>
+              <seq id="sn" class="note" customTest="note">
+                <par id="ss1" class="span">
+                  <audio src="../audio/part_1.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.500"/>
+                </par>
+                <par id="ss2" class="span">
+                  <audio src="../audio/part_1.mp3" clipBegin="0:00:01.500" clipEnd="0:00:04.000"/>
+                </par>
+              </seq>
             </seq>
           </body>
         </x:document>
@@ -916,15 +961,17 @@
               </customAttributes>
 	    </head>
 	    <body>
-              <seq id="sheader" class="h1">
-		<par id="ss1" class="span">
-                  <audio src="../audio/part_1.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.500"/>
-		</par>
-		<seq id="sn" class="note" customTest="note">
-                  <par id="ss2" class="span">
-                    <audio src="../audio/part_1.mp3" clipBegin="0:00:01.500" clipEnd="0:00:04.000"/>
+              <seq id="root-seq">
+                <seq id="sheader" class="h1">
+                  <par id="ss1" class="span">
+                    <audio src="../audio/part_1.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.500"/>
                   </par>
-		</seq>
+                  <seq id="sn" class="note" customTest="note">
+                    <par id="ss2" class="span">
+                      <audio src="../audio/part_1.mp3" clipBegin="0:00:01.500" clipEnd="0:00:04.000"/>
+                    </par>
+                  </seq>
+                </seq>
               </seq>
 	    </body>
 	  </smil>
