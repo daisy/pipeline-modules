@@ -56,6 +56,7 @@
 			px:epub-guide-to-landmarks
 			px:epub3-add-navigation-doc
 			px:epub3-nav-from-ncx
+			px:epub-rename-files
 		</p:documentation>
 	</p:import>
 
@@ -104,7 +105,7 @@
 	<p:group name="upgrade-html">
 		<p:output port="fileset" primary="true"/>
 		<p:output port="in-memory" sequence="true">
-			<p:pipe step="update" port="result.in-memory"/>
+			<p:pipe step="rename" port="result.in-memory"/>
 		</p:output>
 		<px:fileset-load media-types="application/xhtml+xml" name="load">
 			<p:input port="in-memory">
@@ -130,6 +131,28 @@
 				<p:pipe step="docs" port="result"/>
 			</p:input>
 		</px:fileset-update>
+		<p:documentation>
+			Rename files to .xhtml.
+		</p:documentation>
+		<px:fileset-filter media-types="application/xhtml+xml"/>
+		<p:label-elements match="d:file" attribute="original-href" replace="true"
+		                  label="resolve-uri(@href,base-uri(.))"/>
+		<p:label-elements match="d:file" attribute="href" replace="true"
+		                  label="replace(@href,'^(.*)\.([^/\.]*)$','$1.xhtml')"/>
+		<p:delete match="/*/*[not(self::d:file)]"/>
+		<p:delete match="d:file/@*[not(name()=('href','original-href'))]" name="mapping"/>
+		<p:sink/>
+		<px:epub-rename-files name="rename">
+			<p:input port="source.fileset">
+				<p:pipe step="update" port="result.fileset"/>
+			</p:input>
+			<p:input port="source.in-memory">
+				<p:pipe step="update" port="result.in-memory"/>
+			</p:input>
+			<p:input port="mapping">
+				<p:pipe step="mapping" port="result"/>
+			</p:input>
+		</px:epub-rename-files>
 	</p:group>
 
 	<p:documentation>

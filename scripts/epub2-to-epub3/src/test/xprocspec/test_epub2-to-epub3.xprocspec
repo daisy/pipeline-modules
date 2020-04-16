@@ -18,9 +18,9 @@
 						<d:file href="META-INF/container.xml" media-type="application/xml"/>
 						<d:file href="EPUB/package.opf" media-type="application/oebps-package+xml"/>
 						<d:file href="EPUB/toc.ncx" media-type="application/x-dtbncx+xml"/>
-						<d:file href="EPUB/cover.xhtml" media-type="application/xhtml+xml"/>
-						<d:file href="EPUB/front.xhtml" media-type="application/xhtml+xml"/>
-						<d:file href="EPUB/chapter.xhtml" media-type="application/xhtml+xml"/>
+						<d:file href="EPUB/cover.html" media-type="application/xhtml+xml"/>
+						<d:file href="EPUB/front.html" media-type="application/xhtml+xml"/>
+						<d:file href="EPUB/chapter.html" media-type="application/xhtml+xml"/>
 					</d:fileset>
 				</x:document>
 			</x:input>
@@ -46,9 +46,9 @@
 						</metadata>
 						<manifest>
 							<item id="toc" href="toc.ncx" media-type="application/x-dtbncx+xml"/>
-							<item id="cover" href="cover.xhtml" media-type="application/xhtml+xml"/>
-							<item id="front" href="front.xhtml" media-type="application/xhtml+xml"/>
-							<item id="chapter" href="chapter.xhtml" media-type="application/xhtml+xml"/>
+							<item id="cover" href="cover.html" media-type="application/xhtml+xml"/>
+							<item id="front" href="front.html" media-type="application/xhtml+xml"/>
+							<item id="chapter" href="chapter.html" media-type="application/xhtml+xml"/>
 						</manifest>
 						<spine toc="toc">
 							<itemref idref="cover"/>
@@ -56,10 +56,10 @@
 							<itemref idref="chapter"/>
 						</spine>
 						<guide>
-							<reference href="cover.xhtml" type="cover" title="Cover"/>
-							<reference href="front.xhtml#h_1_1" type="toc" title="List of contents"/>
-							<reference href="front.xhtml#h_1_2" type="preface"/>
-							<reference href="chapter.xhtml" type="text"/>
+							<reference href="cover.html" type="cover" title="Cover"/>
+							<reference href="front.html#h_1_1" type="toc" title="List of contents"/>
+							<reference href="front.html#h_1_2" type="preface"/>
+							<reference href="chapter.html" type="text"/>
 						</guide>
 					</package>
 				</x:document>
@@ -76,25 +76,25 @@
 								<navLabel>
 									<text>Title</text>
 								</navLabel>
-								<content src="front.xhtml#h_1"/>
+								<content src="front.html#h_1"/>
 								<navPoint playOrder="2" id="navPoint-2">
 									<navLabel>
 										<text>List of contents</text>
 									</navLabel>
-									<content src="front.xhtml#h_1_1"/>
+									<content src="front.html#h_1_1"/>
 								</navPoint>
 								<navPoint playOrder="3" id="navPoint-3">
 									<navLabel>
 										<text>Preface</text>
 									</navLabel>
-									<content src="front.xhtml#h_1_2"/>
+									<content src="front.html#h_1_2"/>
 								</navPoint>
 							</navPoint>
 							<navPoint playOrder="4" id="navPoint-4">
 								<navLabel>
 									<text>Chapter 1</text>
 								</navLabel>
-								<content src="chapter.xhtml#h_1"/>
+								<content src="chapter.html#h_1"/>
 							</navPoint>
 						</navMap>
 						<pageList>
@@ -102,44 +102,44 @@
 								<navLabel>
 									<text>iv</text>
 								</navLabel>
-								<content src="front.xhtml#page_front_4"/>
+								<content src="front.html#page_front_4"/>
 							</pageTarget>
 							<pageTarget type="front" value="5" playOrder="6" id="pageTarget-2">
 								<navLabel>
 									<text>v</text>
 								</navLabel>
-								<content src="front.xhtml#page_front_4"/>
+								<content src="front.html#page_front_4"/>
 							</pageTarget>
 							<pageTarget type="normal" value="5" playOrder="7" id="pageTarget-3">
 								<navLabel>
 									<text>5</text>
 								</navLabel>
-								<content src="chapter.xhtml#page_5"/>
+								<content src="chapter.html#page_5"/>
 							</pageTarget>
 						</pageList>
 					</ncx>
 				</x:document>
-				<x:document type="inline" xml:base="EPUB/cover.xhtml">
+				<x:document type="inline" xml:base="EPUB/cover.html">
 					<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 						<head>
 							<meta charset="UTF-8" />
 							<title>minimal</title>
 							<meta name="dc:identifier" content="id"/>
-							<link rel="next" href="front.xhtml" />
+							<link rel="next" href="front.html" />
 						</head>
 						<body id="cover">
 							<p>...</p>
 						</body>
 					</html>
 				</x:document>
-				<x:document type="inline" xml:base="EPUB/front.xhtml">
+				<x:document type="inline" xml:base="EPUB/front.html">
 					<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 						<head>
 							<meta charset="UTF-8" />
 							<title>minimal</title>
 							<meta name="dc:identifier" content="id"/>
-							<link rel="prev" href="cover.xhtml"/>
-							<link rel="next" href="chapter.xhtml"/>
+							<link rel="prev" href="cover.html"/>
+							<link rel="next" href="chapter.html"/>
 						</head>
 						<body id="front">
 							<h1 id="h_1">Title</h1>
@@ -153,13 +153,13 @@
 						</body>
 					</html>
 				</x:document>
-				<x:document type="inline" xml:base="EPUB/chapter.xhtml">
+				<x:document type="inline" xml:base="EPUB/chapter.html">
 					<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 						<head>
 							<meta charset="UTF-8"/>
 							<title>minimal</title>
 							<meta name="dc:identifier" content="id"/>
-							<link rel="prev" href="front.xhtml"/>
+							<link rel="prev" href="front.html"/>
 						</head>
 						<body id="chap_1">
 							<div id="page_5" class="page-normal" title="5"/>
