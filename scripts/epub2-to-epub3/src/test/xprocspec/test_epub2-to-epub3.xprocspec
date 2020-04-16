@@ -36,11 +36,12 @@
 					</container>
 				</x:document>
 				<x:document type="inline" xml:base="EPUB/package.opf">
-					<package xmlns="http://www.idpf.org/2007/opf" version="2.0" xml:lang="en" unique-identifier="pub-id">
+					<package xmlns="http://www.idpf.org/2007/opf" version="2.0" xml:lang="en" unique-identifier="pub-id"
+					         xmlns:opf="http://www.idpf.org/2007/opf">
 						<metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
 							<dc:title id="title">minimal</dc:title>
 							<dc:identifier id="pub-id">id</dc:identifier>
-							<meta name="dcterms:modified" content="2020-03-06T12:00:00Z"/>
+							<dc:date opf:event="modification">2020-03-06T12:00:00Z</dc:date>
 							<dc:date>2020-03-06</dc:date>
 							<dc:language>en</dc:language>
 						</metadata>
