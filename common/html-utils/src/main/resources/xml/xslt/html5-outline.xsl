@@ -303,10 +303,15 @@
     <!-- For the outline document convert anchor elements to span and take only the
          @class|@dir|@lang|@title attributes. -->
     <xsl:template match="a">
-        <span>
-            <xsl:copy-of select="@class|@dir|@lang|@title"/>
+        <xsl:variable name="content" as="node()*">
             <xsl:apply-templates/>
-        </span>
+        </xsl:variable>
+        <xsl:if test="exists($content)">
+            <span>
+                <xsl:copy-of select="@class|@dir|@lang|@title"/>
+                <xsl:sequence select="$content"/>
+            </span>
+        </xsl:if>
     </xsl:template>
 
     <xsl:template match="@*|node()">
