@@ -367,7 +367,7 @@
 	
 			<p:documentation>Create page list</p:documentation>
 			<p:group name="page-list">
-				<p:output port="result" primary="true"/>
+				<p:output port="result" primary="true" sequence="true"/>
 				<p:output port="content-docs" sequence="true">
 					<p:pipe step="skip-if-provided" port="content-docs"/>
 				</p:output>
@@ -407,6 +407,9 @@
 						</px:epub3-create-page-list>
 					</p:otherwise>
 				</p:choose>
+				<p:split-sequence test="/html:nav[html:ol/html:li]">
+					<p:documentation>Omit page list if empty</p:documentation>
+				</p:split-sequence>
 			</p:group>
 			<p:sink/>
 
