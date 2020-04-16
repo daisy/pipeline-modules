@@ -58,7 +58,7 @@
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/epub-utils/library.xpl">
         <p:documentation>
-            px:epub3-update-links
+            px:epub-update-links
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/braille/common-utils/library.xpl">
@@ -155,7 +155,7 @@
         <!--
             update cross references
         -->
-        <px:epub3-update-links name="update-links">
+        <px:epub-update-links name="update-links">
             <p:input port="source.fileset">
                 <p:pipe step="move" port="result.fileset"/>
             </p:input>
@@ -165,7 +165,7 @@
             <p:input port="mapping">
                 <p:pipe step="mapping" port="result"/>
             </p:input>
-        </px:epub3-update-links>
+        </px:epub-update-links>
         <!--
             perform rename
         -->

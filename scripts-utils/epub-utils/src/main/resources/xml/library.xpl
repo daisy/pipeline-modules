@@ -43,6 +43,6 @@
 	<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 		<p>Other utility steps</p>
 	</p:documentation>
-	<p:import href="epub3-rename-files.xpl"/>
-	<p:import href="epub3-update-links.xpl"/>
+	<p:import href="epub-rename-files.xpl"/>
+	<p:import href="epub-update-links.xpl"/>
 </p:library>

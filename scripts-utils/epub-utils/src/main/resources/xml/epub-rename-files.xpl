@@ -2,7 +2,7 @@
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 exclude-inline-prefixes="#all"
-                type="px:epub3-rename-files" name="main">
+                type="px:epub-rename-files" name="main">
 
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
         <p>Rename files in an EPUB fileset</p>
@@ -38,21 +38,21 @@
             px:fileset-apply
         </p:documentation>
     </p:import>
-    <p:import href="epub3-update-links.xpl">
+    <p:import href="epub-update-links.xpl">
         <p:documentation>
-            px:epub3-update-links
+            px:epub-update-links
         </p:documentation>
     </p:import>
 
     <p:documentation>Update cross-references</p:documentation>
-    <px:epub3-update-links name="update-links">
+    <px:epub-update-links name="update-links">
         <p:input port="source.in-memory">
             <p:pipe step="main" port="source.in-memory"/>
         </p:input>
         <p:input port="mapping">
             <p:pipe step="main" port="mapping"/>
         </p:input>
-    </px:epub3-update-links>
+    </px:epub-update-links>
 
     <p:documentation>Perform the renaming</p:documentation>
     <px:fileset-apply name="rename">

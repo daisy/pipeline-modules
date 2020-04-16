@@ -2,11 +2,11 @@
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc-internal"
-                type="pxi:epub3-pub-package-doc-update-links"
+                type="pxi:epub-package-doc-update-links"
                 name="main">
 
 	<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-		<p>Update the links in a EPUB 3 package document document after resources have been
+		<p>Update the links in a EPUB package document document after resources have been
 		relocated.</p>
 	</p:documentation>
 	

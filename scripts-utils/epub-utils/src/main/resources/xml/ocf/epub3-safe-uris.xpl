@@ -42,9 +42,9 @@
             px:fileset-apply
         </p:documentation>
     </p:import>
-    <p:import href="../epub3-rename-files.xpl">
+    <p:import href="../epub-rename-files.xpl">
         <p:documentation>
-            px:epub3-rename-files
+            px:epub-rename-files
         </p:documentation>
     </p:import>
 
@@ -70,7 +70,7 @@
               name="mapping"/>
     <p:sink/>
 
-    <px:epub3-rename-files name="rename">
+    <px:epub-rename-files name="rename">
         <p:input port="source.fileset">
             <p:pipe step="main" port="source.fileset"/>
         </p:input>
@@ -80,6 +80,6 @@
         <p:input port="mapping">
             <p:pipe step="mapping" port="result"/>
         </p:input>
-    </px:epub3-rename-files>
+    </px:epub-rename-files>
 
 </p:declare-step>
