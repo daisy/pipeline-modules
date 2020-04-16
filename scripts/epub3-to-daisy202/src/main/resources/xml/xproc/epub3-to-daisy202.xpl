@@ -22,7 +22,7 @@
             <h2 px:role="name">EPUB 3 Publication</h2>
             <p px:role="desc" xml:space="preserve">The EPUB 3 you want to convert to DAISY 2.02.
 
-You may alternatively use the EPUB package document (the OPF-file) if your input is a unzipped/"exploded" version of an EPUB.</p>
+You may alternatively use the "mimetype" document if your input is a unzipped/"exploded" version of an EPUB.</p>
         </p:documentation>
     </p:option>
 

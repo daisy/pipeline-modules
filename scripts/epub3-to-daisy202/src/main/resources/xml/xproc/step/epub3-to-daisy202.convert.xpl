@@ -24,6 +24,7 @@
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
         <p:documentation>
             px:assert
+            px:error
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
@@ -147,18 +148,28 @@
             <p:pipe step="main" port="source.fileset"/>
         </p:input>
     </p:identity>
-    <px:fileset-rebase>
-        <p:with-option name="new-base" select="replace(base-uri(/*),'[^/]+$','')">
-            <p:pipe step="opf" port="result"/>
-        </p:with-option>
-    </px:fileset-rebase>
+    <p:choose>
+        <p:when test="//d:file[matches(@href,'^(.+/)?mimetype$')]">
+            <p:documentation>
+                Make the base URI the directory containing the mimetype file.
+            </p:documentation>
+            <px:fileset-rebase>
+                <p:with-option name="new-base"
+                               select="//d:file[matches(@href,'^(.+/)?mimetype$')][1]
+                                       /replace(resolve-uri(@href,base-uri(.)),'mimetype$','')"/>
+            </px:fileset-rebase>
+        </p:when>
+        <p:otherwise>
+            <px:error code="XXXXX" message="Fileset must contain a 'mimetype' file"/>
+        </p:otherwise>
+    </p:choose>
     <p:group>
         <p:documentation>
             - Delete package document (OPF).
             - Delete table of contents (NCX).
             - Delete original navigation document. It will be replaced with the generated NCC.
             - Delete mimetype and META-INF/.
-            - Delete files outside of the directory that contains the OPF.
+            - Delete files outside of the directory that contains the mimetype.
         </p:documentation>
         <p:variable name="nav" select="(//opf:item[tokenize(@properties,'\s+')='nav']/resolve-uri(@href,base-uri()))[1]">
             <p:pipe step="opf" port="result"/>
@@ -234,9 +245,7 @@
                                         audio/mpeg
                                         audio/mp4"/>
         <px:fileset-copy flatten="true" dry-run="true" name="flatten">
-            <p:with-option name="target" select="base-uri(/*)">
-                <p:pipe step="opf" port="result"/>
-            </p:with-option>
+            <p:with-option name="target" select="base-uri(/*)"/>
         </px:fileset-copy>
         <p:sink/>
         <px:daisy202-rename-files name="rename">
