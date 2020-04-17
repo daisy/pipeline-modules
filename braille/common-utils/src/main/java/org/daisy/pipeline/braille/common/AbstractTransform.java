@@ -19,10 +19,6 @@ public abstract class AbstractTransform implements Transform {
 		return i.incrementAndGet();
 	}
 	
-	public XProc asXProc() throws UnsupportedOperationException {
-		throw new UnsupportedOperationException();
-	}
-	
 	public ToStringHelper toStringHelper() {
 		return MoreObjects.toStringHelper(this);
 	}

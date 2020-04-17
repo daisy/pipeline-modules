@@ -10,14 +10,21 @@ import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import com.xmlcalabash.core.XProcRuntime;
+import com.xmlcalabash.runtime.XAtomicStep;
+
 import static org.daisy.common.file.URIs.asURI;
 import org.daisy.common.file.URLs;
+import org.daisy.common.xproc.calabash.XProcStep;
+import org.daisy.common.xproc.calabash.XProcStepProvider;
+
 import org.daisy.pipeline.braille.common.AbstractBrailleTranslator;
 import org.daisy.pipeline.braille.common.AbstractTransformProvider;
 import org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Function;
 import org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Iterables;
 import org.daisy.pipeline.braille.common.BrailleTranslator;
 import org.daisy.pipeline.braille.common.BrailleTranslatorProvider;
+import org.daisy.pipeline.braille.common.calabash.CxEvalBasedTransformer;
 import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Iterables.transform;
 import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.logCreate;
 import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.logSelect;
@@ -103,26 +110,25 @@ public interface LiblouisCSSBlockTransform {
 			return MoreObjects.toStringHelper("o.d.p.b.liblouis.impl.LiblouisCSSBlockTransform$Provider");
 		}
 		
-		private class TransformImpl extends AbstractBrailleTranslator {
+		private class TransformImpl extends AbstractBrailleTranslator implements XProcStepProvider {
 			
 			private final LiblouisTranslator translator;
-			private final XProc xproc;
+			private final Map<String,String> options;
 			
 			private TransformImpl(LiblouisTranslator translator, boolean htmlOut, String mainLocale) {
-				Map<String,String> options = ImmutableMap.of("text-transform", mutableQuery().add("id", translator.getIdentifier()).toString(),
-				                                             // This will omit the <_ style="text-transform:none">
-				                                             // wrapper. It is assumed that if (output:html) is set, the
-				                                             // result is known to be braille (which is the case if
-				                                             // (output:braille) is also set).
-				                                             "no-wrap", String.valueOf(htmlOut),
-				                                             "main-locale", mainLocale != null ? mainLocale : "");
-				xproc = new XProc(href, null, options);
+				options = ImmutableMap.of("text-transform", mutableQuery().add("id", translator.getIdentifier()).toString(),
+				                          // This will omit the <_ style="text-transform:none">
+				                          // wrapper. It is assumed that if (output:html) is set, the
+				                          // result is known to be braille (which is the case if
+				                          // (output:braille) is also set).
+				                          "no-wrap", String.valueOf(htmlOut),
+				                          "main-locale", mainLocale != null ? mainLocale : "");
 				this.translator = translator;
 			}
 			
 			@Override
-			public XProc asXProc() {
-				return xproc;
+			public XProcStep newStep(XProcRuntime runtime, XAtomicStep step) {
+				return new CxEvalBasedTransformer(href, null, options).newStep(runtime, step);
 			}
 			
 			@Override
