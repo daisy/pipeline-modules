@@ -2,7 +2,6 @@ package org.daisy.pipeline.braille.common.calabash.impl;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -42,7 +41,6 @@ public class PxTransformStep extends Eval {
 	private final ReadableDocument pipeline;
 	
 	private static final QName _query = new QName("query");
-	private static final QName _temp_dir = new QName("temp-dir");
 	private static final QName _step = new QName("step");
 	private static final QName _name = new QName("name");
 	private static final QName _namespace = new QName("namespace");
@@ -87,18 +85,13 @@ public class PxTransformStep extends Eval {
 			catch (NoSuchElementException e) {}
 			if (xproc == null)
 				throw new RuntimeException("Could not find a Transform for query: " + query);
-			RuntimeValue tempDir = getOption(_temp_dir);
 			pipeline.setURI(xproc.getURI());
 			if (xproc.getName() != null) {
 				final QName step = new QName(xproc.getName());
 				setOption(_step, new RuntimeValue() { public QName getQName() { return step; }});
 				throw new RuntimeException("p:library not supported due to a bug in cx:eval"); }
-			if (xproc.getOptions() != null || tempDir != null) {
-				final Map<String,String> options = new HashMap<String,String>();
-				if (xproc.getOptions() != null)
-					options.putAll(xproc.getOptions());
-				if (tempDir != null)
-					options.put("temp-dir", tempDir.getString());
+			if (xproc.getOptions() != null) {
+				final Map<String,String> options = xproc.getOptions();
 				setInput("options", new com.xmlcalabash.io.ReadableDocument(runtime) {
 					private boolean readDoc = false;
 					@Override

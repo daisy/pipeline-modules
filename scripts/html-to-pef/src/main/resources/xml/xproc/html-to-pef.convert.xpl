@@ -116,7 +116,7 @@
             <p:with-option name="query" select="concat('(input:mathml)(locale:',(/*/@xml:lang,/*/@lang,'und')[1],')')">
                 <p:pipe step="html" port="result"/>
             </p:with-option>
-            <p:with-option name="temp-dir" select="$temp-dir"/>
+            <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>
             <p:input port="parameters">
                 <!-- px:transform uses the 'duplex' parameter -->
                 <p:pipe port="result" step="parameters"/>
@@ -133,14 +133,14 @@
             </p:output>
             <px:transform name="obfl" px:message="Transforming from XML with CSS to OBFL" px:progress=".5">
                 <p:with-option name="query" select="concat('(input:css)(output:obfl)',$transform,'(locale:',$lang,')')"/>
-                <p:with-option name="temp-dir" select="$temp-dir"/>
+                <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>
                 <p:input port="parameters">
                     <p:pipe port="result" step="parameters"/>
                 </p:input>
             </px:transform>
             <px:transform px:message="Transforming from OBFL to PEF" px:progress=".5">
                 <p:with-option name="query" select="concat('(input:obfl)(input:text-css)(output:pef)',$transform,'(locale:',$lang,')')"/>
-                <p:with-option name="temp-dir" select="$temp-dir"/>
+                <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>
                 <p:input port="parameters">
                     <p:pipe port="result" step="parameters"/>
                 </p:input>
@@ -153,7 +153,7 @@
             </p:output>
             <px:transform px:message="Transforming from XML with inline CSS to PEF" px:progress="1">
                 <p:with-option name="query" select="concat('(input:css)(output:pef)',$transform,'(locale:',$lang,')')"/>
-                <p:with-option name="temp-dir" select="$temp-dir"/>
+                <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>
                 <p:input port="parameters">
                     <p:pipe port="result" step="parameters"/>
                 </p:input>

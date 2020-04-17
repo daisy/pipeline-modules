@@ -73,13 +73,13 @@
             <p:with-option name="query" select="concat('(input:mathml)(locale:',(/*/@xml:lang,'und')[1],')')">
                 <p:pipe step="zedai" port="result"/>
             </p:with-option>
-            <p:with-option name="temp-dir" select="$temp-dir"/>
+            <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>
         </px:transform>
     </p:viewport>
     
     <px:transform name="pef">
         <p:with-option name="query" select="concat('(input:css)(output:pef)',$transform,'(locale:',(/*/@xml:lang,'und')[1],')')"/>
-        <p:with-option name="temp-dir" select="$temp-dir"/>
+        <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>
     </px:transform>
     <p:sink/>
 

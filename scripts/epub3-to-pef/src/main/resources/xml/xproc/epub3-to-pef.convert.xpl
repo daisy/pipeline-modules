@@ -197,7 +197,7 @@
                     match="math:math">
             <px:transform>
                 <p:with-option name="query" select="concat('(input:mathml)(locale:',$lang,')')"/>
-                <p:with-option name="temp-dir" select="$temp-dir"/>
+                <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>
             </px:transform>
         </p:viewport>
     </p:group>
@@ -220,7 +220,7 @@
                 <p:identity px:message-severity="DEBUG" px:message="px:transform query={$transform-query}"/>
                 <px:transform px:progress="1">
                     <p:with-option name="query" select="$transform-query"/>
-                    <p:with-option name="temp-dir" select="$temp-dir"/>
+                    <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>
                     <p:input port="parameters">
                         <p:pipe port="result" step="parameters"/>
                     </p:input>
@@ -238,7 +238,7 @@
                     <p:identity px:message-severity="DEBUG" px:message="px:transform query={$transform-query}"/>
                     <px:transform px:progress="1">
                         <p:with-option name="query" select="$transform-query"/>
-                        <p:with-option name="temp-dir" select="$temp-dir"/>
+                        <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>
                         <p:input port="parameters">
                             <p:pipe port="result" step="parameters"/>
                         </p:input>
@@ -271,7 +271,7 @@
             <p:identity px:message-severity="DEBUG" px:message="px:transform query={$transform-query}"/>
             <px:transform px:progress="1">
                 <p:with-option name="query" select="$transform-query"/>
-                <p:with-option name="temp-dir" select="$temp-dir"/>
+                <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>
                 <p:input port="parameters">
                     <p:pipe port="result" step="parameters"/>
                 </p:input>
