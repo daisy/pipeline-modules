@@ -8,7 +8,6 @@ import java.util.NoSuchElementException;
 
 import com.xmlcalabash.core.XProcException;
 import com.xmlcalabash.core.XProcRuntime;
-import com.xmlcalabash.core.XProcStep;
 import com.xmlcalabash.extensions.Eval;
 import com.xmlcalabash.model.RuntimeValue;
 import com.xmlcalabash.runtime.XAtomicStep;
@@ -17,6 +16,7 @@ import com.xmlcalabash.util.TreeWriter;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.QName;
 
+import org.daisy.common.xproc.calabash.XProcStep;
 import org.daisy.common.xproc.calabash.XProcStepProvider;
 
 import org.daisy.pipeline.braille.common.Transform;
@@ -35,7 +35,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PxTransformStep extends Eval {
+public class PxTransformStep extends Eval implements XProcStep {
 	
 	private final TransformProvider<Transform> provider;
 	private final ReadableDocument pipeline;
