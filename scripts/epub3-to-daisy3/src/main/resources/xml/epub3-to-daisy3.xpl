@@ -185,7 +185,7 @@
     <p:sink/>
 
     <p:documentation>
-        Combine the merged HTML with the resources (everything except HTML, SMIL and OPF)
+        Combine the merged HTML with the resources (everything except HTML, SMIL, OPF and NCX)
     </p:documentation>
     <p:group name="html-and-resources">
         <p:output port="fileset" primary="true"/>
@@ -194,7 +194,8 @@
         </p:output>
         <px:fileset-filter not-media-types="application/oebps-package+xml
                                             application/xhtml+xml
-                                            application/smil+xml"
+                                            application/smil+xml
+                                            application/x-dtbncx+xml"
                            name="resources">
             <p:input port="source">
                 <p:pipe step="epub3" port="result"/>

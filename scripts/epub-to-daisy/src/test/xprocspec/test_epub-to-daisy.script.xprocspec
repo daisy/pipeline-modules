@@ -56,7 +56,6 @@
 							<c:directory name="audio">
 								<c:file name="mock.mp3"/>
 							</c:directory>
-							<c:file name="toc.ncx"/>
 						</c:directory>
 						<c:file name="book.opf"/>
 						<c:file name="content.xml"/>
