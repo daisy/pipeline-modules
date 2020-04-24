@@ -48,7 +48,7 @@ public class ConfigReader implements ConfigProperties {
 	public ConfigReader(Processor saxonproc, XdmNode doc, Extension... extensions) {
 		String staticConfigPath = System.getProperty(ttsConfigProperty);
 		if (staticConfigPath != null) {
-			XdmNode content = readFromURIinsideConfig(staticConfigPath, saxonproc, null);
+			XdmNode content = readFromURIinsideConfig(staticConfigPath, saxonproc, URIs.asURI(new File("./")));
 			if (content != null)
 				readConfig(null, content, extensions);
 		}
