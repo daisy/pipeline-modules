@@ -181,11 +181,11 @@
         <artifactId>nlp-lexing</artifactId>
         <version>1.0.1</version>
       </dependency>
-      <dependency>
-        <groupId>org.daisy.pipeline.modules</groupId>
-        <artifactId>nlp-light-lexer</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
-      </dependency>
+      <!-- <dependency> -->
+      <!--   <groupId>org.daisy.pipeline.modules</groupId> -->
+      <!--   <artifactId>nlp-light-lexer</artifactId> -->
+      <!--   <version>1.0.1-SNAPSHOT</version> -->
+      <!-- </dependency> -->
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>nlp-common</artifactId>
@@ -201,11 +201,11 @@
         <artifactId>nlp-ruled-lexer</artifactId>
         <version>1.0.1</version>
       </dependency>
-      <dependency>
-        <groupId>org.daisy.pipeline.modules</groupId>
-        <artifactId>zedai-break-detection</artifactId>
-        <version>2.0.2-SNAPSHOT</version>
-      </dependency>
+      <!-- <dependency> -->
+      <!--   <groupId>org.daisy.pipeline.modules</groupId> -->
+      <!--   <artifactId>zedai-break-detection</artifactId> -->
+      <!--   <version>2.0.2-SNAPSHOT</version> -->
+      <!-- </dependency> -->
       
       <!--
           scripts-utils
@@ -480,11 +480,11 @@
         <artifactId>tts-common</artifactId>
         <version>3.0.5</version>
       </dependency>
-      <dependency>
-        <groupId>org.daisy.pipeline.modules</groupId>
-        <artifactId>zedai-to-ssml</artifactId>
-        <version>1.0.4-SNAPSHOT</version>
-      </dependency>
+      <!-- <dependency> -->
+      <!--   <groupId>org.daisy.pipeline.modules</groupId> -->
+      <!--   <artifactId>zedai-to-ssml</artifactId> -->
+      <!--   <version>1.0.4-SNAPSHOT</version> -->
+      <!-- </dependency> -->
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>tts-helpers</artifactId>
