@@ -347,6 +347,9 @@
               <sourceDirectory>${project.build.directory}/classes</sourceDirectory>
               <outputDirectory>${project.build.directory}/doc/src/main/resources</outputDirectory>
               <includes>
+                META-INF/catalog.xml,
+                **/*.xpl,
+                **/*.xsl,
                 hyphen/,
                 hyphen/*
               </includes>
