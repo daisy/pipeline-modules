@@ -5,6 +5,7 @@ Changes
 -------
 - Update to Liblouis [3.13.0](https://github.com/liblouis/liblouis/releases/tag/v3.13.0)
   (https://github.com/daisy/pipeline-mod-braille/issues/198)
+- HTML's `lang` attribute is now recognized.
 
 Components
 ----------
