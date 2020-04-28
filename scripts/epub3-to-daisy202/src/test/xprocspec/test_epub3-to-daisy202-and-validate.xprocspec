@@ -133,16 +133,16 @@
                 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
                     <body>
                         <h1 id="_1" class="title">
-                            <a href="heftywater.smil#par_title">Hefty Water</a>
+                            <a href="heftywater.smil#par_1">Hefty Water</a>
                         </h1>
                         <h2 id="_2">
-                            <a href="heftywater.smil#par_h2-switch">The Switch</a>
+                            <a href="heftywater.smil#par_2">The Switch</a>
                         </h2>
                         <h2 id="_3">
-                            <a href="heftywater.smil#par_h2-source">The Source</a>
+                            <a href="heftywater.smil#par_3">The Source</a>
                         </h2>
                         <h2 id="_4">
-                            <a href="heftywater.smil#par_h2-ruby">Hefty Ruby Water</a>
+                            <a href="heftywater.smil#par_4">Hefty Ruby Water</a>
                         </h2>
                     </body>
                 </html>

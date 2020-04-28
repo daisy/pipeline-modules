@@ -126,13 +126,13 @@
                             <a href="chapter_001.smil#heading1">Chapter 1</a>
                         </h1>
                         <h2 id="_2">
-                            <a href="chapter_001.smil#par_c1-1">Chapter 1.1</a>
+                            <a href="chapter_001.smil#par_1">Chapter 1.1</a>
                         </h2>
                         <span id="_3" class="page-normal">
-                            <a href="chapter_001.smil#par_page1">1</a>
+                            <a href="chapter_001.smil#par_2">1</a>
                         </span>
                         <h1 id="_4">
-                            <a href="chapter_002.smil#par_c2">Chapter 2</a>
+                            <a href="chapter_002.smil#par_1">Chapter 2</a>
                         </h1>
                     </body>
                 </html>
@@ -154,11 +154,11 @@
                             </p>
                             <section>
                                 <h2 id="c1-1">
-                                    <a href="chapter_001.smil#par_c1-1">Chapter 1.1</a>
+                                    <a href="chapter_001.smil#par_1">Chapter 1.1</a>
                                 </h2>
                             </section>
                             <span id="page1" class="page-normal">
-                                <a href="chapter_001.smil#par_page1">1</a>
+                                <a href="chapter_001.smil#par_2">1</a>
                             </span>
                             <p id="c1_p2">
                                 <a href="chapter_001.smil#paragraph2">...</a>
@@ -177,7 +177,7 @@
                     <body>
                         <section>
                             <h1 id="c2">
-                                <a href="chapter_002.smil#par_c2">Chapter 2</a>
+                                <a href="chapter_002.smil#par_1">Chapter 2</a>
                             </h1>
                             <p id="c2_p1">...</p>
                         </section>
@@ -208,11 +208,11 @@
                                 <text src="chapter_001.xhtml#c1_p1"/>
                                 <audio src="audio/chapter_001_002.mp4" clip-begin="0:00:01.000" clip-end="0:00:02.000"/>
                             </par>
-                            <par id="par_c1-1" endsync="last">
-                                <text id="text_c1-1" src="chapter_001.xhtml#c1-1"/>
+                            <par id="par_1" endsync="last">
+                                <text id="text_1" src="chapter_001.xhtml#c1-1"/>
                             </par>
-                            <par id="par_page1" endsync="last">
-                                <text id="text_page1" src="chapter_001.xhtml#page1"/>
+                            <par id="par_2" endsync="last">
+                                <text id="text_2" src="chapter_001.xhtml#page1"/>
                             </par>
                             <par id="paragraph2">
                                 <text src="chapter_001.xhtml#c1_p2"/>
@@ -239,8 +239,8 @@
                     </head>
                     <body>
                         <seq dur="0.0s">
-                            <par id="par_c2" endsync="last">
-                                <text id="text_c2" src="chapter_002.xhtml#c2"/>
+                            <par id="par_1" endsync="last">
+                                <text id="text_1" src="chapter_002.xhtml#c2"/>
                             </par>
                         </seq>
                     </body>

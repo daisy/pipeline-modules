@@ -7,6 +7,7 @@
                 exclude-result-prefixes="#all">
     
     <xsl:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xsl"/>
+    <xsl:include href="http://www.daisy.org/pipeline/modules/common-utils/generate-id.xsl"/>
     
     <!--
         the smil
@@ -38,7 +39,24 @@
         </xsl:for-each>
     </xsl:variable>
     
+    <xsl:template match="/smil/body/seq" priority="1">
+        <xsl:call-template name="pf:next-match-with-generated-ids">
+            <xsl:with-param name="prefix" select="'par_'"/>
+            <xsl:with-param name="for-elements"
+                            select="$html//*[self::html:h1 or
+                                             self::html:h2 or
+                                             self::html:h3 or
+                                             self::html:h4 or
+                                             self::html:h5 or
+                                             self::html:h6 or
+                                             self::html:span[matches(@class,'(^|\s)page-(front|normal|special)(\s|$)')]]
+                                    except $referenced-html-elements"/>
+            <xsl:with-param name="in-use" select="//*/@id[matches(.,'^(par|text|audio)_')]"/>
+        </xsl:call-template>
+    </xsl:template>
+    
     <xsl:template match="/smil/body/seq">
+        <xsl:variable name="seq" select="."/>
         <xsl:variable name="seq-base-uri" select="pf:base-uri(.)"/>
         <xsl:variable name="missing-pars" as="element()*">
             <xsl:for-each select="$html">
@@ -66,23 +84,9 @@
                             <xsl:message terminate="yes">FIXME</xsl:message>
                         </xsl:when>
                         <xsl:otherwise>
-                            <!-- in case there are multiple html files and colliding ids, add a suffix -->
-                            <!-- FIXME: check that id does not exist yet -->
-                            <xsl:variable name="par-id" as="xs:string"
-                                          select="concat(
-                                                    'par_',$id,
-                                                    if (
-                                                      count(
-                                                        $html//*[self::html:h1 or self::html:h2 or
-                                                                 self::html:h3 or self::html:h4 or
-                                                                 self::html:h5 or self::html:h6 or
-                                                                 self::html:span[
-                                                                   matches(@class,'(^|\s)page-(front|normal|special)(\s|$)')]]
-                                                                [@id=$id]
-                                                      )&gt;1
-                                                    ) then concat('_',generate-id(.))
-                                                      else '')"/>
-                            <!-- FIXME: check that id does not exist yet -->
+                            <xsl:variable name="par-id" as="xs:string">
+                                <xsl:call-template name="pf:generate-id"/>
+                            </xsl:variable>
                             <xsl:variable name="text-id" as="xs:string" select="replace($par-id,'par_','text_')"/>
                             <xsl:choose>
                                 <xsl:when test="$referenced-html-elements/ancestor::* intersect .">
@@ -104,9 +108,11 @@
                                                 <xsl:when test="every $i in 1 to count($audio-segments) - 1
                                                                 satisfies ($audio-segments[$i]/@src=$audio-segments[$i + 1]/@src and
                                                                            $audio-segments[$i]/@clip-end=$audio-segments[$i + 1]/@clip-begin)">
+                                                    <xsl:variable name="audio-id" as="xs:string" select="replace($par-id,'par_','audio_')"/>
                                                     <par id="{$par-id}" endsync="last">
                                                         <text id="{$text-id}" src="{pf:relativize-uri(concat($html-base-uri,'#',$id),$seq-base-uri)}"/>
-                                                        <audio src="{pf:relativize-uri($audio-segments[1]/pf:resolve-uri(@src,.),$seq-base-uri)}"
+                                                        <audio id="{$audio-id}"
+                                                               src="{pf:relativize-uri($audio-segments[1]/pf:resolve-uri(@src,.),$seq-base-uri)}"
                                                                clip-begin="{$audio-segments[1]/@clip-begin}"
                                                                clip-end="{$audio-segments[last()]/@clip-end}"/>
                                                     </par>
