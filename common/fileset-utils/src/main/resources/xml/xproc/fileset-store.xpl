@@ -71,6 +71,8 @@
             px:fileset-load
             px:fileset-copy
             px:fileset-update
+            px:fileset-invert
+            px:fileset-apply
         </p:documentation>
     </p:import>
     <p:import href="fileset-fix-original-hrefs.xpl">
@@ -263,20 +265,21 @@
                         </p:input>
                         <p:with-option name="fail-on-error" select="$fail-on-error"/>
                     </px:fileset-store>
-                    <p:identity>
+                    <!-- apply the inverse of the previous copy -->
+                    <px:fileset-invert name="inverse-copy">
                         <p:input port="source">
+                            <p:pipe step="copy-to-temp" port="mapping"/>
+                        </p:input>
+                    </px:fileset-invert>
+                    <p:sink/>
+                    <px:fileset-apply>
+                        <p:input port="source.fileset">
                             <p:pipe step="store-to-temp" port="fileset.out"/>
                         </p:input>
-                    </p:identity>
-                    <!-- apply the inverse of the previous copy -->
-                    <p:viewport match="d:file">
-                        <p:variable name="href" select="/*/resolve-uri(@href,base-uri(.))"/>
-                        <p:add-attribute match="/*" attribute-name="href">
-                            <p:with-option name="attribute-value" select="//d:file[resolve-uri(@href,base-uri(.))=$href]/@original-href">
-                                <p:pipe step="copy-to-temp" port="mapping"/>
-                            </p:with-option>
-                        </p:add-attribute>
-                    </p:viewport>
+                        <p:input port="mapping">
+                            <p:pipe step="inverse-copy" port="result"/>
+                        </p:input>
+                    </px:fileset-apply>
                     <p:identity name="zip-from-temp"/>
                     <p:sink/>
                     <px:fileset-update name="update">

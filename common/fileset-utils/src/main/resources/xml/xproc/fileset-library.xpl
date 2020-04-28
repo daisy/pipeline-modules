@@ -1,4 +1,4 @@
-<p:library version="1.0" xmlns:p="http://www.w3.org/ns/xproc" xmlns:px="http://www.daisy.org/ns/pipeline/xproc">
+<p:library version="1.0" xmlns:p="http://www.w3.org/ns/xproc">
 
     <p:import href="fileset-add-entry.xpl"/>
     <p:import href="fileset-copy.xpl"/>
@@ -19,9 +19,17 @@
     <p:import href="fileset-unzip.xpl"/>
     <p:import href="fileset-update.xpl"/>
     <p:import href="fileset-purge.xpl"/>
+
+    <!--
+        steps that do operations based on mapping documents
+    -->
     <p:import href="fileset-apply.xpl"/>
     <p:import href="fileset-compose.xpl"/>
+    <p:import href="fileset-invert.xpl"/>
 
+    <!--
+        XProcSpec assertion steps
+    -->
     <p:import href="xprocspec-fileset-compare.xpl"/>
 
 </p:library>
