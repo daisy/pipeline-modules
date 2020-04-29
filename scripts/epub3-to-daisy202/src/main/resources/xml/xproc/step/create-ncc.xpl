@@ -31,7 +31,7 @@
         </p:documentation>
     </p:output>
     <p:output port="result.in-memory" sequence="true">
-        <p:pipe step="update-html" port="result.in-memory"/>
+        <p:pipe step="add-ncc" port="result.in-memory"/>
     </p:output>
     <p:output port="ncc">
         <p:pipe step="ncc-with-linkbacks" port="result"/>
@@ -65,6 +65,7 @@
     <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
         <p:documentation>
             px:html-add-ids
+            px:html-outline
         </p:documentation>
     </p:import>
     <p:import href="opf-to-ncc-metadata.xpl">
@@ -127,106 +128,6 @@
                             html:h6|
                             html:span[matches(@class,'(^|\s)page-(front|normal|special)(\s|$)')]"
                      px:progress="1/10"/>
-    <p:sink/>
-
-    <p:documentation>
-        Create NCC file with references to all heading elements. Note that this NCC is invalid and
-        needs to be fixed by the add-linkbacks step below.
-    </p:documentation>
-    <p:group>
-        <p:variable name="ncc-base-uri" select="concat(replace(base-uri(/*),'[^/]+$',''),'ncc.html')">
-            <p:pipe step="opf" port="result"/>
-        </p:variable>
-        <p:variable name="ncc-base-dir-string-length" select="string-length(replace($ncc-base-uri,'[^/]+$',''))"/>
-        <px:opf-to-ncc-metadata>
-            <p:input port="source">
-                <p:pipe step="opf" port="result"/>
-            </p:input>
-            <p:input port="ncc-body">
-                <p:pipe step="ncc.body" port="result"/>
-            </p:input>
-            <p:input port="smil">
-                <p:pipe step="augment-smils" port="smil"/>
-                <p:pipe step="new-smils" port="smil"/>
-            </p:input>
-        </px:opf-to-ncc-metadata>
-        <p:identity name="ncc.head"/>
-        <p:for-each name="ncc-items">
-            <p:iteration-source
-                select="//*[self::html:h1 or
-                            self::html:h2 or
-                            self::html:h3 or
-                            self::html:h4 or
-                            self::html:h5 or
-                            self::html:h6 or
-                            self::html:span[matches(@class,'(^|\s)page-(front|normal|special)(\s|$)')]
-                            ]">
-                <p:pipe step="xhtml-with-ids" port="result"/>
-            </p:iteration-source>
-            <p:string-replace match="/*/text()">
-                <p:input port="source">
-                    <p:inline exclude-inline-prefixes="#all">
-                        <a xmlns="http://www.w3.org/1999/xhtml">REPLACEME</a>
-                    </p:inline>
-                </p:input>
-                <p:with-option name="replace"
-                               select="concat('&quot;',
-                                              replace(normalize-space(string-join(//text(),' ')),'&quot;','&quot;&quot;'),
-                                              '&quot;')">
-                    <p:pipe step="ncc-items" port="current"/>
-                </p:with-option>
-            </p:string-replace>
-            <p:wrap-sequence wrapper-namespace="http://www.w3.org/1999/xhtml">
-                <p:with-option name="wrapper" select="/*/local-name()">
-                    <p:pipe step="ncc-items" port="current"/>
-                </p:with-option>
-            </p:wrap-sequence>
-            <p:add-attribute match="/*" attribute-name="id">
-                <p:with-option name="attribute-value" select="concat('_',p:iteration-position())"/>
-            </p:add-attribute>
-            <p:choose>
-                <p:when test="p:iteration-position()=1">
-                    <p:add-attribute match="/*" attribute-name="class" attribute-value="title">
-                        <p:documentation>
-                            First entry must be a h1 with class "title".
-                            FIXME: check that it is actually a h1 and not e.g. a page number
-                        </p:documentation>
-                    </p:add-attribute>
-                </p:when>
-                <p:when test="/html:span">
-                    <p:add-attribute match="/*" attribute-name="class">
-                        <p:with-option name="attribute-value" select="/*/@class">
-                            <p:pipe step="ncc-items" port="current"/>
-                        </p:with-option>
-                    </p:add-attribute>
-                </p:when>
-                <p:otherwise>
-                    <p:identity/>
-                </p:otherwise>
-            </p:choose>
-            <p:add-attribute match="/*/html:a" attribute-name="href">
-                <p:with-option name="attribute-value"
-                               select="concat(substring(/*/base-uri(),$ncc-base-dir-string-length + 1),'#',/*/@id)">
-                    <p:pipe step="ncc-items" port="current"/>
-                </p:with-option>
-            </p:add-attribute>
-        </p:for-each>
-        <p:wrap-sequence wrapper="body" wrapper-namespace="http://www.w3.org/1999/xhtml"/>
-        <p:identity name="ncc.body"/>
-        <p:wrap-sequence wrapper="html" wrapper-namespace="http://www.w3.org/1999/xhtml">
-            <p:input port="source">
-                <p:pipe step="ncc.head" port="result"/>
-                <p:pipe step="ncc.body" port="result"/>
-            </p:input>
-        </p:wrap-sequence>
-        <p:add-attribute match="/*" attribute-name="lang">
-            <p:with-option name="attribute-value" select="/*/html:head/html:meta[@name='dc:language']/@content"/>
-        </p:add-attribute>
-        <px:set-base-uri>
-            <p:with-option name="base-uri" select="$ncc-base-uri"/>
-        </px:set-base-uri>
-    </p:group>
-    <p:identity name="ncc"/>
     <p:sink/>
 
     <p:documentation>
@@ -526,6 +427,80 @@
     <p:sink/>
 
     <p:documentation>
+        Create NCC file with references to all heading elements. Note that this NCC is invalid and
+        needs to be fixed by the add-linkbacks step below.
+    </p:documentation>
+    <p:group name="ncc">
+        <p:output port="result"/>
+        <p:variable name="ncc-base-uri" select="concat(replace(base-uri(/*),'[^/]+$',''),'ncc.html')">
+            <p:pipe step="opf" port="result"/>
+        </p:variable>
+        <p:identity name="content-docs">
+            <p:input port="source">
+                <p:pipe step="xhtml-with-ids" port="result"/>
+            </p:input>
+        </p:identity>
+        <p:documentation>
+            Create outline
+        </p:documentation>
+        <p:for-each>
+            <px:html-outline fix-untitled-sections-in-outline="unwrap" heading-links-only="true">
+                <p:with-option name="output-base-uri" select="$ncc-base-uri"/>
+            </px:html-outline>
+        </p:for-each>
+        <p:wrap-sequence wrapper="body" wrapper-namespace="http://www.w3.org/1999/xhtml"/>
+        <px:set-base-uri name="outline">
+            <p:with-option name="base-uri" select="$ncc-base-uri"/>
+        </px:set-base-uri>
+        <p:sink/>
+        <p:documentation>
+            Convert outline to NCC format and add page numbers.
+        </p:documentation>
+        <p:xslt name="body">
+            <p:input port="source">
+                <p:pipe step="outline" port="result"/>
+                <p:pipe step="content-docs" port="result"/>
+            </p:input>
+            <p:input port="stylesheet">
+                <p:document href="../../xslt/outline-to-ncc-body.xsl"/>
+            </p:input>
+            <p:input port="parameters">
+                <p:empty/>
+            </p:input>
+        </p:xslt>
+        <p:sink/>
+        <p:documentation>
+            Create head element for NCC from package doc
+        </p:documentation>
+        <px:opf-to-ncc-metadata name="head">
+            <p:input port="source">
+                <p:pipe step="opf" port="result"/>
+            </p:input>
+            <p:input port="ncc-body">
+                <p:pipe step="body" port="result"/>
+            </p:input>
+            <p:input port="smil">
+                <p:pipe step="augment-smils" port="smil"/>
+                <p:pipe step="new-smils" port="smil"/>
+            </p:input>
+        </px:opf-to-ncc-metadata>
+        <p:sink/>
+        <p:wrap-sequence wrapper="html" wrapper-namespace="http://www.w3.org/1999/xhtml">
+            <p:input port="source">
+                <p:pipe step="head" port="result"/>
+                <p:pipe step="body" port="result"/>
+            </p:input>
+        </p:wrap-sequence>
+        <p:add-attribute match="/*" attribute-name="lang">
+            <p:with-option name="attribute-value" select="/*/html:head/html:meta[@name='dc:language']/@content"/>
+        </p:add-attribute>
+        <px:set-base-uri>
+            <p:with-option name="base-uri" select="$ncc-base-uri"/>
+        </px:set-base-uri>
+    </p:group>
+    <p:sink/>
+
+    <p:documentation>
         Make anchors in NCC point to SMILs.
     </p:documentation>
     <p:group px:message="Creating linkbacks for NCC" px:message-severity="DEBUG" px:progress="3/10">
@@ -587,20 +562,10 @@
         </px:fileset-update>
     </p:group>
 
-    <px:fileset-add-entry media-type="application/xhtml+xml" name="add-ncc">
-        <p:documentation>Add generated NCC</p:documentation>
-        <p:input port="source.in-memory">
-            <p:pipe step="add-smils" port="in-memory"/>
-        </p:input>
-        <p:input port="entry">
-            <p:pipe step="ncc-with-linkbacks" port="result"/>
-        </p:input>
-    </px:fileset-add-entry>
-
     <px:fileset-update name="update-html">
         <p:documentation>Update HTML</p:documentation>
         <p:input port="source.in-memory">
-            <p:pipe step="add-ncc" port="result.in-memory"/>
+            <p:pipe step="add-smils" port="in-memory"/>
         </p:input>
         <p:input port="update.fileset">
             <p:pipe step="xhtml.fileset" port="result"/>
@@ -610,5 +575,15 @@
             <p:pipe step="new-smils" port="xhtml"/>
         </p:input>
     </px:fileset-update>
+
+    <px:fileset-add-entry media-type="application/xhtml+xml" name="add-ncc">
+        <p:documentation>Add generated NCC</p:documentation>
+        <p:input port="source.in-memory">
+            <p:pipe step="update-html" port="result.in-memory"/>
+        </p:input>
+        <p:input port="entry">
+            <p:pipe step="ncc-with-linkbacks" port="result"/>
+        </p:input>
+    </px:fileset-add-entry>
 
 </p:declare-step>

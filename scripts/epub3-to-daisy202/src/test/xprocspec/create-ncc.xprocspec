@@ -122,16 +122,16 @@
                         <meta name="ncc:totalTime" content="00:00:03"/>
                     </head>
                     <body>
-                        <h1 id="_1" class="title">
+                        <h1 id="h_1" class="title">
                             <a href="chapter_001.smil#heading1">Chapter 1</a>
                         </h1>
-                        <h2 id="_2">
+                        <h2 id="h_2">
                             <a href="chapter_001.smil#par_1">Chapter 1.1</a>
                         </h2>
-                        <span id="_3" class="page-normal">
+                        <span id="p_1" class="page-normal">
                             <a href="chapter_001.smil#par_2">1</a>
                         </span>
-                        <h1 id="_4">
+                        <h1 id="h_3">
                             <a href="chapter_002.smil#par_1">Chapter 2</a>
                         </h1>
                     </body>
