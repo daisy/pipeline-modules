@@ -24,8 +24,8 @@
 	</p:output>
 	<p:output port="mapping">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			<p><code>d:fileset</code> document that contains a mapping from input to output
-			files.</p>
+			<p><code>d:fileset</code> document that contains a mapping from input to output files
+			and contained <code>id</code> attributes.</p>
 		</p:documentation>
 		<p:pipe step="mapping" port="result"/>
 	</p:output>
@@ -67,14 +67,31 @@
 			<p:iteration-source>
 				<p:pipe step="main" port="source"/>
 			</p:iteration-source>
-			<p:template>
-				<p:input port="template">
-					<p:inline>
-						<d:file href="{$output-base-uri}" original-href="{base-uri(/*)}"/>
-					</p:inline>
-				</p:input>
-				<p:with-param name="output-base-uri" select="$output-base-uri"/>
-			</p:template>
+			<p:variable name="input-base-uri" select="base-uri(/*)"/>
+			<p:for-each>
+				<p:iteration-source select="//*[@id|@xml:id]"/>
+				<p:template>
+					<p:input port="template">
+						<p:inline>
+							<d:anchor id="{/*/(@xml:id,@id)[1]}"/>
+						</p:inline>
+					</p:input>
+					<p:input port="parameters">
+						<p:empty/>
+					</p:input>
+				</p:template>
+			</p:for-each>
+			<p:wrap-sequence wrapper="d:file"/>
+			<p:add-attribute match="/*" attribute-name="href">
+				<p:with-option name="attribute-value" select="$output-base-uri">
+					<p:empty/>
+				</p:with-option>
+			</p:add-attribute>
+			<p:add-attribute match="/*" attribute-name="original-href">
+				<p:with-option name="attribute-value" select="$input-base-uri">
+					<p:empty/>
+				</p:with-option>
+			</p:add-attribute>
 		</p:for-each>
 		<p:wrap-sequence wrapper="d:fileset"/>
 	</p:group>
