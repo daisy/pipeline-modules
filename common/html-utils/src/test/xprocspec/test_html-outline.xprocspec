@@ -397,4 +397,99 @@
 		</x:expect>
 	</x:scenario>
 
+	<x:scenario label="heading-links-only option">
+		<x:call step="px:html-outline">
+			<x:input port="source">
+				<x:document type="inline" xml:base="file:/tmp/foo.xhtml">
+					<html xmlns="http://www.w3.org/1999/xhtml">
+						<body>
+							<section>
+								<h1>Part 1</h1>
+								<h2>Chapter 1</h2>
+								<h2>Chapter 2</h2>
+							</section>
+						</body>
+					</html>
+				</x:document>
+			</x:input>
+			<x:option name="output-base-uri" select="'file:/tmp/toc.xhtml'"/>
+		</x:call>
+		<x:scenario label="false (default)">
+			<x:call>
+				<x:option name="heading-links-only" select="'false'"/>
+			</x:call>
+			<x:context label="the result port">
+				<x:document type="port" port="result"/>
+			</x:context>
+			<x:expect label="the result" type="compare">
+				<x:document type="inline" xmlns="http://www.w3.org/1999/xhtml">
+					<ol xmlns="http://www.w3.org/1999/xhtml">
+						<li>
+							<a href="foo.xhtml#id_1">Untitled document</a>
+							<ol>
+								<li>
+									<a href="foo.xhtml#id_2">Part 1</a>
+									<ol>
+										<li>
+											<a href="foo.xhtml#id_4">Chapter 1</a>
+										</li>
+										<li>
+											<a href="foo.xhtml#id_5">Chapter 2</a>
+										</li>
+									</ol>
+								</li>
+							</ol>
+						</li>
+					</ol>
+				</x:document>
+			</x:expect>
+			<x:context label="the content-doc port">
+				<x:document type="port" port="content-doc"/>
+			</x:context>
+			<x:expect label="the content doc with ID attributes" type="compare">
+				<x:document type="inline" xmlns="http://www.w3.org/1999/xhtml">
+					<html xmlns="http://www.w3.org/1999/xhtml">
+						<body id="id_1">
+							<section id="id_2">
+								<h1 id="id_3">Part 1</h1>
+								<h2 id="id_4">Chapter 1</h2>
+								<h2 id="id_5">Chapter 2</h2>
+							</section>
+						</body>
+					</html>
+				</x:document>
+			</x:expect>
+		</x:scenario>
+		<x:scenario label="true">
+			<x:call>
+				<x:option name="heading-links-only" select="'true'"/>
+			</x:call>
+			<x:context label="the result port">
+				<x:document type="port" port="result"/>
+			</x:context>
+			<x:expect label="the result" type="compare">
+				<x:document type="inline" xmlns="http://www.w3.org/1999/xhtml">
+					<ol xmlns="http://www.w3.org/1999/xhtml">
+						<li>
+							<span>Untitled document</span>
+							<ol>
+								<li>
+									<a href="foo.xhtml#id_3">Part 1</a>
+									<ol>
+										<li>
+											<a href="foo.xhtml#id_4">Chapter 1</a>
+										</li>
+										<li>
+											<a href="foo.xhtml#id_5">Chapter 2</a>
+										</li>
+									</ol>
+								</li>
+							</ol>
+						</li>
+					</ol>
+				</x:document>
+			</x:expect>
+		</x:scenario>
+	</x:scenario>
+
 </x:description>

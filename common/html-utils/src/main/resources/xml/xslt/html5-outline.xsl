@@ -24,6 +24,7 @@
     <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl"/>
 
     <xsl:param name="output-base-uri" required="yes"/>
+    <xsl:param name="heading-links-only" required="yes"/>
     <xsl:param name="fix-untitled-sections-in-outline" required="yes"/>
 
     <xsl:template match="/">
@@ -236,7 +237,20 @@
             </xsl:when>
             <xsl:otherwise>
                 <li>
-                    <a href="{$relative-path}#{(@owner,@heading)[1]}">
+                    <xsl:element namespace="http://www.w3.org/1999/xhtml"
+                                 name="{if ($heading-links-only='true' and not(@heading))
+                                        then 'span'
+                                        else 'a'}">
+                        <xsl:choose>
+                            <xsl:when test="$heading-links-only='true'">
+                                <xsl:if test="@heading">
+                                    <xsl:attribute name="href" select="concat($relative-path,'#',@heading)"/>
+                                </xsl:if>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="href" select="concat($relative-path,'#',(@owner,@heading)[1])"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
                         <!-- FIXME: try to not "depend" on the TTS namespace here -->
                         <xsl:sequence select="$heading/ancestor-or-self::*/@tts:*"/>
                         <xsl:choose>
@@ -284,7 +298,7 @@
                                 </xsl:choose>
                             </xsl:otherwise>
                         </xsl:choose>
-                    </a>
+                    </xsl:element>
                     <xsl:if test="exists(*)">
                         <ol>
                             <xsl:apply-templates select="*"/>

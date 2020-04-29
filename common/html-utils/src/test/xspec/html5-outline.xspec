@@ -5,6 +5,7 @@
                stylesheet="../../main/resources/xml/xslt/html5-outline.xsl">
 
 	<x:param name="output-base-uri" select="'file:/tmp/toc.xhtml'"/>
+	<x:param name="heading-links-only" select="'false'"/>
 	<x:param name="fix-untitled-sections-in-outline" select="'imply-heading'"/>
 
 	<!-- ========================================================================== -->

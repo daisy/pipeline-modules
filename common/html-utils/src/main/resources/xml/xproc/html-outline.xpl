@@ -54,6 +54,18 @@
 			<p>The base URI of the resulting outline.</p>
 		</p:documentation>
 	</p:option>
+	<p:option name="heading-links-only" select="'false'">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p>Whether the <code>a</code> elements in the "result" output should only reference
+			heading elements (<code>h1</code>, <code>h2</code>, <code>h3</code>, <code>h4</code>,
+			<code>h5</code>, <code>h6</code> or <code>hgroup</code>) or whether they may also
+			reference sectioning elements (<code>body</code>, <code>article</code>,
+			<code>aside</code>, <code>nav</code> or <code>section</code>). If this option is set to
+			"true" and the "fix-untitled-sections-in-outline" option is set to "imply-heading", the
+			outline will contain generated section titles but they will be <code>span</code>s, not
+			<code>a</code>s.</p>
+		</p:documentation>
+	</p:option>
 	<p:option name="fix-heading-ranks" select="'keep'">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>Whether to change the <a
@@ -119,6 +131,7 @@
 		<p:input port="stylesheet">
 			<p:document href="../xslt/html5-outline.xsl"/>
 		</p:input>
+		<p:with-param name="heading-links-only" select="$heading-links-only"/>
 		<p:with-param name="fix-untitled-sections-in-outline" select="$fix-untitled-sections-in-outline"/>
 		<p:with-param name="output-base-uri" select="$output-base-uri"/>
 		<p:with-option name="output-base-uri" select="$output-base-uri"/>
