@@ -435,18 +435,26 @@
         <p:variable name="ncc-base-uri" select="concat(replace(base-uri(/*),'[^/]+$',''),'ncc.html')">
             <p:pipe step="opf" port="result"/>
         </p:variable>
-        <p:identity name="content-docs">
-            <p:input port="source">
-                <p:pipe step="xhtml-with-ids" port="result"/>
+        <px:fileset-load name="content-docs">
+            <p:input port="fileset">
+                <p:pipe step="spine.fileset" port="result"/>
             </p:input>
-        </p:identity>
+            <p:input port="in-memory">
+                <p:pipe step="update-html" port="result.in-memory"/>
+            </p:input>
+        </px:fileset-load>
         <p:documentation>
             Create outline
         </p:documentation>
         <p:for-each>
-            <px:html-outline fix-untitled-sections-in-outline="unwrap" heading-links-only="true">
+            <p:wrap match="/html:html/html:body/node()" group-adjacent="true()"
+                    wrapper="section" wrapper-namespace="http://www.w3.org/1999/xhtml">
+                <!-- hack to get "Untitled section" rather than "Untitled document" -->
+            </p:wrap>
+            <px:html-outline fix-untitled-sections-in-outline="imply-heading" heading-links-only="true">
                 <p:with-option name="output-base-uri" select="$ncc-base-uri"/>
             </px:html-outline>
+            <p:filter select="/html:ol/html:li/html:ol"/>
         </p:for-each>
         <p:wrap-sequence wrapper="body" wrapper-namespace="http://www.w3.org/1999/xhtml"/>
         <px:set-base-uri name="outline">
@@ -456,7 +464,7 @@
         <p:documentation>
             Convert outline to NCC format and add page numbers.
         </p:documentation>
-        <p:xslt name="body">
+        <p:xslt>
             <p:input port="source">
                 <p:pipe step="outline" port="result"/>
                 <p:pipe step="content-docs" port="result"/>
@@ -468,6 +476,13 @@
                 <p:empty/>
             </p:input>
         </p:xslt>
+        <!--
+            First entry must be a h1 with class "title".
+            FIXME: check that it is actually a h1 and not e.g. a page number
+            FIXME: somehow ensure that the first heading is actually the book title?
+        -->
+        <p:add-attribute match="html:h1[not(preceding::html:h1)]" attribute-name="class" attribute-value="title"
+                         name="body"/>
         <p:sink/>
         <p:documentation>
             Create head element for NCC from package doc

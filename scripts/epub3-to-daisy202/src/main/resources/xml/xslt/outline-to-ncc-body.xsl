@@ -23,7 +23,8 @@
                 <body>
                     <xsl:call-template name="pf:next-match-with-generated-ids">
                         <xsl:with-param name="prefix" select="'h_'"/>
-                        <xsl:with-param name="for-elements" select="//a"/>
+                        <xsl:with-param name="for-elements" select="//li/a|
+                                                                    //li/span"/>
                         <xsl:with-param name="in-use" select="()"/>
                     </xsl:call-template>
                 </body>
@@ -41,7 +42,9 @@
             <xsl:variable name="content-doc" select="$content-docs[$i]"/>
             <xsl:variable name="relative-uri" select="pf:relativize-uri(base-uri($content-doc/*),base-uri($outline/*))"/>
             <xsl:variable name="headings" as="element()*">
-                <xsl:apply-templates mode="headings" select="."/>
+                <xsl:apply-templates mode="headings" select=".">
+                    <xsl:with-param name="content-doc" tunnel="yes" select="$content-doc"/>
+                </xsl:apply-templates>
             </xsl:variable>
             <xsl:variable name="page-numbers" as="element()*">
                 <xsl:apply-templates mode="page-numbers" select="$content-doc/*">
@@ -73,14 +76,6 @@
         <xsl:param name="depth" as="xs:integer" tunnel="yes" required="yes"/>
         <xsl:element name="h{$depth}">
             <xsl:call-template name="pf:generate-id"/>
-            <!--
-                First entry must be a h1 with class "title".
-                FIXME: check that it is actually a h1 and not e.g. a page number
-                FIXME: somehow ensure that the first heading is actually the book title?
-            -->
-            <xsl:if test="not(preceding::a)">
-                <xsl:attribute name="class" select="'title'"/>
-            </xsl:if>
             <xsl:copy>
                 <!--
                     Link will be fixed by px:html-update-links and create-linkbacks.xsl
@@ -91,7 +86,26 @@
         </xsl:element>
     </xsl:template>
 
-    <xsl:template mode="headings" match="span|*">
+    <!--
+        If a content document has no headings, a title is generated and put in a span. It has no
+        corresponding element to reference, so make it reference the first element in the document
+        that has a SMIL linkback. It will not match the text of the generated title, but it is
+        better than no link because that would make the document unreachable from the NCC.
+    -->
+    <xsl:template mode="headings" match="/body/ol[count(descendant::span|descendant::a)=1]/li/span">
+        <xsl:param name="content-doc" tunnel="yes" as="document-node()" required="yes"/>
+        <xsl:variable name="first-smil-link" as="element()?" select="($content-doc//a[matches(@href,'^.+\.smil#.+$')])[1]"/>
+        <xsl:if test="exists($first-smil-link)">
+            <h1>
+                <xsl:call-template name="pf:generate-id"/>
+                <a href="{pf:relativize-uri($first-smil-link/resolve-uri(@href,base-uri(.)),base-uri($outline/*))}">
+                    <xsl:value-of select="normalize-space(string-join(.//text(),' '))"/>
+                </a>
+            </h1>
+        </xsl:if>
+    </xsl:template>
+
+    <xsl:template mode="headings" match="*">
         <xsl:message terminate="yes">coding error</xsl:message>
     </xsl:template>
 
