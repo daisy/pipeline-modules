@@ -484,8 +484,9 @@
         <xsl:variable name="clean-uri" as="xs:string?" select="f:clean-uri($att)"/>
         <xsl:choose>
             <xsl:when test="$clean-uri">
-                <xsl:element name="{if($elm-name) then $elm-name else $elm/name()}">
-                    <xsl:attribute name="{$att/name()}" select="$clean-uri"/>
+                <xsl:element name="{if($elm-name) then $elm-name else $elm/local-name()}"
+                             namespace="{if ($elm-name) then 'http://www.w3.org/1999/xhtml' else $elm/namespace-uri()}">
+                    <xsl:attribute name="{$att/local-name()}" namespace="{$att/namespace-uri()}" select="$clean-uri"/>
                     <xsl:apply-templates select="$elm/@* except ($att,$skip-att) | $elm/node()"/>
                 </xsl:element>
             </xsl:when>

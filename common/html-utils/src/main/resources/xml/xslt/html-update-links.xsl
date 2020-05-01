@@ -83,18 +83,21 @@
         <xsl:choose>
             <xsl:when test="exists($new-file)">
                 <xsl:variable name="new-uri" select="string-join(($new-file,($new-fragment,$fragment)[1]),'#')"/>
-                <xsl:attribute name="{name(.)}" select="if (starts-with($new-uri,concat($doc-base,'#')))
-                                                        then concat('#',substring-after($new-uri,'#'))
-                                                        else pf:relativize-uri($new-uri,$doc-base)"/>
+                <xsl:attribute name="{local-name(.)}" namespace="{namespace-uri(.)}"
+                               select="if (starts-with($new-uri,concat($doc-base,'#')))
+                                       then concat('#',substring-after($new-uri,'#'))
+                                       else pf:relativize-uri($new-uri,$doc-base)"/>
             </xsl:when>
             <xsl:when test="$doc-base!=$original-doc-base and pf:is-relative(.)">
                 <xsl:variable name="new-uri" select="string-join(($resolved-file,($new-fragment,$fragment)[1]),'#')"/>
-                <xsl:attribute name="{name(.)}" select="if (starts-with($new-uri,concat($doc-base,'#')))
-                                                        then concat('#',substring-after($new-uri,'#'))
-                                                        else pf:relativize-uri($new-uri,$doc-base)"/>
+                <xsl:attribute name="{local-name(.)}" namespace="{namespace-uri(.)}"
+                               select="if (starts-with($new-uri,concat($doc-base,'#')))
+                                       then concat('#',substring-after($new-uri,'#'))
+                                       else pf:relativize-uri($new-uri,$doc-base)"/>
             </xsl:when>
             <xsl:when test="exists($new-fragment)">
-                <xsl:attribute name="{name(.)}" select="string-join(($file,$new-fragment),'#')"/>
+                <xsl:attribute name="{local-name(.)}" namespace="{namespace-uri(.)}"
+                               select="string-join(($file,$new-fragment),'#')"/>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:sequence select="."/>

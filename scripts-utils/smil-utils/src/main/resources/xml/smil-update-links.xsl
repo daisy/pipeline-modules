@@ -62,11 +62,13 @@
         <xsl:choose>
             <xsl:when test="exists($new-file)">
                 <xsl:variable name="new-uri" select="string-join(($new-file/@href,$fragment),'#')"/>
-                <xsl:attribute name="{name(.)}" select="pf:relativize-uri($new-uri,$doc-base)"/>
+                <xsl:attribute name="{local-name(.)}" namespace="{namespace-uri(.)}"
+                               select="pf:relativize-uri($new-uri,$doc-base)"/>
             </xsl:when>
             <xsl:when test="$doc-base!=$original-doc-base and pf:is-relative(.)">
                 <xsl:variable name="new-uri" select="string-join(($resolved-file,$fragment),'#')"/>
-                <xsl:attribute name="{name(.)}" select="pf:relativize-uri($new-uri,$doc-base)"/>
+                <xsl:attribute name="{local-name(.)}" namespace="{namespace-uri(.)}"
+                               select="pf:relativize-uri($new-uri,$doc-base)"/>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:sequence select="."/>

@@ -98,7 +98,8 @@
                       select="for $type in tokenize(., '\s+') return
                               f:expand-property($type,$attr,$implicit.in,$implicit.out,$all,$unified)/@name"/>
         <xsl:if test="exists($normalized)">
-            <xsl:attribute name="{name(.)}" select="string-join($normalized,' ')"/>
+            <xsl:attribute name="{local-name(.)}" namespace="{namespace-uri(.)}"
+                           select="string-join($normalized,' ')"/>
         </xsl:if>
     </xsl:template>
 
