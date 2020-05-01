@@ -1158,7 +1158,7 @@
 		<x:expect label="outline">
 			<ol xmlns="http://www.w3.org/1999/xhtml">
 				<li>
-					<a href="content.xhtml#id_1">Untitled document</a>
+					<a href="content.xhtml#id_1">Frontmatter</a>
 					<ol>
 						<li>
 							<a href="content.xhtml#id_2">Untitled section</a>

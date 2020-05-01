@@ -5,6 +5,7 @@
                 xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions"
                 xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
                 xmlns:tts="http://www.daisy.org/ns/pipeline/tts"
+                xmlns:epub="http://www.idpf.org/2007/ops"
                 xmlns="http://www.w3.org/1999/xhtml"
                 xpath-default-namespace="http://www.w3.org/1999/xhtml"
                 exclude-result-prefixes="#all">
@@ -26,6 +27,10 @@
     <xsl:param name="output-base-uri" required="yes"/>
     <xsl:param name="heading-links-only" required="yes"/>
     <xsl:param name="fix-untitled-sections-in-outline" required="yes"/>
+
+    <xsl:variable name="untitled-section-titles" as="element()*"
+                  select="if ($fix-untitled-sections-in-outline='unwrap') then ()
+                          else document('untitled-section-titles.xml')/*/*"/>
 
     <xsl:template match="/">
         <!-- Create the outline -->
@@ -279,7 +284,17 @@
                                      treat an empty heading as an absent heading. -->
                                 <xsl:variable name="outline-owner" as="element()?"
                                               select="for $o in @owner return $html-doc//*[@id=$o]"/>
+                                <xsl:variable name="section-element-name" select="local-name($outline-owner)"/>
+                                <xsl:variable name="types" as="xs:string*"
+                                              select="tokenize($outline-owner/@epub:type,'\s+')[not(.='')]"/>
+                                <xsl:variable name="title" as="text()?"
+                                              select="$untitled-section-titles[contains(@usage,$section-element-name)]
+                                                                              [@epub:type=$types]
+                                                      /text()[not(.='')][1]"/>
                                 <xsl:choose>
+                                    <xsl:when test="exists($title)">
+                                        <xsl:sequence select="$title"/>
+                                    </xsl:when>
                                     <xsl:when test="$outline-owner[self::body]">
                                         <xsl:sequence select="'Untitled document'"/>
                                     </xsl:when>

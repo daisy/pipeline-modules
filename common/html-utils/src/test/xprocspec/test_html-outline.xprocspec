@@ -47,7 +47,7 @@
 			<x:document type="inline" xmlns="http://www.w3.org/1999/xhtml">
 				<ol>
 					<li>
-						<a href="foo.xhtml#id_1">Untitled document</a>
+						<a href="foo.xhtml#id_1">Frontmatter</a>
 						<ol>
 							<li>
 								<a href="foo.xhtml#id_2">Untitled section</a>
