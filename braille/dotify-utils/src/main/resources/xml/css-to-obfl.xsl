@@ -1931,20 +1931,11 @@
     -->
     <xsl:template mode="block span toc-entry"
                   match="css:string[@name]">
-        <xsl:param name="white-space" as="xs:string?" tunnel="yes" select="()"/>
         <xsl:if test="@scope">
             <xsl:call-template name="pf:warn">
                 <xsl:with-param name="msg">string({}, {}): second argument not supported</xsl:with-param>
                 <xsl:with-param name="args" select="(@name,
                                                      @scope)"/>
-            </xsl:call-template>
-        </xsl:if>
-        <xsl:if test="$white-space[not(.='normal')]">
-            <xsl:call-template name="pf:warn">
-                <xsl:with-param name="msg">white-space:{} could not be applied to {}({})</xsl:with-param>
-                <xsl:with-param name="args" select="($white-space,
-                                                     if (@target) then 'target-string' else 'string',
-                                                     @name)"/>
             </xsl:call-template>
         </xsl:if>
         <xsl:variable name="target" as="xs:string?" select="if (@target) then @target else ()"/>
@@ -2030,12 +2021,7 @@
                 <xsl:if test="matches(@style,re:exact($css:SYMBOLS_FN_RE))">
                     <xsl:sequence select="'-dotify-counter'"/>
                 </xsl:if>
-                <!--
-                    Dotify always uses default mode for page-number (bug?)
-                -->
-                <xsl:if test="not($text-transform='auto' or ($text-transform='none' and matches(@style,re:exact($css:SYMBOLS_FN_RE))))">
-                    <xsl:sequence select="$text-transform"/>
-                </xsl:if>
+                <xsl:sequence select="$text-transform[not(.=('none','auto'))]"/>
             </xsl:variable>
             <xsl:if test="exists($text-transform)">
                 <xsl:sequence select="concat('text-transform: ',string-join($text-transform,' '))"/>
@@ -2044,7 +2030,7 @@
                 <xsl:sequence select="concat('hyphens: ',$hyphens)"/>
             </xsl:if>
             <xsl:if test="$white-space[not(.='normal')]">
-                <xsl:sequence select="concat('white-space:',$white-space)"/>
+                <xsl:sequence select="concat('white-space: ',$white-space)"/>
             </xsl:if>
             <xsl:if test="matches(@style,re:exact($css:SYMBOLS_FN_RE))">
                 <xsl:sequence select="concat('-dotify-counter-style: ',@style)"/>

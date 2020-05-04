@@ -423,30 +423,30 @@
                                 direction="forward"
                                 scope="spread-content"
                                 start-offset="-1"
-                                text-style="text-transform:print-page"/>
+                                text-style="text-transform: print-page"/>
               <marker-reference marker="slash-print-page"
                                 direction="backward"
                                 scope="sequence"
-                                text-style="-dotify-def:tmp_2; text-transform:print-page"/>
+                                text-style="-dotify-def:tmp_2; text-transform: print-page"/>
               <marker-reference marker="slash-print-page/entry"
                                 direction="backward"
                                 scope="sequence"
-                                text-style="-dotify-ifndef:tmp_2; text-transform:print-page"/>
+                                text-style="-dotify-ifndef:tmp_2; text-transform: print-page"/>
             </field>
             <field>
               <marker-reference marker="running-footer/prev"
                                 direction="forward"
                                 scope="spread-content"
-                                text-style="-dotify-def:tmp_3;"
+                                text-style="-dotify-def:tmp_3"
                                 start-offset="-1"/>
               <marker-reference marker="running-footer"
                                 direction="backward"
                                 scope="sequence"
-                                text-style="-dotify-defifndef:tmp_3;"/>
+                                text-style="-dotify-defifndef:tmp_3"/>
               <marker-reference marker="running-footer/entry"
                                 direction="backward"
                                 scope="sequence"
-                                text-style="-dotify-ifndef:tmp_3;"/>
+                                text-style="-dotify-ifndef:tmp_3"/>
             </field>
             <field>
               <current-page number-format="default"/>

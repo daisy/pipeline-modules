@@ -175,9 +175,8 @@ public class BrailleFilterFactoryImpl implements BrailleFilterFactory {
 			// it with "0". We choose a number because in some cases the translator may assume that
 			// the input is numerical.
 			for (int i = 0; i < styledText.size(); i++)
-				if ("??".equals(styledText.get(i).getText())
-				    && (styledText.get(i).getStyle() == null || styledText.get(i).getStyle().isEmpty()))
-					styledText.set(i, new CSSStyledText("0"));
+				if ("??".equals(styledText.get(i).getText()))
+					styledText.set(i, new CSSStyledText("0", styledText.get(i).getStyle()));
 			Iterable<String> result = translator.transform(styledText, from, to);
 			String[] array = new String[size(result)];
 			int i = 0;

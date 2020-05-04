@@ -457,47 +457,35 @@
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:if>
-        <xsl:if test="$white-space!='normal'">
-            <xsl:call-template name="pf:warn">
-                <xsl:with-param name="msg">white-space:{} could not be applied to target-counter({})</xsl:with-param>
-                <xsl:with-param name="args" select="($white-space,
-                                                     @name)"/>
-            </xsl:call-template>
-        </xsl:if>
+        <xsl:variable name="text-transform" as="xs:string*">
+            <xsl:if test="matches(@style,re:exact($css:SYMBOLS_FN_RE))">
+                <xsl:sequence select="'-dotify-counter'"/>
+            </xsl:if>
+            <xsl:sequence select="$text-transform[not(.=('none','auto'))]"/>
+        </xsl:variable>
+        <xsl:variable name="text-style" as="xs:string*">
+            <xsl:if test="exists($text-transform)">
+                <xsl:sequence select="concat('text-transform: ',string-join($text-transform,' '))"/>
+            </xsl:if>
+            <xsl:if test="not($white-space='normal')">
+                <xsl:sequence select="concat('white-space: ',$white-space)"/>
+            </xsl:if>
+            <xsl:if test="matches(@style,re:exact($css:SYMBOLS_FN_RE))">
+                <xsl:sequence select="concat('-dotify-counter-style: ',@style)"/>
+            </xsl:if>
+        </xsl:variable>
         <current-page number-format="{if (@style=('roman', 'upper-roman', 'lower-roman', 'upper-alpha', 'lower-alpha'))
                                       then @style else 'default'}">
-            <xsl:choose>
-                <xsl:when test="matches(@style,re:exact($css:SYMBOLS_FN_RE))">
-                    <xsl:choose>
-                        <xsl:when test="not($text-transform=('none','auto'))">
-                            <xsl:attribute name="text-style"
-                                           select="concat('text-transform: -dotify-counter ',$text-transform,'; ',
-                                                          '-dotify-counter-style: ',@style)"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <xsl:attribute name="text-style" select="concat('text-transform: -dotify-counter; ',
-                                                                            '-dotify-counter-style: ',@style)"/>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:when>
-                <xsl:when test="not($text-transform=('none','auto'))">
-                    <xsl:attribute name="text-style" select="concat('text-transform: ',$text-transform)"/>
-                </xsl:when>
-            </xsl:choose>
+            <xsl:if test="exists($text-style)">
+                <xsl:attribute name="text-style" select="string-join($text-style,'; ')"/>
+            </xsl:if>
         </current-page>
     </xsl:template>
     
     <xsl:template match="css:string[@name][not(@target)]" mode="eval-content-list-top-bottom">
-        <xsl:param name="white-space" as="xs:string" tunnel="yes" select="'normal'"/>
+        <xsl:param name="white-space" as="xs:string" select="'normal'"/>
         <xsl:param name="text-transform" as="xs:string" select="'auto'"/>
         <xsl:param name="page-side" as="xs:string" tunnel="yes" select="'both'"/>
-        <xsl:if test="$white-space!='normal'">
-            <xsl:call-template name="pf:warn">
-                <xsl:with-param name="msg">white-space:{} could not be applied to target-string({})</xsl:with-param>
-                <xsl:with-param name="args" select="($white-space,
-                                                     @name)"/>
-            </xsl:call-template>
-        </xsl:if>
         <xsl:variable name="scope" select="(@scope,'first')[1]"/>
         <xsl:if test="$page-side='both' and $scope=('spread-first','spread-start','spread-last','spread-last-except-start')">
             <!--
@@ -513,20 +501,25 @@
         <xsl:variable name="var-name" as="xs:string">
             <xsl:call-template name="pf:generate-id"/>
         </xsl:variable>
-        <xsl:variable name="text-transform-decl" as="xs:string" select="if (not($text-transform=('none','auto')))
-                                                                        then concat(' text-transform:',$text-transform)
-                                                                        else ''"/>
+        <xsl:variable name="text-style" as="xs:string*">
+            <xsl:if test="not($text-transform=('none','auto'))">
+                <xsl:sequence select="concat('text-transform: ',$text-transform)"/>
+            </xsl:if>
+            <xsl:if test="not($white-space='normal')">
+                <xsl:sequence select="concat('white-space: ',$white-space)"/>
+            </xsl:if>
+        </xsl:variable>
         <xsl:choose>
             <xsl:when test="$scope=('first','page-first')">
                 <marker-reference marker="{@name}" direction="forward" scope="page"
-                                  text-style="-dotify-def:{$var-name};{$text-transform-decl}"/>
+                                  text-style="{string-join((concat('-dotify-def:',$var-name),$text-style),'; ')}"/>
                 <!--
                     FIXME: replace with scope="document" (not implemented yet) and remove second marker-reference
                 -->
                 <marker-reference marker="{@name}" direction="backward" scope="sequence"
-                                  text-style="-dotify-defifndef:{$var-name};{$text-transform-decl}"/>
+                                  text-style="{string-join((concat('-dotify-defifndef:',$var-name),$text-style),'; ')}"/>
                 <marker-reference marker="{@name}/entry" direction="backward" scope="sequence"
-                                  text-style="-dotify-ifndef:{$var-name};{$text-transform-decl}"/>
+                                  text-style="{string-join((concat('-dotify-ifndef:',$var-name),$text-style),'; ')}"/>
             </xsl:when>
             <xsl:when test="$scope=('start','page-start')">
                 <!--
@@ -537,15 +530,15 @@
                     could be to use "start" inside @page and "first" inside @page:first.
                 -->
                 <marker-reference marker="{@name}/prev" direction="forward" scope="page-content"
-                                  text-style="-dotify-def:{$var-name};{$text-transform-decl}"/>
+                                  text-style="{string-join((concat('-dotify-def:',$var-name),$text-style),'; ')}"/>
                 <!--
                     TODO: check that this does not match too much at the end of the page!
                     FIXME: replace with scope="document" (not implemented yet) and remove second marker-reference
                 -->
                 <marker-reference marker="{@name}" direction="backward" scope="sequence"
-                                  text-style="-dotify-defifndef:{$var-name};{$text-transform-decl}"/>
+                                  text-style="{string-join((concat('-dotify-defifndef:',$var-name),$text-style),'; ')}"/>
                 <marker-reference marker="{@name}/entry" direction="backward" scope="sequence"
-                                  text-style="-dotify-ifndef:{$var-name};{$text-transform-decl}"/>
+                                  text-style="{string-join((concat('-dotify-ifndef:',$var-name),$text-style),'; ')}"/>
             </xsl:when>
             <xsl:when test="$scope=('start-except-last','page-start-except-last')">
                 <!--
@@ -555,8 +548,8 @@
                     https://github.com/sbsdev/pipeline-mod-sbs/issues/42).
                 -->
                 <marker-reference marker="{@name}/prev" direction="forward" scope="page-content">
-                    <xsl:if test="not($text-transform=('none','auto'))">
-                        <xsl:attribute name="text-style" select="concat('text-transform:',$text-transform)"/>
+                    <xsl:if test="exists($text-style)">
+                        <xsl:attribute name="text-style" select="string-join($text-style,'; ')"/>
                     </xsl:if>
                 </marker-reference>
             </xsl:when>
@@ -565,24 +558,24 @@
             -->
             <xsl:when test="$scope=('start-except-first','page-start-except-first','volume-start-except-first')">
                 <marker-reference marker="{@name}/if-not-set-next/prev" direction="forward" scope="page-content"
-                                  text-style="-dotify-def:{$var-name};{$text-transform-decl}"/>
+                                  text-style="{string-join((concat('-dotify-def:',$var-name),$text-style),'; ')}"/>
                 <!--
                     FIXME: replace with scope="document" (not implemented yet) and remove second marker-reference
                 -->
                 <marker-reference marker="{@name}/if-not-set-next"
                                   direction="backward" scope="sequence" offset="-1"
-                                  text-style="-dotify-defifndef:{$var-name};{$text-transform-decl}"/>
+                                  text-style="{string-join((concat('-dotify-defifndef:',$var-name),$text-style),'; ')}"/>
                 <marker-reference marker="{@name}/entry" direction="backward" scope="sequence"
-                                  text-style="-dotify-ifndef:{$var-name};{$text-transform-decl}"/>
+                                  text-style="{string-join((concat('-dotify-ifndef:',$var-name),$text-style),'; ')}"/>
             </xsl:when>
             <xsl:when test="$scope=('last','page-last')">
                 <!--
                     FIXME: replace with scope="document" (not implemented yet) and remove second marker-reference
                 -->
                 <marker-reference marker="{@name}" direction="backward" scope="sequence"
-                                  text-style="-dotify-def:{$var-name};{$text-transform-decl}"/>
+                                  text-style="{string-join((concat('-dotify-def:',$var-name),$text-style),'; ')}"/>
                 <marker-reference marker="{@name}/entry" direction="backward" scope="sequence"
-                                  text-style="-dotify-ifndef:{$var-name};{$text-transform-decl}"/>
+                                  text-style="{string-join((concat('-dotify-ifndef:',$var-name),$text-style),'; ')}"/>
             </xsl:when>
             <xsl:when test="$scope=('last-except-start','page-last-except-start')">
                 <xsl:message terminate="yes"
@@ -590,7 +583,7 @@
             </xsl:when>
             <xsl:when test="$scope='spread-first'">
                 <marker-reference marker="{@name}" direction="forward" scope="spread"
-                                  text-style="-dotify-def:{$var-name};{$text-transform-decl}">
+                                  text-style="{string-join((concat('-dotify-def:',$var-name),$text-style),'; ')}">
                     <xsl:if test="$page-side='right'">
                         <xsl:attribute name="start-offset" select="'-1'"/>
                     </xsl:if>
@@ -599,13 +592,13 @@
                     FIXME: replace with scope="document" (not implemented yet) and remove second marker-reference
                 -->
                 <marker-reference marker="{@name}" direction="backward" scope="sequence"
-                                  text-style="-dotify-defifndef:{$var-name};{$text-transform-decl}">
+                                  text-style="{string-join((concat('-dotify-defifndef:',$var-name),$text-style),'; ')}">
                     <xsl:if test="$page-side='right'">
                         <xsl:attribute name="start-offset" select="'-1'"/>
                     </xsl:if>
                 </marker-reference>
                 <marker-reference marker="{@name}/entry" direction="backward" scope="sequence"
-                                  text-style="-dotify-ifndef:{$var-name};{$text-transform-decl}"/>
+                                  text-style="{string-join((concat('-dotify-ifndef:',$var-name),$text-style),'; ')}"/>
             </xsl:when>
             <xsl:when test="$scope='spread-start'">
                 <!--
@@ -615,7 +608,7 @@
                     https://github.com/sbsdev/pipeline-mod-sbs/issues/42).
                 -->
                 <marker-reference marker="{@name}/prev" direction="forward" scope="spread-content"
-                                  text-style="-dotify-def:{$var-name};{$text-transform-decl}">
+                                  text-style="{string-join((concat('-dotify-def:',$var-name),$text-style),'; ')}">
                     <xsl:if test="$page-side='right'">
                         <xsl:attribute name="start-offset" select="'-1'"/>
                     </xsl:if>
@@ -625,13 +618,13 @@
                     FIXME: replace with scope="document" (not implemented yet) and remove second marker-reference
                 -->
                 <marker-reference marker="{@name}" direction="backward" scope="sequence"
-                                  text-style="-dotify-defifndef:{$var-name};{$text-transform-decl}">
+                                  text-style="{string-join((concat('-dotify-defifndef:',$var-name),$text-style),'; ')}">
                     <xsl:if test="$page-side='left'">
                         <xsl:attribute name="start-offset" select="'1'"/>
                     </xsl:if>
                 </marker-reference>
                 <marker-reference marker="{@name}/entry" direction="backward" scope="sequence"
-                                  text-style="-dotify-ifndef:{$var-name};{$text-transform-decl}"/>
+                                  text-style="{string-join((concat('-dotify-ifndef:',$var-name),$text-style),'; ')}"/>
             </xsl:when>
             <xsl:when test="$scope='spread-start-except-last'">
                 <!--
@@ -644,8 +637,8 @@
                     <xsl:if test="$page-side='right'">
                         <xsl:attribute name="start-offset" select="'-1'"/>
                     </xsl:if>
-                    <xsl:if test="not($text-transform=('none','auto'))">
-                        <xsl:attribute name="text-style" select="concat('text-transform:',$text-transform)"/>
+                    <xsl:if test="exists($text-style)">
+                        <xsl:attribute name="text-style" select="string-join($text-style,'; ')"/>
                     </xsl:if>
                 </marker-reference>
             </xsl:when>
@@ -654,13 +647,13 @@
                     FIXME: replace with scope="document" (not implemented yet) and remove second marker-reference
                 -->
                 <marker-reference marker="{@name}" direction="backward" scope="sequence"
-                                  text-style="-dotify-def:{$var-name};{$text-transform-decl}">
+                                  text-style="{string-join((concat('-dotify-def:',$var-name),$text-style),'; ')}">
                     <xsl:if test="$page-side='left'">
                         <xsl:attribute name="start-offset" select="'1'"/>
                     </xsl:if>
                 </marker-reference>
                 <marker-reference marker="{@name}/entry" direction="backward" scope="sequence"
-                                  text-style="-dotify-ifndef:{$var-name};{$text-transform-decl}"/>
+                                  text-style="{string-join((concat('-dotify-ifndef:',$var-name),$text-style),'; ')}"/>
             </xsl:when>
             <xsl:when test="$scope='spread-last-except-start'">
                 <xsl:message terminate="yes"

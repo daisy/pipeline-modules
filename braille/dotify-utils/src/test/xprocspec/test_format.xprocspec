@@ -193,9 +193,9 @@
                   <string value=""/>
                 </field>
                 <field>
-                  <marker-reference marker="running-header" direction="forward" scope="page" text-style="-dotify-def:tmp_3;"/>
-                  <marker-reference marker="running-header" direction="backward" scope="sequence" text-style="-dotify-defifndef:tmp_3;"/>
-                  <marker-reference marker="running-header/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_3;"/>
+                  <marker-reference marker="running-header" direction="forward" scope="page" text-style="-dotify-def:tmp_3"/>
+                  <marker-reference marker="running-header" direction="backward" scope="sequence" text-style="-dotify-defifndef:tmp_3"/>
+                  <marker-reference marker="running-header/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_3"/>
                 </field>
                 <field>
                   <string value=""/>
@@ -206,14 +206,14 @@
                   <string value=""/>
                 </field>
                 <field>
-                  <marker-reference marker="running-footer" direction="forward" scope="page" text-style="-dotify-def:tmp_1;"/>
-                  <marker-reference marker="running-footer" direction="backward" scope="sequence" text-style="-dotify-defifndef:tmp_1;"/>
-                  <marker-reference marker="running-footer/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_1;"/>
+                  <marker-reference marker="running-footer" direction="forward" scope="page" text-style="-dotify-def:tmp_1"/>
+                  <marker-reference marker="running-footer" direction="backward" scope="sequence" text-style="-dotify-defifndef:tmp_1"/>
+                  <marker-reference marker="running-footer/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_1"/>
                 </field>
                 <field>
-                  <marker-reference marker="print-page" direction="forward" scope="page" text-style="-dotify-def:tmp_2;"/>
-                  <marker-reference marker="print-page" direction="backward" scope="sequence" text-style="-dotify-defifndef:tmp_2;"/>
-                  <marker-reference marker="print-page/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_2;"/>
+                  <marker-reference marker="print-page" direction="forward" scope="page" text-style="-dotify-def:tmp_2"/>
+                  <marker-reference marker="print-page" direction="backward" scope="sequence" text-style="-dotify-defifndef:tmp_2"/>
+                  <marker-reference marker="print-page/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_2"/>
                 </field>
               </footer>
             </default-template>
@@ -353,14 +353,14 @@
                   <string value=""/>
                 </field>
                 <field>
-                  <marker-reference marker="running-footer" direction="forward" scope="page" text-style="-dotify-def:tmp_1;"/>
-                  <marker-reference marker="running-footer" direction="backward" scope="sequence" text-style="-dotify-defifndef:tmp_1;"/>
-                  <marker-reference marker="running-footer/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_1;"/>
+                  <marker-reference marker="running-footer" direction="forward" scope="page" text-style="-dotify-def:tmp_1"/>
+                  <marker-reference marker="running-footer" direction="backward" scope="sequence" text-style="-dotify-defifndef:tmp_1"/>
+                  <marker-reference marker="running-footer/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_1"/>
                 </field>
                 <field>
-                  <marker-reference marker="print-page" direction="forward" scope="page" text-style="-dotify-def:tmp_2;"/>
-                  <marker-reference marker="print-page" direction="backward" scope="sequence" text-style="-dotify-defifndef:tmp_2;"/>
-                  <marker-reference marker="print-page/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_2;"/>
+                  <marker-reference marker="print-page" direction="forward" scope="page" text-style="-dotify-def:tmp_2"/>
+                  <marker-reference marker="print-page" direction="backward" scope="sequence" text-style="-dotify-defifndef:tmp_2"/>
+                  <marker-reference marker="print-page/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_2"/>
                 </field>
               </footer>
             </default-template>
@@ -4567,21 +4567,21 @@
               <header>
                 <field>
                   <marker-reference marker="print-page-dash/prev" direction="forward" scope="page-content"/>
-                  <marker-reference marker="print-page" direction="backward" scope="sequence" text-style="-dotify-def:tmp_4;"/>
-                  <marker-reference marker="print-page/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_4;"/>
+                  <marker-reference marker="print-page" direction="backward" scope="sequence" text-style="-dotify-def:tmp_4"/>
+                  <marker-reference marker="print-page/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_4"/>
                 </field>
                 <field>
                   <marker-reference marker="print-page-dash/prev" direction="forward" scope="spread-content" start-offset="-1"/>
-                  <marker-reference marker="print-page" direction="backward" scope="sequence" text-style="-dotify-def:tmp_6;"/>
-                  <marker-reference marker="print-page/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_6;"/>
+                  <marker-reference marker="print-page" direction="backward" scope="sequence" text-style="-dotify-def:tmp_6"/>
+                  <marker-reference marker="print-page/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_6"/>
                 </field>
               </header>
               <footer>
                 <!--
                 <field>
-                  <marker-reference marker="print-page/prev" direction="forward" scope="page-content" text-style="-dotify-def:tmp_x;"/>
-                  <marker-reference marker="print-page" direction="backward" scope="sequence" text-style="-dotify-defifndef:tmp_x;"/>
-                  <marker-reference marker="print-page/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_x;"/>
+                  <marker-reference marker="print-page/prev" direction="forward" scope="page-content" text-style="-dotify-def:tmp_x"/>
+                  <marker-reference marker="print-page" direction="backward" scope="sequence" text-style="-dotify-defifndef:tmp_x"/>
+                  <marker-reference marker="print-page/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_x"/>
                   <marker-reference marker="dash-print-page" direction="backward" scope="page"/>
                 </field>
                 -->
@@ -4590,9 +4590,9 @@
                 </field>
                 <!--
                 <field>
-                  <marker-reference marker="print-page/prev" direction="forward" scope="spread-content" text-style="-dotify-def:tmp_x;" start-offset="-1"/>
-                  <marker-reference marker="print-page" direction="backward" scope="sequence" text-style="-dotify-defifndef:tmp_x;"/>
-                  <marker-reference marker="print-page/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_x;"/>
+                  <marker-reference marker="print-page/prev" direction="forward" scope="spread-content" text-style="-dotify-def:tmp_x" start-offset="-1"/>
+                  <marker-reference marker="print-page" direction="backward" scope="sequence" text-style="-dotify-defifndef:tmp_x"/>
+                  <marker-reference marker="print-page/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_x"/>
                   <marker-reference marker="dash-print-page" direction="backward" scope="spread"/>
                 </field>
                 -->
@@ -4605,8 +4605,8 @@
               <header>
                 <field>
                   <marker-reference marker="print-page-dash/prev" direction="forward" scope="page-content"/>
-                  <marker-reference marker="print-page" direction="backward" scope="sequence" text-style="-dotify-def:tmp_2;"/>
-                  <marker-reference marker="print-page/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_2;"/>
+                  <marker-reference marker="print-page" direction="backward" scope="sequence" text-style="-dotify-def:tmp_2"/>
+                  <marker-reference marker="print-page/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_2"/>
                 </field>
                 <field>
                   <string value=""/>
@@ -4615,9 +4615,9 @@
               <footer>
                 <!--
                 <field>
-                  <marker-reference marker="print-page/prev" direction="forward" scope="page-content" text-style="-dotify-def:tmp_x;"/>
-                  <marker-reference marker="print-page" direction="backward" scope="sequence" text-style="-dotify-defifndef:tmp_x;"/>
-                  <marker-reference marker="print-page/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_x;"/>
+                  <marker-reference marker="print-page/prev" direction="forward" scope="page-content" text-style="-dotify-def:tmp_x"/>
+                  <marker-reference marker="print-page" direction="backward" scope="sequence" text-style="-dotify-defifndef:tmp_x"/>
+                  <marker-reference marker="print-page/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_x"/>
                   <marker-reference marker="dash-print-page" direction="backward" scope="page"/>
                 </field>
                 -->
@@ -4822,9 +4822,9 @@
               <header/>
               <footer>
                 <field>
-                  <marker-reference marker="print-page/prev" direction="forward" scope="page-content" text-style="-dotify-def:tmp_1;"/>
-                  <marker-reference marker="print-page" direction="backward" scope="sequence" text-style="-dotify-defifndef:tmp_1;"/>
-                  <marker-reference marker="print-page/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_1;"/>
+                  <marker-reference marker="print-page/prev" direction="forward" scope="page-content" text-style="-dotify-def:tmp_1"/>
+                  <marker-reference marker="print-page" direction="backward" scope="sequence" text-style="-dotify-defifndef:tmp_1"/>
+                  <marker-reference marker="print-page/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_1"/>
                 </field>
                 <field>
                   <string value=""/>
@@ -4969,9 +4969,9 @@
               <header/>
               <footer>
                 <field>
-                  <marker-reference marker="print-page/prev" direction="forward" scope="page-content" text-style="-dotify-def:tmp_1;"/>
-                  <marker-reference marker="print-page" direction="backward" scope="sequence" text-style="-dotify-defifndef:tmp_1;"/>
-                  <marker-reference marker="print-page/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_1;"/>
+                  <marker-reference marker="print-page/prev" direction="forward" scope="page-content" text-style="-dotify-def:tmp_1"/>
+                  <marker-reference marker="print-page" direction="backward" scope="sequence" text-style="-dotify-defifndef:tmp_1"/>
+                  <marker-reference marker="print-page/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_1"/>
                 </field>
                 <field>
                   <string value=""/>
@@ -5579,14 +5579,14 @@
               <header/>
               <footer>
                 <field>
-                  <marker-reference marker="foo" direction="forward" scope="page" text-style="-dotify-def:tmp_1;"/>
-                  <marker-reference marker="foo" direction="backward" scope="sequence" text-style="-dotify-defifndef:tmp_1;"/>
-                  <marker-reference marker="foo/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_1;"/>
+                  <marker-reference marker="foo" direction="forward" scope="page" text-style="-dotify-def:tmp_1"/>
+                  <marker-reference marker="foo" direction="backward" scope="sequence" text-style="-dotify-defifndef:tmp_1"/>
+                  <marker-reference marker="foo/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_1"/>
                 </field>
                 <field>
-                  <marker-reference marker="foo/prev" direction="forward" scope="page-content" text-style="-dotify-def:tmp_2;"/>
-                  <marker-reference marker="foo" direction="backward" scope="sequence" text-style="-dotify-defifndef:tmp_2;"/>
-                  <marker-reference marker="foo/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_2;"/>
+                  <marker-reference marker="foo/prev" direction="forward" scope="page-content" text-style="-dotify-def:tmp_2"/>
+                  <marker-reference marker="foo" direction="backward" scope="sequence" text-style="-dotify-defifndef:tmp_2"/>
+                  <marker-reference marker="foo/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_2"/>
                 </field>
               </footer>
             </default-template>
@@ -9530,7 +9530,6 @@
           </doc>
         </x:document>
       </x:input>
-      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -10659,9 +10658,9 @@
                   <string value=""/>
                 </field>
                 <field>
-                  <marker-reference marker="running-footer" direction="forward" scope="page" text-style="-dotify-def:tmp_1;"/>
-                  <marker-reference marker="running-footer" direction="backward" scope="sequence" text-style="-dotify-defifndef:tmp_1;"/>
-                  <marker-reference marker="running-footer/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_1;"/>
+                  <marker-reference marker="running-footer" direction="forward" scope="page" text-style="-dotify-def:tmp_1"/>
+                  <marker-reference marker="running-footer" direction="backward" scope="sequence" text-style="-dotify-defifndef:tmp_1"/>
+                  <marker-reference marker="running-footer/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_1"/>
                 </field>
                 <field>
                   <string value=""/>
@@ -10975,8 +10974,8 @@
               <header>
                 <field>
                   <marker-reference marker="print-page-dash/prev" direction="forward" scope="page-content"/>
-                  <marker-reference marker="print-page" direction="backward" scope="sequence" text-style="-dotify-def:tmp_2;"/>
-                  <marker-reference marker="print-page/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_2;"/>
+                  <marker-reference marker="print-page" direction="backward" scope="sequence" text-style="-dotify-def:tmp_2"/>
+                  <marker-reference marker="print-page/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_2"/>
                 </field>
                 <field>
                   <string value=""/>
@@ -12566,13 +12565,13 @@
               <header/>
               <footer>
                 <field>
-                  <marker-reference marker="print-page" direction="forward" scope="page" text-style="-dotify-def:tmp_1;"/>
-                  <marker-reference marker="print-page" direction="backward" scope="sequence" text-style="-dotify-defifndef:tmp_1;"/>
-                  <marker-reference marker="print-page/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_1;"/>
+                  <marker-reference marker="print-page" direction="forward" scope="page" text-style="-dotify-def:tmp_1"/>
+                  <marker-reference marker="print-page" direction="backward" scope="sequence" text-style="-dotify-defifndef:tmp_1"/>
+                  <marker-reference marker="print-page/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_1"/>
                 </field>
                 <field>
-                  <marker-reference marker="print-page" direction="backward" scope="sequence" text-style="-dotify-def:tmp_2;"/>
-                  <marker-reference marker="print-page/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_2;"/>
+                  <marker-reference marker="print-page" direction="backward" scope="sequence" text-style="-dotify-def:tmp_2"/>
+                  <marker-reference marker="print-page/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_2"/>
                 </field>
               </footer>
             </default-template>
@@ -14298,9 +14297,9 @@
               <header/>
               <footer>
                 <field>
-                  <marker-reference marker="foo/if-not-set-next/prev" direction="forward" scope="page-content" text-style="-dotify-def:tmp_1;"/>
-                  <marker-reference marker="foo/if-not-set-next" direction="backward" scope="sequence" offset="-1" text-style="-dotify-defifndef:tmp_1;"/>
-                  <marker-reference marker="foo/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_1;"/>
+                  <marker-reference marker="foo/if-not-set-next/prev" direction="forward" scope="page-content" text-style="-dotify-def:tmp_1"/>
+                  <marker-reference marker="foo/if-not-set-next" direction="backward" scope="sequence" offset="-1" text-style="-dotify-defifndef:tmp_1"/>
+                  <marker-reference marker="foo/entry" direction="backward" scope="sequence" text-style="-dotify-ifndef:tmp_1"/>
                 </field>
                 <field>
                   <string value=""/>
@@ -14384,6 +14383,119 @@
                   <row/>
                   <row/>
                   <row/>
+                </page>
+              </section>
+            </volume>
+          </body>
+        </pef>
+      </x:document>
+    </x:expect>
+  </x:scenario>
+  
+  <x:scenario label="test_123">
+    <x:documentation>
+      Tests white-space on string(), target-string() and counter() and target-counter().
+    </x:documentation>
+    <x:call step="dotify:format">
+      <x:input port="source">
+        <x:document type="inline">
+          <doc style="text-transform:none;
+                      @page {
+                        size: 10 6;
+                        @bottom-right {
+                          white-space: pre-wrap;
+                          text-transform: auto;
+                          content: string(foo) ' ' counter(page); }}">
+            <p style="display: block;">
+              <a href="#x"
+                 style="&amp;::before {
+                          white-space: pre-wrap;
+                          text-transform: auto;
+                          content: target-string(attr(href), foo) ' ' target-counter(attr(href), page);  }"/>
+              ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿
+            </p>
+            <p id="x" style="display: block; string-set: foo '⠤  ⠤'">
+              ⠿⠿⠿⠿⠿
+            </p>
+          </doc>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="obfl">
+      <x:document type="port" port="obfl"/>
+    </x:context>
+    <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
+      <x:document type="inline">
+        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <layout-master name="master" duplex="true" page-width="10" page-height="6">
+            <default-template>
+              <header/>
+              <footer>
+                <field allow-text-flow="true"/>
+                <field>
+                  <marker-reference marker="foo" direction="forward" scope="page"
+                                    text-style="-dotify-def:tmp_1; white-space: pre-wrap"/>
+                  <marker-reference marker="foo" direction="backward" scope="sequence"
+                                    text-style="-dotify-defifndef:tmp_1; white-space: pre-wrap"/>
+                  <marker-reference marker="foo/entry" direction="backward" scope="sequence"
+                                    text-style="-dotify-ifndef:tmp_1; white-space: pre-wrap"/>
+                  <string value=" "/>
+                  <current-page number-format="default" text-style="white-space: pre-wrap"/>
+                </field>
+              </footer>
+            </default-template>
+          </layout-master>
+          <sequence master="master">
+            <block translate="">
+              ⠤  ​⠤ ​<style name="white-space: pre-wrap">
+              <page-number ref-id="x" number-format="default"/>
+            </style>
+            <span translate="pre-translated-text-css">
+              ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿
+            </span>
+            </block>
+            <block>
+              <block>
+                <span id="x"/>
+              </block>
+              <block>
+                <marker class="foo" value="⠤  ⠤"/>
+              </block>
+              ⠿⠿⠿⠿⠿
+            </block>
+          </sequence>
+        </obfl>
+      </x:document>
+    </x:expect>
+    <x:context label="pef">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="pef" type="custom" href="http://www.daisy.org/pipeline/modules/braille/pef-utils/library.xpl" step="x:pef-compare">
+      <x:document type="inline">
+        <pef xmlns="http://www.daisy.org/ns/2008/pef" version="2008-1">
+          <head xmlns:dc="http://purl.org/dc/elements/1.1/">
+            <meta>
+              <dc:format>application/x-pef+xml</dc:format>
+            </meta>
+          </head>
+          <body>
+            <volume cols="10" rows="6" rowgap="0" duplex="true">
+              <section>
+                <page>
+                  <row>⠤⠀⠀⠤⠀⠼⠃⠀</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿⠀⠀⠀⠼⠁</row>
+                </page>
+                <page>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠿⠿</row>
+                  <row/>
+                  <row/>
+                  <row>⠀⠀⠀⠤⠀⠀⠤⠀⠼⠃</row>
                 </page>
               </section>
             </volume>

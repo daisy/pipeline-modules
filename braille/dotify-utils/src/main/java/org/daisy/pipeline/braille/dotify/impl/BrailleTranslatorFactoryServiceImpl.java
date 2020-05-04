@@ -235,9 +235,8 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 			int from = input.getPrecedingText().size();
 			int to = from + input.getTextToTranslate().size();
 			for (int i = 0; i < styledText.size(); i++)
-				if ("??".equals(styledText.get(i).getText())
-				    && (styledText.get(i).getStyle() == null || styledText.get(i).getStyle().isEmpty()))
-					styledText.set(i, new CSSStyledText("0"));
+				if ("??".equals(styledText.get(i).getText()))
+					styledText.set(i, new CSSStyledText("0", styledText.get(i).getStyle()));
 			return translate(styledText, from, to);
 		}
 		
@@ -253,8 +252,9 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 						CSSProperty ws = st.getProperty("white-space");
 						if (ws != null) {
 							if (ws == WhiteSpace.PRE_WRAP)
-								s = s.replaceAll("[\\x20\t\\u2800]", "\u00A0").replaceAll("[\\n\\r]", "\u2028");
-							else if (ws == WhiteSpace.PRE_LINE)
+								s = s.replaceAll("[\\x20\t\\u2800]+", "$0\u200B")
+								     .replaceAll("[\\x20\t\\u2800]", "\u00A0");
+							if (ws == WhiteSpace.PRE_WRAP || ws == WhiteSpace.PRE_LINE)
 								s = s.replaceAll("[\\n\\r]", "\u2028");
 							st.removeProperty("white-space"); }}
 					braille.add(s);
@@ -279,8 +279,8 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 	}
 	
 	/**
-	 * Same as above but assumes that input text exists of only braille and
-	 * white space characters. Supports CSS property "word-spacing".
+	 * Same as above but assumes that input text exists of only braille and white space
+	 * characters. Supports CSS properties "word-spacing" and "white-space".
 	 */
 	private static class PreTranslatedBrailleTranslator implements BrailleTranslator {
 		
@@ -303,6 +303,7 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 				for (CSSStyledText styledText : input) {
 					SimpleInlineStyle style = styledText.getStyle();
 					int spacing = 1;
+					String text = styledText.getText();
 					if (style != null) {
 						CSSProperty val = style.getProperty("word-spacing");
 						if (val != null) {
@@ -315,6 +316,14 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 									
 							// FIXME: assuming style is mutable and text.iterator() does not create copies
 							style.removeProperty("word-spacing"); }
+						val = style.getProperty("white-space");
+						if (val != null) {
+							if (val == WhiteSpace.PRE_WRAP)
+								text = text.replaceAll("[\\x20\t\\u2800]+", "$0\u200B")
+								           .replaceAll("[\\x20\t\\u2800]", "\u00A0");
+							if (val == WhiteSpace.PRE_WRAP || val == WhiteSpace.PRE_LINE)
+								text = text.replaceAll("[\\n\\r]", "\u2028");
+							style.removeProperty("white-space"); }
 						for (String prop : style.getPropertyNames())
 							logger.warn("CSS property {} not supported", style.getSourceDeclaration(prop)); }
 					if (wordSpacing < 0)
@@ -326,7 +335,7 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 					if (attrs != null)
 						for (String k : attrs.keySet())
 							logger.warn("Text attribute \"{}:{}\" ignored", k, attrs.get(k));
-					braille.add(styledText.getText()); }
+					braille.add(text); }
 				if (wordSpacing < 0) wordSpacing = 1; }
 			StringBuilder brailleString = new StringBuilder();
 			int fromChar = 0;
