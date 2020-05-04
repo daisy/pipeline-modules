@@ -136,7 +136,7 @@
     </x:expect>
   </x:scenario>
   
-  <x:scenario label="toc-sequence">
+  <x:scenario label="toc-sequence" pending="see https://github.com/mtmse/dotify.formatter.impl/pull/29">
     <x:documentation>
       Tests toc-sequence/table-of-contents. Tests that on-toc-start and on-toc-end can be used for
       creating top and bottom borders. Tests that break-before="page" works inside on-toc-start.
