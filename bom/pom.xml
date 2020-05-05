@@ -567,7 +567,7 @@
       <dependency>
         <groupId>org.daisy.braille</groupId>
         <artifactId>braille-css</artifactId>
-        <version>1.15.0</version>
+        <version>1.15.1-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>
