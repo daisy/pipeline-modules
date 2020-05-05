@@ -36,9 +36,6 @@
 		<p:pipe step="main" port="parameters"/>
 	</p:variable>
 	
-	<!-- for debug info -->
-	<p:for-each><p:identity/></p:for-each>
-	
 	<px:transform px:message="Translating document with {
 	                            replace($css-block-transform,'\((input|output):css\)','')}"
 	              px:progress=".12">
@@ -48,9 +45,6 @@
 			<p:pipe step="main" port="parameters"/>
 		</p:input>
 	</px:transform>
-	
-	<!-- for debug info -->
-	<p:for-each><p:identity/></p:for-each>
 	
 	<pxi:css-to-obfl px:message="Transforming from CSS to OBFL" px:progress=".83">
 		<p:with-option name="text-transform" select="$text-transform"/>
@@ -63,9 +57,6 @@
 	<p:choose px:progress=".04">
 		<p:when test="$output='pef'">
 			
-			<!-- for debug info -->
-			<p:for-each><p:identity/></p:for-each>
-
 			<!--
 			    Follow the OBFL standard which says that "when volume-transition is present, the
 			    last page or sheet in each volume may be modified so that the volume break occurs

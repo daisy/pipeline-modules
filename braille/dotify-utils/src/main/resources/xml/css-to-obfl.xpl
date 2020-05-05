@@ -763,9 +763,6 @@
         </p:choose>
     </p:for-each>
     
-    <!-- for debug info -->
-    <p:for-each><p:identity/></p:for-each>
-    
     <p:identity name="sections"/>
     
     <p:xslt px:progress=".06">
@@ -786,9 +783,6 @@
             <p:pipe step="extract-page-and-volume-styles" port="result"/>
         </p:with-param>
     </p:xslt>
-    
-    <!-- for debug info -->
-    <p:for-each><p:identity/></p:for-each>
     
     <!--
         generate layout-masters
