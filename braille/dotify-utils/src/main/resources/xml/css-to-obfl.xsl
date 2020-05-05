@@ -16,6 +16,7 @@
     
     <xsl:include href="http://www.daisy.org/pipeline/modules/braille/common-utils/library.xsl"/>
     <xsl:include href="http://www.daisy.org/pipeline/modules/braille/css-utils/library.xsl"/>
+    <xsl:include href="marker-reference.xsl"/>
     
     <xsl:param name="braille-translator-query" as="xs:string" required="yes"/> <!-- unused -->
     <xsl:param name="page-counters" as="xs:string" required="yes"/>
@@ -257,6 +258,10 @@
                                                 '⣠⣡⣢⣣⣤⣥⣦⣧⣨⣩⣪⣫⣬⣭⣮⣯⣰⣱⣲⣳⣴⣵⣶⣷⣸⣹⣺⣻⣼⣽⣾⣿',
                                                 ']'))])"/>
     
+    <xsl:template match="/">
+        <xsl:call-template name="start"/>
+    </xsl:template>
+
     <xsl:template name="start">
         <xsl:call-template name="pf:progress">
             <xsl:with-param name="progress" select="concat('1/',$progress-total)"/>
@@ -899,6 +904,16 @@
     <!-- =========== -->
     <!-- Block boxes -->
     <!-- =========== -->
+    
+    <xsl:template priority="1"
+                  mode="sequence sequence-interrupted-resumed"
+                  match="css:box[@type='block']">
+        <xsl:call-template name="pf:next-match-with-generated-ids">
+            <xsl:with-param name="prefix" select="'tmp_'"/>
+            <xsl:with-param name="for-elements" select="descendant::css:string[@name][not(@target)][@scope]"/>
+            <xsl:with-param name="in-use" select="()"/>
+        </xsl:call-template>
+    </xsl:template>
     
     <xsl:template mode="sequence item td sequence-interrupted-resumed"
                   match="css:box[@type='block']">
@@ -1930,22 +1945,53 @@
         string() and target-string()
     -->
     <xsl:template mode="block span toc-entry"
-                  match="css:string[@name]">
-        <xsl:if test="@scope">
-            <xsl:call-template name="pf:warn">
-                <xsl:with-param name="msg">string({}, {}): second argument not supported</xsl:with-param>
-                <xsl:with-param name="args" select="(@name,
-                                                     @scope)"/>
-            </xsl:call-template>
-        </xsl:if>
-        <xsl:variable name="target" as="xs:string?" select="if (@target) then @target else ()"/>
-        <xsl:variable name="target" as="element()?" select="if ($target)
-                                                            then $sections//*[@css:id=$target][1]
-                                                                 /(descendant-or-self::css:box|following::css:box)[@type='inline'][1]
-                                                            else ."/>
-        <xsl:if test="$target">
-            <xsl:apply-templates mode="css:eval-string" select="css:string(@name, $target)"/>
-        </xsl:if>
+                  match="css:string[@name][@target]|
+                         css:string[@name][not(@target)]">
+        <xsl:choose>
+            <xsl:when test="not(@scope)">
+                <!--
+                    default scope is different than 'first' although it isn't explained like that in the spec
+                    
+                    FIXME: can not use this method if inside volume-transition or pre/post-content
+                -->
+                <xsl:variable name="target" as="xs:string?" select="if (@target) then @target else ()"/>
+                <xsl:variable name="target" as="element()?" select="if ($target)
+                                                                    then $sections//*[@css:id=$target][1]
+                                                                         /(descendant-or-self::css:box|following::css:box)[@type='inline'][1]
+                                                                    else ."/>
+                <xsl:if test="$target">
+                    <xsl:apply-templates mode="css:eval-string" select="css:string(@name, $target)"/>
+                </xsl:if>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:if test="@scope=('spread-first','spread-start','spread-last','spread-last-except-start')">
+                    <xsl:call-template name="pf:error">
+                        <xsl:with-param name="msg">string({}, {}): {} argument not supported within page body</xsl:with-param>
+                        <xsl:with-param name="args" select="(@name,@scope,@scope)"/>
+                    </xsl:call-template>
+                </xsl:if>
+                <xsl:variable name="marker-references" as="element(obfl:marker-reference)*">
+                    <xsl:apply-templates mode="marker-reference" select="."/>
+                </xsl:variable>
+                <xsl:for-each select="$marker-references">
+                    <!--
+                        text-style attribute is only for marker-reference inside field
+                    -->
+                    <xsl:choose>
+                        <xsl:when test="@text-style">
+                            <style name="{@text-style}">
+                                <xsl:copy>
+                                    <xsl:sequence select="@* except @text-style"/>
+                                </xsl:copy>
+                            </style>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:sequence select="."/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:for-each>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
     
     <xsl:template mode="css:eval-string"
@@ -2588,6 +2634,7 @@
     <xsl:template match="pxi:print-mode" mode="marker">marker</xsl:template>
     <xsl:template match="pxi:print-mode" mode="xml-data">xml-data</xsl:template>
     <xsl:template match="pxi:print-mode" mode="sequence-interrupted-resumed">sequence-interrupted-resumed</xsl:template>
+    <xsl:template match="pxi:print-mode" mode="marker-reference">marker-reference</xsl:template>
     <xsl:template match="pxi:print-mode" mode="#all" priority="-1">?</xsl:template>
     
     <!-- =========== -->
@@ -2622,10 +2669,9 @@
                   match="css:attr|
                          css:content[@target]|
                          css:content[not(@target)]|
-                         css:string[@name][not(@target)]|
+                         css:string[@name][@target]|
                          css:counter[not(@target)]|
                          css:text[@target]|
-                         css:string[@name][@target]|
                          css:counter[@target]|
                          css:leader">
         <xsl:call-template name="pf:warn">
@@ -2643,7 +2689,8 @@
     </xsl:template>
     
     <xsl:template mode="css:eval-sequence-interrupted-resumed-content-list"
-                  match="css:custom-func[@name='-obfl-evaluate']">
+                  match="css:custom-func[@name='-obfl-evaluate']|
+                         css:string[@name][not(@target)]">
         <css:box type="inline">
             <xsl:sequence select="."/>
         </css:box>

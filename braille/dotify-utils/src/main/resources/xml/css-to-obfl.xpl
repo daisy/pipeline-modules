@@ -768,8 +768,7 @@
     
     <p:identity name="sections"/>
     
-    <p:xslt px:progress=".06"
-            template-name="start">
+    <p:xslt px:progress=".06">
         <p:input port="source">
             <p:pipe step="sections" port="result"/>
             <p:pipe step="extract-page-and-volume-styles" port="styles"/>

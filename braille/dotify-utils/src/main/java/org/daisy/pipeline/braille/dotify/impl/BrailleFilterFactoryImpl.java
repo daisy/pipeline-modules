@@ -375,15 +375,16 @@ public class BrailleFilterFactoryImpl implements BrailleFilterFactory {
 				else if (properties.contains("-dotify-defifndef")) {
 					key = "-dotify-defifndef"; }
 				if (key != null) {
-					String var = s.getProperty(key, false).toString();
-					s.removeProperty(key);
-					if (env == null)
-						env = new HashSet<String>();
-					if (key.equals("-dotify-ifdef") && !env.contains(var)
-					    || (key.equals("-dotify-ifndef") || key.equals("-dotify-defifndef")) && env.contains(var))
-						t = "";
-					if (key.equals("-dotify-def") || key.equals("-dotify-defifndef"))
-						env.add(var); }}
+					if (!"".equals(t)) {
+						String var = s.getProperty(key, true).toString();
+						if (env == null)
+							env = new HashSet<String>();
+						if (key.equals("-dotify-ifdef") && !env.contains(var)
+						    || (key.equals("-dotify-ifndef") || key.equals("-dotify-defifndef")) && env.contains(var))
+							t = "";
+						if (key.equals("-dotify-def") || key.equals("-dotify-defifndef"))
+							env.add(var); }
+					s.removeProperty(key); }}
 			if (segment != null)
 				segments.add(new CSSStyledText(segment, style, attrs));
 			segment = t;
