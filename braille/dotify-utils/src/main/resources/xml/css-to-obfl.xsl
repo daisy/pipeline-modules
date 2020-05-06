@@ -2440,6 +2440,9 @@
 
         <xsl:choose>
             <xsl:when test="$white-space=('pre-wrap','pre-line') and matches($text,'\n')">
+                <!--
+                    not using style element because Dotify collapses spaces in OBFL
+                -->
                 <xsl:analyze-string select="$text" regex="\n">
                     <xsl:matching-substring>
                         <xsl:text>&#x200B;</xsl:text> <!-- to make sure there are no leading br elements in a block because those would be ignored -->
@@ -2453,20 +2456,6 @@
                 </xsl:analyze-string>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:variable name="text" as="xs:string">
-                    <xsl:choose>
-                        <!--
-                            For 'hyphens:none' all SHY and ZWSP characters are removed from the text in advance.
-                            FIXME: handle this with a style element
-                        -->
-                        <xsl:when test="$hyphens='none'">
-                            <xsl:sequence select="replace($text,'[&#x00AD;&#x200B;]','')"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <xsl:sequence select="$text"/>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:variable>
                 <xsl:variable name="text" as="xs:string*">
                     <xsl:choose>
                         <!--
@@ -2496,6 +2485,12 @@
                     -->
                     <xsl:if test="not($text-transform=('none','auto'))">
                         <xsl:sequence select="concat('text-transform: ',$text-transform)"/>
+                    </xsl:if>
+                    <!--
+                        hyphens handled through hyphenate attribute but not OBFL counterpart for value 'none'
+                    -->
+                    <xsl:if test="$hyphens='none'">
+                        <xsl:sequence select="concat('hyphens: ',$hyphens)"/>
                     </xsl:if>
                     <xsl:if test="not($word-spacing=1)">
                         <xsl:sequence select="concat('word-spacing: ',format-number($word-spacing, '0'))"/>

@@ -24,6 +24,7 @@ import cz.vutbr.web.css.TermInteger;
 import cz.vutbr.web.css.TermList;
 import cz.vutbr.web.css.TermString;
 
+import org.daisy.braille.css.BrailleCSSProperty.Hyphens;
 import org.daisy.braille.css.BrailleCSSProperty.TextTransform;
 import org.daisy.braille.css.BrailleCSSProperty.WhiteSpace;
 import org.daisy.braille.css.BrailleCSSProperty.WordSpacing;
@@ -179,11 +180,9 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 	 * no-break spaces and preserved line feeds must have been converted to
 	 * &lt;obfl:br/&gt;.
 	 *
-	 * Through setHyphenating() the translator can be made to perform
-	 * automatic hyphenation or not. Regardless of this setting, hyphenation
-	 * characters (SHY and ZWSP) in the input are always used in line
-	 * breaking. These hyphenation characters must have been removed from the
-	 * input when no breaking within words is desired at all (hyphens:none).
+	 * Through setHyphenating() the translator can be made to perform automatic hyphenation or
+	 * not. Regardless of this setting, hyphenation characters (SHY and ZWSP) in the input are used
+	 * in line breaking, except when overridden with a <code>hyphens: none</code> style.
 	 *
 	 * Supports special variable assignments (in the form of "<code>-dotify-def:foo</code>") and
 	 * tests (in the form of "<code>-dotify-ifdef:foo</code>" or "<code>-dotify-ifndef:foo</code>")
@@ -248,6 +247,9 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 				for (String s : fromStyledTextToBraille.transform(styledText)) {
 					SimpleInlineStyle st = style.next().getStyle();
 					if (st != null) {
+						if (st.getProperty("hyphens") == Hyphens.NONE) {
+							s = s.replaceAll("[\u00AD\u200B]","");
+							st.removeProperty("hyphens"); }
 						CSSProperty ws = st.getProperty("white-space");
 						if (ws != null) {
 							if (ws == WhiteSpace.PRE_WRAP)
@@ -279,7 +281,7 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 	
 	/**
 	 * Same as above but assumes that input text exists of only braille and white space
-	 * characters. Supports CSS properties "word-spacing" and "white-space".
+	 * characters. Supports CSS properties "word-spacing", "hyphens" and "white-space".
 	 */
 	private static class PreTranslatedBrailleTranslator implements BrailleTranslator {
 		
@@ -315,6 +317,9 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 									
 							// FIXME: assuming style is mutable and text.iterator() does not create copies
 							style.removeProperty("word-spacing"); }
+						if (style.getProperty("hyphens") == Hyphens.NONE) {
+							text = text.replaceAll("[\u00AD\u200B]","");
+							style.removeProperty("hyphens"); }
 						val = style.getProperty("white-space");
 						if (val != null) {
 							if (val == WhiteSpace.PRE_WRAP)
@@ -383,17 +388,14 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 			throw new RuntimeException("Coding error");
 		SimpleInlineStyle style; {
 			String s = attributes != null ? attributes.getDictionaryIdentifier() : null;
-			if (hyphenating) {
-				// FIXME: add hyphens declaration through braille-css model
-				if (s == null || s.isEmpty())
-					s = "hyphens: auto";
-				else
-					s += "; hyphens: auto"; }
 			if (s == null && parentStyle == null)
 				style = null;
 			else
 				// FIXME: extend caching of parsed CSS to support parentStyle!
-				style = new SimpleInlineStyle(s != null ? s : "", parentStyle); }
+				style = new SimpleInlineStyle(s != null ? s : "", parentStyle);
+			if (hyphenating && (style == null || style.getProperty("hyphens") == null))
+				// FIXME: add hyphens declaration through braille-css model
+				style = new SimpleInlineStyle("hyphens: auto", style); }
 		if (attributes != null && attributes.hasChildren())
 			return cssStyledTextFromTranslatable(text, attributes.iterator(), false, style);
 		else
@@ -500,12 +502,12 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 					throw new RuntimeException();
 			}
 			SimpleInlineStyle style; {
-				String s = hyphenate ? "hyphens: auto" : null;
-				if (s == null && parentStyle == null)
+				if (hyphenate && (parentStyle == null || parentStyle.getProperty("hyphens") == null))
+					style = new SimpleInlineStyle("hyphens: auto", parentStyle);
+				else if (parentStyle == null)
 					style = null;
 				else
-					// FIXME: extend caching of parsed CSS to support parentStyle!
-					style = new SimpleInlineStyle(s != null ? s : "", parentStyle);
+					style = new SimpleInlineStyle("", parentStyle);
 			}
 			styledText.add(new CSSStyledText(text, style));
 		}

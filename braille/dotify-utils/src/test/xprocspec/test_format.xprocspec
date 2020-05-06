@@ -3871,7 +3871,7 @@
               ⠿⠿⠿­⠿⠿⠿ ⠿⠿⠿­⠿⠿⠿
             </block>
             <block>
-              ⠿⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿⠿
+              <style name="hyphens: none">⠿⠿⠿­⠿⠿⠿ ⠿⠿⠿­⠿⠿⠿</style>
             </block>
             <block>
               <span translate="">1</span> ⠿⠿⠿
