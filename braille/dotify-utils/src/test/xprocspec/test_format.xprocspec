@@ -19,8 +19,7 @@
       <p:import href="../../main/resources/xml/obfl-normalize-space.xpl"/>
       <p:import href="http://www.daisy.org/pipeline/modules/braille/dotify-utils/library.xpl"/>
       <pxi:css-to-obfl name="obfl" px:message="css-to-obfl" px:progress=".89"
-                       duplex="true">
-        <p:with-option name="text-transform" select="concat($text-transform,'(input:text-css)(output:braille)')"/>
+                       duplex="true" locale="und">
         <p:with-option name="skip-margin-top-of-page" select="$skip-margin-top-of-page"/>
       </pxi:css-to-obfl>
       <pxi:obfl-normalize-space px:progress=".01"/>

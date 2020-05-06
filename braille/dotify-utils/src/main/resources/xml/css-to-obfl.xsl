@@ -18,7 +18,7 @@
     <xsl:include href="http://www.daisy.org/pipeline/modules/braille/css-utils/library.xsl"/>
     <xsl:include href="marker-reference.xsl"/>
     
-    <xsl:param name="braille-translator-query" as="xs:string" required="yes"/> <!-- unused -->
+    <xsl:param name="locale" as="xs:string" required="yes"/>
     <xsl:param name="page-counters" as="xs:string" required="yes"/>
     <xsl:param name="volume-transition" as="xs:string" required="no" select="''"/>
     
@@ -266,7 +266,7 @@
         <xsl:call-template name="pf:progress">
             <xsl:with-param name="progress" select="concat('1/',$progress-total)"/>
         </xsl:call-template>
-        <obfl version="2011-1" xml:lang="und">
+        <obfl version="2011-1" xml:lang="{$locale}">
             <xsl:variable name="translate" as="xs:string" select="if ($initial-text-transform='none') then 'pre-translated-text-css' else ''"/>
             <xsl:variable name="hyphenate" as="xs:string" select="string($initial-hyphens='auto')"/>
             <xsl:attribute name="hyphenate" select="$hyphenate"/>

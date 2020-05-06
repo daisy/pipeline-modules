@@ -606,6 +606,18 @@
       <dependency>
         <groupId>org.daisy.dotify</groupId>
         <artifactId>dotify.translator.impl</artifactId>
+        <!--
+            FIXME: Dotify's Liblouis-based translator currently does not work because of this error:
+            
+            java.lang.IllegalAccessError: tried to access method
+            org.liblouis.Translator.translate(Ljava/lang/String;[S[I[ILorg/liblouis/DisplayTable;)Lorg/liblouis/TranslationResult;
+            from class org.daisy.dotify.translator.impl.liblouis.LiblouisBrailleFilter
+            
+            Updating dotify.translator.impl to version 5.1.0 results in the following Pax-Exam error
+            (because both "standalone" and regular jar on the class path)
+            
+            Bundle symbolic name and version are not unique: org.liblouis.java:4.2.0
+        -->
         <version>5.0.0</version>
       </dependency>
       <dependency>

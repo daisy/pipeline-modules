@@ -133,8 +133,12 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 			if (!m.matches())
 				throw new TranslatorConfigurationException();
 			Query query = query(mode);
+			if (locale != null && !"und".equals(locale))
+				query = mutableQuery(query).add("locale", locale);
 			for (org.daisy.pipeline.braille.common.BrailleTranslator t : brailleTranslatorProvider.get(query))
-				return new BrailleTranslatorFromBrailleTranslator(mode, t);
+				try {
+					return new BrailleTranslatorFromBrailleTranslator(mode, t); }
+				catch (UnsupportedOperationException e) {}
 			try {
 				MutableQuery q = mutableQuery(query);
 				for (Feature f : q.removeAll("input"))
@@ -185,7 +189,8 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 		
 		private BrailleTranslatorFromBrailleTranslator(
 				String mode,
-				org.daisy.pipeline.braille.common.BrailleTranslator translator) {
+				org.daisy.pipeline.braille.common.BrailleTranslator translator)
+				throws UnsupportedOperationException {
 			this.mode = mode;
 			try {
 				this.lineBreakingFromStyledText = translator.lineBreakingFromStyledText();

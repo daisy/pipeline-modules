@@ -17,7 +17,7 @@
     <p:input port="source"/>
     <p:output port="result"/>
     
-    <p:option name="text-transform" required="true"/>
+    <p:option name="locale" select="'und'"/>
     <p:option name="duplex" select="'true'"/>
     <p:option name="skip-margin-top-of-page" select="'false'"/>
     
@@ -773,7 +773,7 @@
         <p:input port="stylesheet">
             <p:document href="css-to-obfl.xsl"/>
         </p:input>
-        <p:with-param name="braille-translator-query" select="if ($text-transform='auto') then '' else $text-transform">
+        <p:with-param name="locale" select="$locale">
             <p:empty/>
         </p:with-param>
         <p:with-param name="page-counters" select="$page-counters">
