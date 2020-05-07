@@ -133,6 +133,17 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 			if (!m.matches())
 				throw new TranslatorConfigurationException();
 			Query query = query(mode);
+			boolean isPreTranslatedQuery = false; {
+				for (Query.Feature f : query)
+					if ("input".equals(f.getKey()) && "braille".equals(f.getValueOrNull()))
+						isPreTranslatedQuery = true;
+					else if (!("locale".equals(f.getKey()) ||
+					           "input".equals(f.getKey()) && "text-css".equals(f.getValueOrNull()) ||
+					           "output".equals(f.getKey()) && "braille".equals(f.getValueOrNull()))) {
+						isPreTranslatedQuery = false;
+						break; }}
+			if (isPreTranslatedQuery)
+				return new PreTranslatedBrailleTranslator();
 			if (locale != null && !"und".equals(locale))
 				query = mutableQuery(query).add("locale", locale);
 			for (org.daisy.pipeline.braille.common.BrailleTranslator t : brailleTranslatorProvider.get(query))
