@@ -1419,8 +1419,6 @@
                                                 @css:text-transform|@css:hyphens)"/>
         <xsl:for-each-group select="node()" group-adjacent="boolean(
                                                               self::css:box[@type='inline'] or
-                                                              self::css:custom-func[@name='-obfl-evaluate'] or
-                                                              self::css:counter[@target][@name=$page-counter-names] or
                                                               self::css:leader)">
             <xsl:choose>
                 <xsl:when test="current-grouping-key()">
@@ -2007,7 +2005,7 @@
     <!--
         target-counter(page)
     -->
-    <xsl:template mode="block toc-entry"
+    <xsl:template mode="span block toc-entry"
                   priority="1"
                   match="css:counter[@target][@name=$page-counter-names]">
         <xsl:variable name="target" as="xs:string" select="@target"/>
@@ -2049,13 +2047,20 @@
         </xsl:choose>
     </xsl:template>
     
-    <xsl:template mode="block toc-entry"
+    <xsl:template mode="span" match="css:counter[@target][@name=$page-counter-names]" priority="0.6">
+        <xsl:next-match>
+            <xsl:with-param name="inside-span" select="true()"/>
+        </xsl:next-match>
+    </xsl:template>
+    
+    <xsl:template mode="span block toc-entry"
                   match="css:counter[@target][@name=$page-counter-names]">
         <xsl:param name="text-transform" as="xs:string" tunnel="yes"/>
         <xsl:param name="hyphens" as="xs:string" tunnel="yes"/>
         <xsl:param name="pending-text-transform" as="xs:string?" tunnel="yes"/>
         <xsl:param name="pending-hyphens" as="xs:string?" tunnel="yes"/>
         <xsl:param name="white-space" as="xs:string?" tunnel="yes" select="()"/>
+        <xsl:param name="inside-span" as="xs:boolean" select="false()"/>
         <xsl:if test="($pending-text-transform[not(.='none')] and $text-transform='none')
                       or ($pending-hyphens[not(.='auto')] and $hyphens='auto')">
             <xsl:message terminate="yes">Coding error</xsl:message>
@@ -2088,7 +2093,7 @@
                                          then @style else 'default'}"/>
         </xsl:variable>
         <xsl:choose>
-            <xsl:when test="exists($style)">
+            <xsl:when test="exists($style) or $inside-span">
                 <style name="{string-join($style,'; ')}">
                     <xsl:sequence select="$page-number"/>
                 </style>
@@ -2097,54 +2102,6 @@
                 <xsl:sequence select="$page-number"/>
             </xsl:otherwise>
         </xsl:choose>
-    </xsl:template>
-    
-    <!--
-        set text-transform to "auto" on block with descendant -target-counter(page) with
-        text-transform ≠ "auto" (because page-number can not be contained within span)
-    -->
-    <xsl:template priority="1"
-                  mode="css:text-transform"
-                  as="xs:string?"
-                  match="css:box[@type='block']
-                           [css:box[@type='inline']
-                              //css:counter[@target][@name=$page-counter-names]
-                                  /ancestor::css:box[@type='inline']
-                                  /@css:text-transform
-                                     [last()]
-                                     [not(.='none')]]">
-        <xsl:param name="specified-value" as="xs:boolean" select="false()"/>
-        <xsl:choose>
-            <xsl:when test="$specified-value">
-                <xsl:next-match/>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:sequence select="'auto'"/>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-    
-    <xsl:template priority="1"
-                  mode="block"
-                  match="css:box[@type='block']
-                           [css:box[@type='inline']
-                              //css:counter[@target][@name=$page-counter-names]
-                                  /ancestor::css:box[@type='inline']
-                                  /@css:text-transform
-                                     [last()]
-                                     [not(.='none')]]">
-        <xsl:param name="text-transform" as="xs:string" tunnel="yes"/>
-        <xsl:variable name="specified-text-transform" as="xs:string?">
-            <xsl:apply-templates mode="css:text-transform" select=".">
-                <xsl:with-param name="specified-value" select="true()"/>
-            </xsl:apply-templates>
-        </xsl:variable>
-        <xsl:next-match>
-            <!--
-                for child css:box[@type='inline'] matcher (FIXME: what about child text nodes?)
-            -->
-            <xsl:with-param name="pending-text-transform-inline" tunnel="yes" select="($specified-text-transform,$text-transform)[1]"/>
-        </xsl:next-match>
     </xsl:template>
     
     <!--
@@ -2168,14 +2125,22 @@
     <!--
         -obfl-evaluate
     -->
-    <xsl:template priority="1"
-                  mode="block toc-entry"
+    <xsl:template priority="0.6"
+                  mode="span"
+                  match="css:custom-func[@name='-obfl-evaluate'][matches(@arg1,$css:STRING_RE) and not (@arg2)]">
+        <xsl:next-match>
+            <xsl:with-param name="inside-span" select="true()"/>
+        </xsl:next-match>
+    </xsl:template>
+    
+    <xsl:template mode="block toc-entry span"
                   match="css:custom-func[@name='-obfl-evaluate'][matches(@arg1,$css:STRING_RE) and not (@arg2)]">
         <xsl:param name="text-transform" as="xs:string" tunnel="yes"/>
         <xsl:param name="hyphens" as="xs:string" tunnel="yes"/>
         <xsl:param name="pending-text-transform" as="xs:string?" tunnel="yes"/>
         <xsl:param name="pending-hyphens" as="xs:string?" tunnel="yes"/>
         <xsl:param name="white-space" as="xs:string?" tunnel="yes" select="()"/>
+        <xsl:param name="inside-span" as="xs:boolean" select="false()"/>
         <xsl:if test="($pending-text-transform[not(.='none')] and $text-transform='none')
                       or ($pending-hyphens[not(.='auto')] and $hyphens='auto')">
             <xsl:message terminate="yes">Coding error</xsl:message>
@@ -2195,7 +2160,7 @@
         </xsl:variable>
         <xsl:variable name="expression" as="xs:string" select="css:parse-string(@arg1)/@value"/>
         <xsl:choose>
-            <xsl:when test="exists($style)">
+            <xsl:when test="exists($style) or $inside-span">
                 <style name="{string-join($style,'; ')}">
                     <evaluate expression="{$expression}"/>
                 </style>
@@ -2211,58 +2176,6 @@
         <xsl:call-template name="pf:warn">
             <xsl:with-param name="msg">-obfl-evaluate() function requires exactly one string argument</xsl:with-param>
         </xsl:call-template>
-    </xsl:template>
-    
-    <!--
-        set text-transform to "auto" on block with descendant -obfl-evaluate() with text-transform ≠
-        "auto" (because evaluate can not be contained within span)
-    -->
-    <xsl:template priority="1"
-                  mode="css:text-transform"
-                  as="xs:string?"
-                  match="css:box[@type='block']
-                           [css:box[@type='inline']
-                              //css:custom-func
-                                  [@name='-obfl-evaluate']
-                                  [matches(@arg1,$css:STRING_RE) and not (@arg2)]
-                                  /ancestor::css:box[@type='inline']
-                                  /@css:text-transform
-                                     [last()]
-                                     [not(.='none')]]">
-        <xsl:param name="specified-value" as="xs:boolean" select="false()"/>
-        <xsl:choose>
-            <xsl:when test="$specified-value">
-                <xsl:next-match/>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:sequence select="'auto'"/>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-    
-    <xsl:template priority="1"
-                  mode="block"
-                  match="css:box[@type='block']
-                           [css:box[@type='inline']
-                              //css:custom-func
-                                  [@name='-obfl-evaluate']
-                                  [matches(@arg1,$css:STRING_RE) and not (@arg2)]
-                                  /ancestor::css:box[@type='inline']
-                                  /@css:text-transform
-                                     [last()]
-                                     [not(.='none')]]">
-        <xsl:param name="text-transform" as="xs:string" tunnel="yes"/>
-        <xsl:variable name="specified-text-transform" as="xs:string?">
-            <xsl:apply-templates mode="css:text-transform" select=".">
-                <xsl:with-param name="specified-value" select="true()"/>
-            </xsl:apply-templates>
-        </xsl:variable>
-        <xsl:next-match>
-            <!--
-                for child css:box[@type='inline'] matcher (FIXME: what about child text nodes?)
-            -->
-            <xsl:with-param name="pending-text-transform-inline" tunnel="yes" select="($specified-text-transform,$text-transform)[1]"/>
-        </xsl:next-match>
     </xsl:template>
     
     <!-- =============== -->

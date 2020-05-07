@@ -2482,8 +2482,12 @@
             </default-template>
           </layout-master>
           <sequence master="body">
-            <block translate="">
-              <page-number ref-id="foo" number-format="default"/>
+            <block>
+              <span translate="">
+                <style name="">
+                  <page-number ref-id="foo" number-format="default"/>
+                </style>
+              </span>
             </block>
             <block>
               ⠤⠤⠤⠤
@@ -3787,8 +3791,12 @@
             </default-template>
           </layout-master>
           <sequence master="a">
-            <block translate="">
-              <page-number ref-id="foo" number-format="default"/>
+            <block>
+              <span translate="">
+                <style name="">
+                  <page-number ref-id="foo" number-format="default"/>
+                </style>
+              </span>
             </block>
             <block>
               <block>
@@ -9616,14 +9624,14 @@
           <volume-template sheets-in-volume-max="1000">
             <pre-content>
               <sequence master="main">
-                <block translate="">
-                  <span translate="pre-translated-text-css">
-                    ⠤⠤⠤⠤⠤
+                <block>
+                  ⠤⠤⠤⠤⠤
+                  <span translate="">
+                    <style name="">
+                      <evaluate expression="(round $volume)"/>
+                    </style>
                   </span>
-                  <evaluate expression="(round $volume)"/>
-                  <span translate="pre-translated-text-css">
-                    ⠤⠤⠤⠤⠤
-                  </span>
+                  ⠤⠤⠤⠤⠤
                 </block>
               </sequence>
             </pre-content>
@@ -14445,13 +14453,13 @@
             </default-template>
           </layout-master>
           <sequence master="master">
-            <block translate="">
-              ⠤  ​⠤ ​<style name="white-space: pre-wrap">
-              <page-number ref-id="x" number-format="default"/>
-            </style>
-            <span translate="pre-translated-text-css">
+            <block>
+              <span translate="">
+                ⠤  ​⠤ ​<style name="white-space: pre-wrap">
+                <page-number ref-id="x" number-format="default"/>
+              </style>
+              </span>
               ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿
-            </span>
             </block>
             <block>
               <block>
