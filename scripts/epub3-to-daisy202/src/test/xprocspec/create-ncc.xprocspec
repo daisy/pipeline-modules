@@ -29,7 +29,10 @@
                     <html>
                         <body>
                             <h1 id="c1">Chapter 1</h1>
-                            <p id="c1_p1">...</p>
+                            <p id="c1_p1">
+                                <a href="http://www.example.com">Some link</a>
+                                ...
+                            </p>
                             <h2 id="c1-1">Chapter 1.1</h2>
                             <span id="page1" class="page-normal">1</span>
                             <p id="c1_p2">...</p>
@@ -193,7 +196,10 @@
                             <a href="chapter_001.smil#heading1">Chapter 1</a>
                         </h1>
                         <p id="c1_p1">
-                            <a href="chapter_001.smil#paragraph1">...</a>
+                            <a href="chapter_001.smil#paragraph1">
+                                <span class="anchor">Some link</span>
+                                ...
+                            </a>
                         </p>
                         <h2 id="c1-1">
                             <a href="chapter_001.smil#par_1">Chapter 1.1</a>
