@@ -6,6 +6,7 @@
                 xpath-default-namespace="http://www.w3.org/1999/xhtml"
                 exclude-result-prefixes="#all">
 
+	<xsl:param name="fix-heading-ranks" required="yes"/> <!-- keep|outline-depth -->
 	<xsl:param name="fix-sectioning" required="yes"/>    <!-- keep|outline-depth -->
 
 	<!--
@@ -25,17 +26,31 @@
 	-->
 	<xsl:variable name="root-outline" select="collection()/d:outline"/>
 
+	<xsl:key name="heading" match="d:section[@heading]" use="@heading"/>
+
 	<xsl:template match="*[@id=$root-outline/@owner]"> <!-- body -->
-		<xsl:choose>
-			<xsl:when test="$fix-sectioning='outline-depth'">
-				<xsl:apply-templates mode="wrap-implied-sections" select="$root-outline">
-					<xsl:with-param name="sectioning-element" select="."/>
-				</xsl:apply-templates>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:sequence select="."/>
-			</xsl:otherwise>
-		</xsl:choose>
+		<xsl:variable name="body" as="element()">
+			<xsl:choose>
+				<xsl:when test="$fix-heading-ranks='outline-depth'">
+					<xsl:apply-templates mode="rename-headings" select="."/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:sequence select="."/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:for-each select="$body">
+			<xsl:choose>
+				<xsl:when test="$fix-sectioning='outline-depth'">
+					<xsl:apply-templates mode="wrap-implied-sections" select="$root-outline">
+						<xsl:with-param name="sectioning-element" select="."/>
+					</xsl:apply-templates>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:sequence select="."/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:for-each>
 	</xsl:template>
 
 	<xsl:template mode="wrap-implied-sections" match="d:outline">
@@ -98,10 +113,31 @@
 		</xsl:choose>
 	</xsl:template>
 
-	<xsl:template match="@*|node()">
+	<xsl:template mode="rename-headings" match="h1|h2|h3|h4|h5|h6|hgroup">
+		<xsl:if test="not(exists(@id))">
+			<xsl:message terminate="yes">coding error</xsl:message>
+		</xsl:if>
+		<xsl:variable name="section" as="element(d:section)?" select="key('heading',@id,$root-outline)[1]"/>
+		<xsl:if test="not($section)">
+			<xsl:message terminate="yes">coding error</xsl:message>
+		</xsl:if>
+		<xsl:variable name="outline-depth" as="xs:integer" select="min((6,count($section/ancestor-or-self::d:section)))"/>
+		<xsl:choose>
+			<xsl:when test="self::hgroup">
+				<xsl:sequence select="."/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:element name="h{$outline-depth}">
+					<xsl:sequence select="@*|node()"/>
+				</xsl:element>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template mode="#default rename-headings" match="@*|node()">
 		<xsl:copy>
 			<xsl:sequence select="@*"/>
-			<xsl:apply-templates/>
+			<xsl:apply-templates mode="#current"/>
 		</xsl:copy>
 	</xsl:template>
 

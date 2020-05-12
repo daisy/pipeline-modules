@@ -304,4 +304,44 @@
 		</x:scenario>
 	</x:scenario>
 
+	<x:scenario label="fix-heading-ranks option">
+		<x:call step="px:html-outline">
+			<x:input port="source">
+				<x:document type="inline" xml:base="file:/tmp/foo.xhtml">
+					<html xmlns="http://www.w3.org/1999/xhtml">
+						<body>
+							<h2/>
+							<h4/>
+							<h3/>
+							<section>
+								<h3/>
+							</section>
+							<h1/>
+						</body>
+					</html>
+				</x:document>
+			</x:input>
+			<x:option name="fix-heading-ranks" select="'outline-depth'"/>
+			<x:option name="output-base-uri" select="'file:/tmp/toc.xhtml'"/>
+		</x:call>
+		<x:context label="the content-doc port">
+			<x:document type="port" port="content-doc"/>
+		</x:context>
+		<x:expect label="the content doc with added sections" type="compare">
+			<x:document type="inline" xmlns="http://www.w3.org/1999/xhtml">
+				<html xmlns="http://www.w3.org/1999/xhtml">
+					<body id="id_1">
+						<h1 id="id_2"/>
+						<h2 id="id_3"/>
+						<h2 id="id_4"/>
+						<section id="id_5">
+							<h2 id="id_6"/>
+						</section>
+						<h1 id="id_7"/>
+					</body>
+				</html>
+			</x:document>
+		</x:expect>
+	</x:scenario>
+
 </x:description>
