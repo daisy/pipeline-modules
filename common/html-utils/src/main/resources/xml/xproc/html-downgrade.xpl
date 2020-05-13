@@ -20,7 +20,20 @@
 		</p:documentation>
 	</p:output>
 
+	<p:import href="html-outline.xpl">
+		<p:documentation>
+			px:html-outline
+		</p:documentation>
+	</p:import>
+
+	<p:documentation>Normalize the heading ranks to match their respective outline depth.</p:documentation>
+	<px:html-outline name="outline" fix-heading-ranks="outline-depth" output-base-uri="file:/irrelevant"/>
+	<p:sink/>
+
 	<p:xslt>
+		<p:input port="source">
+			<p:pipe step="outline" port="content-doc"/>
+		</p:input>
 		<p:input port="parameters">
 			<p:empty/>
 		</p:input>
