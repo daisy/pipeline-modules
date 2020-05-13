@@ -82,6 +82,10 @@
 				root</a> elements must match the <a
 				href="https://html.spec.whatwg.org/multipage/sections.html#outline-depth">outline
 				depth</a>.</dd>
+				<dt>no-implied</dt>
+				<dd>Like outline-depth, but in addition create new sections as needed to get rid of
+				implied sections. Note that this may result in multiple <code>body</code> elements,
+				so a cleanup step may be required.</dd>
 				<dt>keep</dt>
 				<dd>Do nothing. Default value.</dd>
 			</dl>
@@ -122,7 +126,7 @@
 	<p:sink/>
 
 	<p:choose>
-		<p:when test="$fix-sectioning='outline-depth' or $fix-heading-ranks='outline-depth'">
+		<p:when test="$fix-sectioning=('outline-depth','no-implied') or $fix-heading-ranks='outline-depth'">
 			<p:xslt>
 				<p:input port="source">
 					<p:pipe step="html-with-ids" port="result"/>

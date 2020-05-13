@@ -181,7 +181,7 @@
 
 	<x:scenario label="fix-sectioning option">
 		<x:call step="px:html-outline"/>
-		<x:scenario label="1">
+		<x:scenario label="outline-depth (1)">
 			<x:call>
 				<x:input port="source">
 					<x:document type="inline" xml:base="file:/tmp/foo.xhtml">
@@ -220,7 +220,7 @@
 				</x:document>
 			</x:expect>
 		</x:scenario>
-		<x:scenario label="2">
+		<x:scenario label="outline-depth (2)">
 			<x:call>
 				<x:input port="source">
 					<x:document type="inline" xml:base="file:/tmp/foo.xhtml">
@@ -259,7 +259,7 @@
 				</x:document>
 			</x:expect>
 		</x:scenario>
-		<x:scenario label="3">
+		<x:scenario label="outline-depth (3)">
 			<x:call>
 				<x:input port="source">
 					<x:document type="inline" xml:base="file:/tmp/foo.xhtml">
@@ -268,6 +268,7 @@
 								<section>
 									<h2/>
 									<h3/>
+									<h2/>
 								</section>
 								<h1/>
 								<h2/>
@@ -291,12 +292,64 @@
 								<section>
 									<h3 id="id_4"/>
 								</section>
+								<h2 id="id_5"/>
 							</section>
-							<h1 id="id_5"/>
+							<h1 id="id_6"/>
 							<section>
-								<h2 id="id_6"/>
+								<h2 id="id_7"/>
 							</section>
-							<h1 id="id_7"/>
+							<h1 id="id_8"/>
+						</body>
+					</html>
+				</x:document>
+			</x:expect>
+		</x:scenario>
+		<x:scenario label="no-implied">
+			<x:call>
+				<x:input port="source">
+					<x:document type="inline" xml:base="file:/tmp/foo.xhtml">
+						<html xmlns="http://www.w3.org/1999/xhtml">
+							<body>
+								<section>
+									<h2/>
+									<h3/>
+									<h2/>
+								</section>
+								<h1/>
+								<h2/>
+								<h1/>
+							</body>
+						</html>
+					</x:document>
+				</x:input>
+				<x:option name="fix-sectioning" select="'no-implied'"/>
+				<x:option name="output-base-uri" select="'file:/tmp/toc.xhtml'"/>
+			</x:call>
+			<x:context label="the content-doc port">
+				<x:document type="port" port="content-doc"/>
+			</x:context>
+			<x:expect label="the content doc with added sections" type="compare">
+				<x:document type="inline" xmlns="http://www.w3.org/1999/xhtml">
+					<html xmlns="http://www.w3.org/1999/xhtml">
+						<body id="id_1">
+							<section id="id_2">
+								<h2 id="id_3"/>
+								<section>
+									<h3 id="id_4"/>
+								</section>
+							</section>
+							<section>
+								<h2 id="id_5"/>
+							</section>
+						</body>
+						<body>
+							<h1 id="id_6"/>
+							<section>
+								<h2 id="id_7"/>
+							</section>
+						</body>
+						<body>
+							<h1 id="id_8"/>
 						</body>
 					</html>
 				</x:document>

@@ -6,8 +6,8 @@
                 xpath-default-namespace="http://www.w3.org/1999/xhtml"
                 exclude-result-prefixes="#all">
 
-	<xsl:param name="fix-heading-ranks" required="yes"/> <!-- keep|outline-depth -->
-	<xsl:param name="fix-sectioning" required="yes"/>    <!-- keep|outline-depth -->
+	<xsl:param name="fix-heading-ranks" required="yes"/> <!-- keep | outline-depth -->
+	<xsl:param name="fix-sectioning" required="yes"/>    <!-- keep | outline-depth | no-implied -->
 
 	<!--
 	    * d:outline correspond with body|article|aside|nav|section
@@ -41,7 +41,7 @@
 		</xsl:variable>
 		<xsl:for-each select="$body">
 			<xsl:choose>
-				<xsl:when test="$fix-sectioning='outline-depth'">
+				<xsl:when test="$fix-sectioning=('outline-depth','no-implied')">
 					<xsl:apply-templates mode="wrap-implied-sections" select="$root-outline">
 						<xsl:with-param name="sectioning-element" select="."/>
 					</xsl:apply-templates>
@@ -58,17 +58,38 @@
 		<xsl:variable name="sections" as="element(d:section)*" select="*"/> <!-- d:section+ -->
 		<xsl:variable name="implied-sections" as="element(d:section)*" select="$sections[position()>1]"/>
 		<xsl:variable name="section-boundaries" as="xs:string*" select="$implied-sections/@heading"/>
-		<xsl:for-each select="$sectioning-element">
-			<xsl:copy>
-				<xsl:sequence select="@*"/>
-				<xsl:for-each-group select="node()" group-starting-with="*[@id=$section-boundaries]">
+		<xsl:choose>
+			<xsl:when test="$fix-sectioning='no-implied'">
+				<xsl:for-each-group select="$sectioning-element/node()" group-starting-with="*[@id=$section-boundaries]">
 					<xsl:variable name="i" select="position()"/>
-					<xsl:apply-templates mode="#current" select="$sections[$i]">
-						<xsl:with-param name="fragment" select="current-group()"/>
-					</xsl:apply-templates>
+					<xsl:variable name="fragment" select="current-group()"/>
+					<xsl:for-each select="$sectioning-element">
+						<xsl:copy>
+							<xsl:sequence select="@* except @id"/>
+							<xsl:if test="$i=1">
+								<xsl:sequence select="@id"/>
+							</xsl:if>
+							<xsl:apply-templates mode="#current" select="$sections[$i]">
+								<xsl:with-param name="fragment" select="$fragment"/>
+							</xsl:apply-templates>
+						</xsl:copy>
+					</xsl:for-each>
 				</xsl:for-each-group>
-			</xsl:copy>
-		</xsl:for-each>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:for-each select="$sectioning-element">
+					<xsl:copy>
+						<xsl:sequence select="@*"/>
+						<xsl:for-each-group select="node()" group-starting-with="*[@id=$section-boundaries]">
+							<xsl:variable name="i" select="position()"/>
+							<xsl:apply-templates mode="#current" select="$sections[$i]">
+								<xsl:with-param name="fragment" select="current-group()"/>
+							</xsl:apply-templates>
+						</xsl:for-each-group>
+					</xsl:copy>
+				</xsl:for-each>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 
 	<xsl:template mode="wrap-implied-sections" match="d:section">
