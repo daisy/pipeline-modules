@@ -5,6 +5,7 @@ import com.xmlcalabash.core.XProcRuntime;
 import com.xmlcalabash.io.ReadablePipe;
 import com.xmlcalabash.io.WritablePipe;
 import com.xmlcalabash.library.DefaultStep;
+import com.xmlcalabash.model.RuntimeValue;
 import com.xmlcalabash.model.Step;
 import com.xmlcalabash.runtime.XAtomicStep;
 
@@ -12,6 +13,7 @@ import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 
+import org.daisy.common.saxon.SaxonHelper;
 import org.daisy.common.xproc.calabash.XMLCalabashInputValue;
 import org.daisy.common.xproc.calabash.XMLCalabashOutputValue;
 import org.daisy.common.xproc.calabash.XProcStep;
@@ -48,6 +50,8 @@ public class ChunkerStep extends DefaultStep implements XProcStep {
 	private static final QName ALWAYS_BREAK_BEFORE = new QName("always-break-before");
 	private static final QName ALWAYS_BREAK_AFTER = new QName("always-break-after");
 	
+	private static final QName PART_ATTRIBUTE = new QName("part-attribute");
+	private static final QName PROPAGATE = new QName("propagate");
 	private static final QName MAX_CHUNK_SIZE = new QName("max-chunk-size");
 	
 	private ChunkerStep(XProcRuntime runtime, XAtomicStep step) {
@@ -79,6 +83,7 @@ public class ChunkerStep extends DefaultStep implements XProcStep {
 	public void run() throws SaxonApiException {
 		super.run();
 		try {
+			RuntimeValue partAttribute = getOption(PART_ATTRIBUTE);
 			new Chunker(
 				getOption(ALLOW_BREAK_BEFORE),
 				getOption(ALLOW_BREAK_AFTER),
@@ -86,6 +91,8 @@ public class ChunkerStep extends DefaultStep implements XProcStep {
 				getOption(PREFER_BREAK_AFTER),
 				getOption(ALWAYS_BREAK_BEFORE),
 				getOption(ALWAYS_BREAK_AFTER),
+				partAttribute != null ? SaxonHelper.jaxpQName(partAttribute.getQName()) : null,
+				getOption(PROPAGATE, true),
 				getOption(MAX_CHUNK_SIZE, -1),
 				runtime.getProcessor().getUnderlyingConfiguration())
 			.transform(

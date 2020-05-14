@@ -82,7 +82,6 @@
       org.daisy.pipeline.braille.css.impl.BrailleCssCascader,
       org.daisy.pipeline.braille.css.calabash.impl.CssShiftIdStep$Provider,
       org.daisy.pipeline.braille.css.calabash.impl.CssShiftStringSetStep$Provider,
-      org.daisy.pipeline.braille.css.calabash.impl.CssSplitStep$Provider,
       org.daisy.pipeline.braille.css.saxon.impl.ParseStylesheetDefinition,
       org.daisy.pipeline.braille.css.saxon.impl.RenderTableByDefinition,
       org.daisy.pipeline.braille.css.impl.CSSBlockTransform$Provider

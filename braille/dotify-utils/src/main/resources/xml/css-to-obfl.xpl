@@ -664,7 +664,7 @@
                         css:page-break-inside, css:volume-break-before and css:volume-break-after
                         attributes. (Needs to be done a second time because the box tree has been
                         broken up by css:split. css:page-break-before='right' will now be propagated
-                        all the wait to the root box.)
+                        all the way to the root box.)
                     </p:documentation>
                 </pxi:propagate-page-break>
                 <p:group px:progress=".05">

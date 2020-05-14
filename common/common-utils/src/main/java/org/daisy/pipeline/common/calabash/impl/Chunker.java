@@ -10,13 +10,14 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.Set;
-import java.util.Stack;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -74,7 +75,9 @@ class Chunker extends SingleInSingleOutXMLTransformer {
 	final RuntimeValue preferBreakAfterOption;
 	final RuntimeValue alwaysBreakBeforeOption;
 	final RuntimeValue alwaysBreakAfterOption;
+	final QName partAttribute;
 	
+	final boolean propagate;
 	final int maxChunkSize;
 	final Configuration config;
 	
@@ -89,19 +92,21 @@ class Chunker extends SingleInSingleOutXMLTransformer {
 	Chunker(RuntimeValue allowBreakBeforeOption, RuntimeValue allowBreakAfterOption,
 	        RuntimeValue preferBreakBeforeOption, RuntimeValue preferBreakAfterOption,
 	        RuntimeValue alwaysBreakBeforeOption, RuntimeValue alwaysBreakAfterOption,
-	        int maxChunkSize, Configuration config) {
+	        QName partAttribute, boolean propagate, int maxChunkSize, Configuration config) {
 		this.allowBreakBeforeOption = allowBreakBeforeOption;
 		this.allowBreakAfterOption = allowBreakAfterOption;
 		this.preferBreakBeforeOption = preferBreakBeforeOption;
 		this.preferBreakAfterOption = preferBreakAfterOption;
 		this.alwaysBreakBeforeOption = alwaysBreakBeforeOption;
 		this.alwaysBreakAfterOption = alwaysBreakAfterOption;
+		this.partAttribute = partAttribute;
+		this.propagate = propagate;
 		this.maxChunkSize = maxChunkSize;
 		this.config = config;
 	}
 	
-	private Stack<QName> parents;
-	private Stack<Map<QName,String>> parentAttrs;
+	private LinkedList<QName> parents;
+	private LinkedList<Map<QName,String>> parentAttrs;
 	private Path.Builder currentPath;
 	private Iterator<BreakPosition> splitPoints;
 	private Multimap<Integer,String> idToChunk;
@@ -200,10 +205,10 @@ class Chunker extends SingleInSingleOutXMLTransformer {
 		nextSplitPoint = null;
 		if (splitPoints.hasNext())
 			nextSplitPoint = splitPoints.next();
-		parents = new Stack<QName>();
-		parentAttrs = new Stack<Map<QName,String>>();
+		parents = new LinkedList<>();
+		parentAttrs = new LinkedList<>();
 		boolean containsSplitPoint = true;
-		Stack<Boolean> containsSplitPointStack = new Stack<Boolean>();
+		LinkedList<Boolean> containsSplitPointStack = new LinkedList<>();
 		currentPath = new Path.Builder();
 		try {
 			int event = reader.getEventType();
@@ -220,6 +225,8 @@ class Chunker extends SingleInSingleOutXMLTransformer {
 						}
 						writeStartElement(writer, reader);
 						writeAttributes(writer, reader);
+						if (partAttribute != null && containsSplitPoint)
+							writeAttribute(writer, partAttribute, "head");
 						currentPath.down();
 						if (containsSplitPoint) {
 							parents.push(reader.getName());
@@ -258,17 +265,26 @@ class Chunker extends SingleInSingleOutXMLTransformer {
 	}
 	
 	void split(XMLStreamWriter writer) throws XMLStreamException {
-		for (int i = parents.size(); i > 0; i--)
+		nextSplitPoint = splitPoints.hasNext() ? splitPoints.next() : null;
+		for (QName n : parents)
 			writer.writeEndElement();
 		writer.writeEndDocument();
 		writer.writeStartDocument();
-		for (int i = 0; i < parents.size(); i++) {
-			writeStartElement(writer, parents.get(i));
-			for (Map.Entry<QName,String> attr : parentAttrs.get(i).entrySet())
+		Iterator<QName> elems = parents.descendingIterator();
+		Iterator<Map<QName,String>> attrs = parentAttrs.descendingIterator();
+		int i = 0;
+		while (elems.hasNext()) {
+			writeStartElement(writer, elems.next());
+			for (Map.Entry<QName,String> attr : attrs.next().entrySet())
 				if (!(attr.getKey().equals(_ID) || attr.getKey().equals(XML_ID)))
 					writeAttribute(writer, attr);
+			if (partAttribute != null) {
+				if (containsSplitPoint(currentPath.subPath(i++), nextSplitPoint))
+					writeAttribute(writer, partAttribute, "middle");
+				else
+					writeAttribute(writer, partAttribute, "tail");
+			}
 		}
-		nextSplitPoint = splitPoints.hasNext() ? splitPoints.next() : null;
 	}
 	
 	static BaseURIAwareXMLStreamWriter setBaseURI(BaseURIAwareXMLStreamWriter output, URI sourceBaseURI) {
@@ -433,12 +449,12 @@ class Chunker extends SingleInSingleOutXMLTransformer {
 			throws XPathException, SaxonApiException {
 		net.sf.saxon.s9api.QName _ID = new net.sf.saxon.s9api.QName(Chunker._ID);
 		net.sf.saxon.s9api.QName XML_ID = new net.sf.saxon.s9api.QName(Chunker.XML_ID);
-		Predicate<XdmNode> allowBreakBefore = parseOption(allowBreakBeforeOption);
-		Predicate<XdmNode> allowBreakAfter = parseOption(allowBreakAfterOption);
-		Predicate<XdmNode> preferBreakBefore = parseOption(preferBreakBeforeOption);
-		Predicate<XdmNode> preferBreakAfter = parseOption(preferBreakAfterOption);
-		Predicate<XdmNode> alwaysBreakBefore = parseOption(alwaysBreakBeforeOption);
-		Predicate<XdmNode> alwaysBreakAfter = parseOption(alwaysBreakAfterOption);
+		Predicate<XdmNode> allowBreakBefore = parseBreakOpportunityOption(allowBreakBeforeOption);
+		Predicate<XdmNode> allowBreakAfter = parseBreakOpportunityOption(allowBreakAfterOption);
+		Predicate<XdmNode> preferBreakBefore = parseBreakOpportunityOption(preferBreakBeforeOption);
+		Predicate<XdmNode> preferBreakAfter = parseBreakOpportunityOption(preferBreakAfterOption);
+		Predicate<XdmNode> alwaysBreakBefore = parseBreakOpportunityOption(alwaysBreakBeforeOption);
+		Predicate<XdmNode> alwaysBreakAfter = parseBreakOpportunityOption(alwaysBreakAfterOption);
 		return new Function<XdmNode,Integer>() {
 			Path.Builder currentPath = new Path.Builder();
 			public Integer apply(XdmNode node) {
@@ -456,13 +472,16 @@ class Chunker extends SingleInSingleOutXMLTransformer {
 					if (!currentPath.isRoot())
 						if (alwaysBreakBefore.test(node))
 							addOptionally(collectBreakOpportunities,
-							              propagate(node, currentPath, BreakPosition.Side.BEFORE, BreakOpportunity.Weight.ALWAYS, bytesSeen));
+							              propagate(node, currentPath, BreakPosition.Side.BEFORE, BreakOpportunity.Weight.ALWAYS,
+							                        bytesSeen, propagate));
 						else if (preferBreakBefore.test(node))
 							addOptionally(collectBreakOpportunities,
-							              propagate(node, currentPath, BreakPosition.Side.BEFORE, BreakOpportunity.Weight.PREFER, bytesSeen));
+							              propagate(node, currentPath, BreakPosition.Side.BEFORE, BreakOpportunity.Weight.PREFER,
+							                        bytesSeen, propagate));
 						else if (allowBreakBefore.test(node))
 							addOptionally(collectBreakOpportunities,
-							              propagate(node, currentPath, BreakPosition.Side.BEFORE, BreakOpportunity.Weight.ALLOW, bytesSeen));
+							              propagate(node, currentPath, BreakPosition.Side.BEFORE, BreakOpportunity.Weight.ALLOW,
+							                        bytesSeen, propagate));
 					currentPath.down();
 					for (XdmItem i : SaxonHelper.axisIterable(node, Axis.CHILD))
 						bytesSeen += apply((XdmNode)i);
@@ -470,13 +489,16 @@ class Chunker extends SingleInSingleOutXMLTransformer {
 					if (!currentPath.isRoot())
 						if (alwaysBreakAfter.test(node))
 							addOptionally(collectBreakOpportunities,
-							              propagate(node, currentPath, BreakPosition.Side.AFTER, BreakOpportunity.Weight.ALWAYS, bytesSeen));
+							              propagate(node, currentPath, BreakPosition.Side.AFTER, BreakOpportunity.Weight.ALWAYS,
+							                        bytesSeen, propagate));
 						else if (preferBreakAfter.test(node))
 							addOptionally(collectBreakOpportunities,
-							              propagate(node, currentPath, BreakPosition.Side.AFTER, BreakOpportunity.Weight.PREFER, bytesSeen));
+							              propagate(node, currentPath, BreakPosition.Side.AFTER, BreakOpportunity.Weight.PREFER,
+							                        bytesSeen, propagate));
 						else if (allowBreakAfter.test(node))
 							addOptionally(collectBreakOpportunities,
-							              propagate(node, currentPath, BreakPosition.Side.AFTER, BreakOpportunity.Weight.ALLOW, bytesSeen));
+							              propagate(node, currentPath, BreakPosition.Side.AFTER, BreakOpportunity.Weight.ALLOW,
+							                        bytesSeen, propagate));
 				} else if (node.getNodeKind() == XdmNodeKind.TEXT) {
 					// FIXME: currently only taking into account character data
 					// FIXME: we need to know the encoding in order to correctly compute the size
@@ -487,7 +509,7 @@ class Chunker extends SingleInSingleOutXMLTransformer {
 		}.apply(source);
 	}
 	
-	Predicate<XdmNode> parseOption(RuntimeValue option) throws XPathException {
+	Predicate<XdmNode> parseBreakOpportunityOption(RuntimeValue option) throws XPathException {
 		if (!option.getString().equals("/*")) {
 			XPathExpression matcher = SaxonHelper.compileExpression(option.getString(),
 			                                                        option.getNamespaceBindings(),
@@ -503,16 +525,18 @@ class Chunker extends SingleInSingleOutXMLTransformer {
 	}
 	
 	static Optional<BreakOpportunity> propagate(XdmNode element, Path.Builder path, BreakPosition.Side side,
-	                                            BreakOpportunity.Weight weight, int bytesSeen) {
+	                                            BreakOpportunity.Weight weight, int bytesSeen, boolean propagate) {
 		path = path.builder();
 		while (!path.isRoot()) {
-			if (shouldPropagateBreak(element, side)) {
-				element = (XdmNode)element.getParent();
-				path.up();
-				continue;
+			if (propagate) {
+				if (shouldPropagateBreak(element, side)) {
+					element = (XdmNode)element.getParent();
+					path.up();
+					continue;
+				}
+				if (side == BreakPosition.Side.AFTER)
+					bytesSeen += skipWhiteSpaceNodes(element, side, path);
 			}
-			if (side == BreakPosition.Side.AFTER)
-				bytesSeen += skipWhiteSpaceNodes(element, side, path);
 			return Optional.of(new BreakOpportunity(new BreakPosition(path, side).normalize(), weight, bytesSeen));
 		}
 		return Optional.empty();
@@ -572,11 +596,11 @@ class Chunker extends SingleInSingleOutXMLTransformer {
 	 */
 	static class Path implements Comparable<Path> {
 		
-		protected final Stack<Integer> path;
+		protected final List<Integer> path; // first item is deepest element
 		
 		final static Path ROOT = new Builder().build();
 		
-		private Path(Stack<Integer> path) {
+		private Path(List<Integer> path) {
 			this.path = path;
 		}
 		
@@ -585,7 +609,7 @@ class Chunker extends SingleInSingleOutXMLTransformer {
 		}
 		
 		public boolean isElement() {
-			return path.isEmpty() || path.peek() % 2 == 0;
+			return path.isEmpty() || path.get(0) % 2 == 0;
 		}
 		
 		public Builder builder() {
@@ -598,11 +622,11 @@ class Chunker extends SingleInSingleOutXMLTransformer {
 		 */
 		@Override
 		public int compareTo(Path o) {
-			int minsize = Math.min(this.path.size(), o.path.size());
-			for (int i = 0; i < minsize; i++) {
-				int c = this.path.get(i).compareTo(o.path.get(i));
-				if (c != 0)
-					return c;
+			ListIterator<Integer> a = path.listIterator(path.size());
+			ListIterator<Integer> b = o.path.listIterator(o.path.size());
+			while (a.hasPrevious() && b.hasPrevious()) {
+				int c = a.previous().compareTo(b.previous());
+				if (c != 0) return c;
 			}
 			return 0;
 		}
@@ -613,48 +637,61 @@ class Chunker extends SingleInSingleOutXMLTransformer {
 			return o.path.size() > this.path.size();
 		}
 		
+		/** @param depth 0 means root, 1 means ancestor node that is one level below the root element, ... */
+		public Path subPath(int depth) {
+			if (depth < 0)
+				throw new IllegalArgumentException();
+			else if (depth == 0)
+				return ROOT;
+			else
+				return new Path(path.subList(path.size() - depth, path.size()));
+		}
+		
 		static class Builder extends Path {
 			
+			private final LinkedList<Integer> mutablePath;
+			
 			public Builder() {
-				super(new Stack<>());
+				super(new LinkedList<>());
+				mutablePath = (LinkedList<Integer>)path;
 			}
 			
 			private Builder(Path from) {
-				super(new Stack<Integer>());
+				this();
 				for (Integer step : from.path)
-					path.add(step);
+					mutablePath.add(step);
 			}
 			
 			public Builder down() {
-				path.add(0);
+				mutablePath.push(0);
 				return this;
 			}
 			
 			public Builder up() {
-				path.pop();
+				mutablePath.pop();
 				return this;
 			}
 			
 			public Builder inc() {
-				path.add(path.pop() + 1);
+				mutablePath.push(mutablePath.pop() + 1);
 				return this;
 			}
 			
 			public Builder dec() {
-				path.add(path.pop() - 1);
+				mutablePath.push(mutablePath.pop() - 1);
 				return this;
 			}
 			
 			public Builder nextElement() {
-				int step = path.pop() + 1;
+				int step = mutablePath.pop() + 1;
 				if (step % 2 == 1)
 					step++;
-				path.add(step);
+				mutablePath.push(step);
 				return this;
 			}
 			
 			public Path build() {
-				Stack<Integer> copy = new Stack<Integer>();
+				List<Integer> copy = new LinkedList<>();
 				for (Integer step : path)
 					copy.add(step);
 				return new Path(copy);
@@ -687,20 +724,20 @@ class Chunker extends SingleInSingleOutXMLTransformer {
 				return "/";
 			StringBuilder b = new StringBuilder();
 			for (Integer i : path)
-				b.append('/').append(i);
+				b.insert(0, "/" + i);
 			return b.toString();
 		}
 		
 		// for testing
 		static Path parse(String string) {
-			Stack<Integer> path = new Stack<>();
+			LinkedList<Integer> path = new LinkedList<>();
 			if ("/".equals(string))
 				return ROOT;
 			if (!string.matches("(/(0|[1-9][0-9]*))+"))
 				throw new IllegalArgumentException();
 			String[] steps = string.split("/");
 			for (int i = 1; i < steps.length; i++)
-				path.add(Integer.parseInt(steps[i]));
+				path.push(Integer.parseInt(steps[i]));
 			return new Path(path);
 		}
 	}
