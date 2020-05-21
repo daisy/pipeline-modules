@@ -93,7 +93,10 @@
 				href="https://html.spec.whatwg.org/multipage/sections.html#sectioning-root">sectioning
 				root</a> elements must match the <a
 				href="https://html.spec.whatwg.org/multipage/sections.html#outline-depth">outline
-				depth</a>.</dd>
+				depth</a>. All nodes that belong to a certain section have a single common ancestor
+				element that wraps that section, or the outline containing that section. This means
+				that elements in the source that span multiple sections may have to split up in the
+				result.</dd>
 				<dt>no-implied</dt>
 				<dd>Like outline-depth, but in addition create new sections as needed to get rid of
 				implied sections. Note that this may result in multiple <code>body</code> elements,
@@ -150,6 +153,15 @@
 				</p:input>
 				<p:with-param name="fix-heading-ranks" select="$fix-heading-ranks"/>
 				<p:with-param name="fix-sectioning" select="$fix-sectioning"/>
+			</p:xslt>
+			<p:xslt>
+				<!-- Remove duplicate ids created by html5-normalize-sections-headings.xsl -->
+				<p:input port="stylesheet">
+					<p:document href="../xslt/remove-duplicate-ids.xsl"/>
+				</p:input>
+				<p:input port="parameters">
+					<p:empty/>
+				</p:input>
 			</p:xslt>
 		</p:when>
 		<p:otherwise>
