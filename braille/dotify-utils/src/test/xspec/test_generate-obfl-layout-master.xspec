@@ -15,7 +15,7 @@
       <x:param name="default-page-counter-name" select="'page'"/>
     </x:call>
     <x:expect label="layout-master">
-      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="40" page-height="25" duplex="true" page-number-variable="page">
+      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="40" page-height="25" duplex="true">
         <default-template>
           <header/>
           <footer/>
@@ -47,7 +47,7 @@
       <x:param name="default-page-counter-name" select="'page'"/>
     </x:call>
     <x:expect label="layout-master">
-      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="15" page-height="15" duplex="true" page-number-variable="page">
+      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="15" page-height="15" duplex="true">
         <default-template>
           <header>
             <field>
@@ -106,7 +106,7 @@
       <x:param name="default-page-counter-name" select="'page'"/>
     </x:call>
     <x:expect label="layout-master">
-      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="15" page-height="15" duplex="true" page-number-variable="page">
+      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="15" page-height="15" duplex="true">
         <template use-when="(= (% $page 2) 1)">
           <header>
             <field>
@@ -159,7 +159,7 @@
       <x:param name="default-page-counter-name" select="'page'"/>
     </x:call>
     <x:expect label="layout-master">
-      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="15" page-height="5" duplex="true" page-number-variable="page">
+      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="15" page-height="5" duplex="true">
         <default-template>
           <header/>
           <footer>
@@ -189,7 +189,7 @@
       <x:param name="default-page-counter-name" select="'page'"/>
     </x:call>
     <x:expect label="layout-master">
-      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="15" page-height="5" duplex="true" page-number-variable="page">
+      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="15" page-height="5" duplex="true">
         <default-template>
           <header/>
           <footer>
@@ -232,7 +232,7 @@
       <x:param name="default-page-counter-name" select="'page'"/>
     </x:call>
     <x:expect label="layout-master">
-      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="15" page-height="5" duplex="true" page-number-variable="page">
+      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="15" page-height="5" duplex="true">
         <default-template>
           <header/>
           <footer>
@@ -267,7 +267,7 @@
       <x:param name="default-page-counter-name" select="'page'"/>
     </x:call>
     <x:expect label="layout-master">
-      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="15" page-height="5" duplex="true" page-number-variable="page">
+      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="15" page-height="5" duplex="true">
         <default-template>
           <header/>
           <footer>
@@ -311,7 +311,7 @@
       <x:param name="default-page-counter-name" select="'page'"/>
     </x:call>
     <x:expect label="layout-master">
-      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="15" page-height="5" duplex="true" page-number-variable="page">
+      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="15" page-height="5" duplex="true">
         <default-template>
           <header/>
           <footer>
@@ -355,7 +355,7 @@
       <x:param name="default-page-counter-name" select="'page'"/>
     </x:call>
     <x:expect label="layout-master">
-      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="15" page-height="5" duplex="true" page-number-variable="page">
+      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="15" page-height="5" duplex="true">
         <default-template>
           <header/>
           <footer>
@@ -414,7 +414,7 @@
       <x:param name="default-page-counter-name" select="'page'"/>
     </x:call>
     <x:expect label="layout-master">
-      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="28" page-height="28" duplex="true" page-number-variable="page">
+      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="28" page-height="28" duplex="true">
         <template use-when="(= (% $page 2) 1)">
           <header/>
           <footer>
@@ -481,7 +481,7 @@
       <x:param name="default-page-counter-name" select="'page'"/>
     </x:call>
     <x:expect label="layout-master">
-      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="15" page-height="15" duplex="true" page-number-variable="page">
+      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="15" page-height="15" duplex="true">
         <default-template>
           <header/>
           <footer/>
@@ -525,7 +525,7 @@
       <x:param name="default-page-counter-name" select="'page'"/>
     </x:call>
     <x:expect label="layout-master">
-      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="15" page-height="15" duplex="true" page-number-variable="page">
+      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="15" page-height="15" duplex="true">
         <template use-when="(= (% $page 2) 0)">
           <header/>
           <footer/>

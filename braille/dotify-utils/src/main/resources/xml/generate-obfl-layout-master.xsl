@@ -145,7 +145,7 @@
         <xsl:variable name="footnotes-properties" as="element()*"
                       select="$default-page-stylesheet[@selector='@footnotes'][1]/css:property"/>
         <xsl:variable name="footnotes-content" as="element()*" select="$footnotes-properties[@name='content'][1]/*"/>
-        <layout-master name="{$name}" duplex="{$duplex}" page-number-variable="page"
+        <layout-master name="{$name}" duplex="{$duplex}"
                        page-width="{$page-width}" page-height="{$page-height}">
             <xsl:if test="$right-page-stylesheet">
                 <template use-when="(= (% $page 2) 1)">
