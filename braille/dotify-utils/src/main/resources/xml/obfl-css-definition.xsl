@@ -17,7 +17,8 @@
                            'border-left-pattern',   'border-left-style',                                  '-obfl-keep-with-previous-sheets',
                            'border-right-pattern',  'border-right-style',                                 '-obfl-keep-with-next-sheets',
                            'border-top-pattern',    'border-top-style',                                   '-obfl-scenario-cost',
-                           'border-bottom-pattern', 'border-bottom-style')"/>
+                           'border-bottom-pattern', 'border-bottom-style',                                '-obfl-right-text-indent'
+                           )"/>
     
     <xsl:variable name="_OBFL_KEEP_FN_RE">-obfl-keep\(\s*[1-9]\s*\)</xsl:variable>
     
@@ -29,6 +30,8 @@
                               and (
                                 if ($css:property/@name='-obfl-vertical-align')
                                 then $css:property/@value=('before','center','after')
+                                else if ($css:property/@name='-obfl-right-text-indent')
+                                then matches($css:property/@value,re:exact($css:NON_NEGATIVE_INTEGER_RE))
                                 else if ($css:property/@name=('-obfl-vertical-position',
                                                               '-obfl-table-col-spacing',
                                                               '-obfl-table-row-spacing',
@@ -80,6 +83,8 @@
                               then 'normal'
                               else if ($property='-obfl-underline')
                               then 'none'
+                              else if ($property='-obfl-right-text-indent')
+                              then '0'
                               else if ($property='text-transform')
                               then 'none'
                               else if ($property=('-obfl-keep-with-previous-sheets','-obfl-keep-with-next-sheets'))

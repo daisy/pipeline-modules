@@ -1711,6 +1711,11 @@
     </xsl:template>
     
     <xsl:template mode="block-attr"
+                  match="css:box[@type='block']/@css:_obfl-right-text-indent">
+        <xsl:attribute name="right-text-indent" select="."/>
+    </xsl:template>
+    
+    <xsl:template mode="block-attr"
                   match="css:box[@type='block']/@css:page-break-before[.='always']">
         <xsl:attribute name="break-before" select="'page'"/>
     </xsl:template>
