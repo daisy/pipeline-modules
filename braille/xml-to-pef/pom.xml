@@ -68,8 +68,7 @@
   
   <properties>
     <expose-services>
-      org.daisy.pipeline.modules.impl.Module_xml_to_pef,
-      org.daisy.pipeline.datatypes.impl.Datatype_px_xml_to_pef_line_spacing
+      org.daisy.pipeline.modules.impl.Module_xml_to_pef
     </expose-services>
   </properties>
   

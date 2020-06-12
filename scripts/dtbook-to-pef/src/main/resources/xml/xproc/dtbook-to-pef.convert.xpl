@@ -75,11 +75,11 @@
     
     <p:xslt px:message="Generating table of contents" px:progress=".01">
         <p:input port="stylesheet">
-            <p:document href="http://www.daisy.org/pipeline/modules/braille/xml-to-pef/generate-toc.xsl"/>
+            <p:document href="../xslt/generate-toc.xsl"/>
         </p:input>
-        <p:with-param name="depth" select="/*/*[@name='toc-depth']/@value">
+        <p:input port="parameters">
             <p:pipe step="parameters" port="result"/>
-        </p:with-param>
+        </p:input>
     </p:xslt>
     
     <p:group px:message="Applying style sheets" px:progress=".07">
