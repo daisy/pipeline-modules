@@ -82,6 +82,7 @@
     <p:option name="number-of-sheets"/>
     <p:option name="maximum-number-of-sheets"/>
     <p:option name="minimum-number-of-sheets"/>
+    <p:option name="avoid-volume-break-inside-leaf-section"/>
     <p:option name="pef-output-dir"/>
     <p:option name="brf-output-dir"/>
     <p:option name="preview-output-dir"/>

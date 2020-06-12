@@ -17,6 +17,8 @@ $show-braille-page-numbers: true !default;
 $show-print-page-numbers: true !default;
 $force-braille-page-break: false !default;
 
+@import "volume-breaking.scss";
+
 @page {
 	size: $page-width $page-height;
 }

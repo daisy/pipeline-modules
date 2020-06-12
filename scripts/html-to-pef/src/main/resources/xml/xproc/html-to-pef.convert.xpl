@@ -96,6 +96,7 @@
     
     <p:group px:message="Inlining CSS" px:progress=".10">
         <p:variable name="stylesheets-to-be-inlined" select="string-join((
+                                                               resolve-uri('../xslt/volume-breaking.xsl'),
                                                                $default-stylesheet,
                                                                resolve-uri('../../css/default.scss'),
                                                                $stylesheet),' ')">

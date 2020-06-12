@@ -90,6 +90,7 @@
         <p:variable name="stylesheets-to-be-inlined"
                     select="string-join((
                               (tokenize($stylesheet,'\s+')[not(.='')])[position()&lt;$first-css-stylesheet-index],
+                              resolve-uri('../xslt/volume-breaking.xsl'),
                               $default-stylesheet,
                               resolve-uri('../../css/default.scss'),
                               (tokenize($stylesheet,'\s+')[not(.='')])[position()&gt;=$first-css-stylesheet-index]),' ')">

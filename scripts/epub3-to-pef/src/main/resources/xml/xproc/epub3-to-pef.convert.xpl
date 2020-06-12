@@ -175,6 +175,7 @@
         <p:variable name="stylesheets-to-be-inlined"
                     select="string-join((
                               (tokenize($abs-stylesheet,'\s+')[not(.='')])[position()&lt;$first-css-stylesheet-index],
+                              'http://www.daisy.org/pipeline/modules/braille/html-to-pef/volume-breaking.xsl',
                               $default-stylesheet,
                               resolve-uri('../../css/default.scss'),
                               (tokenize($abs-stylesheet,'\s+')[not(.='')])[position()&gt;=$first-css-stylesheet-index]),' ')">

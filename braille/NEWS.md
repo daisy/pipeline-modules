@@ -8,6 +8,8 @@ Changes
   https://github.com/mtmse/dotify.formatter.impl/pull/31)
 - Improved braille translation by performing Unicode normalization of text when needed
   (https://github.com/daisy/pipeline-mod-braille/issues/197)
+- New `avoid-volume-break-inside-leaf-section` setting to prefer volume breaks at section
+  boundaries.
 - Other bugfixes
 
 Components

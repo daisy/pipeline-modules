@@ -605,6 +605,15 @@ See the CSS specification for more info:
             <p px:role="desc" xml:space="preserve">The minimum number of sheets in a volume. **Not implemented**</p>
         </p:documentation>
     </p:option>
+    <p:option name="avoid-volume-break-inside-leaf-section" required="false" px:type="boolean" select="'false'">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <h2 px:role="name">Volumes: Prefer breaks at section boundaries.</h2>
+            <p px:role="desc" xml:space="preserve">Whether to prefer breaking volumes at section boundaries.
+
+Volume breaks are preferably made right before or after elements `level1` to `level6`. Enabling this setting results in volumes being less equal in size.
+            </p>
+        </p:documentation>
+    </p:option>
     
     <!-- ======= -->
     <!-- Outputs -->
