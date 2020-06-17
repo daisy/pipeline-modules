@@ -2,10 +2,7 @@ package org.daisy.pipeline.tts.google.impl;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -29,24 +26,11 @@ import org.daisy.pipeline.tts.Voice;
 
 import com.google.api.gax.core.CredentialsProvider;
 import com.google.api.gax.core.FixedCredentialsProvider;
-import com.google.api.gax.paging.Page;
-import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auth.oauth2.ServiceAccountCredentials;
-import com.google.cloud.storage.Bucket;
-import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageOptions;
-import com.google.cloud.texttospeech.v1.AudioConfig;
-import com.google.cloud.texttospeech.v1.AudioEncoding;
 import com.google.cloud.texttospeech.v1.ListVoicesRequest;
 import com.google.cloud.texttospeech.v1.ListVoicesResponse;
-import com.google.cloud.texttospeech.v1.SsmlVoiceGender;
-import com.google.cloud.texttospeech.v1.SynthesisInput;
-import com.google.cloud.texttospeech.v1.SynthesizeSpeechResponse;
 import com.google.cloud.texttospeech.v1.TextToSpeechClient;
 import com.google.cloud.texttospeech.v1.TextToSpeechSettings;
-import com.google.cloud.texttospeech.v1.VoiceSelectionParams;
-import com.google.common.collect.Lists;
-import com.google.protobuf.ByteString;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +41,6 @@ public class GoogleTTSEngine extends MarklessTTSEngine {
 
 	private AudioFormat mAudioFormat;
 	private String[] mCmd;
-	//private String mESpeakPath;
 	private String mJsonPath;
 	private final static int MIN_CHUNK_SIZE = 2048;
 	private int mPriority;
@@ -65,47 +48,43 @@ public class GoogleTTSEngine extends MarklessTTSEngine {
 
 	public GoogleTTSEngine(GoogleTTSService googleService, String jsonPath, int priority) {
 		super(googleService);
-		// mESpeakPath = eSpeakPath;
 		mJsonPath = jsonPath;
 		mPriority = priority;
-		//mCmd = new String[]{
-		//        eSpeakPath, "-m", "--stdout", "--stdin" 
-		//};
 	}
 
 	@Override
 	public Collection<AudioBuffer> synthesize(String sentence, XdmNode xmlSentence,
-	        Voice voice, TTSResource threadResources, AudioBufferAllocator bufferAllocator, boolean retry)
-	        		throws SynthesisException,InterruptedException, MemoryException {
+			Voice voice, TTSResource threadResources, AudioBufferAllocator bufferAllocator, boolean retry)
+					throws SynthesisException,InterruptedException, MemoryException {
 
 		Collection<AudioBuffer> result = new ArrayList<AudioBuffer>();
-		
+
 		try {
 			new CommandRunner(mCmd)
-				.feedInput(sentence.getBytes("utf-8"))
-				// read the wave on the standard output
-				.consumeOutput(stream -> {
-						BufferedInputStream in = new BufferedInputStream(stream);
-						AudioInputStream fi = AudioSystem.getAudioInputStream(in);
-						if (mAudioFormat == null)
-							mAudioFormat = fi.getFormat();
-						while (true) {
-							AudioBuffer b = bufferAllocator
-								.allocateBuffer(MIN_CHUNK_SIZE + fi.available());
-							int ret = fi.read(b.data, 0, b.size);
-							if (ret == -1) {
-								// note: perhaps it would be better to call allocateBuffer()
-								// somewhere else in order to avoid this extra call:
-								bufferAllocator.releaseBuffer(b);
-								break;
-							}
-							b.size = ret;
-							result.add(b);
-						}
-						fi.close();
-				})
-				.consumeError(mLogger)
-				.run();
+			.feedInput(sentence.getBytes("utf-8"))
+			// read the wave on the standard output
+			.consumeOutput(stream -> {
+				BufferedInputStream in = new BufferedInputStream(stream);
+				AudioInputStream fi = AudioSystem.getAudioInputStream(in);
+				if (mAudioFormat == null)
+					mAudioFormat = fi.getFormat();
+				while (true) {
+					AudioBuffer b = bufferAllocator
+							.allocateBuffer(MIN_CHUNK_SIZE + fi.available());
+					int ret = fi.read(b.data, 0, b.size);
+					if (ret == -1) {
+						// note: perhaps it would be better to call allocateBuffer()
+						// somewhere else in order to avoid this extra call:
+						bufferAllocator.releaseBuffer(b);
+						break;
+					}
+					b.size = ret;
+					result.add(b);
+				}
+				fi.close();
+			})
+			.consumeError(mLogger)
+			.run();
 		} catch (MemoryException|InterruptedException e) {
 			SoundUtil.cancelFootPrint(result, bufferAllocator);
 			throw e;
@@ -115,7 +94,7 @@ public class GoogleTTSEngine extends MarklessTTSEngine {
 			e.printStackTrace(new PrintWriter(sw));
 			throw new SynthesisException(e);
 		}
-		
+
 		/*
 		// Instantiates a client
 	    try (TextToSpeechClient textToSpeechClient = TextToSpeechClient.create()) {
@@ -143,9 +122,9 @@ public class GoogleTTSEngine extends MarklessTTSEngine {
 	      ByteString audioContents = response.getAudioContent();
 
 	      AudioBuffer b = audioContents.toByteArray();
-	      
+
 	      result.add(b);
-	      
+
 	    } catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -159,68 +138,61 @@ public class GoogleTTSEngine extends MarklessTTSEngine {
 	public AudioFormat getAudioOutputFormat() {
 		return mAudioFormat;
 	}
-	
-	/*static void authExplicit(String jsonPath) throws IOException {
-		  // You can specify a credential file by providing a path to GoogleCredentials.
-		  // Otherwise credentials are read from the GOOGLE_APPLICATION_CREDENTIALS environment variable.
-		  GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(jsonPath))
-		        .createScoped(Lists.newArrayList("https://www.googleapis.com/auth/cloud-platform"));
-		  Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-
-		  System.out.println("Buckets:");
-		  Page<Bucket> buckets = storage.list();
-		  for (Bucket bucket : buckets.iterateAll()) {
-		    System.out.println(bucket.toString());
-		  }
-		}*/
 
 	@Override
 	public Collection<Voice> getAvailableVoices() throws SynthesisException,
-	        InterruptedException {
-		
-		Collection<Voice> result;
-		
-		TextToSpeechSettings settings = null;
-		
-		String jsonPath = mJsonPath; 
-		
+	InterruptedException {
+
+		Collection<Voice> result = new ArrayList<Voice>();;	
+
 		CredentialsProvider credentialsProvider = null;
-		try {
-			credentialsProvider = FixedCredentialsProvider.create(ServiceAccountCredentials.fromStream(new FileInputStream(jsonPath)));
-		} catch (FileNotFoundException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		} catch (IOException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
+
+		TextToSpeechSettings settings = null;
+
+		if (mJsonPath != "") {
+
+			try {
+				credentialsProvider = FixedCredentialsProvider.create(ServiceAccountCredentials.fromStream(new FileInputStream(mJsonPath)));
+				settings = TextToSpeechSettings.newBuilder().setCredentialsProvider(credentialsProvider).build();
+			} catch (IOException e) {
+				throw new SynthesisException(e.getMessage(), e.getCause());
+			}
+
+			try (TextToSpeechClient textToSpeechClient = TextToSpeechClient.create(settings)) {
+
+				ListVoicesRequest request = ListVoicesRequest.getDefaultInstance();
+
+				ListVoicesResponse response = textToSpeechClient.listVoices(request);
+				List<com.google.cloud.texttospeech.v1.Voice> voices = response.getVoicesList();
+
+
+				for (com.google.cloud.texttospeech.v1.Voice voice : voices) {	
+					result.add(new Voice("google", voice.getName()));
+				}
+
+			} catch (IOException e) { 
+				throw new SynthesisException(e.getMessage(), e.getCause());
+			}
+
 		}
-		
-		try {
-			settings = TextToSpeechSettings.newBuilder().setCredentialsProvider(credentialsProvider).build();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 
-		try (TextToSpeechClient textToSpeechClient = TextToSpeechClient.create(settings)) {
-			
-			result = new ArrayList<Voice>();
-			
-		    // Builds the text to speech list voices request
-		    ListVoicesRequest request = ListVoicesRequest.getDefaultInstance();
+		else {
+			try (TextToSpeechClient textToSpeechClient = TextToSpeechClient.create()) {
 
-		    // Performs the list voices request
-		    ListVoicesResponse response = textToSpeechClient.listVoices(request);
-		    List<com.google.cloud.texttospeech.v1.Voice> voices = response.getVoicesList();
-		    
+				ListVoicesRequest request = ListVoicesRequest.getDefaultInstance();
 
-		    for (com.google.cloud.texttospeech.v1.Voice voice : voices) {	
-		    	result.add(new Voice(getProvider().getName(), voice.getName()));
-		    }
-		    
-			
-		} catch (Throwable e) {
-			throw new SynthesisException(e.getMessage(), e.getCause());
+				ListVoicesResponse response = textToSpeechClient.listVoices(request);
+				List<com.google.cloud.texttospeech.v1.Voice> voices = response.getVoicesList();
+
+
+				for (com.google.cloud.texttospeech.v1.Voice voice : voices) {	
+					result.add(new Voice("google", voice.getName()));
+				}
+
+			} catch (IOException e) {	  
+				throw new SynthesisException(e.getMessage(), e.getCause());	  
+			}
+
 		}
 
 		return result;
@@ -234,62 +206,73 @@ public class GoogleTTSEngine extends MarklessTTSEngine {
 
 	@Override
 	public TTSResource allocateThreadResources() throws SynthesisException,
-	        InterruptedException {
+	InterruptedException {
 		return new TTSResource();
 	}
-	  
-	/*public static void main (String[] args) throws SynthesisException, IOException{
-		
-		//authExplicit("/Users/louiscaille/Documents/Pipeline/pipeline-b15bde01d04a.json");
-		
-		TextToSpeechSettings settings = null;
-		
-		String jsonPath = "/Users/louiscaille/Documents/Pipeline/pipeline-b15bde01d04a.json"; 
-		
+
+
+
+	/*public static void main (String[] args) throws SynthesisException {
+
+		String mJsonPath = "";
+
+		Collection<Voice> result = new ArrayList<Voice>();;	
+
 		CredentialsProvider credentialsProvider = null;
-		try {
-			credentialsProvider = FixedCredentialsProvider.create(ServiceAccountCredentials.fromStream(new FileInputStream(jsonPath)));
-		} catch (FileNotFoundException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		} catch (IOException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
-		
-		try {
-			settings = TextToSpeechSettings.newBuilder().setCredentialsProvider(credentialsProvider).build();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
-		Collection<Voice> result = new ArrayList<Voice>();
-	
-		try (TextToSpeechClient textToSpeechClient = TextToSpeechClient.create(settings)) {
-			
-		    // Builds the text to speech list voices request
-		    ListVoicesRequest request = ListVoicesRequest.getDefaultInstance();
 
-		    // Performs the list voices request
-		    ListVoicesResponse response = textToSpeechClient.listVoices(request);
-		    List<com.google.cloud.texttospeech.v1.Voice> voices = response.getVoicesList();
-		    
+		TextToSpeechSettings settings = null;
 
-		    for (com.google.cloud.texttospeech.v1.Voice voice : voices) {	
-		    	result.add(new Voice("google", voice.getName()));
-		    }
-		    
-		    
-		  } catch (IOException e) {
-			  throw new SynthesisException(e.getMessage(), e.getCause());
+		if (mJsonPath != "") {
+
+			try {
+				credentialsProvider = FixedCredentialsProvider.create(ServiceAccountCredentials.fromStream(new FileInputStream(mJsonPath)));
+				settings = TextToSpeechSettings.newBuilder().setCredentialsProvider(credentialsProvider).build();
+			} catch (IOException e) {
+				throw new SynthesisException(e.getMessage(), e.getCause());
+			}
+
+			try (TextToSpeechClient textToSpeechClient = TextToSpeechClient.create(settings)) {
+
+				ListVoicesRequest request = ListVoicesRequest.getDefaultInstance();
+
+				ListVoicesResponse response = textToSpeechClient.listVoices(request);
+				List<com.google.cloud.texttospeech.v1.Voice> voices = response.getVoicesList();
+
+
+				for (com.google.cloud.texttospeech.v1.Voice voice : voices) {	
+					result.add(new Voice("google", voice.getName()));
+				}
+
+			} catch (IOException e) { 
+				throw new SynthesisException(e.getMessage(), e.getCause());
+			}
+
 		}
-		
-		System.out.println("Size : " + result.size());
-		
+
+		else {
+			try (TextToSpeechClient textToSpeechClient = TextToSpeechClient.create()) {
+
+				ListVoicesRequest request = ListVoicesRequest.getDefaultInstance();
+
+				ListVoicesResponse response = textToSpeechClient.listVoices(request);
+				List<com.google.cloud.texttospeech.v1.Voice> voices = response.getVoicesList();
+
+
+				for (com.google.cloud.texttospeech.v1.Voice voice : voices) {	
+					result.add(new Voice("google", voice.getName()));
+				}
+
+			} catch (IOException e) {	  
+				throw new SynthesisException(e.getMessage(), e.getCause());	  
+			}
+
+		}
+
 		for (Voice voice : result) {
 			System.out.println("* {engine:google, name:" + voice.name + "} by google-cli");
 		}
-		
+
 	}*/
+
 }
+	
