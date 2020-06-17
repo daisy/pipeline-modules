@@ -13,7 +13,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.ComponentContext;
 
 @Component(
-	name = "espeak-tts-service",
+	name = "google-tts-service",
 	service = { TTSService.class }
 )
 public class GoogleTTSService extends AbstractTTSService {
@@ -26,7 +26,7 @@ public class GoogleTTSService extends AbstractTTSService {
 	@Override
 	public TTSEngine newEngine(Map<String, String> params) throws Throwable {
 		// settings
-		String eSpeakPath = null;
+		/*String eSpeakPath = null;
 		String prop = "org.daisy.pipeline.tts.espeak.path";
 		eSpeakPath = params.get(prop);
 		if (eSpeakPath == null) {
@@ -46,9 +46,15 @@ public class GoogleTTSService extends AbstractTTSService {
 			} catch (NumberFormatException e) {
 
 			}
-		}
+		}*/
+		
+		int intPriority = 2;
+		
+		String jsonPath = "";
+		
+		// String jsonPath = params.get("org.daisy.pipeline.tts.google.jsonPath");
 
-		return new GoogleTTSEngine(this, eSpeakPath, intPriority);
+		return new GoogleTTSEngine(this, jsonPath, intPriority);
 	}
 
 	@Override
