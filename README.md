@@ -33,5 +33,7 @@ To use Google Cloud Text-to-Speech (https://cloud.google.com/text-to-speech/docs
         With the command prompt:
         set GOOGLE_APPLICATION_CREDENTIALS=[PATH]
 
+Or indicate the path to the JSON file containing your service account key as an option command.
+
 
 6. Install and initialize the Cloud SDK.
