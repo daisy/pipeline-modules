@@ -1,16 +1,12 @@
 package org.daisy.pipeline.tts.google.impl;
 
 import java.util.Map;
-import java.util.Optional;
 
-import org.daisy.common.shell.BinaryFinder;
 import org.daisy.pipeline.tts.AbstractTTSService;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSService;
-
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.ComponentContext;
 
 @Component(
 	name = "google-tts-service",
@@ -25,36 +21,14 @@ public class GoogleTTSService extends AbstractTTSService {
 
 	@Override
 	public TTSEngine newEngine(Map<String, String> params) throws Throwable {
-		// settings
-		/*String eSpeakPath = null;
-		String prop = "org.daisy.pipeline.tts.espeak.path";
-		eSpeakPath = params.get(prop);
-		if (eSpeakPath == null) {
-			Optional<String> epath = BinaryFinder.find("espeak");
-			if (!epath.isPresent()) {
-				throw new SynthesisException(
-				        "Cannot find eSpeak's binary using system property " + prop);
-			}
-			eSpeakPath = epath.get();
-		}
 
-		String priority = params.get("org.daisy.pipeline.tts.espeak.priority");
+		// temporary
 		int intPriority = 2;
-		if (priority != null) {
-			try {
-				intPriority = Integer.valueOf(priority);
-			} catch (NumberFormatException e) {
-
-			}
-		}*/
+		// to pass later in the options
+		String jsonPath = "/Users/louiscaille/Documents/Pipeline/pipeline-b15bde01d04a.json"; 
 		
-		int intPriority = 2;
-		
-		String jsonPath = "";
-		
-		// String jsonPath = params.get("org.daisy.pipeline.tts.google.jsonPath");
-
 		return new GoogleTTSEngine(this, jsonPath, intPriority);
+		
 	}
 
 	@Override
