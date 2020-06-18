@@ -14,7 +14,7 @@
     </p:input>
     <p:output port="result" px:media-type="application/x-pef+xml"/>
     
-    <p:option name="default-stylesheet" required="false" select="''"/>
+    <p:option name="default-stylesheet" required="false" select="'#default'"/>
     <p:option name="stylesheet" required="false" select="''"/>
     <p:option name="transform" required="false" select="''"/>
     
@@ -65,7 +65,13 @@
     <p:identity name="zedai"/>
     
     <css:inline>
-        <p:with-option name="default-stylesheet" select="concat($default-stylesheet, ' ', $stylesheet)"/>
+        <p:with-option name="default-stylesheet"
+                       select="concat(
+                                 if ($default-stylesheet!='#default')
+                                   then $default-stylesheet
+                                   else resolve-uri('../css/default.css'),
+                                 ' ',
+                                 $stylesheet)"/>
     </css:inline>
     
     <p:viewport match="math:math">

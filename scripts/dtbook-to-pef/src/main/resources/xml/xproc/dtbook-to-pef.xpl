@@ -148,8 +148,7 @@ When `include-obfl` is set to true, the conversion may fail but still output a d
     <!-- ======= -->
     <!-- CONVERT -->
     <!-- ======= -->
-    <px:dtbook-to-pef name="convert" px:message="Transforming from DTBook to PEF" px:progress=".92"
-                      default-stylesheet="http://www.daisy.org/pipeline/modules/braille/dtbook-to-pef/css/default.css">
+    <px:dtbook-to-pef name="convert" px:message="Transforming from DTBook to PEF" px:progress=".92">
         <p:input port="source.in-memory">
             <p:pipe step="load" port="in-memory.out"/>
         </p:input>

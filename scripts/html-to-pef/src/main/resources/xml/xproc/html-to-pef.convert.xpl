@@ -29,7 +29,7 @@
         </p:inline>
     </p:input>
     
-    <p:option name="default-stylesheet" select="'http://www.daisy.org/pipeline/modules/braille/html-to-pef/css/default.css'"/>
+    <p:option name="default-stylesheet" required="false" select="'#default'"/>
     <p:option name="stylesheet" select="''"/>
     <p:option name="transform" select="'(translator:liblouis)(formatter:dotify)'"/>
     <p:option name="include-obfl" select="'false'"/>
@@ -97,7 +97,9 @@
     <p:group px:message="Inlining CSS" px:progress=".10">
         <p:variable name="stylesheets-to-be-inlined" select="string-join((
                                                                resolve-uri('../xslt/volume-breaking.xsl'),
-                                                               $default-stylesheet,
+                                                               if ($default-stylesheet!='#default')
+                                                                 then $default-stylesheet
+                                                                 else resolve-uri('../../css/default.css'),
                                                                resolve-uri('../../css/default.scss'),
                                                                $stylesheet),' ')">
             <p:inline><_/></p:inline>

@@ -11,12 +11,11 @@
                    ../css/page-breaking.params
                    ../css/volume-breaking.params"/>
   
-  <!-- other -->
+  <!-- xproc library -->
   <uri name="http://www.daisy.org/pipeline/modules/braille/html-to-pef/library.xpl" uri="../xml/xproc/library.xpl"/>
-  <uri name="http://www.daisy.org/pipeline/modules/braille/html-to-pef/css/reset.css" uri="../css/reset.css"/>
-  <uri name="http://www.daisy.org/pipeline/modules/braille/html-to-pef/css/default.css" uri="../css/default.css"/>
   
   <!-- style sheets -->
+  <uri name="http://www.daisy.org/pipeline/modules/braille/html-to-pef/reset.css" uri="../css/reset.css"/>
   <uri name="http://www.daisy.org/pipeline/modules/braille/html-to-pef/default.scss" uri="../css/default.scss"/>
   <uri name="http://www.daisy.org/pipeline/modules/braille/html-to-pef/volume-breaking.xsl" uri="../xml/xslt/volume-breaking.xsl"/>
   

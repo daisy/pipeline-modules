@@ -126,8 +126,7 @@
     <!-- ============ -->
     <!-- HTML TO PEF -->
     <!-- ============ -->
-    <px:html-to-pef name="convert" px:message="Converting from HTML to PEF" px:progress=".90"
-                    default-stylesheet="http://www.daisy.org/pipeline/modules/braille/html-to-pef/css/default.css">
+    <px:html-to-pef name="convert" px:message="Converting from HTML to PEF" px:progress=".90">
         <p:input port="source.in-memory">
             <p:pipe step="html" port="result"/>
         </p:input>

@@ -165,8 +165,7 @@ even though the provided CSS is more specific.
             <p:pipe port="fileset.out" step="load"/>
         </p:input>
     </p:identity>
-    <px:epub3-to-pef name="convert" px:message="Converting from EPUB to PEF" px:progress=".90"
-                     default-stylesheet="http://www.daisy.org/pipeline/modules/braille/epub3-to-pef/css/default.css">
+    <px:epub3-to-pef name="convert" px:message="Converting from EPUB to PEF" px:progress=".90">
         <p:with-option name="epub" select="$epub"/>
         <p:input port="in-memory.in">
             <p:pipe port="in-memory.out" step="load"/>

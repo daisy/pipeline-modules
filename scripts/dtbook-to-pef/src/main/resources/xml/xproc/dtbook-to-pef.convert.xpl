@@ -35,7 +35,7 @@
         </p:inline>
     </p:input>
     
-    <p:option name="default-stylesheet" select="'http://www.daisy.org/pipeline/modules/braille/dtbook-to-pef/css/default.css'"/>
+    <p:option name="default-stylesheet" required="false" select="'#default'"/>
     <p:option name="stylesheet" select="''"/>
     <p:option name="transform" select="'(translator:liblouis)(formatter:dotify)'"/>
     <p:option name="include-obfl" select="'false'"/>
@@ -91,7 +91,9 @@
                     select="string-join((
                               (tokenize($stylesheet,'\s+')[not(.='')])[position()&lt;$first-css-stylesheet-index],
                               resolve-uri('../xslt/volume-breaking.xsl'),
-                              $default-stylesheet,
+                              if ($default-stylesheet!='#default')
+                                then $default-stylesheet
+                                else resolve-uri('../../css/default.css'),
                               resolve-uri('../../css/default.scss'),
                               (tokenize($stylesheet,'\s+')[not(.='')])[position()&gt;=$first-css-stylesheet-index]),' ')">
             <p:inline><_/></p:inline>
