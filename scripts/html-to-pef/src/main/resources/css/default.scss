@@ -17,6 +17,8 @@ $show-braille-page-numbers: true !default;
 $show-print-page-numbers: true !default;
 $force-braille-page-break: false !default;
 
+@namespace epub url(http://www.idpf.org/2007/ops);
+
 @page {
 	size: $page-width $page-height;
 }
@@ -77,13 +79,15 @@ caption {
 	display: if($include-line-groups, block, inline);
 }
 
-.prodnote {
+.prodnote,
+[epub|type~='z3998:production'] {
 	display: if($include-production-notes, block, none);
 }
 
 .page-front,
 .page-normal,
-.page-special {
+.page-special,
+[epub|type='pagebreak'] {
 	@if $show-print-page-numbers {
 		string-set: print-page attr(title);
 	}
