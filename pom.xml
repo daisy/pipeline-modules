@@ -16,19 +16,6 @@
 
   <name>DAISY Pipeline 2 module :: TTS Adapter for Google Cloud TTS</name>
   <description>Implementation of the TTS API for the Google Cloud TTS</description>
-  
-  <dependencyManagement>
-	  <dependencies>
-	    <dependency>
-	      <groupId>com.google.cloud</groupId>
-	      <artifactId>libraries-bom</artifactId>
-	      <version>7.0.0</version>
-	      <type>pom</type>
-	      <scope>import</scope>
-	    </dependency>
-	  </dependencies>
-	</dependencyManagement>
-
 
   <dependencies>
     <dependency>
@@ -58,10 +45,11 @@
       <version>4.12</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-    	<groupId>com.google.cloud</groupId>
-	    <artifactId>google-cloud-texttospeech</artifactId>
-  	</dependency>
+  	<dependency>
+	  <groupId>com.google.cloud</groupId>
+	  <artifactId>google-cloud-texttospeech</artifactId>
+	  <version>1.0.2</version>
+	</dependency>
   </dependencies>
   
   <properties>
