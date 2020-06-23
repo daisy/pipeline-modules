@@ -1,4 +1,4 @@
-package org.daisy.pipeline.braille.liblouis.impl;
+package org.daisy.pipeline.braille.css;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,11 +26,11 @@ import cz.vutbr.web.css.TermList;
 /*
  * Translator that dispatches to sub-translator based on text-transform values.
  */
-class CompoundTranslator extends AbstractBrailleTranslator {
+public class CompoundTranslator extends AbstractBrailleTranslator {
 
 	private final Map<String,Supplier<BrailleTranslator>> translators;
 
-	CompoundTranslator(BrailleTranslator mainTranslator, Map<String,Supplier<BrailleTranslator>> subTranslators) {
+	public CompoundTranslator(BrailleTranslator mainTranslator, Map<String,Supplier<BrailleTranslator>> subTranslators) {
 		translators = ImmutableMap.<String,Supplier<BrailleTranslator>>builder()
 		                          .put("auto", () -> mainTranslator)
 		                          .putAll(subTranslators)

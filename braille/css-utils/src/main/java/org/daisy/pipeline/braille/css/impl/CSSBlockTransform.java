@@ -1,4 +1,4 @@
-package org.daisy.pipeline.braille.liblouis.impl;
+package org.daisy.pipeline.braille.css.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,7 +54,7 @@ import static org.daisy.pipeline.braille.common.TransformProvider.util.dispatch;
 import static org.daisy.pipeline.braille.common.TransformProvider.util.memoize;
 import org.daisy.pipeline.braille.common.util.Function0;
 import org.daisy.pipeline.braille.common.util.Functions;
-import org.daisy.pipeline.braille.liblouis.LiblouisTranslator;
+import org.daisy.pipeline.braille.css.CompoundTranslator;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -68,10 +68,10 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-public interface LiblouisCSSBlockTransform {
+public interface CSSBlockTransform {
 	
 	@Component(
-		name = "org.daisy.pipeline.braille.liblouis.impl.LiblouisCSSBlockTransform.Provider",
+		name = "org.daisy.pipeline.braille.css.impl.CSSBlockTransform.Provider",
 		service = {
 			BrailleTranslatorProvider.class,
 			TransformProvider.class
@@ -83,7 +83,7 @@ public interface LiblouisCSSBlockTransform {
 		
 		@Activate
 		protected void activate(final Map<?,?> properties) {
-			href = asURI(URLs.getResourceFromJAR("xml/transform/liblouis-block-translate.xpl", LiblouisCSSBlockTransform.class));
+			href = asURI(URLs.getResourceFromJAR("xml/transform/block-translator.xpl", CSSBlockTransform.class));
 		}
 		
 		private final static Iterable<BrailleTranslator> empty = Iterables.<BrailleTranslator>empty();
@@ -108,17 +108,14 @@ public interface LiblouisCSSBlockTransform {
 				htmlOut = html;
 			}
 			final String locale = q.containsKey("locale") ? q.getOnly("locale").getValue().get() : null;
-			if (q.containsKey("translator"))
-				if (!"liblouis".equals(q.removeOnly("translator").getValue().get()))
-					return empty;
 			q.add("input", "text-css");
 			if (braille)
 				q.add("output", "braille");
-			Iterable<LiblouisTranslator> translators = logSelect(q, liblouisTranslatorProvider);
+			Iterable<BrailleTranslator> translators = logSelect(q, translatorProvider);
 			return transform(
 				translators,
-				new Function<LiblouisTranslator,BrailleTranslator>() {
-					public BrailleTranslator _apply(LiblouisTranslator translator) {
+				new Function<BrailleTranslator,BrailleTranslator>() {
+					public BrailleTranslator _apply(BrailleTranslator translator) {
 						return __apply(
 							logCreate(new TransformImpl(translator, htmlOut, locale, q))
 						);
@@ -129,16 +126,16 @@ public interface LiblouisCSSBlockTransform {
 			
 		@Override
 		public ToStringHelper toStringHelper() {
-			return MoreObjects.toStringHelper("o.d.p.b.liblouis.impl.LiblouisCSSBlockTransform$Provider");
+			return MoreObjects.toStringHelper("o.d.p.b.css.impl.CSSBlockTransform$Provider");
 		}
 		
 		private class TransformImpl extends AbstractBrailleTranslator implements XProcStepProvider {
 			
 			private final Query mainQuery;
-			private final LiblouisTranslator mainTranslator;
+			private final BrailleTranslator mainTranslator;
 			private final Map<String,String> options;
 			
-			private TransformImpl(LiblouisTranslator translator, boolean htmlOut, String mainLocale, Query query) {
+			private TransformImpl(BrailleTranslator translator, boolean htmlOut, String mainLocale, Query query) {
 				options = ImmutableMap.of(// This will omit the <_ style="text-transform:none">
 				                          // wrapper. It is assumed that if (output:html) is set, the
 				                          // result is known to be braille (which is the case if
@@ -170,7 +167,7 @@ public interface LiblouisCSSBlockTransform {
 											mainTranslator,
 											Maps.transformValues(
 												subTranslators,
-												q -> () -> liblouisTranslatorProvider.get(q).iterator().next()));
+												q -> () -> translatorProvider.get(q).iterator().next()));
 										evictTempTranslator = Provider.this.provideTemporarily(compoundTranslator);
 									} else {
 										compoundTranslator = mainTranslator;
@@ -203,7 +200,7 @@ public interface LiblouisCSSBlockTransform {
 			
 			@Override
 			public ToStringHelper toStringHelper() {
-				return MoreObjects.toStringHelper("o.d.p.b.liblouis.impl.LiblouisCSSBlockTransform$Provider$TransformImpl")
+				return MoreObjects.toStringHelper("o.d.p.b.css.impl.CSSBlockTransform$Provider$TransformImpl")
 					.add("translator", mainTranslator);
 			}
 		}
@@ -249,27 +246,29 @@ public interface LiblouisCSSBlockTransform {
 		}
 		
 		@Reference(
-			name = "LiblouisTranslatorProvider",
-			unbind = "unbindLiblouisTranslatorProvider",
-			service = LiblouisTranslator.Provider.class,
+			name = "BrailleTranslatorProvider",
+			unbind = "unbindBrailleTranslatorProvider",
+			service = BrailleTranslatorProvider.class,
 			cardinality = ReferenceCardinality.MULTIPLE,
 			policy = ReferencePolicy.DYNAMIC
 		)
-		protected void bindLiblouisTranslatorProvider(LiblouisTranslator.Provider provider) {
-			liblouisTranslatorProviders.add(provider);
-			logger.debug("Adding LiblouisTranslator provider: {}", provider);
+		@SuppressWarnings(
+			"unchecked" // safe cast
+		)
+		protected void bindBrailleTranslatorProvider(BrailleTranslatorProvider<?> provider) {
+			translatorProviders.add((BrailleTranslatorProvider<BrailleTranslator>)provider);
+			logger.debug("Adding BrailleTranslator provider: {}", provider);
 		}
 		
-		protected void unbindLiblouisTranslatorProvider(LiblouisTranslator.Provider provider) {
-			liblouisTranslatorProviders.remove(provider);
-			liblouisTranslatorProvider.invalidateCache();
-			logger.debug("Removing LiblouisTranslator provider: {}", provider);
+		protected void unbindBrailleTranslatorProvider(BrailleTranslatorProvider<?> provider) {
+			translatorProviders.remove(provider);
+			translatorProvider.invalidateCache();
+			logger.debug("Removing BrailleTranslator provider: {}", provider);
 		}
 		
-		private List<TransformProvider<LiblouisTranslator>> liblouisTranslatorProviders
-		= new ArrayList<TransformProvider<LiblouisTranslator>>();
-		private TransformProvider.util.MemoizingProvider<LiblouisTranslator> liblouisTranslatorProvider
-		= memoize(dispatch(liblouisTranslatorProviders));
+		private List<BrailleTranslatorProvider<BrailleTranslator>> translatorProviders = new ArrayList<>();
+		private TransformProvider.util.MemoizingProvider<BrailleTranslator> translatorProvider
+		= memoize(dispatch(translatorProviders));
 		
 		private static final Logger logger = LoggerFactory.getLogger(Provider.class);
 		
