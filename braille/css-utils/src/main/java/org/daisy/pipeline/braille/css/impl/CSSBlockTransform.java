@@ -19,6 +19,7 @@ import com.xmlcalabash.runtime.XAtomicStep;
 
 import cz.vutbr.web.css.Declaration;
 import cz.vutbr.web.css.TermIdent;
+import cz.vutbr.web.css.TermURI;
 
 import static org.daisy.common.file.URIs.asURI;
 
@@ -226,20 +227,39 @@ public interface CSSBlockTransform {
 									;
 								else if (!dd.getProperty().equals("system")
 								         && dd.size() == 1
-								         && dd.get(0) instanceof TermIdent) {
+								         && (dd.get(0) instanceof TermIdent || dd.get(0) instanceof TermURI)) {
 									String key = dd.getProperty();
-									String value = ((TermIdent)dd.get(0)).getValue();
-									if (query.containsKey(key))
-										query.removeAll(key);
-									query.add(key, value);
+									String value;
+									if (dd.get(0) instanceof TermIdent) {
+										value = ((TermIdent)dd.get(0)).getValue();
+										if (query.containsKey(key))
+											query.removeAll(key);
+									} else {
+										URI base = asURI(((TermURI)dd.get(0)).getBase());
+										if (base == null)
+											base = asURI(((Document)doc).getBaseURI());
+										value = base.resolve(((TermURI)dd.get(0)).getValue()).toASCIIString();
+									}
 									if (key.equals("contraction") && value.equals("no"))
 										query.removeAll("grade");
+									// FIXME: support this in Liblouis translator
+									if (key.equals("table") || key.equals("liblouis-table")) {
+										query.removeAll("locale");
+										query.removeAll("type");
+										query.removeAll("contraction");
+										query.removeAll("grade");
+										query.removeAll("dots");
+										query.removeAll("direction");
+									}
+									query.add(key, value);
 								} else {
 									query = null;
 									break;
 								}
-							if (queries == null) queries = new HashMap<>();
-							queries.put(rule.getName(), query);
+							if (query != null) {
+								if (queries == null) queries = new HashMap<>();
+								queries.put(rule.getName(), query);
+							}
 							break;
 						}
 			return queries;
