@@ -45,11 +45,13 @@
       <version>4.12</version>
       <scope>test</scope>
     </dependency>
-  	<dependency>
+    
+    <dependency>
 	  <groupId>com.google.cloud</groupId>
 	  <artifactId>google-cloud-texttospeech</artifactId>
 	  <version>1.0.2</version>
 	</dependency>
+	
   </dependencies>
   
   <properties>
@@ -58,18 +60,27 @@
     </expose-services>
   </properties>
 
-  <build>
+<build>
     <plugins>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Import-Package>
-              net.sf.saxon.*;version="${saxon.versionRange}",
-              !org.daisy.common.spi,
-              *
-            </Import-Package>
+           <!-- com.google.api.*;-split-package:=first,
+                    
+                  com.google.auth.*;-split-package:=first, -->
+                <Export-Package>
+                  com.google.*;-split-package:=merge-first, 
+                  io.grpc.*;-split-package:=merge-first, 
+                  com.fasterxml.jackson.core.*;-split-package:=first
+                </Export-Package>
+           		<Import-Package>
+             	  net.sf.saxon.*;version="${saxon.versionRange}",
+                  !org.daisy.common.spi,
+                  *
+                </Import-Package>
+            
           </instructions>
         </configuration>
       </plugin>
