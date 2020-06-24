@@ -1,3 +1,10 @@
+v1.13.6-SNAPSHOT
+================
+
+Changes
+-------
+- Fix regression in `target-counter()`, `target-string()`, `target-text()` and `target-content()`
+
 v1.13.5
 =======
 
@@ -13,9 +20,6 @@ Changes
   - New OBFL variable `$started-volume-first-content-page` in the context of a `::obfl-on-resumed`
     pseudo-element (https://github.com/mtmse/obfl/issues/3,
     https://github.com/mtmse/dotify.formatter.impl/issues/18)
-- Support for `-obfl-right-text-indent` (https://github.com/sbsdev/pipeline-mod-sbs/issues/51,
-  https://github.com/nlbdev/pipeline/issues/169, https://github.com/mtmse/obfl/pull/9,
-  https://github.com/mtmse/dotify.formatter.impl/pull/31)
 - Various smaller fixes and invisible changes
 
 Components
