@@ -22,15 +22,11 @@
 		<xsl:message terminate="yes">Coding error</xsl:message>
 	</xsl:template>
 	
-	<xsl:template match="/css:wrapper" priority="1">
-		<xsl:apply-templates select="*" mode="identify-blocks"/>
-	</xsl:template>
-	
 	<xsl:template match="/*">
 		<xsl:apply-templates select="." mode="identify-blocks"/>
 	</xsl:template>
 	
-	<xsl:template mode="identify-blocks" match="/css:wrapper/*|/*[not(self::css:wrapper)]">
+	<xsl:template mode="identify-blocks" match="/*">
 		<xsl:variable name="source-style" as="element()*">
 			<xsl:call-template name="css:computed-properties">
 				<xsl:with-param name="properties" select="$text-properties"/>

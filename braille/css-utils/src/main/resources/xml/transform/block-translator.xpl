@@ -14,12 +14,6 @@
 	<css:parse-properties px:message="Parsing CSS properties" px:progress=".05"
 	                      properties="display"/>
 	
-	<!--
-	    Suppress warning message "The source document is in namespace foo, but none of the template
-	    rules match elements in this namespace"
-	-->
-	<p:wrap wrapper="css:wrapper" match="/*"/>
-	
 	<p:xslt px:message="Translating CSS blocks" px:progress=".95">
 		<p:input port="stylesheet">
 			<p:document href="block-translator-from-text-transform.xsl"/>
