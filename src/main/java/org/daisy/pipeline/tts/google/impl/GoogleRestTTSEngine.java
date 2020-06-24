@@ -9,6 +9,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -25,8 +27,6 @@ import org.daisy.pipeline.tts.SoundUtil;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.Voice;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,50 +101,15 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 	InterruptedException {
 		
 		Collection<Voice> result = new ArrayList<Voice>();
-
-		/*String apiKey = "AIzaSyA2vhAI52241mAkixcnSfz8AJkS8cpaHVM";
-
-		CloseableHttpClient httpClient = HttpClients.createDefault();
-
+		
+		String apiKey = "AIzaSyA2vhAI52241mAkixcnSfz8AJkS8cpaHVM";
+		
 		try {
 
-			HttpGet request = new HttpGet("https://texttospeech.googleapis.com/v1/voices?key=" + apiKey);
-
-			CloseableHttpResponse response = httpClient.execute(request);
-
-			HttpEntity entity = response.getEntity();
-
-			if (entity != null) {
-
-				String res = EntityUtils.toString(entity);
-
-				JSONObject jsonObject = new JSONObject(res);
-				JSONArray array = new JSONArray(jsonObject.getString("voices"));
-
-				for (int i = 0; i < array.length(); i++) {
-					JSONObject obj = new JSONObject(array.getString(i));
-					Voice voice = new Voice("google", obj.getString("name"));
-					result.add(voice);
-				}
-
-			}
-
-			response.close();
-
-			httpClient.close();
-
-
-		} catch (Throwable e) {
-
-			e.printStackTrace();
-
-		}*/
-
-		try {
-
-			URL url = new URL("https://texttospeech.googleapis.com/v1/voices?key=AIzaSyA2vhAI52241mAkixcnSfz8AJkS8cpaHVM");
+			URL url = new URL("https://texttospeech.googleapis.com/v1/voices?key=" + apiKey);
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("GET");
+			
 			BufferedReader in = new BufferedReader(
 					new InputStreamReader(con.getInputStream()));
 			String inputLine;
@@ -153,20 +118,17 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 				content = content + inputLine;
 			}
 			in.close();
-			JSONObject jsonObject = new JSONObject(content);
-			JSONArray array = new JSONArray(jsonObject.getString("voices"));
 
-			for (int i = 0; i < array.length(); i++) {
-				JSONObject obj = new JSONObject(array.getString(i));
-				Voice voice = new Voice("google", obj.getString("name"));
-				result.add(voice);
-			}
+
+			Pattern p = Pattern .compile("[a-z][a-z]-[A-Z][A-Z]-[a-z A-Z]+-[A-Z]");
+			Matcher m = p.matcher(content);
+			
+			while (m.find())
+				result.add(new Voice(getProvider().getName(),content.substring(m.start(), m.end())));
 
 		} catch (Throwable e) {
-			e.printStackTrace();
+			throw new SynthesisException(e.getMessage(), e.getCause());
 		}
-		
-		//result.add(new Voice("google","BONJOUR"));
 
 		return result;
 
@@ -183,72 +145,5 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 		return new TTSResource();
 	}
 
-	/*public static void main (String[] args) {
-
-		HttpRequestFactory requestFactory
-		= new NetHttpTransport().createRequestFactory();
-		HttpRequest request = requestFactory.buildGetRequest(
-				new GenericUrl("https://texttospeech.googleapis.com/v1/voices?key=AIzaSyA2vhAI52241mAkixcnSfz8AJkS8cpaHVM"));
-		String rawResponse = request.execute().parseAsString();
-		
-		Collection<Voice> result = new ArrayList<Voice>();
-
-		JSONObject jsonObject = new JSONObject(rawResponse);
-		JSONArray array = new JSONArray(jsonObject.getString("voices"));
-		
-		for (int i = 0; i < array.length(); i++) {
-			JSONObject obj = new JSONObject(array.getString(i));
-			Voice voice = new Voice("google", obj.getString("name"));
-			result.add(voice);
-		}
-		
-		for (Voice voice : result) {
-			System.out.println("{ engine : " + voice.engine + ", name : " + voice.name + " }");
-		}
-		
-		HttpRequestFactory requestFactory
-		= new NetHttpTransport().createRequestFactory();
-		String jsonInputString = "{\"input\":{\"text\":\"Android is a mobile operating system developed by Google, based on the Linux kernel and designed primarily for touchscreen mobile devices such as smartphones and tablets.\"},\"voice\":{\"languageCode\":\"en-gb\",\"name\":\"en-GB-Standard-A\",\"ssmlGender\":\"FEMALE\"},\"audioConfig\":{\"audioEncoding\":\"MP3\"}}";
-		JSONObject jsonObject = new JSONObject(jsonInputString);
-		JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-		JsonHttpContent jsonContent = new JsonHttpContent(jsonFactory , jsonObject);
-		HttpRequest request = requestFactory.buildPostRequest(
-				new GenericUrl("https://texttospeech.googleapis.com/v1/text:synthesize?key=AIzaSyA2vhAI52241mAkixcnSfz8AJkS8cpaHVM"), jsonContent);
-		String rawResponse = request.execute().parseAsString();
-		System.out.println(rawResponse);
-
-		Collection<Voice> result = new ArrayList<Voice>();
-
-		try {
-
-			URL url = new URL("https://texttospeech.googleapis.com/v1/voices?key=AIzaSyA2vhAI52241mAkixcnSfz8AJkS8cpaHVM");
-			HttpURLConnection con = (HttpURLConnection) url.openConnection();
-			con.setRequestMethod("GET");
-			BufferedReader in = new BufferedReader(
-					new InputStreamReader(con.getInputStream()));
-			String inputLine;
-			String content = "";
-			while ((inputLine = in.readLine()) != null) {
-				content = content + inputLine;
-			}
-			in.close();
-			JSONObject jsonObject = new JSONObject(content);
-			JSONArray array = new JSONArray(jsonObject.getString("voices"));
-
-			for (int i = 0; i < array.length(); i++) {
-				JSONObject obj = new JSONObject(array.getString(i));
-				Voice voice = new Voice("google", obj.getString("name"));
-				result.add(voice);
-			}
-
-			for (Voice voice : result) {
-				System.out.println("{ engine : " + voice.engine + ", name : " + voice.name + " }");
-			}
-
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
-
-	}*/
 
 }
