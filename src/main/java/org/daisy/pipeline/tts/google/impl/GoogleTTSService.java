@@ -1,9 +1,7 @@
 package org.daisy.pipeline.tts.google.impl;
 
 import java.util.Map;
-import java.util.Optional;
 
-import org.daisy.common.shell.BinaryFinder;
 import org.daisy.pipeline.tts.AbstractTTSService;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSService;
@@ -11,11 +9,11 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 
 @Component(
-	name = "google-tts-service",
-	service = { TTSService.class }
-)
+		name = "google-tts-service",
+		service = { TTSService.class }
+		)
 public class GoogleTTSService extends AbstractTTSService {
-	
+
 	@Activate
 	protected void loadSSMLadapter() {
 		super.loadSSMLadapter("/transform-ssml.xsl", GoogleTTSService.class);
@@ -23,30 +21,22 @@ public class GoogleTTSService extends AbstractTTSService {
 
 	@Override
 	public TTSEngine newEngine(Map<String, String> params) throws Throwable {
-		// settings
-				String eSpeakPath = null;
-				String prop = "org.daisy.pipeline.tts.espeak.path";
-				eSpeakPath = params.get(prop);
-				if (eSpeakPath == null) {
-					Optional<String> epath = BinaryFinder.find("espeak");
-					if (!epath.isPresent()) {
-						throw new SynthesisException(
-						        "Cannot find eSpeak's binary using system property " + prop);
-					}
-					eSpeakPath = epath.get();
-				}
 
-				String priority = params.get("org.daisy.pipeline.tts.espeak.priority");
-				int intPriority = 2;
-				if (priority != null) {
-					try {
-						intPriority = Integer.valueOf(priority);
-					} catch (NumberFormatException e) {
+		String priority = params.get("org.daisy.pipeline.tts.espeak.priority");
+		int intPriority = 2;
+		if (priority != null) {
+			try {
+				intPriority = Integer.valueOf(priority);
+			} catch (NumberFormatException e) {
 
-					}
-				} 
+			}
+		} 
+		
+		// String apiKey = params.get("org.daisy.pipeline.tts.google.apikey");
+		
+		String apiKey = "AIzaSyA2vhAI52241mAkixcnSfz8AJkS8cpaHVM";
 
-		return new GoogleRestTTSEngine(this, eSpeakPath, intPriority);
+		return new GoogleRestTTSEngine(this, apiKey, intPriority);
 
 	}
 
