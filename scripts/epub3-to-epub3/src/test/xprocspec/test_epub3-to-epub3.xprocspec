@@ -250,41 +250,34 @@
 					<body>
 						<nav epub:type="toc">
 							<h1>
-								<span id="st1-1">
-									<span role="word">Table</span>
-									<span role="word">of</span>
-									<span role="word">contents</span>
-								</span>
+								<span id="st1-1">Table of contents</span>
 							</h1>
 							<ol>
 								<li>
 									<a href="cover.xhtml#cover">
 										<span id="st1-2">
-											<span role="word">Cover</span>
+											Cover
 										</span>
 									</a>
 								</li>
 								<li>
 									<a href="front.xhtml#contents">
 										<span id="st1-3">
-											<span role="word">List</span>
-											<span role="word">of</span>
-											<span role="word">contents</span>
+											List of contents
 										</span>
 									</a>
 								</li>
 								<li>
 									<a href="front.xhtml#preface">
 										<span id="st1-4">
-											<span role="word">Preface</span>
+											Preface
 										</span>
 									</a>
 								</li>
 								<li>
 									<a href="chapter.xhtml#chap_1">
 										<span id="st1-5">
-											<span role="word">Chapter</span>
-											<span role="word">1</span>
+											Chapter 1
 										</span>
 									</a>
 								</li>
@@ -292,32 +285,22 @@
 						</nav>
 						<nav epub:type="page-list" hidden="">
 							<h1>
-								<span id="st1-6">
-									<span role="word">List</span>
-									<span role="word">of</span>
-									<span role="word">pages</span>
-								</span>
+								<span id="st1-6">List of pages</span>
 							</h1>
 							<ol>
 								<li>
 									<a href="front.xhtml#page_front_4">
-										<span id="st1-7">
-											<span role="word">vi</span>
-										</span>
+										<span id="st1-7">vi</span>
 									</a>
 								</li>
 								<li>
 									<a href="front.xhtml#page_front_5">
-										<span id="st1-8">
-											<span role="word">v</span>
-										</span>
+										<span id="st1-8">v</span>
 									</a>
 								</li>
 								<li>
 									<a href="chapter.xhtml#page_5">
-										<span id="st1-9">
-											<span role="word">5</span>
-										</span>
+										<span id="st1-9">5</span>
 									</a>
 								</li>
 							</ol>
@@ -361,29 +344,21 @@
 					</head>
 					<body id="front" epub:type="frontmatter">
 						<h1 id="h_1">
-							<span id="st3-1">
-								<span role="word">Title</span>
-							</span>
+							<span id="st3-1">Title</span>
 						</h1>
 						<p>
 							<span id="st3-2">...</span>
 						</p>
 						<section id="contents">
 							<h2 id="h_1_1">
-								<span id="st3-3">
-									<span role="word">List</span>
-									<span role="word">of</span>
-									<span role="word">contents</span>
-								</span>
+								<span id="st3-3">List of contents</span>
 							</h2>
 							<table>...</table>
 							<div id="page_front_4" class="page-front" epub:type="pagebreak" title="iv"/>
 						</section>
 						<section id="preface">
 							<h2 id="h_1_2">
-								<span id="st3-4">
-									<span role="word">Preface</span>
-								</span>
+								<span id="st3-4">Preface</span>
 							</h2>
 							<p>
 								<span id="st3-5">...</span>
@@ -409,10 +384,7 @@
 					<body id="chap_1" epub:type="bodymatter chapter">
 						<div id="page_5" class="page-normal" epub:type="pagebreak" title="5"/>
 						<h1 id="h_1">
-							<span id="st4-1">
-								<span role="word">Chapter</span>
-								<span role="word">1</span>
-							</span>
+							<span id="st4-1">Chapter 1</span>
 						</h1>
 						<p>
 							<span id="st4-2">...</span>
@@ -927,182 +899,30 @@
 					      id="level1_1" epub:type="cover">
 						<section id="prodnote_1" class="render-optional rearcover">
 							<p>
-								<span id="st1-1">
-									<span role="word">Gro</span>
-									<span role="word">försöker</span>
-									<span role="word">att</span>
-									<span role="word">få</span>
-									<span role="word">Runa</span>
-									<span role="word">på</span>
-									<span role="word">gott</span>
-									<span role="word">humör</span>
-									<span role="word">igen</span>.</span></p>
+								<span id="st1-1">Gro försöker att få Runa på gott humör igen.</span></p>
 							<p>
-								<span id="st1-2">–
-									<span role="word">Vi</span>
-									<span role="word">har</span>
-									<span role="word">det</span>
-									<span role="word">bara</span>
-									<span role="word">så</span>
-									<span role="word">långtråkigt</span>.</span>
-								<span id="st1-3">
-									<span role="word">Du</span>
-									<span role="word">har</span>
-									<span role="word">tur</span>.</span>
-								<span id="st1-4">
-									<span role="word">Du</span>
-									<span role="word">får</span>
-									<span role="word">gå</span>
-									<span role="word">ut</span>
-									<span role="word">och</span>
-									<span role="word">in</span>
-									<span role="word">i</span>
-									<span role="word">tornet</span>.</span>
-								<span id="st1-5">
-									<span role="word">Alvilda</span>
-									<span role="word">och</span>
-									<span role="word">jag</span>
-									<span role="word">måste</span>
-									<span role="word">sitta</span>
-									<span role="word">här</span>
-									<span role="word">dag</span>
-									<span role="word">ut</span>
-									<span role="word">och</span>
-									<span role="word">dag</span>
-									<span role="word">in</span>.</span>
-								<span id="st1-6">
-									<span role="word">Bara</span>
-									<span role="word">om</span>
-									<span role="word">natten</span>
-									<span role="word">får</span>
-									<span role="word">vi</span>
-									<span role="word">komma</span>
-									<span role="word">till</span>
-									<span role="word">kvinnosalen</span>.</span>
-								<span id="st1-7">
-									<span role="word">Om</span>
-									<span role="word">det</span>
-									<span role="word">bara</span>
-									<span role="word">snart</span>
-									<span role="word">ville</span>
-									<span role="word">kommma</span>
-									<span role="word">någon</span>
-									<span role="word">som</span>
-									<span role="word">kan</span>
-									<span role="word">slå</span>
-									<span role="word">ihjäl</span>
-									<span role="word">ormen</span>.</span></p>
+								<span id="st1-2">– Vi har det bara så långtråkigt.</span>
+								<span id="st1-3">Du har tur.</span>
+								<span id="st1-4">Du får gå ut och in i tornet.</span>
+								<span id="st1-5">Alvilda och jag måste sitta här dag ut och dag in.</span>
+								<span id="st1-6">Bara om natten får vi komma till kvinnosalen.</span>
+								<span id="st1-7">Om det bara snart ville kommma någon som kan slå ihjäl ormen.</span></p>
 							<p>
-								<span id="st1-8">
-									<span role="word">Gro</span>
-									<span role="word">suckar</span>
-									<span role="word">djupt</span>.</span>
-								<span id="st1-9">
-									<span role="word">Liksom</span>
-									<span role="word">Alvilda</span>
-									<span role="word">är</span>
-									<span role="word">hon</span>
-									<span role="word">trött</span>
-									<span role="word">på</span>
-									<span role="word">att</span>
-									<span role="word">vara</span>
-									<span role="word">inspärrad</span>.</span></p>
+								<span id="st1-8">Gro suckar djupt.</span>
+								<span id="st1-9">Liksom Alvilda är hon trött på att vara inspärrad.</span></p>
 							<p>
-								<span id="st1-10">
-									<span role="word">Alvilda</span>
-									<span role="word">tittar</span>
-									<span role="word">ner</span>
-									<span role="word">på</span>
-									<span role="word">sina</span>
-									<span role="word">bröder</span>
-									<span role="word">igen</span>.</span></p>
+								<span id="st1-10">Alvilda tittar ner på sina bröder igen.</span></p>
 							<p>
-								<span id="st1-11">–
-									<span role="word">Jag</span>
-									<span role="word">vill</span>
-									<span role="word">hellre</span>
-									<span role="word">lära</span>
-									<span role="word">mig</span>
-									<span role="word">att</span>
-									<span role="word">slåss</span>,
-									<span role="word">mumlar</span>
-									<span role="word">hon</span>.</span>
-								<span id="st1-12">
-									<span role="word">Då</span>
-									<span role="word">skulle</span>
-									<span role="word">jag</span>
-									<span role="word">själv</span>
-									<span role="word">kunna</span>
-									<span role="word">slå</span>
-									<span role="word">ihjäl</span>
-									<span role="word">odjuret</span>.</span></p>
+								<span id="st1-11">– Jag vill hellre lära mig att slåss, mumlar hon.</span>
+								<span id="st1-12">Då skulle jag själv kunna slå ihjäl odjuret.</span></p>
 							<p>
-								<span id="st1-13">–
-									<span role="word">Jag</span>
-									<span role="word">hörde</span>
-									<span role="word">nog</span>
-									<span role="word">vad</span>
-									<span role="word">du</span>
-									<span role="word">sa</span>.</span>
-								<span id="st1-14">
-									<span role="word">Runa</span>
-									<span role="word">ruskar</span>
-									<span role="word">på</span>
-									<span role="word">huvudet</span>.</span>
-								<span id="st1-15">
-									<span role="word">Du</span>
-									<span role="word">vet</span>
-									<span role="word">inte</span>
-									<span role="word">vad</span>
-									<span role="word">som</span>
-									<span role="word">är</span>
-									<span role="word">bäst</span>
-									<span role="word">för</span>
-									<span role="word">dig</span>.</span>
-								<span id="st1-16">
-									<span role="word">Tänk</span>
-									<span role="word">på</span>
-									<span role="word">allt</span>
-									<span role="word">det</span>
-									<span role="word">besvär</span>
-									<span role="word">din</span>
-									<span role="word">pappa</span>
-									<span role="word">och</span>
-									<span role="word">mamma</span>
-									<span role="word">har</span>
-									<span role="word">haft</span>.</span>
-								<span id="st1-17">
-									<span role="word">Först</span>
-									<span role="word">byggde</span>
-									<span role="word">de</span>
-									<span role="word">det</span>
-									<span role="word">här</span>
-									<span role="word">tornet</span>
-									<span role="word">av</span>
-									<span role="word">koppar</span>.</span>
-								<span id="st1-18">
-									<span role="word">Sedan</span>
-									<span role="word">har</span>
-									<span role="word">de</span>
-									<span role="word">skaffat</span>
-									<span role="word">en</span>
-									<span role="word">orm</span>,
-									<span role="word">som</span>
-									<span role="word">kan</span>
-									<span role="word">vakta</span>
-									<span role="word">din</span>
-									<span role="word">dygd</span>.</span>
-								<span id="st1-19">
-									<span role="word">Många</span>
-									<span role="word">unga</span>
-									<span role="word">män</span>
-									<span role="word">har</span>
-									<span role="word">mist</span>
-									<span role="word">sina</span>
-									<span role="word">liv</span>
-									<span role="word">för</span>
-									<span role="word">din</span>
-									<span role="word">skull</span>.</span></p>
+								<span id="st1-13">– Jag hörde nog vad du sa.</span>
+								<span id="st1-14">Runa ruskar på huvudet.</span>
+								<span id="st1-15">Du vet inte vad som är bäst för dig.</span>
+								<span id="st1-16">Tänk på allt det besvär din pappa och mamma har haft.</span>
+								<span id="st1-17">Först byggde de det här tornet av koppar.</span>
+								<span id="st1-18">Sedan har de skaffat en orm, som kan vakta din dygd.</span>
+								<span id="st1-19">Många unga män har mist sina liv för din skull.</span></p>
 						</section>
 					</body>
 				</x:document>
