@@ -42,6 +42,11 @@
             px:assert
         </p:documentation>
     </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
+        <p:documentation>
+            px:set-base-uri
+        </p:documentation>
+    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
         <p:documentation>
             px:fileset-load
@@ -305,10 +310,47 @@
             </p:input>
         </px:fileset-filter>
         <p:sink/>
+        <!--
+            First unwrap all child elements within heading elements. This is workaround for a Voice
+            Dream Reader bug.
+        -->
+        <p:group name="voice-dream-workaround">
+            <p:output port="dtbook" primary="true"/>
+            <p:output port="audio-clips">
+                <p:pipe step="secondary" port="result"/>
+            </p:output>
+            <p:xslt name="xslt">
+                <p:input port="source">
+                    <p:pipe step="dtbook" port="result.in-memory"/>
+                    <p:pipe step="audio" port="clips"/>
+                </p:input>
+                <p:input port="stylesheet">
+                    <p:document href="flatten-headings.xsl"/>
+                </p:input>
+                <p:input port="parameters">
+                    <p:empty/>
+                </p:input>
+            </p:xslt>
+            <p:sink/>
+            <px:set-base-uri name="secondary">
+                <p:input port="source">
+                    <p:pipe step="xslt" port="secondary"/>
+                </p:input>
+                <p:with-option name="base-uri" select="base-uri(/*)">
+                    <p:pipe step="audio" port="clips"/>
+                </p:with-option>
+            </px:set-base-uri>
+            <p:sink/>
+            <px:set-base-uri>
+                <p:input port="source">
+                    <p:pipe step="xslt" port="result"/>
+                </p:input>
+                <p:with-option name="base-uri" select="base-uri(/*)">
+                    <p:pipe step="dtbook" port="result.in-memory"/>
+                </p:with-option>
+            </px:set-base-uri>
+        </p:group>
         <px:daisy3-prepare-dtbook name="daisy3-dtbook">
-            <p:input port="source">
-                <p:pipe step="dtbook" port="result.in-memory"/>
-            </p:input>
             <p:with-option name="uid" select="$uid"/>
         </px:daisy3-prepare-dtbook>
 
@@ -322,7 +364,7 @@
                 <p:pipe step="daisy3-dtbook" port="result.in-memory"/>
             </p:input>
             <p:input port="audio-map">
-                <p:pipe step="audio" port="clips"/>
+                <p:pipe step="voice-dream-workaround" port="audio-clips"/>
             </p:input>
         </px:daisy3-create-smils>
         <p:sink/>
@@ -337,7 +379,7 @@
                 <p:pipe step="mo" port="dtbook.in-memory"/>
             </p:input>
             <p:input port="audio-map">
-                <p:pipe step="audio" port="clips"/>
+                <p:pipe step="voice-dream-workaround" port="audio-clips"/>
             </p:input>
         </px:daisy3-create-ncx>
 

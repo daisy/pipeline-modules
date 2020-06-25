@@ -204,6 +204,7 @@
 									</span>
 								</h2>
 								<table>...</table>
+								<a href="#page_5">5</a>
 								<div id="page_front_4" class="page-front" epub:type="pagebreak" title="iv"/>
 							</section>
 							<section id="preface">
@@ -229,8 +230,8 @@
 							<link rel="prev" href="front.xhtml"/>
 						</head>
 						<body id="chap_1" epub:type="bodymatter chapter">
-							<div id="page_5" class="page-normal" epub:type="pagebreak" title="5"/>
 							<h1 id="h_1">
+								<div id="page_5" class="page-normal" epub:type="pagebreak" title="5"/>
 								<span id="st4-1">
 									<span role="word">Chapter</span>
 									<span role="word">1</span>
@@ -448,32 +449,19 @@
 							</p>
 						</level1>
 						<level1 id="front">
-							<h1 smilref="mo1.smil#sh_1" id="h_1">
-								<span smilref="mo1.smil#sst3-1" id="st3-1">
-									<span id="forsmil-3">Title</span>
-								</span>
-							</h1>
-							<p smilref="mo1.smil#sforsmil-4" id="forsmil-4">
+							<h1 smilref="mo1.smil#sh_1" id="h_1">Title</h1>
+							<p smilref="mo1.smil#sforsmil-3" id="forsmil-3">
 								<span smilref="mo1.smil#sst3-2" id="st3-2">...</span>
 							</p>
 							<level2 id="contents">
-								<h2 smilref="mo1.smil#sh_1_1" id="h_1_1">
-									<span smilref="mo1.smil#sst3-3" id="st3-3">
-										<span id="forsmil-5">List</span>
-										<span id="forsmil-6">of</span>
-										<span id="forsmil-7">contents</span>
-									</span>
-								</h2>
-								<table smilref="mo1.smil#sforsmil-8" id="forsmil-8"/>
+								<h2 smilref="mo1.smil#sh_1_1" id="h_1_1">List of contents</h2>
+								<table smilref="mo1.smil#sforsmil-4" id="forsmil-4"/>
+								<a smilref="mo1.smil#sforsmil-5" id="forsmil-5" href="#id_1">5</a>
 								<pagenum smilref="mo1.smil#spage_front_4" id="page_front_4" page="front">iv</pagenum>
 							</level2>
 							<level2 id="preface">
-								<h2 smilref="mo3.smil#sh_1_2" id="h_1_2">
-									<span smilref="mo3.smil#sst3-4" id="st3-4">
-										<span id="forsmil-9">Preface</span>
-									</span>
-								</h2>
-								<p smilref="mo3.smil#sforsmil-10" id="forsmil-10">
+								<h2 smilref="mo3.smil#sh_1_2" id="h_1_2">Preface</h2>
+								<p smilref="mo3.smil#sforsmil-6" id="forsmil-6">
 									<span smilref="mo3.smil#sst3-5" id="st3-5">...</span>
 								</p>
 								<pagenum smilref="mo3.smil#spage_front_5" id="page_front_5" page="front">v</pagenum>
@@ -482,14 +470,8 @@
 					</frontmatter>
 					<bodymatter>
 						<level1 id="chap_1" class="chapter">
-							<pagenum smilref="mo4.smil#spage_5" id="page_5" page="normal">5</pagenum>
-							<h1 smilref="mo4.smil#sid_1" id="id_1">
-								<span smilref="mo4.smil#sst4-1" id="st4-1">
-									<span id="forsmil-11">Chapter</span>
-									<span id="forsmil-12">1</span>
-								</span>
-							</h1>
-							<p smilref="mo4.smil#sforsmil-13" id="forsmil-13">
+							<h1 smilref="mo4.smil#sid_1" id="id_1">5Chapter 1</h1>
+							<p smilref="mo4.smil#sforsmil-7" id="forsmil-7">
 								<span smilref="mo4.smil#sst4-2" id="st4-2">...</span>
 							</p>
 						</level1>
@@ -524,26 +506,25 @@
 			<x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
 				<body>
 					<seq id="root-seq">
-						<seq id="sh_1" class="h1">
-							<par id="sst3-1" class="span">
-								<text src="content.xml#st3-1"/>
-								<audio clipBegin="0:00:00.000" clipEnd="0:00:01.223" src="EPUB/audio/mock.mp3"/>
-							</par>
-						</seq>
-						<seq id="sforsmil-4" class="p">
+						<par id="sh_1" class="h1">
+							<text src="content.xml#h_1"/>
+							<audio clipBegin="0:00:00.000" clipEnd="0:00:01.223" src="EPUB/audio/mock.mp3"/>
+						</par>
+						<seq id="sforsmil-3" class="p">
 							<par id="sst3-2" class="span">
 								<text src="content.xml#st3-2"/>
 								<audio clipBegin="0:00:01.223" clipEnd="0:00:02.446" src="EPUB/audio/mock.mp3"/>
 							</par>
 						</seq>
-						<seq id="sh_1_1" class="h2">
-							<par id="sst3-3" class="span">
-								<text src="content.xml#st3-3"/>
-								<audio clipBegin="0:00:00.000" clipEnd="0:00:01.223" src="EPUB/audio/mock.mp3"/>
-							</par>
-						</seq>
-						<par id="sforsmil-8" class="table">
-							<text src="content.xml#forsmil-8"/>
+						<par id="sh_1_1" class="h2">
+							<text src="content.xml#h_1_1"/>
+							<audio clipBegin="0:00:00.000" clipEnd="0:00:01.223" src="EPUB/audio/mock.mp3"/>
+						</par>
+						<par id="sforsmil-4" class="table">
+							<text src="content.xml#forsmil-4"/>
+						</par>
+						<par id="sforsmil-5" class="a">
+							<text src="content.xml#forsmil-5"/>
 						</par>
 						<par id="spage_front_4" class="pagenum" customTest="pagenum">
 							<text src="content.xml#page_front_4"/>
@@ -559,13 +540,11 @@
 			<x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
 				<body>
 					<seq id="root-seq">
-						<seq id="sh_1_2" class="h2">
-							<par id="sst3-4" class="span">
-								<text src="content.xml#st3-4"/>
-								<audio clipBegin="0:00:00.000" clipEnd="0:00:01.223" src="EPUB/audio/mock.mp3"/>
-							</par>
-						</seq>
-						<seq id="sforsmil-10" class="p">
+						<par id="sh_1_2" class="h2">
+							<text src="content.xml#h_1_2"/>
+							<audio clipBegin="0:00:00.000" clipEnd="0:00:01.223" src="EPUB/audio/mock.mp3"/>
+						</par>
+						<seq id="sforsmil-6" class="p">
 							<par id="sst3-5" class="span">
 								<text src="content.xml#st3-5"/>
 								<audio clipBegin="0:00:01.223" clipEnd="0:00:02.446" src="EPUB/audio/mock.mp3"/>
@@ -600,16 +579,11 @@
 					</head>
 					<body>
 						<seq id="root-seq">
-							<par id="spage_5" class="pagenum" customTest="pagenum">
-								<text src="content.xml#page_5"/>
+							<par id="sid_1" class="h1">
+								<text src="content.xml#id_1"/>
+								<audio clipBegin="0:00:00.000" clipEnd="0:00:01.223" src="EPUB/audio/mock.mp3"/>
 							</par>
-							<seq id="sid_1" class="h1">
-								<par id="sst4-1" class="span">
-									<text src="content.xml#st4-1"/>
-									<audio clipBegin="0:00:00.000" clipEnd="0:00:01.223" src="EPUB/audio/mock.mp3"/>
-								</par>
-							</seq>
-							<seq id="sforsmil-13" class="p">
+							<seq id="sforsmil-7" class="p">
 								<par id="sst4-2" class="span">
 									<text src="content.xml#st4-2"/>
 									<audio clipBegin="0:00:00.000" clipEnd="0:00:01.223" src="EPUB/audio/mock.mp3"/>
@@ -630,8 +604,8 @@
 						<meta content="DAISY Pipeline 2" name="dtb:generator"/>
 						<meta name="dtb:uid" content="id"/>
 						<meta name="dtb:depth" content="02"/>
-						<meta name="dtb:totalPageCount" content="3"/>
-						<meta name="dtb:maxPageNumber" content="3"/>
+						<meta name="dtb:totalPageCount" content="2"/>
+						<meta name="dtb:maxPageNumber" content="2"/>
 						<smilCustomTest bookStruct="PAGE_NUMBER" defaultState="false" id="pagenum" override="visible"/>
 						<smilCustomTest bookStruct="NOTE" defaultState="false" id="note" override="visible"/>
 						<smilCustomTest bookStruct="NOTE_REFERENCE" defaultState="false" id="noteref" override="visible"/>
@@ -667,7 +641,7 @@
 						</navPoint>
 						<navPoint playOrder="6" id="ncx-6">
 							<navLabel>
-								<text>Chapter 1</text>
+								<text>5Chapter 1</text>
 								<audio clipBegin="0:00:00.000" clipEnd="0:00:01.223" src="EPUB/audio/mock.mp3"/>
 							</navLabel>
 							<content src="mo4.smil#sid_1"/>
@@ -685,12 +659,6 @@
 								<text>v</text>
 							</navLabel>
 							<content src="mo3.smil#spage_front_5"/>
-						</pageTarget>
-						<pageTarget type="normal" value="3" playOrder="7" id="ncx-7">
-							<navLabel>
-								<text>5</text>
-							</navLabel>
-							<content src="mo4.smil#spage_5"/>
 						</pageTarget>
 					</pageList>
 				</ncx>
