@@ -21,22 +21,14 @@ public class GoogleTTSService extends AbstractTTSService {
 
 	@Override
 	public TTSEngine newEngine(Map<String, String> params) throws Throwable {
-
-		String priority = params.get("org.daisy.pipeline.tts.espeak.priority");
-		int intPriority = 2;
-		if (priority != null) {
-			try {
-				intPriority = Integer.valueOf(priority);
-			} catch (NumberFormatException e) {
-
-			}
-		} 
+		
+		int priority = 2;
 		
 		// String apiKey = params.get("org.daisy.pipeline.tts.google.apikey");
 		
 		String apiKey = "AIzaSyA2vhAI52241mAkixcnSfz8AJkS8cpaHVM";
 
-		return new GoogleRestTTSEngine(this, apiKey, intPriority);
+		return new GoogleRestTTSEngine(this, apiKey, priority);
 
 	}
 
