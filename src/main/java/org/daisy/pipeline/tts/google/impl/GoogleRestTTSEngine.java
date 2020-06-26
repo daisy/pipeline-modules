@@ -55,23 +55,28 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 
 		String adaptedSentence = "";
 
-		char c;
-
 		for (int i = 0; i < sentence.length(); i++) {
-			c = sentence.charAt(i);
-			if (c == '"') {
-				adaptedSentence = adaptedSentence + '\\' + c;
+			if (sentence.charAt(i) == '"') {
+				adaptedSentence = adaptedSentence + '\\' + sentence.charAt(i);
 			}
 			else {
-				adaptedSentence = adaptedSentence + c;
+				adaptedSentence = adaptedSentence + sentence.charAt(i);
 			}
 		}
 
 		adaptedSentence = '"' + adaptedSentence + '"';
-
-		String languageCode = '"' + voice.name.substring(0, 4) + '"';
-		String name = '"' + voice.name + '"';
-		String ssmlGender = '"' + "FEMALE" + '"';
+		
+		String languageCode;
+		String name;
+		
+		if (voice != null) {
+			languageCode = '"' + voice.name.substring(0, 4) + '"';
+			name = '"' + voice.name + '"';
+		}
+		else {
+			languageCode = '"' + "en-GB" + '"';
+			name = '"' + "en-GB-Standard-A" + '"';
+		}
 
 		try {
 
@@ -88,8 +93,7 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 							"  }," + 
 							"  \"voice\":{" + 
 							"    \"languageCode\":" + languageCode + "," + 
-							"    \"name\":" + name + "," + 
-							"    \"ssmlGender\":" + ssmlGender + 
+							"    \"name\":" + name + 
 							"  }," + 
 							"  \"audioConfig\":{" + 
 							"    \"audioEncoding\":\"MP3\"" + 
@@ -177,17 +181,30 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 		return new TTSResource();
 	}
 
-	/*public static void main (String[] args) throws IOException {
+	public static void main (String[] args) throws IOException {
 
 		String apiKey = "AIzaSyA2vhAI52241mAkixcnSfz8AJkS8cpaHVM";
 
-		String sentence = "<speak>Salut</speak>";
+		String sentence = "<speak><p>Bonjour, <pagenum>5</pagenum>, comment <mark name=\"here\"/> <noteref>12</noteref> vas-tu?</p></speak>";
+		
+		String adaptedSentence = "";
 
-		String tmp = '"' + sentence + '"';
+		char c;
 
-		String languageCode = "\"en-gb\"";
-		String name = "\"en-GB-Standard-A\"";
-		String ssmlGender = "\"FEMALE\"";
+		for (int i = 0; i < sentence.length(); i++) {
+			c = sentence.charAt(i);
+			if (c == '"') {
+				adaptedSentence = adaptedSentence + '\\' + c;
+			}
+			else {
+				adaptedSentence = adaptedSentence + c;
+			}
+		}
+
+		adaptedSentence = '"' + adaptedSentence + '"';
+
+		String languageCode = '"' + "en-GB" + '"';
+		String name = '"' + "en-GB-Standard-A" + '"';
 
 		try {
 
@@ -200,15 +217,15 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 
 			String jsonInputString =
 					"  { \"input\":{" + 
-							"    \"ssml\":" + tmp + 
+							"    \"ssml\":" + adaptedSentence + 
 							"  }," + 
 							"  \"voice\":{" + 
 							"    \"languageCode\":" + languageCode + "," + 
-							"    \"name\":" + name + "," + 
-							"    \"ssmlGender\":" + ssmlGender + 
+							"    \"name\":" + name +
 							"  }," + 
 							"  \"audioConfig\":{" + 
-							"    \"audioEncoding\":\"MP3\"" + 
+							"    \"audioEncoding\":\"MP3\"," + 
+							"    \"sampleRateHertz\": 24000" +
 							"  }}";
 
 			try(OutputStream os = con.getOutputStream()) {
@@ -223,13 +240,13 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 				while ((responseLine = br.readLine()) != null) {
 					response.append(responseLine.trim());
 				}
-
+				
 				FileWriter myWriter = new FileWriter("synthesize-output-base64.txt");
 				myWriter.write(response.toString().substring(18, response.length()-2));
 				myWriter.close();
 
 				byte[] decodedBytes = Base64.getDecoder().decode(response.toString().substring(18, response.length()-2));
-
+				
 				String fileName = "out.mp3";
 				File dest = new File(fileName);
 				dest.createNewFile();
@@ -249,14 +266,12 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 
 				sourceFile.close();
 
-			} catch (Throwable e) {
-				e.printStackTrace();
 			}
 
-		} finally {
-
+		} catch (Throwable e) {
+			e.printStackTrace();
 		}
 
-	}*/
+	}
 
 }
