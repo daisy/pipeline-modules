@@ -1,10 +1,7 @@
 package org.daisy.pipeline.tts.google.impl;
 
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import javax.sound.sampled.AudioFormat;
 
@@ -21,7 +18,7 @@ import org.daisy.pipeline.tts.Voice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.api.gax.core.CredentialsProvider;
+/*import com.google.api.gax.core.CredentialsProvider;
 import com.google.api.gax.core.FixedCredentialsProvider;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.cloud.texttospeech.v1.AudioConfig;
@@ -35,6 +32,8 @@ import com.google.cloud.texttospeech.v1.TextToSpeechClient;
 import com.google.cloud.texttospeech.v1.TextToSpeechSettings;
 import com.google.cloud.texttospeech.v1.VoiceSelectionParams;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.Descriptors.FieldDescriptor;
+import com.google.protobuf.UnknownFieldSet.Field;*/
 
 public class GoogleTTSEngine extends MarklessTTSEngine {
 
@@ -57,7 +56,7 @@ public class GoogleTTSEngine extends MarklessTTSEngine {
 
 		Collection<AudioBuffer> result = new ArrayList<AudioBuffer>();
 
-		CredentialsProvider credentialsProvider = null;
+		/*CredentialsProvider credentialsProvider = null;
 
 		TextToSpeechSettings settings = null;
 
@@ -66,7 +65,6 @@ public class GoogleTTSEngine extends MarklessTTSEngine {
 		 VoiceSelectionParams voiceSelectionParams = VoiceSelectionParams.newBuilder()
 				.setName(voice.name)
 				.setLanguageCode(voice.name.substring(0, 2))
-				.setSsmlGender(SsmlVoiceGender.NEUTRAL)
 				.build();
 
 		AudioConfig audioConfig =
@@ -110,7 +108,7 @@ public class GoogleTTSEngine extends MarklessTTSEngine {
 
 		b.data = audioContents.toByteArray();
 
-		result.add(b);
+		result.add(b);*/
 
 
 		return result;
@@ -127,7 +125,7 @@ public class GoogleTTSEngine extends MarklessTTSEngine {
 
 		Collection<Voice> result = new ArrayList<Voice>();
 
-		CredentialsProvider credentialsProvider = null;
+		/*CredentialsProvider credentialsProvider = null;
 
 		TextToSpeechSettings settings = null;
 
@@ -169,7 +167,7 @@ public class GoogleTTSEngine extends MarklessTTSEngine {
 
 		for (com.google.cloud.texttospeech.v1.Voice voice : voices) {	
 			result.add(new Voice(getProvider().getName(), voice.getName()));
-		}
+		}*/
 
 		return result;
 
@@ -185,46 +183,6 @@ public class GoogleTTSEngine extends MarklessTTSEngine {
 	InterruptedException {
 		return new TTSResource();
 	}
-	
-	/*public static void main (String[] args) throws SynthesisException, MemoryException {
-
-		// Instantiates a client
-		try (TextToSpeechClient textToSpeechClient = TextToSpeechClient.create()) {
-			// Set the text input to be synthesized
-			SynthesisInput input = SynthesisInput.newBuilder().setSsml("<speak><p>Bonjour, <pagenum>5</pagenum>, comment <noteref>12</noteref> vas-tu?</p></speak>").build();
-
-			// Build the voice request, select the language code ("en-US") and the ssml voice gender
-			// ("neutral")
-			VoiceSelectionParams voiceSelectionParams =
-					VoiceSelectionParams.newBuilder()
-					.setLanguageCode("fr")
-					.setSsmlGender(SsmlVoiceGender.MALE)
-					.build();
-
-			// Select the type of audio file you want returned
-			AudioConfig audioConfig =
-					AudioConfig.newBuilder().setAudioEncoding(AudioEncoding.MP3).build();
-
-			// Perform the text-to-speech request on the text input with the selected voice parameters and
-			// audio file type
-			SynthesizeSpeechResponse response =
-					textToSpeechClient.synthesizeSpeech(input, voiceSelectionParams, audioConfig);
-
-			// Get the audio contents from the response
-			ByteString audioContents = response.getAudioContent();
-
-			// Write the response to the output file.
-			try (OutputStream out = new FileOutputStream("output.mp3")) {
-				out.write(audioContents.toByteArray());
-				System.out.println("Audio content written to file \"output.mp3\"");
-			}
-
-
-		} catch (IOException e) {
-			throw new SynthesisException(e.getMessage(), e.getCause());	  
-		}
-
-	}*/
 
 }
 	
