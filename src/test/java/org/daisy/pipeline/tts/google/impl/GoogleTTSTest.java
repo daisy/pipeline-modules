@@ -6,14 +6,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.daisy.common.shell.BinaryFinder;
 import org.daisy.pipeline.audio.AudioBuffer;
 import org.daisy.pipeline.tts.AudioBufferAllocator;
 import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
 import org.daisy.pipeline.tts.StraightBufferAllocator;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
-import org.daisy.pipeline.tts.google.impl.GoogleTTSEngine;
+import org.daisy.pipeline.tts.google.impl.GoogleRestTTSEngine;
 import org.daisy.pipeline.tts.google.impl.GoogleTTSService;
 import org.daisy.pipeline.tts.Voice;
 
@@ -33,11 +32,9 @@ public class GoogleTTSTest {
 		return res;
 	}
 
-	private static GoogleTTSEngine allocateEngine() throws Throwable {
-		Assume.assumeTrue("Test can not be run because espeak not present",
-		                  BinaryFinder.find("espeak").isPresent());
-GoogleTTSService s = new GoogleTTSService();
-		return (GoogleTTSEngine) s.newEngine(new HashMap<String, String>());
+	private static GoogleRestTTSEngine allocateEngine() throws Throwable {
+		GoogleTTSService s = new GoogleTTSService();
+		return (GoogleRestTTSEngine) s.newEngine(new HashMap<String, String>());
 	}
 
 	@Test
@@ -48,11 +45,11 @@ GoogleTTSService s = new GoogleTTSService();
 
 	@Test
 	public void speakEasy() throws Throwable {
-		GoogleTTSEngine engine = allocateEngine();
+		GoogleRestTTSEngine engine = allocateEngine();
 
 		TTSResource resource = engine.allocateThreadResources();
 		Collection<AudioBuffer> li = engine.synthesize("<s>this is a test</s>", null, null,
-		        resource, BufferAllocator, false);
+				resource, BufferAllocator, false);
 		engine.releaseThreadResources(resource);
 
 		Assert.assertTrue(getSize(li) > 2000);
@@ -60,7 +57,7 @@ GoogleTTSService s = new GoogleTTSService();
 
 	@Test
 	public void speakWithVoices() throws Throwable {
-		GoogleTTSEngine engine = allocateEngine();
+		GoogleRestTTSEngine engine = allocateEngine();
 		TTSResource resource = engine.allocateThreadResources();
 
 		Set<Integer> sizes = new HashSet<Integer>();
@@ -69,8 +66,8 @@ GoogleTTSService s = new GoogleTTSService();
 		while (ite.hasNext()) {
 			Voice v = ite.next();
 			Collection<AudioBuffer> li = engine.synthesize("<s><voice name=\"" + v.name
-			        + "\">small test</voice></s>", null, null, resource,
-			        BufferAllocator, false);
+					+ "\">small test</voice></s>", null, null, resource,
+					BufferAllocator, false);
 
 			sizes.add(getSize(li) / 4); //div 4 helps being more robust to tiny differences
 			totalVoices++;
@@ -79,17 +76,17 @@ GoogleTTSService s = new GoogleTTSService();
 
 		//this number will be very low if the voice names are not properly retrieved
 		float diversity = Float.valueOf(sizes.size()) / totalVoices;
-
+		System.out.println(diversity);
 		Assert.assertTrue(diversity > 0.4);
 	}
 
 	@Test
 	public void speakUnicode() throws Throwable {
-		GoogleTTSEngine engine = allocateEngine();
+		GoogleRestTTSEngine engine = allocateEngine();
 		TTSResource resource = engine.allocateThreadResources();
 		Collection<AudioBuffer> li = engine.synthesize(
-		        "<s>𝄞𝄞𝄞𝄞 水水水水水 𝄞水𝄞水𝄞水𝄞水 test 国Ø家Ť标准 ĜæŘ ß ŒÞ ๕</s>", null, null,
-		        resource, BufferAllocator, false);
+				"<s>𝄞𝄞𝄞𝄞 水水水水水 𝄞水𝄞水𝄞水𝄞水 test 国Ø家Ť标准 ĜæŘ ß ŒÞ ๕</s>", null, null,
+				resource, BufferAllocator, false);
 		engine.releaseThreadResources(resource);
 
 		Assert.assertTrue(getSize(li) > 2000);
@@ -97,7 +94,7 @@ GoogleTTSService s = new GoogleTTSService();
 
 	@Test
 	public void multiSpeak() throws Throwable {
-		final GoogleTTSEngine engine = allocateEngine();
+		final GoogleRestTTSEngine engine = allocateEngine();
 
 		final int[] sizes = new int[16];
 		Thread[] threads = new Thread[sizes.length];
