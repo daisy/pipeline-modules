@@ -55,6 +55,7 @@
             px:fileset-join
             px:fileset-intersect
             px:fileset-update
+            px:fileset-filter-in-memory
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/epub-utils/library.xpl">
@@ -133,7 +134,7 @@
     <p:documentation>
         Augment SMIL files with references to heading elements.
     </p:documentation>
-    <px:fileset-load media-types="application/smil+xml" name="smils">
+    <px:fileset-load media-types="application/smil+xml" name="load-smil">
         <p:documentation>Load SMIL files</p:documentation>
         <p:input port="fileset">
             <p:pipe step="main" port="source.fileset"/>
@@ -143,10 +144,10 @@
         </p:input>
     </px:fileset-load>
     <p:for-each name="augment-smils" px:message="Augmenting SMILs" px:message-severity="DEBUG" px:progress="3/10">
-        <p:output port="smil">
+        <p:output port="smil.in-memory" sequence="true">
             <p:pipe step="drop-smil-without-associated-xhtml" port="smil"/>
         </p:output>
-        <p:output port="xhtml" sequence="true">
+        <p:output port="xhtml.in-memory" sequence="true">
             <p:pipe step="drop-smil-without-associated-xhtml" port="xhtml"/>
         </p:output>
         <p:output port="xhtml.fileset" sequence="true">
@@ -187,7 +188,7 @@
         </px:fileset-intersect>
         <p:choose name="drop-smil-without-associated-xhtml">
             <p:when test="exists(//d:file)">
-                <p:output port="smil">
+                <p:output port="smil" sequence="true">
                     <p:pipe step="smil" port="result"/>
                 </p:output>
                 <p:output port="xhtml" sequence="true">
@@ -204,7 +205,7 @@
                 <p:documentation>Augment the SMIL.</p:documentation>
                 <p:group>
                     <p:variable name="smil-href" select="//d:file[resolve-uri(@href,base-uri(.))=$smil-base]/@href">
-                        <p:pipe step="smils" port="result.fileset"/>
+                        <p:pipe step="load-smil" port="result.fileset"/>
                     </p:variable>
                     <p:xslt px:message="Processing {$smil-href}" px:message-severity="DEBUG">
                         <p:input port="source">
@@ -268,8 +269,8 @@
                 <!-- There are no associated html documents. This could be because the smil is
                      associated with the navigation document which is not included in the
                      spine. -->
-                <p:output port="smil">
-                    <p:pipe step="augment-smils" port="current"/>
+                <p:output port="smil" sequence="true">
+                    <p:empty/>
                 </p:output>
                 <p:output port="xhtml" sequence="true">
                     <p:empty/>
@@ -281,6 +282,15 @@
             </p:otherwise>
         </p:choose>
     </p:for-each>
+    <px:fileset-filter-in-memory name="augment-smils.smil.fileset">
+        <p:input port="source.fileset">
+            <p:pipe step="load-smil" port="result.fileset"/>
+        </p:input>
+        <p:input port="source.in-memory">
+            <p:pipe step="augment-smils" port="smil.in-memory"/>
+        </p:input>
+    </px:fileset-filter-in-memory>
+    <p:sink/>
 
     <p:documentation>
         Create new SMIL file with references to heading elements for every content document without
@@ -495,7 +505,7 @@
                 <p:pipe step="body" port="result"/>
             </p:input>
             <p:input port="smil">
-                <p:pipe step="augment-smils" port="smil"/>
+                <p:pipe step="augment-smils" port="smil.in-memory"/>
                 <p:pipe step="new-smils" port="smil"/>
             </p:input>
         </px:opf-to-ncc-metadata>
@@ -522,7 +532,7 @@
         <p:xslt>
             <p:input port="source">
                 <p:pipe step="ncc" port="result"/>
-                <p:pipe step="augment-smils" port="smil"/>
+                <p:pipe step="augment-smils" port="smil.in-memory"/>
                 <p:pipe step="new-smils" port="smil"/>
             </p:input>
             <p:input port="stylesheet">
@@ -569,10 +579,10 @@
                 <p:pipe step="new-smils" port="smil"/>
             </p:input>
             <p:input port="update.fileset">
-                <p:pipe step="smils" port="result.fileset"/>
+                <p:pipe step="augment-smils.smil.fileset" port="result"/>
             </p:input>
             <p:input port="update.in-memory">
-                <p:pipe step="augment-smils" port="smil"/>
+                <p:pipe step="augment-smils" port="smil.in-memory"/>
             </p:input>
         </px:fileset-update>
     </p:group>
@@ -586,7 +596,7 @@
             <p:pipe step="xhtml.fileset" port="result"/>
         </p:input>
         <p:input port="update.in-memory">
-            <p:pipe step="augment-smils" port="xhtml"/>
+            <p:pipe step="augment-smils" port="xhtml.in-memory"/>
             <p:pipe step="new-smils" port="xhtml"/>
         </p:input>
     </px:fileset-update>
