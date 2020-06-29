@@ -55,6 +55,7 @@
             px:fileset-add-entry
             px:fileset-copy
             px:fileset-compose
+            px:fileset-diff
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/epub3-to-html/library.xpl">
@@ -80,6 +81,7 @@
     <p:import href="http://www.daisy.org/pipeline/modules/smil-utils/library.xpl">
         <p:documentation>
             px:smil-to-audio-clips
+            px:smil-to-audio-fileset
             px:smil-update-links
             px:audio-clips-to-fileset
         </p:documentation>
@@ -394,12 +396,43 @@
         <p:documentation>
             Create package document
         </p:documentation>
+        <!--
+            Remove audio files that were referenced by SMILs in the EPUB 3 but not in the DAISY 3,
+            because the corresponding text was omitted. (We're assuming that these files are not
+            referenced elsewhere.)
+        -->
+        <p:for-each>
+            <p:iteration-source>
+                <p:pipe step="mo" port="smil.in-memory"/>
+            </p:iteration-source>
+            <px:smil-to-audio-fileset/>
+        </p:for-each>
+        <px:fileset-join name="referenced-audio-files"/>
+        <p:sink/>
+        <px:fileset-diff name="unreferenced-audio-files">
+            <p:input port="source">
+                <p:pipe step="audio" port="fileset"/>
+            </p:input>
+            <p:input port="secondary">
+                <p:pipe step="referenced-audio-files" port="result"/>
+            </p:input>
+        </px:fileset-diff>
+        <p:sink/>
+        <px:fileset-diff name="referenced-resources">
+            <p:input port="source">
+                <p:pipe step="dtbook" port="not-matched"/>
+            </p:input>
+            <p:input port="secondary">
+                <p:pipe step="unreferenced-audio-files" port="result"/>
+            </p:input>
+        </px:fileset-diff>
+        <p:sink/>
         <px:fileset-join name="daisy3-without-opf">
             <p:input port="source">
                 <p:pipe step="mo" port="result.fileset"/>
                 <p:pipe step="ncx" port="result.fileset"/>
                 <p:pipe step="res" port="result.fileset"/>
-                <p:pipe step="dtbook" port="not-matched"/>
+                <p:pipe step="referenced-resources" port="result"/>
             </p:input>
         </px:fileset-join>
         <px:daisy3-create-opf audio-only="false" name="daisy3-opf" px:message="Creating OPF file" px:progress="1/5">
