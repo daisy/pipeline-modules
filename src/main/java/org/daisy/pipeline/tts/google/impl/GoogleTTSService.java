@@ -2,6 +2,8 @@ package org.daisy.pipeline.tts.google.impl;
 
 import java.util.Map;
 
+import javax.sound.sampled.AudioFormat;
+
 import org.daisy.pipeline.tts.AbstractTTSService;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSService;
@@ -22,13 +24,15 @@ public class GoogleTTSService extends AbstractTTSService {
 	@Override
 	public TTSEngine newEngine(Map<String, String> params) throws Throwable {
 		
-		int priority = 2;
+		String apiKey = params.get("org.daisy.pipeline.tts.google.apikey");
 		
-		// String apiKey = params.get("org.daisy.pipeline.tts.google.apikey");
+		int sampleRate = convertToInt(params, "org.daisy.pipeline.tts.google.samplerate", 22050);
 		
-		String apiKey = "AIzaSyA2vhAI52241mAkixcnSfz8AJkS8cpaHVM";
+		int priority = convertToInt(params, "org.daisy.pipeline.tts.google.priority", 15);
 
-		return new GoogleRestTTSEngine(this, apiKey, priority);
+		AudioFormat audioFormat = new AudioFormat((float) sampleRate, 16, 1, true, false);
+
+		return new GoogleRestTTSEngine(this, apiKey, audioFormat, priority);
 
 	}
 
@@ -41,4 +45,19 @@ public class GoogleTTSService extends AbstractTTSService {
 	public String getVersion() {
 		return "cli";
 	}
+	
+	private static int convertToInt(Map<String, String> params, String prop, int defaultVal)
+	        throws SynthesisException {
+		String str = params.get(prop);
+		if (str != null) {
+			try {
+				defaultVal = Integer.valueOf(str);
+			} catch (NumberFormatException e) {
+				throw new SynthesisException(str + " is not a valid a value for property "
+				        + prop);
+			}
+		}
+		return defaultVal;
+	}
+
 }
