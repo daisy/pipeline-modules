@@ -44,6 +44,7 @@
         <p:documentation>
             px:html-upgrade
             px:html-downgrade
+            px:html-outline
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/daisy202-utils/library.xpl">
@@ -136,6 +137,18 @@
         <px:html-downgrade>
             <p:documentation>Downgrade to HTML4. This preserves all ID.</p:documentation>
         </px:html-downgrade>
+        <px:html-outline name="fix-heading-ranks" fix-heading-ranks="outline-depth" output-base-uri="file:/irrelevant">
+            <p:documentation>Make sure heading hierarchy is correct in output</p:documentation>
+            <!-- Note that this is already done once in px:html-downgrade but we do it a second time
+                 after the sectioning elements have been converted, so that if the first heading is
+                 a h2 everything shifts up one level. -->
+        </px:html-outline>
+        <p:sink/>
+        <p:identity>
+            <p:input port="source">
+                <p:pipe step="fix-heading-ranks" port="content-doc"/>
+            </p:input>
+        </p:identity>
     </p:for-each>
     <p:identity name="daisy202.xhtml.in-memory"/>
     <p:sink/>
