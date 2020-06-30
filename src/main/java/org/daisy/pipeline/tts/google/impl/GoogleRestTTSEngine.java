@@ -31,7 +31,7 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 	private AudioFormat mAudioFormat;
 	private String mApiKey;
 	private int mPriority;
-
+	
 	public GoogleRestTTSEngine(GoogleTTSService googleService, String apiKey, AudioFormat audioFormat, int priority) {
 		super(googleService);
 		mApiKey = apiKey;
@@ -89,7 +89,7 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 							"    \"name\":" + name + 
 							"  }," + 
 							"  \"audioConfig\":{" + 
-							"    \"audioEncoding\":\"MP3\"," +
+							"    \"audioEncoding\":\"LINEAR16\"," +
 							"    \"sampleRateHertz\":" + mAudioFormat.getSampleRate() +
 							"  }}";
 
@@ -107,9 +107,10 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 				}
 
 				byte[] decodedBytes = Base64.getDecoder().decode(response.toString().substring(18, response.length()-2));
+
 				AudioBuffer b = bufferAllocator.allocateBuffer(decodedBytes.length);
 				b.data = decodedBytes;
-				result.add(b);	
+				result.add(b);
 
 			}
 
