@@ -23,14 +23,13 @@
     -->
 
     <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl"/>
+    <xsl:include href="untitled-section-titles.xsl"/>
 
     <xsl:param name="output-base-uri" required="yes"/>
     <xsl:param name="heading-links-only" required="yes"/>
     <xsl:param name="fix-untitled-sections-in-outline" required="yes"/>
 
-    <xsl:variable name="untitled-section-titles" as="element()*"
-                  select="if ($fix-untitled-sections-in-outline='unwrap') then ()
-                          else document('untitled-section-titles.xml')/*/*"/>
+    <xsl:key name="id" match="*" use="@id"/>
 
     <xsl:template match="/">
         <!-- Create the outline -->
@@ -230,7 +229,7 @@
         <xsl:if test="not(@owner) and not(@heading)">
             <xsl:message terminate="yes">coding error</xsl:message>
         </xsl:if>
-        <xsl:variable name="heading" as="element()?" select="for $h in @heading return $html-doc//*[@id=$h]"/>
+        <xsl:variable name="heading" as="element()?" select="key('id',@heading,$html-doc)"/>
         <xsl:variable name="heading" as="element()?" select="for $h in $heading return
                                                              if (f:is-heading($h))
                                                                then $h
@@ -278,39 +277,16 @@
                                     </xsl:when>
                                 </xsl:choose>
                             </xsl:when>
-                            <xsl:otherwise>
+                            <xsl:when test="@owner">
                                 <!-- If the section has no associated heading, create implied heading -->
                                 <!-- An empty entry leads to an invalid EPUB according to epubcheck, so
                                      treat an empty heading as an absent heading. -->
-                                <xsl:variable name="outline-owner" as="element()?"
-                                              select="for $o in @owner return $html-doc//*[@id=$o]"/>
-                                <xsl:variable name="section-element-name" select="local-name($outline-owner)"/>
-                                <xsl:variable name="types" as="xs:string*"
-                                              select="tokenize($outline-owner/@epub:type,'\s+')[not(.='')]"/>
-                                <xsl:variable name="title" as="text()?"
-                                              select="$untitled-section-titles[contains(@usage,$section-element-name)]
-                                                                              [@epub:type=$types]
-                                                      /text()[not(.='')][1]"/>
-                                <xsl:choose>
-                                    <xsl:when test="exists($title)">
-                                        <xsl:sequence select="$title"/>
-                                    </xsl:when>
-                                    <xsl:when test="$outline-owner[self::body]">
-                                        <xsl:sequence select="'Untitled document'"/>
-                                    </xsl:when>
-                                    <xsl:when test="$outline-owner[self::article]">
-                                        <xsl:sequence select="'Article'"/>
-                                    </xsl:when>
-                                    <xsl:when test="$outline-owner[self::aside]">
-                                        <xsl:sequence select="'Sidebar'"/>
-                                    </xsl:when>
-                                    <xsl:when test="$outline-owner[self::nav]">
-                                        <xsl:sequence select="'Navigation'"/>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xsl:sequence select="'Untitled section'"/>
-                                    </xsl:otherwise>
-                                </xsl:choose>
+                                <xsl:call-template name="get-untitled-section-title">
+                                    <xsl:with-param name="sectioning-element" select="key('id',@owner,$html-doc)"/>
+                                </xsl:call-template>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:sequence select="'Untitled section'"/>
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:element>
@@ -355,7 +331,7 @@
     <!-- FUNCTIONS -->
     <!-- ========= -->
 
-    <!-- Check if an element is a header content element. -->
+    <!-- Check if an element is a heading content element. -->
     <xsl:function name="f:is-heading" as="xs:boolean">
         <xsl:param name="node" as="element()"/>
         <xsl:sequence select="boolean($node[self::h1 or

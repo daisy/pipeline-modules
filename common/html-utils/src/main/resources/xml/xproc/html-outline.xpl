@@ -38,9 +38,9 @@
 	<p:output port="content-doc">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">The modified HTML document.</h2>
-			<p px:role="desc">Depending on the value of the "fix-heading-ranks" and "fix-sectioning"
-			options, heading elements may be renamed and section elements inserted, but the outline
-			is guaranteed to be unchanged.</p>
+			<p px:role="desc">Depending on the values of the "fix-heading-ranks", "fix-sectioning"
+			and "fix-untitled-sections" options, heading elements may be inserted or renamed and
+			section elements may be inserted, but the outline is guaranteed to be unchanged.</p>
 			<p px:role="desc">All <code>body</code>, <code>article</code>, <code>aside</code>,
 			<code>nav</code>, <code>section</code>, <code>h1</code>, <code>h2</code>,
 			<code>h3</code>, <code>h4</code>, <code>h5</code>, <code>h6</code> and
@@ -106,11 +106,25 @@
 			</dl>
 		</p:documentation>
 	</p:option>
+	<p:option name="fix-untitled-sections" select="'keep'">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p>Whether to generate a <a
+			href="https://html.spec.whatwg.org/multipage/dom.html#heading-content-2">heading content
+			element</a> for sections that don't have one.</p>
+			<dl>
+				<dt>imply-heading</dt>
+				<dd>Insert heading elements. The rank is determined by the outline depth.</dd>
+				<dt>keep</dt>
+				<dd>Don't insert heading elements. Default value.</dd>
+			</dl>
+		</p:documentation>
+	</p:option>
 	<p:option name="fix-untitled-sections-in-outline" select="'imply-heading'">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>How to handle sections in the outline without an associated <a
 			href="https://html.spec.whatwg.org/multipage/dom.html#heading-content-2">heading content
-			element</a>.</p>
+			element</a>. Setting this option has no effect if "fix-untitled-sections" is set to
+			"imply-heading".</p>
 			<dl>
 				<dt>imply-heading</dt>
 				<dd>Generate a heading text for a such sections. This is the default value.</dd>
@@ -135,14 +149,17 @@
 			<p:document href="../xslt/html5-outline.xsl"/>
 		</p:input>
 		<p:with-param name="heading-links-only" select="$heading-links-only"/>
-		<p:with-param name="fix-untitled-sections-in-outline" select="$fix-untitled-sections-in-outline"/>
+		<p:with-param name="fix-untitled-sections-in-outline"
+		              select="($fix-untitled-sections[.='imply-heading'],$fix-untitled-sections-in-outline)[1]"/>
 		<p:with-param name="output-base-uri" select="$output-base-uri"/>
 		<p:with-option name="output-base-uri" select="$output-base-uri"/>
 	</p:xslt>
 	<p:sink/>
 
 	<p:choose>
-		<p:when test="$fix-sectioning=('outline-depth','no-implied') or $fix-heading-ranks='outline-depth'">
+		<p:when test="$fix-sectioning=('outline-depth','no-implied')
+		              or $fix-heading-ranks='outline-depth'
+		              or $fix-untitled-sections='imply-heading'">
 			<p:xslt>
 				<p:input port="source">
 					<p:pipe step="html-with-ids" port="result"/>
@@ -153,6 +170,7 @@
 				</p:input>
 				<p:with-param name="fix-heading-ranks" select="$fix-heading-ranks"/>
 				<p:with-param name="fix-sectioning" select="$fix-sectioning"/>
+				<p:with-param name="fix-untitled-sections" select="$fix-untitled-sections"/>
 			</p:xslt>
 			<p:xslt>
 				<!-- Remove duplicate ids created by html5-normalize-sections-headings.xsl -->

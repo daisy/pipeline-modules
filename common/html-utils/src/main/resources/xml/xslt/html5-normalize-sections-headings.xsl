@@ -9,6 +9,9 @@
 
 	<xsl:param name="fix-heading-ranks" required="yes"/> <!-- keep | outline-depth -->
 	<xsl:param name="fix-sectioning" required="yes"/>    <!-- keep | outline-depth | no-implied -->
+	<xsl:param name="fix-untitled-sections" required="yes"/> <!-- keep | imply-heading -->
+
+	<xsl:include href="untitled-section-titles.xsl"/>
 
 	<!--
 	    * d:outline correspond with body|article|aside|nav|section
@@ -30,6 +33,7 @@
 
 	<xsl:key name="id" match="*" use="@id"/>
 	<xsl:key name="heading" match="d:section[@heading]" use="@heading"/>
+	<xsl:key name="owner" match="d:section[@owner]" use="@owner"/>
 
 	<xsl:template match="*[@id=$root-outline/@owner]"> <!-- body -->
 		<xsl:variable name="body" as="element()">
@@ -41,6 +45,18 @@
 					<xsl:sequence select="."/>
 				</xsl:otherwise>
 			</xsl:choose>
+		</xsl:variable>
+		<xsl:variable name="body" as="element()">
+			<xsl:for-each select="$body">
+				<xsl:choose>
+					<xsl:when test="$fix-untitled-sections='imply-heading'">
+						<xsl:apply-templates mode="add-implied-headings" select="."/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:sequence select="."/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:for-each>
 		</xsl:variable>
 		<xsl:for-each select="$body">
 			<xsl:choose>
@@ -526,7 +542,35 @@
 		</xsl:choose>
 	</xsl:template>
 
-	<xsl:template mode="#default rename-headings" match="@*|node()">
+	<xsl:template mode="add-implied-headings" match="body|article|aside|nav|section">
+		<xsl:if test="not(exists(@id))">
+			<xsl:message terminate="yes">coding error</xsl:message>
+		</xsl:if>
+		<xsl:variable name="section" as="element(d:section)?" select="key('owner',@id,$root-outline)"/>
+		<xsl:if test="not($section)">
+			<xsl:message terminate="yes">coding error</xsl:message>
+		</xsl:if>
+		<xsl:choose>
+			<xsl:when test="$section/@heading">
+				<xsl:next-match/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:copy>
+					<xsl:apply-templates mode="#current" select="@*"/>
+					<xsl:variable name="outline-depth" as="xs:integer"
+					              select="min((6,count($section/ancestor-or-self::d:section)))"/>
+					<xsl:element name="h{$outline-depth}">
+						<xsl:call-template name="get-untitled-section-title">
+							<xsl:with-param name="sectioning-element" select="."/>
+						</xsl:call-template>
+					</xsl:element>
+					<xsl:apply-templates mode="#current"/>
+				</xsl:copy>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template mode="#default rename-headings add-implied-headings" match="@*|node()">
 		<xsl:copy>
 			<xsl:sequence select="@*"/>
 			<xsl:apply-templates mode="#current"/>
