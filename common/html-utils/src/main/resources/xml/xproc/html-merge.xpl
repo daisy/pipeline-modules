@@ -116,6 +116,24 @@
 			<p:pipe step="fix-ids" port="result"/>
 		</p:iteration-source>
 		<p:output port="result"/>
+		<!--
+		    first make links that point to a file (without a fragment) point to the body element of that file
+		-->
+		<p:xslt>
+			<p:input port="source">
+				<p:pipe step="update-links" port="current"/>
+				<p:pipe step="fix-ids" port="result"/>
+			</p:input>
+			<p:input port="stylesheet">
+				<p:document href="../xslt/add-link-fragments.xsl"/>
+			</p:input>
+			<p:input port="parameters">
+				<p:empty/>
+			</p:input>
+		</p:xslt>
+		<!--
+		    then update links according to file/id mapping
+		-->
 		<px:html-update-links>
 			<p:input port="mapping">
 				<p:pipe step="mapping" port="result"/>

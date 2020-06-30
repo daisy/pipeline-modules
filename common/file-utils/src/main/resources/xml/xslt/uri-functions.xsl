@@ -59,7 +59,7 @@
             provided as input. It does not work if the node was retrieved via doc(), or
             created within the current XSLT transformation.
         -->
-        <xsl:sequence select="collection()[. is $root]"/>
+        <xsl:sequence select="collection()[. is $root][1]"/>
     </xsl:function>
     
     <!--
