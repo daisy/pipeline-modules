@@ -87,6 +87,7 @@
             px:epub-update-links
             px:epub3-create-mediaoverlays
             px:epub3-add-mediaoverlays
+            px:opf-spine-to-fileset
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/braille/common-utils/library.xpl">
@@ -201,19 +202,51 @@
                 <!--
                     perform TTS
                 -->
-
-                <px:tts-for-epub3 name="tts" audio="true" px:progress="1">
-                    <p:input port="source.fileset">
-                        <p:pipe step="maybe-copy" port="fileset"/>
-                    </p:input>
-                    <p:input port="source.in-memory">
-                        <p:pipe step="maybe-copy" port="in-memory"/>
-                    </p:input>
-                    <p:input port="config">
-                        <p:pipe step="main" port="tts-config"/>
-                    </p:input>
-                    <p:with-option name="temp-dir" select="$temp-dir"/>
-                </px:tts-for-epub3>
+                <p:group name="tts" px:progress="1">
+                    <p:output port="result.fileset" primary="true"/>
+                    <p:output port="result.in-memory" sequence="true">
+                        <p:pipe step="update" port="result.in-memory"/>
+                    </p:output>
+                    <p:output port="audio-map">
+                        <p:pipe step="do-tts" port="audio-map"/>
+                    </p:output>
+                    <p:output port="log" sequence="true">
+                        <p:pipe step="do-tts" port="log"/>
+                    </p:output>
+                    <!-- don't perform TTS on documents that are not in spine -->
+                    <px:opf-spine-to-fileset name="spine">
+                        <p:input port="source.fileset">
+                            <p:pipe step="maybe-copy" port="fileset"/>
+                        </p:input>
+                        <p:input port="source.in-memory">
+                            <p:pipe step="maybe-copy" port="in-memory"/>
+                        </p:input>
+                    </px:opf-spine-to-fileset>
+                    <px:tts-for-epub3 name="do-tts" audio="true" px:progress="1">
+                        <p:input port="source.in-memory">
+                            <p:pipe step="maybe-copy" port="in-memory"/>
+                        </p:input>
+                        <p:input port="config">
+                            <p:pipe step="main" port="tts-config"/>
+                        </p:input>
+                        <p:with-option name="temp-dir" select="$temp-dir"/>
+                    </px:tts-for-epub3>
+                    <p:sink/>
+                    <px:fileset-update name="update">
+                        <p:input port="source.fileset">
+                            <p:pipe step="maybe-copy" port="fileset"/>
+                        </p:input>
+                        <p:input port="source.in-memory">
+                            <p:pipe step="maybe-copy" port="in-memory"/>
+                        </p:input>
+                        <p:input port="update.fileset">
+                            <p:pipe step="do-tts" port="result.fileset"/>
+                        </p:input>
+                        <p:input port="update.in-memory">
+                            <p:pipe step="do-tts" port="result.in-memory"/>
+                        </p:input>
+                    </px:fileset-update>
+                </p:group>
 
                 <!--
                     generate SMIL files and copy audio files

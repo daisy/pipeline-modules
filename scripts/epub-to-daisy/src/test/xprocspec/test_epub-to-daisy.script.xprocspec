@@ -47,7 +47,6 @@
 							<c:file name="front.html"/>
 							<c:file name="front.smil"/>
 							<c:file name="mock.mp3"/>
-							<c:file name="nav.smil"/>
 							<c:file name="ncc.html"/>
 						</c:directory>
 					</c:directory>
@@ -78,7 +77,6 @@
 								<c:file name="chapter.smil"/>
 								<c:file name="cover.smil"/>
 								<c:file name="front.smil"/>
-								<c:file name="nav.smil"/>
 							</c:directory>
 							<c:file name="nav.xhtml"/>
 							<c:file name="package.opf"/>

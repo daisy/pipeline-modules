@@ -185,7 +185,6 @@
 					<d:file href="result/EPUB/cover.xhtml" media-type="application/xhtml+xml"/>
 					<d:file href="result/EPUB/front.xhtml" media-type="application/xhtml+xml"/>
 					<d:file href="result/EPUB/chapter.xhtml" media-type="application/xhtml+xml"/>
-					<d:file href="result/EPUB/mo/nav.smil" media-type="application/smil+xml"/>
 					<d:file href="result/EPUB/mo/cover.smil" media-type="application/smil+xml"/>
 					<d:file href="result/EPUB/mo/front.smil" media-type="application/smil+xml"/>
 					<d:file href="result/EPUB/mo/chapter.smil" media-type="application/smil+xml"/>
@@ -210,23 +209,21 @@
 						<dc:date xmlns:dc="http://purl.org/dc/elements/1.1/">2020-03-06</dc:date>
 						<meta property="dcterms:modified">2020-03-06T11:11:52Z</meta>
 						<meta name="dcterms:modified" content="2020-03-06T11:11:52Z"/>
-						<meta property="media:duration">00:00:20.791</meta>
-						<meta name="media:duration" content="00:00:20.791"/>
-						<meta property="media:duration" refines="#item_1">00:00:11.007</meta>
-						<meta property="media:duration" refines="#item_2">00:00:01.223</meta>
-						<meta property="media:duration" refines="#item_3">00:00:06.115</meta>
-						<meta property="media:duration" refines="#item_4">00:00:02.446</meta>
+						<meta property="media:duration">00:00:09.784</meta>
+						<meta name="media:duration" content="00:00:09.784"/>
+						<meta property="media:duration" refines="#item_1">00:00:01.223</meta>
+						<meta property="media:duration" refines="#item_2">00:00:06.115</meta>
+						<meta property="media:duration" refines="#item_3">00:00:02.446</meta>
 					</metadata>
 					<manifest>
-						<item id="nav" href="nav.xhtml" properties="nav" media-type="application/xhtml+xml" media-overlay="item_1"/>
-						<item id="cover" href="cover.xhtml" media-type="application/xhtml+xml" media-overlay="item_2"/>
-						<item id="front" href="front.xhtml" media-type="application/xhtml+xml" media-overlay="item_3"/>
-						<item id="chapter" href="chapter.xhtml" media-type="application/xhtml+xml" media-overlay="item_4"/>
-						<item id="item_1" href="mo/nav.smil" media-type="application/smil+xml"/>
-						<item id="item_2" href="mo/cover.smil" media-type="application/smil+xml"/>
-						<item id="item_3" href="mo/front.smil" media-type="application/smil+xml"/>
-						<item id="item_4" href="mo/chapter.smil" media-type="application/smil+xml"/>
-						<item id="item_5" href="audio/mock.mp3" media-type="audio/mpeg"/>
+						<item id="nav" href="nav.xhtml" properties="nav" media-type="application/xhtml+xml"/>
+						<item id="cover" href="cover.xhtml" media-type="application/xhtml+xml" media-overlay="item_1"/>
+						<item id="front" href="front.xhtml" media-type="application/xhtml+xml" media-overlay="item_2"/>
+						<item id="chapter" href="chapter.xhtml" media-type="application/xhtml+xml" media-overlay="item_3"/>
+						<item id="item_1" href="mo/cover.smil" media-type="application/smil+xml"/>
+						<item id="item_2" href="mo/front.smil" media-type="application/smil+xml"/>
+						<item id="item_3" href="mo/chapter.smil" media-type="application/smil+xml"/>
+						<item id="item_4" href="audio/mock.mp3" media-type="audio/mpeg"/>
 					</manifest>
 					<spine>
 						<itemref idref="cover"/>
@@ -249,58 +246,46 @@
 					</head>
 					<body>
 						<nav epub:type="toc">
-							<h1>
-								<span id="st1-1">Table of contents</span>
-							</h1>
+							<h1>Table of contents</h1>
 							<ol>
 								<li>
 									<a href="cover.xhtml#cover">
-										<span id="st1-2">
-											Cover
-										</span>
+										Cover
 									</a>
 								</li>
 								<li>
 									<a href="front.xhtml#contents">
-										<span id="st1-3">
-											List of contents
-										</span>
+										List of contents
 									</a>
 								</li>
 								<li>
 									<a href="front.xhtml#preface">
-										<span id="st1-4">
-											Preface
-										</span>
+										Preface
 									</a>
 								</li>
 								<li>
 									<a href="chapter.xhtml#chap_1">
-										<span id="st1-5">
-											Chapter 1
-										</span>
+										Chapter 1
 									</a>
 								</li>
 							</ol>
 						</nav>
 						<nav epub:type="page-list" hidden="">
-							<h1>
-								<span id="st1-6">List of pages</span>
-							</h1>
+							<h1>List of pages</h1>
 							<ol>
 								<li>
 									<a href="front.xhtml#page_front_4">
-										<span id="st1-7">vi</span>
+										vi
 									</a>
 								</li>
 								<li>
 									<a href="front.xhtml#page_front_5">
-										<span id="st1-8">v</span>
+										v
 									</a>
 								</li>
 								<li>
 									<a href="chapter.xhtml#page_5">
-										<span id="st1-9">5</span>
+										5
 									</a>
 								</li>
 							</ol>
@@ -323,7 +308,7 @@
 					</head>
 					<body id="cover" epub:type="cover">
 						<p>
-							<span id="st2-1">...</span>
+							<span id="st1-1">...</span>
 						</p>
 					</body>
 				</html>
@@ -344,24 +329,24 @@
 					</head>
 					<body id="front" epub:type="frontmatter">
 						<h1 id="h_1">
-							<span id="st3-1">Title</span>
+							<span id="st2-1">Title</span>
 						</h1>
 						<p>
-							<span id="st3-2">...</span>
+							<span id="st2-2">...</span>
 						</p>
 						<section id="contents">
 							<h2 id="h_1_1">
-								<span id="st3-3">List of contents</span>
+								<span id="st2-3">List of contents</span>
 							</h2>
 							<table>...</table>
 							<div id="page_front_4" class="page-front" epub:type="pagebreak" title="iv"/>
 						</section>
 						<section id="preface">
 							<h2 id="h_1_2">
-								<span id="st3-4">Preface</span>
+								<span id="st2-4">Preface</span>
 							</h2>
 							<p>
-								<span id="st3-5">...</span>
+								<span id="st2-5">...</span>
 							</p>
 							<div id="page_front_5" class="page-front" epub:type="pagebreak" title="v"/>
 						</section>
@@ -384,60 +369,13 @@
 					<body id="chap_1" epub:type="bodymatter chapter">
 						<div id="page_5" class="page-normal" epub:type="pagebreak" title="5"/>
 						<h1 id="h_1">
-							<span id="st4-1">Chapter 1</span>
+							<span id="st3-1">Chapter 1</span>
 						</h1>
 						<p>
-							<span id="st4-2">...</span>
+							<span id="st3-2">...</span>
 						</p>
 					</body>
 				</html>
-			</x:document>
-		</x:expect>
-		<x:context label="nav.smil">
-			<x:document type="port" port="epub.out.in-memory" select="/*[base-uri()=resolve-uri('result/EPUB/mo/nav.smil')]"/>
-		</x:context>
-		<x:expect label="nav.smil" type="compare">
-			<x:document type="inline">
-				<smil xmlns="http://www.w3.org/ns/SMIL" version="3.0">
-					<body>
-						<par>
-							<text src="../nav.xhtml#st1-1"/>
-							<audio src="../audio/mock.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.223"/>
-						</par>
-						<par>
-							<text src="../nav.xhtml#st1-2"/>
-							<audio src="../audio/mock.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.223"/>
-						</par>
-						<par>
-							<text src="../nav.xhtml#st1-3"/>
-							<audio src="../audio/mock.mp3" clipBegin="0:00:01.223" clipEnd="0:00:02.446"/>
-						</par>
-						<par>
-							<text src="../nav.xhtml#st1-4"/>
-							<audio src="../audio/mock.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.223"/>
-						</par>
-						<par>
-							<text src="../nav.xhtml#st1-5"/>
-							<audio src="../audio/mock.mp3" clipBegin="0:00:01.223" clipEnd="0:00:02.446"/>
-						</par>
-						<par>
-							<text src="../nav.xhtml#st1-6"/>
-							<audio src="../audio/mock.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.223"/>
-						</par>
-						<par>
-							<text src="../nav.xhtml#st1-7"/>
-							<audio src="../audio/mock.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.223"/>
-						</par>
-						<par>
-							<text src="../nav.xhtml#st1-8"/>
-							<audio src="../audio/mock.mp3" clipBegin="0:00:01.223" clipEnd="0:00:02.446"/>
-						</par>
-						<par>
-							<text src="../nav.xhtml#st1-9"/>
-							<audio src="../audio/mock.mp3" clipBegin="0:00:02.446" clipEnd="0:00:03.669"/>
-						</par>
-					</body>
-				</smil>
 			</x:document>
 		</x:expect>
 		<x:context label="cover.smil">
@@ -448,7 +386,7 @@
 				<smil xmlns="http://www.w3.org/ns/SMIL" version="3.0">
 					<body epub:textref="../cover.xhtml#cover" epub:type="cover">
 						<par>
-							<text src="../cover.xhtml#st2-1"/>
+							<text src="../cover.xhtml#st1-1"/>
 							<audio src="../audio/mock.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.223"/>
 						</par>
 					</body>
@@ -464,18 +402,18 @@
 					<body epub:textref="../front.xhtml#front" epub:type="frontmatter">
 						<seq epub:textref="../front.xhtml#h_1">
 							<par>
-								<text src="../front.xhtml#st3-1"/>
+								<text src="../front.xhtml#st2-1"/>
 								<audio src="../audio/mock.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.223"/>
 							</par>
 						</seq>
 						<par>
-							<text src="../front.xhtml#st3-2"/>
+							<text src="../front.xhtml#st2-2"/>
 							<audio src="../audio/mock.mp3" clipBegin="0:00:01.223" clipEnd="0:00:02.446"/>
 						</par>
 						<seq epub:textref="../front.xhtml#contents">
 							<seq epub:textref="../front.xhtml#h_1_1">
 								<par>
-									<text src="../front.xhtml#st3-3"/>
+									<text src="../front.xhtml#st2-3"/>
 									<audio src="../audio/mock.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.223"/>
 								</par>
 							</seq>
@@ -483,12 +421,12 @@
 						<seq epub:textref="../front.xhtml#preface">
 							<seq epub:textref="../front.xhtml#h_1_2">
 								<par>
-									<text src="../front.xhtml#st3-4"/>
+									<text src="../front.xhtml#st2-4"/>
 									<audio src="../audio/mock.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.223"/>
 								</par>
 							</seq>
 							<par>
-								<text src="../front.xhtml#st3-5"/>
+								<text src="../front.xhtml#st2-5"/>
 								<audio src="../audio/mock.mp3" clipBegin="0:00:01.223" clipEnd="0:00:02.446"/>
 							</par>
 						</seq>
@@ -505,12 +443,12 @@
 					<body epub:textref="../chapter.xhtml#chap_1" epub:type="bodymatter chapter">
 						<seq epub:textref="../chapter.xhtml#h_1">
 							<par>
-								<text src="../chapter.xhtml#st4-1"/>
+								<text src="../chapter.xhtml#st3-1"/>
 								<audio src="../audio/mock.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.223"/>
 							</par>
 						</seq>
 						<par>
-							<text src="../chapter.xhtml#st4-2"/>
+							<text src="../chapter.xhtml#st3-2"/>
 							<audio src="../audio/mock.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.223"/>
 						</par>
 					</body>
@@ -845,7 +783,8 @@
 						        original-href="../resources/valentin.epub!/mimetype"/>
 						<d:file href="result/EPUB/C00000-1-cover.xhtml" media-type="application/xhtml+xml"/>
 						<d:file href="result/EPUB/package.opf" media-type="application/oebps-package+xml"/>
-						<d:file href="result/EPUB/nav.xhtml" media-type="application/xhtml+xml"/>
+						<d:file href="result/EPUB/nav.xhtml" media-type="application/xhtml+xml"
+						        original-href="../resources/valentin.epub!/EPUB/nav.xhtml"/>
 						<d:file href="result/EPUB/nav.ncx" media-type="application/x-dtbncx+xml"
 						        original-href="../resources/valentin.epub!/EPUB/nav.ncx"/>
 						<d:file href="result/EPUB/C00000-9-footnotes.xhtml" media-type="application/xhtml+xml"/>
@@ -875,7 +814,6 @@
 						<d:file href="result/META-INF/container.xml" media-type="application/xml"
 						        original-href="../resources/valentin.epub!/META-INF/container.xml"/>
 						<d:file href="result/EPUB/mo/C00000-1-cover.smil" media-type="application/smil+xml"/>
-						<d:file href="result/EPUB/mo/nav.smil" media-type="application/smil+xml"/>
 						<d:file href="result/EPUB/mo/C00000-9-footnotes.smil" media-type="application/smil+xml"/>
 						<d:file href="result/EPUB/mo/C00000-5-chapter.smil" media-type="application/smil+xml"/>
 						<d:file href="result/EPUB/mo/C00000-6-rearnotes.smil" media-type="application/smil+xml"/>
