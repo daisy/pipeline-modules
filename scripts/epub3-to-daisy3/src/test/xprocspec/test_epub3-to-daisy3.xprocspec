@@ -442,8 +442,9 @@
 			<x:document type="inline" xmlns="http://www.daisy.org/z3986/2005/dtbook/">
 				<book>
 					<frontmatter>
-						<doctitle smilref="mo0.smil#sforsmil-1" id="forsmil-1">minimal</doctitle>
+						<doctitle smilref="mo0.smil#sforsmil-1" id="forsmil-1">Untitled document</doctitle>
 						<level1 id="cover" class="jacketcopy">
+							<h1 smilref="mo0.smil#sheading_1" id="heading_1">Cover</h1>
 							<p smilref="mo0.smil#sforsmil-2" id="forsmil-2">
 								<span smilref="mo0.smil#sst2-1" id="st2-1">...</span>
 							</p>
@@ -488,6 +489,9 @@
 					<seq id="root-seq">
 						<par id="sforsmil-1" class="doctitle">
 							<text src="content.xml#forsmil-1"/>
+						</par>
+						<par id="sheading_1" class="h1">
+							<text src="content.xml#heading_1"/>
 						</par>
 						<seq id="sforsmil-2" class="p">
 							<par id="sst2-1" class="span">
@@ -615,23 +619,29 @@
 						<smilCustomTest bookStruct="OPTIONAL_PRODUCER_NOTE" defaultState="false" id="prodnote" override="visible"/>
 					</head>
 					<docTitle>
-						<text>minimal</text>
+						<text>Untitled document</text>
 					</docTitle>
 					<navMap>
 						<navPoint playOrder="1" id="ncx-1">
+							<navLabel>
+								<text>Cover</text>
+							</navLabel>
+							<content src="mo0.smil#sheading_1"/>
+						</navPoint>
+						<navPoint playOrder="2" id="ncx-2">
 							<navLabel>
 								<text>Title</text>
 								<audio clipBegin="0:00:00.000" clipEnd="0:00:01.223" src="EPUB/audio/mock.mp3"/>
 							</navLabel>
 							<content src="mo1.smil#sh_1"/>
-							<navPoint playOrder="2" id="ncx-2">
+							<navPoint playOrder="3" id="ncx-3">
 								<navLabel>
 									<text>List of contents</text>
 									<audio clipBegin="0:00:00.000" clipEnd="0:00:01.223" src="EPUB/audio/mock.mp3"/>
 								</navLabel>
 								<content src="mo1.smil#sh_1_1"/>
 							</navPoint>
-							<navPoint playOrder="4" id="ncx-4">
+							<navPoint playOrder="5" id="ncx-5">
 								<navLabel>
 									<text>Preface</text>
 									<audio clipBegin="0:00:00.000" clipEnd="0:00:01.223" src="EPUB/audio/mock.mp3"/>
@@ -639,7 +649,7 @@
 								<content src="mo3.smil#sh_1_2"/>
 							</navPoint>
 						</navPoint>
-						<navPoint playOrder="6" id="ncx-6">
+						<navPoint playOrder="7" id="ncx-7">
 							<navLabel>
 								<text>5Chapter 1</text>
 								<audio clipBegin="0:00:00.000" clipEnd="0:00:01.223" src="EPUB/audio/mock.mp3"/>
@@ -648,13 +658,13 @@
 						</navPoint>
 					</navMap>
 					<pageList>
-						<pageTarget type="front" value="1" playOrder="3" id="ncx-3">
+						<pageTarget type="front" value="1" playOrder="4" id="ncx-4">
 							<navLabel>
 								<text>iv</text>
 							</navLabel>
 							<content src="mo1.smil#spage_front_4"/>
 						</pageTarget>
-						<pageTarget type="front" value="2" playOrder="5" id="ncx-5">
+						<pageTarget type="front" value="2" playOrder="6" id="ncx-6">
 							<navLabel>
 								<text>v</text>
 							</navLabel>
