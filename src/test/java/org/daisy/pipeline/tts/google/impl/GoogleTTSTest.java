@@ -12,12 +12,9 @@ import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
 import org.daisy.pipeline.tts.StraightBufferAllocator;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
-import org.daisy.pipeline.tts.google.impl.GoogleRestTTSEngine;
-import org.daisy.pipeline.tts.google.impl.GoogleTTSService;
 import org.daisy.pipeline.tts.Voice;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Test;
 
 public class GoogleTTSTest {
@@ -65,9 +62,8 @@ public class GoogleTTSTest {
 		Iterator<Voice> ite = engine.getAvailableVoices().iterator();
 		while (ite.hasNext()) {
 			Voice v = ite.next();
-			Collection<AudioBuffer> li = engine.synthesize("<s><voice name=\"" + v.name
-					+ "\">small test</voice></s>", null, null, resource,
-					BufferAllocator, false);
+			Collection<AudioBuffer> li = engine.synthesize("small test", null, v, resource,
+			       BufferAllocator, false);
 
 			sizes.add(getSize(li) / 4); //div 4 helps being more robust to tiny differences
 			totalVoices++;
@@ -76,7 +72,7 @@ public class GoogleTTSTest {
 
 		//this number will be very low if the voice names are not properly retrieved
 		float diversity = Float.valueOf(sizes.size()) / totalVoices;
-		System.out.println(diversity);
+
 		Assert.assertTrue(diversity > 0.4);
 	}
 
