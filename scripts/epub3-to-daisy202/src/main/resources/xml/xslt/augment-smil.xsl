@@ -100,10 +100,11 @@
                                     <xsl:choose>
                                         <xsl:when test="replace(string-join($segments/string(.),''),'[\s\p{Z}]+','')
                                                         =replace(string(.),'[\s\p{Z}]+','')">
-                                            <xsl:variable name="audio-segments" as="element()*"
+                                            <xsl:variable name="smil-segments" as="element()*"
                                                           select="for $s in $segments return
                                                                   for $id in $s/concat(pf:normalize-uri(pf:html-base-uri(.)),'#',@id) return
-                                                                  $smil//text[pf:normalize-uri(pf:resolve-uri(@src,.))=$id]/parent::*/audio"/>
+                                                                  $smil//text[pf:normalize-uri(pf:resolve-uri(@src,.))=$id]/parent::*"/>
+                                            <xsl:variable name="audio-segments" as="element()*" select="$smil-segments/audio"/>
                                             <xsl:choose>
                                                 <xsl:when test="every $i in 1 to count($audio-segments) - 1
                                                                 satisfies ($audio-segments[$i]/@src=$audio-segments[$i + 1]/@src and
@@ -118,13 +119,23 @@
                                                     </par>
                                                 </xsl:when>
                                                 <xsl:otherwise>
-                                                  <xsl:message terminate="yes"
-                                                               select="concat(
+                                                  <!--
+                                                      Not terminating here because we can recover from it in create-linkbacks.xsl,
+                                                      by linking to the first segment.
+                                                  -->
+                                                  <xsl:message select="concat(
                                                                          'SMIL &quot;',replace($smil-base-uri,'^.*/([^/]+)^','$1'),
                                                                          '&quot; references one or more segments inside a ',
                                                                          if (starts-with(local-name(),'h')) then 'heading' else 'page number',
                                                                          ' but the corresponding audio clips can not be combined: ',
                                                                          string-join($audio-segments/concat(@src,' (',@clip-begin,'-',@clip-end,')'),', '))"/>
+                                                  <!--
+                                                      Create an intermediary par that contains a seq with all the segments. Later it will be
+                                                      replaced with the pars in the seq.
+                                                  -->
+                                                  <seq textref="{pf:relativize-uri(concat($html-base-uri,'#',$id),$seq-base-uri)}">
+                                                      <xsl:sequence select="$smil-segments"/>
+                                                  </seq>
                                                 </xsl:otherwise>
                                             </xsl:choose>
                                       </xsl:when>
@@ -154,12 +165,12 @@
             <xsl:apply-templates select="@*"/>
             <xsl:apply-templates select="(par,$missing-pars)">
                 <!-- pf:base-uri will return empty sequence for $missing-pars -->
-                <xsl:sort select="index-of($html[pf:base-uri(.)=current()/pf:resolve-uri(substring-before(text/@src,'#'),
+                <xsl:sort select="index-of($html[pf:base-uri(.)=current()/pf:resolve-uri(substring-before(@textref|text/@src,'#'),
                                                                                          (pf:base-uri(.),$seq-base-uri)[1])],
                                            $html)"/>
-                <xsl:sort select="$html[pf:html-base-uri(.)=current()/pf:resolve-uri(substring-before(text/@src,'#'),
+                <xsl:sort select="$html[pf:html-base-uri(.)=current()/pf:resolve-uri(substring-before(@textref|text/@src,'#'),
                                                                                      (pf:base-uri(.),$seq-base-uri)[1])]
-                                  //*[@id=substring-after(current()/text/@src,'#')][1]/count(preceding::*|ancestor::*)"/>
+                                  //*[@id=substring-after(current()/(@textref|text/@src),'#')][1]/count(preceding::*|ancestor::*)"/>
             </xsl:apply-templates>
         </xsl:copy>
     </xsl:template>

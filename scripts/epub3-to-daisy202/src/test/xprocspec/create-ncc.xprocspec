@@ -36,6 +36,10 @@
                             <h2 id="c1-1">Chapter 1.1</h2>
                             <span id="page1" class="page-normal">1</span>
                             <p id="c1_p2">...</p>
+                            <h2 id="c1-2">
+                                <span class="word" id="c1-2_w1">Chapter</span>
+                                <span class="word" id="c1-2_w2">1.2</span>
+                            </h2>
                         </body>
                     </html>
                 </x:document>
@@ -72,7 +76,7 @@
                             </layout>
                         </head>
                         <body>
-                            <seq id="seq1" dur="3s">
+                            <seq id="seq1" dur="5s">
                                 <par id="heading1">
                                     <text src="chapter_001.xhtml#c1"/>
                                     <audio src="audio/chapter_001_002.mp4" clip-begin="0:00:00.000" clip-end="0:00:01.000"/>
@@ -84,6 +88,14 @@
                                 <par id="paragraph2">
                                     <text src="chapter_001.xhtml#c1_p2"/>
                                     <audio src="audio/chapter_001_002.mp4" clip-begin="0:00:03.000" clip-end="0:00:04.000"/>
+                                </par>
+                                <par>
+                                    <text src="chapter_001.xhtml#c1-2_w1"/>
+                                    <audio src="audio/chapter_001_002.mp4" clip-begin="0:00:04.000" clip-end="0:00:04.500"/>
+                                </par>
+                                <par>
+                                    <text src="chapter_001.xhtml#c1-2_w2"/>
+                                    <audio src="audio/chapter_001_003.mp4" clip-begin="0:00:00.000" clip-end="0:00:00.500"/>
                                 </par>
                             </seq>
                         </body>
@@ -142,14 +154,14 @@
                         <title/>
                         <meta name="dc:format" content="Daisy 2.02"/>
                         <meta name="ncc:charset" content="utf-8"/>
-                        <meta name="ncc:tocItems" content="5"/>
+                        <meta name="ncc:tocItems" content="6"/>
                         <meta name="ncc:pageFront" content="0"/>
                         <meta name="ncc:pageNormal" content="1"/>
                         <meta name="ncc:pageSpecial" content="0"/>
                         <meta name="ncc:sidebars" content="0"/>
                         <meta name="ncc:prodNotes" content="0"/>
                         <meta name="ncc:footnotes" content="0"/>
-                        <meta name="ncc:totalTime" content="00:00:04"/>
+                        <meta name="ncc:totalTime" content="00:00:06"/>
                     </head>
                     <body>
                         <h1 id="h_1" class="title">
@@ -164,7 +176,10 @@
                         <span id="p_1" class="page-normal">
                             <a href="chapter_001.smil#par_2">1</a>
                         </span>
-                        <h1 id="h_4">
+                        <h2 id="h_4">
+                            <a href="chapter_001.smil#id_1">Chapter 1.2</a>
+                        </h2>
+                        <h1 id="h_5">
                             <a href="chapter_002.smil#par_1">Chapter 2</a>
                         </h1>
                     </body>
@@ -210,6 +225,14 @@
                         <p id="c1_p2">
                             <a href="chapter_001.smil#paragraph2">...</a>
                         </p>
+                        <h2 id="c1-2">
+                            <span class="word" id="c1-2_w1">
+                                <a href="chapter_001.smil#id_1">Chapter</a>
+                            </span>
+                            <span class="word" id="c1-2_w2">
+                                <a href="chapter_001.smil#id_2">1.2</a>
+                            </span>
+                        </h2>
                     </body>
                 </html>
             </x:document>
@@ -261,13 +284,13 @@
                 <smil>
                     <head>
                         <meta name="dc:format" content="Daisy 2.02"/>
-                        <meta name="ncc:timeInThisSmil" content="00:00:03"/>
+                        <meta name="ncc:timeInThisSmil" content="00:00:05"/>
                         <layout>
                             <region id="txtView"/>
                         </layout>
                     </head>
                     <body>
-                        <seq id="seq1" dur="3s">
+                        <seq id="seq1" dur="5s">
                             <par id="heading1">
                                 <text src="chapter_001.xhtml#c1"/>
                                 <audio src="audio/chapter_001_002.mp4" clip-begin="0:00:00.000" clip-end="0:00:01.000"/>
@@ -285,6 +308,14 @@
                             <par id="paragraph2">
                                 <text src="chapter_001.xhtml#c1_p2"/>
                                 <audio src="audio/chapter_001_002.mp4" clip-begin="0:00:03.000" clip-end="0:00:04.000"/>
+                            </par>
+                            <par id="id_1">
+                                <text src="chapter_001.xhtml#c1-2_w1"/>
+                                <audio src="audio/chapter_001_002.mp4" clip-begin="0:00:04.000" clip-end="0:00:04.500"/>
+                            </par>
+                            <par id="id_2">
+                                <text src="chapter_001.xhtml#c1-2_w2"/>
+                                <audio src="audio/chapter_001_003.mp4" clip-begin="0:00:00.000" clip-end="0:00:00.500"/>
                             </par>
                         </seq>
                     </body>

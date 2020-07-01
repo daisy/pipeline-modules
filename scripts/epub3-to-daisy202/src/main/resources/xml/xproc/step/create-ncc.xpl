@@ -147,6 +147,10 @@
         <p:output port="smil.in-memory" sequence="true">
             <p:pipe step="drop-smil-without-associated-xhtml" port="smil"/>
         </p:output>
+        <p:output port="smil-with-textref" sequence="true">
+            <!-- Possibly with textref attributes. For use in create-linkbacks.xsl of NCC. -->
+            <p:pipe step="drop-smil-without-associated-xhtml" port="smil-with-textref"/>
+        </p:output>
         <p:output port="xhtml.in-memory" sequence="true">
             <p:pipe step="drop-smil-without-associated-xhtml" port="xhtml"/>
         </p:output>
@@ -191,6 +195,9 @@
                 <p:output port="smil" sequence="true">
                     <p:pipe step="smil" port="result"/>
                 </p:output>
+                <p:output port="smil-with-textref" sequence="true">
+                    <p:pipe step="smil-with-textref" port="result"/>
+                </p:output>
                 <p:output port="xhtml" sequence="true">
                     <p:pipe step="xhtml-with-linkbacks" port="result"/>
                 </p:output>
@@ -220,6 +227,12 @@
                         </p:input>
                     </p:xslt>
                 </p:group>
+                <p:documentation>Make sure pars have an id attribute (needed for create-linkbacks.xsl)</p:documentation>
+                <p:for-each>
+                    <px:add-ids match="par"/>
+                </p:for-each>
+                <p:identity name="smil-with-textref"/>
+                <p:unwrap match="*[@textref]"/>
                 <p:documentation>Fix metadata</p:documentation>
                 <p:xslt>
                     <p:input port="stylesheet">
@@ -229,10 +242,6 @@
                         <p:empty/>
                     </p:input>
                 </p:xslt>
-                <p:documentation>Make sure pars have an id attribute (needed for create-linkbacks.xsl)</p:documentation>
-                <p:for-each>
-                    <px:add-ids match="par"/>
-                </p:for-each>
                 <p:xslt name="smil">
                     <p:input port="stylesheet">
                         <p:document href="../../xslt/pretty-print.xsl"/>
@@ -270,6 +279,9 @@
                      associated with the navigation document which is not included in the
                      spine. -->
                 <p:output port="smil" sequence="true">
+                    <p:empty/>
+                </p:output>
+                <p:output port="smil-with-textref" sequence="true">
                     <p:empty/>
                 </p:output>
                 <p:output port="xhtml" sequence="true">
@@ -532,13 +544,15 @@
         <p:xslt>
             <p:input port="source">
                 <p:pipe step="ncc" port="result"/>
-                <p:pipe step="augment-smils" port="smil.in-memory"/>
+                <p:pipe step="augment-smils" port="smil-with-textref"/>
                 <p:pipe step="new-smils" port="smil"/>
             </p:input>
             <p:input port="stylesheet">
                 <p:document href="../../xslt/create-linkbacks.xsl"/>
             </p:input>
-            <p:with-param port="parameters" name="is-ncc" select="'true'"/>
+            <p:with-param port="parameters" name="is-ncc" select="'true'">
+                <p:empty/>
+            </p:with-param>
         </p:xslt>
         <p:xslt>
             <p:input port="stylesheet">

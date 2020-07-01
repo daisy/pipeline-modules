@@ -60,7 +60,7 @@
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template match="html:a" priority="1">
+    <xsl:template match="html:a[not(matches(@href,'.+\.[Ss][Mm][Ii][Ll]#.+$'))]" priority="1">
         <xsl:param name="base-uri" as="xs:string" tunnel="yes"/>
         <xsl:param name="smil-href" as="xs:string*" tunnel="yes"/>
         <xsl:param name="smil" as="node()*" tunnel="yes"/> <!-- as="document-node()*" -->
@@ -80,7 +80,25 @@
                         </xsl:copy>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:next-match/>
+                        <!--
+                            Check if there is a seq that references the heading/pagenum using a @textref
+                        -->
+                        <xsl:variable name="seq" select="($smil//seq[@textref][resolve-uri(@textref,base-uri())=$href])[1]"/>
+                        <xsl:choose>
+                            <xsl:when test="$seq">
+                                <xsl:variable name="smil-href" as="xs:string"
+                                              select="if ($smil-href[1]) then $smil-href[1]
+                                                      else pf:relativize-uri(base-uri($seq/root()),$base-uri)"/>
+                                <xsl:copy>
+                                    <xsl:apply-templates select="@* except @href"/>
+                                    <xsl:attribute name="href" select="concat($smil-href,'#',$seq/par[1]/@id)"/>
+                                    <xsl:apply-templates/>
+                                </xsl:copy>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:message terminate="yes">coding error</xsl:message>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:when>

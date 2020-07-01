@@ -10,6 +10,7 @@
 					<p:document href="../../main/resources/xml/xslt/augment-smil.xsl"/>
 				</p:input>
 			</p:xslt>
+			<p:unwrap match="*[@textref]"/>
 		</p:pipeline>
 	</x:script>
 	
@@ -160,6 +161,14 @@
 									<text src="chapter_001.xhtml#c1_p2"/>
 									<audio src="audio/chapter_001_002.mp4" clip-begin="0:00:03.000" clip-end="0:00:04.000"/>
 								</par>
+								<par id="word3">
+									<text src="chapter_001.xhtml#c1-2_w1"/>
+									<audio src="audio/chapter_001_002.mp4" clip-begin="0:00:04.000" clip-end="0:00:04.500"/>
+								</par>
+								<par id="word4">
+									<text src="chapter_001.xhtml#c1-2_w2"/>
+									<audio src="audio/chapter_001_003.mp4" clip-begin="0:00:00.000" clip-end="0:00:00.500"/>
+								</par>
 							</seq>
 						</body>
 					</smil>
@@ -180,6 +189,12 @@
 									<h2 id="c1-1">Chapter 1.1</h2>
 								</section>
 								<p id="c1_p2">...</p>
+								<section>
+									<h2 id="c1-2">
+										<span id="c1-2_w1">Chapter</span>
+										<span id="c1-2_w2">1.2</span>
+									</h2>
+								</section>
 							</section>
 						</body>
 					</html>
@@ -208,6 +223,14 @@
 							<par id="paragraph2">
 								<text src="chapter_001.xhtml#c1_p2"/>
 								<audio src="audio/chapter_001_002.mp4" clip-begin="0:00:03.000" clip-end="0:00:04.000"/>
+							</par>
+							<par id="word3">
+								<text src="chapter_001.xhtml#c1-2_w1"/>
+								<audio src="audio/chapter_001_002.mp4" clip-begin="0:00:04.000" clip-end="0:00:04.500"/>
+							</par>
+							<par id="word4">
+								<text src="chapter_001.xhtml#c1-2_w2"/>
+								<audio src="audio/chapter_001_003.mp4" clip-begin="0:00:00.000" clip-end="0:00:00.500"/>
 							</par>
 						</seq>
 					</body>
