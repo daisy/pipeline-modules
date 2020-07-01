@@ -61,9 +61,11 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 		
 		String languageCode;
 		String name;
+		int indexOfSecondHyphen;
 		
 		if (voice != null) {
-			languageCode = '"' + voice.name.substring(0, 4) + '"';
+			indexOfSecondHyphen = voice.name.indexOf('-', voice.name.indexOf('-') + 1);
+			languageCode = '"' + voice.name.substring(0, indexOfSecondHyphen) + '"';
 			name = '"' + voice.name + '"';
 		}
 		else {
@@ -151,7 +153,7 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 			in.close();
 
 
-			Pattern p = Pattern .compile("[a-z][a-z]-[A-Z][A-Z]-[a-z A-Z]+-[A-Z]");
+			Pattern p = Pattern .compile("[a-z]+-[A-Z]+-[a-z A-Z]+-[A-Z]");
 			Matcher m = p.matcher(content);
 			
 			while (m.find())
