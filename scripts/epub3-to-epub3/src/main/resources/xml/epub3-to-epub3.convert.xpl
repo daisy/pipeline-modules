@@ -181,7 +181,7 @@
         </p:output>
         <px:fileset-filter media-types="application/oebps-package+xml"/>
         <p:delete match="d:file[preceding::d:file]"/>
-        <px:fileset-load name="default-rendition.package-document">
+        <px:fileset-load name="package-document">
             <p:input port="in-memory">
                 <p:pipe step="maybe-copy" port="in-memory"/>
             </p:input>
@@ -259,11 +259,11 @@
                     <p:input port="audio-map">
                         <p:pipe step="tts" port="audio-map"/>
                     </p:input>
-                    <p:with-option name="mediaoverlay-dir" select="resolve-uri('EPUB/mo/',base-uri(/*))">
-                        <p:pipe step="maybe-copy" port="fileset"/>
+                    <p:with-option name="mediaoverlay-dir" select="resolve-uri('mo/',base-uri(/*))">
+                        <p:pipe step="package-document" port="result"/>
                     </p:with-option>
-                    <p:with-option name="audio-dir" select="resolve-uri('EPUB/audio/',base-uri(/*))">
-                        <p:pipe step="maybe-copy" port="fileset"/>
+                    <p:with-option name="audio-dir" select="resolve-uri('audio/',base-uri(/*))">
+                        <p:pipe step="package-document" port="result"/>
                     </p:with-option>
                 </px:epub3-create-mediaoverlays>
                 <p:sink/>
