@@ -200,8 +200,7 @@
 		<x:expect label="package.opf" type="custom"
 		          href="http://www.daisy.org/pipeline/modules/epub-utils/library.xpl" step="x:epub3-compare-package-doc">
 			<x:document type="inline">
-				<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="pub-id" xml:lang="en"
-				         prefix="media: http://www.idpf.org/epub/vocab/overlays/#">
+				<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="pub-id" xml:lang="en">
 					<metadata>
 						<dc:title xmlns:dc="http://purl.org/dc/elements/1.1/" id="title">minimal</dc:title>
 						<dc:identifier xmlns:dc="http://purl.org/dc/elements/1.1/" id="pub-id">id</dc:identifier>

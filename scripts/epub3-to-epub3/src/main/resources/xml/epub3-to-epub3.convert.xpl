@@ -272,7 +272,9 @@
                     update EPUB with mediaoverlays
                 -->
 
-                <px:epub3-add-mediaoverlays name="add">
+                <!-- not declaring "media" prefix because this appears to cause issues in Adobe
+                     Digital Editions -->
+                <px:epub3-add-mediaoverlays declare-media-prefix="false" name="add">
                     <p:input port="source.fileset">
                         <p:pipe step="tts" port="result.fileset"/>
                     </p:input>
