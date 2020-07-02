@@ -407,13 +407,13 @@
 						</seq>
 						<par>
 							<text src="../front.xhtml#st2-2"/>
-							<audio src="../audio/mock.mp3" clipBegin="0:00:01.223" clipEnd="0:00:02.446"/>
+							<audio src="../audio/mock.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.223"/>
 						</par>
 						<seq epub:textref="../front.xhtml#contents">
 							<seq epub:textref="../front.xhtml#h_1_1">
 								<par>
 									<text src="../front.xhtml#st2-3"/>
-									<audio src="../audio/mock.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.223"/>
+									<audio src="../audio/mock.mp3" clipBegin="0:00:01.223" clipEnd="0:00:02.446"/>
 								</par>
 							</seq>
 						</seq>
@@ -426,7 +426,7 @@
 							</seq>
 							<par>
 								<text src="../front.xhtml#st2-5"/>
-								<audio src="../audio/mock.mp3" clipBegin="0:00:01.223" clipEnd="0:00:02.446"/>
+								<audio src="../audio/mock.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.223"/>
 							</par>
 						</seq>
 					</body>
@@ -915,39 +915,39 @@
 								</par>
 								<par>
 									<text src="../C00000-1-cover.xhtml#st1-11"/>
-									<audio src="../audio/mock.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.223"/>
+									<audio src="../audio/mock.mp3" clipBegin="0:00:12.230" clipEnd="0:00:13.453"/>
 								</par>
 								<par>
 									<text src="../C00000-1-cover.xhtml#st1-12"/>
-									<audio src="../audio/mock.mp3" clipBegin="0:00:01.223" clipEnd="0:00:02.446"/>
+									<audio src="../audio/mock.mp3" clipBegin="0:00:13.453" clipEnd="0:00:14.677"/>
 								</par>
 								<par>
 									<text src="../C00000-1-cover.xhtml#st1-13"/>
-									<audio src="../audio/mock.mp3" clipBegin="0:00:02.446" clipEnd="0:00:03.669"/>
+									<audio src="../audio/mock.mp3" clipBegin="0:00:14.677" clipEnd="0:00:15.900"/>
 								</par>
 								<par>
 									<text src="../C00000-1-cover.xhtml#st1-14"/>
-									<audio src="../audio/mock.mp3" clipBegin="0:00:03.669" clipEnd="0:00:04.892"/>
+									<audio src="../audio/mock.mp3" clipBegin="0:00:15.900" clipEnd="0:00:17.123"/>
 								</par>
 								<par>
 									<text src="../C00000-1-cover.xhtml#st1-15"/>
-									<audio src="../audio/mock.mp3" clipBegin="0:00:04.892" clipEnd="0:00:06.115"/>
+									<audio src="../audio/mock.mp3" clipBegin="0:00:17.123" clipEnd="0:00:18.346"/>
 								</par>
 								<par>
 									<text src="../C00000-1-cover.xhtml#st1-16"/>
-									<audio src="../audio/mock.mp3" clipBegin="0:00:06.115" clipEnd="0:00:07.338"/>
+									<audio src="../audio/mock.mp3" clipBegin="0:00:18.346" clipEnd="0:00:19.569"/>
 								</par>
 								<par>
 									<text src="../C00000-1-cover.xhtml#st1-17"/>
-									<audio src="../audio/mock.mp3" clipBegin="0:00:07.338" clipEnd="0:00:08.561"/>
+									<audio src="../audio/mock.mp3" clipBegin="0:00:19.569" clipEnd="0:00:20.792"/>
 								</par>
 								<par>
 									<text src="../C00000-1-cover.xhtml#st1-18"/>
-									<audio src="../audio/mock.mp3" clipBegin="0:00:08.561" clipEnd="0:00:09.784"/>
+									<audio src="../audio/mock.mp3" clipBegin="0:00:20.792" clipEnd="0:00:22.015"/>
 								</par>
 								<par>
 									<text src="../C00000-1-cover.xhtml#st1-19"/>
-									<audio src="../audio/mock.mp3" clipBegin="0:00:09.784" clipEnd="0:00:11.007"/>
+									<audio src="../audio/mock.mp3" clipBegin="0:00:22.015" clipEnd="0:00:23.238"/>
 								</par>
 							</seq>
 						</body>

@@ -61,7 +61,6 @@
 					<d:file href="epub3/out/epub/EPUB/audio/part0002_02_000.mp3" original-href="epub3/temp/audio/part0002_02_000.mp3" media-type="audio/mpeg"/>
 					<d:file href="epub3/out/epub/EPUB/audio/part0002_03_000.mp3" original-href="epub3/temp/audio/part0002_03_000.mp3" media-type="audio/mpeg"/>
 					<d:file href="epub3/out/epub/EPUB/audio/part0002_04_000.mp3" original-href="epub3/temp/audio/part0002_04_000.mp3" media-type="audio/mpeg"/>
-					<d:file href="epub3/out/epub/EPUB/audio/part0003_00_000.mp3" original-href="epub3/temp/audio/part0003_00_000.mp3" media-type="audio/mpeg"/>
 					<d:file href="epub3/out/epub/EPUB/mo/toc.smil" media-type="application/smil+xml"/>
 					<d:file href="epub3/out/epub/EPUB/mo/minimal-1.smil" media-type="application/smil+xml"/>
 					<d:file href="epub3/out/epub/EPUB/mo/minimal-2.smil" media-type="application/smil+xml"/>
@@ -149,7 +148,7 @@
 						</par>
 						<par>
 							<text src="../toc.xhtml#st3-6"/>
-							<audio src="../audio/part0003_00_000.mp3" clipBegin="0:00:00.000" clipEnd="0:00:00.578"/>
+							<audio src="../audio/part0002_04_000.mp3" clipBegin="0:00:00.578" clipEnd="0:00:01.157"/>
 						</par>
 					</body>
 				</smil>
