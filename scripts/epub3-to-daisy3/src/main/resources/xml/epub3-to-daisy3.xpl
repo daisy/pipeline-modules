@@ -71,6 +71,12 @@
     <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
         <p:documentation>
             px:html-merge
+            px:html-to-fileset
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/dtbook-utils/library.xpl">
+        <p:documentation>
+            px:dtbook-load
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/html-to-dtbook/library.xpl">
@@ -397,6 +403,31 @@
             Create package document
         </p:documentation>
         <!--
+            Remove resources that were referenced by the HTML but not by the DTBook. (We're assuming
+            that these files are not referenced elsewhere.)
+        -->
+        <px:dtbook-load name="dtbook-fileset">
+            <p:input port="source">
+                <p:pipe step="daisy3-dtbook" port="result.in-memory"/>
+            </p:input>
+        </px:dtbook-load>
+        <p:sink/>
+        <px:fileset-load media-types="application/xhtml+xml">
+            <p:input port="fileset">
+                <p:pipe step="copy" port="result.fileset"/>
+            </p:input>
+            <p:input port="in-memory">
+                <p:pipe step="copy" port="result.in-memory"/>
+            </p:input>
+        </px:fileset-load>
+        <px:html-to-fileset name="html-fileset"/>
+        <px:fileset-diff name="unreferenced-resources">
+            <p:input port="secondary">
+                <p:pipe step="dtbook-fileset" port="fileset.out"/>
+            </p:input>
+        </px:fileset-diff>
+        <p:sink/>
+        <!--
             Remove audio files that were referenced by SMILs in the EPUB 3 but not in the DAISY 3,
             because the corresponding text was omitted. (We're assuming that these files are not
             referenced elsewhere.)
@@ -418,10 +449,15 @@
             </p:input>
         </px:fileset-diff>
         <p:sink/>
-        <px:fileset-diff name="referenced-resources">
+        <px:fileset-diff>
             <p:input port="source">
                 <p:pipe step="dtbook" port="not-matched"/>
             </p:input>
+            <p:input port="secondary">
+                <p:pipe step="unreferenced-resources" port="result"/>
+            </p:input>
+        </px:fileset-diff>
+        <px:fileset-diff name="referenced-resources">
             <p:input port="secondary">
                 <p:pipe step="unreferenced-audio-files" port="result"/>
             </p:input>
