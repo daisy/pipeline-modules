@@ -31,8 +31,10 @@ public class GoogleTTSService extends AbstractTTSService {
 		int priority = convertToInt(params, "org.daisy.pipeline.tts.google.priority", 15);
 
 		AudioFormat audioFormat = new AudioFormat((float) sampleRate, 16, 1, true, false);
-
-		return new GoogleRestTTSEngine(this, apiKey, audioFormat, priority);
+		
+		GoogleRequestScheduler scheduler = new GoogleRequestScheduler();
+		
+		return new GoogleRestTTSEngine(this, apiKey, audioFormat, scheduler, priority);
 
 	}
 
