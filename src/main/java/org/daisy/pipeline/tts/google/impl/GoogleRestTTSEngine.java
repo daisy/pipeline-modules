@@ -1,6 +1,7 @@
 package org.daisy.pipeline.tts.google.impl;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -10,6 +11,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,18 +27,22 @@ import org.daisy.pipeline.tts.SoundUtil;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.Voice;
+import org.daisy.pipeline.tts.google.impl.RequestScheduler.TRequest;
 
 public class GoogleRestTTSEngine extends MarklessTTSEngine {
 
 	private AudioFormat mAudioFormat;
+	private RequestScheduler mRequestScheduler;
 	private String mApiKey;
 	private int mPriority;
 	
-	public GoogleRestTTSEngine(GoogleTTSService googleService, String apiKey, AudioFormat audioFormat, int priority) {
+	public GoogleRestTTSEngine(GoogleTTSService googleService, String apiKey, AudioFormat audioFormat, 
+			RequestScheduler requestScheduler, int priority) {
 		super(googleService);
-		mApiKey = apiKey;
+		mApiKey = "AIzaSyA2vhAI52241mAkixcnSfz8AJkS8cpaHVM";
 		mPriority = priority;
 		mAudioFormat = audioFormat;
+		mRequestScheduler = requestScheduler;
 	}
 
 	@Override
@@ -74,6 +80,9 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 		}
 
 		try {
+			
+			UUID requestID = mRequestScheduler.addRequest(new TRequest(sentence.length(), 300, 15000));
+			mRequestScheduler.getRequest(requestID);
 
 			URL url = new URL("https://texttospeech.googleapis.com/v1/text:synthesize?key=" + mApiKey);
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -95,26 +104,26 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 							"    \"sampleRateHertz\":" + mAudioFormat.getSampleRate() +
 							"  }}";
 
+			
 			try(OutputStream os = con.getOutputStream()) {
 				byte[] input = jsonInputString.getBytes("utf-8");
 				os.write(input, 0, input.length);           
 			}
-
-			try(BufferedReader br = new BufferedReader(
-					new InputStreamReader(con.getInputStream(), "utf-8"))) {
-				StringBuilder response = new StringBuilder();
-				String responseLine = null;
-				while ((responseLine = br.readLine()) != null) {
-					response.append(responseLine.trim());
-				}
-
-				byte[] decodedBytes = Base64.getDecoder().decode(response.toString().substring(18, response.length()-2));
-
-				AudioBuffer b = bufferAllocator.allocateBuffer(decodedBytes.length);
-				b.data = decodedBytes;
-				result.add(b);
-
+			
+			BufferedReader br = new BufferedReader(
+					new InputStreamReader(con.getInputStream(), "utf-8"));
+			StringBuilder response = new StringBuilder();
+			String inputLine;
+			while ((inputLine = br.readLine()) != null) {
+				response.append(inputLine.trim());
 			}
+			br.close();
+
+			byte[] decodedBytes = Base64.getDecoder().decode(response.toString().substring(18, response.length()-2));
+
+			AudioBuffer b = bufferAllocator.allocateBuffer(decodedBytes.length);
+			b.data = decodedBytes;
+			result.add(b);
 
 		} catch (Throwable e) {
 			SoundUtil.cancelFootPrint(result, bufferAllocator);
@@ -138,26 +147,28 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 		Collection<Voice> result = new ArrayList<Voice>();
 		
 		try {
+			
+			UUID requestID = mRequestScheduler.addRequest(new TRequest(0, 300, 15000));
+			mRequestScheduler.getRequest(requestID);
 
 			URL url = new URL("https://texttospeech.googleapis.com/v1/voices?key=" + mApiKey);
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("GET");
 			
-			BufferedReader in = new BufferedReader(
-					new InputStreamReader(con.getInputStream()));
+			BufferedReader br = new BufferedReader(
+					new InputStreamReader(con.getInputStream(), "utf-8"));
+			StringBuilder response = new StringBuilder();
 			String inputLine;
-			StringBuilder content = new StringBuilder();
-			while ((inputLine = in.readLine()) != null) {
-				content.append(inputLine);
+			while ((inputLine = br.readLine()) != null) {
+				response.append(inputLine.trim());
 			}
-			in.close();
-
+			br.close();
 
 			Pattern p = Pattern .compile("[a-z]+-[A-Z]+-[a-z A-Z]+-[A-Z]");
-			Matcher m = p.matcher(content);
+			Matcher m = p.matcher(response);
 			
 			while (m.find())
-				result.add(new Voice(getProvider().getName(),content.substring(m.start(), m.end())));
+				result.add(new Voice(getProvider().getName(),response.substring(m.start(), m.end())));
 
 		} catch (Throwable e) {
 			throw new SynthesisException(e.getMessage(), e.getCause());
@@ -177,5 +188,48 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 	InterruptedException {
 		return new TTSResource();
 	}
+
+	/*public static void main (String[] args) throws IOException, InterruptedException {
+
+		URL url;
+		HttpURLConnection con = null;
+		BufferedReader br;
+		StringBuilder response;
+		String inputLine;
+
+		for(int i = 0; i < 500; i++) {
+			
+			System.out.println(i);
+
+			boolean t = true;
+
+			while(t) {
+
+				try {
+					url = new URL("https://texttospeech.googleapis.com/v1/voices?key=" + "AIzaSyA2vhAI52241mAkixcnSfz8AJkS8cpaHVM");
+					con = (HttpURLConnection) url.openConnection();
+					con.setRequestMethod("GET");
+
+					br = new BufferedReader(
+							new InputStreamReader(con.getInputStream(), "utf-8"));
+					response = new StringBuilder();
+					while ((inputLine = br.readLine()) != null) {
+						response.append(inputLine.trim());
+					}
+					br.close();
+					t = false;
+				} catch (IOException e) {
+					if (con.getResponseCode() == 429) {
+						System.out.println("HELLO");
+						Thread.sleep(60000);
+					}
+				}
+
+			}
+			
+		}
+
+
+	}*/
 
 }
