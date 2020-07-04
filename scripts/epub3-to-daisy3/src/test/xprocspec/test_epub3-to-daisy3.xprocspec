@@ -471,7 +471,7 @@
 					</frontmatter>
 					<bodymatter>
 						<level1 id="chap_1" class="chapter">
-							<h1 smilref="mo4.smil#sid_1" id="id_1">5Chapter 1</h1>
+							<h1 smilref="mo4.smil#sid_1" id="id_1">5 Chapter 1</h1>
 							<p smilref="mo4.smil#sforsmil-7" id="forsmil-7">
 								<span smilref="mo4.smil#sst4-2" id="st4-2">...</span>
 							</p>
@@ -651,7 +651,7 @@
 						</navPoint>
 						<navPoint playOrder="7" id="ncx-7">
 							<navLabel>
-								<text>5Chapter 1</text>
+								<text>5 Chapter 1</text>
 								<audio clipBegin="0:00:00.000" clipEnd="0:00:01.223" src="EPUB/audio/mock.mp3"/>
 							</navLabel>
 							<content src="mo4.smil#sid_1"/>
