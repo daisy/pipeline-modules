@@ -1,40 +1,49 @@
 package org.daisy.pipeline.tts.google.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 public class GoogleRequestScheduler implements RequestScheduler {
 	
-	private int mNbRequests = 0;
-	private int mNbChar = 0;
-	
-	private Map<UUID, TRequest> mRequests = new HashMap<>();
-	
+	private int waitingTime = 0;
+	private int nbRequests = 0;
+	private int nbChar = 0;
+	private LocalDateTime timestamp;
 
 	@Override
-	public synchronized UUID addRequest(TRequest req) {
-		UUID uuid = UUID.randomUUID();
-		while (mRequests.containsKey(uuid)) {
-			uuid = UUID.randomUUID();
-		}
-		mRequests.put(uuid, req);
-		return uuid;
+	public synchronized void addWaitingTime(int time) {
+		waitingTime += time;
 	}
 
 	@Override
-	public synchronized TRequest getRequest(UUID requestID) throws InterruptedException {
-		TRequest req = mRequests.get(requestID);
-		if (mNbRequests >= req.maxRequestsByMinute || mNbChar + req.nbChar > req.maxCharByMinute) {
-			Thread.sleep(60000);
-			mNbRequests = 0;
-			mNbChar = 0;
-		}
-		mNbRequests++;
-		mNbChar += req.nbChar;
-		mRequests.remove(requestID);
+	public synchronized void sleep() throws InterruptedException {
+		Thread.sleep(waitingTime);
+		waitingTime = 0;
+		nbRequests = 0;
+		this.nbChar = 0;
+		timestamp = LocalDateTime.now();
+	}
+	
+	@Override
+	public synchronized void addRequest(int nbChar, int time) throws InterruptedException {
 		
-		return req;
+		if (timestamp == null) {
+			timestamp = LocalDateTime.now();
+		}
+		
+		nbRequests++;
+		this.nbChar += nbChar;
+		
+		if ( Duration.between(timestamp, LocalDateTime.now()).getSeconds() < 60 
+				&& (nbRequests > 300 || this.nbChar > 15000) ) {
+			
+			Thread.sleep(time);
+			nbRequests = 0;
+			this.nbChar = 0;
+			timestamp = LocalDateTime.now();
+			
+		}
 	}
+	
 
 }
