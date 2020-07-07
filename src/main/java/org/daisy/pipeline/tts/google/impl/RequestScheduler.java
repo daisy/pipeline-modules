@@ -7,5 +7,7 @@ public interface RequestScheduler {
 	void sleep() throws InterruptedException;
 
 	void addRequest(int nbChar, int waitingTime) throws InterruptedException;
+	
+	void assertChar(int nbChar, int waitingTime) throws InterruptedException;
 
 }
