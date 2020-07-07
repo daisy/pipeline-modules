@@ -17,11 +17,12 @@ public class GoogleRequestScheduler implements RequestScheduler {
 
 	@Override
 	public synchronized void sleep() throws InterruptedException {
-		Thread.sleep(waitingTime);
-		waitingTime = 0;
-		nbRequests = 0;
-		this.nbChar = 0;
-		timestamp = LocalDateTime.now();
+		if (waitingTime > 0) {
+			Thread.sleep(waitingTime);
+			waitingTime = 0;
+			nbRequests = 0;
+			this.nbChar = 0;
+		}
 	}
 	
 	@Override
@@ -31,17 +32,26 @@ public class GoogleRequestScheduler implements RequestScheduler {
 			timestamp = LocalDateTime.now();
 		}
 		
+		if ( Duration.between(timestamp, LocalDateTime.now()).getSeconds() > 60 ) {		
+			nbRequests = 0;
+			this.nbChar = 0;
+			timestamp = LocalDateTime.now();	
+		}
+		
 		nbRequests++;
 		this.nbChar += nbChar;
 		
-		if ( Duration.between(timestamp, LocalDateTime.now()).getSeconds() < 60 
-				&& (nbRequests > 300 || this.nbChar > 15000) ) {
-			
-			Thread.sleep(time);
-			nbRequests = 0;
-			this.nbChar = 0;
-			timestamp = LocalDateTime.now();
-			
+		if ( Duration.between(timestamp, LocalDateTime.now()).getSeconds() <= 60 
+				&& (nbRequests >= 300 || this.nbChar >= 15000) ) {	
+			addWaitingTime(time);	
+		}
+	}
+	
+	@Override
+	public synchronized void assertChar(int nbChar, int time) throws InterruptedException {
+		if (this.nbChar + nbChar > 15000) {
+			addWaitingTime(time);
+			sleep();
 		}
 	}
 	
