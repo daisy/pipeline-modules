@@ -10,6 +10,9 @@ public class GoogleRequestScheduler implements RequestScheduler {
 	private int nbChar = 0;
 	private LocalDateTime timestamp;
 
+	// 65000ms is used as a wait time with the Google API
+	// quotas are 300 requests per minute or 15000 characters
+	
 	@Override
 	public synchronized void addWaitingTime(int time) {
 		waitingTime += time;
@@ -19,6 +22,7 @@ public class GoogleRequestScheduler implements RequestScheduler {
 	public synchronized void sleep() throws InterruptedException {
 		if (waitingTime > 0) {
 			Thread.sleep(waitingTime);
+			// after a sleep everything is reset to zero
 			waitingTime = 0;
 			nbRequests = 0;
 			this.nbChar = 0;
@@ -32,6 +36,7 @@ public class GoogleRequestScheduler implements RequestScheduler {
 			timestamp = LocalDateTime.now();
 		}
 		
+		// if more than a minute has passed since the last request then the counters are set to 0
 		if ( Duration.between(timestamp, LocalDateTime.now()).getSeconds() > 60 ) {		
 			nbRequests = 0;
 			this.nbChar = 0;
@@ -41,6 +46,7 @@ public class GoogleRequestScheduler implements RequestScheduler {
 		nbRequests++;
 		this.nbChar += nbChar;
 		
+		// if quotas are exceeded, waiting time is added
 		if ( Duration.between(timestamp, LocalDateTime.now()).getSeconds() <= 60 
 				&& (nbRequests >= 300 || this.nbChar >= 15000) ) {	
 			addWaitingTime(time);	

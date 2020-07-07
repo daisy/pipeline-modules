@@ -49,8 +49,11 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 
 		Collection<AudioBuffer> result = new ArrayList<AudioBuffer>();
 
+		// the sentence must be in an appropriate format to be inserted in the json query
+		// it is necessary to wrap the sentence in quotes and add backslash in front of the existing quotes
+		
 		String adaptedSentence = "";
-
+		
 		for (int i = 0; i < sentence.length(); i++) {
 			if (sentence.charAt(i) == '"') {
 				adaptedSentence = adaptedSentence + '\\' + sentence.charAt(i);
@@ -59,19 +62,21 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 				adaptedSentence = adaptedSentence + sentence.charAt(i);
 			}
 		}
-
+		
 		adaptedSentence = '"' + adaptedSentence + '"';
 		
 		String languageCode;
 		String name;
 		int indexOfSecondHyphen;
-		
+
 		if (voice != null) {
+			//recovery of the language code in the name of the voice
 			indexOfSecondHyphen = voice.name.indexOf('-', voice.name.indexOf('-') + 1);
 			languageCode = '"' + voice.name.substring(0, indexOfSecondHyphen) + '"';
 			name = '"' + voice.name + '"';
 		}
 		else {
+			// by default the voice is set to English
 			languageCode = '"' + "en-GB" + '"';
 			name = '"' + "en-GB-Standard-A" + '"';
 		}
@@ -90,6 +95,8 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 		mRequestScheduler.sleep();
 		mRequestScheduler.assertChar(sentence.length(), 65000);
 		
+		// we loop until the request has not been processed 
+		// (google limits to 300 requests per minute or 15000 characters)
 		while(isNotDone) {
 			
 			try {
@@ -101,6 +108,7 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 				con.setRequestProperty("Accept", "application/json");
 				con.setDoOutput(true);
 
+				// building the json query
 				jsonInputString =
 						"  { \"input\":{" + 
 								"    \"ssml\":" + adaptedSentence + 
@@ -127,6 +135,7 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 				}
 				br.close();
 
+				// the answer is encoded in base 64, so it must be decoded
 				decodedBytes = Base64.getDecoder().decode(response.toString().substring(18, response.length()-2));
 
 				b = bufferAllocator.allocateBuffer(decodedBytes.length);
@@ -145,6 +154,7 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 						throw new SynthesisException(e1);
 					}
 					else {
+						// if the error "too many requests is raised
 						mRequestScheduler.addWaitingTime(65000);
 						mRequestScheduler.sleep();
 					}
@@ -180,13 +190,16 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 		BufferedReader br;
 		StringBuilder response;
 		String inputLine;
+		// voice name pattern
 		Pattern p = Pattern .compile("[a-z]+-[A-Z]+-[a-z A-Z]+-[A-Z]");
 		Matcher m;
 
 		boolean isNotDone = true;
 		
 		mRequestScheduler.sleep();
-
+		
+		// we loop until the request has not been processed 
+		// (google limits to 300 requests per minute or 15000 characters)
 		while(isNotDone) {
 			
 			try {
@@ -201,7 +214,8 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 					response.append(inputLine.trim());
 				}
 				br.close();
-
+				
+				// we retrieve the names of the voices in the response returned by the API
 				m = p.matcher(response);
 
 				while (m.find())
@@ -216,6 +230,7 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 						throw new SynthesisException(e1.getMessage(), e1.getCause());
 					}
 					else {
+						// if the error "too many requests is raised
 						mRequestScheduler.addWaitingTime(65000);
 						mRequestScheduler.sleep();
 					}
