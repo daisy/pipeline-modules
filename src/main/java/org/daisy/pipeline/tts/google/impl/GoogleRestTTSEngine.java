@@ -36,7 +36,7 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 	public GoogleRestTTSEngine(GoogleTTSService googleService, String apiKey, AudioFormat audioFormat, 
 			RequestScheduler requestScheduler, int priority) {
 		super(googleService);
-		mApiKey = "AIzaSyA2vhAI52241mAkixcnSfz8AJkS8cpaHVM";
+		mApiKey = apiKey;
 		mPriority = priority;
 		mAudioFormat = audioFormat;
 		mRequestScheduler = requestScheduler;
@@ -87,10 +87,10 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 		
 		boolean isNotDone = true;
 		
+		mRequestScheduler.sleep();
+		mRequestScheduler.assertChar(sentence.length(), 65000);
+		
 		while(isNotDone) {
-			
-			mRequestScheduler.addRequest(sentence.length(), 65000);	
-			mRequestScheduler.sleep();
 			
 			try {
 				
@@ -146,6 +146,7 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 					}
 					else {
 						mRequestScheduler.addWaitingTime(65000);
+						mRequestScheduler.sleep();
 					}
 				} catch (Exception e2) {
 					SoundUtil.cancelFootPrint(result, bufferAllocator);
@@ -157,6 +158,8 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 			}
 			
 		}
+		
+		mRequestScheduler.addRequest(sentence.length(), 65000);
 
 		return result;
 	}
@@ -181,11 +184,10 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 		Matcher m;
 
 		boolean isNotDone = true;
+		
+		mRequestScheduler.sleep();
 
 		while(isNotDone) {
-			
-			mRequestScheduler.addRequest(0, 65000);	
-			mRequestScheduler.sleep();
 			
 			try {
 
@@ -215,6 +217,7 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 					}
 					else {
 						mRequestScheduler.addWaitingTime(65000);
+						mRequestScheduler.sleep();
 					}
 				} catch (Exception e2) {
 					throw new SynthesisException(e1.getMessage(), e2.getCause());
@@ -223,6 +226,8 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 			}
 
 		}
+		
+		mRequestScheduler.addRequest(0, 65000);
 
 		return result;
 
