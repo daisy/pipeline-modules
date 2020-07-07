@@ -46,6 +46,10 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 	public Collection<AudioBuffer> synthesize(String sentence, XdmNode xmlSentence,
 			Voice voice, TTSResource threadResources, AudioBufferAllocator bufferAllocator, boolean retry)
 					throws SynthesisException,InterruptedException, MemoryException {
+		
+		if (sentence.length() > 5000) {
+			throw new SynthesisException("The number of characters in the sentence must not exceed 5000.");
+		}
 
 		Collection<AudioBuffer> result = new ArrayList<AudioBuffer>();
 
@@ -147,16 +151,16 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 			} catch (Throwable e1) {
 				
 				try {
-					if (con.getResponseCode() != 429) {
+					if (con.getResponseCode() == 429) {
+						// if the error "too many requests is raised
+						mRequestScheduler.addWaitingTime(65000);
+						mRequestScheduler.sleep();
+					}
+					else {
 						SoundUtil.cancelFootPrint(result, bufferAllocator);
 						StringWriter sw = new StringWriter();
 						e1.printStackTrace(new PrintWriter(sw));
 						throw new SynthesisException(e1);
-					}
-					else {
-						// if the error "too many requests is raised
-						mRequestScheduler.addWaitingTime(65000);
-						mRequestScheduler.sleep();
 					}
 				} catch (Exception e2) {
 					SoundUtil.cancelFootPrint(result, bufferAllocator);
@@ -226,16 +230,16 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 			} catch (Throwable e1) {
 				
 				try {
-					if (con.getResponseCode() != 429) {
-						throw new SynthesisException(e1.getMessage(), e1.getCause());
-					}
-					else {
+					if (con.getResponseCode() == 429) {
 						// if the error "too many requests is raised
 						mRequestScheduler.addWaitingTime(65000);
 						mRequestScheduler.sleep();
 					}
+					else {
+						throw new SynthesisException(e1.getMessage(), e1.getCause());
+					}
 				} catch (Exception e2) {
-					throw new SynthesisException(e1.getMessage(), e2.getCause());
+					throw new SynthesisException(e2.getMessage(), e2.getCause());
 				}
 				
 			}
