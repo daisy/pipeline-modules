@@ -40,11 +40,9 @@
 				<c:directory name="out">
 					<c:directory name="daisy202">
 						<c:directory name="id">
-							<c:file name="chapter.html"/>
 							<c:file name="chapter.smil"/>
-							<c:file name="cover.html"/>
+							<c:file name="content.html"/>
 							<c:file name="cover.smil"/>
-							<c:file name="front.html"/>
 							<c:file name="front.smil"/>
 							<c:file name="mock.mp3"/>
 							<c:file name="ncc.html"/>

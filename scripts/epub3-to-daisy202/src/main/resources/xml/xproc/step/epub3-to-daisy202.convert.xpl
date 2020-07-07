@@ -35,6 +35,7 @@
             px:fileset-copy
             px:fileset-update
             px:fileset-join
+            px:fileset-add-entry
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/epub-utils/library.xpl">
@@ -47,11 +48,13 @@
             px:html-upgrade
             px:html-downgrade
             px:html-outline
+            px:html-merge
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/daisy202-utils/library.xpl">
         <p:documentation>
             px:daisy202-rename-files
+            px:daisy202-update-links
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/smil-utils/library.xpl">
@@ -168,7 +171,7 @@
                 Load content documents.
             </p:documentation>
             <p:input port="in-memory">
-                <p:pipe step="main" port="source.in-memory"/>
+                <p:pipe step="convert-smil" port="in-memory"/>
             </p:input>
         </px:fileset-load>
         <p:for-each px:message="Converting HTML5 to HTML4" px:progress="1">
@@ -258,6 +261,86 @@
     </pxi:create-ncc>
 
     <p:documentation>
+        Merge into single HTML document (workaround for Voice Dream Reader)
+    </p:documentation>
+    <p:group name="voice-dream-workaround" px:message="Merging HTML documents" px:progress="1/5">
+        <p:output port="fileset" primary="true"/>
+        <p:output port="in-memory" sequence="true">
+            <p:pipe step="choose" port="in-memory"/>
+        </p:output>
+        <px:fileset-filter href="*/ncc.html" name="ncc">
+            <p:input port="source.in-memory">
+                <p:pipe step="create-ncc" port="result.in-memory"/>
+            </p:input>
+        </px:fileset-filter>
+        <p:sink/>
+        <px:fileset-filter media-types="application/xhtml+xml" name="daisy202.html">
+            <p:input port="source">
+                <p:pipe step="ncc" port="not-matched"/>
+            </p:input>
+            <p:input port="source.in-memory">
+                <p:pipe step="ncc" port="not-matched.in-memory"/>
+            </p:input>
+        </px:fileset-filter>
+        <p:choose name="choose">
+            <p:when test="count(//d:file)&gt;1">
+                <p:output port="fileset" primary="true"/>
+                <p:output port="in-memory" sequence="true">
+                    <p:pipe step="add-entry" port="result.in-memory"/>
+                </p:output>
+                <px:fileset-load>
+                    <p:input port="in-memory">
+                        <p:pipe step="create-ncc" port="result.in-memory"/>
+                    </p:input>
+                </px:fileset-load>
+                <px:html-merge name="merge">
+                    <p:with-option name="output-base-uri" select="resolve-uri('content.html',base-uri(/*))">
+                        <p:pipe step="opf" port="result"/>
+                    </p:with-option>
+                </px:html-merge>
+                <p:unwrap match="html:section" name="html4">
+                    <!-- added by px:html-merge -->
+                </p:unwrap>
+                <p:sink/>
+                <px:fileset-join>
+                    <p:input port="source">
+                        <p:pipe step="ncc" port="result"/>
+                        <p:pipe step="daisy202.html" port="not-matched"/>
+                    </p:input>
+                </px:fileset-join>
+                <px:daisy202-update-links name="update-links">
+                    <p:input port="source.in-memory">
+                        <p:pipe step="ncc" port="result.in-memory"/>
+                        <p:pipe step="daisy202.html" port="not-matched.in-memory"/>
+                    </p:input>
+                    <p:input port="mapping">
+                        <p:pipe step="merge" port="mapping"/>
+                    </p:input>
+                </px:daisy202-update-links>
+                <px:fileset-add-entry media-type="application/xhtml+xml" name="add-entry">
+                    <p:input port="source.in-memory">
+                        <p:pipe step="update-links" port="result.in-memory"/>
+                    </p:input>
+                    <p:input port="entry">
+                        <p:pipe step="html4" port="result"/>
+                    </p:input>
+                </px:fileset-add-entry>
+            </p:when>
+            <p:otherwise>
+                <p:output port="fileset" primary="true"/>
+                <p:output port="in-memory" sequence="true">
+                    <p:pipe step="create-ncc" port="result.in-memory"/>
+                </p:output>
+                <p:identity>
+                    <p:input port="source">
+                        <p:pipe step="create-ncc" port="result.fileset"/>
+                    </p:input>
+                </p:identity>
+            </p:otherwise>
+        </p:choose>
+    </p:group>
+
+    <p:documentation>
         Rename content documents to .html.
     </p:documentation>
     <p:group name="rename-xhtml" px:message="Renaming content documents to .html" px:progress="1/5">
@@ -275,10 +358,10 @@
         <p:sink/>
         <px:daisy202-rename-files name="rename">
             <p:input port="source.fileset">
-                <p:pipe step="create-ncc" port="result.fileset"/>
+                <p:pipe step="voice-dream-workaround" port="fileset"/>
             </p:input>
             <p:input port="source.in-memory">
-                <p:pipe step="create-ncc" port="result.in-memory"/>
+                <p:pipe step="voice-dream-workaround" port="in-memory"/>
             </p:input>
             <p:input port="mapping">
                 <p:pipe step="rename-xhtml-mapping" port="result"/>
