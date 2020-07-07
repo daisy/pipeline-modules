@@ -29,24 +29,10 @@
 		</p:documentation>
 	</p:output>
 
-	<p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
-		<p:documentation>
-			px:fileset-join
-		</p:documentation>
-	</p:import>
-
-	<!-- normalize mapping document -->
-	<px:fileset-join name="mapping">
-		<p:input port="source">
-			<p:pipe step="main" port="mapping"/>
-		</p:input>
-	</px:fileset-join>
-	<p:sink/>
-
 	<p:xslt>
 		<p:input port="source">
 			<p:pipe step="main" port="source"/>
-			<p:pipe step="mapping" port="result"/>
+			<p:pipe step="main" port="mapping"/>
 		</p:input>
 		<p:input port="stylesheet">
 			<p:document href="smil-update-links.xsl"/>

@@ -14,10 +14,9 @@
 
     <!--
         A fileset defines the relocation of resources.
-        We know that it has been previously normalized.
     -->
     <xsl:variable name="mapping" as="element(d:fileset)">
-        <xsl:apply-templates mode="absolute-hrefs" select="collection()[/d:fileset][1]"/>
+        <xsl:apply-templates mode="normalize" select="collection()[/d:fileset][1]"/>
     </xsl:variable>
 
     <xsl:variable name="original-doc-base" as="xs:string"
@@ -56,19 +55,34 @@
         <xsl:variable name="resolved-file" as="xs:anyURI" select="resolve-uri($file,$original-doc-base)"/>
         <xsl:variable name="new-file" as="element(d:file)*" select="$mapping/d:file[@original-href=$resolved-file]"/>
         <xsl:variable name="new-file" as="element(d:file)?" select="(if (exists($fragment))
-                                                                       then $new-file[d:anchor[@id=$fragment]]
+                                                                       then $new-file[d:anchor[(@original-id,@id)[1]=$fragment]]
                                                                        else(),
                                                                      $new-file)[1]"/>
+        <xsl:variable name="new-fragment" as="xs:string?" select="if (exists($fragment))
+                                                                  then if (exists($new-file))
+                                                                       then $new-file/d:anchor[(@original-id,@id)[1]=$fragment]/@id
+                                                                       else $mapping/d:file[not(@original-href)][@href=$resolved-file][1]
+                                                                                    /d:anchor[(@original-id,@id)[1]=$fragment]/@id
+                                                                  else ()"/>
+        <xsl:variable name="new-file" as="xs:string?" select="$new-file/@href"/>
         <xsl:choose>
             <xsl:when test="exists($new-file)">
-                <xsl:variable name="new-uri" select="string-join(($new-file/@href,$fragment),'#')"/>
+                <xsl:variable name="new-uri" select="string-join(($new-file,($new-fragment,$fragment)[1]),'#')"/>
                 <xsl:attribute name="{local-name(.)}" namespace="{namespace-uri(.)}"
-                               select="pf:relativize-uri($new-uri,$doc-base)"/>
+                               select="if (starts-with($new-uri,concat($doc-base,'#')))
+                                       then concat('#',substring-after($new-uri,'#'))
+                                       else pf:relativize-uri($new-uri,$doc-base)"/>
             </xsl:when>
             <xsl:when test="$doc-base!=$original-doc-base and pf:is-relative(.)">
-                <xsl:variable name="new-uri" select="string-join(($resolved-file,$fragment),'#')"/>
+                <xsl:variable name="new-uri" select="string-join(($resolved-file,($new-fragment,$fragment)[1]),'#')"/>
                 <xsl:attribute name="{local-name(.)}" namespace="{namespace-uri(.)}"
-                               select="pf:relativize-uri($new-uri,$doc-base)"/>
+                               select="if (starts-with($new-uri,concat($doc-base,'#')))
+                                       then concat('#',substring-after($new-uri,'#'))
+                                       else pf:relativize-uri($new-uri,$doc-base)"/>
+            </xsl:when>
+            <xsl:when test="exists($new-fragment)">
+                <xsl:attribute name="{local-name(.)}" namespace="{namespace-uri(.)}"
+                               select="string-join(($file,$new-fragment),'#')"/>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:sequence select="."/>
@@ -76,13 +90,13 @@
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template mode="absolute-hrefs"
+    <xsl:template mode="normalize"
                   match="d:file/@href|
                          d:file/@original-href">
-        <xsl:attribute name="{name()}" select="resolve-uri(.,base-uri(..))"/>
+        <xsl:attribute name="{name()}" select="pf:normalize-uri(resolve-uri(.,base-uri(..)))"/>
     </xsl:template>
 
-    <xsl:template mode="#default absolute-hrefs" match="@*|node()">
+    <xsl:template mode="#default normalize" match="@*|node()">
         <xsl:copy>
             <xsl:apply-templates mode="#current" select="@*|node()"/>
         </xsl:copy>
