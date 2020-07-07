@@ -51,6 +51,18 @@ public class GoogleTTSTest {
 
 		Assert.assertTrue(getSize(li) > 2000);
 	}
+	
+	@Test
+	public void speakEasyWithVoiceNotNull() throws Throwable {
+		GoogleRestTTSEngine engine = allocateEngine();
+
+		TTSResource resource = engine.allocateThreadResources();
+		Collection<AudioBuffer> li = engine.synthesize("<s>this is a test</s>", null, new Voice("google", "en-GB-Standard-B"),
+		        resource, BufferAllocator, false);
+		engine.releaseThreadResources(resource);
+
+		Assert.assertTrue(getSize(li) > 2000);
+	}
 
 	@Test
 	public void speakWithVoices() throws Throwable {
@@ -143,6 +155,18 @@ public class GoogleTTSTest {
 			engine.getAvailableVoices();
 		}
 		
+	}
+	
+	@Test(expected=SynthesisException.class)
+	public void tooBigSentence() throws Throwable {
+		String sentence = "";
+		for (int i = 0 ; i < 5001; i++) {
+			sentence = sentence + 'a';
+		}
+		GoogleRestTTSEngine engine = allocateEngine();
+		TTSResource resource = engine.allocateThreadResources();
+		engine.synthesize(sentence, null, null,resource, BufferAllocator, false);
+		engine.releaseThreadResources(resource);
 	}
 	
 }
