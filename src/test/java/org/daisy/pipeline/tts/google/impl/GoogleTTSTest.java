@@ -165,6 +165,16 @@ public class GoogleTTSTest {
 	}
 	
 	@Test
+	public void reachNbRequestsQuota() throws Throwable {
+		GoogleRestTTSEngine engine = allocateEngine();
+		TTSResource resource = engine.allocateThreadResources();
+		for (int i=0; i<350; i++) {
+			engine.getAvailableVoices();
+		}
+		engine.releaseThreadResources(resource);
+	}
+	
+	@Test
 	public void reachCharQuota() throws Throwable {
 		String s = "";
 		for (int i=0; i<4000; i++) {
