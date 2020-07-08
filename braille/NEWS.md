@@ -7,6 +7,15 @@ Changes
   https://github.com/nlbdev/pipeline/issues/169, https://github.com/mtmse/obfl/pull/9,
   https://github.com/mtmse/dotify.formatter.impl/pull/31)
 
+Components
+----------
+
+Closed issues
+-------------
+- https://github.com/mtmse/obfl/pull/9
+- https://github.com/mtmse/dotify.api/pull/12
+- https://github.com/mtmse/dotify.formatter.impl/pull/31
+
 v1.13.5
 =======
 
