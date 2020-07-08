@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import org.daisy.pipeline.audio.AudioBuffer;
@@ -32,6 +33,22 @@ public class GoogleTTSTest {
 	private static GoogleRestTTSEngine allocateEngine() throws Throwable {
 		GoogleTTSService s = new GoogleTTSService();
 		return (GoogleRestTTSEngine) s.newEngine(new HashMap<String, String>());
+	}
+	
+	@Test
+	public void convertToIntWithGivenParams() throws Throwable {
+		Map<String, String> params = new HashMap<>();
+		params.put("org.daisy.pipeline.tts.google.samplerate", "24000");
+		GoogleTTSService s = new GoogleTTSService();
+		s.newEngine(params);
+	}
+	
+	@Test(expected=SynthesisException.class)
+	public void convertToIntWithNotValidParams() throws Throwable {
+		Map<String, String> params = new HashMap<>();
+		params.put("org.daisy.pipeline.tts.google.samplerate", "240s0T0");
+		GoogleTTSService s = new GoogleTTSService();
+		s.newEngine(params);
 	}
 
 	@Test
@@ -147,22 +164,21 @@ public class GoogleTTSTest {
 		}
 	}
 	
-	@Test
-	public void reachQuotas() throws Throwable {
-		final GoogleRestTTSEngine engine = allocateEngine();
-		
-		for (int i = 0; i < 350; i++) {
-			engine.getAvailableVoices();
-		}
-		
-	}
-	
 	@Test(expected=SynthesisException.class)
 	public void tooBigSentence() throws Throwable {
 		String sentence = "";
 		for (int i = 0 ; i < 5001; i++) {
 			sentence = sentence + 'a';
 		}
+		GoogleRestTTSEngine engine = allocateEngine();
+		TTSResource resource = engine.allocateThreadResources();
+		engine.synthesize(sentence, null, null,resource, BufferAllocator, false);
+		engine.releaseThreadResources(resource);
+	}
+	
+	@Test
+	public void adaptedSentence() throws Throwable {
+		String sentence = "I can pause <break time=\"3s\"/>.";
 		GoogleRestTTSEngine engine = allocateEngine();
 		TTSResource resource = engine.allocateThreadResources();
 		engine.synthesize(sentence, null, null,resource, BufferAllocator, false);
