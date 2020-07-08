@@ -164,6 +164,23 @@ public class GoogleTTSTest {
 		}
 	}
 	
+	@Test
+	public void reachCharQuota() throws Throwable {
+		String s = "";
+		for (int i=0; i<4000; i++) {
+			s += 'a';
+		}
+		
+		GoogleRestTTSEngine engine = allocateEngine();
+		TTSResource resource = engine.allocateThreadResources();
+		
+		for (int j=0; j<6; j++) {
+			engine.synthesize(s, null, null,resource, BufferAllocator, false);
+		}
+		
+		engine.releaseThreadResources(resource);
+	}
+	
 	@Test(expected=SynthesisException.class)
 	public void tooBigSentence() throws Throwable {
 		String sentence = "";
