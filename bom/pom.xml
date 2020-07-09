@@ -12,7 +12,7 @@
 
   <groupId>org.daisy.pipeline.modules</groupId>
   <artifactId>modules-bom</artifactId>
-  <version>1.13.6-SNAPSHOT</version>
+  <version>1.13.6</version>
   <packaging>pom</packaging>
 
   <name>DAISY Pipeline 2 :: Modules BoM</name>
@@ -45,12 +45,12 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>css-utils</artifactId>
-        <version>4.1.1-SNAPSHOT</version>
+        <version>4.1.1</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>dotify-utils</artifactId>
-        <version>3.4.0-SNAPSHOT</version>
+        <version>3.4.0</version>
       </dependency>
       <!-- list main libhyphen-utils first because this determines the version of the 'doc' artifact picked for the website -->
       <dependency>
@@ -698,4 +698,8 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+
+  <scm>
+    <tag>v1.13.6</tag>
+  </scm>
 </project>
