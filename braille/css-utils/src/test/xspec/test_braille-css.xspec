@@ -402,14 +402,18 @@
 	</x:scenario>
 	
 	<x:scenario label="test_32">
-		<x:call function="css:deep-parse-stylesheet">
-			<x:param select="'display:block
+		<x:call template="css:deep-parse-stylesheet">
+			<x:param name="stylesheet"
+			         select="'display:block
 			                  &amp;::before { content: &quot;x&quot; }
-			                  &amp;::before::after { content: &quot;x&quot; }
+			                  &amp;::before::after { content: target-counter(attr(href), page) }
 			                  &amp;::after { @page { size: 10 10 }}
 			                  @page { size: 40 25 @top-right { content: &quot;x&quot; }}
 			                  @volume { @begin { content: flow(titlepage); @page { size: 15 5; } @page:left { size: 15 5; @top-right { content: none; }}}}
 			                  @volume:only { @begin { content: &quot;single volume&quot;; }}'"/>
+			<x:param name="context">
+				<a href="#foo"/>
+			</x:param>
 		</x:call>
 		<x:expect label="result">
 			<css:rule>
@@ -467,7 +471,7 @@
 				</css:rule>
 				<css:rule selector="&amp;::after">
 					<css:property name="content">
-						<css:string value="x"/>
+						<css:counter target="#foo" name="page" />
 					</css:property>
 				</css:rule>
 			</css:rule>

@@ -448,31 +448,67 @@
                             target-text(<url>)
                         -->
                         <xsl:when test="regex-group($css:CONTENT_RE_target_text_fn)!=''">
-                            <css:text target="{if (regex-group($css:CONTENT_RE_target_text_fn_url_string)!='')
-                                               then substring(regex-group($css:CONTENT_RE_target_text_fn_url_string),
-                                                              2, string-length(regex-group($css:CONTENT_RE_target_text_fn_url_string))-2)
-                                               else string($context/@*[name()=regex-group($css:CONTENT_RE_target_text_fn_url_attr)])}"/>
+                            <xsl:element name="css:text">
+                                <xsl:choose>
+                                    <xsl:when test="regex-group($css:CONTENT_RE_target_text_fn_url_string)!=''">
+                                        <xsl:attribute name="target"
+                                                       select="substring(regex-group($css:CONTENT_RE_target_text_fn_url_string),
+                                                                         2,
+                                                                         string-length(regex-group($css:CONTENT_RE_target_text_fn_url_string))-2)"/>
+                                    </xsl:when>
+                                    <xsl:when test="exists($context)">
+                                        <xsl:attribute name="target"
+                                                       select="string($context/@*[name()=regex-group($css:CONTENT_RE_target_text_fn_url_attr)])"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="target-attribute" select="regex-group($css:CONTENT_RE_target_text_fn_url_attr)"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:element>
                         </xsl:when>
                         <!--
                             target-string(<url>,<ident>)
                         -->
                         <xsl:when test="regex-group($css:CONTENT_RE_target_string_fn)!=''">
-                            <css:string target="{if (regex-group($css:CONTENT_RE_target_string_fn_url_string)!='')
-                                                 then substring(regex-group($css:CONTENT_RE_target_string_fn_url_string),
-                                                                2, string-length(regex-group($css:CONTENT_RE_target_string_fn_url_string))-2)
-                                                 else string($context/@*[name()=regex-group($css:CONTENT_RE_target_string_fn_url_attr)])}"
-                                        name="{regex-group($css:CONTENT_RE_target_string_fn_ident)}"/>
+                            <xsl:element name="css:string">
+                                <xsl:choose>
+                                    <xsl:when test="regex-group($css:CONTENT_RE_target_string_fn_url_string)!=''">
+                                        <xsl:attribute name="target"
+                                                       select="substring(regex-group($css:CONTENT_RE_target_string_fn_url_string),
+                                                                         2,
+                                                                         string-length(regex-group($css:CONTENT_RE_target_string_fn_url_string))-2)"/>
+                                    </xsl:when>
+                                    <xsl:when test="exists($context)">
+                                        <xsl:attribute name="target"
+                                                       select="string($context/@*[name()=regex-group($css:CONTENT_RE_target_string_fn_url_attr)])"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="target-attribute" select="regex-group($css:CONTENT_RE_target_string_fn_url_attr)"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                                <xsl:attribute name="name" select="regex-group($css:CONTENT_RE_target_string_fn_ident)"/>
+                            </xsl:element>
                         </xsl:when>
                         <!--
                             target-counter(<url>,<ident>,<counter-style>?)
                         -->
                         <xsl:when test="regex-group($css:CONTENT_RE_target_counter_fn)!=''">
                             <xsl:element name="css:counter">
-                                <xsl:attribute name="target"
-                                               select="if (regex-group($css:CONTENT_RE_target_counter_fn_url_string)!='')
-                                                       then substring(regex-group($css:CONTENT_RE_target_counter_fn_url_string),
-                                                                      2, string-length(regex-group($css:CONTENT_RE_target_counter_fn_url_string))-2)
-                                                       else string($context/@*[name()=regex-group($css:CONTENT_RE_target_counter_fn_url_attr)])"/>
+                                <xsl:choose>
+                                    <xsl:when test="regex-group($css:CONTENT_RE_target_counter_fn_url_string)!=''">
+                                        <xsl:attribute name="target"
+                                                       select="substring(regex-group($css:CONTENT_RE_target_counter_fn_url_string),
+                                                                         2,
+                                                                         string-length(regex-group($css:CONTENT_RE_target_counter_fn_url_string))-2)"/>
+                                    </xsl:when>
+                                    <xsl:when test="exists($context)">
+                                        <xsl:attribute name="target"
+                                                       select="string($context/@*[name()=regex-group($css:CONTENT_RE_target_counter_fn_url_attr)])"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="target-attribute" select="regex-group($css:CONTENT_RE_target_counter_fn_url_attr)"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
                                 <xsl:attribute name="name" select="regex-group($css:CONTENT_RE_target_counter_fn_ident)"/>
                                 <xsl:if test="regex-group($css:CONTENT_RE_target_counter_fn_style)!=''">
                                     <xsl:attribute name="style" select="regex-group($css:CONTENT_RE_target_counter_fn_style)"/>
@@ -483,10 +519,23 @@
                             target-content(<url>)
                         -->
                         <xsl:when test="regex-group($css:CONTENT_RE_target_content_fn)!=''">
-                            <css:content target="{if (regex-group($css:CONTENT_RE_target_content_fn_url_string)!='')
-                                                  then substring(regex-group($css:CONTENT_RE_target_content_fn_url_string),
-                                                                 2, string-length(regex-group($css:CONTENT_RE_target_content_fn_url_string))-2)
-                                                  else string($context/@*[name()=regex-group($css:CONTENT_RE_target_content_fn_url_attr)])}"/>
+                            <xsl:element name="css:content">
+                                <xsl:choose>
+                                    <xsl:when test="regex-group($css:CONTENT_RE_target_content_fn_url_string)!=''">
+                                        <xsl:attribute name="target"
+                                                       select="substring(regex-group($css:CONTENT_RE_target_content_fn_url_string),
+                                                                         2,
+                                                                         string-length(regex-group($css:CONTENT_RE_target_content_fn_url_string))-2)"/>
+                                    </xsl:when>
+                                    <xsl:when test="exists($context)">
+                                        <xsl:attribute name="target"
+                                                       select="string($context/@*[name()=regex-group($css:CONTENT_RE_target_content_fn_url_attr)])"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="target-attribute" select="regex-group($css:CONTENT_RE_target_content_fn_url_attr)"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:element>
                         </xsl:when>
                         <!--
                             leader(<braille-string>[,[<integer>|<percentage>][,[left|center|right]]?]?)
@@ -941,7 +990,7 @@
                                      '&quot;')"/>
     </xsl:template>
     
-    <xsl:template match="css:content[not(@target)]" mode="css:serialize" as="xs:string">
+    <xsl:template match="css:content[not(@target|@target-attribute)]" mode="css:serialize" as="xs:string">
         <xsl:sequence select="'content()'"/>
     </xsl:template>
     
@@ -949,11 +998,15 @@
         <xsl:sequence select="concat('target-content(url(&quot;',@target,'&quot;))')"/>
     </xsl:template>
     
+    <xsl:template match="css:content[@target-attribute]" mode="css:serialize" as="xs:string">
+        <xsl:sequence select="concat('target-content(attr(',@target-attribute,' url))')"/>
+    </xsl:template>
+    
     <xsl:template match="css:attr" mode="css:serialize" as="xs:string">
         <xsl:sequence select="concat('attr(',@name,')')"/>
     </xsl:template>
     
-    <xsl:template match="css:string[@name][not(@target)]" mode="css:serialize" as="xs:string">
+    <xsl:template match="css:string[@name][not(@target|@target-attribute)]" mode="css:serialize" as="xs:string">
         <xsl:sequence select="concat('string(',@name,if (@scope) then concat(', ', @scope) else '',')')"/>
     </xsl:template>
     
@@ -965,14 +1018,26 @@
         <xsl:sequence select="concat('target-text(url(&quot;',@target,'&quot;))')"/>
     </xsl:template>
     
+    <xsl:template match="css:text[@target-attribute]" mode="css:serialize" as="xs:string">
+        <xsl:sequence select="concat('target-text(attr(',@target-attribute,' url))')"/>
+    </xsl:template>
+    
     <xsl:template match="css:string[@name][@target]" mode="css:serialize" as="xs:string">
         <xsl:sequence select="concat('target-string(url(&quot;',@target,'&quot;), ',@name,')')"/>
+    </xsl:template>
+    
+    <xsl:template match="css:string[@name][@target-attribute]" mode="css:serialize" as="xs:string">
+        <xsl:sequence select="concat('target-string(attr(',@target-attribute,' url), ',@name,')')"/>
     </xsl:template>
     
     <xsl:template match="css:counter[@target]" mode="css:serialize" as="xs:string">
         <xsl:variable name="target" as="xs:string" select="(@original-target,@target)[1]"/>
         <xsl:variable name="target" as="xs:string" select="if (contains($target,'#')) then $target else concat('#',$target)"/>
         <xsl:sequence select="concat('target-counter(url(&quot;',$target,'&quot;), ',@name,if (@style) then concat(', ', @style) else '',')')"/>
+    </xsl:template>
+    
+    <xsl:template match="css:counter[@target-attribute]" mode="css:serialize" as="xs:string">
+        <xsl:sequence select="concat('target-counter(attr(',@target-attribute,' url), ',@name,if (@style) then concat(', ', @style) else '',')')"/>
     </xsl:template>
     
     <xsl:template match="css:leader" mode="css:serialize" as="xs:string">

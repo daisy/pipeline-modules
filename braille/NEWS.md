@@ -1,4 +1,4 @@
-v1.13.6-SNAPSHOT
+v1.13.7-SNAPSHOT
 ================
 
 Changes
@@ -20,6 +20,15 @@ Closed issues
 - https://github.com/mtmse/dotify.formatter.impl/pull/31
 - https://github.com/daisy/pipeline-mod-braille/issues/197
 
+v1.13.6
+=======
+
+Changes
+-------
+- Support for margin, padding and border properties inside `@sequence-interrupted`,
+  `@sequence-resumed`, `@any-interrupted` and `@any-resumed`
+- Fix regression in `target-counter()`, `target-string()`, `target-text()` and `target-content()`
+
 v1.13.5
 =======
 
@@ -35,9 +44,6 @@ Changes
   - New OBFL variable `$started-volume-first-content-page` in the context of a `::obfl-on-resumed`
     pseudo-element (https://github.com/mtmse/obfl/issues/3,
     https://github.com/mtmse/dotify.formatter.impl/issues/18)
-- Support for `-obfl-right-text-indent` (https://github.com/sbsdev/pipeline-mod-sbs/issues/51,
-  https://github.com/nlbdev/pipeline/issues/169, https://github.com/mtmse/obfl/pull/9,
-  https://github.com/mtmse/dotify.formatter.impl/pull/31)
 - Various smaller fixes and invisible changes
 
 Components
@@ -109,7 +115,9 @@ v1.13.2
 Changes
 -------
 - Support `text-transform: uncontracted` (https://github.com/daisy/pipeline-modules/issues/9)
-- Support for `-obfl-evaluate(...)` inside `@sequence-interrupted` and `@sequence-resumed`
+- Support for `@any-interrupted` and `@any-resumed`
+- Support for `-obfl-evaluate(...)` inside `@sequence-interrupted`, `@sequence-resumed`,
+  `@any-interrupted` and `@any-resumed`
 - Bugfixes in white space processing, line breaking and page breaking
 
 v1.13.1
