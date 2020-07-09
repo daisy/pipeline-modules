@@ -3,6 +3,8 @@ v1.13.6-SNAPSHOT
 
 Changes
 -------
+- Support for margin, padding and border properties inside `@sequence-interrupted`,
+  `@sequence-resumed`, `@any-interrupted` and `@any-resumed`
 - Fix regression in `target-counter()`, `target-string()`, `target-text()` and `target-content()`
 
 v1.13.5
@@ -91,7 +93,9 @@ v1.13.2
 Changes
 -------
 - Support `text-transform: uncontracted` (https://github.com/daisy/pipeline-modules/issues/9)
-- Support for `-obfl-evaluate(...)` inside `@sequence-interrupted` and `@sequence-resumed`
+- Support for `@any-interrupted` and `@any-resumed`
+- Support for `-obfl-evaluate(...)` inside `@sequence-interrupted`, `@sequence-resumed`,
+  `@any-interrupted` and `@any-resumed`
 - Bugfixes in white space processing, line breaking and page breaking
 
 v1.13.1

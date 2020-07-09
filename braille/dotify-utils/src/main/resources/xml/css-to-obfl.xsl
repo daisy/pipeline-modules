@@ -586,10 +586,37 @@
                         <xsl:variable name="sequence-interrupted-resumed-content" as="element()*"> <!-- css:box* -->
                             <xsl:sequence select="for $e in $sequence-interrupted-resumed-content return if ($e/self::css:_) then $e/* else $e"/>
                         </xsl:variable>
-                        <xsl:variable name="sequence-interrupted-resumed-content" as="element()*"> <!-- css:box[@type='block']* -->
+                        <xsl:variable name="sequence-interrupted-resumed-content" as="element(css:box)*"> <!-- css:box[@type='block']* -->
                             <xsl:call-template name="make-anonymous-block-boxes">
                                 <xsl:with-param name="boxes" select="$sequence-interrupted-resumed-content"/>
                             </xsl:call-template>
+                        </xsl:variable>
+                        <xsl:variable name="sequence-interrupted-resumed-content" as="element(css:box)*"> <!-- css:box[@type='block']* -->
+                            <!--
+                                for now these are the only properties supported on @(sequence|any)-(interrupted|resumed)
+                            -->
+                            <xsl:variable name="style" as="element(css:property)*"
+                                          select="css:property[@name=(
+                                                    'margin-top',    'padding-top',    'border-top-pattern',
+                                                    'margin-bottom', 'padding-bottom', 'border-bottom-pattern',
+                                                    'margin-left',   'padding-left',   'border-left-pattern',
+                                                    'margin-right',  'padding-right',  'border-right-pattern'
+                                                    )]"/>
+                            <xsl:choose>
+                                <xsl:when test="exists($style)">
+                                    <!--
+                                        FIXME: values are not validated and inherited (css:new-definition)
+                                        and negative values are not handled (css:adjust-boxes)
+                                    -->
+                                    <css:box type="block">
+                                        <xsl:apply-templates mode="css:property-as-attribute" select="$style"/>
+                                        <xsl:sequence select="$sequence-interrupted-resumed-content"/>
+                                    </css:box>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:sequence select="$sequence-interrupted-resumed-content"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
                         </xsl:variable>
                         <xsl:variable name="sequence" as="element()*"> <!-- block* -->
                             <xsl:apply-templates mode="sequence-interrupted-resumed" select="$sequence-interrupted-resumed-content">
