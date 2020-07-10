@@ -41,6 +41,11 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 		mAudioFormat = audioFormat;
 		mRequestScheduler = requestScheduler;
 	}
+	
+	@Override
+	public int expectedMillisecPerWord() {
+		return 64000;
+	}
 
 	@Override
 	public Collection<AudioBuffer> synthesize(String sentence, XdmNode xmlSentence,
@@ -96,9 +101,6 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 		
 		boolean isNotDone = true;
 		
-		mRequestScheduler.sleep();
-		mRequestScheduler.assertChar(sentence.length(), 65000);
-		
 		// we loop until the request has not been processed 
 		// (google limits to 300 requests per minute or 15000 characters)
 		while(isNotDone) {
@@ -153,7 +155,6 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 				try {
 					if (con.getResponseCode() == 429) {
 						// if the error "too many requests is raised
-						mRequestScheduler.addWaitingTime(65000);
 						mRequestScheduler.sleep();
 					}
 					else {
@@ -172,8 +173,6 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 			}
 			
 		}
-		
-		mRequestScheduler.addRequest(sentence.length(), 65000);
 
 		return result;
 	}
@@ -199,8 +198,6 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 		Matcher m;
 
 		boolean isNotDone = true;
-		
-		mRequestScheduler.sleep();
 		
 		// we loop until the request has not been processed 
 		// (google limits to 300 requests per minute or 15000 characters)
@@ -232,7 +229,6 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 				try {
 					if (con.getResponseCode() == 429) {
 						// if the error "too many requests is raised
-						mRequestScheduler.addWaitingTime(65000);
 						mRequestScheduler.sleep();
 					}
 					else {
@@ -245,8 +241,6 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 			}
 
 		}
-		
-		mRequestScheduler.addRequest(0, 65000);
 
 		return result;
 
