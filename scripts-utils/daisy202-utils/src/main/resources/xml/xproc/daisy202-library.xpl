@@ -13,5 +13,6 @@
     
     <p:import href="load/load.xpl"/>
     <p:import href="rename-files.xpl"/>
+    <p:import href="update-links.xpl"/>
     
 </p:library>

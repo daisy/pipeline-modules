@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-                xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc-internal"
                 exclude-inline-prefixes="#all"
-                type="pxi:daisy202-update-links" name="main">
+                type="px:daisy202-update-links" name="main">
 
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
         <p>Update cross-references in HTML and SMIL documents</p>
