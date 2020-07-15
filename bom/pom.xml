@@ -549,12 +549,6 @@
         <groupId>org.daisy.libs</groupId>
         <artifactId>jstyleparser</artifactId>
         <version>1.20-p14</version>
-        <exclusions>
-          <exclusion>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.unbescape</groupId>
