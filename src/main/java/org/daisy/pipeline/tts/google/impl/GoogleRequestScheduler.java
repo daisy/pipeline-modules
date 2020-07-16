@@ -13,7 +13,7 @@ public class GoogleRequestScheduler implements RequestScheduler {
 	@Override
 	public synchronized void sleep() throws InterruptedException {
 		random_number_milliseconds = (int) (Math.random() * 1000);
-		waitingTime = (int) Math.min(Math.pow(2, n) + random_number_milliseconds, MAXIMUM_BACKOFF);
+		waitingTime = (int) Math.min(Math.pow(2, n) * 100L + random_number_milliseconds, MAXIMUM_BACKOFF);
 		Thread.sleep(waitingTime);
 		n++;
 	}
