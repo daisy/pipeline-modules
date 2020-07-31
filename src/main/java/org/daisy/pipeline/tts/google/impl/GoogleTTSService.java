@@ -32,7 +32,7 @@ public class GoogleTTSService extends AbstractTTSService {
 
 		AudioFormat audioFormat = new AudioFormat((float) sampleRate, 16, 1, true, false);
 		
-		GoogleRequestScheduler scheduler = new GoogleRequestScheduler();
+		ExponentialBackoffScheduler scheduler = new ExponentialBackoffScheduler();
 		
 		return new GoogleRestTTSEngine(this, apiKey, audioFormat, scheduler, priority);
 
