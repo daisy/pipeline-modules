@@ -1,6 +1,6 @@
 package org.daisy.pipeline.tts.google.impl;
 
-public class GoogleRequestScheduler implements RequestScheduler {
+public class ExponentialBackoffScheduler implements RequestScheduler {
 	
 	private int waitingTime;
 	private int random_number_milliseconds;
