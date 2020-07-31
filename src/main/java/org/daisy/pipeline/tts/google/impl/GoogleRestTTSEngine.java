@@ -26,6 +26,13 @@ import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.Voice;
 
+/**
+ * Connector class to synthesize audio using the google cloud tts engine.
+ * This connector is based on their REST Api.
+ * 
+ * @author Louis Caille @ braillenet.org
+ *
+ */
 public class GoogleRestTTSEngine extends MarklessTTSEngine {
 
 	private AudioFormat mAudioFormat;
@@ -90,14 +97,7 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 			name = '"' + "en-GB-Standard-A" + '"';
 		}
 		
-		URL url;
 		HttpURLConnection con = null;
-		String jsonInputString;
-		BufferedReader br;
-		StringBuilder response;
-		String inputLine;
-		byte[] decodedBytes;
-		AudioBuffer b;
 		
 		boolean isNotDone = true;
 		
@@ -107,7 +107,7 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 			
 			try {
 				
-				url = new URL("https://texttospeech.googleapis.com/v1/text:synthesize?key=" + mApiKey);
+				URL url = new URL("https://texttospeech.googleapis.com/v1/text:synthesize?key=" + mApiKey);
 				con = (HttpURLConnection) url.openConnection();
 				con.setRequestMethod("POST");
 				con.setRequestProperty("Content-Type", "application/json; utf-8");
@@ -115,7 +115,7 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 				con.setDoOutput(true);
 
 				// building the json query
-				jsonInputString =
+				String jsonInputString =
 						"  { \"input\":{" + 
 								"    \"ssml\":" + adaptedSentence + 
 								"  }," + 
@@ -134,17 +134,18 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 					os.write(input, 0, input.length);           
 				}
 
-				br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
-				response = new StringBuilder();
+				BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
+				StringBuilder response = new StringBuilder();
+				String inputLine;
 				while ((inputLine = br.readLine()) != null) {
 					response.append(inputLine.trim());
 				}
 				br.close();
 
 				// the answer is encoded in base 64, so it must be decoded
-				decodedBytes = Base64.getDecoder().decode(response.toString().substring(18, response.length()-2));
+				byte[] decodedBytes = Base64.getDecoder().decode(response.toString().substring(18, response.length()-2));
 
-				b = bufferAllocator.allocateBuffer(decodedBytes.length);
+				AudioBuffer b = bufferAllocator.allocateBuffer(decodedBytes.length);
 				b.data = decodedBytes;
 				result.add(b);
 				
@@ -188,14 +189,7 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 
 		Collection<Voice> result = new ArrayList<Voice>();
 		
-		URL url;
 		HttpURLConnection con = null;
-		BufferedReader br;
-		StringBuilder response;
-		String inputLine;
-		// voice name pattern
-		Pattern p = Pattern .compile("[a-z]+-[A-Z]+-[a-z A-Z]+-[A-Z]");
-		Matcher m;
 
 		boolean isNotDone = true;
 		
@@ -205,19 +199,23 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 			
 			try {
 
-				url = new URL("https://texttospeech.googleapis.com/v1/voices?key=" + mApiKey);
+				URL url = new URL("https://texttospeech.googleapis.com/v1/voices?key=" + mApiKey);
 				con = (HttpURLConnection) url.openConnection();
 				con.setRequestMethod("GET");
 
-				br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
-				response = new StringBuilder();
+				BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
+				StringBuilder response = new StringBuilder();
+				String inputLine;
 				while ((inputLine = br.readLine()) != null) {
 					response.append(inputLine.trim());
 				}
 				br.close();
 				
+				// voice name pattern
+				Pattern p = Pattern .compile("[a-z]+-[A-Z]+-[a-z A-Z]+-[A-Z]");
+				
 				// we retrieve the names of the voices in the response returned by the API
-				m = p.matcher(response);
+				Matcher m = p.matcher(response);
 
 				while (m.find())
 					result.add(new Voice(getProvider().getName(),response.substring(m.start(), m.end())));
