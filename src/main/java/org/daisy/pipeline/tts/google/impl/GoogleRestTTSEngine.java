@@ -2,14 +2,12 @@ package org.daisy.pipeline.tts.google.impl;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,6 +23,7 @@ import org.daisy.pipeline.tts.SoundUtil;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.Voice;
+import org.daisy.pipeline.tts.google.impl.GoogleRequestBuilder.Action;
 
 /**
  * Connector class to synthesize audio using the google cloud tts engine.
@@ -36,22 +35,18 @@ import org.daisy.pipeline.tts.Voice;
 public class GoogleRestTTSEngine extends MarklessTTSEngine {
 
 	private AudioFormat mAudioFormat;
-	private RequestScheduler mRequestScheduler;
-	private String mApiKey;
+	private RequestScheduler<GoogleRestRequest> mRequestScheduler;
 	private int mPriority;
+	private GoogleRequestBuilder mRequestBuilder;
 	
 	public GoogleRestTTSEngine(GoogleTTSService googleService, String apiKey, AudioFormat audioFormat, 
-			RequestScheduler requestScheduler, int priority) {
+			RequestScheduler<GoogleRestRequest> requestScheduler, int priority) {
 		super(googleService);
-		mApiKey = apiKey;
 		mPriority = priority;
 		mAudioFormat = audioFormat;
 		mRequestScheduler = requestScheduler;
-	}
-	
-	@Override
-	public int expectedMillisecPerWord() {
-		return 64000;
+		mRequestBuilder = new GoogleRequestBuilder(apiKey);
+		
 	}
 
 	@Override
@@ -79,8 +74,6 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 			}
 		}
 		
-		adaptedSentence = '"' + adaptedSentence + '"';
-		
 		String languageCode;
 		String name;
 		int indexOfSecondHyphen;
@@ -88,18 +81,34 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 		if (voice != null) {
 			//recovery of the language code in the name of the voice
 			indexOfSecondHyphen = voice.name.indexOf('-', voice.name.indexOf('-') + 1);
-			languageCode = '"' + voice.name.substring(0, indexOfSecondHyphen) + '"';
-			name = '"' + voice.name + '"';
+			languageCode = voice.name.substring(0, indexOfSecondHyphen);
+			name = voice.name;
 		}
 		else {
 			// by default the voice is set to English
-			languageCode = '"' + "en-GB" + '"';
-			name = '"' + "en-GB-Standard-A" + '"';
+			languageCode = "en-GB";
+			name = "en-GB-Standard-A";
 		}
 		
-		HttpURLConnection con = null;
-		
+		GoogleRestRequest speechRequest = null;
+		GoogleRestRequest request = null;
+		UUID requestUuid = null;
 		boolean isNotDone = true;
+		
+		try {
+			
+			speechRequest = mRequestBuilder.newRequest()
+					.withAction(Action.SPEECH)
+					.withLanguageCode(languageCode)
+					.withVoice(name)
+					.withText(adaptedSentence)
+					.build();
+			
+			requestUuid = mRequestScheduler.add(speechRequest);
+			
+		} catch (Throwable e) {
+			throw new SynthesisException(e.getMessage(), e.getCause());
+		}
 		
 		// we loop until the request has not been processed 
 		// (google limits to 300 requests per minute or 15000 characters)
@@ -107,34 +116,9 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 			
 			try {
 				
-				URL url = new URL("https://texttospeech.googleapis.com/v1/text:synthesize?key=" + mApiKey);
-				con = (HttpURLConnection) url.openConnection();
-				con.setRequestMethod("POST");
-				con.setRequestProperty("Content-Type", "application/json; utf-8");
-				con.setRequestProperty("Accept", "application/json");
-				con.setDoOutput(true);
+				request = mRequestScheduler.poll(requestUuid);
 
-				// building the json query
-				String jsonInputString =
-						"  { \"input\":{" + 
-								"    \"ssml\":" + adaptedSentence + 
-								"  }," + 
-								"  \"voice\":{" + 
-								"    \"languageCode\":" + languageCode + "," + 
-								"    \"name\":" + name + 
-								"  }," + 
-								"  \"audioConfig\":{" + 
-								"    \"audioEncoding\":\"LINEAR16\"," +
-								"    \"sampleRateHertz\":" + mAudioFormat.getSampleRate() +
-								"  }}";
-
-
-				try(OutputStream os = con.getOutputStream()) {
-					byte[] input = jsonInputString.getBytes("utf-8");
-					os.write(input, 0, input.length);           
-				}
-
-				BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
+				BufferedReader br = new BufferedReader(new InputStreamReader(request.send(), "utf-8"));
 				StringBuilder response = new StringBuilder();
 				String inputLine;
 				while ((inputLine = br.readLine()) != null) {
@@ -154,9 +138,10 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 			} catch (Throwable e1) {
 				
 				try {
-					if (con.getResponseCode() == 429) {
-						// if the error "too many requests is raised
-						mRequestScheduler.sleep();
+					if (request.getConnection().getResponseCode() == 429) {
+						// if the error "too many requests" is raised
+						requestUuid = mRequestScheduler.add(request);
+						mRequestScheduler.delay(requestUuid);
 					}
 					else {
 						SoundUtil.cancelFootPrint(result, bufferAllocator);
@@ -189,21 +174,32 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 
 		Collection<Voice> result = new ArrayList<Voice>();
 		
-		HttpURLConnection con = null;
-
+		GoogleRestRequest voicesRequest = null;
+		GoogleRestRequest request = null;
+		UUID requestUuid = null;
 		boolean isNotDone = true;
+		
+		try {
+			
+			voicesRequest = mRequestBuilder.newRequest()
+					.withAction(Action.VOICES)
+					.build();
+			
+			requestUuid = mRequestScheduler.add(voicesRequest);
+			
+		} catch (Throwable e) {
+			throw new SynthesisException(e.getMessage(), e.getCause());
+		}
 		
 		// we loop until the request has not been processed 
 		// (google limits to 300 requests per minute or 15000 characters)
 		while(isNotDone) {
 			
 			try {
-
-				URL url = new URL("https://texttospeech.googleapis.com/v1/voices?key=" + mApiKey);
-				con = (HttpURLConnection) url.openConnection();
-				con.setRequestMethod("GET");
-
-				BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
+				
+				request = mRequestScheduler.poll(requestUuid);
+				
+				BufferedReader br = new BufferedReader(new InputStreamReader(request.send(), "utf-8"));
 				StringBuilder response = new StringBuilder();
 				String inputLine;
 				while ((inputLine = br.readLine()) != null) {
@@ -225,9 +221,10 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 			} catch (Throwable e1) {
 				
 				try {
-					if (con.getResponseCode() == 429) {
-						// if the error "too many requests is raised
-						mRequestScheduler.sleep();
+					if (request.getConnection().getResponseCode() == 429) {
+						// if the error "too many requests" is raised
+						requestUuid = mRequestScheduler.add(request);
+						mRequestScheduler.delay(requestUuid);
 					}
 					else {
 						throw new SynthesisException(e1.getMessage(), e1.getCause());
@@ -253,6 +250,11 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 	public TTSResource allocateThreadResources() throws SynthesisException,
 	InterruptedException {
 		return new TTSResource();
+	}
+	
+	@Override
+	public int expectedMillisecPerWord() {
+		return 64000;
 	}
 
 }
