@@ -13,6 +13,7 @@ import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 
+import org.custommonkey.xmlunit.Diff;
 import org.daisy.common.xslt.ThreadUnsafeXslTransformer;
 import org.daisy.common.xslt.XslTransformCompiler;
 import org.junit.Assert;
@@ -49,7 +50,10 @@ public class GoogleTTSSSMLTest {
 		tw.addStartElement(new QName(SsmlNs, "y"));
 		tw.addAttribute(new QName(null, "attr"), "attr-val");
 		tw.addEndElement();
-		tw.addText("this is text");
+		tw.addStartElement(new QName(SsmlNs, "token"));
+		tw.addText("this");
+		tw.addEndElement();
+		tw.addText(" is text");
 		tw.addEndElement();
 
 		Map<String, Object> params = new TreeMap<String, Object>();
@@ -57,11 +61,13 @@ public class GoogleTTSSSMLTest {
 		params.put("voice", voice);
 
 		String result = Transformer.transformToString(tw.getResult(), params);
-		String expected = "<voice name=\""
-		        + voice
-		        + "\"><s><y attr=\"attr-val\"></y>this is text</s></voice><break time=\"250ms\"></break>";
+		String expected = "<s:speak xmlns:s=\"http://www.w3.org/2001/10/synthesis\" version=\"1.0\"><s:s>"
+		        + "<s:y attr=\"attr-val\"/>this is text</s:s><s:break time=\"250ms\"/><s:mark name=\""
+		        + endingmark + "\"/></s:speak>";
 
-		Assert.assertEquals(expected, result);
+		Diff d = new Diff(result, expected);
+
+		Assert.assertTrue(d.similar());
 	}
 
 	@Test
@@ -86,11 +92,13 @@ public class GoogleTTSSSMLTest {
 
 		String result = Transformer.transformToString(tw.getResult(), params);
 
-		String expected = "<voice name=\""
-		        + voice
-		        + "\"><s><y attr=\"attr-val\"></y>this is text</s></voice><break time=\"250ms\"></break>";
+		String expected = "<s:speak xmlns:s=\"http://www.w3.org/2001/10/synthesis\" version=\"1.0\"><s:s>"
+		        + "<s:y attr=\"attr-val\"/>this is text</s:s><s:break time=\"250ms\"/><s:mark name=\""
+		        + endingmark + "\"/></s:speak>";
 
-		Assert.assertEquals(expected, result);
+		Diff d = new Diff(result, expected);
+
+		Assert.assertTrue(d.similar());
 	}
 
 	@Test
@@ -117,11 +125,13 @@ public class GoogleTTSSSMLTest {
 		XdmNode firstChild = (XdmNode) tw.getResult().axisIterator(Axis.CHILD).next();
 
 		String result = Transformer.transformToString(firstChild, params);
-		String expected = "<voice name=\""
-		        + voice
-		        + "\"><s><y attr=\"attr-val\"></y>this is text</s></voice><break time=\"250ms\"></break>";
+		String expected = "<s:speak xmlns:s=\"http://www.w3.org/2001/10/synthesis\" version=\"1.0\"><s:s>"
+		        + "<s:y attr=\"attr-val\"/>this is text</s:s><s:break time=\"250ms\"/><s:mark name=\""
+		        + endingmark + "\"/></s:speak>";
 
-		Assert.assertEquals(expected, result);
+		Diff d = new Diff(result, expected);
+
+		Assert.assertTrue(d.similar());
 	}
 
 }
