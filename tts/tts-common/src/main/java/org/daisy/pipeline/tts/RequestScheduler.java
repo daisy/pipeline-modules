@@ -1,7 +1,15 @@
-package org.daisy.pipeline.tts.google.impl;
+package org.daisy.pipeline.tts;
 
 import java.util.UUID;
 
+/**
+ * Scheduler interface to delay a request when some quotas or errors are met.
+ * An example of implementation is provided in the ExponentialBackoffSc
+ * 
+ * @author Louis Caille @ braillenet
+ *
+ * @param <RequestType> the request class to handle
+ */
 public interface RequestScheduler<RequestType> {
 	
 	/**

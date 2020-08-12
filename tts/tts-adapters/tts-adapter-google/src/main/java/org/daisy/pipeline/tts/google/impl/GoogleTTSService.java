@@ -7,9 +7,19 @@ import javax.sound.sampled.AudioFormat;
 import org.daisy.pipeline.tts.AbstractTTSService;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSService;
+import org.daisy.pipeline.tts.ExponentialBackoffScheduler;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 
+
+
+/**
+ * 
+ * OSGI service to instantiate the Google Cloud Text-to-speech engine adapter
+ * 
+ * @author Louis Caille @ braillenet.org
+ *
+ */
 @Component(
 		name = "google-tts-service",
 		service = { TTSService.class }
@@ -45,7 +55,7 @@ public class GoogleTTSService extends AbstractTTSService {
 
 	@Override
 	public String getVersion() {
-		return "cli";
+		return "rest";
 	}
 	
 	private static int convertToInt(Map<String, String> params, String prop, int defaultVal)

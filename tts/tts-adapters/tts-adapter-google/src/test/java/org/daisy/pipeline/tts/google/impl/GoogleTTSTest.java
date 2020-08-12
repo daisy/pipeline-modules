@@ -17,8 +17,18 @@ import org.daisy.pipeline.tts.Voice;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.Before;
+import org.junit.Assume;
 
 public class GoogleTTSTest {
+	
+	@Before
+	public void checkForAPIKey() {
+		if(System.getProperty("org.daisy.pipeline.tts.google.apikey") == null) {
+			System.out.println("No API key provided for tests, please add one with the property org.daisy.pipeline.tts.google.apikey");
+		}
+		Assume.assumeTrue(System.getProperty("org.daisy.pipeline.tts.google.apikey") != null);
+	}
 
 	static AudioBufferAllocator BufferAllocator = new StraightBufferAllocator();
 
@@ -30,14 +40,28 @@ public class GoogleTTSTest {
 		return res;
 	}
 
+	/**
+	 * Default engine allocator for tests.
+	 * Developpers should pass their own API key as system property either with maven option 
+	 * -Dorg.daisy.pipeline.tts.google.apikey=their_key
+	 * or as either a property in the pom or a configuration file (for global pipeline build)
+	 * @return
+	 * @throws Throwable
+	 */
 	private static GoogleRestTTSEngine allocateEngine() throws Throwable {
 		GoogleTTSService s = new GoogleTTSService();
-		return (GoogleRestTTSEngine) s.newEngine(new HashMap<String, String>());
+		Map<String, String> params = new HashMap<>();
+		params.put("org.daisy.pipeline.tts.google.apikey", System.getProperty("org.daisy.pipeline.tts.google.apikey"));
+		return (GoogleRestTTSEngine) s.newEngine(params);
 	}
+	
+	
 	
 	@Test
 	public void convertToIntWithGivenParams() throws Throwable {
+		System.out.println("Test - convertToIntWithGivenParams");
 		Map<String, String> params = new HashMap<>();
+		params.put("org.daisy.pipeline.tts.google.apikey", System.getProperty("org.daisy.pipeline.tts.google.apikey"));
 		params.put("org.daisy.pipeline.tts.google.samplerate", "24000");
 		GoogleTTSService s = new GoogleTTSService();
 		s.newEngine(params);
@@ -45,7 +69,9 @@ public class GoogleTTSTest {
 	
 	@Test(expected=SynthesisException.class)
 	public void convertToIntWithNotValidParams() throws Throwable {
+		System.out.println("Test - convertToIntWithNotValidParams");
 		Map<String, String> params = new HashMap<>();
+		params.put("org.daisy.pipeline.tts.google.apikey", System.getProperty("org.daisy.pipeline.tts.google.apikey"));
 		params.put("org.daisy.pipeline.tts.google.samplerate", "240s0T0");
 		GoogleTTSService s = new GoogleTTSService();
 		s.newEngine(params);
@@ -53,12 +79,14 @@ public class GoogleTTSTest {
 
 	@Test
 	public void getVoiceInfo() throws Throwable {
+		System.out.println("Test - getVoiceInfo");
 		Collection<Voice> voices = allocateEngine().getAvailableVoices();
 		Assert.assertTrue(voices.size() > 5);
 	}
 
 	@Test
 	public void speakEasy() throws Throwable {
+		System.out.println("Test - speakEasy");
 		GoogleRestTTSEngine engine = allocateEngine();
 
 		TTSResource resource = engine.allocateThreadResources();
@@ -71,6 +99,8 @@ public class GoogleTTSTest {
 	
 	@Test
 	public void speakEasyWithVoiceNotNull() throws Throwable {
+		System.out.println("Test - speakEasyWithVoiceNotNull");
+		
 		GoogleRestTTSEngine engine = allocateEngine();
 
 		TTSResource resource = engine.allocateThreadResources();
@@ -83,6 +113,7 @@ public class GoogleTTSTest {
 
 	@Test
 	public void speakWithVoices() throws Throwable {
+		System.out.println("Test - speakWithVoices");
 		GoogleRestTTSEngine engine = allocateEngine();
 		TTSResource resource = engine.allocateThreadResources();
 
@@ -107,6 +138,7 @@ public class GoogleTTSTest {
 
 	@Test
 	public void speakUnicode() throws Throwable {
+		System.out.println("Test - speakUnicode");
 		GoogleRestTTSEngine engine = allocateEngine();
 		TTSResource resource = engine.allocateThreadResources();
 		Collection<AudioBuffer> li = engine.synthesize(
@@ -119,6 +151,7 @@ public class GoogleTTSTest {
 
 	@Test
 	public void multiSpeak() throws Throwable {
+		System.out.println("Test - multiSpeak");
 		final GoogleRestTTSEngine engine = allocateEngine();
 
 		final int[] sizes = new int[16];
@@ -166,6 +199,7 @@ public class GoogleTTSTest {
 	
 	@Test(expected=SynthesisException.class)
 	public void tooBigSentence() throws Throwable {
+		System.out.println("Test - tooBigSentence");
 		String sentence = "";
 		for (int i = 0 ; i < 5001; i++) {
 			sentence = sentence + 'a';
@@ -178,6 +212,7 @@ public class GoogleTTSTest {
 	
 	@Test
 	public void adaptedSentence() throws Throwable {
+		System.out.println("Test - adaptedSentence");
 		String sentence = "I can pause <break time=\"3s\"/>.";
 		GoogleRestTTSEngine engine = allocateEngine();
 		TTSResource resource = engine.allocateThreadResources();

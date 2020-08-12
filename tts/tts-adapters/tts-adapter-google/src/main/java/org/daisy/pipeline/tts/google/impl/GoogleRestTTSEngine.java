@@ -23,7 +23,7 @@ import org.daisy.pipeline.tts.SoundUtil;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.Voice;
-import org.daisy.pipeline.tts.google.impl.GoogleRequestBuilder.Action;
+import org.daisy.pipeline.tts.RequestScheduler;
 
 /**
  * Connector class to synthesize audio using the google cloud tts engine.
@@ -98,7 +98,8 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 		try {
 			
 			speechRequest = mRequestBuilder.newRequest()
-					.withAction(Action.SPEECH)
+					.withSampleRate((int)mAudioFormat.getSampleRate())
+					.withAction(GoogleRestAction.SPEECH)
 					.withLanguageCode(languageCode)
 					.withVoice(name)
 					.withText(adaptedSentence)
@@ -169,8 +170,7 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 	}
 
 	@Override
-	public Collection<Voice> getAvailableVoices() throws SynthesisException,
-	InterruptedException {
+	public Collection<Voice> getAvailableVoices() throws SynthesisException, InterruptedException {
 
 		Collection<Voice> result = new ArrayList<Voice>();
 		
@@ -182,7 +182,7 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 		try {
 			
 			voicesRequest = mRequestBuilder.newRequest()
-					.withAction(Action.VOICES)
+					.withAction(GoogleRestAction.VOICES)
 					.build();
 			
 			requestUuid = mRequestScheduler.add(voicesRequest);
@@ -254,6 +254,8 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 	
 	@Override
 	public int expectedMillisecPerWord() {
+		// Worst case scenario with quotas : 
+		// the thread can wait for a bit more than a minute for a anwser
 		return 64000;
 	}
 

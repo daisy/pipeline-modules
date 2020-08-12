@@ -1,3 +1,5 @@
+# Google cloud Text-to-speech Adapter
+
 To use Google Cloud Text-to-Speech (https://cloud.google.com/text-to-speech/docs/quickstart-client-libraries)
 
 1. In Cloud Console (https://console.cloud.google.com), on the project selection page, select or create a Cloud project.
@@ -9,3 +11,7 @@ To use Google Cloud Text-to-Speech (https://cloud.google.com/text-to-speech/docs
 4. Create an API key.
 
 5. Specify the API key in the google configuration file with the property "org.daisy.pipeline.tts.google.apikey".
+
+## tests
+
+For unit test to work, please add the property "org.daisy.pipeline.tts.google.apikey" to either your configuration or pom, or add the option `-Dorg.daisy.pipeline.tts.google.apikey="your_key"` to your maven call. 

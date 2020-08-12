@@ -1,4 +1,4 @@
-package org.daisy.pipeline.tts.google.impl;
+package org.daisy.pipeline.tts;
 
 import java.util.HashMap;
 import java.util.Map;
