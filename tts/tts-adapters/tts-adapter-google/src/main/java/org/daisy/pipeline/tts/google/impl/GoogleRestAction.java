@@ -5,7 +5,7 @@ package org.daisy.pipeline.tts.google.impl;
  * @author  Louis Caille @ braillenet.org
  *
  */
-public enum GoogleRestAction {
+public enum GoogleRestAction{
 	VOICES("GET","/v1/voices"),
 	SPEECH("POST","/v1/text:synthesize");
 	

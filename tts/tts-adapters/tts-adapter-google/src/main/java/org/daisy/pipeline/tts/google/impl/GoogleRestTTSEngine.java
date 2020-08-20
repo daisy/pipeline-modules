@@ -1,6 +1,7 @@
 package org.daisy.pipeline.tts.google.impl;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -23,7 +24,12 @@ import org.daisy.pipeline.tts.SoundUtil;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.Voice;
-import org.daisy.pipeline.tts.RequestScheduler;
+import org.daisy.pipeline.tts.rest.Request;
+import org.daisy.pipeline.tts.scheduler.FatalError;
+import org.daisy.pipeline.tts.scheduler.RecoverableError;
+import org.daisy.pipeline.tts.scheduler.Schedulable;
+import org.daisy.pipeline.tts.scheduler.Scheduler;
+import org.daisy.pipeline.tts.scheduler.impl.ExponentialBackoffScheduler;
 
 /**
  * Connector class to synthesize audio using the google cloud tts engine.
@@ -35,16 +41,15 @@ import org.daisy.pipeline.tts.RequestScheduler;
 public class GoogleRestTTSEngine extends MarklessTTSEngine {
 
 	private AudioFormat mAudioFormat;
-	private RequestScheduler<GoogleRestRequest> mRequestScheduler;
+	private Scheduler<Schedulable> mRequestScheduler;
 	private int mPriority;
 	private GoogleRequestBuilder mRequestBuilder;
 	
-	public GoogleRestTTSEngine(GoogleTTSService googleService, String apiKey, AudioFormat audioFormat, 
-			RequestScheduler<GoogleRestRequest> requestScheduler, int priority) {
+	public GoogleRestTTSEngine(GoogleTTSService googleService, String apiKey, AudioFormat audioFormat, int priority) {
 		super(googleService);
 		mPriority = priority;
 		mAudioFormat = audioFormat;
-		mRequestScheduler = requestScheduler;
+		mRequestScheduler = new ExponentialBackoffScheduler<Schedulable>();
 		mRequestBuilder = new GoogleRequestBuilder(apiKey);
 		
 	}
@@ -90,76 +95,53 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 			name = "en-GB-Standard-A";
 		}
 		
-		GoogleRestRequest speechRequest = null;
-		GoogleRestRequest request = null;
-		UUID requestUuid = null;
-		boolean isNotDone = true;
+		
+		
 		
 		try {
-			
-			speechRequest = mRequestBuilder.newRequest()
+			Request speechRequest = mRequestBuilder.newRequest()
 					.withSampleRate((int)mAudioFormat.getSampleRate())
 					.withAction(GoogleRestAction.SPEECH)
 					.withLanguageCode(languageCode)
 					.withVoice(name)
 					.withText(adaptedSentence)
 					.build();
-			
-			requestUuid = mRequestScheduler.add(speechRequest);
-			
-		} catch (Throwable e) {
-			throw new SynthesisException(e.getMessage(), e.getCause());
-		}
-		
-		// we loop until the request has not been processed 
-		// (google limits to 300 requests per minute or 15000 characters)
-		while(isNotDone) {
-			
-			try {
-				
-				request = mRequestScheduler.poll(requestUuid);
-
-				BufferedReader br = new BufferedReader(new InputStreamReader(request.send(), "utf-8"));
-				StringBuilder response = new StringBuilder();
-				String inputLine;
-				while ((inputLine = br.readLine()) != null) {
-					response.append(inputLine.trim());
-				}
-				br.close();
-
-				// the answer is encoded in base 64, so it must be decoded
-				byte[] decodedBytes = Base64.getDecoder().decode(response.toString().substring(18, response.length()-2));
-
-				AudioBuffer b = bufferAllocator.allocateBuffer(decodedBytes.length);
-				b.data = decodedBytes;
-				result.add(b);
-				
-				isNotDone = false;
-
-			} catch (Throwable e1) {
-				
+			UUID requestUuid = mRequestScheduler.add(()->{
 				try {
-					if (request.getConnection().getResponseCode() == 429) {
-						// if the error "too many requests" is raised
-						requestUuid = mRequestScheduler.add(request);
-						mRequestScheduler.delay(requestUuid);
+					BufferedReader br = new BufferedReader(new InputStreamReader(speechRequest.send(), "utf-8"));
+					StringBuilder response = new StringBuilder();
+					String inputLine;
+					while ((inputLine = br.readLine()) != null) {
+						response.append(inputLine.trim());
 					}
-					else {
-						SoundUtil.cancelFootPrint(result, bufferAllocator);
-						StringWriter sw = new StringWriter();
-						e1.printStackTrace(new PrintWriter(sw));
-						throw new SynthesisException(e1);
+					br.close();
+
+					// the answer is encoded in base 64, so it must be decoded
+					byte[] decodedBytes = Base64.getDecoder().decode(response.toString().substring(18, response.length()-2));
+
+					AudioBuffer b = bufferAllocator.allocateBuffer(decodedBytes.length);
+					b.data = decodedBytes;
+					result.add(b);
+				} catch (IOException | MemoryException e) {
+					try {
+						if (speechRequest.getConnection().getResponseCode() == 429) {
+							throw new RecoverableError("Exceeded quotas", e);
+						} else {
+							throw new FatalError(e);
+						}
+					} catch (IOException responseCodeError) {
+						throw new FatalError("could not retrieve response code for request", responseCodeError);
 					}
-				} catch (Exception e2) {
-					SoundUtil.cancelFootPrint(result, bufferAllocator);
-					StringWriter sw = new StringWriter();
-					e2.printStackTrace(new PrintWriter(sw));
-					throw new SynthesisException(e2);
 				}
-				
-			}
+			});
 			
-		}
+			mRequestScheduler.launch(requestUuid);
+		} catch (Exception e) { // include FatalError
+			SoundUtil.cancelFootPrint(result, bufferAllocator);
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			throw new SynthesisException(e.getMessage(), e.getCause());
+		} 
 
 		return result;
 	}
@@ -174,68 +156,50 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 
 		Collection<Voice> result = new ArrayList<Voice>();
 		
-		GoogleRestRequest voicesRequest = null;
-		GoogleRestRequest request = null;
-		UUID requestUuid = null;
-		boolean isNotDone = true;
-		
 		try {
 			
-			voicesRequest = mRequestBuilder.newRequest()
+			Request voicesRequest = mRequestBuilder.newRequest()
 					.withAction(GoogleRestAction.VOICES)
 					.build();
 			
-			requestUuid = mRequestScheduler.add(voicesRequest);
+			UUID requestUuid = mRequestScheduler.add(()->{
+				try {
+					BufferedReader br = new BufferedReader(new InputStreamReader(voicesRequest.send(), "utf-8"));
+					StringBuilder response = new StringBuilder();
+					String inputLine;
+					while ((inputLine = br.readLine()) != null) {
+						response.append(inputLine.trim());
+					}
+					br.close();
+					
+					// voice name pattern
+					Pattern p = Pattern .compile("[a-z]+-[A-Z]+-[a-z A-Z]+-[A-Z]");
+					
+					// we retrieve the names of the voices in the response returned by the API
+					Matcher m = p.matcher(response);
+
+					while (m.find()) {
+						result.add(new Voice(getProvider().getName(),response.substring(m.start(), m.end())));;
+					}
+				} catch (IOException e) {
+					try {
+						if (voicesRequest.getConnection().getResponseCode() == 429) {
+							throw new RecoverableError("Exceeded quotas", e);
+						} else {
+							throw new FatalError(e);
+						}
+					} catch (IOException responseCodeError) {
+						throw new FatalError("could not retrieve response code of a request", responseCodeError);
+					}
+				}
+			});
 			
-		} catch (Throwable e) {
+			mRequestScheduler.launch(requestUuid);
+			
+		} catch (Exception e) { // Include FatalError
 			throw new SynthesisException(e.getMessage(), e.getCause());
 		}
 		
-		// we loop until the request has not been processed 
-		// (google limits to 300 requests per minute or 15000 characters)
-		while(isNotDone) {
-			
-			try {
-				
-				request = mRequestScheduler.poll(requestUuid);
-				
-				BufferedReader br = new BufferedReader(new InputStreamReader(request.send(), "utf-8"));
-				StringBuilder response = new StringBuilder();
-				String inputLine;
-				while ((inputLine = br.readLine()) != null) {
-					response.append(inputLine.trim());
-				}
-				br.close();
-				
-				// voice name pattern
-				Pattern p = Pattern .compile("[a-z]+-[A-Z]+-[a-z A-Z]+-[A-Z]");
-				
-				// we retrieve the names of the voices in the response returned by the API
-				Matcher m = p.matcher(response);
-
-				while (m.find())
-					result.add(new Voice(getProvider().getName(),response.substring(m.start(), m.end())));
-
-				isNotDone = false;
-
-			} catch (Throwable e1) {
-				
-				try {
-					if (request.getConnection().getResponseCode() == 429) {
-						// if the error "too many requests" is raised
-						requestUuid = mRequestScheduler.add(request);
-						mRequestScheduler.delay(requestUuid);
-					}
-					else {
-						throw new SynthesisException(e1.getMessage(), e1.getCause());
-					}
-				} catch (Exception e2) {
-					throw new SynthesisException(e2.getMessage(), e2.getCause());
-				}
-				
-			}
-
-		}
 
 		return result;
 

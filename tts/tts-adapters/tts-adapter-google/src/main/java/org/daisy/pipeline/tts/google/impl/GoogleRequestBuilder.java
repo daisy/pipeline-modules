@@ -1,6 +1,9 @@
 package org.daisy.pipeline.tts.google.impl;
 
-import java.net.URL;
+import java.util.HashMap;
+
+import org.daisy.pipeline.tts.rest.Request;
+import org.json.JSONObject;
 
 /**
  * Google REST Request builder class.
@@ -20,15 +23,13 @@ public class GoogleRequestBuilder {
 	 */
 	private Integer sampleRate = null;
 	
-	private GoogleRestAction action;
-	
-	private String requestParameters = null;
+	private GoogleRestAction action = GoogleRestAction.VOICES;
 	private String text = null;
 	private String languageCode = null;
 	private String voice = null;
 	
 	/**
-	 * 
+	 * Create a new REST request builder for google services
 	 * @param apiKey the API key to access google services (to create from your google cloud console API identifiers)
 	 */
 	public GoogleRequestBuilder(String apiKey) {
@@ -98,12 +99,13 @@ public class GoogleRequestBuilder {
 	 * @return
 	 * @throws Exception
 	 */
-	public GoogleRestRequest build() throws Exception {
+	public Request build() throws Exception {
 		
-		GoogleRestRequest restRequest = new GoogleRestRequest();
+		HashMap<String, String> headers = new HashMap<String, String>();
+		JSONObject parameters = null;
 		
-		String requestUrl = "https://texttospeech.googleapis.com" + action.domain + "?key=" + apiKey;
-		restRequest.setRequestUrl(new URL(requestUrl));
+		headers.put("Accept", "application/json");
+		headers.put("Content-Type", "application/json; utf-8");
 		
 		switch(action) {
 		case VOICES:
@@ -116,25 +118,35 @@ public class GoogleRequestBuilder {
 			if(languageCode == null || languageCode.length() == 0) 
 				throw new Exception("Language code definition is mandatory, please set one (speech request for " + text + ")");
 			
-			requestParameters = "{";
-			requestParameters += "\"input\":{\"ssml\":" + '"' + text + '"' + "},";
-			requestParameters += "\"voice\":{"
-					+ "\"languageCode\":" + '"' + languageCode +'"';
-			if(voice != null && voice.length() > 0) {
-				requestParameters += ",\"name\":" + '"' + voice + '"';
-			}
-			requestParameters += "},\"audioConfig\":{"
-					+ "\"audioEncoding\":\"LINEAR16\"";
-			if(this.sampleRate != null) {
-				requestParameters += ",\"sampleRateHertz\":" + '"' + sampleRate + '"';
-			}
-			requestParameters += "}}";
-			restRequest.setRequestParameters(requestParameters);
+			String jsonParameters = 
+				"{"
+					+ "\"input\":{"
+						+ "\"ssml\":\"" + text + "\""
+					+ "},"
+					+ "\"voice\":{"
+						+ "\"languageCode\":\"" + languageCode + "\""
+						+ (voice != null && voice.length() > 0 
+							? ",\"name\":\"" + voice + "\"" 
+							: "") 
+					+"},"
+					+ "\"audioConfig\":{"
+						+ "\"audioEncoding\":\"LINEAR16\""
+						+ (sampleRate != null 
+							? ",\"sampleRateHertz\":\"" + sampleRate + "\"" 
+							: "") 
+					+ "}"
+				+ "}";
+
+			parameters = new JSONObject(jsonParameters);
 			break;
 		}
-		restRequest.setMethod(action.method);
 		
-		return restRequest;
+		
+		return new Request(
+				action.method, 
+				"https://texttospeech.googleapis.com" + action.domain + "?key=" + apiKey, 
+				headers, 
+				parameters);
 	}
 
 }

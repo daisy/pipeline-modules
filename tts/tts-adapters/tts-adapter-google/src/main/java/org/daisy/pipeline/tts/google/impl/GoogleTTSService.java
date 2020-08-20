@@ -7,7 +7,6 @@ import javax.sound.sampled.AudioFormat;
 import org.daisy.pipeline.tts.AbstractTTSService;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSService;
-import org.daisy.pipeline.tts.ExponentialBackoffScheduler;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 
@@ -42,9 +41,7 @@ public class GoogleTTSService extends AbstractTTSService {
 
 		AudioFormat audioFormat = new AudioFormat((float) sampleRate, 16, 1, true, false);
 		
-		ExponentialBackoffScheduler<GoogleRestRequest> scheduler = new ExponentialBackoffScheduler<GoogleRestRequest>();
-		
-		return new GoogleRestTTSEngine(this, apiKey, audioFormat, scheduler, priority);
+		return new GoogleRestTTSEngine(this, apiKey, audioFormat, priority);
 
 	}
 
