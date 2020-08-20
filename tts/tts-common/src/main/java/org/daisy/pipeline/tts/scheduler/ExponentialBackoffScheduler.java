@@ -22,10 +22,9 @@ import org.daisy.pipeline.tts.scheduler.Scheduler;
  * 
  * @author Louis Caille @ braillenet.org
  *
- * @param <RequestType> class of request objects to handle
+ * @param <Action> class of request objects to handle
  */
-public class ExponentialBackoffScheduler<RequestType extends Schedulable> extends Scheduler<RequestType> {
-	
+public class ExponentialBackoffScheduler<Action extends Schedulable> implements Scheduler<Action> {
 	
 	/**
 	 *  maximum waiting time in millisecond
@@ -49,15 +48,14 @@ public class ExponentialBackoffScheduler<RequestType extends Schedulable> extend
 	 * When a recoverable error is thrown, the scheduler keep the action in its queue 
 	 * and delays all launches by sleeping the thread while in locked state
 	 */
-	@Override
-	public void launch(UUID actionUuid) throws InterruptedException, FatalError {
+	public void launch(Action action) throws InterruptedException, FatalError {
 		int attempt = 0;
-		while(this.scheduledActions.containsKey(actionUuid)) {
+		boolean retry = true;
+		while(retry) {
 			try {
-				this.scheduledActions.get(actionUuid).launch();
-				this.scheduledActions.remove(actionUuid);
+				action.launch();
+				retry = false;
 			} catch (RecoverableError e){
-				System.out.println("Rescheduling " + actionUuid.toString() + "due to recoverable error (attempt " + (attempt+1) + ") : " + e.getMessage());
 				Thread.sleep(waitingTime(attempt));
 				attempt++;
 			}

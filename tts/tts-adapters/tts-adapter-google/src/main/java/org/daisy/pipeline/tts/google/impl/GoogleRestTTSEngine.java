@@ -8,7 +8,6 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -106,7 +105,9 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 					.withVoice(name)
 					.withText(adaptedSentence)
 					.build();
-			UUID requestUuid = mRequestScheduler.add(()->{
+			
+			
+			mRequestScheduler.launch(()->{
 				try {
 					BufferedReader br = new BufferedReader(new InputStreamReader(speechRequest.send(), "utf-8"));
 					StringBuilder response = new StringBuilder();
@@ -134,8 +135,6 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 					}
 				}
 			});
-			
-			mRequestScheduler.launch(requestUuid);
 		} catch (Exception e) { // include FatalError
 			SoundUtil.cancelFootPrint(result, bufferAllocator);
 			StringWriter sw = new StringWriter();
@@ -162,7 +161,8 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 					.withAction(GoogleRestAction.VOICES)
 					.build();
 			
-			UUID requestUuid = mRequestScheduler.add(()->{
+			
+			mRequestScheduler.launch(()->{
 				try {
 					BufferedReader br = new BufferedReader(new InputStreamReader(voicesRequest.send(), "utf-8"));
 					StringBuilder response = new StringBuilder();
@@ -193,8 +193,6 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 					}
 				}
 			});
-			
-			mRequestScheduler.launch(requestUuid);
 			
 		} catch (Exception e) { // Include FatalError
 			throw new SynthesisException(e.getMessage(), e.getCause());
