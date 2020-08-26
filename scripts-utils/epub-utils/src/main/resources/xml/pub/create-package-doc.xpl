@@ -435,33 +435,47 @@
 
         <p:documentation>Add properties of content documents</p:documentation>
         <p:group name="manifest-with-content-doc-properties">
-            <p:for-each>
-                <p:iteration-source>
-                    <p:pipe step="content-docs" port="result"/>
-                </p:iteration-source>
-                <p:variable name="doc-base" select="p:base-uri(/*)"/>
-                <p:identity name="current"/>
-                <px:fileset-create/>
-                <px:fileset-add-entry>
-                    <p:with-option name="href" select="$doc-base"/>
-                    <p:with-option name="media-type" select="'application/xhtml+xml'"/>
-                </px:fileset-add-entry>
+            <p:output port="result" sequence="true"/>
+            <p:viewport match="/*/d:file">
+                <p:viewport-source>
+                    <p:pipe step="content-docs" port="result.fileset"/>
+                </p:viewport-source>
+                <p:variable name="href" select="/*/@href"/>
+                <p:identity name="file"/>
+                <p:sink/>
+                <px:fileset-filter>
+                    <p:input port="source">
+                        <p:pipe step="content-docs" port="result.fileset"/>
+                    </p:input>
+                    <p:with-option name="href" select="$href"/>
+                </px:fileset-filter>
+                <px:fileset-load name="doc">
+                    <p:input port="in-memory">
+                        <p:pipe step="content-docs" port="result"/>
+                    </p:input>
+                </px:fileset-load>
+                <p:sink/>
+                <p:identity>
+                    <p:input port="source">
+                        <p:pipe step="file" port="result"/>
+                    </p:input>
+                </p:identity>
                 <p:choose>
                     <p:when test="$detect-properties='true'">
-                        <p:add-attribute attribute-name="mathml" match="/*/*">
+                        <p:add-attribute attribute-name="mathml" match="/*">
                             <p:with-option name="attribute-value" select="distinct-values(//namespace::*)='http://www.w3.org/1998/Math/MathML'">
-                                <p:pipe step="current" port="result"/>
+                                <p:pipe step="doc" port="result"/>
                             </p:with-option>
                         </p:add-attribute>
-                        <p:add-attribute attribute-name="svg" match="/*/*">
+                        <p:add-attribute attribute-name="svg" match="/*">
                             <p:with-option name="attribute-value"
                                            select="(//html:embed|//html:iframe)/@src/ends-with(.,'.svg') or
                                                    (//html:embed|//html:object)/@type='image/svg+xml' or
                                                    distinct-values(//namespace::*)='http://www.w3.org/2000/svg'">
-                                <p:pipe step="current" port="result"/>
+                                <p:pipe step="doc" port="result"/>
                             </p:with-option>
                         </p:add-attribute>
-                        <p:add-attribute attribute-name="scripted" match="/*/*">
+                        <p:add-attribute attribute-name="scripted" match="/*">
                             <p:with-option name="attribute-value"
                                            select="count(//*/@href[starts-with(.,'javascript:')]) &gt; 0 or
                                                    //html:script/@type=('',
@@ -481,17 +495,17 @@
                                                    'onstalled','onstorage','onsubmit','onsuspend','ontimeupdate','onunload','onvolumechange',
                                                    'onwaiting')
                                                    ">
-                                <p:pipe step="current" port="result"/>
+                                <p:pipe step="doc" port="result"/>
                             </p:with-option>
                         </p:add-attribute>
-                        <p:add-attribute attribute-name="switch" match="/*/*">
+                        <p:add-attribute attribute-name="switch" match="/*">
                             <p:with-option name="attribute-value" select="count(//epub:switch) &gt; 0">
-                                <p:pipe step="current" port="result"/>
+                                <p:pipe step="doc" port="result"/>
                             </p:with-option>
                         </p:add-attribute>
-                        <p:add-attribute attribute-name="remote-resources" match="/*/*">
+                        <p:add-attribute attribute-name="remote-resources" match="/*">
                             <p:with-option name="attribute-value" select="count(//*/@src[contains(tokenize(.,'/')[1],':')][1]) &gt; 0">
-                                <p:pipe step="current" port="result"/>
+                                <p:pipe step="doc" port="result"/>
                             </p:with-option>
                         </p:add-attribute>
                     </p:when>
@@ -499,8 +513,8 @@
                         <p:identity/>
                     </p:otherwise>
                 </p:choose>
-            </p:for-each>
-            <px:fileset-join name="content-docs-with-properties"/>
+            </p:viewport>
+            <p:identity name="content-docs-with-properties"/>
             <px:fileset-join>
                 <p:input port="source">
                     <p:pipe step="manifest-with-bindings" port="result"/>

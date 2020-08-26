@@ -22,7 +22,7 @@
 						<d:file href="images/Pict2.jpg" media-type="image/jpeg"/>
 						<d:file href="images/Pict3.jpg" media-type="image/jpeg"/>
 						<d:file href="images/Pict4.jpg" media-type="image/jpeg"/>
-						<d:file href="images/cover.jpg" media-type="image/jpeg" role="cover-image"/>
+						<d:file href="images/cover.svg" media-type="image/svg+xml" role="cover-image"/>
 						<d:file href="scripts/impl.xhtml" media-type="application/xhtml+xml"/>
 					</d:fileset>
 				</x:document>
@@ -182,6 +182,11 @@
 						<slide src="images/Pict4.jpg" dur="3"/>
 					</slides>
 				</x:document>
+				<x:document type="inline" xml:base="file:/tmp/epub/EPUB/images/cover.svg">
+					<svg xmlns="http://www.w3.org/2000/svg" width="240" height="100" viewBox="0 0 240 100">
+						<g><text x="10" y="50">Cover</text></g>
+					</svg>
+				</x:document>
 			</x:input>
 			<x:input port="spine">
 				<x:document type="inline">
@@ -253,7 +258,7 @@
 						<item id="item_7" href="images/Pict2.jpg" media-type="image/jpeg"/>
 						<item id="item_8" href="images/Pict3.jpg" media-type="image/jpeg"/>
 						<item id="item_9" href="images/Pict4.jpg" media-type="image/jpeg"/>
-						<item id="item_10" href="images/cover.jpg" media-type="image/jpeg" properties="cover-image"/>
+						<item id="item_10" href="images/cover.svg" media-type="image/svg+xml" properties="cover-image svg"/>
 						<item id="item_11" href="scripts/impl.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
 						<item id="item_12" href="mo/cover.smil" media-type="application/smil+xml"/>
 						<item id="item_13" href="mo/chapter.smil" media-type="application/smil+xml"/>
@@ -261,7 +266,8 @@
 					<spine>
 						<itemref idref="item_1" id="itemref_1" linear="no"/>
 						<itemref idref="item_2" id="itemref_2"/>
-						<itemref idref="item_11" id="itemref_3" linear="no"/>
+						<itemref idref="item_10" id="itemref_3" linear="no"/>
+						<itemref idref="item_11" id="itemref_4" linear="no"/>
 					</spine>
 					<bindings>
 						<mediaType handler="item_11" media-type="application/x-demo-slideshow"/>
