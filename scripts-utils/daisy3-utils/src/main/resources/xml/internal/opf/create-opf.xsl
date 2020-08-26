@@ -17,6 +17,7 @@
   <xsl:param name="uid"/>
   <xsl:param name="total-time"/>
   <xsl:param name="lang"/>
+  <xsl:param name="date"/>
   <xsl:param name="publisher"/>
   <xsl:param name="audio-only"/>
 
@@ -29,7 +30,8 @@
 	<dc-metadata xmlns:oebpackage="http://openebook.org/namespaces/oeb-package/1.0/" xmlns:dc="http://purl.org/dc/elements/1.1/">
 	  <dc:Format>ANSI/NISO Z39.86-2005</dc:Format>
 	  <dc:Language><xsl:value-of select="$lang"/></dc:Language>
-	  <dc:Date><xsl:value-of select="format-date(current-date(), '[Y0001]-[M01]-[D01]')"/></dc:Date>
+	  <dc:Date><xsl:value-of select="if ($date[.!='']) then $date
+	                                 else format-date(current-date(), '[Y0001]-[M01]-[D01]')"/></dc:Date>
 	  <dc:Publisher><xsl:value-of select="$publisher"/></dc:Publisher>
 	  <dc:Title><xsl:value-of select="$title"/></dc:Title>
 	  <dc:Identifier id="uid"><xsl:value-of select="$uid"/></dc:Identifier>

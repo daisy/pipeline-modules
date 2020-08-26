@@ -59,6 +59,7 @@
 				</x:document>
 			</x:input>
 			<x:input port="in-memory.in"/>
+			<x:option name="date" select="'2020-03-03'"/>
 			<x:option name="output-dir" select="resolve-uri('result/')"/>
 		</x:call>
 		<x:context label="the fileset.out port">
@@ -257,9 +258,6 @@
 						<meta name="ncc:footnotes" content="0"/>
 						<meta name="ncc:sidebars" content="0"/>
 						<meta name="ncc:maxPageNormal" content="24"/>
-						<!--
-						    FIXME: brittle test because of data
-						-->
 						<meta name="ncc:producedDate" content="2020-03-03"/>
 						<meta name="ncc:tocItems" content="44"/>
 					</head>

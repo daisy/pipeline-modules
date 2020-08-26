@@ -114,6 +114,14 @@
     </p:documentation>
   </p:option>
 
+  <p:option name="date" required="false" select="''">
+    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <p>Date of publication of the DTB</p>
+      <p>Format must be YYYY[-MM[-DD]]</p>
+      <p>Defaults to the current date.</p>
+    </p:documentation>
+  </p:option>
+
   <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
     <p:documentation>
       px:assert
@@ -378,6 +386,7 @@
       <p:with-option name="uid" select="$uid"/>
       <p:with-option name="title" select="$title"/>
       <p:with-option name="lang" select="$lang"/>
+      <p:with-option name="date" select="$date"/>
       <p:with-option name="publisher" select="$publisher"/>
       <p:with-option name="audio-only" select="$audio-only"/>
       <p:with-option name="total-time" select="//*[@duration]/@duration">

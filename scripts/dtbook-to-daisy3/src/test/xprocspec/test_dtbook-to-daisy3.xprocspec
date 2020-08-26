@@ -180,6 +180,7 @@
 			</x:input>
 			<x:option name="audio" select="false()"/>
 			<x:option name="audio-only" select="false()"/>
+			<x:option name="date" select="'2020-02-27'"/>
 			<x:option name="output-fileset-base" select="resolve-uri('result/')"/>
 		</x:call>
 		<x:context label="the fileset.out port">

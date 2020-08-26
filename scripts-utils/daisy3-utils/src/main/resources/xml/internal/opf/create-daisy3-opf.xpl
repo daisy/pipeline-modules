@@ -58,6 +58,14 @@
       </p:documentation>
     </p:option>
 
+    <p:option name="date" required="false" select="''">
+      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+        <p>Date of publication of the DTB</p>
+        <p>Format must be YYYY[-MM[-DD]]</p>
+        <p>Defaults to the current date.</p>
+      </p:documentation>
+    </p:option>
+
     <p:option name="audio-only" required="false" select="'false'">
       <p:documentation xmlns="http://www.w3.org/1999/xhtml">
         <p>No reference to DTBook in SMIL files</p>
@@ -83,6 +91,7 @@
 	<p:document href="create-opf.xsl"/>
       </p:input>
       <p:with-param name="lang" select="$lang"/>
+      <p:with-param name="date" select="$date"/>
       <p:with-param name="publisher" select="$publisher"/>
       <p:with-param name="output-base-uri" select="$opf-uri"/>
       <p:with-param name="uid" select="$uid"/>

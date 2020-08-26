@@ -25,6 +25,14 @@
         <p:pipe port="result" step="result-docs"/>
     </p:output>
 
+    <p:option name="date" select="''">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Date of publication of the result DAISY 2.02 DTB.</p>
+            <p>Must be a ISO8601 date - recommended format is YYYY-MM-DD.</p>
+            <p>Defaults to the current date.</p>
+        </p:documentation>
+    </p:option>
+
     <p:option name="output-dir" required="true"/>
 
     <p:serialization port="fileset.out" indent="true"/>
@@ -132,9 +140,7 @@
             <p:input port="stylesheet">
                 <p:document href="ncx-to-ncc.xsl"/>
             </p:input>
-            <p:input port="parameters">
-                <p:empty/>
-            </p:input>
+            <p:with-param name="date" select="$date"/>
         </p:xslt>
         <px:set-base-uri name="ncc.doc">
             <p:with-option name="base-uri" select="concat($output-dir,'ncc.html')"/>
