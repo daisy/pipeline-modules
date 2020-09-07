@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <x:description xmlns:x="http://www.jenitennison.com/xslt/xspec"
+               xmlns:epub="http://www.idpf.org/2007/ops"
                xmlns="http://www.w3.org/1999/xhtml"
                stylesheet="../../main/resources/xml/xslt/html5-outliner.xsl">
 
@@ -119,11 +120,12 @@
 		</x:context>
 		<x:expect label="outline">
 			<ol>
-				<li><a href="content.xhtml#body">h12</a>
+				<li data-generated="true"><a href="content.xhtml#body">Untitled document</a>
 				<ol>
 					<li><a href="content.xhtml#section">h11</a></li>
 				</ol>
 				</li>
+				<li><a href="content.xhtml#h12">h12</a></li>
 			</ol>
 		</x:expect>
 	</x:scenario>
@@ -144,9 +146,13 @@
 		</x:context>
 		<x:expect label="outline">
 			<ol>
-				<li><a href="content.xhtml#body">h12</a>
+				<li data-generated="true"><a href="content.xhtml#body">Untitled document</a>
 				<ol>
 					<li><a href="content.xhtml#section1">h11</a></li>
+				</ol>
+				</li>
+				<li><a href="content.xhtml#h12">h12</a>
+				<ol>
 					<li><a href="content.xhtml#section2">h13</a></li>
 				</ol>
 				</li>
@@ -915,11 +921,12 @@
 		</x:context>
 		<x:expect label="outline">
 			<ol>
-				<li><a href="content.xhtml#body">Foo</a>
+				<li data-generated="true"><a href="content.xhtml#body">Untitled document</a>
 				<ol>
 					<li><a href="content.xhtml#section1">Thud</a></li>
 				</ol>
 				</li>
+				<li><a href="content.xhtml#foo">Foo</a></li>
 				<li><a href="content.xhtml#bar">Bar</a>
 				<ol>
 					<li><a href="content.xhtml#quux">Quux</a></li>
@@ -952,11 +959,12 @@
 		</x:context>
 		<x:expect label="outline">
 			<ol>
-				<li><a href="content.xhtml#body">Foo</a>
+				<li data-generated="true"><a href="content.xhtml#body">Untitled document</a>
 				<ol>
 					<li><a href="content.xhtml#section1">Thud</a></li>
 				</ol>
 				</li>
+				<li><a href="content.xhtml#foo">Foo</a></li>
 				<li><a href="content.xhtml#bar1">Bar</a>
 				<ol>
 					<li><a href="content.xhtml#section2">Thud</a></li>
@@ -1056,9 +1064,13 @@
 		</x:context>
 		<x:expect label="outline">
 			<ol>
-				<li><a href="content.xhtml#body">h2</a>
+				<li data-generated="true"><a href="content.xhtml#body">Untitled document</a>
 				<ol>
 					<li><a href="content.xhtml#section">h1</a></li>
+				</ol>
+				</li>
+				<li><a href="content.xhtml#h21">h2</a>
+				<ol>
 					<li><a href="content.xhtml#h31">h3</a></li>
 				</ol>
 				</li>
@@ -1105,20 +1117,38 @@
 		</x:expect>
 	</x:scenario>
 	
-	<x:scenario label="complex 8 - handle empty titles">
+	<x:scenario label="empty titles">
 		<x:context>
 			<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" xml:base="file:/tmp/content.xhtml">
-				<head><meta charset="UTF-8" /><title></title></head>
-				<body xmlns:epub="http://www.idpf.org/2007/ops" id="d862273e7-0" epub:type="frontmatter">
-					<section id="d861827e19">
-						<h1 id="d862273e9-0" epub:type="title"><span class="ftit"></span></h1>
-						<p><span class="auteur"><span class="pc">LOREM IPSUM</span> <span class="pc">LOREM IPSUM</span></span></p><aside id="d862273e18-0" epub:type="annotation">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua</aside>
+				<head>
+					<meta charset="UTF-8"/>
+					<title/>
+				</head>
+				<body id="id_1" epub:type="frontmatter">
+					<section id="id_2">
+						<h1 id="id_3" epub:type="title"><span class="ftit"/></h1>
+						<p>
+							<span class="auteur">
+								<span class="pc">LOREM IPSUM</span> <span class="pc">LOREM IPSUM</span>
+							</span>
+						</p>
+						<aside id="id_4" epub:type="annotation">
+							Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+							tempor incididunt ut labore et dolore magna aliqua
+						</aside>
 					</section>
-					<section id="d861827e29"><p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.</p><aside id="d862273e51-0" epub:type="annotation">Image non fournie par l éditeur.</aside>
+					<section id="id_5">
+						<p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut
+						fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi
+						nesciunt.</p>
+						<aside id="id_6" epub:type="annotation">Image non fournie par l éditeur.</aside>
 					</section>
-					<section id="d861827e87">
-						<h1 id="d862273e78-0"><em>Table des matières</em></h1>
-						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua</p>
+					<section id="id_7">
+						<h1 id="id_8">
+							<em>Table des matières</em>
+						</h1>
+						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+						tempor incididunt ut labore et dolore magna aliqua</p>
 					</section>
 				</body>
 			</html>
@@ -1126,27 +1156,27 @@
 		<x:expect label="outline">
 			<ol xmlns="http://www.w3.org/1999/xhtml">
 				<li data-generated="true">
-					<a href="content.xhtml#d862273e7-0">Untitled document</a>
+					<a href="content.xhtml#id_1">Untitled document</a>
 					<ol>
 						<li data-generated="true">
-							<a href="content.xhtml#d861827e19">Untitled section</a>
+							<a href="content.xhtml#id_2">Untitled section</a>
 							<ol>
 								<li data-generated="true">
-									<a href="content.xhtml#d862273e18-0">Sidebar</a>
+									<a href="content.xhtml#id_4">Sidebar</a>
 								</li>
 							</ol>
 						</li>
 						<li data-generated="true">
-							<a href="content.xhtml#d861827e29">Untitled section</a>
+							<a href="content.xhtml#id_5">Untitled section</a>
 							<ol>
 								<li data-generated="true">
-									<a href="content.xhtml#d862273e51-0">Sidebar</a>
+									<a href="content.xhtml#id_6">Sidebar</a>
 								</li>
 							</ol>
 						</li>
 						<li>
-							<a href="content.xhtml#d861827e87">
-								<em xmlns:epub="http://www.idpf.org/2007/ops">Table des matières</em>
+							<a href="content.xhtml#id_7">
+								<em>Table des matières</em>
 							</a>
 						</li>
 					</ol>
