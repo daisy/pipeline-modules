@@ -5,6 +5,7 @@
                 xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions"
                 xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
                 xmlns:tts="http://www.daisy.org/ns/pipeline/tts"
+                xmlns:epub="http://www.idpf.org/2007/ops"
                 xmlns="http://www.w3.org/1999/xhtml"
                 xpath-default-namespace="http://www.w3.org/1999/xhtml"
                 exclude-result-prefixes="#all">
@@ -22,8 +23,13 @@
     -->
 
     <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl"/>
+    <xsl:include href="untitled-section-titles.xsl"/>
 
     <xsl:param name="output-base-uri" required="yes"/>
+    <xsl:param name="heading-links-only" required="yes"/>
+    <xsl:param name="fix-untitled-sections-in-outline" required="yes"/>
+
+    <xsl:key name="id" match="*" use="@id"/>
 
     <xsl:template match="/">
         <!-- Create the outline -->
@@ -54,12 +60,23 @@
         <xsl:param name="outline" as="element(d:outline)" required="yes"/>
         <xsl:variable name="input-base-uri" select="base-uri(/*)"/>
         <xsl:variable name="relative-path" select="pf:relativize-uri($input-base-uri, $output-base-uri)"/>
-        <ol>
-            <xsl:apply-templates select="$outline">
-                <xsl:with-param name="html-doc" tunnel="yes" select="root()"/>
-                <xsl:with-param name="relative-path" tunnel="yes" select="$relative-path"/>
-            </xsl:apply-templates>
-        </ol>
+        <xsl:variable name="ol" as="element(ol)">
+            <ol>
+                <xsl:apply-templates select="$outline">
+                    <xsl:with-param name="html-doc" tunnel="yes" select="root()"/>
+                    <xsl:with-param name="relative-path" tunnel="yes" select="$relative-path"/>
+                </xsl:apply-templates>
+            </ol>
+        </xsl:variable>
+        <xsl:choose>
+            <xsl:when test="$fix-untitled-sections-in-outline='unwrap'">
+                <!-- Because we might be left with empty ol elements -->
+                <xsl:apply-templates mode="clean" select="$ol"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:sequence select="$ol"/>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
     <!-- for XSpec tests -->
@@ -212,81 +229,89 @@
         <xsl:if test="not(@owner) and not(@heading)">
             <xsl:message terminate="yes">coding error</xsl:message>
         </xsl:if>
-        <li>
-            <xsl:variable name="heading" as="element()?" select="for $h in @heading return $html-doc//*[@id=$h]"/>
-            <xsl:variable name="heading" as="element()?" select="for $h in $heading return
-                                                                 if (f:is-heading($h))
-                                                                   then $h
-                                                                   else $h/*[f:is-heading(.)][1]"/>
-            <xsl:if test="not($heading/descendant-or-self::text())">
-                <!-- An empty heading leads to an empty entry after the nav-fixer process, which
-                     leads to an invalid EPUB according to epubcheck. Therefore mark the
-                     corresponding entries as "data-generated" to be identified by the nav-fixer as
-                     removable. -->
-                <xsl:attribute name="data-generated" select="'true'"/>
-            </xsl:if>
-            <a href="{$relative-path}#{(@owner,@heading)[1]}">
-                <!-- FIXME: try to not "depend" on the TTS namespace here -->
-                <xsl:sequence select="$heading/ancestor-or-self::*/@tts:*"/>
-                <xsl:choose>
-                    <xsl:when test="$heading/descendant-or-self::text()">
-                        <!-- Get the content of the associated heading content element. -->
+        <xsl:variable name="heading" as="element()?" select="key('id',@heading,$html-doc)"/>
+        <xsl:variable name="heading" as="element()?" select="for $h in $heading return
+                                                             if (f:is-heading($h))
+                                                               then $h
+                                                               else $h/*[f:is-heading(.)][1]"/>
+        <xsl:choose>
+            <xsl:when test="not($heading/descendant-or-self::text())
+                            and $fix-untitled-sections-in-outline='unwrap'">
+                <xsl:apply-templates select="*"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <li>
+                    <xsl:element namespace="http://www.w3.org/1999/xhtml"
+                                 name="{if ($heading-links-only='true' and not(@heading))
+                                        then 'span'
+                                        else 'a'}">
                         <xsl:choose>
-                            <xsl:when test="$heading[self::h1 or
-                                                     self::h2 or
-                                                     self::h3 or
-                                                     self::h4 or
-                                                     self::h5 or
-                                                     self::h6]">
-                                <xsl:apply-templates select="$heading/(*|text())"/>
+                            <xsl:when test="$heading-links-only='true'">
+                                <xsl:if test="@heading">
+                                    <xsl:attribute name="href" select="concat($relative-path,'#',@heading)"/>
+                                </xsl:if>
                             </xsl:when>
-                            <xsl:when test="$heading[self::hgroup]">
-                                <!-- Get the content of the child that gives this hgroup its rank. -->
-                                <xsl:variable name="rank" select="f:rank($heading)"/>
-                                <xsl:variable name="heading" select="$heading/*[f:rank(.)=$rank][1]"/>
-                                <xsl:apply-templates select="$heading/(*|text())"/>
-                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="href" select="concat($relative-path,'#',(@owner,@heading)[1])"/>
+                            </xsl:otherwise>
                         </xsl:choose>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <!-- If the section has no associated heading, create implied heading -->
-                        <xsl:variable name="outline-owner" as="element()?"
-                                      select="for $o in @owner return $html-doc//*[@id=$o]"/>
+                        <!-- FIXME: try to not "depend" on the TTS namespace here -->
+                        <xsl:sequence select="$heading/ancestor-or-self::*/@tts:*"/>
                         <xsl:choose>
-                            <xsl:when test="$outline-owner[self::body]">
-                                <xsl:sequence select="'Untitled document'"/>
+                            <xsl:when test="$heading/descendant-or-self::text()">
+                                <!-- Get the content of the associated heading content element. -->
+                                <xsl:choose>
+                                    <xsl:when test="$heading[self::h1 or
+                                                             self::h2 or
+                                                             self::h3 or
+                                                             self::h4 or
+                                                             self::h5 or
+                                                             self::h6]">
+                                        <xsl:apply-templates select="$heading/(*|text())"/>
+                                    </xsl:when>
+                                    <xsl:when test="$heading[self::hgroup]">
+                                        <!-- Get the content of the child that gives this hgroup its rank. -->
+                                        <xsl:variable name="rank" select="f:rank($heading)"/>
+                                        <xsl:variable name="heading" select="$heading/*[f:rank(.)=$rank][1]"/>
+                                        <xsl:apply-templates select="$heading/(*|text())"/>
+                                    </xsl:when>
+                                </xsl:choose>
                             </xsl:when>
-                            <xsl:when test="$outline-owner[self::article]">
-                                <xsl:sequence select="'Article'"/>
-                            </xsl:when>
-                            <xsl:when test="$outline-owner[self::aside]">
-                                <xsl:sequence select="'Sidebar'"/>
-                            </xsl:when>
-                            <xsl:when test="$outline-owner[self::nav]">
-                                <xsl:sequence select="'Navigation'"/>
+                            <xsl:when test="@owner">
+                                <!-- If the section has no associated heading, create implied heading -->
+                                <!-- An empty entry leads to an invalid EPUB according to epubcheck, so
+                                     treat an empty heading as an absent heading. -->
+                                <xsl:call-template name="get-untitled-section-title">
+                                    <xsl:with-param name="sectioning-element" select="key('id',@owner,$html-doc)"/>
+                                </xsl:call-template>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:sequence select="'Untitled section'"/>
                             </xsl:otherwise>
                         </xsl:choose>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </a>
-            <xsl:if test="exists(*)">
-                <ol>
-                    <xsl:apply-templates select="*"/>
-                </ol>
-            </xsl:if>
-        </li>
+                    </xsl:element>
+                    <xsl:if test="exists(*)">
+                        <ol>
+                            <xsl:apply-templates select="*"/>
+                        </ol>
+                    </xsl:if>
+                </li>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
     <!-- For the outline document convert anchor elements to span and take only the
          @class|@dir|@lang|@title attributes. -->
     <xsl:template match="a">
-        <span>
-            <xsl:copy-of select="@class|@dir|@lang|@title"/>
+        <xsl:variable name="content" as="node()*">
             <xsl:apply-templates/>
-        </span>
+        </xsl:variable>
+        <xsl:if test="exists($content)">
+            <span>
+                <xsl:copy-of select="@class|@dir|@lang|@title"/>
+                <xsl:sequence select="$content"/>
+            </span>
+        </xsl:if>
     </xsl:template>
 
     <xsl:template match="@*|node()">
@@ -295,11 +320,23 @@
         </xsl:copy>
     </xsl:template>
 
+    <!-- =========== -->
+    <!-- FOURTH PASS -->
+    <!-- =========== -->
+
+    <xsl:template mode="clean" match="ol[.. and not(li)]"/>
+
+    <xsl:template mode="clean" match="@*|node()">
+        <xsl:copy>
+            <xsl:apply-templates mode="#current" select="@*|node()"/>
+        </xsl:copy>
+    </xsl:template>
+
     <!-- ========= -->
     <!-- FUNCTIONS -->
     <!-- ========= -->
 
-    <!-- Check if an element is a header content element. -->
+    <!-- Check if an element is a heading content element. -->
     <xsl:function name="f:is-heading" as="xs:boolean">
         <xsl:param name="node" as="element()"/>
         <xsl:sequence select="boolean($node[self::h1 or

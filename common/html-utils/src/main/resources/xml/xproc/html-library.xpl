@@ -9,5 +9,6 @@
     <p:import href="html-upgrade.xpl"/>
     <p:import href="html-downgrade.xpl"/>
     <p:import href="html-update-links.xpl"/>
+    <p:import href="html-merge.xpl"/>
 
 </p:library>

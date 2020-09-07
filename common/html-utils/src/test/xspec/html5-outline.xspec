@@ -2,9 +2,11 @@
 <x:description xmlns:x="http://www.jenitennison.com/xslt/xspec"
                xmlns:epub="http://www.idpf.org/2007/ops"
                xmlns="http://www.w3.org/1999/xhtml"
-               stylesheet="../../main/resources/xml/xslt/html5-outliner.xsl">
+               stylesheet="../../main/resources/xml/xslt/html5-outline.xsl">
 
 	<x:param name="output-base-uri" select="'file:/tmp/toc.xhtml'"/>
+	<x:param name="heading-links-only" select="'false'"/>
+	<x:param name="fix-untitled-sections-in-outline" select="'imply-heading'"/>
 
 	<!-- ========================================================================== -->
 	<!-- the first heading element in sectioning content is the section heading     -->
@@ -120,7 +122,7 @@
 		</x:context>
 		<x:expect label="outline">
 			<ol>
-				<li data-generated="true"><a href="content.xhtml#body">Untitled document</a>
+				<li><a href="content.xhtml#body">Untitled document</a>
 				<ol>
 					<li><a href="content.xhtml#section">h11</a></li>
 				</ol>
@@ -146,7 +148,7 @@
 		</x:context>
 		<x:expect label="outline">
 			<ol>
-				<li data-generated="true"><a href="content.xhtml#body">Untitled document</a>
+				<li><a href="content.xhtml#body">Untitled document</a>
 				<ol>
 					<li><a href="content.xhtml#section1">h11</a></li>
 				</ol>
@@ -685,7 +687,7 @@
 		</x:context>
 		<x:expect label="outline">
 			<ol>
-				<li data-generated="true"><a href="content.xhtml#body">Untitled document</a></li>
+				<li><a href="content.xhtml#body">Untitled document</a></li>
 			</ol>
 		</x:expect>
 	</x:scenario>
@@ -703,7 +705,7 @@
 			<ol>
 				<li><a href="content.xhtml#body">h1</a>
 				<ol>
-					<li data-generated="true"><a href="content.xhtml#section">Untitled section</a></li>
+					<li><a href="content.xhtml#section">Untitled section</a></li>
 				</ol>
 				</li>
 			</ol>
@@ -723,7 +725,7 @@
 			<ol>
 				<li><a href="content.xhtml#body">h1</a>
 				<ol>
-					<li data-generated="true"><a href="content.xhtml#article">Article</a></li>
+					<li><a href="content.xhtml#article">Article</a></li>
 				</ol>
 				</li>
 			</ol>
@@ -743,7 +745,7 @@
 			<ol>
 				<li><a href="content.xhtml#body">h1</a>
 				<ol>
-					<li data-generated="true"><a href="content.xhtml#aside">Sidebar</a></li>
+					<li><a href="content.xhtml#aside">Sidebar</a></li>
 				</ol>
 				</li>
 			</ol>
@@ -763,7 +765,7 @@
 			<ol>
 				<li><a href="content.xhtml#body">h1</a>
 				<ol>
-					<li data-generated="true"><a href="content.xhtml#nav">Navigation</a></li>
+					<li><a href="content.xhtml#nav">Navigation</a></li>
 				</ol>
 				</li>
 			</ol>
@@ -921,7 +923,7 @@
 		</x:context>
 		<x:expect label="outline">
 			<ol>
-				<li data-generated="true"><a href="content.xhtml#body">Untitled document</a>
+				<li><a href="content.xhtml#body">Untitled document</a>
 				<ol>
 					<li><a href="content.xhtml#section1">Thud</a></li>
 				</ol>
@@ -959,7 +961,7 @@
 		</x:context>
 		<x:expect label="outline">
 			<ol>
-				<li data-generated="true"><a href="content.xhtml#body">Untitled document</a>
+				<li><a href="content.xhtml#body">Untitled document</a>
 				<ol>
 					<li><a href="content.xhtml#section1">Thud</a></li>
 				</ol>
@@ -1064,7 +1066,7 @@
 		</x:context>
 		<x:expect label="outline">
 			<ol>
-				<li data-generated="true"><a href="content.xhtml#body">Untitled document</a>
+				<li><a href="content.xhtml#body">Untitled document</a>
 				<ol>
 					<li><a href="content.xhtml#section">h1</a></li>
 				</ol>
@@ -1155,21 +1157,21 @@
 		</x:context>
 		<x:expect label="outline">
 			<ol xmlns="http://www.w3.org/1999/xhtml">
-				<li data-generated="true">
-					<a href="content.xhtml#id_1">Untitled document</a>
+				<li>
+					<a href="content.xhtml#id_1">Frontmatter</a>
 					<ol>
-						<li data-generated="true">
+						<li>
 							<a href="content.xhtml#id_2">Untitled section</a>
 							<ol>
-								<li data-generated="true">
+								<li>
 									<a href="content.xhtml#id_4">Sidebar</a>
 								</li>
 							</ol>
 						</li>
-						<li data-generated="true">
+						<li>
 							<a href="content.xhtml#id_5">Untitled section</a>
 							<ol>
-								<li data-generated="true">
+								<li>
 									<a href="content.xhtml#id_6">Sidebar</a>
 								</li>
 							</ol>
