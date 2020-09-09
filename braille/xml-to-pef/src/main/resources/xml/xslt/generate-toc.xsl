@@ -12,6 +12,7 @@
   <xsl:param name="heading-names" select="''"/>
   
   <xsl:include href="http://www.daisy.org/pipeline/modules/common-utils/generate-id.xsl"/>
+  <xsl:include href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl"/>
   
   <xsl:variable name="depth" as="xs:integer" select="if ($toc-depth) then xs:integer($toc-depth) else 6"/>
   
@@ -262,7 +263,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <xsl:attribute name="href" select="$id"/>
+    <xsl:attribute name="href" select="concat('#',encode-for-uri($id))"/>
     <xsl:if test="not(@xml:base)">
       <xsl:variable name="header-base-uri" as="xs:anyURI" select="base-uri(.)"/>
       <xsl:if test="not($header-base-uri=$root-base-uri)">
