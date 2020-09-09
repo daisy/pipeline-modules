@@ -8,9 +8,10 @@
                 version="2.0">
     
     <xsl:include href="http://www.daisy.org/pipeline/modules/common-utils/generate-id.xsl"/>
+    <xsl:include href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl"/>
     
-    <xsl:key name="url-1" match="*[@id]" use="resolve-uri(concat('#',@id),base-uri(.))"/>
-    <xsl:key name="url-2" match="*[@xml:id]" use="resolve-uri(concat('#',@xml:id),base-uri(.))"/>
+    <xsl:key name="url-1" match="*[@id]" use="pf:normalize-uri(resolve-uri(concat('#',encode-for-uri(@id)),base-uri(.)))"/>
+    <xsl:key name="url-2" match="*[@xml:id]" use="pf:normalize-uri(resolve-uri(concat('#',@xml:id),base-uri(.)))"/>
     
     <xsl:function name="f:get-target" as="element()?">
         <xsl:param name="target" as="xs:string"/> <!-- resolved and normalized URI -->
@@ -28,6 +29,7 @@
                 <xsl:variable name="target" as="xs:string" select="@target"/>
                 <xsl:variable name="target" as="xs:string" select="if (contains($target,'#')) then $target else concat('#',$target)"/>
                 <xsl:variable name="target" as="xs:anyURI" select="resolve-uri($target,base-uri(.))"/>
+                <xsl:variable name="target" as="xs:string" select="pf:normalize-uri($target)"/>
                 <xsl:sequence select="$target"/>
             </xsl:for-each>
         </xsl:variable>
@@ -54,8 +56,9 @@
     </xsl:template>
     
     <xsl:template match="*[@xml:id or @id][not(@css:id)]">
-        <xsl:variable name="uri" as="xs:anyURI*"
-                      select="for $id in (@xml:id|@id) return resolve-uri(concat('#',$id),base-uri(.))"/>
+        <xsl:variable name="uri" as="xs:string*"
+                      select="(@id/pf:normalize-uri(resolve-uri(concat('#',encode-for-uri(.)),base-uri(..))),
+                               @xml:id/pf:normalize-uri(resolve-uri(concat('#',.),base-uri(..))))"/>
         <xsl:choose>
             <xsl:when test="$referenced-elements[.=$uri and f:get-target(.) is current()]">
                 <xsl:copy>
@@ -77,8 +80,8 @@
                          css:string[@name][@target]|
                          css:counter[@target]|
                          css:content[@target]">
-        <xsl:variable name="uri" as="xs:anyURI"
-                      select="resolve-uri(if (contains(@target,'#')) then @target else concat('#',@target),base-uri(.))"/>
+        <xsl:variable name="uri" as="xs:string"
+                      select="pf:normalize-uri(resolve-uri(if (contains(@target,'#')) then @target else concat('#',@target),base-uri(.)))"/>
         <xsl:variable name="target" as="element()?" select="f:get-target($uri)"/>
         <xsl:choose>
             <xsl:when test="exists($target)">

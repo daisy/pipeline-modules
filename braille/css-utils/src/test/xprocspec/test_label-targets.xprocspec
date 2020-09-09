@@ -110,4 +110,36 @@
     </x:expect>
   </x:scenario>
   
+  <x:scenario label="test_03">
+    <x:call step="css:label-targets">
+      <x:input port="source">
+        <x:document type="inline">
+          <html xmlns="http://www.w3.org/1999/xhtml">
+            <body>
+              <a class="pageref" href="#%23x">
+                <css:counter target="#%23x" name="page"/>
+              </a>
+              <a class="page" id="#x"/>
+            </body>
+          </html>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="result" type="compare">
+      <x:document type="inline">
+          <html xmlns="http://www.w3.org/1999/xhtml">
+            <body>
+              <a class="pageref" href="#%23x">
+                <css:counter target="target_1" original-target="#%23x" name="page"/>
+              </a>
+              <a class="page" id="#x" css:id="target_1"/>
+            </body>
+          </html>
+        </x:document>
+    </x:expect>
+  </x:scenario>
+  
 </x:description>
