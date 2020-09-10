@@ -34,10 +34,10 @@ import org.json.JSONObject;
 
 /**
  * Connector class to synthesize audio using the google cloud tts engine.
- * This connector is based on their REST Api.
- * 
- * @author Louis Caille @ braillenet.org
  *
+ * <p>This connector is based on their REST Api.</p>
+ *
+ * @author Louis Caille @ braillenet.org
  */
 public class GoogleRestTTSEngine extends MarklessTTSEngine {
 
@@ -45,21 +45,20 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 	private Scheduler<Schedulable> mRequestScheduler;
 	private int mPriority;
 	private GoogleRequestBuilder mRequestBuilder;
-	
+
 	public GoogleRestTTSEngine(GoogleTTSService googleService, String apiKey, AudioFormat audioFormat, int priority) {
 		super(googleService);
 		mPriority = priority;
 		mAudioFormat = audioFormat;
 		mRequestScheduler = new ExponentialBackoffScheduler<Schedulable>();
 		mRequestBuilder = new GoogleRequestBuilder(apiKey);
-		
 	}
 
 	@Override
-	public Collection<AudioBuffer> synthesize(String sentence, XdmNode xmlSentence,
-			Voice voice, TTSResource threadResources, AudioBufferAllocator bufferAllocator, boolean retry)
-					throws SynthesisException,InterruptedException, MemoryException {
-		
+	public Collection<AudioBuffer> synthesize(String sentence, XdmNode xmlSentence, Voice voice, TTSResource threadResources,
+	                                          AudioBufferAllocator bufferAllocator, boolean retry)
+			throws SynthesisException,InterruptedException, MemoryException {
+	
 		if (sentence.length() > 5000) {
 			throw new SynthesisException("The number of characters in the sentence must not exceed 5000.");
 		}
@@ -68,9 +67,9 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 
 		// the sentence must be in an appropriate format to be inserted in the json query
 		// it is necessary to wrap the sentence in quotes and add backslash in front of the existing quotes
-		
+
 		String adaptedSentence = "";
-		
+
 		for (int i = 0; i < sentence.length(); i++) {
 			if (sentence.charAt(i) == '"') {
 				adaptedSentence = adaptedSentence + '\\' + sentence.charAt(i);
@@ -79,7 +78,7 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 				adaptedSentence = adaptedSentence + sentence.charAt(i);
 			}
 		}
-		
+
 		String languageCode;
 		String name;
 		int indexOfSecondHyphen;
@@ -89,27 +88,22 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 			indexOfSecondHyphen = voice.name.indexOf('-', voice.name.indexOf('-') + 1);
 			languageCode = voice.name.substring(0, indexOfSecondHyphen);
 			name = voice.name;
-		}
-		else {
+		} else {
 			// by default the voice is set to English
 			languageCode = "en-GB";
 			name = "en-GB-Standard-A";
 		}
-		
-		
-		
-		
+
 		try {
 			Request<JSONObject> speechRequest = mRequestBuilder.newRequest()
-					.withSampleRate((int)mAudioFormat.getSampleRate())
-					.withAction(GoogleRestAction.SPEECH)
-					.withLanguageCode(languageCode)
-					.withVoice(name)
-					.withText(adaptedSentence)
-					.build();
-			
-			
-			mRequestScheduler.launch(()->{
+				.withSampleRate((int)mAudioFormat.getSampleRate())
+				.withAction(GoogleRestAction.SPEECH)
+				.withLanguageCode(languageCode)
+				.withVoice(name)
+				.withText(adaptedSentence)
+				.build();
+
+			mRequestScheduler.launch(() -> {
 				try {
 					BufferedReader br = new BufferedReader(new InputStreamReader(speechRequest.send(), "utf-8"));
 					StringBuilder response = new StringBuilder();
@@ -142,7 +136,7 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 			StringWriter sw = new StringWriter();
 			e.printStackTrace(new PrintWriter(sw));
 			throw new SynthesisException(e.getMessage(), e.getCause());
-		} 
+		}
 
 		return result;
 	}
@@ -156,15 +150,13 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 	public Collection<Voice> getAvailableVoices() throws SynthesisException, InterruptedException {
 
 		Collection<Voice> result = new ArrayList<Voice>();
-		
+
 		try {
-			
+
 			Request<JSONObject> voicesRequest = mRequestBuilder.newRequest()
-					.withAction(GoogleRestAction.VOICES)
-					.build();
-			
-			
-			mRequestScheduler.launch(()->{
+				.withAction(GoogleRestAction.VOICES)
+				.build();
+			mRequestScheduler.launch(() -> {
 				try {
 					BufferedReader br = new BufferedReader(new InputStreamReader(voicesRequest.send(), "utf-8"));
 					StringBuilder response = new StringBuilder();
@@ -173,10 +165,10 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 						response.append(inputLine.trim());
 					}
 					br.close();
-					
+
 					// voice name pattern
 					Pattern p = Pattern .compile("[a-z]+-[A-Z]+-[a-z A-Z]+-[A-Z]");
-					
+
 					// we retrieve the names of the voices in the response returned by the API
 					Matcher m = p.matcher(response);
 
@@ -195,14 +187,12 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 					}
 				}
 			});
-			
+
 		} catch (Exception e) { // Include FatalError
 			throw new SynthesisException(e.getMessage(), e.getCause());
 		}
-		
 
 		return result;
-
 	}
 
 	@Override
@@ -215,12 +205,11 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 	InterruptedException {
 		return new TTSResource();
 	}
-	
+
 	@Override
 	public int expectedMillisecPerWord() {
-		// Worst case scenario with quotas : 
+		// Worst case scenario with quotas:
 		// the thread can wait for a bit more than a minute for a anwser
 		return 64000;
 	}
-
 }
