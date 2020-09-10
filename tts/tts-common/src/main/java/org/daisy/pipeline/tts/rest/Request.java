@@ -10,14 +10,15 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import org.json.JSONObject;
 
 /**
- * REST Request to communicate with remote services (mainly tts services like google and amazon)
+ * REST Request to communicate with remote services 
+ * (mainly tts services like google and amazon).
+ * 
  * @author Nicolas Pavie @ braillenet.org
  *
  */
-public class Request {
+public class Request<ContentType> {
 	
 	
 	private static List<String> httpMethods =  
@@ -26,7 +27,7 @@ public class Request {
 				"CONNECT","OPTIONS","TRACE","PATCH");
 	
 	private HashMap<String,String> headers = new HashMap<String,String>();
-	private JSONObject parameters = null;
+	private ContentType content = null;
 	private URL requestURL;
 	private String method = "GET";
 	private HttpURLConnection connection;
@@ -37,27 +38,36 @@ public class Request {
 	 * @param url a string of the complete request url (including url parameters like "?voice=smtg)"
 	 * @param headers http headers of the request <br/>
 	 * Use {@code null} to unset all headers.
-	 * @param parameters json data parameters to send with the request (often associated with POST requests)<br/> 
-	 * Use {@code null} for requests without parameters
+	 * @param content content to send with the request (often associated with POST requests)<br/> 
+	 * Use {@code null} for requests without content
 	 * @throws Exception if the http method is not one of the list above
 	 * @throws MalformedURLException if the url is not valid
 	 */
-	public Request(String httpMethod, String url, HashMap<String,String> headers, JSONObject parameters) throws Exception, MalformedURLException {
+	public Request(String httpMethod, String url, HashMap<String,String> headers, ContentType content) throws Exception, MalformedURLException {
 		this.setMethod(httpMethod);
 		this.setRequestUrl(url);
 		this.headers = headers;
-		this.parameters = parameters;
+		this.content = content;
 	}
 	
 	
-	
+	/**
+	 * Add a new header field with specified value to the request
+	 * @param name name of the header field 
+	 * @param value value set for the field
+	 */
 	public void addHeader(String name, String value) {
 		this.headers.put(name, value);
 	}
 	
 	
-	public void setParameters(JSONObject parameters) {
-		this.parameters = parameters;
+	/**
+	 * Set the request content, to be sent through 
+	 * the request connection output stream
+	 * @param content content of the request 
+	 */
+	public void setContent(ContentType content) {
+		this.content = content;
 	}
 	
 	/**
@@ -92,16 +102,15 @@ public class Request {
 	 * @throws IOException if an error occured during the connection or while sending data to the server
 	 */
 	public InputStream send() throws IOException {
-		
 		connection = (HttpURLConnection) requestURL.openConnection();
 		connection.setRequestMethod(method);
 		if(headers != null) headers.forEach((String key, String value) -> {
 				connection.setRequestProperty(key, value);
 			});
-		if(parameters != null) {
+		if(content != null) {
 			connection.setDoOutput(true);
 			try(OutputStream os = connection.getOutputStream()) {
-				byte[] input = parameters.toString().getBytes("utf-8");
+				byte[] input = content.toString().getBytes("utf-8");
 				os.write(input, 0, input.length);           
 			}
 		} else {

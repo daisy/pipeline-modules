@@ -99,7 +99,7 @@ public class GoogleRequestBuilder {
 	 * @return
 	 * @throws Exception
 	 */
-	public Request build() throws Exception {
+	public Request<JSONObject> build() throws Exception {
 		
 		HashMap<String, String> headers = new HashMap<String, String>();
 		JSONObject parameters = null;
@@ -142,7 +142,7 @@ public class GoogleRequestBuilder {
 		}
 		
 		
-		return new Request(
+		return new Request<JSONObject>(
 				action.method, 
 				"https://texttospeech.googleapis.com" + action.domain + "?key=" + apiKey, 
 				headers, 

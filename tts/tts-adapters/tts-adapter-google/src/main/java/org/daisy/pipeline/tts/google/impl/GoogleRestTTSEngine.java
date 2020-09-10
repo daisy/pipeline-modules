@@ -30,6 +30,8 @@ import org.daisy.pipeline.tts.scheduler.RecoverableError;
 import org.daisy.pipeline.tts.scheduler.Schedulable;
 import org.daisy.pipeline.tts.scheduler.Scheduler;
 
+import org.json.JSONObject;
+
 /**
  * Connector class to synthesize audio using the google cloud tts engine.
  * This connector is based on their REST Api.
@@ -98,7 +100,7 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 		
 		
 		try {
-			Request speechRequest = mRequestBuilder.newRequest()
+			Request<JSONObject> speechRequest = mRequestBuilder.newRequest()
 					.withSampleRate((int)mAudioFormat.getSampleRate())
 					.withAction(GoogleRestAction.SPEECH)
 					.withLanguageCode(languageCode)
@@ -157,7 +159,7 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 		
 		try {
 			
-			Request voicesRequest = mRequestBuilder.newRequest()
+			Request<JSONObject> voicesRequest = mRequestBuilder.newRequest()
 					.withAction(GoogleRestAction.VOICES)
 					.build();
 			
