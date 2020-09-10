@@ -25,11 +25,11 @@ import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.Voice;
 import org.daisy.pipeline.tts.rest.Request;
+import org.daisy.pipeline.tts.scheduler.ExponentialBackoffScheduler;
 import org.daisy.pipeline.tts.scheduler.FatalError;
 import org.daisy.pipeline.tts.scheduler.RecoverableError;
 import org.daisy.pipeline.tts.scheduler.Schedulable;
 import org.daisy.pipeline.tts.scheduler.Scheduler;
-import org.daisy.pipeline.tts.scheduler.impl.ExponentialBackoffScheduler;
 
 /**
  * Connector class to synthesize audio using the google cloud tts engine.
