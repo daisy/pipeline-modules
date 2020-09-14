@@ -2,6 +2,7 @@ package org.daisy.pipeline.tts.google.impl;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -104,31 +105,25 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 				.build();
 
 			mRequestScheduler.launch(() -> {
+				Response response = doRequest(speechRequest);
+				if (response.status == 429)
+					throw new RecoverableError("Exceeded quotas", response.exception);
+				else if (response.status != 200)
+					throw new FatalError("Response code " + response.status, response.exception);
+				else if (response.body == null)
+					throw new FatalError("Response body is null", response.exception);
 				try {
-					BufferedReader br = new BufferedReader(new InputStreamReader(speechRequest.send(), "utf-8"));
-					StringBuilder response = new StringBuilder();
-					String inputLine;
-					while ((inputLine = br.readLine()) != null) {
-						response.append(inputLine.trim());
-					}
-					br.close();
+					String responseString = readStream(response.body);
 
+					// FIXME: properly parse and validate JSON
+					String audioContent = responseString.substring(18, responseString.length()-2);
 					// the answer is encoded in base 64, so it must be decoded
-					byte[] decodedBytes = Base64.getDecoder().decode(response.toString().substring(18, response.length()-2));
-
+					byte[] decodedBytes = Base64.getDecoder().decode(audioContent);
 					AudioBuffer b = bufferAllocator.allocateBuffer(decodedBytes.length);
 					b.data = decodedBytes;
 					result.add(b);
 				} catch (IOException | MemoryException e) {
-					try {
-						if (speechRequest.getConnection().getResponseCode() == 429) {
-							throw new RecoverableError("Exceeded quotas", e);
-						} else {
-							throw new FatalError(e);
-						}
-					} catch (IOException responseCodeError) {
-						throw new FatalError("could not retrieve response code for request", responseCodeError);
-					}
+					throw new FatalError(e);
 				}
 			});
 		} catch (Exception e) { // include FatalError
@@ -157,34 +152,25 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 				.withAction(GoogleRestAction.VOICES)
 				.build();
 			mRequestScheduler.launch(() -> {
+				Response response = doRequest(voicesRequest);
+				if (response.status == 429)
+					throw new RecoverableError("Exceeded quotas", response.exception);
+				else if (response.status != 200)
+					throw new FatalError("Response code " + response.status, response.exception);
+				else if (response.body == null)
+					throw new FatalError("Response body is null", response.exception);
 				try {
-					BufferedReader br = new BufferedReader(new InputStreamReader(voicesRequest.send(), "utf-8"));
-					StringBuilder response = new StringBuilder();
-					String inputLine;
-					while ((inputLine = br.readLine()) != null) {
-						response.append(inputLine.trim());
-					}
-					br.close();
-
-					// voice name pattern
-					Pattern p = Pattern .compile("[a-z]+-[A-Z]+-[a-z A-Z]+-[A-Z]");
+					String responseString = readStream(response.body);
 
 					// we retrieve the names of the voices in the response returned by the API
-					Matcher m = p.matcher(response);
-
+					// FIXME: properly parse and validate JSON
+					Pattern p = Pattern.compile("[a-z]+-[A-Z]+-[a-z A-Z]+-[A-Z]");
+					Matcher m = p.matcher(responseString);
 					while (m.find()) {
-						result.add(new Voice(getProvider().getName(),response.substring(m.start(), m.end())));;
+						result.add(new Voice(getProvider().getName(),responseString.substring(m.start(), m.end())));
 					}
 				} catch (IOException e) {
-					try {
-						if (voicesRequest.getConnection().getResponseCode() == 429) {
-							throw new RecoverableError("Exceeded quotas", e);
-						} else {
-							throw new FatalError(e);
-						}
-					} catch (IOException responseCodeError) {
-						throw new FatalError("could not retrieve response code of a request", responseCodeError);
-					}
+					throw new FatalError(e);
 				}
 			});
 
@@ -211,5 +197,47 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 		// Worst case scenario with quotas:
 		// the thread can wait for a bit more than a minute for a anwser
 		return 64000;
+	}
+
+	private static class Response {
+		int status;
+		InputStream body;
+		IOException exception;
+	}
+
+	/**
+	 * Send request and get response status code and body.
+	 *
+	 * <p><code>body</code> is null if <code>exception</code> is non-null and visa-versa.</p>
+	 *
+	 * @throws FatalError if <code>status</code> can not be retrieved.
+	 */
+	private static Response doRequest(Request request) throws FatalError {
+		Response r = new Response();
+		try {
+			r.body = request.send();
+		} catch (IOException e) {
+			r.exception = e;
+		}
+		try {
+			r.status = request.getConnection().getResponseCode();
+		} catch (IOException responseCodeError) {
+			throw new FatalError("could not retrieve response code for request", responseCodeError);
+		}
+		return r;
+	}
+
+	/**
+	 * Read InputStream as a UTF-8 encoded string.
+	 */
+	private static String readStream(InputStream is) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(is, "utf-8"));
+		StringBuilder sb = new StringBuilder();
+		String line;
+		while ((line = br.readLine()) != null) {
+			sb.append(line.trim());
+		}
+		br.close();
+		return sb.toString();
 	}
 }
