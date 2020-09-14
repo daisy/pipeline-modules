@@ -15,7 +15,9 @@
                 exclude-inline-prefixes="#all"
                 name="main">
     
-    <p:option name="epub" required="true"/>
+    <p:option name="epub" required="true">
+      <p:documentation>Base URI to resolve style sheets against</p:documentation>
+    </p:option>
     <p:input port="fileset.in" primary="true"/>
     <p:input port="in-memory.in" sequence="true"/>
     <p:output port="fileset.out" primary="true">
@@ -102,6 +104,26 @@
         </p:input>
         <p:with-option name="media-types" select="string-join(('application/oebps-package+xml',$content-media-types),' ')"/>
     </px:fileset-load>
+    <!-- Prepend preamble -->
+    <p:identity name="spine"/>
+    <p:sink/>
+    <p:delete match="/*/d:file[not(@role='preamble')]">
+        <p:input port="source">
+            <p:pipe step="main" port="fileset.in"/>
+        </p:input>
+    </p:delete>
+    <px:fileset-load name="preamble">
+        <p:input port="in-memory">
+            <p:pipe port="in-memory.in" step="main"/>
+        </p:input>
+    </px:fileset-load>
+    <p:sink/>
+    <p:identity>
+        <p:input port="source">
+            <p:pipe step="preamble" port="result"/>
+            <p:pipe step="spine" port="result"/>
+        </p:input>
+    </p:identity>
     <p:for-each>
         <p:add-xml-base/>
     </p:for-each>
