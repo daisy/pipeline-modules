@@ -422,7 +422,7 @@
       <dependency>
         <groupId>org.daisy.pipeline</groupId>
         <artifactId>framework-bom</artifactId>
-        <version>1.13.2</version>
+        <version>1.13.3-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -818,11 +818,6 @@
         <dependency>
           <groupId>org.daisy.pipeline</groupId>
           <artifactId>webservice</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.daisy.pipeline</groupId>
-          <artifactId>push-notifier</artifactId>
           <scope>test</scope>
         </dependency>
         <dependency>
