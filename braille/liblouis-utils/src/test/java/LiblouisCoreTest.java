@@ -213,6 +213,14 @@ public class LiblouisCoreTest extends AbstractTest {
 	}
 	
 	@Test
+	public void testUndefinedChar() {
+		FromStyledTextToBraille translator = provider.withContext(messageBus)
+		                                             .get(query("(locale:foo)(contraction:full)(dots-for-undefined-char:'⣀')")).iterator().next()
+		                                             .fromStyledTextToBraille();
+		assertEquals(braille("⣀"), translator.transform(text("€")));
+	}
+	
+	@Test
 	public void testHyphenate() {
 		assertEquals("foo\u00ADbar",
 		             hyphenatorProvider.withContext(messageBus)
