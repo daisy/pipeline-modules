@@ -21,14 +21,15 @@ import com.google.common.collect.Iterators;
 
 import cz.vutbr.web.css.CSSFactory;
 import cz.vutbr.web.css.MediaSpec;
-import cz.vutbr.web.css.NetworkProcessor;
 import cz.vutbr.web.css.NodeData;
 import cz.vutbr.web.css.RuleFactory;
 import cz.vutbr.web.css.Selector.PseudoElement;
 import cz.vutbr.web.css.StyleSheet;
 import cz.vutbr.web.css.SupportedCSS;
 import cz.vutbr.web.csskit.antlr.CSSParserFactory;
-import cz.vutbr.web.csskit.antlr.CSSParserFactory.SourceType;
+import cz.vutbr.web.csskit.antlr.CSSSource;
+import cz.vutbr.web.csskit.antlr.CSSSourceReader;
+import cz.vutbr.web.csskit.antlr.DefaultCSSSourceReader;
 import cz.vutbr.web.csskit.DefaultNetworkProcessor;
 import cz.vutbr.web.domassign.Analyzer;
 import cz.vutbr.web.domassign.DeclarationTransformer;
@@ -67,7 +68,7 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 	private final RuleFactory ruleFactory;
 	private final SupportedCSS supportedCSS;
 	private final DeclarationTransformer declarationTransformer;
-	private final NetworkProcessor network;
+	private final CSSSourceReader cssReader;
 
 	private static final Logger logger = LoggerFactory.getLogger(JStyleParserCssCascader.class);
 
@@ -86,7 +87,7 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 		this.ruleFactory = ruleFactory;
 		this.supportedCSS = supportedCSS;
 		this.declarationTransformer = declarationTransformer;
-		this.network = new DefaultNetworkProcessor() {
+		this.cssReader = new DefaultCSSSourceReader(new DefaultNetworkProcessor() {
 				@Override
 				public InputStream fetch(URL url) throws IOException {
 					logger.debug("Fetching CSS style sheet: " + url);
@@ -107,7 +108,7 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 					is = new BOMInputStream(is);
 					return is;
 				}
-			};
+			});
 	}
 
 	private StyleSheet styleSheet = null;
@@ -153,10 +154,10 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 					StringTokenizer t = new StringTokenizer(defaultStyleSheet);
 					while (t.hasMoreTokens()) {
 						URL u = URLs.asURL(baseURI.resolve(URIs.asURI(t.nextToken())));
-						styleSheet = parserFactory.append(u, network, null, SourceType.URL, styleSheet, u);
+						styleSheet = parserFactory.append(new CSSSource(u, null), cssReader, styleSheet);
 					}
 				}
-				styleSheet = CSSFactory.getUsedStyles(document, null, baseURL, new MediaSpec(medium), network, styleSheet);
+				styleSheet = CSSFactory.getUsedStyles(document, null, baseURL, new MediaSpec(medium), cssReader, styleSheet);
 				styleMap = new Analyzer(styleSheet).evaluateDOM(document, medium, false);
 			}
 			writer.setBaseURI(baseURI);
