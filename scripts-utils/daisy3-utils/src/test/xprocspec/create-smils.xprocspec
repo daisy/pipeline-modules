@@ -75,6 +75,14 @@
           </d:fileset>
         </x:document>
       </x:expect>
+      <x:context label="dtb:totalElapsedTime meta elements ">
+        <x:document type="port" port="result.in-memory" select="//s:head/s:meta[@name='dtb:totalElapsedTime']"/>
+      </x:context>
+      <x:expect label="result" type="compare">
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <meta name="dtb:totalElapsedTime" content="0:00:00"/>
+        </x:document>
+      </x:expect>
       <x:context label="duration port">
         <x:document type="port" port="duration"/>
       </x:context>
@@ -120,6 +128,14 @@
           </body>
         </x:document>
       </x:expect>
+      <x:context label="dtb:totalElapsedTime meta elements ">
+        <x:document type="port" port="result.in-memory" select="//s:head/s:meta[@name='dtb:totalElapsedTime']"/>
+      </x:context>
+      <x:expect label="result" type="compare">
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <meta name="dtb:totalElapsedTime" content="0:00:00"/>
+        </x:document>
+      </x:expect>
     </x:scenario>
 
     <x:scenario label="headings with audio">
@@ -152,6 +168,14 @@
               </par>
             </seq>
           </body>
+        </x:document>
+      </x:expect>
+      <x:context label="dtb:totalElapsedTime meta elements ">
+        <x:document type="port" port="result.in-memory" select="//s:head/s:meta[@name='dtb:totalElapsedTime']"/>
+      </x:context>
+      <x:expect label="result" type="compare">
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <meta name="dtb:totalElapsedTime" content="0:00:00"/>
         </x:document>
       </x:expect>
     </x:scenario>
@@ -204,6 +228,15 @@
               </par>
             </seq>
           </body>
+        </x:document>
+      </x:expect>
+      <x:context label="dtb:totalElapsedTime meta elements ">
+        <x:document type="port" port="result.in-memory" select="//s:head/s:meta[@name='dtb:totalElapsedTime']"/>
+      </x:context>
+      <x:expect label="result" type="compare">
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <meta name="dtb:totalElapsedTime" content="0:00:00"/>
+          <meta name="dtb:totalElapsedTime" content="0:00:01.5"/>
         </x:document>
       </x:expect>
     </x:scenario>
@@ -262,6 +295,15 @@
               </par>
             </seq>
           </body>
+        </x:document>
+      </x:expect>
+      <x:context label="dtb:totalElapsedTime meta elements ">
+        <x:document type="port" port="result.in-memory" select="//s:head/s:meta[@name='dtb:totalElapsedTime']"/>
+      </x:context>
+      <x:expect label="result" type="compare">
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <meta name="dtb:totalElapsedTime" content="0:00:00"/>
+          <meta name="dtb:totalElapsedTime" content="0:00:04"/>
         </x:document>
       </x:expect>
     </x:scenario>
@@ -347,6 +389,15 @@
               </par>
             </seq>
           </body>
+        </x:document>
+      </x:expect>
+      <x:context label="dtb:totalElapsedTime meta elements ">
+        <x:document type="port" port="result.in-memory" select="//s:head/s:meta[@name='dtb:totalElapsedTime']"/>
+      </x:context>
+      <x:expect label="result" type="compare">
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <meta name="dtb:totalElapsedTime" content="0:00:00"/>
+          <meta name="dtb:totalElapsedTime" content="0:00:04.5"/>
         </x:document>
       </x:expect>
     </x:scenario>
@@ -440,6 +491,15 @@
           </body>
         </x:document>
       </x:expect>
+      <x:context label="dtb:totalElapsedTime meta elements ">
+        <x:document type="port" port="result.in-memory" select="//s:head/s:meta[@name='dtb:totalElapsedTime']"/>
+      </x:context>
+      <x:expect label="result" type="compare">
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <meta name="dtb:totalElapsedTime" content="0:00:00"/>
+	  <meta name="dtb:totalElapsedTime" content="0:00:04.5"/>
+        </x:document>
+      </x:expect>
     </x:scenario>
 
     <x:scenario label="noteref outside sentence">
@@ -489,6 +549,14 @@
               </seq>
             </seq>
           </body>
+        </x:document>
+      </x:expect>
+      <x:context label="dtb:totalElapsedTime meta elements ">
+        <x:document type="port" port="result.in-memory" select="//s:head/s:meta[@name='dtb:totalElapsedTime']"/>
+      </x:context>
+      <x:expect label="result" type="compare">
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <meta name="dtb:totalElapsedTime" content="0:00:00"/>
         </x:document>
       </x:expect>
     </x:scenario>
@@ -541,6 +609,14 @@
               </seq>
             </seq>
           </body>
+        </x:document>
+      </x:expect>
+      <x:context label="dtb:totalElapsedTime meta elements ">
+        <x:document type="port" port="result.in-memory" select="//s:head/s:meta[@name='dtb:totalElapsedTime']"/>
+      </x:context>
+      <x:expect label="result" type="compare">
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <meta name="dtb:totalElapsedTime" content="0:00:00"/>
         </x:document>
       </x:expect>
     </x:scenario>
@@ -609,6 +685,14 @@
           </body>
         </x:document>
       </x:expect>
+      <x:context label="dtb:totalElapsedTime meta elements ">
+        <x:document type="port" port="result.in-memory" select="//s:head/s:meta[@name='dtb:totalElapsedTime']"/>
+      </x:context>
+      <x:expect label="result" type="compare">
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <meta name="dtb:totalElapsedTime" content="0:00:00"/>
+        </x:document>
+      </x:expect>
     </x:scenario>
 
     <x:scenario label="noteref inside note">
@@ -670,6 +754,14 @@
               </seq>
             </seq>
           </body>
+        </x:document>
+      </x:expect>
+      <x:context label="dtb:totalElapsedTime meta elements ">
+        <x:document type="port" port="result.in-memory" select="//s:head/s:meta[@name='dtb:totalElapsedTime']"/>
+      </x:context>
+      <x:expect label="result" type="compare">
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <meta name="dtb:totalElapsedTime" content="0:00:00"/>
         </x:document>
       </x:expect>
     </x:scenario>
@@ -740,6 +832,16 @@
           </body>
         </x:document>
       </x:expect>
+      <x:context label="dtb:totalElapsedTime meta elements ">
+        <x:document type="port" port="result.in-memory" select="//s:head/s:meta[@name='dtb:totalElapsedTime']"/>
+      </x:context>
+      <x:expect label="result" type="compare">
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <meta name="dtb:totalElapsedTime" content="0:00:00"/>
+          <meta name="dtb:totalElapsedTime" content="0:00:01.5"/>
+          <meta name="dtb:totalElapsedTime" content="0:00:04"/>
+        </x:document>
+      </x:expect>
     </x:scenario>
 
     <x:scenario label="no smilref for top elements">
@@ -796,6 +898,15 @@
           </body>
         </x:document>
       </x:expect>
+      <x:context label="dtb:totalElapsedTime meta elements ">
+        <x:document type="port" port="result.in-memory" select="//s:head/s:meta[@name='dtb:totalElapsedTime']"/>
+      </x:context>
+      <x:expect label="result" type="compare">
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <meta name="dtb:totalElapsedTime" content="0:00:00"/>
+          <meta name="dtb:totalElapsedTime" content="0:00:01.5"/>
+        </x:document>
+      </x:expect>
     </x:scenario>
 
     <x:scenario label="duplicate noteref">
@@ -847,6 +958,14 @@
               </par>
             </seq>
           </body>
+        </x:document>
+      </x:expect>
+      <x:context label="dtb:totalElapsedTime meta elements ">
+        <x:document type="port" port="result.in-memory" select="//s:head/s:meta[@name='dtb:totalElapsedTime']"/>
+      </x:context>
+      <x:expect label="result" type="compare">
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <meta name="dtb:totalElapsedTime" content="0:00:00"/>
         </x:document>
       </x:expect>
     </x:scenario>
@@ -902,6 +1021,14 @@
               </seq>
             </seq>
           </body>
+        </x:document>
+      </x:expect>
+      <x:context label="dtb:totalElapsedTime meta elements ">
+        <x:document type="port" port="result.in-memory" select="//s:head/s:meta[@name='dtb:totalElapsedTime']"/>
+      </x:context>
+      <x:expect label="result" type="compare">
+        <x:document type="inline" xmlns="http://www.w3.org/2001/SMIL20/">
+          <meta name="dtb:totalElapsedTime" content="0:00:00"/>
         </x:document>
       </x:expect>
     </x:scenario>
