@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                xmlns:dtb="http://www.daisy.org/z3986/2005/dtbook/"
                 type="px:daisy3-create-opf" name="main">
 
     <p:input port="source" primary="true">
@@ -29,39 +30,26 @@
       <p:pipe step="fileset" port="result"/>
     </p:output>
 
-    <p:option name="title">
+    <p:option name="uid">
       <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-	<p>Title of the DTBook document.</p>
+        <p>Globally unique identifier for the DTB.</p>
+        <p>Will be used as the dc:Identifier metadata element referenced by the package document's
+        unique-identifier attribute.</p>
       </p:documentation>
     </p:option>
 
-    <p:option name="uid">
+    <p:input kind="parameter" port="dc-metadata">
       <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-	<p>UID of the DTBook (in the meta elements)</p>
+        <p>Metadata to be included in the dc-metadata element of the package document.</p>
+        <p>Names must be in the Dublin Core namespace.</p>
       </p:documentation>
-    </p:option>
+    </p:input>
 
     <p:option name="output-base-uri">
       <p:documentation xmlns="http://www.w3.org/1999/xhtml">
 	<p>Output directory URI if the OPF file were to be stored or refered by a fileset.</p>
       </p:documentation>
     </p:option>
-
-    <p:option name="lang">
-      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-	<p>Main language of the DTBook file(s).</p>
-      </p:documentation>
-    </p:option>
-
-    <p:option name="date" required="false" select="''">
-      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-        <p>Date of publication of the DTB</p>
-        <p>Format must be YYYY[-MM[-DD]]</p>
-        <p>Defaults to the current date.</p>
-      </p:documentation>
-    </p:option>
-
-    <p:option name="publisher"/>
 
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
         <p:documentation>
@@ -93,22 +81,39 @@
     </p:xslt>
     <p:sink/>
 
+    <px:fileset-load media-types="application/x-dtbook+xml" name="dtbook">
+      <p:input port="fileset">
+        <p:pipe step="main" port="source"/>
+      </p:input>
+      <p:input port="in-memory">
+        <p:pipe step="main" port="source.in-memory"/>
+      </p:input>
+    </px:fileset-load>
+    <p:sink/>
+
+    <p:parameters name="dc-metadata">
+      <p:input port="parameters">
+        <p:pipe step="main" port="dc-metadata"/>
+      </p:input>
+    </p:parameters>
+
     <p:xslt>
       <p:input port="source">
         <p:pipe step="main" port="source"/>
+        <p:pipe step="dc-metadata" port="result"/>
+        <!--
+            FIXME: also allow specifying DTBook when audio only
+        -->
+        <p:pipe step="dtbook" port="result"/>
       </p:input>
       <p:input port="stylesheet">
 	<p:document href="create-opf.xsl"/>
       </p:input>
-      <p:with-param name="lang" select="$lang"/>
-      <p:with-param name="date" select="$date"/>
-      <p:with-param name="publisher" select="$publisher"/>
-      <p:with-param name="output-base-uri" select="$output-base-uri"/>
       <p:with-param name="uid" select="$uid"/>
-      <p:with-param name="title" select="$title"/>
       <p:with-param name="total-time" select="string(/*)">
         <p:pipe step="total-time" port="result"/>
       </p:with-param>
+      <p:with-param name="output-base-uri" select="$output-base-uri"/>
     </p:xslt>
 
     <px:set-base-uri>

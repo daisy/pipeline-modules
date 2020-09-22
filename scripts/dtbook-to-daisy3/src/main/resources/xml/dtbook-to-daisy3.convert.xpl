@@ -118,7 +118,7 @@
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
       <p>Date of publication of the DTB</p>
       <p>Format must be YYYY[-MM[-DD]]</p>
-      <p>Defaults to the current date.</p>
+      <p>Defaults to the date in the DTBook, or the current date.</p>
     </p:documentation>
   </p:option>
 
@@ -228,16 +228,8 @@
       <p:pipe step="daisy3.in-memory" port="result"/>
     </p:output>
 
-    <!-- Those variables could be used for structuring the output
-         package but some DAISY players can only read flat
-         package. -->
     <p:variable name="uid" select="concat((//dtbook:meta[@name='dtb:uid'])[1]/@content, '-packaged')"/>
-    <p:variable name="title" select="normalize-space((//dtbook:meta[@name='dc:Title'])[1]/@content)"/>
-    <p:variable name="dclang" select="(//dtbook:meta[@name='dc:Language'])[1]/@content"/>
-    <p:variable name="lang" select="if ($dclang) then $dclang else //@*[name()='xml:lang'][1]"/>
-    <p:variable name="dcpublisher" select="(//dtbook:meta[@name='dc:Publisher'])[1]/@content"/>
-    <p:variable name="publisher" select="if ($publisher) then $publisher
-					 else (if ($dcpublisher) then $dcpublisher else 'unknown')"/>
+    <p:variable name="lang" select="((//dtbook:meta[@name='dc:Language'])[1]/@content,//@xml:lang)[1]"/>
 
     <!--
         FIXME: automatic upgrade?
@@ -387,10 +379,9 @@
       </p:input>
       <p:with-option name="output-base-uri" select="concat($output-fileset-base, 'book.opf')"/>
       <p:with-option name="uid" select="$uid"/>
-      <p:with-option name="title" select="$title"/>
-      <p:with-option name="lang" select="$lang"/>
-      <p:with-option name="date" select="$date"/>
-      <p:with-option name="publisher" select="$publisher"/>
+      <p:with-param port="dc-metadata" name="dc:Language" select="$lang"/>
+      <p:with-param port="dc-metadata" name="dc:Date" select="$date"/>
+      <p:with-param port="dc-metadata" name="dc:Publisher" select="$publisher"/>
     </px:daisy3-create-opf>
     <p:sink/>
     <p:identity name="daisy3.in-memory">

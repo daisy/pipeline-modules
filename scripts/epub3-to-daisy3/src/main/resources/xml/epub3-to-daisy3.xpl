@@ -290,21 +290,17 @@
     <p:documentation>
         Create DAISY 3
     </p:documentation>
-    <p:identity>
-        <p:input port="source">
-            <p:pipe step="epub3-opf" port="result"/>
-        </p:input>
-    </p:identity>
     <p:group name="daisy3" px:progress="5/10">
         <p:output port="fileset" primary="true"/>
         <p:output port="in-memory" sequence="true">
             <p:pipe step="daisy3.in-memory" port="result"/>
         </p:output>
-        <p:variable name="uid" select="/opf:package/opf:metadata/dc:identifier"/>
-        <p:variable name="lang" select="(/opf:package/opf:metadata/dc:language,/opf:package/@xml:lang)[1]"/>
-        <p:variable name="title" select="(/opf:package/opf:metadata/dc:title,'unknown')[1]"/>
-        <p:variable name="publisher" select="(/opf:package/opf:metadata/dc:publisher,'unknown')[1]"/>
-        <p:sink/>
+        <p:variable name="uid" select="/opf:package/opf:metadata/dc:identifier">
+            <p:pipe step="epub3-opf" port="result"/>
+        </p:variable>
+        <p:variable name="lang" select="(/opf:package/opf:metadata/dc:language,/opf:package/@xml:lang)[1]">
+            <p:pipe step="epub3-opf" port="result"/>
+        </p:variable>
 
         <p:documentation>
             Prepare DTBook for DAISY 3
@@ -477,10 +473,7 @@
             </p:input>
             <p:with-option name="output-base-uri" select="concat($output-dir, 'book.opf')"/>
             <p:with-option name="uid" select="$uid"/>
-            <p:with-option name="lang" select="$lang"/>
-            <p:with-option name="date" select="$date"/>
-            <p:with-option name="title" select="$title"/>
-            <p:with-option name="publisher" select="$publisher"/>
+            <p:with-param port="dc-metadata" name="dc:Date" select="$date"/>
         </px:daisy3-create-opf>
         <p:sink/>
         <p:identity name="daisy3.in-memory">
