@@ -67,7 +67,6 @@
 			<x:option name="date" select="'2020-06-29'"/>
 			<x:option name="title" select="'Title'"/>
 			<x:option name="publisher" select="'Publisher'"/>
-			<x:option name="total-time" select="'0:15:30.176'"/>
 		</x:call>
 		<x:context label="result">
 			<x:document type="port" port="result"/>

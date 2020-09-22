@@ -471,7 +471,7 @@
                 <p:pipe step="referenced-resources" port="result"/>
             </p:input>
         </px:fileset-join>
-        <px:daisy3-create-opf audio-only="false" name="daisy3-opf" px:message="Creating OPF file" px:progress="1/5">
+        <px:daisy3-create-opf name="daisy3-opf" px:message="Creating OPF file" px:progress="1/5">
             <p:input port="source.in-memory">
                 <p:pipe step="mo" port="result.in-memory"/>
             </p:input>

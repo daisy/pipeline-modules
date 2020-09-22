@@ -61,12 +61,6 @@
       </p:documentation>
     </p:option>
 
-    <p:option name="audio-only" required="false" select="'false'">
-      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-        <p>No reference to DTBook in SMIL files</p>
-      </p:documentation>
-    </p:option>
-
     <p:option name="publisher"/>
 
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
@@ -115,7 +109,6 @@
       <p:with-param name="total-time" select="string(/*)">
         <p:pipe step="total-time" port="result"/>
       </p:with-param>
-      <p:with-param name="audio-only" select="$audio-only"/>
     </p:xslt>
 
     <px:set-base-uri>

@@ -19,11 +19,11 @@
   <xsl:param name="lang"/>
   <xsl:param name="date"/>
   <xsl:param name="publisher"/>
-  <xsl:param name="audio-only"/>
 
   <xsl:template match="/">
-    <xsl:variable name="has-audio" select="boolean(//d:file[contains(@media-type, 'audio')][1])"/>
-    <xsl:variable name="has-image" select="boolean(//d:file[contains(@media-type, 'image')][1])"/>
+    <xsl:variable name="has-audio" as="xs:boolean" select="exists(//d:file[contains(@media-type, 'audio')])"/>
+    <xsl:variable name="has-image" as="xs:boolean" select="exists(//d:file[contains(@media-type, 'image')])"/>
+    <xsl:variable name="audio-only" as="xs:boolean" select="not(exists(//d:file[@media-type='application/x-dtbook+xml']))"/>
 
     <package unique-identifier="uid">
       <metadata>
@@ -38,12 +38,12 @@
 	</dc-metadata>
 	<x-metadata>
 	  <meta name="dtb:multimediaType"
-		content="{if ($audio-only='true') then 'audioOnly' else
+		content="{if ($audio-only) then 'audioOnly' else
 			 (if ($has-audio) then 'audioFullText' else 'textNCX')}"/>
 	  <meta name="dtb:totalTime" content="{$total-time}"/>
 	  <meta name="dtb:multimediaContent"
 		content="{concat(
-			 if ($audio-only='true') then 'audio' else (if ($has-audio) then 'audio,text' else 'text'),
+			 if ($audio-only) then 'audio' else (if ($has-audio) then 'audio,text' else 'text'),
 			 if ($has-image) then ',image' else '')}"/>
 	  <xsl:if test="//d:file[@role='mathml-xslt-fallback']">
 	    <meta name="z39-86-extension-version"

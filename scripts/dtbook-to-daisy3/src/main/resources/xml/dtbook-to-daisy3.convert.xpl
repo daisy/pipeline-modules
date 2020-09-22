@@ -391,7 +391,6 @@
       <p:with-option name="lang" select="$lang"/>
       <p:with-option name="date" select="$date"/>
       <p:with-option name="publisher" select="$publisher"/>
-      <p:with-option name="audio-only" select="$audio-only"/>
     </px:daisy3-create-opf>
     <p:sink/>
     <p:identity name="daisy3.in-memory">
