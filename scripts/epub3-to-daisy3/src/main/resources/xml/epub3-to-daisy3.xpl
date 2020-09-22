@@ -472,15 +472,15 @@
             </p:input>
         </px:fileset-join>
         <px:daisy3-create-opf audio-only="false" name="daisy3-opf" px:message="Creating OPF file" px:progress="1/5">
+            <p:input port="source.in-memory">
+                <p:pipe step="mo" port="result.in-memory"/>
+            </p:input>
             <p:with-option name="opf-uri" select="concat($output-dir, 'book.opf')"/>
             <p:with-option name="uid" select="$uid"/>
             <p:with-option name="lang" select="$lang"/>
             <p:with-option name="date" select="$date"/>
             <p:with-option name="title" select="$title"/>
             <p:with-option name="publisher" select="$publisher"/>
-            <p:with-option name="total-time" select="//*[@duration]/@duration">
-                <p:pipe step="mo" port="duration"/>
-            </p:with-option>
         </px:daisy3-create-opf>
         <p:sink/>
         <p:identity name="daisy3.in-memory">

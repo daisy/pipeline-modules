@@ -83,16 +83,6 @@
           <meta name="dtb:totalElapsedTime" content="0:00:00"/>
         </x:document>
       </x:expect>
-      <x:context label="duration port">
-        <x:document type="port" port="duration"/>
-      </x:context>
-      <x:expect label="the duration" type="compare">
-        <x:document type="inline">
-          <d:durations>
-            <d:total duration="0:00:01.5"/>
-          </d:durations>
-        </x:document>
-      </x:expect>
     </x:scenario>
 
     <x:scenario label="headings without audio">
