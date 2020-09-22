@@ -61,7 +61,7 @@
 					</smil>
 				</x:document>
 			</x:input>
-			<x:option name="opf-uri" select="resolve-uri('book.opf')"/>
+			<x:option name="output-base-uri" select="resolve-uri('book.opf')"/>
 			<x:option name="uid" select="'urn:uuid:123'"/>
 			<x:option name="lang" select="'en'"/>
 			<x:option name="date" select="'2020-06-29'"/>

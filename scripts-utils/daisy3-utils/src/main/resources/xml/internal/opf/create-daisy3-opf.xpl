@@ -41,7 +41,7 @@
       </p:documentation>
     </p:option>
 
-    <p:option name="opf-uri">
+    <p:option name="output-base-uri">
       <p:documentation xmlns="http://www.w3.org/1999/xhtml">
 	<p>Output directory URI if the OPF file were to be stored or refered by a fileset.</p>
       </p:documentation>
@@ -103,7 +103,7 @@
       <p:with-param name="lang" select="$lang"/>
       <p:with-param name="date" select="$date"/>
       <p:with-param name="publisher" select="$publisher"/>
-      <p:with-param name="output-base-uri" select="$opf-uri"/>
+      <p:with-param name="output-base-uri" select="$output-base-uri"/>
       <p:with-param name="uid" select="$uid"/>
       <p:with-param name="title" select="$title"/>
       <p:with-param name="total-time" select="string(/*)">
@@ -112,13 +112,13 @@
     </p:xslt>
 
     <px:set-base-uri>
-      <p:with-option name="base-uri" select="$opf-uri"/>
+      <p:with-option name="base-uri" select="$output-base-uri"/>
     </px:set-base-uri>
     <p:identity name="opf"/>
     <p:sink/>
 
     <px:fileset-create>
-      <p:with-option name="base" select="resolve-uri('./',$opf-uri)"/>
+      <p:with-option name="base" select="resolve-uri('./',$output-base-uri)"/>
     </px:fileset-create>
     <px:fileset-add-entry media-type="text/xml" name="fileset">
       <p:input port="entry">

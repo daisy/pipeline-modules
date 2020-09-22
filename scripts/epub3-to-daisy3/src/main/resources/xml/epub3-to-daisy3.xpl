@@ -475,7 +475,7 @@
             <p:input port="source.in-memory">
                 <p:pipe step="mo" port="result.in-memory"/>
             </p:input>
-            <p:with-option name="opf-uri" select="concat($output-dir, 'book.opf')"/>
+            <p:with-option name="output-base-uri" select="concat($output-dir, 'book.opf')"/>
             <p:with-option name="uid" select="$uid"/>
             <p:with-option name="lang" select="$lang"/>
             <p:with-option name="date" select="$date"/>
