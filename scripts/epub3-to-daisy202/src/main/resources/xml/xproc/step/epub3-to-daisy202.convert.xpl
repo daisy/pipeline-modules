@@ -184,6 +184,15 @@
                 <p:documentation>Normalize HTML5.</p:documentation>
                 <!-- hopefully this preserves all IDs -->
             </px:html-upgrade>
+            <p:xslt>
+                <p:documentation>Identify page break elements</p:documentation>
+                <p:input port="stylesheet">
+                    <p:document href="../../xslt/identify-pagebreaks.xsl"/>
+                </p:input>
+                <p:input port="parameters">
+                    <p:empty/>
+                </p:input>
+            </p:xslt>
             <px:html-downgrade>
                 <p:documentation>Downgrade to HTML4. This preserves all ID.</p:documentation>
             </px:html-downgrade>
