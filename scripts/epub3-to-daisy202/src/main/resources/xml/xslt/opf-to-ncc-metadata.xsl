@@ -38,7 +38,12 @@
             <!-- mandatory metadata -->
             <meta name="dc:format" content="Daisy 2.02"/>
             <!-- dc:title mandatory in EPUB -->
-            <!-- dc:identifier mandatory in EPUB -->
+            <!-- dc:identifier mandatory in EPUB, but multiple allowed whereas exactly one needed in DAISY -->
+            <xsl:for-each select="dc:identifier[@id=/*/@unique-identifier]">
+                <xsl:call-template name="meta">
+                    <xsl:with-param name="name" select="name()"/>
+                </xsl:call-template>
+            </xsl:for-each>
             <!-- dc:language mandatory in EPUB -->
             <!-- dc:creator is not strictly mandatory in EPUB, but we can't include a sensible value if it is not provided -->
             <!-- dc:publisher is not strictly mandatory in EPUB, but we can't include a sensible value if it is not provided -->
@@ -55,7 +60,10 @@
             <meta name="ncc:totalTime" content="{pf:mediaoverlay-seconds-to-full-clock-value(
                                                    sum($smil/body/seq/@dur/xs:decimal(replace(.,'^(.+)s$','$1'))))}"/>
 
-            <xsl:for-each select="*[not(self::opf:*) and not(self::dc:format) and not(self::dc:date)]">
+            <xsl:for-each select="*[not(self::opf:*|
+                                        self::dc:format|
+                                        self::dc:date|
+                                        self::dc:identifier)]">
                 <xsl:call-template name="meta">
                     <xsl:with-param name="name" select="name()"/>
                 </xsl:call-template>

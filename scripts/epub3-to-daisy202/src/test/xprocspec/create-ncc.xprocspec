@@ -104,9 +104,11 @@
             </x:input>
             <x:input port="opf">
                 <x:document type="inline" xml:base="file:/tmp/EPUB/package.opf">
-                    <package xmlns="http://www.idpf.org/2007/opf" version="3.0">
+                    <package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="PrimaryID">
                         <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
                             <dc:date>2020-07-02</dc:date>
+                            <dc:identifier id="PrimaryID">primary-id</dc:identifier>
+                            <dc:identifier id="ISBN">abcdefg</dc:identifier>
                         </metadata>
                         <manifest>
                             <item id="cover" href="cover.xhtml" media-type="application/xhtml+xml"
@@ -155,6 +157,7 @@
                         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
                         <title/>
                         <meta name="dc:format" content="Daisy 2.02"/>
+                        <meta name="dc:identifier" content="primary-id"/>
                         <meta name="dc:date" content="2020-07-02"/>
                         <meta name="ncc:charset" content="utf-8"/>
                         <meta name="ncc:tocItems" content="6"/>

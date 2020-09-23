@@ -128,6 +128,7 @@
                         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
                         <title>minimal</title>
                         <meta name="dc:format" content="Daisy 2.02"/>
+                        <meta name="dc:identifier" content="id"/>
                         <meta name="dc:date" content="2020-09-23"/>
                         <meta name="ncc:charset" content="utf-8"/>
                         <meta name="ncc:tocItems" content="2"/>
@@ -139,7 +140,6 @@
                         <meta name="ncc:footnotes" content="0"/>
                         <meta name="ncc:totalTime" content="00:00:00"/>
                         <meta name="dc:title" content="minimal"/>
-                        <meta name="dc:identifier" content="id"/>
                         <meta name="dc:language" content="en"/>
                     </head>
                     <body>
