@@ -298,9 +298,6 @@
         <p:variable name="uid" select="/opf:package/opf:metadata/dc:identifier">
             <p:pipe step="epub3-opf" port="result"/>
         </p:variable>
-        <p:variable name="lang" select="(/opf:package/opf:metadata/dc:language,/opf:package/@xml:lang)[1]">
-            <p:pipe step="epub3-opf" port="result"/>
-        </p:variable>
 
         <p:documentation>
             Prepare DTBook for DAISY 3
@@ -392,7 +389,6 @@
         </p:documentation>
         <px:daisy3-create-res-file name="res">
             <p:with-option name="output-dir" select="$output-dir"/>
-            <p:with-option name="lang" select="$lang"/>
         </px:daisy3-create-res-file>
 
         <p:documentation>

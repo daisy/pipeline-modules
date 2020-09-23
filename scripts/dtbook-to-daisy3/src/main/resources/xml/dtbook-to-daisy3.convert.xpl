@@ -229,7 +229,6 @@
     </p:output>
 
     <p:variable name="uid" select="concat((//dtbook:meta[@name='dtb:uid'])[1]/@content, '-packaged')"/>
-    <p:variable name="lang" select="((//dtbook:meta[@name='dc:Language'])[1]/@content,//@xml:lang)[1]"/>
 
     <!--
         FIXME: automatic upgrade?
@@ -282,7 +281,6 @@
     <!-- ===== RESOURCE FILE ===== -->
     <px:daisy3-create-res-file name="res-file">
       <p:with-option name="output-dir" select="$output-fileset-base"/>
-      <p:with-option name="lang" select="$lang"/>
     </px:daisy3-create-res-file>
     <p:sink/>
 
@@ -379,7 +377,6 @@
       </p:input>
       <p:with-option name="output-base-uri" select="concat($output-fileset-base, 'book.opf')"/>
       <p:with-option name="uid" select="$uid"/>
-      <p:with-param port="dc-metadata" name="dc:Language" select="$lang"/>
       <p:with-param port="dc-metadata" name="dc:Date" select="$date"/>
       <p:with-param port="dc-metadata" name="dc:Publisher" select="$publisher"/>
     </px:daisy3-create-opf>
