@@ -23,6 +23,11 @@
             The package document of the original EPUB 3 from which the DAISY 2.02 was generated.
         </p:documentation>
     </p:input>
+    <p:input port="page-list">
+        <p:documentation>
+            A fileset XML document listing all the pagebreak elements as d:anchor elements.
+        </p:documentation>
+    </p:input>
 
     <p:output port="result.fileset" primary="true">
         <p:documentation>
@@ -118,7 +123,8 @@
     </px:fileset-load>
 
     <p:documentation>
-        Add missing IDs to heading and page number elements.
+        Add missing IDs to heading elements. Page number elements already have an ID thanks to
+        identify-pagebreaks.xsl
     </p:documentation>
     <px:html-add-ids name="xhtml-with-ids"
                      match="html:h1|
@@ -126,8 +132,7 @@
                             html:h3|
                             html:h4|
                             html:h5|
-                            html:h6|
-                            html:span[matches(@class,'(^|\s)page-(front|normal|special)(\s|$)')]"
+                            html:h6"
                      px:progress="1/10"/>
     <p:sink/>
 
@@ -217,6 +222,7 @@
                     <p:xslt px:message="Processing {$smil-href}" px:message-severity="DEBUG">
                         <p:input port="source">
                             <p:pipe step="augment-smils" port="current"/>
+                            <p:pipe step="main" port="page-list"/>
                             <p:pipe step="associated-xhtml" port="result"/>
                         </p:input>
                         <p:input port="stylesheet">
@@ -375,6 +381,7 @@
         <p:xslt>
             <p:input port="source">
                 <p:pipe step="empty-smil" port="result"/>
+                <p:pipe step="main" port="page-list"/>
                 <p:pipe step="new-smils" port="current"/>
             </p:input>
             <p:input port="stylesheet">
@@ -489,6 +496,7 @@
         <p:xslt>
             <p:input port="source">
                 <p:pipe step="outline" port="result"/>
+                <p:pipe step="main" port="page-list"/>
                 <p:pipe step="content-docs" port="result"/>
             </p:input>
             <p:input port="stylesheet">

@@ -3,6 +3,7 @@
                 xmlns:html="http://www.w3.org/1999/xhtml"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
+                xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns="" xpath-default-namespace=""
                 exclude-result-prefixes="#all">
     
@@ -16,10 +17,15 @@
     <!--
         the corresponding content document(s) in spine order
     -->
-    <xsl:variable name="html" select="collection()[position()&gt;1]/*"/>
+    <xsl:variable name="html" select="collection()[position()&gt;2]/*"/>
+    <!--
+        the list of pagebreak elements
+    -->
+    <xsl:variable name="page-list" select="collection()[2]"/>
     
     <xsl:variable name="smil-base-uri" select="pf:base-uri($smil)"/>
     
+    <xsl:key name="id" match="*[@id]" use="@id"/>
     <xsl:key name="absolute-id" match="*[@id]" use="concat(pf:normalize-uri(pf:html-base-uri(.)),'#',@id)"/>
     
     <xsl:variable name="referenced-html-elements" as="element()*">
@@ -39,17 +45,27 @@
         </xsl:for-each>
     </xsl:variable>
     
+    <xsl:variable name="page-number-elements" as="element()*">
+      <xsl:for-each select="$html">
+        <xsl:variable name="content-doc" select="."/>
+        <xsl:variable name="content-doc-uri" select="pf:normalize-uri(base-uri(.))"/>
+        <xsl:for-each select="$page-list//d:file[pf:normalize-uri(resolve-uri(@href,base-uri(.)))=$content-doc-uri]/d:anchor">
+          <xsl:sequence select="key('id',@id,$content-doc)"/>
+        </xsl:for-each>
+      </xsl:for-each>
+    </xsl:variable>
+    
     <xsl:template match="/smil/body/seq" priority="1">
         <xsl:call-template name="pf:next-match-with-generated-ids">
             <xsl:with-param name="prefix" select="'par_'"/>
             <xsl:with-param name="for-elements"
-                            select="$html//*[self::html:h1 or
-                                             self::html:h2 or
-                                             self::html:h3 or
-                                             self::html:h4 or
-                                             self::html:h5 or
-                                             self::html:h6 or
-                                             self::html:span[matches(@class,'(^|\s)page-(front|normal|special)(\s|$)')]]
+                            select="($html//*[self::html:h1 or
+                                              self::html:h2 or
+                                              self::html:h3 or
+                                              self::html:h4 or
+                                              self::html:h5 or
+                                              self::html:h6],
+                                     $page-number-elements)
                                     except $referenced-html-elements"/>
             <xsl:with-param name="in-use" select="//*/@id[matches(.,'^(par|text|audio)_')]"/>
         </xsl:call-template>
@@ -61,13 +77,13 @@
         <xsl:variable name="missing-pars" as="element()*">
             <xsl:for-each select="$html">
                 <xsl:variable name="html-base-uri" select="pf:html-base-uri(.)"/>
-                <xsl:for-each select="//*[self::html:h1 or
-                                          self::html:h2 or
-                                          self::html:h3 or
-                                          self::html:h4 or
-                                          self::html:h5 or
-                                          self::html:h6 or
-                                          self::html:span[matches(@class,'(^|\s)page-(front|normal|special)(\s|$)')]]">
+                <xsl:for-each select="(//*[self::html:h1 or
+                                           self::html:h2 or
+                                           self::html:h3 or
+                                           self::html:h4 or
+                                           self::html:h5 or
+                                           self::html:h6],
+                                       //* intersect $page-number-elements)">
                     <!--
                         we know these elements have an id attribute (added in create-ncc.xpl)
                     -->
@@ -183,8 +199,8 @@
                                                           self::html:h3 or
                                                           self::html:h4 or
                                                           self::html:h5 or
-                                                          self::html:h6 or
-                                                          self::html:span[matches(@class,'(^|\s)page-(front|normal|special)(\s|$)')]])">
+                                                          self::html:h6]
+                          or $referenced-element/ancestor::* intersect $page-number-elements)">
             <xsl:next-match/>
         </xsl:if>
     </xsl:template>

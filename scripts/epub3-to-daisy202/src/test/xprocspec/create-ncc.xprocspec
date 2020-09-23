@@ -129,6 +129,15 @@
                     </package>
                 </x:document>
             </x:input>
+            <x:input port="page-list">
+                <x:document type="inline">
+                    <d:fileset>
+                        <d:file href="file:/tmp/EPUB/chapter_001.xhtml">
+                            <d:anchor id="page1"/>
+                        </d:file>
+                    </d:fileset>
+                </x:document>
+            </x:input>
         </x:call>
         <x:context label="The resulting fileset">
             <x:document type="port" port="result.fileset"/>

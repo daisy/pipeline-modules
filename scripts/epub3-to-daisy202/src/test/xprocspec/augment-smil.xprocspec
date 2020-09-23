@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-               xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal">
+               xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
+               xmlns:d="http://www.daisy.org/ns/pipeline/data">
 	
 	<x:script>
 		<p:pipeline xmlns:p="http://www.w3.org/ns/xproc" version="1.0" type="pxi:test">
@@ -39,6 +40,14 @@
 							</seq>
 						</body>
 					</smil>
+				</x:document>
+				<!--
+					the list of pagebreak elements
+				-->
+				<x:document type="inline">
+					<d:fileset>
+						<d:file href="file:/tmp/EPUB/chapter_001.xhtml"/>
+					</d:fileset>
 				</x:document>
 				<!--
 				    the associated HTML
@@ -101,6 +110,14 @@
 							<seq/>
 						</body>
 					</smil>
+				</x:document>
+				<!--
+					the list of pagebreak elements
+				-->
+				<x:document type="inline">
+					<d:fileset>
+						<d:file href="file:/tmp/EPUB/chapter_002.xhtml"/>
+					</d:fileset>
 				</x:document>
 				<!--
 				    the associated HTML
@@ -172,6 +189,14 @@
 							</seq>
 						</body>
 					</smil>
+				</x:document>
+				<!--
+					the list of pagebreak elements
+				-->
+				<x:document type="inline">
+					<d:fileset>
+						<d:file href="file:/tmp/EPUB/chapter_001.xhtml"/>
+					</d:fileset>
 				</x:document>
 				<!--
 				    the associated HTML

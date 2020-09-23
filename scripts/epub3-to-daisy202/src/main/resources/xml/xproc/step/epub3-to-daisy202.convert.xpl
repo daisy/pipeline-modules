@@ -27,6 +27,11 @@
             px:error
         </p:documentation>
     </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
+        <p:documentation>
+            px:set-base-uri
+        </p:documentation>
+    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
         <p:documentation>
             px:fileset-filter
@@ -166,6 +171,9 @@
         <p:output port="in-memory" sequence="true">
             <p:pipe step="update" port="result.in-memory"/>
         </p:output>
+        <p:output port="page-list">
+            <p:pipe step="identify-pagebreaks" port="page-list"/>
+        </p:output>
         <px:fileset-load media-types="application/xhtml+xml" name="epub3.xhtml">
             <p:documentation>
                 Load content documents.
@@ -174,6 +182,41 @@
                 <p:pipe step="convert-smil" port="in-memory"/>
             </p:input>
         </px:fileset-load>
+        <p:group name="identify-pagebreaks">
+            <p:documentation>Identify page break elements</p:documentation>
+            <p:output port="result" primary="true" sequence="true">
+                <p:pipe step="for-each" port="result"/>
+            </p:output>
+            <p:output port="page-list">
+                <p:pipe step="page-list" port="result"/>
+            </p:output>
+            <p:for-each name="for-each">
+                <p:output port="result" primary="true"/>
+                <p:output port="page-list">
+                    <p:pipe step="xslt" port="secondary"/>
+                </p:output>
+                <p:xslt name="xslt">
+                    <p:input port="stylesheet">
+                        <p:document href="../../xslt/identify-pagebreaks.xsl"/>
+                    </p:input>
+                    <p:input port="parameters">
+                        <p:empty/>
+                    </p:input>
+                </p:xslt>
+                <px:set-base-uri name="result">
+                    <p:with-option name="base-uri" select="base-uri(/*)">
+                        <p:pipe step="for-each" port="current"/>
+                    </p:with-option>
+                </px:set-base-uri>
+            </p:for-each>
+            <p:sink/>
+            <p:wrap-sequence wrapper="d:fileset" name="page-list">
+                <p:input port="source">
+                    <p:pipe step="for-each" port="page-list"/>
+                </p:input>
+            </p:wrap-sequence>
+            <p:sink/>
+        </p:group>
         <p:for-each px:message="Converting HTML5 to HTML4" px:progress="1">
             <p:variable name="base" select="base-uri()"/>
             <p:variable name="href" select="//d:file[resolve-uri(@href,base-uri(.))=$base]/@href">
@@ -184,15 +227,6 @@
                 <p:documentation>Normalize HTML5.</p:documentation>
                 <!-- hopefully this preserves all IDs -->
             </px:html-upgrade>
-            <p:xslt>
-                <p:documentation>Identify page break elements</p:documentation>
-                <p:input port="stylesheet">
-                    <p:document href="../../xslt/identify-pagebreaks.xsl"/>
-                </p:input>
-                <p:input port="parameters">
-                    <p:empty/>
-                </p:input>
-            </p:xslt>
             <px:html-downgrade>
                 <p:documentation>Downgrade to HTML4. This preserves all ID.</p:documentation>
             </px:html-downgrade>
@@ -266,6 +300,9 @@
         </p:input>
         <p:input port="opf">
             <p:pipe step="opf" port="result"/>
+        </p:input>
+        <p:input port="page-list">
+            <p:pipe step="convert-html" port="page-list"/>
         </p:input>
     </pxi:create-ncc>
 
