@@ -10,6 +10,8 @@
 
 	<xsl:include href="http://www.daisy.org/pipeline/modules/common-utils/generate-id.xsl"/>
 
+	<xsl:variable name="pagebreaks-from-nav" as="document-node(element(d:fileset))?" select="collection()[2]"/>
+
 	<xsl:template match="/*" priority="1">
 		<xsl:call-template name="pf:next-match-with-generated-ids">
 			<xsl:with-param name="prefix" select="'page_'"/>
@@ -23,17 +25,20 @@
 
 	<xsl:template match="/*">
 		<xsl:apply-templates mode="convert" select="."/>
-		<xsl:result-document href="page-list">
-			<d:file>
-				<xsl:attribute name="href" select="base-uri(/*)"/>
-				<xsl:apply-templates mode="list" select="."/>
-			</d:file>
-		</xsl:result-document>
+		<xsl:if test="not(exists($pagebreaks-from-nav))">
+			<xsl:result-document href="page-list">
+				<d:file>
+					<xsl:attribute name="href" select="base-uri(/*)"/>
+					<xsl:apply-templates mode="list" select="."/>
+				</d:file>
+			</xsl:result-document>
+		</xsl:if>
 	</xsl:template>
 
 	<!--
 	    Convert to span with class page-normal|page-front|page-special, and make sure it has a text value.
 	    This step is not strictly needed, but done to give page numbers the same format as in the NCC.
+	    Also, the element should have a text value for it to be converted to speech.
 	-->
 	<xsl:template mode="convert"
 	              match="*[self::span|self::div|self::a|self::hr]

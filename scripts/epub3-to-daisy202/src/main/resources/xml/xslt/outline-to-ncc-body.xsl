@@ -116,7 +116,8 @@
         <xsl:param name="relative-uri" required="yes"/>
         <xsl:variable name="element" as="element()" select="key('referenced-element',@id,$content-doc)"/>
         <span>
-            <xsl:variable name="value" select="normalize-space(string-join($element//text(),' '))"/>
+            <xsl:variable name="value" select="if (@title) then @title
+                                               else normalize-space(string-join($element//text(),' '))"/>
             <xsl:sequence select="@class"/>
             <xsl:if test="not(@class)">
                 <xsl:attribute name="class">

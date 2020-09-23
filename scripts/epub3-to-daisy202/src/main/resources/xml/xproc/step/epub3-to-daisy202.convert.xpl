@@ -4,6 +4,7 @@
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:html="http://www.w3.org/1999/xhtml"
+                xmlns:epub="http://www.idpf.org/2007/ops"
                 xmlns:opf="http://www.idpf.org/2007/opf"
                 xmlns:dc="http://purl.org/dc/elements/1.1/"
                 type="px:epub3-to-daisy202" name="main">
@@ -46,6 +47,7 @@
     <p:import href="http://www.daisy.org/pipeline/modules/epub-utils/library.xpl">
         <p:documentation>
             px:opf-spine-to-fileset
+            px:epub3-label-pagebreaks-from-nav
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
@@ -133,6 +135,15 @@
     </p:group>
 
     <p:documentation>
+        Read the "page-list" navigation and label page break elements with epub:type="pagebreak".
+    </p:documentation>
+    <px:epub3-label-pagebreaks-from-nav name="label-pagebreaks-from-nav">
+        <p:input port="source.in-memory">
+            <p:pipe step="convert-smil" port="in-memory"/>
+        </p:input>
+    </px:epub3-label-pagebreaks-from-nav>
+
+    <p:documentation>
         Sort HTML files by spine order and delete HTML files that are not in spine. Note that the
         navigation document may be part of the spine, in which case there will be the original
         navigation document as well as the generated NCC.
@@ -164,7 +175,7 @@
     </p:group>
 
     <p:documentation>
-        Convert from EPUB 3 HTML to DAISY 2.02 HTML.
+        Convert from EPUB 3 HTML to DAISY 2.02 HTML and identify page break elements.
     </p:documentation>
     <p:group name="convert-html" px:progress="1/5">
         <p:output port="fileset" primary="true"/>
@@ -179,23 +190,27 @@
                 Load content documents.
             </p:documentation>
             <p:input port="in-memory">
-                <p:pipe step="convert-smil" port="in-memory"/>
+                <p:pipe step="label-pagebreaks-from-nav" port="result.in-memory"/>
             </p:input>
         </px:fileset-load>
         <p:group name="identify-pagebreaks">
             <p:documentation>Identify page break elements</p:documentation>
-            <p:output port="result" primary="true" sequence="true">
-                <p:pipe step="for-each" port="result"/>
+            <p:output port="content-docs" primary="true" sequence="true">
+                <p:pipe step="content-docs" port="result"/>
             </p:output>
             <p:output port="page-list">
                 <p:pipe step="page-list" port="result"/>
             </p:output>
-            <p:for-each name="for-each">
+            <p:for-each name="content-docs">
                 <p:output port="result" primary="true"/>
-                <p:output port="page-list">
+                <p:output port="page-lists" sequence="true">
                     <p:pipe step="xslt" port="secondary"/>
                 </p:output>
                 <p:xslt name="xslt">
+                    <p:input port="source">
+                        <p:pipe step="content-docs" port="current"/>
+                        <p:pipe step="label-pagebreaks-from-nav" port="page-list"/>
+                    </p:input>
                     <p:input port="stylesheet">
                         <p:document href="../../xslt/identify-pagebreaks.xsl"/>
                     </p:input>
@@ -203,18 +218,40 @@
                         <p:empty/>
                     </p:input>
                 </p:xslt>
-                <px:set-base-uri name="result">
+                <px:set-base-uri>
                     <p:with-option name="base-uri" select="base-uri(/*)">
-                        <p:pipe step="for-each" port="current"/>
+                        <p:pipe step="content-docs" port="current"/>
                     </p:with-option>
                 </px:set-base-uri>
             </p:for-each>
             <p:sink/>
-            <p:wrap-sequence wrapper="d:fileset" name="page-list">
+            <p:count>
                 <p:input port="source">
-                    <p:pipe step="for-each" port="page-list"/>
+                    <p:pipe step="label-pagebreaks-from-nav" port="page-list"/>
                 </p:input>
-            </p:wrap-sequence>
+            </p:count>
+            <p:choose name="page-list">
+                <p:when test="/*=1">
+                    <p:documentation>Get them from the navigation document.</p:documentation>
+                    <p:output port="result"/>
+                    <p:sink/>
+                    <p:identity>
+                        <p:input port="source">
+                            <p:pipe step="label-pagebreaks-from-nav" port="page-list"/>
+                        </p:input>
+                    </p:identity>
+                </p:when>
+                <p:otherwise>
+                    <p:documentation>Get them from epub:type="pagebreak" markup.</p:documentation>
+                    <p:output port="result"/>
+                    <p:sink/>
+                    <p:wrap-sequence wrapper="d:fileset">
+                        <p:input port="source">
+                            <p:pipe step="content-docs" port="page-lists"/>
+                        </p:input>
+                    </p:wrap-sequence>
+                </p:otherwise>
+            </p:choose>
             <p:sink/>
         </p:group>
         <p:for-each px:message="Converting HTML5 to HTML4" px:progress="1">
