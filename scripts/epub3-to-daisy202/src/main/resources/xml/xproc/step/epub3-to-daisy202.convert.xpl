@@ -206,9 +206,15 @@
                 <p:output port="page-lists" sequence="true">
                     <p:pipe step="xslt" port="secondary"/>
                 </p:output>
+                <p:label-elements match="*[@role='doc-pagebreak']" attribute="epub:type" replace="true"
+                                  label="string-join(distinct-values((@epub:type/tokenize(.,'\s+')[not(.='')],'pagebreak')),' ')"
+                                  name="handle-dpub-aria">
+                    <!-- Convert DPUB-ARIA roles to epub:type -->
+                </p:label-elements>
+                <p:sink/>
                 <p:xslt name="xslt">
                     <p:input port="source">
-                        <p:pipe step="content-docs" port="current"/>
+                        <p:pipe step="handle-dpub-aria" port="result"/>
                         <p:pipe step="label-pagebreaks-from-nav" port="page-list"/>
                     </p:input>
                     <p:input port="stylesheet">

@@ -217,7 +217,7 @@
 								<p>
 									<span id="st3-5">...</span>
 								</p>
-								<div id="page_front_5" class="page-front" epub:type="pagebreak" title="v"/>
+								<div id="page_front_5" class="page-front" role="doc-pagebreak" title="v"/>
 							</section>
 						</body>
 					</html>
