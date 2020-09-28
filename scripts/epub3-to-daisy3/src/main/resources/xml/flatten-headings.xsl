@@ -27,87 +27,24 @@
 
 	<xsl:template match="/">
 		<!--
-		    Mapping from IDs of unwrapped elements to IDs of their parent heading elements, as a set of
-		    d:anchor elements. (Note that there may be d:anchor with the same @id and different
+		    Mapping from IDs of unwrapped elements to IDs of their parent heading elements, as a set
+		    of d:anchor elements. (Note that there may be d:anchor with the same @id and different
 		    @original-id.)
 		-->
 		<xsl:variable name="id-mapping">
 			<xsl:document>
-				<d:file>
-					<xsl:apply-templates mode="id-mapping" select="*"/>
-				</d:file>
+				<d:fileset>
+					<d:file href="{base-uri(/*)}">
+						<xsl:apply-templates mode="id-mapping" select="*"/>
+					</d:file>
+				</d:fileset>
 			</xsl:document>
-		</xsl:variable>
-		<!--
-		    update idref of clips
-		-->
-		<xsl:variable name="audio-clips" as="element(d:audio-clips)">
-			<xsl:for-each select="collection()[2]/*">
-				<xsl:copy>
-					<xsl:sequence select="@*"/>
-					<xsl:for-each select="d:clip">
-						<xsl:copy>
-							<xsl:sequence select="@* except @idref"/>
-							<xsl:variable name="anchor" as="element(d:anchor)?" select="key('original-id',@idref,$id-mapping)"/>
-							<xsl:choose>
-								<xsl:when test="exists($anchor)">
-									<xsl:attribute name="idref" select="$anchor/@id"/>
-								</xsl:when>
-								<xsl:otherwise>
-									<xsl:sequence select="@idref"/>
-								</xsl:otherwise>
-							</xsl:choose>
-						</xsl:copy>
-					</xsl:for-each>
-				</xsl:copy>
-			</xsl:for-each>
-		</xsl:variable>
-		<!--
-		    merge clips with same idref
-		-->
-		<xsl:variable name="audio-clips" as="element(d:audio-clips)">
-			<xsl:for-each select="$audio-clips">
-				<xsl:copy>
-					<xsl:sequence select="@*"/>
-					<xsl:for-each-group select="d:clip" group-by="@idref">
-						<xsl:variable name="clips" as="element(d:clip)*" select="current-group()"/>
-						<xsl:choose>
-							<xsl:when test="count($clips)=1">
-								<xsl:sequence select="$clips"/>
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:variable name="clips" as="element(d:clip)*">
-									<xsl:perform-sort select="$clips">
-										<xsl:sort select="@clipBegin"/>
-									</xsl:perform-sort>
-								</xsl:variable>
-								<xsl:choose>
-									<xsl:when test="every $i in 1 to count($clips) - 1
-									                satisfies $clips[$i]/@src=$clips[$i + 1]/@src
-									                          and $clips[$i]/@clipEnd=$clips[$i + 1]/@clipBegin">
-										<d:clip idref="{$clips[1]/@idref}"
-										        src="{$clips[1]/@src}"
-										        clipBegin="{$clips[1]/@clipBegin}"
-										        clipEnd="{$clips[last()]/@clipEnd}"/>
-									</xsl:when>
-									<xsl:otherwise>
-										<xsl:message terminate="yes"
-										             select="concat(
-										                       'Audio clips of a heading element can not be combined: ',
-										                       string-join($clips/concat(@src,' (',@clipBegin,'-',@clipEnd,')'),', '))"/>
-									</xsl:otherwise>
-								</xsl:choose>
-							</xsl:otherwise>
-						</xsl:choose>
-					</xsl:for-each-group>
-				</xsl:copy>
-			</xsl:for-each>
 		</xsl:variable>
 		<xsl:apply-templates select="/*">
 			<xsl:with-param name="id-mapping" tunnel="yes" select="$id-mapping"/>
 		</xsl:apply-templates>
 		<xsl:result-document href="mapping">
-			<xsl:sequence select="$audio-clips"/>
+			<xsl:sequence select="$id-mapping"/>
 		</xsl:result-document>
 	</xsl:template>
 

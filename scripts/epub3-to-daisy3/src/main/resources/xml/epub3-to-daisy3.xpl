@@ -90,6 +90,7 @@
             px:smil-to-audio-fileset
             px:smil-update-links
             px:audio-clips-to-fileset
+            px:audio-clips-update-files
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/daisy3-utils/library.xpl">
@@ -318,12 +319,11 @@
         <p:group name="voice-dream-workaround">
             <p:output port="dtbook" primary="true"/>
             <p:output port="audio-clips">
-                <p:pipe step="secondary" port="result"/>
+                <p:pipe step="audio-clips" port="result"/>
             </p:output>
             <p:xslt name="xslt">
                 <p:input port="source">
                     <p:pipe step="dtbook" port="result.in-memory"/>
-                    <p:pipe step="audio" port="clips"/>
                 </p:input>
                 <p:input port="stylesheet">
                     <p:document href="flatten-headings.xsl"/>
@@ -333,7 +333,7 @@
                 </p:input>
             </p:xslt>
             <p:sink/>
-            <px:set-base-uri name="secondary">
+            <px:set-base-uri name="mapping">
                 <p:input port="source">
                     <p:pipe step="xslt" port="secondary"/>
                 </p:input>
@@ -341,6 +341,15 @@
                     <p:pipe step="audio" port="clips"/>
                 </p:with-option>
             </px:set-base-uri>
+            <p:sink/>
+            <px:audio-clips-update-files name="audio-clips">
+                <p:input port="source">
+                    <p:pipe step="audio" port="clips"/>
+                </p:input>
+                <p:input port="mapping">
+                    <p:pipe step="mapping" port="result"/>
+                </p:input>
+            </px:audio-clips-update-files>
             <p:sink/>
             <px:set-base-uri>
                 <p:input port="source">
