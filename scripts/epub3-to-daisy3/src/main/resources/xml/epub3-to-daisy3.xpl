@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:dc="http://purl.org/dc/elements/1.1/"
                 xmlns:html="http://www.w3.org/1999/xhtml"
@@ -66,6 +67,7 @@
     <p:import href="http://www.daisy.org/pipeline/modules/epub-utils/library.xpl">
         <p:documentation>
             px:opf-spine-to-fileset
+            px:epub3-label-pagebreaks-from-nav
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
@@ -100,6 +102,11 @@
             px:daisy3-create-opf
             px:daisy3-create-res-file
             px:daisy3-create-smils
+        </p:documentation>
+    </p:import>
+    <p:import href="page-list-update-links.xpl">
+        <p:documentation>
+            pxi:page-list-update-links
         </p:documentation>
     </p:import>
 
@@ -137,16 +144,25 @@
     <p:sink/>
 
     <p:documentation>
+        Read the "page-list" navigation and label page break elements with epub:type="pagebreak".
+    </p:documentation>
+    <px:epub3-label-pagebreaks-from-nav name="pagebreaks-from-nav">
+        <p:input port="source.fileset">
+            <p:pipe step="epub3" port="result"/>
+        </p:input>
+        <p:input port="source.in-memory">
+            <p:pipe step="main" port="source.in-memory"/>
+        </p:input>
+    </px:epub3-label-pagebreaks-from-nav>
+
+    <p:documentation>
         Get the spine
     </p:documentation>
     <p:group name="spine">
         <p:output port="result"/>
         <px:opf-spine-to-fileset>
-            <p:input port="source.fileset">
-                <p:pipe step="main" port="source.fileset"/>
-            </p:input>
             <p:input port="source.in-memory">
-                <p:pipe step="main" port="source.in-memory"/>
+                <p:pipe step="pagebreaks-from-nav" port="result.in-memory"/>
             </p:input>
         </px:opf-spine-to-fileset>
         <!-- because spine could contain non-HTML files -->
@@ -163,12 +179,12 @@
         </p:output>
         <px:fileset-load>
             <p:input port="in-memory">
-                <p:pipe step="main" port="source.in-memory"/>
+                <p:pipe step="pagebreaks-from-nav" port="result.in-memory"/>
             </p:input>
         </px:fileset-load>
         <px:html-merge name="merge">
             <p:with-option name="output-base-uri" select="resolve-uri('content.html',base-uri(/*))">
-                <p:pipe step="epub3" port="result"/>
+                <p:pipe step="pagebreaks-from-nav" port="result.fileset"/>
             </p:with-option>
         </px:html-merge>
     </p:group>
@@ -212,10 +228,10 @@
                                             application/x-dtbncx+xml"
                            name="resources">
             <p:input port="source">
-                <p:pipe step="epub3" port="result"/>
+                <p:pipe step="pagebreaks-from-nav" port="result.fileset"/>
             </p:input>
             <p:input port="source.in-memory">
-                <p:pipe step="main" port="source.in-memory"/>
+                <p:pipe step="pagebreaks-from-nav" port="result.in-memory"/>
             </p:input>
         </px:fileset-filter>
         <px:fileset-add-entry name="add-html" media-type="application/xhtml+xml">
@@ -249,6 +265,19 @@
     <p:sink/>
 
     <p:documentation>
+        Total mapping of the HTML merge, the copy and the DTBook conversion. Assumes that IDs were
+        preserved in the DTBook conversion.
+    </p:documentation>
+    <px:fileset-compose name="total-mapping">
+        <p:input port="source">
+            <p:pipe step="merge-html" port="mapping"/>
+            <p:pipe step="copy" port="mapping"/>
+            <p:pipe step="dtbook-and-resources" port="mapping"/>
+        </p:input>
+    </px:fileset-compose>
+    <p:sink/>
+
+    <p:documentation>
         Convert EPUB 3 SMILs to d:audio-clips document
     </p:documentation>
     <p:group name="audio">
@@ -256,26 +285,18 @@
         <p:output port="clips">
             <p:pipe step="clips" port="result"/>
         </p:output>
-        <!-- because audio files have been moved and id attributes possibly changed -->
-        <px:fileset-compose name="mapping">
-            <p:input port="source">
-                <p:pipe step="merge-html" port="mapping"/>
-                <p:pipe step="copy" port="mapping"/>
-            </p:input>
-        </px:fileset-compose>
-        <p:sink/>
         <px:fileset-load media-types="application/smil+xml" name="smil">
             <p:input port="fileset">
-                <p:pipe step="epub3" port="result"/>
+                <p:pipe step="pagebreaks-from-nav" port="result.fileset"/>
             </p:input>
             <p:input port="in-memory">
-                <p:pipe step="main" port="source.in-memory"/>
+                <p:pipe step="pagebreaks-from-nav" port="result.in-memory"/>
             </p:input>
         </px:fileset-load>
         <p:for-each>
             <px:smil-update-links>
                 <p:input port="mapping">
-                    <p:pipe step="mapping" port="result"/>
+                    <p:pipe step="total-mapping" port="result"/>
                 </p:input>
             </px:smil-update-links>
         </p:for-each>
@@ -286,6 +307,22 @@
         </px:smil-to-audio-clips>
         <px:audio-clips-to-fileset/>
     </p:group>
+    <p:sink/>
+
+    <p:documentation>
+        List of pagebreak elements in the DTBook
+    </p:documentation>
+    <p:for-each name="dtbook-page-list">
+        <p:iteration-source>
+            <p:pipe step="pagebreaks-from-nav" port="page-list"/>
+        </p:iteration-source>
+        <p:output port="result"/>
+        <pxi:page-list-update-links>
+            <p:input port="mapping">
+                <p:pipe step="total-mapping" port="result"/>
+            </p:input>
+        </pxi:page-list-update-links>
+    </p:for-each>
     <p:sink/>
 
     <p:documentation>
@@ -321,6 +358,9 @@
             <p:output port="audio-clips">
                 <p:pipe step="audio-clips" port="result"/>
             </p:output>
+            <p:output port="page-list" sequence="true">
+                <p:pipe step="page-list" port="result"/>
+            </p:output>
             <p:xslt name="xslt">
                 <p:input port="source">
                     <p:pipe step="dtbook" port="result.in-memory"/>
@@ -350,6 +390,18 @@
                     <p:pipe step="mapping" port="result"/>
                 </p:input>
             </px:audio-clips-update-files>
+            <p:sink/>
+            <p:for-each name="page-list">
+                <p:iteration-source>
+                    <p:pipe step="dtbook-page-list" port="result"/>
+                </p:iteration-source>
+                <p:output port="result" sequence="true"/>
+                <pxi:page-list-update-links>
+                    <p:input port="mapping">
+                        <p:pipe step="mapping" port="result"/>
+                    </p:input>
+                </pxi:page-list-update-links>
+            </p:for-each>
             <p:sink/>
             <px:set-base-uri>
                 <p:input port="source">
@@ -390,6 +442,9 @@
             </p:input>
             <p:input port="audio-map">
                 <p:pipe step="voice-dream-workaround" port="audio-clips"/>
+            </p:input>
+            <p:input port="page-list">
+                <p:pipe step="voice-dream-workaround" port="page-list"/>
             </p:input>
         </px:daisy3-create-ncx>
 
