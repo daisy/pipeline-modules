@@ -32,7 +32,7 @@ public class ConfigReader implements ConfigProperties {
 
 	public interface Extension {
 		/**
-		 * @node has a non-null local name
+		 * @param node has a non-null local name
 		 * @return false is the parsing can keep going with other extensions
 		 *         (most likely if @node is not related to the extension)
 		 */
