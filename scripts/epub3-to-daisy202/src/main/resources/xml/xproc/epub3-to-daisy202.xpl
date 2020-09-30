@@ -52,7 +52,7 @@ You may alternatively use the "mimetype" document if your input is a unzipped/"e
             <h1 px:role="name">Input validation status</h1>
             <p px:role="desc" xml:space="preserve">An XML document describing, briefly, whether the input validation was successful.
 
-[More details on the file format](http://daisy.github.io/pipeline/ValidationStatusXML).</p>
+[More details on the file format](http://daisy.github.io/pipeline/StatusXML).</p>
         </p:documentation>
         <p:pipe step="status" port="result"/>
     </p:output>

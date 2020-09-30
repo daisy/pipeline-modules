@@ -73,7 +73,7 @@
 	</p:output>
 	<p:output port="validation-status" px:media-type="application/vnd.pipeline.status+xml">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			<p>The <a href="http://daisy.github.io/pipeline/ValidationStatusXML">validation
+			<p>The <a href="http://daisy.github.io/pipeline/StatusXML">validation
 			status</a> document</p>
 			<p>'ok' if the <code>validation</code> option not 'abort' or if the input is a valid
 			EPUB, 'error' otherwise.</p>

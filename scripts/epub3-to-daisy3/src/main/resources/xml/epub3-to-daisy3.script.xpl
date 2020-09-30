@@ -50,7 +50,7 @@ You may alternatively use the EPUB package document (the OPF-file) if your input
             <h1 px:role="name">Conversion status</h1>
             <p px:role="desc" xml:space="preserve">An XML document describing whether the conversion was successful.
 
-[More details on the file format](http://daisy.github.io/pipeline/ValidationStatusXML).</p>
+[More details on the file format](http://daisy.github.io/pipeline/StatusXML).</p>
         </p:documentation>
         <p:pipe step="status" port="result"/>
     </p:output>
