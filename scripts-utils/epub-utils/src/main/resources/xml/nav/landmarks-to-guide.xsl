@@ -9,9 +9,7 @@
     
     <xsl:include href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl"/>
     
-    <xsl:output indent="yes"/>
-    
-    <xsl:param name="opf-base" required="yes"/>
+    <xsl:param name="output-base-uri" required="yes"/>
     
     <xsl:template match="/*">
         <guide>
@@ -22,15 +20,16 @@
     </xsl:template>
     
     <xsl:template name="landmarks-nav">
+        <xsl:variable name="nav-base" select="pf:base-uri(.)"/>
         <xsl:for-each select="descendant::html:a">
-            <reference title="{.}" href="{pf:relativize-uri(resolve-uri(@href,pf:base-uri(.)),$opf-base)}">
+            <reference title="{.}" href="{pf:relativize-uri(resolve-uri(@href,$nav-base),$output-base-uri)}">
                 <xsl:attribute name="type">
                     <xsl:choose>
                         <xsl:when test="@epub:type='titlepage'">
                             <xsl:value-of select="'title-page'"/>
                         </xsl:when>
                         <xsl:when test="@epub:type=('rearnotes','footnotes')">
-                            <xsl:value-of select="'note'"/>
+                            <xsl:value-of select="'notes'"/>
                         </xsl:when>
                         <xsl:when
                             test="@epub:type=('acknowledgements',
