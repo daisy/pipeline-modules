@@ -543,7 +543,7 @@
       <dependency>
         <groupId>org.daisy.libs</groupId>
         <artifactId>jstyleparser</artifactId>
-        <version>1.20-p14</version>
+        <version>1.20-p15-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.unbescape</groupId>

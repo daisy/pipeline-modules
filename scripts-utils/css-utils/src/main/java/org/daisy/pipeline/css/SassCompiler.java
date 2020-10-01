@@ -24,6 +24,7 @@ import javax.xml.transform.URIResolver;
 import javax.xml.transform.stream.StreamSource;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.ByteSource;
 import com.google.common.io.CharStreams;
 
@@ -45,9 +46,15 @@ public class SassCompiler {
 
 	private final Importer importer;
 	private final StreamSourceURIResolver resolver;
+	private final Map<String,String> env;
 
-	public SassCompiler(final URIResolver resolver) {
+	/**
+	 * @param env SASS variables. The map is allowed to be mutated by the caller after the
+	 *            SassCompiler is created.
+	 */
+	public SassCompiler(final URIResolver resolver, Map<String,String> env) {
 		this.resolver = new StreamSourceURIResolver(resolver);
+		this.env = env;
 		importer = new Importer() {
 				public Collection<Import> apply(String url, Import previous) {
 					URI uri = URIs.asURI(url);
@@ -87,26 +94,28 @@ public class SassCompiler {
 	                                                +")\\s*";
 
 	/**
+	 * @param encoding the encoding of the input or null if unknown
 	 * @throws IOException if something goes wrong reading the input
 	 * @throws RuntimeException if the compilation fails.
 	 */
-	public InputStream compile(Source sass, Map<String,String> env) throws IOException {
+	public InputStream compile(Source sass, Charset encoding) throws IOException {
 		String base = sass.getSystemId();
 		if (sass instanceof StreamSource)
-			return compile(((StreamSource)sass).getInputStream(), URLs.asURL(base), env);
+			return compile(((StreamSource)sass).getInputStream(), URLs.asURL(base), encoding);
 		else
 			try {
-				return compile(resolver.resolve(base, base), env);
+				return compile(resolver.resolve(base, base), encoding);
 			} catch (TransformerException e) {
 				throw new IOException(e);
 			}
 	}
 
 	/**
+	 * @param encoding the encoding of the input or null if unknown
 	 * @throws IOException if something goes wrong reading the input
 	 * @throws RuntimeException if the compilation fails.
 	 */
-	public InputStream compile(InputStream sass, URL base, Map<String,String> env) throws IOException {
+	public InputStream compile(InputStream sass, URL base, Charset encoding) throws IOException {
 		Compiler sassCompiler = new Compiler();
 		Options options = new Options();
 		options.setIsIndentedSyntaxSrc(false);
@@ -132,23 +141,28 @@ public class SassCompiler {
 				scss.append("$").append(var).append(": ").append(value).append(";\n");
 			}
 		}
-		Charset encoding = StandardCharsets.UTF_8;
 		// FIXME: if stream starts with BOM, encoding should be UTF-8
 		BufferedInputStream bufferedStream = new BufferedInputStream(sass);
 		bufferedStream.mark(1000);
-		BufferedReader r = new BufferedReader(new InputStreamReader(bufferedStream, StandardCharsets.UTF_8));
+		BufferedReader r = new BufferedReader(new InputStreamReader(bufferedStream,
+		                                                            encoding != null ? encoding : StandardCharsets.UTF_8));
 		String firstLine = r.readLine();
 		Pattern charsetRule = Pattern.compile("(@charset +\"(.+)\";?).*");
 		Matcher m = charsetRule.matcher(firstLine);
 		if (m.matches()) {
 			String charset = m.group(2);
 			firstLine = firstLine.substring(m.group(1).length());
-			try {
-				encoding = Charset.forName(charset);
-			} catch (UnsupportedCharsetException e) {
+			if (encoding == null)
+				try {
+					encoding = Charset.forName(charset);
+				} catch (UnsupportedCharsetException e) {
+					logger.warn("Ignoring @charset \"" + charset + "\";");
+				}
+			else
 				logger.warn("Ignoring @charset \"" + charset + "\";");
-			}
 		}
+		if (encoding == null)
+			encoding = StandardCharsets.UTF_8;
 		if (encoding != StandardCharsets.UTF_8) {
 			if (firstLine.getBytes(StandardCharsets.UTF_8).length < 1000) {
 				bufferedStream.reset();
