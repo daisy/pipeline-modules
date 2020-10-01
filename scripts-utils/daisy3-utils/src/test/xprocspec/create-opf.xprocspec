@@ -78,7 +78,9 @@
 			</x:input>
 			<x:option name="output-base-uri" select="resolve-uri('book.opf')"/>
 			<x:option name="uid" select="'urn:uuid:123'"/>
-			<x:param port="dc-metadata" name="dc:Publisher" select="'Publisher'"/>
+			<!-- depends on https://github.com/daisy/xprocspec/pull/77 -->
+			<!-- <x:param port="dc-metadata" name="dc:Publisher" select="'Publisher'"/> -->
+			<x:input port="dc-metadata"/>
 		</x:call>
 		<x:context label="result">
 			<x:document type="port" port="result"/>
@@ -91,7 +93,8 @@
 							<dc:Format>ANSI/NISO Z39.86-2005</dc:Format>
 							<dc:Language>en</dc:Language>
 							<dc:Date>2020-06-29</dc:Date>
-							<dc:Publisher>Publisher</dc:Publisher>
+							<!-- <dc:Publisher>Publisher</dc:Publisher> -->
+							<dc:Publisher>unknown</dc:Publisher>
 							<dc:Title>Title</dc:Title>
 							<dc:Identifier id="uid">urn:uuid:123</dc:Identifier>
 							<dc:Author>Author</dc:Author>
