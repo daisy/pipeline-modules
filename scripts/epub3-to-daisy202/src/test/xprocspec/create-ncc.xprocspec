@@ -135,7 +135,7 @@
                     <d:fileset>
                         <d:file href="file:/tmp/EPUB/chapter_001.xhtml">
                             <d:anchor id="page1"/>
-                            <d:anchor id="page2"/>
+                            <d:anchor id="page2" title="2"/>
                         </d:file>
                     </d:fileset>
                 </x:document>
@@ -250,9 +250,7 @@
                             <a href="chapter_001.smil#paragraph2">...</a>
                         </p>
                         <h2 id="c1-2">
-                            <span id="page2" class="page-normal" title="2">
-                                <a href="chapter_001.smil#par_2"/>
-                            </span>
+                            <span id="page2" class="page-normal" title="2"/>
                             <span class="word" id="c1-2_w1">
                                 <a href="chapter_001.smil#id_1">Chapter</a>
                             </span>
