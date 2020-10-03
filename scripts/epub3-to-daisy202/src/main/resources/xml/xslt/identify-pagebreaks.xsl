@@ -90,7 +90,7 @@
 	</xsl:template>
 
 	<xsl:template mode="list"
-	              match="*[self::span|self::div]
+	              match="*[self::span|self::div|self::a|self::hr]
 	                      [@epub:type/tokenize(.,'\s+')='pagebreak']
 	                      [not(*)]">
 		<d:anchor>
