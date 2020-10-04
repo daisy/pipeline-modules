@@ -15,7 +15,7 @@
 	<xsl:template match="/*" priority="1">
 		<xsl:call-template name="pf:next-match-with-generated-ids">
 			<xsl:with-param name="prefix" select="'page_'"/>
-			<xsl:with-param name="for-elements" select="//*[self::span|self::div|self::a|self::hr]
+			<xsl:with-param name="for-elements" select="//*[self::span|self::div|self::a|self::hr|self::br]
 			                                               [@epub:type/tokenize(.,'\s+')='pagebreak']
 			                                               [not(*)]
 			                                               [not(@id)]"/>
@@ -40,7 +40,7 @@
 	    This step is not strictly needed, but done to give page numbers the same format as in the NCC.
 	-->
 	<xsl:template mode="convert"
-	              match="*[self::span|self::div|self::a|self::hr]
+	              match="*[self::span|self::div|self::a|self::hr|self::br]
 	                      [@epub:type/tokenize(.,'\s+')='pagebreak']
 	                      [not(*)]">
 		<span>
@@ -95,7 +95,7 @@
 	</xsl:template>
 
 	<xsl:template mode="list"
-	              match="*[self::span|self::div|self::a|self::hr]
+	              match="*[self::span|self::div|self::a|self::hr|self::br]
 	                      [@epub:type/tokenize(.,'\s+')='pagebreak']
 	                      [not(*)]">
 		<d:anchor>
