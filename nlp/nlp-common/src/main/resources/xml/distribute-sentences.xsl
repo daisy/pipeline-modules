@@ -2,18 +2,34 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:d="http://www.daisy.org/ns/pipeline/data"
+    xmlns:c="http://www.w3.org/ns/xproc-step"
+    xmlns:f="functions"
     xmlns:xml="http://www.w3.org/XML/1998/namespace"
     exclude-result-prefixes="xs"
     version="2.0">
 
-  <xsl:param name="tmp-ns"/>
-  <xsl:param name="tmp-word-tag"/>
-  <xsl:param name="tmp-sentence-tag"/>
   <xsl:param name="can-contain-sentences"/>
   <xsl:param name="cannot-be-sentence-child"/>
 
+  <xsl:variable name="options" as="element(c:param-set)" select="collection()[2]/*"/>
+
   <xsl:variable name="ok-parent-list" select="concat(',', $can-contain-sentences, ',')"/>
   <xsl:variable name="no-sent-child" select="concat(',', $cannot-be-sentence-child, ',')"/>
+
+  <!--
+      This relies on p:in-scope-names adding the namespaces that travel with an option
+      (https://www.w3.org/TR/xproc/#opt-param-bindings) to the c:param element. This is true for our
+      version of XMLCalabash.
+  -->
+  <xsl:variable name="tmp-word-tag" as="xs:QName"
+		select="f:param-value-as-QName($options/c:param[@name='tmp-word-tag'])"/>
+  <xsl:variable name="tmp-sentence-tag" as="xs:QName"
+		select="f:param-value-as-QName($options/c:param[@name='tmp-sentence-tag'])"/>
+
+  <xsl:function name="f:param-value-as-QName" as="xs:QName">
+    <xsl:param name="param" as="element(c:param)"/>
+    <xsl:sequence select="resolve-QName($param/@value,$param)"/>
+  </xsl:function>
 
   <!-- Copy the document until a sentence is found. -->
 
@@ -23,7 +39,9 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="*[local-name() = $tmp-sentence-tag]" priority="2">
+  <xsl:template match="*[local-name()=local-name-from-QName($tmp-sentence-tag)
+		         and namespace-uri()=namespace-uri-from-QName($tmp-sentence-tag)]"
+		priority="2">
     <xsl:choose>
       <xsl:when test="contains($ok-parent-list, concat(',', local-name(..), ','))">
 	<xsl:call-template name="new-sent-on-top-of-children">
@@ -61,12 +79,16 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="*[local-name() = $tmp-word-tag]" mode="split-sentence" priority="2">
+  <xsl:template match="*[local-name()=local-name-from-QName($tmp-word-tag)
+		         and namespace-uri()=namespace-uri-from-QName($tmp-word-tag)]"
+		mode="split-sentence" priority="2">
     <xsl:param name="lang" select="''"/>
     <xsl:copy-of select="node()"/> <!-- ignore the tmp:word -->
   </xsl:template>
 
-  <xsl:template match="*[local-name() = $tmp-sentence-tag]" mode="split-sentence" priority="2">
+  <xsl:template match="*[local-name()=local-name-from-QName($tmp-sentence-tag)
+		         and namespace-uri()=namespace-uri-from-QName($tmp-sentence-tag)]"
+		mode="split-sentence" priority="2">
     <xsl:param name="lang" select="''"/>
     <!-- Should not happen. -->
     <xsl:copy-of select="node()"/>
@@ -79,7 +101,8 @@
       <xsl:choose>
 	<xsl:when test="current-grouping-key()">
 	  <!-- assuming the tmp words are inserted at the lowest possible level. -->
-	  <xsl:element name="{$tmp-sentence-tag}" namespace="{$tmp-ns}">
+	  <xsl:element name="{local-name-from-QName($tmp-sentence-tag)}"
+		       namespace="{namespace-uri-from-QName($tmp-sentence-tag)}">
 	    <xsl:if test="$lang != ''">
 	      <xsl:attribute namespace="http://www.w3.org/XML/1998/namespace" name="lang">
 		<xsl:value-of select="$lang"/>

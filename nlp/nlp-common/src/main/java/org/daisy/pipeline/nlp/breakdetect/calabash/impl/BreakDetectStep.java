@@ -50,9 +50,8 @@ public class BreakDetectStep extends DefaultStep implements TreeWriterFactory, I
 	private Collection<String> wordAfterOption;
 	private Collection<String> sentenceBeforeOption;
 	private Collection<String> sentenceAfterOption;
-	private String tmpNs;
-	private String wordTagOption;
-	private String sentenceTagOption;
+	private QName wordTagOption;
+	private QName sentenceTagOption;
 	private LangDetector mLangDetector = null;
 
 	public BreakDetectStep(XProcRuntime runtime, XAtomicStep step, LexServiceRegistry registry) {
@@ -81,11 +80,9 @@ public class BreakDetectStep extends DefaultStep implements TreeWriterFactory, I
 		} else if ("ensure-sentence-after".equalsIgnoreCase(name.getLocalName())) {
 			sentenceAfterOption = processListOption(value.getString());
 		} else if ("output-word-tag".equalsIgnoreCase(name.getLocalName())) {
-			wordTagOption = value.getString();
+			wordTagOption = value.getQName();
 		} else if ("output-sentence-tag".equalsIgnoreCase(name.getLocalName())) {
-			sentenceTagOption = value.getString();
-		} else if ("tmp-ns".equalsIgnoreCase(name.getLocalName())) {
-			tmpNs = value.getString();
+			sentenceTagOption = value.getQName();
 		} else {
 			runtime.error(new RuntimeException("unrecognized option " + name));
 		}
@@ -119,7 +116,7 @@ public class BreakDetectStep extends DefaultStep implements TreeWriterFactory, I
 		}
 		langToToken.put(null, generic);
 
-		FormatSpecifications formatSpecs = new FormatSpecifications(tmpNs, sentenceTagOption,
+		FormatSpecifications formatSpecs = new FormatSpecifications(sentenceTagOption,
 		        wordTagOption, "http://www.w3.org/XML/1998/namespace", "lang",
 		        inlineTagsOption, wordBeforeOption, wordAfterOption, sentenceBeforeOption,
 		        sentenceAfterOption);

@@ -131,16 +131,14 @@
   <!-- The tags are chosen to not conflict with other elements since
        the namespace is not always used in the XSLT scripts, which
        otherwise helps distinguish temporary tags from the others. -->
-  <p:variable name="tmp-ns" select="'http://www.daisy.org/ns/pipeline/tmp'"/>
-  <p:variable name="tmp-word-tag" select="'ww'"/>
-  <p:variable name="tmp-sentence-tag" select="'ss'"/>
+  <p:variable name="tmp-word-tag" select="'tmp:ww'"/>
+  <p:variable name="tmp-sentence-tag" select="'tmp:ss'"/>
 
   <!-- run the java-based lexing step -->
   <px:break-detect name="break">
     <p:with-option name="inline-tags" select="$inline-tags"/>
     <p:with-option name="output-word-tag" select="$tmp-word-tag"/>
     <p:with-option name="output-sentence-tag" select="$tmp-sentence-tag"/>
-    <p:with-option name="tmp-ns" select="$tmp-ns"/>
     <p:with-option name="ensure-word-before" select="$ensure-word-before"/>
     <p:with-option name="ensure-word-after" select="$ensure-word-after"/>
     <p:with-option name="ensure-sentence-before" select="$ensure-sentence-before"/>
@@ -160,7 +158,6 @@
     <p:with-option name="sentence-attr-val" select="$sentence-attr-val"/>
     <p:with-option name="output-ns" select="$output-ns"/>
     <p:with-option name="output-subsentence-tag" select="$output-subsentence-tag"/>
-    <p:with-option name="tmp-ns" select="$tmp-ns"/>
     <p:with-option name="tmp-word-tag" select="$tmp-word-tag"/>
     <p:with-option name="tmp-sentence-tag" select="$tmp-sentence-tag"/>
     <p:with-option name="exclusive-word-tag" select="$exclusive-word-tag"/>

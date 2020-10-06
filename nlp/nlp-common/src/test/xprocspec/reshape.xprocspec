@@ -20,6 +20,8 @@
 	<p:with-option name="output-word-tag" select="'w'"/>
 	<p:with-option name="output-sentence-tag" select="'sent'"/>
 	<p:with-option name="output-subsentence-tag" select="'span'"/>
+	<p:with-option name="tmp-word-tag" select="'tmp:ww'"/>
+	<p:with-option name="tmp-sentence-tag" select="'tmp:ss'"/>
       </px:reshape>
     </p:declare-step>
   </x:script>

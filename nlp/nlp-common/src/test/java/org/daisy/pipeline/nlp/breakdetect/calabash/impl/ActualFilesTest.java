@@ -313,8 +313,8 @@ public class ActualFilesTest implements TreeWriterFactory {
 				        .getResourceAsStream(file)));
 				XdmNode document = Builder.build(source);
 
-				FormatSpecifications specs = new FormatSpecifications("http://tmp", "sss",
-				        "www", "http://ns", "lang", Arrays.asList(inlineElements), Arrays
+				FormatSpecifications specs = new FormatSpecifications(new QName("tmp", "http://tmp", "sss"),
+						new QName("tmp", "http://tmp", "www"), "http://ns", "lang", Arrays.asList(inlineElements), Arrays
 				                .asList(spaceEquivalents), Arrays.asList(spaceEquivalents),
 				        null, null);
 
