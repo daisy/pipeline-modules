@@ -201,34 +201,34 @@
         <plugin>
           <groupId>org.daisy.maven</groupId>
           <artifactId>xproc-maven-plugin</artifactId>
-          <version>1.0.1</version>
+          <version>1.0.2-SNAPSHOT</version>
           <dependencies>
             <!--
                 provided dependencies of xprocspec-runner
                 
                 need to be defined here and not in test dependencies because otherwise the
                 Module_xprocspec_runner and MessageStepProvider services will fail to load because
-                the XProcStepProvider and ModuleRef classes will not be found
+                the XProcStepProvider and Module classes will not be found
             -->
             <dependency>
               <groupId>org.daisy.pipeline</groupId>
               <artifactId>modules-registry</artifactId>
-              <version>3.0.0</version>
+              <version>4.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
               <groupId>org.daisy.pipeline</groupId>
               <artifactId>xmlcatalog</artifactId>
-              <version>2.0.5</version>
+              <version>2.0.6</version>
             </dependency>
             <dependency>
               <groupId>org.daisy.pipeline</groupId>
               <artifactId>calabash-adapter</artifactId>
-              <version>3.0.2</version>
+              <version>4.0.1-SNAPSHOT</version>
             </dependency>
             <dependency>
               <groupId>org.daisy.pipeline</groupId>
               <artifactId>ds-to-spi-runtime</artifactId>
-              <version>1.0.0</version>
+              <version>1.1.0</version>
             </dependency>
           </dependencies>
         </plugin>
