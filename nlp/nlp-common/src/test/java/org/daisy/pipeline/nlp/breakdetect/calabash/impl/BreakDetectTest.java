@@ -5,7 +5,6 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -72,10 +71,12 @@ public class BreakDetectTest implements TreeWriterFactory {
 		XdmNode document = Builder.build(source);
 
 		FormatSpecifications specs = new FormatSpecifications(
-				new QName("tmp", "http://tmp", "s"), new QName("tmp", "http://tmp", "w"),
-		        "http://ns", "lang", Arrays.asList("span1", "span2", "span3", "space"), Arrays
-		                .asList("space", "span3"), Arrays.asList("space", "span3"), Arrays
-		                .asList("sentbefore"), Arrays.asList("sentafter"));
+				new QName("tmp", "http://tmp", "s"), new QName("tmp", "http://tmp", "w"), "http://ns", "lang",
+				x -> x.getNodeName().getLocalName().matches("span1|span2|span3|space"),
+				x -> x.getNodeName().getLocalName().matches("span3|space"),
+				x -> x.getNodeName().getLocalName().matches("span3|space"),
+				x -> x.getNodeName().getLocalName().equals("sentbefore"),
+				x -> x.getNodeName().getLocalName().equals("sentafter"));
 
 		XdmNode tree = new XmlBreakRebuilder().rebuild(this, Lexers, document, specs,
 		        new DummyLangDetector(), forbidAnyDuplication, new ArrayList<String>());

@@ -4,10 +4,9 @@
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:c="http://www.w3.org/ns/xproc-step"
                 xmlns:f="functions"
+                xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                 exclude-result-prefixes="xs">
 
-  <xsl:param name="can-contain-words"/>
-  <xsl:param name="special-sentences" select="''"/>
   <xsl:param name="output-ns"/>
   <xsl:param name="output-sentence-tag"/>
   <xsl:param name="sentence-attr" select="''"/>
@@ -43,8 +42,6 @@
   </xsl:function>
 
   <xsl:key name="sentence-for-element" match="d:sentence" use="@element"/>
-
-  <xsl:variable name="special-list" select="concat(',', $special-sentences, ',')"/>
 
   <!--========================================================= -->
   <!-- FIND ALL THE SENTENCES' ID                               -->
@@ -86,7 +83,7 @@
        sentence is the parent of existing sentence(s), the existing
        sentences will be discarded. -->
   <xsl:template mode="sentence-ids" priority="3"
-      match="*[contains($special-list, concat(',', local-name(), ',')) or
+      match="*[@pxi:special-sentence or
 	     ($exclusive-sentence-tag = 'true' and local-name() = $output-sentence-tag)]">
     <!-- TODO: copy the @xml:lang -->
     <d:sentence element="{generate-id(.)}" recycled="1"/>
@@ -116,20 +113,20 @@
     </xsl:result-document>
   </xsl:template>
 
-  <xsl:template match="@*|node()" priority="1">
+  <xsl:template match="node()" priority="1">
     <xsl:variable name="entry" select="key('sentence-for-element', generate-id(.), $sentence-ids-tree)"/>
     <xsl:choose>
       <xsl:when test="$entry and $entry/@recycled">
   	<xsl:copy copy-namespaces="no">
   	  <xsl:call-template name="copy-namespaces"/>
-  	  <xsl:copy-of select="@*"/>
+  	  <xsl:apply-templates select="@*" mode="inside-sentence"/>
   	  <xsl:if test="not(@id)">
   	    <xsl:attribute name="id">
   	      <xsl:value-of select="$entry/@id"/>
   	    </xsl:attribute>
   	  </xsl:if>
   	  <xsl:apply-templates select="node()" mode="inside-sentence">
-  	    <xsl:with-param name="parent-name" select="local-name()"/>
+  	    <xsl:with-param name="can-contain-sentences" select="exists(@pxi:can-contain-sentences)"/>
   	  </xsl:apply-templates>
   	</xsl:copy>
       </xsl:when>
@@ -145,7 +142,7 @@
 	  </xsl:if>
 	  <xsl:copy-of select="@xml:lang"/> <!-- doesn't always exist -->
   	  <xsl:apply-templates select="node()" mode="inside-sentence">
-  	    <xsl:with-param name="parent-name" select="$output-sentence-tag"/>
+	    <xsl:with-param name="can-contain-sentences" select="true()"/>
   	  </xsl:apply-templates>
   	</xsl:element>
       </xsl:when>
@@ -174,22 +171,21 @@
   <xsl:template match="*[local-name()=local-name-from-QName($tmp-sentence-tag)
 		         and namespace-uri()=namespace-uri-from-QName($tmp-sentence-tag)]"
 		mode="inside-sentence" priority="2">
-    <xsl:param name="parent-name"/>
+    <xsl:param name="can-contain-sentences" as="xs:boolean"/>
     <!-- Ignore the node: since we are already inside a sentence,
          it means that a parent node has been recycled to contain the
          current sentence (e.g. a pagenum or an existing sentence) -->
-    <xsl:apply-templates select="node()" mode="inside-sentence">
-      <xsl:with-param name="parent-name" select="$parent-name"/>
+    <xsl:apply-templates select="node()" mode="#current">
+      <xsl:with-param name="can-contain-sentences" select="$can-contain-sentences"/>
     </xsl:apply-templates>
   </xsl:template>
 
-  <xsl:variable name="ok-parent-list" select="concat(',', $can-contain-words, ',', $output-sentence-tag, ',')" />
   <xsl:template match="*[local-name()=local-name-from-QName($tmp-word-tag)
 		         and namespace-uri()=namespace-uri-from-QName($tmp-word-tag)]"
 		mode="inside-sentence" priority="2">
-    <xsl:param name="parent-name"/>
+    <xsl:param name="can-contain-sentences" as="xs:boolean"/>
     <xsl:choose>
-      <xsl:when test="contains($ok-parent-list, concat(',', $parent-name, ','))">
+      <xsl:when test="$can-contain-sentences">
 	<xsl:element name="{$output-word-tag}" namespace="{$output-ns}">
 	  <xsl:if test="$word-attr != ''">
 	    <xsl:attribute name="{$word-attr}">
@@ -197,14 +193,14 @@
 	    </xsl:attribute>
 	  </xsl:if>
 	  <xsl:apply-templates select="node()" mode="inside-word">
-	    <xsl:with-param name="parent-name" select="local-name()"/>
+	    <xsl:with-param name="can-contain-sentences" select="exists(@pxi:can-contain-sentences)"/>
 	  </xsl:apply-templates>
 	</xsl:element>
       </xsl:when>
       <xsl:otherwise>
 	<!-- The word is ignored. -->
-	<xsl:apply-templates select="node()" mode="inside-sentence">
-	  <xsl:with-param name="parent-name" select="local-name()"/>
+	<xsl:apply-templates select="node()" mode="#current">
+	  <xsl:with-param name="can-contain-sentences" select="exists(@pxi:can-contain-sentences)"/>
 	</xsl:apply-templates>
       </xsl:otherwise>
     </xsl:choose>
@@ -213,8 +209,8 @@
   <xsl:template match="*[$exclusive-sentence-tag='true' and local-name()=$output-sentence-tag]"
 		mode="inside-sentence" priority="3">
     <!-- The existing sentence is ignored. Warning: the attributes are lost. -->
-    <xsl:apply-templates select="node()" mode="inside-sentence">
-      <xsl:with-param name="parent-name" select="local-name()"/>
+    <xsl:apply-templates select="node()" mode="#current">
+      <xsl:with-param name="can-contain-sentences" select="true()"/>
     </xsl:apply-templates>
   </xsl:template>
 
@@ -222,17 +218,16 @@
 		mode="inside-sentence" priority="2">
     <xsl:copy copy-namespaces="no">
       <xsl:call-template name="copy-namespaces"/>
-      <xsl:copy-of select="@*"/>
-      <xsl:apply-templates select="node()" mode="inside-word"/>
+      <xsl:apply-templates select="@*|node()" mode="inside-word"/>
     </xsl:copy>
   </xsl:template>
 
   <xsl:template match="node()" mode="inside-sentence" priority="1">
     <xsl:copy copy-namespaces="no">
       <xsl:call-template name="copy-namespaces"/>
-      <xsl:copy-of select="@*"/>
-      <xsl:apply-templates select="node()" mode="inside-sentence">
-	<xsl:with-param name="parent-name" select="local-name()"/>
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:apply-templates select="node()" mode="#current">
+	<xsl:with-param name="can-contain-sentences" select="exists(@pxi:can-contain-sentences)"/>
       </xsl:apply-templates>
     </xsl:copy>
   </xsl:template>
@@ -241,7 +236,7 @@
 		         and namespace-uri()=namespace-uri-from-QName($tmp-word-tag)]"
 		mode="inside-word" priority="2">
     <!-- the temporary word is ignored.-->
-    <xsl:apply-templates select="node()" mode="inside-word"/>
+    <xsl:apply-templates select="node()" mode="#current"/>
   </xsl:template>
 
   <xsl:template match="*[$exclusive-word-tag='true' and local-name()=$output-word-tag]"
@@ -250,12 +245,11 @@
     <xsl:choose>
       <xsl:when test="count(@*) > 0">
 	<xsl:element name="{$output-subsentence-tag}" namespace="{$output-ns}">
-	  <xsl:copy-of select="@*"/>
-	  <xsl:apply-templates select="node()" mode="inside-word"/>
+	  <xsl:apply-templates select="@*|node()" mode="#current"/>
 	</xsl:element>
       </xsl:when>
       <xsl:otherwise>
-	<xsl:apply-templates select="node()" mode="inside-word"/>
+	<xsl:apply-templates select="node()" mode="#current"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -263,17 +257,28 @@
   <xsl:template match="node()" mode="inside-word" priority="1">
     <xsl:copy copy-namespaces="no">
       <xsl:call-template name="copy-namespaces"/>
-      <xsl:copy-of select="@*"/>
-      <xsl:apply-templates select="node()" mode="inside-word"/>
+      <xsl:apply-templates select="@*|node()" mode="#current"/>
     </xsl:copy>
   </xsl:template>
 
+  <xsl:template mode="#default inside-sentence inside-word" match="@*">
+    <xsl:sequence select="."/>
+  </xsl:template>
+
+  <xsl:template mode="#default inside-sentence inside-word"
+		match="@pxi:special-sentence|
+		       @pxi:can-contain-sentences|
+		       @pxi:cannot-be-sentence-child"/>
+
   <!-- UTILS -->
+
+  <xsl:variable name="remove-ns" as="xs:string*"
+		select="('http://www.daisy.org/ns/pipeline/xproc/internal',
+			 distinct-values(
+			   for $tag in ($tmp-word-tag,$tmp-sentence-tag) return namespace-uri-from-QName($tag)))"/>
+
   <xsl:template name="copy-namespaces">
-    <xsl:variable name="tmp-ns" as="xs:string*"
-		  select="distinct-values(
-			    for $tag in ($tmp-word-tag,$tmp-sentence-tag) return namespace-uri-from-QName($tag))"/>
-    <xsl:for-each select="namespace::*[not(.=$tmp-ns)]">
+    <xsl:for-each select="namespace::*[not(.=$remove-ns)]">
       <xsl:sequence select="."/>
     </xsl:for-each>
   </xsl:template>

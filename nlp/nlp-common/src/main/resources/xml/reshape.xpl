@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                 type="px:reshape"
                 name="main"
                 exclude-inline-prefixes="#all">
@@ -36,31 +37,67 @@
 
   <p:in-scope-names name="options"/>
 
+  <p:identity>
+    <p:input port="source">
+      <p:pipe step="main" port="source"/>
+    </p:input>
+  </p:identity>
+  <!--
+      Mark elements with attributes @pxi:can-contain-sentences, @special-sentences and
+      @cannot-be-sentence-child. These attributes are removed again in distribute-sentences.xsl.
+  -->
+  <p:group name="mark">
+    <p:output port="result"/>
+    <p:add-attribute attribute-name="pxi:can-contain-sentences" attribute-value="">
+      <p:with-option name="match" select="$can-contain-sentences"/>
+    </p:add-attribute>
+    <!-- accept words which are children of a temporary sentence which is in turn the child of an
+	 existing sentence. -->
+    <p:add-attribute attribute-name="pxi:can-contain-sentences" attribute-value="">
+      <p:with-option name="match" select="concat('*:',$output-sentence-tag)"/>
+    </p:add-attribute>
+    <p:choose>
+      <p:when test="$special-sentences!=''">
+	<p:add-attribute attribute-name="pxi:special-sentence" attribute-value="">
+	  <p:with-option name="match" select="$special-sentences"/>
+	</p:add-attribute>
+      </p:when>
+      <p:otherwise>
+	<p:identity/>
+      </p:otherwise>
+    </p:choose>
+    <p:choose>
+      <p:when test="$cannot-be-sentence-child!=''">
+	<p:add-attribute attribute-name="pxi:cannot-be-sentence-child" attribute-value="">
+	  <p:with-option name="match" select="$cannot-be-sentence-child"/>
+	</p:add-attribute>
+      </p:when>
+      <p:otherwise>
+	<p:identity/>
+      </p:otherwise>
+    </p:choose>
+  </p:group>
+
   <!-- Distribute some sentences to prevent them from having parents
        not compliant with the format. -->
   <p:xslt name="distribute">
     <p:with-option name="output-base-uri" select="base-uri(/*)">
       <p:pipe step="main" port="source"/>
     </p:with-option>
-    <!-- The output-sentence-tag is added so as to accept words which
-         are children of a temporary sentence which is in turn the
-         child of an existing sentence. -->
-    <p:with-param name="can-contain-sentences"
-		  select="concat($can-contain-sentences, ',', $output-sentence-tag)"/>
-    <p:with-param name="cannot-be-sentence-child" select="$cannot-be-sentence-child"/>
     <p:input port="source">
-      <p:pipe step="main" port="source"/>
+      <p:pipe step="mark" port="result"/>
       <p:pipe step="options" port="result"/>
     </p:input>
     <p:input port="stylesheet">
       <p:document href="distribute-sentences.xsl"/>
     </p:input>
+    <p:input port="parameters">
+      <p:empty/>
+    </p:input>
   </p:xslt>
 
   <!-- Create the actual sentence/word elements. -->
   <p:xslt name="create-valid">
-    <p:with-param name="can-contain-words" select="$can-contain-sentences"/>
-    <p:with-param name="special-sentences" select="$special-sentences"/>
     <p:with-param name="output-word-tag" select="$output-word-tag"/>
     <p:with-param name="output-sentence-tag" select="$output-sentence-tag"/>
     <p:with-param name="word-attr" select="$word-attr"/>

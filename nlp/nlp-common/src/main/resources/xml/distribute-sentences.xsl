@@ -1,20 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:d="http://www.daisy.org/ns/pipeline/data"
-    xmlns:c="http://www.w3.org/ns/xproc-step"
-    xmlns:f="functions"
-    xmlns:xml="http://www.w3.org/XML/1998/namespace"
-    exclude-result-prefixes="xs"
-    version="2.0">
-
-  <xsl:param name="can-contain-sentences"/>
-  <xsl:param name="cannot-be-sentence-child"/>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
+		xmlns:xs="http://www.w3.org/2001/XMLSchema"
+		xmlns:d="http://www.daisy.org/ns/pipeline/data"
+		xmlns:c="http://www.w3.org/ns/xproc-step"
+		xmlns:f="functions"
+		xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
+		xmlns:xml="http://www.w3.org/XML/1998/namespace"
+		exclude-result-prefixes="xs">
 
   <xsl:variable name="options" as="element(c:param-set)" select="collection()[2]/*"/>
-
-  <xsl:variable name="ok-parent-list" select="concat(',', $can-contain-sentences, ',')"/>
-  <xsl:variable name="no-sent-child" select="concat(',', $cannot-be-sentence-child, ',')"/>
 
   <!--
       This relies on p:in-scope-names adding the namespaces that travel with an option
@@ -43,7 +37,7 @@
 		         and namespace-uri()=namespace-uri-from-QName($tmp-sentence-tag)]"
 		priority="2">
     <xsl:choose>
-      <xsl:when test="contains($ok-parent-list, concat(',', local-name(..), ','))">
+      <xsl:when test="../@pxi:can-contain-sentences">
 	<xsl:call-template name="new-sent-on-top-of-children">
 	  <!-- @xml:lang comes from the Java detection -->
 	  <xsl:with-param name="lang" select="@xml:lang"/>
@@ -57,7 +51,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="node()[contains($ok-parent-list, concat(',', local-name(.), ','))]"
+  <xsl:template match="*[@pxi:can-contain-sentences]"
 		mode="split-sentence" priority="3">
     <xsl:param name="lang" select="''"/>
     <xsl:copy>
@@ -97,7 +91,7 @@
   <xsl:template name="new-sent-on-top-of-children">
     <xsl:param name="lang" select="''"/>
     <xsl:for-each-group select="node()"
-			group-adjacent="self::text() or not(contains($no-sent-child, concat(',', local-name(.), ',')))">
+			group-adjacent="self::text() or not(@pxi:cannot-be-sentence-child)">
       <xsl:choose>
 	<xsl:when test="current-grouping-key()">
 	  <!-- assuming the tmp words are inserted at the lowest possible level. -->
