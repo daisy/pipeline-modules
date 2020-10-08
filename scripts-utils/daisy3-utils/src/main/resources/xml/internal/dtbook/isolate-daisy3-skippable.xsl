@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 		xmlns="http://www.daisy.org/z3986/2005/dtbook/"
 		xmlns:d="http://www.daisy.org/ns/pipeline/data"
@@ -20,7 +21,7 @@
 
   <xsl:key name="in-scope" match="*[@skippable]" use="concat(@skippable, @n)"/>
   <xsl:key name="sentence" match="*[@id]" use="@id"/>
-  <xsl:key name="skippables" match="*" use="generate-id()"/>
+  <xsl:key name="skippables" match="*" use="@id"/>
 
   <xsl:template match="node()">
     <xsl:copy>
@@ -76,26 +77,24 @@
   </xsl:template>
 
   <xsl:template match="node()" mode="find-scopes">
-    <xsl:variable name="prev-skippable" select="preceding::*[local-name() = $skippable-elements][1]"/>
-    <xsl:variable name="prev-skippable-id"
-		  select="if ($prev-skippable) then generate-id($prev-skippable)
-			  else $no-skippable-marker"/>
     <xsl:call-template name="add-scope-entry">
-      <xsl:with-param name="prev-skippable-id" select="$prev-skippable-id"/>
+      <xsl:with-param name="prev-skippable" select="preceding::*[local-name() = $skippable-elements][1]"/>
     </xsl:call-template>
     <xsl:apply-templates select="node()" mode="find-scopes"/>
   </xsl:template>
 
   <xsl:template match="*[local-name() = $skippable-elements]" mode="find-scopes">
     <xsl:call-template name="add-scope-entry">
-      <xsl:with-param name="prev-skippable-id" select="generate-id()"/>
+      <xsl:with-param name="prev-skippable" select="."/>
     </xsl:call-template>
   </xsl:template>
 
   <xsl:template name="add-scope-entry">
-    <xsl:param name="prev-skippable-id"/>
-    <xsl:variable name="id" select="generate-id()"/>
-    <d:a skippable="{$prev-skippable-id}" n="{$id}"/>
+    <xsl:param name="prev-skippable" as="element()?"/>
+    <xsl:variable name="prev-skippable-id"
+		  select="if ($prev-skippable) then $prev-skippable/@id
+			  else $no-skippable-marker"/> <!-- we know @id is present because of px:add-id step -->
+    <d:a skippable="{$prev-skippable-id}" n="{generate-id()}"/>
     <xsl:for-each select="ancestor::*">
       <d:a skippable="{$prev-skippable-id}" n="{generate-id(current())}"/>
     </xsl:for-each>
@@ -106,17 +105,11 @@
     <xsl:param name="scope"/>
     <xsl:param name="skippable"/>
     <xsl:choose>
-      <xsl:when test="generate-id() = $skippable">
-	<xsl:variable name="skippable-id"
-		      select="if (@id) then @id else concat($id-prefix, generate-id())"/>
+      <!-- if this is a skippable we know @id is present because of px:add-id step -->
+      <xsl:when test="@id[.=$skippable]">
 	<xsl:copy>
 	  <xsl:copy-of select="@*"/>
-	  <xsl:if test="not(@id)">
-	    <xsl:attribute name="id">
-	      <xsl:value-of select="$skippable-id"/>
-	    </xsl:attribute>
-	  </xsl:if>
-	  <skippable id="{$skippable-id}"/>
+	  <skippable id="{@id}"/>
 	  <xsl:copy-of select="node()"/>
 	</xsl:copy>
       </xsl:when>
