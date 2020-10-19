@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-		xmlns="http://www.daisy.org/z3986/2005/dtbook/"
 		xmlns:d="http://www.daisy.org/ns/pipeline/data"
 		exclude-result-prefixes="#all"
 		version="2.0">
@@ -15,24 +14,25 @@
 
   <xsl:param name="id-prefix" />
 
-  <xsl:variable name="skippable-elements" select="('pagenum', 'noteref', 'annoref', 'linenum', 'math')"/>
   <xsl:variable name="no-skippable-marker" select="'no-skippable'"/>
   <xsl:variable name="sentence-ids" select="collection()[2]"/>
+  <xsl:variable name="namespace" select="namespace-uri(/*)"/>
 
   <xsl:key name="in-scope" match="*[@skippable]" use="concat(@skippable, @n)"/>
   <xsl:key name="sentence" match="*[@id]" use="@id"/>
   <xsl:key name="skippables" match="*" use="@id"/>
 
-  <xsl:template match="node()">
+  <xsl:template match="@*|node()" mode="#default copy">
     <xsl:copy>
-      <xsl:copy-of select="@*"/>
-      <xsl:apply-templates select="node()"/>
+      <xsl:apply-templates select="@*|node()"/>
     </xsl:copy>
   </xsl:template>
 
+  <xsl:template match="@skippable" mode="#default copy"/>
+
   <xsl:template match="*[@id and key('sentence', @id, $sentence-ids)]">
     <xsl:copy>
-      <xsl:copy-of select="@*"/>
+      <xsl:apply-templates select="@*"/>
       <xsl:variable name="sentence">
 	<xsl:copy-of select="."/>
       </xsl:variable>
@@ -43,9 +43,8 @@
       </xsl:variable>
 
       <xsl:choose>
-	<xsl:when test="local-name() = $skippable-elements">
+	<xsl:when test="@skippable">
 	  <!-- The sentence is itself a skippable structure -->
-	  <skippable id="{@id}"/> <!-- in DTBook namespace so we won't leave any unsolicited namespaces behind -->
 	  <xsl:copy-of select="node()"/>
 	</xsl:when>
 	<xsl:when test="not($scope/*/*[@skippable != $no-skippable-marker])">
@@ -64,12 +63,13 @@
 	      </xsl:apply-templates>
 	    </xsl:if>
 	    <!-- TODO: not create an empty span when we're dealing with adjacent skippable elts -->
-	    <span id="{concat($sent-id, current-grouping-key())}">
+	    <xsl:element name="span" namespace="{$namespace}">
+	      <xsl:attribute name="id" select="concat($sent-id, current-grouping-key())"/>
 	      <xsl:apply-templates select="$sentence/*/node()" mode="copy-sentence">
 		<xsl:with-param name="scope" select="$scope"/>
 		<xsl:with-param name="skippable" select="current-grouping-key()"/>
 	      </xsl:apply-templates>
-	    </span>
+	    </xsl:element>
 	  </xsl:for-each-group>
 	</xsl:otherwise>
       </xsl:choose>
@@ -78,12 +78,12 @@
 
   <xsl:template match="node()" mode="find-scopes">
     <xsl:call-template name="add-scope-entry">
-      <xsl:with-param name="prev-skippable" select="preceding::*[local-name() = $skippable-elements][1]"/>
+      <xsl:with-param name="prev-skippable" select="preceding::*[@skippable][1]"/>
     </xsl:call-template>
-    <xsl:apply-templates select="node()" mode="find-scopes"/>
+    <xsl:apply-templates mode="#current"/>
   </xsl:template>
 
-  <xsl:template match="*[local-name() = $skippable-elements]" mode="find-scopes">
+  <xsl:template match="*[@skippable]" mode="find-scopes">
     <xsl:call-template name="add-scope-entry">
       <xsl:with-param name="prev-skippable" select="."/>
     </xsl:call-template>
@@ -108,20 +108,18 @@
       <!-- if this is a skippable we know @id is present because of px:add-id step -->
       <xsl:when test="@id[.=$skippable]">
 	<xsl:copy>
-	  <xsl:copy-of select="@*"/>
-	  <skippable id="{@id}"/>
-	  <xsl:copy-of select="node()"/>
+	  <xsl:apply-templates select="@*|node()" mode="copy"/>
 	</xsl:copy>
       </xsl:when>
       <xsl:when test="count($skippable-ancestors intersect .) = 1">
 	<xsl:variable name="id" select="generate-id()"/>
 	<xsl:variable name="scope-entry" select="key('in-scope', concat($skippable, $id), $scope)[1]"/>
 	<xsl:copy>
-	  <xsl:copy-of select="@* except @id"/>
+	  <xsl:apply-templates select="@* except @id"/>
 	  <xsl:if test="@id and not($scope-entry/preceding-sibling::*[@n = $id][1])">
 	    <xsl:copy-of select="@id"/> <!-- there must not be duplicated @ids -->
 	  </xsl:if>
-	  <xsl:apply-templates select="*" mode="copy-skippable">
+	  <xsl:apply-templates select="*" mode="#current">
 	    <xsl:with-param name="skippable-ancestors" select="$skippable-ancestors"/>
 	    <xsl:with-param name="scope" select="$scope"/>
 	    <xsl:with-param name="skippable" select="$skippable"/>
@@ -134,16 +132,16 @@
   <xsl:template match="node()" mode="copy-sentence">
     <xsl:param name="scope"/>
     <xsl:param name="skippable"/>
-    <xsl:if test="not(local-name() = $skippable-elements)">
+    <xsl:if test="not(@skippable)">
       <xsl:variable name="id" select="generate-id()"/>
       <xsl:variable name="scope-entry" select="key('in-scope', concat($skippable, $id), $scope)[1]"/>
       <xsl:if test="$scope-entry">
 	<xsl:copy>
-	  <xsl:copy-of select="@* except @id"/>
+	  <xsl:apply-templates select="@* except @id"/>
 	  <xsl:if test="@id and not($scope-entry/preceding-sibling::*[@n = $id][1])">
 	    <xsl:copy-of select="@id"/> <!-- there must not be duplicated @ids -->
 	  </xsl:if>
-	<xsl:apply-templates select="node()" mode="copy-sentence">
+	<xsl:apply-templates mode="#current">
 	  <xsl:with-param name="scope" select="$scope"/>
 	  <xsl:with-param name="skippable" select="$skippable"/>
 	</xsl:apply-templates>

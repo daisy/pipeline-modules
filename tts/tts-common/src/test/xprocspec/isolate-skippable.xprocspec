@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<x:description script="../../main/resources/xml/internal/dtbook/isolate-daisy3-skippable.xpl"
-	       xmlns:x="http://www.daisy.org/ns/xprocspec"
-	       xmlns:p="http://www.w3.org/ns/xproc"
+<x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
 	       xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
 	       xmlns:d="http://www.daisy.org/ns/pipeline/data"
-	       xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+	       xmlns:dtb="http://www.daisy.org/z3986/2005/dtbook/"
+	       xmlns:math="http://www.w3.org/1998/Math/MathML"
+	       xmlns="http://www.daisy.org/z3986/2005/dtbook/"
+	       script="../../main/resources/xml/xproc/isolate-skippable.xpl">
 
   <x:scenario label="General scenario">
-    <x:call step="px:daisy3-isolate-skippable">
+    <x:call step="px:isolate-skippable">
       <x:input port="sentence-ids">
 	<x:document type="inline">
 	  <d:sentences>
@@ -16,6 +17,7 @@
 	  </d:sentences>
 	</x:document>
       </x:input>
+      <x:option name="match" select="'dtb:pagenum|dtb:noteref|dtb:annoref|dtb:linenum|math:math'"/>
       <x:option name="id-prefix" select="'prefix'"/>
     </x:call>
 
@@ -62,9 +64,9 @@
 	  </book>
 	</x:document>
 	<x:document type="inline">
-	  <skippables>
-	    <skippable id="id_1"/>
-	  </skippables>
+	  <d:skippables>
+	    <d:skippable id="id_1"/>
+	  </d:skippables>
 	</x:document>
       </x:expect>
     </x:scenario>
@@ -100,7 +102,7 @@
 	  </book>
 	</x:document>
 	<x:document type="inline">
-	  <skippables/>
+	  <d:skippables/>
 	</x:document>
       </x:expect>
     </x:scenario>
@@ -138,9 +140,9 @@
 	  </book>
 	</x:document>
 	<x:document type="inline">
-	  <skippables>
-	    <skippable id="id_1"/>
-	  </skippables>
+	  <d:skippables>
+	    <d:skippable id="id_1"/>
+	  </d:skippables>
 	</x:document>
       </x:expect>
     </x:scenario>
@@ -178,9 +180,9 @@
 	  </book>
 	</x:document>
 	<x:document type="inline">
-	  <skippables>
-	    <skippable id="noteref-id"/>
-	  </skippables>
+	  <d:skippables>
+	    <d:skippable id="noteref-id"/>
+	  </d:skippables>
 	</x:document>
       </x:expect>
     </x:scenario>
@@ -218,9 +220,9 @@
 	  </book>
 	</x:document>
 	<x:document type="inline">
-	  <skippables>
-	    <skippable id="id_1"/>
-	  </skippables>
+	  <d:skippables>
+	    <d:skippable id="id_1"/>
+	  </d:skippables>
 	</x:document>
       </x:expect>
     </x:scenario>
@@ -260,9 +262,9 @@
 	  </book>
 	</x:document>
 	<x:document type="inline">
-	  <skippables>
-	    <skippable id="id_1"/>
-	  </skippables>
+	  <d:skippables>
+	    <d:skippable id="id_1"/>
+	  </d:skippables>
 	</x:document>
       </x:expect>
     </x:scenario>
@@ -288,9 +290,9 @@
 	  </book>
 	</x:document>
 	<x:document type="inline">
-	  <skippables>
-	    <skippable id="sent1"/>
-	  </skippables>
+	  <d:skippables>
+	    <d:skippable id="sent1"/>
+	  </d:skippables>
 	</x:document>
       </x:expect>
     </x:scenario>
@@ -327,13 +329,14 @@
 	  </sent>
 	</x:document>
 	<x:document type="inline">
-	  <skippables>
-	    <skippable id="id_1"/>
-	    <skippable id="id_2"/>
-	  </skippables>
+	  <d:skippables>
+	    <d:skippable id="id_1"/>
+	    <d:skippable id="id_2"/>
+	  </d:skippables>
 	</x:document>
       </x:expect>
     </x:scenario>
 
   </x:scenario>
+
 </x:description>
