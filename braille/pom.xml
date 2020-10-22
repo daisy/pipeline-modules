@@ -36,6 +36,11 @@
     <module>xml-to-pef</module>
   </modules>
   
+  <!-- don't publish aggregator -->
+  <properties>
+    <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
+  </properties>
+
   <build>
     <plugins>
       <plugin>

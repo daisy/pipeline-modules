@@ -38,4 +38,10 @@
     <!--<module>zedai-to-ssml</module>-->
     <module>mathml-to-ssml</module>
   </modules>
+
+  <!-- don't publish aggregator -->
+  <properties>
+    <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
+  </properties>
+
 </project>

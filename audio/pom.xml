@@ -22,4 +22,10 @@
     <module>audio-common</module>
     <module>audio-encoder-lame</module>
   </modules>
+  
+  <!-- don't publish aggregator -->
+  <properties>
+    <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
+  </properties>
+
 </project>

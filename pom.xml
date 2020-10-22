@@ -29,10 +29,9 @@
     <module>braille</module>
     <module>scripts</module>
   </modules>
-
+  
   <build>
     <plugins>
-      <!-- don't publish aggregator -->
       <plugin>
         <artifactId>maven-install-plugin</artifactId>
         <version>2.4</version>

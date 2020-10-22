@@ -27,4 +27,10 @@
     <module>html-break-detection</module>
     <module>dtbook-break-detection</module>
   </modules>
+
+  <!-- don't publish aggregator -->
+  <properties>
+    <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
+  </properties>
+
 </project>
