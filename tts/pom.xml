@@ -7,7 +7,7 @@
     <groupId>org.daisy</groupId>
     <artifactId>daisy</artifactId>
     <version>4</version>
-    <relativePath />
+    <relativePath/>
   </parent>
 
   <groupId>org.daisy.pipeline.modules</groupId>
@@ -30,12 +30,12 @@
     <module>text-to-ssml</module>
     <module>tts-common</module>
     <module>tts-adapters/tts-adapter-espeak</module>
-    <module>tts-adapters/tts-adapter-acapela</module>
+    <!--<module>tts-adapters/tts-adapter-acapela</module>-->
     <module>tts-adapters/tts-adapter-osx</module>
     <module>tts-adapters/tts-adapter-sapinative</module>
     <module>tts-adapters/tts-adapter-qfrency</module>
     <module>tts-adapters/tts-adapter-google</module>
-    <module>zedai-to-ssml</module>
+    <!--<module>zedai-to-ssml</module>-->
     <module>mathml-to-ssml</module>
   </modules>
 </project>
