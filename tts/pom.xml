@@ -12,7 +12,7 @@
 
   <groupId>org.daisy.pipeline.modules</groupId>
   <artifactId>tts-modules-aggregator</artifactId>
-  <version>1.13.7</version>
+  <version>1.13.8-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>DAISY Pipeline 2 :: TTS Modules Aggregator POM</name>
@@ -30,12 +30,12 @@
     <module>text-to-ssml</module>
     <module>tts-common</module>
     <module>tts-adapters/tts-adapter-espeak</module>
-    <!--<module>tts-adapters/tts-adapter-acapela</module>-->
+    <module>tts-adapters/tts-adapter-acapela</module>
     <module>tts-adapters/tts-adapter-osx</module>
     <module>tts-adapters/tts-adapter-sapinative</module>
     <module>tts-adapters/tts-adapter-qfrency</module>
     <module>tts-adapters/tts-adapter-google</module>
-    <!--<module>zedai-to-ssml</module>-->
+    <module>zedai-to-ssml</module>
     <module>mathml-to-ssml</module>
   </modules>
 
@@ -43,9 +43,4 @@
   <properties>
     <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
   </properties>
-
-
-  <scm>
-    <tag>v1.13.7</tag>
-  </scm>
 </project>
