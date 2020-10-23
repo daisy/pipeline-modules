@@ -7,12 +7,12 @@
     <groupId>org.daisy</groupId>
     <artifactId>daisy</artifactId>
     <version>4</version>
-    <relativePath/>
+    <relativePath />
   </parent>
 
   <groupId>org.daisy.pipeline.modules</groupId>
   <artifactId>nlp-modules-aggregator</artifactId>
-  <version>1.13.7-SNAPSHOT</version>
+  <version>1.13.7</version>
   <packaging>pom</packaging>
 
   <name>DAISY Pipeline 2 :: NLP Modules Aggregator POM</name>
@@ -33,4 +33,8 @@
     <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
   </properties>
 
+
+  <scm>
+    <tag>v1.13.7</tag>
+  </scm>
 </project>
