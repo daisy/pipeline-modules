@@ -72,6 +72,14 @@ public class VoiceManager {
 		// get info from configuration
 		voiceInfo.addAll(voiceInfoFromConfig);
 
+		// get info from engines (lowest priority)
+		for (Voice v : mBestEngines.keySet())
+			if (v.getLocale().isPresent() && v.getGender().isPresent())
+				voiceInfo.add(new VoiceInfo(v,
+				                            v.getLocale().get(),
+				                            v.getGender().get(),
+				                            0));
+
 		// voices can also be applied to less specific locales (without region tag)
 		final float priorityVariantPenalty = 0.1f;
 		List<VoiceInfo> derivedVoiceInfo = new ArrayList<>(); {
