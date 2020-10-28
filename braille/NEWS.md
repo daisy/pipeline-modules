@@ -6,9 +6,11 @@ Changes
 - Support for `-obfl-right-text-indent` (https://github.com/sbsdev/pipeline-mod-sbs/issues/51,
   https://github.com/nlbdev/pipeline/issues/169, https://github.com/mtmse/obfl/pull/9,
   https://github.com/mtmse/dotify.formatter.impl/pull/31)
+- Support for `volume-break-after` (https://github.com/daisy/pipeline-mod-braille/issues/207)
 
 Closed issues
 -------------
+- https://github.com/daisy/pipeline-mod-braille/issues/207
 - https://github.com/mtmse/obfl/pull/9
 - https://github.com/mtmse/dotify.api/pull/12
 - https://github.com/mtmse/dotify.formatter.impl/pull/31
