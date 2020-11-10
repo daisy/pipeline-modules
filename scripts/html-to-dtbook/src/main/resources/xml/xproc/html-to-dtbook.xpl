@@ -46,6 +46,7 @@
     <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
         <p:documentation>
             px:html-outline
+            px:html-upgrade
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
@@ -81,6 +82,20 @@
     <px:assert message="The HTML file must have a file extension." error-code="XXXXX">
         <p:with-option name="test" select="$dtbook-file-name!='' or matches(base-uri(/*),'.*[^\.]\.[^\.]*$')"/>
     </px:assert>
+    <p:choose>
+        <!--
+            upgrade HTML if the input is not coming from an EPUB 3
+        -->
+        <p:xpath-context>
+            <p:pipe step="filter-html" port="result"/>
+        </p:xpath-context>
+        <p:when test="/*/d:file/@media-version='5.0'">
+            <p:identity/>
+        </p:when>
+        <p:otherwise>
+            <px:html-upgrade/>
+        </p:otherwise>
+    </p:choose>
     <p:identity name="html"/>
 
     <!--
