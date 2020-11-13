@@ -29,6 +29,8 @@ Changes
   volume breaking (https://github.com/daisy/pipeline-mod-braille/issues/205)
 - Support for `(dots-for-undefined-char:'...')` in translator query
   (https://github.com/daisy/pipeline-mod-braille/issues/206)
+- New "preamble" option in EPUB 3 to PEF to add boilerplate text
+  (https://github.com/daisy/pipeline-mod-braille/issues/194)
 - Various other improvements and bugfixes (https://github.com/daisy/pipeline-modules/issues/24,
   https://github.com/daisy/pipeline-mod-braille/issues/204, ...)
 
@@ -38,6 +40,7 @@ Components
 Closed issues
 -------------
 - https://github.com/daisy/pipeline-mod-braille/issues/191
+- https://github.com/daisy/pipeline-mod-braille/issues/194
 - https://github.com/daisy/pipeline-mod-braille/issues/196
 - https://github.com/daisy/pipeline-mod-braille/issues/197
 - https://github.com/daisy/pipeline-mod-braille/issues/200
