@@ -16,7 +16,7 @@ import net.sf.saxon.s9api.XdmNodeKind;
 import net.sf.saxon.s9api.XdmSequenceIterator;
 
 import org.daisy.common.file.URLs;
-import org.daisy.pipeline.properties.Properties;
+import org.daisy.common.properties.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
