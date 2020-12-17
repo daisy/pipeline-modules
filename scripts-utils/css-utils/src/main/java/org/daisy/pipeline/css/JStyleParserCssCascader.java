@@ -160,7 +160,7 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 						} catch (RuntimeException e) {
 							throw new IOException(
 								(source.mediaType != null ? (source.mediaType + " p") : "P")
-								+ "re-processing failed", e);
+								+ "re-processing failed: " + e.getMessage(), e);
 						}
 					}
 					return new CSSInputStream(is, source.encoding, base, sourceMap);

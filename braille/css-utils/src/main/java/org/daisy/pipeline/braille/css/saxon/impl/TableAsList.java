@@ -45,12 +45,15 @@ import org.daisy.braille.css.SimpleInlineStyle;
 import org.daisy.common.stax.XMLStreamWriterHelper.ToStringWriter;
 import org.daisy.common.stax.XMLStreamWriterHelper.WriterEvent;
 import org.daisy.common.transform.InputValue;
+import org.daisy.common.transform.Mult;
 import org.daisy.common.transform.SingleInSingleOutXMLTransformer;
+import org.daisy.common.transform.TransformerException;
 import org.daisy.common.transform.XMLInputValue;
 import org.daisy.common.transform.XMLOutputValue;
 import org.daisy.common.stax.BaseURIAwareXMLStreamReader;
 import org.daisy.common.stax.BaseURIAwareXMLStreamWriter;
 import static org.daisy.common.stax.XMLStreamWriterHelper.writeAttribute;
+import static org.daisy.common.stax.XMLStreamWriterHelper.writeElement;
 import static org.daisy.common.stax.XMLStreamWriterHelper.writeStartElement;
 import org.daisy.pipeline.braille.common.util.Strings;
 import org.daisy.pipeline.braille.css.impl.BrailleCssSerializer;
@@ -111,10 +114,12 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 
 		if (source == null || result == null)
 			throw new IllegalArgumentException();
-		return () -> transform(source.ensureSingleItem().asXMLStreamReader(), result.asXMLStreamWriter());
+		return () -> transform(source.ensureSingleItem().mult(2), result.asXMLStreamWriter());
 	}
 
-	private void transform(BaseURIAwareXMLStreamReader reader, BaseURIAwareXMLStreamWriter writer) {
+	private void transform(Mult<? extends XMLInputValue<?>> source, BaseURIAwareXMLStreamWriter writer)
+			throws TransformerException {
+		XMLStreamReader reader = source.get().asXMLStreamReader();
 		try {
 			writeActionsBefore = new ArrayList<WriterEvent>();
 			writeActionsAfter = new ArrayList<WriterEvent>();
@@ -234,18 +239,26 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 							else if (isCell && _AXIS.equals(attrName))
 								withinCell.axis = AXIS_SPLITTER.splitToList(attrValue);
 							else if (isCell && _ROWSPAN.equals(attrName)) {
-								int rowspan = nonNegativeInteger(attrValue);
-								if (rowspan == 0)
-									throw new RuntimeException("rowspan 0 not supported yet.");
-								withinCell.rowspan = rowspan;
-								for (int m = 1; m < rowspan; m++)
+								try {
+									withinCell.rowspan = Integer.parseInt(attrValue);
+									if (withinCell.rowspan < 0)
+										throw new InvalidTableException("Invalid rowspan: " + attrValue);
+									else if (withinCell.rowspan == 0)
+										throw new RuntimeException("rowspan 0 not supported yet."); }
+								catch (NumberFormatException e) {
+									throw new InvalidTableException("Invalid rowspan: " + attrValue); }
+								for (int m = 1; m < withinCell.rowspan; m++)
 									for (int n = 0; n < withinCell.colspan; n++)
 										setCovered(row + m, col + n); }
 							else if (isCell && _COLSPAN.equals(attrName)) {
-								int colspan = nonNegativeInteger(attrValue);
-								if (colspan == 0)
-									throw new RuntimeException("colspan 0 not supported yet.");
-								withinCell.colspan = colspan;
+								try {
+									withinCell.colspan = Integer.parseInt(attrValue);
+									if (withinCell.colspan < 0)
+										throw new InvalidTableException("Invalid colspan: " + attrValue);
+									else if (withinCell.colspan == 0)
+										throw new RuntimeException("colspan 0 not supported yet."); }
+								catch (NumberFormatException e) {
+									throw new InvalidTableException("Invalid colspan: " + attrValue); }
 								for (int m = 0; m < withinCell.rowspan; m++)
 									for (int n = 1; n < withinCell.colspan; n++)
 										setCovered(row + m, col + n); }
@@ -384,7 +397,21 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 
 			write(writer);
 		} catch (XMLStreamException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException(e); // should not happen
+		} catch (InvalidTableException e) {
+			String message = "Table structure broken: " + e.getMessage();
+			throw new TransformerException(
+				new RuntimeException(
+					message,
+					// trick to show table XML only in detailed (DEBUG) log
+					new RuntimeException(message + ":\n" + elementToString(source.get()))));
+		} catch (RuntimeException e) {
+			String message = "Error happened while processing table";
+			throw new TransformerException(
+				new RuntimeException(
+					message,
+					// trick to show table XML only in detailed (DEBUG) log
+					new RuntimeException(message + ":\n" + elementToString(source.get()), e)));
 		}
 	}
 
@@ -397,7 +424,7 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 	private void setCovered(int row, int col) {
 		CellCoordinates coords = new CellCoordinates(row, col);
 		if (coveredCoordinates.contains(coords))
-			throw new RuntimeException("Table structure broken: cells overlap");
+			throw new InvalidTableException("cells overlap");
 		coveredCoordinates.add(coords);
 	}
 
@@ -1111,7 +1138,7 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 		for (TableCell c : cells)
 			if (id.equals(c.id))
 				return c;
-		throw new RuntimeException("No element found with id " + id);
+		throw new InvalidTableException("No element found with id " + id);
 	}
 
 	private TableCell getByCoordinates(int row, int col) {
@@ -1290,15 +1317,6 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 		}
 	}
 
-	private static int nonNegativeInteger(String s) {
-		try {
-			int i = Integer.parseInt(s);
-			if (i >= 0)
-				return i; }
-		catch(NumberFormatException e) {}
-		throw new RuntimeException("Expected positive integer but got "+ s);
-	}
-
 	private static class WriteOnlyOnce extends ArrayList<WriterEvent> implements WriterEvent {
 		public void writeTo(XMLStreamWriter writer) throws XMLStreamException {
 			Iterator<WriterEvent> i = iterator();
@@ -1395,5 +1413,60 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 					b += s; }}
 		if (b == null) b = "";
 		return b;
+	}
+
+	private static String elementToString(XMLInputValue<?> element) {
+		ToStringWriter xml = new ToStringWriter() {
+				int skipElement = 0;
+				@Override
+				public void writeStartElement(String prefix, String localName, String namespaceURI)
+						throws XMLStreamException {
+					if (skipElement > 0) {
+						skipElement++;
+						return;
+					}
+					if (XMLNS_CSS.equals(namespaceURI)) {
+						skipElement++;
+						return;
+					}
+					super.writeStartElement(prefix, localName, namespaceURI);
+				}
+				@Override
+				public void writeEndElement() throws XMLStreamException {
+					if (skipElement > 0) {
+						skipElement--;
+						return;
+					}
+					super.writeEndElement();
+				}
+				@Override
+				public void writeAttribute(String prefix, String namespaceURI, String localName, String value)
+						throws XMLStreamException {
+					if (skipElement > 0)
+						return;
+					if (XMLNS_CSS.equals(namespaceURI))
+						return;
+					if ("style".equals(localName))
+						return;
+					super.writeAttribute(prefix, namespaceURI, localName, value);
+				}
+				@Override
+				public void writeCharacters(String text) throws XMLStreamException {
+					if (skipElement > 0)
+						return;
+					super.writeCharacters(text);
+				}
+			};
+		XMLStreamReader r = element.asXMLStreamReader();
+		try {
+			if (r.next() != START_ELEMENT)
+				throw new IllegalArgumentException();
+			writeElement(xml, r);
+		} catch(NoSuchElementException e) {
+			throw new IllegalArgumentException();
+		} catch (XMLStreamException e) {
+			throw new RuntimeException(e); // should not happen
+		}
+		return xml.toString();
 	}
 }

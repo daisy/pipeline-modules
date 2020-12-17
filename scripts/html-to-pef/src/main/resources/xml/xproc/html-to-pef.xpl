@@ -131,7 +131,7 @@ When `include-obfl` is set to true, the conversion may fail but still output a d
     <!-- pass all the variables all the time.              -->
     <!-- ================================================= -->
     <p:in-scope-names name="in-scope-names"/>
-    <px:delete-parameters name="input-options" px:message="Collecting parameters" px:progress=".01"
+    <px:delete-parameters name="input-options" px:message="Collecting parameters" px:message-severity="DEBUG" px:progress=".01"
                           parameter-names="html
                                            stylesheet
                                            stylesheet-parameters
@@ -160,7 +160,7 @@ When `include-obfl` is set to true, the conversion may fail but still output a d
     <!-- =============== -->
     <!-- CREATE TEMP DIR -->
     <!-- =============== -->
-    <px:tempdir name="temp-dir" px:message="Creating temporary directory" px:progress=".01">
+    <px:tempdir name="temp-dir" px:message="Creating temporary directory" px:message-severity="DEBUG" px:progress=".01">
         <p:with-option name="href" select="if ($temp-dir!='') then $temp-dir else $pef-output-dir"/>
     </px:tempdir>
     
@@ -197,7 +197,7 @@ When `include-obfl` is set to true, the conversion may fail but still output a d
     <!-- ========= -->
     <!-- STORE PEF -->
     <!-- ========= -->
-    <px:html-to-pef.store px:message="Storing PEF" px:progress=".05">
+    <px:html-to-pef.store px:message="Storing results" px:progress=".05">
         <p:input port="obfl">
             <p:pipe step="convert" port="obfl"/>
         </p:input>

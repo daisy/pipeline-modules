@@ -75,6 +75,9 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 	private static final QName _style_type = new QName("style-type");
 	private static final QName _css_text_transform_definitions = new QName("css-text-transform-definitions");
 	
+	/** Code for Dotify formatting errors caused by invalid input or input that can not be handled. */
+	private static final QName DOTIFY_ERROR = new QName("DOTIFY");
+
 	private ReadablePipe source = null;
 	private WritablePipe result = null;
 	private final Map<String,String> params = new HashMap<String,String>();
@@ -241,6 +244,8 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 			pefStream.close(); }
 		
 		catch (Throwable e) {
+			if (e.getMessage().contains("Failed to solve table"))
+				throw new XProcException(DOTIFY_ERROR, step, e);
 			throw XProcStep.raiseError(e, step); }
 		finally {
 			evictTempTranslator.apply(); }

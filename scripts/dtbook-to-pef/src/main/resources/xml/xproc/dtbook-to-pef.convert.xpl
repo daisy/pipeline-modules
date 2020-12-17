@@ -222,8 +222,7 @@
                             <p:pipe step="catch" port="error"/>
                         </p:input>
                     </px:log-error>
-                    <p:identity px:message="Failed to convert OBFL to PEF (Please see detailed log for more info.)"
-                                px:message-severity="ERROR"/>
+                    <p:identity px:message="Failed to convert OBFL to PEF" px:message-severity="ERROR"/>
                     <p:identity name="status"/>
                     <p:sink/>
                 </p:catch>

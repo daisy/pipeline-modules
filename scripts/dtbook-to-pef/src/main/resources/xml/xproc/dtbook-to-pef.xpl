@@ -197,7 +197,7 @@ When `include-obfl` is set to true, the conversion may fail but still output a d
     <!-- ===== -->
     <!-- STORE -->
     <!-- ===== -->
-    <px:dtbook-to-pef.store px:message="Storing" px:progress=".06">
+    <px:dtbook-to-pef.store px:message="Storing results" px:progress=".06">
         <p:input port="dtbook">
             <p:pipe step="main" port="source"/>
         </p:input>

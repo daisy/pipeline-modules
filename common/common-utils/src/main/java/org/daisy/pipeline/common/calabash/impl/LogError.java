@@ -135,7 +135,7 @@ public class LogError implements XProcStepProvider {
 							case START_ELEMENT:
 								if (C_ERROR.equals(reader.getName())) {
 									XProcError xprocError = parseXProcError(reader);
-									log(xprocError.getMessage());
+									log(xprocError.getMessage() + " (Please see detailed log for more info.)");
 									LOGGER.debug(xprocError.toString());
 								}
 								break;

@@ -236,7 +236,7 @@ even though the provided CSS is more specific.
         </p:input>
     </p:identity>
     <p:delete match="/*/@xml:base"/>
-    <px:epub3-to-pef.store px:message="Storing PEF" px:progress=".05">
+    <px:epub3-to-pef.store px:message="Storing results" px:progress=".05">
         <p:with-option name="epub" select="$epub"/>
         <p:input port="opf">
             <p:pipe step="opf" port="result"/>

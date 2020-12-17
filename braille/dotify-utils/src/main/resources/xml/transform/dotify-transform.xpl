@@ -47,7 +47,7 @@
 	
 	<p:choose px:progress=".12">
 		<p:when test="$css-block-transform!=''">
-			<px:transform px:message="Translating document with {
+			<px:transform px:message="Pre-translating document with {
 			                            replace($css-block-transform,'\((input|output):css\)','')}">
 				<p:with-option name="query" select="$css-block-transform"/>
 				<p:input port="parameters">
