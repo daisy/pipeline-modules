@@ -139,7 +139,7 @@ public class VoiceManager {
 			for (VoiceInfo vi : voiceInfo) allLangs.add(vi.language);
 			allLangs.remove(VoiceInfo.NO_DEFINITE_LANG); }
 		mVoiceIndex = new HashMap<VoiceKey,Voice>(); {
-			for (VoiceInfo vi : voiceInfo)
+			for (VoiceInfo vi : voiceInfo) {
 				if (vi.isMultiLang())
 					// this is to make sure that multi-lang voice wins from regular voice if it has
 					// a higher priority
@@ -152,15 +152,15 @@ public class VoiceManager {
 								if (!mVoiceIndex.containsKey(k))
 									mVoiceIndex.put(k, vi.voice);
 							}
-				else
-					for (boolean sameEngine : new boolean[]{true, false})
-						for (boolean sameGender : new boolean[]{true, false}) {
-							VoiceKey k = new VoiceKey(vi.language,
-							                          sameGender ? vi.gender : null,
-							                          sameEngine ? vi.voice.engine : null);
-							if (!mVoiceIndex.containsKey(k))
-								mVoiceIndex.put(k, vi.voice);
-						}
+				for (boolean sameEngine : new boolean[]{true, false})
+					for (boolean sameGender : new boolean[]{true, false}) {
+						VoiceKey k = new VoiceKey(vi.language,
+						                          sameGender ? vi.gender : null,
+						                          sameEngine ? vi.voice.engine : null);
+						if (!mVoiceIndex.containsKey(k))
+							mVoiceIndex.put(k, vi.voice);
+					}
+			}
 		}
 
 		// log
