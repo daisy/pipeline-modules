@@ -69,6 +69,8 @@ class TimedTTSExecutor {
 			Collection<AudioBuffer> result = engine.synthesize(
 				sentence, xmlSentence, voice, threadResources, marks, expectedMarks, bufferAllocator, retry);
 			long millisecElapsed = System.currentTimeMillis() - startTime;
+			if (log != null)
+				log.setTimeElapsed((float)millisecElapsed / 1000);
 			synchronized(maxMicrosecPerCharacter) {
 				Long m = millisecElapsed * 1000 / sentenceSize;
 				int n = 1000; // don't go below 1 ms
