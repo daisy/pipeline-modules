@@ -29,25 +29,28 @@ class TimedTTSExecutor {
 	/**
 	 * The maximum number of milliseconds the TTS engine is allowed to spend on a single word. This
 	 * takes into account {@see TTSEngine#expectedMillisecPerWord()}, the number of words processed
-	 * so far, and the maximum number of milliseconds the engine has spent on a word so far. A large
-	 * enough safety factor is taken into account for long words and other deviations.
+	 * so far, and the time the engine has spent on previous sentences. A large enough safety factor
+	 * is taken into account for long words and other deviations.
 	 */
 	private int maximumMillisec(TTSEngine engine, int sentenceSize) {
+		// adding an offset because the processing time is not always directly proportional to the
+		// length of the sentence
+		int offset = 1000; // 1 sec
 		int wordCount = 1 + sentenceSize / 6; // ~6 characters/word
 		Integer n = totalCharacters.get(engine);
 		if (n == null)
 			// initially base timeout on engine.expectedMillisecPerWord()
-			return 10 * engine.expectedMillisecPerWord() * wordCount;
+			return offset + 10 * engine.expectedMillisecPerWord() * wordCount;
 		else {
 			// in the long run base timeout on maxActualMicrosecPerCharacter
 			Integer maxActualMicrosecPerCharacter = maxMicrosecPerCharacter.get(engine);
 			if (n < FIRST_CHARACTERS)
 				// interpolate
-				return 1
+				return offset
 					+ 3 * n * maxActualMicrosecPerCharacter * sentenceSize / 1000 / FIRST_CHARACTERS
 					+ 10 * (FIRST_CHARACTERS - n) * engine.expectedMillisecPerWord() * wordCount / FIRST_CHARACTERS;
 			else
-				return 1 + 3 * maxActualMicrosecPerCharacter * sentenceSize / 1000;
+				return offset + 3 * maxActualMicrosecPerCharacter * sentenceSize / 1000;
 		}
 	}
 
