@@ -295,6 +295,7 @@
         <xsl:attribute name="xml:base" select="$header-base-uri"/>
       </xsl:if>
     </xsl:if>
+    <xsl:attribute name="title" select="normalize-space(string(.))"/>
   </xsl:template>
   
 </xsl:stylesheet>
