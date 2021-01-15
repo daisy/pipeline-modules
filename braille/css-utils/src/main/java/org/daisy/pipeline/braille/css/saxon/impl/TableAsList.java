@@ -75,7 +75,10 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 	private static final QName _ROWSPAN = new QName("rowspan");
 	private static final QName _COLSPAN = new QName("colspan");
 
-	private static final QName CSS_TABLE_HEADER_POLICY = new QName(XMLNS_CSS, "table-header-policy");
+	private static final QName CSS_TABLE_HEADER_POLICY = new QName(XMLNS_CSS, "table-header-policy", "css");
+	private static final QName CSS_TABLE_BY = new QName(XMLNS_CSS, "table-by", "css");
+	private static final QName CSS_LIST_ITEM = new QName(XMLNS_CSS, "list-item", "css");
+	private static final QName CSS_LIST_HEADER = new QName(XMLNS_CSS, "list-header", "css");
 
 	private static final Splitter HEADERS_SPLITTER = Splitter.on(' ').trimResults().omitEmptyStrings();
 	private static final Splitter AXIS_SPLITTER = Splitter.on(',').trimResults().omitEmptyStrings();
@@ -93,7 +96,6 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 	private List<WriterEvent> writeActionsAfter;
 	private List<TableCell> cells;
 	private Set<CellCoordinates> coveredCoordinates;
-	private String ns;
 
 	@Override
 	public Runnable transform(XMLInputValue<?> source, XMLOutputValue<?> result, InputValue<?> params)
@@ -126,11 +128,7 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 						boolean isCell = false;
 						if (depth == 1) {
 							if (!isHTMLorDTBookElement(TABLE, name))
-								throw new RuntimeException("Expected table element (html|dtb).");
-							if (XMLNS_HTML.equals(name.getNamespaceURI()))
-								ns = XMLNS_HTML;
-							else if (XMLNS_DTB.equals(name.getNamespaceURI()))
-								ns = XMLNS_DTB; }
+								throw new RuntimeException("Expected table element (html|dtb)."); }
 						else if (isHTMLorDTBookElement(THEAD, name)) {
 							rowType = TableCell.RowType.THEAD;
 							// TODO: if style != default, warning that style on thead element is ignored
@@ -691,7 +689,8 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 		public void write(XMLStreamWriter writer) {
 			try {
 				if (hasSubGroups) {
-					writeStartElement(writer, new QName(ns, "_"));
+					writeStartElement(writer, CSS_TABLE_BY);
+					writeAttribute(writer, _AXIS, subGroupingAxis);
 					writeStyleAttribute(writer, getTableByStyle(subGroupingAxis)); }
 				List<List<TableCell>> promotedHeaders = null;
 				int i = 0;
@@ -703,17 +702,18 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 							if (!cc.newlyPromotedHeaders().isEmpty()) {
 								if (promotedHeaders == null) {
 									if (i == 0 && j == 0) {
-										writeStartElement(writer, new QName(ns, "_"));
+										writeStartElement(writer, CSS_LIST_HEADER);
 										writeStyleAttribute(writer, getTableByStyle(g.groupingAxis).getListHeaderStyle());
 										if (g.hasSubGroups) {
 											writeStartElement(writer, CSS_TABLE_BY);
+											writeAttribute(writer, _AXIS, g.subGroupingAxis);
 											writeStyleAttribute(writer, getTableByStyle(g.subGroupingAxis)); }
 										promotedHeaders = new ArrayList<List<TableCell>>(); }
 									else
 										throw new RuntimeException("Some headers of children promoted but not all children have a promoted header."); }
 								if (i == 0) {
 									if (g.hasSubGroups) {
-										writeStartElement(writer, new QName(ns, "_"));
+										writeStartElement(writer, CSS_LIST_ITEM);
 										Predicate<PseudoClass> matcher = matchesPosition(j + 1, g.children.size());
 										writeStyleAttribute(writer, getTableByStyle(g.subGroupingAxis).getListItemStyle(matcher)); }
 									for (TableCell h : cc.newlyPromotedHeaders())
@@ -738,7 +738,7 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 				i = 0;
 				for (TableCellCollection c : children) {
 					if (hasSubGroups) {
-						writeStartElement(writer, new QName(ns, "_"));
+						writeStartElement(writer, CSS_LIST_ITEM);
 						Predicate<PseudoClass> matcher = matchesPosition(i + 1, children.size());
 						writeStyleAttribute(writer, getTableByStyle(subGroupingAxis).getListItemStyle(matcher)); }
 					for (TableCell h : c.newlyRenderedHeaders())
