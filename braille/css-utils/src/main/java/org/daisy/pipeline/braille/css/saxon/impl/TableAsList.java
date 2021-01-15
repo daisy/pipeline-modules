@@ -3,6 +3,7 @@ package org.daisy.pipeline.braille.css.saxon.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -47,6 +48,7 @@ import org.daisy.common.stax.BaseURIAwareXMLStreamReader;
 import org.daisy.common.stax.BaseURIAwareXMLStreamWriter;
 import static org.daisy.common.stax.XMLStreamWriterHelper.writeAttribute;
 import static org.daisy.common.stax.XMLStreamWriterHelper.writeStartElement;
+import org.daisy.pipeline.braille.common.util.Strings;
 import org.daisy.pipeline.braille.css.impl.BrailleCssSerializer;
 
 public class TableAsList extends SingleInSingleOutXMLTransformer {
@@ -119,6 +121,7 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 			int rowGroup = 1;
 			int row = 1;
 			int col = 1;
+			String namespace = null;
 			while (true)
 				try {
 					switch (reader.next()) {
@@ -128,7 +131,11 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 						boolean isCell = false;
 						if (depth == 1) {
 							if (!isHTMLorDTBookElement(TABLE, name))
-								throw new RuntimeException("Expected table element (html|dtb)."); }
+								throw new RuntimeException("Expected table element (html|dtb).");
+							if (XMLNS_HTML.equals(name.getNamespaceURI()))
+								namespace = XMLNS_HTML;
+							else if (XMLNS_DTB.equals(name.getNamespaceURI()))
+								namespace = XMLNS_DTB; }
 						else if (isHTMLorDTBookElement(THEAD, name)) {
 							rowType = TableCell.RowType.THEAD;
 							// TODO: if style != default, warning that style on thead element is ignored
@@ -146,19 +153,21 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 							break; }
 						else if (isHTMLorDTBookElement(COLGROUP, name) || isHTMLorDTBookElement(COL, name))
 							throw new RuntimeException("Elements colgroup and col not supported yet.");
-						else if (isHTMLorDTBookElement(TD, name) || isHTMLorDTBookElement(TH, name)) {
+						if (isHTMLorDTBookElement(TD, name) || isHTMLorDTBookElement(TH, name)) {
 							isCell = true;
 							withinCell = new TableCell();
 							withinCell.row = row;
 							withinCell.col = col;
 							withinCell.rowGroup = rowGroup;
 							withinCell.rowType = rowType;
+							withinCell.ns = namespace;
 							setCovered(row, col);
 							cells.add(withinCell);
 							if (isHTMLorDTBookElement(TH, name))
 								withinCell.type = TableCell.CellType.TH;
-							writeActions = withinCell.writeActions; }
-						writeActions.add(w -> writeStartElement(w, name));
+							writeActions = withinCell.content; }
+						else
+							writeActions.add(w -> writeStartElement(w, name));
 						for (int i = 0; i < reader.getNamespaceCount(); i++) {
 							String prf = reader.getNamespacePrefix(i);
 							String ns = reader.getNamespaceURI(i);
@@ -293,11 +302,12 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 							col = 1;
 							while (isCovered(row, col)) col++;
 							break; }
-						writeActions.add(w -> w.writeEndElement());
 						if (isHTMLorDTBookElement(TD, name) || isHTMLorDTBookElement(TH, name)) {
 							withinCell = null;
 							writeActions = writeActionsAfter;
 							while (isCovered(row, col)) col++; }
+						else
+							writeActions.add(w -> w.writeEndElement());
 						break; }}}
 				catch (NoSuchElementException e) {
 					break; }
@@ -1077,12 +1087,23 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 		List<String> axis;
 		int rowspan = 1;
 		int colspan = 1;
+		String ns;
+		List<WriterEvent> content = new ArrayList<WriterEvent>();
 
-		List<WriterEvent> writeActions = new ArrayList<WriterEvent>();
+		private AtomicReference<Boolean> written = new AtomicReference<Boolean>(false);
 
 		public void write(XMLStreamWriter writer) throws XMLStreamException {
-			for (WriterEvent action : writeActions)
+			writer.writeStartElement(ns, type == CellType.TD ? "td" : "th");
+			if (axis != null)
+				writeAttribute(writer, _AXIS, Strings.join(axis, ","));
+			if (id != null && !written.get()) {
+				writeAttribute(writer, _ID, id);
+				written.set(true); }
+			if (headers != null)
+				writeAttribute(writer, _HEADERS, Strings.join(headers, " "));
+			for (WriterEvent action : content)
 				action.writeTo(writer);
+			writer.writeEndElement();
 		}
 
 		public TableCell clone() {
@@ -1099,7 +1120,9 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 			clone.axis = this.axis;
 			clone.rowspan = this.rowspan;
 			clone.colspan = this.colspan;
-			clone.writeActions.addAll(this.writeActions);
+			clone.ns = this.ns;
+			clone.content.addAll(this.content);
+			clone.written = this.written;
 			return clone;
 		}
 
