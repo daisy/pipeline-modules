@@ -236,11 +236,7 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 														// and for other parts (classes or attributes) it does not makes sense to come after
 														// a pseudo element
 														PseudoElementImpl pseudo = (PseudoElementImpl)selector.get(0).get(0);
-														if ("list-item".equals(pseudo.getName()))
-															addListItemStyle(
-																pseudo.getPseudoClasses(),
-																new ListItemStyle(rest(ruleblock)));
-														else if ("list-header".equals(pseudo.getName())) {
+														if ("list-header".equals(pseudo.getName())) {
 															if (pseudo.getPseudoClasses().isEmpty())
 																addListHeaderStyle(
 																	new ListItemStyle(rest(ruleblock))); }
@@ -479,6 +475,8 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 		private final TableCell groupingHeader;
 		private final String groupingAxis;
 		private final TableCellGroup precedingSibling;
+		private final boolean hasSubGroups;
+		private final String subGroupingAxis;
 		private final List<TableCellCollection> children;
 		private final boolean rowApplied;
 		private final boolean columnAppliedBeforeRow;
@@ -498,6 +496,8 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 			this.rowApplied = rowApplied;
 			this.columnAppliedBeforeRow = columnAppliedBeforeRow;
 			children = groupCellsBy(cells, nextAxes);
+			hasSubGroups = !children.isEmpty() && children.get(0) instanceof TableCellGroup; // all children of same type
+			subGroupingAxis = hasSubGroups ? ((TableCellGroup)children.get(0)).groupingAxis : null; // all children has same groupingAxis
 		}
 
 		private List<TableCellCollection> groupCellsBy(List<TableCell> cells, Iterator<String> axes) {
@@ -690,6 +690,9 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 
 		public void write(XMLStreamWriter writer) {
 			try {
+				if (hasSubGroups) {
+					writeStartElement(writer, new QName(ns, "_"));
+					writeStyleAttribute(writer, getTableByStyle(subGroupingAxis)); }
 				List<List<TableCell>> promotedHeaders = null;
 				int i = 0;
 				for (TableCellCollection c : children) {
@@ -701,21 +704,22 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 								if (promotedHeaders == null) {
 									if (i == 0 && j == 0) {
 										writeStartElement(writer, new QName(ns, "_"));
-										writeStyleAttribute(writer,
-										                    groupingAxis != null ? getTableByStyle(groupingAxis).getListHeaderStyle()
-										                                         : getListHeaderStyle());
-										writeStartElement(writer, new QName(ns, "_"));
-										writeStyleAttribute(writer, getTableByStyle(g.groupingAxis));
+										writeStyleAttribute(writer, getTableByStyle(g.groupingAxis).getListHeaderStyle());
+										if (g.hasSubGroups) {
+											writeStartElement(writer, CSS_TABLE_BY);
+											writeStyleAttribute(writer, getTableByStyle(g.subGroupingAxis)); }
 										promotedHeaders = new ArrayList<List<TableCell>>(); }
 									else
 										throw new RuntimeException("Some headers of children promoted but not all children have a promoted header."); }
 								if (i == 0) {
-									writeStartElement(writer, new QName(ns, "_"));
-									Predicate<PseudoClass> matcher = matchesPosition(j + 1, g.children.size());
-									writeStyleAttribute(writer, getTableByStyle(g.groupingAxis).getListItemStyle(matcher));
+									if (g.hasSubGroups) {
+										writeStartElement(writer, new QName(ns, "_"));
+										Predicate<PseudoClass> matcher = matchesPosition(j + 1, g.children.size());
+										writeStyleAttribute(writer, getTableByStyle(g.subGroupingAxis).getListItemStyle(matcher)); }
 									for (TableCell h : cc.newlyPromotedHeaders())
 										h.write(writer);
-									writer.writeEndElement();
+									if (g.hasSubGroups)
+										writer.writeEndElement(); // css:list-item
 									promotedHeaders.add(cc.newlyPromotedHeaders()); }
 								else if (!promotedHeaders.get(j).equals(cc.newlyPromotedHeaders()))
 									throw new RuntimeException("Headers of children promoted but not the same as promoted headers of sibling groups."); }
@@ -728,27 +732,24 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 						throw new RuntimeException("Coding error");
 					i++; }
 				if (promotedHeaders != null) {
-					writer.writeEndElement();
-					writer.writeEndElement(); }
+					if (((TableCellGroup)children.get(0)).hasSubGroups)
+						writer.writeEndElement(); // css:table-by
+					writer.writeEndElement(); } // css:list-header
 				i = 0;
 				for (TableCellCollection c : children) {
-					writeStartElement(writer, new QName(ns, "_"));
-					Predicate<PseudoClass> matcher = matchesPosition(i + 1, children.size());
-					writeStyleAttribute(writer,
-					                    groupingAxis != null ? getTableByStyle(groupingAxis).getListItemStyle(matcher)
-					                                         : getListItemStyle(matcher));
+					if (hasSubGroups) {
+						writeStartElement(writer, new QName(ns, "_"));
+						Predicate<PseudoClass> matcher = matchesPosition(i + 1, children.size());
+						writeStyleAttribute(writer, getTableByStyle(subGroupingAxis).getListItemStyle(matcher)); }
 					for (TableCell h : c.newlyRenderedHeaders())
 						h.write(writer);
-					if (c instanceof TableCellGroup) {
-						TableCellGroup g = (TableCellGroup)c;
-						writeStartElement(writer, new QName(ns, "_"));
-						writeStyleAttribute(writer, getTableByStyle(g.groupingAxis)); }
 					c.write(writer);
-					if (c instanceof TableCellGroup)
-						writer.writeEndElement();
-					writer.writeEndElement();
-					i++; }}
-			catch (XMLStreamException e) {
+					if (hasSubGroups)
+						writer.writeEndElement(); // css:list-item
+					i++; }
+				if (hasSubGroups)
+					writer.writeEndElement(); // css:table-by
+			} catch (XMLStreamException e) {
 				throw new RuntimeException(e); }
 		}
 
@@ -770,15 +771,7 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 	}
 
 	final private Map<String,TableByStyle> tableByStyles = new HashMap<String,TableByStyle>();
-	final private Map<List<PseudoClass>,ListItemStyle> listItemStyles = new LinkedHashMap<List<PseudoClass>,ListItemStyle>();
 	private ListItemStyle listHeaderStyle = new ListItemStyle();
-
-	public void addListItemStyle(List<PseudoClass> pseudo, ListItemStyle style) {
-		if (!listItemStyles.containsKey(pseudo))
-			listItemStyles.put(pseudo, style);
-		else
-			listItemStyles.put(pseudo, listItemStyles.get(pseudo).mergeWith(style));
-	}
 
 	public void addListHeaderStyle(ListItemStyle style) {
 		listHeaderStyle = listHeaderStyle.mergeWith(style);
@@ -789,16 +782,6 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 		if (style == null) {
 			style = new TableByStyle();
 			tableByStyles.put(axis, style); }
-		return style;
-	}
-
-	public ListItemStyle getListItemStyle(Predicate<PseudoClass> matcher) {
-		ListItemStyle style = new ListItemStyle();
-	  outer: for (List<PseudoClass> pseudoClasses : listItemStyles.keySet()) {
-			for (PseudoClass pseudoClass : pseudoClasses)
-				if (!matcher.apply(pseudoClass))
-					continue outer;
-			style = style.mergeWith(listItemStyles.get(pseudoClasses)); }
 		return style;
 	}
 

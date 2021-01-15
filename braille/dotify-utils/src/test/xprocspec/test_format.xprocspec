@@ -11655,14 +11655,14 @@
           <body style="@page { size: 10 20 }">
             <table xmlns="http://www.daisy.org/z3986/2005/dtbook/"
                    style="display: block;
-                          render-table-by: row;
+                          render-table-by: row, column;
                           text-transform: none;
-                          &amp;::table-by(row) {
+                          &amp;::table-by(row)::list-item {
                             display:block;
                             margin-left:2; }
-                          &amp;::table-by(row)::list-item {
+                          &amp;::table-by(column)::list-item {
                             display:block; }
-                          &amp;::table-by(row)::list-item:first-child {
+                          &amp;::table-by(column)::list-item:first-child {
                             text-indent:-2; }">
               <thead>
                 <tr>
@@ -11721,27 +11721,27 @@
             <block>
               <block>
                 <block first-line-indent="0" text-indent="2">⠿⠁⠤⠁⠤⠁</block>
-                <block padding-left="2">⠤⠁⠤⠃</block>
+                <block padding-left="2">⠿⠁⠤⠁⠤⠃</block>
                 <block padding-left="2">⠿⠉⠤⠁⠤⠉</block>
               </block>
               <block>
                 <block first-line-indent="0" text-indent="2">⠿⠁⠤⠃⠤⠁</block>
-                <block padding-left="2">⠤⠃⠤⠃</block>
+                <block padding-left="2">⠿⠁⠤⠃⠤⠃</block>
                 <block padding-left="2">⠿⠉⠤⠃⠤⠉</block>
               </block>
               <block>
                 <block first-line-indent="0" text-indent="2">⠿⠁⠤⠉⠤⠁</block>
-                <block padding-left="2">⠤⠉⠤⠃</block>
+                <block padding-left="2">⠿⠁⠤⠉⠤⠃</block>
                 <block padding-left="2">⠿⠉⠤⠉⠤⠉</block>
               </block>
               <block>
                 <block first-line-indent="0" text-indent="2">⠿⠁⠤⠉⠤⠁</block>
-                <block padding-left="2">⠤⠙⠤⠃</block>
+                <block padding-left="2">⠿⠁⠤⠙⠤⠃</block>
                 <block padding-left="2">⠿⠉⠤⠙⠤⠉</block>
               </block>
               <block>
                 <block first-line-indent="0" text-indent="2">⠿⠁⠶⠁</block>
-                <block padding-left="2">⠶⠃</block>
+                <block padding-left="2">⠿⠁⠶⠃</block>
                 <block padding-left="2">⠿⠉⠶⠉</block>
               </block>
             </block>
@@ -11765,19 +11765,19 @@
               <section>
                 <page>
                   <row>⠿⠁⠤⠁⠤⠁</row>
-                  <row>⠀⠀⠤⠁⠤⠃</row>
+                  <row>⠀⠀⠿⠁⠤⠁⠤⠃</row>
                   <row>⠀⠀⠿⠉⠤⠁⠤⠉</row>
                   <row>⠿⠁⠤⠃⠤⠁</row>
-                  <row>⠀⠀⠤⠃⠤⠃</row>
+                  <row>⠀⠀⠿⠁⠤⠃⠤⠃</row>
                   <row>⠀⠀⠿⠉⠤⠃⠤⠉</row>
                   <row>⠿⠁⠤⠉⠤⠁</row>
-                  <row>⠀⠀⠤⠉⠤⠃</row>
+                  <row>⠀⠀⠿⠁⠤⠉⠤⠃</row>
                   <row>⠀⠀⠿⠉⠤⠉⠤⠉</row>
                   <row>⠿⠁⠤⠉⠤⠁</row>
-                  <row>⠀⠀⠤⠙⠤⠃</row>
+                  <row>⠀⠀⠿⠁⠤⠙⠤⠃</row>
                   <row>⠀⠀⠿⠉⠤⠙⠤⠉</row>
                   <row>⠿⠁⠶⠁</row>
-                  <row>⠀⠀⠶⠃</row>
+                  <row>⠀⠀⠿⠁⠶⠃</row>
                   <row>⠀⠀⠿⠉⠶⠉</row>
                 </page>
               </section>
@@ -12939,15 +12939,15 @@
                           &amp;:-obfl-alternate-scenario {
                             -obfl-scenario-cost: 2;
                             display: block;
-                            render-table-by:row; }
+                            render-table-by: row, column; }
                           &amp;:-obfl-alternate-scenario td:blank::after {
                             content: '⠪⠕'; }
-                          &amp;:-obfl-alternate-scenario::table-by(row) {
+                          &amp;:-obfl-alternate-scenario::table-by(row)::list-item {
                             display:block;
                             margin-left:2; }
-                          &amp;:-obfl-alternate-scenario::table-by(row)::list-item {
+                          &amp;:-obfl-alternate-scenario::table-by(column)::list-item {
                             display:block; }
-                          &amp;:-obfl-alternate-scenario::table-by(row)::list-item:first-child {
+                          &amp;:-obfl-alternate-scenario::table-by(column)::list-item:first-child {
                             text-indent:-2; }">
               <thead>
                 <tr>
