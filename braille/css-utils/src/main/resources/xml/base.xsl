@@ -944,7 +944,7 @@
                                       then string(@style)
                                       else css:serialize-stylesheet(*,(),$level,$indent)"/>
             </xsl:when>
-            <xsl:when test="exists($base) and not(matches(@selector,'^&amp;:'))">
+            <xsl:when test="exists($base) and not(matches(@selector,'^&amp;'))">
                 <xsl:sequence select="string-join((
                                         string-join($base,', '),' {',$newline,$indent,
                                         css:serialize-stylesheet(
@@ -956,7 +956,7 @@
                                           $indent),
                                         $newline,'}'),'')"/>
             </xsl:when>
-            <xsl:otherwise> <!-- matches(@selector,'^&amp;:') -->
+            <xsl:otherwise> <!-- matches(@selector,'^&amp;') -->
                 <xsl:sequence select="css:serialize-stylesheet(
                                         if (@style)
                                           then css:deep-parse-stylesheet(@style)
@@ -1093,14 +1093,15 @@
         <xsl:variable name="newline" as="xs:string"
                       select="if (exists($indent)) then string-join(('&#xa;',for $i in 2 to $level return $indent),'') else ' '"/>
         <xsl:variable name="serialized-pseudo-rules" as="xs:string*">
-            <xsl:apply-templates select="$rules[self::css:rule and @selector[matches(.,'^&amp;:')]]" mode="css:serialize">
+            <!-- also includes rules with relative selector -->
+            <xsl:apply-templates select="$rules[self::css:rule and @selector[matches(.,'^&amp;')]]" mode="css:serialize">
                 <xsl:with-param name="base" select="$base"/>
                 <xsl:with-param name="level" select="$level"/>
                 <xsl:with-param name="indent" select="$indent"/>
             </xsl:apply-templates>
         </xsl:variable>
         <xsl:variable name="serialized-at-rules" as="xs:string*">
-            <xsl:apply-templates select="$rules[self::css:rule and @selector[not(matches(.,'^&amp;:'))]]" mode="css:serialize">
+            <xsl:apply-templates select="$rules[self::css:rule and @selector[not(matches(.,'^&amp;'))]]" mode="css:serialize">
                 <xsl:with-param name="level" select="if (exists($base)) then $level+1 else $level"/>
                 <xsl:with-param name="indent" select="$indent"/>
             </xsl:apply-templates>
