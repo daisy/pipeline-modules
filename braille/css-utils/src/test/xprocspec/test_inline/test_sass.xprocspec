@@ -366,39 +366,6 @@
   
   <x:scenario label="test_12">
     <x:documentation>
-      Recover from SASS bug. SASS reverses the order of `:not([class])` and `::table-by(row)`. We
-      reverse the order again while parsing the CSS.
-    </x:documentation>
-    <x:call step="px:css-cascade">
-      <x:input port="source">
-        <x:document type="inline">
-          <document>
-            <head>
-              <link type="text/x-scss" rel="stylesheet" href="../../resources/sass/sass_9.scss" media="embossed"/>
-            </head>
-            <body>
-              <table class="foo"/>
-              <table/>
-            </body>
-          </document>
-        </x:document>
-      </x:input>
-    </x:call>
-    <x:context label="result">
-      <x:document type="port" port="result" select="//body"/>
-    </x:context>
-    <x:expect label="result" type="compare">
-      <x:document type="inline">
-        <body>
-          <table class="foo"/>
-          <table style="&amp;::table-by(row) { display: block; margin-left: 2; }"/>
-        </body>
-      </x:document>
-    </x:expect>
-  </x:scenario>
-
-  <x:scenario label="test_13">
-    <x:documentation>
       Embedded SASS.
     </x:documentation>
     <x:call step="px:css-cascade">
@@ -431,6 +398,60 @@
         <body>
           <h1 style="display: block; margin-left: 4;"/>
           <p/>
+        </body>
+      </x:document>
+    </x:expect>
+  </x:scenario>
+  
+  <x:scenario label="test_13">
+    <x:documentation>
+      Test that SASS can mess things up when @extend is used ot stack a pseudo class onto as pseudo
+      element or visa versa.
+
+      Because in vanilla CSS a pseudo element can not have a pseudo class, SASS moves the pseudo
+      classes to the beginning. Another problem is that the version of SASS that we are using treats
+      pseudo elements with arguments (like ::table-by) as a pseudo class, and because the order of
+      pseudo classes does not matter, `:not([class])` and `::table-by(row)` will get out of order
+      when @extend is used.
+
+      We advise users not to make use of @extend in certain unsupported cases.
+    </x:documentation>
+    <x:call step="px:css-cascade">
+      <x:input port="source">
+        <x:document type="inline">
+          <document>
+            <head>
+              <style type="text/x-scss" media="embossed">
+                <![CDATA[
+                %table-linearized {
+                    &::table-by(row) {
+                        display: block;
+                        margin-left: 2;
+                    }
+                }
+                table:not([class]) {
+                    @extend %table-linearized
+                }
+                ]]>
+              </style>
+            </head>
+            <body>
+              <table class="foo"/>
+              <table/>
+            </body>
+          </document>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result" select="//body"/>
+    </x:context>
+    <x:expect label="result" type="compare"
+              xfail="both table elements will get the style &amp;::table-by(row):not([class]) { ... }">
+      <x:document type="inline">
+        <body>
+          <table class="foo"/>
+          <table style="&amp;::table-by(row) { display: block; margin-left: 2; }"/>
         </body>
       </x:document>
     </x:expect>
