@@ -504,11 +504,13 @@
 					<css:property name="size" value="32 27"/>
 				</css:rule>
 				<css:rule selector="@bottom-center">
-					<css:property name="content" value="none"/>
+					<css:property name="content">
+						<css:counter name="page" />
+					</css:property>
 				</css:rule>
 			</x:param>
 		</x:call>
-		<x:expect label="result" select="'size: 32 27 @bottom-center { content: none }'"/>
+		<x:expect label="result" select="'size: 32 27 @bottom-center { content: counter(page) }'"/>
 	</x:scenario>
 	<x:scenario label="test_34.2">
 		<x:call function="css:serialize-stylesheet">
