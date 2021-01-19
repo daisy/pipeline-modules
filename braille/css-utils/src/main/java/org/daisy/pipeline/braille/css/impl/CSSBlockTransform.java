@@ -20,6 +20,7 @@ import com.xmlcalabash.runtime.XAtomicStep;
 
 import cz.vutbr.web.css.Declaration;
 import cz.vutbr.web.css.TermIdent;
+import cz.vutbr.web.css.TermInteger;
 import cz.vutbr.web.css.TermURI;
 
 import org.daisy.braille.css.InlineStyle;
@@ -244,19 +245,24 @@ public interface CSSBlockTransform {
 									;
 								else if (!dd.getProperty().equals("system")
 								         && dd.size() == 1
-								         && (dd.get(0) instanceof TermIdent || dd.get(0) instanceof TermURI)) {
+								         && (dd.get(0) instanceof TermIdent
+								             || dd.get(0) instanceof TermURI
+								             || dd.get(0) instanceof TermInteger)) {
 									String key = dd.getProperty();
 									String value;
-									if (dd.get(0) instanceof TermIdent) {
-										value = ((TermIdent)dd.get(0)).getValue();
-										if (query.containsKey(key))
-											query.removeAll(key);
-									} else {
+									if (dd.get(0) instanceof TermURI) {
 										URL base = ((TermURI)dd.get(0)).getBase();
 										URI baseURI = base != null ? URLs.asURI(base) : URLs.asURI(((Document)doc).getBaseURI());
 										value = URLs.resolve(baseURI,
 										                     URLs.asURI(((TermURI)dd.get(0)).getValue()))
 										            .toASCIIString();
+									} else {
+										if (dd.get(0) instanceof TermInteger)
+											value = "" + ((TermInteger)dd.get(0)).getIntValue();
+										else
+											value = "" + dd.get(0).getValue();
+										if (query.containsKey(key))
+											query.removeAll(key);
 									}
 									if (key.equals("contraction") && value.equals("no"))
 										query.removeAll("grade");
