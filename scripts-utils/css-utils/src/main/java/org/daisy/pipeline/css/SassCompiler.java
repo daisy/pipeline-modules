@@ -179,9 +179,7 @@ public class SassCompiler {
 		scss.append(CharStreams.toString(r));
 		r.close();
 		try {
-			Output result = sassCompiler.compileString(scss.toString(), StandardCharsets.UTF_8, URLs.asURI(base), null, options);
-			if (result.getErrorStatus() != 0)
-				throw new RuntimeException("Could not compile SASS style sheet: " + result.getErrorMessage());
+			Output result = sassCompiler.compileString(scss.toString(), URLs.asURI(base), null, options);
 			String css = result.getCss();
 			logger.debug(base + " compiled to:\n\n" + css);
 			return new ByteArrayInputStream(css.getBytes(StandardCharsets.UTF_8)); }
