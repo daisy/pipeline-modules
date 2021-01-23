@@ -483,7 +483,7 @@
     <x:context label="result">
       <x:document type="port" port="result" select="//body"/>
     </x:context>
-    <x:expect label="result" type="compare" xfail="got: &amp;::after { content: 'bar'; text-transform: uppercase; }">
+    <x:expect label="result" type="compare">
       <x:document type="inline">
         <body>
           <div style="&amp;::after { content: 'foo'; } &amp;::after::after { content: 'bar'; text-transform: uppercase; }"/>
@@ -528,10 +528,10 @@
     <x:context label="result">
       <x:document type="port" port="result" select="//body"/>
     </x:context>
-    <x:expect label="result" type="compare" xfail="got: &amp;::table-by(row)::list-item { display: block; margin-left: 2; }">
+    <x:expect label="result" type="compare">
       <x:document type="inline">
         <body>
-          <table style="&amp;::table-by(row)::list-item { display: block; margin-left: 2; } &amp;::table-by(row)::list-item::first-child { text-indent: -2; }"/>
+          <table style="&amp;::table-by(row)::list-item { display: block; margin-left: 2; } &amp;::table-by(row)::list-item:first-child { text-indent: -2; }"/>
         </body>
       </x:document>
     </x:expect>

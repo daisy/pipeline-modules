@@ -54,7 +54,7 @@ import org.daisy.pipeline.braille.css.impl.BrailleCssSerializer;
 import org.daisy.pipeline.css.CssCascader;
 import org.daisy.pipeline.css.JStyleParserCssCascader;
 import org.daisy.pipeline.css.Medium;
-import org.daisy.pipeline.css.SassCompiler;
+import org.daisy.pipeline.css.sass.SassCompiler;
 
 import org.osgi.service.component.annotations.Component;
 

@@ -215,7 +215,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>css-utils</artifactId>
-        <version>2.1.2-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
@@ -548,13 +548,16 @@
         <artifactId>braille-css</artifactId>
         <version>1.19.0</version>
       </dependency>
+      <!--
+          for scripts-utils/css-utils, braille/common-utils and braille/css-utils
+      -->
       <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>
         <artifactId>org.apache.servicemix.bundles.antlr-runtime</artifactId>
         <version>3.5.2_1</version>
       </dependency>
       <!--
-          for braille/css-utils
+          for scripts-utils/css-utils
       -->
       <dependency>
         <groupId>org.daisy.libs</groupId>

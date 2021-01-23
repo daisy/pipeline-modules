@@ -51,6 +51,7 @@ import org.daisy.common.transform.SingleInSingleOutXMLTransformer;
 import org.daisy.common.transform.TransformerException;
 import org.daisy.common.transform.XMLInputValue;
 import org.daisy.common.transform.XMLOutputValue;
+import org.daisy.pipeline.css.sass.SassCompiler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

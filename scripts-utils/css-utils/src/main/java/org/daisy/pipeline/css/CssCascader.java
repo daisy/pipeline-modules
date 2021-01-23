@@ -4,6 +4,7 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.URIResolver;
 
 import org.daisy.common.transform.SingleInSingleOutXMLTransformer;
+import org.daisy.pipeline.css.sass.SassCompiler;
 
 /**
  * Used by the <a
