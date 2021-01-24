@@ -4,7 +4,6 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.URIResolver;
 
 import org.daisy.common.transform.SingleInSingleOutXMLTransformer;
-import org.daisy.pipeline.css.sass.SassCompiler;
 
 /**
  * Used by the <a
@@ -24,7 +23,7 @@ public interface CssCascader {
 	public SingleInSingleOutXMLTransformer newInstance(Medium medium,
 	                                                   String defaultStylesheet,
 	                                                   URIResolver uriResolver,
-	                                                   SassCompiler sassCompiler,
+	                                                   CssPreProcessor preProcessor,
 	                                                   QName attributeName);
 
 }

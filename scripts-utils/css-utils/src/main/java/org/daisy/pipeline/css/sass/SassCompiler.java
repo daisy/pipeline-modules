@@ -41,13 +41,26 @@ import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 
 import org.daisy.common.file.URLs;
+import org.daisy.pipeline.css.CssPreProcessor;
 import org.daisy.pipeline.css.sass.impl.SassPostProcessLexer;
 import org.daisy.pipeline.css.sass.impl.SassPostProcessParser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SassCompiler {
+/**
+ * {@link CssPreProcessor} that handles media type "text/x-scss".
+ */
+public class SassCompiler implements CssPreProcessor {
+
+	public boolean supportsMediaType(String mediaType, URL url) {
+		if ("text/x-scss".equals(mediaType))
+			return true;
+		else if (mediaType == null && url != null && url.toString().endsWith(".scss"))
+			return true;
+		else
+			return false;
+	}
 
 	private final Importer importer;
 	private final StreamSourceURIResolver resolver;
@@ -121,6 +134,7 @@ public class SassCompiler {
 	 * @throws IOException if something goes wrong reading the input
 	 * @throws RuntimeException if the compilation fails.
 	 */
+	@Override
 	public InputStream compile(InputStream sass, URL base, Charset encoding) throws IOException {
 		Compiler sassCompiler = new Compiler();
 		Options options = new Options();
