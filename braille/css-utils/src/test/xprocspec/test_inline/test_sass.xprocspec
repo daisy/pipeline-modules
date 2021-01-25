@@ -311,7 +311,7 @@
           </document>
         </x:document>
       </x:input>
-      <x:param port="sass-variables" name="border" select="'⠿'"/>
+      <x:param port="parameters" name="border" select="'⠿'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result" select="//body"/>
@@ -344,11 +344,11 @@
           </document>
         </x:document>
       </x:input>
-      <x:param port="sass-variables" name="padding-left" select="'A great lot'':!'"/>
-      <x:param port="sass-variables" name="margin-left" select="'a lot'"/>
-      <x:param port="sass-variables" name="padding-right" select="'something'"/>
-      <x:param port="sass-variables" name="margin-right" select="'''something'''"/>
-      <x:param port="sass-variables" name="padding-top" select="''"/>
+      <x:param port="parameters" name="padding-left" select="'A great lot'':!'"/>
+      <x:param port="parameters" name="margin-left" select="'a lot'"/>
+      <x:param port="parameters" name="padding-right" select="'something'"/>
+      <x:param port="parameters" name="margin-right" select="'''something'''"/>
+      <x:param port="parameters" name="padding-top" select="''"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result" select="//body"/>
