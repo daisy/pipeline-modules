@@ -21,8 +21,9 @@ of the document (TTS voices, pronunciations, speech pitch, speech
 rates, speech levels, etc.) is controlled with CSS style sheets and
 PLS lexicons.
 
-The following two properties must be set through
-[system properties](http://daisy.github.io/pipeline/Configuration-Files#system-properties).
+The following two properties must be set through the
+[pipeline.properties
+file](http://daisy.github.io/pipeline/Configuration-Files#user-properties).
 
 `org.daisy.pipeline.tts.config`
 : File to load TTS configuration properties from at start-up
@@ -34,18 +35,18 @@ The following two properties must be set through
 : Allow dynamic setting of properties
 : Defaults to "true"
 
-All other TTS properties may be specified through either
-[system properties](http://daisy.github.io/pipeline/Configuration-Files#system-properties)
+All other TTS properties may be specified through either the
+[pipeline.properties
+file](http://daisy.github.io/pipeline/Configuration-Files#user-properties)
 or special TTS configuration files. Aural CSS style sheets and PLS
 lexicons must be specified in TTS configuration files.
 
 
 Configuration files may either be specified "statically", through the
-system property `org.daisy.pipeline.tts.config` or "dynamically"
-through the optional script input. If
-`org.daisy.pipeline.tts.host.protection` is true, properties in
-dynamic configuration files are ignored. The configuration file format
-is as follows:
+user property `org.daisy.pipeline.tts.config` or "dynamically" through
+the optional script input. If `org.daisy.pipeline.tts.host.protection`
+is true, properties in dynamic configuration files are ignored. The
+configuration file format is as follows:
 
 ~~~xml
 <config>
