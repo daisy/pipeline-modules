@@ -12,7 +12,7 @@
 
   <groupId>org.daisy.pipeline.modules</groupId>
   <artifactId>modules-aggregator</artifactId>
-  <version>1.14.1</version>
+  <version>1.14.2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>DAISY Pipeline 2 :: Aggregator POM for all the modules</name>
@@ -57,8 +57,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <scm>
-    <tag>v1.14.1</tag>
-  </scm>
 </project>

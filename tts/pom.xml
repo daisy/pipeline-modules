@@ -12,7 +12,7 @@
 
   <groupId>org.daisy.pipeline.modules</groupId>
   <artifactId>tts-modules-aggregator</artifactId>
-  <version>1.14.1</version>
+  <version>1.14.2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>DAISY Pipeline 2 :: TTS Modules Aggregator POM</name>
@@ -23,28 +23,24 @@
     <!-- because they are platform-specific. The module tts-adapter-attnative -->
     <!-- too, because it depends on att-nar which cannot be publicly deployed -->
     <!-- according to the AT&T's license. -->
-    <!--<module>css-speech</module>-->
-    <!--<module>dtbook-tts</module>-->
-    <!--<module>epub3-tts</module>-->
+    <module>css-speech</module>
+    <module>dtbook-tts</module>
+    <module>epub3-tts</module>
     <module>ssml-to-audio</module>
-    <!--<module>text-to-ssml</module>-->
+    <module>text-to-ssml</module>
     <module>tts-common</module>
-    <!--<module>tts-adapters/tts-adapter-espeak</module>-->
-    <!--<module>tts-adapters/tts-adapter-acapela</module>-->
-    <!--<module>tts-adapters/tts-adapter-osx</module>-->
-    <!--<module>tts-adapters/tts-adapter-sapinative</module>-->
-    <!--<module>tts-adapters/tts-adapter-qfrency</module>-->
-    <!--<module>tts-adapters/tts-adapter-google</module>-->
-    <!--<module>zedai-to-ssml</module>-->
-    <!--<module>mathml-to-ssml</module>-->
+    <module>tts-adapters/tts-adapter-espeak</module>
+    <module>tts-adapters/tts-adapter-acapela</module>
+    <module>tts-adapters/tts-adapter-osx</module>
+    <module>tts-adapters/tts-adapter-sapinative</module>
+    <module>tts-adapters/tts-adapter-qfrency</module>
+    <module>tts-adapters/tts-adapter-google</module>
+    <module>zedai-to-ssml</module>
+    <module>mathml-to-ssml</module>
   </modules>
 
   <!-- don't publish aggregator -->
   <properties>
     <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
   </properties>
-
-  <scm>
-    <tag>v1.14.1</tag>
-  </scm>
 </project>
