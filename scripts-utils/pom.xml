@@ -7,7 +7,7 @@
     <groupId>org.daisy</groupId>
     <artifactId>daisy</artifactId>
     <version>4</version>
-    <relativePath />
+    <relativePath/>
   </parent>
 
   <groupId>org.daisy.pipeline.modules</groupId>
@@ -21,19 +21,19 @@
   <!-- List of the modules to build all-at-once -->
   <modules>
     <module>ace-adapter</module>
-    <module>asciimath-utils</module>
+    <!--<module>asciimath-utils</module>-->
     <module>css-utils</module>
     <module>daisy202-utils</module>
-    <module>daisy3-utils</module>
+    <!--<module>daisy3-utils</module>-->
     <module>dtbook-utils</module>
     <module>epub-utils</module>
-    <module>epubcheck-adapter</module>
-    <module>epub3-to-html</module>
-    <module>html-to-dtbook</module>
+    <!--<module>epubcheck-adapter</module>-->
+    <!--<module>epub3-to-html</module>-->
+    <!--<module>html-to-dtbook</module>-->
     <module>mathml-utils</module>
-    <module>smil-utils</module>
-    <module>metadata-utils</module>
-    <module>odf-utils</module>
+    <!--<module>smil-utils</module>-->
+    <!--<module>metadata-utils</module>-->
+    <!--<module>odf-utils</module>-->
     <module>zedai-utils</module>
   </modules>
   

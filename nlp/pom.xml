@@ -7,7 +7,7 @@
     <groupId>org.daisy</groupId>
     <artifactId>daisy</artifactId>
     <version>4</version>
-    <relativePath />
+    <relativePath/>
   </parent>
 
   <groupId>org.daisy.pipeline.modules</groupId>
@@ -19,13 +19,13 @@
   <description>Aggregator POM for modules related to Natural Language Processing</description>
 
   <modules>
-    <module>nlp-common</module>
-    <module>lexers/ruled-lexer</module>
-    <module>lexers/light-lexer</module>
-    <module>lexers/omnilang-lexer</module>
-    <module>zedai-break-detection</module>
+    <!--<module>nlp-common</module>-->
+    <!--<module>lexers/ruled-lexer</module>-->
+    <!--<module>lexers/light-lexer</module>-->
+    <!--<module>lexers/omnilang-lexer</module>-->
+    <!--<module>zedai-break-detection</module>-->
     <module>html-break-detection</module>
-    <module>dtbook-break-detection</module>
+    <!--<module>dtbook-break-detection</module>-->
   </modules>
 
   <!-- don't publish aggregator -->
