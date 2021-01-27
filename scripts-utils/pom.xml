@@ -12,7 +12,7 @@
 
   <groupId>org.daisy.pipeline.modules</groupId>
   <artifactId>script-utils-aggregator</artifactId>
-  <version>1.14.0</version>
+  <version>1.14.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>DAISY Pipeline 2 :: Aggregator POM for the Script Utility Modules</name>
@@ -21,19 +21,19 @@
   <!-- List of the modules to build all-at-once -->
   <modules>
     <module>ace-adapter</module>
-    <!--<module>asciimath-utils</module>-->
+    <module>asciimath-utils</module>
     <module>css-utils</module>
     <module>daisy202-utils</module>
-    <!--<module>daisy3-utils</module>-->
+    <module>daisy3-utils</module>
     <module>dtbook-utils</module>
     <module>epub-utils</module>
-    <!--<module>epubcheck-adapter</module>-->
-    <!--<module>epub3-to-html</module>-->
-    <!--<module>html-to-dtbook</module>-->
+    <module>epubcheck-adapter</module>
+    <module>epub3-to-html</module>
+    <module>html-to-dtbook</module>
     <module>mathml-utils</module>
-    <!--<module>smil-utils</module>-->
-    <!--<module>metadata-utils</module>-->
-    <!--<module>odf-utils</module>-->
+    <module>smil-utils</module>
+    <module>metadata-utils</module>
+    <module>odf-utils</module>
     <module>zedai-utils</module>
   </modules>
   
@@ -60,8 +60,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <scm>
-    <tag>v1.14.0</tag>
-  </scm>
 </project>

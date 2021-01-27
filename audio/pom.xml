@@ -12,14 +12,14 @@
 
   <groupId>org.daisy.pipeline.modules</groupId>
   <artifactId>audio-modules-aggregator</artifactId>
-  <version>1.14.0</version>
+  <version>1.14.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>DAISY Pipeline 2 :: Audio Modules Aggregator</name>
   <description>Aggregator for modules providing audio-related functionality</description>
 
   <modules>
-    <!--<module>audio-common</module>-->
+    <module>audio-common</module>
     <module>audio-encoder-lame</module>
   </modules>
   
@@ -27,8 +27,4 @@
   <properties>
     <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
   </properties>
-
-  <scm>
-    <tag>v1.14.0</tag>
-  </scm>
 </project>
