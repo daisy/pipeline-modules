@@ -702,31 +702,8 @@
           <name>documentation</name>
         </property>
       </activation>
-      <properties>
-        <maven.main.skip>true</maven.main.skip>
-        <maven.resources.skip>true</maven.resources.skip>
-        <maven.test.skip>true</maven.test.skip>
-      </properties>
       <build>
         <plugins>
-          <plugin>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>maven-bundle-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>default-bundle</id>
-                <phase>none</phase>
-              </execution>
-              <execution>
-                <id>default-install</id>
-                <phase>none</phase>
-              </execution>
-              <execution>
-                <id>bundle-before-test</id>
-                <phase>none</phase>
-              </execution>
-            </executions>
-          </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-resources-plugin</artifactId>
@@ -738,7 +715,7 @@
                   <goal>copy-resources</goal>
                 </goals>
                 <configuration>
-                  <!-- to overrule maven.resources.skip -->
+                  <!-- to overrule maven.resources.skip if documentation-only is also specified -->
                   <skip>false</skip>
                   <resources>
                     <resource>
@@ -848,6 +825,42 @@
                     <addMavenDescriptor>false</addMavenDescriptor>
                   </archive>
                 </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>module-with-documentation-only</id>
+      <activation>
+        <property>
+          <name>documentation-only</name>
+        </property>
+      </activation>
+      <properties>
+        <maven.main.skip>true</maven.main.skip>
+        <maven.resources.skip>true</maven.resources.skip>
+        <maven.test.skip>true</maven.test.skip>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>maven-bundle-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>default-bundle</id>
+                <phase>none</phase>
+              </execution>
+              <execution>
+                <id>default-install</id>
+                <phase>none</phase>
+              </execution>
+              <execution>
+                <id>bundle-before-test</id>
+                <phase>none</phase>
               </execution>
             </executions>
           </plugin>
