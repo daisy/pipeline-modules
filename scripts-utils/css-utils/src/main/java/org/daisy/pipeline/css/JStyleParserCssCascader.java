@@ -6,11 +6,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URI;
 import java.nio.charset.Charset;
-import java.util.AbstractMap;
-import java.util.AbstractSet;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.xml.namespace.QName;
@@ -18,8 +14,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.URIResolver;
-
-import com.google.common.collect.Iterators;
 
 import cz.vutbr.web.css.CSSFactory;
 import cz.vutbr.web.css.MediaSpec;
@@ -236,25 +230,12 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 				Node attr = attributes.item(i);
 				if (!(attr.getPrefix() == null && "style".equals(attr.getLocalName())))
 					writeAttribute(writer, attr); }
+			Map<PseudoElement,NodeData> pseudoStyles = new java.util.HashMap<>(); {
+				for (PseudoElement pseudo : styleMap.pseudoSet(elem))
+					pseudoStyles.put(pseudo, styleMap.get(elem, pseudo)); }
 			String style = serializeStyle(
 				styleMap.get(elem),
-				new AbstractMap<PseudoElement,NodeData>() {
-					Set<Entry<PseudoElement,NodeData>> entrySet = new AbstractSet<Entry<PseudoElement,NodeData>>() {
-							Set<PseudoElement> keySet = styleMap.pseudoSet(elem);
-							public Iterator<Entry<PseudoElement,NodeData>> iterator() {
-								return Iterators.transform(
-									keySet.iterator(),
-									pseudo -> new SimpleImmutableEntry<PseudoElement,NodeData>(
-										pseudo, styleMap.get(elem, pseudo)));
-							}
-							public int size() {
-								return keySet.size();
-							}
-						};
-					public Set<Entry<PseudoElement,NodeData>> entrySet() {
-						return entrySet;
-					}
-				},
+				pseudoStyles,
 				elem);
 			if (style != null)
 				writeAttribute(writer, attributeName, style);
