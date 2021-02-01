@@ -31,9 +31,7 @@
             <p>A copy of the source fileset with the media overlay files added and the package
             document updated.</p>
         </p:documentation>
-        <p:pipe step="update-metadata" port="result"/>
-        <p:pipe step="filter-package-doc" port="not-matched.in-memory"/>
-        <p:pipe step="main" port="mo.in-memory"/>
+        <p:pipe step="update-metadata" port="result.in-memory"/>
     </p:output>
 
     <p:option name="compatibility-mode" required="false" select="'true'" px:type="boolean">
@@ -70,6 +68,7 @@
         <p:documentation>
             px:fileset-filter
             px:fileset-load
+            px:fileset-join
         </p:documentation>
     </p:import>
     <p:import href="add-metadata.xpl">
@@ -127,13 +126,30 @@
             </p:input>
         </p:xslt>
     </p:group>
+    <p:sink/>
+
+    <px:fileset-join>
+        <p:input port="source">
+            <p:pipe step="filter-package-doc" port="not-matched"/>
+            <p:pipe step="load-package-doc" port="result.fileset"/>
+            <p:pipe step="main" port="mo.fileset"/>
+        </p:input>
+    </px:fileset-join>
 
     <p:documentation>Update metadata with duration information</p:documentation>
     <p:group name="update-metadata">
-        <p:output port="result">
-            <p:pipe step="add-metadata" port="result"/>
+        <p:output port="result.fileset" primary="true">
+            <p:pipe step="add-metadata" port="result.fileset"/>
+        </p:output>
+        <p:output port="result.in-memory" sequence="true">
+            <p:pipe step="add-metadata" port="result.in-memory"/>
         </p:output>
         <px:epub3-add-metadata name="add-metadata">
+            <p:input port="source.in-memory">
+                <p:pipe step="update-manifest" port="result"/>
+                <p:pipe step="filter-package-doc" port="not-matched.in-memory"/>
+                <p:pipe step="main" port="mo.in-memory"/>
+            </p:input>
             <p:input port="metadata">
                 <p:pipe step="duration-metadata" port="result"/>
             </p:input>
@@ -230,14 +246,5 @@
         </p:group>
         <p:sink/>
     </p:group>
-    <p:sink/>
-
-    <px:fileset-join>
-        <p:input port="source">
-            <p:pipe step="filter-package-doc" port="not-matched"/>
-            <p:pipe step="load-package-doc" port="result.fileset"/>
-            <p:pipe step="main" port="mo.fileset"/>
-        </p:input>
-    </px:fileset-join>
 
 </p:declare-step>

@@ -22,6 +22,10 @@
         <p:pipe step="add-braille-rendition" port="in-memory"/>
     </p:output>
     
+    <p:input port="metadata" sequence="true">
+        <p:empty/>
+    </p:input>
+    
     <p:option name="result-base" required="false">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>If not specified, will not copy EPUB before modifying it.</p>
@@ -88,6 +92,7 @@
             px:epub-update-links
             px:epub3-create-mediaoverlays
             px:epub3-add-mediaoverlays
+            px:epub3-add-metadata
             px:opf-spine-to-fileset
         </p:documentation>
     </p:import>
@@ -176,6 +181,48 @@
     </p:choose>
     
     <!--
+        Add metadata
+    -->
+    <p:sink/>
+    <p:count>
+        <p:input port="source">
+            <p:pipe step="main" port="metadata"/>
+        </p:input>
+    </p:count>
+    <p:choose name="add-metadata">
+        <p:when test="/*=0">
+            <p:output port="fileset" primary="true"/>
+            <p:output port="in-memory" sequence="true">
+                <p:pipe step="maybe-copy" port="in-memory"/>
+            </p:output>
+            <p:sink/>
+            <p:identity>
+                <p:input port="source">
+                    <p:pipe step="maybe-copy" port="fileset"/>
+                </p:input>
+            </p:identity>
+        </p:when>
+        <p:otherwise>
+            <p:output port="fileset" primary="true"/>
+            <p:output port="in-memory" sequence="true">
+                <p:pipe step="add" port="result.in-memory"/>
+            </p:output>
+            <p:sink/>
+            <px:epub3-add-metadata name="add">
+                <p:input port="source.fileset">
+                    <p:pipe step="maybe-copy" port="fileset"/>
+                </p:input>
+                <p:input port="source.in-memory">
+                    <p:pipe step="maybe-copy" port="in-memory"/>
+                </p:input>
+                <p:input port="metadata">
+                    <p:pipe step="main" port="metadata"/>
+                </p:input>
+            </px:epub3-add-metadata>
+        </p:otherwise>
+    </p:choose>
+    
+    <!--
         Perform TTS or only sentence detection or nothing
     -->
     <p:group name="add-mediaoverlays" px:progress="1/2">
@@ -193,7 +240,7 @@
         <p:delete match="d:file[preceding::d:file]"/>
         <px:fileset-load name="package-document">
             <p:input port="in-memory">
-                <p:pipe step="maybe-copy" port="in-memory"/>
+                <p:pipe step="add-metadata" port="in-memory"/>
             </p:input>
         </px:fileset-load>
         <p:choose name="skip-if-disabled" px:progress="1">
@@ -226,15 +273,15 @@
                     <!-- don't perform TTS on documents that are not in spine -->
                     <px:opf-spine-to-fileset name="spine">
                         <p:input port="source.fileset">
-                            <p:pipe step="maybe-copy" port="fileset"/>
+                            <p:pipe step="add-metadata" port="fileset"/>
                         </p:input>
                         <p:input port="source.in-memory">
-                            <p:pipe step="maybe-copy" port="in-memory"/>
+                            <p:pipe step="add-metadata" port="in-memory"/>
                         </p:input>
                     </px:opf-spine-to-fileset>
                     <px:tts-for-epub3 name="do-tts" audio="true" px:progress="1">
                         <p:input port="source.in-memory">
-                            <p:pipe step="maybe-copy" port="in-memory"/>
+                            <p:pipe step="add-metadata" port="in-memory"/>
                         </p:input>
                         <p:input port="config">
                             <p:pipe step="main" port="tts-config"/>
@@ -244,10 +291,10 @@
                     <p:sink/>
                     <px:fileset-update name="update">
                         <p:input port="source.fileset">
-                            <p:pipe step="maybe-copy" port="fileset"/>
+                            <p:pipe step="add-metadata" port="fileset"/>
                         </p:input>
                         <p:input port="source.in-memory">
-                            <p:pipe step="maybe-copy" port="in-memory"/>
+                            <p:pipe step="add-metadata" port="in-memory"/>
                         </p:input>
                         <p:input port="update.fileset">
                             <p:pipe step="do-tts" port="result.fileset"/>
@@ -315,15 +362,15 @@
                 </p:output>
                 <px:opf-spine-to-fileset name="spine">
                     <p:input port="source.fileset">
-                        <p:pipe step="maybe-copy" port="fileset"/>
+                        <p:pipe step="add-metadata" port="fileset"/>
                     </p:input>
                     <p:input port="source.in-memory">
-                        <p:pipe step="maybe-copy" port="in-memory"/>
+                        <p:pipe step="add-metadata" port="in-memory"/>
                     </p:input>
                 </px:opf-spine-to-fileset>
                 <px:fileset-load media-types="application/xhtml+xml" name="html">
                     <p:input port="in-memory">
-                        <p:pipe step="maybe-copy" port="in-memory"/>
+                        <p:pipe step="add-metadata" port="in-memory"/>
                     </p:input>
                 </px:fileset-load>
                 <p:for-each name="sentence-detection" px:progress="1">
@@ -345,10 +392,10 @@
                 <p:sink/>
                 <px:fileset-update name="update">
                     <p:input port="source.fileset">
-                        <p:pipe step="maybe-copy" port="fileset"/>
+                        <p:pipe step="add-metadata" port="fileset"/>
                     </p:input>
                     <p:input port="source.in-memory">
-                        <p:pipe step="maybe-copy" port="in-memory"/>
+                        <p:pipe step="add-metadata" port="in-memory"/>
                     </p:input>
                     <p:input port="update.fileset">
                         <p:pipe step="html" port="result.fileset"/>
@@ -361,7 +408,7 @@
             <p:otherwise>
                 <p:output port="fileset" primary="true"/>
                 <p:output port="in-memory" sequence="true">
-                    <p:pipe step="maybe-copy" port="in-memory"/>
+                    <p:pipe step="add-metadata" port="in-memory"/>
                 </p:output>
                 <p:output port="temp-audio.fileset">
                     <p:inline><d:fileset/></p:inline>
@@ -371,7 +418,7 @@
                 </p:output>
                 <p:identity>
                     <p:input port="source">
-                        <p:pipe step="maybe-copy" port="fileset"/>
+                        <p:pipe step="add-metadata" port="fileset"/>
                     </p:input>
                 </p:identity>
             </p:otherwise>
@@ -706,7 +753,7 @@
                 create and add metadata.xml
             -->
             
-            <p:group name="add-metadata">
+            <p:group name="add-metadata-xml">
                 <p:output port="fileset" primary="true">
                     <p:pipe step="add-entry" port="result"/>
                 </p:output>
@@ -767,7 +814,7 @@
                 </p:output>
                 <px:fileset-add-entry name="add-entry">
                     <p:input port="source.in-memory">
-                        <p:pipe step="add-metadata" port="in-memory"/>
+                        <p:pipe step="add-metadata-xml" port="in-memory"/>
                     </p:input>
                     <p:input port="entry">
                         <p:pipe step="rendition-mapping" port="result"/>

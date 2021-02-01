@@ -27,6 +27,46 @@ You may alternatively use the "mimetype" document if your input is a unzipped/"e
         </p:documentation>
     </p:option>
     
+    <p:input port="metadata" primary="false" sequence="true" px:media-type="application/xml">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <h2 px:role="name">Metadata</h2>
+            <p px:role="desc" xml:space="preserve">Metadata to be included in the EPUB.
+
+If specified, the document must be a single
+[`metadata`](https://www.w3.org/publishing/epub3/epub-packages.html#sec-metadata-elem) element in
+the OPF namespace. A
+[`prefix`](https://www.w3.org/publishing/epub3/epub-packages.html#sec-prefix-attr) attribute is
+allowed on the root element. The metadata will be injected in the EPUB's package document, possibly
+overwriting existing metadata. This works as follows:
+
+- All (valid) fields in the provided metadata document end up in the output EPUB. More than one
+  field with the same property is allowed. `meta` elements with a `refines` attribute must refine
+  elements within the metadata document itself. Elements that refine elements in the EPUB's package
+  document will be dropped.
+- Any metadata fields in the input EPUB that have matching fields (same property in case of `meta`
+  fields, same element name in case of `dc:*` fields) in the provided metadata document are omitted,
+  together with any `meta` elements that refine them.
+- Metadata fields in the input that do not have any matching fields in the provided metadata
+  document are preserved in the output.
+
+There are a number of fields that result in addional changes in the EPUB (apart from an updated
+`metadata` section in the package document):
+
+- If the provided metadata document contains one or more
+  [`dc:identifier`](https://www.w3.org/publishing/epub3/epub-packages.html#sec-opf-dcidentifier) fields, the
+  first one with a `refines` attribute will be used to update the
+  [`unique-identifier`](https://www.w3.org/publishing/epub3/epub-packages.html#attrdef-package-unique-identifier)
+  attribute on the package document.
+
+Some fields are ignored:
+
+- The [`dcterms:modified`](https://www.w3.org/publishing/epub3/epub-packages.html#last-modified-date)
+  field gets updated whenever Pipeline produces an EPUB. As a consequence, any `dcterms:modified`
+  fields in the provided metadata document are ignored.</p>
+        </p:documentation>
+        <p:empty/>
+    </p:input>
+
     <p:option name="braille" required="false" px:type="boolean" select="'true'">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h2 px:role="name">Translate to braille</h2>
@@ -161,6 +201,9 @@ specific.
         </p:input>
         <p:with-option name="result-base"
                        select="concat($output-dir,'/',replace(replace($source,'(\.epub|/mimetype)$',''),'^.*/([^/]+)$','$1'),'.epub!/')"/>
+        <p:input port="metadata">
+            <p:pipe port="metadata" step="main"/>
+        </p:input>
         <p:with-option name="braille-translator" select="$braille-translator"/>
         <p:with-option name="stylesheet" select="$stylesheet"/>
         <p:with-option name="apply-document-specific-stylesheets" select="$apply-document-specific-stylesheets"/>

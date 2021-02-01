@@ -612,7 +612,7 @@
             </p:input>
         </p:insert>
         <p:add-attribute match="/*" attribute-name="unique-identifier">
-            <p:with-option name="attribute-value" select="/opf:package/opf:metadata/dc:identifier/@id"/>
+            <p:with-option name="attribute-value" select="/opf:package/opf:metadata/dc:identifier[1]/@id"/>
         </p:add-attribute>
         <p:choose>
             <p:when test="/opf:package/opf:metadata/@prefix">

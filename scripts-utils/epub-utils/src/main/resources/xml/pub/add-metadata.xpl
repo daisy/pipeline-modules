@@ -3,6 +3,7 @@
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                 xmlns:opf="http://www.idpf.org/2007/opf"
+                xmlns:dc="http://purl.org/dc/elements/1.1/"
                 type="px:epub3-add-metadata"
                 name="main">
 
@@ -10,9 +11,11 @@
 		<p>Inject new metadata into a EPUB package document.</p>
 	</p:documentation>
 
-	<p:input port="source" primary="true">
+	<p:input port="source.fileset" primary="true"/>
+	<p:input port="source.in-memory" sequence="true">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			<p>The input package document</p>
+			<p>The source fileset</p>
+			<p>Must include the package document.</p>
 		</p:documentation>
 	</p:input>
 
@@ -26,10 +29,17 @@
 		</p:documentation>
 	</p:input>
 
-	<p:output port="result">
+	<p:output port="result.fileset" primary="true">
+		<p:pipe step="main" port="source.fileset"/>
+	</p:output>
+	<p:output port="result.in-memory" sequence="true">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			<p>The output package document with the existing and new metadata merged.</p>
+			<p>The result fileset</p>
+			<p>A copy of the source fileset with the updated package document with the existing and
+			new metadata merged.</p>
 		</p:documentation>
+		<p:pipe step="updated-package-doc" port="result"/>
+		<p:pipe step="filter-package-doc" port="not-matched.in-memory"/>
 	</p:output>
 
 	<p:option name="compatibility-mode" required="false" select="'true'" px:type="boolean">
@@ -49,6 +59,17 @@
 		</p:documentation>
 	</p:option>
 
+	<p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
+		<p:documentation>
+			px:assert
+		</p:documentation>
+	</p:import>
+	<p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
+		<p:documentation>
+			px:fileset-filter
+			px:fileset-load
+		</p:documentation>
+	</p:import>
 	<p:import href="merge-metadata.xpl">
 		<p:documentation>
 			pxi:merge-metadata
@@ -60,6 +81,21 @@
 		</p:documentation>
 	</p:import>
 
+	<p:documentation>Load package document</p:documentation>
+	<px:fileset-filter media-types="application/oebps-package+xml" name="filter-package-doc">
+		<p:input port="source.in-memory">
+			<p:pipe step="main" port="source.in-memory"/>
+		</p:input>
+	</px:fileset-filter>
+	<px:fileset-load name="load-package-doc">
+		<p:input port="in-memory">
+			<p:pipe step="main" port="source.in-memory"/>
+		</p:input>
+	</px:fileset-load>
+	<px:assert message="There must be exactly one package document in the fileset"
+	           test-count-min="1" test-count-max="1" error-code="XXXXX"
+	           name="package-doc"/>
+
 	<p:label-elements match="/*[@prefix]/opf:metadata" attribute="prefix" label="../@prefix"/>
 	<p:viewport match="/*/opf:metadata" name="metadata-viewport">
 		<p:sink/>
@@ -70,7 +106,7 @@
 				<p:pipe step="metadata-viewport" port="current"/>
 			</p:input>
 			<p:input port="manifest" select="/*/opf:manifest">
-				<p:pipe step="main" port="source"/>
+				<p:pipe step="package-doc" port="result"/>
 			</p:input>
 			<p:with-option name="reserved-prefixes" select="$reserved-prefixes"/>
 		</pxi:merge-metadata>
@@ -87,6 +123,11 @@
 			</p:otherwise>
 		</p:choose>
 	</p:viewport>
+	<p:add-attribute match="/*" attribute-name="unique-identifier">
+		<!-- this assumes there is at least one dc:identifier in source or metadata (required for valid EPUB) -->
+		<!-- and we know that if there is a dc:identifier with a @refines, pxi:merge-metadata puts it first -->
+		<p:with-option name="attribute-value" select="/opf:package/opf:metadata/dc:identifier[1]/@id"/>
+	</p:add-attribute>
 	<p:choose>
 		<p:when test="/*/opf:metadata/@prefix">
 			<p:add-attribute attribute-name="prefix" match="/*">
@@ -98,5 +139,7 @@
 			<p:delete match="/*/@prefix"/>
 		</p:otherwise>
 	</p:choose>
+	<p:identity name="updated-package-doc"/>
+	<p:sink/>
 
 </p:declare-step>
