@@ -29,7 +29,7 @@
       <p:with-option name="ensure-word-before" select="'span,br,ruby,s,address,abbr,style'"/>
       <p:with-option name="ensure-word-after" select="'span,br,ruby,s,address,abbr,style'"/>
       <!-- Based on the containers of phrasing, flow and transparent content of HTML5 DTB: -->
-      <p:with-option name="can-contain-sentences" select="'body,section,nav,article,aside,h1,h2,h3,h4,h5,h6,header,footer,address,p,pre,blockquote,li,dt,dd,a,q,cite,em,strong,small,mark,dfn,abbr,time,progress,meter,code,var,samp,kdb,sub,sup,span,i,b,bdo,rt,ins,del,caption,td,th,form,label,input,button,datalist,output,bb,menu,legend,div'"/>
+      <p:with-option name="can-contain-sentences" select="'body,section,nav,article,aside,h1,h2,h3,h4,h5,h6,header,footer,address,p,pre,blockquote,li,dt,dd,a,q,cite,em,strong,small,mark,dfn,abbr,time,progress,meter,code,var,samp,kdb,sub,sup,span,i,b,bdo,rt,ins,del,caption,figcaption,td,th,form,label,input,button,datalist,output,bb,menu,legend,div'"/>
       <p:with-option name="output-ns" select="'http://www.w3.org/1999/xhtml'"/>
       <p:with-option name="output-word-tag" select="'span'"/>
       <p:with-option name="word-attr" select="'role'"/>

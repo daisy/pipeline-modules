@@ -165,6 +165,9 @@
 								<span id="page_5" class="page-normal" epub:type="pagebreak" title="5"/>
 								a page break.
 							</p>
+							<figcaption id="caption_1">
+								<strong>Illustration 1 A.</strong> This is an illustration.
+							</figcaption>
 						</body>
 					</html>
 				</x:document>
@@ -218,11 +221,11 @@
 							<meta name="dcterms:modified" content="2020-03-06T11:11:52Z"/>
 							<meta property="schema:accessibilityFeature">ttsMarkup</meta>
 							<meta name="schema:accessibilityFeature" content="ttsMarkup"/>
-							<meta property="media:duration">00:00:12.23</meta>
-							<meta name="media:duration" content="00:00:12.23"/>
+							<meta property="media:duration">00:00:14.676</meta>
+							<meta name="media:duration" content="00:00:14.676"/>
 							<meta property="media:duration" refines="#item_1">00:00:01.223</meta>
 							<meta property="media:duration" refines="#item_2">00:00:06.115</meta>
-							<meta property="media:duration" refines="#item_3">00:00:04.892</meta>
+							<meta property="media:duration" refines="#item_3">00:00:07.338</meta>
 						</metadata>
 						<manifest>
 							<item id="nav" href="nav.xhtml" properties="nav" media-type="application/xhtml+xml"/>
@@ -358,6 +361,16 @@
 									<span id="i3st3-2-page_5">a page break.</span>
 								</span>
 							</p>
+							<figcaption id="caption_1">
+								<strong>
+									<span id="st3-3">
+										Illustration 1 A.
+									</span>
+								</strong>
+								<span id="st3-4">
+									This is an illustration.
+								</span>
+							</figcaption>
 						</body>
 					</html>
 				</x:document>
@@ -411,7 +424,7 @@
 								</seq>
 								<par>
 									<text src="../front.xhtml#st2-5"/>
-									<audio src="../audio/mock.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.223"/>
+									<audio src="../audio/mock.mp3" clipBegin="0:00:01.223" clipEnd="0:00:02.446"/>
 								</par>
 							</seq>
 						</body>
@@ -443,6 +456,16 @@
 								<par>
 									<text src="../chapter.xhtml#i3st3-2-page_5"/>
 									<audio src="../audio/mock.mp3" clipBegin="0:00:01.223" clipEnd="0:00:02.446"/>
+								</par>
+							</seq>
+							<seq epub:textref="../chapter.xhtml#caption_1">
+								<par>
+									<text src="../chapter.xhtml#st3-3"/>
+									<audio src="../audio/mock.mp3" clipBegin="0:00:01.223" clipEnd="0:00:02.446"/>
+								</par>
+								<par>
+									<text src="../chapter.xhtml#st3-4"/>
+									<audio src="../audio/mock.mp3" clipBegin="0:00:00.000" clipEnd="0:00:01.223"/>
 								</par>
 							</seq>
 						</body>
@@ -558,6 +581,16 @@
 									<span id="i3st3-2-page_5">a page break.</span>
 								</span>
 							</p>
+							<figcaption id="caption_1">
+								<strong>
+									<span id="st3-3">
+										Illustration 1 A.
+									</span>
+								</strong>
+								<span id="st3-4">
+									This is an illustration.
+								</span>
+							</figcaption>
 						</body>
 					</html>
 				</x:document>
