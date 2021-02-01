@@ -55,6 +55,16 @@ This will remove any existing media overlays in the EPUB.</p>
         </p:documentation>
     </p:option>
     
+    <p:option name="sentence-detection" required="false" px:type="boolean" select="'false'">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <h2 px:role="name">Perform sentence detection</h2>
+            <p px:role="desc" xml:space="preserve">Whether to add markup (span elements) for sentences.
+
+This setting has no effect when text-to-speech is also enabled. In that case sentences are always
+marked up.</p>
+        </p:documentation>
+    </p:option>
+
     <p:option name="braille-translator" required="false" px:type="transform-query" select="'(translator:liblouis)'">
         <p:documentation>
             <h2 px:role="name">Braille translator query</h2>
@@ -157,6 +167,7 @@ specific.
         <p:with-option name="set-default-rendition-to-braille" select="$set-default-rendition-to-braille"/>
         <p:with-option name="braille" select="$braille"/>
         <p:with-option name="tts" select="$tts"/>
+        <p:with-option name="sentence-detection" select="$sentence-detection"/>
         <p:input port="tts-config">
             <p:pipe step="main" port="tts-config"/>
         </p:input>

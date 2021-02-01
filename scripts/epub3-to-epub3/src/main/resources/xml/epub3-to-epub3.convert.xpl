@@ -29,6 +29,7 @@
     </p:option>
     <p:option name="braille" required="false" select="'true'"/>
     <p:option name="tts" required="false" select="'default'"/>
+    <p:option name="sentence-detection" required="false" select="'false'"/>
     <p:option name="braille-translator" select="''"/>
     <p:option name="stylesheet" select="''"/>
     <p:option name="apply-document-specific-stylesheets" select="'false'"/>
@@ -107,6 +108,17 @@
             px:tts-for-epub3
         </p:documentation>
     </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/html-break-detection/library.xpl">
+        <p:documentation>
+            px:html-break-detect
+            px:html-unwrap-words
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/tts-common/library.xpl">
+        <p:documentation>
+            px:isolate-skippable
+        </p:documentation>
+    </p:import>
     
     <p:variable name="default-stylesheet" select="resolve-uri('../css/default.css')">
         <p:inline>
@@ -163,6 +175,9 @@
         </p:otherwise>
     </p:choose>
     
+    <!--
+        Perform TTS or only sentence detection or nothing
+    -->
     <p:group name="add-mediaoverlays" px:progress="1/2">
         <p:output port="fileset" primary="true"/>
         <p:output port="in-memory" sequence="true">
@@ -283,6 +298,65 @@
                         <p:pipe step="mo" port="result.in-memory"/>
                     </p:input>
                 </px:epub3-add-mediaoverlays>
+            </p:when>
+            <p:when test="$sentence-detection='true'" px:message="Performing sentence detection">
+                <!--
+                    perform sentence detection
+                -->
+                <p:output port="fileset" primary="true"/>
+                <p:output port="in-memory" sequence="true">
+                    <p:pipe step="update" port="result.in-memory"/>
+                </p:output>
+                <p:output port="temp-audio.fileset">
+                    <p:inline><d:fileset/></p:inline>
+                </p:output>
+                <p:output port="log" sequence="true">
+                    <p:empty/>
+                </p:output>
+                <px:opf-spine-to-fileset name="spine">
+                    <p:input port="source.fileset">
+                        <p:pipe step="maybe-copy" port="fileset"/>
+                    </p:input>
+                    <p:input port="source.in-memory">
+                        <p:pipe step="maybe-copy" port="in-memory"/>
+                    </p:input>
+                </px:opf-spine-to-fileset>
+                <px:fileset-load media-types="application/xhtml+xml" name="html">
+                    <p:input port="in-memory">
+                        <p:pipe step="maybe-copy" port="in-memory"/>
+                    </p:input>
+                </px:fileset-load>
+                <p:for-each name="sentence-detection" px:progress="1">
+                    <p:output port="result"/>
+                    <px:html-break-detect name="break-detect">
+                        <p:with-option name="id-prefix" select="concat(p:iteration-position(),'-')"/>
+                    </px:html-break-detect>
+                    <px:isolate-skippable match="*[@epub:type/tokenize(.,'\s+')='pagebreak']|
+                                                 *[@role='doc-pagebreak']">
+                        <p:input port="sentence-ids">
+                            <p:pipe step="break-detect" port="sentence-ids"/>
+                        </p:input>
+                        <p:with-option name="id-prefix" select="concat('i', p:iteration-position())"/>
+                    </px:isolate-skippable>
+                    <px:html-unwrap-words>
+                        <!-- only keep the sentences, not the words -->
+                    </px:html-unwrap-words>
+                </p:for-each>
+                <p:sink/>
+                <px:fileset-update name="update">
+                    <p:input port="source.fileset">
+                        <p:pipe step="maybe-copy" port="fileset"/>
+                    </p:input>
+                    <p:input port="source.in-memory">
+                        <p:pipe step="maybe-copy" port="in-memory"/>
+                    </p:input>
+                    <p:input port="update.fileset">
+                        <p:pipe step="html" port="result.fileset"/>
+                    </p:input>
+                    <p:input port="update.in-memory">
+                        <p:pipe step="sentence-detection" port="result"/>
+                    </p:input>
+                </px:fileset-update>
             </p:when>
             <p:otherwise>
                 <p:output port="fileset" primary="true"/>
