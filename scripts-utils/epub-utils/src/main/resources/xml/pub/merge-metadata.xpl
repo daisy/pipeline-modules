@@ -11,13 +11,13 @@
 
 	<p:input port="source" sequence="true" primary="true">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			<p>A set of 'metadata' documents in the OPF namespace</p>
+			<p>A set of <code>metadata</code> documents in the OPF namespace</p>
 		</p:documentation>
 	</p:input>
 
 	<p:input port="manifest">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			<p>The 'manifest' document</p>
+			<p>The <code>manifest</code> document</p>
 		</p:documentation>
 	</p:input>
 
@@ -25,8 +25,10 @@
 
 	<p:output port="result">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			<p>A single 'metadata' document in the OPF namespace, containing in 'merged'
-			metadata</p>
+			<p>A single <code>metadata</code> document in the OPF namespace, containing the merged
+			metadata. When the same metadata (the same property) exists in multiple input documents,
+			the first occurences win. Elements that are not valid OPF 3 metadata elements are
+			removed.</p>
 		</p:documentation>
 	</p:output>
 
