@@ -23,6 +23,13 @@
 
 	<p:option name="reserved-prefixes" required="false" select="'#default'"/>
 
+	<p:option name="log-conflicts" required="false" select="'true'">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p>Whether to create log messages when there are fields with the same property in
+			different documents.</p>
+		</p:documentation>
+	</p:option>
+
 	<p:output port="result">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>A single <code>metadata</code> document in the OPF namespace, containing the merged
@@ -57,6 +64,9 @@
 			<p:document href="create-metadata.merge.xsl"/>
 		</p:input>
 		<p:with-param name="reserved-prefixes" select="$reserved-prefixes">
+			<p:empty/>
+		</p:with-param>
+		<p:with-param name="log-conflicts" select="$log-conflicts">
 			<p:empty/>
 		</p:with-param>
 	</p:xslt>

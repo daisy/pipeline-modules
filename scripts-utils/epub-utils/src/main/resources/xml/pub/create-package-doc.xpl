@@ -308,7 +308,7 @@
         </p:uuid>
         <p:sink/>
 
-        <pxi:merge-metadata>
+        <pxi:merge-metadata log-conflicts="false">
             <p:input port="source">
                 <p:pipe step="main" port="metadata"/>
                 <p:pipe step="default-metadata" port="result"/>
