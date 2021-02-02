@@ -131,11 +131,12 @@
         </metadata>
     </xsl:template>
 
-    <xsl:template match="dc:identifier">
-        <dc:identifier id="{f:unique-id((@id,generate-id())[1],//@id except @id)}">
+    <xsl:template match="dc:identifier[not(@id)]">
+        <dc:identifier>
+            <!-- make sure there is an ID for the unique-identifier attribute to point to -->
+            <xsl:attribute name="id" select="f:unique-id(generate-id(),//@id)"/>
             <xsl:apply-templates select="node() | @* except @id"/>
         </dc:identifier>
-        <xsl:apply-templates select="key('refines',f:unified-id(@id))"/>
     </xsl:template>
 
     <xsl:template match="dc:*">
