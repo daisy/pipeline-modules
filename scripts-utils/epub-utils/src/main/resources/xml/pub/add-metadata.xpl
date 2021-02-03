@@ -106,6 +106,9 @@
 			<p:input port="source">
 				<!-- first occurences win -->
 				<p:pipe step="main" port="metadata"/>
+				<!-- We need to pass the whole package document because metadata can refine manifest
+				     items. The other reason is to make sure that the resulting metadata document
+				     will have no id attributes that collide with other ids in the package document -->
 				<p:pipe step="package-doc" port="result"/>
 			</p:input>
 			<p:with-option name="reserved-prefixes" select="$reserved-prefixes"/>

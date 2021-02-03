@@ -15,6 +15,7 @@
                                                rendition: http://www.idpf.org/vocab/rendition/#
                                                schema:    http://schema.org/
                                                xsd:       http://www.w3.org/2001/XMLSchema#'"/>
+    <x:param name="existing-id-outside-metadata" select="()"/>
 
     <x:scenario label="IDs :: ">
         <x:scenario label="conflicting IDs">

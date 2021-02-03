@@ -18,6 +18,10 @@
     <xsl:param name="reserved-prefixes" required="yes"/>
     <xsl:param name="log-conflicts" required="yes"/>
 
+    <!-- existing ids outside metadata elements (required by f:unified-id) -->
+    <!-- if it weren't for XSpec this could have been a xsl:variable -->
+    <xsl:param name="existing-id-outside-metadata" as="xs:string*" select="//@id[not(ancestor::metadata)]"/>
+
     <!--=========================================-->
     <!--TODO: document merge rules. For now, see the tests.-->
     <!--=========================================-->
@@ -214,6 +218,10 @@
                                 </xsl:for-each>
                             </xsl:variable>
                             <xsl:if test="exists($discarded)">
+                                <!--
+                                    FIXME: also mention meta[@refines] elements that are discarded
+                                    because the element they refine is discarded
+                                -->
                                 <xsl:choose>
                                     <xsl:when test="exists($first-group-processed)">
                                         <xsl:variable name="new-value" as="xs:string"
@@ -402,7 +410,11 @@
         <xsl:variable name="count" select="count($id/ancestor::metadata/preceding::metadata)"
             as="xs:integer"/>
         <xsl:sequence
-            select="concat(if (starts-with($id,'#')) then substring($id,2) else $id, if ($count) then $count+1 else '')"
+            select="f:unique-id(
+                      concat(
+                        if (starts-with($id,'#')) then substring($id,2) else $id,
+                        if ($count) then $count+1 else ''),
+                        $existing-id-outside-metadata)"
         />
     </xsl:function>
 
