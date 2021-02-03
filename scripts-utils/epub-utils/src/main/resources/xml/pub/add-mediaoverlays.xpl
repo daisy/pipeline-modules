@@ -215,15 +215,22 @@
                 </p:choose>
             </p:group>
             <p:sink/>
-            <p:insert match="/*" position="last-child">
+            <p:insert match="/*/*" position="last-child">
                 <p:input port="source">
                     <p:inline>
-                        <opf:metadata/>
+                        <opf:package>
+                            <opf:metadata/>
+                        </opf:package>
                     </p:inline>
                 </p:input>
                 <p:input port="insertion">
                     <p:pipe step="metadata.durations" port="result"/>
                     <p:pipe step="metadata.total-duration" port="result"/>
+                </p:input>
+            </p:insert>
+            <p:insert match="/*" position="last-child">
+                <p:input port="insertion" select="//opf:manifest">
+                    <p:pipe step="update-manifest" port="result"/>
                 </p:input>
             </p:insert>
             <p:choose>

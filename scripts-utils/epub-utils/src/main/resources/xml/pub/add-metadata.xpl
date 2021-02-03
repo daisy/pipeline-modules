@@ -23,9 +23,10 @@
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>A <a
 			href="https://www.w3.org/publishing/epub3/epub-packages.html#sec-metadata-elem"><code>opf:metadata</code></a>
-			element. A <a
+			or <code>opf:package</code> element. In case of the former, a <a
 			href="https://www.w3.org/publishing/epub3/epub-packages.html#sec-prefix-attr"><code>prefix</code></a>
-			attribute is allowed on the root element.</p>
+			attribute is allowed on the root element. <code>refines</code> attributes must reference
+			an element within the document itself.</p>
 		</p:documentation>
 	</p:input>
 
@@ -96,16 +97,12 @@
 	           test-count-min="1" test-count-max="1" error-code="XXXXX"
 	           name="package-doc"/>
 
-	<p:label-elements match="/*[@prefix]/opf:metadata" attribute="prefix" label="../@prefix"/>
-	<p:viewport match="/*/opf:metadata" name="metadata-viewport">
+	<p:viewport match="/*/opf:metadata">
 		<p:sink/>
 		<pxi:merge-metadata>
 			<p:input port="source">
 				<!-- first occurences win -->
 				<p:pipe step="main" port="metadata"/>
-				<p:pipe step="metadata-viewport" port="current"/>
-			</p:input>
-			<p:input port="manifest" select="/*/opf:manifest">
 				<p:pipe step="package-doc" port="result"/>
 			</p:input>
 			<p:with-option name="reserved-prefixes" select="$reserved-prefixes"/>

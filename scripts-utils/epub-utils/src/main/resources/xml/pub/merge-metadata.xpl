@@ -11,13 +11,13 @@
 
 	<p:input port="source" sequence="true" primary="true">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			<p>A set of <code>metadata</code> documents in the OPF namespace</p>
-		</p:documentation>
-	</p:input>
-
-	<p:input port="manifest">
-		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			<p>The <code>manifest</code> document</p>
+			<p>A set of <code>metadata</code> or <code>package</code> documents in the OPF
+			namespace.</p>
+			<p>When a document is a <code>package</code> element, it may also contain a
+			<code>manifest</code> element, in which case elements from the <code>metadata</code>
+			element may "refine" elements from the manifest. It is assumed that the manifest is the
+			same as the one of the final package document. It makes most sense if at most one of the
+			documents on the 'source' port has a manifest.</p>
 		</p:documentation>
 	</p:input>
 
@@ -33,9 +33,9 @@
 	<p:output port="result">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>A single <code>metadata</code> document in the OPF namespace, containing the merged
-			metadata. When the same metadata (the same property) exists in multiple input documents,
-			the first occurences win. Elements that are not valid OPF 3 metadata elements are
-			removed.</p>
+			metadata, and possibly having a <code>prefix</code> attribute. When the same metadata
+			(the same property) exists in multiple input documents, the first occurences
+			win. Elements that are not valid OPF 3 metadata elements are removed.</p>
 		</p:documentation>
 	</p:output>
 
@@ -49,17 +49,13 @@
 		<!-- wrap input documents in a common root element (the name of the wrapper is insignificant) -->
 	</p:wrap-sequence>
 
-	<px:epub3-merge-prefix name="metadata-with-single-prefix-attribute">
+	<px:epub3-merge-prefix>
 		<p:with-option name="implicit-output-prefixes" select="$reserved-prefixes">
 			<p:empty/>
 		</p:with-option>
 	</px:epub3-merge-prefix>
 
 	<p:xslt>
-		<p:input port="source">
-			<p:pipe step="metadata-with-single-prefix-attribute" port="result"/>
-			<p:pipe step="main" port="manifest"/>
-		</p:input>
 		<p:input port="stylesheet">
 			<p:document href="create-metadata.merge.xsl"/>
 		</p:input>

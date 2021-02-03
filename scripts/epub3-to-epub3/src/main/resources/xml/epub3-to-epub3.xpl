@@ -33,8 +33,8 @@ You may alternatively use the "mimetype" document if your input is a unzipped/"e
             <p px:role="desc" xml:space="preserve">Metadata to be included in the EPUB.
 
 If specified, the document must be a single
-[`metadata`](https://www.w3.org/publishing/epub3/epub-packages.html#sec-metadata-elem) element in
-the OPF namespace. A
+[`metadata`](https://www.w3.org/publishing/epub3/epub-packages.html#sec-metadata-elem) or
+[`package`](https://www.w3.org/publishing/epub3/epub-packages.html#sec-package-elem) element. A
 [`prefix`](https://www.w3.org/publishing/epub3/epub-packages.html#sec-prefix-attr) attribute is
 allowed on the root element. The metadata will be injected in the EPUB's package document, possibly
 overwriting existing metadata. This works as follows:

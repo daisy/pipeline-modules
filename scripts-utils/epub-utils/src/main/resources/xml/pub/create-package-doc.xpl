@@ -313,9 +313,6 @@
                 <p:pipe step="main" port="metadata"/>
                 <p:pipe step="default-metadata" port="result"/>
             </p:input>
-            <p:input port="manifest">
-                <p:pipe step="manifest" port="result"/>
-            </p:input>
             <p:with-option name="reserved-prefixes" select="$reserved-prefixes">
                 <p:empty/>
             </p:with-option>

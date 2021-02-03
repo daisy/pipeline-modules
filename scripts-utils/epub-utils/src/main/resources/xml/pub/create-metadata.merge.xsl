@@ -25,12 +25,6 @@
     <xsl:key name="unified-id" match="//meta[@id]|//dc:*[@id]" use="f:unified-id(@id)"/>
     <xsl:key name="unified-refines" match="//meta[@refines]" use="f:unified-id(@refines)"/>
 
-    <xsl:template match="/">
-        <xsl:apply-templates select="/*">
-            <xsl:with-param tunnel="yes" name="manifest" select="collection()[2]"/>
-        </xsl:apply-templates>
-    </xsl:template>
-
     <xsl:template match="/*" priority="1">
         <xsl:variable name="prefix-attr" as="element(f:vocab)*" select="f:parse-prefix-decl(@prefix)"/>
         <xsl:variable name="implicit-prefixes" as="element(f:vocab)*"
@@ -50,7 +44,6 @@
         <xsl:param name="prefix-attr" as="element(f:vocab)*" tunnel="yes" required="yes"/>
         <xsl:param name="implicit-prefixes" as="element(f:vocab)*" tunnel="yes" required="yes"/>
         <xsl:param name="vocabs" as="element(f:vocab)*" tunnel="yes" required="yes"/>
-        <xsl:param name="manifest" tunnel="yes" as="document-node()?" select="()"/>
         <metadata>
             <xsl:namespace name="dc" select="'http://purl.org/dc/elements/1.1/'"/>
             <xsl:variable name="dcterms-vocab" as="element(f:vocab)"
@@ -78,7 +71,7 @@
             <xsl:if test="$log-conflicts='true'">
                 <xsl:variable name="new-value" as="xs:string" select="f:serialize-value($first-group)"/>
                 <xsl:for-each-group select="$titles except $first-group"
-                                    group-by="count(ancestor::metadata/preceding-sibling::*)">
+                                    group-by="count(ancestor::metadata/preceding::metadata)">
                     <xsl:variable name="value" as="xs:string"
                                   select="f:serialize-value(current-group())"/>
                     <xsl:if test="$value!=$new-value">
@@ -99,7 +92,7 @@
             <xsl:if test="$log-conflicts='true'">
                 <xsl:variable name="new-value" as="xs:string" select="f:serialize-value($first-group)"/>
                 <xsl:for-each-group select="$identifiers except $first-group"
-                                    group-by="count(ancestor::metadata/preceding-sibling::*)">
+                                    group-by="count(ancestor::metadata/preceding::metadata)">
                     <xsl:variable name="value" as="xs:string"
                                   select="f:serialize-value(current-group())"/>
                     <xsl:if test="$value!=$new-value">
@@ -120,7 +113,7 @@
             <xsl:if test="$log-conflicts='true'">
                 <xsl:variable name="new-value" as="xs:string" select="f:serialize-value($first-group)"/>
                 <xsl:for-each-group select="$languages except $first-group"
-                                    group-by="count(ancestor::metadata/preceding-sibling::*)">
+                                    group-by="count(ancestor::metadata/preceding::metadata)">
                     <xsl:variable name="value" as="xs:string"
                                   select="f:serialize-value(current-group())"/>
                     <xsl:if test="$value!=$new-value">
@@ -174,7 +167,7 @@
                     <xsl:variable name="new-value" as="xs:string"
                                   select="f:serialize-value($first-group)"/>
                     <xsl:for-each-group select="current-group() except $first-group"
-                                        group-by="count(ancestor::metadata/preceding-sibling::*)">
+                                        group-by="count(ancestor::metadata/preceding::metadata)">
                         <xsl:variable name="value" as="xs:string"
                                       select="f:serialize-value(current-group())"/>
                         <xsl:if test="$value!=$new-value">
@@ -226,7 +219,7 @@
                                         <xsl:variable name="new-value" as="xs:string"
                                                       select="f:serialize-value($first-group-processed[not(@refines)])"/>
                                         <xsl:for-each-group select="$discarded"
-                                                            group-by="count(ancestor::metadata/preceding-sibling::*)">
+                                                            group-by="count(ancestor::metadata/preceding::metadata)">
                                             <xsl:variable name="value" as="xs:string"
                                                           select="f:serialize-value(current-group())"/>
                                             <xsl:if test="$value!=$new-value">
@@ -258,15 +251,18 @@
                 </xsl:choose>
             </xsl:for-each-group>
 
-            <!-- process meta that refine manifest items -->
-            <xsl:apply-templates select="//meta[replace(@refines,'^#','')=$manifest//item/@id]">
-                <xsl:with-param name="copy-refines" tunnel="yes" select="true()"/>
-            </xsl:apply-templates>
+            <!-- process meta that refine manifest items within the same package document -->
+            <xsl:for-each select="//metadata">
+                <xsl:variable name="manifest" as="element(opf:manifest)?" select="parent::package/manifest"/>
+                <xsl:apply-templates select="meta[replace(@refines,'^#','')=$manifest//item/@id]">
+                    <xsl:with-param name="copy-refines" tunnel="yes" select="true()"/>
+                </xsl:apply-templates>
 
-            <xsl:for-each select="//meta[@refines][not(replace(@refines,'^#','')=$manifest//item/@id) and
-                                                   not(exists(key('unified-id',f:unified-id(@refines))))]">
-                <xsl:message>[WARNING] Discarding property '<xsl:value-of select="@property"
-                />' with broken refines attribute '<xsl:value-of select="@refines"/>'.</xsl:message>
+                <xsl:for-each select="meta[@refines][not(replace(@refines,'^#','')=$manifest//item/@id) and
+                                      not(exists(key('unified-id',f:unified-id(@refines))))]">
+                    <xsl:message>[WARNING] Discarding property '<xsl:value-of select="@property"
+                    />' with broken refines attribute '<xsl:value-of select="@refines"/>'.</xsl:message>
+                </xsl:for-each>
             </xsl:for-each>
 
             <xsl:apply-templates select="//link"/>
@@ -403,7 +399,7 @@
     -->
     <xsl:function name="f:unified-id" as="xs:string">
         <xsl:param name="id" as="attribute()?"/>
-        <xsl:variable name="count" select="count($id/ancestor::metadata/preceding-sibling::*)"
+        <xsl:variable name="count" select="count($id/ancestor::metadata/preceding::metadata)"
             as="xs:integer"/>
         <xsl:sequence
             select="concat(if (starts-with($id,'#')) then substring($id,2) else $id, if ($count) then $count+1 else '')"
