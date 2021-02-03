@@ -19,11 +19,11 @@
 		</p:documentation>
 	</p:input>
 
-	<p:input port="metadata">
+	<p:input port="metadata" sequence="true">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			<p>A <a
+			<p>A set of <a
 			href="https://www.w3.org/publishing/epub3/epub-packages.html#sec-metadata-elem"><code>opf:metadata</code></a>
-			or <code>opf:package</code> element. In case of the former, a <a
+			or <code>opf:package</code> documents. In case of the former, a <a
 			href="https://www.w3.org/publishing/epub3/epub-packages.html#sec-prefix-attr"><code>prefix</code></a>
 			attribute is allowed on the root element. <code>refines</code> attributes must reference
 			an element within the document itself.</p>
@@ -37,7 +37,8 @@
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>The result fileset</p>
 			<p>A copy of the source fileset with the updated package document with the existing and
-			new metadata merged.</p>
+			new metadata merged. When the same metadata (the same property) exists in multiple input
+			metadata documents, the first occurences win.</p>
 		</p:documentation>
 		<p:pipe step="updated-package-doc" port="result"/>
 		<p:pipe step="filter-package-doc" port="not-matched.in-memory"/>
@@ -59,6 +60,8 @@
 			used but not declared in the input are also not declared in the output.</p>
 		</p:documentation>
 	</p:option>
+
+	<p:option name="log-conflicts" required="false" select="'true'"/>
 
 	<p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
 		<p:documentation>
@@ -106,11 +109,12 @@
 				<p:pipe step="package-doc" port="result"/>
 			</p:input>
 			<p:with-option name="reserved-prefixes" select="$reserved-prefixes"/>
+			<p:with-option name="log-conflicts" select="$log-conflicts"/>
 		</pxi:merge-metadata>
-		<!--
-		    Add OPF 2 metadata. Note that all OPF 2 metadata that was already present has been
-		    removed by the previous step.
-		-->
+		<p:documentation>For compatibility with OPF 2, add a second meta element with "name" and
+		"content" attributes for every meta element.</p:documentation>
+		<!-- Note that all OPF 2 metadata that was already present has been
+		     removed by the previous step. -->
 		<p:choose>
 			<p:when test="$compatibility-mode='true'">
 				<pxi:opf3-to-opf2-metadata compatibility-mode="true"/>
