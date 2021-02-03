@@ -192,7 +192,7 @@
 					<d:fileset>
 						<d:file href="result/mimetype" media-type="text/plain" compression-method="stored"/>
 						<d:file href="result/META-INF/container.xml" media-type="application/xml"/>
-						<d:file href="result/EPUB/package.opf" media-type="application/oebps-package+xml"/>
+						<d:file href="result/EPUB/package.opf" media-type="application/oebps-package+xml" indent="true"/>
 						<d:file href="result/EPUB/nav.xhtml" media-type="application/xhtml+xml"/>
 						<d:file href="result/EPUB/cover.xhtml" media-type="application/xhtml+xml"/>
 						<d:file href="result/EPUB/front.xhtml" media-type="application/xhtml+xml"/>
@@ -489,7 +489,7 @@
 					<d:fileset>
 						<d:file href="result/mimetype" media-type="text/plain" compression-method="stored"/>
 						<d:file href="result/META-INF/container.xml" media-type="application/xml"/>
-						<d:file href="result/EPUB/package.opf" media-type="application/oebps-package+xml"/>
+						<d:file href="result/EPUB/package.opf" media-type="application/oebps-package+xml" indent="true"/>
 						<d:file href="result/EPUB/nav.xhtml" media-type="application/xhtml+xml"/>
 						<d:file href="result/EPUB/cover.xhtml" media-type="application/xhtml+xml"/>
 						<d:file href="result/EPUB/front.xhtml" media-type="application/xhtml+xml"/>
@@ -626,7 +626,7 @@
 					<d:fileset>
 						<d:file href="result/mimetype" media-type="text/plain" compression-method="stored"/>
 						<d:file href="result/META-INF/container.xml" media-type="application/xml"/>
-						<d:file href="result/EPUB/package.opf" media-type="application/oebps-package+xml"/>
+						<d:file href="result/EPUB/package.opf" media-type="application/oebps-package+xml" indent="true"/>
 						<d:file href="result/EPUB/nav.xhtml" media-type="application/xhtml+xml"/>
 						<d:file href="result/EPUB/cover.xhtml" media-type="application/xhtml+xml"/>
 						<d:file href="result/EPUB/front.xhtml" media-type="application/xhtml+xml"/>
@@ -737,7 +737,7 @@
 						        original-href="../resources/valentin.epub!/mimetype"/>
 						<d:file href="result/EPUB/C00000-1-cover.xhtml" media-type="application/xhtml+xml"
 						        original-href="../resources/valentin.epub!/EPUB/C00000-1-cover.xhtml"/>
-						<d:file href="result/EPUB/package.opf" media-type="application/oebps-package+xml"
+						<d:file href="result/EPUB/package.opf" media-type="application/oebps-package+xml" indent="true"
 						        original-href="../resources/valentin.epub!/EPUB/package.opf"/>
 						<d:file href="result/EPUB/nav.xhtml" media-type="application/xhtml+xml"
 						        original-href="../resources/valentin.epub!/EPUB/nav.xhtml"/>
@@ -797,7 +797,7 @@
 						<d:file href="result/EPUB/C00000-9-footnotes_braille.css" media-type="text/plain"/>
 						<d:file href="result/EPUB/nav_braille.css" media-type="text/plain"/>
 						<d:file href="result/META-INF/metadata.xml"/>
-						<d:file href="result/EPUB/package-braille.opf" media-type="application/oebps-package+xml"/>
+						<d:file href="result/EPUB/package-braille.opf" media-type="application/oebps-package+xml" indent="true"/>
 						<d:file href="result/EPUB/renditionMapping.html" indent="true"/>
 					</d:fileset>
 				</x:document>
@@ -1000,7 +1000,7 @@
 						<d:file href="result/mimetype" compression-method="stored"
 						        original-href="../resources/valentin.epub!/mimetype"/>
 						<d:file href="result/EPUB/C00000-1-cover.xhtml" media-type="application/xhtml+xml"/>
-						<d:file href="result/EPUB/package.opf" media-type="application/oebps-package+xml"/>
+						<d:file href="result/EPUB/package.opf" media-type="application/oebps-package+xml" indent="true"/>
 						<d:file href="result/EPUB/nav.xhtml" media-type="application/xhtml+xml"
 						        original-href="../resources/valentin.epub!/EPUB/nav.xhtml"/>
 						<d:file href="result/EPUB/nav.ncx" media-type="application/x-dtbncx+xml"

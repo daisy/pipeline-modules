@@ -951,5 +951,11 @@
             </p:group>
         </p:otherwise>
     </p:choose>
-    
+
+    <!--
+        Pretty print package documents
+    -->
+    <p:add-attribute match="d:file[@media-type='application/oebps-package+xml']"
+                     attribute-name="indent" attribute-value="true"/>
+
 </p:declare-step>
