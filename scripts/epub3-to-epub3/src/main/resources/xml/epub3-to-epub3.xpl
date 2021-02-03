@@ -57,6 +57,10 @@ There are a number of fields that result in addional changes in the EPUB (apart 
   first one with a `refines` attribute will be used to update the
   [`unique-identifier`](https://www.w3.org/publishing/epub3/epub-packages.html#attrdef-package-unique-identifier)
   attribute on the package document.
+- If the provided metadata document contains exactly one
+  [`dc:language`](https://www.w3.org/publishing/epub3/epub-packages.html#sec-opf-dclanguage) field,
+  it can be used to update the `xml:lang` and `lang` attributes of the content documents. This
+  behavior can be enabled or disabled with the "Update 'lang' attributes based on metadata" option.
 
 Some fields are ignored:
 
@@ -66,6 +70,21 @@ Some fields are ignored:
         </p:documentation>
         <p:empty/>
     </p:input>
+
+    <p:option name="update-lang-attributes" required="false" px:type="boolean" select="'false'">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <h2 px:role="name">Update 'lang' attributes based on metadata</h2>
+            <p px:role="desc" xml:space="preserve">Whether to update 'lang' and 'xml:lang' attributes of content documents based on metadata in the package document.
+
+If there is exactly one
+[`dc:language`](https://www.w3.org/publishing/epub3/epub-packages.html#sec-opf-dclanguage) element,
+use its value to create `xml:lang` and `lang` attributes on the root elements of all content
+documents (overwriting any existing attributes)
+
+If the "Metadata" option is used to inject new metadata into the EPUB, the resulting metadata is
+used to generate the attributes.</p>
+        </p:documentation>
+    </p:option>
 
     <p:option name="braille" required="false" px:type="boolean" select="'true'">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -211,6 +230,7 @@ specific.
         <p:with-option name="braille" select="$braille"/>
         <p:with-option name="tts" select="$tts"/>
         <p:with-option name="sentence-detection" select="$sentence-detection"/>
+        <p:with-option name="update-lang-attributes" select="$update-lang-attributes"/>
         <p:input port="tts-config">
             <p:pipe step="main" port="tts-config"/>
         </p:input>

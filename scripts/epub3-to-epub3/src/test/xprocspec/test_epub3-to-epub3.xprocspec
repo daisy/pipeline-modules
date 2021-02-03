@@ -603,6 +603,7 @@
 			<x:call>
 				<x:option name="tts" select="false()"/>
 				<x:option name="sentence-detection" select="false()"/>
+				<x:option name="update-lang-attributes" select="true()"/>
 				<x:input port="metadata">
 					<x:document xmlns="http://www.idpf.org/2007/opf" type="inline">
 						<metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
@@ -613,6 +614,7 @@
 							<meta property="schema:accessModeSufficient">textual,visual</meta>
 							<meta property="schema:accessModeSufficient">textual</meta>
 							<meta property="schema:accessibilityFeature">pageNavigation</meta>
+							<dc:language>en-GB</dc:language>
 						</metadata>
 					</x:document>
 				</x:input>
@@ -640,11 +642,11 @@
 			<x:expect label="package.opf" type="custom"
 			          href="http://www.daisy.org/pipeline/modules/epub-utils/library.xpl" step="x:epub3-compare-package-doc">
 				<x:document type="inline">
-					<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="pub-id" xml:lang="en">
+					<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="pub-id" xml:lang="en-GB">
 						<metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
 							<dc:title id="title2">minimal</dc:title>
 							<dc:identifier id="pub-id">new-id</dc:identifier>
-							<dc:language>en</dc:language>
+							<dc:language>en-GB</dc:language>
 							<meta property="dcterms:modified">2021-02-01T16:03:09Z</meta>
 							<meta name="dcterms:modified" content="2021-02-01T16:03:09Z"/>
 							<dc:creator id="creator">Bert</dc:creator>
@@ -669,6 +671,24 @@
 							<itemref idref="chapter"/>
 						</spine>
 					</package>
+				</x:document>
+			</x:expect>
+			<x:context label="cover.xhtml">
+				<x:document type="port" port="epub.out.in-memory" select="/*[base-uri()=resolve-uri('result/EPUB/cover.xhtml')]"/>
+			</x:context>
+			<x:expect label="cover.xhtml" type="compare">
+				<x:document type="inline">
+					<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB" lang="en-GB">
+						<head>
+							<meta charset="UTF-8" />
+							<title>minimal</title>
+							<meta name="dc:identifier" content="id"/>
+							<link rel="next" href="front.xhtml" />
+						</head>
+						<body id="cover" epub:type="cover">
+							<p>...</p>
+						</body>
+					</html>
 				</x:document>
 			</x:expect>
 		</x:scenario>
