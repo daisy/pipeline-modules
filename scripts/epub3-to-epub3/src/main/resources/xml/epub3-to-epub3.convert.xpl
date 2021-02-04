@@ -32,6 +32,7 @@
         </p:documentation>
     </p:option>
     <p:option name="update-lang-attributes" required="false" select="'false'"/>
+    <p:option name="ensure-pagenum-text" required="false" select="'false'"/>
     <p:option name="braille" required="false" select="'true'"/>
     <p:option name="tts" required="false" select="'default'"/>
     <p:option name="sentence-detection" required="false" select="'false'"/>
@@ -94,6 +95,7 @@
             px:epub3-create-mediaoverlays
             px:epub3-add-mediaoverlays
             px:epub3-add-metadata
+            px:epub3-label-pagebreaks-from-nav
             px:opf-spine-to-fileset
         </p:documentation>
     </p:import>
@@ -333,6 +335,68 @@
     </p:choose>
 
     <!--
+        Page number fixes
+    -->
+    <p:group name="fix-pagenum">
+        <p:output port="fileset" primary="true"/>
+        <p:output port="in-memory" sequence="true">
+            <p:pipe step="update" port="result.in-memory"/>
+        </p:output>
+        <!--
+            Read navigation document and label page break elements with epub:type="pagebreak" if
+            missing (and also add title attribute if missing)
+        -->
+        <px:epub3-label-pagebreaks-from-nav name="label-pagebreaks-from-nav">
+            <p:input port="source.in-memory">
+                <p:pipe step="update-lang-attributes" port="in-memory"/>
+            </p:input>
+        </px:epub3-label-pagebreaks-from-nav>
+        <px:fileset-load media-types="application/xhtml+xml" name="html">
+            <p:input port="in-memory">
+                <p:pipe step="label-pagebreaks-from-nav" port="result.in-memory"/>
+            </p:input>
+        </px:fileset-load>
+        <p:for-each name="fixed-html">
+            <p:output port="result"/>
+            <!--
+                Convert DPUB-ARIA role="doc-pagebreak" to epub:type="pagebreak"
+            -->
+            <p:label-elements match="*[@role='doc-pagebreak']" attribute="epub:type" replace="true"
+                              label="string-join(distinct-values((@epub:type/tokenize(.,'\s+')[not(.='')],'pagebreak')),' ')"/>
+            <!--
+                Generate text for empty page numbers
+            -->
+            <p:choose name="ensure-pagenum-text">
+                <p:when test="$ensure-pagenum-text=('true','hidden')">
+                    <p:xslt>
+                        <p:input port="stylesheet">
+                            <p:document href="ensure-pagenum-text.xsl"/>
+                        </p:input>
+                        <p:with-param name="hidden" select="$ensure-pagenum-text='hidden'"/>
+                    </p:xslt>
+                </p:when>
+                <p:otherwise>
+                    <p:identity/>
+                </p:otherwise>
+            </p:choose>
+        </p:for-each>
+        <px:fileset-update name="update">
+            <p:input port="source.fileset">
+                <p:pipe step="label-pagebreaks-from-nav" port="result.fileset"/>
+            </p:input>
+            <p:input port="source.in-memory">
+                <p:pipe step="label-pagebreaks-from-nav" port="result.in-memory"/>
+            </p:input>
+            <p:input port="update.fileset">
+                <p:pipe step="html" port="result.fileset"/>
+            </p:input>
+            <p:input port="update.in-memory">
+                <p:pipe step="fixed-html" port="result"/>
+            </p:input>
+        </px:fileset-update>
+    </p:group>
+
+    <!--
         Perform TTS or only sentence detection or nothing
     -->
     <p:group name="add-mediaoverlays" px:progress="1/2">
@@ -350,7 +414,7 @@
         <p:delete match="d:file[preceding::d:file]"/>
         <px:fileset-load name="package-document">
             <p:input port="in-memory">
-                <p:pipe step="update-lang-attributes" port="in-memory"/>
+                <p:pipe step="fix-pagenum" port="in-memory"/>
             </p:input>
         </px:fileset-load>
         <p:choose name="skip-if-disabled" px:progress="1">
@@ -383,15 +447,15 @@
                     <!-- don't perform TTS on documents that are not in spine -->
                     <px:opf-spine-to-fileset name="spine">
                         <p:input port="source.fileset">
-                            <p:pipe step="update-lang-attributes" port="fileset"/>
+                            <p:pipe step="fix-pagenum" port="fileset"/>
                         </p:input>
                         <p:input port="source.in-memory">
-                            <p:pipe step="update-lang-attributes" port="in-memory"/>
+                            <p:pipe step="fix-pagenum" port="in-memory"/>
                         </p:input>
                     </px:opf-spine-to-fileset>
                     <px:tts-for-epub3 name="do-tts" audio="true" px:progress="1">
                         <p:input port="source.in-memory">
-                            <p:pipe step="update-lang-attributes" port="in-memory"/>
+                            <p:pipe step="fix-pagenum" port="in-memory"/>
                         </p:input>
                         <p:input port="config">
                             <p:pipe step="main" port="tts-config"/>
@@ -401,10 +465,10 @@
                     <p:sink/>
                     <px:fileset-update name="update">
                         <p:input port="source.fileset">
-                            <p:pipe step="update-lang-attributes" port="fileset"/>
+                            <p:pipe step="fix-pagenum" port="fileset"/>
                         </p:input>
                         <p:input port="source.in-memory">
-                            <p:pipe step="update-lang-attributes" port="in-memory"/>
+                            <p:pipe step="fix-pagenum" port="in-memory"/>
                         </p:input>
                         <p:input port="update.fileset">
                             <p:pipe step="do-tts" port="result.fileset"/>
@@ -472,15 +536,15 @@
                 </p:output>
                 <px:opf-spine-to-fileset name="spine">
                     <p:input port="source.fileset">
-                        <p:pipe step="update-lang-attributes" port="fileset"/>
+                        <p:pipe step="fix-pagenum" port="fileset"/>
                     </p:input>
                     <p:input port="source.in-memory">
-                        <p:pipe step="update-lang-attributes" port="in-memory"/>
+                        <p:pipe step="fix-pagenum" port="in-memory"/>
                     </p:input>
                 </px:opf-spine-to-fileset>
                 <px:fileset-load media-types="application/xhtml+xml" name="html">
                     <p:input port="in-memory">
-                        <p:pipe step="update-lang-attributes" port="in-memory"/>
+                        <p:pipe step="fix-pagenum" port="in-memory"/>
                     </p:input>
                 </px:fileset-load>
                 <p:for-each name="sentence-detection" px:progress="1">
@@ -502,10 +566,10 @@
                 <p:sink/>
                 <px:fileset-update name="update">
                     <p:input port="source.fileset">
-                        <p:pipe step="update-lang-attributes" port="fileset"/>
+                        <p:pipe step="fix-pagenum" port="fileset"/>
                     </p:input>
                     <p:input port="source.in-memory">
-                        <p:pipe step="update-lang-attributes" port="in-memory"/>
+                        <p:pipe step="fix-pagenum" port="in-memory"/>
                     </p:input>
                     <p:input port="update.fileset">
                         <p:pipe step="html" port="result.fileset"/>
@@ -518,7 +582,7 @@
             <p:otherwise>
                 <p:output port="fileset" primary="true"/>
                 <p:output port="in-memory" sequence="true">
-                    <p:pipe step="update-lang-attributes" port="in-memory"/>
+                    <p:pipe step="fix-pagenum" port="in-memory"/>
                 </p:output>
                 <p:output port="temp-audio.fileset">
                     <p:inline><d:fileset/></p:inline>
@@ -528,7 +592,7 @@
                 </p:output>
                 <p:identity>
                     <p:input port="source">
-                        <p:pipe step="update-lang-attributes" port="fileset"/>
+                        <p:pipe step="fix-pagenum" port="fileset"/>
                     </p:input>
                 </p:identity>
             </p:otherwise>

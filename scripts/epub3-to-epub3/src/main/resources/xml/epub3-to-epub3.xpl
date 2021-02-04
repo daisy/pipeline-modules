@@ -86,6 +86,35 @@ used to generate the attributes.</p>
         </p:documentation>
     </p:option>
 
+    <p:option name="ensure-pagenum-text" required="false" select="'false'">
+        <p:pipeinfo>
+            <px:type>
+                <choice xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
+                    <value>true</value>
+                    <a:documentation xml:lang="en">Yes</a:documentation>
+                    <value>false</value>
+                    <a:documentation xml:lang="en">No</a:documentation>
+                    <value>hidden</value>
+                    <a:documentation xml:lang="en">Yes, but not visible</a:documentation>
+                </choice>
+            </px:type>
+        </p:pipeinfo>
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <h2 px:role="name">Ensure text content for page numbers</h2>
+            <p px:role="desc" xml:space="preserve">Whether to fix empty page number elements.
+
+Page number elements (elements with a `doc-pagebreak` `role` or `pagebreak` `epub:type`) that have
+no child text node can be given one. The text can be generated based on
+
+- the element's `aria-label` attribute,
+- the element's `title` attribute, or
+- the text used by the corresponding page link in the navigation document.
+
+These options are tried in the listed order. If none of the attributes exist, and the page is linked
+from the navigation document, no text is generated.</p>
+        </p:documentation>
+    </p:option>
+
     <p:option name="braille" required="false" px:type="boolean" select="'true'">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h2 px:role="name">Translate to braille</h2>
@@ -231,6 +260,7 @@ specific.
         <p:with-option name="tts" select="$tts"/>
         <p:with-option name="sentence-detection" select="$sentence-detection"/>
         <p:with-option name="update-lang-attributes" select="$update-lang-attributes"/>
+        <p:with-option name="ensure-pagenum-text" select="$ensure-pagenum-text"/>
         <p:input port="tts-config">
             <p:pipe step="main" port="tts-config"/>
         </p:input>
