@@ -3,15 +3,17 @@
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:f="functions"
+                xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
                 xmlns="http://www.w3.org/1999/xhtml"
                 xpath-default-namespace="http://www.w3.org/1999/xhtml"
                 exclude-result-prefixes="#all">
 
 	<xsl:param name="fix-heading-ranks" required="yes"/> <!-- keep | outline-depth -->
 	<xsl:param name="fix-sectioning" required="yes"/>    <!-- keep | outline-depth | no-implied -->
-	<xsl:param name="fix-untitled-sections" required="yes"/> <!-- keep | imply-heading -->
+	<xsl:param name="fix-untitled-sections" required="yes"/> <!-- keep | imply-heading | imply-heading-from-aria-label -->
 
 	<xsl:include href="untitled-section-titles.xsl"/>
+	<xsl:include href="http://www.daisy.org/pipeline/modules/common-utils/generate-id.xsl"/>
 
 	<!--
 	    * d:outline correspond with body|article|aside|nav|section
@@ -36,7 +38,7 @@
 	<xsl:key name="owner" match="d:section[@owner]" use="@owner"/>
 
 	<xsl:template match="*[@id=$root-outline/@owner]"> <!-- body -->
-		<xsl:variable name="body" as="element()">
+		<xsl:variable name="body" as="element(body)">
 			<xsl:choose>
 				<xsl:when test="$fix-heading-ranks='outline-depth'">
 					<xsl:apply-templates mode="rename-headings" select="."/>
@@ -49,7 +51,7 @@
 		<xsl:variable name="body" as="element()">
 			<xsl:for-each select="$body">
 				<xsl:choose>
-					<xsl:when test="$fix-untitled-sections='imply-heading'">
+					<xsl:when test="$fix-untitled-sections=('imply-heading','imply-heading-from-aria-label')">
 						<xsl:apply-templates mode="add-implied-headings" select="."/>
 					</xsl:when>
 					<xsl:otherwise>
@@ -542,6 +544,16 @@
 		</xsl:choose>
 	</xsl:template>
 
+	<xsl:template mode="add-implied-headings" match="body" priority="1">
+		<xsl:call-template name="pf:next-match-with-generated-ids">
+			<xsl:with-param name="prefix" select="'aria_label_'"/>
+			<xsl:with-param name="for-elements" select="(self::*|.//article|.//aside|.//nav|.//section)
+			                                            [@aria-label]
+			                                            [not(key('owner',@id,$root-outline)/@heading)]"/>
+			<xsl:with-param name="in-use" select=".//@id"/>
+		</xsl:call-template>
+	</xsl:template>
+
 	<xsl:template mode="add-implied-headings" match="body|article|aside|nav|section">
 		<xsl:if test="not(exists(@id))">
 			<xsl:message terminate="yes">coding error</xsl:message>
@@ -554,16 +566,33 @@
 			<xsl:when test="$section/@heading">
 				<xsl:next-match/>
 			</xsl:when>
+			<xsl:when test="$fix-untitled-sections='imply-heading-from-aria-label' and not(@aria-label)">
+				<xsl:next-match/>
+			</xsl:when>
 			<xsl:otherwise>
 				<xsl:copy>
-					<xsl:apply-templates mode="#current" select="@*"/>
+					<xsl:apply-templates mode="#current" select="@* except @aria-label"/>
 					<xsl:variable name="outline-depth" as="xs:integer"
 					              select="min((6,count($section/ancestor-or-self::d:section)))"/>
-					<xsl:element name="h{$outline-depth}">
-						<xsl:call-template name="get-untitled-section-title">
-							<xsl:with-param name="sectioning-element" select="."/>
-						</xsl:call-template>
-					</xsl:element>
+					<xsl:choose>
+						<xsl:when test="@aria-label">
+							<xsl:variable name="label-id" as="attribute(id)">
+								<xsl:call-template name="pf:generate-id"/>
+							</xsl:variable>
+							<xsl:attribute name="aria-labelledby" select="$label-id"/>
+							<xsl:element name="h{$outline-depth}">
+								<xsl:sequence select="$label-id"/>
+								<xsl:value-of select="@aria-label"/>
+							</xsl:element>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:element name="h{$outline-depth}">
+								<xsl:call-template name="get-untitled-section-title">
+									<xsl:with-param name="sectioning-element" select="."/>
+								</xsl:call-template>
+							</xsl:element>
+						</xsl:otherwise>
+					</xsl:choose>
 					<xsl:apply-templates mode="#current"/>
 				</xsl:copy>
 			</xsl:otherwise>

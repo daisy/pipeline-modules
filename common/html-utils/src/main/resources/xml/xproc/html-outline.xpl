@@ -118,6 +118,12 @@
 			<dl>
 				<dt>imply-heading</dt>
 				<dd>Insert heading elements. The rank is determined by the outline depth.</dd>
+				<dt>imply-heading-from-aria-label</dt>
+				<dd>Same as 'imply-heading' but only use <a
+				href="https://www.w3.org/TR/wai-aria/#aria-label"><code>aria-label</code></a>
+				attributes on sectioning elements to derive the headings from, don't generate
+				"dummy" headings. The <code>aria-label</code> is replaced with a <a
+				href="https://www.w3.org/TR/wai-aria/#aria-labelledby"><code>aria-labelledby</code></a>.</dd>
 				<dt>keep</dt>
 				<dd>Don't insert heading elements. Default value.</dd>
 			</dl>
@@ -163,7 +169,7 @@
 	<p:choose>
 		<p:when test="$fix-sectioning=('outline-depth','no-implied')
 		              or $fix-heading-ranks='outline-depth'
-		              or $fix-untitled-sections='imply-heading'">
+		              or $fix-untitled-sections=('imply-heading','imply-heading-from-aria-label')">
 			<p:xslt>
 				<p:input port="source">
 					<p:pipe step="html-with-ids" port="result"/>
