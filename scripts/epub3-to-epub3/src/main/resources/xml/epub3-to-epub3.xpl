@@ -115,6 +115,20 @@ from the navigation document, no text is generated.</p>
         </p:documentation>
     </p:option>
 
+    <p:option name="ensure-section-headings" required="false" px:type="boolean" select="'false'">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <h2 px:role="name">Ensure headings for all sections</h2>
+            <p px:role="desc" xml:space="preserve">Whether to generate a heading element for sections that don't have one.
+
+For sectioning elements that don't have a heading element, one can be created. The headings are
+generated based on the section element's [`aria-label`](https://www.w3.org/TR/wai-aria/#aria-label)
+attribute. If the `aria-label` attribute is not present, no heading element is generated. When an
+`aria-label` is used to generate a heading, it is replaced with a
+[`aria-labelledby`](https://www.w3.org/TR/wai-aria/#aria-labelledby) attribute that points to the
+new heading.</p>
+        </p:documentation>
+    </p:option>
+
     <p:option name="braille" required="false" px:type="boolean" select="'true'">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h2 px:role="name">Translate to braille</h2>
@@ -261,6 +275,7 @@ specific.
         <p:with-option name="sentence-detection" select="$sentence-detection"/>
         <p:with-option name="update-lang-attributes" select="$update-lang-attributes"/>
         <p:with-option name="ensure-pagenum-text" select="$ensure-pagenum-text"/>
+        <p:with-option name="ensure-section-headings" select="$ensure-section-headings"/>
         <p:input port="tts-config">
             <p:pipe step="main" port="tts-config"/>
         </p:input>

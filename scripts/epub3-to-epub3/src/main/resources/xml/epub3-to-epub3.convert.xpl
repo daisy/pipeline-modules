@@ -33,6 +33,7 @@
     </p:option>
     <p:option name="update-lang-attributes" required="false" select="'false'"/>
     <p:option name="ensure-pagenum-text" required="false" select="'false'"/>
+    <p:option name="ensure-section-headings" required="false" select="'false'"/>
     <p:option name="braille" required="false" select="'true'"/>
     <p:option name="tts" required="false" select="'default'"/>
     <p:option name="sentence-detection" required="false" select="'false'"/>
@@ -87,6 +88,11 @@
             px:fileset-load
             px:fileset-filter
             px:fileset-update
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
+        <p:documentation>
+            px:html-outline
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/epub-utils/library.xpl">
@@ -335,6 +341,63 @@
     </p:choose>
 
     <!--
+        Add missing headings
+    -->
+    <p:choose name="add-missing-headings">
+        <p:when test="$ensure-section-headings='true'">
+            <p:output port="fileset" primary="true"/>
+            <p:output port="in-memory" sequence="true">
+                <p:pipe step="update" port="result.in-memory"/>
+            </p:output>
+            <px:fileset-load media-types="application/xhtml+xml" name="html">
+                <p:input port="in-memory">
+                    <p:pipe step="update-lang-attributes" port="in-memory"/>
+                </p:input>
+            </px:fileset-load>
+            <p:for-each name="fixed-html">
+                <p:output port="result"/>
+                <p:choose>
+                    <p:when test="(//html:body|//html:section|//html:nav|//html:article|//html:aside)/@aria-label">
+                        <px:html-outline name="fix-untitled-sections"
+                                         fix-untitled-sections="imply-heading-from-aria-label"
+                                         output-base-uri="file:/irrelevant"/>
+                        <p:sink/>
+                        <p:identity>
+                            <p:input port="source">
+                                <p:pipe step="fix-untitled-sections" port="content-doc"/>
+                            </p:input>
+                        </p:identity>
+                    </p:when>
+                    <p:otherwise>
+                        <p:identity/>
+                    </p:otherwise>
+                </p:choose>
+            </p:for-each>
+            <px:fileset-update name="update">
+                <p:input port="source.fileset">
+                    <p:pipe step="update-lang-attributes" port="fileset"/>
+                </p:input>
+                <p:input port="source.in-memory">
+                    <p:pipe step="update-lang-attributes" port="in-memory"/>
+                </p:input>
+                <p:input port="update.fileset">
+                    <p:pipe step="html" port="result.fileset"/>
+                </p:input>
+                <p:input port="update.in-memory">
+                    <p:pipe step="fixed-html" port="result"/>
+                </p:input>
+            </px:fileset-update>
+        </p:when>
+        <p:otherwise>
+            <p:output port="fileset" primary="true"/>
+            <p:output port="in-memory" sequence="true">
+                <p:pipe step="update-lang-attributes" port="in-memory"/>
+            </p:output>
+            <p:identity/>
+        </p:otherwise>
+    </p:choose>
+
+    <!--
         Page number fixes
     -->
     <p:group name="fix-pagenum">
@@ -348,7 +411,7 @@
         -->
         <px:epub3-label-pagebreaks-from-nav name="label-pagebreaks-from-nav">
             <p:input port="source.in-memory">
-                <p:pipe step="update-lang-attributes" port="in-memory"/>
+                <p:pipe step="add-missing-headings" port="in-memory"/>
             </p:input>
         </px:epub3-label-pagebreaks-from-nav>
         <px:fileset-load media-types="application/xhtml+xml" name="html">

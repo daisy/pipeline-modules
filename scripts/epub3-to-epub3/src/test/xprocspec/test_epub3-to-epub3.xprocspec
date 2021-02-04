@@ -134,8 +134,7 @@
 								<table>...</table>
 								<div id="page_front_4" class="page-front" epub:type="pagebreak" title="iv"/>
 							</section>
-							<section id="preface">
-								<h2 id="h_1_2">Preface</h2>
+							<section id="preface" aria-label="Preface">
 								<p>...</p>
 								<div id="page_front_5" class="page-front"/>
 							</section>
@@ -164,6 +163,7 @@
 					</html>
 				</x:document>
 			</x:input>
+			<x:option name="ensure-section-headings" select="'true'"/>
 			<x:option name="braille" select="false()"/>
 			<x:option name="braille-translator" select="''"/>
 			<x:option name="stylesheet" select="''"/>
@@ -338,8 +338,8 @@
 									<span id="st2-4"/>
 								</div>
 							</section>
-							<section id="preface">
-								<h2 id="h_1_2">
+							<section id="preface" aria-labelledby="aria_label_1">
+								<h2 id="aria_label_1">
 									<span id="st2-5">Preface</span>
 								</h2>
 								<p>
@@ -437,7 +437,7 @@
 								</seq>
 							</seq>
 							<seq epub:textref="../front.xhtml#preface">
-								<seq epub:textref="../front.xhtml#h_1_2">
+								<seq epub:textref="../front.xhtml#aria_label_1">
 									<par>
 										<text src="../front.xhtml#st2-5"/>
 										<audio src="../audio/mock.mp3" clipBegin="0:00:01.223" clipEnd="0:00:02.446"/>
