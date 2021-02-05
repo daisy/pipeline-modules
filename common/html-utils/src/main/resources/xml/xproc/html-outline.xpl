@@ -53,9 +53,10 @@
 		<p:pipe step="normalize" port="result"/>
 	</p:output>
 
-	<p:option name="output-base-uri" required="true">
+	<p:option name="output-base-uri" required="false" select="''">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>The base URI of the resulting outline.</p>
+			<p>May be omitted if the outline output is not used.</p>
 		</p:documentation>
 	</p:option>
 	<p:option name="heading-links-only" select="'false'">
@@ -162,8 +163,10 @@
 		<p:with-param name="heading-links-only" select="$heading-links-only"/>
 		<p:with-param name="fix-untitled-sections-in-outline"
 		              select="($fix-untitled-sections[.='imply-heading'],$fix-untitled-sections-in-outline)[1]"/>
-		<p:with-param name="output-base-uri" select="$output-base-uri"/>
-		<p:with-option name="output-base-uri" select="$output-base-uri"/>
+		<p:with-param name="output-base-uri"
+		              select="if ($output-base-uri!='') then $output-base-uri else base-uri(/*)"/>
+		<p:with-option name="output-base-uri"
+		               select="if ($output-base-uri!='') then $output-base-uri else base-uri(/*)"/>
 	</p:xslt>
 	<p:sink/>
 

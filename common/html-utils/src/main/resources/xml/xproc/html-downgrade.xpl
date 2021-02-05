@@ -27,7 +27,7 @@
 	</p:import>
 
 	<p:documentation>Normalize the heading ranks to match their respective outline depth.</p:documentation>
-	<px:html-outline name="outline" fix-heading-ranks="outline-depth" output-base-uri="file:/irrelevant"/>
+	<px:html-outline name="outline" fix-heading-ranks="outline-depth"/>
 	<p:sink/>
 
 	<p:xslt>

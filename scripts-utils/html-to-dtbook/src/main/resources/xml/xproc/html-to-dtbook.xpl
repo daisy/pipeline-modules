@@ -97,7 +97,6 @@
             Add missing sectioning elements so that there are no implied sections
         -->
         <px:html-outline fix-sectioning="no-implied" name="fix-sectioning"
-                         output-base-uri="file:/tmp/irrelevant.html"
                          px:progress="1/4"/>
         <p:sink/>
         <!--
@@ -128,8 +127,7 @@
         -->
         <p:choose px:progress="1/4">
             <p:when test="$imply-headings='true'">
-                <px:html-outline fix-untitled-sections="imply-heading" name="fix-untitled-sections"
-                                 output-base-uri="file:/tmp/irrelevant.html"/>
+                <px:html-outline fix-untitled-sections="imply-heading" name="fix-untitled-sections"/>
                 <p:sink/>
                 <p:identity>
                     <p:input port="source">
