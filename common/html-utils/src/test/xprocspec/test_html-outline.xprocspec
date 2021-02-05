@@ -584,27 +584,77 @@
 					</html>
 				</x:document>
 			</x:input>
-			<x:option name="fix-heading-ranks" select="'outline-depth'"/>
 			<x:option name="toc-output-base-uri" select="'file:/tmp/toc.xhtml'"/>
 		</x:call>
-		<x:context label="the result port">
-			<x:document type="port" port="result"/>
-		</x:context>
-		<x:expect label="the result with added sections" type="compare">
-			<x:document type="inline" xmlns="http://www.w3.org/1999/xhtml">
-				<html xmlns="http://www.w3.org/1999/xhtml">
-					<body id="id_1">
-						<h1 id="id_2"/>
-						<h2 id="id_3"/>
-						<h2 id="id_4"/>
-						<section id="id_5">
-							<h2 id="id_6"/>
-						</section>
-						<h1 id="id_7"/>
-					</body>
-				</html>
-			</x:document>
-		</x:expect>
+		<x:scenario label="outline-depth">
+			<x:call>
+				<x:option name="fix-heading-ranks" select="'outline-depth'"/>
+			</x:call>
+			<x:context label="the result port">
+				<x:document type="port" port="result"/>
+			</x:context>
+			<x:expect label="the result with added sections" type="compare">
+				<x:document type="inline" xmlns="http://www.w3.org/1999/xhtml">
+					<html xmlns="http://www.w3.org/1999/xhtml">
+						<body id="id_1">
+							<h1 id="id_2"/>
+							<h2 id="id_3"/>
+							<h2 id="id_4"/>
+							<section id="id_5">
+								<h2 id="id_6"/>
+							</section>
+							<h1 id="id_7"/>
+						</body>
+					</html>
+				</x:document>
+			</x:expect>
+		</x:scenario>
+		<x:scenario label="toc-depth">
+			<x:call>
+				<x:option name="fix-heading-ranks" select="'toc-depth'"/>
+				<x:input port="input-toc">
+					<x:document type="inline" xml:base="file:/tmp/nav.xhtml" xmlns="http://www.w3.org/1999/xhtml">
+						<ol>
+							<li>
+								<a href="foo.xhtml#id_2"></a>
+								<ol>
+									<li>
+										<a href="foo.xhtml#id_3"></a>
+									</li>
+									<li>
+										<a href="foo.xhtml#id_4"></a>
+									</li>
+									<li>
+										<a href="foo.xhtml#id_5"></a>
+									</li>
+								</ol>
+							</li>
+							<li>
+								<a href="foo.xhtml#id_7"></a>
+							</li>
+						</ol>
+					</x:document>
+				</x:input>
+			</x:call>
+			<x:context label="the result port">
+				<x:document type="port" port="result"/>
+			</x:context>
+			<x:expect label="the result with added sections" type="compare">
+				<x:document type="inline" xmlns="http://www.w3.org/1999/xhtml">
+					<html xmlns="http://www.w3.org/1999/xhtml">
+						<body id="id_1">
+							<h1 id="id_2"/>
+							<h2 id="id_3"/>
+							<h2 id="id_4"/>
+							<section id="id_5">
+								<h2 id="id_6"/>
+							</section>
+							<h1 id="id_7"/>
+						</body>
+					</html>
+				</x:document>
+			</x:expect>
+		</x:scenario>
 	</x:scenario>
 
 	<x:scenario label="heading-links-only option">

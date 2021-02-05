@@ -2,7 +2,7 @@
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
-                type="px:html-outline">
+                type="px:html-outline" name="main">
 
 	<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 		<p>Apply the <a
@@ -16,11 +16,23 @@
 		table of contents, or to rename heading elements according to their outline depth.</p>
 	</p:documentation>
 	
-	<p:input port="source">
+	<p:input port="source" primary="true">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">HTML document</h2>
 			<p px:role="desc">The HTML document from which the outline must be extracted.</p>
 		</p:documentation>
+	</p:input>
+	<p:input port="input-toc" sequence="true">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<h2 px:role="name">Table of contents</h2>
+			<p px:role="desc">A table of contents referencing some sections or headings in the
+			source document. Only required if the "fix-heading-ranks" option is set to "toc-depth"
+			(and not more than one document is allowed). The table of contents should be formatted
+			as the <code>ol</code> element from a <a
+			href="https://www.w3.org/publishing/epub3/epub-packages.html#sec-package-nav-def-model">EPUB
+			<code>&lt;nav epub:type="toc"&gt;</code> element</a>.</p>
+		</p:documentation>
+		<p:empty/>
 	</p:input>
 
 	<p:output port="result" primary="true">
@@ -40,7 +52,9 @@
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">The outline in HTML format</h2>
 			<p px:role="desc">The outline of the HTML document as a <code>ol</code> element. Can be
-			used directly as a table of contents.</p>
+			used directly to include in a <a
+			href="https://www.w3.org/publishing/epub3/epub-packages.html#sec-package-nav-def-model">EPUB
+			<code>&lt;nav epub:type="toc"&gt;</code> element</a>.</p>
 		</p:documentation>
 		<p:pipe step="outline" port="result"/>
 	</p:output>
@@ -66,9 +80,9 @@
 			<code>h5</code>, <code>h6</code> or <code>hgroup</code>) or whether they may also
 			reference sectioning elements (<code>body</code>, <code>article</code>,
 			<code>aside</code>, <code>nav</code> or <code>section</code>). If this option is set to
-			"true" and the "fix-untitled-sections-in-outline" option is set to "imply-heading", the
-			outline will contain generated section titles but they will be <code>span</code>s, not
-			<code>a</code>s.</p>
+			"true", "fix-untitled-sections" is "keep" and "fix-untitled-sections-in-outline" is
+			"imply-heading", the outline will contain generated section titles but they will be
+			<code>span</code>s, not <code>a</code>s.</p>
 		</p:documentation>
 	</p:option>
 	<p:option name="fix-heading-ranks" select="'keep'">
@@ -82,6 +96,11 @@
 				<dd>The rank must match the <a
 				href="https://html.spec.whatwg.org/multipage/sections.html#outline-depth">outline
 				depth</a> of the heading (or 6 if the depth is higher).</dd>
+				<dt>toc-depth</dt>
+				<dd>The rank of a heading is set to the number of ancestor <code>ol</code> elements
+				of the <code>a</code> element in the "input-toc" document that references the
+				heading or the sectioning content element associated with the heading. If the
+				heading is not referenced in the table of contents, the rank is 1.</dd>
 				<dt>keep</dt>
 				<dd>Don't rename heading elements. Default value.</dd>
 			</dl>
@@ -118,8 +137,8 @@
 			element</a> for sections that don't have one.</p>
 			<dl>
 				<dt>imply-heading</dt>
-				<dd>Insert heading elements. The rank is determined by the outline depth if
-				"fix-heading-ranks" option is "outline-depth". Otherwise the rank is 1.</dd>
+				<dd>Insert heading elements. The rank is determined by the "fix-heading-ranks"
+				option, whereby "keep" is treated as "toc-depth".</dd>
 				<dt>imply-heading-from-aria-label</dt>
 				<dd>Same as 'imply-heading' but only use <a
 				href="https://www.w3.org/TR/wai-aria/#aria-label"><code>aria-label</code></a>
@@ -146,11 +165,25 @@
 		</p:documentation>
 	</p:option>
 
+	<p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
+		<p:documentation>
+			px:assert
+		</p:documentation>
+	</p:import>
 	<p:import href="html-add-ids.xpl">
 		<p:documentation>
 			px:html-add-ids
 		</p:documentation>
 	</p:import>
+
+	<p:choose>
+		<p:when test="$fix-heading-ranks='toc-depth'">
+			<px:assert test-count-min="1" test-count-max="1" message="Exactly one document expected on 'toc' port"/>
+		</p:when>
+		<p:otherwise>
+			<p:identity/>
+		</p:otherwise>
+	</p:choose>
 
 	<p:documentation>Add ID attributes</p:documentation>
 	<px:html-add-ids name="html-with-ids"/>
@@ -172,12 +205,13 @@
 
 	<p:choose>
 		<p:when test="$fix-sectioning=('outline-depth','no-implied')
-		              or $fix-heading-ranks='outline-depth'
+		              or $fix-heading-ranks=('outline-depth','toc-depth')
 		              or $fix-untitled-sections=('imply-heading','imply-heading-from-aria-label')">
 			<p:xslt>
 				<p:input port="source">
 					<p:pipe step="html-with-ids" port="result"/>
 					<p:pipe step="outline" port="secondary"/>
+					<p:pipe step="main" port="input-toc"/>
 				</p:input>
 				<p:input port="stylesheet">
 					<p:document href="../xslt/html5-normalize-sections-headings.xsl"/>

@@ -358,13 +358,49 @@
                 <p:output port="result"/>
                 <p:choose>
                     <p:when test="(//html:body|//html:section|//html:nav|//html:article|//html:aside)/@aria-label">
-                        <px:html-outline fix-untitled-sections="imply-heading-from-aria-label"/>
+                        <px:html-outline fix-untitled-sections="imply-heading-from-aria-label">
+                            <p:input port="input-toc">
+                                <p:pipe step="toc" port="result"/>
+                            </p:input>
+                        </px:html-outline>
                     </p:when>
                     <p:otherwise>
                         <p:identity/>
                     </p:otherwise>
                 </p:choose>
             </p:for-each>
+            <p:sink/>
+            <p:group name="toc">
+                <p:output port="result"/>
+                <p:identity>
+                    <p:input port="source">
+                        <p:pipe step="update-lang-attributes" port="fileset"/>
+                    </p:input>
+                </p:identity>
+                <p:choose>
+                    <p:when test="exists(//d:file[@role='nav'])">
+                        <px:fileset-load>
+                            <p:input port="in-memory">
+                                <p:pipe step="update-lang-attributes" port="in-memory"/>
+                            </p:input>
+                            <p:with-option name="href" select="//d:file[@role='nav'][1]/@href"/>
+                        </px:fileset-load>
+                        <p:add-xml-base>
+                            <!-- Not sure why this is needed. Omitted this triggers a base URI error
+                                 in px:html-outline. Bug? -->
+                        </p:add-xml-base>
+                        <p:filter select="//html:nav[tokenize(@epub:type,'\s+')='toc'][1]/html:ol"/>
+                    </p:when>
+                    <p:otherwise>
+                        <p:identity>
+                            <p:input port="source">
+                                <p:empty/>
+                            </p:input>
+                        </p:identity>
+                    </p:otherwise>
+                </p:choose>
+            </p:group>
+            <p:sink/>
             <px:fileset-update name="update">
                 <p:input port="source.fileset">
                     <p:pipe step="update-lang-attributes" port="fileset"/>

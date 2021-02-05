@@ -125,7 +125,8 @@ generated based on the section element's [`aria-label`](https://www.w3.org/TR/wa
 attribute. If the `aria-label` attribute is not present, no heading element is generated. When an
 `aria-label` is used to generate a heading, it is replaced with a
 [`aria-labelledby`](https://www.w3.org/TR/wai-aria/#aria-labelledby) attribute that points to the
-new heading.</p>
+new heading. The rank of the generated heading matches the depth of the corresponding TOC item in
+the navigation document.</p>
         </p:documentation>
     </p:option>
 
