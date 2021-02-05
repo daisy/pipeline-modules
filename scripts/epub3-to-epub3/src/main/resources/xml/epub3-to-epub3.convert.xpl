@@ -358,14 +358,7 @@
                 <p:output port="result"/>
                 <p:choose>
                     <p:when test="(//html:body|//html:section|//html:nav|//html:article|//html:aside)/@aria-label">
-                        <px:html-outline name="fix-untitled-sections"
-                                         fix-untitled-sections="imply-heading-from-aria-label"/>
-                        <p:sink/>
-                        <p:identity>
-                            <p:input port="source">
-                                <p:pipe step="fix-untitled-sections" port="content-doc"/>
-                            </p:input>
-                        </p:identity>
+                        <px:html-outline fix-untitled-sections="imply-heading-from-aria-label"/>
                     </p:when>
                     <p:otherwise>
                         <p:identity/>

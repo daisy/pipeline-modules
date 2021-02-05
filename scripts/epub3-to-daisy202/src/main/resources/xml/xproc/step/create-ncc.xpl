@@ -483,10 +483,16 @@
                     wrapper="section" wrapper-namespace="http://www.w3.org/1999/xhtml">
                 <!-- hack to get "Untitled section" rather than "Untitled document" -->
             </p:wrap>
-            <px:html-outline fix-untitled-sections-in-outline="imply-heading" heading-links-only="true">
-                <p:with-option name="output-base-uri" select="$ncc-base-uri"/>
+            <px:html-outline fix-untitled-sections-in-outline="imply-heading" heading-links-only="true"
+                             name="html-outline">
+                <p:with-option name="toc-output-base-uri" select="$ncc-base-uri"/>
             </px:html-outline>
-            <p:filter select="/html:ol/html:li/html:ol"/>
+            <p:sink/>
+            <p:filter select="/html:ol/html:li/html:ol">
+                <p:input port="source">
+                    <p:pipe step="html-outline" port="toc"/>
+                </p:input>
+            </p:filter>
         </p:for-each>
         <p:wrap-sequence wrapper="body" wrapper-namespace="http://www.w3.org/1999/xhtml"/>
         <px:set-base-uri name="outline">

@@ -25,7 +25,20 @@
 
 	<p:output port="result" primary="true">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			<h2 px:role="name">The outline</h2>
+			<h2 px:role="name">The modified HTML document.</h2>
+			<p px:role="desc">Depending on the values of the "fix-heading-ranks", "fix-sectioning"
+			and "fix-untitled-sections" options, heading elements may be inserted or renamed and
+			section elements may be inserted, but the outline is guaranteed to be unchanged.</p>
+			<p px:role="desc">All <code>body</code>, <code>article</code>, <code>aside</code>,
+			<code>nav</code>, <code>section</code>, <code>h1</code>, <code>h2</code>,
+			<code>h3</code>, <code>h4</code>, <code>h5</code>, <code>h6</code> and
+			<code>hgroup</code> elements get an <code>id</code> attribute.</p>
+		</p:documentation>
+		<p:pipe step="normalize" port="result"/>
+	</p:output>
+	<p:output port="toc">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<h2 px:role="name">The outline in HTML format</h2>
 			<p px:role="desc">The outline of the HTML document as a <code>ol</code> element. Can be
 			used directly as a table of contents.</p>
 		</p:documentation>
@@ -39,24 +52,11 @@
 		</p:documentation>
 		<p:pipe step="raw-outline" port="result"/>
 	</p:output>
-	<p:output port="content-doc">
-		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			<h2 px:role="name">The modified HTML document.</h2>
-			<p px:role="desc">Depending on the values of the "fix-heading-ranks", "fix-sectioning"
-			and "fix-untitled-sections" options, heading elements may be inserted or renamed and
-			section elements may be inserted, but the outline is guaranteed to be unchanged.</p>
-			<p px:role="desc">All <code>body</code>, <code>article</code>, <code>aside</code>,
-			<code>nav</code>, <code>section</code>, <code>h1</code>, <code>h2</code>,
-			<code>h3</code>, <code>h4</code>, <code>h5</code>, <code>h6</code> and
-			<code>hgroup</code> elements get an <code>id</code> attribute.</p>
-		</p:documentation>
-		<p:pipe step="normalize" port="result"/>
-	</p:output>
 
-	<p:option name="output-base-uri" required="false" select="''">
+	<p:option name="toc-output-base-uri" required="false" select="''">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			<p>The base URI of the resulting outline.</p>
-			<p>May be omitted if the outline output is not used.</p>
+			<p>The base URI of the resulting TOC document.</p>
+			<p>May be omitted if the "toc" output is not used.</p>
 		</p:documentation>
 	</p:option>
 	<p:option name="heading-links-only" select="'false'">
@@ -164,9 +164,9 @@
 		<p:with-param name="fix-untitled-sections-in-outline"
 		              select="($fix-untitled-sections[.='imply-heading'],$fix-untitled-sections-in-outline)[1]"/>
 		<p:with-param name="output-base-uri"
-		              select="if ($output-base-uri!='') then $output-base-uri else base-uri(/*)"/>
+		              select="if ($toc-output-base-uri!='') then $toc-output-base-uri else base-uri(/*)"/>
 		<p:with-option name="output-base-uri"
-		               select="if ($output-base-uri!='') then $output-base-uri else base-uri(/*)"/>
+		               select="if ($toc-output-base-uri!='') then $toc-output-base-uri else base-uri(/*)"/>
 	</p:xslt>
 	<p:sink/>
 
