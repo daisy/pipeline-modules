@@ -753,11 +753,11 @@
 						<body id="id_1">
 							<h1>Untitled document</h1>
 							<section id="id_2">
-								<h2>Untitled section</h2>
+								<h1>Untitled section</h1>
 								<p/>
 							</section>
 							<section id="id_3" aria-labelledby="aria_label_1">
-								<h2 id="aria_label_1">My chapter</h2>
+								<h1 id="aria_label_1">My chapter</h1>
 								<p/>
 							</section>
 						</body>
@@ -800,7 +800,7 @@
 								<p/>
 							</section>
 							<section id="id_3" aria-labelledby="aria_label_1">
-								<h2 id="aria_label_1">My chapter</h2>
+								<h1 id="aria_label_1">My chapter</h1>
 								<p/>
 							</section>
 						</body>

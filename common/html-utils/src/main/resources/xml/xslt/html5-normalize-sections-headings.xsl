@@ -573,7 +573,9 @@
 				<xsl:copy>
 					<xsl:apply-templates mode="#current" select="@* except @aria-label"/>
 					<xsl:variable name="outline-depth" as="xs:integer"
-					              select="min((6,count($section/ancestor-or-self::d:section)))"/>
+					              select="if ($fix-heading-ranks='outline-depth')
+					                      then min((6,count($section/ancestor-or-self::d:section)))
+					                      else 1"/>
 					<xsl:choose>
 						<xsl:when test="@aria-label">
 							<xsl:variable name="label-id" as="attribute(id)">

@@ -117,7 +117,8 @@
 			element</a> for sections that don't have one.</p>
 			<dl>
 				<dt>imply-heading</dt>
-				<dd>Insert heading elements. The rank is determined by the outline depth.</dd>
+				<dd>Insert heading elements. The rank is determined by the outline depth if
+				"fix-heading-ranks" option is "outline-depth". Otherwise the rank is 1.</dd>
 				<dt>imply-heading-from-aria-label</dt>
 				<dd>Same as 'imply-heading' but only use <a
 				href="https://www.w3.org/TR/wai-aria/#aria-label"><code>aria-label</code></a>
