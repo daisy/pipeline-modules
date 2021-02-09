@@ -18,7 +18,7 @@
 	<!--
 	    API: implement xsl:template match="css:block"
 	-->
-	<xsl:template mode="#default after before" match="css:block">
+	<xsl:template match="css:block">
 		<xsl:message terminate="yes">Coding error</xsl:message>
 	</xsl:template>
 	
@@ -224,43 +224,36 @@
 			<xsl:sequence select="$style[matches(@selector,'^@text-transform')]"/>
 			<xsl:apply-templates mode="translate-style" select="$style[@selector
 			                                                           and not(@selector=('&amp;::before','&amp;::after'))
-			                                                           and not(matches(@selector,'^@text-transform'))]">
-				<xsl:with-param name="restore-text-style" tunnel="yes" select="true()"/>
-			</xsl:apply-templates>
+			                                                           and not(matches(@selector,'^@text-transform'))]"/>
 		</xsl:variable>
 		<xsl:apply-templates mode="insert-style" select="$translated-style"/>
 	</xsl:template>
 	
 	<xsl:template mode="translate-style"
-	              match="css:rule[@selector=('&amp;::before','&amp;::after')]|
-	                     css:rule[@selector=('&amp;::before','&amp;::after')]/css:rule[not(@selector)]">
-		<xsl:param name="restore-text-style" as="xs:boolean" tunnel="yes" select="false()"/>
+	              match="css:rule[matches(@selector,'^&amp;::(after|before)')]
+	                             [css:property[@name='content']/*[not(self::css:string[@value]|self::css:attr)]]|
+	                     css:rule[matches(@selector,'^&amp;::(after|before)')]
+	                             /css:rule[not(@selector)]
+	                             [css:property[@name='content']/*[not(self::css:string[@value]|self::css:attr)]]">
 		<xsl:next-match>
 			<!--
-			    Don't pre-translate when the content property has other values that strings or
+			    Don't pre-translate when the content property has other values than strings or
 			    attr() values.
 			-->
-			<xsl:with-param name="restore-text-style" tunnel="yes"
-			                select="$restore-text-style
-			                        or css:property[@name='content']/*[not(self::css:string[@value]|self::css:attr)]"/>
+			<xsl:with-param name="restore-text-style" tunnel="yes" select="true()"/>
 		</xsl:next-match>
 	</xsl:template>
 	
 	<xsl:template mode="translate-style" match="css:rule">
-		<xsl:param name="mode" as="xs:string" tunnel="yes" select="'#default'"/>
 		<xsl:param name="source-style" as="element()*" tunnel="yes"/> <!-- css:property* -->
 		<xsl:param name="restore-text-style" as="xs:boolean" tunnel="yes" select="false()"/>
 		<xsl:copy>
 			<xsl:sequence select="@selector"/>
-			<xsl:variable name="mode" as="xs:string" select="if (@selector='&amp;::before') then 'before'
-			                                                 else if (@selector='&amp;::after') then 'after'
-			                                                 else $mode"/>
 			<xsl:variable name="translated-style" as="element()*">
 				<xsl:choose>
 					<xsl:when test="css:rule">
 						<xsl:call-template name="translate-style">
 							<xsl:with-param name="style" select="css:rule"/>
-							<xsl:with-param name="mode" tunnel="yes" select="$mode"/>
 						</xsl:call-template>
 					</xsl:when>
 					<xsl:otherwise>
@@ -277,14 +270,12 @@
 								<xsl:variable name="properties" as="element()*" select="css:property"/>
 								<xsl:apply-templates mode="restore-text-style-and-translate-other-style"
 								                     select="($properties,$source-style[not(@name=$properties/@name)])">
-									<xsl:with-param name="mode" tunnel="yes" select="$mode"/>
 									<xsl:with-param name="source-style" tunnel="yes"
 									                select="($source-style,$properties[@name='content'])"/>
 								</xsl:apply-templates>
 							</xsl:when>
 							<xsl:otherwise>
 								<xsl:apply-templates mode="#current" select="css:property">
-									<xsl:with-param name="mode" tunnel="yes" select="$mode"/>
 									<xsl:with-param name="source-style" tunnel="yes" select="$source-style"/>
 								</xsl:apply-templates>
 							</xsl:otherwise>
@@ -415,11 +406,14 @@
 		                                              else 'none')"/>
 	</xsl:template>
 	
+	<!--
+	    FIXME: Pass context when translating segments of a single content property. If possible also
+	    pass context when translating inline pseudo-elements.
+	-->
 	<xsl:template mode="translate-style" match="css:string[@value]|css:attr" as="element()?">
 		<xsl:param name="context" as="element()" tunnel="yes"/>
 		<xsl:param name="source-style" as="element()*" tunnel="yes"/> <!-- css:property* -->
 		<xsl:param name="result-style" as="element()*" tunnel="yes"/> <!-- css:property* -->
-		<xsl:param name="mode" as="xs:string" tunnel="yes"/> <!-- before|after -->
 		<xsl:variable name="evaluated-string" as="xs:string">
 			<xsl:apply-templates mode="css:eval" select=".">
 				<xsl:with-param name="context" select="$context"/>
@@ -437,25 +431,11 @@
 		<xsl:variable name="source-style" as="element()*" select="$source-style"/>
 		<xsl:variable name="result-style" as="element()*" select="$result-style"/>
 		<xsl:variable name="translated-block" as="node()*">
-			<xsl:choose>
-				<xsl:when test="$mode='before'">
-					<xsl:apply-templates mode="before" select="$block/css:block">
-						<xsl:with-param name="context" select="$context"/>
-						<xsl:with-param name="source-style" tunnel="yes" select="$source-style"/>
-						<xsl:with-param name="result-style" tunnel="yes" select="$result-style"/>
-					</xsl:apply-templates>
-				</xsl:when>
-				<xsl:when test="$mode='after'">
-					<xsl:apply-templates mode="after" select="$block/css:block">
-						<xsl:with-param name="context" select="$context"/>
-						<xsl:with-param name="source-style" tunnel="yes" select="$source-style"/>
-						<xsl:with-param name="result-style" tunnel="yes" select="$result-style"/>
-					</xsl:apply-templates>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:sequence select="$block/css:block"/>
-				</xsl:otherwise>
-			</xsl:choose>
+			<xsl:apply-templates select="$block/css:block">
+				<xsl:with-param name="context" select="$context"/>
+				<xsl:with-param name="source-style" tunnel="yes" select="$source-style"/>
+				<xsl:with-param name="result-style" tunnel="yes" select="$result-style"/>
+			</xsl:apply-templates>
 		</xsl:variable>
 		<css:string value="{string-join($translated-block/string(.),'')}"/>
 	</xsl:template>
