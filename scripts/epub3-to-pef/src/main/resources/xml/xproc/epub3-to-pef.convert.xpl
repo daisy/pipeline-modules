@@ -222,7 +222,6 @@
                     select="string-join((
                               resolve-uri('../xslt/generate-toc.xsl'),
                               (tokenize($abs-stylesheet,'\s+')[not(.='')])[position()&lt;$first-css-stylesheet-index],
-                              'http://www.daisy.org/pipeline/modules/braille/html-to-pef/volume-breaking.xsl',
                               if ($default-stylesheet!='#default')
                                 then $default-stylesheet
                                 else resolve-uri('../../css/default.css'),
