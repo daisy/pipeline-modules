@@ -928,10 +928,6 @@
                       <value>${project.build.directory}/webserver</value>
                     </systemProperty>
                     <systemProperty>
-                      <key>org.daisy.pipeline.iobase</key>
-                      <value>${project.build.directory}/webserver/jobs</value>
-                    </systemProperty>
-                    <systemProperty>
                       <key>org.daisy.pipeline.persistence</key>
                       <value>true</value>
                     </systemProperty>
