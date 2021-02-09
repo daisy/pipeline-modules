@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- ==================================================================== -->
-<!-- There are 3 copies of this file:                                     -->
-<!-- * scripts/dtbook-to-pef/src/main/resources/xml/xslt/generate-toc.xsl -->
-<!-- * scripts/html-to-pef/src/main/resources/xml/xslt/generate-toc.xsl   -->
-<!-- * scripts/epub3-to-pef/src/main/resources/xml/xslt/generate-toc.xsl  -->
-<!-- Whenever you update this file, also update the other copies.         -->
-<!-- ==================================================================== -->
+<!-- =============================================================== -->
+<!-- There are 2 copies of this file:                                -->
+<!-- * scripts/dtbook-to-pef/src/main/resources/css/generate-toc.xsl -->
+<!-- * scripts/html-to-pef/src/main/resources/css/generate-toc.xsl   -->
+<!-- Whenever you update this file, also update the other copies.    -->
+<!-- =============================================================== -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:pf="http://www.daisy.org/ns/pipeline/functions"

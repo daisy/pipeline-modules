@@ -25,7 +25,7 @@
                     </html>
                 </x:document>
             </x:input>
-            <x:option name="stylesheets" select="'../../main/resources/xml/xslt/generate-toc.xsl'"/>
+            <x:option name="stylesheets" select="'../../main/resources/css/generate-toc.xsl'"/>
             <x:param port="parameters" name="toc-depth" select="2"/>
         </x:call>
         <x:context label="result">

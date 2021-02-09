@@ -220,7 +220,6 @@
                     select="(index-of(tokenize($abs-stylesheet,'\s+')[not(.='')], $first-css-stylesheet),10000)[1]"/>
         <p:variable name="stylesheets-to-be-inlined"
                     select="string-join((
-                              resolve-uri('../xslt/generate-toc.xsl'),
                               (tokenize($abs-stylesheet,'\s+')[not(.='')])[position()&lt;$first-css-stylesheet-index],
                               if ($default-stylesheet!='#default')
                                 then $default-stylesheet
