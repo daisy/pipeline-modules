@@ -9,7 +9,10 @@ $toc-depth: 0 !default;
 	 * Generate the TOC:
 	 */
 	@xslt "generate-toc.xsl" {
-		toc-depth: $toc-depth;
+		depth: $toc-depth;
+		exclude-class: $toc-exclude-class;
+		document-toc-id: "generated-document-toc";
+		volume-toc-id: "generated-volume-toc";
 	}
 	/*
 	 * ... and style it:
