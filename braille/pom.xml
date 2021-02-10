@@ -33,7 +33,6 @@
     <module>dotify-utils</module>
     <module>libhyphen-utils</module>
     <module>texhyph-utils</module>
-    <module>xml-to-pef</module>
   </modules>
   
   <!-- don't publish aggregator -->

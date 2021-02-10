@@ -110,11 +110,6 @@
         <artifactId>texhyph-utils</artifactId>
         <version>2.0.2</version>
       </dependency>
-      <dependency>
-        <groupId>org.daisy.pipeline.modules.braille</groupId>
-        <artifactId>xml-to-pef</artifactId>
-        <version>5.0.0</version>
-      </dependency>
       
       <!--
           common
@@ -324,7 +319,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>dtbook-to-pef</artifactId>
-        <version>7.1.0</version>
+        <version>7.1.1-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
@@ -369,7 +364,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>epub3-to-pef</artifactId>
-        <version>4.1.0</version>
+        <version>4.1.1-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
@@ -384,7 +379,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>html-to-pef</artifactId>
-        <version>4.1.0</version>
+        <version>4.1.1-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
@@ -404,7 +399,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>zedai-to-pef</artifactId>
-        <version>5.0.1</version>
+        <version>5.0.2-SNAPSHOT</version>
       </dependency>
       
       <!--
