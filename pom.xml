@@ -59,7 +59,6 @@
     <module>tts/css-speech</module>
     <module>tts/dtbook-tts</module>
     <module>tts/epub3-tts</module>
-    <module>tts/ssml-to-audio</module>
     <module>tts/text-to-ssml</module>
     <module>tts/tts-common</module>
     <module>tts/tts-adapters/tts-adapter-espeak</module>
