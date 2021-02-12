@@ -10,6 +10,9 @@
   <xsl:param name="special-sentences" select="''"/>
   <xsl:param name="output-ns"/>
   <xsl:param name="output-sentence-tag"/>
+  <xsl:param name="sentence-attr" select="''"/>
+  <xsl:param name="sentence-attr-val" select="''"/>
+
   <xsl:param name="exclusive-sentence-tag" select="'true'"/> <!-- false if the element can be used for another purpose -->
   <xsl:param name="exclusive-word-tag" select="'true'"/><!-- false if the element can be used for another purpose -->
   <xsl:param name="output-subsentence-tag" />
@@ -116,6 +119,11 @@
   	  <xsl:attribute name="id">
   	    <xsl:value-of select="$entry/@id"/>
   	  </xsl:attribute>
+	  <xsl:if test="$sentence-attr != ''">
+	    <xsl:attribute name="{$sentence-attr}">
+	      <xsl:value-of select="$sentence-attr-val"/>
+	    </xsl:attribute>
+	  </xsl:if>
 	  <xsl:copy-of select="@xml:lang"/> <!-- doesn't always exist -->
   	  <xsl:apply-templates select="node()" mode="inside-sentence">
   	    <xsl:with-param name="parent-name" select="$output-sentence-tag"/>

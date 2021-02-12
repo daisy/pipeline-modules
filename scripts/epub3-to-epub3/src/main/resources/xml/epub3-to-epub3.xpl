@@ -219,6 +219,16 @@ specific.
         <p:inline><d:config/></p:inline>
     </p:input>
     
+    <p:option name="sentence-class" required="false" select="''">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <h2 px:role="name">Sentence class</h2>
+            <p px:role="desc" xml:space="preserve">Class attribute to mark sentences with.
+
+When sentence detection is enabled, this option may be used to add a class attribute to the `span`
+elements that represent the sentences.</p>
+        </p:documentation>
+    </p:option>
+
     <p:option name="output-dir" required="true" px:output="result" px:type="anyDirURI">
         <p:documentation>
             <h2 px:role="name">Output EPUB 3</h2>
@@ -277,6 +287,7 @@ specific.
         <p:with-option name="update-lang-attributes" select="$update-lang-attributes"/>
         <p:with-option name="ensure-pagenum-text" select="$ensure-pagenum-text"/>
         <p:with-option name="ensure-section-headings" select="$ensure-section-headings"/>
+        <p:with-option name="sentence-class" select="$sentence-class"/>
         <p:input port="tts-config">
             <p:pipe step="main" port="tts-config"/>
         </p:input>

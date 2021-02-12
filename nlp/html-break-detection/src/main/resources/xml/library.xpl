@@ -18,6 +18,18 @@
 
     <p:option name="id-prefix" required="false" select="''"/>
 
+    <p:option name="sentence-attr" required="false" select="''">
+      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+        <p>Attribute to be added to sentence spans.</p>
+      </p:documentation>
+    </p:option>
+
+    <p:option name="sentence-attr-val" required="false" select="''">
+      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+        <p>Corresponding attribute value.</p>
+      </p:documentation>
+    </p:option>
+
     <p:import href="http://www.daisy.org/pipeline/modules/nlp-common/library.xpl">
       <p:documentation>
         px:break-and-reshape
@@ -39,6 +51,8 @@
       <p:with-option name="exclusive-sentence-tag" select="'false'"/>
       <p:with-option name="exclusive-word-tag" select="'false'"/>
       <p:with-option name="id-prefix" select="$id-prefix"/>
+      <p:with-option name="sentence-attr" select="$sentence-attr"/>
+      <p:with-option name="sentence-attr-val" select="$sentence-attr-val"/>
     </px:break-and-reshape>
 
   </p:declare-step>
