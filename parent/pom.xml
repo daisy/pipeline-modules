@@ -669,6 +669,7 @@
                 -->
                 <org.daisy.pipeline.junit.runners>OSGiLessRunner</org.daisy.pipeline.junit.runners>
               </systemPropertyVariables>
+              <trimStackTrace>false</trimStackTrace>
             </configuration>
           </plugin>
         </plugins>
