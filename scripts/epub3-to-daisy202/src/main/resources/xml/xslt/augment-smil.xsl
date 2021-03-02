@@ -167,6 +167,9 @@
                                                                            $audio-segments[$i]/@clip-end=$audio-segments[$i + 1]/@clip-begin)">
                                                     <xsl:variable name="audio-id" as="xs:string" select="replace($par-id,'par_','audio_')"/>
                                                     <par id="{$par-id}" endsync="last">
+                                                        <xsl:if test=". intersect $page-number-elements">
+                                                            <xsl:attribute name="system-required" select="'pagenumber-on'"/>
+                                                        </xsl:if>
                                                         <text id="{$text-id}" src="{pf:relativize-uri(concat($html-base-uri,'#',$id),$seq-base-uri)}"/>
                                                         <audio id="{$audio-id}"
                                                                src="{pf:relativize-uri($audio-segments[1]/pf:resolve-uri(@src,.),$seq-base-uri)}"
@@ -190,7 +193,17 @@
                                                       replaced with the pars in the seq.
                                                   -->
                                                   <seq id="{$par-id}" textref="{pf:relativize-uri(concat($html-base-uri,'#',$id),$seq-base-uri)}">
-                                                      <xsl:sequence select="$smil-segments"/>
+                                                      <xsl:choose>
+                                                          <xsl:when test=". intersect $page-number-elements">
+                                                              <xsl:for-each select="$smil-segments">
+                                                                  <xsl:attribute name="system-required" select="'pagenumber-on'"/>
+                                                                  <xsl:sequence select="@*|node()"/>
+                                                              </xsl:for-each>
+                                                          </xsl:when>
+                                                          <xsl:otherwise>
+                                                              <xsl:sequence select="$smil-segments"/>
+                                                          </xsl:otherwise>
+                                                      </xsl:choose>
                                                   </seq>
                                                 </xsl:otherwise>
                                             </xsl:choose>
@@ -208,6 +221,9 @@
                                 </xsl:when>
                                 <xsl:otherwise>
                                     <par id="{$par-id}" endsync="last">
+                                        <xsl:if test=". intersect $page-number-elements">
+                                            <xsl:attribute name="system-required" select="'pagenumber-on'"/>
+                                        </xsl:if>
                                         <text id="{$text-id}" src="{pf:relativize-uri(concat($html-base-uri,'#',$id),$seq-base-uri)}"/>
                                     </par>
                                 </xsl:otherwise>

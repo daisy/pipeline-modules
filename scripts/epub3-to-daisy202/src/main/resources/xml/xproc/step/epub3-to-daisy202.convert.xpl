@@ -91,55 +91,14 @@
     <p:sink/>
 
     <p:documentation>
-        Convert from EPUB 3 SMIL to DAISY 2.02 SMIL.
-    </p:documentation>
-    <p:group name="convert-smil" px:progress="1/5">
-        <p:output port="fileset" primary="true"/>
-        <p:output port="in-memory" sequence="true">
-            <p:pipe step="update" port="result.in-memory"/>
-        </p:output>
-        <px:fileset-load media-types="application/smil+xml" name="epub3.smil">
-            <p:documentation>
-                Load SMIL files.
-            </p:documentation>
-            <p:input port="fileset">
-                <p:pipe step="main" port="source.fileset"/>
-            </p:input>
-            <p:input port="in-memory">
-                <p:pipe step="main" port="source.in-memory"/>
-            </p:input>
-        </px:fileset-load>
-        <p:for-each px:message="Converting SMIL 3.0 to SMIL 1.0" px:progress="1">
-            <p:variable name="smil-base" select="base-uri(/*)"/>
-            <p:variable name="smil-href" select="//d:file[resolve-uri(@href,base-uri(.))=$smil-base]/@href">
-                <p:pipe step="epub3.smil" port="result.fileset"/>
-            </p:variable>
-            <px:smil-downgrade version="1.0" px:message="Processing {$smil-href}"/>
-        </p:for-each>
-        <p:identity name="daisy202.smil.in-memory"/>
-        <p:sink/>
-        <px:fileset-update name="update">
-            <p:input port="source.fileset">
-                <p:pipe step="main" port="source.fileset"/>
-            </p:input>
-            <p:input port="source.in-memory">
-                <p:pipe step="main" port="source.in-memory"/>
-            </p:input>
-            <p:input port="update.fileset">
-                <p:pipe step="epub3.smil" port="result.fileset"/>
-            </p:input>
-            <p:input port="update.in-memory">
-                <p:pipe port="result" step="daisy202.smil.in-memory"/>
-            </p:input>
-        </px:fileset-update>
-    </p:group>
-
-    <p:documentation>
         Read the "page-list" navigation and label page break elements with epub:type="pagebreak".
     </p:documentation>
     <px:epub3-label-pagebreaks-from-nav name="label-pagebreaks-from-nav">
+        <p:input port="source.fileset">
+            <p:pipe step="main" port="source.fileset"/>
+        </p:input>
         <p:input port="source.in-memory">
-            <p:pipe step="convert-smil" port="in-memory"/>
+            <p:pipe step="main" port="source.in-memory"/>
         </p:input>
     </px:epub3-label-pagebreaks-from-nav>
 
@@ -162,7 +121,7 @@
         <p:sink/>
         <px:fileset-filter media-types="application/xhtml+xml" name="epub3.xhtml">
             <p:input port="source">
-                <p:pipe step="main" port="source.fileset"/>
+                <p:pipe step="label-pagebreaks-from-nav" port="result.fileset"/>
             </p:input>
         </px:fileset-filter>
         <p:sink/>
@@ -287,13 +246,74 @@
                 <p:pipe step="filter-spine" port="result"/>
             </p:input>
             <p:input port="source.in-memory">
-                <p:pipe step="convert-smil" port="in-memory"/>
+                <p:pipe step="label-pagebreaks-from-nav" port="result.in-memory"/>
             </p:input>
             <p:input port="update.fileset">
                 <p:pipe step="epub3.xhtml" port="result.fileset"/>
             </p:input>
             <p:input port="update.in-memory">
                 <p:pipe port="result" step="daisy202.xhtml.in-memory"/>
+            </p:input>
+        </px:fileset-update>
+    </p:group>
+
+    <p:documentation>
+        Convert from EPUB 3 SMIL to DAISY 2.02 SMIL.
+    </p:documentation>
+    <p:group name="convert-smil" px:progress="1/5">
+        <p:output port="fileset" primary="true"/>
+        <p:output port="in-memory" sequence="true">
+            <p:pipe step="update" port="result.in-memory"/>
+        </p:output>
+        <px:fileset-load media-types="application/smil+xml" name="epub3.smil">
+            <p:documentation>
+                Load SMIL files.
+            </p:documentation>
+            <p:input port="in-memory">
+                <p:pipe step="convert-html" port="in-memory"/>
+            </p:input>
+        </px:fileset-load>
+        <p:for-each px:message="Converting SMIL 3.0 to SMIL 1.0" px:progress="1">
+            <p:variable name="smil-base" select="base-uri(/*)"/>
+            <p:variable name="smil-href" select="//d:file[resolve-uri(@href,base-uri(.))=$smil-base]/@href">
+                <p:pipe step="epub3.smil" port="result.fileset"/>
+            </p:variable>
+            <p:group px:progress="1" px:message="Processing {$smil-href}">
+                <p:identity name="smil-without-system-required"/>
+                <p:sink/>
+                <p:xslt>
+                    <p:documentation>
+                        Add systemRequired attributes (which will be converted to system-required)
+                    </p:documentation>
+                    <p:input port="source">
+                        <p:pipe step="smil-without-system-required" port="result"/>
+                        <p:pipe step="convert-html" port="page-list"/>
+                        <p:pipe step="convert-html" port="in-memory"/>
+                    </p:input>
+                    <p:input port="stylesheet">
+                        <p:document href="../../xslt/make-skippables.xsl"/>
+                    </p:input>
+                    <p:input port="parameters">
+                        <p:empty/>
+                    </p:input>
+                </p:xslt>
+                <px:smil-downgrade version="1.0" px:progress=".5"/>
+            </p:group>
+        </p:for-each>
+        <p:identity name="daisy202.smil.in-memory"/>
+        <p:sink/>
+        <px:fileset-update name="update">
+            <p:input port="source.fileset">
+                <p:pipe step="convert-html" port="fileset"/>
+            </p:input>
+            <p:input port="source.in-memory">
+                <p:pipe step="convert-html" port="in-memory"/>
+            </p:input>
+            <p:input port="update.fileset">
+                <p:pipe step="epub3.smil" port="result.fileset"/>
+            </p:input>
+            <p:input port="update.in-memory">
+                <p:pipe port="result" step="daisy202.smil.in-memory"/>
             </p:input>
         </px:fileset-update>
     </p:group>
@@ -333,7 +353,7 @@
     </p:documentation>
     <pxi:create-ncc name="create-ncc" px:message="Creating NCC" px:progress="2/5">
         <p:input port="source.in-memory">
-            <p:pipe step="convert-html" port="in-memory"/>
+            <p:pipe step="convert-smil" port="in-memory"/>
         </p:input>
         <p:input port="opf">
             <p:pipe step="opf" port="result"/>

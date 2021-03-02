@@ -172,7 +172,7 @@
                             <par endsync="last" id="par_1">
                                 <text id="text_1" src="content.html#id_2"/>
                             </par>
-                            <par endsync="last" id="par_2">
+                            <par endsync="last" id="par_2" system-required="pagenumber-on">
                                 <text id="text_2" src="content.html#page1"/>
                             </par>
                         </seq>
@@ -347,7 +347,7 @@
                             <par endsync="last" id="par_1">
                                 <text id="text_1" src="content.html#id_2"/>
                             </par>
-                            <par endsync="last" id="par_2">
+                            <par endsync="last" id="par_2" system-required="pagenumber-on">
                                 <text id="text_2" src="content.html#page1"/>
                             </par>
                         </seq>
