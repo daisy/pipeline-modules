@@ -37,6 +37,23 @@
 		</xsl:for-each>
 	</xsl:variable>
 
+	<xsl:variable name="note-elements" as="element()*">
+		<xsl:variable name="noteref-list" as="document-node(element(d:fileset))?" select="collection()[3]"/>
+		<xsl:for-each select="collection()/html:*">
+			<xsl:variable name="content-doc" select="."/>
+			<xsl:variable name="content-doc-uri" select="pf:normalize-uri(base-uri(.))"/>
+			<xsl:for-each select="$noteref-list//d:file[pf:normalize-uri(resolve-uri(@href,base-uri(.)))=$content-doc-uri]/d:anchor">
+				<xsl:variable name="noteref-element" as="element()?" select="key('id',@id,$content-doc)"/>
+				<!--
+				    for now only note references within the same document are supported
+				-->
+				<xsl:if test="$noteref-element/self::html:a[starts-with(@href,'#')]">
+					<xsl:sequence select="key('id',substring($noteref-element/@href,2),$content-doc)"/>
+				</xsl:if>
+			</xsl:for-each>
+		</xsl:for-each>
+	</xsl:variable>
+
 	<xsl:template match="seq[@epub:textref]">
 		<xsl:variable name="absolute-src" select="pf:normalize-uri(pf:resolve-uri(@epub:textref,base-uri(.)))"/>
 		<xsl:variable name="referenced-element" as="element()?" select="(collection()/html:*/key('absolute-id',$absolute-src))[1]"/>
@@ -44,7 +61,7 @@
 			<xsl:when test="$referenced-element intersect $page-number-elements">
 				<xsl:apply-templates mode="pagenumber-on" select="."/>
 			</xsl:when>
-			<xsl:when test="$referenced-element/@epub:type/tokenize(.,'\s+')=('footnote','endnote')">
+			<xsl:when test="$referenced-element intersect $note-elements">
 				<xsl:apply-templates mode="footnote-on" select="."/>
 			</xsl:when>
 			<xsl:otherwise>
@@ -66,7 +83,7 @@
 			<xsl:when test="$referenced-element/ancestor-or-self::* intersect $page-number-elements">
 				<xsl:apply-templates mode="pagenumber-on" select="."/>
 			</xsl:when>
-			<xsl:when test="$referenced-element/ancestor-or-self::*/@epub:type/tokenize(.,'\s+')=('footnote','endnote')">
+			<xsl:when test="$referenced-element/ancestor-or-self::* intersect $note-elements">
 				<xsl:apply-templates mode="footnote-on" select="."/>
 			</xsl:when>
 			<xsl:otherwise>

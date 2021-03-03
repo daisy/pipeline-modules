@@ -118,8 +118,8 @@
         <span>
             <xsl:variable name="value" select="if (@title) then @title
                                                else normalize-space(string-join($element//text(),' '))"/>
-            <xsl:sequence select="@class"/>
-            <xsl:if test="not(@class)">
+            <xsl:sequence select="@class[not(.='page')]"/>
+            <xsl:if test="not(@class[not(.='page')])">
                 <xsl:attribute name="class">
                     <xsl:variable name="element-class" as="xs:string*" select="$element/@class/tokenize(.,'\s+')[not(.='')]"/>
                     <xsl:choose>

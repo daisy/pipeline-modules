@@ -236,10 +236,21 @@
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
             <xsl:apply-templates select="(par,$missing-pars)">
-                <!-- pf:base-uri will return empty sequence for $missing-pars -->
+                <!--
+                    First sort by spine order.
+
+                    (pf:base-uri will return empty sequence for $missing-pars)
+                -->
                 <xsl:sort select="index-of($html[pf:base-uri(.)=current()/pf:resolve-uri(substring-before(@textref|text/@src,'#'),
                                                                                          (pf:base-uri(.),$seq-base-uri)[1])],
                                            $html)"/>
+                <!--
+                    Then sort by document order within content document.
+
+                    In case this does not match the default reading order (such as when a note body
+                    does not come right after the corresponding note ref in the content document),
+                    this is fixed in a subsequent step.
+                -->
                 <xsl:sort select="$html[pf:html-base-uri(.)=current()/pf:resolve-uri(substring-before(@textref|text/@src,'#'),
                                                                                      (pf:base-uri(.),$seq-base-uri)[1])]
                                   //*[@id=substring-after(current()/(@textref|text/@src),'#')][1]/count(preceding::*|ancestor::*)"/>

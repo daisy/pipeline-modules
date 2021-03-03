@@ -433,7 +433,7 @@
                             <p id="p_1">
                                 <span id="s_1">See note </span><a id="a_1" epub:type="noteref" href="#aside_1">1</a><span id="s_2">.</span>
                             </p>
-                            <aside epub:type="footnote" id="aside_1">
+                            <aside id="aside_1">
                                 This is note 1.
                             </aside>
                         </body>
@@ -573,13 +573,13 @@
                                 <text id="id_3" src="content.html#a_1"/>
                                 <audio id="id_4" src="content.mp3" clip-begin="npt=1s" clip-end="npt=2s"/>
                             </par>
-                            <par id="id_11" endsync="last">
-                                <text id="id_5" src="content.html#s_2"/>
-                                <audio id="id_6" src="content.mp3" clip-begin="npt=2s" clip-end="npt=3s"/>
-                            </par>
                             <par id="id_12" endsync="last" system-required="footnote-on">
                                 <text id="id_7" src="content.html#aside_1"/>
                                 <audio id="id_8" src="content.mp3" clip-begin="npt=3s" clip-end="npt=4s"/>
+                            </par>
+                            <par id="id_11" endsync="last">
+                                <text id="id_5" src="content.html#s_2"/>
+                                <audio id="id_6" src="content.mp3" clip-begin="npt=2s" clip-end="npt=3s"/>
                             </par>
                         </seq>
                     </body>

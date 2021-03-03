@@ -142,7 +142,10 @@
             <p:pipe step="update" port="result.in-memory"/>
         </p:output>
         <p:output port="page-list">
-            <p:pipe step="identify-pagebreaks" port="page-list"/>
+            <p:pipe step="identify-pagebreaks-and-noterefs" port="page-list"/>
+        </p:output>
+        <p:output port="noteref-list">
+            <p:pipe step="identify-pagebreaks-and-noterefs" port="noteref-list"/>
         </p:output>
         <px:fileset-load media-types="application/xhtml+xml" name="epub3.xhtml">
             <p:documentation>
@@ -152,17 +155,20 @@
                 <p:pipe step="label-pagebreaks-from-nav" port="result.in-memory"/>
             </p:input>
         </px:fileset-load>
-        <p:group name="identify-pagebreaks">
-            <p:documentation>Identify page break elements</p:documentation>
+        <p:group name="identify-pagebreaks-and-noterefs">
+            <p:documentation>Identify page break elements and noteref elements</p:documentation>
             <p:output port="content-docs" primary="true" sequence="true">
                 <p:pipe step="content-docs" port="result"/>
             </p:output>
             <p:output port="page-list">
                 <p:pipe step="page-list" port="result"/>
             </p:output>
+            <p:output port="noteref-list">
+                <p:pipe step="noteref-list" port="result"/>
+            </p:output>
             <p:for-each name="content-docs">
                 <p:output port="result" primary="true"/>
-                <p:output port="page-lists" sequence="true">
+                <p:output port="page-and-noteref-lists" sequence="true">
                     <p:pipe step="xslt" port="secondary"/>
                 </p:output>
                 <p:label-elements match="*[@role='doc-pagebreak']" attribute="epub:type" replace="true"
@@ -177,7 +183,7 @@
                         <p:pipe step="label-pagebreaks-from-nav" port="page-list"/>
                     </p:input>
                     <p:input port="stylesheet">
-                        <p:document href="../../xslt/identify-pagebreaks.xsl"/>
+                        <p:document href="../../xslt/identify-pagebreaks-and-noterefs.xsl"/>
                     </p:input>
                     <p:input port="parameters">
                         <p:empty/>
@@ -205,6 +211,7 @@
                             <p:pipe step="label-pagebreaks-from-nav" port="page-list"/>
                         </p:input>
                     </p:identity>
+                    <p:add-attribute match="d:anchor" attribute-name="class" attribute-value="page"/>
                 </p:when>
                 <p:otherwise>
                     <p:documentation>Get them from epub:type="pagebreak" markup.</p:documentation>
@@ -212,11 +219,22 @@
                     <p:sink/>
                     <p:wrap-sequence wrapper="d:fileset">
                         <p:input port="source">
-                            <p:pipe step="content-docs" port="page-lists"/>
+                            <p:pipe step="content-docs" port="page-and-noteref-lists"/>
                         </p:input>
                     </p:wrap-sequence>
+                    <p:delete match="d:anchor[not(@class=('page-normal','page-front','page-special'))]"/>
                 </p:otherwise>
             </p:choose>
+            <p:sink/>
+            <p:group name="noteref-list">
+                <p:output port="result"/>
+                <p:wrap-sequence wrapper="d:fileset">
+                    <p:input port="source">
+                        <p:pipe step="content-docs" port="page-and-noteref-lists"/>
+                    </p:input>
+                </p:wrap-sequence>
+                <p:delete match="d:anchor[not(@class=('noteref'))]"/>
+            </p:group>
             <p:sink/>
         </p:group>
         <p:for-each px:message="Converting HTML5 to HTML4" px:progress="1">
@@ -288,6 +306,7 @@
                     <p:input port="source">
                         <p:pipe step="smil-without-system-required" port="result"/>
                         <p:pipe step="convert-html" port="page-list"/>
+                        <p:pipe step="convert-html" port="noteref-list"/>
                         <p:pipe step="epub3.xhtml" port="result"/>
                     </p:input>
                     <p:input port="stylesheet">
@@ -373,6 +392,56 @@
     </pxi:create-ncc>
 
     <p:documentation>
+        Move notes after their corresponding note refs in the media overlays.
+    </p:documentation>
+    <p:group name="rearrange-notes">
+        <p:output port="fileset" primary="true"/>
+        <p:output port="in-memory" sequence="true">
+            <p:pipe step="update" port="result.in-memory"/>
+        </p:output>
+        <px:fileset-load media-types="application/smil+xml" name="smil">
+            <p:input port="in-memory">
+                <p:pipe step="create-ncc" port="result.in-memory"/>
+            </p:input>
+        </px:fileset-load>
+        <p:for-each name="rearrange-smil">
+            <p:output port="result"/>
+            <p:sink/>
+            <p:xslt>
+                <p:input port="source">
+                    <p:pipe step="rearrange-smil" port="current"/>
+                    <p:pipe step="convert-html" port="noteref-list">
+                        <!-- assumes convert-smil and create-ncc do not change base URIs of content
+                             documents and IDs of noteref and note elements -->
+                    </p:pipe>
+                    <p:pipe step="create-ncc" port="result.in-memory"/>
+                </p:input>
+                <p:input port="stylesheet">
+                    <p:document href="../../xslt/rearrange-notes.xsl"/>
+                </p:input>
+                <p:input port="parameters">
+                    <p:empty/>
+                </p:input>
+            </p:xslt>
+        </p:for-each>
+        <p:sink/>
+        <px:fileset-update name="update">
+            <p:input port="source.fileset">
+                <p:pipe step="create-ncc" port="result.fileset"/>
+            </p:input>
+            <p:input port="source.in-memory">
+                <p:pipe step="create-ncc" port="result.in-memory"/>
+            </p:input>
+            <p:input port="update.fileset">
+                <p:pipe step="smil" port="result.fileset"/>
+            </p:input>
+            <p:input port="update.in-memory">
+                <p:pipe step="rearrange-smil" port="result"/>
+            </p:input>
+        </px:fileset-update>
+    </p:group>
+
+    <p:documentation>
         Merge into single HTML document (workaround for Voice Dream Reader)
     </p:documentation>
     <p:group name="voice-dream-workaround" px:message="Merging HTML documents" px:progress="1/5">
@@ -382,7 +451,7 @@
         </p:output>
         <px:fileset-filter href="*/ncc.html" name="ncc">
             <p:input port="source.in-memory">
-                <p:pipe step="create-ncc" port="result.in-memory"/>
+                <p:pipe step="rearrange-notes" port="in-memory"/>
             </p:input>
         </px:fileset-filter>
         <p:sink/>
@@ -402,7 +471,7 @@
                 </p:output>
                 <px:fileset-load>
                     <p:input port="in-memory">
-                        <p:pipe step="create-ncc" port="result.in-memory"/>
+                        <p:pipe step="rearrange-notes" port="in-memory"/>
                     </p:input>
                 </px:fileset-load>
                 <px:html-merge name="merge">
@@ -441,11 +510,11 @@
             <p:otherwise>
                 <p:output port="fileset" primary="true"/>
                 <p:output port="in-memory" sequence="true">
-                    <p:pipe step="create-ncc" port="result.in-memory"/>
+                    <p:pipe step="rearrange-notes" port="in-memory"/>
                 </p:output>
                 <p:identity>
                     <p:input port="source">
-                        <p:pipe step="create-ncc" port="result.fileset"/>
+                        <p:pipe step="rearrange-notes" port="fileset"/>
                     </p:input>
                 </p:identity>
             </p:otherwise>
