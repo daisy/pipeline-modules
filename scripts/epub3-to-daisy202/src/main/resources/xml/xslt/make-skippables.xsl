@@ -10,15 +10,15 @@
                 exclude-result-prefixes="#all">
 
 	<!--
-	    Add 'systemRequired' attribute to par elements that correspond with page numbers.
+	    Add 'systemRequired' attribute to par elements that correspond with page numbers and notes.
 	-->
 
 	<!--
-	    Note that for page numbers to be skippable in EPUB, epub:type="pagebreak" should be present
-	    on SMIL elements (see
+	    Note that for elements to be skippable in EPUB, an epub:type attribute with value
+	    "pagebreak", "footnote" or "endnote" should be present on SMIL elements (see
 	    https://www.w3.org/publishing/epub3/epub-mediaoverlays.html#sec-skippability), however we
-	    don't use this information in the conversion. We make all page numbers in the DAISY 2.02
-	    skippable.
+	    don't use this information in the conversion. We make all page numbers and notes in the
+	    DAISY 2.02 skippable.
 	-->
 
 	<xsl:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xsl"/>
@@ -44,6 +44,9 @@
 			<xsl:when test="$referenced-element intersect $page-number-elements">
 				<xsl:apply-templates mode="pagenumber-on" select="."/>
 			</xsl:when>
+			<xsl:when test="$referenced-element/@epub:type/tokenize(.,'\s+')=('footnote','endnote')">
+				<xsl:apply-templates mode="footnote-on" select="."/>
+			</xsl:when>
 			<xsl:otherwise>
 				<xsl:next-match/>
 			</xsl:otherwise>
@@ -55,13 +58,16 @@
 		<xsl:variable name="referenced-element" as="element()?" select="(collection()/html:*/key('absolute-id',$absolute-src))[1]"/>
 		<xsl:choose>
 			<!--
-			    In addition to checking for par and seq elements that reference page numbers
-			    directly, we also check for par elements that reference descendant elements of page
-			    numbers, because we can not be sure that the structure of the content document
+			    In addition to checking for par and seq elements that reference skippable elements
+			    directly, we also check for par elements that reference descendants of skippable
+			    elements, because we can not be sure that the structure of the content document
 			    matches exactly the structure of the media overlay document.
 			-->
 			<xsl:when test="$referenced-element/ancestor-or-self::* intersect $page-number-elements">
 				<xsl:apply-templates mode="pagenumber-on" select="."/>
+			</xsl:when>
+			<xsl:when test="$referenced-element/ancestor-or-self::*/@epub:type/tokenize(.,'\s+')=('footnote','endnote')">
+				<xsl:apply-templates mode="footnote-on" select="."/>
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:next-match/>
@@ -76,7 +82,14 @@
 		</xsl:copy>
 	</xsl:template>
 
-	<xsl:template mode="#default pagenumber-on" match="@*|node()">
+	<xsl:template mode="footnote-on" match="par[not(@systemRequired)]">
+		<xsl:copy>
+			<xsl:attribute name="systemRequired" select="'footnote-on'"/>
+			<xsl:apply-templates mode="#current" select="@*|node()"/>
+		</xsl:copy>
+	</xsl:template>
+
+	<xsl:template mode="#default pagenumber-on footnote-on" match="@*|node()">
 		<xsl:copy>
 			<xsl:apply-templates mode="#current" select="@*|node()"/>
 		</xsl:copy>

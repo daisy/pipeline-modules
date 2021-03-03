@@ -288,7 +288,7 @@
                     <p:input port="source">
                         <p:pipe step="smil-without-system-required" port="result"/>
                         <p:pipe step="convert-html" port="page-list"/>
-                        <p:pipe step="convert-html" port="in-memory"/>
+                        <p:pipe step="epub3.xhtml" port="result"/>
                     </p:input>
                     <p:input port="stylesheet">
                         <p:document href="../../xslt/make-skippables.xsl"/>
@@ -301,6 +301,15 @@
             </p:group>
         </p:for-each>
         <p:identity name="daisy202.smil.in-memory"/>
+        <p:sink/>
+        <px:fileset-load media-types="application/xhtml+xml" name="epub3.xhtml">
+            <p:input port="fileset">
+                <p:pipe step="label-pagebreaks-from-nav" port="result.fileset"/>
+            </p:input>
+            <p:input port="in-memory">
+                <p:pipe step="label-pagebreaks-from-nav" port="result.in-memory"/>
+            </p:input>
+        </px:fileset-load>
         <p:sink/>
         <px:fileset-update name="update">
             <p:input port="source.fileset">
