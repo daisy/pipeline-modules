@@ -44,11 +44,7 @@
     </dependency>
     <dependency>
       <groupId>org.daisy.dotify</groupId>
-      <artifactId>dotify.api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.daisy.dotify</groupId>
-      <artifactId>dotify.common</artifactId>
+      <artifactId>dotify.library</artifactId>
     </dependency>
     <dependency>
       <groupId>org.daisy.streamline</groupId>
@@ -85,26 +81,6 @@
     <dependency>
       <groupId>org.daisy.pipeline.modules.braille</groupId>
       <artifactId>css-utils</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.daisy.dotify</groupId>
-      <artifactId>dotify.formatter.impl</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.daisy.dotify</groupId>
-      <artifactId>dotify.text.impl</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.daisy.dotify</groupId>
-      <artifactId>dotify.hyphenator.impl</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.daisy.dotify</groupId>
-      <artifactId>dotify.translator.impl</artifactId>
       <scope>runtime</scope>
     </dependency>
     <dependency>

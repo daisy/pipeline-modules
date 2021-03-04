@@ -9,9 +9,9 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 
-import org.daisy.braille.api.table.BrailleConverter;
-import org.daisy.braille.api.table.Table;
-import org.daisy.braille.api.table.TableCatalogService;
+import org.daisy.dotify.api.table.BrailleConverter;
+import org.daisy.dotify.api.table.Table;
+import org.daisy.dotify.api.table.TableCatalogService;
 
 import static org.daisy.common.file.URLs.asURI;
 import org.daisy.pipeline.braille.common.BrailleTranslator;
@@ -34,7 +34,6 @@ import org.daisy.pipeline.braille.liblouis.LiblouisTranslator;
 
 import org.daisy.pipeline.junit.AbstractTest;
 
-import static org.daisy.pipeline.pax.exam.Options.mavenBundle;
 import static org.daisy.pipeline.pax.exam.Options.thisPlatform;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -82,7 +81,7 @@ public class LiblouisCoreTest extends AbstractTest {
 			pipelineModule("fileset-utils"),
 			pipelineModule("common-utils"),
 			"org.liblouis:liblouis-java:?",
-			"org.daisy.braille:braille-utils.api:?",
+			"org.daisy.dotify:dotify.library:?",
 			"org.daisy.pipeline:calabash-adapter:?",
 		};
 	}
@@ -100,8 +99,6 @@ public class LiblouisCoreTest extends AbstractTest {
 	@Override @Configuration
 	public Option[] config() {
 		return options(
-			// FIXME: BrailleUtils needs older version of jing
-			mavenBundle("org.daisy.libs:jing:20120724.0.0"),
 			thisBundle(thisPlatform()),
 			composite(super.config()));
 	}

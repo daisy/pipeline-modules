@@ -19,12 +19,8 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.daisy.braille</groupId>
-      <artifactId>braille-utils.api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.daisy.braille</groupId>
-      <artifactId>braille-utils.pef-tools</artifactId>
+      <groupId>org.daisy.dotify</groupId>
+      <artifactId>dotify.library</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -64,11 +60,6 @@
     <!--
         runtime dependencies
     -->
-    <dependency>
-      <groupId>org.daisy.braille</groupId>
-      <artifactId>braille-utils.impl</artifactId>
-      <scope>runtime</scope>
-    </dependency>
     <dependency>
       <groupId>org.daisy.pipeline.modules</groupId>
       <artifactId>file-utils</artifactId>
@@ -209,7 +200,7 @@
                   </offlineLinks>
                   <links>
                     <link>https://google.github.io/guava/releases/15.0/api/docs</link>
-                    <link>http://brailleapps.github.io/braille-utils.api/3.0.1/javadoc</link>
+                    <link>http://brailleapps.github.io/dotify.api/4.1.0/javadoc</link>
                   </links>
                 </configuration>
               </execution>

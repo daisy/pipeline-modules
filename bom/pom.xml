@@ -80,7 +80,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>liblouis-utils</artifactId>
-        <version>3.1.0</version>
+        <version>3.1.1-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
@@ -103,7 +103,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>pef-utils</artifactId>
-        <version>4.0.1</version>
+        <version>4.0.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
@@ -510,24 +510,6 @@
         <version>1.9.12</version>
       </dependency>
       <!--
-          for pef-utils
-      -->
-      <dependency>
-        <groupId>org.daisy.braille</groupId>
-        <artifactId>braille-utils.api</artifactId>
-        <version>3.0.1</version>
-      </dependency>
-      <dependency>
-        <groupId>org.daisy.braille</groupId>
-        <artifactId>braille-utils.impl</artifactId>
-        <version>3.0.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.daisy.braille</groupId>
-        <artifactId>braille-utils.pef-tools</artifactId>
-        <version>2.2.0</version>
-      </dependency>
-      <!--
           for css-utils (braille) and css-speech
       -->
       <dependency>
@@ -580,48 +562,22 @@
         <version>1.4.1</version>
       </dependency>
       <!--
-          for braille/common-utils and dotify-utils
+          for braille/common-utils, dotify-utils and pef-utils
       -->
       <dependency>
         <groupId>org.daisy.dotify</groupId>
-        <artifactId>dotify.api</artifactId>
-        <version>5.0.7</version>
-      </dependency>
-      <!--
-          for dotify-utils
-      -->
-      <dependency>
-        <groupId>org.daisy.dotify</groupId>
-        <artifactId>dotify.common</artifactId>
-        <version>4.4.1</version>
-      </dependency>
-      <dependency>
-        <groupId>org.daisy.dotify</groupId>
-        <artifactId>dotify.translator.impl</artifactId>
-        <!--
-            FIXME: Dotify's Liblouis-based translator currently does not work because of this error:
-            
-            java.lang.IllegalAccessError: tried to access method
-            org.liblouis.Translator.translate(Ljava/lang/String;[S[I[ILorg/liblouis/DisplayTable;)Lorg/liblouis/TranslationResult;
-            from class org.daisy.dotify.translator.impl.liblouis.LiblouisBrailleFilter
-            
-            Updating dotify.translator.impl to version 5.1.0 results in the following Pax-Exam error
-            (because both "standalone" and regular jar on the class path)
-            
-            Bundle symbolic name and version are not unique: org.liblouis.java:4.2.0
-        -->
-        <version>5.0.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.daisy.dotify</groupId>
-        <artifactId>dotify.hyphenator.impl</artifactId>
-        <version>5.0.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.daisy.dotify</groupId>
-        <artifactId>dotify.formatter.impl</artifactId>
-        <version>5.0.8</version>
+        <artifactId>dotify.library</artifactId>
+        <version>1.0.0</version>
         <exclusions>
+          <exclusion>
+            <!--
+                Exclude liblouis-java because it is the "standalone" version and we can't have both
+                the standalone and regular version on the class path. Note that Dotify's
+                Liblouis-based translator will not work because of this.
+            -->
+            <groupId>org.liblouis</groupId>
+            <artifactId>liblouis-java</artifactId>
+          </exclusion>
           <exclusion>
             <!--
                 covered by org.codehaus.woodstox:woodstox-core-lgpl (framework dependency)
@@ -629,17 +585,29 @@
             <groupId>com.fasterxml.woodstox</groupId>
             <artifactId>woodstox-core</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>net.sf.saxon</groupId>
+            <artifactId>Saxon-HE</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
+      <!--
+          for dotify-utils
+      -->
       <dependency>
         <groupId>org.daisy.dotify</groupId>
         <artifactId>dotify.task.impl</artifactId>
         <version>5.0.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.daisy.dotify</groupId>
-        <artifactId>dotify.text.impl</artifactId>
-        <version>5.0.0</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.daisy.dotify</groupId>
+            <artifactId>dotify.api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.daisy.dotify</groupId>
+            <artifactId>dotify.common</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.daisy.streamline</groupId>

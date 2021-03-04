@@ -32,7 +32,7 @@
     </dependency>
     <dependency>
       <groupId>org.daisy.dotify</groupId>
-      <artifactId>dotify.hyphenator.impl</artifactId>
+      <artifactId>dotify.library</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
