@@ -240,11 +240,8 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 			result.write(runtime.getProcessor().newDocumentBuilder().build(new StreamSource(pefStream)));
 			pefStream.close(); }
 		
-		catch (XProcException e) {
-			throw e; }
 		catch (Throwable e) {
-			logger.error("pxi:obfl-to-pef failed", e);
-			throw new XProcException(step.getNode(), e); }
+			throw XProcStep.raiseError(e, step); }
 		finally {
 			evictTempTranslator.apply(); }
 	}

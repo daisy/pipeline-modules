@@ -1,6 +1,5 @@
 package org.daisy.pipeline.braille.common.calabash.impl;
 
-import com.xmlcalabash.core.XProcException;
 import com.xmlcalabash.core.XProcRuntime;
 import com.xmlcalabash.io.WritablePipe;
 import com.xmlcalabash.library.DefaultStep;
@@ -54,9 +53,8 @@ public class PxParseQueryStep extends DefaultStep implements XProcStep {
 		try {
 			marshallQuery(query(new XMLCalabashOptionValue(getOption(_QUERY)).toString()),
 			              new XMLCalabashOutputValue(result, runtime).asXMLStreamWriter());
-		} catch (Exception e) {
-			logger.error("px:parse-query failed", e);
-			throw new XProcException(step.getNode(), e);
+		} catch (Throwable e) {
+			throw XProcStep.raiseError(e, step);
 		}
 		super.run();
 	}

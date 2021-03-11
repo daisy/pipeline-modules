@@ -32,10 +32,10 @@
             <p:with-param port="parameters" name="allow-text-overflow-trimming" select="$allow-text-overflow-trimming"/>
           </px:obfl-to-pef>
         </p:group>
-        <p:catch>
+        <p:catch name="catch">
           <p:identity>
             <p:input port="source">
-              <p:inline><pef xmlns="http://www.daisy.org/ns/2008/pef">obfl-to-pef failed</pef></p:inline>
+              <p:pipe step="catch" port="error"/>
             </p:input>
           </p:identity>
         </p:catch>
