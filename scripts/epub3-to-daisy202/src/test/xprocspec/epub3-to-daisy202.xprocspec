@@ -433,8 +433,11 @@
                             <p id="p_1">
                                 <span id="s_1">See note </span><a id="a_1" epub:type="noteref" href="#aside_1">1</a><span id="s_2">.</span>
                             </p>
-                            <aside id="aside_1">
+                            <aside epub:type="footnote" id="aside_1">
                                 This is note 1.
+                            </aside>
+                            <aside id="aside_2">
+                                This is a sidebar.
                             </aside>
                         </body>
                     </html>
@@ -459,6 +462,10 @@
                             <par epub:type="footnote">
                                 <text src="content.xhtml#aside_1"/>
                                 <audio src="content.mp3" clipBegin="0:00:03.000" clipEnd="0:00:04.000"/>
+                            </par>
+                            <par>
+                                <text src="content.xhtml#aside_2"/>
+                                <audio src="content.mp3" clipBegin="0:00:04.000" clipEnd="0:00:05.000"/>
                             </par>
                         </body>
                     </smil>
@@ -506,13 +513,13 @@
                         <meta name="ncc:sidebars" content="0"/>
                         <meta name="ncc:prodNotes" content="0"/>
                         <meta name="ncc:footnotes" content="0"/>
-                        <meta name="ncc:totalTime" content="00:00:04"/>
+                        <meta name="ncc:totalTime" content="00:00:05"/>
                         <meta name="dc:title" content="minimal"/>
                         <meta name="dc:language" content="en"/>
                     </head>
                     <body>
                         <h1 class="title" id="h_1">
-                            <a href="content.smil#id_9">Untitled section</a>
+                            <a href="content.smil#id_11">Untitled section</a>
                         </h1>
                     </body>
                 </html>
@@ -532,18 +539,23 @@
                     <body id="body">
                         <p id="p_1">
                             <span id="s_1">
-                                <a href="content.smil#id_9">See note </a>
+                                <a href="content.smil#id_11">See note </a>
                             </span>
                             <a id="a_1" href="#aside_1">
-                                <a href="content.smil#id_10">1</a>
+                                <a href="content.smil#id_12">1</a>
                             </a>
                             <span id="s_2">
-                                <a href="content.smil#id_11">.</a>
+                                <a href="content.smil#id_13">.</a>
                             </span>
                         </p>
                         <div id="aside_1" class="aside">
-                            <a href="content.smil#id_12">
+                            <a href="content.smil#id_14">
                                 This is note 1.
+                            </a>
+                        </div>
+                        <div id="aside_2" class="aside">
+                            <a href="content.smil#id_15">
+                                This is a sidebar.
                             </a>
                         </div>
                     </body>
@@ -558,28 +570,32 @@
                 <smil>
                     <head>
                         <meta name="dc:format" content="Daisy 2.02"/>
-                        <meta name="ncc:timeInThisSmil" content="00:00:04"/>
+                        <meta name="ncc:timeInThisSmil" content="00:00:05"/>
                         <layout>
                             <region id="txtView"/>
                         </layout>
                     </head>
                     <body>
-                        <seq dur="4s">
-                            <par id="id_9" endsync="last">
+                        <seq dur="5s">
+                            <par id="id_11" endsync="last">
                                 <text id="id_1" src="content.html#s_1"/>
                                 <audio id="id_2" src="content.mp3" clip-begin="npt=0s" clip-end="npt=1s"/>
                             </par>
-                            <par id="id_10" endsync="last">
+                            <par id="id_12" endsync="last">
                                 <text id="id_3" src="content.html#a_1"/>
                                 <audio id="id_4" src="content.mp3" clip-begin="npt=1s" clip-end="npt=2s"/>
                             </par>
-                            <par id="id_12" endsync="last" system-required="footnote-on">
+                            <par id="id_14" endsync="last" system-required="footnote-on">
                                 <text id="id_7" src="content.html#aside_1"/>
                                 <audio id="id_8" src="content.mp3" clip-begin="npt=3s" clip-end="npt=4s"/>
                             </par>
-                            <par id="id_11" endsync="last">
+                            <par id="id_13" endsync="last">
                                 <text id="id_5" src="content.html#s_2"/>
                                 <audio id="id_6" src="content.mp3" clip-begin="npt=2s" clip-end="npt=3s"/>
+                            </par>
+                            <par id="id_15" endsync="last" system-required="sidebar-on">
+                                <text id="id_9" src="content.html#aside_2"/>
+                                <audio id="id_10" src="content.mp3" clip-begin="npt=4s" clip-end="npt=5s"/>
                             </par>
                         </seq>
                     </body>

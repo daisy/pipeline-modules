@@ -10,7 +10,8 @@
                 exclude-result-prefixes="#all">
 
 	<!--
-	    Add 'systemRequired' attribute to par elements that correspond with page numbers and notes.
+	    Add 'systemRequired' attribute to par elements that correspond with page numbers, notes and
+	    sidebars.
 	-->
 
 	<!--
@@ -64,6 +65,9 @@
 			<xsl:when test="$referenced-element intersect $note-elements">
 				<xsl:apply-templates mode="footnote-on" select="."/>
 			</xsl:when>
+			<xsl:when test="$referenced-element/self::html:aside">
+				<xsl:apply-templates mode="sidebar-on" select="."/>
+			</xsl:when>
 			<xsl:otherwise>
 				<xsl:next-match/>
 			</xsl:otherwise>
@@ -86,6 +90,9 @@
 			<xsl:when test="$referenced-element/ancestor-or-self::* intersect $note-elements">
 				<xsl:apply-templates mode="footnote-on" select="."/>
 			</xsl:when>
+			<xsl:when test="$referenced-element/ancestor-or-self::html:aside">
+				<xsl:apply-templates mode="sidebar-on" select="."/>
+			</xsl:when>
 			<xsl:otherwise>
 				<xsl:next-match/>
 			</xsl:otherwise>
@@ -106,7 +113,14 @@
 		</xsl:copy>
 	</xsl:template>
 
-	<xsl:template mode="#default pagenumber-on footnote-on" match="@*|node()">
+	<xsl:template mode="sidebar-on" match="par[not(@systemRequired)]">
+		<xsl:copy>
+			<xsl:attribute name="systemRequired" select="'sidebar-on'"/>
+			<xsl:apply-templates mode="#current" select="@*|node()"/>
+		</xsl:copy>
+	</xsl:template>
+
+	<xsl:template mode="#default pagenumber-on footnote-on sidebar-on" match="@*|node()">
 		<xsl:copy>
 			<xsl:apply-templates mode="#current" select="@*|node()"/>
 		</xsl:copy>
