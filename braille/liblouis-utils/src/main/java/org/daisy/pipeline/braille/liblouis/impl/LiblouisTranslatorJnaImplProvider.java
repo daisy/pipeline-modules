@@ -687,7 +687,9 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 											logger.warn("letter-spacing: {} not supported, must be non-negative", val);
 											letterSpacing[i] = 0; }}
 									style.removeProperty("letter-spacing"); }
-								typeform[i] = typeform[i].add(typeformFromInlineCSS(style, liblouisTranslator, supportedTypeforms)); }
+								typeform[i] = typeform[i].add(typeformFromInlineCSS(style, liblouisTranslator, supportedTypeforms));
+								for (String prop : style.getPropertyNames())
+									logger.warn("{}: {} not supported", prop, style.get(prop)); }
 							else
 								someTransform = true; }
 					}
@@ -808,7 +810,7 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 						if (segmentInBraille.length() <= available || !hyphenate[textWithWsMapping[curSegment]]
 						    || (fullHyphenator == null && lineBreaker == null)) {
 							if (hyphenate[textWithWsMapping[curSegment]] || segmentInBraille.length() > available)
-								logger.warn("hyphens:auto not supported");
+								logger.warn("hyphens: auto not supported");
 							
 							segmentInBraille = addLetterSpacing(segment, segmentInBraille, letterSpacing[textWithWsMapping[curSegment]]);
 							next += segmentInBraille;
@@ -1213,7 +1215,10 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 								logger.warn("letter-spacing: {} not supported, must be non-negative", val);
 								letterSpacing[i] = 0; }}
 						style.removeProperty("letter-spacing"); }
-					typeform[i] = typeform[i].add(typeformFromInlineCSS(style, translator, supportedTypeforms)); }
+					typeform[i] = typeform[i].add(typeformFromInlineCSS(style, translator, supportedTypeforms));
+					for (String prop : style.getPropertyNames())
+						if (!"white-space".equals(prop))
+							logger.warn("{}: {} not supported", prop, style.get(prop)); }
 				else
 					someTransform = true; }
 			
@@ -1352,7 +1357,7 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 					byte[] hyphens = null;
 					try {
 						if (fullHyphenator == null) {
-							logger.warn("hyphens:auto not supported");
+							logger.warn("hyphens: auto not supported");
 							if (lineBreaker != null)
 								throw new RuntimeException(); }
 						else {
@@ -1757,9 +1762,10 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 					if (t != null)
 						typeform = typeform.add(t);
 					else
-						logger.warn("Inline CSS property {} not supported: emphclass 'italic' not defined in table {}",
-						            style.getSourceDeclaration(prop),
+						logger.warn("{}: {} not supported: emphclass 'italic' not defined in table {}",
+						            prop, style.get(prop),
 						            table.getTable());
+					style.removeProperty(prop);
 					continue; }}
 			else if (prop.equals("font-weight")) {
 				CSSProperty value = style.getProperty(prop);
@@ -1768,9 +1774,10 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 					if (t != null)
 						typeform = typeform.add(t);
 					else
-						logger.warn("Inline CSS property {} not supported: emphclass 'bold' not defined in table {}",
-						            style.getSourceDeclaration(prop),
+						logger.warn("{}: {} not supported: emphclass 'bold' not defined in table {}",
+						            prop, style.get(prop),
 						            table.getTable());
+					style.removeProperty(prop);
 					continue; }}
 			else if (prop.equals("text-decoration")) {
 				CSSProperty value = style.getProperty(prop);
@@ -1779,11 +1786,11 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 					if (t != null)
 						typeform = typeform.add(t);
 					else
-						logger.warn("Inline CSS property {} not supported: emphclass 'underline' not defined in table {}",
-						            style.getSourceDeclaration(prop),
+						logger.warn("{}: {} not supported: emphclass 'underline' not defined in table {}",
+						            prop, style.get(prop),
 						            table.getTable());
-					continue; }}
-			logger.warn("Inline CSS property {} not supported", style.getSourceDeclaration(prop)); }
+					style.removeProperty(prop);
+					continue; }}}
 		return typeform;
 	}
 	
