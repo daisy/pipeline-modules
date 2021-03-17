@@ -536,14 +536,24 @@ public class LiblouisCoreTest extends AbstractTest {
 			//                   |<- 20
 			"foobar\n" +
 			"quux",
-			fillLines(translator.transform(styledText("foobar quux", "word-spacing:2")), 20)); // words are split up using U+2028
+			fillLines(translator.transform(text("foobar\u2028quux")), 20));
+		assertEquals(
+			//                   |<- 20
+			"foobar\n" +
+			"quux",
+			fillLines(translator.transform(styledText("foobar\nquux", "white-space:pre-line")), 20));
+		assertEquals(
+			//                   |<- 20
+			"foobar\n" +
+			"quux",
+			fillLines(translator.transform(styledText("foobar\u2028quux", "word-spacing:2")), 20));
 		assertEquals(
 			//                   |<- 20
 			"norf\n" +
 			"quux\n" +
 			"foobar\n" +
 			"xyzzy",
-			fillLines(translator.transform(styledText("norf quux foobar xyzzy", "word-spacing:2")), 20)); // words are split up using U+2028
+			fillLines(translator.transform(styledText("norf\u2028quux\u2028foobar\u2028xyzzy", "word-spacing:2")), 20));
 	}
 	
 	@Inject

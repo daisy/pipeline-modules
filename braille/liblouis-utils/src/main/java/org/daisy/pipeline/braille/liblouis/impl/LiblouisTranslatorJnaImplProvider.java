@@ -4,6 +4,7 @@ import java.net.URI;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,6 +19,7 @@ import com.google.common.collect.ImmutableMap;
 
 import static com.google.common.collect.Iterables.size;
 import static com.google.common.collect.Iterables.toArray;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
 
 import cz.vutbr.web.css.CSSProperty;
@@ -491,10 +493,23 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 					                             styledText,
 					                             from,
 					                             to); }
+				// style is mutated and may not be empty
+				Iterator<SimpleInlineStyle> style = Iterators.transform(styledTextCopy.iterator(), CSSStyledText::getStyle);
 				StringBuilder brailleString = new StringBuilder();
 				int fromChar = 0;
 				int toChar = to >= 0 ? 0 : -1;
 				for (String s : braille) {
+					// the only property expected in the output is white-space
+					// ignore other properties
+					SimpleInlineStyle st = style.next();
+					if (st != null) {
+						CSSProperty ws = st.getProperty("white-space");
+						if (ws != null) {
+							if (ws == WhiteSpace.PRE_WRAP)
+								s = s.replaceAll("[\\x20\t\\u2800]+", "$0\u200B")
+									.replaceAll("[\\x20\t\\u2800]", "\u00A0");
+							if (ws == WhiteSpace.PRE_WRAP || ws == WhiteSpace.PRE_LINE)
+								s = s.replaceAll("[\\n\\r]", "\u2028"); }}
 					brailleString.append(s);
 					if (--from == 0)
 						fromChar = brailleString.length();
