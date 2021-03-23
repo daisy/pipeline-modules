@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -239,9 +240,21 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 								ImmutableList.<Boolean>of(Boolean.TRUE, Boolean.FALSE),
 								contracted -> contracted ? translators : nonContractingTranslators)),
 						new Function<Map<Boolean,WithSideEffect<LiblouisTranslator,Logger>>,LiblouisTranslator>() {
-							public LiblouisTranslator _apply(Map<Boolean,WithSideEffect<LiblouisTranslator,Logger>> translators) {
-								return new HandleTextTransformUncontracted(__apply(translators.get(true)),
-								                                           __apply(translators.get(false))); }});
+							public LiblouisTranslator _apply(Map<Boolean,WithSideEffect<LiblouisTranslator,Logger>> translators)
+									throws NoSuchElementException {
+								LiblouisTranslator t;
+								try {
+									t = __apply(translators.get(true));
+								} catch (NoSuchElementException e) {
+									// make sure all elements that we get from an iterator are also
+									// dereferenced (because AbstractTransformProvider.util.concat
+									// requires it)
+									__apply(translators.get(false));
+									throw e;
+								}
+								return new HandleTextTransformUncontracted(t, __apply(translators.get(false)));
+							}
+						});
 			}
 		}
 		return translators;
