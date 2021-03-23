@@ -13,6 +13,7 @@ public abstract class WithSideEffect<T,W> implements Function<W,T> {
 	
 	private T value = null;
 	private boolean computed = false;
+	private boolean absent = true;
 	
 	public final T apply(W world) throws NoSuchElementException {
 		if (!computed) {
@@ -20,14 +21,17 @@ public abstract class WithSideEffect<T,W> implements Function<W,T> {
 			firstWorld = world;
 			try {
 				value = _apply();
-				sideEffects = sideEffectsBuilder.build();
-				computed = true; }
+				absent = false; }
 			finally {
+				sideEffects = sideEffectsBuilder.build();
 				sideEffectsBuilder = null;
-				firstWorld = null; }}
+				firstWorld = null;
+				computed = true; }}
 		else
 			for (Function<? super W,?> sideEffect : sideEffects)
 				sideEffect.apply(world);
+		if (absent)
+			throw new NoSuchElementException();
 		return value;
 	}
 	
