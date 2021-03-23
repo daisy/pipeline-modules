@@ -14,7 +14,7 @@ public abstract class WithSideEffect<T,W> implements Function<W,T> {
 	private T value = null;
 	private boolean computed = false;
 	
-	public final T apply(W world) throws Exception {
+	public final T apply(W world) throws NoSuchElementException {
 		if (!computed) {
 			sideEffectsBuilder = new ImmutableList.Builder<Function<? super W,?>>();
 			firstWorld = world;
@@ -22,18 +22,16 @@ public abstract class WithSideEffect<T,W> implements Function<W,T> {
 				value = _apply();
 				sideEffects = sideEffectsBuilder.build();
 				computed = true; }
-			catch (Throwable t) {
-				throw new Exception(t); }
 			finally {
 				sideEffectsBuilder = null;
 				firstWorld = null; }}
 		else
 			for (Function<? super W,?> sideEffect : sideEffects)
-				try { sideEffect.apply(world); } catch(Throwable t) {}
+				sideEffect.apply(world);
 		return value;
 	}
 	
-	protected abstract T _apply() throws Throwable;
+	protected abstract T _apply() throws NoSuchElementException;
 	
 	private List<Function<? super W,?>> sideEffects;
 	private ImmutableList.Builder<Function<? super W,?>> sideEffectsBuilder;
@@ -42,22 +40,6 @@ public abstract class WithSideEffect<T,W> implements Function<W,T> {
 	protected final <V> V __apply(final Function<? super W,? extends V> withSideEffect) {
 		sideEffectsBuilder.add(withSideEffect);
 		return withSideEffect.apply(firstWorld);
-	}
-	
-	/* --------- */
-	/* Exception */
-	/* --------- */
-	
-	@SuppressWarnings("serial")
-	public static class Exception extends NoSuchElementException {
-		private final Throwable cause;
-		private Exception(Throwable cause) {
-			this.cause = cause;
-		}
-		@Override
-		public Throwable getCause() {
-			return cause;
-		}
 	}
 	
 	/* -- */
@@ -157,12 +139,15 @@ public abstract class WithSideEffect<T,W> implements Function<W,T> {
 								private Iterator<WithSideEffect<T,W>> from = iterable.iterator();
 								protected T computeNext() {
 									while (true) {
+										WithSideEffect<T,W> next;
 										try {
-											return from.next().apply(world); }
-										catch (WithSideEffect.Exception e) {
-											continue; }
+											next = from.next(); }
 										catch (NoSuchElementException e) {
-											return endOfData(); }}
+											return endOfData(); }
+										try {
+											return next.apply(world); }
+										catch (NoSuchElementException e) {
+											continue; }}
 								}
 							};
 						}
