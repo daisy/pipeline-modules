@@ -224,7 +224,9 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 			String contraction = q.containsKey("contraction")
 				? q.removeAll("contraction").iterator().next().getValue().get()
 				: null;
-			if (!"no".equals(contraction)) {
+			boolean computer = q.containsKey("type")
+				&& "computer".equals(q.get("type").iterator().next().getValue().orElse(null));
+			if (!computer && !"no".equals(contraction)) {
 				q.add("contraction", "no");
 				q.removeAll("grade");
 				Iterable<LiblouisTranslator> nonContractingTranslators = Iterables.memoize(
