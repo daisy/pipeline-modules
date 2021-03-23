@@ -234,27 +234,29 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 						hyphenator,
 						handleNonStandardHyphenation));
 				if (nonContractingTranslators.iterator().hasNext())
-					return Iterables.transform(
-						combinations(
-							Maps.toMap(
-								ImmutableList.<Boolean>of(Boolean.TRUE, Boolean.FALSE),
-								contracted -> contracted ? translators : nonContractingTranslators)),
-						new Function<Map<Boolean,WithSideEffect<LiblouisTranslator,Logger>>,LiblouisTranslator>() {
-							public LiblouisTranslator _apply(Map<Boolean,WithSideEffect<LiblouisTranslator,Logger>> translators)
+					return concat(
+						Iterables.transform(
+							combinations(
+								Maps.toMap(
+									ImmutableList.<Boolean>of(Boolean.TRUE, Boolean.FALSE),
+									contracted -> contracted ? translators : nonContractingTranslators)),
+							new Function<Map<Boolean,WithSideEffect<LiblouisTranslator,Logger>>,LiblouisTranslator>() {
+								public LiblouisTranslator _apply(Map<Boolean,WithSideEffect<LiblouisTranslator,Logger>> translators)
 									throws NoSuchElementException {
-								LiblouisTranslator t;
-								try {
-									t = __apply(translators.get(true));
-								} catch (NoSuchElementException e) {
-									// make sure all elements that we get from an iterator are also
-									// dereferenced (because AbstractTransformProvider.util.concat
-									// requires it)
-									__apply(translators.get(false));
-									throw e;
+									LiblouisTranslator t;
+									try {
+										t = __apply(translators.get(true));
+									} catch (NoSuchElementException e) {
+										// make sure all elements that we get from an iterator are also
+										// dereferenced (because AbstractTransformProvider.util.concat
+										// requires it)
+										__apply(translators.get(false));
+										throw e;
+									}
+									return new HandleTextTransformUncontracted(t, __apply(translators.get(false)));
 								}
-								return new HandleTextTransformUncontracted(t, __apply(translators.get(false)));
-							}
-						});
+							}),
+						translators);
 			}
 		}
 		return translators;
