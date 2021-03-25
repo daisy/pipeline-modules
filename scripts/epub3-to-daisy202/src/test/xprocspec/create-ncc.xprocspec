@@ -236,7 +236,9 @@
                         </h1>
                         <p id="c1_p1">
                             <a href="chapter_001.smil#paragraph1">
-                                <span class="anchor">Some link</span>
+                                <span>
+                                    <a href="http://www.example.com">Some link</a>
+                                </span>
                                 ...
                             </a>
                         </p>

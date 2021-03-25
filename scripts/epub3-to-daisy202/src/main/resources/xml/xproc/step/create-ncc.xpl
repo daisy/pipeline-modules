@@ -153,7 +153,7 @@
             <p:pipe step="drop-smil-without-associated-xhtml" port="smil"/>
         </p:output>
         <p:output port="smil-with-textref" sequence="true">
-            <!-- Possibly with textref attributes. For use in create-linkbacks.xsl of NCC. -->
+            <!-- Possibly with "textref" and "contained-in" attributes. For use in create-linkbacks.xsl of NCC. -->
             <p:pipe step="drop-smil-without-associated-xhtml" port="smil-with-textref"/>
         </p:output>
         <p:output port="xhtml.in-memory" sequence="true">
@@ -260,7 +260,10 @@
                     </p:input>
                 </p:xslt>
                 <p:sink/>
-                <p:documentation>Add linkbacks from HTML to SMIL.</p:documentation>
+                <p:documentation>
+                    Add linkbacks from HTML to SMIL. <!-- (Note that the spec does not explicitly
+                    mandate links in content documents, only in the NCC.)  -->
+                </p:documentation>
                 <p:for-each name="xhtml-with-linkbacks">
                     <p:iteration-source>
                         <p:pipe step="associated-xhtml" port="result"/>

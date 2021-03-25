@@ -542,7 +542,9 @@
                                 <a href="content.smil#id_11">See note </a>
                             </span>
                             <a id="a_1" href="#aside_1">
-                                <a href="content.smil#id_12">1</a>
+                                <span>
+                                    <a href="content.smil#id_12">1</a>
+                                </span>
                             </a>
                             <span id="s_2">
                                 <a href="content.smil#id_13">.</a>
