@@ -105,7 +105,7 @@
                     </xsl:when>
                     <xsl:otherwise>
                         <!--
-                            Check if there is a seq that references the heading/pagenum using a @textref
+                            Check if there is a seq that references the heading/pagenum/noteref using a @textref
                         -->
                         <xsl:variable name="seq" select="($smil//seq[@textref][resolve-uri(@textref,base-uri())=$href])[1]"/>
                         <xsl:variable name="smil-href" as="xs:string"
@@ -134,6 +134,10 @@
                                     <xsl:apply-templates/>
                                 </xsl:copy>
                             </xsl:when>
+                            <!--
+                                Noterefs are optional in NCC
+                            -->
+                            <xsl:when test="parent::html:span/@class='noteref'"/>
                             <xsl:otherwise>
                                 <xsl:message terminate="yes">coding error</xsl:message>
                             </xsl:otherwise>

@@ -389,6 +389,9 @@
         <p:input port="page-list">
             <p:pipe step="convert-html" port="page-list"/>
         </p:input>
+        <p:input port="noteref-list">
+            <p:pipe step="convert-html" port="noteref-list"/>
+        </p:input>
     </pxi:create-ncc>
 
     <p:documentation>

@@ -146,7 +146,7 @@
                         <h1 class="title" id="h_1">
                             <a href="content.smil#par_1">...</a>
                         </h1>
-                        <span class="page-normal" id="p_1">
+                        <span class="page-normal" id="span_1">
                             <a href="content.smil#par_2">1</a>
                         </span>
                     </body>
@@ -321,7 +321,7 @@
                         <h1 class="title" id="h_1">
                             <a href="content.smil#par_1">...</a>
                         </h1>
-                        <span class="page-normal" id="p_1">
+                        <span class="page-normal" id="span_1">
                             <a href="content.smil#par_2">1</a>
                         </span>
                     </body>
@@ -506,13 +506,13 @@
                         <meta name="dc:identifier" content="id"/>
                         <meta name="dc:date" content="2021-03-02"/>
                         <meta name="ncc:charset" content="utf-8"/>
-                        <meta name="ncc:tocItems" content="1"/>
+                        <meta name="ncc:tocItems" content="2"/>
                         <meta name="ncc:pageFront" content="0"/>
                         <meta name="ncc:pageNormal" content="0"/>
                         <meta name="ncc:pageSpecial" content="0"/>
                         <meta name="ncc:sidebars" content="0"/>
                         <meta name="ncc:prodNotes" content="0"/>
-                        <meta name="ncc:footnotes" content="0"/>
+                        <meta name="ncc:footnotes" content="1"/>
                         <meta name="ncc:totalTime" content="00:00:05"/>
                         <meta name="dc:title" content="minimal"/>
                         <meta name="dc:language" content="en"/>
@@ -521,6 +521,9 @@
                         <h1 class="title" id="h_1">
                             <a href="content.smil#id_11">Untitled section</a>
                         </h1>
+                        <span class="noteref" id="span_1">
+                            <a href="content.smil#id_12">1</a>
+                        </span>
                     </body>
                 </html>
             </x:document>
