@@ -68,7 +68,8 @@
                                               self::html:h6],
                                      $page-number-elements)
                                     except $referenced-html-elements"/>
-            <xsl:with-param name="in-use" select="//*/@id[matches(.,'^(par|text|audio)_')]"/>
+            <xsl:with-param name="in-use" select="(//*/@id,
+                                                   //*/@id[matches(.,'^(text|audio)_')]/replace(.,'^(text|audio)','par'))"/>
         </xsl:call-template>
     </xsl:template>
     
