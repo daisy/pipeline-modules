@@ -171,8 +171,12 @@
                 <p:output port="page-and-noteref-lists" sequence="true">
                     <p:pipe step="xslt" port="secondary"/>
                 </p:output>
-                <p:label-elements match="*[@role='doc-pagebreak']" attribute="epub:type" replace="true"
-                                  label="string-join(distinct-values((@epub:type/tokenize(.,'\s+')[not(.='')],'pagebreak')),' ')"
+                <p:label-elements match="*[@role=('doc-pagebreak','doc-noteref')]" attribute="epub:type" replace="true"
+                                  label="string-join(
+                                           distinct-values((
+                                             @epub:type/tokenize(.,'\s+')[not(.='')],
+                                             replace(@role,'^doc-',''))),
+                                           ' ')"
                                   name="handle-dpub-aria">
                     <!-- Convert DPUB-ARIA roles to epub:type -->
                 </p:label-elements>
