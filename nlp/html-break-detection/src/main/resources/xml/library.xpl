@@ -25,7 +25,7 @@
     </p:import>
 
     <px:break-and-reshape name="generic">
-      <p:with-option name="inline-tags" select="'span,i,b,a,br,del,font,ruby,s,small,strike,strong,sup,u,q,address,abbr,em,style'"/>
+      <p:with-option name="inline-tags" select="'span,i,b,a,br,del,font,ruby,s,small,strike,strong,sup,sub,u,q,address,abbr,em,style'"/>
       <p:with-option name="ensure-word-before" select="'span,br,ruby,s,address,abbr,style'"/>
       <p:with-option name="ensure-word-after" select="'span,br,ruby,s,address,abbr,style'"/>
       <!-- Based on the containers of phrasing, flow and transparent content of HTML5 DTB: -->
