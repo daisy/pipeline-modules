@@ -1,6 +1,7 @@
 package org.daisy.pipeline.tts.espeak.impl;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -41,12 +42,12 @@ public class ESpeakEngine extends MarklessTTSEngine {
 	private int mPriority;
 	private final static Logger mLogger = LoggerFactory.getLogger(ESpeakEngine.class);
 
-	public ESpeakEngine(ESpeakService eSpeakService, String eSpeakPath, int priority) {
+	public ESpeakEngine(ESpeakService eSpeakService, File eSpeakPath, int priority) {
 		super(eSpeakService);
-		mESpeakPath = eSpeakPath;
+		mESpeakPath = eSpeakPath.getAbsolutePath();
 		mPriority = priority;
 		mCmd = new String[]{
-		        eSpeakPath, "-m", "--stdout", "--stdin"
+		        mESpeakPath, "-m", "--stdout", "--stdin"
 		};
 	}
 
