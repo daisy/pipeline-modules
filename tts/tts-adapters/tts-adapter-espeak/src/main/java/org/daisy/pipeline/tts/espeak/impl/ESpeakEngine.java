@@ -6,6 +6,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -18,7 +19,6 @@ import javax.sound.sampled.AudioSystem;
 import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.common.shell.CommandRunner;
-
 import org.daisy.pipeline.audio.AudioBuffer;
 import org.daisy.pipeline.tts.AudioBufferAllocator;
 import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
@@ -27,6 +27,7 @@ import org.daisy.pipeline.tts.SoundUtil;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.Voice;
+import org.daisy.pipeline.tts.VoiceInfo.Gender;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,9 +114,13 @@ public class ESpeakEngine extends MarklessTTSEngine {
 							Matcher mr = Pattern.compile("\\s*[0-9]+\\s+([-a-z]+)").matcher("");
 							scanner.nextLine(); //headers
 							while (scanner.hasNextLine()) {
-								mr.reset(scanner.nextLine());
-								mr.find();
-								languages.add(mr.group(1).split("-")[0]);
+								String line = scanner.nextLine();
+								mr.reset(line);
+								if (mr.find()) {
+									languages.add(mr.group(1).split("-")[0]);
+								} else {
+									mLogger.warn("Could not parse line from `espeak --voices' output: " + line);
+								}
 							}
 						}
 					}
@@ -126,16 +131,25 @@ public class ESpeakEngine extends MarklessTTSEngine {
 			// Second: get the list of the voices for the found languages.
 			// White spaces are not allowed in voice names
 			result = new ArrayList<Voice>();
-			Matcher mr = Pattern.compile("^\\s*[0-9]+\\s+[-a-z]+\\s+([FM]\\s+)?([^ ]+)").matcher("");
+			Matcher mr = Pattern.compile("^\\s*[0-9]+\\s+(?<locale>[-a-z]+)\\s+(?<gender>[FfMm-]\\s+)?(?<name>[^ ]+)").matcher("");
 			for (String lang : languages) {
 				new CommandRunner(mESpeakPath, "--voices=" + lang)
 					.consumeOutput(stream -> {
 							try (Scanner scanner = new Scanner(stream)) {
 								scanner.nextLine(); // headers
 								while (scanner.hasNextLine()) {
-									mr.reset(scanner.nextLine());
-									mr.find();
-									result.add(new Voice(getProvider().getName(), mr.group(2).trim()));
+									String line = scanner.nextLine();
+									mr.reset(line);
+									if (mr.find()) {
+										Locale locale = Locale.forLanguageTag(mr.group("locale"));
+										Gender gender = "f".equals(mr.group("gender").trim().toLowerCase())
+											? Gender.FEMALE_ADULT
+											: Gender.MALE_ADULT;
+										String name = mr.group("name");
+										result.add(new Voice(getProvider().getName(), name, locale, gender));
+									} else {
+										mLogger.warn("Could not parse line from `espeak --voices' output: " + line);
+									}
 								}
 							}
 						}
