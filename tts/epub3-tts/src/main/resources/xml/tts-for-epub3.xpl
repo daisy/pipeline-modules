@@ -58,6 +58,13 @@
     <p:pipe step="synthesize" port="status"/>
   </p:output>
 
+  <p:option name="include-log" select="'false'">
+    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <p>Whether or not to make the TTS log available on the "log" port.</p>
+      <p>Note that if this option is set to false, it can still be overwritten by the
+      "org.daisy.pipeline.tts.log" property.</p>
+    </p:documentation>
+  </p:option>
   <p:output port="log" sequence="true">
     <p:pipe step="synthesize" port="log"/>
   </p:output>
@@ -297,6 +304,9 @@
         <p:input port="config">
           <p:pipe port="config" step="main"/>
         </p:input>
+        <p:with-option name="include-log" select="$include-log">
+          <p:empty/>
+        </p:with-option>
         <p:with-option name="temp-dir" select="if ($temp-dir!='') then concat($temp-dir,'audio/') else ''">
           <p:empty/>
         </p:with-option>

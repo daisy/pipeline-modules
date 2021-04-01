@@ -242,6 +242,9 @@ elements that represent the sentences.</p>
         </p:documentation>
     </p:option>
     
+    <p:option name="include-tts-log" select="'false'">
+        <!-- defined in common-options.xpl -->
+    </p:option>
     <p:output port="tts-log" sequence="true">
         <!-- defined in common-options.xpl -->
         <p:pipe step="convert" port="tts-log"/>
@@ -288,6 +291,7 @@ elements that represent the sentences.</p>
         <p:with-option name="ensure-pagenum-text" select="$ensure-pagenum-text"/>
         <p:with-option name="ensure-section-headings" select="$ensure-section-headings"/>
         <p:with-option name="sentence-class" select="$sentence-class"/>
+        <p:with-option name="include-tts-log" select="$include-tts-log"/>
         <p:input port="tts-config">
             <p:pipe step="main" port="tts-config"/>
         </p:input>
