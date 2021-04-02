@@ -1248,8 +1248,6 @@
                   name="insert-text-attributes-and-next-match">
         <xsl:param name="text-transform" as="xs:string" tunnel="yes"/>
         <xsl:param name="hyphens" as="xs:string" tunnel="yes"/>
-        <xsl:param name="pending-text-transform-inline" as="xs:string?" tunnel="yes" select="()"/>
-        <xsl:param name="pending-hyphens-inline" as="xs:string?" tunnel="yes" select="()"/>
         <xsl:variable name="new-text-transform" as="xs:string?">
             <xsl:apply-templates mode="css:text-transform" select="."/>
         </xsl:variable>
@@ -1265,8 +1263,8 @@
         <xsl:next-match>
             <xsl:with-param name="text-transform" tunnel="yes" select="($new-text-transform,$text-transform)[1]"/>
             <xsl:with-param name="hyphens" tunnel="yes" select="($new-hyphens,$hyphens)[1]"/>
-            <xsl:with-param name="pending-text-transform" tunnel="yes" select="$pending-text-transform-inline"/>
-            <xsl:with-param name="pending-hyphens" tunnel="yes" select="$pending-hyphens-inline"/>
+            <xsl:with-param name="pending-text-transform" tunnel="yes" select="()"/>
+            <xsl:with-param name="pending-hyphens" tunnel="yes" select="()"/>
         </xsl:next-match>
     </xsl:template>
     
