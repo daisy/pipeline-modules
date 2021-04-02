@@ -11,19 +11,20 @@
     </p:documentation>
     
     <p:input port="source">
-        <p:documentation>
-            The input document must be valid HTML (namespace "http://www.w3.org/1999/xhtml") or
-            DTBook ("http://www.daisy.org/z3986/2005/dtbook/"). The 'display', 'render-table-by' and
-            'table-header-policy' properties of elements in the input must be declared in
-            css:display, css:render-table-by and css:table-header-policy attributes.
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>The input document must be valid HTML (namespace "http://www.w3.org/1999/xhtml") or
+            DTBook ("http://www.daisy.org/z3986/2005/dtbook/"). The 'display', 'render-table-by',
+            'table-header-policy' and 'flow' properties of elements in the input must be declared in
+            css:display, css:render-table-by, css:table-header-policy and css:flow attributes.</p>
         </p:documentation>
     </p:input>
     
     <p:output port="result">
-        <p:documentation>
-            Each table element with a 'display' property not equal to 'table' and with a
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Each table element with a 'display' property not equal to 'table' and with a
             'render-table-by' property is rendered according to the axes specified in the
-            'render-table-by' property.
+            'render-table-by' property. When a table header element is duplicated, descendent css:id
+            attributes are excluded, as are elements that are not part of the normal flow.</p>
         </p:documentation>
     </p:output>
     

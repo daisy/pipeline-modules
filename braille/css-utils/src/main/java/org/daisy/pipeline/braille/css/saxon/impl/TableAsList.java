@@ -18,6 +18,7 @@ import static javax.xml.stream.XMLStreamConstants.CHARACTERS;
 import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
 import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import com.google.common.base.Predicate;
@@ -81,6 +82,8 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 	private static final QName CSS_TABLE_BY = new QName(XMLNS_CSS, "table-by", "css");
 	private static final QName CSS_LIST_ITEM = new QName(XMLNS_CSS, "list-item", "css");
 	private static final QName CSS_LIST_HEADER = new QName(XMLNS_CSS, "list-header", "css");
+	private static final QName CSS_ID = new QName(XMLNS_CSS, "id", "css");
+	private static final QName CSS_FLOW = new QName(XMLNS_CSS, "flow", "css");
 
 	private static final Splitter HEADERS_SPLITTER = Splitter.on(' ').trimResults().omitEmptyStrings();
 	private static final Splitter AXIS_SPLITTER = Splitter.on(',').trimResults().omitEmptyStrings();
@@ -166,8 +169,17 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 							if (isHTMLorDTBookElement(TH, name))
 								withinCell.type = TableCell.CellType.TH;
 							writeActions = withinCell.content; }
-						else
-							writeActions.add(w -> writeStartElement(w, name));
+						else {
+							if (withinCell != null) {
+								String flow = "normal";
+								for (int i = 0; i < reader.getAttributeCount(); i++)
+									if (CSS_FLOW.equals(reader.getAttributeName(i))) {
+										flow = reader.getAttributeValue(i);
+										break; }
+								if (!"normal".equals(flow)) {
+									writeActions.add(writeElementOnce(reader));
+									break; }}
+							writeActions.add(w -> writeStartElement(w, name)); }
 						for (int i = 0; i < reader.getNamespaceCount(); i++) {
 							String prf = reader.getNamespacePrefix(i);
 							String ns = reader.getNamespaceURI(i);
@@ -175,7 +187,11 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 						for (int i = 0; i < reader.getAttributeCount(); i++) {
 							QName attrName = reader.getAttributeName(i);
 							String attrValue = reader.getAttributeValue(i);
-							if (CSS_TABLE_HEADER_POLICY.equals(attrName)) {
+							if (CSS_ID.equals(attrName)) {
+								WriteOnlyOnce writeOnlyOnce = new WriteOnlyOnce();
+								writeOnlyOnce.add(w -> writeAttribute(w, attrName, attrValue));
+								writeActions.add(writeOnlyOnce); }
+							else if (CSS_TABLE_HEADER_POLICY.equals(attrName)) {
 								if (isCell)
 									if ("once".equals(attrValue))
 										withinCell.headerPolicy = TableCell.HeaderPolicy.ONCE;
@@ -1180,6 +1196,51 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 				return i; }
 		catch(NumberFormatException e) {}
 		throw new RuntimeException("Expected positive integer but got "+ s);
+	}
+
+	private static class WriteOnlyOnce extends ArrayList<WriterEvent> implements WriterEvent {
+		public void writeTo(XMLStreamWriter writer) throws XMLStreamException {
+			Iterator<WriterEvent> i = iterator();
+			while (i.hasNext()) {
+				i.next().writeTo(writer);
+				i.remove();
+			}
+		}
+	}
+
+	public static WriterEvent writeElementOnce(XMLStreamReader reader) throws XMLStreamException {
+		WriteOnlyOnce list = new WriteOnlyOnce();
+		int depth = 0;
+		element: while (true)
+			try {
+				switch (reader.getEventType()) {
+				case START_ELEMENT: {
+					QName name = reader.getName();
+					depth++;
+					list.add(w -> writeStartElement(w, name));
+					for (int i = 0; i < reader.getNamespaceCount(); i++) {
+						String prf = reader.getNamespacePrefix(i);
+						String ns = reader.getNamespaceURI(i);
+						list.add(w -> w.writeNamespace(prf, ns)); }
+					for (int i = 0; i < reader.getAttributeCount(); i++) {
+						QName attrName = reader.getAttributeName(i);
+						String attrValue = reader.getAttributeValue(i);
+						list.add(w -> writeAttribute(w, attrName, attrValue)); }
+					break; }
+				case CHARACTERS:
+					String chars = reader.getText();
+					list.add(w -> w.writeCharacters(chars));
+					break;
+				case END_ELEMENT: {
+					QName name = reader.getName();
+					list.add(w -> w.writeEndElement());
+					depth--;
+					if (depth == 0)
+						break element; }}
+				reader.next(); }
+			catch (NoSuchElementException e) {
+				throw new RuntimeException("coding error"); }
+		return list;
 	}
 
 	/* Remove the first part of the selector, or the whole selector if it exists of only one part */
