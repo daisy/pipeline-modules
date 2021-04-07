@@ -143,9 +143,7 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 								+ "re-processing failed", e);
 						}
 					}
-					// FIXME: there should be a way to pass the resolved URL to the CSSInputStream
-					// so that relative imports can be handled correctly
-					return new CSSInputStream(is, source.encoding);
+					return new CSSInputStream(is, source.encoding, url != null ? url : source.base);
 				}
 			};
 	}
