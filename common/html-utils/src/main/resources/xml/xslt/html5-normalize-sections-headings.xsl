@@ -629,6 +629,11 @@
 		</xsl:choose>
 	</xsl:template>
 
+	<!-- ignore sectioning root elements other than body -->
+	<xsl:template mode="rename-headings add-implied-headings" match="blockquote|details|fieldset|figure|td">
+		<xsl:sequence select="."/>
+	</xsl:template>
+
 	<xsl:template mode="#default rename-headings add-implied-headings" match="@*|node()">
 		<xsl:copy>
 			<xsl:sequence select="@*"/>
