@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -38,6 +40,7 @@ import org.daisy.braille.css.InlineStyle.RuleRelativeBlock;
 import org.daisy.braille.css.SelectorImpl;
 import org.daisy.braille.css.SelectorImpl.PseudoClassImpl;
 import org.daisy.braille.css.SelectorImpl.PseudoElementImpl;
+import org.daisy.braille.css.SimpleInlineStyle;
 
 import org.daisy.common.stax.XMLStreamWriterHelper.ToStringWriter;
 import org.daisy.common.stax.XMLStreamWriterHelper.WriterEvent;
@@ -125,9 +128,9 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 			int row = 1;
 			int col = 1;
 			String namespace = null;
-			while (true)
-				try {
-					switch (reader.next()) {
+			Deque<SimpleInlineStyle> inheritedStyle = new LinkedList<>();
+			while (reader.hasNext()) {
+				switch (reader.next()) {
 					case START_ELEMENT: {
 						QName name = reader.getName();
 						depth++;
@@ -139,20 +142,27 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 								namespace = XMLNS_HTML;
 							else if (XMLNS_DTB.equals(name.getNamespaceURI()))
 								namespace = XMLNS_DTB; }
-						else if (isHTMLorDTBookElement(THEAD, name)) {
-							rowType = TableCell.RowType.THEAD;
-							// TODO: if style != default, warning that style on thead element is ignored
-							break; }
-						else if (isHTMLorDTBookElement(TFOOT, name)) {
-							rowType = TableCell.RowType.TFOOT;
-							// TODO: if style != default, warning that style on tfoot element is ignored
-							break; }
-						else if (isHTMLorDTBookElement(TBODY, name)) {
-							rowType = TableCell.RowType.TBODY;
-							// TODO: if style != default, warning that style on tbody element is ignored
-							break; }
-						else if (isHTMLorDTBookElement(TR, name)) {
-							// TODO: if style != default, warning that style on tr element is ignored
+						else if (isHTMLorDTBookElement(THEAD, name) ||
+						         isHTMLorDTBookElement(TFOOT, name) ||
+						         isHTMLorDTBookElement(TBODY, name) ||
+						         isHTMLorDTBookElement(TR, name)) {
+							rowType = isHTMLorDTBookElement(THEAD, name)
+								? TableCell.RowType.THEAD
+								: isHTMLorDTBookElement(TFOOT, name)
+									? TableCell.RowType.TFOOT
+									: isHTMLorDTBookElement(TBODY, name)
+										? TableCell.RowType.TBODY
+										: rowType;
+										;
+							String style = null; {
+								for (int i = 0; i < reader.getAttributeCount(); i++) {
+									if (_STYLE.equals(reader.getAttributeName(i))) {
+										style = reader.getAttributeValue(i);
+										break; }}}
+							// FIXME: if (non-default) block-level style present, warn that style is ignored
+							// FIXME: We assume that not both a tbody/thead/tfoot and a child tr have a text-transform property,
+							// because two text-transform properties can not always simply be replaced with a single one.
+							inheritedStyle.push(new SimpleInlineStyle(style, inheritedStyle.isEmpty() ? null : inheritedStyle.peek()));
 							break; }
 						else if (isHTMLorDTBookElement(COLGROUP, name) || isHTMLorDTBookElement(COL, name))
 							throw new RuntimeException("Elements colgroup and col not supported yet.");
@@ -168,6 +178,12 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 							cells.add(withinCell);
 							if (isHTMLorDTBookElement(TH, name))
 								withinCell.type = TableCell.CellType.TH;
+							String style = null; {
+								for (int i = 0; i < reader.getAttributeCount(); i++) {
+									if (_STYLE.equals(reader.getAttributeName(i))) {
+										style = reader.getAttributeValue(i);
+										break; }}}
+							withinCell.style = new SimpleInlineStyle(style, inheritedStyle.isEmpty() ? null : inheritedStyle.peek());
 							writeActions = withinCell.content; }
 						else {
 							if (withinCell != null) {
@@ -298,6 +314,8 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 									newStyle = serializeRuleBlockList(builder); }
 								if (!newStyle.isEmpty())
 									writeActions.add(w -> writeAttribute(w, attrName, newStyle)); }
+							else if (isCell && _STYLE.equals(attrName))
+								; // handled above
 							else
 								writeActions.add(w -> writeAttribute(w, attrName, attrValue)); }
 						break; }
@@ -311,9 +329,11 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 						if (isHTMLorDTBookElement(THEAD, name)
 						    || isHTMLorDTBookElement(TFOOT, name)
 						    || isHTMLorDTBookElement(TBODY, name)) {
+							inheritedStyle.pop();
 							rowGroup++;
 							break; }
 						else if (isHTMLorDTBookElement(TR, name)) {
+							inheritedStyle.pop();
 							row++;
 							col = 1;
 							while (isCovered(row, col)) col++;
@@ -325,8 +345,6 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 						else
 							writeActions.add(w -> w.writeEndElement());
 						break; }}}
-				catch (NoSuchElementException e) {
-					break; }
 
 			// handle colspan and rowspan on data cells by simply splitting them into several identical ones for now
 			List<TableCell> moreCells = new ArrayList<TableCell>();
@@ -1104,6 +1122,7 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 		int rowspan = 1;
 		int colspan = 1;
 		String ns;
+		SimpleInlineStyle style = null;
 		List<WriterEvent> content = new ArrayList<WriterEvent>();
 
 		private AtomicReference<Boolean> written = new AtomicReference<Boolean>(false);
@@ -1117,6 +1136,10 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 				written.set(true); }
 			if (headers != null)
 				writeAttribute(writer, _HEADERS, Strings.join(headers, " "));
+			if (style != null) {
+				String styleAttr = BrailleCssSerializer.toString(style);
+				if (styleAttr != null && !"".equals(styleAttr))
+					writeAttribute(writer, _STYLE, styleAttr); }
 			for (WriterEvent action : content)
 				action.writeTo(writer);
 			writer.writeEndElement();
@@ -1137,6 +1160,7 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 			clone.rowspan = this.rowspan;
 			clone.colspan = this.colspan;
 			clone.ns = this.ns;
+			clone.style = (SimpleInlineStyle)this.style.clone();
 			clone.content.addAll(this.content);
 			clone.written = this.written;
 			return clone;
