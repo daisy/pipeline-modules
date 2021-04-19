@@ -67,11 +67,11 @@
 		<!-- parent is block -->
 		<xsl:param name="is-block" as="xs:boolean" select="true()" tunnel="yes"/>
 		<!-- computed text properties of the parent element in the source -->
-		<xsl:param name="source-style" as="element()*" tunnel="yes"/> <!-- css:property* -->
+		<xsl:param name="source-style" as="element(css:property)*" tunnel="yes"/>
 		<!-- computed text properties of the parent element in the result -->
-		<xsl:param name="result-style" as="element()*" tunnel="yes"/> <!-- css:property* -->
+		<xsl:param name="result-style" as="element(css:property)*" tunnel="yes"/>
 		<xsl:param name="portion" required="yes"/>
-		<xsl:variable name="style" as="element()*"> <!-- css:rule* -->
+		<xsl:variable name="style" as="element(css:rule)*">
 			<xsl:if test="@css:*">
 				<css:rule>
 					<xsl:apply-templates mode="css:attribute-as-property" select="@css:*"/>
@@ -82,7 +82,7 @@
 			</xsl:call-template>
 		</xsl:variable>
 		<xsl:variable name="context" as="element()" select="."/>
-		<xsl:variable name="translated-style" as="element()*"> <!-- css:rule* -->
+		<xsl:variable name="translated-style" as="element(css:rule)*">
 			<xsl:call-template name="translate-style">
 				<xsl:with-param name="style" select="$style"/>
 				<xsl:with-param name="context" tunnel="yes" select="$context"/>
@@ -186,12 +186,12 @@
 		<xsl:sequence select="."/>
 	</xsl:template>
 	
-	<xsl:template name="translate-style" as="element()*"> <!-- css:rule* -->
-		<xsl:param name="style" as="element()*" required="yes"/> <!-- css:rule* -->
-		<xsl:param name="source-style" as="element()*" tunnel="yes"/> <!-- css:property* -->
-		<xsl:param name="result-style" as="element()*" tunnel="yes"/> <!-- css:property* -->
-		<xsl:variable name="main-style" as="element()*" select="$style[not(@selector)]"/> <!-- css:rule* -->
-		<xsl:variable name="translated-main-style" as="element()*"> <!-- css:rule* -->
+	<xsl:template name="translate-style" as="element(css:rule)*">
+		<xsl:param name="style" as="element(css:rule)*" required="yes"/>
+		<xsl:param name="source-style" as="element(css:property)*" tunnel="yes"/>
+		<xsl:param name="result-style" as="element(css:property)*" tunnel="yes"/>
+		<xsl:variable name="main-style" as="element(css:rule)*" select="$style[not(@selector)]"/>
+		<xsl:variable name="translated-main-style" as="element(css:rule)*">
 			<xsl:apply-templates mode="translate-style" select="$main-style"/>
 		</xsl:variable>
 		<xsl:variable name="source-style" as="element()*">
@@ -245,7 +245,7 @@
 	</xsl:template>
 	
 	<xsl:template mode="translate-style" match="css:rule">
-		<xsl:param name="source-style" as="element()*" tunnel="yes"/> <!-- css:property* -->
+		<xsl:param name="source-style" as="element(css:property)*" tunnel="yes"/>
 		<xsl:param name="restore-text-style" as="xs:boolean" tunnel="yes" select="false()"/>
 		<xsl:copy>
 			<xsl:sequence select="@selector"/>
@@ -412,8 +412,8 @@
 	-->
 	<xsl:template mode="translate-style" match="css:string[@value]|css:attr" as="element()?">
 		<xsl:param name="context" as="element()" tunnel="yes"/>
-		<xsl:param name="source-style" as="element()*" tunnel="yes"/> <!-- css:property* -->
-		<xsl:param name="result-style" as="element()*" tunnel="yes"/> <!-- css:property* -->
+		<xsl:param name="source-style" as="element(css:property)*" tunnel="yes"/>
+		<xsl:param name="result-style" as="element(css:property)*" tunnel="yes"/>
 		<xsl:variable name="evaluated-string" as="xs:string">
 			<xsl:apply-templates mode="css:eval" select=".">
 				<xsl:with-param name="context" select="$context"/>
@@ -440,12 +440,14 @@
 		<css:string value="{string-join($translated-block/string(.),'')}"/>
 	</xsl:template>
 	
+	<xsl:variable name="empty-style" as="element(css:rule)"><css:rule/></xsl:variable>
+	
 	<xsl:template mode="treewalk" match="*">
 		<xsl:param name="new-text-nodes" as="xs:string*" required="yes"/>
-		<xsl:param name="source-style" as="element()*" tunnel="yes"/> <!-- css:property* -->
-		<xsl:param name="result-style" as="element()*" tunnel="yes"/> <!-- css:property* -->
+		<xsl:param name="source-style" as="element(css:property)*" tunnel="yes"/>
+		<xsl:param name="result-style" as="element(css:property)*" tunnel="yes"/>
 		<xsl:variable name="text-node-count" select="count(.//text())"/>
-		<xsl:variable name="style" as="element()*"> <!-- css:rule* -->
+		<xsl:variable name="style" as="element(css:rule)*">
 			<xsl:if test="@css:*">
 				<css:rule>
 					<xsl:apply-templates mode="css:attribute-as-property" select="@css:*"/>
@@ -455,8 +457,10 @@
 				<xsl:with-param name="stylesheet" select="@style"/>
 			</xsl:call-template>
 		</xsl:variable>
+		<xsl:variable name="style" as="element(css:rule)*"
+		              select="if (exists($style)) then $style else $empty-style"/>
 		<xsl:variable name="context" as="element()" select="."/>
-		<xsl:variable name="translated-style" as="element()*"> <!-- css:rule* -->
+		<xsl:variable name="translated-style" as="element(css:rule)*">
 			<xsl:call-template name="translate-style">
 				<xsl:with-param name="style" select="$style"/>
 				<xsl:with-param name="context" tunnel="yes" select="$context"/>
@@ -502,6 +506,7 @@
 				<xsl:with-param name="new-text-nodes" select="$new-text-nodes[position()&lt;=$text-node-count]"/>
 				<xsl:with-param name="source-style" tunnel="yes" select="$source-style"/>
 				<xsl:with-param name="result-style" tunnel="yes" select="$result-style"/>
+				<xsl:with-param name="restore-text-style" tunnel="yes" select="false()"/>
 			</xsl:apply-templates>
 		</xsl:element>
 		<xsl:apply-templates mode="#current" select="following-sibling::node()[1]">
@@ -511,30 +516,24 @@
 	
 	<xsl:template mode="treewalk" match="text()">
 		<xsl:param name="new-text-nodes" as="xs:string*" required="yes"/>
-		<xsl:value-of select="$new-text-nodes[1]"/>
-		<xsl:apply-templates mode="#current" select="following-sibling::node()[1]">
-			<xsl:with-param name="new-text-nodes" select="$new-text-nodes[position()&gt;1]"/>
-		</xsl:apply-templates>
-	</xsl:template>
-	
-	<xsl:variable name="empty-style" as="element()"><css:rule/></xsl:variable>
-	
-	<xsl:template mode="treewalk" match="text()" priority="0.6">
-		<xsl:param name="new-text-nodes" as="xs:string*" required="yes"/>
 		<xsl:param name="restore-text-style" as="xs:boolean" tunnel="yes" select="false()"/>
-		<xsl:param name="result-style" as="element()*" tunnel="yes"/> <!-- css:property* -->
+		<xsl:param name="result-style" as="element(css:property)*" tunnel="yes"/>
 		<xsl:choose>
 			<xsl:when test="$restore-text-style">
-				<xsl:variable name="restored-style" as="element()*"> <!-- css:rule? -->
+				<xsl:variable name="restored-style" as="element(css:rule)?">
 					<xsl:call-template name="translate-style">
 						<xsl:with-param name="style" select="$empty-style"/>
 					</xsl:call-template>
 				</xsl:variable>
-				<xsl:variable name="restored-style" as="element()*"> <!-- css:property* -->
+				<xsl:variable name="restored-style" as="element(css:property)*">
 					<xsl:apply-templates mode="insert-style" select="$restored-style/css:property"/>
 				</xsl:variable>
 				<xsl:choose>
-					<xsl:when test="exists($restored-style)">
+					<xsl:when test="exists($restored-style) and
+					                not(string(.)='') and
+					                (not(normalize-space(.)='')
+					                 or ($restored-style/css:property[@name='white-space'],
+					                     $result-style/css:property[@name='white-space'])[1][not(@value='normal')])">
 						<_>
 							<xsl:sequence select="css:style-attribute(css:serialize-stylesheet($restored-style))"/>
 							<xsl:if test="ancestor::*[@xml:lang]
@@ -547,33 +546,21 @@
 								                       then concat($lang,'-Brai')
 								                       else $lang"/>
 							</xsl:if>
-							<xsl:variable name="result-style" as="element()*">
-								<xsl:call-template name="css:computed-properties">
-									<xsl:with-param name="properties" select="$text-properties"/>
-									<xsl:with-param name="context" select="$dummy-element"/>
-									<xsl:with-param name="cascaded-properties" tunnel="yes" select="$restored-style"/>
-									<xsl:with-param name="parent-properties" tunnel="yes" select="$result-style"/>
-								</xsl:call-template>
-							</xsl:variable>
-							<xsl:next-match>
-								<xsl:with-param name="new-text-nodes" select="$new-text-nodes"/>
-								<xsl:with-param name="result-style" tunnel="yes" select="$result-style"/>
-							</xsl:next-match>
+							<xsl:value-of select="$new-text-nodes[1]"/>
 						</_>
 					</xsl:when>
 					<xsl:otherwise>
-						<xsl:next-match>
-							<xsl:with-param name="new-text-nodes" select="$new-text-nodes"/>
-						</xsl:next-match>
+						<xsl:value-of select="$new-text-nodes[1]"/>
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:when>
 			<xsl:otherwise>
-				<xsl:next-match>
-					<xsl:with-param name="new-text-nodes" select="$new-text-nodes"/>
-				</xsl:next-match>
+				<xsl:value-of select="$new-text-nodes[1]"/>
 			</xsl:otherwise>
 		</xsl:choose>
+		<xsl:apply-templates mode="#current" select="following-sibling::node()[1]">
+			<xsl:with-param name="new-text-nodes" select="$new-text-nodes[position()&gt;1]"/>
+		</xsl:apply-templates>
 	</xsl:template>
 	
 	<xsl:template mode="restore-text-style" match="css:property[@name=$text-properties]">
@@ -618,7 +605,7 @@
 		<xsl:param name="properties" as="xs:string*" select="('#all')"/>
 		<xsl:param name="validate" as="xs:boolean" select="false()"/>
 		<xsl:param name="context" as="element()" select="."/>
-		<xsl:param name="cascaded-properties" as="element()*" select="()" tunnel="yes"/> <!-- css:property* -->
+		<xsl:param name="cascaded-properties" as="element(css:property)*" select="()" tunnel="yes"/>
 		<xsl:sequence select="for $name in distinct-values(
 		                                     if ('#all'=$properties)
 		                                     then $cascaded-properties/@name
@@ -633,7 +620,7 @@
 		<xsl:param name="concretize-initial" as="xs:boolean" select="true()"/>
 		<xsl:param name="validate" as="xs:boolean"/>
 		<xsl:param name="context" as="element()" select="."/>
-		<xsl:param name="parent-properties" as="element()*" select="()" tunnel="yes"/> <!-- css:property* -->
+		<xsl:param name="parent-properties" as="element(css:property)*" select="()" tunnel="yes"/>
 		<xsl:choose>
 			<xsl:when test="exists($parent-properties[@name=$property])">
 				<xsl:sequence select="$parent-properties[@name=$property][last()]"/>
