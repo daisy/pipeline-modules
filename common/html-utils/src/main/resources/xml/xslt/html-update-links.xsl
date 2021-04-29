@@ -18,7 +18,7 @@
     <!-- <xsl:import href="uri-functions.xsl"/> -->
     <xsl:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xsl"/>
 
-    <xsl:param name="source-renamed" select="'false'"/>
+    <xsl:param name="source-renamed" as="xs:string" select="'false'"/>
 
     <!--
         A fileset defines the relocation of resources.

@@ -4,6 +4,8 @@
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:c="http://www.w3.org/ns/xproc-step"
                 xmlns:pef="http://www.daisy.org/ns/2008/pef"
                 xmlns:math="http://www.w3.org/1998/Math/MathML"
@@ -43,9 +45,9 @@
     
     <p:option name="default-stylesheet" required="false" select="'#default'"/>
     <p:option name="stylesheet" select="''"/>
-    <p:option name="apply-document-specific-stylesheets" select="'false'"/>
+    <p:option name="apply-document-specific-stylesheets" select="'false'" cx:as="xs:string"/>
     <p:option name="transform" select="'(translator:liblouis)(formatter:dotify)'"/>
-    <p:option name="include-obfl" select="'false'"/>
+    <p:option name="include-obfl" select="'false'" cx:as="xs:string"/>
     <p:option name="content-media-types" select="'application/xhtml+xml'">
         <!--
             space separated list of content document media-types to include for braille transcription
@@ -212,20 +214,23 @@
     
     <p:group px:message="Inlining global CSS" px:progress=".11">
         <p:variable name="abs-stylesheet"
-                    select="string-join(for $s in tokenize($stylesheet,'\s+')[not(.='')]
-                                        return resolve-uri($s,$epub),' ')"/>
+                    select="for $s in tokenize($stylesheet,'\s+')[not(.='')]
+                            return resolve-uri($s,$epub)"/>
         <p:variable name="first-css-stylesheet"
-                    select="tokenize($abs-stylesheet,'\s+')[matches(.,'\.s?css$')][1]"/>
+                    select="$abs-stylesheet[matches(.,'\.s?css$')][1]"/>
         <p:variable name="first-css-stylesheet-index"
-                    select="(index-of(tokenize($abs-stylesheet,'\s+')[not(.='')], $first-css-stylesheet),10000)[1]"/>
+                    select="(if (exists($first-css-stylesheet))
+                               then index-of($abs-stylesheet, $first-css-stylesheet)
+                               else (),
+                             10000)[1]"/>
         <p:variable name="stylesheets-to-be-inlined"
                     select="string-join((
-                              (tokenize($abs-stylesheet,'\s+')[not(.='')])[position()&lt;$first-css-stylesheet-index],
+                              $abs-stylesheet[position()&lt;$first-css-stylesheet-index],
                               if ($default-stylesheet!='#default')
                                 then $default-stylesheet
                                 else resolve-uri('../../css/default.css'),
                               resolve-uri('../../css/default.scss'),
-                              (tokenize($abs-stylesheet,'\s+')[not(.='')])[position()&gt;=$first-css-stylesheet-index]),' ')">
+                              $abs-stylesheet[position()&gt;=$first-css-stylesheet-index]),' ')">
             <p:inline><_/></p:inline>
         </p:variable>
         <p:identity px:message="stylesheets: {$stylesheets-to-be-inlined}"/>

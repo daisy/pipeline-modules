@@ -178,7 +178,8 @@ public class CssCascadeStep extends DefaultStep implements XProcStep {
 			XMLInputValue<Void> stylesheet = new SaxonInputValue(runtime.parse(stylesheetURI.toASCIIString(), null), conf);
 			Map<javax.xml.namespace.QName,InputValue<?>> params = new HashMap<>(); {
 				for (String p : parameters.keySet())
-					params.put(new javax.xml.namespace.QName(p), new InputValue(parameters.get(p))); }
+					params.put(new javax.xml.namespace.QName(p),
+					           new SaxonInputValue(new RuntimeValue(parameters.get(p)).getUntypedAtomic(runtime), conf)); }
 			SaxonBuffer buf = new SaxonBuffer(conf);
 			transform(
 				ImmutableMap.of(

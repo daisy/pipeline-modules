@@ -3,6 +3,8 @@
                 xmlns:p="http://www.w3.org/ns/xproc"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:c="http://www.w3.org/ns/xproc-step"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:dotify="http://code.google.com/p/dotify/"
                 xmlns:obfl="http://www.daisy.org/ns/2011/obfl"
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
@@ -27,19 +29,19 @@
 	<p:import href="../css-to-obfl.xpl"/>
 	<p:import href="../obfl-normalize-space.xpl"/>
 	
-	<p:variable name="page-width"
-	               select="(//c:param[@name='page-width' and not(@namespace[not(.='')])]/@value,40)[1]">
+	<p:variable name="page-width" cx:as="xs:string"
+	               select="(//c:param[@name='page-width' and not(@namespace[not(.='')])]/@value,'40')[1]">
 		<p:pipe step="main" port="parameters"/>
 	</p:variable>
-	<p:variable name="page-height"
-	               select="(//c:param[@name='page-height' and not(@namespace[not(.='')])]/@value,25)[1]">
+	<p:variable name="page-height" cx:as="xs:string"
+	               select="(//c:param[@name='page-height' and not(@namespace[not(.='')])]/@value,'25')[1]">
 		<p:pipe step="main" port="parameters"/>
 	</p:variable>
-	<p:variable name="duplex"
+	<p:variable name="duplex" cx:as="xs:string"
 	            select="(//c:param[@name='duplex' and not(@namespace[not(.='')])]/@value,'true')[.=('true','false')][1]">
 		<p:pipe step="main" port="parameters"/>
 	</p:variable>
-	<p:variable name="skip-margin-top-of-page"
+	<p:variable name="skip-margin-top-of-page" cx:as="xs:string"
 	            select="(//c:param[@name='skip-margin-top-of-page' and not(@namespace[not(.='')])]/@value,'false')[.=('true','false')][1]">
 		<p:pipe step="main" port="parameters"/>
 	</p:variable>

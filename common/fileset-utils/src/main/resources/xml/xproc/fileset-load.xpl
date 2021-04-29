@@ -4,6 +4,8 @@
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:c="http://www.w3.org/ns/xproc-step"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 type="px:fileset-load" name="main"
                 exclude-inline-prefixes="px">
@@ -468,7 +470,7 @@
       <p:variable name="base-uri" select="string(/*)">
         <p:pipe step="normalize-uri" port="normalized"/>
       </p:variable>
-      <p:variable name="base-uri-changed" select="not($base-uri=base-uri(/))"/>
+      <p:variable name="base-uri-changed" cx:as="xs:string" select="not($base-uri=base-uri(/))"/>
   
       <px:fileset-add-entry name="normalized.fileset">
         <p:with-option name="href" select="$base-uri"/>

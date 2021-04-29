@@ -6,6 +6,8 @@
                 xmlns:dc="http://purl.org/dc/elements/1.1/"
                 xmlns:html="http://www.w3.org/1999/xhtml"
                 xmlns:epub="http://www.idpf.org/2007/ops"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 type="pxi:daisy202-to-epub3-navigation" name="main">
 
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -56,7 +58,7 @@
             <pre><code class="example">file:/home/user/epub3/epub/Publication/Content/</code></pre>
         </p:documentation>
     </p:option>
-    <p:option name="compatibility-mode" required="true">
+    <p:option name="compatibility-mode" required="true" cx:as="xs:string">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p px:role="desc">Whether or not to include NCX-file. Can be either 'true' (default) or 'false'.</p>
         </p:documentation>

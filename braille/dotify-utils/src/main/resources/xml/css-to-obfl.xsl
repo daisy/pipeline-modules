@@ -20,14 +20,14 @@
     
     <xsl:param name="locale" as="xs:string" required="yes"/>
     <xsl:param name="page-counters" as="xs:string" required="yes"/>
-    <xsl:param name="volume-transition" as="xs:string" required="no" select="''"/>
+    <xsl:param name="volume-transition" as="xs:string?" required="no"/>
     
     <xsl:variable name="sections" select="collection()[position() &lt; last()]"/>
     <xsl:variable name="page-and-volume-styles" select="collection()[position()=last()]/*/*"/>
     <xsl:variable name="page-counter-names" as="xs:string*" select="tokenize($page-counters,' ')"/>
     
     <xsl:variable name="volume-transition-rule" as="element()?">
-        <xsl:if test="not($volume-transition='')">
+        <xsl:if test="exists($volume-transition)">
             <xsl:sequence select="css:deep-parse-stylesheet(concat('@-obfl-volume-transition { ',$volume-transition,' }'))"/>
         </xsl:if>
     </xsl:variable>

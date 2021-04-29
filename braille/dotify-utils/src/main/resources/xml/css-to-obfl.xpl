@@ -3,6 +3,7 @@
                 xmlns:p="http://www.w3.org/ns/xproc"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
                 xmlns:css="http://www.daisy.org/ns/pipeline/braille-css"
                 xmlns:obfl="http://www.daisy.org/ns/2011/obfl"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -21,7 +22,7 @@
     <p:option name="page-width" select="'40'"/>
     <p:option name="page-height" select="'25'"/>
     <p:option name="duplex" select="'true'"/>
-    <p:option name="skip-margin-top-of-page" select="'false'"/>
+    <p:option name="skip-margin-top-of-page" select="'false'" cx:as="xs:string"/>
     
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
       <p:documentation xmlns="http://www.w3.org/1999/xhtml">
