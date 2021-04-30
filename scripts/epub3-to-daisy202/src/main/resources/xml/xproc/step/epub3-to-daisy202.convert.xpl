@@ -400,6 +400,8 @@
 
     <p:documentation>
         Move notes after their corresponding note refs in the media overlays.
+        <!-- Note that this step needs to come after pxi:create-ncc because pxi:create-ncc sorts the
+             pars in document order. -->
     </p:documentation>
     <p:group name="rearrange-notes">
         <p:output port="fileset" primary="true"/>

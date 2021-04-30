@@ -12,9 +12,11 @@
 
 	<xsl:key name="id" match="*[@id]" use="@id"/>
 	<xsl:key name="href" match="html:a[@href]" use="@href"/>
-	<xsl:key name="absolute-id" match="*[@id]" use="concat(pf:normalize-uri(pf:html-base-uri(.)),'#',@id)"/>
+	<xsl:key name="absolute-src" match="par[text]" use="pf:normalize-uri(text/resolve-uri(@src,base-uri(.)))"/>
 
-	<xsl:variable name="smil-base-uri" select="pf:base-uri(/*)"/>
+	<xsl:variable name="smil" select="collection()[1]"/>
+	<xsl:variable name="smil-base-uri" select="pf:base-uri($smil/*)"/>
+	<xsl:variable name="noteref-list" select="collection()[2]"/>
 
 	<!--
 	    mapping from noteref pars to sequence of associated note pars
@@ -24,7 +26,7 @@
 			<xsl:for-each select="collection()/html:*">
 				<xsl:variable name="content-doc" select="."/>
 				<xsl:variable name="content-doc-uri" select="pf:normalize-uri(base-uri(.))"/>
-				<xsl:for-each select="collection()[2]
+				<xsl:for-each select="$noteref-list
 				                      //d:file[pf:normalize-uri(resolve-uri(@href,base-uri(.)))=$content-doc-uri]
 				                      /d:anchor">
 					<xsl:variable name="noteref-element" as="element()?" select="key('id',@id,$content-doc)"/>
@@ -32,12 +34,10 @@
 					    for now only note references within the same (HTML and SMIL) document are supported
 					-->
 					<xsl:if test="$noteref-element/self::html:a[starts-with(@href,'#')]">
-						<xsl:variable name="noteref-linkbacks" as="xs:string*"
-						              select="$noteref-element/descendant::html:a
-						                        [matches(@href,'.+\.[Ss][Mm][Ii][Ll]#.+$')]
-						                        [starts-with(resolve-uri(@href,$content-doc-uri),concat($smil-base-uri,'#'))]
-						                      /substring-after(@href,'#')"/>
-						<xsl:if test="exists($noteref-linkbacks)">
+						<xsl:variable name="noteref-par-elements" as="element()*"
+						              select="for $id in $noteref-element/descendant-or-self::*/@id
+						                      return key('absolute-src',concat($content-doc-uri,'#',$id),$smil)"/>
+						<xsl:if test="exists($noteref-par-elements)">
 							<xsl:variable name="note-element" as="element()?"
 							              select="key('id',substring($noteref-element/@href,2),$content-doc)"/>
 							<xsl:if test="exists($note-element)">
@@ -45,13 +45,13 @@
 								    a note could in theory be referenced by more than one noteref
 								-->
 								<xsl:if test="key('href',concat('#',$note-element/@id),$content-doc) is $noteref-element">
-									<xsl:variable name="note-linkbacks" as="xs:string*"
-									              select="$note-element/descendant::html:a
-									                        [matches(@href,'.+\.[Ss][Mm][Ii][Ll]#.+$')]
-									                        [starts-with(resolve-uri(@href,$content-doc-uri),concat($smil-base-uri,'#'))]
-									                      /substring-after(@href,'#')"/>
-									<xsl:if test="exists($note-linkbacks)">
-										<xsl:map-entry key="$noteref-linkbacks[last()]" select="$note-linkbacks"/>
+									<xsl:variable name="note-par-elements" as="element()*"
+									              select="for $id in $note-element/descendant-or-self::*/@id
+									                      return key('absolute-src',concat($content-doc-uri,'#',$id),$smil)"/>
+									<xsl:if test="exists($note-par-elements)">
+										<!-- all pars have an @id after pxi:create-ncc -->
+										<xsl:map-entry key="$noteref-par-elements[last()]/@id/string(.)"
+										               select="$note-par-elements/@id/string(.)"/>
 									</xsl:if>
 								</xsl:if>
 							</xsl:if>

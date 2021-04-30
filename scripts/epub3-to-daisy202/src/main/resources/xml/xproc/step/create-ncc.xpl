@@ -225,7 +225,8 @@
                         <p:pipe step="load-smil" port="result.fileset"/>
                     </p:variable>
                     <p:sink/>
-                    <p:documentation>Make sure pars have an id attribute (needed for augment-smils.xsl and create-linkbacks.xsl)</p:documentation>
+                    <p:documentation>Make sure pars have an id attribute (needed for augment-smils.xsl and
+                    create-linkbacks.xsl and also later by rearrange-notes.xsl)</p:documentation>
                     <px:add-ids match="par" name="smil-with-ids">
                         <p:input port="source">
                             <p:pipe step="augment-smils" port="current"/>
