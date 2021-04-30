@@ -248,24 +248,7 @@
                     </p:xslt>
                 </p:group>
                 <p:identity name="smil-with-textref"/>
-                <p:unwrap match="*[@textref]"/>
-                <p:documentation>Fix metadata</p:documentation>
-                <p:xslt>
-                    <p:input port="stylesheet">
-                        <p:document href="../../xslt/smil-metadata.xsl"/>
-                    </p:input>
-                    <p:input port="parameters">
-                        <p:empty/>
-                    </p:input>
-                </p:xslt>
-                <p:xslt name="smil">
-                    <p:input port="stylesheet">
-                        <p:document href="../../xslt/pretty-print.xsl"/>
-                    </p:input>
-                    <p:input port="parameters">
-                        <p:empty/>
-                    </p:input>
-                </p:xslt>
+                <p:unwrap match="*[@textref]" name="smil"/>
                 <p:sink/>
                 <p:documentation>
                     Add linkbacks from HTML to SMIL. <!-- (Note that the spec does not explicitly
@@ -399,15 +382,6 @@
             </p:input>
             <p:input port="stylesheet">
                 <p:document href="../../xslt/augment-smil.xsl"/>
-            </p:input>
-            <p:input port="parameters">
-                <p:empty/>
-            </p:input>
-        </p:xslt>
-        <p:documentation>Fix metadata</p:documentation>
-        <p:xslt>
-            <p:input port="stylesheet">
-                <p:document href="../../xslt/smil-metadata.xsl"/>
             </p:input>
             <p:input port="parameters">
                 <p:empty/>

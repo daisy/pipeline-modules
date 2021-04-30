@@ -451,6 +451,55 @@
     </p:group>
 
     <p:documentation>
+        Fix SMIL metadata and pretty print
+    </p:documentation>
+    <p:group name="smil-metadata">
+        <p:output port="fileset" primary="true"/>
+        <p:output port="in-memory" sequence="true">
+            <p:pipe step="update" port="result.in-memory"/>
+        </p:output>
+        <px:fileset-load media-types="application/smil+xml" name="smil">
+            <p:input port="in-memory">
+                <p:pipe step="create-ncc" port="result.in-memory"/>
+            </p:input>
+        </px:fileset-load>
+        <p:for-each>
+            <p:xslt>
+                <p:input port="stylesheet">
+                    <p:document href="../../xslt/smil-metadata.xsl"/>
+                </p:input>
+                <p:input port="parameters">
+                    <p:empty/>
+                </p:input>
+            </p:xslt>
+            <p:xslt>
+                <p:input port="stylesheet">
+                    <p:document href="../../xslt/pretty-print.xsl"/>
+                </p:input>
+                <p:input port="parameters">
+                    <p:empty/>
+                </p:input>
+            </p:xslt>
+        </p:for-each>
+        <p:identity name="smil-with-metadata"/>
+        <p:sink/>
+        <px:fileset-update name="update">
+            <p:input port="source.fileset">
+                <p:pipe step="rearrange-notes" port="fileset"/>
+            </p:input>
+            <p:input port="source.in-memory">
+                <p:pipe step="rearrange-notes" port="in-memory"/>
+            </p:input>
+            <p:input port="update.fileset">
+                <p:pipe step="smil" port="result.fileset"/>
+            </p:input>
+            <p:input port="update.in-memory">
+                <p:pipe step="smil-with-metadata" port="result"/>
+            </p:input>
+        </px:fileset-update>
+    </p:group>
+
+    <p:documentation>
         Merge into single HTML document (workaround for Voice Dream Reader)
     </p:documentation>
     <p:group name="voice-dream-workaround" px:message="Merging HTML documents" px:progress="1/5">
@@ -460,7 +509,7 @@
         </p:output>
         <px:fileset-filter href="*/ncc.html" name="ncc">
             <p:input port="source.in-memory">
-                <p:pipe step="rearrange-notes" port="in-memory"/>
+                <p:pipe step="smil-metadata" port="in-memory"/>
             </p:input>
         </px:fileset-filter>
         <p:sink/>
@@ -480,7 +529,7 @@
                 </p:output>
                 <px:fileset-load>
                     <p:input port="in-memory">
-                        <p:pipe step="rearrange-notes" port="in-memory"/>
+                        <p:pipe step="smil-metadata" port="in-memory"/>
                     </p:input>
                 </px:fileset-load>
                 <px:html-merge name="merge">
@@ -519,11 +568,11 @@
             <p:otherwise>
                 <p:output port="fileset" primary="true"/>
                 <p:output port="in-memory" sequence="true">
-                    <p:pipe step="rearrange-notes" port="in-memory"/>
+                    <p:pipe step="smil-metadata" port="in-memory"/>
                 </p:output>
                 <p:identity>
                     <p:input port="source">
-                        <p:pipe step="rearrange-notes" port="fileset"/>
+                        <p:pipe step="smil-metadata" port="fileset"/>
                     </p:input>
                 </p:identity>
             </p:otherwise>
