@@ -406,24 +406,44 @@
     <p:group name="rearrange-notes">
         <p:output port="fileset" primary="true"/>
         <p:output port="in-memory" sequence="true">
-            <p:pipe step="update" port="result.in-memory"/>
+            <p:pipe step="update-links" port="result.in-memory"/>
         </p:output>
         <px:fileset-load media-types="application/smil+xml" name="smil">
             <p:input port="in-memory">
                 <p:pipe step="create-ncc" port="result.in-memory"/>
             </p:input>
         </px:fileset-load>
+        <p:sink/>
+        <p:xslt name="noterefs">
+            <p:input port="source">
+                <p:pipe step="convert-html" port="noteref-list">
+                    <!-- assumes convert-smil and create-ncc do not change base URIs of content
+                         documents and IDs of noteref and note elements -->
+                </p:pipe>
+                <p:pipe step="create-ncc" port="result.in-memory"/>
+            </p:input>
+            <p:input port="stylesheet">
+                <p:document href="../../xslt/noterefs-in-smil.xsl"/>
+            </p:input>
+            <p:input port="parameters">
+                <p:empty/>
+            </p:input>
+        </p:xslt>
+        <p:sink/>
         <p:for-each name="rearrange-smil">
-            <p:output port="result"/>
+            <p:iteration-source>
+                <p:pipe step="smil" port="result"/>
+            </p:iteration-source>
+            <p:output port="result" primary="true"/>
+            <p:output port="mapping">
+                <p:pipe step="xslt" port="secondary"/>
+            </p:output>
             <p:sink/>
-            <p:xslt>
+            <p:xslt name="xslt">
                 <p:input port="source">
                     <p:pipe step="rearrange-smil" port="current"/>
-                    <p:pipe step="convert-html" port="noteref-list">
-                        <!-- assumes convert-smil and create-ncc do not change base URIs of content
-                             documents and IDs of noteref and note elements -->
-                    </p:pipe>
-                    <p:pipe step="create-ncc" port="result.in-memory"/>
+                    <p:pipe step="smil" port="result"/>
+                    <p:pipe step="noterefs" port="result"/>
                 </p:input>
                 <p:input port="stylesheet">
                     <p:document href="../../xslt/rearrange-notes.xsl"/>
@@ -432,7 +452,18 @@
                     <p:empty/>
                 </p:input>
             </p:xslt>
+            <px:set-base-uri>
+                <p:with-option name="base-uri" select="base-uri(/*)">
+                    <p:pipe step="rearrange-smil" port="current"/>
+                </p:with-option>
+            </px:set-base-uri>
         </p:for-each>
+        <p:sink/>
+        <p:wrap-sequence name="mapping" wrapper="d:fileset">
+            <p:input port="source">
+                <p:pipe step="rearrange-smil" port="mapping"/>
+            </p:input>
+        </p:wrap-sequence>
         <p:sink/>
         <px:fileset-update name="update">
             <p:input port="source.fileset">
@@ -448,10 +479,20 @@
                 <p:pipe step="rearrange-smil" port="result"/>
             </p:input>
         </px:fileset-update>
+        <px:daisy202-update-links name="update-links">
+            <p:input port="source.in-memory">
+                <p:pipe step="update" port="result.in-memory"/>
+            </p:input>
+            <p:input port="mapping">
+                <p:pipe step="mapping" port="result"/>
+            </p:input>
+        </px:daisy202-update-links>
     </p:group>
 
     <p:documentation>
         Fix SMIL metadata and pretty print
+        <!-- Note that this step needs to come after rearrange-notes because rearrange-notes affects
+             ncc:timeInThisSmil -->
     </p:documentation>
     <p:group name="smil-metadata">
         <p:output port="fileset" primary="true"/>
@@ -460,7 +501,7 @@
         </p:output>
         <px:fileset-load media-types="application/smil+xml" name="smil">
             <p:input port="in-memory">
-                <p:pipe step="create-ncc" port="result.in-memory"/>
+                <p:pipe step="rearrange-notes" port="in-memory"/>
             </p:input>
         </px:fileset-load>
         <p:for-each>
