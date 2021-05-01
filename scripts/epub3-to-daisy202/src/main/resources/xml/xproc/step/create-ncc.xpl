@@ -131,14 +131,15 @@
         Add missing IDs to heading elements. Page number elements already have an ID thanks to
         identify-pagebreaks.xsl
     </p:documentation>
-    <px:html-add-ids name="xhtml-with-ids"
-                     match="html:h1|
-                            html:h2|
-                            html:h3|
-                            html:h4|
-                            html:h5|
-                            html:h6"
-                     px:progress="1/10"/>
+    <p:for-each name="xhtml-with-ids" px:progress="1/10">
+        <p:output port="result"/>
+        <px:html-add-ids match="html:h1|
+                                html:h2|
+                                html:h3|
+                                html:h4|
+                                html:h5|
+                                html:h6"/>
+    </p:for-each>
     <p:sink/>
 
     <p:documentation>
