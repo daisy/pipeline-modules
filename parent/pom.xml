@@ -452,7 +452,7 @@
       <dependency>
         <groupId>org.daisy.maven</groupId>
         <artifactId>xproc-engine-daisy-pipeline</artifactId>
-        <version>1.14.0</version>
+        <version>1.14.1</version>
         <scope>test</scope>
       </dependency>
     </dependencies>
