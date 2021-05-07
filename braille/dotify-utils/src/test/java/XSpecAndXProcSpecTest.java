@@ -40,9 +40,6 @@ public class XSpecAndXProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 			"org.daisy.pipeline.modules.braille:libhyphen-utils:jar:" + thisPlatform() + ":?",
 			pipelineModule("css-utils"),
 			"com.google.guava:guava:?",
-			"org.daisy.dotify:dotify.task.impl:?",
-			"org.daisy.streamline:streamline-api:?",
-			"org.daisy.streamline:streamline-engine:?",
 			"org.daisy.pipeline:calabash-adapter:?",
 			"org.slf4j:jul-to-slf4j:?",
 			"org.daisy.pipeline:logging-activator:?",
@@ -58,8 +55,6 @@ public class XSpecAndXProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 		return options(
 			// apparently the liblouis-java exclusion defined in modules-bom does not have an effect
 			mavenBundle("org.daisy.dotify:dotify.library:?"),
-			// FIXME: Dotify needs older version of jing
-			mavenBundle("org.daisy.libs:jing:20120724.0.0"),
 			composite(super.config()));
 	}
 	

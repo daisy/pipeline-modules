@@ -47,14 +47,6 @@
       <artifactId>dotify.library</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.daisy.streamline</groupId>
-      <artifactId>streamline-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.daisy.streamline</groupId>
-      <artifactId>streamline-engine</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
@@ -81,11 +73,6 @@
     <dependency>
       <groupId>org.daisy.pipeline.modules.braille</groupId>
       <artifactId>css-utils</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.daisy.dotify</groupId>
-      <artifactId>dotify.task.impl</artifactId>
       <scope>runtime</scope>
     </dependency>
     <!--
@@ -131,7 +118,6 @@
   <properties>
     <expose-services>
       org.daisy.pipeline.modules.impl.Module_dotify_utils,
-      org.daisy.pipeline.braille.dotify.calabash.impl.FileToOBFLStep$Provider,
       org.daisy.pipeline.braille.dotify.calabash.impl.OBFLToPEFStep$Provider,
       org.daisy.pipeline.braille.dotify.calabash.impl.ShiftObflMarkerStep$Provider,
       org.daisy.pipeline.braille.dotify.impl.BrailleFilterFactoryImpl,
@@ -194,8 +180,7 @@
               *
             </Import-Package>
             <Provide-Capability>
-              xproc.step;name="{http://code.google.com/p/dotify/}obfl-to-pef",
-              xproc.step;name="{http://code.google.com/p/dotify/}file-to-obfl"
+              xproc.step;name="{http://code.google.com/p/dotify/}obfl-to-pef"
             </Provide-Capability>
           </instructions>
         </configuration>

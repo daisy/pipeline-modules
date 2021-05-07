@@ -592,34 +592,6 @@
         </exclusions>
       </dependency>
       <!--
-          for dotify-utils
-      -->
-      <dependency>
-        <groupId>org.daisy.dotify</groupId>
-        <artifactId>dotify.task.impl</artifactId>
-        <version>5.0.0</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.daisy.dotify</groupId>
-            <artifactId>dotify.api</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.daisy.dotify</groupId>
-            <artifactId>dotify.common</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.daisy.streamline</groupId>
-        <artifactId>streamline-api</artifactId>
-        <version>1.5.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.daisy.streamline</groupId>
-        <artifactId>streamline-engine</artifactId>
-        <version>1.3.0</version>
-      </dependency>
-      <!--
           for liblouis-utils
       -->
       <dependency>
