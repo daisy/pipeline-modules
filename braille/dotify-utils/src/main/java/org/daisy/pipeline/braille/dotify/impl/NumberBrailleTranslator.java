@@ -107,6 +107,7 @@ class NumberBrailleTranslator extends AbstractBrailleTranslator implements Brail
 	private String transform(CSSStyledText styledText) {
 		SimpleInlineStyle style = styledText.getStyle();
 		String text = styledText.getText();
+		boolean noTransform = false;
 		if (style != null) {
 			CSSProperty ws = style.getProperty("white-space");
 			if (ws != null) {
@@ -119,12 +120,18 @@ class NumberBrailleTranslator extends AbstractBrailleTranslator implements Brail
 			CSSProperty textTransform = style.getProperty("text-transform");
 			if (textTransform == TextTransform.AUTO)
 				style.removeProperty("text-transform");
+			if (textTransform == TextTransform.NONE) {
+				noTransform = true;
+				style.removeProperty("text-transform");
+			}
 			if (!style.isEmpty())
 				throw new RuntimeException("Translator does not support style '" + style + "'");
 		}
 		Map<String,String> attrs = styledText.getTextAttributes();
 		if (attrs != null && !attrs.isEmpty())
 			throw new RuntimeException("Translator does not support text attributes '" + attrs + "'");
+		if (noTransform)
+			return text;
 		return transform(text);
 	}
 
