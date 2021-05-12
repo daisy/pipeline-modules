@@ -56,6 +56,7 @@
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/braille/common-utils/library.xpl">
         <p:documentation>
+            px:parse-query
             px:transform
             px:merge-parameters
             px:apply-stylesheets
@@ -78,7 +79,14 @@
             <p:pipe step="main" port="parameters"/>
         </p:input>
     </px:merge-parameters>
+    <p:sink/>
     
+    <!-- Parse transform query to a c:param-set -->
+    <px:parse-query name="parsed-transform-query">
+        <p:with-option name="query" select="$transform"/>
+    </px:parse-query>
+    <p:sink/>
+
     <!-- Load HTML -->
     <px:fileset-load media-types="application/xhtml+xml">
         <p:input port="fileset">
@@ -143,6 +151,9 @@
     
     <p:choose name="transform" px:message="" px:progress=".76">
         <p:variable name="lang" select="(/*/@xml:lang,/*/@lang,'und')[1]"/>
+        <p:variable name="locale-query" select="if (//c:param[@name='locale']) then '' else concat('(locale:',$lang,')')">
+            <p:pipe step="parsed-transform-query" port="result"/>
+        </p:variable>
         <p:when test="$include-obfl='true'">
             <p:output port="pef" primary="true" sequence="true"/>
             <p:output port="obfl">
@@ -153,7 +164,7 @@
             </p:output>
             <p:group name="obfl" px:message="Transforming from XML with CSS to OBFL" px:progress=".5">
                 <p:output port="result"/>
-                <p:variable name="transform-query" select="concat('(input:css)(output:obfl)',$transform,'(locale:',$lang,')')"/>
+                <p:variable name="transform-query" select="concat('(input:css)(output:obfl)',$transform,$locale-query)"/>
                 <p:identity px:message-severity="DEBUG" px:message="px:transform query={$transform-query}"/>
                 <px:transform px:progress="1">
                     <p:with-option name="query" select="$transform-query"/>
@@ -171,7 +182,7 @@
                             <d:status result="ok"/>
                         </p:inline>
                     </p:output>
-                    <p:variable name="transform-query" select="concat('(input:obfl)(input:text-css)(output:pef)',$transform,'(locale:',$lang,')')"/>
+                    <p:variable name="transform-query" select="concat('(input:obfl)(input:text-css)(output:pef)',$transform,$locale-query)"/>
                     <p:identity px:message-severity="DEBUG" px:message="px:transform query={$transform-query}"/>
                     <px:transform px:progress="1">
                         <p:with-option name="query" select="$transform-query"/>
@@ -217,7 +228,7 @@
                     <d:status result="ok"/>
                 </p:inline>
             </p:output>
-            <p:variable name="transform-query" select="concat('(input:css)(output:pef)',$transform,'(locale:',$lang,')')"/>
+            <p:variable name="transform-query" select="concat('(input:css)(output:pef)',$transform,$locale-query)"/>
             <p:identity px:message-severity="DEBUG" px:message="px:transform query={$transform-query}"/>
             <px:transform px:progress="1">
                 <p:with-option name="query" select="$transform-query"/>
