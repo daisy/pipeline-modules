@@ -646,8 +646,9 @@
                         <p:with-option name="sentence-attr" select="if ($sentence-class!='') then 'class' else ''"/>
                         <p:with-option name="sentence-attr-val" select="$sentence-class"/>
                     </px:html-break-detect>
-                    <px:isolate-skippable match="*[@epub:type/tokenize(.,'\s+')='pagebreak']|
-                                                 *[@role='doc-pagebreak']">
+                    <px:isolate-skippable match="*[@epub:type/tokenize(.,'\s+')=('pagebreak','noteref')]|
+                                                 *[@role='doc-pagebreak']|
+                                                 *[@role='doc-noteref']">
                         <p:input port="sentence-ids">
                             <p:pipe step="break-detect" port="sentence-ids"/>
                         </p:input>

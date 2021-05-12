@@ -249,8 +249,11 @@
           <p:with-option name="id-prefix" select="concat($anti-conflict-prefix, p:iteration-position(), '-')"/>
         </px:html-break-detect>
         <px:isolate-skippable name="isolate-skippable"
-                              match="*[@epub:type/tokenize(.,'\s+')='pagebreak']|
-                                     *[@role='doc-pagebreak']">
+                              match="*[@epub:type/tokenize(.,'\s+')=('pagebreak','noteref')]|
+                                     *[@role='doc-pagebreak']|
+                                     *[@role='doc-noteref']">
+          <!-- noterefs don't actually need to be skippable (only the notes), but they are isolated
+               to not disturb the flow of the surrounding text -->
           <p:input port="sentence-ids">
             <p:pipe step="lexing" port="sentence-ids"/>
           </p:input>
