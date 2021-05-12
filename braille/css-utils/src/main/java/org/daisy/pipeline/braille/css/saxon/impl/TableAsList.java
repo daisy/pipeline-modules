@@ -1022,7 +1022,7 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 
 	private int recurAddHeader(List<TableCell> headers, int index, TableCell header, boolean firstLeftThenUpward) {
 		if (headers.contains(header))
-			throw new RuntimeException();
+			; // if a cell spans multiple cols/rows we could find the same header via multiple paths
 		else {
 			headers.add(index, header);
 			index = findHeaders(headers, index, header, firstLeftThenUpward);
