@@ -565,17 +565,8 @@
       <dependency>
         <groupId>org.daisy.dotify</groupId>
         <artifactId>dotify.library</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.2</version>
         <exclusions>
-          <exclusion>
-            <!--
-                Exclude liblouis-java because it is the "standalone" version and we can't have both
-                the standalone and regular version on the class path. Note that Dotify's
-                Liblouis-based translator will not work because of this.
-            -->
-            <groupId>org.liblouis</groupId>
-            <artifactId>liblouis-java</artifactId>
-          </exclusion>
           <exclusion>
             <!--
                 covered by org.codehaus.woodstox:woodstox-core-lgpl (framework dependency)

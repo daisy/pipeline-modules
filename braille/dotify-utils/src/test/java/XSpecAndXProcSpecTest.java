@@ -4,16 +4,11 @@ import org.daisy.dotify.api.text.Integer2TextFactoryMakerService;
 
 import org.daisy.pipeline.junit.AbstractXSpecAndXProcSpecTest;
 
-import static org.daisy.pipeline.pax.exam.Options.mavenBundle;
 import static org.daisy.pipeline.pax.exam.Options.thisPlatform;
 
 import org.junit.Test;
 import org.junit.Assert;
 
-import org.ops4j.pax.exam.Configuration;
-import static org.ops4j.pax.exam.CoreOptions.composite;
-import static org.ops4j.pax.exam.CoreOptions.options;
-import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.ProbeBuilder;
 import org.ops4j.pax.exam.TestProbeBuilder;
 
@@ -39,6 +34,7 @@ public class XSpecAndXProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 			brailleModule("libhyphen-utils"),
 			"org.daisy.pipeline.modules.braille:libhyphen-utils:jar:" + thisPlatform() + ":?",
 			pipelineModule("css-utils"),
+			"org.daisy.dotify:dotify.library:?",
 			"com.google.guava:guava:?",
 			"org.daisy.pipeline:calabash-adapter:?",
 			"org.slf4j:jul-to-slf4j:?",
@@ -46,14 +42,6 @@ public class XSpecAndXProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 			// dependencies causes stax2-api to be excluded too
 			"org.codehaus.woodstox:stax2-api:jar:?",
 		};
-	}
-	
-	@Override @Configuration
-	public Option[] config() {
-		return options(
-			// apparently the liblouis-java exclusion defined in modules-bom does not have an effect
-			mavenBundle("org.daisy.dotify:dotify.library:?"),
-			composite(super.config()));
 	}
 	
 	@ProbeBuilder
