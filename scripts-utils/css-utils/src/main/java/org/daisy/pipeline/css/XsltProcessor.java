@@ -11,7 +11,7 @@ import org.daisy.common.transform.XMLInputValue;
 public interface XsltProcessor {
 
 	/**
-	 * @param stylesheet XSLT style sheet as absolute URI
+	 * @param stylesheetURI XSLT style sheet as absolute URI
 	 */
 	public XMLInputValue<Void> transform(URI stylesheetURI,
 	                                     XMLInputValue<?> source,
