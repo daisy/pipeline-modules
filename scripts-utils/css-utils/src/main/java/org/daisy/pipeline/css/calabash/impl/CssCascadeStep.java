@@ -31,7 +31,7 @@ import org.daisy.common.xproc.calabash.XProcStep;
 import org.daisy.common.xproc.calabash.XProcStepProvider;
 import org.daisy.pipeline.css.CssCascader;
 import org.daisy.pipeline.css.Medium;
-import org.daisy.pipeline.css.SassCompiler;
+import org.daisy.pipeline.css.sass.SassCompiler;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;

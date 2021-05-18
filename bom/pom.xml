@@ -215,7 +215,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>css-utils</artifactId>
-        <version>2.1.1</version>
+        <version>3.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
@@ -546,25 +546,38 @@
       <dependency>
         <groupId>org.daisy.braille</groupId>
         <artifactId>braille-css</artifactId>
-        <version>1.18.0</version>
+        <version>1.19.0</version>
       </dependency>
+      <!--
+          for scripts-utils/css-utils, braille/common-utils and braille/css-utils
+      -->
       <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>
         <artifactId>org.apache.servicemix.bundles.antlr-runtime</artifactId>
         <version>3.5.2_1</version>
       </dependency>
       <!--
-          for braille/css-utils
+          for scripts-utils/css-utils
       -->
       <dependency>
         <groupId>org.daisy.libs</groupId>
         <artifactId>io.bit3.jsass</artifactId>
-        <version>4.1.0-p1</version>
+        <version>5.10.4-p1</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
-        <version>3.7</version>
+        <version>3.9</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-text</artifactId>
+        <version>1.8</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sharegov</groupId>
+        <artifactId>mjson</artifactId>
+        <version>1.4.1</version>
       </dependency>
       <!--
           for braille/common-utils and dotify-utils

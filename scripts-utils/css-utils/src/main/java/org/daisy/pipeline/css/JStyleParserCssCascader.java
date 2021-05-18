@@ -74,7 +74,7 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 	private static final Logger logger = LoggerFactory.getLogger(JStyleParserCssCascader.class);
 
 	public JStyleParserCssCascader(URIResolver uriResolver,
-	                               SassCompiler sassCompiler,
+	                               CssPreProcessor preProcessor,
 	                               String defaultStyleSheet,
 	                               Medium medium,
 	                               QName attributeName,
@@ -91,8 +91,9 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 		this.declarationTransformer = declarationTransformer;
 		NetworkProcessor defaultNetwork = new DefaultNetworkProcessor();
 		/*
-		 * CSSSourceReader that handles media type "text/x-scss". Throws a IOException if something
-		 * goes wrong when resolving the source or if the SASS compilation fails.
+		 * CSSSourceReader that handles media types supported by preProcessor. Throws a
+		 * IOException if something goes wrong when resolving the source or if the
+		 * pre-processing fails.
 		 */
 		this.cssReader = new CSSSourceReader() {
 				public boolean supportsMediaType(String mediaType, URL url) {
@@ -100,14 +101,10 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 						return true;
 					else if (mediaType == null && (url == null || url.toString().endsWith(".css")))
 						return true;
-					else if (sassCompiler == null)
+					else if (preProcessor == null)
 						return false;
-					else if ("text/x-scss".equals(mediaType))
-						return true;
-					else if (mediaType == null && url != null && url.toString().endsWith(".scss"))
-						return true;
 					else
-						return false;
+						return preProcessor.supportsMediaType(mediaType, url);
 				}
 				public CSSInputStream read(CSSSource source) throws IOException {
 					URL url = null;
@@ -141,13 +138,15 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 					}
 					if (!supportsMediaType(source.mediaType, url))
 						throw new IllegalArgumentException();
-					if ("text/x-scss".equals(source.mediaType)
-					    || (source.mediaType == null && url != null && url.toString().endsWith(".scss"))) {
-						// sassCompiler must be non-null
+					if (!("text/css".equals(source.mediaType)
+					      || source.mediaType == null && (url == null || url.toString().endsWith(".css")))) {
+						// preProcessor must be non-null
 						try {
-							is = sassCompiler.compile(is, url != null ? url : source.base, source.encoding);
+							is = preProcessor.compile(is, url != null ? url : source.base, source.encoding);
 						} catch (RuntimeException e) {
-							throw new IOException("SASS compilation failed", e);
+							throw new IOException(
+								(source.mediaType != null ? (source.mediaType + " p") : "P")
+								+ "re-processing failed", e);
 						}
 					}
 					// FIXME: there should be a way to pass the resolved URL to the CSSInputStream
