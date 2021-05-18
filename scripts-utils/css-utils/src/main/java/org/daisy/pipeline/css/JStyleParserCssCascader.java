@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -15,7 +16,10 @@ import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.URIResolver;
 
+import com.google.common.collect.Iterables;
+
 import cz.vutbr.web.css.CSSFactory;
+import cz.vutbr.web.css.Declaration;
 import cz.vutbr.web.css.MediaSpec;
 import cz.vutbr.web.css.NetworkProcessor;
 import cz.vutbr.web.css.NodeData;
@@ -23,10 +27,15 @@ import cz.vutbr.web.css.RuleFactory;
 import cz.vutbr.web.css.Selector.PseudoElement;
 import cz.vutbr.web.css.StyleSheet;
 import cz.vutbr.web.css.SupportedCSS;
+import cz.vutbr.web.css.Term;
+import cz.vutbr.web.css.TermIdent;
+import cz.vutbr.web.css.TermInteger;
+import cz.vutbr.web.css.TermString;
 import cz.vutbr.web.csskit.antlr.CSSParserFactory;
 import cz.vutbr.web.csskit.antlr.CSSSource;
 import cz.vutbr.web.csskit.antlr.CSSSourceReader;
 import cz.vutbr.web.csskit.DefaultNetworkProcessor;
+import cz.vutbr.web.csskit.RuleXslt;
 import cz.vutbr.web.domassign.Analyzer;
 import cz.vutbr.web.domassign.DeclarationTransformer;
 import cz.vutbr.web.domassign.StyleMap;
@@ -41,6 +50,7 @@ import static org.daisy.common.stax.XMLStreamWriterHelper.writeComment;
 import static org.daisy.common.stax.XMLStreamWriterHelper.writeProcessingInstruction;
 import static org.daisy.common.stax.XMLStreamWriterHelper.writeStartElement;
 import org.daisy.common.transform.InputValue;
+import org.daisy.common.transform.Mult;
 import org.daisy.common.transform.SingleInSingleOutXMLTransformer;
 import org.daisy.common.transform.TransformerException;
 import org.daisy.common.transform.XMLInputValue;
@@ -64,11 +74,13 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 	private final SupportedCSS supportedCSS;
 	private final DeclarationTransformer declarationTransformer;
 	private final CSSSourceReader cssReader;
+	private final XsltProcessor xsltProcessor;
 
 	private static final Logger logger = LoggerFactory.getLogger(JStyleParserCssCascader.class);
 
 	public JStyleParserCssCascader(URIResolver uriResolver,
 	                               CssPreProcessor preProcessor,
+	                               XsltProcessor xsltProcessor,
 	                               String defaultStyleSheet,
 	                               Medium medium,
 	                               QName attributeName,
@@ -83,6 +95,7 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 		this.ruleFactory = ruleFactory;
 		this.supportedCSS = supportedCSS;
 		this.declarationTransformer = declarationTransformer;
+		this.xsltProcessor = xsltProcessor;
 		NetworkProcessor defaultNetwork = new DefaultNetworkProcessor();
 		/*
 		 * CSSSourceReader that handles media types supported by preProcessor. Throws a
@@ -150,13 +163,14 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 
 	private StyleSheet styleSheet = null;
 
-	public Runnable transform(XMLInputValue<?> source, XMLOutputValue<?> result, InputValue<?> params) {
+	public Runnable transform(XMLInputValue<?> source, XMLOutputValue<?> result, InputValue<?> params) throws TransformerException {
 		if (source == null || result == null)
-			throw new IllegalArgumentException();
-		return () -> transform(source.ensureSingleItem().asNodeIterator().next(), result.asXMLStreamWriter());
+			throw new TransformerException(new IllegalArgumentException());
+		return () -> transform(source.ensureSingleItem().mult(2), result.asXMLStreamWriter());
 	}
 
-	private void transform(Node node, BaseURIAwareXMLStreamWriter output) throws TransformerException {
+	private void transform(Mult<? extends XMLInputValue<?>> source, BaseURIAwareXMLStreamWriter output) throws TransformerException {
+		Node node = source.get().asNodeIterator().next();
 		if (!(node instanceof Document))
 			throw new TransformerException(new IllegalArgumentException());
 		Document document = (Document)node;
@@ -198,6 +212,36 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 					}
 				}
 				styleSheet = CSSFactory.getUsedStyles(document, null, baseURL, medium, cssReader, styleSheet);
+				XMLInputValue<?> transformed = null;
+				for (RuleXslt r : Iterables.filter(styleSheet, RuleXslt.class)) {
+					Map<String,String> params = new HashMap<>();
+					for (Declaration d: r) {
+						if (d.size() == 1) {
+							if (d.get(0) instanceof TermIdent || d.get(0) instanceof TermString)
+								params.put(d.getProperty(), ((Term<String>)d.get(0)).getValue());
+							else if (d.get(0) instanceof TermInteger)
+								params.put(d.getProperty(), ""+((TermInteger)d.get(0)).getIntValue());
+							else
+								logger.warn("@xslt parameter value must be a string, ident or integer, but got " + d);
+						} else
+							logger.warn("@xslt parameter value must consist of exactly one part, but got " + d);
+					}
+					transformed = xsltProcessor.transform(
+						URLs.resolve(URLs.asURI(r.base), URLs.asURI(r.uri)),
+						transformed != null ? transformed : source.get(),
+						params);
+				}
+				if (transformed != null) {
+					node = transformed.ensureSingleItem().asNodeIterator().next();
+					if (!(node instanceof Document))
+						throw new TransformerException(
+							new RuntimeException("XsltProcessor must return a (single) document"));
+					document = (Document)node;
+					// We assume that base URI did not change.
+					// We need to recompute the stylesheet because of any possible inline styles, which
+					// are attached to an element in the original document.
+					styleSheet = CSSFactory.getUsedStyles(document, null, baseURL, medium, cssReader, styleSheet);
+				}
 				styleMap = new Analyzer(styleSheet).evaluateDOM(document, medium, false);
 			}
 			writer.setBaseURI(baseURI);
