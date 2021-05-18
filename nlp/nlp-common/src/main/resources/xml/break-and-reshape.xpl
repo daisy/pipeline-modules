@@ -61,6 +61,18 @@
     </p:documentation>
   </p:option>
 
+  <p:option name="sentence-attr" required="false" select="''">
+    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+      Attribute name of the element used for representing a sentence.
+    </p:documentation>
+  </p:option>
+
+  <p:option name="sentence-attr-val" required="false" select="''">
+    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+      Corresponding attribute value of the option 'sentence-attr'.
+    </p:documentation>
+  </p:option>
+
   <p:option name="output-ns" required="true">
     <p:documentation>
       Output namespace in which the words and the sentences will be
@@ -144,6 +156,8 @@
     <p:with-option name="output-sentence-tag" select="$output-sentence-tag"/>
     <p:with-option name="word-attr" select="$word-attr"/>
     <p:with-option name="word-attr-val" select="$word-attr-val"/>
+    <p:with-option name="sentence-attr" select="$sentence-attr"/>
+    <p:with-option name="sentence-attr-val" select="$sentence-attr-val"/>
     <p:with-option name="output-ns" select="$output-ns"/>
     <p:with-option name="output-subsentence-tag" select="$output-subsentence-tag"/>
     <p:with-option name="tmp-ns" select="$tmp-ns"/>

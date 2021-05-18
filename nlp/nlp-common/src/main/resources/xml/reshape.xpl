@@ -11,6 +11,8 @@
   <p:option name="output-sentence-tag" required="true"/>
   <p:option name="word-attr" required="false" select="''"/>
   <p:option name="word-attr-val" required="false" select="''"/>
+  <p:option name="sentence-attr" required="false" select="''"/>
+  <p:option name="sentence-attr-val" required="false" select="''"/>
   <p:option name="output-ns" required="true"/>
   <p:option name="output-subsentence-tag" required="true"/>
   <p:option name="tmp-ns" select="'http://www.daisy.org/ns/pipeline/tmp'"/>
@@ -60,6 +62,8 @@
     <p:with-param name="output-sentence-tag" select="$output-sentence-tag"/>
     <p:with-param name="word-attr" select="$word-attr"/>
     <p:with-param name="word-attr-val" select="$word-attr-val"/>
+    <p:with-param name="sentence-attr" select="$sentence-attr"/>
+    <p:with-param name="sentence-attr-val" select="$sentence-attr-val"/>
     <p:with-param name="output-ns" select="$output-ns"/>
     <p:with-param name="output-subsentence-tag" select="$output-subsentence-tag"/>
     <p:with-param name="exclusive-word-tag" select="$exclusive-word-tag"/>
