@@ -465,7 +465,34 @@
             </p:input>
         </p:wrap-sequence>
         <p:sink/>
-        <px:fileset-update name="update">
+        <!--
+            Drop href attributes of noteref elements
+        -->
+        <px:fileset-load media-types="application/xhtml+xml" name="html">
+            <p:input port="fileset">
+                <p:pipe step="create-ncc" port="result.fileset"/>
+            </p:input>
+            <p:input port="in-memory">
+                <p:pipe step="create-ncc" port="result.in-memory"/>
+            </p:input>
+        </px:fileset-load>
+        <p:for-each name="html-without-href">
+            <p:output port="result"/>
+            <p:xslt>
+                <p:input port="source">
+                    <p:pipe step="html-without-href" port="current"/>
+                    <p:pipe step="convert-html" port="noteref-list"/>
+                </p:input>
+                <p:input port="stylesheet">
+                    <p:document href="../../xslt/remove-href-from-noterefs.xsl"/>
+                </p:input>
+                <p:input port="parameters">
+                    <p:empty/>
+                </p:input>
+            </p:xslt>
+        </p:for-each>
+        <p:sink/>
+        <px:fileset-update name="update-1">
             <p:input port="source.fileset">
                 <p:pipe step="create-ncc" port="result.fileset"/>
             </p:input>
@@ -479,9 +506,20 @@
                 <p:pipe step="rearrange-smil" port="result"/>
             </p:input>
         </px:fileset-update>
+        <px:fileset-update name="update-2">
+            <p:input port="source.in-memory">
+                <p:pipe step="update-1" port="result.in-memory"/>
+            </p:input>
+            <p:input port="update.fileset">
+                <p:pipe step="html" port="result.fileset"/>
+            </p:input>
+            <p:input port="update.in-memory">
+                <p:pipe step="html-without-href" port="result"/>
+            </p:input>
+        </px:fileset-update>
         <px:daisy202-update-links name="update-links">
             <p:input port="source.in-memory">
-                <p:pipe step="update" port="result.in-memory"/>
+                <p:pipe step="update-2" port="result.in-memory"/>
             </p:input>
             <p:input port="mapping">
                 <p:pipe step="mapping" port="result"/>
