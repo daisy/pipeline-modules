@@ -241,6 +241,7 @@
             <p:input port="entry">
                 <p:pipe step="html-with-head" port="result"/>
             </p:input>
+            <p:with-param port="file-attributes" name="media-version" select="'5.0'"/>
         </px:fileset-add-entry>
     </p:group>
 

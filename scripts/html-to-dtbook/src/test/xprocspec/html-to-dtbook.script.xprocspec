@@ -16,6 +16,7 @@
             <x:document type="inline">
                 <c:directory name="output">
                     <c:file name="C00000.xml"/>
+                    <c:file name="dtbook.2005.basic.css"/>
                     <c:directory name="images">
                         <c:file name="valentin.jpg"/>
                     </c:directory>

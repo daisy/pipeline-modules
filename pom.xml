@@ -79,6 +79,7 @@
     <module>braille/texhyph-utils</module>
     <module>scripts/daisy202-to-epub3</module>
     <module>scripts/daisy202-validator</module>
+    <module>scripts/daisy202-to-daisy3</module>
     <module>scripts/daisy3-to-daisy202</module>
     <module>scripts/daisy3-to-epub3</module>
     <module>scripts/dtbook-to-daisy3</module>

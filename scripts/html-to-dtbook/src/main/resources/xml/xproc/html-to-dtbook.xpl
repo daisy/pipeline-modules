@@ -2,8 +2,6 @@
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
-                xmlns:html="http://www.w3.org/1999/xhtml"
-                xmlns:epub="http://www.idpf.org/2007/ops"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 type="px:html-to-dtbook" name="main">
 
@@ -12,9 +10,11 @@
         <p:empty/>
     </p:input>
 
-    <p:output port="result.fileset" primary="true"/>
+    <p:output port="result.fileset" primary="true">
+        <p:pipe step="html-to-dtbook" port="fileset"/>
+    </p:output>
     <p:output port="result.in-memory" sequence="true">
-        <p:pipe step="add-dtbook" port="result.in-memory"/>
+        <p:pipe step="html-to-dtbook" port="in-memory"/>
     </p:output>
 
     <p:option name="dtbook-file-name" select="''">
@@ -25,6 +25,12 @@
     <p:option name="imply-headings" select="'false'">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>Whether to generate headings for untitled levels.</p>
+        </p:documentation>
+    </p:option>
+    <p:option name="dtbook-css" select="''">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>URI of CSS style sheet to apply to the DTBook.</p>
+            <p>If left empty, a default style sheet is used.</p>
         </p:documentation>
     </p:option>
 
@@ -40,12 +46,10 @@
         <p:documentation>
             px:fileset-load
             px:fileset-filter
-            px:fileset-add-entry
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
         <p:documentation>
-            px:html-outline
             px:html-upgrade
         </p:documentation>
     </p:import>
@@ -54,164 +58,147 @@
             px:assert
         </p:documentation>
     </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
-        <p:documentation>
-            px:set-base-uri
-        </p:documentation>
-    </p:import>
     <p:import href="extract-svg.xpl">
         <p:documentation>
             pxi:html-extract-svg
         </p:documentation>
     </p:import>
+    <p:import href="epub3-html-to-dtbook.xpl">
+        <p:documentation>
+            pxi:epub3-html-to-dtbook
+        </p:documentation>
+    </p:import>
+    <p:import href="daisy202-html-to-dtbook.xpl">
+        <p:documentation>
+            pxi:daisy202-html-to-dtbook
+        </p:documentation>
+    </p:import>
+
+    <!--
+        Extract SVG images into their own files and link to with img element
+    -->
+    <pxi:html-extract-svg name="extract-svg" px:progress="1/10">
+        <p:input port="source.in-memory">
+            <p:pipe step="main" port="source.in-memory"/>
+        </p:input>
+    </pxi:html-extract-svg>
 
     <!--
         Load HTML
     -->
     <px:fileset-filter media-types="application/xhtml+xml" name="filter-html" px:progress="1/20">
         <p:input port="source.in-memory">
-            <p:pipe step="main" port="source.in-memory"/>
+            <p:pipe step="extract-svg" port="result.in-memory"/>
         </p:input>
     </px:fileset-filter>
     <px:fileset-load>
         <p:input port="in-memory">
-            <p:pipe step="main" port="source.in-memory"/>
+            <p:pipe step="extract-svg" port="result.in-memory"/>
         </p:input>
     </px:fileset-load>
     <px:assert test-count-min="1" test-count-max="1" message="There must be exactly one HTML file in the fileset." error-code="XXXXX"/>
     <px:assert message="The HTML file must have a file extension." error-code="XXXXX">
         <p:with-option name="test" select="$dtbook-file-name!='' or matches(base-uri(/*),'.*[^\.]\.[^\.]*$')"/>
     </px:assert>
-    <p:choose>
-        <!--
-            upgrade HTML if the input is not coming from an EPUB 3
-        -->
-        <p:xpath-context>
-            <p:pipe step="filter-html" port="result"/>
-        </p:xpath-context>
-        <p:when test="/*/d:file/@media-version='5.0'">
-            <p:identity/>
-        </p:when>
-        <p:otherwise>
-            <px:html-upgrade/>
-        </p:otherwise>
-    </p:choose>
     <p:identity name="html"/>
-
-    <!--
-        epub3-to-dtbook.xsl makes certain assumptions about the input structure
-        - sectioning content elements have sectioning (root/content) element as parent
-        - heading elements have sectioning element as parent
-        - body becomes book
-        - child 'header' element of body becomes doctitle/covertitle/docauthor
-        - child sectionining elements of body become frontmatter/bodymatter/rearmatter
-    -->
-    <p:group px:progress="4/10" name="prepare-html">
-        <p:output port="result"/>
-        <!--
-            Add missing sectioning elements so that there are no implied sections
-        -->
-        <px:html-outline fix-sectioning="no-implied" px:progress="1/4"/>
-        <!--
-            Move everything one level down if step above resulted in multiple body elements
-        -->
-        <p:wrap match="/*/html:body[preceding-sibling::html:body|following-sibling::html:body]"
-                group-adjacent="true()" wrapper="html:body"/>
-        <p:rename match="/*/html:body/html:body" new-name="html:section"/>
-        <!--
-            Move body one level down if it contains content beside sectioning and heading elements
-        -->
-        <p:wrap match="/*/html:body[text()[normalize-space()]
-                                   |*[not(self::html:section  |self::html:h1
-                                         |self::html:article  |self::html:h2
-                                         |self::html:aside    |self::html:h3
-                                         |self::html:nav      |self::html:h4
-                                         |self::html:header   |self::html:h5
-                                         |self::html:hgroup   |self::html:h6
-                                         )]]"
-                wrapper="html:body"/>
-        <p:rename match="/*/html:body/html:body" new-name="html:section"/>
-        <!--
-            Add missing headings
-        -->
-        <p:choose px:progress="1/4">
-            <p:when test="$imply-headings='true'">
-                <px:html-outline fix-untitled-sections="imply-heading"/>
-            </p:when>
-            <p:otherwise>
-                <p:identity/>
-            </p:otherwise>
-        </p:choose>
-        <!--
-            Wrap body's heading element inside header
-        -->
-        <p:wrap match="/*/html:body/*[self::html:h1
-                                     |self::html:h2
-                                     |self::html:h3
-                                     |self::html:h4
-                                     |self::html:h5
-                                     |self::html:hgroup]"
-                group-adjacent="true()" wrapper="html:header"/>
-        <!--
-            Move sectioning and heading elements up
-        -->
-        <p:xslt px:progress="1/2">
-            <p:input port="stylesheet">
-                <p:document href="../xslt/prepare-html.xsl"/>
-            </p:input>
-            <p:input port="parameters">
-                <p:empty/>
-            </p:input>
-        </p:xslt>
-    </p:group>
     <p:sink/>
 
     <!--
-        Extract SVG images into their own files and link to with img element
+        If HTML is not coming from EPUB 3 or DAISY 2.02, upgrade to HTML 5.0 and treat it as if it
+        was coming from an EPUB 3.
     -->
-    <pxi:html-extract-svg name="extract-svg" px:progress="1/10">
-        <p:input port="source.fileset">
-            <p:pipe step="main" port="source.fileset"/>
+    <p:identity>
+        <p:input port="source">
+            <p:pipe step="filter-html" port="result"/>
         </p:input>
-        <p:input port="source.in-memory">
-            <p:pipe step="prepare-html" port="result"/>
-            <p:pipe step="filter-html" port="not-matched.in-memory"/>
-        </p:input>
-    </pxi:html-extract-svg>
+    </p:identity>
+    <p:choose name="maybe-upgrade-html">
+        <p:when test="not(/*/d:file/@media-version=('4.0','5.0'))">
+            <p:output port="fileset" primary="true">
+                <p:pipe step="html5-fileset" port="result"/>
+            </p:output>
+            <p:output port="in-memory">
+                <p:pipe step="html5" port="result"/>
+            </p:output>
+            <p:add-attribute match="/d:file" attribute-name="media-version" attribute-value="5.0"
+                             name="html5-fileset"/>
+            <p:sink/>
+            <px:html-upgrade name="html5">
+                <p:input port="source">
+                    <p:pipe step="html" port="result"/>
+                </p:input>
+            </px:html-upgrade>
+            <p:sink/>
+        </p:when>
+        <p:otherwise>
+            <p:output port="fileset" primary="true"/>
+            <p:output port="in-memory">
+                <p:pipe step="html" port="result"/>
+            </p:output>
+            <p:identity/>
+        </p:otherwise>
+    </p:choose>
 
     <!--
         Convert HTML to DTBook
     -->
-    <px:fileset-filter media-types="application/xhtml+xml" name="filter-html-2">
-        <p:input port="source.in-memory">
-            <p:pipe step="extract-svg" port="result.in-memory"/>
-        </p:input>
-    </px:fileset-filter>
-    <p:sink/>
-    <p:label-elements match="*[@role='doc-pagebreak']" attribute="epub:type" replace="true"
-                      label="string-join(distinct-values((@epub:type/tokenize(.,'\s+')[not(.='')],'pagebreak')),' ')">
-        <!--
-            Convert DPUB-ARIA roles to epub:type
-        -->
-        <p:input port="source">
-            <p:pipe step="filter-html-2" port="result.in-memory"/>
-        </p:input>
-    </p:label-elements>
-    <p:xslt px:progress="4/10">
-        <p:input port="stylesheet">
-            <p:document href="../xslt/epub3-to-dtbook.xsl"/>
-        </p:input>
-        <p:input port="parameters">
-            <p:empty/>
-        </p:input>
-    </p:xslt>
-    <px:set-base-uri>
-        <p:with-option name="base-uri"
-                       select="resolve-uri(($dtbook-file-name[.!=''],
-                                            concat(replace(base-uri(/*),'^(.*)\.[^/\.]*$','$1'),'.xml'))[1],
-                                           base-uri(/*))"/>
-    </px:set-base-uri>
-    <p:identity name="dtbook"/>
+    <p:choose px:progress="8/10" name="html-to-dtbook">
+        <p:when test="/*/d:file/@media-version='5.0'">
+            <!--
+                Assume the HTML is coming from an EPUB 3
+            -->
+            <p:output port="fileset" primary="true"/>
+            <p:output port="in-memory" sequence="true">
+                <p:pipe step="convert" port="result.in-memory"/>
+            </p:output>
+            <pxi:epub3-html-to-dtbook name="convert">
+                <p:with-option name="imply-headings" select="$imply-headings"/>
+                <p:with-option name="dtbook-file-name"
+                               select="($dtbook-file-name[.!=''],
+                                        concat(replace(base-uri(/*),'^(.*)\.[^/\.]*$','$1'),'.xml'))[1]">
+                    <p:pipe step="html" port="result"/>
+                </p:with-option>
+                <p:input port="html.in-memory">
+                    <p:pipe step="maybe-upgrade-html" port="in-memory"/>
+                </p:input>
+                <p:input port="resources.fileset">
+                    <p:pipe step="filter-html" port="not-matched"/>
+                </p:input>
+                <p:input port="resources.in-memory">
+                    <p:pipe step="filter-html" port="not-matched.in-memory"/>
+                </p:input>
+            </pxi:epub3-html-to-dtbook>
+        </p:when>
+        <p:otherwise> <!-- 4.0 -->
+            <!--
+                Assume the HTML is coming from a DAISY 2.02
+            -->
+            <p:output port="fileset" primary="true"/>
+            <p:output port="in-memory" sequence="true">
+                <p:pipe step="convert" port="result.in-memory"/>
+            </p:output>
+            <pxi:daisy202-html-to-dtbook name="convert">
+                <p:with-option name="dtbook-file-name"
+                               select="($dtbook-file-name[.!=''],
+                                        concat(replace(base-uri(/*),'^(.*)\.[^/\.]*$','$1'),'.xml'))[1]">
+                    <p:pipe step="html" port="result"/>
+                </p:with-option>
+                <p:with-option name="dtbook-css" select="($dtbook-css[.!=''],
+                                                          resolve-uri('../../css/dtbook.2005.basic.css',base-uri(/)))[1]">
+                    <p:inline><irrelevant/></p:inline>
+                </p:with-option>
+                <p:input port="html.in-memory">
+                    <p:pipe step="maybe-upgrade-html" port="in-memory"/>
+                </p:input>
+                <p:input port="resources.fileset">
+                    <p:pipe step="filter-html" port="not-matched"/>
+                </p:input>
+                <p:input port="resources.in-memory">
+                    <p:pipe step="filter-html" port="not-matched.in-memory"/>
+                </p:input>
+            </pxi:daisy202-html-to-dtbook>
+        </p:otherwise>
+    </p:choose>
 
     <!--
         Mapping from input to output file name
@@ -220,7 +207,8 @@
         <p:input port="template">
             <p:inline>
                 <d:fileset>
-                    <d:file href="{base-uri(/*)}" original-href="{$html-base-uri}"/>
+                    <d:file href="{/*/d:file[@media-type='application/x-dtbook+xml']/resolve-uri(@href,base-uri(.))}"
+                            original-href="{$html-base-uri}"/>
                 </d:fileset>
             </p:inline>
         </p:input>
@@ -229,30 +217,5 @@
         </p:with-param>
     </p:template>
     <p:sink/>
-
-    <!--
-        Combine DTBook with resources
-    -->
-    <px:fileset-filter not-media-types="text/css" name="filter-resources">
-        <p:input port="source">
-            <p:pipe step="filter-html-2" port="not-matched"/>
-        </p:input>
-        <p:input port="source.in-memory">
-            <p:pipe step="filter-html-2" port="not-matched.in-memory"/>
-        </p:input>
-    </px:fileset-filter>
-    <px:fileset-add-entry media-type="application/x-dtbook+xml" name="add-dtbook" px:progress="1/20">
-        <p:input port="source.in-memory">
-            <p:pipe step="filter-resources" port="result.in-memory"/>
-        </p:input>
-        <p:input port="entry">
-            <p:pipe step="dtbook" port="result"/>
-        </p:input>
-        <p:with-param port="file-attributes" name="omit-xml-declaration" select="'false'"/>
-        <p:with-param port="file-attributes" name="version" select="'1.0'"/>
-        <p:with-param port="file-attributes" name="encoding" select="'utf-8'"/>
-        <p:with-param port="file-attributes" name="doctype-public" select="'-//NISO//DTD dtbook 2005-3//EN'"/>
-        <p:with-param port="file-attributes" name="doctype-system" select="'http://www.daisy.org/z3986/2005/dtbook-2005-3.dtd'"/>
-    </px:fileset-add-entry>
 
 </p:declare-step>
