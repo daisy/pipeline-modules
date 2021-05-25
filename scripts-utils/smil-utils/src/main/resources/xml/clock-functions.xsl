@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema" exclude-result-prefixes="#all" version="2.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
+                exclude-result-prefixes="#all">
 
-    <xsl:function name="pf:mediaoverlay-clock-value-to-seconds" as="xs:double">
+    <xsl:function name="pf:smil-clock-value-to-seconds" as="xs:double">
         <xsl:param name="string" as="xs:string"/>
-        <xsl:variable name="stringTokenized"
+        <xsl:variable name="stringTokenized" as="xs:string*"
             select="reverse(
                         subsequence(
                             tokenize(
@@ -16,18 +17,17 @@
                             ':'),
                         1, 3)
                     )"/>
-        <xsl:variable name="number"
+        <xsl:sequence
             select=" (number($stringTokenized[1]) + (if (count($stringTokenized)&gt;=2) then number($stringTokenized[2])*60 else 0) + (if (count($stringTokenized)=3) then number($stringTokenized[3])*3600 else 0))
             *(if (ends-with($string,'ms')) then 0.001 else (if (ends-with($string,'min')) then 60 else (if (ends-with($string,'h')) then 3600 else 1)))"/>
-        <xsl:value-of select="$number"/>
     </xsl:function>
 
-    <xsl:function name="pf:mediaoverlay-seconds-to-timecount" as="xs:string">
+    <xsl:function name="pf:smil-seconds-to-timecount" as="xs:string">
         <xsl:param name="number" as="xs:double"/>
-        <xsl:value-of select="pf:mediaoverlay-seconds-to-timecount($number,'s')"/>
+        <xsl:value-of select="pf:smil-seconds-to-timecount($number,'s')"/>
     </xsl:function>
 
-    <xsl:function name="pf:mediaoverlay-seconds-to-timecount" as="xs:string">
+    <xsl:function name="pf:smil-seconds-to-timecount" as="xs:string">
         <xsl:param name="number" as="xs:double"/>
         <xsl:param name="metric" as="xs:string"/>
         <xsl:choose>
@@ -50,7 +50,7 @@
         </xsl:choose>
     </xsl:function>
 
-    <xsl:function name="pf:mediaoverlay-seconds-to-full-clock-value" as="xs:string">
+    <xsl:function name="pf:smil-seconds-to-full-clock-value" as="xs:string">
         <xsl:param name="number" as="xs:double"/>
         <xsl:variable name="HH"
             select="concat(if (($number div 3600) &lt; 10) then '0' else '', string(floor($number div 3600)))"/>
@@ -61,7 +61,7 @@
         <xsl:value-of select="concat($HH,':',$MM,':',$SS)"/>
     </xsl:function>
 
-    <xsl:function name="pf:mediaoverlay-seconds-to-partial-clock-value" as="xs:string">
+    <xsl:function name="pf:smil-seconds-to-partial-clock-value" as="xs:string">
         <xsl:param name="number" as="xs:double"/>
         <!-- TODO: Throw error or warning if $number > 3600 ? -->
         <xsl:variable name="MM"
@@ -71,17 +71,17 @@
         <xsl:value-of select="concat($MM,':',$SS)"/>
     </xsl:function>
 
-    <xsl:function name="pf:mediaoverlay-seconds-to-clock-value" as="xs:string">
+    <xsl:function name="pf:smil-seconds-to-clock-value" as="xs:string">
         <xsl:param name="number" as="xs:double"/>
         <xsl:choose>
             <xsl:when test="$number &lt; 60">
-                <xsl:value-of select="pf:mediaoverlay-seconds-to-timecount($number)"/>
+                <xsl:value-of select="pf:smil-seconds-to-timecount($number)"/>
             </xsl:when>
             <xsl:when test="$number &lt; 3600">
-                <xsl:value-of select="pf:mediaoverlay-seconds-to-partial-clock-value($number)"/>
+                <xsl:value-of select="pf:smil-seconds-to-partial-clock-value($number)"/>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:value-of select="pf:mediaoverlay-seconds-to-full-clock-value($number)"/>
+                <xsl:value-of select="pf:smil-seconds-to-full-clock-value($number)"/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:function>
