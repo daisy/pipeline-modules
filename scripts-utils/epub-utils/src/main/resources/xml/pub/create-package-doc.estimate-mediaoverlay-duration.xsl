@@ -8,12 +8,7 @@
     <xsl:template match="/*">
         <meta property="media:duration">
             <xsl:value-of
-                select="
-                pf:smil-seconds-to-full-clock-value(round-half-to-even(
-                        sum(//mo:audio[@clipEnd]/pf:smil-clock-value-to-seconds(@clipEnd))
-                    -   sum(//mo:audio[@clipEnd and @clipBegin]/pf:smil-clock-value-to-seconds(@clipBegin))
-                , 4))
-                "
+                select="pf:smil-seconds-to-full-clock-value(round-half-to-even(pf:smil-total-seconds(/*), 4))"
             />
         </meta>
     </xsl:template>

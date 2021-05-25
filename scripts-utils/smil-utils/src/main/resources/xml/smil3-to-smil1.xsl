@@ -19,12 +19,8 @@
                 <xsl:apply-templates select="/*"/>
             </xsl:document>
         </xsl:variable>
-        <xsl:variable name="total-time" as="xs:double"
-                      select="sum(for $audio in $smil//audio
-                                  return pf:smil-clock-value-to-seconds($audio/@clip-end)
-                                       - pf:smil-clock-value-to-seconds($audio/@clip-begin))"/>
         <xsl:apply-templates mode="dur" select="$smil/*">
-            <xsl:with-param name="total-time" tunnel="yes" select="$total-time"/>
+            <xsl:with-param name="total-time" tunnel="yes" select="pf:smil-total-seconds($smil/*)"/>
         </xsl:apply-templates>
     </xsl:template>
 

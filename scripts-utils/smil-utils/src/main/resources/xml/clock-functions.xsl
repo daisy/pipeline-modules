@@ -2,6 +2,9 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
+                xmlns:s="http://www.w3.org/2001/SMIL20/"
+                xmlns:mo="http://www.w3.org/ns/SMIL"
+                xpath-default-namespace=""
                 exclude-result-prefixes="#all">
 
     <xsl:function name="pf:smil-clock-value-to-seconds" as="xs:double">
@@ -82,6 +85,27 @@
             </xsl:when>
             <xsl:otherwise>
                 <xsl:value-of select="pf:smil-seconds-to-full-clock-value($number)"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:function>
+
+    <xsl:function name="pf:smil-total-seconds" as="xs:double">
+        <xsl:param name="smil" as="element()"/>
+        <xsl:choose>
+            <xsl:when test="$smil/self::mo:*">
+                <xsl:sequence select="  sum($smil//mo:audio[@clipEnd]/pf:smil-clock-value-to-seconds(@clipEnd))
+                                      - sum($smil//mo:audio[@clipEnd and @clipBegin]/pf:smil-clock-value-to-seconds(@clipBegin))"/>
+            </xsl:when>
+            <xsl:when test="$smil/self::s:*">
+                <xsl:sequence select="  sum($smil//s:audio[@clipEnd]/pf:smil-clock-value-to-seconds(@clipEnd))
+                                      - sum($smil//s:audio[@clipEnd and @clipBegin]/pf:smil-clock-value-to-seconds(@clipBegin))"/>
+            </xsl:when>
+            <xsl:when test="namespace-uri($smil)=''">
+                <xsl:sequence select="  sum($smil//audio[@clip-end]/pf:smil-clock-value-to-seconds(@clip-end))
+                                      - sum($smil//audio[@clip-end and @clip-begin]/pf:smil-clock-value-to-seconds(@clip-begin))"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:message terminate="yes">Unexpected argument</xsl:message>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:function>

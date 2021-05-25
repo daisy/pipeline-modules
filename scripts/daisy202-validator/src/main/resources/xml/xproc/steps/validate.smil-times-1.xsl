@@ -21,8 +21,7 @@
             <xsl:variable name="meta-duration" select="head/meta[@name='ncc:timeInThisSmil']/string(@content)"/>
             <xsl:variable name="meta-duration" select="if ($meta-duration) then pf:smil-clock-value-to-seconds($meta-duration) else 0"/>
             <!-- NOTE: this assumes that if there are no clip-end attribute, only a clip-begin attribute, then the declared SMIL duration is the total duration of the audio file pointed to by that audio element -->
-            <xsl:attribute name="calculated-duration"
-                select="sum(for $audio in (body//audio[@clip-begin or @clip-end]) return (($audio[@clip-end]/pf:smil-clock-value-to-seconds(@clip-end),$meta-duration)[1] - ($audio[@clip-begin]/pf:smil-clock-value-to-seconds(@clip-begin),0)[1]))"/>
+            <xsl:attribute name="calculated-duration" select="pf:smil-total-seconds(.)"/>
             <xsl:for-each select="body//audio[@clip-begin and not(@clip-end) or not(@clip-begin) and @clip-end]">
                 <xsl:message select="concat('audio clip is missing a ',(if (@clip-begin) then 'clip-end' else 'clip-begin'),' attribute (par id: ',parent::par/@id,')')"/>
             </xsl:for-each>
