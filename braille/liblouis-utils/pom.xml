@@ -150,7 +150,6 @@
       org.daisy.pipeline.braille.liblouis.pef.impl.LiblouisDisplayTableProvider,
       org.daisy.pipeline.braille.liblouis.saxon.impl.HyphenateDefinition,
       org.daisy.pipeline.braille.liblouis.calabash.impl.TranslateFileStep$Provider,
-      org.daisy.pipeline.braille.libhyphen.impl.LibhyphenTablePath_liblouis_hyphen_tables,
       org.daisy.pipeline.braille.pef.impl.NabccEightDotTableProvider
     </expose-services>
   </properties>
