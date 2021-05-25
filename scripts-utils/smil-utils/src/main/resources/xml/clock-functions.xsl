@@ -56,11 +56,13 @@
     <xsl:function name="pf:smil-seconds-to-full-clock-value" as="xs:string">
         <xsl:param name="number" as="xs:double"/>
         <xsl:variable name="HH"
-            select="concat(if (($number div 3600) &lt; 10) then '0' else '', string(floor($number div 3600)))"/>
+            select="string(floor($number div 3600))"/>
         <xsl:variable name="MM"
             select="concat(if ((($number mod 3600) div 60) &lt; 10) then '0' else '', string(floor(($number mod 3600) div 60)))"/>
         <xsl:variable name="SS"
             select="concat(if (($number mod 60) &lt; 10) then '0' else '', string(round(($number mod 60)*1000) div 1000))"/>
+        <xsl:variable name="SS"
+            select="if (not(contains($SS,'.'))) then $SS else string-join(($SS,for $_ in string-length($SS) to 5 return '0'),'')"/>
         <xsl:value-of select="concat($HH,':',$MM,':',$SS)"/>
     </xsl:function>
 
