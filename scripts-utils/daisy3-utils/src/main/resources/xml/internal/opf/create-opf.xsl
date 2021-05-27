@@ -26,7 +26,7 @@
   <xsl:template match="/">
     <xsl:variable name="has-audio" as="xs:boolean" select="exists(//d:file[contains(@media-type, 'audio')])"/>
     <xsl:variable name="has-image" as="xs:boolean" select="exists(//d:file[contains(@media-type, 'image')])"/>
-    <xsl:variable name="audio-only" as="xs:boolean" select="not(exists(//d:file[@media-type='application/x-dtbook+xml']))"/>
+    <xsl:variable name="has-text" as="xs:boolean" select="exists(//d:file[@media-type='application/x-dtbook+xml'])"/>
 
     <xsl:variable name="dtbook" as="document-node(element(dtb:dtbook))?" select="collection()[3]"/>
 
@@ -115,13 +115,15 @@
 	</dc-metadata>
 	<x-metadata>
 	  <meta name="dtb:multimediaType"
-		content="{if ($audio-only) then 'audioOnly' else
-			 (if ($has-audio) then 'audioFullText' else 'textNCX')}"/>
+		content="{if ($has-text and $has-audio) then 'audioFullText'
+			  else if ($has-text) then 'textNCX'
+			  else 'audioNCX'}"/>
 	  <meta name="dtb:totalTime" content="{$total-time}"/>
 	  <meta name="dtb:multimediaContent"
-		content="{concat(
-			 if ($audio-only) then 'audio' else (if ($has-audio) then 'audio,text' else 'text'),
-			 if ($has-image) then ',image' else '')}"/>
+		content="{string-join((
+			    if ($has-audio) then 'audio' else (),
+			    if ($has-text) then 'text' else (),
+			    if ($has-image) then 'image' else ()),',')}"/>
 	  <xsl:if test="//d:file[@role='mathml-xslt-fallback']">
 	    <meta name="z39-86-extension-version"
 		  scheme="http://www.w3.org/1998/Math/MathML"
