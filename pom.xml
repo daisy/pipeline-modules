@@ -24,7 +24,6 @@
     <module>common/common-utils</module>
     <module>common/file-utils</module>
     <module>common/fileset-utils</module>
-    <module>common/html-utils</module>
     <module>common/image-utils</module>
     <module>common/mediatype-utils</module>
     <module>common/validation-utils</module>
@@ -32,6 +31,7 @@
     <module>scripts-utils/ace-adapter</module>
     <module>scripts-utils/asciimath-utils</module>
     <module>scripts-utils/css-utils</module>
+    <module>scripts-utils/html-utils</module>
     <module>scripts-utils/daisy202-utils</module>
     <module>scripts-utils/daisy3-utils</module>
     <module>scripts-utils/dtbook-utils</module>
