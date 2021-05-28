@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="3.0"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
+                xmlns:c="http://www.w3.org/ns/xproc-step"
                 xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions"
                 xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
                 xmlns:svg="http://www.w3.org/2000/svg"
@@ -11,6 +12,7 @@
                 exclude-result-prefixes="#all">
 
     <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl"/>
+    <xsl:use-package name="http://www.daisy.org/pipeline/modules/css-utils/library.xsl"/>
 
     <xsl:strip-space elements="*"/>
     <xsl:output indent="yes"/>
@@ -87,7 +89,7 @@
         <xsl:if test="$rel='stylesheet' and (@type='text/css' or pf:get-extension(@href)='css')">
             <xsl:variable name="href" select="resolve-uri(@href,base-uri(.))"/>
             <xsl:if test="unparsed-text-available($href)">
-                <xsl:for-each select="f:get-css-resources(unparsed-text($href),$href)">
+                <xsl:for-each select="pf:css-to-fileset(unparsed-text($href),$href,(),())">
                     <xsl:sequence select="f:fileset-entry(.,(),'')"/>
                 </xsl:for-each>
             </xsl:if>
@@ -95,7 +97,7 @@
     </xsl:template>
 
     <xsl:template match="style">
-        <xsl:for-each select="f:get-css-resources(.,$doc-base)">
+        <xsl:for-each select="pf:css-to-fileset(.,$doc-base,(),())">
             <xsl:sequence select="f:fileset-entry(.,(),'')"/>
         </xsl:for-each>
     </xsl:template>
@@ -284,54 +286,6 @@
                               else if (matches($src,'.*\.gif$','i')) then 'image/gif'
                               else if (matches($src,'.*\.svg$','i')) then 'image/svg+xml'
                               else ()"/>
-    </xsl:function>
-
-
-    <!--–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
-     |  Extract URLs from CSS                                                      |
-    <|–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––-->
-    <xsl:function name="f:get-css-resources" as="xs:string*">
-        <xsl:param name="css" as="xs:string"/>
-        <xsl:param name="css-base" as="xs:string"/>
-        <xsl:analyze-string select="$css" regex="@import\s+(.*?)(\s*|\s+[^)].*);">
-            <xsl:matching-substring>
-                <xsl:variable name="url"
-                    select="f:parse-css-url(replace(regex-group(1),'^url\(\s*(.*?)\s*\)$','$1'))"/>
-                <xsl:if test="$url">
-                    <!--TODO remove query fragments, check that URL is relative-->
-                    <xsl:sequence select="resolve-uri($url,$css-base)"/>
-                    <xsl:if test="unparsed-text-available(resolve-uri($url,$css-base))">
-                        <xsl:sequence select="f:get-css-resources(unparsed-text(resolve-uri($url,$css-base)),
-                                                                  resolve-uri($url,$css-base))"/>
-                    </xsl:if>
-                </xsl:if>
-            </xsl:matching-substring>
-            <xsl:non-matching-substring>
-                <xsl:analyze-string select="." regex="url\(\s*(.*?)\s*\)">
-                    <xsl:matching-substring>
-                        <xsl:variable name="url" select="f:parse-css-url(regex-group(1))"/>
-                        <xsl:if test="$url">
-                            <xsl:sequence select="resolve-uri($url,$css-base)"/>
-                            <xsl:if test="unparsed-text-available(resolve-uri($url,$css-base))">
-                                <xsl:sequence select="f:get-css-resources(unparsed-text(resolve-uri($url,$css-base)),
-                                                      resolve-uri($url,$css-base))"/>
-                            </xsl:if>
-                        </xsl:if>
-                    </xsl:matching-substring>
-                </xsl:analyze-string>
-            </xsl:non-matching-substring>
-        </xsl:analyze-string>
-    </xsl:function>
-
-    <xsl:function name="f:parse-css-url" as="xs:string?">
-        <xsl:param name="url" as="xs:string"/>
-        <xsl:sequence
-            select="
-            if (matches($url,'''(.*?)''')) then replace($url,'''(.*?)''','$1')
-            else if  (matches($url,'&quot;(.*?)&quot;')) then replace($url,'&quot;(.*?)&quot;','$1')
-            else if (matches($url,'^[^''&quot;]')) then $url
-            else ()"
-        />
     </xsl:function>
 
 </xsl:stylesheet>
