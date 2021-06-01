@@ -34,7 +34,7 @@
     <p:option name="update-lang-attributes" required="false" select="'false'"/>
     <p:option name="ensure-pagenum-text" required="false" select="'false'"/>
     <p:option name="ensure-section-headings" required="false" select="'false'"/>
-    <p:option name="braille" required="false" select="'true'"/>
+    <p:option name="braille" required="false" select="'false'"/>
     <p:option name="tts" required="false" select="'default'"/>
     <p:option name="sentence-detection" required="false" select="'false'"/>
     <p:option name="braille-translator" select="''"/>
