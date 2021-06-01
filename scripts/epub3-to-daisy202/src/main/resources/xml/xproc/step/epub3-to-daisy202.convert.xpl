@@ -251,6 +251,13 @@
                 <p:documentation>Normalize HTML5.</p:documentation>
                 <!-- hopefully this preserves all IDs -->
             </px:html-upgrade>
+            <p:delete match="html:a[@href][@role='doc-backlink']">
+                <p:documentation>
+                    Drop "doc-backlink" elements because navigation to and from notes will be
+                    handled through SMIL (see rearrange-notes). We drop all of them and assume they
+                    are actually contained in a referenced note.
+                </p:documentation>
+            </p:delete>
             <px:html-downgrade>
                 <p:documentation>Downgrade to HTML4. This preserves all ID.</p:documentation>
             </px:html-downgrade>
@@ -466,7 +473,8 @@
         </p:wrap-sequence>
         <p:sink/>
         <!--
-            Drop href attributes of noteref elements
+            Drop href attributes of noteref elements because
+            navigation to and from notes is handled through SMIL.
         -->
         <px:fileset-load media-types="application/xhtml+xml" name="html">
             <p:input port="fileset">

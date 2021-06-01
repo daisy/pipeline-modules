@@ -450,6 +450,7 @@
                         <body id="body">
                             <aside epub:type="footnote" id="aside_1">
                                 This is note 1.
+                                <a role="doc-backlink" href="content.xhtml#a_1">(back to text)</a>
                             </aside>
                         </body>
                     </html>
