@@ -52,6 +52,8 @@
                             <xsl:with-param name="name" select="@name"/>
                             <xsl:with-param name="style" select="$style"/>
                             <xsl:with-param name="context" select="$target"/>
+                            <xsl:with-param name="default-marker-contents"
+                                            select="exists($target/ancestor::*[self::css:marker or @name='css:marker'])"/>
                         </xsl:call-template>
                     </xsl:if>
                 </xsl:variable>

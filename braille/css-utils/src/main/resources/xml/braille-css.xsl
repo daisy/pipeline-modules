@@ -468,8 +468,8 @@
                         <xsl:attribute name="negative" select="($style/@negative,'-')[1]"/>
                     </xsl:if>
                     <xsl:attribute name="prefix" select="($style/@prefix,'')[1]"/>
-                    <xsl:attribute name="suffix" select="($style/@suffix,'. ')[1]"/>
-                    <xsl:attribute name="fallback" select="($style/@fallback,'. ')[1]"/>
+                    <xsl:attribute name="suffix" select="($style/@suffix,' ')[1]"/>
+                    <xsl:attribute name="fallback" select="($style/@fallback,'decimal')[1]"/>
                     <xsl:attribute name="text-transform" select="($style/@text-transform,'auto')[1]"/>
                 </xsl:element>
             </xsl:when>
@@ -478,7 +478,7 @@
                                    symbols="'0' '1' '2' '3' '4' '5' '6' '7' '8' '9'"
                                    negative="-"
                                    prefix=""
-                                   suffix=". "
+                                   suffix=" "
                                    fallback="decimal"
                                    text-transform="auto"/>
             </xsl:otherwise>

@@ -2080,13 +2080,13 @@
             </default-template>
           </layout-master>
           <sequence master="body">
-            <block><span translate="">1</span> ⠤⠤⠤ </block>
-            <block><span translate="">2</span> ⠤⠤⠤ </block>
-            <block><span translate="">i</span> ⠤⠤⠤ </block>
-            <block><span translate="">ii</span> ⠤⠤⠤ </block>
+            <block><span translate="">1 </span>⠤⠤⠤ </block>
+            <block><span translate="">2 </span>⠤⠤⠤ </block>
+            <block><span translate="">i </span>⠤⠤⠤ </block>
+            <block><span translate="">ii </span>⠤⠤⠤ </block>
             <block>⠶ ⠤⠤⠤ </block>
             <block>⠶ ⠤⠤⠤ </block>
-            <block><span translate="">3</span> ⠤⠤⠤ </block>
+            <block><span translate="">3 </span>⠤⠤⠤ </block>
           </sequence>
         </obfl>
       </x:document>
