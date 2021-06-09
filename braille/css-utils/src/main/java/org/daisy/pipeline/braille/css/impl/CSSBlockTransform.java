@@ -99,18 +99,14 @@ public interface CSSBlockTransform {
 				if ("html".equals(f.getValue().get())) {}
 				else if (!"css".equals(f.getValue().get()))
 					return empty;
-			boolean braille = false;
-			final boolean htmlOut; {
-				boolean html = false;
+			boolean braille = false; {
 				for (Feature f : q.removeAll("output"))
 					if ("css".equals(f.getValue().get())) {}
-					else if ("html".equals(f.getValue().get()))
-						html = true;
+					else if ("html".equals(f.getValue().get())) {}
 					else if ("braille".equals(f.getValue().get()))
 						braille = true;
 					else
 						return empty;
-				htmlOut = html;
 			}
 			final String locale = q.containsKey("locale") ? q.getOnly("locale").getValue().get() : null;
 			q.add("input", "text-css");
@@ -122,7 +118,7 @@ public interface CSSBlockTransform {
 				new Function<BrailleTranslator,BrailleTranslator>() {
 					public BrailleTranslator _apply(BrailleTranslator translator) {
 						return __apply(
-							logCreate(new TransformImpl(translator, false, htmlOut, locale, q))
+							logCreate(new TransformImpl(translator, false, locale, q))
 						);
 					}
 				}
@@ -149,13 +145,8 @@ public interface CSSBlockTransform {
 			 */
 			// FIXME: mainTranslator is optional if default translator has been defined in CSS (which we can not know in advance)
 			private TransformImpl(BrailleTranslator mainTranslator, boolean forceMainTranslator,
-			                      boolean htmlOut, String mainLocale, Query query) {
-				options = ImmutableMap.of(// This will omit the <_ style="text-transform:none">
-				                          // wrapper. It is assumed that if (output:html) is set, the
-				                          // result is known to be braille (which is the case if
-				                          // (output:braille) is also set).
-				                          "no-wrap", String.valueOf(htmlOut),
-				                          "main-locale", mainLocale != null ? mainLocale : "");
+			                      String mainLocale, Query query) {
+				options = ImmutableMap.of("main-locale", mainLocale != null ? mainLocale : "");
 				this.mainTranslator = mainTranslator;
 				this.forceMainTranslator = forceMainTranslator;
 				mainQuery = query;

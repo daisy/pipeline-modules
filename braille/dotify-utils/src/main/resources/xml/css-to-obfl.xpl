@@ -188,6 +188,13 @@
     </p:xslt>
     -->
     
+    <p:wrap match="/*" wrapper="_">
+        <!--
+            Wrap everything in new root element so that css:make-pseudo-elements below can not fail
+            (it may otherwise try to output multiple documents).
+        -->
+    </p:wrap>
+
     <pxi:recursive-parse-stylesheet-and-make-pseudo-elements px:progress=".04">
         <p:documentation>
             Make css:page, css:volume, css:top-of-page and css:_obfl-volume-transition attributes,
@@ -238,12 +245,17 @@
             Delete @css:_obfl-volume-transition attributes.
         </p:documentation>
     </p:delete>
-    <pxi:extract-obfl-pseudo-elements px:progress=".02">
-        <p:documentation>
-            Extract css:_obfl-on-toc-start, css:_obfl-on-volume-start, css:_obfl-on-volume-end
-            and css:_obfl-on-toc-end pseudo-elements into their own documents.
-        </p:documentation>
-    </pxi:extract-obfl-pseudo-elements>
+    
+    <p:filter select="/_/*"/>
+
+    <p:for-each px:progress=".02">
+        <pxi:extract-obfl-pseudo-elements>
+            <p:documentation>
+                Extract css:_obfl-on-toc-start, css:_obfl-on-volume-start, css:_obfl-on-volume-end
+                and css:_obfl-on-toc-end pseudo-elements into their own documents.
+            </p:documentation>
+        </pxi:extract-obfl-pseudo-elements>
+    </p:for-each>
     
     <p:for-each px:progress=".04">
         <css:parse-properties px:progress=".50"
@@ -281,8 +293,8 @@
                 </p:documentation>
             </css:parse-properties>
         </p:for-each>
-        <p:split-sequence test="/*[not(@css:flow)]" name="_1"/>
-        <p:wrap wrapper="_" match="/*"/>
+        <p:split-sequence test="not(/css:_[@css:flow])" name="_1"/>
+        <p:wrap-sequence wrapper="_"/>
         <css:flow-into name="_2" px:progress=".50">
             <p:documentation>
                 Extract named flows based on css:flow attributes and place anchors (css:id
@@ -304,6 +316,10 @@
             Make css:id attributes. <!-- depends on parse-content -->
         </p:documentation>
     </css:label-targets>
+    
+    <p:for-each>
+      <p:delete match="@xml:base"/>
+    </p:for-each>
     
     <css:eval-target-content px:progress=".005">
         <p:documentation>
