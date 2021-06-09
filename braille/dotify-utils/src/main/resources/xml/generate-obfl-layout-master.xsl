@@ -29,6 +29,7 @@
     <xsl:template match="/*">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
+            <xsl:apply-templates select="obfl:meta"/>
             <xsl:variable name="sequences" as="element()*" select="//obfl:sequence|//obfl:toc-sequence|//obfl:dynamic-sequence"/>
             <xsl:for-each select="distinct-values($sequences/@css:page)">
                 <xsl:variable name="layout-master-name" select="pxi:layout-master-name(.)"/>
@@ -59,7 +60,7 @@
                     </xsl:variable>
                 </xsl:for-each>
             </xsl:for-each>
-            <xsl:apply-templates/>
+            <xsl:apply-templates select="* except obfl:meta"/>
         </xsl:copy>
     </xsl:template>
     

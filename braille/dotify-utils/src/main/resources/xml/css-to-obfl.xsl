@@ -273,6 +273,9 @@
             <xsl:if test="$translate!=''">
                 <xsl:attribute name="translate" select="$translate"/>
             </xsl:if>
+            <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+                <dp2:style-type>text/css</dp2:style-type>
+            </meta>
             <xsl:call-template name="_start">
                 <xsl:with-param name="text-transform" tunnel="yes" select="$initial-text-transform"/>
                 <xsl:with-param name="hyphens" tunnel="yes" select="$initial-hyphens"/>

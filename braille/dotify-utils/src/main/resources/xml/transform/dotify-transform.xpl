@@ -5,7 +5,6 @@
                 xmlns:c="http://www.w3.org/ns/xproc-step"
                 xmlns:cx="http://xmlcalabash.com/ns/extensions"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                xmlns:dotify="http://code.google.com/p/dotify/"
                 xmlns:obfl="http://www.daisy.org/ns/2011/obfl"
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                 exclude-inline-prefixes="#all">
@@ -23,7 +22,7 @@
 	<p:import href="http://www.daisy.org/pipeline/modules/braille/common-utils/library.xpl"/>
 	<p:import href="../library.xpl">
 		<p:documentation>
-			dotify:obfl-to-pef
+			px:obfl-to-pef
 		</p:documentation>
 	</p:import>
 	<p:import href="../css-to-obfl.xpl"/>
@@ -90,7 +89,7 @@
 					<p:pipe step="main" port="parameters"/>
 				</p:input>
 			</px:merge-parameters>
-			<dotify:obfl-to-pef px:message="Transforming from OBFL to PEF" px:progress="1">
+			<px:obfl-to-pef px:message="Transforming from OBFL to PEF" px:progress="1">
 				<p:input port="source">
 					<p:pipe step="obfl" port="result"/>
 				</p:input>
@@ -99,7 +98,7 @@
 				<p:input port="parameters">
 					<p:pipe step="parameters" port="result"/>
 				</p:input>
-			</dotify:obfl-to-pef>
+			</px:obfl-to-pef>
 		</p:when>
 		<p:otherwise>
 			<p:identity/>

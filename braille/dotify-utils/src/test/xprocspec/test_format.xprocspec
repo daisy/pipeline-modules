@@ -26,11 +26,11 @@
       <p:for-each><p:identity/></p:for-each>
       <p:try px:progress=".10">
         <p:group>
-          <dotify:obfl-to-pef px:message="obfl-to-pef" px:progress="1"
-                              locale="und">
+          <px:obfl-to-pef px:message="obfl-to-pef" px:progress="1"
+                          locale="und">
             <p:with-option name="mode" select="concat($text-transform,'(input:text-css)(output:braille)')"/>
             <p:with-param port="parameters" name="allow-text-overflow-trimming" select="$allow-text-overflow-trimming"/>
-          </dotify:obfl-to-pef>
+          </px:obfl-to-pef>
         </p:group>
         <p:catch>
           <p:identity>
@@ -72,6 +72,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="30" page-height="5" duplex="true">
             <default-template>
               <header/>
@@ -185,6 +188,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="20" page-height="5" duplex="true">
             <default-template>
               <header>
@@ -338,6 +344,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="20" page-height="5" duplex="true">
             <default-template>
               <header/>
@@ -468,6 +477,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="15" page-height="5" duplex="true">
             <default-template>
               <header/>
@@ -637,6 +649,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="front" page-width="15" page-height="5" duplex="true">
             <default-template>
               <header/>
@@ -861,6 +876,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" page-width="10" page-height="6" duplex="true">
             <default-template>
               <header/>
@@ -1135,6 +1153,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" page-width="10" page-height="6" duplex="true">
             <default-template>
               <header/>
@@ -1252,6 +1273,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" page-width="10" page-height="6" duplex="true">
             <default-template>
               <header/>
@@ -1327,6 +1351,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" page-width="20" page-height="15" duplex="true">
             <default-template>
               <header/>
@@ -1435,6 +1462,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" page-width="20" page-height="15" duplex="true">
             <default-template>
               <header/>
@@ -1542,6 +1572,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" page-width="20" page-height="15" duplex="true">
             <default-template>
               <header/>
@@ -1619,6 +1652,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" page-width="30" page-height="2" duplex="true">
             <default-template>
               <header/>
@@ -1682,6 +1718,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" page-width="40" page-height="25" duplex="true">
             <default-template>
               <header/>
@@ -1744,6 +1783,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" page-width="40" page-height="25" duplex="true">
             <default-template>
               <header/>
@@ -1806,6 +1848,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" page-width="15" page-height="5" duplex="true">
             <default-template>
               <header/>
@@ -1867,6 +1912,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" page-width="15" page-height="5" duplex="true">
             <default-template>
               <header/>
@@ -1933,6 +1981,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" page-width="15" page-height="5" duplex="true">
             <default-template>
               <header/>
@@ -2019,6 +2070,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" page-width="40" page-height="25" duplex="true">
             <default-template>
               <header/>
@@ -2126,6 +2180,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" page-width="14" page-height="8" duplex="true">
             <default-template>
               <header/>
@@ -2319,6 +2376,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" page-width="15" page-height="5" duplex="true">
             <default-template>
               <header/>
@@ -2474,6 +2534,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" page-width="14" page-height="8" duplex="true">
             <default-template>
               <header/>
@@ -2547,6 +2610,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="40" page-height="25" duplex="true">
             <default-template>
               <header/>
@@ -2612,6 +2678,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="40" page-height="25" duplex="true">
             <default-template>
               <header/>
@@ -2674,6 +2743,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="12" page-height="5" duplex="true">
             <default-template>
               <header/>
@@ -2743,6 +2815,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" page-width="20" page-height="15" duplex="true">
             <default-template>
               <header/>
@@ -2815,6 +2890,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="40" page-height="25" duplex="true">
             <default-template>
               <header/>
@@ -2888,6 +2966,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="40" page-height="25" duplex="true">
             <default-template>
               <header/>
@@ -2963,6 +3044,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="40" page-height="25" duplex="true">
             <default-template>
               <header/>
@@ -3035,6 +3119,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="40" page-height="25" duplex="true">
             <default-template>
               <header/>
@@ -3106,6 +3193,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="40" page-height="25" duplex="true">
             <default-template>
               <header/>
@@ -3173,6 +3263,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="40" page-height="25" duplex="true">
             <default-template>
               <header/>
@@ -3238,6 +3331,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="40" page-height="25" duplex="true">
             <default-template>
               <header>
@@ -3306,6 +3402,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="40" page-height="25" duplex="true">
             <default-template>
               <header>
@@ -3383,6 +3482,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="40" page-height="25" duplex="true">
             <default-template>
               <header>
@@ -3451,6 +3553,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="40" page-height="25" duplex="true">
             <default-template>
               <header>
@@ -3529,6 +3634,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="40" page-height="25" duplex="true">
             <template use-when="(= (% $page 2) 1)">
               <header>
@@ -3638,6 +3746,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="40" page-height="25" duplex="true">
             <default-template>
               <header/>
@@ -3714,6 +3825,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="40" page-height="25" duplex="true">
             <default-template>
               <header/>
@@ -3783,6 +3897,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="40" page-height="25" duplex="true">
             <default-template>
               <header/>
@@ -3867,6 +3984,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" page-width="12" page-height="8" duplex="true">
             <default-template>
               <header/>
@@ -3944,6 +4064,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="15" page-height="5" duplex="true">
             <default-template>
               <header/>
@@ -4028,6 +4151,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="15" page-height="5" duplex="true">
             <default-template>
               <header/>
@@ -4121,6 +4247,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="15" page-height="5" duplex="true">
             <default-template>
               <header/>
@@ -4206,6 +4335,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="15" page-height="5" duplex="true">
             <default-template>
               <header/>
@@ -4300,6 +4432,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="15" page-height="5" duplex="true">
             <default-template>
               <header/>
@@ -4394,6 +4529,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="15" page-height="5" duplex="true">
             <default-template>
               <header/>
@@ -4568,6 +4706,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="20" page-height="7" duplex="true">
             <template use-when="(= (% $page 2) 1)">
               <header>
@@ -4823,6 +4964,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="20" page-height="6" duplex="true">
             <default-template>
               <header/>
@@ -4970,6 +5114,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="10" page-height="6" duplex="true">
             <default-template>
               <header/>
@@ -5120,6 +5267,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" page-width="15" page-height="5" duplex="true">
             <default-template>
               <header/>
@@ -5202,6 +5352,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" page-width="10" page-height="5" duplex="true">
             <default-template>
               <header/>
@@ -5393,6 +5546,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" page-width="10" page-height="5" duplex="true">
             <default-template>
               <header/>
@@ -5580,6 +5736,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="10" page-height="5" duplex="true">
             <default-template>
               <header/>
@@ -5706,6 +5865,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" page-width="15" page-height="5" duplex="true">
             <default-template>
               <header/>
@@ -5796,6 +5958,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" page-width="15" page-height="5" duplex="true">
             <default-template>
               <header/>
@@ -5880,6 +6045,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" page-width="15" page-height="5" duplex="true">
             <default-template>
               <header/>
@@ -5959,6 +6127,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" page-width="10" page-height="10" duplex="true">
             <default-template>
               <header/>
@@ -6078,6 +6249,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="20" page-height="12">
             <default-template>
               <header/>
@@ -6231,6 +6405,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" duplex="true" page-width="25" page-height="10">
             <default-template>
               <header/>
@@ -6330,6 +6507,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" duplex="true" page-width="10" page-height="6">
             <default-template>
               <header/>
@@ -6430,6 +6610,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" duplex="true" page-width="10" page-height="6">
             <default-template>
               <header/>
@@ -6533,6 +6716,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="10" page-height="6">
             <default-template>
               <header/>
@@ -6727,6 +6913,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="20" page-height="6">
             <default-template>
               <header/>
@@ -6834,6 +7023,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="20" page-height="6">
             <default-template>
               <header/>
@@ -6949,6 +7141,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="20" page-height="6">
             <default-template>
               <header/>
@@ -7030,6 +7225,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" duplex="true" page-width="10" page-height="6">
             <default-template>
               <header/>
@@ -7129,6 +7327,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="20" page-height="10">
             <default-template>
               <header/>
@@ -7246,6 +7447,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="20" page-height="10">
             <default-template>
               <header/>
@@ -7401,6 +7605,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="15" page-height="7">
             <default-template>
               <header/>
@@ -7768,6 +7975,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="15" page-height="7">
             <default-template>
               <header/>
@@ -7944,6 +8154,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="40" page-height="25">
             <default-template>
               <header/>
@@ -8049,6 +8262,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="40" page-height="25">
             <default-template>
               <header/>
@@ -8155,6 +8371,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="master_2" duplex="true" page-width="15" page-height="5">
             <default-template>
               <header/>
@@ -8253,6 +8472,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" duplex="true" page-width="10" page-height="6">
             <default-template>
               <header/>
@@ -8357,6 +8579,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" duplex="true" page-width="10" page-height="5">
             <template use-when="(= (% $page 2) 1)">
               <header/>
@@ -8473,6 +8698,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="15" page-height="5">
             <default-template>
               <header/>
@@ -8567,6 +8795,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="15" page-height="7">
             <default-template>
               <header/>
@@ -8687,6 +8918,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="master_1" duplex="true" page-width="15" page-height="7">
             <default-template>
               <header/>
@@ -8752,6 +8986,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="master_1" duplex="true" page-width="15" page-height="5">
             <default-template>
               <header/>
@@ -8821,6 +9058,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="master_1" duplex="true" page-width="40" page-height="25">
             <default-template>
               <header/>
@@ -8903,6 +9143,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="15" page-height="5">
             <default-template>
               <header/>
@@ -9034,6 +9277,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" duplex="true" page-width="10" page-height="6">
             <default-template>
               <header/>
@@ -9130,6 +9376,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="15" page-height="7">
             <default-template>
               <header/>
@@ -9308,6 +9557,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="15" page-height="7">
             <default-template>
               <header/>
@@ -9476,6 +9728,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="front" duplex="true" page-width="10" page-height="5">
             <default-template>
               <header/>
@@ -9575,6 +9830,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="master_1" duplex="true" page-width="40" page-height="25">
             <default-template>
               <header/>
@@ -9646,6 +9904,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="40" page-height="25">
             <default-template>
               <header/>
@@ -9736,6 +9997,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="40" page-height="25">
             <default-template>
               <header/>
@@ -9851,6 +10115,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="20" page-height="10">
             <default-template>
               <header/>
@@ -9980,6 +10247,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="master_1" duplex="true" page-width="10" page-height="10">
             <default-template>
               <header/>
@@ -10065,6 +10335,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="10" page-height="5">
             <default-template>
               <header/>
@@ -10394,6 +10667,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="10" page-height="5">
             <default-template>
               <header/>
@@ -10555,6 +10831,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="10" page-height="5">
             <default-template>
               <header/>
@@ -10688,6 +10967,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="master_1" duplex="true" page-width="20" page-height="5">
             <default-template>
               <header/>
@@ -10790,6 +11072,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" duplex="true" page-width="15" page-height="5">
             <default-template>
               <header/>
@@ -10897,6 +11182,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="40" page-height="25" duplex="true">
             <default-template>
               <header/>
@@ -11007,6 +11295,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="20" page-height="7" duplex="true">
             <default-template>
               <header>
@@ -11145,6 +11436,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="10" page-height="6">
             <default-template>
               <header/>
@@ -11319,6 +11613,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="10" page-height="6">
             <default-template>
               <header/>
@@ -11483,6 +11780,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" page-width="15" page-height="5" duplex="true">
             <default-template>
               <header/>
@@ -11570,6 +11870,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="10" page-height="5">
             <default-template>
               <header/>
@@ -11711,6 +12014,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" duplex="true" page-width="10" page-height="20">
             <default-template>
               <header/>
@@ -11817,6 +12123,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="40" page-height="25" duplex="true">
             <default-template>
               <header/>
@@ -11905,6 +12214,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" duplex="true" page-width="15" page-height="5">
             <default-template>
               <header/>
@@ -12052,6 +12364,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="10" page-height="5">
             <default-template>
               <header/>
@@ -12206,6 +12521,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="10" page-height="5">
             <default-template>
               <header/>
@@ -12475,6 +12793,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="10" page-height="5">
             <default-template>
               <header/>
@@ -12598,6 +12919,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="master" duplex="true" page-width="10" page-height="6">
             <default-template>
               <header/>
@@ -12685,6 +13009,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" page-width="20" page-height="5" duplex="true">
             <default-template>
               <header/>
@@ -12755,6 +13082,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="master_2" duplex="true" page-width="20" page-height="5">
             <default-template>
               <header/>
@@ -12835,6 +13165,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="10" page-height="5">
             <default-template>
               <header/>
@@ -12979,6 +13312,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="10" page-height="10">
             <default-template>
               <header/>
@@ -13114,6 +13450,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="10" page-height="5">
             <default-template>
               <header/>
@@ -13255,6 +13594,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" page-width="20" page-height="15" duplex="true">
             <default-template>
               <header/>
@@ -13351,6 +13693,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" page-width="20" page-height="15" duplex="true">
             <default-template>
               <header/>
@@ -13442,6 +13787,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="15" page-height="5" duplex="true">
             <default-template>
               <header/>
@@ -13537,6 +13885,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="15" page-height="5" duplex="true">
             <default-template>
               <header/>
@@ -13645,6 +13996,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="10" page-height="5">
             <default-template>
               <header/>
@@ -13922,6 +14276,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="15" page-height="7">
             <default-template>
               <header/>
@@ -14329,6 +14686,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="a" page-width="10" page-height="5" duplex="true">
             <default-template>
               <header/>
@@ -14464,6 +14824,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="master" duplex="true" page-width="10" page-height="6">
             <default-template>
               <header/>
@@ -14587,6 +14950,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="master" duplex="true" page-width="8" page-height="4">
             <default-template>
               <header/>
@@ -14800,6 +15166,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" page-width="20" page-height="5" duplex="true">
             <default-template>
               <header/>
@@ -14876,6 +15245,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="master" duplex="true" page-width="8" page-height="4">
             <default-template>
               <header/>
@@ -15026,6 +15398,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="10" page-height="5">
             <default-template>
               <header/>
@@ -15113,6 +15488,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="main" duplex="true" page-width="10" page-height="5">
             <default-template>
               <header/>
@@ -15191,6 +15569,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="master" duplex="true" page-width="40" page-height="25">
             <default-template>
               <header/>
@@ -15264,6 +15645,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="master" duplex="true" page-width="40" page-height="25">
             <default-template>
               <header/>
@@ -15358,6 +15742,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" page-width="10" page-height="2" duplex="true">
             <default-template>
               <header/>
@@ -15435,6 +15822,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" page-width="10" page-height="5" duplex="true">
             <default-template>
               <header/>
@@ -15518,6 +15908,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="body" page-width="10" page-height="5" duplex="true">
             <default-template>
               <header/>
@@ -15591,6 +15984,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="master" duplex="true" page-width="40" page-height="25">
             <default-template>
               <header/>
@@ -15676,6 +16072,9 @@
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
           <layout-master name="master" duplex="true" page-width="10" page-height="10">
             <default-template>
               <header/>
