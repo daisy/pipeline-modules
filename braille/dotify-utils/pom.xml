@@ -123,7 +123,8 @@
       org.daisy.pipeline.braille.dotify.impl.DotifyCSSStyledDocumentTransform$Provider,
       org.daisy.pipeline.braille.dotify.impl.DotifyHyphenatorImpl$Provider,
       org.daisy.pipeline.braille.dotify.impl.DotifyOBFLTransform$Provider,
-      org.daisy.pipeline.braille.dotify.impl.DotifyTranslatorImpl$Provider
+      org.daisy.pipeline.braille.dotify.impl.DotifyTranslatorImpl$Provider,
+      org.daisy.pipeline.braille.dotify.impl.PreTranslatedBrailleTranslatorProvider
     </expose-services>
   </properties>
   
