@@ -20,6 +20,7 @@
             <p:option name="mode" required="true"/>
             <p:option name="identifier" required="false" select="''"/>
             <p:option name="style-type" required="false" select="''"/>
+            <p:option name="css-text-transform-definitions" required="false" select="''"/>
             <p:input port="parameters" kind="parameter" primary="false"/>
             <!--
                 Implemented in ../../java/org/daisy/pipeline/braille/dotify/calabash/impl/OBFLToPEFStep.java
@@ -31,11 +32,18 @@
                  that this is also what translators understand, meaning that $mode should contain
                  "(input:text-css)". -->
         </p:delete>
+        <p:delete match="/obfl:obfl/obfl:meta/dp2:css-text-transform-definitions">
+            <!-- We don't want this to end up in the PEF. -->
+        </p:delete>
+
         <pxi:obfl-to-pef>
             <p:with-option name="locale" select="$locale"/>
             <p:with-option name="mode" select="$mode"/>
             <p:with-option name="identifier" select="$identifier"/>
             <p:with-option name="style-type" select="/obfl:obfl/obfl:meta/dp2:style-type[1]">
+                <p:pipe step="main" port="source"/>
+            </p:with-option>
+            <p:with-option name="css-text-transform-definitions" select="/obfl:obfl/obfl:meta/dp2:css-text-transform-definitions">
                 <p:pipe step="main" port="source"/>
             </p:with-option>
             <p:input port="parameters">

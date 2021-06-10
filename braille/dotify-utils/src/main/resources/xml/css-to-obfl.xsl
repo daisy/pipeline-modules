@@ -21,6 +21,7 @@
     <xsl:param name="locale" as="xs:string" required="yes"/>
     <xsl:param name="page-counters" as="xs:string" required="yes"/>
     <xsl:param name="volume-transition" as="xs:string?" required="no"/>
+    <xsl:param name="text-transforms" as="xs:string?" required="no"/>
     
     <xsl:variable name="sections" select="collection()[position() &lt; last()]"/>
     <xsl:variable name="page-and-volume-styles" select="collection()[position()=last()]/*/*"/>
@@ -29,6 +30,11 @@
     <xsl:variable name="volume-transition-rule" as="element()?">
         <xsl:if test="exists($volume-transition)">
             <xsl:sequence select="css:deep-parse-stylesheet(concat('@-obfl-volume-transition { ',$volume-transition,' }'))"/>
+        </xsl:if>
+    </xsl:variable>
+    <xsl:variable name="text-transform-rule" as="element()?">
+        <xsl:if test="exists($text-transforms) and not($text-transforms='')">
+            <css:rule selector="@text-transform" style="{$text-transforms}"/>
         </xsl:if>
     </xsl:variable>
     
@@ -275,6 +281,13 @@
             </xsl:if>
             <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
                 <dp2:style-type>text/css</dp2:style-type>
+                <xsl:if test="exists($text-transform-rule)">
+                    <dp2:css-text-transform-definitions>
+                        <xsl:text>&#xa;</xsl:text>
+                        <xsl:value-of select="css:serialize-stylesheet($text-transform-rule,(),1,'    ')"/>
+                        <xsl:text>&#xa;</xsl:text>
+                    </dp2:css-text-transform-definitions>
+                </xsl:if>
             </meta>
             <xsl:call-template name="_start">
                 <xsl:with-param name="text-transform" tunnel="yes" select="$initial-text-transform"/>

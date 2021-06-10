@@ -1,11 +1,9 @@
 package org.daisy.pipeline.braille.css.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.net.URI;
-import java.net.URL;
 import javax.xml.namespace.QName;
 
 import com.google.common.base.MoreObjects;
@@ -13,18 +11,9 @@ import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
-import static com.google.common.collect.Iterables.filter;
-
 import com.xmlcalabash.core.XProcRuntime;
 import com.xmlcalabash.runtime.XAtomicStep;
 
-import cz.vutbr.web.css.Declaration;
-import cz.vutbr.web.css.TermIdent;
-import cz.vutbr.web.css.TermInteger;
-import cz.vutbr.web.css.TermURI;
-
-import org.daisy.braille.css.InlineStyle;
-import org.daisy.braille.css.RuleTextTransform;
 import org.daisy.common.file.URLs;
 import org.daisy.common.saxon.SaxonInputValue;
 import org.daisy.common.transform.InputValue;
@@ -56,6 +45,7 @@ import static org.daisy.pipeline.braille.common.TransformProvider.util.memoize;
 import org.daisy.pipeline.braille.common.util.Function0;
 import org.daisy.pipeline.braille.common.util.Functions;
 import org.daisy.pipeline.braille.css.CompoundTranslator;
+import org.daisy.pipeline.braille.css.TextTransformParser;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -215,70 +205,12 @@ public interface CSSBlockTransform {
 			}
 		}
 		
-		private Map<String,Query> readTextTransformRules(Node doc, Query mainQuery) {
+		private static Map<String,Query> readTextTransformRules(Node doc, Query baseQuery) {
 			if (!(doc instanceof Document))
 				throw new TransformerException(new IllegalArgumentException());
-			Map<String,Query> queries = null;
 			String style = (((Document)doc).getDocumentElement()).getAttribute("style");
-			if (style != null && !"".equals(style))
-				for (RuleTextTransform rule : filter(new InlineStyle(style), RuleTextTransform.class))
-					for (Declaration d : rule)
-						if (d.getProperty().equals("system")
-						    && d.size() == 1
-						    && d.get(0) instanceof TermIdent
-						    && "braille-translator".equals(((TermIdent)d.get(0)).getValue())) {
-							MutableQuery query = mutableQuery(mainQuery);
-							for (Declaration dd : rule)
-								if (dd.getProperty().equals("system")
-								    && dd.size() == 1
-								    && dd.get(0) instanceof TermIdent
-								    && "braille-translator".equals(((TermIdent)dd.get(0)).getValue()))
-									;
-								else if (!dd.getProperty().equals("system")
-								         && dd.size() == 1
-								         && (dd.get(0) instanceof TermIdent
-								             || dd.get(0) instanceof TermURI
-								             || dd.get(0) instanceof TermInteger)) {
-									String key = dd.getProperty();
-									String value;
-									if (dd.get(0) instanceof TermURI) {
-										URL base = ((TermURI)dd.get(0)).getBase();
-										URI baseURI = base != null ? URLs.asURI(base) : URLs.asURI(((Document)doc).getBaseURI());
-										value = URLs.resolve(baseURI,
-										                     URLs.asURI(((TermURI)dd.get(0)).getValue()))
-										            .toASCIIString();
-									} else {
-										if (dd.get(0) instanceof TermInteger)
-											value = "" + ((TermInteger)dd.get(0)).getIntValue();
-										else
-											value = "" + dd.get(0).getValue();
-										if (query.containsKey(key))
-											query.removeAll(key);
-									}
-									if (key.equals("contraction") && value.equals("no"))
-										query.removeAll("grade");
-									// FIXME: support this in Liblouis translator
-									if (key.equals("table") || key.equals("liblouis-table")) {
-										query.removeAll("locale");
-										query.removeAll("type");
-										query.removeAll("contraction");
-										query.removeAll("grade");
-										query.removeAll("dots");
-										query.removeAll("direction");
-									}
-									query.add(key, value);
-								} else {
-									query = null;
-									break;
-								}
-							if (query != null) {
-								if (queries == null) queries = new HashMap<>();
-								String name = rule.getName();
-								queries.put(name == null ? "auto" : name, query);
-							}
-							break;
-						}
-			return queries;
+			URI baseURI = URLs.asURI(((Document)doc).getBaseURI());
+			return TextTransformParser.getBrailleTranslatorQueries(style, baseURI, baseQuery);
 		}
 		
 		@Reference(
