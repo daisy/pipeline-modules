@@ -248,7 +248,11 @@
     <!-- Start -->
     <!-- ===== -->
     
-    <xsl:variable name="initial-text-transform" as="xs:string" select="'none'"/>
+    <!-- these defaults must match initial values defined in obfl-css-definition.xsl -->
+    <xsl:variable name="initial-text-transform" as="xs:string"
+                  select="if ($sections/css:_/css:box[not(@css:text-transform='none')])
+                          then 'auto'
+                          else 'none'"/>
     <xsl:variable name="initial-hyphens" as="xs:string" select="'manual'"/>
     <xsl:variable name="initial-word-spacing" as="xs:integer" select="1"/>
     
@@ -896,6 +900,7 @@
                   match="/css:_
                          /css:box[@type='block' and @css:_obfl-list-of-references]">
         <xsl:apply-templates mode="assert-nil-attr" select="@* except (@type|
+                                                                       @css:text-transform|
                                                                        @css:_obfl-list-of-references|
                                                                        @css:_obfl-on-volume-start|
                                                                        @css:_obfl-on-volume-end)"/>

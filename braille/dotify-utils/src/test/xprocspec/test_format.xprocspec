@@ -2132,7 +2132,7 @@
           <doc style="text-transform:none">
             <body style="@page { size: 14 8; margin-bottom: 1; @bottom-right { content: counter(page) }}">
               <frontmatter>
-                <toc>
+                <toc style="display: block">
                   <entry ref="chapter_1" style="&amp;::after {
                                                   display: block;
                                                   text-transform: auto;
@@ -2197,6 +2197,7 @@
             </default-template>
           </layout-master>
           <sequence master="body">
+            <block>
             <block translate="">
               ⠿
               ⠄⠄⠄⠄⠄⠄⠄
@@ -2214,6 +2215,7 @@
               ⠄⠄⠄⠄
               ⠤⠤
               <page-number ref-id="chapter_3" number-format="default"/>
+            </block>
             </block>
             <block align="center" break-before="page">
               <block>
@@ -2321,7 +2323,7 @@
           <doc style="text-transform:none">
             <body style="@page { size: 15 5; margin-bottom: 1; @bottom-right { content: counter(page) }}">
               <frontmatter>
-                <toc>
+                <toc style="display: block">
                   <entry ref="chapter_1" style="&amp;::after {
                                                   display: block;
                                                   text-transform: auto;
@@ -2393,6 +2395,7 @@
             </default-template>
           </layout-master>
           <sequence master="body">
+            <block>
             <block translate="">
               ⠿
               ⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄
@@ -2402,6 +2405,7 @@
               ⠿⠿
               ⠄⠄⠄⠄⠄⠄⠄⠄⠄
               <page-number ref-id="chapter_2" number-format="default"/>
+            </block>
             </block>
             <block break-before="page">
               <block>
@@ -5266,7 +5270,7 @@
     </x:context>
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
-        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false">
           <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
             <dp2:style-type>text/css</dp2:style-type>
           </meta>
@@ -5279,15 +5283,15 @@
           <volume-template sheets-in-volume-max="1000">
             <pre-content>
               <sequence master="main">
-                <block>
+                <block translate="pre-translated-text-css">
                   ⠿⠿⠿
                 </block>
               </sequence>
             </pre-content>
           </volume-template>
           <sequence master="main">
-            <block translate=""/>
-            <block>
+            <block/>
+            <block translate="pre-translated-text-css">
               ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
             </block>
           </sequence>
@@ -7604,7 +7608,7 @@
     </x:context>
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
-        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false">
           <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
             <dp2:style-type>text/css</dp2:style-type>
           </meta>
@@ -7622,7 +7626,7 @@
             </default-template>
           </layout-master>
           <table-of-contents name="volume-toc">
-            <toc-block translate="">
+            <toc-block>
               <toc-block>
                 <toc-entry ref-id="ch_1">1 ⠄⠄⠄⠄⠄⠄⠄⠄⠄
                 <page-number ref-id="ch_1" number-format="default"/></toc-entry>
@@ -7654,7 +7658,7 @@
             </toc-block>
           </table-of-contents>
           <table-of-contents name="document-toc">
-            <toc-block translate="">
+            <toc-block>
               <toc-block>
                 <toc-entry ref-id="ch_1">1 ⠄⠄⠄⠄⠄⠄⠄⠄⠄
                 <page-number ref-id="ch_1" number-format="default"/></toc-entry>
@@ -7688,11 +7692,11 @@
           <volume-template sheets-in-volume-max="3" use-when="(! (= $volume 1))">
             <pre-content>
               <sequence master="main">
-                <block> ⠿⠿⠿⠿ </block>
+                <block translate="pre-translated-text-css"> ⠿⠿⠿⠿ </block>
               </sequence>
               <toc-sequence toc="volume-toc" master="main" range="volume">
                 <on-toc-start>
-                  <block translate=""> ⠿⠿⠿ </block>
+                  <block> ⠿⠿⠿ </block>
                 </on-toc-start>
               </toc-sequence>
             </pre-content>
@@ -7701,11 +7705,11 @@
             <pre-content>
               <toc-sequence toc="document-toc" master="main" range="document">
                 <on-toc-start>
-                  <block> ⠿ ⠿ ⠿ ⠿ </block>
-                  <block> ⠿⠿⠿⠿ </block>
+                  <block translate="pre-translated-text-css"> ⠿ ⠿ ⠿ ⠿ </block>
+                  <block translate="pre-translated-text-css"> ⠿⠿⠿⠿ </block>
                 </on-toc-start>
                 <on-volume-start>
-                  <block translate="">
+                  <block>
                     <evaluate expression="(round $started-volume-number)"/>
                   </block>
                 </on-volume-start>
@@ -7713,8 +7717,8 @@
             </pre-content>
           </volume-template>
           <sequence master="main">
-            <block translate=""/>
-            <block>
+            <block/>
+            <block translate="pre-translated-text-css">
               <block translate="">
                 <block>
                   <span id="ch_1"/>
@@ -7974,7 +7978,7 @@
     </x:context>
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
-        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false">
           <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
             <dp2:style-type>text/css</dp2:style-type>
           </meta>
@@ -7992,7 +7996,7 @@
             </default-template>
           </layout-master>
           <table-of-contents name="toc">
-            <toc-block translate="">
+            <toc-block>
               <toc-block>
                 <toc-entry ref-id="ch_1">1 ⠄⠄⠄⠄⠄⠄⠄⠄⠄
                 <page-number ref-id="ch_1" number-format="default"/></toc-entry>
@@ -8013,14 +8017,14 @@
             <pre-content>
               <toc-sequence master="main" range="document" toc="toc">
                 <on-toc-start>
-                  <block margin-bottom="1" translate=""> 0 </block>
+                  <block margin-bottom="1"> 0 </block>
                 </on-toc-start>
               </toc-sequence>
             </pre-content>
           </volume-template>
           <sequence master="main">
-            <block translate=""/>
-            <block>
+            <block/>
+            <block translate="pre-translated-text-css">
               <block translate="">
                 <block>
                   <span id="ch_1"/>
@@ -8261,7 +8265,7 @@
     </x:context>
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
-        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false">
           <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
             <dp2:style-type>text/css</dp2:style-type>
           </meta>
@@ -8272,7 +8276,7 @@
             </default-template>
           </layout-master>
           <table-of-contents name="toc">
-            <toc-block translate="" break-before="page">
+            <toc-block break-before="page">
               <toc-block> <toc-entry ref-id="a">⠿⠿⠿ 1 ⠄⠄⠄⠄⠄⠄⠄⠄⠄
               <page-number ref-id="a" number-format="default"/></toc-entry>
               </toc-block>
@@ -8282,7 +8286,7 @@
             <pre-content>
               <toc-sequence master="main" range="document" toc="toc">
                 <on-toc-start>
-                  <block break-before="page" translate="">
+                  <block break-before="page">
                     <block>⠿⠿⠿ 0</block>
                   </block>
                 </on-toc-start>
@@ -8290,7 +8294,7 @@
             </pre-content>
           </volume-template>
           <sequence master="main">
-            <block translate="" break-before="page">
+            <block break-before="page">
               <block>
                 <block>
                   <span id="a"/>
@@ -8370,7 +8374,7 @@
     </x:context>
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
-        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false">
           <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
             <dp2:style-type>text/css</dp2:style-type>
           </meta>
@@ -8396,13 +8400,13 @@
           <volume-template sheets-in-volume-max="1000">
             <pre-content>
               <sequence master="master_2">
-                <block> ⠿⠿⠿ </block>
+                <block translate="pre-translated-text-css"> ⠿⠿⠿ </block>
               </sequence>
             </pre-content>
           </volume-template>
           <sequence master="master_1">
-            <block translate=""/>
-            <block> ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤ </block>
+            <block/>
+            <block translate="pre-translated-text-css"> ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤ </block>
           </sequence>
         </obfl>
       </x:document>
@@ -9142,7 +9146,7 @@
     </x:context>
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
-        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false">
           <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
             <dp2:style-type>text/css</dp2:style-type>
           </meta>
@@ -9155,14 +9159,14 @@
           <volume-template sheets-in-volume-max="3">
             <pre-content>
               <sequence master="main">
-                <block translate="">
+                <block>
                   <evaluate expression="(round $sheets-in-volume)"/> ⠌ <evaluate expression="(round $sheets-in-document)"/>
                 </block>
               </sequence>
             </pre-content>
           </volume-template>
           <sequence master="main">
-            <block>
+            <block translate="pre-translated-text-css">
               ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
               ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
               ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
@@ -9375,7 +9379,7 @@
     </x:context>
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
-        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false">
           <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
             <dp2:style-type>text/css</dp2:style-type>
           </meta>
@@ -9386,7 +9390,7 @@
             </default-template>
           </layout-master>
           <table-of-contents name="toc">
-            <toc-block translate="">
+            <toc-block>
               <toc-block>
                 <toc-entry ref-id="ch_1">1 ⠄⠄⠄⠄⠄⠄⠄⠄⠄ <page-number ref-id="ch_1" number-format="default"/></toc-entry>
               </toc-block>
@@ -9402,7 +9406,7 @@
             </pre-content>
           </volume-template>
           <sequence master="main">
-            <block>
+            <block translate="pre-translated-text-css">
               <block translate="">
                 <block>
                   <span id="ch_1"/>
@@ -9556,7 +9560,7 @@
     </x:context>
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
-        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false">
           <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
             <dp2:style-type>text/css</dp2:style-type>
           </meta>
@@ -9567,7 +9571,7 @@
             </default-template>
           </layout-master>
           <table-of-contents name="toc">
-            <toc-block translate="">
+            <toc-block>
               <toc-block>
                 <toc-entry ref-id="ch_1">1 ⠄⠄⠄⠄⠄⠄⠄⠄⠄ <page-number ref-id="ch_1" number-format="default"/></toc-entry>
               </toc-block>
@@ -9583,7 +9587,7 @@
             </post-content>
           </volume-template>
           <sequence master="main">
-            <block>
+            <block translate="pre-translated-text-css">
               <block translate="">
                 <block>
                   <span id="ch_1"/>
@@ -9996,7 +10000,7 @@
     </x:context>
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
-        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false">
           <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
             <dp2:style-type>text/css</dp2:style-type>
           </meta>
@@ -10009,7 +10013,7 @@
           <volume-template sheets-in-volume-max="1000">
             <pre-content>
               <sequence master="main">
-                <block translate="">
+                <block>
                   <block>
                     1<style name="text-transform: downshift">
                     <evaluate expression="(round $volumes)"/>
@@ -10025,7 +10029,7 @@
             </pre-content>
           </volume-template>
           <sequence master="main">
-            <block>
+            <block translate="pre-translated-text-css">
               ⠤⠤⠤⠤⠤
             </block>
           </sequence>
@@ -11071,7 +11075,7 @@
     </x:context>
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
-        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false">
           <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
             <dp2:style-type>text/css</dp2:style-type>
           </meta>
@@ -11091,13 +11095,13 @@
           <volume-template sheets-in-volume-max="1000">
             <pre-content>
               <sequence master="a" initial-page-number="11">
-                <block> ⠿⠿⠿ </block>
+                <block translate="pre-translated-text-css"> ⠿⠿⠿ </block>
               </sequence>
             </pre-content>
           </volume-template>
           <sequence master="a">
-            <block translate=""/>
-            <block> ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤ </block>
+            <block/>
+            <block translate="pre-translated-text-css"> ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤ </block>
           </sequence>
         </obfl>
       </x:document>
@@ -11612,7 +11616,7 @@
     </x:context>
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
-        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false">
           <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
             <dp2:style-type>text/css</dp2:style-type>
           </meta>
@@ -11628,7 +11632,7 @@
               <dynamic-sequence master="main">
                 <list-of-references collection="endnotes" range="document">
                   <on-volume-start>
-                    <block border-bottom-style="solid" border-bottom-align="center" translate="">
+                    <block border-bottom-style="solid" border-bottom-align="center">
                       <evaluate expression="(round $started-volume-number)"/>
                     </block>
                   </on-volume-start>
@@ -11638,19 +11642,19 @@
           </volume-template>
           <collection name="endnotes">
             <item id="a">
-              <block> ⠿⠿⠿ </block>
+              <block translate="pre-translated-text-css"> ⠿⠿⠿ </block>
             </item>
             <item id="b">
-              <block> ⠿⠿⠿⠿⠿⠿ </block>
+              <block translate="pre-translated-text-css"> ⠿⠿⠿⠿⠿⠿ </block>
             </item>
           </collection>
           <sequence master="main">
-            <block>
+            <block translate="pre-translated-text-css">
               ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠶
               <anchor item="a"/>
               ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
             </block>
-            <block>
+            <block translate="pre-translated-text-css">
               ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠶
               <anchor item="b"/>
               ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
@@ -11779,7 +11783,7 @@
     </x:context>
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
-        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false">
           <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
             <dp2:style-type>text/css</dp2:style-type>
           </meta>
@@ -11792,18 +11796,18 @@
           <volume-template sheets-in-volume-max="1000">
             <pre-content>
               <sequence master="main">
-                <block>
+                <block translate="pre-translated-text-css">
                   ⠿⠿⠿
                 </block>
-                <block break-before="page">
+                <block translate="pre-translated-text-css" break-before="page">
                   ⠿⠿⠿
                 </block>
               </sequence>
             </pre-content>
           </volume-template>
           <sequence master="main">
-            <block translate=""/>
-            <block>
+            <block/>
+            <block translate="pre-translated-text-css">
               ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
             </block>
           </sequence>
@@ -12363,7 +12367,7 @@
     </x:context>
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
-        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false">
           <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
             <dp2:style-type>text/css</dp2:style-type>
           </meta>
@@ -12383,22 +12387,22 @@
           <volume-template sheets-in-volume-max="1000">
             <pre-content>
               <sequence master="main" page-number-counter="page">
-                <block>
+                <block translate="pre-translated-text-css">
                   ⠿⠿⠿
                 </block>
               </sequence>
             </pre-content>
           </volume-template>
           <sequence master="main" page-number-counter="page">
-            <block translate=""/>
-            <block>
+            <block/>
+            <block translate="pre-translated-text-css">
               <block>
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
               </block>
             </block>
           </sequence>
           <sequence master="main" page-number-counter="page" break-before="volume">
-            <block>
+            <block translate="pre-translated-text-css">
               <block/>
               <block>
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
@@ -14275,7 +14279,7 @@
     </x:context>
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
-        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false">
           <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
             <dp2:style-type>text/css</dp2:style-type>
           </meta>
@@ -14293,7 +14297,7 @@
             </default-template>
           </layout-master>
           <table-of-contents name="volume-toc">
-            <toc-block translate="">
+            <toc-block>
               <toc-block>
                 <toc-block>
                   <toc-entry ref-id="ch_1">1 ⠐⠐⠐⠐⠐⠐⠐⠐⠐
@@ -14349,7 +14353,7 @@
             </toc-block>
           </table-of-contents>
           <table-of-contents name="document-toc">
-            <toc-block translate="">
+            <toc-block>
               <toc-block>
                 <toc-block>
                   <toc-entry ref-id="ch_1">1 ⠐⠐⠐⠐⠐⠐⠐⠐⠐
@@ -14415,8 +14419,8 @@
             </pre-content>
           </volume-template>
           <sequence master="main">
-            <block translate=""/>
-            <block>
+            <block/>
+            <block translate="pre-translated-text-css">
               <block translate="">
                 <block>
                   <span id="ch_1"/>
@@ -14436,7 +14440,7 @@
             </block>
           </sequence>
           <sequence master="main" break-before="volume">
-            <block>
+            <block translate="pre-translated-text-css">
               <block/>
               <block translate="">
                 <block>
@@ -14450,7 +14454,7 @@
             </block>
           </sequence>
           <sequence master="main" break-before="volume">
-            <block>
+            <block translate="pre-translated-text-css">
               <block/>
               <block>
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
@@ -14464,7 +14468,7 @@
             </block>
           </sequence>
           <sequence master="main" break-before="volume">
-            <block>
+            <block translate="pre-translated-text-css">
               <block/>
               <block translate="">
                 <block>
@@ -16157,7 +16161,7 @@
     </x:context>
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
-        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false">
           <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
             <dp2:style-type>text/css</dp2:style-type>
             <dp2:css-text-transform-definitions>
@@ -16174,7 +16178,7 @@
             </default-template>
           </layout-master>
           <sequence master="body">
-            <block translate="">
+            <block>
               <span translate="pre-translated-text-css">⠤⠤⠤ </span><style name="text-transform: downshift number">1</style>
             </block>
           </sequence>

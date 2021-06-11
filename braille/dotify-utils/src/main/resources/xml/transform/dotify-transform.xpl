@@ -15,7 +15,7 @@
 	<p:input port="parameters" kind="parameter" primary="false"/>
 	
 	<p:option name="output" select="pef"/> <!-- pef | obfl -->
-	<p:option name="css-block-transform" required="true"/>
+	<p:option name="css-block-transform" required="true"/> <!-- empty means disable pre-translation -->
 	<p:option name="locale" required="true"/>
 	<p:option name="mode" required="true"/>
 	
@@ -45,14 +45,20 @@
 		<p:pipe step="main" port="parameters"/>
 	</p:variable>
 	
-	<px:transform px:message="Translating document with {
-	                            replace($css-block-transform,'\((input|output):css\)','')}"
-	              px:progress=".12">
-		<p:with-option name="query" select="$css-block-transform"/>
-		<p:input port="parameters">
-			<p:pipe step="main" port="parameters"/>
-		</p:input>
-	</px:transform>
+	<p:choose px:progress=".12">
+		<p:when test="$css-block-transform!=''">
+			<px:transform px:message="Translating document with {
+			                            replace($css-block-transform,'\((input|output):css\)','')}">
+				<p:with-option name="query" select="$css-block-transform"/>
+				<p:input port="parameters">
+					<p:pipe step="main" port="parameters"/>
+				</p:input>
+			</px:transform>
+		</p:when>
+		<p:otherwise>
+			<p:identity/>
+		</p:otherwise>
+	</p:choose>
 	
 	<pxi:css-to-obfl px:message="Transforming from CSS to OBFL" px:progress=".83">
 		<p:with-option name="locale" select="$locale"/>
