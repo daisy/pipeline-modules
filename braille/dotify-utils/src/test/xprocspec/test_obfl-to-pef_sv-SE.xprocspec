@@ -6,7 +6,7 @@
   
   <x:scenario label="test_01">
     <x:documentation>
-      Tests int2text function (requires that dotify.text.impl is loaded)
+      Tests int2text function
     </x:documentation>
     <x:call step="dotify:obfl-to-pef">
       <x:input port="source">
