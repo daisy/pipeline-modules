@@ -3085,11 +3085,10 @@
     </x:expect>
   </x:scenario>
   
-  <x:scenario label="marker-indicator-before-block" xfail="true">
+  <x:scenario label="marker-indicator-empty-block">
     <x:documentation>
-      Tests marker-indicator directly followed by a block.
-      
-      Broken: marker does not create an indicator: see https://github.com/joeha480/dotify/issues/194
+      Tests marker-indicator when there's no other content in the same block (between the preceding
+      and following block boundary).
     </x:documentation>
     <x:call step="pxi:test">
       <x:input port="source">
