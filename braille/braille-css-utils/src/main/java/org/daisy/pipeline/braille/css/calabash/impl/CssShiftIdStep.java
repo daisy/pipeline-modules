@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.xml.namespace.QName;
 import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
@@ -73,6 +75,7 @@ public class CssShiftIdStep extends DefaultStep implements XProcStep {
 	private static final QName _NAME = new QName("name");
 	private static final QName _TARGET = new QName("target");
 	private static final QName CSS_ANCHOR = new QName(XMLNS_CSS, "anchor");
+	private static final QName CSS_FLOW = new QName(XMLNS_CSS, "flow");
 	
 	private CssShiftIdStep(XProcRuntime runtime, XAtomicStep step) {
 		super(runtime, step);
@@ -101,8 +104,9 @@ public class CssShiftIdStep extends DefaultStep implements XProcStep {
 			// Two passes: one for shifting id, second for updating references.
 			// Alternative is to combine the two and make use of FutureEvent for forward references.
 			Map<String,String> idMap = new TreeMap<String,String>();
-			new ShiftIdTransformer(idMap)
-			.andThen(new UpdateRefsTransformer(idMap),
+			Set<String> discardedIds = new TreeSet<String>();
+			new ShiftIdTransformer(idMap, discardedIds)
+			.andThen(new UpdateRefsTransformer(idMap, discardedIds),
 			         new SaxonBuffer(runtime.getProcessor().getUnderlyingConfiguration()),
 			         false)
 			.transform(
@@ -115,10 +119,12 @@ public class CssShiftIdStep extends DefaultStep implements XProcStep {
 	
 	private static class ShiftIdTransformer extends SingleInSingleOutXMLTransformer {
 		
-		final Map<String,String> idMap;
+		private final Map<String,String> idMap;
+		private final Set<String> discardedIds;
 		
-		public ShiftIdTransformer(Map<String,String> idMap) {
+		public ShiftIdTransformer(Map<String,String> idMap, Set<String> discardedIds) {
 			this.idMap = idMap;
+			this.discardedIds = discardedIds;
 		}
 		
 		public Runnable transform(XMLInputValue<?> source, XMLOutputValue<?> result, InputValue<?> params) throws IllegalArgumentException {
@@ -134,6 +140,8 @@ public class CssShiftIdStep extends DefaultStep implements XProcStep {
 			Stack<Boolean> inlineBoxes = new Stack<Boolean>();
 			List<String> pendingId = new ArrayList<String>();
 			ShiftedId shiftedId = null;
+			int depth = 0;
+			String currentFlow = "normal";
 			try {
 				int event = reader.getEventType();
 				while (true)
@@ -148,6 +156,7 @@ public class CssShiftIdStep extends DefaultStep implements XProcStep {
 							else {
 								boolean isBox = CSS_BOX.equals(reader.getName());
 								String id = null;
+								String flow = depth == 0 ? "normal" : currentFlow;
 								for (int i = 0; i < reader.getAttributeCount(); i++) {
 									QName name = reader.getAttributeName(i);
 									String value = reader.getAttributeValue(i);
@@ -159,11 +168,26 @@ public class CssShiftIdStep extends DefaultStep implements XProcStep {
 												isInlineBox = true;
 											else if ("block".equalsIgnoreCase(value))
 												isBlockBox = true;
+										if (depth == 0 && CSS_FLOW.equals(name))
+											flow = value;
 										writeAttribute(writer, name, value); }}
-								if (isBlockBox || isInlineBox)
+								boolean newFlow = !flow.equals(currentFlow);
+								currentFlow = flow;
+								if (newFlow || isBlockBox) {
+									if (!pendingId.isEmpty()) {
+										if (shiftedId == null) {
+											if (newFlow) {
+												discardedIds.addAll(pendingId);
+												pendingId.clear(); }}
+										else {
+											shiftedId.putAll(pendingId);
+											pendingId.clear(); }}
 									if (shiftedId != null) {
 										shiftedId.render();
-										shiftedId = null; }
+										shiftedId = null; }}
+								if (isInlineBox && shiftedId != null) {
+									shiftedId.render(); // will be empty
+									shiftedId = null; }
 								if (isInlineBox) {
 									if (id != null)
 										if (!pendingId.isEmpty())
@@ -184,24 +208,25 @@ public class CssShiftIdStep extends DefaultStep implements XProcStep {
 									insideInlineBox = true; }
 							blockBoxes.push(isBlockBox);
 							inlineBoxes.push(isInlineBox);
+							depth++;
 							break; }
 						case END_ELEMENT: {
+							depth--;
 							boolean isBlockBox = blockBoxes.pop();
 							boolean isInlineBox = inlineBoxes.pop();
 							if (isBlockBox) {
 								if (!pendingId.isEmpty()) {
 									if (shiftedId == null)
-										throw new RuntimeException();
+										discardedIds.addAll(pendingId);
 									else
 										shiftedId.putAll(pendingId);
 									pendingId.clear(); }}
-							if (isInlineBox) {
+							else if (isInlineBox) {
 								if (shiftedId != null)
 									throw new RuntimeException("coding error");
 								shiftedId = new ShiftedId();
-								writer.writeEvent(shiftedId); }
-							if (isInlineBox)
-								insideInlineBox = false;
+								writer.writeEvent(shiftedId);
+								insideInlineBox = false; }
 							writeEvent(writer, reader);
 							break; }
 						default:
@@ -261,10 +286,12 @@ public class CssShiftIdStep extends DefaultStep implements XProcStep {
 	
 	private static class UpdateRefsTransformer extends SingleInSingleOutXMLTransformer {
 		
-		final Map<String,String> idMap;
+		private final Map<String,String> idMap;
+		private final Set<String> discardedIds;
 		
-		public UpdateRefsTransformer(Map<String,String> idMap) {
+		public UpdateRefsTransformer(Map<String,String> idMap, Set<String> discardedIds) {
 			this.idMap = idMap;
+			this.discardedIds = discardedIds;
 		}
 		
 		public Runnable transform(XMLInputValue<?> source, XMLOutputValue<?> result, InputValue<?> params) throws IllegalArgumentException {
@@ -300,12 +327,16 @@ public class CssShiftIdStep extends DefaultStep implements XProcStep {
 							if (anchor != null) {
 								if (idMap.containsKey(anchor)) {
 									anchor = idMap.get(anchor);
+								} else if (discardedIds.contains(anchor)) {
+									throw new RuntimeException();
 								}
 								writeAttribute(writer, CSS_ANCHOR, anchor);
 							}
 							if (counterTarget != null) {
 								if (idMap.containsKey(counterTarget)) {
 									counterTarget = idMap.get(counterTarget);
+								} else if (discardedIds.contains(counterTarget)) {
+									throw new RuntimeException();
 								}
 								writeAttribute(writer, _TARGET, counterTarget);
 							}

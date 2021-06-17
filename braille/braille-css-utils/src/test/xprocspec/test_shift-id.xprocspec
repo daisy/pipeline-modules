@@ -14,6 +14,7 @@
             </css:_>
             <css:box type="inline" css:id="c"/>
             <css:box type="inline"/>
+            <css:_ css:id="d"/>
           </_>
         </x:document>
         <x:document type="inline">
@@ -38,7 +39,10 @@
             <css:_/>
           </css:_>
           <css:box type="inline" css:id="c"/>
-          <css:box type="inline"/>
+          <css:box type="inline">
+            <css:_ css:id="d"/>
+          </css:box>
+          <css:_/>
         </_>
       </x:document>
       <x:document type="inline">
