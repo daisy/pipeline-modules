@@ -212,9 +212,11 @@
 	</xsl:template>
 	
 	<xsl:template mode="translate-style"
-	              match="css:rule[matches(@selector,'^&amp;::(after|before)')]
+	              match="css:rule[@selector=('&amp;::after','&amp;::before',
+	                                         '@top-left','@top-center','@top-right','@right',
+	                                         '@bottom-right','@bottom-center','@bottom-left','@left')]
 	                             [css:property[@name='content']/*[not(self::css:string[@value]|self::css:attr)]]|
-	                     css:rule[matches(@selector,'^&amp;::(after|before)')]
+	                     css:rule[@selector=('&amp;::after','&amp;::before')]
 	                             /css:rule[not(@selector)]
 	                             [css:property[@name='content']/*[not(self::css:string[@value]|self::css:attr)]]">
 		<xsl:next-match>

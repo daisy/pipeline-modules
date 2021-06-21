@@ -89,4 +89,18 @@
     </x:expect>
   </x:scenario>
   
+  <x:scenario label="test_07">
+    <x:context>
+      <doc style="@page {{
+                    @bottom-right {{
+                      content: counter(page, lower-roman);
+                      text-transform: uncontracted; }} }}"/>
+    </x:context>
+    <x:expect label="result">
+      <doc style="text-transform: none @page {{ @bottom-right {{ content: counter(page, lower-roman); text-transform: uncontracted }} }}">
+
+      </doc>
+    </x:expect>
+  </x:scenario>
+  
 </x:description>
