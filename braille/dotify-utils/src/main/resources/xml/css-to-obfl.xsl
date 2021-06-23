@@ -1319,16 +1319,23 @@
                   match="css:box[@type='table']">
         <xsl:apply-templates mode="table-attr" select="@* except (@type|@css:render-table-by|
                                                                   @css:text-transform|@css:hyphens)"/>
-        <xsl:if test="@css:render-table-by and not(@css:render-table-by='column')">
+        <xsl:variable name="render-table-by" as="xs:string*" select="tokenize(@css:render-table-by,'\s*,\s*')[not(.='')]"/>
+        <xsl:variable name="render-table-by" as="xs:string" select="string-join($render-table-by,', ')"/>
+        <xsl:if test="not($render-table-by=('',
+                                            'column',
+                                            'row',
+                                            'column, row',
+                                            'row, column'))">
             <xsl:call-template name="pf:warn">
                 <xsl:with-param name="msg">
-                    'render-table-by' property with a value other than 'column' is not supported on
-                    elements with 'display: table'.
+                    <xsl:text>'render-table-by' property with a value of '</xsl:text>
+                    <xsl:value-of select="$render-table-by"/>
+                    <xsl:text>' is not supported on elements with 'display: table'.</xsl:text>
                 </xsl:with-param>
             </xsl:call-template>
         </xsl:if>
         <xsl:choose>
-            <xsl:when test="@css:render-table-by='column'">
+            <xsl:when test="$render-table-by=('column','column, row')">
                 <xsl:for-each-group select="css:box[@type='table-cell']" group-by="@css:table-column">
                     <xsl:sort select="xs:integer(current-grouping-key())"/>
                     <tr>
@@ -1338,7 +1345,9 @@
                                               if (@css:table-footer-group) then 3 else ()"/>
                             <xsl:sort select="xs:integer((@css:table-header-group,@css:table-row-group,@css:table-footer-group)[1])"/>
                             <xsl:sort select="xs:integer(@css:table-row)"/>
-                            <xsl:apply-templates mode="tr" select="."/>
+                            <xsl:apply-templates mode="tr" select=".">
+                                <xsl:with-param name="render-table-by" tunnel="yes" select="$render-table-by"/>
+                            </xsl:apply-templates>
                         </xsl:for-each>
                     </tr>
                 </xsl:for-each-group>
@@ -1413,12 +1422,13 @@
     
     <xsl:template mode="tr"
                   match="css:box[@type='table-cell']">
+        <xsl:param name="render-table-by" tunnel="yes" select="''"/>
         <xsl:if test="@css:table-row-span">
-            <xsl:attribute name="{if (parent::*/@css:render-table-by='column') then 'col-span' else 'row-span'}"
+            <xsl:attribute name="{if ($render-table-by=('column','column, row')) then 'col-span' else 'row-span'}"
                            select="@css:table-row-span"/>
         </xsl:if>
         <xsl:if test="@css:table-column-span">
-            <xsl:attribute name="{if (parent::*/@css:render-table-by='column') then 'row-span' else 'col-span'}"
+            <xsl:attribute name="{if ($render-table-by=('column','column, row')) then 'row-span' else 'col-span'}"
                            select="@css:table-column-span"/>
         </xsl:if>
         <xsl:apply-templates mode="td-attr"
