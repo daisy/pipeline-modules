@@ -13270,22 +13270,24 @@
           <body style="text-transform: none;
                        @page { size: 10 10 }">
             <table xmlns="http://www.daisy.org/z3986/2005/dtbook/"
-                   style="display: table;
-                          padding-top: 1;
-                          -obfl-table-col-spacing: 1;
-                          -obfl-scenario-cost: -obfl-evaluate('$forced-break-count');
-                          &amp;:-obfl-alternate-scenario {
+                   style="padding-top: 1;
+                          display: none;
+                          &amp;:-obfl-alternate-scenario(1) {
+                            display: table;
+                            -obfl-table-col-spacing: 1;
+                            -obfl-scenario-cost: -obfl-evaluate('$forced-break-count'); }
+                          &amp;:-obfl-alternate-scenario(2) {
                             -obfl-scenario-cost: 2;
                             display: block;
                             render-table-by: row, column; }
-                          &amp;:-obfl-alternate-scenario td:blank::after {
+                          &amp;:-obfl-alternate-scenario(2) td:blank::after {
                             content: '⠪⠕'; }
-                          &amp;:-obfl-alternate-scenario::table-by(row)::list-item {
+                          &amp;:-obfl-alternate-scenario(2)::table-by(row)::list-item {
                             display:block;
                             margin-left:2; }
-                          &amp;:-obfl-alternate-scenario::table-by(column)::list-item {
+                          &amp;:-obfl-alternate-scenario(2)::table-by(column)::list-item {
                             display:block; }
-                          &amp;:-obfl-alternate-scenario::table-by(column)::list-item:first-child {
+                          &amp;:-obfl-alternate-scenario(2)::table-by(column)::list-item:first-child {
                             text-indent:-2; }">
               <thead>
                 <tr>
