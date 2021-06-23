@@ -4,6 +4,8 @@
                 exclude-result-prefixes="#all"
                 version="2.0">
     
+    <xsl:include href="http://www.daisy.org/pipeline/modules/braille/css-utils/library.xsl"/>
+    
     <xsl:template match="@*|node()">
         <xsl:copy>
             <xsl:apply-templates select="@*|node()"/>
@@ -53,7 +55,7 @@
     
     <xsl:template match="*[@css:_obfl-alternate-scenario]">
         <xsl:if test="@css:flow[not(.='normal')]">
-            <xsl:message terminate="yes">Elements with a ::-obfl-alternate-scenario pseudo-element must participate in the normal flow.</xsl:message>
+            <xsl:message terminate="yes">Elements with a :-obfl-alternate-scenario pseudo-class must participate in the normal flow.</xsl:message>
         </xsl:if>
         <!--
             The reason we use attributes to tag the scenarios, and not elements, is because elements
@@ -76,8 +78,25 @@
             -->
             <xsl:copy>
                 <xsl:attribute name="css:_obfl-scenario" select="'_'"/>
-                <xsl:attribute name="style" select="@css:_obfl-alternate-scenario"/>
-                <xsl:sequence select="@* except (@style|@css:*)"/>
+                <!--  pseudo-classes always derive from the main style -->
+                <xsl:choose>
+                    <xsl:when test="not(@style)">
+                        <xsl:attribute name="style" select="@css:_obfl-alternate-scenario"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <!-- merge @style and @css:_obfl-alternate-scenario -->
+                        <xsl:attribute name="style" select="css:serialize-stylesheet((
+                                                              css:parse-stylesheet(@style),
+                                                              css:parse-stylesheet(@css:_obfl-alternate-scenario)))"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+                <!-- skip all css:* attributes except property attributes but including css:flow
+                     ('display', 'render-table-by', 'table-header-policy' and 'flow' are the only
+                     properties that may be defined as attributes at this point) -->
+                <xsl:sequence select="(@* except (@css:*|@style))|
+                                      @css:display|
+                                      @css:render-table-by|
+                                      @css:table-header-policy"/>
                 <xsl:apply-templates/>
             </xsl:copy>
         </css:_>

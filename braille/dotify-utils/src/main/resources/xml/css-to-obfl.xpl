@@ -110,7 +110,7 @@
                 Make css:flow attributes.
             </p:documentation>
         </css:parse-properties>
-        <p:delete match="css:_obfl-alternate-scenario/@css:flow">
+        <p:delete match="*[@css:_obfl-scenario]/@css:flow">
             <p:documentation>
                 ::-obfl-alternate-scenario pseudo-elements must participate in the normal flow.
             </p:documentation>
@@ -139,7 +139,7 @@
                     <p:documentation>
                         Make css:_obfl-on-toc-start, css:_obfl-on-volume-start,
                         css:_obfl-on-volume-end, css:_obfl-on-toc-end, css:_obfl-on-resumed and
-                        css:_obfl-alternate-scenario pseudo-elements.
+                        *[@css:_obfl-scenario] pseudo-elements.
                     </p:documentation>
                 </pxi:make-obfl-pseudo-elements>
                 <p:viewport match="//*[@css:_obfl-scenario and @style]">

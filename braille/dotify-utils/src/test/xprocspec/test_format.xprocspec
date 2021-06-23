@@ -13271,6 +13271,7 @@
                        @page { size: 10 10 }">
             <table xmlns="http://www.daisy.org/z3986/2005/dtbook/"
                    style="display: table;
+                          padding-top: 1;
                           -obfl-table-col-spacing: 1;
                           -obfl-scenario-cost: -obfl-evaluate('$forced-break-count');
                           &amp;:-obfl-alternate-scenario {
@@ -13349,7 +13350,7 @@
             <xml-data renderer="renderer_1">
                 <d:scenarios xmlns:d="http://www.daisy.org/ns/pipeline/data">
                     <d:scenario>
-                        <block xmlns="http://www.daisy.org/ns/2011/obfl">
+                        <block padding-top="1">
                             <table table-col-spacing="1">
                                 <thead>
                                     <tr>
@@ -13374,7 +13375,7 @@
                         </block>
                     </d:scenario>
                     <d:scenario>
-                        <block>
+                        <block padding-top="1">
                             <block>
                                 <block first-line-indent="0" text-indent="2">⠿⠿⠿⠤⠤⠤</block>
                                 <block padding-left="2">⠿⠿⠿⠪⠕</block>
@@ -13409,6 +13410,7 @@
             <volume cols="10" rows="10" rowgap="0" duplex="true">
             <section>
                 <page>
+                  <row/>
                   <row>⠿⠿⠿⠀⠿⠿⠀⠿⠿⠿</row>
                   <row>⠀⠀⠀⠀⠿</row>
                   <row>⠤⠤⠤⠀⠀⠀⠀⠤⠤⠤</row>
