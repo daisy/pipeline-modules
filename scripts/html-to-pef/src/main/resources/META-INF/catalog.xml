@@ -19,6 +19,9 @@
   <!-- for epub3-to-pef -->
   <uri name="http://www.daisy.org/pipeline/modules/braille/html-to-pef/default.scss" uri="../css/default.scss"/>
   
+  <!-- partials -->
+  <uri name="http://www.daisy.org/pipeline/modules/braille/html-to-pef/_tables.scss" uri="../css/_tables.scss"/>
+
   <!-- dependencies -->
   <nextCatalog catalog="org:daisy:pipeline:modules:braille:common-utils"/>
   <nextCatalog catalog="org:daisy:pipeline:modules:braille:pef-utils"/>
