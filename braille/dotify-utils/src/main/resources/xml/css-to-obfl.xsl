@@ -223,7 +223,9 @@
                              xs:bogus="">
                 <_xsl:param name="n" as="xs:integer"/>
                 <_xsl:template match="/">
-                    <_xsl:sequence select="/*/d:scenario[position()=$n]"/>
+                    <xml-processor-result>
+                        <_xsl:sequence select="/*/d:scenario[position()=$n]/node()"/>
+                    </xml-processor-result>
                 </_xsl:template>
             </_xsl:stylesheet>
         </xml-processor>

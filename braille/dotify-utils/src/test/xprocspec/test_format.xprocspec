@@ -13335,7 +13335,9 @@
                             d:bogus="" xs:bogus="">
               <xsl:param name="n" as="xs:integer"/>
               <xsl:template match="/">
-                <xsl:sequence select="/*/d:scenario[position()=$n]"/>
+                <xml-processor-result>
+                  <xsl:sequence select="/*/d:scenario[position()=$n]/node()"/>
+                </xml-processor-result>
               </xsl:template>
             </xsl:stylesheet>
           </xml-processor>

@@ -587,7 +587,9 @@
                               xpath-default-namespace="http://www.daisy.org/ns/pipeline/data">
                 <xsl:param name="n" as="xs:integer" required="yes"/>
                 <xsl:template match="/">
-                  <xsl:sequence select="/*/scenario[position()=$n]"/>
+                  <xml-processor-result>
+                    <xsl:sequence select="/*/scenario[position()=$n]/node()"/>
+                  </xml-processor-result>
                 </xsl:template>
               </xsl:stylesheet>
             </xml-processor>
