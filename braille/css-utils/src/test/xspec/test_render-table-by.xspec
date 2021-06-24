@@ -584,12 +584,10 @@
                     <td>Cell 1.1</td>
                   </css:list-item>
                   <css:list-item>
-                    <th>Column 1</th>
                     <th>Row 2</th>
                     <td>Cell 2.1</td>
                   </css:list-item>
                   <css:list-item>
-                    <th>Column 1</th>
                     <th>Row 3</th>
                     <td>Cell 3.1</td>
                   </css:list-item>
@@ -603,12 +601,10 @@
                     <td>Cell 1.2</td>
                   </css:list-item>
                   <css:list-item>
-                    <th>Column 2</th>
                     <th>Row 2</th>
                     <td>Cell 2.2</td>
                   </css:list-item>
                   <css:list-item>
-                    <th>Column 2</th>
                     <th>Row 3</th>
                     <td>Cell 3.2</td>
                   </css:list-item>
@@ -622,12 +618,10 @@
                     <td>Cell 1.3</td>
                   </css:list-item>
                   <css:list-item>
-                    <th>Column 3</th>
                     <th>Row 2</th>
                     <td>Cell 2.3</td>
                   </css:list-item>
                   <css:list-item>
-                    <th>Column 3</th>
                     <th>Row 3</th>
                     <td>Cell 3.3</td>
                   </css:list-item>

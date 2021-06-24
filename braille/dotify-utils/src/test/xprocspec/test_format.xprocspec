@@ -12031,27 +12031,27 @@
             <block>
               <block>
                 <block first-line-indent="0" text-indent="2">⠿⠁⠤⠁⠤⠁</block>
-                <block padding-left="2">⠿⠁⠤⠁⠤⠃</block>
+                <block padding-left="2">⠤⠁⠤⠃</block>
                 <block padding-left="2">⠿⠉⠤⠁⠤⠉</block>
               </block>
               <block>
                 <block first-line-indent="0" text-indent="2">⠿⠁⠤⠃⠤⠁</block>
-                <block padding-left="2">⠿⠁⠤⠃⠤⠃</block>
+                <block padding-left="2">⠤⠃⠤⠃</block>
                 <block padding-left="2">⠿⠉⠤⠃⠤⠉</block>
               </block>
               <block>
                 <block first-line-indent="0" text-indent="2">⠿⠁⠤⠉⠤⠁</block>
-                <block padding-left="2">⠿⠁⠤⠉⠤⠃</block>
+                <block padding-left="2">⠤⠉⠤⠃</block>
                 <block padding-left="2">⠿⠉⠤⠉⠤⠉</block>
               </block>
               <block>
                 <block first-line-indent="0" text-indent="2">⠿⠁⠤⠉⠤⠁</block>
-                <block padding-left="2">⠿⠁⠤⠙⠤⠃</block>
+                <block padding-left="2">⠤⠙⠤⠃</block>
                 <block padding-left="2">⠿⠉⠤⠙⠤⠉</block>
               </block>
               <block>
                 <block first-line-indent="0" text-indent="2">⠿⠁⠶⠁</block>
-                <block padding-left="2">⠿⠁⠶⠃</block>
+                <block padding-left="2">⠶⠃</block>
                 <block padding-left="2">⠿⠉⠶⠉</block>
               </block>
             </block>
@@ -12075,19 +12075,19 @@
               <section>
                 <page>
                   <row>⠿⠁⠤⠁⠤⠁</row>
-                  <row>⠀⠀⠿⠁⠤⠁⠤⠃</row>
+                  <row>⠀⠀⠤⠁⠤⠃</row>
                   <row>⠀⠀⠿⠉⠤⠁⠤⠉</row>
                   <row>⠿⠁⠤⠃⠤⠁</row>
-                  <row>⠀⠀⠿⠁⠤⠃⠤⠃</row>
+                  <row>⠀⠀⠤⠃⠤⠃</row>
                   <row>⠀⠀⠿⠉⠤⠃⠤⠉</row>
                   <row>⠿⠁⠤⠉⠤⠁</row>
-                  <row>⠀⠀⠿⠁⠤⠉⠤⠃</row>
+                  <row>⠀⠀⠤⠉⠤⠃</row>
                   <row>⠀⠀⠿⠉⠤⠉⠤⠉</row>
                   <row>⠿⠁⠤⠉⠤⠁</row>
-                  <row>⠀⠀⠿⠁⠤⠙⠤⠃</row>
+                  <row>⠀⠀⠤⠙⠤⠃</row>
                   <row>⠀⠀⠿⠉⠤⠙⠤⠉</row>
                   <row>⠿⠁⠶⠁</row>
-                  <row>⠀⠀⠿⠁⠶⠃</row>
+                  <row>⠀⠀⠶⠃</row>
                   <row>⠀⠀⠿⠉⠶⠉</row>
                 </page>
               </section>
