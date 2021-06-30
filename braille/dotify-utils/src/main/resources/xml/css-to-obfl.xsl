@@ -813,6 +813,7 @@
                                     </xsl:message>
                                 </xsl:if>
                                 <xsl:variable name="self" as="element()" select="."/>
+                                <xsl:variable name="range" as="xs:string" select="(@css:_obfl-list-of-references-range,'document')[1]"/>
                                 <xsl:variable name="on-collection-start" as="element()*"
                                               select="if (@css:_obfl-on-collection-start)
                                                       then $sections/*[@css:flow=concat('-obfl-on-collection-start/',
@@ -824,16 +825,16 @@
                                                                                         $self/@css:_obfl-on-collection-end)]/*
                                                       else ()"/>
                                 <xsl:variable name="on-volume-start" as="element()*"
-                                              select="if (@css:_obfl-on-volume-start)
+                                              select="if ($range='document' and @css:_obfl-on-volume-start)
                                                       then $sections/*[@css:flow=concat('-obfl-on-volume-start/',
                                                                                         $self/@css:_obfl-on-volume-start)]/*
                                                       else ()"/>
                                 <xsl:variable name="on-volume-end" as="element()*"
-                                              select="if (@css:_obfl-on-volume-end)
+                                              select="if ($range='document' and @css:_obfl-on-volume-end)
                                                       then $sections/*[@css:flow=concat('-obfl-on-volume-end/',
                                                                                         $self/@css:_obfl-on-volume-end)]/*
                                                       else ()"/>
-                                <list-of-references collection="{$collection/@arg1}" range="document">
+                                <list-of-references collection="{$collection/@arg1}" range="{$range}">
                                     <xsl:if test="exists($on-collection-start)">
                                         <on-collection-start>
                                             <xsl:for-each select="$on-collection-start">
@@ -929,6 +930,7 @@
                                                                        @css:text-transform|
                                                                        @css:hyphens|
                                                                        @css:_obfl-list-of-references|
+                                                                       @css:_obfl-list-of-references-range|
                                                                        @css:_obfl-on-collection-start|
                                                                        @css:_obfl-on-collection-end|
                                                                        @css:_obfl-on-volume-start|
