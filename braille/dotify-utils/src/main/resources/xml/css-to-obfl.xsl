@@ -985,7 +985,7 @@
     <xsl:template mode="block-attr span-attr td-attr table-attr assert-nil-attr"
                   match="css:box/@part"/>
     
-    <xsl:template mode="block-attr span-attr td-attr table-attr assert-nil-attr"
+    <xsl:template mode="block-attr span-attr td-attr table-attr assert-nil-attr display-obfl-list-of-references"
                   match="css:box/@name|
                          css:box/css:_/@name|
                          css:_/css:_/@name"/>

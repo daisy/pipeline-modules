@@ -376,7 +376,7 @@
             </p:documentation>
         </p:add-attribute>
         <p:add-attribute px:progress=".01"
-                         match="css:alternate[@css:display='-obfl-list-of-references']"
+                         match="*[@css:display='-obfl-list-of-references']"
                          attribute-name="css:_obfl-list-of-references" attribute-value="_">
             <p:documentation>
                 Mark display:-obfl-list-of-references elements.
