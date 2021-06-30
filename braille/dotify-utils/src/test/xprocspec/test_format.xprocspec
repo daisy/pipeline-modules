@@ -8486,7 +8486,9 @@
             </default-template>
             <page-area align="bottom" max-height="4" collection="footnotes">
               <before>
-                <leader pattern="⠒" position="100%" align="right"/>
+                <block translate="pre-translated-text-css">
+                  <leader pattern="⠒" position="100%" align="right"/>⠒
+                </block>
               </before>
             </page-area>
           </layout-master>
