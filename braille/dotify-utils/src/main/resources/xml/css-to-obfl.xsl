@@ -813,6 +813,16 @@
                                     </xsl:message>
                                 </xsl:if>
                                 <xsl:variable name="self" as="element()" select="."/>
+                                <xsl:variable name="on-collection-start" as="element()*"
+                                              select="if (@css:_obfl-on-collection-start)
+                                                      then $sections/*[@css:flow=concat('-obfl-on-collection-start/',
+                                                                                        $self/@css:_obfl-on-collection-start)]/*
+                                                      else ()"/>
+                                <xsl:variable name="on-collection-end" as="element()*"
+                                              select="if (@css:_obfl-on-collection-end)
+                                                      then $sections/*[@css:flow=concat('-obfl-on-collection-end/',
+                                                                                        $self/@css:_obfl-on-collection-end)]/*
+                                                      else ()"/>
                                 <xsl:variable name="on-volume-start" as="element()*"
                                               select="if (@css:_obfl-on-volume-start)
                                                       then $sections/*[@css:flow=concat('-obfl-on-volume-start/',
@@ -824,6 +834,20 @@
                                                                                         $self/@css:_obfl-on-volume-end)]/*
                                                       else ()"/>
                                 <list-of-references collection="{$collection/@arg1}" range="document">
+                                    <xsl:if test="exists($on-collection-start)">
+                                        <on-collection-start>
+                                            <xsl:for-each select="$on-collection-start">
+                                                <xsl:apply-templates mode="sequence" select="."/>
+                                            </xsl:for-each>
+                                        </on-collection-start>
+                                    </xsl:if>
+                                    <xsl:if test="exists($on-collection-end)">
+                                        <on-collection-end>
+                                            <xsl:for-each select="$on-collection-end">
+                                                <xsl:apply-templates mode="sequence" select="."/>
+                                            </xsl:for-each>
+                                        </on-collection-end>
+                                    </xsl:if>
                                     <xsl:if test="exists($on-volume-start)">
                                         <on-volume-start>
                                             <xsl:for-each select="$on-volume-start">
@@ -905,6 +929,8 @@
                                                                        @css:text-transform|
                                                                        @css:hyphens|
                                                                        @css:_obfl-list-of-references|
+                                                                       @css:_obfl-on-collection-start|
+                                                                       @css:_obfl-on-collection-end|
                                                                        @css:_obfl-on-volume-start|
                                                                        @css:_obfl-on-volume-end)"/>
         <xsl:apply-templates mode="#current"/>
