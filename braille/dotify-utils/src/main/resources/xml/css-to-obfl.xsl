@@ -903,6 +903,7 @@
                          /css:box[@type='block' and @css:_obfl-list-of-references]">
         <xsl:apply-templates mode="assert-nil-attr" select="@* except (@type|
                                                                        @css:text-transform|
+                                                                       @css:hyphens|
                                                                        @css:_obfl-list-of-references|
                                                                        @css:_obfl-on-volume-start|
                                                                        @css:_obfl-on-volume-end)"/>
