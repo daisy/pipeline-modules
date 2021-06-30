@@ -9,7 +9,8 @@
                    ../css/page-layout.params
                    ../css/generate-toc.params
                    ../css/page-breaking.params
-                   ../css/volume-breaking.params"/>
+                   ../css/volume-breaking.params
+                   ../css/notes.params"/>
   
   <!-- xproc library -->
   <uri name="http://www.daisy.org/pipeline/modules/braille/html-to-pef/library.xpl" uri="../xml/xproc/library.xpl"/>
