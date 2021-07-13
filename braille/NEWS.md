@@ -1,3 +1,38 @@
+v1.14.3
+=======
+
+Changes
+-------
+- Fixed bug in handling of `-obfl-marker` property resulting in missing markers in page margin
+  (https://github.com/mtmse/dotify.library/pull/19)
+- Fixed translation of text around `<br/>` elements (https://github.com/daisy/pipeline/issues/603,
+  https://github.com/mtmse/dotify.library/pull/17)
+- Various other bugfixes (https://github.com/mtmse/dotify.library/pull/9,
+  https://github.com/mtmse/dotify.library/pull/14, https://github.com/mtmse/dotify.library/pull/15)
+
+Components
+----------
+- liblouis ([3.16.0](https://github.com/liblouis/liblouis/releases/tag/v3.16.0)),
+  liblouisutdml ([2.5.0](https://github.com/liblouis/liblouisutdml/releases/tag/v2.5.0)),
+  liblouis-java ([4.3.1](https://github.com/liblouis/liblouis-java/releases/tag/4.3.1))
+- **dotify** ([**1.0.1**](https://github.com/mtmse/dotify.library/releases/tag/1.0.1)
+- braille-css ([1.19.0](https://github.com/daisy/braille-css/releases/tag/1.19.0))
+- jsass ([5.10.4-p1](https://github.com/snaekobbi/jsass/releases/tag/5.10.4-p1))
+- libhyphen ([2.8.8](https://github.com/snaekobbi/libhyphen-nar/releases/tag/2.8.8)), jhyphen
+  ([1.0.2](https://github.com/daisy/jhyphen/releases/tag/1.0.2))
+- texhyphj ([1.2](https://github.com/joeha480/texhyphj/releases/tag/release-1.2))
+
+Closed issues
+-------------
+- https://github.com/daisy/pipeline/issues/603
+- https://github.com/mtmse/dotify.library/pull/9
+- https://github.com/mtmse/dotify.library/pull/10
+- https://github.com/mtmse/dotify.library/pull/14
+- https://github.com/mtmse/dotify.library/pull/15
+- https://github.com/mtmse/dotify.library/pull/17
+- https://github.com/mtmse/dotify.library/pull/19
+
+
 v1.14.2
 =======
 
