@@ -7618,7 +7618,10 @@
   <x:scenario label="test_70">
     <x:documentation>
       Tests document scope table of contents in @begin area of first volume and volume scope table
-      of contents in @begin are of subsequent volumes.
+      of contents in @begin area of subsequent volumes. Note that there are sheet breaks between the
+      TOC and any content that is included before and after it, and that content before the TOC is
+      not automatically put in a "on-toc-start" element. For this you need to use a
+      `::-obfl-on-toc-start' pseudo-element.
     </x:documentation>
     <x:call step="dotify:format">
       <x:input port="source">
@@ -7628,8 +7631,8 @@
                         size: 15 7;
                         margin-bottom: 1;
                         @bottom-right { content: counter(page) }}
-                      @volume:first { max-length: 3; @begin { content: flow(first-front) }}
-                      @volume { max-length: 3; @begin { content: flow(next-front) }}">
+                      @volume:first { max-length: 4; @begin { content: flow(first-front) }}
+                      @volume { max-length: 4; @begin { content: flow(next-front) }}">
             <front>
               <h1 style="display: block; flow: first-front">
                 ⠿ ⠿ ⠿ ⠿
@@ -7738,7 +7741,7 @@
               </toc-block>
             </toc-block>
           </table-of-contents>
-          <volume-template sheets-in-volume-max="3" use-when="(! (= $volume 1))">
+          <volume-template sheets-in-volume-max="4" use-when="(! (= $volume 1))">
             <pre-content>
               <sequence master="main">
                 <block translate="pre-translated-text-css"> ⠿⠿⠿⠿ </block>
@@ -7750,13 +7753,13 @@
               </toc-sequence>
             </pre-content>
           </volume-template>
-          <volume-template sheets-in-volume-max="3" use-when="(= $volume 1)">
+          <volume-template sheets-in-volume-max="4" use-when="(= $volume 1)">
             <pre-content>
+              <sequence master="main">
+                <block translate="pre-translated-text-css"> ⠿ ⠿ ⠿ ⠿ </block>
+                <block translate="pre-translated-text-css"> ⠿⠿⠿⠿ </block>
+              </sequence>
               <toc-sequence toc="toc" master="main" range="document">
-                <on-toc-start>
-                  <block translate="pre-translated-text-css"> ⠿ ⠿ ⠿ ⠿ </block>
-                  <block translate="pre-translated-text-css"> ⠿⠿⠿⠿ </block>
-                </on-toc-start>
                 <on-volume-start>
                   <block>
                     <evaluate expression="(round $started-volume-number)"/>
@@ -7842,20 +7845,31 @@
                 <page>
                   <row>⠿⠀⠿⠀⠿⠀⠿</row>
                   <row>⠿⠿⠿⠿</row>
+                  <row/>
+                  <row/>
+                  <row/>
+                  <row/>
+                  <row>⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁</row>
+                </page>
+              </section>
+              <section>
+                <page>
                   <row>⠼⠁</row>
                   <row>⠼⠁⠀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠀⠼⠁</row>
                   <row>⠀⠼⠁⠀⠄⠄⠄⠄⠄⠄⠄⠄⠀⠼⠁</row>
                   <row>⠀⠼⠃⠀⠄⠄⠄⠄⠄⠄⠄⠄⠀⠼⠉</row>
-                  <row>⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁</row>
-                </page>
-                <page>
                   <row>⠼⠃⠀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠀⠼⠙</row>
                   <row>⠼⠃</row>
+                  <row>⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉</row>
+                </page>
+                <page>
                   <row>⠀⠼⠁⠀⠄⠄⠄⠄⠄⠄⠄⠄⠀⠼⠑</row>
                   <row>⠀⠼⠃⠀⠄⠄⠄⠄⠄⠄⠄⠄⠀⠼⠋</row>
                   <row/>
                   <row/>
-                  <row>⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠃</row>
+                  <row/>
+                  <row/>
+                  <row>⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙</row>
                 </page>
               </section>
               <section>
@@ -7939,21 +7953,6 @@
                   <row>⠼⠃</row>
                   <row>⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠋</row>
                 </page>
-              </section>
-            </volume>
-            <volume cols="15" rows="7" rowgap="0" duplex="true">
-              <section>
-                <page>
-                  <row>⠿⠿⠿⠿</row>
-                  <row/>
-                  <row/>
-                  <row/>
-                  <row/>
-                  <row/>
-                  <row>⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁</row>
-                </page>
-              </section>
-              <section>
                 <page>
                   <row>⠤⠤⠤⠤⠤⠀⠤⠤⠤⠤⠤⠀</row>
                   <row>⠤⠤⠤⠤⠤⠀⠤⠤⠤⠤⠤⠀</row>
@@ -7995,8 +7994,15 @@
                         @bottom-right {content: counter(page) }}
                       @volume { @begin { content: flow(front) }}">
             <front>
-              <h1 id="ch_0" style="display:block; margin-bottom:1; flow:front; text-transform:auto"> 0 </h1>
-              <toc style="display: -obfl-toc; flow: front; text-transform: auto">
+              <toc id="ch_0"
+                   style="display: -obfl-toc;
+                          flow: front;
+                          text-transform: auto;
+                          &amp;::-obfl-on-toc-start {
+                            display: block;
+                            margin-bottom: 1;
+                            text-transform: auto;
+                            content: '0'; }">
                 <entry ref="ch_0" style="display: block;
                                          &amp;::after { content: ' ⠄⠄⠄⠄⠄⠄⠄⠄⠄ ' target-counter(attr(ref), page) }"> 0 </entry>
                 <entry ref="ch_1" style="display: block;
@@ -8335,13 +8341,12 @@
           </table-of-contents>
           <volume-template sheets-in-volume-max="1000">
             <pre-content>
-              <toc-sequence master="main" range="document" toc="toc">
-                <on-toc-start>
-                  <block break-before="page">
-                    <block>⠿⠿⠿ 0</block>
-                  </block>
-                </on-toc-start>
-              </toc-sequence>
+              <sequence master="main">
+                <block break-before="page">
+                  <block>⠿⠿⠿ 0</block>
+                </block>
+              </sequence>
+              <toc-sequence master="main" range="document" toc="toc"/>
             </pre-content>
           </volume-template>
           <sequence master="main">
@@ -8375,6 +8380,8 @@
                 <page>
                   <row>⠿⠿⠿⠀⠼⠚</row>
                 </page>
+              </section>
+              <section>
                 <page>
                   <row>⠿⠿⠿⠀⠼⠁⠀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠀⠼⠁</row>
                 </page>
