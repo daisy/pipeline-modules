@@ -38,6 +38,16 @@
       </p:documentation>
     </p:option>
 
+    <p:input port="metadata">
+      <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+        <p>Metadata to be included in the package document.</p>
+        <p>Must be a <code>metadata</code> document in the
+        "http://openebook.org/namespaces/oeb-package/1.0/" namespace, with <code>dc-metadata</code>
+        and <code>x-metadata</code> child elements.</p>
+      </p:documentation>
+      <p:inline><metadata xmlns="http://openebook.org/namespaces/oeb-package/1.0/"/></p:inline>
+    </p:input>
+
     <p:input kind="parameter" port="dc-metadata">
       <p:documentation xmlns="http://www.w3.org/1999/xhtml">
         <p>Metadata to be included in the dc-metadata element of the package document.</p>
@@ -100,6 +110,7 @@
     <p:xslt>
       <p:input port="source">
         <p:pipe step="main" port="source"/>
+        <p:pipe step="main" port="metadata"/>
         <p:pipe step="dc-metadata" port="result"/>
         <!--
             FIXME: also allow specifying DTBook when audio only
