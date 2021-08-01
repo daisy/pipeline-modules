@@ -290,7 +290,7 @@
 
     <!-- ===== RESOURCE FILE ===== -->
     <px:daisy3-create-res-file name="res-file">
-      <p:with-option name="output-dir" select="$output-fileset-base"/>
+      <p:with-option name="output-base-uri" select="concat($output-fileset-base,'resources.res')"/>
     </px:daisy3-create-res-file>
     <p:sink/>
 

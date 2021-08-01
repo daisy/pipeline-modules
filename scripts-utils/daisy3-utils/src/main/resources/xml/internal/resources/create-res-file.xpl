@@ -18,9 +18,9 @@
 	<p:pipe step="fileset" port="result"/>
   </p:output>
 
-  <p:option name="output-dir">
+  <p:option name="output-base-uri">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-      <p>Output directory URI if the resource file were to be stored or refered by a fileset.</p>
+	  <p>Result base URI.</p>
     </p:documentation>
   </p:option>
 
@@ -111,12 +111,13 @@
 	</resources>
       </p:inline>
     </p:input>
-    <p:with-option name="base-uri" select="concat($output-dir, 'resources.res')"/>
+    <p:with-option name="base-uri" select="$output-base-uri"/>
   </px:set-base-uri>
   <p:identity name="res-file"/>
+  <p:sink/>
 
   <px:fileset-create>
-    <p:with-option name="base" select="$output-dir"/>
+    <p:with-option name="base" select="resolve-uri('./',$output-base-uri)"/>
   </px:fileset-create>
   <px:fileset-add-entry media-type="application/x-dtbresource+xml" name="fileset">
     <p:input port="entry">

@@ -47,7 +47,7 @@
 
     <p:option name="output-base-uri">
       <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-	<p>Output directory URI if the OPF file were to be stored or refered by a fileset.</p>
+        <p>Result base URI.</p>
       </p:documentation>
     </p:option>
 
