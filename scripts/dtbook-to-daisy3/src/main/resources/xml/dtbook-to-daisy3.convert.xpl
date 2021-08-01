@@ -395,7 +395,7 @@
       <p:input port="source">
         <p:pipe step="mo" port="result.in-memory"/>
         <p:pipe step="ncx" port="result"/>
-        <p:pipe step="res-file" port="result"/>
+        <p:pipe step="res-file" port="result.in-memory"/>
         <p:pipe step="opf" port="result"/>
       </p:input>
     </p:identity>
