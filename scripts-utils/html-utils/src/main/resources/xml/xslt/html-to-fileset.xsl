@@ -18,6 +18,9 @@
     <xsl:strip-space elements="*"/>
     <xsl:output indent="yes"/>
 
+    <xsl:param name="context.fileset" as="document-node(element(d:fileset))?"/>
+    <xsl:param name="context.in-memory" as="document-node()*"/>
+
     <xsl:template match="text()|@*"/>
 
     <xsl:variable name="doc-base"
@@ -90,7 +93,7 @@
         <xsl:if test="$rel='stylesheet' and (@type='text/css' or pf:get-extension(@href)='css')">
             <xsl:variable name="href" select="resolve-uri(@href,base-uri(.))"/>
             <xsl:if test="unparsed-text-available($href)">
-                <xsl:for-each select="pf:css-to-fileset(unparsed-text($href),$href,(),())">
+                <xsl:for-each select="pf:css-to-fileset(unparsed-text($href),$href,$context.fileset,$context.in-memory)">
                     <xsl:sequence select="f:fileset-entry(.,(),'')"/>
                 </xsl:for-each>
             </xsl:if>
@@ -98,7 +101,7 @@
     </xsl:template>
 
     <xsl:template match="style">
-        <xsl:for-each select="pf:css-to-fileset(.,$doc-base,(),())">
+        <xsl:for-each select="pf:css-to-fileset(.,$doc-base,$context.fileset,$context.in-memory)">
             <xsl:sequence select="f:fileset-entry(.,(),'')"/>
         </xsl:for-each>
     </xsl:template>
@@ -240,8 +243,11 @@
                        else if (pf:is-relative($href) and  $uri instance of attribute() and base-uri($uri) ne $doc-base) then
                            pf:relativize-uri($resolved,$doc-base)
                        else
-                           $href}"
-                original-href="{$resolved}">
+                           $href}">
+                <xsl:if test="not($context.fileset//d:file[resolve-uri(@href,base-uri(.))=$resolved]
+                                                          [1][not(@original-href)])">
+                    <xsl:attribute name="original-href" select="$resolved"/>
+                </xsl:if>
                 <xsl:if test="$type">
                     <xsl:attribute name="media-type" select="$type"/>
                 </xsl:if>
