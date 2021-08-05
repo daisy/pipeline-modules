@@ -87,14 +87,19 @@
         pxi:deep-parse-page-and-volume-stylesheets
       </p:documentation>
     </p:import>
+    <cx:import href="http://www.daisy.org/pipeline/modules/braille/css-utils/library.xsl" type="application/xslt+xml">
+      <p:documentation>
+        css:parse-counter-styles
+      </p:documentation>
+    </cx:import>
     
     <p:declare-step type="pxi:recursive-parse-stylesheet-and-make-pseudo-elements">
         <p:input port="source"/>
         <p:output port="result"/>
         <css:parse-stylesheet>
             <p:documentation>
-                Make css:page, css:volume, css:text-transform, css:after, css:before,
-                css:footnote-call, css:duplicate, css:alternate, css:top-of-page,
+                Make css:page, css:volume, css:text-transform, css:counter-style, css:after,
+                css:before, css:footnote-call, css:duplicate, css:alternate, css:top-of-page,
                 css:_obfl-alternate-scenario, css:_obfl-on-toc-start, css:_obfl-on-volume-start,
                 css:_obfl-on-volume-end, css:_obfl-on-toc-end, css:_obfl-volume-transition and
                 css:_obfl-on-resumed attributes.
@@ -193,7 +198,7 @@
 
     <pxi:recursive-parse-stylesheet-and-make-pseudo-elements px:progress=".04">
         <p:documentation>
-            Make css:page, css:volume, css:text-transform, css:top-of-page and
+            Make css:page, css:volume, css:text-transform, css:counter-style, css:top-of-page and
             css:_obfl-volume-transition attributes, css:after, css:before, css:duplicate,
             css:alternate, css:footnote-call, css:_obfl-on-toc-start, css:_obfl-on-volume-start,
             css:_obfl-on-volume-end, css:_obfl-on-toc-end, css:_obfl-on-resumed and
@@ -205,14 +210,20 @@
                error-code="XXX" message="@text-transform rules are only allowed on root element">
         <p:with-option name="test" select="not(/_/*//*/@css:text-transform)"/>
     </px:assert>
+    <px:assert name="assert-counter-style-only-on-root"
+               error-code="XXX" message="@counter-style rules are only allowed on root element">
+        <p:with-option name="test" select="not(/_/*//*/@css:counter-style)"/>
+    </px:assert>
     <px:assert name="assert-volume-transition-only-on-root"
                error-code="XXX" message="@-obfl-volume-transition rules are only allowed on root element">
         <p:with-option name="test" select="not(/_/*//*/@css:_obfl-volume-transition)"/>
     </px:assert>
     <p:delete match="@css:text-transform|
+                     @css:counter-style|
                      @css:_obfl-volume-transition">
         <p:documentation>
-            Delete @css:text-transform and @css:_obfl-volume-transition attributes.
+            Delete @css:text-transform, @css:counter-style and @css:_obfl-volume-transition
+            attributes.
         </p:documentation>
     </p:delete>
     
@@ -461,6 +472,9 @@
         </p:documentation>
         <p:with-option name="exclude-counters" select="$page-counters">
             <p:empty/>
+        </p:with-option>
+        <p:with-option name="counter-styles" select="css:parse-counter-styles(/_/*/@css:counter-style)">
+            <p:pipe step="assert-counter-style-only-on-root" port="result"/>
         </p:with-option>
     </css:eval-counter>
     

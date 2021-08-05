@@ -256,7 +256,7 @@
 		<x:expect label="result" select="('x',' ⠚ ','')"/>
 	</x:scenario>
 	
-	<x:scenario label="test_20">
+	<x:scenario label="test_20.1">
 		<x:call template="css:counter-representation">
 			<x:param name="value" select="100"/>
 			<x:param name="style" select="css:counter-style('decimal')"/>
@@ -264,7 +264,7 @@
 		<x:expect label="result" select="('100','auto')"/>
 	</x:scenario>
 	
-	<x:scenario label="test_21">
+	<x:scenario label="test_20.2">
 		<x:call template="css:counter-representation">
 			<x:param name="value" select="-25"/>
 			<x:param name="style" select="css:counter-style('decimal')"/>
@@ -272,7 +272,7 @@
 		<x:expect label="result" select="('-25','auto')"/>
 	</x:scenario>
 	
-	<x:scenario label="test_22">
+	<x:scenario label="test_20.3">
 		<x:call template="css:counter-representation">
 			<x:param name="value" select="100"/>
 			<x:param name="style" select="css:counter-style('lower-alpha')"/>
@@ -280,7 +280,7 @@
 		<x:expect label="result" select="('cv','auto')"/>
 	</x:scenario>
 	
-	<x:scenario label="test_23">
+	<x:scenario label="test_20.4">
 		<x:call template="css:counter-representation">
 			<x:param name="value" select="1998"/>
 			<x:param name="style" select="css:counter-style('lower-roman')"/>
@@ -288,7 +288,7 @@
 		<x:expect label="result" select="('mcmxcviii','auto')"/>
 	</x:scenario>
 	
-	<x:scenario label="test_24">
+	<x:scenario label="test_20.5">
 		<x:call template="css:counter-representation">
 			<x:param name="value" select="1998"/>
 			<x:param name="style" select="css:counter-style('upper-roman')"/>
@@ -296,7 +296,7 @@
 		<x:expect label="result" select="('MCMXCVIII','auto')"/>
 	</x:scenario>
 	
-	<x:scenario label="test_25">
+	<x:scenario label="test_21.1">
 		<x:call template="css:counter-representation">
 			<x:param name="value" select="1998"/>
 			<x:param name="style">
@@ -308,7 +308,7 @@
 		<x:expect label="result" select="('⠍⠉⠍⠭⠉⠧⠊⠊⠊','none')"/>
 	</x:scenario>
 	
-	<x:scenario label="test_26">
+	<x:scenario label="test_21.2">
 		<x:call template="css:counter-representation">
 			<x:param name="value" select="1998"/>
 			<x:param name="style">
@@ -318,6 +318,32 @@
 			</x:param>
 		</x:call>
 		<x:expect label="result" select="('mcmxcviii','uppercase')"/>
+	</x:scenario>
+	
+	<x:scenario label="test_22.1">
+		<x:call template="css:counter-representation">
+			<x:param name="value" select="5"/>
+			<x:param name="style">
+				<css:counter-style system="fixed"
+				                   symbols="'een' 'twee' 'drie' 'vier' 'vijf'"
+				                   fallback="decimal"
+				                   text-transform="auto"/>
+			</x:param>
+		</x:call>
+		<x:expect label="result" select="('vijf','auto')"/>
+	</x:scenario>
+	
+	<x:scenario label="test_22.2">
+		<x:call template="css:counter-representation">
+			<x:param name="value" select="6"/>
+			<x:param name="style">
+				<css:counter-style system="fixed"
+				                   symbols="'een' 'twee' 'drie' 'vier' 'vijf'"
+				                   fallback="upper-roman"
+				                   text-transform="auto"/>
+			</x:param>
+		</x:call>
+		<x:expect label="result" select="('VI','auto')"/>
 	</x:scenario>
 	
 	<x:scenario label="test_27">
