@@ -73,6 +73,7 @@
             px:merge-parameters
             px:apply-stylesheets
             px:transform
+            px:parse-query
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/braille/pef-utils/library.xpl">
@@ -104,7 +105,14 @@
             <p:pipe step="main" port="parameters"/>
         </p:input>
     </px:merge-parameters>
-    
+    <p:sink/>
+
+    <!-- Parse transform query to a c:param-set -->
+    <px:parse-query name="parsed-transform-query">
+        <p:with-option name="query" select="$transform"/>
+    </px:parse-query>
+    <p:sink/>
+
     <!-- Load XHTML documents in spine order. -->
     <px:opf-spine-to-fileset ignore-missing="true">
         <p:input port="source.fileset">
@@ -255,10 +263,13 @@
         <p:variable name="lang" select="(/*/opf:metadata/dc:language[not(@refines)])[1]/text()">
             <p:pipe port="result" step="opf"/>
         </p:variable>
+        <p:variable name="locale-query" select="if (//c:param[@name='locale']) then '' else concat('(locale:',$lang,')')">
+            <p:pipe step="parsed-transform-query" port="result"/>
+        </p:variable>
         <p:viewport px:progress="1"
                     match="math:math">
             <px:transform>
-                <p:with-option name="query" select="concat('(input:mathml)(locale:',$lang,')')"/>
+                <p:with-option name="query" select="concat('(input:mathml)',$locale-query)"/>
                 <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>
             </px:transform>
         </p:viewport>
@@ -267,6 +278,9 @@
     <p:choose name="transform" px:progress=".61">
         <p:variable name="lang" select="(/*/opf:metadata/dc:language[not(@refines)])[1]/text()">
             <p:pipe port="result" step="opf"/>
+        </p:variable>
+        <p:variable name="locale-query" select="if (//c:param[@name='locale']) then '' else concat('(locale:',$lang,')')">
+            <p:pipe step="parsed-transform-query" port="result"/>
         </p:variable>
         <p:when test="$include-obfl='true'">
             <p:output port="pef" primary="true" sequence="true"/>
@@ -278,7 +292,7 @@
             </p:output>
             <p:group name="obfl" px:message="Transforming from XML with inline CSS to OBFL" px:progress=".40">
                 <p:output port="result"/>
-                <p:variable name="transform-query" select="concat('(input:css)(output:obfl)',$transform,'(locale:',$lang,')')"/>
+                <p:variable name="transform-query" select="concat('(input:css)(output:obfl)',$transform,$locale-query)"/>
                 <p:identity px:message-severity="DEBUG" px:message="px:transform query={$transform-query}"/>
                 <px:transform px:progress="1">
                     <p:with-option name="query" select="$transform-query"/>
@@ -296,7 +310,7 @@
                             <d:status result="ok"/>
                         </p:inline>
                     </p:output>
-                    <p:variable name="transform-query" select="concat('(input:obfl)(input:text-css)(output:pef)',$transform,'(locale:',$lang,')')"/>
+                    <p:variable name="transform-query" select="concat('(input:obfl)(input:text-css)(output:pef)',$transform,$locale-query)"/>
                     <p:identity px:message-severity="DEBUG" px:message="px:transform query={$transform-query}"/>
                     <px:transform px:progress="1">
                         <p:with-option name="query" select="$transform-query"/>
@@ -342,7 +356,7 @@
                     <d:status result="ok"/>
                 </p:inline>
             </p:output>
-            <p:variable name="transform-query" select="concat('(input:css)(output:pef)',$transform,'(locale:',$lang,')')"/>
+            <p:variable name="transform-query" select="concat('(input:css)(output:pef)',$transform,$locale-query)"/>
             <p:identity px:message-severity="DEBUG" px:message="px:transform query={$transform-query}"/>
             <px:transform px:progress="1">
                 <p:with-option name="query" select="$transform-query"/>

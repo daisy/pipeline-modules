@@ -3,6 +3,10 @@ v1.14.3
 
 Changes
 -------
+- New option to choose from a list of braille codes (Liblouis tables).
+- Possibility to specify the braille code's locale as a transformer feature
+  (e.g. `(locale:nl)`). The input document's language is only used if no locale or Liblouis table
+  has been specified.
 - Improved hyphenation of German text.
 - Fixed bug in handling of `-obfl-marker` property resulting in missing markers in page margin
   (https://github.com/mtmse/dotify.library/pull/19)

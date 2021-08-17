@@ -77,6 +77,7 @@ even though the provided CSS is more specific.
     </p:option>
     
     <p:option name="stylesheet-parameters"/>
+    <p:option name="braille-code"/>
     <p:option name="transform"/>
     <p:option name="include-preview"/>
     <p:option name="include-brf"/>
@@ -152,6 +153,7 @@ even though the provided CSS is more specific.
                                            stylesheet-parameters
                                            apply-document-specific-stylesheets
                                            transform
+                                           braille-code
                                            ascii-table
                                            ascii-file-format
                                            include-brf
@@ -214,7 +216,8 @@ even though the provided CSS is more specific.
         </p:with-option>
         <p:with-option name="stylesheet" select="$stylesheet"/>
         <p:with-option name="apply-document-specific-stylesheets" select="$apply-document-specific-stylesheets"/>
-        <p:with-option name="transform" select="$transform"/>
+        <p:with-option name="transform"
+                       select="concat($braille-code,($transform,'(translator:liblouis)(formatter:dotify)')[not(.='')][1])"/>
         <p:with-option name="include-obfl" select="$include-obfl"/>
         <p:input port="parameters">
             <p:pipe port="result" step="input-options"/>
