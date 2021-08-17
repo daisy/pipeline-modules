@@ -136,5 +136,15 @@
       <pagenum css:top-of-page="display: none;" />
     </x:expect>
   </x:scenario>
+
+  <x:scenario label="test_13">
+    <x:context>
+      <doc style="@counter-style trinary {{ system: numeric; symbols: '0' '1' '2'; }}
+                  @counter-style dice {{ system: additive; additive-symbols: 6 ⚅, 5 ⚄, 4 ⚃, 3 ⚂, 2 ⚁, 1 ⚀; }}"/>
+    </x:context>
+    <x:expect label="result">
+      <doc css:counter-style="&amp; dice {{ system: additive; additive-symbols: 6 ⚅, 5 ⚄, 4 ⚃, 3 ⚂, 2 ⚁, 1 ⚀; }} &amp; trinary {{ system: numeric; symbols: '0' '1' '2'; }}"/>
+    </x:expect>
+  </x:scenario>
   
 </x:description>

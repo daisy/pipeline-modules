@@ -9,6 +9,7 @@ Changes
   has been specified.
 - By default text is transcribed to braille during formatting. A `force-pre-translation` transformer
   feature was added to override this behavior.
+- Support for `@counter-style` rules.
 - Support for relative `url()` values.
 - Improved hyphenation of German text.
 - Fixed bug in handling of `-obfl-marker` property resulting in missing markers in page margin

@@ -2080,13 +2080,13 @@
             </default-template>
           </layout-master>
           <sequence master="body">
-            <block><span translate="">1</span> ⠤⠤⠤ </block>
-            <block><span translate="">2</span> ⠤⠤⠤ </block>
-            <block><span translate="">i</span> ⠤⠤⠤ </block>
-            <block><span translate="">ii</span> ⠤⠤⠤ </block>
+            <block><span translate="">1 </span>⠤⠤⠤ </block>
+            <block><span translate="">2 </span>⠤⠤⠤ </block>
+            <block><span translate="">i </span>⠤⠤⠤ </block>
+            <block><span translate="">ii </span>⠤⠤⠤ </block>
             <block>⠶ ⠤⠤⠤ </block>
             <block>⠶ ⠤⠤⠤ </block>
-            <block><span translate="">3</span> ⠤⠤⠤ </block>
+            <block><span translate="">3 </span>⠤⠤⠤ </block>
           </sequence>
         </obfl>
       </x:document>
@@ -16201,6 +16201,88 @@
               <section>
                 <page>
                   <row>⠤⠤⠤⠀⠂</row>
+                </page>
+              </section>
+            </volume>
+          </body>
+        </pef>
+      </x:document>
+    </x:expect>
+  </x:scenario>
+  
+  <x:scenario label="test_137">
+    <x:documentation>
+      Tests @counter-style.
+    </x:documentation>
+    <x:call step="dotify:format">
+      <x:input port="source">
+        <x:document type="inline">
+          <ul style="text-transform: none;
+                     list-style-type: dice;
+                     @counter-style dice {
+                       system: additive;
+                       additive-symbols: 6 '⠿', 5 '⠟', 4 '⠛', 3 '⠋', 2 '⠉', 1 '⠁';
+                       text-transform: none; }">
+            <li style="display: list-item">⠤⠤⠤</li>
+            <li style="display: list-item">⠤⠤⠤</li>
+            <li style="display: list-item">⠤⠤⠤</li>
+            <li style="display: list-item">⠤⠤⠤</li>
+            <li style="display: list-item">⠤⠤⠤</li>
+            <li style="display: list-item">⠤⠤⠤</li>
+            <li style="display: list-item">⠤⠤⠤</li>
+          </ul>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="obfl">
+      <x:document type="port" port="obfl"/>
+    </x:context>
+    <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
+      <x:document type="inline">
+        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+          <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+            <dp2:style-type>text/css</dp2:style-type>
+          </meta>
+          <layout-master name="body" page-width="40" page-height="25" duplex="true">
+            <default-template>
+              <header/>
+              <footer/>
+            </default-template>
+          </layout-master>
+          <sequence master="body">
+            <block>⠁ ⠤⠤⠤</block>
+            <block>⠉ ⠤⠤⠤</block>
+            <block>⠋ ⠤⠤⠤</block>
+            <block>⠛ ⠤⠤⠤</block>
+            <block>⠟ ⠤⠤⠤</block>
+            <block>⠿ ⠤⠤⠤</block>
+            <block>⠿⠁ ⠤⠤⠤</block>
+          </sequence>
+        </obfl>
+      </x:document>
+    </x:expect>
+    <x:context label="pef">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="pef" type="custom" href="http://www.daisy.org/pipeline/modules/braille/pef-utils/library.xpl" step="x:pef-compare">
+      <x:document type="inline">
+        <pef xmlns="http://www.daisy.org/ns/2008/pef" version="2008-1">
+          <head xmlns:dc="http://purl.org/dc/elements/1.1/">
+            <meta>
+              <dc:format>application/x-pef+xml</dc:format>
+            </meta>
+          </head>
+          <body>
+            <volume rows="25" cols="40" rowgap="0" duplex="true">
+              <section>
+                <page>
+                  <row>⠁⠀⠤⠤⠤</row>
+                  <row>⠉⠀⠤⠤⠤</row>
+                  <row>⠋⠀⠤⠤⠤</row>
+                  <row>⠛⠀⠤⠤⠤</row>
+                  <row>⠟⠀⠤⠤⠤</row>
+                  <row>⠿⠀⠤⠤⠤</row>
+                  <row>⠿⠁⠀⠤⠤⠤</row>
                 </page>
               </section>
             </volume>
