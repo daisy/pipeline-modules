@@ -50,7 +50,7 @@ public class TextTransformParser {
 								String key = dd.getProperty();
 								String value;
 								if (dd.get(0) instanceof TermURI) {
-									URL cssBase = ((TermURI)dd.get(0)).getBase();
+									URL cssBase = ((TermURI)dd.get(0)).getBase(); // this is always null because the source is a string
 									value = URLs.resolve(cssBase != null ? URLs.asURI(cssBase) : baseURI,
 									                     URLs.asURI(((TermURI)dd.get(0)).getValue()))
 										.toASCIIString();
