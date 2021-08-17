@@ -7,6 +7,8 @@ Changes
 - Possibility to specify the braille code's locale as a transformer feature
   (e.g. `(locale:nl)`). The input document's language is only used if no locale or Liblouis table
   has been specified.
+- By default text is transcribed to braille during formatting. A `force-pre-translation` transformer
+  feature was added to override this behavior.
 - Improved hyphenation of German text.
 - Fixed bug in handling of `-obfl-marker` property resulting in missing markers in page margin
   (https://github.com/mtmse/dotify.library/pull/19)

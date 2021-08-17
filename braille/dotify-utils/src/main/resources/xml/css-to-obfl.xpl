@@ -27,6 +27,7 @@
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
       <p:documentation xmlns="http://www.w3.org/1999/xhtml">
         px:error
+        px:assert
       </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/css-utils/library.xpl">
@@ -92,18 +93,13 @@
         <p:output port="result"/>
         <css:parse-stylesheet>
             <p:documentation>
-                Make css:page, css:volume, css:after, css:before, css:footnote-call, css:duplicate,
-                css:alternate, css:top-of-page, css:_obfl-alternate-scenario,
-                css:_obfl-on-toc-start, css:_obfl-on-volume-start, css:_obfl-on-volume-end,
-                css:_obfl-on-toc-end, css:_obfl-volume-transition and css:_obfl-on-resumed
-                attributes.
+                Make css:page, css:volume, css:text-transform, css:after, css:before,
+                css:footnote-call, css:duplicate, css:alternate, css:top-of-page,
+                css:_obfl-alternate-scenario, css:_obfl-on-toc-start, css:_obfl-on-volume-start,
+                css:_obfl-on-volume-end, css:_obfl-on-toc-end, css:_obfl-volume-transition and
+                css:_obfl-on-resumed attributes.
             </p:documentation>
         </css:parse-stylesheet>
-        <p:delete match="@css:*[matches(local-name(),'^text-transform-')]">
-            <p:documentation>
-                For now, ignore @text-transform definitions.
-            </p:documentation>
-        </p:delete>
         <css:parse-properties properties="flow">
             <p:documentation>
                 Make css:flow attributes.
@@ -188,15 +184,37 @@
     </p:xslt>
     -->
     
+    <p:wrap match="/*" wrapper="_">
+        <!--
+            Wrap everything in new root element so that css:make-pseudo-elements below can not fail
+            (it may otherwise try to output multiple documents).
+        -->
+    </p:wrap>
+
     <pxi:recursive-parse-stylesheet-and-make-pseudo-elements px:progress=".04">
         <p:documentation>
-            Make css:page, css:volume, css:top-of-page and css:_obfl-volume-transition attributes,
-            css:after, css:before, css:duplicate, css:alternate, css:footnote-call,
-            css:_obfl-on-toc-start, css:_obfl-on-volume-start, css:_obfl-on-volume-end,
-            css:_obfl-on-toc-end, css:_obfl-on-resumed and css:_obfl-alternate-scenario
-            pseudo-elements.
+            Make css:page, css:volume, css:text-transform, css:top-of-page and
+            css:_obfl-volume-transition attributes, css:after, css:before, css:duplicate,
+            css:alternate, css:footnote-call, css:_obfl-on-toc-start, css:_obfl-on-volume-start,
+            css:_obfl-on-volume-end, css:_obfl-on-toc-end, css:_obfl-on-resumed and
+            css:_obfl-alternate-scenario pseudo-elements.
         </p:documentation>
     </pxi:recursive-parse-stylesheet-and-make-pseudo-elements>
+    
+    <px:assert name="assert-text-transform-only-on-root"
+               error-code="XXX" message="@text-transform rules are only allowed on root element">
+        <p:with-option name="test" select="not(/_/*//*/@css:text-transform)"/>
+    </px:assert>
+    <px:assert name="assert-volume-transition-only-on-root"
+               error-code="XXX" message="@-obfl-volume-transition rules are only allowed on root element">
+        <p:with-option name="test" select="not(/_/*//*/@css:_obfl-volume-transition)"/>
+    </px:assert>
+    <p:delete match="@css:text-transform|
+                     @css:_obfl-volume-transition">
+        <p:documentation>
+            Delete @css:text-transform and @css:_obfl-volume-transition attributes.
+        </p:documentation>
+    </p:delete>
     
     <css:parse-properties px:progress=".02"
                           properties="display render-table-by table-header-policy">
@@ -233,17 +251,16 @@
         <p:sink/>
     </p:group>
     
-    <p:delete match="@css:_obfl-volume-transition">
-        <p:documentation>
-            Delete @css:_obfl-volume-transition attributes.
-        </p:documentation>
-    </p:delete>
-    <pxi:extract-obfl-pseudo-elements px:progress=".02">
-        <p:documentation>
-            Extract css:_obfl-on-toc-start, css:_obfl-on-volume-start, css:_obfl-on-volume-end
-            and css:_obfl-on-toc-end pseudo-elements into their own documents.
-        </p:documentation>
-    </pxi:extract-obfl-pseudo-elements>
+    <p:filter select="/_/*"/>
+
+    <p:for-each px:progress=".02">
+        <pxi:extract-obfl-pseudo-elements>
+            <p:documentation>
+                Extract css:_obfl-on-toc-start, css:_obfl-on-volume-start, css:_obfl-on-volume-end
+                and css:_obfl-on-toc-end pseudo-elements into their own documents.
+            </p:documentation>
+        </pxi:extract-obfl-pseudo-elements>
+    </p:for-each>
     
     <p:for-each px:progress=".04">
         <css:parse-properties px:progress=".50"
@@ -281,8 +298,8 @@
                 </p:documentation>
             </css:parse-properties>
         </p:for-each>
-        <p:split-sequence test="/*[not(@css:flow)]" name="_1"/>
-        <p:wrap wrapper="_" match="/*"/>
+        <p:split-sequence test="not(/css:_[@css:flow])" name="_1"/>
+        <p:wrap-sequence wrapper="_"/>
         <css:flow-into name="_2" px:progress=".50">
             <p:documentation>
                 Extract named flows based on css:flow attributes and place anchors (css:id
@@ -304,6 +321,10 @@
             Make css:id attributes. <!-- depends on parse-content -->
         </p:documentation>
     </css:label-targets>
+    
+    <p:for-each>
+      <p:delete match="@xml:base"/>
+    </p:for-each>
     
     <css:eval-target-content px:progress=".005">
         <p:documentation>
@@ -793,8 +814,11 @@
         <p:with-param name="page-counters" select="$page-counters">
             <p:empty/>
         </p:with-param>
-        <p:with-param name="volume-transition" select="(//@css:_obfl-volume-transition)[last()]">
-            <p:pipe step="extract-page-and-volume-styles" port="result"/>
+        <p:with-param name="volume-transition" select="/_/*/@css:_obfl-volume-transition">
+            <p:pipe step="assert-volume-transition-only-on-root" port="result"/>
+        </p:with-param>
+        <p:with-param name="text-transforms" select="/_/*/@css:text-transform">
+            <p:pipe step="assert-text-transform-only-on-root" port="result"/>
         </p:with-param>
     </p:xslt>
     

@@ -21,6 +21,7 @@
     <xsl:param name="locale" as="xs:string" required="yes"/>
     <xsl:param name="page-counters" as="xs:string" required="yes"/>
     <xsl:param name="volume-transition" as="xs:string?" required="no"/>
+    <xsl:param name="text-transforms" as="xs:string?" required="no"/>
     
     <xsl:variable name="sections" select="collection()[position() &lt; last()]"/>
     <xsl:variable name="page-and-volume-styles" select="collection()[position()=last()]/*/*"/>
@@ -29,6 +30,11 @@
     <xsl:variable name="volume-transition-rule" as="element()?">
         <xsl:if test="exists($volume-transition)">
             <xsl:sequence select="css:deep-parse-stylesheet(concat('@-obfl-volume-transition { ',$volume-transition,' }'))"/>
+        </xsl:if>
+    </xsl:variable>
+    <xsl:variable name="text-transform-rule" as="element()?">
+        <xsl:if test="exists($text-transforms) and not($text-transforms='')">
+            <css:rule selector="@text-transform" style="{$text-transforms}"/>
         </xsl:if>
     </xsl:variable>
     
@@ -242,7 +248,11 @@
     <!-- Start -->
     <!-- ===== -->
     
-    <xsl:variable name="initial-text-transform" as="xs:string" select="'none'"/>
+    <!-- these defaults must match initial values defined in obfl-css-definition.xsl -->
+    <xsl:variable name="initial-text-transform" as="xs:string"
+                  select="if ($sections/css:_/css:box[not(@css:text-transform='none')])
+                          then 'auto'
+                          else 'none'"/>
     <xsl:variable name="initial-hyphens" as="xs:string" select="'manual'"/>
     <xsl:variable name="initial-word-spacing" as="xs:integer" select="1"/>
     
@@ -273,6 +283,16 @@
             <xsl:if test="$translate!=''">
                 <xsl:attribute name="translate" select="$translate"/>
             </xsl:if>
+            <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
+                <dp2:style-type>text/css</dp2:style-type>
+                <xsl:if test="exists($text-transform-rule)">
+                    <dp2:css-text-transform-definitions>
+                        <xsl:text>&#xa;</xsl:text>
+                        <xsl:value-of select="css:serialize-stylesheet($text-transform-rule,(),1,'    ')"/>
+                        <xsl:text>&#xa;</xsl:text>
+                    </dp2:css-text-transform-definitions>
+                </xsl:if>
+            </meta>
             <xsl:call-template name="_start">
                 <xsl:with-param name="text-transform" tunnel="yes" select="$initial-text-transform"/>
                 <xsl:with-param name="hyphens" tunnel="yes" select="$initial-hyphens"/>
@@ -880,6 +900,7 @@
                   match="/css:_
                          /css:box[@type='block' and @css:_obfl-list-of-references]">
         <xsl:apply-templates mode="assert-nil-attr" select="@* except (@type|
+                                                                       @css:text-transform|
                                                                        @css:_obfl-list-of-references|
                                                                        @css:_obfl-on-volume-start|
                                                                        @css:_obfl-on-volume-end)"/>

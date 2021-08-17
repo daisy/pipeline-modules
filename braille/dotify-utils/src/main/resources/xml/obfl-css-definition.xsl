@@ -84,8 +84,6 @@
                               then 'normal'
                               else if ($property='-obfl-underline')
                               then 'none'
-                              else if ($property='text-transform')
-                              then 'none'
                               else if ($property=('-obfl-keep-with-previous-sheets','-obfl-keep-with-next-sheets'))
                               then '0'
                               else if ($property='-obfl-scenario-cost')
