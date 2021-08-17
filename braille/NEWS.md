@@ -3,6 +3,7 @@ v1.14.3
 
 Changes
 -------
+- Improved hyphenation of German text.
 - Fixed bug in handling of `-obfl-marker` property resulting in missing markers in page margin
   (https://github.com/mtmse/dotify.library/pull/19)
 - Fixed translation of text around `<br/>` elements (https://github.com/daisy/pipeline/issues/603,
