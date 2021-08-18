@@ -520,7 +520,7 @@
       <dependency>
         <groupId>org.daisy.libs</groupId>
         <artifactId>jstyleparser</artifactId>
-        <version>1.20-p18-SNAPSHOT</version>
+        <version>1.20-p18</version>
       </dependency>
       <dependency>
         <groupId>org.unbescape</groupId>
@@ -533,7 +533,7 @@
       <dependency>
         <groupId>org.daisy.braille</groupId>
         <artifactId>braille-css</artifactId>
-        <version>1.19.0</version>
+        <version>1.20.0</version>
       </dependency>
       <!--
           for scripts-utils/css-utils, braille/common-utils and braille/css-utils
@@ -602,7 +602,7 @@
       <dependency>
         <groupId>org.liblouis</groupId>
         <artifactId>liblouis-java</artifactId>
-        <version>4.4.0-SNAPSHOT</version>
+        <version>4.4.0</version>
       </dependency>
       <dependency>
         <groupId>net.java.dev.jna</groupId>
