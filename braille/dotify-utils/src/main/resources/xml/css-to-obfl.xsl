@@ -690,22 +690,21 @@
             <xsl:for-each select="$sections/css:_[@css:flow=$collection-flows]">
                 <xsl:variable name="flow" as="xs:string" select="@css:flow"/>
                 <collection name="{$flow}">
-                    <xsl:for-each select="*">
+                    <xsl:for-each-group select="*" group-by="@css:anchor">
                         <xsl:if test="@css:anchor='NULL'">
                             <xsl:call-template name="pf:warn">
                                 <xsl:with-param name="msg">Flowed element does not have anchor in normal flow</xsl:with-param>
                             </xsl:call-template>
                         </xsl:if>
                         <!--
-                            We don't explicitly check that two items do not end up having the same
-                            ID, which would trigger a "Identifier is not unique" error in
-                            Dotify. Until this happens in practice I just assume that it can not
-                            happen.
+                            FIXME: We don't explicitly check that two items in different collections
+                            do not end up having the same ID, which would trigger a "Identifier is
+                            not unique" error in Dotify.
                         -->
                         <item id="{@css:anchor}">
-                            <xsl:apply-templates mode="item" select="."/>
+                            <xsl:apply-templates mode="item" select="current-group()"/>
                         </item>
-                    </xsl:for-each>
+                    </xsl:for-each-group>
                 </collection>
                 <xsl:if test="$sections/css:_[@css:flow[not(.=$collection-flows)]]/*/@css:_obfl-use-when-collection-not-empty=$flow">
                     <collection name="meta/{$flow}">

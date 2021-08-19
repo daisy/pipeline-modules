@@ -16269,7 +16269,8 @@
   
   <x:scenario label="test_138">
     <x:documentation>
-      Tests that noterefs without content also generate anchors.
+      Tests that noterefs without content also generate anchors. Under certain conditions
+      consecutive anchors collapse into one and the corresponding items are merged.
     </x:documentation>
     <x:call step="dotify:format">
       <x:input port="source">
@@ -16292,6 +16293,18 @@
                           flow: footnotes;
                           content: target-content(attr(href)); }"/>
             </p>
+            <a href="#note_3"
+               style="display: none
+                      &amp;::alternate {
+                        display: block;
+                        flow: footnotes;
+                        content: target-content(attr(href)); }"/>
+            <a href="#note_4"
+               style="display: none;
+                      &amp;::alternate {
+                        display: block;
+                        flow: footnotes;
+                        content: target-content(attr(href)); }"/>
             <p style="display: block">
               ⠉⠉⠉
             </p>
@@ -16300,6 +16313,12 @@
             </aside>
             <aside id="note_2" style="display: none">
               ⠿⠿⠿ ⠿⠿⠿
+            </aside>
+            <aside id="note_3" style="display: none">
+              ⠿⠿⠿ ⠿⠿⠿ ⠿⠿⠿
+            </aside>
+            <aside id="note_4" style="display: none">
+              ⠿⠿⠿ ⠿⠿⠿ ⠿⠿⠿ ⠿⠿⠿
             </aside>
           </body>
         </x:document>
@@ -16332,11 +16351,20 @@
                 ⠿⠿⠿ ⠿⠿⠿
               </block>
             </item>
+            <item id="item_3">
+              <block translate="pre-translated-text-css">
+                ⠿⠿⠿ ⠿⠿⠿ ⠿⠿⠿
+              </block>
+              <block translate="pre-translated-text-css">
+                ⠿⠿⠿ ⠿⠿⠿ ⠿⠿⠿ ⠿⠿⠿
+              </block>
+            </item>
           </collection>
           <sequence master="master">
             <block>
               <anchor item="item_1"/>
               <anchor item="item_2"/>
+              <anchor item="item_3"/>
             </block>
             <block translate="pre-translated-text-css">
               ⠉⠉⠉
@@ -16366,10 +16394,10 @@
                   <row/>
                   <row/>
                   <row/>
-                  <row/>
-                  <row/>
                   <row>⠿⠿⠿</row>
                   <row>⠿⠿⠿⠀⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠀⠿⠿⠿⠀⠿⠿⠿</row>
+                  <row>⠿⠿⠿⠀⠿⠿⠿⠀⠿⠿⠿⠀⠿⠿⠿</row>
                 </page>
               </section>
             </volume>
