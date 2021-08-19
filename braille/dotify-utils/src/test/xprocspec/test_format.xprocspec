@@ -8840,6 +8840,7 @@
                                               => new solution: don't move margin to empty blocks?
                                                  => but we don't in advance if a block will evaluate to empty (only if it is already empty)
                                               => other solution: support skippable top margin in OBFL/Dotify
+                                              => other solution: see "collapsing-margin-top-of-page" test in test_obfl-to-pef.xprocspec
                                          -->
               <block>
                 ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
