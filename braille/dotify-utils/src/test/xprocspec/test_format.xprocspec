@@ -7625,39 +7625,7 @@
               </footer>
             </default-template>
           </layout-master>
-          <table-of-contents name="volume-toc">
-            <toc-block>
-              <toc-block>
-                <toc-entry ref-id="ch_1">1 ⠄⠄⠄⠄⠄⠄⠄⠄⠄
-                <page-number ref-id="ch_1" number-format="default"/></toc-entry>
-              </toc-block>
-              <toc-block>
-                <toc-block padding-left="1">
-                  <toc-entry ref-id="ch_1_1">1 ⠄⠄⠄⠄⠄⠄⠄⠄
-                  <page-number ref-id="ch_1_1" number-format="default"/></toc-entry>
-                </toc-block>
-                <toc-block padding-left="1">
-                  <toc-entry ref-id="ch_1_2">2 ⠄⠄⠄⠄⠄⠄⠄⠄
-                  <page-number ref-id="ch_1_2" number-format="default"/></toc-entry>
-                </toc-block>
-              </toc-block>
-              <toc-block>
-                <toc-entry ref-id="ch_2">2 ⠄⠄⠄⠄⠄⠄⠄⠄⠄
-                <page-number ref-id="ch_2" number-format="default"/></toc-entry>
-              </toc-block>
-              <toc-block>
-                <toc-block padding-left="1">
-                  <toc-entry ref-id="ch_2_1">1 ⠄⠄⠄⠄⠄⠄⠄⠄
-                  <page-number ref-id="ch_2_1" number-format="default"/></toc-entry>
-                </toc-block>
-                <toc-block padding-left="1">
-                  <toc-entry ref-id="ch_2_2">2 ⠄⠄⠄⠄⠄⠄⠄⠄
-                  <page-number ref-id="ch_2_2" number-format="default"/></toc-entry>
-                </toc-block>
-              </toc-block>
-            </toc-block>
-          </table-of-contents>
-          <table-of-contents name="document-toc">
+          <table-of-contents name="toc">
             <toc-block>
               <toc-block>
                 <toc-entry ref-id="ch_1">1 ⠄⠄⠄⠄⠄⠄⠄⠄⠄
@@ -7694,7 +7662,7 @@
               <sequence master="main">
                 <block translate="pre-translated-text-css"> ⠿⠿⠿⠿ </block>
               </sequence>
-              <toc-sequence toc="volume-toc" master="main" range="volume">
+              <toc-sequence toc="toc" master="main" range="volume">
                 <on-toc-start>
                   <block> ⠿⠿⠿ </block>
                 </on-toc-start>
@@ -7703,7 +7671,7 @@
           </volume-template>
           <volume-template sheets-in-volume-max="3" use-when="(= $volume 1)">
             <pre-content>
-              <toc-sequence toc="document-toc" master="main" range="document">
+              <toc-sequence toc="toc" master="main" range="document">
                 <on-toc-start>
                   <block translate="pre-translated-text-css"> ⠿ ⠿ ⠿ ⠿ </block>
                   <block translate="pre-translated-text-css"> ⠿⠿⠿⠿ </block>
@@ -14304,63 +14272,7 @@
               </footer>
             </default-template>
           </layout-master>
-          <table-of-contents name="volume-toc">
-            <toc-block>
-              <toc-block>
-                <toc-block>
-                  <toc-entry ref-id="ch_1">1 ⠐⠐⠐⠐⠐⠐⠐⠐⠐
-                  <page-number ref-id="ch_1" number-format="default"/></toc-entry>
-                </toc-block>
-                <toc-block>
-                  <toc-entry-on-resumed range="[ch_1,ch_2)">1 ⠄⠄⠄ ⠐⠐⠐⠐⠐
-                  <evaluate expression="$started-volume-first-content-page"/></toc-entry-on-resumed>
-                </toc-block>
-                <toc-block>
-                  <toc-block padding-left="1">
-                    <toc-entry ref-id="ch_1_1">1.1 ⠐⠐⠐⠐⠐⠐
-                    <page-number ref-id="ch_1_1" number-format="default"/></toc-entry>
-                  </toc-block>
-                  <toc-block padding-left="1">
-                    <toc-entry ref-id="ch_1_2">1.2 ⠐⠐⠐⠐⠐⠐
-                    <page-number ref-id="ch_1_2" number-format="default"/></toc-entry>
-                  </toc-block>
-                </toc-block>
-              </toc-block>
-              <toc-block>
-                <toc-block>
-                  <toc-entry ref-id="ch_2">2 ⠐⠐⠐⠐⠐⠐⠐⠐⠐
-                  <page-number ref-id="ch_2" number-format="default"/></toc-entry>
-                </toc-block>
-                <toc-block>
-                  <toc-entry-on-resumed range="[ch_2,ch_2_1)">2 ⠄⠄⠄ ⠐⠐⠐⠐⠐
-                  <evaluate expression="$started-volume-first-content-page"/></toc-entry-on-resumed>
-                </toc-block>
-                <toc-block>
-                  <toc-block>
-                    <toc-block padding-left="1">
-                      <toc-entry ref-id="ch_2_1">2.1 ⠐⠐⠐⠐⠐⠐
-                      <page-number ref-id="ch_2_1" number-format="default"/></toc-entry>
-                    </toc-block>
-                    <toc-block padding-left="1">
-                      <toc-entry-on-resumed range="[ch_2_1,ch_2_2)">2.1 ⠄⠄⠄ ⠐⠐
-                      <evaluate expression="$started-volume-first-content-page"/></toc-entry-on-resumed>
-                    </toc-block>
-                  </toc-block>
-                  <toc-block>
-                    <toc-block padding-left="1">
-                      <toc-entry ref-id="ch_2_2">2.2 ⠐⠐⠐⠐⠐⠐
-                      <page-number ref-id="ch_2_2" number-format="default"/></toc-entry>
-                    </toc-block>
-                    <toc-block padding-left="1">
-                      <toc-entry-on-resumed range="[ch_2_2,)">2.2 ⠄⠄⠄ ⠐⠐⠐⠐⠐
-                      <evaluate expression="$started-volume-first-content-page"/></toc-entry-on-resumed>
-                    </toc-block>
-                  </toc-block>
-                </toc-block>
-              </toc-block>
-            </toc-block>
-          </table-of-contents>
-          <table-of-contents name="document-toc">
+          <table-of-contents name="toc">
             <toc-block>
               <toc-block>
                 <toc-block>
@@ -14418,12 +14330,12 @@
           </table-of-contents>
           <volume-template sheets-in-volume-max="1000" use-when="(! (= $volume 1))">
             <pre-content>
-              <toc-sequence toc="volume-toc" master="main" range="volume"/>
+              <toc-sequence toc="toc" master="main" range="volume"/>
             </pre-content>
           </volume-template>
           <volume-template sheets-in-volume-max="1000" use-when="(= $volume 1)">
             <pre-content>
-              <toc-sequence toc="document-toc" master="main" range="document"/>
+              <toc-sequence toc="toc" master="main" range="document"/>
             </pre-content>
           </volume-template>
           <sequence master="main">

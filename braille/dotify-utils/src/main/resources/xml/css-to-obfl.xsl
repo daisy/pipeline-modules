@@ -461,7 +461,6 @@
                                                                         <xsl:variable name="toc" as="element()?"
                                                                                       select="current-group()/self::css:box[@type='block' and @css:_obfl-toc]"/>
                                                                         <xsl:if test="exists($toc)">
-                                                                            <xsl:variable name="toc-name" select="generate-id($toc)"/>
                                                                             <xsl:variable name="toc-range" as="xs:string"
                                                                                           select="($toc/@css:_obfl-toc-range,'document')[1]"/>
                                                                             <xsl:variable name="on-toc-start" as="element()*"
@@ -498,7 +497,7 @@
                                                                                     <xsl:sequence select="$before-toc"/>
                                                                                 </xsl:element>
                                                                             </xsl:if>
-                                                                            <toc-sequence css:page="{$page-style/@style}" range="{$toc-range}" toc="{$toc-name}">
+                                                                            <toc-sequence css:page="{$page-style/@style}" range="{$toc-range}">
                                                                                 <xsl:if test="position()=1
                                                                                               or (exists($before-toc) and $toc-range='document' and not($before-toc/self::obfl:list-of-references))">
                                                                                     <xsl:sequence select="$initial-page-number"/>
@@ -508,7 +507,7 @@
                                                                                     Inserting table-of-contents here as child of toc-sequence. Will be moved to the
                                                                                     right place (child of obfl) later.
                                                                                 -->
-                                                                                <table-of-contents name="{$toc-name}">
+                                                                                <table-of-contents>
                                                                                     <xsl:apply-templates mode="table-of-contents" select="$toc">
                                                                                         <xsl:with-param name="pending-text-transform" tunnel="yes" select="$pending-text-transform"/>
                                                                                         <xsl:with-param name="pending-hyphens" tunnel="yes" select="$pending-hyphens"/>

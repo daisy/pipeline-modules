@@ -917,15 +917,14 @@
     <!--
         move table-of-contents elements to the right place
     -->
-    <p:group px:progress=".005">
-        <p:identity name="_1"/>
-        <p:insert match="/obfl:obfl/obfl:volume-template[not(preceding-sibling::obfl:volume-template)]" position="before">
-            <p:input port="insertion" select="//obfl:toc-sequence/obfl:table-of-contents">
-                <p:pipe step="_1" port="result"/>
-            </p:input>
-        </p:insert>
-        <p:delete match="obfl:toc-sequence/obfl:table-of-contents"/>
-    </p:group>
+    <p:xslt px:progress=".005">
+        <p:input port="stylesheet">
+            <p:document href="move-table-of-contents.xsl"/>
+        </p:input>
+        <p:input port="parameters">
+            <p:empty/>
+        </p:input>
+    </p:xslt>
     
     <!--
         display-when="..." also requires keep="page"
