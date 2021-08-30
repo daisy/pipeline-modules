@@ -166,8 +166,8 @@
 				<!-- the unprocessed nodes in the parent section -->
 				<xsl:param name="remaining-content" as="node()*" select="$fragment"/>
 				<!-- the processed subsections (one sectioning element per section) and nodes in
-				     between subsections, as a map containing info to construct the output -->
-				<xsl:param name="done" as="map(xs:string,item()*)*" select="()"/>
+				     between subsections -->
+				<xsl:param name="done" as="item()*" select="()"/>
 				<xsl:on-completion>
 					<xsl:call-template name="build">
 						<xsl:with-param name="content" as="item()*">

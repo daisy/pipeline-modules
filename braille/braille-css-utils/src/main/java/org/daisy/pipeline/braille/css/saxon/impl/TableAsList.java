@@ -133,10 +133,12 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 			int col = 1;
 			String namespace = null;
 			Deque<SimpleInlineStyle> inheritedStyle = new LinkedList<>();
+			Deque<QName> elementNames = new LinkedList<>();
 			while (reader.hasNext()) {
 				switch (reader.next()) {
 					case START_ELEMENT: {
 						QName name = reader.getName();
+						elementNames.push(name);
 						depth++;
 						boolean isCell = false;
 						if (depth == 1) {
@@ -198,6 +200,7 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 										break; }
 								if (!"normal".equals(flow)) {
 									writeActions.add(writeElementOnce(reader));
+									elementNames.pop();
 									break; }}
 							writeActions.add(w -> writeStartElement(w, name)); }
 						for (int i = 0; i < reader.getNamespaceCount(); i++) {
@@ -336,7 +339,7 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 						writeActions.add(w -> w.writeCharacters(chars));
 						break;
 					case END_ELEMENT: {
-						QName name = reader.getName();
+						QName name = elementNames.pop(); // reader.getName() does not work
 						depth--;
 						if (isHTMLorDTBookElement(THEAD, name)
 						    || isHTMLorDTBookElement(TFOOT, name)
@@ -1360,7 +1363,6 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 					list.add(w -> w.writeCharacters(chars));
 					break;
 				case END_ELEMENT: {
-					QName name = reader.getName();
 					list.add(w -> w.writeEndElement());
 					depth--;
 					if (depth == 0)

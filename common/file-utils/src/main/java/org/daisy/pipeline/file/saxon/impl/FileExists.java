@@ -5,7 +5,6 @@ import java.io.File;
 import net.sf.saxon.expr.XPathContext;
 import net.sf.saxon.lib.ExtensionFunctionCall;
 import net.sf.saxon.lib.ExtensionFunctionDefinition;
-import net.sf.saxon.om.AtomicSequence;
 import net.sf.saxon.om.Sequence;
 import net.sf.saxon.om.StructuredQName;
 import net.sf.saxon.trans.XPathException;
@@ -45,14 +44,10 @@ public class FileExists extends ExtensionFunctionDefinition {
 		return new ExtensionFunctionCall() {
 
 			@SuppressWarnings({ "unchecked", "rawtypes" })
-			public Sequence call(XPathContext context, Sequence[] arguments)
-					throws XPathException {
-
+			public Sequence call(XPathContext context, Sequence[] arguments) throws XPathException {
 				try {
-					String path = ((AtomicSequence) arguments[0])
-							.getStringValue();
-					boolean result = (path.isEmpty()) ? true : new File(path)
-							.exists();
+					String path = arguments[0].head().getStringValue();
+					boolean result = (path.isEmpty()) ? true : new File(path).exists();
 					return new BooleanValue(result, BuiltInAtomicType.BOOLEAN);
 				} catch (Throwable e) {
 					throw new XPathException("Unexpected error in pf:file-exists", e);

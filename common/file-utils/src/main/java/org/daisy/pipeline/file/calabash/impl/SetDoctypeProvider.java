@@ -14,6 +14,8 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
+import net.sf.saxon.om.AttributeMap;
+import net.sf.saxon.om.EmptyAttributeMap;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
 
@@ -30,6 +32,7 @@ import com.xmlcalabash.library.DefaultStep;
 import com.xmlcalabash.model.RuntimeValue;
 import com.xmlcalabash.runtime.XAtomicStep;
 import com.xmlcalabash.util.TreeWriter;
+import com.xmlcalabash.util.TypeUtils;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -81,21 +84,19 @@ public class SetDoctypeProvider implements XProcStepProvider {
 			boolean ok = false;
 			ok = SetDoctype.setDoctype(file, encoding, doctype, logger);
 
-
 			TreeWriter tree = new TreeWriter(runtime);
 			tree.startDocument(step.getNode().getBaseURI());
-			tree.addStartElement(XProcConstants.c_result);
-			tree.startContent();
-			
+			AttributeMap attrs = EmptyAttributeMap.getInstance();
+			if (!ok) {
+				String errorMessage = "px:set-doctype failed to read from "+file+" (doctype: "+doctype+", filesize: "+(file==null?'?':file.length())+")";
+				logger.warn("SetDoctype: "+errorMessage);
+				attrs = attrs.put(TypeUtils.attributeInfo(new QName("error"), errorMessage));
+			}
+			tree.addStartElement(XProcConstants.c_result, attrs);
 			if (ok) {
 				logger.debug("SetDoctype: successfully set the doctype");
 				tree.addText(file.toURI().toString());
-			} else {
-				String errorMessage = "px:set-doctype failed to read from "+file+" (doctype: "+doctype+", filesize: "+(file==null?'?':file.length())+")";
-				logger.warn("SetDoctype: "+errorMessage);
-				tree.addAttribute(new QName("error"), errorMessage);
 			}
-
 			tree.addEndElement();
 			tree.endDocument();
 

@@ -109,7 +109,7 @@
     <java.source.version>1.8</java.source.version> <!-- if we change this to 9 we also have to change target to 9 -->
     <java.target.version>1.8</java.target.version>
     <!-- must match version from framework-bom -->
-    <saxon.versionRange>[9.8.0,9.8.1)</saxon.versionRange>
+    <saxon.versionRange>[10.5,10.6)</saxon.versionRange>
   </properties>
 
   <build>
@@ -189,19 +189,19 @@
         <plugin>
           <groupId>org.daisy.maven</groupId>
           <artifactId>xspec-maven-plugin</artifactId>
-          <version>1.0.0</version>
+          <version>1.0.1</version>
           <dependencies>
             <dependency>
               <groupId>org.daisy.maven</groupId>
               <artifactId>xspec-runner</artifactId>
-              <version>1.0.2</version>
+              <version>1.0.6-SNAPSHOT</version>
             </dependency>
           </dependencies>
         </plugin>
         <plugin>
           <groupId>org.daisy.maven</groupId>
           <artifactId>xproc-maven-plugin</artifactId>
-          <version>1.0.2</version>
+          <version>1.0.3-SNAPSHOT</version>
           <dependencies>
             <!--
                 provided dependencies of xprocspec-runner
@@ -209,6 +209,9 @@
                 need to be defined here and not in test dependencies because otherwise the
                 Module_xprocspec_runner and MessageStepProvider services will fail to load because
                 the XProcStepProvider and Module classes will not be found
+
+                FIXME: make xprocspec-runner independent of calabash-adapter?
+                FIXME: make xprocspec-runner independent of modules-registry?
             -->
             <dependency>
               <groupId>org.daisy.pipeline</groupId>
@@ -223,17 +226,17 @@
             <dependency>
               <groupId>org.daisy.pipeline</groupId>
               <artifactId>calabash-adapter</artifactId>
-              <version>4.4.0</version>
+              <version>4.4.1-SNAPSHOT</version>
             </dependency>
             <dependency>
               <groupId>org.daisy.libs</groupId>
               <artifactId>com.xmlcalabash</artifactId>
-              <version>1.1.20-p8-98</version>
+              <version>1.3.2-p1-100-SNAPSHOT</version>
             </dependency>
             <dependency>
               <groupId>org.daisy.xprocspec</groupId>
               <artifactId>xprocspec</artifactId>
-              <version>1.4.2</version>
+              <version>1.4.3-SNAPSHOT</version>
             </dependency>
             <dependency>
               <groupId>org.daisy.pipeline</groupId>
@@ -452,12 +455,12 @@
       <dependency>
         <groupId>org.daisy.pipeline.build</groupId>
         <artifactId>modules-test-helper</artifactId>
-        <version>2.2.1</version>
+        <version>2.2.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.maven</groupId>
         <artifactId>xproc-engine-daisy-pipeline</artifactId>
-        <version>1.14.1</version>
+        <version>1.14.2-SNAPSHOT</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -947,6 +950,9 @@
         </dependency>
       </dependencies>
       <properties>
+        <!--
+            can't use maven.test.skip because that ignores logback.xml
+        -->
         <skipTests>true</skipTests>
       </properties>
       <build>

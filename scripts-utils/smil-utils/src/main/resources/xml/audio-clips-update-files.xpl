@@ -41,10 +41,10 @@
     <p:input port="stylesheet">
       <p:document href="audio-clips-update-files.xsl"/>
     </p:input>
-    <p:with-param name="output-base-uri" select="base-uri(/*)">
+    <p:with-param name="output-base-uri" select="base-uri(/)">
       <p:pipe step="main" port="mapping"/>
     </p:with-param>
-    <p:with-option name="output-base-uri" select="base-uri(/*)">
+    <p:with-option name="output-base-uri" select="base-uri(/)">
       <p:pipe step="main" port="mapping"/>
     </p:with-option>
   </p:xslt>

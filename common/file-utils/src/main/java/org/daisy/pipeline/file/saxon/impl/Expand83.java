@@ -3,7 +3,6 @@ package org.daisy.pipeline.file.saxon.impl;
 import net.sf.saxon.expr.XPathContext;
 import net.sf.saxon.lib.ExtensionFunctionCall;
 import net.sf.saxon.lib.ExtensionFunctionDefinition;
-import net.sf.saxon.om.AtomicSequence;
 import net.sf.saxon.om.Sequence;
 import net.sf.saxon.om.StructuredQName;
 import net.sf.saxon.trans.XPathException;
@@ -46,7 +45,7 @@ public class Expand83 extends ExtensionFunctionDefinition {
 			@Override
 			public Sequence call(XPathContext context, Sequence[] arguments)
 					throws XPathException {
-				String uri = ((AtomicSequence) arguments[0]).getStringValue();
+				String uri = arguments[0].head().getStringValue();
 				try {
 					uri = expand83(uri);
 				} catch (Throwable e) {

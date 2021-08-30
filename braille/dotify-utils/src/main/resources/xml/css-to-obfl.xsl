@@ -152,9 +152,9 @@
                 <xsl:for-each select="distinct-values(
                                         $volume-area-content/self::css:flow[@from][@scope='document']/@from)">
                     <xsl:variable name="flow" as="xs:string" select="."/>
-                    <xsl:sequence select="$sections/*[@css:flow=$flow]
-                                          /css:box[@type='block' and @css:_obfl-list-of-references]
-                                          //css:flow[@from][@scope=('volume','-obfl-document')]/@from"/>
+                    <xsl:sequence select="for $s in $sections[/*[@css:flow=$flow]]
+                                          return $s/*/css:box[@type='block' and @css:_obfl-list-of-references]
+                                                   //css:flow[@from][@scope=('volume','-obfl-document')]/@from"/>
                 </xsl:for-each>
             </xsl:for-each>
         </xsl:for-each>
@@ -255,7 +255,7 @@
     
     <!-- these defaults must match initial values defined in obfl-css-definition.xsl -->
     <xsl:variable name="initial-text-transform" as="xs:string"
-                  select="if ($sections/css:_/css:box[not(@css:text-transform='none')])
+                  select="if (some $s in $sections satisfies $s/css:_/css:box[not(@css:text-transform='none')])
                           then 'auto'
                           else 'none'"/>
     <xsl:variable name="initial-braille-charset" as="xs:string" select="if ($braille-charset-table='') then 'unicode' else 'custom'"/>
@@ -351,7 +351,7 @@
                         <!--
                             page style to use in @begin and @end areas when no page property specified
                         -->
-                        <xsl:variable name="default-page-style" as="xs:string" select="($sections/*[not(@css:flow)])[1]/string(@css:page)"/>
+                        <xsl:variable name="default-page-style" as="xs:string" select="$sections[/*[not(@css:flow)]][1]/*/string(@css:page)"/>
                         <volume-template sheets-in-volume-max="{($properties[@name='max-length' and css:is-valid(.)]/string(@value),$no-upper-limit)[1]}">
                             <xsl:if test="not($use-when='t')">
                                 <xsl:attribute name="use-when" select="$use-when"/>
@@ -578,7 +578,7 @@
             Note that a volume-keep-priority attribute is not needed to prefer volume breaking
             before a block over inside a block, but for now we have the conditional anyway.
         -->
-        <xsl:if test="exists($volume-transition-rule) or $sections//@css:volume-break-inside">
+        <xsl:if test="exists($volume-transition-rule) or (some $s in $sections satisfies $s//@css:volume-break-inside)">
             <volume-transition range="sheet">
                 <xsl:for-each select="$volume-transition-rule/css:rule[matches(@selector,'@(sequence|any)-(interrupted|resumed)')
                                                                        and css:property[@name='content']]">
@@ -650,7 +650,7 @@
             </volume-transition>
         </xsl:if>
         <xsl:apply-templates mode="assert-nil" select="$sections/*[not(self::css:_)]"/>
-        <xsl:for-each select="$sections/css:_[@css:flow=$collection-flows]">
+        <xsl:for-each select="for $s in $sections[/css:_[@css:flow=$collection-flows]] return $s/*">
             <xsl:variable name="flow" as="xs:string" select="@css:flow"/>
             <collection name="{$flow}">
                 <xsl:for-each-group select="*" group-by="@css:anchor">
@@ -669,7 +669,7 @@
                     </item>
                 </xsl:for-each-group>
             </collection>
-            <xsl:if test="$sections/css:_[@css:flow[not(.=$collection-flows)]]/*/@css:_obfl-use-when-collection-not-empty=$flow">
+            <xsl:if test="some $s in $sections satisfies $s/css:_[@css:flow[not(.=$collection-flows)]]/*/@css:_obfl-use-when-collection-not-empty=$flow">
                 <collection name="meta/{$flow}">
                     <xsl:for-each select="*[1]">
                         <!--
@@ -686,7 +686,7 @@
             FIXME: duplication
         -->
         <xsl:variable name="default-page-style-uses-explicit-counter-page" as="xs:boolean"
-                      select="some $p in $page-stylesheets[@style=($sections/*[not(@css:flow)])[1]/string(@css:page)][1]
+                      select="some $p in $page-stylesheets[@style=$sections[/*[not(@css:flow)]][1]/*/string(@css:page)][1]
                               satisfies
                                 (if ($p/css:property)
                                  then $p/css:property
@@ -707,7 +707,7 @@
                                         else $p/*[not(@selector)]/css:property)
                                        [@name='counter-increment']
                                        [css:parse-counter-set(@value,1)[@name='page']]"/>
-        <xsl:for-each-group select="$sections/css:_[not(@css:flow)]" group-starting-with="*[@css:counter-set]">
+        <xsl:for-each-group select="for $s in $sections[/css:_[not(@css:flow)]] return $s/*" group-starting-with="*[@css:counter-set]">
             <xsl:variable name="first-sequence" as="xs:boolean" select="position()=1"/>
             <xsl:for-each-group select="current-group()" group-adjacent="string(@css:page)">
                 <xsl:variable name="first-sequence" as="xs:boolean" select="$first-sequence and position()=1"/>
@@ -1047,7 +1047,9 @@
                                |(descendant::css:counter)/@target)"/>
         <xsl:choose>
             <xsl:when test="exists($descendant-refs) and
-                            not(exists($descendant-refs[some $id in string(.) satisfies $sections/*[not(@css:flow)]//*[@css:id=$id]]))">
+                            not(exists($descendant-refs[some $id in string(.) satisfies
+                                                        some $s in $sections[/*[not(@css:flow)]] satisfies
+                                                        $s/*//*[@css:id=$id]]))">
                 <!--
                     If an entry references an element in a named flow, we assume that element is
                     part of the volume begin or end area, and is therefore omitted from the table of
@@ -1284,11 +1286,15 @@
                                        |(descendant::css:string)/@target
                                        |(descendant::css:counter)/@target)"/>
                 <xsl:choose>
-                    <xsl:when test="exists($descendant-refs[some $id in string(.) satisfies $sections/*[not(@css:flow)]//*[@css:id=$id]])">
+                    <xsl:when test="exists($descendant-refs[some $id in string(.) satisfies
+                                                            some $s in $sections[/*[not(@css:flow)]] satisfies
+                                                            $s/*//*[@css:id=$id]])">
                         <!--
                             FIXME: show a warning when not all references point to the same element
                         -->
-                        <toc-entry ref-id="{$descendant-refs[some $id in string(.) satisfies $sections/*[not(@css:flow)]//*[@css:id=$id]][1]}">
+                        <toc-entry ref-id="{$descendant-refs[some $id in string(.) satisfies
+                                                             some $s in $sections[/*[not(@css:flow)]] satisfies
+                                                             $s/*//*[@css:id=$id]][1]}">
                             <xsl:apply-templates mode="toc-entry"/>
                         </toc-entry>
                     </xsl:when>
@@ -2132,7 +2138,8 @@
                 -->
                 <xsl:variable name="target" as="xs:string?" select="if (@target) then @target else ()"/>
                 <xsl:variable name="target" as="element()?" select="if ($target)
-                                                                    then $sections//*[@css:id=$target][1]
+                                                                    then $sections[//*[@css:id=$target]][1]
+                                                                         //*[@css:id=$target]
                                                                          /(descendant-or-self::css:box|following::css:box)[@type='inline'][1]
                                                                     else ."/>
                 <xsl:if test="$target">
@@ -2173,7 +2180,7 @@
                   priority="1"
                   match="css:counter[@target][@name=$page-counter-names]">
         <xsl:variable name="target" as="xs:string" select="@target"/>
-        <xsl:variable name="target" as="element()*" select="$sections//*[@css:id=$target]"/>
+        <xsl:variable name="target" as="element()*" select="for $s in $sections return $s//*[@css:id=$target]"/>
         <xsl:choose>
             <xsl:when test="count($target)=0">
                 <!-- can not happen: these references should already have been removed in css:label-targets -->
@@ -2383,13 +2390,14 @@
     <!-- =============== -->
     
     <xsl:variable name="page-number-references" as="xs:string*"
-                  select="$sections//css:counter[@name='page']/@target"/>
+                  select="for $s in $sections return $s//css:counter[@name='page']/@target"/>
     
     <xsl:variable name="toc-entry-references" as="xs:string*"
-                  select="$sections//css:box[@type='block' and @css:_obfl-toc]
-                          /((descendant::css:counter)/@target|
-                            (descendant::css:string)/@target|
-                            (descendant::css:box)/@css:anchor)"/>
+                  select="for $s in $sections return
+                          $s//css:box[@type='block' and @css:_obfl-toc]
+                            /((descendant::css:counter)/@target|
+                              (descendant::css:string)/@target|
+                              (descendant::css:box)/@css:anchor)"/>
     
     <xsl:template mode="block-attr span-attr"
                   match="css:box[@type='block']/@css:id|
@@ -2434,7 +2442,7 @@
                   match="css:box/@css:id|
                          css:box[@type='inline']/css:_/@css:id">
         <xsl:variable name="id" as="xs:string" select="."/>
-        <xsl:if test="$sections/*[@css:flow=$collection-flows]/*/@css:anchor=$id">
+        <xsl:if test="some $s in $sections[/*[@css:flow=$collection-flows]] satisfies $s/*/*/@css:anchor=$id">
             <anchor item="{$id}"/>
         </xsl:if>
     </xsl:template>
@@ -2784,7 +2792,7 @@
                   match="css:flow[@from][@scope='document']"
                   priority="0.6">
         <xsl:variable name="flow" as="xs:string" select="@from"/>
-        <xsl:sequence select="$sections/*[@css:flow=$flow]"/>
+        <xsl:sequence select="for $s in $sections[/*[@css:flow=$flow]] return $s/*"/>
     </xsl:template>
     
     <xsl:template mode="css:eval-volume-area-content-list"

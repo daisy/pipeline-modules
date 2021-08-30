@@ -9,12 +9,14 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+
+import net.sf.saxon.om.AttributeMap;
+import net.sf.saxon.om.EmptyAttributeMap;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
 
 import org.daisy.common.xproc.calabash.XProcStep;
 import org.daisy.common.xproc.calabash.XProcStepProvider;
-
 import org.daisy.pipeline.file.calabash.impl.PeekProvider.Peek;
 
 import com.xmlcalabash.core.XProcConstants;
@@ -25,6 +27,7 @@ import com.xmlcalabash.library.DefaultStep;
 import com.xmlcalabash.model.RuntimeValue;
 import com.xmlcalabash.runtime.XAtomicStep;
 import com.xmlcalabash.util.TreeWriter;
+import com.xmlcalabash.util.TypeUtils;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -213,21 +216,19 @@ public class XMLPeekProvider implements XProcStepProvider {
 
 			TreeWriter tree = new TreeWriter(runtime);
 			tree.startDocument(step.getNode().getBaseURI());
-			tree.addStartElement(XProcConstants.c_result);
-			tree.addAttribute(new QName("content-type"), "text/plain; charset=utf-8");
+			AttributeMap attrs = EmptyAttributeMap.getInstance();
+			attrs = attrs.put(TypeUtils.attributeInfo(new QName("content-type"), "text/plain; charset=utf-8"));
 			if (bomType != null) {
-				tree.addAttribute(new QName("bom-type"), bomType);
+				attrs = attrs.put(TypeUtils.attributeInfo(new QName("bom-type"), bomType));
 			}
 			if (bomBase64 != null) {
-				tree.addAttribute(new QName("bom-base64"), bomBase64);
+				attrs = attrs.put(TypeUtils.attributeInfo(new QName("bom-base64"), bomBase64));
 			}
 			if (bomBase64 != null) {
-				tree.addAttribute(new QName("bom-hex"), bomHex);
+				attrs = attrs.put(TypeUtils.attributeInfo(new QName("bom-hex"), bomHex));
 			}
-			tree.startContent();
-
+			tree.addStartElement(XProcConstants.c_result, attrs);
 			tree.addText(resultString);
-
 			tree.addEndElement();
 			tree.endDocument();
 

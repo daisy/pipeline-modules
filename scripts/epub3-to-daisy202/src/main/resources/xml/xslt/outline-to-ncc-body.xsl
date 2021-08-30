@@ -91,7 +91,7 @@
                     Link will be fixed by px:html-update-links and create-linkbacks.xsl
                 -->
                 <xsl:sequence select="@href"/>
-                <xsl:value-of select="normalize-space(string-join(.//text(),' '))"/>
+                <xsl:value-of select="normalize-space(string(.))"/>
             </xsl:copy>
         </xsl:element>
     </xsl:template>
@@ -109,7 +109,7 @@
             <h1>
                 <xsl:call-template name="pf:generate-id"/>
                 <a href="{pf:relativize-uri($first-smil-link/resolve-uri(@href,base-uri(.)),base-uri($outline/*))}">
-                    <xsl:value-of select="normalize-space(string-join(.//text(),' '))"/>
+                    <xsl:value-of select="normalize-space(string(.))"/>
                 </a>
             </h1>
         </xsl:if>
@@ -125,7 +125,7 @@
         <xsl:variable name="element" as="element()" select="key('referenced-element',@id,$content-doc)"/>
         <span>
             <xsl:variable name="value" select="if (@title) then @title
-                                               else normalize-space(string-join($element//text(),' '))"/>
+                                               else normalize-space(string($element))"/>
             <xsl:sequence select="@class[not(.='page')]"/>
             <xsl:if test="not(@class[not(.='page')])">
                 <xsl:attribute name="class">
@@ -155,7 +155,7 @@
         <xsl:variable name="element" as="element()" select="key('referenced-element',@id,$content-doc)"/>
         <span class="noteref">
             <a href="{$relative-uri}#{@id}">
-                <xsl:value-of select="normalize-space(string-join($element//text(),' '))"/>
+                <xsl:value-of select="normalize-space(string($element))"/>
             </a>
         </span>
     </xsl:template>

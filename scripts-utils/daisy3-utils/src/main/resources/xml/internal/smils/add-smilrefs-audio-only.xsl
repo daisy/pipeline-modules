@@ -11,7 +11,7 @@
   <xsl:param name="no-smilref"/>
   <xsl:param name="mo-dir"/>
 
-  <xsl:variable name="mo-dir-rel" select="pf:relativize-uri($mo-dir, base-uri(/*))"/>
+  <xsl:variable name="mo-dir-rel" select="pf:relativize-uri($mo-dir, base-uri(/))"/>
 
   <!-- pagenums and noterefs are also linked by the NCX but they can't
        be SMIL seq (they have no children), so there is no need to

@@ -20,7 +20,7 @@
         <xsl:variable name="manifest-with-smil">
             <xsl:copy>
                 <xsl:sequence select="@*|opf:item"/>
-                <xsl:variable name="smil-uris" select="collection()/s:smil/base-uri()"/>
+                <xsl:variable name="smil-uris" select="for $s in collection()[/s:smil] return $s/s:smil/base-uri()"/>
                 <xsl:variable name="existing-item-uris" select="opf:item/resolve-uri(@href,base-uri(.))"/>
                 <xsl:variable name="new-smil-uris" select="$smil-uris[not(.=$existing-item-uris)]"/>
                 <xsl:for-each select="$new-smil-uris">
@@ -28,8 +28,8 @@
                 </xsl:for-each>
                 <xsl:variable name="audio-uris" as="xs:string*">
                     <xsl:variable name="audio-uris" as="xs:string*">
-                        <xsl:for-each select="collection()/s:smil">
-                            <xsl:variable name="smil-base" select="base-uri(.)"/>
+                        <xsl:for-each select="collection()[/s:smil]">
+                            <xsl:variable name="smil-base" select="base-uri(/)"/>
                             <xsl:sequence select="distinct-values(//s:audio/resolve-uri(@src,$smil-base))"/>
                         </xsl:for-each>
                     </xsl:variable>

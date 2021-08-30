@@ -47,7 +47,6 @@ public class StructuredSSMLSplitter implements SSMLMarkSplitter {
 		while (iter.hasNext()){
 			TreeWriter tw = new TreeWriter(mProc);
 			tw.startDocument(docURI);
-			tw.startContent();
 			tw.addStartElement(sNode);
 			mark = false;
 			while (iter.hasNext()) {
@@ -72,7 +71,6 @@ public class StructuredSSMLSplitter implements SSMLMarkSplitter {
 			//last node is a mark
 			TreeWriter tw = new TreeWriter(mProc);
 			tw.startDocument(docURI);
-			tw.startContent();
 			tw.addStartElement(sNode);
 			tw.addEndElement();
 			tw.endDocument();

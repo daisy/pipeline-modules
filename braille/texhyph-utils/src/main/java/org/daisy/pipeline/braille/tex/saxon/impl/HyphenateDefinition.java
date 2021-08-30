@@ -7,7 +7,6 @@ import java.util.NoSuchElementException;
 import net.sf.saxon.expr.XPathContext;
 import net.sf.saxon.lib.ExtensionFunctionCall;
 import net.sf.saxon.lib.ExtensionFunctionDefinition;
-import net.sf.saxon.om.AtomicSequence;
 import net.sf.saxon.om.Item;
 import net.sf.saxon.om.Sequence;
 import net.sf.saxon.om.SequenceIterator;
@@ -80,7 +79,7 @@ public class HyphenateDefinition extends ExtensionFunctionDefinition {
 		return new ExtensionFunctionCall() {
 			public Sequence call(XPathContext context, Sequence[] arguments) throws XPathException {
 				try {
-					Query query = query(((AtomicSequence)arguments[0]).getStringValue());
+					Query query = query(arguments[0].head().getStringValue());
 					TexHyphenator hyphenator;
 					try { hyphenator = provider.get(query).iterator().next(); }
 					catch (NoSuchElementException e) {

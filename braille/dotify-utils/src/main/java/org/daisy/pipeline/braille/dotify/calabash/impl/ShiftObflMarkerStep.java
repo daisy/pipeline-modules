@@ -65,9 +65,13 @@ public class ShiftObflMarkerStep extends DefaultStep implements XProcStep {
 	private WritablePipe resultPipe = null;
 	
 	private static final String XMLNS_CSS = "http://www.daisy.org/ns/pipeline/braille-css";
-	private static final QName CSS_OBFL_MARKER = new QName(XMLNS_CSS, "_obfl-marker");
-	private static final QName CSS_BOX = new QName(XMLNS_CSS, "box");
-	private static final QName CSS__ = new QName(XMLNS_CSS, "_");
+	// Specifying a prefix should normally not be needed, but possibly there is a bug in
+	// StreamWriterToReceiver. Note that Saxon should take care of resolving collisions if
+	// necessary.
+	private static final String PREFIX_CSS = "css";
+	private static final QName CSS_OBFL_MARKER = new QName(XMLNS_CSS, "_obfl-marker", PREFIX_CSS);
+	private static final QName CSS_BOX = new QName(XMLNS_CSS, "box", PREFIX_CSS);
+	private static final QName CSS__ = new QName(XMLNS_CSS, "_", PREFIX_CSS);
 	private static final QName _TYPE = new QName("type");
 	
 	private ShiftObflMarkerStep(XProcRuntime runtime, XAtomicStep step) {

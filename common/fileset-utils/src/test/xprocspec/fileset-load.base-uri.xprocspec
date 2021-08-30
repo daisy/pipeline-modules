@@ -16,7 +16,7 @@
             <p:option name="fail-on-not-found" select="'false'"/>
             <p:option name="load-if-not-in-memory" select="'true'"/>
             
-            <p:output port="result"/>
+            <p:output port="result" sequence="true"/>
             
             <p:import href="../../main/resources/xml/xproc/fileset-load.xpl"/>
             
@@ -34,6 +34,7 @@
                 <p:with-option name="load-if-not-in-memory" select="$load-if-not-in-memory"/>
             </px:fileset-load>
             <p:split-sequence test="position()=1"/>
+            <p:for-each>
             <p:delete match="/*/@xml:base"/>
             <p:identity name="load"/>
             
@@ -80,6 +81,7 @@
                     <p:pipe step="xslt" port="result"/>
                 </p:with-option>
             </p:add-attribute>
+            </p:for-each>
         </p:declare-step>
     </x:script>
 
@@ -93,8 +95,8 @@
                 </x:document>
             </x:input>
             <x:input port="in-memory">
-                <x:document type="inline">
-                    <doc xml:base="file:/from-memory/foo.xml"/>
+                <x:document type="inline" xml:base="file:/from-memory/foo.xml">
+                    <doc/>
                 </x:document>
             </x:input>
             <x:option name="href" select="'file:/from-memory/foo.xml'"/>
@@ -102,6 +104,7 @@
         <x:context label="the results">
             <x:document type="port" port="result"/>
         </x:context>
+        <x:expect label="the number of documents should be 1" type="count" min="1" max="1"/>
         <x:expect label="the base-uri of the loaded document is the requested uri" type="xpath"
                   test="/d:results/@document-base-uri-before-xslt" equals="'file:/from-memory/foo.xml'"/>
         <x:expect label="the base-uri of the document element is the requested uri" type="xpath"
@@ -126,6 +129,7 @@
         <x:context label="the results">
             <x:document type="port" port="result"/>
         </x:context>
+        <x:expect label="the number of documents should be 1" type="count" min="1" max="1"/>
         <x:expect label="the base-uri of the loaded document is the requested uri" type="xpath"
                   test="/d:results/@document-base-uri-before-xslt" equals="resolve-uri('samples/fileset/test.xml')"/>
         <x:expect label="the base-uri of the document element is the requested uri" type="xpath"
@@ -150,6 +154,7 @@
         <x:context label="the results">
             <x:document type="port" port="result"/>
         </x:context>
+        <x:expect label="the number of documents should be 1" type="count" min="1" max="1"/>
         <x:expect label="the base-uri of the loaded document is the requested uri" type="xpath"
                   test="/d:results/@document-base-uri-before-xslt" equals="resolve-uri('samples/fileset/copy.xml')"/>
         <x:expect label="the base-uri of the document element is the requested uri" type="xpath"
@@ -174,6 +179,7 @@
         <x:context label="the results">
             <x:document type="port" port="result"/>
         </x:context>
+        <x:expect label="the number of documents should be 1" type="count" min="1" max="1"/>
         <x:expect label="the base-uri of the loaded document is the requested uri" type="xpath"
                   test="/d:results/@document-base-uri-before-xslt" equals="resolve-uri('samples/fileset2/a.zip!/e.svg')"/>
         <x:expect label="the base-uri of the document element is the requested uri" type="xpath"

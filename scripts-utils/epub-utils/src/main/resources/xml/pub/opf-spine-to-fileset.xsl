@@ -14,7 +14,7 @@
 			<xsl:copy>
 				<xsl:sequence select="@*"/>
 				<xsl:for-each select="collection()[1]">
-					<xsl:variable name="opf-base" select="base-uri(/*)"/>
+					<xsl:variable name="opf-base" select="base-uri(/)"/>
 					<xsl:for-each select="/*/spine/itemref">
 						<xsl:variable name="idref" select="@idref"/>
 						<xsl:variable name="item" as="element(opf:item)*" select="/*/manifest/item[@id=$idref]"/>

@@ -49,7 +49,7 @@
 		</x:context>
 		<x:expect label="new prefix should be added" type="compare">
 			<x:document type="inline">
-				<metadata prefix="nordic: http://www.mtm.se/epub/ dc: http://purl.org/dc/elements/1.1/"/>
+				<metadata prefix="dc: http://purl.org/dc/elements/1.1/ nordic: http://www.mtm.se/epub/"/>
 			</x:document>
 		</x:expect>
 	</x:scenario>

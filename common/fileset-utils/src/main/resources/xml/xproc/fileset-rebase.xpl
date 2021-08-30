@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step version="1.0" type="px:fileset-rebase" name="main"
-    xmlns:p="http://www.w3.org/ns/xproc" xmlns:px="http://www.daisy.org/ns/pipeline/xproc">
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
+                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                type="px:fileset-rebase">
     
     <p:documentation>Changes the xml:base of the fileset, and updates the relative hrefs in the fileset accordingly.</p:documentation>
     
@@ -20,7 +21,8 @@
     </px:assert>
 
     <p:xslt>
-        <p:with-param name="new-base" select="$new-base"/>
+        <p:with-option name="output-base-uri" select="$new-base"/>
+        <p:with-param name="output-base-uri" select="$new-base"/>
         <p:input port="stylesheet">
             <p:document href="../xslt/fileset-rebase.xsl"/>
         </p:input>

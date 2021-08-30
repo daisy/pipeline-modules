@@ -33,6 +33,7 @@
     <p:input port="stylesheet">
       <p:document href="audio-clips-to-fileset.xsl"/>
     </p:input>
+    <p:with-option name="output-base-uri" select="base-uri(/)"/>
     <p:input port="parameters">
       <p:empty/>
     </p:input>

@@ -9,7 +9,10 @@ import com.xmlcalabash.io.ReadableDocument;
 import com.xmlcalabash.model.RuntimeValue;
 import com.xmlcalabash.runtime.XAtomicStep;
 import com.xmlcalabash.util.TreeWriter;
+import com.xmlcalabash.util.TypeUtils;
 
+import net.sf.saxon.om.AttributeMap;
+import net.sf.saxon.om.EmptyAttributeMap;
 import net.sf.saxon.s9api.QName;
 
 import org.daisy.common.xproc.calabash.XProcStep;
@@ -65,13 +68,12 @@ public class CxEvalBasedTransformer implements XProcStepProvider {
 						TreeWriter optionWriter = new TreeWriter(runtime);
 						optionWriter.startDocument(step.getNode().getBaseURI());
 						optionWriter.addStartElement(cx_options);
-						optionWriter.startContent();
 						for (String option : xprocOptions.keySet()) {
-							optionWriter.addStartElement(cx_option);
-							optionWriter.addAttribute(_name, option);
-							optionWriter.addAttribute(_namespace, "");
-							optionWriter.addAttribute(_value, xprocOptions.get(option));
-							optionWriter.startContent();
+							AttributeMap attrs = EmptyAttributeMap.getInstance();
+							attrs = attrs.put(TypeUtils.attributeInfo(_name, option));
+							attrs = attrs.put(TypeUtils.attributeInfo(_namespace, ""));
+							attrs = attrs.put(TypeUtils.attributeInfo(_value, xprocOptions.get(option)));
+							optionWriter.addStartElement(cx_option, attrs);
 							optionWriter.addEndElement(); }
 						optionWriter.addEndElement();
 						optionWriter.endDocument();

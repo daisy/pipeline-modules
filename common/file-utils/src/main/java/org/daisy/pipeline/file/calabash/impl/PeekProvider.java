@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 
+import net.sf.saxon.om.AttributeMap;
+import net.sf.saxon.om.EmptyAttributeMap;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
 
@@ -20,6 +22,7 @@ import com.xmlcalabash.model.RuntimeValue;
 import com.xmlcalabash.runtime.XAtomicStep;
 import com.xmlcalabash.util.Base64;
 import com.xmlcalabash.util.TreeWriter;
+import com.xmlcalabash.util.TypeUtils;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -80,20 +83,20 @@ public class PeekProvider implements XProcStepProvider {
 				e.printStackTrace();
 			}
 
-
 			TreeWriter tree = new TreeWriter(runtime);
 			tree.startDocument(step.getNode().getBaseURI());
-			tree.addStartElement(XProcConstants.c_result);
-			tree.addAttribute(new QName("content-type"), "binary/octet-stream");
-			tree.addAttribute(new QName("encoding"), "base64");
-			tree.startContent();
-			
+			AttributeMap attrs = EmptyAttributeMap.getInstance();
+			attrs = attrs.put(TypeUtils.attributeInfo(new QName("content-type"), "binary/octet-stream"));
+			attrs = attrs.put(TypeUtils.attributeInfo(new QName("encoding"), "base64"));
 			if (resultBytes == null) {
-				tree.addAttribute(new QName("error"), "px:file-peek failed to read from "+file+" (offset: "+offset+", length: "+length+", filesize: "+(file==null?'?':file.length())+")");
-			} else {
+				attrs = attrs.put(TypeUtils.attributeInfo(new QName("error"), "px:file-peek failed to read from " + file
+				                                          + " (offset: " + offset + ", length: " + length
+				                                          + ", filesize: " + (file == null ? '?' : file.length()) + ")"));
+			}
+			tree.addStartElement(XProcConstants.c_result, attrs);
+			if (resultBytes != null) {
 				tree.addText(Peek.encodeBase64(resultBytes));
 			}
-
 			tree.addEndElement();
 			tree.endDocument();
 

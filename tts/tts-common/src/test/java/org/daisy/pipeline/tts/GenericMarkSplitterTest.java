@@ -5,6 +5,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
 
+import com.xmlcalabash.util.TreeWriter;
+import com.xmlcalabash.util.TypeUtils;
+
+import net.sf.saxon.om.EmptyAttributeMap;
 import net.sf.saxon.s9api.Axis;
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.QName;
@@ -12,12 +16,13 @@ import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 
 import org.custommonkey.xmlunit.Diff;
+
 import org.daisy.pipeline.tts.SSMLMarkSplitter.Chunk;
+
 import org.junit.Assert;
 import org.junit.Test;
-import org.xml.sax.SAXException;
 
-import com.xmlcalabash.util.TreeWriter;
+import org.xml.sax.SAXException;
 
 public class GenericMarkSplitterTest {
 	static Processor Proc = new Processor(false);
@@ -27,7 +32,6 @@ public class GenericMarkSplitterTest {
 	private static TreeWriter newTreeWriter() throws URISyntaxException {
 		TreeWriter tw = new TreeWriter(Proc);
 		tw.startDocument(new URI("http://test"));
-		tw.startContent();
 		tw.addStartElement(new QName(SsmlNs, "speak"));
 		return tw;
 	}
@@ -61,8 +65,9 @@ public class GenericMarkSplitterTest {
 		source.addStartElement(new QName(null, "a"));
 		source.addText("text1");
 		source.addEndElement();
-		source.addStartElement(new QName(SsmlNs, "mark"));
-		source.addAttribute(new QName(null, "name"), markname);
+		source.addStartElement(new QName(SsmlNs, "mark"),
+		                       EmptyAttributeMap.getInstance()
+		                                        .put(TypeUtils.attributeInfo(new QName(null, "name"), markname)));
 		source.addEndElement();
 		source.addStartElement(new QName(null, "b"));
 		source.addText("text2");
@@ -103,16 +108,18 @@ public class GenericMarkSplitterTest {
 		source.addText("text1");
 		source.addEndElement();
 
-		source.addStartElement(new QName(SsmlNs, "mark"));
-		source.addAttribute(new QName(null, "name"), markname1);
+		source.addStartElement(new QName(SsmlNs, "mark"),
+		                       EmptyAttributeMap.getInstance()
+		                                        .put(TypeUtils.attributeInfo(new QName(null, "name"), markname1)));
 		source.addEndElement();
 
 		source.addStartElement(new QName(null, "b"));
 		source.addText("text2");
 		source.addEndElement();
 
-		source.addStartElement(new QName(SsmlNs, "mark"));
-		source.addAttribute(new QName(null, "name"), markname2);
+		source.addStartElement(new QName(SsmlNs, "mark"),
+		                       EmptyAttributeMap.getInstance()
+		                                        .put(TypeUtils.attributeInfo(new QName(null, "name"), markname2)));
 		source.addEndElement();
 
 		source.addStartElement(new QName(null, "c"));
@@ -165,8 +172,9 @@ public class GenericMarkSplitterTest {
 		source.addText("text1");
 		source.addEndElement(); //</k>
 
-		source.addStartElement(new QName(SsmlNs, "mark"));
-		source.addAttribute(new QName(null, "name"), markname1);
+		source.addStartElement(new QName(SsmlNs, "mark"),
+		                       EmptyAttributeMap.getInstance()
+		                                        .put(TypeUtils.attributeInfo(new QName(null, "name"), markname1)));
 		source.addEndElement();
 
 		source.addStartElement(new QName(null, "b"));
@@ -178,8 +186,9 @@ public class GenericMarkSplitterTest {
 
 		source.addText("text3");
 
-		source.addStartElement(new QName(SsmlNs, "mark"));
-		source.addAttribute(new QName(null, "name"), markname2);
+		source.addStartElement(new QName(SsmlNs, "mark"),
+		                       EmptyAttributeMap.getInstance()
+		                                        .put(TypeUtils.attributeInfo(new QName(null, "name"), markname2)));
 		source.addEndElement();
 
 		source.addEndElement(); //</a>
@@ -236,8 +245,9 @@ public class GenericMarkSplitterTest {
 		source.addText("text0");
 		source.addEndElement();
 		for (int i = 1; i <= numMarks; ++i) {
-			source.addStartElement(new QName(SsmlNs, "mark"));
-			source.addAttribute(new QName(null, "name"), "mark" + i);
+			source.addStartElement(new QName(SsmlNs, "mark"),
+			                       EmptyAttributeMap.getInstance()
+			                                        .put(TypeUtils.attributeInfo(new QName(null, "name"), "mark" + i)));
 			source.addEndElement();
 			source.addStartElement(new QName(null, "a"));
 			source.addText("text" + i);

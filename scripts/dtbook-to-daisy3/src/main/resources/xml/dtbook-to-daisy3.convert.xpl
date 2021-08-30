@@ -384,7 +384,7 @@
           <p:input port="source">
             <p:pipe step="main" port="fileset.in"/>
           </p:input>
-          <p:with-option name="new-base" select="base-uri(/*)">
+          <p:with-option name="new-base" select="base-uri(/)">
             <p:pipe step="tts-enriched-dtbook" port="result"/>
           </p:with-option>
         </px:fileset-rebase>

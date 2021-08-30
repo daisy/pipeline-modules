@@ -50,6 +50,7 @@
                 <p:input port="parameters">
                     <p:empty/>
                 </p:input>
+                <p:with-option name="output-base-uri" select="base-uri(/)"/>
             </p:xslt>
         </p:when>
         <p:when test="local-name(/*)='smil' and namespace-uri(/*)='http://www.w3.org/2001/SMIL20/'">
@@ -66,6 +67,9 @@
                 <p:input port="parameters">
                     <p:empty/>
                 </p:input>
+                <p:with-option name="output-base-uri" select="base-uri(/)">
+                    <p:pipe step="smil" port="result"/>
+                </p:with-option>
             </p:xslt>
         </p:when>
         <p:otherwise>

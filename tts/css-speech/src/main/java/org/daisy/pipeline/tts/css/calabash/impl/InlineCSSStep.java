@@ -20,6 +20,7 @@ import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmNodeKind;
 import net.sf.saxon.s9api.XdmSequenceIterator;
+import net.sf.saxon.trans.XPathException;
 import net.sf.saxon.tree.util.ProcInstParser;
 
 import org.daisy.common.xproc.calabash.XProcStep;
@@ -125,22 +126,25 @@ public class InlineCSSStep extends DefaultStep implements TreeWriterFactory, XPr
 
 		//add the CSS stylesheet URI from the processing-instructions
 		XdmSequenceIterator it = doc.axisIterator(Axis.CHILD);
-		while (it.hasNext()) {
-			XdmNode next = (XdmNode) it.next();
-			if (next.getNodeKind() == XdmNodeKind.PROCESSING_INSTRUCTION) {
-				String content = next.getStringValue();
-				String href = ProcInstParser.getPseudoAttribute(content, "href");
-				if ("xml-stylesheet".equals(next.getNodeName().getLocalName())
-				        && href != null
-				        && !href.isEmpty()
-				        && "text/css".equals(ProcInstParser
-				                .getPseudoAttribute(content, "type"))) {
-
-					URI uri = buildAbsoluteURI(href, doc);
-					if (uri != null)
-						result.add(uri);
+		try {
+			while (it.hasNext()) {
+				XdmNode next = (XdmNode) it.next();
+				if (next.getNodeKind() == XdmNodeKind.PROCESSING_INSTRUCTION) {
+					String content = next.getStringValue();
+					String href = ProcInstParser.getPseudoAttribute(content, "href");
+					if ("xml-stylesheet".equals(next.getNodeName().getLocalName())
+					        && href != null
+					        && !href.isEmpty()
+					        && "text/css".equals(ProcInstParser
+					                .getPseudoAttribute(content, "type"))) {
+						URI uri = buildAbsoluteURI(href, doc);
+						if (uri != null)
+							result.add(uri);
+					}
 				}
 			}
+		} catch (XPathException e) {
+			throw new RuntimeException(e);
 		}
 
 		//add the CSS stylesheet URIs from the headers

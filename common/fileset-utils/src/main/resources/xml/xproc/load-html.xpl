@@ -93,5 +93,6 @@
         <p:input port="stylesheet">
             <p:document href="../xslt/namespace-fixup.xsl"/>
         </p:input>
+        <p:with-option name="output-base-uri" select="base-uri(/)"/>
     </p:xslt>
 </p:declare-step>

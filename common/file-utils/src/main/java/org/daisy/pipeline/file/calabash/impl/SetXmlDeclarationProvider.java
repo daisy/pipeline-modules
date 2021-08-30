@@ -14,6 +14,8 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
+import net.sf.saxon.om.AttributeMap;
+import net.sf.saxon.om.EmptyAttributeMap;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
 
@@ -30,6 +32,7 @@ import com.xmlcalabash.library.DefaultStep;
 import com.xmlcalabash.model.RuntimeValue;
 import com.xmlcalabash.runtime.XAtomicStep;
 import com.xmlcalabash.util.TreeWriter;
+import com.xmlcalabash.util.TypeUtils;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -78,24 +81,23 @@ public class SetXmlDeclarationProvider implements XProcStepProvider {
 				throw new XProcException(step, "Cannot set xml declaration of file: file is a directory: " + file.getAbsolutePath());
 			}
 			
-			boolean ok = false;
-			ok = SetXmlDeclaration.setXmlDeclaration(file, encoding, xmlDeclaration, logger);
-
+			boolean ok = SetXmlDeclaration.setXmlDeclaration(file, encoding, xmlDeclaration, logger);
 
 			TreeWriter tree = new TreeWriter(runtime);
 			tree.startDocument(step.getNode().getBaseURI());
-			tree.addStartElement(XProcConstants.c_result);
-			tree.startContent();
-			
+			AttributeMap attrs = EmptyAttributeMap.getInstance();
+			if (!ok) {
+				String errorMessage = "px:set-xml-declaration failed to read from " + file
+					+ " (xml declaration: " + xmlDeclaration
+					+ ", filesize: " + (file == null ? '?' : file.length()) + ")";
+				logger.warn("SetXmlDeclaration: "+errorMessage);
+				attrs = attrs.put(TypeUtils.attributeInfo(new QName("error"), errorMessage));
+			}
+			tree.addStartElement(XProcConstants.c_result, attrs);
 			if (ok) {
 				logger.debug("SetXmlDeclaration: successfully set the XML declaration");
 				tree.addText(file.toURI().toString());
-			} else {
-				String errorMessage = "px:set-xml-declaration failed to read from "+file+" (xml declaration: "+xmlDeclaration+", filesize: "+(file==null?'?':file.length())+")";
-				logger.warn("SetXmlDeclaration: "+errorMessage);
-				tree.addAttribute(new QName("error"), errorMessage);
 			}
-
 			tree.addEndElement();
 			tree.endDocument();
 

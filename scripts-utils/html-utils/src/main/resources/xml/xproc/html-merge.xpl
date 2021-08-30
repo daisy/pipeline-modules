@@ -162,7 +162,9 @@
 			<p:pipe step="html-count" port="result"/>
 		</p:xpath-context>
 		<p:when test="/*=1">
-			<p:identity/>
+			<px:set-base-uri>
+				<p:with-option name="base-uri" select="$output-base-uri"/>
+			</px:set-base-uri>
 		</p:when>
 		<p:otherwise>
 			<p:sink/>
@@ -184,14 +186,14 @@
 				<p:input port="parameters">
 					<p:empty/>
 				</p:input>
+				<p:with-option name="output-base-uri" select="$output-base-uri">
+					<p:empty/>
+				</p:with-option>
 			</p:xslt>
 			<p:wrap match="/*/html:body[preceding-sibling::html:body|following-sibling::html:body]"
 			        group-adjacent="true()" wrapper="body" wrapper-namespace="http://www.w3.org/1999/xhtml"/>
 			<p:rename match="/*/html:body/html:body" new-name="section" new-namespace="http://www.w3.org/1999/xhtml"/>
 		</p:otherwise>
 	</p:choose>
-	<px:set-base-uri>
-		<p:with-option name="base-uri" select="$output-base-uri"/>
-	</px:set-base-uri>
 
 </p:declare-step>

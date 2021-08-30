@@ -9,6 +9,8 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.saxon.om.AttributeMap;
+import net.sf.saxon.om.EmptyAttributeMap;
 import net.sf.saxon.s9api.Axis;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
@@ -31,6 +33,7 @@ import com.xmlcalabash.library.DefaultStep;
 import com.xmlcalabash.model.RuntimeValue;
 import com.xmlcalabash.runtime.XAtomicStep;
 import com.xmlcalabash.util.TreeWriter;
+import com.xmlcalabash.util.TypeUtils;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -262,9 +265,9 @@ public class TranslateFileStep extends DefaultStep implements XProcStep {
 	private void writeDocument(URI baseURI, String textContent, int pageCount) {
 		TreeWriter treeWriter = new TreeWriter(runtime);
 		treeWriter.startDocument(baseURI);
-		treeWriter.addStartElement(louis_result);
-		treeWriter.addAttribute(_pages, String.valueOf(pageCount));
-		treeWriter.startContent();
+		AttributeMap attrs = EmptyAttributeMap.getInstance();
+		attrs = attrs.put(TypeUtils.attributeInfo(_pages, String.valueOf(pageCount)));
+		treeWriter.addStartElement(louis_result, attrs);
 		treeWriter.addText(textContent);
 		treeWriter.addEndElement();
 		treeWriter.endDocument();
