@@ -258,11 +258,12 @@
 			</px:fileset-load>
 			<p:for-each>
 				<p:variable name="smil" select="/"/>
-				<p:variable name="smil-base" select="base-uri($smil/*)"/>
+				<p:variable name="smil-base" select="base-uri($smil)"/>
 				<p:xslt>
 					<p:input port="stylesheet">
 						<p:document href="d202smil_Z2005smil.xsl"/>
 					</p:input>
+					<p:with-option name="output-base-uri" select="$smil-base"/>
 					<p:with-param port="parameters" name="uid" select="$daisy3-identifier"/>
 					<p:with-param port="parameters" name="title" select="daisy3-title"/>
 					<p:with-param port="parameters" name="isNcxOnly"

@@ -62,7 +62,7 @@ public class CereProcEngineTest {
 		writer.writeEndElement();
 		writer.writeEndDocument();
 		writer.flush();
-		writer.close();
+		//writer.close(); // for some reason results in NPE in latest Saxon
 
 		XdmNode node = (XdmNode)ssmlProcessed.get(0);
 		Voice  v = new Voice("cereproc", "Ylva", new Locale("sv"), null, null);

@@ -33,7 +33,9 @@
 						</xsl:document>
 					</xsl:template>
 					<xsl:template match="/*">
-						<xsl:sequence select="."/>
+						<xsl:copy>
+							<xsl:sequence select="@*|node()"/>
+						</xsl:copy>
 					</xsl:template>
 					<!-- if xml:base attribute is defined on document element, also adapt it -->
 					<xsl:template match="/*[@xml:base]" priority="1">
@@ -47,5 +49,27 @@
 			</p:inline>
 		</p:input>
 	</p:xslt>
+	
+	<p:choose>
+		<p:when test="exists(/processing-instruction())">
+			<p:xslt>
+				<p:input port="stylesheet">
+					<p:inline>
+						<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0">
+							<xsl:template match="/">
+								<xsl:sequence select="node()"/>
+							</xsl:template>
+						</xsl:stylesheet>
+					</p:inline>
+				</p:input>
+				<p:input port="parameters">
+					<p:empty/>
+				</p:input>
+			</p:xslt>
+		</p:when>
+		<p:otherwise>
+			<p:identity/>
+		</p:otherwise>
+	</p:choose>
 	
 </p:declare-step>

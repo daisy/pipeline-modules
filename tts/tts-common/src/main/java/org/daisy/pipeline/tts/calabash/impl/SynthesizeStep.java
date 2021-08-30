@@ -10,6 +10,19 @@ import java.util.concurrent.Semaphore;
 
 import javax.sound.sampled.AudioFileFormat;
 
+import com.google.common.collect.Iterables;
+import com.xmlcalabash.core.XProcException;
+import com.xmlcalabash.core.XProcRuntime;
+import com.xmlcalabash.io.ReadablePipe;
+import com.xmlcalabash.io.WritablePipe;
+import com.xmlcalabash.library.DefaultStep;
+import com.xmlcalabash.model.RuntimeValue;
+import com.xmlcalabash.runtime.XAtomicStep;
+import com.xmlcalabash.util.TreeWriter;
+import com.xmlcalabash.util.TypeUtils;
+
+import net.sf.saxon.om.AttributeMap;
+import net.sf.saxon.om.EmptyAttributeMap;
 import net.sf.saxon.s9api.Axis;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
@@ -25,16 +38,6 @@ import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.config.ConfigReader;
 import org.daisy.pipeline.tts.calabash.impl.EncodingThread.EncodingException;
 import org.daisy.pipeline.tts.calabash.impl.TTSLog.ErrorCode;
-
-import com.google.common.collect.Iterables;
-import com.xmlcalabash.core.XProcException;
-import com.xmlcalabash.core.XProcRuntime;
-import com.xmlcalabash.io.ReadablePipe;
-import com.xmlcalabash.io.WritablePipe;
-import com.xmlcalabash.library.DefaultStep;
-import com.xmlcalabash.model.RuntimeValue;
-import com.xmlcalabash.runtime.XAtomicStep;
-import com.xmlcalabash.util.TreeWriter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -243,11 +246,12 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 				if (sf.clipBegin < sf.clipEnd){
 					//sf.clipBegin = sf.clipEnd if the input text is empty. Those clips are not useful
 					//and they can eventually lead to validation errors
-					tw.addStartElement(ClipTag);
-					tw.addAttribute(Audio_attr_id, sf.xmlid);
-					tw.addAttribute(Audio_attr_clipBegin, convertSecondToString(sf.clipBegin));
-					tw.addAttribute(Audio_attr_clipEnd, convertSecondToString(sf.clipEnd));
-					tw.addAttribute(Audio_attr_src, soundFileURI);
+					AttributeMap attrs = EmptyAttributeMap.getInstance();
+					attrs = attrs.put(TypeUtils.attributeInfo(Audio_attr_id, sf.xmlid));
+					attrs = attrs.put(TypeUtils.attributeInfo(Audio_attr_clipBegin, convertSecondToString(sf.clipBegin)));
+					attrs = attrs.put(TypeUtils.attributeInfo(Audio_attr_clipEnd, convertSecondToString(sf.clipEnd)));
+					attrs = attrs.put(TypeUtils.attributeInfo(Audio_attr_src, soundFileURI));
+					tw.addStartElement(ClipTag, attrs);
 					tw.addEndElement();
 				}
 				++num;
@@ -275,14 +279,15 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 
 		tw = new TreeWriter(runtime);
 		tw.startDocument(runtime.getStaticBaseURI());
-		tw.addStartElement(StatusRootTag);
+		AttributeMap attrs = EmptyAttributeMap.getInstance();
 		if (mErrorCounter == 0)
-			tw.addAttribute(Status_attr_result, "ok");
+			attrs = attrs.put(TypeUtils.attributeInfo(Status_attr_result, "ok"));
 		else {
-			tw.addAttribute(Status_attr_result, "error");
-			tw.addAttribute(Status_attr_success_rate,
-			                (int)Math.floor(100 * (1 - (double)mErrorCounter/mSentenceCounter)) + "%");
+			attrs = attrs.put(TypeUtils.attributeInfo(Status_attr_result, "error"));
+			attrs = attrs.put(TypeUtils.attributeInfo(Status_attr_success_rate,
+			                                          (int)Math.floor(100 * (1 - (double)mErrorCounter/mSentenceCounter)) + "%"));
 		}
+		tw.addStartElement(StatusRootTag, attrs);
 		tw.addEndElement();
 		tw.endDocument();
 		status.write(tw.getResult());
@@ -295,31 +300,30 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 			TreeWriter xmlLog = new TreeWriter(runtime);
 			xmlLog.startDocument(runtime.getStaticBaseURI());
 			xmlLog.addStartElement(LogRootTag);
-			xmlLog.startContent();
 			for (TTSLog.Error err : log.readonlyGeneralErrors()) {
 				writeXMLerror(xmlLog, err);
 			}
 			for (Map.Entry<String, TTSLog.Entry> entry : log.getEntries()) {
 				TTSLog.Entry le = entry.getValue();
-				xmlLog.addStartElement(LogTextTag);
-
-				xmlLog.addAttribute(Log_attr_id, entry.getKey());
+				attrs = EmptyAttributeMap.getInstance();
+				attrs = attrs.put(TypeUtils.attributeInfo(Log_attr_id, entry.getKey()));
 				if (le.getSoundFile() != null) {
 					String basename = new File(le.getSoundFile()).getName();
-					xmlLog.addAttribute(Log_attr_file, basename);
-					xmlLog.addAttribute(Log_attr_begin, String.valueOf(le.getBeginInFile()));
-					xmlLog.addAttribute(Log_attr_end, String.valueOf(le.getEndInFile()));
+					attrs = attrs.put(TypeUtils.attributeInfo(Log_attr_file, basename));
+					attrs = attrs.put(TypeUtils.attributeInfo(Log_attr_begin, String.valueOf(le.getBeginInFile())));
+					attrs = attrs.put(TypeUtils.attributeInfo(Log_attr_end, String.valueOf(le.getEndInFile())));
 				}
 
-				xmlLog.addAttribute(Log_attr_timeout, "" + le.getTimeout() + "s");
+				attrs = attrs.put(TypeUtils.attributeInfo(Log_attr_timeout, "" + le.getTimeout() + "s"));
 
 				if (le.getSelectedVoice() != null)
-					xmlLog.addAttribute(Log_attr_selected_voice, le.getSelectedVoice()
-					        .toString());
+					attrs = attrs.put(TypeUtils.attributeInfo(Log_attr_selected_voice, le.getSelectedVoice()
+					        .toString()));
 				if (le.getActualVoice() != null) {
-					xmlLog.addAttribute(Log_attr_actual_voice, le.getActualVoice().toString());
-					xmlLog.addAttribute(Log_attr_time_elapsed, "" + le.getTimeElapsed() + "s");
+					attrs = attrs.put(TypeUtils.attributeInfo(Log_attr_actual_voice, le.getActualVoice().toString()));
+					attrs = attrs.put(TypeUtils.attributeInfo(Log_attr_time_elapsed, "" + le.getTimeElapsed() + "s"));
 				}
+				xmlLog.addStartElement(LogTextTag, attrs);
 
 				for (TTSLog.Error err : le.getReadOnlyErrors())
 					writeXMLerror(xmlLog, err);
@@ -343,8 +347,9 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 	}
 
 	private static void writeXMLerror(TreeWriter tw, TTSLog.Error err) {
-		tw.addStartElement(LogErrorTag);
-		tw.addAttribute(Log_attr_code, err.getErrorCode().toString());
+		AttributeMap attrs = EmptyAttributeMap.getInstance();
+		attrs = attrs.put(TypeUtils.attributeInfo(Log_attr_code, err.getErrorCode().toString()));
+		tw.addStartElement(LogErrorTag, attrs);
 		tw.addText(err.getMessage());
 		tw.addEndElement();
 	}

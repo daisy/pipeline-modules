@@ -86,7 +86,7 @@
 				<c:body>&lt;?xml version="1.1" encoding="us-ascii"?&gt;
 &lt;!DOCTYPE html
   PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"&gt;
-&lt;html xmlns:px="http://www.daisy.org/ns/pipeline/xproc" xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns:x="http://www.daisy.org/ns/xprocspec" xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:dpx="http://www.daisy.org/ns/pipeline/xproc"/&gt;</c:body>
+&lt;html xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns:dpx="http://www.daisy.org/ns/pipeline/xproc" xmlns:px="http://www.daisy.org/ns/pipeline/xproc" xmlns:x="http://www.daisy.org/ns/xprocspec"/&gt;</c:body>
 			</x:document>
 		</x:expect>
 		<x:context label="The e.xml document inside the zip">

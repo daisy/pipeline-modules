@@ -514,7 +514,7 @@
 	</xsl:template>
 	
 	<xsl:template match="dtb:img" mode="office:text office:annotation text:section table:table-cell text:list-item">
-		<xsl:variable name="src" select="resolve-uri(@src, base-uri(collection()[2]/*))"/>
+		<xsl:variable name="src" select="resolve-uri(@src, base-uri(collection()[2]))"/>
 		<xsl:choose>
 			<xsl:when test="matches($src,'^https?://')
 			                or (matches($src,'^file:') and pf:file-exists(substring($src,6)))">

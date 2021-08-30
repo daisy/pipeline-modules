@@ -50,7 +50,7 @@
 			<p:pipe step="main" port="source.in-memory"/>
 		</p:iteration-source>
 		<px:fileset-add-entry>
-			<p:with-option name="href" select="resolve-uri(base-uri(/*))"/>
+			<p:with-option name="href" select="resolve-uri(base-uri(/))"/>
 			<p:input port="source.fileset">
 				<p:pipe step="base" port="result"/>
 			</p:input>

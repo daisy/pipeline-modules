@@ -590,11 +590,11 @@
                 </x:document>
             </x:input>
             <x:input port="in-memory">
-                <x:document type="inline">
-                    <doc xml:base="samples/fileset2/xml/container.xml"/>
+                <x:document type="inline" xml:base="samples/fileset2/xml/container.xml">
+                    <doc/>
                 </x:document>
-                <x:document type="inline">
-                    <doc xml:base="samples/fileset2/xml/not-part-of-fileset.xml"/>
+                <x:document type="inline" xml:base="samples/fileset2/xml/not-part-of-fileset.xml">
+                    <doc/>
                 </x:document>
             </x:input>
             <x:option name="fail-on-not-found" select="'true'"/>
@@ -644,11 +644,11 @@
                 </x:document>
             </x:input>
             <x:input port="in-memory">
-                <x:document type="inline">
-                    <doc xml:base="samples/fileset2/xml/container.xml"/>
+                <x:document type="inline" xml:base="samples/fileset2/xml/container.xml">
+                    <doc/>
                 </x:document>
-                <x:document type="inline">
-                    <doc xml:base="samples/fileset2/xml/not-on-disk-only-in-memory.xml"/>
+                <x:document type="inline" xml:base="samples/fileset2/xml/not-on-disk-only-in-memory.xml">
+                    <doc/>
                 </x:document>
             </x:input>
             <x:option name="fail-on-not-found" select="'true'"/>
@@ -681,8 +681,8 @@
                 </x:document>
             </x:input>
             <x:input port="in-memory">
-                <x:document type="inline">
-                    <doc xml:base="file:///samples/fileset2//xml/not-on-disk-only-in-memory.xml"/>
+                <x:document type="inline" xml:base="file:///samples/fileset2//xml/not-on-disk-only-in-memory.xml">
+                    <doc/>
                 </x:document>
             </x:input>
         </x:call>

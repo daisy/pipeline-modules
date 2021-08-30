@@ -157,7 +157,7 @@
         <p:choose px:progress="1/2">
             <p:when test="$apply-document-specific-stylesheets='true'">
                 <px:message>
-                    <p:with-option name="message" select="concat('Inlining document-specific CSS for ',replace(base-uri(/*),'.*/',''),'')"/>
+                    <p:with-option name="message" select="concat('Inlining document-specific CSS for ',replace(base-uri(/),'.*/',''),'')"/>
                 </px:message>
                 <px:apply-stylesheets px:progress="1">
                     <p:with-option name="media"
@@ -372,7 +372,7 @@
                 </p:input>
             </pef:add-metadata>
             <px:set-base-uri>
-                <p:with-option name="base-uri" select="replace(base-uri(/*),'[^/]+$',concat(((/*/opf:metadata/dc:identifier[not(@refines)]/text()), 'pef')[1],'.pef'))">
+                <p:with-option name="base-uri" select="replace(base-uri(/),'[^/]+$',concat(((/*/opf:metadata/dc:identifier[not(@refines)]/text()), 'pef')[1],'.pef'))">
                     <p:pipe port="result" step="opf"/>
                 </p:with-option>
             </px:set-base-uri>
@@ -390,11 +390,11 @@
         </p:when>
         <p:otherwise>
             <px:fileset-create>
-                <p:with-option name="base" select="replace(base-uri(/*),'[^/]+$','')"/>
+                <p:with-option name="base" select="replace(base-uri(/),'[^/]+$','')"/>
             </px:fileset-create>
             <px:fileset-add-entry px:progress=".01"
                                   media-type="application/x-pef+xml">
-                <p:with-option name="href" select="base-uri(/*)">
+                <p:with-option name="href" select="base-uri(/)">
                     <p:pipe port="result" step="in-memory.out"/>
                 </p:with-option>
             </px:fileset-add-entry>

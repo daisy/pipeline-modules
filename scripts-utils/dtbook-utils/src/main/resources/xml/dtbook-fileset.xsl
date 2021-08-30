@@ -11,7 +11,7 @@
 	<xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl"/>
 
 	<xsl:template match="/">
-		<xsl:variable name="base" select="base-uri(/*)"/>
+		<xsl:variable name="base" select="base-uri(/)"/>
 		<d:fileset>
 			<xsl:attribute name="xml:base" select="replace($base,'[^/]+$','')"/>
 			<xsl:for-each select="//dtb:link[@rel='stylesheet'][empty(@type) or @type='text/css']/@href[normalize-space()]">

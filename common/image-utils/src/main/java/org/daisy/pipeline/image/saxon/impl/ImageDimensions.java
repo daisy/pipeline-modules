@@ -55,14 +55,12 @@ public class ImageDimensions extends ExtensionFunctionDefinition {
 			public Sequence call(XPathContext context, Sequence[] arguments)
 					throws XPathException {
 				try {
-					String path = ((StringValue) arguments[0])
-							.getStringValue();
-					BufferedImage image = ImageIO.read(new URL(URLDecoder
-							.decode(path)));
+					String path = arguments[0].head().getStringValue();
+					BufferedImage image = ImageIO.read(new URL(URLDecoder.decode(path)));
 					return new LazySequence(
-							new ArrayIterator (new IntegerValue[] {
-									new BigIntegerValue(image.getWidth()),
-									new BigIntegerValue(image.getHeight()) }));
+						new ArrayIterator (new IntegerValue[] {
+								new BigIntegerValue(image.getWidth()),
+								new BigIntegerValue(image.getHeight()) }));
 				} catch (Throwable e) {
 					throw new XPathException("Unexpected error in pf:image-dimensions", e);
 				}
@@ -70,6 +68,5 @@ public class ImageDimensions extends ExtensionFunctionDefinition {
 		};
 	}
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(ImageDimensions.class);
+	private static final Logger logger = LoggerFactory.getLogger(ImageDimensions.class);
 }

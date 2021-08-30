@@ -674,10 +674,10 @@
                     <p:input port="audio-map">
                         <p:pipe step="tts" port="audio-map"/>
                     </p:input>
-                    <p:with-option name="mediaoverlay-dir" select="resolve-uri('mo/',base-uri(/*))">
+                    <p:with-option name="mediaoverlay-dir" select="resolve-uri('mo/',base-uri(/))">
                         <p:pipe step="package-document" port="result"/>
                     </p:with-option>
-                    <p:with-option name="audio-dir" select="resolve-uri('audio/',base-uri(/*))">
+                    <p:with-option name="audio-dir" select="resolve-uri('audio/',base-uri(/))">
                         <p:pipe step="package-document" port="result"/>
                     </p:with-option>
                 </px:epub3-create-mediaoverlays>
@@ -830,7 +830,7 @@
                     </p:input>
                     <p:with-param name="content-media-types" select="$content-media-types"/>
                     <p:with-param name="braille-rendition.package-document.base"
-                                  select="resolve-uri('EPUB/package-braille.opf',base-uri(/*))">
+                                  select="resolve-uri('EPUB/package-braille.opf',base-uri(/))">
                         <p:pipe step="maybe-copy" port="fileset"/>
                     </p:with-param>
                 </p:xslt>
@@ -898,7 +898,7 @@
                         <p:pipe port="result" step="default-rendition.package-document"/>
                     </p:variable>
                     <px:message message="Generating $1" severity="INFO">
-                        <p:with-option name="param1" select="substring-after(base-uri(/*),'!/')"/>
+                        <p:with-option name="param1" select="substring-after(base-uri(/),'!/')"/>
                     </px:message>
                     <p:choose>
                         <p:when test="$apply-document-specific-stylesheets='true'">
@@ -947,7 +947,7 @@
                                             <link rel="stylesheet" type="text/css" media="embossed"/>
                                         </p:inline>
                                     </p:input>
-                                    <p:with-option name="attribute-value" select="replace(base-uri(/*),'^.*/(([^/]+)\.x?html|([^/]+))$','$2$3.css')"/>
+                                    <p:with-option name="attribute-value" select="replace(base-uri(/),'^.*/(([^/]+)\.x?html|([^/]+))$','$2$3.css')"/>
                                 </p:add-attribute>
                                 <!--
                                     assuming there is one and only one head element
@@ -1005,7 +1005,7 @@
                         <p:input port="source.fileset">
                             <p:pipe step="base" port="result"/>
                         </p:input>
-                        <p:with-option name="href" select="base-uri(/*)"/>
+                        <p:with-option name="href" select="base-uri(/)"/>
                         <p:with-option name="media-type" select="/c:result/@content-type"/> <!-- text/plain -->
                     </px:fileset-add-entry>
                 </p:for-each>
@@ -1155,7 +1155,7 @@
                         </p:input>
                     </p:insert>
                     <px:set-base-uri>
-                        <p:with-option name="base-uri" select="resolve-uri('META-INF/metadata.xml',base-uri(/*))">
+                        <p:with-option name="base-uri" select="resolve-uri('META-INF/metadata.xml',base-uri(/))">
                             <p:pipe step="maybe-copy" port="fileset"/>
                         </p:with-option>
                     </px:set-base-uri>
@@ -1189,7 +1189,8 @@
                         <p:iteration-source select="/*/d:file">
                             <p:pipe step="braille-rendition.process-html" port="html.fileset"/>
                         </p:iteration-source>
-                        <p:output port="result"/>
+                        <!-- added sequence="true" because xslt may return no document (why was this not a problem before?) -->
+                        <p:output port="result" sequence="true"/>
                         <p:variable name="braille-rendition.html.base" select="/d:file/resolve-uri(@href,base-uri(.))"/>
                         <p:variable name="default-rendition.html.base"
                                     select="//d:file[resolve-uri(@href,base-uri(.))=$braille-rendition.html.base]
@@ -1206,7 +1207,7 @@
                             </p:input>
                             <p:with-param name="default-rendition.html.base" select="$default-rendition.html.base"/>
                             <p:with-param name="braille-rendition.html.base" select="$braille-rendition.html.base"/>
-                            <p:with-param name="rendition-mapping.base" select="resolve-uri('EPUB/renditionMapping.html',base-uri(/*))">
+                            <p:with-param name="rendition-mapping.base" select="resolve-uri('EPUB/renditionMapping.html',base-uri(/))">
                                 <p:pipe step="maybe-copy" port="fileset"/>
                             </p:with-param>
                         </p:xslt>
@@ -1229,7 +1230,7 @@
                         </p:input>
                     </p:insert>
                     <px:set-base-uri>
-                        <p:with-option name="base-uri" select="resolve-uri('EPUB/renditionMapping.html',base-uri(/*))">
+                        <p:with-option name="base-uri" select="resolve-uri('EPUB/renditionMapping.html',base-uri(/))">
                             <p:pipe step="maybe-copy" port="fileset"/>
                         </p:with-option>
                     </px:set-base-uri>
@@ -1260,14 +1261,14 @@
                     </p:input>
                 </px:fileset-update>
                 <p:sink/>
-                <px:fileset-load name="original-container">
+                <px:fileset-load name="original-container" fail-on-not-found="true">
                     <p:input port="fileset">
                         <p:pipe step="add-rendition-mapping" port="fileset"/>
                     </p:input>
                     <p:input port="in-memory">
                         <p:pipe step="add-rendition-mapping" port="in-memory"/>
                     </p:input>
-                    <p:with-option name="href" select="resolve-uri('META-INF/container.xml',base-uri(/*))">
+                    <p:with-option name="href" select="resolve-uri('META-INF/container.xml',base-uri(/))">
                         <p:pipe step="maybe-copy" port="fileset"/>
                     </p:with-option>
                 </px:fileset-load>
@@ -1303,7 +1304,7 @@
                         </p:input>
                     </p:insert>
                     <px:set-base-uri>
-                        <p:with-option name="base-uri" select="base-uri(/*)">
+                        <p:with-option name="base-uri" select="base-uri(/)">
                             <p:pipe step="original-container" port="result"/>
                         </p:with-option>
                     </px:set-base-uri>

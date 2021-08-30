@@ -257,7 +257,7 @@
     </x:context>
     <x:expect label="The stored file" type="compare">
       <x:document type="inline" xml:space="preserve"><body xmlns="http://www.w3.org/ns/xproc-step">&lt;?xml version="1.0" encoding="bar"?&gt;&lt;!DOCTYPE foo&gt;
-&lt;root xmlns:px="http://www.daisy.org/ns/pipeline/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal" xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns:x="http://www.daisy.org/ns/xprocspec" xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:dpx="http://www.daisy.org/ns/pipeline/xproc"&gt;
+&lt;root xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:dpx="http://www.daisy.org/ns/pipeline/xproc" xmlns:px="http://www.daisy.org/ns/pipeline/xproc" xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal" xmlns:x="http://www.daisy.org/ns/xprocspec"&gt;
 	&lt;node&gt;
 	&lt;/node&gt;
 &lt;/root&gt;</body></x:document>
@@ -412,7 +412,7 @@
       <x:document type="file" base-uri="temp-dir" href="8/c.zip!/e.xml" method="text"/>
     </x:context>
     <x:expect label="The stored file" type="compare">
-      <x:document type="inline" xml:space="preserve"><body xmlns="http://www.w3.org/ns/xproc-step">&lt;?xml version="1.0" encoding="us-ascii"?&gt;&lt;root xmlns:px="http://www.daisy.org/ns/pipeline/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal" xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns:x="http://www.daisy.org/ns/xprocspec" xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:dpx="http://www.daisy.org/ns/pipeline/xproc"&gt;
+      <x:document type="inline" xml:space="preserve"><body xmlns="http://www.w3.org/ns/xproc-step">&lt;?xml version="1.0" encoding="us-ascii"?&gt;&lt;root xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:dpx="http://www.daisy.org/ns/pipeline/xproc" xmlns:px="http://www.daisy.org/ns/pipeline/xproc" xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal" xmlns:x="http://www.daisy.org/ns/xprocspec"&gt;
 	&lt;node&gt;
 	&lt;/node&gt;
 &lt;/root&gt;</body></x:document>
@@ -475,7 +475,7 @@
     </x:context>
     <x:expect label="The stored file" type="compare">
       <x:document type="inline" xml:space="preserve"><body xmlns="http://www.w3.org/ns/xproc-step">&lt;!DOCTYPE foo&gt;
-&lt;root xmlns:px="http://www.daisy.org/ns/pipeline/xproc" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal" xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns:x="http://www.daisy.org/ns/xprocspec" xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:dpx="http://www.daisy.org/ns/pipeline/xproc"&gt;
+&lt;root xmlns:c="http://www.w3.org/ns/xproc-step" xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns:d="http://www.daisy.org/ns/pipeline/data" xmlns:dpx="http://www.daisy.org/ns/pipeline/xproc" xmlns:px="http://www.daisy.org/ns/pipeline/xproc" xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal" xmlns:x="http://www.daisy.org/ns/xprocspec"&gt;
 	&lt;node&gt;
 	&lt;/node&gt;
 &lt;/root&gt;</body></x:document>

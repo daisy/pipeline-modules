@@ -5,6 +5,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
 
+import com.xmlcalabash.util.TreeWriter;
+import com.xmlcalabash.util.TypeUtils;
+
+import net.sf.saxon.om.EmptyAttributeMap;
 import net.sf.saxon.s9api.Axis;
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.QName;
@@ -12,12 +16,13 @@ import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 
 import org.custommonkey.xmlunit.Diff;
+
 import org.daisy.pipeline.tts.SSMLMarkSplitter.Chunk;
+
 import org.junit.Assert;
 import org.junit.Test;
-import org.xml.sax.SAXException;
 
-import com.xmlcalabash.util.TreeWriter;
+import org.xml.sax.SAXException;
 
 public class StructuredMarkSplitterTest {
 	static Processor Proc = new Processor(false);
@@ -27,7 +32,6 @@ public class StructuredMarkSplitterTest {
 	private static TreeWriter newTreeWriter() throws URISyntaxException {
 		TreeWriter tw = new TreeWriter(Proc);
 		tw.startDocument(new URI("http://test"));
-		tw.startContent();
 		tw.addStartElement(new QName(SsmlNs, "s"));
 		return tw;
 	}
@@ -67,8 +71,9 @@ public class StructuredMarkSplitterTest {
 		source.addText("text1");
 		source.addEndElement();
 		
-		source.addStartElement(new QName(SsmlNs, "mark"));
-		source.addAttribute(new QName("name"), markname);
+		source.addStartElement(new QName(SsmlNs, "mark"),
+		                       EmptyAttributeMap.getInstance()
+		                                        .put(TypeUtils.attributeInfo(new QName(null, "name"), markname)));
 		source.addEndElement();
 		
 		source.addStartElement(new QName("b"));
@@ -108,8 +113,9 @@ public class StructuredMarkSplitterTest {
 
 		//input
 		TreeWriter source = newTreeWriter();
-		source.addStartElement(new QName(SsmlNs, "mark"));
-		source.addAttribute(new QName("name"), markname);
+		source.addStartElement(new QName(SsmlNs, "mark"),
+		                       EmptyAttributeMap.getInstance()
+		                                        .put(TypeUtils.attributeInfo(new QName(null, "name"), markname)));
 		source.addEndElement();
 	
 		//expected chunks
@@ -141,8 +147,9 @@ public class StructuredMarkSplitterTest {
 		//input
 		TreeWriter source = newTreeWriter();
 		source.addText("text1");
-		source.addStartElement(new QName(SsmlNs, "mark"));
-		source.addAttribute(new QName("name"), markname);
+		source.addStartElement(new QName(SsmlNs, "mark"),
+		                       EmptyAttributeMap.getInstance()
+		                                        .put(TypeUtils.attributeInfo(new QName(null, "name"), markname)));
 		source.addEndElement();
 		source.addText("text2");
 
@@ -179,16 +186,18 @@ public class StructuredMarkSplitterTest {
 		source.addText("text1");
 		source.addEndElement();
 
-		source.addStartElement(new QName(SsmlNs, "mark"));
-		source.addAttribute(new QName("name"), markname1);
+		source.addStartElement(new QName(SsmlNs, "mark"),
+		                       EmptyAttributeMap.getInstance()
+		                                        .put(TypeUtils.attributeInfo(new QName(null, "name"), markname1)));
 		source.addEndElement();
 
 		source.addStartElement(new QName("b"));
 		source.addText("text2");
 		source.addEndElement();
 
-		source.addStartElement(new QName(SsmlNs, "mark"));
-		source.addAttribute(new QName("name"), markname2);
+		source.addStartElement(new QName(SsmlNs, "mark"),
+		                       EmptyAttributeMap.getInstance()
+		                                        .put(TypeUtils.attributeInfo(new QName(null, "name"), markname2)));
 		source.addEndElement();
 
 		source.addStartElement(new QName("c"));

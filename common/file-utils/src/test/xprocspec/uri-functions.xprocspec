@@ -204,13 +204,11 @@
 			    ===========================================
 			    foo-3.xml: base URI set with p:set-base-uri
 			    ===========================================
-			    * document-uri() does not work, also not on a document node
-			    * base-uri() works in simple cases but not if descendant axis is used
-			    * base-uri(root()) does not work
+			    * document-uri() on an element does not work
 			-->
 			<x:document type="inline">
 				<_>
-					<test expression="   document-uri(.)"       value=""/>
+					<test expression="   document-uri(.)"       value="foo-3.xml"/>
 					<test expression="pf:document-uri(.)"       value="foo-3.xml"/>
 					<test expression="   document-uri(/*)"      value=""/>
 					<test expression="pf:document-uri(/*)"      value="foo-3.xml"/>
@@ -224,11 +222,11 @@
 					<test expression="pf:base-uri(/*/*[1])"     value="foo-3.xml"/>
 					<test expression="   base-uri((/*/*)[1])"   value="foo-3.xml"/>
 					<test expression="pf:base-uri((/*/*)[1])"   value="foo-3.xml"/>
-					<test expression="   base-uri((//*)[1])"    value=""/>
+					<test expression="   base-uri((//*)[1])"    value="foo-3.xml"/>
 					<test expression="pf:base-uri((//*)[1])"    value="foo-3.xml"/>
 					<foo>
 						<bar>
-							<test expression="   base-uri(root())" value=""/>
+							<test expression="   base-uri(root())" value="foo-3.xml"/>
 							<test expression="pf:base-uri(root())" value="foo-3.xml"/>
 							<test expression="   base-uri(.)"      value="foo-3.xml"/>
 							<test expression="pf:base-uri(.)"      value="foo-3.xml"/>
@@ -236,9 +234,9 @@
 						</bar>
 					</foo>
 					<bar>
-						<test expression="   base-uri(root())" value=""/>
+						<test expression="   base-uri(root())" value="foo-3.xml"/>
 						<test expression="pf:base-uri(root())" value="foo-3.xml"/>
-						<test expression="   base-uri(.)"      value=""/>
+						<test expression="   base-uri(.)"      value="foo-3.xml"/>
 						<test expression="pf:base-uri(.)"      value="foo-3.xml"/>
 						<quux/>
 					</bar>
@@ -249,8 +247,6 @@
 			    foo-4.xml: document from within XSLT itself
 			    ===========================================
 			    * document-uri() does not work, also not on a document node
-			    * base-uri() works in simple cases but not if descendant axis is used
-			    * base-uri(root()) does not work
 			    * pf:* functions do not work
 			-->
 			<x:document type="inline">
@@ -269,11 +265,11 @@
 					<test expression="pf:base-uri(/*/*[1])"     value=""/>
 					<test expression="   base-uri((/*/*)[1])"   value="foo-4.xml"/>
 					<test expression="pf:base-uri((/*/*)[1])"   value=""/>
-					<test expression="   base-uri((//*)[1])"    value=""/>
+					<test expression="   base-uri((//*)[1])"    value="foo-4.xml"/>
 					<test expression="pf:base-uri((//*)[1])"    value=""/>
 					<foo>
 						<bar>
-							<test expression="   base-uri(root())" value=""/>
+							<test expression="   base-uri(root())" value="foo-4.xml"/>
 							<test expression="pf:base-uri(root())" value=""/>
 							<test expression="   base-uri(.)"      value="foo-4.xml"/>
 							<test expression="pf:base-uri(.)"      value=""/>
@@ -281,9 +277,9 @@
 						</bar>
 					</foo>
 					<bar>
-						<test expression="   base-uri(root())" value=""/>
+						<test expression="   base-uri(root())" value="foo-4.xml"/>
 						<test expression="pf:base-uri(root())" value=""/>
-						<test expression="   base-uri(.)"      value=""/>
+						<test expression="   base-uri(.)"      value="foo-4.xml"/>
 						<test expression="pf:base-uri(.)"      value=""/>
 						<quux/>
 					</bar>

@@ -11,10 +11,10 @@
 
 	<xsl:template match="/">
 		<html>
-			<xsl:sequence select="(collection()/html)[1]/(@lang|@xml:lang)"/>
-			<xsl:sequence select="(collection()/html)[1]/head"/>
+			<xsl:sequence select="collection()[/html][1]/html/(@lang|@xml:lang)"/>
+			<xsl:sequence select="collection()[/html][1]/html/head"/>
 			<xsl:call-template name="merge-sections">
-				<xsl:with-param name="content" select="collection()/html/body"/>
+				<xsl:with-param name="content" select="for $doc in collection() return $doc/html/body"/>
 			</xsl:call-template>
 		</html>
 	</xsl:template>
@@ -33,7 +33,7 @@
 			                                                              self::text()[normalize-space(.)=''])">
 				<xsl:choose>
 					<xsl:when test="current-grouping-key()">
-						<xsl:variable name="sections" select="current-group()/self::*"/>
+						<xsl:variable name="sections" select="current-group()[self::*]"/>
 						<xsl:for-each-group select="current-group()" group-ending-with="*">
 							<xsl:variable name="i" select="position()"/>
 							<xsl:choose>
@@ -51,7 +51,8 @@
 										    * not referenced
 										    * same attributes (except id)
 										-->
-										<xsl:when test="collection()//d:section[@owner=$sections[$i]/@id][not(@heading|preceding::d:section)]
+										<xsl:when test="(some $doc in collection()[/d:outline] satisfies
+										                   exists($doc//d:section[@owner=$sections[$i]/@id][not(@heading|preceding::d:section)]))
 										                and name($sections[$i])=name($sections[$i - 1])
 										                and not($sections[$i]/@id[.=$idrefs])
 										                and count($attrs)=count($prev-attrs)

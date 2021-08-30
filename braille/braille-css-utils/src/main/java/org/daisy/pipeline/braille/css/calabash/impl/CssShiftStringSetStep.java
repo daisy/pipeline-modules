@@ -70,9 +70,13 @@ public class CssShiftStringSetStep extends DefaultStep implements XProcStep {
 	private WritablePipe resultPipe = null;
 	
 	private static final String XMLNS_CSS = "http://www.daisy.org/ns/pipeline/braille-css";
-	private static final QName CSS_STRING_SET = new QName(XMLNS_CSS, "string-set");
-	private static final QName CSS_BOX = new QName(XMLNS_CSS, "box");
-	private static final QName CSS__ = new QName(XMLNS_CSS, "_");
+	// Specifying a prefix should normally not be needed, but possibly there is a bug in
+	// StreamWriterToReceiver. Note that Saxon should take care of resolving collisions if
+	// necessary.
+	private static final String PREFIX_CSS = "css";
+	private static final QName CSS_STRING_SET = new QName(XMLNS_CSS, "string-set", PREFIX_CSS);
+	private static final QName CSS_BOX = new QName(XMLNS_CSS, "box", PREFIX_CSS);
+	private static final QName CSS__ = new QName(XMLNS_CSS, "_", PREFIX_CSS);
 	private static final QName _TYPE = new QName("type");
 	
 	private CssShiftStringSetStep(XProcRuntime runtime, XAtomicStep step) {

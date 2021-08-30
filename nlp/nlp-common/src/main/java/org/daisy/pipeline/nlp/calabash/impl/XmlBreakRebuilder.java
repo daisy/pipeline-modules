@@ -6,6 +6,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import com.xmlcalabash.util.TreeWriter;
+import com.xmlcalabash.util.TypeUtils;
+
+import net.sf.saxon.om.AttributeMap;
+import net.sf.saxon.om.EmptyAttributeMap;
+import net.sf.saxon.om.FingerprintedQName;
+import net.sf.saxon.om.NamespaceMap;
 import net.sf.saxon.om.NodeInfo;
 import net.sf.saxon.s9api.Axis;
 import net.sf.saxon.s9api.QName;
@@ -19,8 +26,6 @@ import org.daisy.pipeline.nlp.calabash.impl.StringComposer.TextPointer;
 import org.daisy.pipeline.nlp.lexing.LexService.LexerInitException;
 import org.daisy.pipeline.nlp.lexing.LexService.LexerToken;
 import org.daisy.pipeline.nlp.lexing.LexService.Sentence;
-
-import com.xmlcalabash.util.TreeWriter;
 
 /**
  * This class is used for rebuilding the input document with the additional XML
@@ -83,15 +88,20 @@ public class XmlBreakRebuilder implements InlineSectionProcessor {
 
 					XdmNode root = n;
 					mPreviousNode = root;
-					mTreeWriter.addStartElement(root);
-					mTreeWriter.addAttributes(root);
+					NamespaceMap nsmap = root.getUnderlyingNode().getAllNamespaces();
 					if (!"".equals(mSpecs.wordTag.getPrefix()))
-						mTreeWriter.addNamespace(mSpecs.wordTag.getPrefix(),
-						                         mSpecs.wordTag.getNamespaceURI());
+						nsmap = nsmap.put(mSpecs.wordTag.getPrefix(),
+						                  mSpecs.wordTag.getNamespaceURI());
 					if (!"".equals(mSpecs.sentenceTag.getPrefix()))
-						mTreeWriter.addNamespace(mSpecs.sentenceTag.getPrefix(),
-						                         mSpecs.sentenceTag.getNamespaceURI());
-
+						nsmap = nsmap.put(mSpecs.sentenceTag.getPrefix(),
+						                  mSpecs.sentenceTag.getNamespaceURI());
+					mTreeWriter.addStartElement(new FingerprintedQName(root.getNodeName().getPrefix(),
+					                                                   root.getNodeName().getNamespaceURI(),
+					                                                   root.getNodeName().getLocalName()),
+					                            root.getUnderlyingNode().attributes(),
+					                            root.getUnderlyingNode().getSchemaType(),
+					                            nsmap,
+					                            root.getBaseURI());
 					new InlineSectionFinder().find(root, mPreviousLevel, specs, this,
 					        unsplittable);
 					closeAllElementsUntil(root, 0);
@@ -232,7 +242,6 @@ public class XmlBreakRebuilder implements InlineSectionProcessor {
 		case ELEMENT:
 			mDuplicationManager.onNewNode(node, level);
 			mTreeWriter.addStartElement(node);
-			mTreeWriter.addAttributes(node);
 			mPreviousLevel = level;
 			mPreviousNode = node;
 			break;
@@ -290,12 +299,13 @@ public class XmlBreakRebuilder implements InlineSectionProcessor {
 		}
 
 		//*** Create the element ***
-		mTreeWriter.addStartElement(elementToWrite);
+		AttributeMap attrs = EmptyAttributeMap.getInstance();
 		if (mCurrentLang != null) {
 			//the lang attribute will be dispatched later when the format-compliant
 			//elements will be created.
-			mTreeWriter.addAttribute(mSpecs.langAttr, mCurrentLang);
+			attrs = attrs.put(TypeUtils.attributeInfo(mSpecs.langAttr, mCurrentLang));
 		}
+		mTreeWriter.addStartElement(elementToWrite, attrs);
 		mPreviousLevel = wordOrsentenceParent.level;
 	}
 

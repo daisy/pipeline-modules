@@ -9,9 +9,7 @@
 
     <xsl:template name="main">
         <!-- because collection()/* can apparently change the order (bug?) -->
-        <xsl:variable name="filesets" as="element(d:fileset)*">
-            <xsl:apply-templates mode="sequence" select="collection()"/>
-        </xsl:variable>
+        <xsl:variable name="filesets" as="element(d:fileset)*" select="for $d in collection() return $d/*"/>
         <xsl:call-template name="join">
             <xsl:with-param name="filesets" select="$filesets"/>
         </xsl:call-template>
@@ -55,10 +53,6 @@
         <xsl:copy>
             <xsl:apply-templates mode="#current" select="@*|node()"/>
         </xsl:copy>
-    </xsl:template>
-
-    <xsl:template mode="sequence" match="/">
-        <xsl:copy-of select="/*"/>
     </xsl:template>
 
 </xsl:stylesheet>

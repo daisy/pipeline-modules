@@ -7,7 +7,6 @@ import java.util.NoSuchElementException;
 import net.sf.saxon.expr.XPathContext;
 import net.sf.saxon.lib.ExtensionFunctionCall;
 import net.sf.saxon.lib.ExtensionFunctionDefinition;
-import net.sf.saxon.om.AtomicSequence;
 import net.sf.saxon.om.Sequence;
 import net.sf.saxon.om.StructuredQName;
 import net.sf.saxon.trans.XPathException;
@@ -85,8 +84,8 @@ public class DecodeDefinition extends ExtensionFunctionDefinition {
 		return new ExtensionFunctionCall() {
 			public Sequence call(XPathContext context, Sequence[] arguments) throws XPathException {
 				try {
-					Query tableQuery = query(((AtomicSequence)arguments[0]).getStringValue());
-					String text = ((AtomicSequence)arguments[1]).getStringValue();
+					Query tableQuery = query(arguments[0].head().getStringValue());
+					String text = arguments[1].head().getStringValue();
 					Table table;
 					try {
 						table = tableRegistry.get(tableQuery).iterator().next(); }

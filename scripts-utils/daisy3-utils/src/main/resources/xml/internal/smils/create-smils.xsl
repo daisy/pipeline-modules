@@ -13,7 +13,7 @@
   <xsl:param name="uid"/>
   <xsl:param name="audio-only"/>
 
-  <xsl:variable name="content-doc-uri" select="base-uri(/*)"/>
+  <xsl:variable name="content-doc-uri" select="base-uri(/)"/>
   <xsl:variable name="content-doc-rel" select="pf:relativize-uri($content-doc-uri, $mo-dir)"/>
   <xsl:variable name="ref-targets" select="' note annotation '"/>
 
@@ -32,7 +32,7 @@
   <!-- d:audio-clips document with @src attributes relativized against $mo-dir -->
   <xsl:variable name="audio-map">
     <xsl:variable name="audio-map" select="collection()[/d:audio-clips]"/>
-    <xsl:variable name="audio-map-uri" select="base-uri($audio-map/*)"/>
+    <xsl:variable name="audio-map-uri" select="base-uri($audio-map)"/>
     <xsl:for-each select="$audio-map/*">
       <xsl:copy>
         <xsl:for-each-group select="*" group-by="@src">

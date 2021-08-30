@@ -460,8 +460,8 @@ class Chunker extends SingleInSingleOutXMLTransformer {
 			public Integer apply(XdmNode node) {
 				int bytesSeen = 0;
 				if (node.getNodeKind() == XdmNodeKind.DOCUMENT) {
-					for (XdmItem i : SaxonHelper.axisIterable(node, Axis.CHILD))
-						bytesSeen += apply((XdmNode)i);
+					for (XdmNode n : SaxonHelper.axisIterable(node, Axis.CHILD))
+						bytesSeen += apply(n);
 				} else if (node.getNodeKind() == XdmNodeKind.ELEMENT) {
 					if (!currentPath.isRoot())
 						currentPath.nextElement();
@@ -483,8 +483,8 @@ class Chunker extends SingleInSingleOutXMLTransformer {
 							              propagate(node, currentPath, BreakPosition.Side.BEFORE, BreakOpportunity.Weight.ALLOW,
 							                        bytesSeen, propagate));
 					currentPath.down();
-					for (XdmItem i : SaxonHelper.axisIterable(node, Axis.CHILD))
-						bytesSeen += apply((XdmNode)i);
+					for (XdmNode n : SaxonHelper.axisIterable(node, Axis.CHILD))
+						bytesSeen += apply(n);
 					currentPath.up();
 					if (!currentPath.isRoot())
 						if (alwaysBreakAfter.test(node))
@@ -543,9 +543,8 @@ class Chunker extends SingleInSingleOutXMLTransformer {
 	}
 	
 	static boolean shouldPropagateBreak(XdmNode element, BreakPosition.Side side) {
-		for (XdmItem i : SaxonHelper.axisIterable(element, side == BreakPosition.Side.BEFORE ? Axis.PRECEDING_SIBLING
+		for (XdmNode n : SaxonHelper.axisIterable(element, side == BreakPosition.Side.BEFORE ? Axis.PRECEDING_SIBLING
 		                                                                                     : Axis.FOLLOWING_SIBLING)) {
-			XdmNode n = (XdmNode)i;
 			if (n.getNodeKind() == XdmNodeKind.ELEMENT)
 				return false;
 			else if (n.getNodeKind() == XdmNodeKind.TEXT && !isWhiteSpaceNode(n))
@@ -556,9 +555,8 @@ class Chunker extends SingleInSingleOutXMLTransformer {
 	
 	static int skipWhiteSpaceNodes(XdmNode element, BreakPosition.Side side, Path.Builder path) {
 		int bytesSkipped = 0;
-		for (XdmItem i : SaxonHelper.axisIterable(element, side == BreakPosition.Side.BEFORE ? Axis.PRECEDING_SIBLING
+		for (XdmNode n : SaxonHelper.axisIterable(element, side == BreakPosition.Side.BEFORE ? Axis.PRECEDING_SIBLING
 		                                                                                     : Axis.FOLLOWING_SIBLING)) {
-			XdmNode n = (XdmNode)i;
 			if (n.getNodeKind() == XdmNodeKind.ELEMENT) {
 				if (side == BreakPosition.Side.AFTER)
 					path.inc();

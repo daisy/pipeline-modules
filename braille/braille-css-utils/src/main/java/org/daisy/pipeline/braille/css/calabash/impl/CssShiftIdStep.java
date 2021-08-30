@@ -67,15 +67,19 @@ public class CssShiftIdStep extends DefaultStep implements XProcStep {
 	private WritablePipe resultPipe = null;
 	
 	private static final String XMLNS_CSS = "http://www.daisy.org/ns/pipeline/braille-css";
-	private static final QName CSS_ID = new QName(XMLNS_CSS, "id");
-	private static final QName CSS_BOX = new QName(XMLNS_CSS, "box");
-	private static final QName CSS__ = new QName(XMLNS_CSS, "_");
+	// Specifying a prefix should normally not be needed, but possibly there is a bug in
+	// StreamWriterToReceiver. Note that Saxon should take care of resolving collisions if
+	// necessary.
+	private static final String PREFIX_CSS = "css";
+	private static final QName CSS_ID = new QName(XMLNS_CSS, "id", PREFIX_CSS);
+	private static final QName CSS_BOX = new QName(XMLNS_CSS, "box", PREFIX_CSS);
+	private static final QName CSS__ = new QName(XMLNS_CSS, "_", PREFIX_CSS);
 	private static final QName _TYPE = new QName("type");
-	private static final QName CSS_COUNTER = new QName(XMLNS_CSS, "counter");
+	private static final QName CSS_COUNTER = new QName(XMLNS_CSS, "counter", PREFIX_CSS);
 	private static final QName _NAME = new QName("name");
 	private static final QName _TARGET = new QName("target");
-	private static final QName CSS_ANCHOR = new QName(XMLNS_CSS, "anchor");
-	private static final QName CSS_FLOW = new QName(XMLNS_CSS, "flow");
+	private static final QName CSS_ANCHOR = new QName(XMLNS_CSS, "anchor", PREFIX_CSS);
+	private static final QName CSS_FLOW = new QName(XMLNS_CSS, "flow", PREFIX_CSS);
 	
 	private CssShiftIdStep(XProcRuntime runtime, XAtomicStep step) {
 		super(runtime, step);

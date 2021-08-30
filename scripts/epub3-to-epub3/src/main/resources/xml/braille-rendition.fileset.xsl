@@ -13,10 +13,12 @@
 	<xsl:variable name="_content-media-types" as="xs:string*" select="tokenize($content-media-types,'\s+')[not(.='')]"/>
 	
 	<xsl:template match="/">
-		<d:fileset>
-			<d:file href="{$braille-rendition.package-document.base}" original-href="{base-uri(/*)}"/>
-			<xsl:apply-templates select="//opf:manifest/opf:item"/>
-		</d:fileset>
+		<xsl:copy>
+			<d:fileset>
+				<d:file href="{$braille-rendition.package-document.base}" original-href="{base-uri(/*)}"/>
+				<xsl:apply-templates select="//opf:manifest/opf:item"/>
+			</d:fileset>
+		</xsl:copy>
 	</xsl:template>
 	
 	<xsl:template match="opf:manifest/opf:item">

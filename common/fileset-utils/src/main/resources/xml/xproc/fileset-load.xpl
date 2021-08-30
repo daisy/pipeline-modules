@@ -136,7 +136,7 @@
               <p:input port="source">
                 <p:pipe port="in-memory" step="normalized"/>
               </p:input>
-              <p:with-option name="test" select="concat('base-uri(/*)=&quot;',$target,'&quot;')">
+              <p:with-option name="test" select="concat('base-uri(/)=&quot;',$target,'&quot;')">
                 <p:empty/>
               </p:with-option>
             </p:split-sequence>
@@ -417,12 +417,12 @@
 
   <!-- URI normalization -->
   <px:fileset-create>
-    <p:with-option name="base" select="base-uri(/*)">
+    <p:with-option name="base" select="base-uri(/)">
       <p:pipe port="fileset" step="main"/>
     </p:with-option>
   </px:fileset-create>
   <px:message severity="DEBUG" message="Initialized in-memory fileset with xml:base=&quot;$1&quot;">
-    <p:with-option name="param1" select="base-uri(/*)"/>
+    <p:with-option name="param1" select="base-uri(/)"/>
   </px:message>
   <p:identity name="fileset.in-memory-base"/>
   <p:sink/>
@@ -442,7 +442,7 @@
         - Normalize URI (e.g. "file:///" to "file:/")
     -->
     <px:normalize-uri name="normalize-uri">
-      <p:with-option name="href" select="resolve-uri(base-uri(/*))"/>
+      <p:with-option name="href" select="resolve-uri(base-uri(/))"/>
     </px:normalize-uri>
     <p:group name="normalized.group">
       <p:output port="in-memory" sequence="true">
@@ -454,7 +454,7 @@
       <p:variable name="base-uri" select="string(/*)">
         <p:pipe step="normalize-uri" port="normalized"/>
       </p:variable>
-      <p:variable name="base-uri-changed" cx:as="xs:string" select="not($base-uri=base-uri(/))"/>
+      <p:variable name="orig-base-uri" cx:as="xs:string" select="base-uri(/)"/>
   
       <px:fileset-add-entry name="normalized.fileset">
         <p:with-option name="href" select="$base-uri"/>
@@ -470,7 +470,7 @@
             computed based on the xml:base attribute.
         -->
         <p:when test="/d:fileset/d:file/resolve-uri(@href, base-uri()) != $base-uri
-                      or $base-uri-changed='true'">
+                      or not($base-uri=$orig-base-uri)">
           <px:set-base-uri>
             <p:input port="source">
               <p:pipe port="current" step="normalized"/>

@@ -436,7 +436,7 @@
                 </px:message>
                 <p:split-sequence>
                     <p:with-option name="test"
-                        select="concat('base-uri(/*)=&quot;',$target,'&quot;')"/>
+                        select="concat('base-uri(/)=&quot;',$target,'&quot;')"/>
                     <p:input port="source">
                         <p:pipe step="fix" port="result.in-memory"/>
                     </p:input>

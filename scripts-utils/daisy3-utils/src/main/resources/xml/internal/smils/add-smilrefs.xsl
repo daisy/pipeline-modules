@@ -16,7 +16,7 @@
   <xsl:param name="no-smilref"/>
   <xsl:param name="mo-dir"/>
 
-  <xsl:variable name="mo-dir-rel" select="pf:relativize-uri($mo-dir, base-uri(/*))"/>
+  <xsl:variable name="mo-dir-rel" select="pf:relativize-uri($mo-dir, base-uri(/))"/>
 
   <xsl:key name="struct" match="*[@node]" use="@node"/>
   <xsl:key name="clips" match="*[@idref]" use="@idref"/>

@@ -7,6 +7,11 @@ import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.xmlcalabash.util.TreeWriter;
+import com.xmlcalabash.util.TypeUtils;
+
+import net.sf.saxon.om.AttributeMap;
+import net.sf.saxon.om.EmptyAttributeMap;
 import net.sf.saxon.s9api.Axis;
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.QName;
@@ -15,12 +20,12 @@ import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.common.xslt.ThreadUnsafeXslTransformer;
 import org.daisy.common.xslt.XslTransformCompiler;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.xml.sax.SAXException;
 
-import com.xmlcalabash.util.TreeWriter;
+import org.xml.sax.SAXException;
 
 public class EspeakSSMLTest {
 
@@ -43,11 +48,11 @@ public class EspeakSSMLTest {
 
 		TreeWriter tw = new TreeWriter(Proc);
 		tw.startDocument(new URI("http://test"));
-		tw.startContent();
 		tw.addStartElement(new QName(SsmlNs, "speak"));
 		tw.addStartElement(new QName(SsmlNs, "s"));
-		tw.addStartElement(new QName(SsmlNs, "y"));
-		tw.addAttribute(new QName(null, "attr"), "attr-val");
+		AttributeMap attrs = EmptyAttributeMap.getInstance()
+			.put(TypeUtils.attributeInfo(new QName(null, "attr"), "attr-val"));
+		tw.addStartElement(new QName(SsmlNs, "y"), attrs);
 		tw.addEndElement();
 		tw.addText("this is text");
 		tw.addEndElement();
@@ -72,10 +77,10 @@ public class EspeakSSMLTest {
 
 		TreeWriter tw = new TreeWriter(Proc);
 		tw.startDocument(new URI("http://test"));
-		tw.startContent();
 		tw.addStartElement(new QName(SsmlNs, "s"));
-		tw.addStartElement(new QName(SsmlNs, "y"));
-		tw.addAttribute(new QName(null, "attr"), "attr-val");
+		AttributeMap attrs = EmptyAttributeMap.getInstance()
+			.put(TypeUtils.attributeInfo(new QName(null, "attr"), "attr-val"));
+		tw.addStartElement(new QName(SsmlNs, "y"), attrs);
 		tw.addEndElement();
 		tw.addText("this is text");
 		tw.addEndElement();
@@ -101,11 +106,11 @@ public class EspeakSSMLTest {
 
 		TreeWriter tw = new TreeWriter(Proc);
 		tw.startDocument(new URI("http://test"));
-		tw.startContent();
 		tw.addStartElement(new QName(SsmlNs, "speak"));
 		tw.addStartElement(new QName(SsmlNs, "s"));
-		tw.addStartElement(new QName(SsmlNs, "y"));
-		tw.addAttribute(new QName(null, "attr"), "attr-val");
+		AttributeMap attrs = EmptyAttributeMap.getInstance()
+			.put(TypeUtils.attributeInfo(new QName(null, "attr"), "attr-val"));
+		tw.addStartElement(new QName(SsmlNs, "y"), attrs);
 		tw.addEndElement();
 		tw.addText("this is text");
 		tw.addEndElement();

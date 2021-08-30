@@ -153,7 +153,7 @@
                 <p:input port="source">
                     <p:pipe step="smils" port="result"/>
                 </p:input>
-                <p:with-option name="output-base-uri" select="base-uri(/*)">
+                <p:with-option name="output-base-uri" select="base-uri(/)">
                     <p:pipe step="source.fileset" port="result"/>
                 </p:with-option>
             </px:smil-to-audio-clips>

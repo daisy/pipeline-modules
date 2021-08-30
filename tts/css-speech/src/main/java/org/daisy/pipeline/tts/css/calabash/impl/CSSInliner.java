@@ -9,11 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.saxon.dom.DocumentOverNodeInfo;
-import net.sf.saxon.s9api.QName;
-import net.sf.saxon.s9api.XdmNode;
-
 import com.xmlcalabash.util.TreeWriter;
+import com.xmlcalabash.util.TypeUtils;
 
 import cz.vutbr.web.css.CSSProperty.Content;
 import cz.vutbr.web.css.NodeData;
@@ -24,6 +21,13 @@ import cz.vutbr.web.css.TermIdent;
 import cz.vutbr.web.css.TermList;
 import cz.vutbr.web.css.TermString;
 import cz.vutbr.web.domassign.StyleMap;
+
+import net.sf.saxon.dom.DocumentOverNodeInfo;
+import net.sf.saxon.om.AttributeMap;
+import net.sf.saxon.om.EmptyAttributeMap;
+import net.sf.saxon.om.NamespaceMap;
+import net.sf.saxon.s9api.QName;
+import net.sf.saxon.s9api.XdmNode;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -127,15 +131,12 @@ public class CSSInliner {
 			        .getNextSibling())
 				rebuildRec(child);
 		} else if (node.getNodeType() == Node.ELEMENT_NODE) {
-			if (node.getNamespaceURI() == null || node.getNamespaceURI().isEmpty())
-				mTreeWriter.addStartElement(new QName(null, node.getLocalName()));
-			else
-				mTreeWriter.addStartElement(new QName(mPrefixes.get(node.getNamespaceURI()),
-				        node.getNamespaceURI(), node.getLocalName()));
+			NamespaceMap nsmap = NamespaceMap.emptyMap();
+			AttributeMap amap = EmptyAttributeMap.getInstance();
 
 			if (mFirst) {
 				for (Map.Entry<String, String> ns : mPrefixes.entrySet()) {
-					mTreeWriter.addNamespace(ns.getValue(), ns.getKey());
+					nsmap = nsmap.put(ns.getValue(), ns.getKey());
 				}
 				mFirst = false;
 			}
@@ -145,12 +146,12 @@ public class CSSInliner {
 				Node attr = attributes.item(i);
 				if (attr.getNamespaceURI() != null && !attr.getNamespaceURI().isEmpty()) {
 					if (!attr.getNamespaceURI().equals(xmlns))
-						mTreeWriter.addAttribute(new QName(mPrefixes.get(attr
+						amap = amap.put(TypeUtils.attributeInfo(new QName(mPrefixes.get(attr
 						        .getNamespaceURI()), attr.getNamespaceURI(), attr
-						        .getLocalName()), attr.getNodeValue());
+						        .getLocalName()), attr.getNodeValue()));
 				} else {
-					mTreeWriter.addAttribute(new QName(null, attr.getLocalName()), attr
-					        .getNodeValue());
+					amap = amap.put(TypeUtils.attributeInfo(new QName(null, attr.getLocalName()), attr
+					        .getNodeValue()));
 				}
 			}
 
@@ -184,8 +185,8 @@ public class CSSInliner {
 						} else {
 							str = t.toString().replace("_", "-").toLowerCase();
 						}
-						mTreeWriter.addAttribute(
-						        new QName(mStyleNsPrefix, mStyleNS, property), str);
+						amap = amap.put(TypeUtils.attributeInfo(
+						        new QName(mStyleNsPrefix, mStyleNS, property), str));
 
 					}
 				}
@@ -220,8 +221,8 @@ public class CSSInliner {
 									break;
 								}
 								if (value != null && value.length() > 0)
-									mTreeWriter.addAttribute(
-										new QName(mStyleNsPrefix, mStyleNS, pseudo.getName()), value.toString());
+									amap = amap.put(TypeUtils.attributeInfo(
+										new QName(mStyleNsPrefix, mStyleNS, pseudo.getName()), value.toString()));
 								break;
 							case NORMAL:
 							case NONE:
@@ -239,9 +240,13 @@ public class CSSInliner {
 				}
 			}
 
-			mTreeWriter.startContent();
-
 			// ===== end inlining ===== //
+
+			if (node.getNamespaceURI() == null || node.getNamespaceURI().isEmpty())
+				mTreeWriter.addStartElement(new QName(null, node.getLocalName()), amap, nsmap);
+			else
+				mTreeWriter.addStartElement(new QName(mPrefixes.get(node.getNamespaceURI()),
+				        node.getNamespaceURI(), node.getLocalName()), amap, nsmap);
 
 			for (Node child = elem.getFirstChild(); child != null; child = child
 			        .getNextSibling())

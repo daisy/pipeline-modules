@@ -60,10 +60,7 @@ class InMemoryURIResolver implements URIResolver {
 						                        uri.toASCIIString());
 					else
 						return doc.asSource(); }}}
-		catch (URISyntaxException e) {
-			e.printStackTrace();
-			throw new TransformerException(e); }
-		catch (SaxonApiException e) {
+		catch (URISyntaxException|SaxonApiException e) {
 			e.printStackTrace();
 			throw new TransformerException(e); }
 		return null;

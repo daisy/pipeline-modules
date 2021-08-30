@@ -27,6 +27,7 @@
 		<p:input port="parameters">
 			<p:empty/>
 		</p:input>
+		<p:with-option name="output-base-uri" select="base-uri(/)"/>
 	</p:xslt>
 
 </p:declare-step>

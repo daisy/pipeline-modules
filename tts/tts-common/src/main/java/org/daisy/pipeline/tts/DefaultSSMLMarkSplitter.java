@@ -1,30 +1,34 @@
 package org.daisy.pipeline.tts;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.Deque;
+import java.util.LinkedList;
 
-import net.sf.saxon.om.NodeInfo;
-import net.sf.saxon.s9api.Axis;
-import net.sf.saxon.s9api.Processor;
-import net.sf.saxon.s9api.QName;
-import net.sf.saxon.s9api.XdmNode;
-import net.sf.saxon.s9api.XdmNodeKind;
-import net.sf.saxon.s9api.XdmSequenceIterator;
+import static javax.xml.stream.XMLStreamConstants.CDATA;
+import static javax.xml.stream.XMLStreamConstants.CHARACTERS;
+import static javax.xml.stream.XMLStreamConstants.COMMENT;
+import static javax.xml.stream.XMLStreamConstants.END_DOCUMENT;
+import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
+import static javax.xml.stream.XMLStreamConstants.PROCESSING_INSTRUCTION;
+import static javax.xml.stream.XMLStreamConstants.SPACE;
+import static javax.xml.stream.XMLStreamConstants.START_DOCUMENT;
+import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 import com.xmlcalabash.util.TreeWriter;
 
-public class DefaultSSMLMarkSplitter implements SSMLMarkSplitter {
+import net.sf.saxon.s9api.Processor;
+import net.sf.saxon.s9api.XdmNode;
 
-	private static Logger ServerLogger = LoggerFactory
-	        .getLogger(DefaultSSMLMarkSplitter.class);
+import org.daisy.common.saxon.SaxonInputValue;
+
+// Note that this class is currently not used
+public class DefaultSSMLMarkSplitter implements SSMLMarkSplitter {
 
 	private Processor mProc;
 
@@ -34,80 +38,71 @@ public class DefaultSSMLMarkSplitter implements SSMLMarkSplitter {
 
 	@Override
 	public Collection<Chunk> split(XdmNode ssml) {
-		List<String> sortedMarkNames = new ArrayList<String>();
-		Multimap<NodeInfo, String> marksScope = HashMultimap.create();
-		sortedMarkNames.add(null); //null means 'no mark'
-		findMarks(ssml, marksScope, sortedMarkNames);
-
+		XMLStreamReader reader = new SaxonInputValue(ssml).asXMLStreamReader();
 		Collection<Chunk> chunks = new ArrayList<Chunk>();
-
-		if (ssml.getNodeKind() == XdmNodeKind.DOCUMENT) {
-			XdmSequenceIterator iter = ssml.axisIterator(Axis.CHILD);
-			while (ssml.getNodeKind() != XdmNodeKind.ELEMENT && iter.hasNext()) {
-				ssml = (XdmNode) iter.next();
-			}
-		}
-		URI docURI = null;
+		String markName = null;
+		URI docURI = URI.create("http://tmp");
+		Deque<QName> parents = new LinkedList<>();
+		TreeWriter tw = new TreeWriter(mProc);
+		tw.startDocument(docURI);
 		try {
-			docURI = new URI("http://tmp");
-		} catch (URISyntaxException e) {
+			while (reader.hasNext()) {
+				reader.next();
+				switch (reader.getEventType()) {
+				case START_ELEMENT:
+					QName name = reader.getName();
+					if (name.getLocalPart().equals(markNode.getLocalPart())) {
+						// split
+						for (QName p : parents)
+							tw.addEndElement();
+						tw.endDocument();
+						chunks.add(new Chunk(tw.getResult(), markName));
+						tw = null;
+						for (int i = 0; i < reader.getAttributeCount(); i++)
+							if (reader.getAttributeName(i).getLocalPart().equals(markNameAttr.getLocalPart()))
+								markName = reader.getAttributeValue(i);
+					} else {
+						if (tw == null) {
+							tw = new TreeWriter(mProc);
+							tw.startDocument(docURI);
+							for (QName p : parents)
+								tw.addStartElement(new net.sf.saxon.s9api.QName(p));
+						}
+						tw.addStartElement(new net.sf.saxon.s9api.QName(name));
+					}
+					parents.offerLast(name);
+					break;
+				case END_ELEMENT:
+					if (!parents.pollLast().getLocalPart().equals(markNode.getLocalPart()) && tw != null) {
+						tw.addEndElement();
+					}
+					break;
+				case SPACE:
+				case CHARACTERS:
+					if (!reader.getText().isEmpty()) {
+						if (tw == null) {
+							tw = new TreeWriter(mProc);
+							tw.startDocument(docURI);
+							for (QName p : parents)
+								tw.addStartElement(new net.sf.saxon.s9api.QName(p));
+						}
+						tw.addText(reader.getText());
+					}
+					break;
+				case START_DOCUMENT:
+				case END_DOCUMENT:
+				case PROCESSING_INSTRUCTION:
+				case CDATA:
+				case COMMENT:
+				default:
+				}
+			}
+		} catch (XMLStreamException e) {
 		}
-
-		for (String markName : sortedMarkNames) {
-			TreeWriter tw = new TreeWriter(mProc);
-			tw.startDocument(docURI);
-			tw.startContent();
-			toXML(ssml, tw, markName, marksScope);
-			tw.endDocument();
-			chunks.add(new Chunk(tw.getResult(), markName));
-		}
-
+		for (QName p : parents) tw.addEndElement(); // just to be sure
+		tw.endDocument();
+		chunks.add(new Chunk(tw.getResult(), markName));
 		return chunks;
-	}
-
-	private static void findMarks(XdmNode ssml, Multimap<NodeInfo, String> marksScope,
-	        List<String> sortedMarkNames) {
-		String markName = sortedMarkNames.get(sortedMarkNames.size() - 1);
-		marksScope.put(ssml.getUnderlyingNode(), markName);
-		XdmSequenceIterator iter = ssml.axisIterator(Axis.ANCESTOR);
-		while (iter.hasNext()) {
-			XdmNode parent = (XdmNode) iter.next();
-			marksScope.put(parent.getUnderlyingNode(), markName);
-		}
-		if (ssml.getNodeName() != null
-		        && markNode.getLocalName().equals(ssml.getNodeName().getLocalName())) {
-			sortedMarkNames.add(ssml.getAttributeValue(markNameAttr));
-		}
-		iter = ssml.axisIterator(Axis.CHILD);
-		while (iter.hasNext()) {
-			findMarks((XdmNode) iter.next(), marksScope, sortedMarkNames);
-		}
-	}
-
-	private static void toXML(XdmNode ssml, TreeWriter tw, String markName,
-	        Multimap<NodeInfo, String> marksScope) {
-		if (!marksScope.containsEntry(ssml.getUnderlyingNode(), markName)) {
-			return;
-		}
-		if (ssml.getNodeKind() == XdmNodeKind.TEXT) {
-			tw.addText(ssml.getStringValue());
-		} else if (ssml.getNodeKind() == XdmNodeKind.ELEMENT
-		        && !markNode.getLocalName().equals(ssml.getNodeName().getLocalName())) {
-			QName elementName = ssml.getNodeName();
-			if (elementName != null) {
-				tw.addStartElement(ssml);
-				tw.addAttributes(ssml);
-			}
-
-			XdmSequenceIterator iter = ssml.axisIterator(Axis.CHILD);
-			while (iter.hasNext()) {
-				toXML((XdmNode) iter.next(), tw, markName, marksScope);
-			}
-
-			if (elementName != null) {
-				tw.addEndElement();
-			}
-		}
 	}
 
 	private static final QName markNode = new QName("mark");
