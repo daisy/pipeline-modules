@@ -21,9 +21,9 @@
     <!--template for frontmatter elements-->
     <xsl:template name="FrontMatter">
         <!--Parameter Tile of the document-->
-        <xsl:param name ="Title"></xsl:param>
+        <xsl:param name="Title"></xsl:param>
         <!--Parameter author of the document-->
-        <xsl:param name ="Creator"></xsl:param>
+        <xsl:param name="Creator"></xsl:param>
         <!--Parameter trackchanges-->
         <xsl:param name="prmTrack"/>
         <!--Parameter version of Office-->
@@ -36,7 +36,7 @@
         <xsl:param name="sNumbers"/>
         <xsl:param name="sZeros"/>
         <xsl:param name="imgOption"/>
-        <xsl:param name ="dpi"/>
+        <xsl:param name="dpi"/>
         <xsl:param name="charStyles"/>
 
         <xsl:message terminate="no">progress:frontmatter</xsl:message>
@@ -66,9 +66,9 @@
             </xsl:choose>
         </docauthor>
 
-        <xsl:call-template name ="Matter">
-            <xsl:with-param name="prmTrack" select ="$prmTrack"/>
-            <xsl:with-param name="version" select ="$version"/>
+        <xsl:call-template name="Matter">
+            <xsl:with-param name="prmTrack" select="$prmTrack"/>
+            <xsl:with-param name="version" select="$version"/>
             <xsl:with-param name="custom" select="$custom"/>
             <xsl:with-param name="masterSub" select="$masterSub"/>
             <xsl:with-param name="sOperators" select="$sOperators"/>
@@ -85,7 +85,7 @@
 
 
     <!--Template for implementing bodymatter elements-->
-    <xsl:template name ="BodyMatter">
+    <xsl:template name="BodyMatter">
         <!--Parameter trackchanges-->
         <xsl:param name="prmTrack"/>
         <!--Parameter version of Office-->
@@ -98,12 +98,12 @@
         <xsl:param name="sNumbers"/>
         <xsl:param name="sZeros"/>
         <xsl:param name="imgOption"/>
-        <xsl:param name ="dpi"/>
+        <xsl:param name="dpi"/>
         <xsl:param name="charStyles"/>
 
         <xsl:call-template name="Matter">
-            <xsl:with-param name="prmTrack" select ="$prmTrack"/>
-            <xsl:with-param name="version" select ="$version"/>
+            <xsl:with-param name="prmTrack" select="$prmTrack"/>
+            <xsl:with-param name="version" select="$version"/>
             <xsl:with-param name="custom" select="$custom"/>
             <xsl:with-param name="masterSub" select="$masterSub"/>
             <xsl:with-param name="sOperators" select="$sOperators"/>
@@ -121,7 +121,7 @@
 
 
     <!--Template for implementing Rearmatter elements-->
-    <xsl:template name ="RearMatter">
+    <xsl:template name="RearMatter">
         <!--Parameter trackchanges-->
         <xsl:param name="prmTrack"/>
         <!--Parameter version of Office-->
@@ -134,7 +134,7 @@
         <xsl:param name="sNumbers"/>
         <xsl:param name="sZeros"/>
         <xsl:param name="imgOption"/>
-        <xsl:param name ="dpi"/>
+        <xsl:param name="dpi"/>
         <xsl:param name="charStyles"/>
 
         <xsl:if test="not(count(document('word/document.xml')//w:document/w:body/w:p/w:r/w:rPr/w:rStyle[@w:val='EndnoteReference'])=0)">
@@ -144,14 +144,14 @@
                 <xsl:for-each select="document('word/document.xml')//w:document/w:body/w:p/w:r/w:rPr/w:rStyle">
                     <xsl:message terminate="no">progress:parahandler</xsl:message>
                     <xsl:if test="@w:val='EndnoteReference'">
-                        <xsl:call-template name ="tmpNote">
+                        <xsl:call-template name="tmpNote">
                             <xsl:with-param name="endNoteId" select="../../w:endnoteReference/@w:id"/>
                             <xsl:with-param name="sOperators" select="$sOperators"/>
                             <xsl:with-param name="sMinuses" select="$sMinuses"/>
                             <xsl:with-param name="sNumbers" select="$sNumbers"/>
                             <xsl:with-param name="sZeros" select="$sZeros"/>
-                            <xsl:with-param name ="vernote" select="$version"/>
-                            <xsl:with-param name ="MasterSub" select="$masterSub"/>
+                            <xsl:with-param name="vernote" select="$version"/>
+                            <xsl:with-param name="MasterSub" select="$masterSub"/>
                             <xsl:with-param name="charStyles" select="$charStyles"/>
                         </xsl:call-template>
                     </xsl:if>
@@ -160,8 +160,8 @@
         </xsl:if>
 
         <xsl:call-template name="Matter">
-            <xsl:with-param name="prmTrack" select ="$prmTrack"/>
-            <xsl:with-param name="version" select ="$version"/>
+            <xsl:with-param name="prmTrack" select="$prmTrack"/>
+            <xsl:with-param name="version" select="$version"/>
             <xsl:with-param name="custom" select="$custom"/>
             <xsl:with-param name="masterSub" select="$masterSub"/>
             <xsl:with-param name="sOperators" select="$sOperators"/>
@@ -178,7 +178,7 @@
 
 
 
-    <xsl:template name ="Matter">
+    <xsl:template name="Matter">
         <!--Parameter trackchanges-->
         <xsl:param name="prmTrack"/>
         <!--Parameter version of Office-->
@@ -191,7 +191,7 @@
         <xsl:param name="sNumbers"/>
         <xsl:param name="sZeros"/>
         <xsl:param name="imgOption"/>
-        <xsl:param name ="dpi"/>
+        <xsl:param name="dpi"/>
         <xsl:param name="charStyles"/>
         <xsl:param name="matterType" />
         <!--Variable external images-->
@@ -204,7 +204,7 @@
             <xsl:message terminate="no">translation.oox2Daisy.ExternalImage</xsl:message>
         </xsl:if>
 
-        <xsl:variable name ="var_heading">
+        <xsl:variable name="var_heading">
             <xsl:for-each select="document('word/styles.xml')//w:styles/w:style/w:name[@w:val='heading 1']">
                 <xsl:message terminate="no">progress:parahandler</xsl:message>
                 <xsl:value-of select="../@w:styleId"/>
@@ -229,14 +229,14 @@
                 <xsl:call-template name="AddLevel">
                     <xsl:with-param name="levelValue" select="1"/>
                     <xsl:with-param name="check" select="0"/>
-                    <xsl:with-param name ="verhead" select="$version"/>
-                    <xsl:with-param name ="custom" select="$custom"/>
-                    <xsl:with-param name ="sOperators" select="$sOperators"/>
-                    <xsl:with-param name ="sMinuses" select="$sMinuses"/>
-                    <xsl:with-param name ="sNumbers" select="$sNumbers"/>
-                    <xsl:with-param name ="sZeros" select="$sZeros"/>
-                    <xsl:with-param name ="mastersubhead" select="$masterSub"/>
-                    <xsl:with-param name ="txt" select="'0'"/>
+                    <xsl:with-param name="verhead" select="$version"/>
+                    <xsl:with-param name="custom" select="$custom"/>
+                    <xsl:with-param name="sOperators" select="$sOperators"/>
+                    <xsl:with-param name="sMinuses" select="$sMinuses"/>
+                    <xsl:with-param name="sNumbers" select="$sNumbers"/>
+                    <xsl:with-param name="sZeros" select="$sZeros"/>
+                    <xsl:with-param name="mastersubhead" select="$masterSub"/>
+                    <xsl:with-param name="txt" select="'0'"/>
                     <xsl:with-param name="lvlcharStyle" select="$charStyles"/>
                 </xsl:call-template>
             </xsl:if>
@@ -262,11 +262,11 @@
                         <xsl:call-template name="StyleContainer">
                             <xsl:with-param name="prmTrack" select="$prmTrack"/>
                             <xsl:with-param name="VERSION" select="$version"/>
-                            <xsl:with-param name ="custom" select="$custom"/>
-                            <xsl:with-param name ="styleHeading" select="$var_heading"/>
-                            <xsl:with-param name ="mastersubstyle" select="$masterSub"/>
-                            <xsl:with-param name ="imgOptionStyle" select="$imgOption"/>
-                            <xsl:with-param name ="dpiStyle" select="$dpi"/>
+                            <xsl:with-param name="custom" select="$custom"/>
+                            <xsl:with-param name="styleHeading" select="$var_heading"/>
+                            <xsl:with-param name="mastersubstyle" select="$masterSub"/>
+                            <xsl:with-param name="imgOptionStyle" select="$imgOption"/>
+                            <xsl:with-param name="dpiStyle" select="$dpi"/>
                             <xsl:with-param name="characterStyle" select="$charStyles"/>
                         </xsl:call-template>
                     </xsl:when>
@@ -276,8 +276,8 @@
                         <xsl:variable name="checkCoverpage" select="myObj:CheckCaverPage()"/>
                         <xsl:call-template name="TableHandler">
                             <xsl:with-param name="parmVerTable" select="$version"/>
-                            <xsl:with-param name ="custom" select="$custom"/>
-                            <xsl:with-param name ="mastersubtbl" select="$masterSub"/>
+                            <xsl:with-param name="custom" select="$custom"/>
+                            <xsl:with-param name="mastersubtbl" select="$masterSub"/>
                             <xsl:with-param name="characterStyle" select="$charStyles"/>
                         </xsl:call-template>
                     </xsl:when>
@@ -286,7 +286,7 @@
                         <!--calling for foonote template and displaying footnote text at the end of the page-->
                         <xsl:call-template name="footnote">
                             <xsl:with-param name="verfoot" select="$version"/>
-                            <xsl:with-param name ="mastersubfoot" select="$masterSub"/>
+                            <xsl:with-param name="mastersubfoot" select="$masterSub"/>
                             <xsl:with-param name="characStyle" select="$charStyles"/>
                             <xsl:with-param name="sOperators" select="$sOperators"/>
                             <xsl:with-param name="sMinuses" select="$sMinuses"/>
@@ -312,26 +312,26 @@
                                 </xsl:call-template>
                                 <!--Calling Template to add Table Of Contents-->
                                 <xsl:call-template name="TableOfContents">
-                                    <xsl:with-param name ="custom" select="$custom"/>
+                                    <xsl:with-param name="custom" select="$custom"/>
                                 </xsl:call-template>
                                 <!--Open $PeekLevel levels after Table Of Contents-->
                                 <xsl:call-template name="AddLevel">
                                     <xsl:with-param name="levelValue" select="$PeekLevel"/>
                                     <xsl:with-param name="check" select="1"/>
-                                    <xsl:with-param name ="verhead" select="$version"/>
-                                    <xsl:with-param name ="custom" select="$custom"/>
-                                    <xsl:with-param name ="sOperators" select="$sOperators"/>
-                                    <xsl:with-param name ="sMinuses" select="$sMinuses"/>
-                                    <xsl:with-param name ="sNumbers" select="$sNumbers"/>
-                                    <xsl:with-param name ="sZeros" select="$sZeros"/>
-                                    <xsl:with-param name ="mastersubhead" select="$masterSub"/>
-                                    <xsl:with-param name ="txt" select="0"/>
+                                    <xsl:with-param name="verhead" select="$version"/>
+                                    <xsl:with-param name="custom" select="$custom"/>
+                                    <xsl:with-param name="sOperators" select="$sOperators"/>
+                                    <xsl:with-param name="sMinuses" select="$sMinuses"/>
+                                    <xsl:with-param name="sNumbers" select="$sNumbers"/>
+                                    <xsl:with-param name="sZeros" select="$sZeros"/>
+                                    <xsl:with-param name="mastersubhead" select="$masterSub"/>
+                                    <xsl:with-param name="txt" select="0"/>
                                     <xsl:with-param name="lvlcharStyle" select="$charStyles"/>
                                 </xsl:call-template>
                             </xsl:when>
                             <xsl:otherwise>
                                 <!--Calling structuredocument for handling Fidelity loss-->
-                                <xsl:call-template name ="structuredocument"/>
+                                <xsl:call-template name="structuredocument"/>
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:when>
@@ -460,8 +460,8 @@
                     <!--Checking for BookMarkEnd -->
                     <xsl:when test="name()='w:bookmarkEnd'">
                         <xsl:variable name="seperate">
-                            <xsl:variable name ="id" select="@w:id"/>
-                            <xsl:variable name ="tempAbbr" select="document('word/document.xml')//w:bookmarkStart[@w:id=$id]/@w:name"/>
+                            <xsl:variable name="id" select="@w:id"/>
+                            <xsl:variable name="tempAbbr" select="document('word/document.xml')//w:bookmarkStart[@w:id=$id]/@w:name"/>
                             <xsl:value-of select="myObj:Book($tempAbbr)"/>
                         </xsl:variable>
                         <!--Checking whether BookMarkEnd is related to Abbreviations or not -->
@@ -516,12 +516,12 @@
         <xsl:param name="sMinuses"/>
         <xsl:param name="sNumbers"/>
         <xsl:param name="sZeros"/>
-        <xsl:param name ="custom"/>
-        <xsl:param name ="txt"/>
+        <xsl:param name="custom"/>
+        <xsl:param name="txt"/>
         <xsl:param name="level"/>
-        <xsl:param name ="mastersubpara"/>
-        <xsl:param name ="imgOptionPara"/>
-        <xsl:param name ="dpiPara"/>
+        <xsl:param name="mastersubpara"/>
+        <xsl:param name="imgOptionPara"/>
+        <xsl:param name="dpiPara"/>
         <xsl:param name="charparahandlerStyle"/>
         <xsl:message terminate="no">progress:parahandler</xsl:message>
         <xsl:variable name="quote">"</xsl:variable>
@@ -532,7 +532,7 @@
             <xsl:if test="not(name(..)='w:tc')">
                 <xsl:call-template name="footnote">
                     <xsl:with-param name="verfoot" select="$VERSION"/>
-                    <xsl:with-param name ="mastersubfoot" select="$mastersubpara"/>
+                    <xsl:with-param name="mastersubfoot" select="$mastersubpara"/>
                     <xsl:with-param name="characStyle" select="$charparahandlerStyle"/>
                     <xsl:with-param name="sOperators" select="$sOperators"/>
                     <xsl:with-param name="sMinuses" select="$sMinuses"/>
@@ -544,7 +544,7 @@
                     <xsl:when test="((w:r/w:br/@w:type='page') and not((following-sibling::w:p[1]/w:pPr/w:sectPr) or (following-sibling::w:p[2]/w:r/w:lastRenderedPageBreak) or (following-sibling::w:p[1]/w:r/w:lastRenderedPageBreak) or (following-sibling::w:sdt[1]/w:sdtPr/w:docPartObj/w:docPartGallery/@w:val='Table of Contents')))">
                         <xsl:call-template name="footnote">
                             <xsl:with-param name="verfoot" select="$VERSION"/>
-                            <xsl:with-param name ="mastersubfoot" select="$mastersubpara"/>
+                            <xsl:with-param name="mastersubfoot" select="$mastersubpara"/>
                             <xsl:with-param name="characStyle" select="$charparahandlerStyle"/>
                             <xsl:with-param name="sOperators" select="$sOperators"/>
                             <xsl:with-param name="sMinuses" select="$sMinuses"/>
@@ -556,7 +556,7 @@
                     <xsl:when test="(w:r/w:lastRenderedPageBreak)">
                         <xsl:call-template name="footnote">
                             <xsl:with-param name="verfoot" select="$VERSION"/>
-                            <xsl:with-param name ="mastersubfoot" select="$mastersubpara"/>
+                            <xsl:with-param name="mastersubfoot" select="$mastersubpara"/>
                             <xsl:with-param name="characStyle" select="$charparahandlerStyle"/>
                             <xsl:with-param name="sOperators" select="$sOperators"/>
                             <xsl:with-param name="sMinuses" select="$sMinuses"/>
@@ -577,13 +577,13 @@
             <xsl:if test="not(w:r/w:pict//v:textbox/w:txbxContent/w:p/w:pPr/w:pStyle[@w:val='Caption'])">
                 <xsl:call-template name="TempSidebar">
                     <xsl:with-param name="flag" select="$flag"/>
-                    <xsl:with-param name ="custom" select="$custom"/>
-                    <xsl:with-param name ="txt" select="$txt"/>
+                    <xsl:with-param name="custom" select="$custom"/>
+                    <xsl:with-param name="txt" select="$txt"/>
                     <xsl:with-param name="prmTrack" select="$prmTrack"/>
                     <xsl:with-param name="VERSION" select="$VERSION"/>
                     <xsl:with-param name="charparahandlerStyle" select="$charparahandlerStyle"/>
-                    <xsl:with-param name ="mastersubpara" select="$mastersubpara"/>
-                    <xsl:with-param name ="level" select="$level"/>
+                    <xsl:with-param name="mastersubpara" select="$mastersubpara"/>
+                    <xsl:with-param name="level" select="$level"/>
                 </xsl:call-template>
             </xsl:if>
         </xsl:if>
@@ -592,13 +592,13 @@
             <xsl:if test="not(w:r/w:pict//v:textbox/w:txbxContent/w:p/w:pPr/w:pStyle[@w:val='Caption'])">
                 <xsl:call-template name="TempSidebar">
                     <xsl:with-param name="flag" select="$flag"/>
-                    <xsl:with-param name ="custom" select="$custom"/>
-                    <xsl:with-param name ="txt" select="$txt"/>
+                    <xsl:with-param name="custom" select="$custom"/>
+                    <xsl:with-param name="txt" select="$txt"/>
                     <xsl:with-param name="prmTrack" select="$prmTrack"/>
                     <xsl:with-param name="VERSION" select="$VERSION"/>
                     <xsl:with-param name="charparahandlerStyle" select="$charparahandlerStyle"/>
-                    <xsl:with-param name ="mastersubpara" select="$mastersubpara"/>
-                    <xsl:with-param name ="level" select="$level"/>
+                    <xsl:with-param name="mastersubpara" select="$mastersubpara"/>
+                    <xsl:with-param name="level" select="$level"/>
                 </xsl:call-template>
             </xsl:if>
         </xsl:if>
@@ -611,7 +611,7 @@
                     <xsl:when test="(w:r/w:rPr/w:lang) or (w:r/w:rPr/w:rFonts/@w:hint)">
                         <xsl:call-template name="Languages">
                             <xsl:with-param name="Attribute" select="'0'"/>
-                            <xsl:with-param name ="txt" select="$txt"/>
+                            <xsl:with-param name="txt" select="$txt"/>
                         </xsl:call-template>
                     </xsl:when>
                     <xsl:otherwise>
@@ -634,13 +634,13 @@
         </xsl:if>
 
         <!--Traversing through each node inside a paragraph-->
-        <xsl:for-each select ="./node()">
+        <xsl:for-each select="./node()">
             <xsl:message terminate="no">progress:parahandler</xsl:message>
 
             <xsl:if test="name()='w:subDoc'">
                 <xsl:if test="$mastersubpara='Yes'">
                     <xsl:variable name="aquote">"</xsl:variable>
-                    <xsl:variable name ="temp"    select="concat('&lt;','subdoc ','rId=',$aquote,@r:id,$aquote,'&gt;','&lt;','/subdoc','&gt;')"/>
+                    <xsl:variable name="temp"    select="concat('&lt;','subdoc ','rId=',$aquote,@r:id,$aquote,'&gt;','&lt;','/subdoc','&gt;')"/>
                     <xsl:variable name="abbr" select="myObj:PushMasterSubdoc($temp)"/>
                     <xsl:variable name="masterSubSet" select="myObj:MasterSubSetFlag()"/>
                 </xsl:if>
@@ -887,13 +887,13 @@
             <!--Checking for BookMarkEnd -->
             <xsl:if test="name()='w:bookmarkEnd'">
                 <xsl:variable name="seperate">
-                    <xsl:variable name="id" select ="@w:id"/>
+                    <xsl:variable name="id" select="@w:id"/>
                     <xsl:choose>
                         <xsl:when test="$flagNote='Note'">
                             <xsl:value-of select="myObj:BookFootnote(@w:id)"/>
                         </xsl:when>
                         <xsl:otherwise>
-                            <xsl:variable name ="tempAbbr" select="document('word/document.xml')//w:bookmarkStart[@w:id=$id]/@w:name"/>
+                            <xsl:variable name="tempAbbr" select="document('word/document.xml')//w:bookmarkStart[@w:id=$id]/@w:name"/>
                             <xsl:value-of select="myObj:Book($tempAbbr)"/>
                         </xsl:otherwise>
                     </xsl:choose>
@@ -1036,13 +1036,13 @@
             </xsl:if>
 
             <xsl:if test="name()='w:r' and not(preceding-sibling::w:pPr/w:pStyle[substring(@w:val,1,3)='TOC'])">
-                <xsl:call-template name ="TempParaHandler">
+                <xsl:call-template name="TempParaHandler">
                     <xsl:with-param name="flag" select="$flag"/>
-                    <xsl:with-param name ="imgOptionPara" select="$imgOptionPara"/>
-                    <xsl:with-param name ="dpiPara" select="$dpiPara"/>
-                    <xsl:with-param name ="custom" select="$custom"/>
-                    <xsl:with-param name ="txt" select="$txt"/>
-                    <xsl:with-param name="charparahandlerStyle" select ="$charparahandlerStyle"/>
+                    <xsl:with-param name="imgOptionPara" select="$imgOptionPara"/>
+                    <xsl:with-param name="dpiPara" select="$dpiPara"/>
+                    <xsl:with-param name="custom" select="$custom"/>
+                    <xsl:with-param name="txt" select="$txt"/>
+                    <xsl:with-param name="charparahandlerStyle" select="$charparahandlerStyle"/>
                     <xsl:with-param name="VERSION" select="$VERSION"/>
                 </xsl:call-template>
             </xsl:if>
@@ -1083,7 +1083,7 @@
                     </xsl:otherwise>
                 </xsl:choose>
                 <xsl:if test="(myObj:ListMasterSubFlag()='1') and ($mastersubpara = 'Yes')">
-                    <xsl:variable name ="curLevel" select="myObj:PeekLevel()"/>
+                    <xsl:variable name="curLevel" select="myObj:PeekLevel()"/>
                     <xsl:value-of disable-output-escaping="yes" select="myObj:ClosingMasterSub($curLevel)"/>
                     <xsl:value-of disable-output-escaping="yes" select="myObj:PeekMasterSubdoc()"/>
                     <xsl:variable name="masterSubReSet" select="myObj:MasterSubResetFlag()"/>
@@ -1098,7 +1098,7 @@
             <xsl:variable name="abbrpara" select="myObj:PushAbrAcrpara($temp)"/>
         </xsl:if>
         <xsl:variable name="initializeFlag" select="myObj:SetGetHyperLinkFlag()"/>
-        <xsl:variable name ="tempList" select="myObj:ReSetListFlag()"/>
+        <xsl:variable name="tempList" select="myObj:ReSetListFlag()"/>
         <!--code for hard return-->
         <xsl:text>&#13;&#10;</xsl:text>
 
@@ -1106,10 +1106,10 @@
 
     <xsl:template name="TempSidebar">
         <xsl:param name="flag"/>
-        <xsl:param name ="custom"/>
-        <xsl:param name ="txt"/>
-        <xsl:param name ="prmTrack"/>
-        <xsl:param name ="VERSION"/>
+        <xsl:param name="custom"/>
+        <xsl:param name="txt"/>
+        <xsl:param name="prmTrack"/>
+        <xsl:param name="VERSION"/>
         <xsl:param name="charparahandlerStyle"/>
         <xsl:param name="mastersubpara"/>
         <xsl:param name="level"/>
@@ -1130,8 +1130,8 @@
                             <hd>
                                 <xsl:call-template name="ParaHandler">
                                     <xsl:with-param name="flag" select="'0'"/>
-                                    <xsl:with-param name ="txt" select="$txt"/>
-                                    <xsl:with-param name ="custom" select="$custom"/>
+                                    <xsl:with-param name="txt" select="$txt"/>
+                                    <xsl:with-param name="custom" select="$custom"/>
                                     <xsl:with-param name="charparahandlerStyle" select="$charparahandlerStyle"/>
                                 </xsl:call-template>
                             </hd>
@@ -1159,9 +1159,9 @@
                                 <xsl:with-param name="prmTrack" select="$prmTrack"/>
                                 <xsl:with-param name="VERSION" select="$VERSION"/>
                                 <xsl:with-param name="custom" select="$custom"/>
-                                <xsl:with-param name ="mastersubstyle" select="$mastersubpara"/>
+                                <xsl:with-param name="mastersubstyle" select="$mastersubpara"/>
                                 <xsl:with-param name="flag" select="'0'"/>
-                                <xsl:with-param name ="txt" select="$txt"/>
+                                <xsl:with-param name="txt" select="$txt"/>
                                 <xsl:with-param name="characterparaStyle" select="$charparahandlerStyle"/>
                             </xsl:call-template>
                         </xsl:when>
@@ -1174,7 +1174,7 @@
                                     <xsl:with-param name="VERSION" select="$VERSION"/>
                                     <xsl:with-param name="prmTrack" select="$prmTrack"/>
                                     <xsl:with-param name="custom" select="$custom"/>
-                                    <xsl:with-param name ="mastersubstyle" select="$mastersubpara"/>
+                                    <xsl:with-param name="mastersubstyle" select="$mastersubpara"/>
                                     <xsl:with-param name="characterStyle" select="$charparahandlerStyle"/>
                                 </xsl:call-template>
                             </xsl:if>
@@ -1185,16 +1185,16 @@
         </xsl:for-each>
     </xsl:template>
 
-    <xsl:template name ="TempParaHandler">
+    <xsl:template name="TempParaHandler">
         <xsl:param name="flag"/>
-        <xsl:param name ="imgOptionPara"/>
-        <xsl:param name ="dpiPara"/>
-        <xsl:param name ="custom"/>
-        <xsl:param name ="txt"/>
+        <xsl:param name="imgOptionPara"/>
+        <xsl:param name="dpiPara"/>
+        <xsl:param name="custom"/>
+        <xsl:param name="txt"/>
         <xsl:param name="charparahandlerStyle"/>
         <xsl:param name="VERSION"/>
         <xsl:message terminate="no">progress:parahandler</xsl:message>
-        <xsl:variable name ="quote">"</xsl:variable>
+        <xsl:variable name="quote">"</xsl:variable>
 
         <!--Checking for line breaks-->
         <xsl:if test="((w:br/@w:type='textWrapping') or (w:br)) and (not(w:br/@w:type='page'))">
@@ -1348,8 +1348,8 @@
             <!--checking for images in word2007 version-->
             <xsl:when test="w:drawing">
                 <xsl:call-template name="PictureHandler">
-                    <xsl:with-param name ="imgOpt" select="$imgOptionPara"/>
-                    <xsl:with-param name ="dpi" select="$dpiPara"/>
+                    <xsl:with-param name="imgOpt" select="$imgOptionPara"/>
+                    <xsl:with-param name="dpi" select="$dpiPara"/>
                     <xsl:with-param name="characterStyle" select="$charparahandlerStyle"/>
                 </xsl:call-template>
             </xsl:when>
@@ -1363,7 +1363,7 @@
                         <xsl:variable name="Math_DSMT4">
                             <xsl:choose>
                                 <xsl:when test="ancestor::node()[name()='w:txbxContent']">
-                                    <xsl:value-of select ="myObj:GetMathML('wdTextFrameStory')"/>
+                                    <xsl:value-of select="myObj:GetMathML('wdTextFrameStory')"/>
                                 </xsl:when>
                                 <xsl:otherwise>
                                     <xsl:value-of select="myObj:GetMathML('wdMainTextStory')"/>
@@ -1387,13 +1387,13 @@
                                                 </xsl:when>
                                                 <xsl:otherwise>
                                                     <!--Hardcoding value 'Math Equation'if user donot provide alt text for Math Equations-->
-                                                    <xsl:value-of select ="'Math Equation'"/>
+                                                    <xsl:value-of select="'Math Equation'"/>
                                                 </xsl:otherwise>
                                             </xsl:choose>
                                         </xsl:attribute>
                                         <xsl:attribute name="src">
                                             <!--Calling MathImage function-->
-                                            <xsl:value-of select ="myObj:MathImage($Math_rid)"/>
+                                            <xsl:value-of select="myObj:MathImage($Math_rid)"/>
                                         </xsl:attribute>
                                     </img>
                                 </imggroup>
@@ -1417,12 +1417,12 @@
                                             <xsl:value-of select="w:object/v:shape/@alt"/>
                                         </xsl:when>
                                         <xsl:otherwise>
-                                            <xsl:value-of select ="'Math Equation'"/>
+                                            <xsl:value-of select="'Math Equation'"/>
                                         </xsl:otherwise>
                                     </xsl:choose>
                                 </xsl:attribute>
                                 <xsl:attribute name="src">
-                                    <xsl:value-of select ="myObj:MathImage($mathimage)"/>
+                                    <xsl:value-of select="myObj:MathImage($mathimage)"/>
                                 </xsl:attribute>
                             </img>
                         </imggroup>
@@ -1545,7 +1545,7 @@
                                                                                                                                 or (../w:r/w:object))))">
                     <xsl:choose>
                         <xsl:when test="myObj:ListFlag()=0">
-                            <xsl:variable name ="setFlag" select ="myObj:SetListFlag()"/>
+                            <xsl:variable name="setFlag" select="myObj:SetListFlag()"/>
                             <xsl:call-template name="CustomStyles">
                                 <xsl:with-param name="customTag" select="w:rPr/w:rStyle/@w:val"/>
                                 <xsl:with-param name="custom" select="$custom"/>
@@ -1631,7 +1631,7 @@
         <xsl:choose>
             <!--Checking condition for supressing Author,Title,Year-->
             <xsl:when test="($supressAuthor='true')and ($supressTitle='true') and($supressYear='true')">
-                <xsl:value-of select ="./w:sdtContent//w:t"/>
+                <xsl:value-of select="./w:sdtContent//w:t"/>
             </xsl:when>
             <!--Checking condition for supressing Author,Title-->
             <xsl:when test="($supressAuthor='true') and ($supressTitle='true')">
@@ -1733,7 +1733,7 @@
         <xsl:choose>
             <!--Checking condition for supressing Author,Title,Year-->
             <xsl:when test="($supressAuthor='true')and ($supressTitle='true') and($supressYear='true')">
-                <xsl:value-of select ="./w:sdtContent//w:t"/>
+                <xsl:value-of select="./w:sdtContent//w:t"/>
             </xsl:when>
             <xsl:when test="$supressAuthor='true'">
                 <title>
@@ -1886,7 +1886,7 @@
     <xsl:template name="Blocklist">
         <xsl:param name="prmTrack"/>
         <xsl:param name="VERSION"/>
-        <xsl:param name ="custom"/>
+        <xsl:param name="custom"/>
         <xsl:param name="blkcharstyle"/>
         <xsl:if test="count(preceding-sibling::node()[1]/w:pPr/w:pStyle[substring(@w:val,1,5)='Block'])=0">
             <xsl:value-of disable-output-escaping="yes" select="concat('&lt;','blockquote ','&gt;')"/>
@@ -1897,7 +1897,7 @@
                 <author>
                     <xsl:call-template name="ParaHandler">
                         <xsl:with-param name="flag" select="'0'"/>
-                        <xsl:with-param name ="custom" select="$custom"/>
+                        <xsl:with-param name="custom" select="$custom"/>
                         <xsl:with-param name="charparahandlerStyle" select="$blkcharstyle"/>
                     </xsl:call-template>
                 </author>
@@ -1915,7 +1915,7 @@
                     <!--Calling ParagraphStyle Template-->
                     <xsl:call-template name="ParagraphStyle">
                         <xsl:with-param name="flag" select="'0'"/>
-                        <xsl:with-param name ="custom" select="$custom"/>
+                        <xsl:with-param name="custom" select="$custom"/>
                         <xsl:with-param name="characterparaStyle" select="$blkcharstyle"/>
                     </xsl:call-template>
                 </xsl:if>
@@ -1931,7 +1931,7 @@
     <xsl:template name="CustomStyles">
         <xsl:param name="customTag"/>
         <xsl:param name="custom"/>
-        <xsl:param name ="txt"/>
+        <xsl:param name="txt"/>
         <xsl:param name="customcharStyle"/>
         <xsl:variable name="aquote">"</xsl:variable>
         <xsl:choose>
@@ -1941,7 +1941,7 @@
                     <xsl:attribute name="xml:space">preserve</xsl:attribute>
                     <xsl:call-template name="CustomCharStyle">
                         <xsl:with-param name="characterStyle" select="$customcharStyle"/>
-                        <xsl:with-param name ="txt" select="$txt"/>
+                        <xsl:with-param name="txt" select="$txt"/>
                     </xsl:call-template>
                 </samp>
             </xsl:when>
@@ -1950,7 +1950,7 @@
                 <q>
                     <xsl:call-template name="CustomCharStyle">
                         <xsl:with-param name="characterStyle" select="$customcharStyle"/>
-                        <xsl:with-param name ="txt" select="$txt"/>
+                        <xsl:with-param name="txt" select="$txt"/>
                     </xsl:call-template>
                 </q>
             </xsl:when>
@@ -1962,7 +1962,7 @@
                 </xsl:if>
                 <xsl:call-template name="CustomCharStyle">
                     <xsl:with-param name="characterStyle" select="$customcharStyle"/>
-                    <xsl:with-param name ="txt" select="$txt"/>
+                    <xsl:with-param name="txt" select="$txt"/>
                 </xsl:call-template>
                 <xsl:if test="count(following-sibling::w:r[1]/w:rPr/w:rStyle[contains(@w:val,'Code')])=0">
                     <xsl:value-of disable-output-escaping="yes" select="concat('&lt;','/code','&gt;')"/>
@@ -1976,7 +1976,7 @@
                 </xsl:if>
                 <xsl:call-template name="CustomCharStyle">
                     <xsl:with-param name="characterStyle" select="$customcharStyle"/>
-                    <xsl:with-param name ="txt" select="$txt"/>
+                    <xsl:with-param name="txt" select="$txt"/>
                 </xsl:call-template>
                 <xsl:if test="count(following-sibling::w:r[1]/w:rPr/w:rStyle[contains(@w:val,'Sent')])=0">
                     <xsl:value-of disable-output-escaping="yes" select="concat('&lt;','/sent','&gt;')"/>
@@ -1989,7 +1989,7 @@
                 </xsl:if>
                 <xsl:call-template name="CustomCharStyle">
                     <xsl:with-param name="characterStyle" select="$customcharStyle"/>
-                    <xsl:with-param name ="txt" select="$txt"/>
+                    <xsl:with-param name="txt" select="$txt"/>
                 </xsl:call-template>
                 <xsl:if test="count(following-sibling::w:r[1]/w:rPr/w:rStyle[contains(@w:val,'Span')])=0">
                     <xsl:value-of disable-output-escaping="yes" select="concat('&lt;','/span','&gt;')"/>
@@ -2000,7 +2000,7 @@
                 <dfn>
                     <xsl:call-template name="CustomCharStyle">
                         <xsl:with-param name="characterStyle" select="$customcharStyle"/>
-                        <xsl:with-param name ="txt" select="$txt"/>
+                        <xsl:with-param name="txt" select="$txt"/>
                     </xsl:call-template>
                 </dfn>
             </xsl:when>
@@ -2009,7 +2009,7 @@
                 <cite>
                     <xsl:call-template name="CustomCharStyle">
                         <xsl:with-param name="characterStyle" select="$customcharStyle"/>
-                        <xsl:with-param name ="txt" select="$txt"/>
+                        <xsl:with-param name="txt" select="$txt"/>
                     </xsl:call-template>
                 </cite>
             </xsl:when>
@@ -2018,7 +2018,7 @@
                 <kbd>
                     <xsl:call-template name="CustomCharStyle">
                         <xsl:with-param name="characterStyle" select="$customcharStyle"/>
-                        <xsl:with-param name ="txt" select="$txt"/>
+                        <xsl:with-param name="txt" select="$txt"/>
                     </xsl:call-template>
                 </kbd>
             </xsl:when>
@@ -2041,7 +2041,7 @@
                 <!--Calling template for page number text-->
                 <xsl:call-template name="CustomCharStyle">
                     <xsl:with-param name="characterStyle" select="$customcharStyle"/>
-                    <xsl:with-param name ="txt" select="$txt"/>
+                    <xsl:with-param name="txt" select="$txt"/>
                 </xsl:call-template>
                 <xsl:if test="count(following-sibling::node()[1]/w:rPr/w:rStyle[@w:val='PageNumberDAISY'])=0">
                     <xsl:value-of disable-output-escaping="yes" select="concat('&lt;','/pagenum','&gt;')"/>
@@ -2053,7 +2053,7 @@
                         <linenum>
                             <xsl:call-template name="CustomCharStyle">
                                 <xsl:with-param name="characterStyle" select="$customcharStyle"/>
-                                <xsl:with-param name ="txt" select="$txt"/>
+                                <xsl:with-param name="txt" select="$txt"/>
                             </xsl:call-template>
                         </linenum>
                     </xsl:when>
@@ -2062,7 +2062,7 @@
                             <linenum>
                                 <xsl:call-template name="CustomCharStyle">
                                     <xsl:with-param name="characterStyle" select="$customcharStyle"/>
-                                    <xsl:with-param name ="txt" select="$txt"/>
+                                    <xsl:with-param name="txt" select="$txt"/>
                                 </xsl:call-template>
                             </linenum>
                         </line>
@@ -2073,7 +2073,7 @@
                             <linenum>
                                 <xsl:call-template name="CustomCharStyle">
                                     <xsl:with-param name="characterStyle" select="$customcharStyle"/>
-                                    <xsl:with-param name ="txt" select="$txt"/>
+                                    <xsl:with-param name="txt" select="$txt"/>
                                 </xsl:call-template>
                             </linenum>
                         </line>
@@ -2091,7 +2091,7 @@
             <xsl:otherwise>
                 <xsl:call-template name="CustomCharStyle">
                     <xsl:with-param name="characterStyle" select="$customcharStyle"/>
-                    <xsl:with-param name ="txt" select="$txt"/>
+                    <xsl:with-param name="txt" select="$txt"/>
                 </xsl:call-template>
             </xsl:otherwise>
         </xsl:choose>
@@ -2100,7 +2100,7 @@
     <!--Template for different inbuilt character styles-->
     <xsl:template name="CustomCharStyle">
         <xsl:param name="characterStyle"/>
-        <xsl:param name ="txt"/>
+        <xsl:param name="txt"/>
         <xsl:choose>
             <!--Strong and Emp-->
             <xsl:when test="(w:rPr/w:b or w:rPr/w:rStyle[@w:val='Strong']) and (w:rPr/w:i or w:rPr/w:rStyle[@w:val='Emphasis']) and not((w:rPr/w:vertAlign[@w:val ='superscript']) or (w:rPr/w:vertAlign[@w:val ='subscript']) or (w:rPr/w:rStyle[@w:val ='FootnoteReference']) or (w:rPr/w:rStyle[@w:val ='EndnoteReference']) or (w:footnoteReference) or (w:endnoteReference))">
@@ -2108,7 +2108,7 @@
                     <em>
                         <xsl:call-template name="CharacterStyles">
                             <xsl:with-param name="characterStyle" select="$characterStyle"/>
-                            <xsl:with-param name ="txt" select="$txt"/>
+                            <xsl:with-param name="txt" select="$txt"/>
                         </xsl:call-template>
                     </em>
                 </strong>
@@ -2118,7 +2118,7 @@
                 <strong>
                     <xsl:call-template name="CharacterStyles">
                         <xsl:with-param name="characterStyle" select="$characterStyle"/>
-                        <xsl:with-param name ="txt" select="$txt"/>
+                        <xsl:with-param name="txt" select="$txt"/>
                     </xsl:call-template>
                 </strong>
             </xsl:when>
@@ -2127,7 +2127,7 @@
                 <em>
                     <xsl:call-template name="CharacterStyles">
                         <xsl:with-param name="characterStyle" select="$characterStyle"/>
-                        <xsl:with-param name ="txt" select="$txt"/>
+                        <xsl:with-param name="txt" select="$txt"/>
                     </xsl:call-template>
                 </em>
             </xsl:when>
@@ -2138,7 +2138,7 @@
                         <em>
                             <xsl:call-template name="CharacterStyles">
                                 <xsl:with-param name="characterStyle" select="$characterStyle"/>
-                                <xsl:with-param name ="txt" select="$txt"/>
+                                <xsl:with-param name="txt" select="$txt"/>
                             </xsl:call-template>
                         </em>
                     </strong>
@@ -2150,7 +2150,7 @@
                     <strong>
                         <xsl:call-template name="CharacterStyles">
                             <xsl:with-param name="characterStyle" select="$characterStyle"/>
-                            <xsl:with-param name ="txt" select="$txt"/>
+                            <xsl:with-param name="txt" select="$txt"/>
                         </xsl:call-template>
                     </strong>
                 </sub>
@@ -2161,7 +2161,7 @@
                     <em>
                         <xsl:call-template name="CharacterStyles">
                             <xsl:with-param name="characterStyle" select="$characterStyle"/>
-                            <xsl:with-param name ="txt" select="$txt"/>
+                            <xsl:with-param name="txt" select="$txt"/>
                         </xsl:call-template>
                     </em>
                 </sub>
@@ -2171,7 +2171,7 @@
                 <sub>
                     <xsl:call-template name="CharacterStyles">
                         <xsl:with-param name="characterStyle" select="$characterStyle"/>
-                        <xsl:with-param name ="txt" select="$txt"/>
+                        <xsl:with-param name="txt" select="$txt"/>
                     </xsl:call-template>
                 </sub>
             </xsl:when>
@@ -2182,7 +2182,7 @@
                         <em>
                             <xsl:call-template name="CharacterStyles">
                                 <xsl:with-param name="characterStyle" select="$characterStyle"/>
-                                <xsl:with-param name ="txt" select="$txt"/>
+                                <xsl:with-param name="txt" select="$txt"/>
                             </xsl:call-template>
                         </em>
                     </strong>
@@ -2194,7 +2194,7 @@
                     <strong>
                         <xsl:call-template name="CharacterStyles">
                             <xsl:with-param name="characterStyle" select="$characterStyle"/>
-                            <xsl:with-param name ="txt" select="$txt"/>
+                            <xsl:with-param name="txt" select="$txt"/>
                         </xsl:call-template>
                     </strong>
                 </sup>
@@ -2205,7 +2205,7 @@
                     <em>
                         <xsl:call-template name="CharacterStyles">
                             <xsl:with-param name="characterStyle" select="$characterStyle"/>
-                            <xsl:with-param name ="txt" select="$txt"/>
+                            <xsl:with-param name="txt" select="$txt"/>
                         </xsl:call-template>
                     </em>
                 </sup>
@@ -2215,7 +2215,7 @@
                 <sup>
                     <xsl:call-template name="CharacterStyles">
                         <xsl:with-param name="characterStyle" select="$characterStyle"/>
-                        <xsl:with-param name ="txt" select="$txt"/>
+                        <xsl:with-param name="txt" select="$txt"/>
                     </xsl:call-template>
                 </sup>
             </xsl:when>
@@ -2224,7 +2224,7 @@
                 <w>
                     <xsl:call-template name="CharacterStyles">
                         <xsl:with-param name="characterStyle" select="$characterStyle"/>
-                        <xsl:with-param name ="txt" select="$txt"/>
+                        <xsl:with-param name="txt" select="$txt"/>
                     </xsl:call-template>
                 </w>
             </xsl:when>
@@ -2243,7 +2243,7 @@
                 </xsl:if>
                 <xsl:call-template name="CharacterStyles">
                     <xsl:with-param name="characterStyle" select="$characterStyle"/>
-                    <xsl:with-param name ="txt" select="$txt"/>
+                    <xsl:with-param name="txt" select="$txt"/>
                 </xsl:call-template>
             </xsl:when>
 
@@ -2252,7 +2252,7 @@
                 <xsl:for-each select="./node()">
                     <xsl:call-template name="CharacterStyles">
                         <xsl:with-param name="characterStyle" select="$characterStyle"/>
-                        <xsl:with-param name ="txt" select="$txt"/>
+                        <xsl:with-param name="txt" select="$txt"/>
                     </xsl:call-template>
                     <xsl:message terminate="no">progress:parahandler</xsl:message>
                     <xsl:choose>
@@ -2279,9 +2279,9 @@
     </xsl:template>
 
     <xsl:template name="List">
-        <xsl:param name ="verlist"/>
+        <xsl:param name="verlist"/>
         <xsl:param name="prmTrack"/>
-        <xsl:param name ="custom"/>
+        <xsl:param name="custom"/>
         <xsl:param name="sOperators"/>
         <xsl:param name="sMinuses"/>
         <xsl:param name="sNumbers"/>
@@ -2372,7 +2372,7 @@
         <xsl:variable name="PeekLevel" select="myObj:ListPeekLevel()"/>
         <xsl:if test="myObj:Difference($checkilvl,$PeekLevel)">
             <xsl:value-of disable-output-escaping="yes" select="concat('&lt;','/li','&gt;')"/>
-            <xsl:call-template name ="ComplexListClose">
+            <xsl:call-template name="ComplexListClose">
                 <xsl:with-param name="close" select="$checkilvl"/>
             </xsl:call-template>
         </xsl:if>
@@ -2397,7 +2397,7 @@
             <xsl:value-of select="document('word/numbering.xml')//w:numbering/w:abstractNum[@w:abstractNumId=$val]/w:lvl[@w:ilvl=$checkilvl]/w:lvlText/@w:val"/>
         </xsl:variable>
 
-        <xsl:call-template name ="recStart">
+        <xsl:call-template name="recStart">
             <xsl:with-param name="abstLevel" select="$val"/>
             <xsl:with-param name="level" select="$checkilvl"/>
         </xsl:call-template>
@@ -2406,8 +2406,8 @@
         <xsl:call-template name="addlist">
             <xsl:with-param name="openId" select="$checknumId"/>
             <xsl:with-param name="openlvl" select="$checkilvl"/>
-            <xsl:with-param name ="verlist" select="$verlist"/>
-            <xsl:with-param name ="custom" select="$custom"/>
+            <xsl:with-param name="verlist" select="$verlist"/>
+            <xsl:with-param name="custom" select="$custom"/>
             <xsl:with-param name="sOperators" select="$sOperators"/>
             <xsl:with-param name="sMinuses" select="$sMinuses"/>
             <xsl:with-param name="sNumbers" select="$sNumbers"/>
@@ -2429,7 +2429,7 @@
 
         <!--Insert page break in list-->
         <xsl:call-template name="PageInList">
-            <xsl:with-param name ="custom" select="$custom"/>
+            <xsl:with-param name="custom" select="$custom"/>
         </xsl:call-template>
 
         <!--Closing all the nested Lists-->
@@ -2449,16 +2449,16 @@
     <xsl:template name="StyleContainer">
         <xsl:param name="prmTrack"/>
         <xsl:param name="VERSION"/>
-        <xsl:param name ="custom"/>
-        <xsl:param name ="styleHeading"/>
+        <xsl:param name="custom"/>
+        <xsl:param name="styleHeading"/>
         <xsl:param name="sOperators"/>
         <xsl:param name="sMinuses"/>
         <xsl:param name="sNumbers"/>
         <xsl:param name="sZeros"/>
-        <xsl:param name ="mastersubstyle"/>
-        <xsl:param name ="txt"/>
-        <xsl:param name ="imgOptionStyle"/>
-        <xsl:param name ="dpiStyle"/>
+        <xsl:param name="mastersubstyle"/>
+        <xsl:param name="txt"/>
+        <xsl:param name="imgOptionStyle"/>
+        <xsl:param name="dpiStyle"/>
         <xsl:param name="characterStyle"/>
         <xsl:message terminate="no">progress:parahandler</xsl:message>
         <xsl:choose>
@@ -2468,7 +2468,7 @@
                 <xsl:call-template name="Blocklist">
                     <xsl:with-param name="prmTrack" select="$prmTrack"/>
                     <xsl:with-param name="VERSION" select="$VERSION"/>
-                    <xsl:with-param name ="custom" select="$custom"/>
+                    <xsl:with-param name="custom" select="$custom"/>
                     <xsl:with-param name="blkcharstyle" select="$characterStyle"/>
                 </xsl:call-template>
             </xsl:when>
@@ -2482,20 +2482,20 @@
                 </xsl:call-template>
                 <!--Calling Template to add Table Of Contents-->
                 <xsl:call-template name="TableOfContents">
-                    <xsl:with-param name ="custom" select="$custom"/>
+                    <xsl:with-param name="custom" select="$custom"/>
                 </xsl:call-template>
                 <!--Open $PeekLevel levels after Table Of Contents-->
                 <xsl:call-template name="AddLevel">
                     <xsl:with-param name="levelValue" select="$PeekLevel"/>
                     <xsl:with-param name="check" select="1"/>
-                    <xsl:with-param name ="verhead" select="$VERSION"/>
-                    <xsl:with-param name ="custom" select="$custom"/>
-                    <xsl:with-param name ="sOperators" select="$sOperators"/>
-                    <xsl:with-param name ="sMinuses" select="$sMinuses"/>
-                    <xsl:with-param name ="sNumbers" select="$sNumbers"/>
-                    <xsl:with-param name ="sZeros" select="$sZeros"/>
-                    <xsl:with-param name ="mastersubhead" select="$mastersubstyle"/>
-                    <xsl:with-param name ="txt" select="0"/>
+                    <xsl:with-param name="verhead" select="$VERSION"/>
+                    <xsl:with-param name="custom" select="$custom"/>
+                    <xsl:with-param name="sOperators" select="$sOperators"/>
+                    <xsl:with-param name="sMinuses" select="$sMinuses"/>
+                    <xsl:with-param name="sNumbers" select="$sNumbers"/>
+                    <xsl:with-param name="sZeros" select="$sZeros"/>
+                    <xsl:with-param name="mastersubhead" select="$mastersubstyle"/>
+                    <xsl:with-param name="txt" select="0"/>
                     <xsl:with-param name="lvlcharStyle" select="$characterStyle"/>
                 </xsl:call-template>
             </xsl:when>
@@ -2505,9 +2505,9 @@
                 <xsl:if test="(w:r/w:lastRenderedPageBreak) or (w:r/w:br/@w:type='page')">
                     <xsl:call-template name="footnote">
                         <xsl:with-param name="verfoot" select="$VERSION"/>
-                        <xsl:with-param name ="custom" select="$custom"/>
-                        <xsl:with-param name ="mastersubfoot" select="$mastersubstyle"/>
-                        <xsl:with-param name ="characStyle" select="$characterStyle"/>
+                        <xsl:with-param name="custom" select="$custom"/>
+                        <xsl:with-param name="mastersubfoot" select="$mastersubstyle"/>
+                        <xsl:with-param name="characStyle" select="$characterStyle"/>
                         <xsl:with-param name="sOperators" select="$sOperators"/>
                         <xsl:with-param name="sMinuses" select="$sMinuses"/>
                         <xsl:with-param name="sNumbers" select="$sNumbers"/>
@@ -2517,21 +2517,21 @@
 
                 <xsl:choose>
                     <xsl:when test="((w:pPr/w:numPr/w:ilvl) and (w:pPr/w:numPr/w:numId))">
-                        <xsl:variable name ="text_heading">
+                        <xsl:variable name="text_heading">
                             <!--variable checkilvl holds level(w:ilvl) value of the List-->
                             <!--NOTE:Use GetCheckLvlInt function that return 0 if node is not exists-->
                             <xsl:variable name="checkilvl" select="myObj:GetCheckLvlInt(w:pPr/w:numPr/w:ilvl/@w:val)"/>
                             <!--Variable checknumId holds the w:numId value which specifies the type of numbering in the list-->
                             <xsl:variable name="checknumId" select="w:pPr/w:numPr/w:numId/@w:val"/>
-                            <xsl:call-template name ="HeadingsPart">
-                                <xsl:with-param name ="checkilvl" select="$checkilvl"/>
-                                <xsl:with-param name ="checknumId" select="$checknumId"/>
-                                <xsl:with-param name ="doc" select="'Document'"/>
+                            <xsl:call-template name="HeadingsPart">
+                                <xsl:with-param name="checkilvl" select="$checkilvl"/>
+                                <xsl:with-param name="checknumId" select="$checknumId"/>
+                                <xsl:with-param name="doc" select="'Document'"/>
                             </xsl:call-template>
-                            <xsl:value-of select ="myObj:RetrieveHeadingPart()"/>
+                            <xsl:value-of select="myObj:RetrieveHeadingPart()"/>
                         </xsl:variable>
 
-                        <xsl:variable name ="absValue">
+                        <xsl:variable name="absValue">
                             <!--variable checkilvl holds level(w:ilvl) value of the List-->
                             <!--NOTE:Use GetCheckLvlInt function that return 0 if node is not exists-->
                             <xsl:variable name="checkilvl" select="myObj:GetCheckLvlInt(w:pPr/w:numPr/w:ilvl/@w:val)"/>
@@ -2549,21 +2549,21 @@
                             <!--Passing parameter levelValue which holds the Heading type value-->
                             <xsl:with-param name="levelValue" select="w:pPr/w:numPr/w:ilvl/@w:val"/>
                             <xsl:with-param name="check" select="1"/>
-                            <xsl:with-param name ="verhead" select="$VERSION"/>
-                            <xsl:with-param name ="custom" select="$custom"/>
-                            <xsl:with-param name ="sOperators" select="$sOperators"/>
-                            <xsl:with-param name ="sMinuses" select="$sMinuses"/>
-                            <xsl:with-param name ="sNumbers" select="$sNumbers"/>
-                            <xsl:with-param name ="sZeros" select="$sZeros"/>
-                            <xsl:with-param name ="mastersubhead" select="$mastersubstyle"/>
-                            <xsl:with-param name ="abValue" select="$absValue"/>
-                            <xsl:with-param name ="txt" select="concat($text_heading,'!',w:pPr/w:numPr/w:numId/@w:val)"/>
+                            <xsl:with-param name="verhead" select="$VERSION"/>
+                            <xsl:with-param name="custom" select="$custom"/>
+                            <xsl:with-param name="sOperators" select="$sOperators"/>
+                            <xsl:with-param name="sMinuses" select="$sMinuses"/>
+                            <xsl:with-param name="sNumbers" select="$sNumbers"/>
+                            <xsl:with-param name="sZeros" select="$sZeros"/>
+                            <xsl:with-param name="mastersubhead" select="$mastersubstyle"/>
+                            <xsl:with-param name="abValue" select="$absValue"/>
+                            <xsl:with-param name="txt" select="concat($text_heading,'!',w:pPr/w:numPr/w:numId/@w:val)"/>
                             <xsl:with-param name="lvlcharStyle" select="$characterStyle"/>
                         </xsl:call-template>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:variable name ="text_heading">
-                            <xsl:variable name ="nameHeading" select="w:pPr/w:pStyle/@w:val"/>
+                        <xsl:variable name="text_heading">
+                            <xsl:variable name="nameHeading" select="w:pPr/w:pStyle/@w:val"/>
                             <xsl:for-each select="document('word/styles.xml')//w:styles/w:style[@w:styleId=$nameHeading]">
                                 <xsl:message terminate="no">progress:parahandler</xsl:message>
                                 <xsl:choose>
@@ -2571,12 +2571,12 @@
                                         <!--NOTE:Use GetCheckLvlInt function that return 0 if node is not exists-->
                                         <xsl:variable name="checkilvl" select="myObj:GetCheckLvlInt(./w:pPr/w:outlineLvl/@w:val)"/>
                                         <xsl:variable name="checknumId" select="./w:pPr/w:numPr/w:numId/@w:val"/>
-                                        <xsl:call-template name ="HeadingsPart">
-                                            <xsl:with-param name ="checkilvl" select="$checkilvl"/>
-                                            <xsl:with-param name ="checknumId" select="$checknumId"/>
-                                            <xsl:with-param name ="doc" select="'Style'"/>
+                                        <xsl:call-template name="HeadingsPart">
+                                            <xsl:with-param name="checkilvl" select="$checkilvl"/>
+                                            <xsl:with-param name="checknumId" select="$checknumId"/>
+                                            <xsl:with-param name="doc" select="'Style'"/>
                                         </xsl:call-template>
-                                        <xsl:value-of select ="myObj:RetrieveHeadingPart()"/>
+                                        <xsl:value-of select="myObj:RetrieveHeadingPart()"/>
                                     </xsl:when>
                                     <xsl:when test="string-length(./w:pPr/w:numPr/w:numId)=0">
                                         <!--NOTE:Use GetCheckLvlInt function that return 0 if node is not exists-->
@@ -2589,8 +2589,8 @@
                             </xsl:for-each>
                         </xsl:variable>
 
-                        <xsl:variable name ="absValue">
-                            <xsl:variable name ="nameHeading" select="w:pPr/w:pStyle/@w:val"/>
+                        <xsl:variable name="absValue">
+                            <xsl:variable name="nameHeading" select="w:pPr/w:pStyle/@w:val"/>
                             <xsl:for-each select="document('word/styles.xml')//w:styles/w:style[@w:styleId=$nameHeading]">
                                 <xsl:message terminate="no">progress:parahandler</xsl:message>
                                 <xsl:if test="(./w:pPr/w:outlineLvl) and (./w:pPr/w:numPr/w:numId)">
@@ -2605,7 +2605,7 @@
 
 
                         <xsl:variable name="ilvl">
-                            <xsl:variable name ="nameHeading" select="w:pPr/w:pStyle/@w:val"/>
+                            <xsl:variable name="nameHeading" select="w:pPr/w:pStyle/@w:val"/>
                             <xsl:for-each select="document('word/styles.xml')//w:styles/w:style[@w:styleId=$nameHeading]">
                                 <xsl:message terminate="no">progress:parahandler</xsl:message>
                                 <xsl:choose>
@@ -2626,15 +2626,15 @@
                         <xsl:call-template name="AddLevel">
                             <xsl:with-param name="levelValue" select="$ilvl"/>
                             <xsl:with-param name="check" select="1"/>
-                            <xsl:with-param name ="verhead" select="$VERSION"/>
-                            <xsl:with-param name ="custom" select="$custom"/>
-                            <xsl:with-param name ="sOperators" select="$sOperators"/>
-                            <xsl:with-param name ="sMinuses" select="$sMinuses"/>
-                            <xsl:with-param name ="sNumbers" select="$sNumbers"/>
-                            <xsl:with-param name ="sZeros" select="$sZeros"/>
-                            <xsl:with-param name ="mastersubhead" select="$mastersubstyle"/>
-                            <xsl:with-param name ="abValue" select="$absValue"/>
-                            <xsl:with-param name ="txt" select="$text_heading"/>
+                            <xsl:with-param name="verhead" select="$VERSION"/>
+                            <xsl:with-param name="custom" select="$custom"/>
+                            <xsl:with-param name="sOperators" select="$sOperators"/>
+                            <xsl:with-param name="sMinuses" select="$sMinuses"/>
+                            <xsl:with-param name="sNumbers" select="$sNumbers"/>
+                            <xsl:with-param name="sZeros" select="$sZeros"/>
+                            <xsl:with-param name="mastersubhead" select="$mastersubstyle"/>
+                            <xsl:with-param name="abValue" select="$absValue"/>
+                            <xsl:with-param name="txt" select="$text_heading"/>
                             <xsl:with-param name="lvlcharStyle" select="$characterStyle"/>
                         </xsl:call-template>
 
@@ -2648,11 +2648,11 @@
                     <xsl:call-template name="ParaHandler">
                         <xsl:with-param name="flag" select="'0'"/>
                         <xsl:with-param name="VERSION" select="$VERSION"/>
-                        <xsl:with-param name ="custom" select="$custom"/>
-                        <xsl:with-param name ="imgOptionPara" select="$imgOptionStyle"/>
-                        <xsl:with-param name ="dpiPara" select="$dpiStyle"/>
-                        <xsl:with-param name ="txt" select="$txt"/>
-                        <xsl:with-param name ="charparahandlerStyle" select="$characterStyle"/>
+                        <xsl:with-param name="custom" select="$custom"/>
+                        <xsl:with-param name="imgOptionPara" select="$imgOptionStyle"/>
+                        <xsl:with-param name="dpiPara" select="$dpiStyle"/>
+                        <xsl:with-param name="txt" select="$txt"/>
+                        <xsl:with-param name="charparahandlerStyle" select="$characterStyle"/>
                     </xsl:call-template>
                 </bridgehead>
             </xsl:when>
@@ -2665,11 +2665,11 @@
                             <xsl:call-template name="ParaHandler">
                                 <xsl:with-param name="flag" select="'0'"/>
                                 <xsl:with-param name="VERSION" select="$VERSION"/>
-                                <xsl:with-param name ="custom" select="$custom"/>
-                                <xsl:with-param name ="imgOptionPara" select="$imgOptionStyle"/>
-                                <xsl:with-param name ="dpiPara" select="$dpiStyle"/>
-                                <xsl:with-param name ="charparahandlerStyle" select="$characterStyle"/>
-                                <xsl:with-param name ="txt" select="$txt"/>
+                                <xsl:with-param name="custom" select="$custom"/>
+                                <xsl:with-param name="imgOptionPara" select="$imgOptionStyle"/>
+                                <xsl:with-param name="dpiPara" select="$dpiStyle"/>
+                                <xsl:with-param name="charparahandlerStyle" select="$characterStyle"/>
+                                <xsl:with-param name="txt" select="$txt"/>
                             </xsl:call-template>
                             <xsl:text disable-output-escaping="yes">&lt;/hd&gt;</xsl:text>
                         </xsl:variable>
@@ -2693,9 +2693,9 @@
                                 <xsl:variable name="checknumId" select="w:pPr/w:numPr/w:numId/@w:val"/>
 
                                 <xsl:call-template name="VanishTemplate">
-                                    <xsl:with-param name ="checkilvl" select="$checkilvl"/>
-                                    <xsl:with-param name ="checknumId" select="$checknumId"/>
-                                    <xsl:with-param name ="checkCounter" select="$checkCounter"/>
+                                    <xsl:with-param name="checkilvl" select="$checkilvl"/>
+                                    <xsl:with-param name="checknumId" select="$checknumId"/>
+                                    <xsl:with-param name="checkCounter" select="$checkCounter"/>
                                 </xsl:call-template>
 
                             </xsl:otherwise>
@@ -2706,9 +2706,9 @@
                         <xsl:call-template name="List">
                             <xsl:with-param name="prmTrack" select="$prmTrack"/>
                             <xsl:with-param name="VERSION" select="$VERSION"/>
-                            <xsl:with-param name ="custom" select="$custom"/>
-                            <xsl:with-param name ="imgOptionPara" select="$imgOptionStyle"/>
-                            <xsl:with-param name ="dpiPara" select="$dpiStyle"/>
+                            <xsl:with-param name="custom" select="$custom"/>
+                            <xsl:with-param name="imgOptionPara" select="$imgOptionStyle"/>
+                            <xsl:with-param name="dpiPara" select="$dpiStyle"/>
                             <xsl:with-param name="listcharStyle" select="$characterStyle"/>
                         </xsl:call-template>
                     </xsl:when>
@@ -2729,11 +2729,11 @@
                                 <xsl:with-param name="VERSION" select="$VERSION"/>
                                 <xsl:with-param name="flag" select="'0'"/>
                                 <xsl:with-param name="custom" select="$custom"/>
-                                <xsl:with-param name ="masterparastyle" select="$mastersubstyle"/>
-                                <xsl:with-param name ="imgOptionPara" select="$imgOptionStyle"/>
-                                <xsl:with-param name ="dpiPara" select="$dpiStyle"/>
-                                <xsl:with-param name ="txt" select="$txt"/>
-                                <xsl:with-param name ="characterparaStyle" select="$characterStyle"/>
+                                <xsl:with-param name="masterparastyle" select="$mastersubstyle"/>
+                                <xsl:with-param name="imgOptionPara" select="$imgOptionStyle"/>
+                                <xsl:with-param name="dpiPara" select="$dpiStyle"/>
+                                <xsl:with-param name="txt" select="$txt"/>
+                                <xsl:with-param name="characterparaStyle" select="$characterStyle"/>
                             </xsl:call-template>
                         </xsl:if>
                     </xsl:otherwise>
@@ -2742,10 +2742,10 @@
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template name ="VanishTemplate">
-        <xsl:param name ="checkilvl"/>
-        <xsl:param name ="checknumId"/>
-        <xsl:param name ="checkCounter"/>
+    <xsl:template name="VanishTemplate">
+        <xsl:param name="checkilvl"/>
+        <xsl:param name="checknumId"/>
+        <xsl:param name="checkCounter"/>
         <xsl:message terminate="no">progress:parahandler</xsl:message>
         <xsl:variable name="val">
             <xsl:value-of select="document('word/numbering.xml')//w:numbering/w:num[@w:numId=$checknumId]/w:abstractNumId/@w:val"/>
@@ -2767,17 +2767,17 @@
                         <xsl:choose>
                             <xsl:when test="not($lStartOverride='')">
                                 <xsl:variable name="resetListCounters" select="myObj:StartHeadingValueCtr($checknumId,$val)"/>
-                                <xsl:variable name ="startItem" select="myObj:StartHeadingString($checkilvl,$lStartOverride,$checknumId,$val,'Vanish','Yes')"/>
-                                <xsl:variable name ="copyCurrCounter" select="myObj:CopyToCurrCounter($checknumId)"/>
+                                <xsl:variable name="startItem" select="myObj:StartHeadingString($checkilvl,$lStartOverride,$checknumId,$val,'Vanish','Yes')"/>
+                                <xsl:variable name="copyCurrCounter" select="myObj:CopyToCurrCounter($checknumId)"/>
                                 <xsl:variable name="vanishCounter" select="myObj:IncrementHeadingCounters(w:pPr/w:numPr/w:ilvl/@w:val,$checknumId,$val)"/>
-                                <xsl:variable name ="copyBaseCounter" select="myObj:CopyToBaseCounter($checknumId)"/>
+                                <xsl:variable name="copyBaseCounter" select="myObj:CopyToBaseCounter($checknumId)"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:variable name="resetListCounters" select="myObj:StartHeadingValueCtr($checknumId,$val)"/>
-                                <xsl:variable name ="startItem" select="myObj:StartHeadingString($checkilvl,$lStart,$checknumId,$val,'Vanish','No')"/>
-                                <xsl:variable name ="copyCurrCounter" select="myObj:CopyToCurrCounter($checknumId)"/>
+                                <xsl:variable name="startItem" select="myObj:StartHeadingString($checkilvl,$lStart,$checknumId,$val,'Vanish','No')"/>
+                                <xsl:variable name="copyCurrCounter" select="myObj:CopyToCurrCounter($checknumId)"/>
                                 <xsl:variable name="vanishCounter" select="myObj:IncrementHeadingCounters(w:pPr/w:numPr/w:ilvl/@w:val,$checknumId,$val)"/>
-                                <xsl:variable name ="copyBaseCounter" select="myObj:CopyToBaseCounter($checknumId)"/>
+                                <xsl:variable name="copyBaseCounter" select="myObj:CopyToBaseCounter($checknumId)"/>
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:when>
@@ -2793,18 +2793,18 @@
                         </xsl:if>
                         <xsl:choose>
                             <xsl:when test="not($lStartOverride='')">
-                                <xsl:variable name ="copyCurrCounter" select="myObj:CopyToCurrCounter($checknumId)"/>
+                                <xsl:variable name="copyCurrCounter" select="myObj:CopyToCurrCounter($checknumId)"/>
                                 <xsl:variable name="ListCounters" select="myObj:StartHeadingValueCtr($checknumId,$val)"/>
-                                <xsl:variable name ="startItem" select="myObj:StartHeadingString($checkilvl,$lStartOverride,$checkCounter,$val,'Vanish','Yes')"/>
+                                <xsl:variable name="startItem" select="myObj:StartHeadingString($checkilvl,$lStartOverride,$checkCounter,$val,'Vanish','Yes')"/>
                                 <xsl:variable name="vanishCounter" select="myObj:IncrementHeadingCounters(w:pPr/w:numPr/w:ilvl/@w:val,$checkCounter,$val)"/>
-                                <xsl:variable name ="copyBaseCounter" select="myObj:CopyToBaseCounter($checkCounter)"/>
+                                <xsl:variable name="copyBaseCounter" select="myObj:CopyToBaseCounter($checkCounter)"/>
                             </xsl:when>
                             <xsl:otherwise>
-                                <xsl:variable name ="copyCurrCounter" select="myObj:CopyToCurrCounter($checknumId)"/>
+                                <xsl:variable name="copyCurrCounter" select="myObj:CopyToCurrCounter($checknumId)"/>
                                 <xsl:variable name="resetListCounters" select="myObj:StartHeadingValueCtr($checknumId,$val)"/>
-                                <xsl:variable name ="startItem" select="myObj:StartHeadingString($checkilvl,$lStart,$checknumId,$val,'Vanish','No')"/>
+                                <xsl:variable name="startItem" select="myObj:StartHeadingString($checkilvl,$lStart,$checknumId,$val,'Vanish','No')"/>
                                 <xsl:variable name="vanishCounter" select="myObj:IncrementHeadingCounters(w:pPr/w:numPr/w:ilvl/@w:val,$checkCounter,$val)"/>
-                                <xsl:variable name ="copyBaseCounter" select="myObj:CopyToBaseCounter($checkCounter)"/>
+                                <xsl:variable name="copyBaseCounter" select="myObj:CopyToBaseCounter($checkCounter)"/>
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:when>
@@ -2813,10 +2813,10 @@
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template name ="HeadingsPart">
-        <xsl:param name ="checkilvl"/>
-        <xsl:param name ="checknumId"/>
-        <xsl:param name ="doc"/>
+    <xsl:template name="HeadingsPart">
+        <xsl:param name="checkilvl"/>
+        <xsl:param name="checknumId"/>
+        <xsl:param name="doc"/>
         <xsl:message terminate="no">progress:parahandler</xsl:message>
         <xsl:variable name="val">
             <xsl:value-of select="document('word/numbering.xml')//w:numbering/w:num[@w:numId=$checknumId]/w:abstractNumId/@w:val"/>
@@ -2849,18 +2849,18 @@
                 <xsl:choose>
                     <xsl:when test="not($lStartOverride='')">
                         <xsl:variable name="resetListCounters" select="myObj:StartHeadingNewCtr($checknumId,$val)"/>
-                        <xsl:variable name ="startItem" select="myObj:StartHeadingString($checkilvl,$lStartOverride,$checknumId,$val,$doc,'Yes')"/>
-                        <xsl:variable name ="copyCurrCounter" select="myObj:CopyToCurrCounter($checknumId)"/>
+                        <xsl:variable name="startItem" select="myObj:StartHeadingString($checkilvl,$lStartOverride,$checknumId,$val,$doc,'Yes')"/>
+                        <xsl:variable name="copyCurrCounter" select="myObj:CopyToCurrCounter($checknumId)"/>
                     </xsl:when>
                     <xsl:when test="$lStartOverride='' and document('word/numbering.xml')//w:numbering/w:num[@w:numId=$checknumId]/w:lvlOverride">
                         <xsl:variable name="resetListCounters" select="myObj:StartHeadingNewCtr($checknumId,$val)"/>
-                        <xsl:variable name ="startItem" select="myObj:StartHeadingString($checkilvl,'0',$checknumId,$val,$doc,'Yes')"/>
-                        <xsl:variable name ="copyCurrCounter" select="myObj:CopyToCurrCounter($checknumId)"/>
+                        <xsl:variable name="startItem" select="myObj:StartHeadingString($checkilvl,'0',$checknumId,$val,$doc,'Yes')"/>
+                        <xsl:variable name="copyCurrCounter" select="myObj:CopyToCurrCounter($checknumId)"/>
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:variable name="resetListCounters" select="myObj:StartHeadingNewCtr($checknumId,$val)"/>
-                        <xsl:variable name ="startItem" select="myObj:StartHeadingString($checkilvl,$lStart,$checknumId,$val,$doc,'No')"/>
-                        <xsl:variable name ="copyCurrCounter" select="myObj:CopyToCurrCounter($checknumId)"/>
+                        <xsl:variable name="startItem" select="myObj:StartHeadingString($checkilvl,$lStart,$checknumId,$val,$doc,'No')"/>
+                        <xsl:variable name="copyCurrCounter" select="myObj:CopyToCurrCounter($checknumId)"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:when>
@@ -2878,7 +2878,7 @@
 
     <xsl:template name="CharacterStyles">
         <xsl:param name="characterStyle"/>
-        <xsl:param name ="txt"/>
+        <xsl:param name="txt"/>
         <xsl:message terminate="no">progress:parahandler</xsl:message>
         <xsl:choose>
             <xsl:when test="$characterStyle='True'">
@@ -3131,15 +3131,15 @@
         <xsl:param name="flag"/>
         <xsl:param name="flagNote"/>
         <xsl:param name="checkid"/>
-        <xsl:param name ="custom"/>
+        <xsl:param name="custom"/>
         <xsl:param name="sOperators"/>
         <xsl:param name="sMinuses"/>
         <xsl:param name="sNumbers"/>
         <xsl:param name="sZeros"/>
-        <xsl:param name ="txt"/>
-        <xsl:param name ="masterparastyle"/>
-        <xsl:param name ="imgOptionPara"/>
-        <xsl:param name ="dpiPara"/>
+        <xsl:param name="txt"/>
+        <xsl:param name="masterparastyle"/>
+        <xsl:param name="imgOptionPara"/>
+        <xsl:param name="dpiPara"/>
         <xsl:param name="characterparaStyle"/>
 
         <xsl:variable name="aquote">"</xsl:variable>
@@ -3157,8 +3157,8 @@
                 <xsl:call-template name="ParaHandler">
                     <xsl:with-param name="flag" select="'0'"/>
                     <xsl:with-param name="VERSION" select="$VERSION"/>
-                    <xsl:with-param name ="custom" select="$custom"/>
-                    <xsl:with-param name ="txt" select="$txt"/>
+                    <xsl:with-param name="custom" select="$custom"/>
+                    <xsl:with-param name="txt" select="$txt"/>
                     <xsl:with-param name="charparahandlerStyle" select="$characterparaStyle"/>
                 </xsl:call-template>
                 <xsl:value-of disable-output-escaping="yes" select="concat('&lt;','/doctitle','&gt;')"/>
@@ -3180,7 +3180,7 @@
                 </xsl:if>
                 <xsl:call-template name="Paracharacterstyle">
                     <xsl:with-param name="characterStyle" select="$characterparaStyle"/>
-                    <xsl:with-param name ="txt" select="$txt"/>
+                    <xsl:with-param name="txt" select="$txt"/>
                     <xsl:with-param name="flag" select="0"/>
                 </xsl:call-template>
                 <xsl:value-of disable-output-escaping="yes" select="concat('&lt;','/author','&gt;')"/>
@@ -3195,7 +3195,7 @@
                 <xsl:value-of disable-output-escaping="yes" select="concat('&lt;','covertitle ','xml:lang=',$aquote,$lang,$aquote,'&gt;')"/>
                 <xsl:call-template name="Paracharacterstyle">
                     <xsl:with-param name="characterStyle" select="$characterparaStyle"/>
-                    <xsl:with-param name ="txt" select="$txt"/>
+                    <xsl:with-param name="txt" select="$txt"/>
                     <xsl:with-param name="flag" select="0"/>
                 </xsl:call-template>
                 <xsl:value-of disable-output-escaping="yes" select="concat('&lt;','/covertitle','&gt;')"/>
@@ -3217,7 +3217,7 @@
                 <xsl:value-of disable-output-escaping="yes" select="concat('&lt;','byline ','xml:lang=',$aquote,$lang,$aquote,'&gt;')"/>
                 <xsl:call-template name="Paracharacterstyle">
                     <xsl:with-param name="characterStyle" select="$characterparaStyle"/>
-                    <xsl:with-param name ="txt" select="$txt"/>
+                    <xsl:with-param name="txt" select="$txt"/>
                     <xsl:with-param name="flag" select="0"/>
                 </xsl:call-template>
                 <xsl:value-of disable-output-escaping="yes" select="concat('&lt;','/byline','&gt;')"/>
@@ -3239,7 +3239,7 @@
                 <xsl:value-of disable-output-escaping="yes" select="concat('&lt;','dateline ','xml:lang=',$aquote,$lang,$aquote,'&gt;')"/>
                 <xsl:call-template name="Paracharacterstyle">
                     <xsl:with-param name="characterStyle" select="$characterparaStyle"/>
-                    <xsl:with-param name ="txt" select="$txt"/>
+                    <xsl:with-param name="txt" select="$txt"/>
                     <xsl:with-param name="flag" select="0"/>
                 </xsl:call-template>
                 <xsl:value-of disable-output-escaping="yes" select="concat('&lt;','/dateline','&gt;')"/>
@@ -3257,7 +3257,7 @@
 
                 <xsl:call-template name="Paracharacterstyle">
                     <xsl:with-param name="characterStyle" select="$characterparaStyle"/>
-                    <xsl:with-param name ="txt" select="$txt"/>
+                    <xsl:with-param name="txt" select="$txt"/>
                     <xsl:with-param name="flag" select="1"/>
                 </xsl:call-template>
 
@@ -3278,7 +3278,7 @@
 
                 <xsl:call-template name="Paracharacterstyle">
                     <xsl:with-param name="characterStyle" select="$characterparaStyle"/>
-                    <xsl:with-param name ="txt" select="$txt"/>
+                    <xsl:with-param name="txt" select="$txt"/>
                     <xsl:with-param name="flag" select="1"/>
                 </xsl:call-template>
 
@@ -3307,7 +3307,7 @@
                     <title>
                         <xsl:call-template name="Paracharacterstyle">
                             <xsl:with-param name="characterStyle" select="$characterparaStyle"/>
-                            <xsl:with-param name ="txt" select="$txt"/>
+                            <xsl:with-param name="txt" select="$txt"/>
                             <xsl:with-param name="flag" select="0"/>
                         </xsl:call-template>
                     </title>
@@ -3316,7 +3316,7 @@
                     <hd>
                         <xsl:call-template name="Paracharacterstyle">
                             <xsl:with-param name="characterStyle" select="$characterparaStyle"/>
-                            <xsl:with-param name ="txt" select="$txt"/>
+                            <xsl:with-param name="txt" select="$txt"/>
                             <xsl:with-param name="flag" select="0"/>
                         </xsl:call-template>
                     </hd>
@@ -3333,7 +3333,7 @@
                     <line>
                         <xsl:call-template name="Paracharacterstyle">
                             <xsl:with-param name="characterStyle" select="$characterparaStyle"/>
-                            <xsl:with-param name ="txt" select="$txt"/>
+                            <xsl:with-param name="txt" select="$txt"/>
                             <xsl:with-param name="flag" select="0"/>
                         </xsl:call-template>
                     </line>
@@ -3345,7 +3345,7 @@
                     <author>
                         <xsl:call-template name="Paracharacterstyle">
                             <xsl:with-param name="characterStyle" select="$characterparaStyle"/>
-                            <xsl:with-param name ="txt" select="$txt"/>
+                            <xsl:with-param name="txt" select="$txt"/>
                             <xsl:with-param name="flag" select="0"/>
                         </xsl:call-template>
                     </author>
@@ -3354,7 +3354,7 @@
                     <byline>
                         <xsl:call-template name="Paracharacterstyle">
                             <xsl:with-param name="characterStyle" select="$characterparaStyle"/>
-                            <xsl:with-param name ="txt" select="$txt"/>
+                            <xsl:with-param name="txt" select="$txt"/>
                             <xsl:with-param name="flag" select="0"/>
                         </xsl:call-template>
                     </byline>
@@ -3375,7 +3375,7 @@
                 </xsl:if>
                 <xsl:call-template name="Paracharacterstyle">
                     <xsl:with-param name="characterStyle" select="$characterparaStyle"/>
-                    <xsl:with-param name ="txt" select="$txt"/>
+                    <xsl:with-param name="txt" select="$txt"/>
                     <xsl:with-param name="flag" select="1"/>
                 </xsl:call-template>
                 <xsl:if test="count(following-sibling::node()[1]/w:pPr/w:pStyle[substring(@w:val,1,8)='Epigraph'])=0">
@@ -3415,7 +3415,7 @@
                 <line>
                     <xsl:call-template name="Paracharacterstyle">
                         <xsl:with-param name="characterStyle" select="$characterparaStyle"/>
-                        <xsl:with-param name ="txt" select="$txt"/>
+                        <xsl:with-param name="txt" select="$txt"/>
                         <xsl:with-param name="flag" select="0"/>
                     </xsl:call-template>
                 </line>
@@ -3438,7 +3438,7 @@
 
                 <xsl:call-template name="Paracharacterstyle">
                     <xsl:with-param name="characterStyle" select="$characterparaStyle"/>
-                    <xsl:with-param name ="txt" select="$txt"/>
+                    <xsl:with-param name="txt" select="$txt"/>
                     <xsl:with-param name="flag" select="1"/>
                 </xsl:call-template>
 
@@ -3453,13 +3453,13 @@
                     <xsl:with-param name="flag" select="'3'"/>
                     <xsl:with-param name="VERSION" select="$VERSION"/>
                     <xsl:with-param name="flagNote" select="$flagNote"/>
-                    <xsl:with-param name ="custom" select="$custom"/>
+                    <xsl:with-param name="custom" select="$custom"/>
                     <xsl:with-param name="sOperators" select="$sOperators"/>
                     <xsl:with-param name="sMinuses" select="$sMinuses"/>
                     <xsl:with-param name="sNumbers" select="$sNumbers"/>
                     <xsl:with-param name="sZeros" select="$sZeros"/>
-                    <xsl:with-param name ="txt" select="$txt"/>
-                    <xsl:with-param name ="mastersubpara" select="$masterparastyle"/>
+                    <xsl:with-param name="txt" select="$txt"/>
+                    <xsl:with-param name="mastersubpara" select="$masterparastyle"/>
                     <xsl:with-param name="charparahandlerStyle" select="$characterparaStyle"/>
                 </xsl:call-template>
             </xsl:when>
@@ -3493,7 +3493,7 @@
                     <dd>
                         <xsl:call-template name="Paracharacterstyle">
                             <xsl:with-param name="characterStyle" select="$characterparaStyle"/>
-                            <xsl:with-param name ="txt" select="$txt"/>
+                            <xsl:with-param name="txt" select="$txt"/>
                             <xsl:with-param name="flag" select="0"/>
                         </xsl:call-template>
                     </dd>
@@ -3516,8 +3516,8 @@
                                 <xsl:call-template name="ParaHandler">
                                     <xsl:with-param name="flag" select="'0'"/>
                                     <xsl:with-param name="VERSION" select="$VERSION"/>
-                                    <xsl:with-param name ="custom" select="$custom"/>
-                                    <xsl:with-param name ="txt" select="$txt"/>
+                                    <xsl:with-param name="custom" select="$custom"/>
+                                    <xsl:with-param name="txt" select="$txt"/>
                                     <xsl:with-param name="charparahandlerStyle" select="$characterparaStyle"/>
                                 </xsl:call-template>
                             </span>
@@ -3532,8 +3532,8 @@
                                 <xsl:call-template name="ParaHandler">
                                     <xsl:with-param name="flag" select="'0'"/>
                                     <xsl:with-param name="VERSION" select="$VERSION"/>
-                                    <xsl:with-param name ="custom" select="$custom"/>
-                                    <xsl:with-param name ="txt" select="$txt"/>
+                                    <xsl:with-param name="custom" select="$custom"/>
+                                    <xsl:with-param name="txt" select="$txt"/>
                                     <xsl:with-param name="charparahandlerStyle" select="$characterparaStyle"/>
                                 </xsl:call-template>
                             </span>
@@ -3547,7 +3547,7 @@
                                 <xsl:call-template name="ParaHandler">
                                     <xsl:with-param name="flag" select="'0'"/>
                                     <xsl:with-param name="VERSION" select="$VERSION"/>
-                                    <xsl:with-param name ="custom" select="$custom"/>
+                                    <xsl:with-param name="custom" select="$custom"/>
                                     <xsl:with-param name="charparahandlerStyle" select="$characterparaStyle"/>
                                 </xsl:call-template>
                             </span>
@@ -3561,8 +3561,8 @@
                                 <xsl:call-template name="ParaHandler">
                                     <xsl:with-param name="flag" select="'0'"/>
                                     <xsl:with-param name="VERSION" select="$VERSION"/>
-                                    <xsl:with-param name ="custom" select="$custom"/>
-                                    <xsl:with-param name ="txt" select="$txt"/>
+                                    <xsl:with-param name="custom" select="$custom"/>
+                                    <xsl:with-param name="txt" select="$txt"/>
                                     <xsl:with-param name="charparahandlerStyle" select="$characterparaStyle"/>
                                 </xsl:call-template>
                             </span>
@@ -3575,8 +3575,8 @@
                                 <xsl:call-template name="ParaHandler">
                                     <xsl:with-param name="flag" select="'0'"/>
                                     <xsl:with-param name="VERSION" select="$VERSION"/>
-                                    <xsl:with-param name ="custom" select="$custom"/>
-                                    <xsl:with-param name ="txt" select="$txt"/>
+                                    <xsl:with-param name="custom" select="$custom"/>
+                                    <xsl:with-param name="txt" select="$txt"/>
                                     <xsl:with-param name="charparahandlerStyle" select="$characterparaStyle"/>
                                 </xsl:call-template>
                             </span>
@@ -3589,11 +3589,11 @@
                             <xsl:with-param name="VERSION" select="$VERSION"/>
                             <xsl:with-param name="flagNote" select="$flagNote"/>
                             <xsl:with-param name="checkid" select="$checkid"/>
-                            <xsl:with-param name ="custom" select="$custom"/>
-                            <xsl:with-param name ="mastersubpara" select="$masterparastyle"/>
-                            <xsl:with-param name ="imgOptionPara" select="$imgOptionPara"/>
-                            <xsl:with-param name ="dpiPara" select="$dpiPara"/>
-                            <xsl:with-param name ="txt" select="$txt"/>
+                            <xsl:with-param name="custom" select="$custom"/>
+                            <xsl:with-param name="mastersubpara" select="$masterparastyle"/>
+                            <xsl:with-param name="imgOptionPara" select="$imgOptionPara"/>
+                            <xsl:with-param name="dpiPara" select="$dpiPara"/>
+                            <xsl:with-param name="txt" select="$txt"/>
                             <xsl:with-param name="charparahandlerStyle" select="$characterparaStyle"/>
                         </xsl:call-template>
                     </xsl:otherwise>
@@ -3606,13 +3606,13 @@
                     <xsl:with-param name="flag" select="'3'"/>
                     <xsl:with-param name="VERSION" select="$VERSION"/>
                     <xsl:with-param name="flagNote" select="$flagNote"/>
-                    <xsl:with-param name ="custom" select="$custom"/>
+                    <xsl:with-param name="custom" select="$custom"/>
                     <xsl:with-param name="sOperators" select="$sOperators"/>
                     <xsl:with-param name="sMinuses" select="$sMinuses"/>
                     <xsl:with-param name="sNumbers" select="$sNumbers"/>
                     <xsl:with-param name="sZeros" select="$sZeros"/>
-                    <xsl:with-param name ="txt" select="$txt"/>
-                    <xsl:with-param name ="mastersubpara" select="$masterparastyle"/>
+                    <xsl:with-param name="txt" select="$txt"/>
+                    <xsl:with-param name="mastersubpara" select="$masterparastyle"/>
                     <xsl:with-param name="charparahandlerStyle" select="$characterparaStyle"/>
                 </xsl:call-template>
             </xsl:when>
@@ -3645,7 +3645,7 @@
                     <dd>
                         <xsl:call-template name="Paracharacterstyle">
                             <xsl:with-param name="characterStyle" select="$characterparaStyle"/>
-                            <xsl:with-param name ="txt" select="$txt"/>
+                            <xsl:with-param name="txt" select="$txt"/>
                             <xsl:with-param name="flag" select="0"/>
                         </xsl:call-template>
                     </dd>
@@ -3663,8 +3663,8 @@
                 <xsl:call-template name="ParaHandler">
                     <xsl:with-param name="flag" select="'2'"/>
                     <xsl:with-param name="VERSION" select="$VERSION"/>
-                    <xsl:with-param name ="mastersubpara" select="$masterparastyle"/>
-                    <xsl:with-param name ="custom" select="$custom"/>
+                    <xsl:with-param name="mastersubpara" select="$masterparastyle"/>
+                    <xsl:with-param name="custom" select="$custom"/>
                     <xsl:with-param name="charparahandlerStyle" select="$characterparaStyle"/>
                 </xsl:call-template>
             </xsl:when>
@@ -3686,11 +3686,11 @@
                     <xsl:with-param name="VERSION" select="$VERSION"/>
                     <xsl:with-param name="flagNote" select="$flagNote"/>
                     <xsl:with-param name="checkid" select="$checkid"/>
-                    <xsl:with-param name ="custom" select="$custom"/>
-                    <xsl:with-param name ="mastersubpara" select="$masterparastyle"/>
-                    <xsl:with-param name ="imgOptionPara" select="$imgOptionPara"/>
-                    <xsl:with-param name ="dpiPara" select="$dpiPara"/>
-                    <xsl:with-param name ="txt" select="$txt"/>
+                    <xsl:with-param name="custom" select="$custom"/>
+                    <xsl:with-param name="mastersubpara" select="$masterparastyle"/>
+                    <xsl:with-param name="imgOptionPara" select="$imgOptionPara"/>
+                    <xsl:with-param name="dpiPara" select="$dpiPara"/>
+                    <xsl:with-param name="txt" select="$txt"/>
                     <xsl:with-param name="charparahandlerStyle" select="$characterparaStyle"/>
                 </xsl:call-template>
             </xsl:when>
@@ -3716,10 +3716,10 @@
 
     <xsl:template name="Paracharacterstyle">
         <xsl:param name="VERSION"/>
-        <xsl:param name ="custom"/>
+        <xsl:param name="custom"/>
         <xsl:param name="characterStyle"/>
-        <xsl:param name ="flag"/>
-        <xsl:param name ="txt"/>
+        <xsl:param name="flag"/>
+        <xsl:param name="txt"/>
         <xsl:message terminate="no">progress:parahandler</xsl:message>
         <xsl:choose>
             <xsl:when test="$characterStyle='True'">
@@ -3733,8 +3733,8 @@
                             <xsl:call-template name="ParaHandler">
                                 <xsl:with-param name="flag" select="'0'"/>
                                 <xsl:with-param name="VERSION" select="$VERSION"/>
-                                <xsl:with-param name ="custom" select="$custom"/>
-                                <xsl:with-param name ="txt" select="$txt"/>
+                                <xsl:with-param name="custom" select="$custom"/>
+                                <xsl:with-param name="txt" select="$txt"/>
                                 <xsl:with-param name="charparahandlerStyle" select="$characterStyle"/>
                             </xsl:call-template>
                         </span>
@@ -3747,8 +3747,8 @@
                             <xsl:call-template name="ParaHandler">
                                 <xsl:with-param name="flag" select="'0'"/>
                                 <xsl:with-param name="VERSION" select="$VERSION"/>
-                                <xsl:with-param name ="custom" select="$custom"/>
-                                <xsl:with-param name ="txt" select="$txt"/>
+                                <xsl:with-param name="custom" select="$custom"/>
+                                <xsl:with-param name="txt" select="$txt"/>
                                 <xsl:with-param name="charparahandlerStyle" select="$characterStyle"/>
                             </xsl:call-template>
                         </span>
@@ -3760,8 +3760,8 @@
                             <xsl:call-template name="ParaHandler">
                                 <xsl:with-param name="flag" select="'0'"/>
                                 <xsl:with-param name="VERSION" select="$VERSION"/>
-                                <xsl:with-param name ="custom" select="$custom"/>
-                                <xsl:with-param name ="txt" select="$txt"/>
+                                <xsl:with-param name="custom" select="$custom"/>
+                                <xsl:with-param name="txt" select="$txt"/>
                                 <xsl:with-param name="charparahandlerStyle" select="$characterStyle"/>
                             </xsl:call-template>
                         </span>
@@ -3773,8 +3773,8 @@
                             <xsl:call-template name="ParaHandler">
                                 <xsl:with-param name="flag" select="'0'"/>
                                 <xsl:with-param name="VERSION" select="$VERSION"/>
-                                <xsl:with-param name ="custom" select="$custom"/>
-                                <xsl:with-param name ="txt" select="$txt"/>
+                                <xsl:with-param name="custom" select="$custom"/>
+                                <xsl:with-param name="txt" select="$txt"/>
                                 <xsl:with-param name="charparahandlerStyle" select="$characterStyle"/>
                             </xsl:call-template>
                         </span>
@@ -3785,8 +3785,8 @@
                             <xsl:call-template name="ParaHandler">
                                 <xsl:with-param name="flag" select="'0'"/>
                                 <xsl:with-param name="VERSION" select="$VERSION"/>
-                                <xsl:with-param name ="custom" select="$custom"/>
-                                <xsl:with-param name ="txt" select="$txt"/>
+                                <xsl:with-param name="custom" select="$custom"/>
+                                <xsl:with-param name="txt" select="$txt"/>
                                 <xsl:with-param name="charparahandlerStyle" select="$characterStyle"/>
                             </xsl:call-template>
                         </span>
@@ -3795,8 +3795,8 @@
                         <xsl:call-template name="ParaHandler">
                             <xsl:with-param name="flag" select="$flag"/>
                             <xsl:with-param name="VERSION" select="$VERSION"/>
-                            <xsl:with-param name ="custom" select="$custom"/>
-                            <xsl:with-param name ="txt" select="$txt"/>
+                            <xsl:with-param name="custom" select="$custom"/>
+                            <xsl:with-param name="txt" select="$txt"/>
                             <xsl:with-param name="charparahandlerStyle" select="$characterStyle"/>
                         </xsl:call-template>
                     </xsl:otherwise>
@@ -3806,8 +3806,8 @@
                 <xsl:call-template name="ParaHandler">
                     <xsl:with-param name="flag" select="$flag"/>
                     <xsl:with-param name="VERSION" select="$VERSION"/>
-                    <xsl:with-param name ="custom" select="$custom"/>
-                    <xsl:with-param name ="txt" select="$txt"/>
+                    <xsl:with-param name="custom" select="$custom"/>
+                    <xsl:with-param name="txt" select="$txt"/>
                     <xsl:with-param name="charparahandlerStyle" select="$characterStyle"/>
                 </xsl:call-template>
             </xsl:otherwise>

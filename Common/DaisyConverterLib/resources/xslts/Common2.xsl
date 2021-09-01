@@ -22,10 +22,10 @@ xmlns:v="urn:schemas-microsoft-com:vml"
 		<!--Parameter check holds the value that checks for different level values-->
 		<xsl:param name="check"/>
 		<xsl:param name="verhead"/>
-		<xsl:param name ="custom"/>
-		<xsl:param name ="mastersubhead"/>
-		<xsl:param name ="abValue"/>
-		<xsl:param name ="txt"/>
+		<xsl:param name="custom"/>
+		<xsl:param name="mastersubhead"/>
+		<xsl:param name="abValue"/>
+		<xsl:param name="txt"/>
 		<xsl:param name="lvlcharStyle"/>
 		<xsl:param name="sOperators"/>
 		<xsl:param name="sMinuses"/>
@@ -36,8 +36,10 @@ xmlns:v="urn:schemas-microsoft-com:vml"
 		<xsl:variable name ="headingIncrementCounters" select="myObj:IncrementHeadingCounters($levelValue,substring-after($txt,'!'),$abValue)"/>
 		<xsl:message terminate="no">progress:parahandler</xsl:message>
 		<xsl:variable name ="copyCounter" select="myObj:CopyToBaseCounter(substring-after($txt,'!'))"/>
-		<xsl:message terminate="no">progress:parahandler</xsl:message>
-		<xsl:variable name="level" select="myObj:PushLevel($levelValue)"/>
+        <xsl:message terminate="no">progress:parahandler</xsl:message>
+		
+        <xsl:variable name="level" select="myObj:PushLevel($levelValue)"/>
+        
 		<xsl:message terminate="no">progress:parahandler</xsl:message>
 		<xsl:choose>
 			<!--Checking the level value-->
