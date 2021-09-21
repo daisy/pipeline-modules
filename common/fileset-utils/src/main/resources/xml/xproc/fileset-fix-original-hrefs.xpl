@@ -92,7 +92,7 @@
 		<p:sink/>
 		<p:try>
 			<p:group>
-				<p:variable name="file" select="replace($href, '^([^!]+)!/(.+)$', '$1')"/>
+				<p:variable name="file" select="replace(replace($href,'^(jar|bundle):',''),'^([^!]+)!/(.+)$', '$1')"/>
 				<px:info>
 					<p:with-option name="href" select="$file"/>
 				</px:info>

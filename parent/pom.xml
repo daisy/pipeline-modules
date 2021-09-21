@@ -223,12 +223,17 @@
             <dependency>
               <groupId>org.daisy.pipeline</groupId>
               <artifactId>calabash-adapter</artifactId>
-              <version>4.1.0</version>
+              <version>4.4.0-SNAPSHOT</version>
             </dependency>
             <dependency>
               <groupId>org.daisy.libs</groupId>
               <artifactId>com.xmlcalabash</artifactId>
-              <version>1.1.20-p5-98</version>
+              <version>1.1.20-p8-98-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+              <groupId>org.daisy.xprocspec</groupId>
+              <artifactId>xprocspec</artifactId>
+              <version>1.4.2</version>
             </dependency>
             <dependency>
               <groupId>org.daisy.pipeline</groupId>
@@ -468,6 +473,7 @@
       </activation>
       <properties>
         <generated-packages>
+          $(if;$(isdir;${project.build.directory}/generated-sources/process-catalog/org/daisy/common/saxon/impl);org.daisy.common.saxon.impl\;-split-package:=first,)
           $(if;$(isdir;${project.build.directory}/generated-sources/process-catalog/org/daisy/common/xpath/saxon/impl);org.daisy.common.xpath.saxon.impl\;-split-package:=first,)
           $(if;$(isdir;${project.build.directory}/generated-sources/process-catalog/org/daisy/common/xproc/calabash/impl);org.daisy.common.xproc.calabash.impl\;-split-package:=first,)
           $(if;$(isdir;${project.build.directory}/generated-sources/process-catalog/org/daisy/pipeline/datatypes/impl);org.daisy.pipeline.datatypes.impl\;-split-package:=first,)

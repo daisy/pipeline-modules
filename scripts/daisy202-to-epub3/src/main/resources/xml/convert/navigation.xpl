@@ -2,6 +2,7 @@
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
+                xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:dc="http://purl.org/dc/elements/1.1/"
                 xmlns:html="http://www.w3.org/1999/xhtml"
@@ -88,6 +89,12 @@
             px:epub3-nav-to-ncx
         </p:documentation>
     </p:import>
+    <cx:import href="http://www.daisy.org/pipeline/modules/daisy202-utils/library.xsl" type="application/xslt+xml">
+        <p:documentation>
+            pf:daisy202-identifier
+        </p:documentation>
+    </cx:import>
+
 
     <p:variable name="original-href" select="/*/@original-href"/>
 
@@ -164,7 +171,7 @@
         <p:input port="source">
             <p:pipe step="nav-doc" port="nav"/>
         </p:input>
-        <p:with-param name="identifier" select="(/*/html:head/html:meta[lower-case(@name)='dc:identifier']/@content)[1]">
+        <p:with-param name="identifier" select="pf:daisy202-identifier(/)">
             <p:pipe port="ncc-navigation" step="main"/>
         </p:with-param>
         <p:input port="stylesheet">
