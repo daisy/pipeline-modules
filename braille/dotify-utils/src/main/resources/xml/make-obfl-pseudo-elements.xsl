@@ -14,22 +14,32 @@
     </xsl:template>
     
     <xsl:template match="*[@css:_obfl-on-toc-start|
+                           @css:_obfl-on-collection-start|
                            @css:_obfl-on-volume-start|
                            @css:_obfl-on-volume-end|
+                           @css:_obfl-on-collection-end|
                            @css:_obfl-on-toc-end]">
         <xsl:copy>
             <xsl:sequence select="@* except (@css:_obfl-on-toc-start|
+                                             @css:_obfl-on-collection-start|
                                              @css:_obfl-on-volume-start|
                                              @css:_obfl-on-volume-end|
+                                             @css:_obfl-on-collection-end|
                                              @css:_obfl-on-toc-end)"/>
             <xsl:if test="@css:_obfl-on-toc-start">
                 <css:_obfl-on-toc-start style="{@css:_obfl-on-toc-start}"/>
+            </xsl:if>
+            <xsl:if test="@css:_obfl-on-collection-start">
+                <css:_obfl-on-collection-start style="{@css:_obfl-on-collection-start}"/>
             </xsl:if>
             <xsl:if test="@css:_obfl-on-volume-start">
                 <css:_obfl-on-volume-start style="{@css:_obfl-on-volume-start}"/>
             </xsl:if>
             <xsl:if test="@css:_obfl-on-volume-end">
                 <css:_obfl-on-volume-end style="{@css:_obfl-on-volume-end}"/>
+            </xsl:if>
+            <xsl:if test="@css:_obfl-on-collection-end">
+                <css:_obfl-on-collection-end style="{@css:_obfl-on-collection-end}"/>
             </xsl:if>
             <xsl:if test="@css:_obfl-on-toc-end">
                 <css:_obfl-on-toc-end style="{@css:_obfl-on-toc-end}"/>

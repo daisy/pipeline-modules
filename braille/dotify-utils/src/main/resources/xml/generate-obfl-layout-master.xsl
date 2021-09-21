@@ -226,7 +226,16 @@
                         </fallback>
                     </xsl:if>
                     <xsl:if test="$footnotes-border-top!='none'">
-                        <before><leader pattern="{$footnotes-border-top}" position="100%" align="right"/></before>
+                        <before>
+                            <block translate="pre-translated-text-css">
+                                <leader pattern="{$footnotes-border-top}" position="100%" align="right"/>
+                                <!-- We add a single instance of the pattern in order to have some
+                                     text after the leader and to make sure that the
+                                     translate="pre-translated-text-css" has an effect on the leader
+                                     (Dotify bug). -->
+                                <xsl:value-of select="$footnotes-border-top"/>
+                            </block>
+                        </before>
                     </xsl:if>
                 </page-area>
             </xsl:for-each>

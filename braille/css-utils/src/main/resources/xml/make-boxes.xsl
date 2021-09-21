@@ -10,7 +10,7 @@
     <xsl:include href="library.xsl"/>
     <xsl:include href="http://www.daisy.org/pipeline/modules/braille/common-utils/library.xsl"/>
     
-    <xsl:template match="css:_">
+    <xsl:template match="css:_|css:box">
         <xsl:copy>
             <xsl:apply-templates select="@*|node()"/>
         </xsl:copy>

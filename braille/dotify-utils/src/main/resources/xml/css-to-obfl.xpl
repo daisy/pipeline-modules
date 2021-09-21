@@ -100,8 +100,9 @@
             <p:documentation>
                 Make css:page, css:volume, css:text-transform, css:counter-style, css:after,
                 css:before, css:footnote-call, css:duplicate, css:alternate, css:top-of-page,
-                css:_obfl-alternate-scenario*, css:_obfl-on-toc-start, css:_obfl-on-volume-start,
-                css:_obfl-on-volume-end, css:_obfl-on-toc-end, css:_obfl-volume-transition and
+                css:_obfl-alternate-scenario*, css:_obfl-on-toc-start,
+                css:_obfl-on-collection-start, css:_obfl-on-volume-start, css:_obfl-on-volume-end,
+                css:_obfl-on-collection-end, css:_obfl-on-toc-end, css:_obfl-volume-transition and
                 css:_obfl-on-resumed attributes.
             </p:documentation>
         </css:parse-stylesheet>
@@ -122,8 +123,10 @@
                           //*/@css:alternate|
                           //*/@css:footnote-call|
                           //*/@css:_obfl-on-toc-start|
+                          //*/@css:_obfl-on-collection-start|
                           //*/@css:_obfl-on-volume-start|
                           //*/@css:_obfl-on-volume-end|
+                          //*/@css:_obfl-on-collection-end|
                           //*/@css:_obfl-on-toc-end|
                           //*/@css:_obfl-on-resumed[not(.='_')]|
                           //*/@css:*[matches(local-name(),'^_obfl-alternate-scenario(-[1-9][0-9]*)?$')]
@@ -137,8 +140,9 @@
                 </css:make-pseudo-elements>
                 <pxi:make-obfl-pseudo-elements>
                     <p:documentation>
-                        Make css:_obfl-on-toc-start, css:_obfl-on-volume-start,
-                        css:_obfl-on-volume-end, css:_obfl-on-toc-end, css:_obfl-on-resumed and
+                        Make css:_obfl-on-toc-start, css:_obfl-on-collection-start,
+                        css:_obfl-on-volume-start, css:_obfl-on-volume-end,
+                        css:_obfl-on-collection-end, css:_obfl-on-toc-end, css:_obfl-on-resumed and
                         *[@css:_obfl-scenario] pseudo-elements.
                     </p:documentation>
                 </pxi:make-obfl-pseudo-elements>
@@ -267,8 +271,9 @@
     <p:for-each px:progress=".02">
         <pxi:extract-obfl-pseudo-elements>
             <p:documentation>
-                Extract css:_obfl-on-toc-start, css:_obfl-on-volume-start, css:_obfl-on-volume-end
-                and css:_obfl-on-toc-end pseudo-elements into their own documents.
+                Extract css:_obfl-on-toc-start, css:_obfl-on-collection-start,
+                css:_obfl-on-volume-start, css:_obfl-on-volume-end, css:_obfl-on-collection-end and
+                css:_obfl-on-toc-end pseudo-elements into their own documents.
             </p:documentation>
         </pxi:extract-obfl-pseudo-elements>
     </p:for-each>
@@ -371,7 +376,7 @@
             </p:documentation>
         </p:add-attribute>
         <p:add-attribute px:progress=".01"
-                         match="css:alternate[@css:display='-obfl-list-of-references']"
+                         match="*[@css:display='-obfl-list-of-references']"
                          attribute-name="css:_obfl-list-of-references" attribute-value="_">
             <p:documentation>
                 Mark display:-obfl-list-of-references elements.
