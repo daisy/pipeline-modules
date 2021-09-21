@@ -12,7 +12,8 @@
                 exclude-result-prefixes="#all">
 
     <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl"/>
-    <xsl:use-package name="http://www.daisy.org/pipeline/modules/css-utils/library.xsl"/>
+    <!-- <xsl:use-package name="http://www.daisy.org/pipeline/modules/css-utils/library.xsl"/> -->
+    <xsl:import href="http://www.daisy.org/pipeline/modules/css-utils/library.xsl"/>
 
     <xsl:strip-space elements="*"/>
     <xsl:output indent="yes"/>

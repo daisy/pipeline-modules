@@ -20,8 +20,8 @@
         <expose-services>
             org.daisy.pipeline.modules.impl.Module_css_utils,
             org.daisy.pipeline.css.calabash.impl.CssCascadeStep$Provider,
-            org.daisy.pipeline.css.saxon.impl.MediaQueryMatchesDefinition,
-            org.daisy.common.saxon.impl.PackageDetails_http___www_daisy_org_pipeline_modules_css_utils_library_xsl
+            org.daisy.pipeline.css.saxon.impl.MediaQueryMatchesDefinition
+            <!-- org.daisy.common.saxon.impl.PackageDetails_http___www_daisy_org_pipeline_modules_css_utils_library_xsl -->
         </expose-services>
     </properties>
 

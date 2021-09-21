@@ -5,7 +5,8 @@
                 xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
                 exclude-result-prefixes="#all">
 
-    <xsl:use-package name="http://www.daisy.org/pipeline/modules/css-utils/library.xsl"/>
+    <!-- <xsl:use-package name="http://www.daisy.org/pipeline/modules/css-utils/library.xsl"/> -->
+    <xsl:import href="library.xsl"/>
 
     <xsl:param name="source" as="xs:string"/>
     <xsl:param name="context.fileset" as="document-node(element(d:fileset))?"/>

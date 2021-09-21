@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:package xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="3.0"
+<!-- <xsl:package version="3.0" -->
+<!--              name="http://www.daisy.org/pipeline/modules/css-utils/library.xsl" -->
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
              xmlns:xs="http://www.w3.org/2001/XMLSchema"
              xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
              xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions"
@@ -7,9 +9,9 @@
              xmlns:c="http://www.w3.org/ns/xproc-step"
              xmlns:java="implemented-in-java"
              exclude-result-prefixes="#all"
-             name="http://www.daisy.org/pipeline/modules/css-utils/library.xsl">
+             >
 
-	<xsl:expose component="function" names="pf:css-to-fileset" visibility="public"/>
+	<!-- <xsl:expose component="function" names="pf:css-to-fileset" visibility="public"/> -->
 
 	<xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl"/>
 
@@ -123,4 +125,4 @@
 		-->
 	</java:function>
 
-</xsl:package>
+</xsl:stylesheet>
