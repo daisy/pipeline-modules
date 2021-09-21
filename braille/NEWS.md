@@ -10,8 +10,15 @@ Changes
   has been specified.
 - By default text is transcribed to braille during formatting. A `force-pre-translation` transformer
   feature was added to override this behavior.
+- Option to specify the layout of notes
+- CSS module (Sass partial) for table styling
 - Support for `@counter-style` rules.
-- Support for relative `url()` values.
+- Support for relative `url()` values
+- Support for `:-obfl-alternate-scenario(2)` etc.
+- Support for `-obfl-list-of-references-range: volume`
+- Support for new `::-obfl-on-collection-start` and `::-obfl-on-collection-end` pseudo-elements
+- Support for `display: -obfl-list-of-references` on any element (not only on `::alternate`
+  elements)
 - Improved hyphenation of German text.
 - Fixed bug in handling of `-obfl-marker` property resulting in missing markers in page margin
   (https://github.com/mtmse/dotify.library/pull/19)
