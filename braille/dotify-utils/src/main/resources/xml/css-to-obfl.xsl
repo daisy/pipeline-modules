@@ -163,7 +163,7 @@
     
     <xsl:function name="pxi:renderer-to-string" as="xs:string">
         <xsl:param name="elem" as="element()"/>
-        <xsl:sequence select="string-join($elem/child::*/(@css:_obfl-scenario-cost,'none')[1],' ')"/>
+        <xsl:sequence select="string-join($elem/child::*/(@css:_obfl-scenario-cost/string(.),'none')[1],' ')"/>
     </xsl:function>
     
     <xsl:variable name="renderers" as="xs:string*"
@@ -223,7 +223,9 @@
                              xs:bogus="">
                 <_xsl:param name="n" as="xs:integer"/>
                 <_xsl:template match="/">
-                    <_xsl:sequence select="/*/d:scenario[position()=$n]"/>
+                    <xml-processor-result>
+                        <_xsl:sequence select="/*/d:scenario[position()=$n]/node()"/>
+                    </xml-processor-result>
                 </_xsl:template>
             </_xsl:stylesheet>
         </xml-processor>

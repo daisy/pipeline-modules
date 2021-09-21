@@ -12031,27 +12031,27 @@
             <block>
               <block>
                 <block first-line-indent="0" text-indent="2">⠿⠁⠤⠁⠤⠁</block>
-                <block padding-left="2">⠿⠁⠤⠁⠤⠃</block>
+                <block padding-left="2">⠤⠁⠤⠃</block>
                 <block padding-left="2">⠿⠉⠤⠁⠤⠉</block>
               </block>
               <block>
                 <block first-line-indent="0" text-indent="2">⠿⠁⠤⠃⠤⠁</block>
-                <block padding-left="2">⠿⠁⠤⠃⠤⠃</block>
+                <block padding-left="2">⠤⠃⠤⠃</block>
                 <block padding-left="2">⠿⠉⠤⠃⠤⠉</block>
               </block>
               <block>
                 <block first-line-indent="0" text-indent="2">⠿⠁⠤⠉⠤⠁</block>
-                <block padding-left="2">⠿⠁⠤⠉⠤⠃</block>
+                <block padding-left="2">⠤⠉⠤⠃</block>
                 <block padding-left="2">⠿⠉⠤⠉⠤⠉</block>
               </block>
               <block>
                 <block first-line-indent="0" text-indent="2">⠿⠁⠤⠉⠤⠁</block>
-                <block padding-left="2">⠿⠁⠤⠙⠤⠃</block>
+                <block padding-left="2">⠤⠙⠤⠃</block>
                 <block padding-left="2">⠿⠉⠤⠙⠤⠉</block>
               </block>
               <block>
                 <block first-line-indent="0" text-indent="2">⠿⠁⠶⠁</block>
-                <block padding-left="2">⠿⠁⠶⠃</block>
+                <block padding-left="2">⠶⠃</block>
                 <block padding-left="2">⠿⠉⠶⠉</block>
               </block>
             </block>
@@ -12075,19 +12075,19 @@
               <section>
                 <page>
                   <row>⠿⠁⠤⠁⠤⠁</row>
-                  <row>⠀⠀⠿⠁⠤⠁⠤⠃</row>
+                  <row>⠀⠀⠤⠁⠤⠃</row>
                   <row>⠀⠀⠿⠉⠤⠁⠤⠉</row>
                   <row>⠿⠁⠤⠃⠤⠁</row>
-                  <row>⠀⠀⠿⠁⠤⠃⠤⠃</row>
+                  <row>⠀⠀⠤⠃⠤⠃</row>
                   <row>⠀⠀⠿⠉⠤⠃⠤⠉</row>
                   <row>⠿⠁⠤⠉⠤⠁</row>
-                  <row>⠀⠀⠿⠁⠤⠉⠤⠃</row>
+                  <row>⠀⠀⠤⠉⠤⠃</row>
                   <row>⠀⠀⠿⠉⠤⠉⠤⠉</row>
                   <row>⠿⠁⠤⠉⠤⠁</row>
-                  <row>⠀⠀⠿⠁⠤⠙⠤⠃</row>
+                  <row>⠀⠀⠤⠙⠤⠃</row>
                   <row>⠀⠀⠿⠉⠤⠙⠤⠉</row>
                   <row>⠿⠁⠶⠁</row>
-                  <row>⠀⠀⠿⠁⠶⠃</row>
+                  <row>⠀⠀⠶⠃</row>
                   <row>⠀⠀⠿⠉⠶⠉</row>
                 </page>
               </section>
@@ -13270,21 +13270,24 @@
           <body style="text-transform: none;
                        @page { size: 10 10 }">
             <table xmlns="http://www.daisy.org/z3986/2005/dtbook/"
-                   style="display: table;
-                          -obfl-table-col-spacing: 1;
-                          -obfl-scenario-cost: -obfl-evaluate('$forced-break-count');
-                          &amp;:-obfl-alternate-scenario {
+                   style="padding-top: 1;
+                          display: none;
+                          &amp;:-obfl-alternate-scenario(1) {
+                            display: table;
+                            -obfl-table-col-spacing: 1;
+                            -obfl-scenario-cost: -obfl-evaluate('$forced-break-count'); }
+                          &amp;:-obfl-alternate-scenario(2) {
                             -obfl-scenario-cost: 2;
                             display: block;
                             render-table-by: row, column; }
-                          &amp;:-obfl-alternate-scenario td:blank::after {
+                          &amp;:-obfl-alternate-scenario(2) td:blank::after {
                             content: '⠪⠕'; }
-                          &amp;:-obfl-alternate-scenario::table-by(row)::list-item {
+                          &amp;:-obfl-alternate-scenario(2)::table-by(row)::list-item {
                             display:block;
                             margin-left:2; }
-                          &amp;:-obfl-alternate-scenario::table-by(column)::list-item {
+                          &amp;:-obfl-alternate-scenario(2)::table-by(column)::list-item {
                             display:block; }
-                          &amp;:-obfl-alternate-scenario::table-by(column)::list-item:first-child {
+                          &amp;:-obfl-alternate-scenario(2)::table-by(column)::list-item:first-child {
                             text-indent:-2; }">
               <thead>
                 <tr>
@@ -13332,7 +13335,9 @@
                             d:bogus="" xs:bogus="">
               <xsl:param name="n" as="xs:integer"/>
               <xsl:template match="/">
-                <xsl:sequence select="/*/d:scenario[position()=$n]"/>
+                <xml-processor-result>
+                  <xsl:sequence select="/*/d:scenario[position()=$n]/node()"/>
+                </xml-processor-result>
               </xsl:template>
             </xsl:stylesheet>
           </xml-processor>
@@ -13349,7 +13354,7 @@
             <xml-data renderer="renderer_1">
                 <d:scenarios xmlns:d="http://www.daisy.org/ns/pipeline/data">
                     <d:scenario>
-                        <block xmlns="http://www.daisy.org/ns/2011/obfl">
+                        <block padding-top="1">
                             <table table-col-spacing="1">
                                 <thead>
                                     <tr>
@@ -13374,7 +13379,7 @@
                         </block>
                     </d:scenario>
                     <d:scenario>
-                        <block>
+                        <block padding-top="1">
                             <block>
                                 <block first-line-indent="0" text-indent="2">⠿⠿⠿⠤⠤⠤</block>
                                 <block padding-left="2">⠿⠿⠿⠪⠕</block>
@@ -13409,6 +13414,7 @@
             <volume cols="10" rows="10" rowgap="0" duplex="true">
             <section>
                 <page>
+                  <row/>
                   <row>⠿⠿⠿⠀⠿⠿⠀⠿⠿⠿</row>
                   <row>⠀⠀⠀⠀⠿</row>
                   <row>⠤⠤⠤⠀⠀⠀⠀⠤⠤⠤</row>

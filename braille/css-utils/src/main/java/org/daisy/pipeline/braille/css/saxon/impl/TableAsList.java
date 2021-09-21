@@ -420,8 +420,29 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 	private static final List<TableCell> emptyList = new ArrayList<TableCell>();
 
 	private abstract class TableCellCollection {
+		/**
+		 * Headers associated with this cell or group of cells that must be rendered before it, in
+		 * the order of this list.
+		 */
 		public abstract List<TableCell> newlyRenderedHeaders();
+		/**
+		 * Headers associated with this cell or group of cells that must be rendered before the
+		 * first sibling group of the containing group, together with the promoted headers of all
+		 * the siblings of this cell/group.
+		 *
+		 * In the example below ROW_1 is the group header of (a1, b1, c1) and ROW_2 is the group
+		 * header of (a2, b2, c2). COLUMN_A is the promoted header of a1 and a2, COLUMN_B is the
+		 * promoted header of b1 and b2 and COLUMN_C is the promoted header of c1 and c2. This
+		 * results in the promoted header group (COLUMN_A, COLUMN_B, COLUMN_C).
+		 *
+		 *           COLUMN_A, COLUMN_B, COLUMN_C
+		 *    ROW_1: a1,       b1,       c1
+		 *    ROW_2: a2,       b2,       c2
+		 */
 		public abstract List<TableCell> newlyPromotedHeaders();
+		/**
+		 * Get XML representation.
+		 */
 		public abstract void write(XMLStreamWriter writer) throws XMLStreamException;
 	}
 
@@ -439,6 +460,7 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 			this.columnAppliedBeforeRow = columnAppliedBeforeRow;
 		}
 
+		/* Headers associated with this cell but not with the containing group. */
 		private List<TableCell> newlyAppliedHeaders;
 		public List<TableCell> newlyAppliedHeaders() {
 			if (newlyAppliedHeaders == null) {
@@ -449,6 +471,9 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 			return newlyAppliedHeaders;
 		}
 
+		/* The first part of this list are the headers to be promoted, the other part are the
+		 * headers to be rendered. The last header of the first part is the last header with policy
+		 * FRONT. */
 		private List<TableCell> newlyRenderedOrPromotedHeaders;
 		private List<TableCell> newlyRenderedOrPromotedHeaders() {
 			if (newlyRenderedOrPromotedHeaders == null) {
@@ -457,14 +482,18 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 					precedingSibling != null ? precedingSibling.newlyAppliedHeaders() : emptyList
 				).iterator();
 				boolean canOmit = true;
+				// add headers that were deferred by the containing group
 				for (TableCell h : parent.deferredHeaders()) {
 					newlyRenderedOrPromotedHeaders.add(h);
+					// no headers can be omitted if headers were deferred by the containing group
 					canOmit = false; }
 				for (TableCell h : newlyAppliedHeaders()) {
+					// omit headers that have already been rendered and do not need to be repeated
 					if (canOmit
 					    && h.headerPolicy != TableCell.HeaderPolicy.ALWAYS
 					    && lastAppliedHeaders.hasNext() && lastAppliedHeaders.next().equals(h))
 						continue;
+					// no more headers can be omitted as soon as one header could not be omitted
 					newlyRenderedOrPromotedHeaders.add(h);
 					canOmit = false; }}
 			return newlyRenderedOrPromotedHeaders;
@@ -545,7 +574,21 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 		private List<TableCellCollection> groupCellsBy(List<TableCell> cells, Iterator<String> axes) {
 			String firstAxis = axes.hasNext() ? axes.next() : null;
 			List<String> nextAxes = ImmutableList.copyOf(axes);
+
+			// Use the last child of the preceding sibling group as the preceding sibling for the
+			// first child of this group if no new headers are associated with this group and the
+			// previous one.
+			TableCellCollection transferChild
+				= (precedingSibling != null
+				   && precedingSibling.newlyAppliedHeaders().isEmpty()
+				   && newlyAppliedHeaders().isEmpty())
+				? precedingSibling.children.get(precedingSibling.children.size() - 1)
+				: null;
 			if (firstAxis != null) {
+
+				// If any of the cells have a header within the given axis, group the cells
+				// according to the scopes of the headers in the axis. The cells that do not fall
+				// within the scope of any of the headers in the axis form their own group.
 				Map<TableCell,List<TableCell>> categories = new LinkedHashMap<TableCell,List<TableCell>>();
 				List<TableCell> uncategorized = null;
 				for (TableCell c : cells) {
@@ -565,6 +608,8 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 				if (!categories.isEmpty()) {
 					List<TableCellCollection> children = new ArrayList<TableCellCollection>();
 					TableCellGroup child = null;
+					if (transferChild instanceof TableCellGroup)
+						child = (TableCellGroup)transferChild;
 					for (TableCell h : categories.keySet()) {
 						child = new TableCellGroup(categories.get(h), nextAxes.iterator(), this, h, firstAxis, child,
 						                           rowApplied, columnAppliedBeforeRow);
@@ -574,9 +619,11 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 						                           rowApplied, columnAppliedBeforeRow);
 						children.add(child); }
 					return children; }
+
+				// If the axis is "row", group cells according to the row their are in. This is
+				// regardless of whether they have a header.
 				else if ("row".equals(firstAxis)) {
 					List<TableCellCollection> children = new ArrayList<TableCellCollection>();
-					TableCellGroup child = null;
 					Map<Integer,List<TableCell>> rows = new LinkedHashMap<Integer,List<TableCell>>();
 					for (TableCell c : cells) {
 						List<TableCell> row = rows.get(c.row);
@@ -584,13 +631,18 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 							row = new ArrayList<TableCell>();
 							rows.put(c.row, row); }
 						row.add(c); }
+					TableCellGroup child = null;
+					if (transferChild instanceof TableCellGroup)
+						child = (TableCellGroup)transferChild;
 					for (List<TableCell> row : rows.values()) {
 						child = new TableCellGroup(row, nextAxes.iterator(), this, null, firstAxis, child, true, columnAppliedBeforeRow);
 						children.add(child); }
 					return children; }
+
+				// If the axis is "column", group cells according to the column their are in. This
+				// is regardless of whether they have a header.
 				else if ("column".equals(firstAxis) || "col".equals(firstAxis)) {
 					List<TableCellCollection> children = new ArrayList<TableCellCollection>();
-					TableCellGroup child = null;
 					Map<Integer,List<TableCell>> columns = new LinkedHashMap<Integer,List<TableCell>>();
 					for (TableCell c : cells) {
 						List<TableCell> column = columns.get(c.col);
@@ -598,13 +650,18 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 							column = new ArrayList<TableCell>();
 							columns.put(c.col, column); }
 						column.add(c); }
+					TableCellGroup child = null;
+					if (transferChild instanceof TableCellGroup)
+						child = (TableCellGroup)transferChild;
 					for (List<TableCell> column : columns.values()) {
 						child = new TableCellGroup(column, nextAxes.iterator(), this, null, firstAxis, child, rowApplied, !rowApplied);
 						children.add(child); }
 					return children; }
+
+				// If the axis is "row-group", group cells according to the row group (thead, tbody,
+				// tfoot) their are in. This is regardless of whether they have a header.
 				else if ("row-group".equals(firstAxis)) {
 					List<TableCellCollection> children = new ArrayList<TableCellCollection>();
-					TableCellGroup child = null;
 					Map<Integer,List<TableCell>> rowGroups = new LinkedHashMap<Integer,List<TableCell>>();
 					for (TableCell c : cells) {
 						List<TableCell> rowGroup = rowGroups.get(c.rowGroup);
@@ -612,6 +669,9 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 							rowGroup = new ArrayList<TableCell>();
 							rowGroups.put(c.rowGroup, rowGroup); }
 						rowGroup.add(c); }
+					TableCellGroup child = null;
+					if (transferChild instanceof TableCellGroup)
+						child = (TableCellGroup)transferChild;
 					for (List<TableCell> rowGroup : rowGroups.values()) {
 						child = new TableCellGroup(rowGroup, nextAxes.iterator(), this, null, firstAxis, child,
 						                           rowApplied, columnAppliedBeforeRow);
@@ -622,12 +682,15 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 			else {
 				List<TableCellCollection> children = new ArrayList<TableCellCollection>();
 				SingleTableCell child = null;
+				if (transferChild instanceof SingleTableCell)
+					child = (SingleTableCell)transferChild;
 				for (TableCell c : cells) {
 					child = new SingleTableCell(c, this, child, columnAppliedBeforeRow);
 					children.add(child); }
 				return children; }
 		}
 
+		/* Headers associated with this group but not with the containing group. */
 		private List<TableCell> newlyAppliedHeaders;
 		public List<TableCell> newlyAppliedHeaders() {
 			if (newlyAppliedHeaders == null) {
@@ -639,6 +702,7 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 			return newlyAppliedHeaders;
 		}
 
+		/* Headers associated with the containing group. */
 		private List<TableCell> previouslyAppliedHeaders() {
 			if (parent != null)
 				return parent.appliedHeaders();
@@ -646,6 +710,7 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 				return emptyList;
 		}
 
+		/* All headers associated with this group (as a whole). */
 		private List<TableCell> appliedHeaders;
 		public List<TableCell> appliedHeaders() {
 			if (appliedHeaders == null) {
@@ -655,6 +720,7 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 			return appliedHeaders;
 		}
 
+		/* Headers associated with this group but not with the containing group and not rendered yet. */
 		private List<TableCell> newlyDeferredHeaders;
 		private List<TableCell> newlyDeferredHeaders() {
 			if (newlyDeferredHeaders == null) {
@@ -665,6 +731,7 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 			return newlyDeferredHeaders;
 		}
 
+		/* Headers associated with this group but not rendered yet. */
 		private List<TableCell> deferredHeaders;
 		private List<TableCell> deferredHeaders() {
 			if (deferredHeaders == null) {
@@ -675,6 +742,7 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 			return deferredHeaders;
 		}
 
+		/* Headers associated with the containing group but not rendered yet. */
 		private List<TableCell> previouslyDeferredHeaders() {
 			if (parent != null)
 				return parent.deferredHeaders();
@@ -682,27 +750,36 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 				return emptyList;
 		}
 
+		/* The first part of this list are the headers to be promoted, the other part are the
+		 * headers to be rendered. The last header of the first part is the last header with policy
+		 * FRONT. */
 		private List<TableCell> newlyRenderedOrPromotedHeaders;
 		private List<TableCell> newlyRenderedOrPromotedHeaders() {
 			if (newlyRenderedOrPromotedHeaders == null) {
 				newlyRenderedOrPromotedHeaders = new ArrayList<TableCell>();
 				int i = newlyAppliedHeaders().size() - 1;
+				// defer the last headers if they have policy ALWAYS
 				while (i >= 0 && newlyAppliedHeaders().get(i).headerPolicy == TableCell.HeaderPolicy.ALWAYS)
 					i--;
+				// if not all headers are deferred ...
 				if (i >= 0) {
 					Iterator<TableCell> lastAppliedHeaders = (
 						precedingSibling != null ? precedingSibling.newlyAppliedHeaders() : emptyList
 					).iterator();
 					boolean canOmit = true;
+					// add headers that were deferred by the containing group
 					for (TableCell h : previouslyDeferredHeaders()) {
 						newlyRenderedOrPromotedHeaders.add(h);
+						// no headers can be omitted if headers were deferred by the containing group
 						canOmit = false; }
 					for (int j = 0; j <= i; j++) {
 						TableCell h = newlyAppliedHeaders().get(j);
+						// omit headers that have already been rendered and do not need to be repeated
 						if (canOmit
 						    && h.headerPolicy != TableCell.HeaderPolicy.ALWAYS
 						    && lastAppliedHeaders.hasNext() && lastAppliedHeaders.next().equals(h))
 							continue;
+						// no more headers can be omitted as soon as one header could not be omitted
 						newlyRenderedOrPromotedHeaders.add(h);
 						canOmit = false; }}}
 			return newlyRenderedOrPromotedHeaders;

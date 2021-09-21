@@ -100,7 +100,7 @@
             <p:documentation>
                 Make css:page, css:volume, css:text-transform, css:counter-style, css:after,
                 css:before, css:footnote-call, css:duplicate, css:alternate, css:top-of-page,
-                css:_obfl-alternate-scenario, css:_obfl-on-toc-start, css:_obfl-on-volume-start,
+                css:_obfl-alternate-scenario*, css:_obfl-on-toc-start, css:_obfl-on-volume-start,
                 css:_obfl-on-volume-end, css:_obfl-on-toc-end, css:_obfl-volume-transition and
                 css:_obfl-on-resumed attributes.
             </p:documentation>
@@ -110,7 +110,7 @@
                 Make css:flow attributes.
             </p:documentation>
         </css:parse-properties>
-        <p:delete match="css:_obfl-alternate-scenario/@css:flow">
+        <p:delete match="*[@css:_obfl-scenario]/@css:flow">
             <p:documentation>
                 ::-obfl-alternate-scenario pseudo-elements must participate in the normal flow.
             </p:documentation>
@@ -126,7 +126,7 @@
                           //*/@css:_obfl-on-volume-end|
                           //*/@css:_obfl-on-toc-end|
                           //*/@css:_obfl-on-resumed[not(.='_')]|
-                          //*/@css:_obfl-alternate-scenario
+                          //*/@css:*[matches(local-name(),'^_obfl-alternate-scenario(-[1-9][0-9]*)?$')]
                           ">
                 <css:make-pseudo-elements>
                     <p:documentation>
@@ -139,7 +139,7 @@
                     <p:documentation>
                         Make css:_obfl-on-toc-start, css:_obfl-on-volume-start,
                         css:_obfl-on-volume-end, css:_obfl-on-toc-end, css:_obfl-on-resumed and
-                        css:_obfl-alternate-scenario pseudo-elements.
+                        *[@css:_obfl-scenario] pseudo-elements.
                     </p:documentation>
                 </pxi:make-obfl-pseudo-elements>
                 <p:viewport match="//*[@css:_obfl-scenario and @style]">
@@ -356,7 +356,7 @@
             </p:documentation>
         </css:preserve-white-space>
         <p:add-attribute px:progress=".01"
-                         match="*[@css:_obfl-scenario and not(@css:display[.=('block','table')])]"
+                         match="*[@css:_obfl-scenario and not(@css:display[.=('block','table','none')])]"
                          attribute-name="css:display"
                          attribute-value="block">
             <p:documentation>

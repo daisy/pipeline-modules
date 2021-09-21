@@ -493,6 +493,7 @@
             <directory>src/main/resources</directory>
             <excludes>
               <exclude>META-INF/catalog.xml</exclude>
+              <exclude>**/*.md</exclude>
             </excludes>
           </resource>
         </resources>
@@ -752,7 +753,7 @@
                       <directory>${project.basedir}</directory>
                       <includes>
                         <include>index.md</include>
-                        <include>src/main/README.md</include>
+                        <include>src/main/**/*.md</include>
                         <include>doc/**/*</include>
                       </includes>
                     </resource>
