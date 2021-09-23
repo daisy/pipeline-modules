@@ -10,7 +10,7 @@
                     <value>bottom-of-page</value>
                     <documentation xml:lang="en" xml:space="preserve">At the bottom of the page
 
-Notes are rendered in the [`@footnotes`](braillespecs.github.io/braille-css/#the-footnotes-area)
+Notes are rendered in the [`@footnotes`](http://braillespecs.github.io/braille-css/#the-footnotes-area)
 area of the page on which they occur.
 
 There is a built-in fallback mechanism: if a note does not fit on a page, e.g. because it is too
@@ -19,38 +19,37 @@ the end of the volume in which they occur.
 
 The footnotes area can be styled using a `@footnotes` rule. Example:
 
-```css
+~~~css
 @page {
    @footnotes {
       border-top: ⠤;
       max-height: 20;
    }
 }
-```
+~~~
 </documentation>
                     <value>end-of-volume</value>
                     <documentation xml:lang="en" xml:space="preserve">At the end of the volume
 
-Notes are rendered in the [`@end`](braillespecs.github.io/braille-css/#the-footnotes-area) area of
+Notes are rendered in the [`@end`](http://braillespecs.github.io/braille-css/#the-footnotes-area) area of
 the volume in which they occur.
 </documentation>
                     <value>end-of-book</value>
                     <documentation xml:lang="en" xml:space="preserve">At the end of the book
 
-Notes are rendered in the [`@end`](braillespecs.github.io/braille-css/#the-footnotes-area) area of
+Notes are rendered in the [`@end`](http://braillespecs.github.io/braille-css/#the-footnotes-area) area of
 the last volume.
 
 Notes can be grouped by volume using a
 [`#endnotes-section::-obfl-on-volume-start`](http://braillespecs.github.io/braille-css/obfl#extending-the-display-property-with--obfl-list-of-references)
 rule. Example:
 
-```css
+~~~css
 #endnotes-section::-obfl-on-volume-start {
    content: "Notes in volume " -obfl-evaluate("$started-volume-number");
    margin: 1 0;
 }
-
-```
+~~~
 </documentation>
                 </choice>
             </px:type>
@@ -68,13 +67,13 @@ Note references and notes can be styled using `noteref` and `noteref::alternate`
 respectively. A title can be inserted at the beginning of an endnotes section using a
 `#endnotes-section::-obfl-on-collection-start` rule. Example:
 
-```css
+~~~css
 #endnotes-section::-obfl-on-collection-start {
    content: "Notes in this volume";
    text-align: center;
    margin-bottom: 1;
 }
-```
+~~~
 </p>
         </p:documentation>
     </p:option>

@@ -22,7 +22,7 @@ features are:
   relative to a registered table path, an absolute file URI, or a
   fully qualified table identifier. A collection of tables used in
   LibreOffice is available under the path
-  [`http://www.libreoffice.org/dictionaries/hyphen/`](../src/main/resources/hyphen/). This
+  [`http://www.libreoffice.org/dictionaries/hyphen/`](../src/main/resources/tables/). This
   feature is not compatible with other features except `hyphenator`.
 
 `locale`

@@ -397,8 +397,8 @@
                     src/main/resources/META-INF/catalog.xml,
                     src/main/resources/**/*.xpl,
                     src/main/resources/**/*.xsl,
-                    src/main/resources/hyphen/,
-                    src/main/resources/hyphen/*
+                    src/main/resources/tables/,
+                    src/main/resources/tables/*
                   </includes>
                 </configuration>
               </execution>
