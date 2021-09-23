@@ -142,12 +142,12 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>mathml-utils</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>mediatype-utils</artifactId>
-        <version>1.2.2</version>
+        <version>1.2.3-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
@@ -265,7 +265,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>zedai-utils</artifactId>
-        <version>1.1.1</version>
+        <version>1.1.2-SNAPSHOT</version>
       </dependency>
       
       <!--
@@ -289,12 +289,12 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>daisy3-to-daisy202</artifactId>
-        <version>2.0.3</version>
+        <version>2.0.4-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>daisy3-to-epub3</artifactId>
-        <version>2.0.3</version>
+        <version>2.0.4-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
@@ -309,7 +309,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>dtbook-to-html</artifactId>
-        <version>2.1.1</version>
+        <version>2.1.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
@@ -334,7 +334,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>dtbook-validator</artifactId>
-        <version>3.0.1</version>
+        <version>3.0.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
@@ -344,7 +344,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>epub2-to-epub3</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
@@ -369,7 +369,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>epub3-validator</artifactId>
-        <version>2.0.1</version>
+        <version>2.0.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
@@ -389,7 +389,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>nimas-fileset-validator</artifactId>
-        <version>2.0.3</version>
+        <version>2.0.4-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
@@ -428,7 +428,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>text-to-ssml</artifactId>
-        <version>3.0.4</version>
+        <version>3.0.5-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
@@ -478,7 +478,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>mathml-to-ssml</artifactId>
-        <version>1.0.4</version>
+        <version>1.0.5-SNAPSHOT</version>
       </dependency>
       
       <!--
