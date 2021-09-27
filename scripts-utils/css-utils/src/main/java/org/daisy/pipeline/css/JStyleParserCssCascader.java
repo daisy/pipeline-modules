@@ -67,7 +67,7 @@ import org.w3c.dom.Node;
 
 public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransformer {
 
-	private final String defaultStyleSheet;
+	private final String defaultStyleSheets;
 	private final MediaSpec medium;
 	private final QName attributeName;
 	private final CSSParserFactory parserFactory;
@@ -82,14 +82,14 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 	public JStyleParserCssCascader(URIResolver uriResolver,
 	                               CssPreProcessor preProcessor,
 	                               XsltProcessor xsltProcessor,
-	                               String defaultStyleSheet,
+	                               String defaultStyleSheets,
 	                               Medium medium,
 	                               QName attributeName,
 	                               CSSParserFactory parserFactory,
 	                               RuleFactory ruleFactory,
 	                               SupportedCSS supportedCSS,
 	                               DeclarationTransformer declarationTransformer) {
-		this.defaultStyleSheet = defaultStyleSheet;
+		this.defaultStyleSheets = defaultStyleSheets;
 		this.medium = medium.asMediaSpec();
 		this.attributeName = attributeName;
 		this.parserFactory = parserFactory;
@@ -207,17 +207,20 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 				// - Repeater.assignDefaults in DeclarationTransformer.parseDeclaration in SingleMapNodeData.push in Analyzer.evaluateDOM
 				// - Variator.assignDefaults in DeclarationTransformer.parseDeclaration in SingleMapNodeData.push in Analyzer.evaluateDOM
 				CSSFactory.registerSupportedCSS(supportedCSS);
-				styleSheet = (StyleSheet)ruleFactory.createStyleSheet().unlock();
-				if (defaultStyleSheet != null) {
-					StringTokenizer t = new StringTokenizer(defaultStyleSheet);
+				StyleSheet defaultStyleSheet = (StyleSheet)ruleFactory.createStyleSheet().unlock();
+				if (defaultStyleSheets != null) {
+					StringTokenizer t = new StringTokenizer(defaultStyleSheets);
 					while (t.hasMoreTokens()) {
 						URL u = URLs.asURL(URLs.resolve(baseURI, URLs.asURI(t.nextToken())));
 						if (!cssReader.supportsMediaType(null, u))
 							logger.warn("Style sheet type not supported: " + u);
 						else
-							styleSheet = parserFactory.append(new CSSSource(u, (Charset)null, (String)null), cssReader, styleSheet);
+							defaultStyleSheet
+								= parserFactory.append(new CSSSource(u, (Charset)null, (String)null), cssReader, defaultStyleSheet);
 					}
 				}
+				styleSheet = (StyleSheet)ruleFactory.createStyleSheet().unlock();
+				styleSheet.addAll(defaultStyleSheet);
 				styleSheet = CSSFactory.getUsedStyles(document, null, baseURL, medium, cssReader, styleSheet);
 				XMLInputValue<?> transformed = null;
 				for (RuleXslt r : Iterables.filter(styleSheet, RuleXslt.class)) {
@@ -247,6 +250,8 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 					// We assume that base URI did not change.
 					// We need to recompute the stylesheet because of any possible inline styles, which
 					// are attached to an element in the original document.
+					styleSheet = (StyleSheet)ruleFactory.createStyleSheet().unlock();
+					styleSheet.addAll(defaultStyleSheet);
 					styleSheet = CSSFactory.getUsedStyles(document, null, baseURL, medium, cssReader, styleSheet);
 				}
 				styleMap = new Analyzer(styleSheet).evaluateDOM(document, medium, false);
