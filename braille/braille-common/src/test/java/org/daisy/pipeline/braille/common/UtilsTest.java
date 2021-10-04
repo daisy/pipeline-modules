@@ -20,8 +20,11 @@ public class UtilsTest {
 	
 	@Test
 	public void testExtractHyphens() {
-		assertEquals("[0, 0, 1, 0, 0]", Arrays.toString(extractHyphens("foo\u00ADbar", '\u00AD')._2));
-		assertEquals("[0, 0, 0, 2, 0, 0]", Arrays.toString(extractHyphens("foo-\u200Bbar", null, '\u200B')._2));
+		assertEquals("[0, 0, 1, 0, 0]", Arrays.toString(extractHyphens("foo\u00ADbar", false, '\u00AD')._2));
+		assertEquals("[0, 0, 0, 2, 0, 0]", Arrays.toString(extractHyphens("foo-\u200Bbar", false, null, '\u200B')._2));
+		// grinning face emoji
+		assertEquals("[0, 0, 0, 0, 0, 1, 0, 0]", Arrays.toString(extractHyphens("\uD83D\uDE00 foo\u00ADbar", false, '\u00AD')._2));
+		assertEquals("[0, 0, 0, 0, 1, 0, 0]", Arrays.toString(extractHyphens("\uD83D\uDE00 foo\u00ADbar", true, '\u00AD')._2));
 	}
 	
 	@Test

@@ -248,6 +248,15 @@ public class LiblouisCoreTest extends AbstractTest {
 	}
 	
 	@Test
+	public void testUCS4() {
+		FromStyledTextToBraille translator = provider.withContext(messageBus)
+		                                             .get(query("(table:'foobar.utb')")).iterator().next()
+		                                             .fromStyledTextToBraille();
+		assertEquals(braille("⠛⠗⠊⠝"), translator.transform(text("\uD83D\uDE00"))); // U+1F600 grinning face
+		assertEquals(braille("⠛⠗⠊⠝\u00AD⠛⠗⠊⠝"), translator.transform(text("\uD83D\uDE00\u00AD\uD83D\uDE00")));
+	}
+	
+	@Test
 	public void testUndefinedChar() {
 		FromStyledTextToBraille translator = provider.withContext(messageBus)
 		                                             .get(query("(locale:foo)(contraction:full)(dots-for-undefined-char:'⣀')")).iterator().next()

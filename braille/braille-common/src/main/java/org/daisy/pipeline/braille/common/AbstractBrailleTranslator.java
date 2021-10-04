@@ -320,7 +320,7 @@ public abstract class AbstractBrailleTranslator extends AbstractTransform implem
 							String n = lastWordPart;
 							lastWordPart = null;
 							return n; }
-						Tuple2<String,byte[]> t = extractHyphens(lastWordPart + RS + lastWordOtherPart, SHY, ZWSP, RS);
+						Tuple2<String,byte[]> t = extractHyphens(lastWordPart + RS + lastWordOtherPart, false, SHY, ZWSP, RS);
 						String lastWord = t._1;
 						// if last word fits
 						if (lastWord.length() <= limit) {

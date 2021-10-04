@@ -446,16 +446,20 @@ public abstract class util {
 			return String.valueOf(object).replaceAll("\\s+", " ").trim();
 		}
 		
-		public static Tuple2<String,byte[]> extractHyphens(String text, Character... characters) {
-			return extractHyphens(null, text, characters);
+		public static Tuple2<String,byte[]> extractHyphens(String text, boolean codePointBased, Character... characters) {
+			return extractHyphens(null, text, codePointBased, characters);
 		}
 		
-		public static Tuple2<String,byte[]> extractHyphens(byte[] addTo, String text, Character... characters) {
+		/**
+		 * @param codePointBased Whether byte array index refers to code points or chars.
+		 */
+		public static Tuple2<String,byte[]> extractHyphens(byte[] addTo, String text, boolean codePointBased, Character... characters) {
 			StringBuilder unhyphenatedText = new StringBuilder();
 			List<Byte> hyphens = new ArrayList<Byte>();
 			byte hyphen = 0;
 			int j = -1;
-			next_char: for (char c : text.toCharArray()) {
+			int[] charArray = codePointBased ? text.codePoints().toArray() : text.chars().toArray();
+			next_char: for (int c : charArray) {
 				j++;
 				if (addTo != null && j > 0)
 					hyphen |= addTo[j - 1];
@@ -463,7 +467,7 @@ public abstract class util {
 					if (characters[i] != null && characters[i] == c) {
 						hyphen |= (1 << i);
 						continue next_char; }
-				unhyphenatedText.append(c);
+				unhyphenatedText.appendCodePoint(c);
 				hyphens.add(hyphen);
 				hyphen = 0; }
 			if (unhyphenatedText.length() > 0) {
@@ -473,21 +477,29 @@ public abstract class util {
 				return new Tuple2<String,byte[]>("", null);
 		}
 		
-		public static String insertHyphens(String text, byte hyphens[], Character... characters) {
+		/**
+		 * @param codePointBased Whether byte array index refers to code points or chars.
+		 */
+		public static String insertHyphens(String text, byte hyphens[], boolean codePointBased, Character... characters) {
 			if (text.equals("")) return "";
 			if (hyphens == null) return text;
-			if (hyphens.length != text.length()-1)
+			int textLength = codePointBased ? text.codePoints().toArray().length : text.length();
+			if (hyphens.length != textLength - 1)
 				throw new RuntimeException("hyphens.length must be equal to text.length() - 1");
 			StringBuilder hyphenatedText = new StringBuilder();
-			int i;
-			for (i = 0; i < hyphens.length; i++) {
-				hyphenatedText.append(text.charAt(i));
-				for (int j = 0; j < characters.length; j++) {
-					byte b = (byte)(1 << j);
-					Character c = characters[j];
-					if (c != null && (hyphens[i] & b) == b)
-						hyphenatedText.append(c); }}
-			hyphenatedText.append(text.charAt(i));
+			int i = 0;
+			int j = 0;
+			for (Character c : text.toCharArray()) {
+				hyphenatedText.append(c);
+				if (j < hyphens.length && text.codePointAt(i) == c) {
+					if (hyphens[j] != 0) {
+						for (int k = 0; k < characters.length; k++) {
+							byte b = (byte)(1 << k);
+							Character h = characters[k];
+							if (h != null && (hyphens[j] & b) == b)
+								hyphenatedText.append(h); }}
+					j++; }
+				i++; }
 			return hyphenatedText.toString();
 		}
 		

@@ -159,22 +159,22 @@ public class LiblouisHyphenatorJnaImplProvider implements LiblouisHyphenator.Pro
 		private String transform(String text) {
 			if (text.length() == 0)
 				return text;
-			Tuple2<String,byte[]> t = extractHyphens(text, SHY, ZWSP);
+			Tuple2<String,byte[]> t = extractHyphens(text, true, SHY, ZWSP);
 			if (t._1.length() == 0)
 				return text;
-			return insertHyphens(t._1, transform(t._2, t._1), SHY, ZWSP);
+			return insertHyphens(t._1, transform(t._2, t._1), true, SHY, ZWSP);
 		}
 		
 		private String[] transform(String text[]) {
-			Tuple2<String,byte[]> t = extractHyphens(join(text, US), SHY, ZWSP);
+			Tuple2<String,byte[]> t = extractHyphens(join(text, US), true, SHY, ZWSP);
 			String[] unhyphenated = toArray(SEGMENT_SPLITTER.split(t._1), String.class);
-			t = extractHyphens(t._2, t._1, null, null, US);
+			t = extractHyphens(t._2, t._1, true, null, null, US);
 			String _text = t._1;
 			// This byte array is used not only to track the hyphen
 			// positions but also the segment boundaries.
 			byte[] positions = t._2;
 			positions = transform(positions, _text);
-			_text = insertHyphens(_text, positions, SHY, ZWSP, US);
+			_text = insertHyphens(_text, positions, true, SHY, ZWSP, US);
 			if (text.length == 1)
 				return new String[]{_text};
 			else {
