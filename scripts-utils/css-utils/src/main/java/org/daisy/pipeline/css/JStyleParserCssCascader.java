@@ -225,16 +225,24 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 				XMLInputValue<?> transformed = null;
 				for (RuleXslt r : Iterables.filter(styleSheet, RuleXslt.class)) {
 					Map<String,String> params = new HashMap<>();
-					for (Declaration d: r) {
-						if (d.size() == 1) {
-							if (d.get(0) instanceof TermIdent || d.get(0) instanceof TermString)
-								params.put(d.getProperty(), ((Term<String>)d.get(0)).getValue());
-							else if (d.get(0) instanceof TermInteger)
-								params.put(d.getProperty(), ""+((TermInteger)d.get(0)).getIntValue());
-							else
-								logger.warn("@xslt parameter value must be a string, ident or integer, but got " + d);
-						} else
-							logger.warn("@xslt parameter value must consist of exactly one part, but got " + d);
+					for (Declaration d : r) {
+						StringBuilder val = new StringBuilder();
+						boolean invalid = false;
+						for (Term<?> t : d) {
+							if (t instanceof TermIdent || t instanceof TermString) {
+								if (val.length() > 0) val.append(' ');
+								val.append(((Term<String>)t).getValue());
+							} else if (t instanceof TermInteger) {
+								if (val.length() > 0) val.append(' ');
+								val.append(""+((TermInteger)t).getIntValue());
+							} else {
+								logger.warn("@xslt parameter value must be a sequence of string, ident or integer, but got " + d);
+								invalid = true;
+								break;
+							}
+						}
+						if (!invalid)
+							params.put(d.getProperty(), val.toString());
 					}
 					transformed = xsltProcessor.transform(
 						URLs.resolve(URLs.asURI(r.base), URLs.asURI(r.uri)),
