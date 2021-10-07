@@ -320,13 +320,16 @@ public class LiblouisTableJnaImplProvider extends AbstractTransformProvider<Libl
 								charset = q.containsKey("charset")
 									? q.removeOnly("charset").getValue().get()
 									: q.removeOnly("braille-charset").getValue().get();
-							if (q.containsKey("table"))
-								// FIXME: display and remaining features in query are ignored
-								table = q.removeOnly("table").getValue().get();
-							else if (q.containsKey("liblouis-table"))
-								// FIXME: display and remaining features in query are ignored
-								table = q.removeOnly("liblouis-table").getValue().get();
-							else {
+							if (q.containsKey("table") || q.containsKey("liblouis-table")) {
+								table = q.containsKey("table")
+									? q.removeOnly("table").getValue().get()
+									: q.removeOnly("liblouis-table").getValue().get();
+								tableInfo = new TableInfo(table);
+								for (Feature f : q)
+									if (!f.getValue().orElse("yes").equals(tableInfo.get(f.getKey()))) {
+										logger.warn("Table " + table + " does not match " + f);
+										throw new NoSuchElementException(); }
+							} else {
 								if (!q.containsKey("locale") && documentLocale != null)
 									q.add("locale", documentLocale);
 								if (q.isEmpty())

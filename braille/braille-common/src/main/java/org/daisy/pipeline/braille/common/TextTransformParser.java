@@ -90,7 +90,6 @@ public class TextTransformParser {
 							break; }
 						else if (key.equals("contraction") && value.equals("no"))
 							query.removeAll("grade");
-						// FIXME: support this in Liblouis translator
 						else if (key.equals("table") || key.equals("liblouis-table")) {
 							query.removeAll("locale");
 							query.removeAll("type");

@@ -207,10 +207,6 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 			LiblouisTranslatorImpl.NON_STANDARD_HYPH_FAIL : v.equalsIgnoreCase("defer") ?
 			LiblouisTranslatorImpl.NON_STANDARD_HYPH_DEFER :
 			LiblouisTranslatorImpl.NON_STANDARD_HYPH_IGNORE;
-		if (table != null && !q.isEmpty()) {
-			logger.warn("A query with both 'table' or 'liblouis-table' and '"
-			            + q.iterator().next().getKey() + "' never matches anything");
-			return empty; }
 		if (table != null)
 			q.add("table", table);
 		if (documentLocale != null)
