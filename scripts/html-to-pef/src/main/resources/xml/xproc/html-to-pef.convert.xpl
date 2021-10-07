@@ -136,10 +136,14 @@
     </p:group>
     
     <p:viewport match="math:math" px:progress=".10" px:message="Transforming MathML">
+        <p:variable name="lang" select="(/*/@xml:lang,/*/@lang,'und')[1]">
+            <p:pipe step="html" port="result"/>
+        </p:variable>
+        <p:variable name="locale-query" select="concat('(locale:',(//c:param[@name='locale']/@value,$lang)[1],')')">
+            <p:pipe step="parsed-transform-query" port="result"/>
+        </p:variable>
         <px:transform px:progress="1">
-            <p:with-option name="query" select="concat('(input:mathml)(locale:',(/*/@xml:lang,/*/@lang,'und')[1],')')">
-                <p:pipe step="html" port="result"/>
-            </p:with-option>
+            <p:with-option name="query" select="concat('(input:mathml)',$locale-query)"/>
             <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>
             <p:input port="parameters">
                 <p:pipe port="result" step="parameters"/>
