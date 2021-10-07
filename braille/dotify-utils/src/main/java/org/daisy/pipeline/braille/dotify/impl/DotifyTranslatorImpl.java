@@ -223,7 +223,7 @@ public class DotifyTranslatorImpl extends AbstractBrailleTranslator implements D
 											MutableQuery hyphenatorQuery = mutableQuery();
 											if (!"auto".equals(hyphenator))
 												hyphenatorQuery.add("hyphenator", hyphenator);
-											hyphenatorQuery.add("locale", locale);
+											hyphenatorQuery.add("locale", documentLocale != null ? documentLocale : locale);
 											Iterable<Hyphenator> hyphenators = logSelect(hyphenatorQuery, hyphenatorProvider);
 											translators = Iterables.transform(
 												hyphenators,

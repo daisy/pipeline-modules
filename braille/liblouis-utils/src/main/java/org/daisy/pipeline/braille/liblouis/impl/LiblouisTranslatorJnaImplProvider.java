@@ -187,10 +187,15 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 		else
 			v = "auto";
 		final String hyphenator = v;
-		v = null;
-		if (q.containsKey("locale"))
-			v = q.removeAll("locale").iterator().next().getValue().get();
-		final String locale = v;
+		final String documentLocale; {
+			try {
+				documentLocale = q.containsKey("document-locale")
+					? parseLocale(q.removeOnly("document-locale").getValue().get()).toLanguageTag()
+					: null; }
+			catch (IllegalArgumentException e) {
+				logger.error("Invalid locale", e);
+				return empty; }
+		}
 		v = null;
 		if (q.containsKey("handle-non-standard-hyphenation"))
 			v = q.removeOnly("handle-non-standard-hyphenation").getValue().get();
@@ -206,18 +211,14 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 			return empty; }
 		if (table != null)
 			q.add("table", table);
-		if (locale != null)
-			try {
-				q.add("locale", parseLocale(locale).toLanguageTag()); }
-			catch (IllegalArgumentException e) {
-				logger.error("Invalid locale", e);
-				return empty; }
+		if (documentLocale != null)
+			q.add("document-locale", documentLocale);
 		if (!asciiBraille)
 			q.add("unicode");
 		q.add("white-space");
 		Iterable<LiblouisTranslator> translators = getSimpleTranslator(
 			q.asImmutable(),
-			locale,
+			documentLocale,
 			hyphenator,
 			handleNonStandardHyphenation);
 		if (translators.iterator().hasNext()) {
@@ -232,7 +233,7 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 				Iterable<LiblouisTranslator> nonContractingTranslators = Iterables.memoize(
 					getSimpleTranslator(
 						q.asImmutable(),
-						locale,
+						documentLocale,
 						hyphenator,
 						handleNonStandardHyphenation));
 				if (nonContractingTranslators.iterator().hasNext())
@@ -264,8 +265,11 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 		return translators;
 	}
 
+	/**
+	 * @param documentLocale  Locale for hyphenation rules
+	 */
 	private Iterable<LiblouisTranslator> getSimpleTranslator(Query query,
-	                                                         String locale,
+	                                                         String documentLocale,
 	                                                         String hyphenator,
 	                                                         int handleNonStandardHyphenation) {
 		return concat(
@@ -283,7 +287,6 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 											logCreate((LiblouisTranslator)new LiblouisTranslatorHyphenatorImpl(
 													table.getTranslator(),
 													handleNonStandardHyphenation,
-													locale,
 													unicodeNormalization))
 										);
 										break; }
@@ -291,11 +294,11 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 								MutableQuery hyphenatorQuery = mutableQuery();
 								if (!"auto".equals(hyphenator))
 									hyphenatorQuery.add("hyphenator", hyphenator);
-								if (locale != null)
-									hyphenatorQuery.add("locale", locale);
+								if (documentLocale != null)
+									hyphenatorQuery.add("locale", documentLocale);
 								Iterable<Hyphenator> hyphenators = logSelect(hyphenatorQuery.asImmutable(), hyphenatorProvider);
-								if (locale != null && !"auto".equals(hyphenator)) {
-									// also search without locale because locale might only refer to translator itself
+								if (documentLocale != null && !"auto".equals(hyphenator)) {
+									// also search without locale because "hyphenator" feature might be an ID
 									hyphenatorQuery.removeAll("locale");
 									hyphenators = concat(
 										hyphenators,
@@ -312,7 +315,6 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 																table.getTranslator(),
 																hyphenator,
 																handleNonStandardHyphenation,
-																locale,
 																unicodeNormalization))); }}));
 								}}
 						if ("none".equals(hyphenator) || "auto".equals(hyphenator))
@@ -322,7 +324,6 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 										table.getTranslator(),
 										null,
 										handleNonStandardHyphenation,
-										locale,
 										unicodeNormalization)));
 						return translators;
 					}
@@ -343,7 +344,6 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 		private Hyphenator hyphenator;
 		protected FullHyphenator fullHyphenator;
 		private Hyphenator.LineBreaker lineBreaker;
-		private final String mainLocale;
 		private final Map<String,Typeform> supportedTypeforms;
 		
 		// how to handle non-standard hyphenation in pre-translation mode
@@ -363,12 +363,10 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 		
 		private LiblouisTranslatorImpl(Translator translator,
 			                           int handleNonStandardHyphenation,
-			                           String mainLocale,
 			                           Normalizer.Form unicodeNormalization) {
 			table = new LiblouisTable(translator.getTable());
 			this.translator = translator;
 			this.handleNonStandardHyphenation = handleNonStandardHyphenation;
-			this.mainLocale = mainLocale;
 			this.supportedTypeforms
 				= translator.getSupportedTypeforms().stream().collect(Collectors.toMap(Typeform::getName, e -> e));
 			this.unicodeNormalization = unicodeNormalization;
@@ -377,9 +375,8 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 		private LiblouisTranslatorImpl(Translator translator,
 			                           Hyphenator hyphenator,
 			                           int handleNonStandardHyphenation,
-			                           String mainLocale,
 			                           Normalizer.Form unicodeNormalization) {
-			this(translator, handleNonStandardHyphenation, mainLocale, unicodeNormalization);
+			this(translator, handleNonStandardHyphenation, unicodeNormalization);
 			this.hyphenator = hyphenator;
 			if (hyphenator != null) {
 				try {
@@ -1657,9 +1654,8 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 		
 		private LiblouisTranslatorHyphenatorImpl(Translator translator,
 			                                     int handleNonStandardHyphenation,
-			                                     String mainLocale,
 			                                     Normalizer.Form unicodeNormalization) {
-			super(translator, handleNonStandardHyphenation, mainLocale, unicodeNormalization);
+			super(translator, handleNonStandardHyphenation, unicodeNormalization);
 			fullHyphenator = new LiblouisTranslatorAsFullHyphenator(translator);
 		}
 		
