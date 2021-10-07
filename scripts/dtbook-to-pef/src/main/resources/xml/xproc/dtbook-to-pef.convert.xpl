@@ -166,9 +166,7 @@
     
     <p:choose name="transform" px:progress=".83">
         <p:variable name="lang" select="(/*/@xml:lang,'und')[1]"/>
-        <p:variable name="locale-query" select="if (//c:param[@name='locale']) then '' else concat('(locale:',$lang,')')">
-            <p:pipe step="parsed-transform-query" port="result"/>
-        </p:variable>
+        <p:variable name="locale-query" select="concat('(document-locale:',$lang,')')"/>
         <p:when test="$include-obfl='true'">
             <p:output port="pef" primary="true" sequence="true"/>
             <p:output port="obfl">

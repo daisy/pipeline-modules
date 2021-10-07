@@ -179,10 +179,16 @@ public class DotifyTranslatorImpl extends AbstractBrailleTranslator implements D
 			new AbstractTransformProvider<DotifyTranslator>() {
 				public Iterable<DotifyTranslator> _get(Query query) {
 					MutableQuery q = mutableQuery(query);
-					if (q.containsKey("locale")) {
+					if (q.containsKey("locale") || q.containsKey("document-locale")) {
+						final String documentLocale;
 						final String locale; {
 							try {
-								locale = parseLocale(q.removeOnly("locale").getValue().get()).toLanguageTag(); }
+								documentLocale = q.containsKey("document-locale")
+									? parseLocale(q.removeOnly("document-locale").getValue().get()).toLanguageTag()
+									: null;
+								locale = q.containsKey("locale")
+									? parseLocale(q.removeOnly("locale").getValue().get()).toLanguageTag()
+									: documentLocale; }
 							catch (IllegalArgumentException e) {
 								logger.error("Invalid locale", e);
 								return empty; }

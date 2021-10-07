@@ -24,7 +24,7 @@ can be selected using a query that contains
   or not at all. A value not equal to "none", "liblouis" or "auto"
   will match every Liblouis translator that uses an external
   hyphenator that matches this feature. A translator will only use
-  external hyphenators with the same locale as the translator itself.
+  external hyphenators with the same locale as the document.
 
 `table`
 `liblouis-table`

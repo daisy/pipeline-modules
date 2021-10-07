@@ -128,7 +128,7 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 				throw new TranslatorConfigurationException();
 			Query query = query(mode);
 			if (locale != null && !"und".equals(locale))
-				query = mutableQuery(query).add("locale", locale);
+				query = mutableQuery(query).add("document-locale", locale);
 			for (org.daisy.pipeline.braille.common.BrailleTranslator t : brailleTranslatorProvider.get(query))
 				try {
 					return new BrailleTranslatorFromBrailleTranslator(mode, t.lineBreakingFromStyledText()); }

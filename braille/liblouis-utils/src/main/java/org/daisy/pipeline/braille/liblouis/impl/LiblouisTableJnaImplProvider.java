@@ -287,6 +287,7 @@ public class LiblouisTableJnaImplProvider extends AbstractTransformProvider<Libl
 							boolean whiteSpace = false;
 							String dotsForUndefinedChar = null;
 							boolean display = false;
+							String documentLocale = null;
 							if (q.containsKey("unicode")) {
 								q.removeOnly("unicode");
 								unicode = true; }
@@ -306,13 +307,19 @@ public class LiblouisTableJnaImplProvider extends AbstractTransformProvider<Libl
 									logger.warn("A query with '(unicode)(display)' never matches anything");
 									throw new NoSuchElementException(); }
 								display = true; }
+							if (q.containsKey("document-locale"))
+								documentLocale = q.removeOnly("document-locale").getValue().get();
 							if (q.containsKey("table"))
 								// FIXME: display and remaining features in query are ignored
 								table = q.removeOnly("table").getValue().get();
 							else if (q.containsKey("liblouis-table"))
 								// FIXME: display and remaining features in query are ignored
 								table = q.removeOnly("liblouis-table").getValue().get();
-							else if (!q.isEmpty()) {
+							else {
+								if (!q.containsKey("locale") && documentLocale != null)
+									q.add("locale", documentLocale);
+								if (q.isEmpty())
+									throw new NoSuchElementException();
 								StringBuilder b = new StringBuilder();
 								if (display)
 									b.append("type:display ");
