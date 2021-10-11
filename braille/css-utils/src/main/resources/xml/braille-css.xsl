@@ -131,7 +131,7 @@
                  re:exact(re:or(('none',$css:NON_NEGATIVE_INTEGER_RE))),
                  re:exact(re:or(($css:NON_NEGATIVE_INTEGER_RE,'auto'))),
                  re:exact(re:or(($css:NON_NEGATIVE_INTEGER_RE,'auto'))),
-                 re:exact(re:or(($css:IDENT_LIST_RE,'auto','none'))),
+                 re:exact(re:or((re:space-separated(re:or(($css:IDENT_RE,$css:VENDOR_PRF_IDENT_RE))),'auto','none'))),
                  re:exact(re:or(('normal','italic','oblique'))),
                  re:exact(re:or(('normal','bold','100','200','300','400','500','600','700','800','900'))),
                  re:exact(re:or(('none','underline','overline','line-through','blink'))),
