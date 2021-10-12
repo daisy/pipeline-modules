@@ -161,6 +161,23 @@ public class LiblouisCoreTest extends AbstractTest {
 	}
 	
 	@Test
+	public void testCompoundTranslator() {
+		LineBreakingFromStyledText translator = provider.withContext(messageBus)
+		                                                .get(query("(locale:foo)(contraction:full)(output:ascii)")).iterator().next()
+		                                                .lineBreakingFromStyledText();
+		assertEquals(
+			"xxxxxxx\n" +
+			"abc⠀def⠀\n" +
+			"ghi",
+			fillLines(
+				translator.transform(
+					styledText(
+						"xxxxxxx abc def ", "",
+						"ghi", "text-transform: uncontracted")),
+				10));
+	}
+	
+	@Test
 	public void testTranslateSegments() {
 		FromStyledTextToBraille translator = provider.withContext(messageBus)
 		                                             .get(query("(table:'foobar.uti')")).iterator().next()

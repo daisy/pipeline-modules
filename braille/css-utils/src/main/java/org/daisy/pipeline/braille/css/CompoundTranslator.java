@@ -209,11 +209,16 @@ public class CompoundTranslator extends AbstractBrailleTranslator {
 
 		public String nextTranslatedRow(int limit, boolean force, boolean wholeWordsOnly) {
 			String row = "";
+			BrailleTranslator.LineIterator prev = null;
 			while (limit > row.length()) {
-				if (current == null) break;
+				if (current == null || current == prev) break;
 				String s = current.nextTranslatedRow(limit - row.length(), force, wholeWordsOnly);
-				if (s.isEmpty()) break;
+				if (s.isEmpty())
+					break;
+				else
+					force = false;
 				row += s;
+				prev = current;
 				computeCurrent(); }
 			return row;
 		}
