@@ -58,7 +58,7 @@ import org.slf4j.LoggerFactory;
 
 public class PEF2TextStep extends DefaultStep implements XProcStep {
 	
-	private static final QName _dir_href = new QName("dir-href");
+	private static final QName _output_dir = new QName("output-dir");
 	private static final QName _file_format = new QName("file-format");
 	private static final QName _line_breaks = new QName("line-breaks");
 	private static final QName _page_breaks = new QName("page-breaks");
@@ -106,7 +106,7 @@ public class PEF2TextStep extends DefaultStep implements XProcStep {
 				logger.debug("Storing PEF to file format: " + fileFormat);
 				
 				// Initialize output directory
-				File textDir = new File(new URI(getOption(_dir_href).getString()));
+				File textDir = new File(new URI(getOption(_output_dir).getString()));
 				textDir.mkdirs();
 				
 				// Read source PEF

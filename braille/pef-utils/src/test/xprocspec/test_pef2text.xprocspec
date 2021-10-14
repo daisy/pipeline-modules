@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
                xmlns:pef="http://www.daisy.org/ns/2008/pef"
-               script="../resources/pef2text.xpl">
+               script="../../main/resources/xml/pef2text.xpl">
   
   <x:scenario label="test_01">
     <x:call step="pef:pef2text">
@@ -31,7 +31,7 @@
                                             (page-breaks:&quot;---&quot;)
                                             (table:&quot;org.daisy.braille.impl.table.DefaultTableProvider.TableType.EN_US&quot;)'"/>
       <x:option name="pad" select="'BOTH'"/>
-      <x:option name="dir-href" select="resolve-uri('test_01/', $temp-dir)"/>
+      <x:option name="output-dir" select="resolve-uri('test_01/', $temp-dir)"/>
       <x:option name="single-volume-name" select="'text'"/>
     </x:call>
     <x:context label="result file">
