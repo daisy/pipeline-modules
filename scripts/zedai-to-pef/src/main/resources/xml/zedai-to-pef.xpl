@@ -74,10 +74,10 @@ manual](http://sass-lang.com/documentation/file.SASS_REFERENCE.html).</p>
         </p:documentation>
     </p:option>
     
-    <p:option name="ascii-table" required="false" px:type="transform-query" select="''">
+    <p:option name="preview-table" required="false" px:type="transform-query" select="''">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h2 px:role="name">ASCII braille table</h2>
-            <p px:role="desc" xml:space="preserve">The ASCII braille table, used to render the PEF preview and the plain text version.
+            <h2 px:role="name">ASCII braille table for PEF preview</h2>
+            <p px:role="desc" xml:space="preserve">The ASCII braille table used to render the PEF preview.
 
 If left blank, the locale information in the input document will be used to select a suitable table.</p>
         </p:documentation>
@@ -192,7 +192,7 @@ If left blank, the locale information in the input document will be used to sele
         </p:with-option>
         <p:with-option name="include-brf" select="$include-brf"/>
         <p:with-option name="include-preview" select="$include-preview"/>
-        <p:with-option name="ascii-table" select="$ascii-table"/>
+        <p:with-option name="preview-table" select="$preview-table"/>
         <p:with-option name="pef-output-dir" select="$pef-output-dir"/>
         <p:with-option name="brf-output-dir" select="$brf-output-dir"/>
         <p:with-option name="preview-output-dir" select="$preview-output-dir"/>

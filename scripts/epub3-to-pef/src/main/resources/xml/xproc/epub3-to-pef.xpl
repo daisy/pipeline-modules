@@ -83,7 +83,7 @@ even though the provided CSS is more specific.
     <p:option name="include-brf"/>
     <p:option name="include-obfl"/>
     <p:option name="ascii-file-format"/>
-    <p:option name="ascii-table"/>
+    <p:option name="preview-table"/>
     <p:option name="page-width"/>
     <p:option name="page-height"/>
     <p:option name="duplex"/>
@@ -155,7 +155,7 @@ even though the provided CSS is more specific.
                                            apply-document-specific-stylesheets
                                            transform
                                            braille-code
-                                           ascii-table
+                                           preview-table
                                            ascii-file-format
                                            include-brf
                                            include-preview
@@ -247,7 +247,7 @@ even though the provided CSS is more specific.
         <p:with-option name="include-brf" select="$include-brf"/>
         <p:with-option name="include-preview" select="$include-preview"/>
         <p:with-option name="ascii-file-format" select="$ascii-file-format"/>
-        <p:with-option name="ascii-table" select="$ascii-table"/>
+        <p:with-option name="preview-table" select="$preview-table"/>
         <p:with-option name="pef-output-dir" select="$pef-output-dir"/>
         <p:with-option name="brf-output-dir" select="$brf-output-dir"/>
         <p:with-option name="preview-output-dir" select="$preview-output-dir"/>

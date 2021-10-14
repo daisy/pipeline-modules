@@ -12,7 +12,6 @@
     <p:input port="source" sequence="false" primary="true"/>
     <p:option name="dir-href" required="true"/>
     <p:option name="file-format" required="false"/> <!-- query format -->
-    <p:option name="table" required="false"/> <!-- query format -->
     <p:option name="line-breaks" required="false"/>
     <p:option name="page-breaks" required="false"/>
     <p:option name="pad" required="false"/>

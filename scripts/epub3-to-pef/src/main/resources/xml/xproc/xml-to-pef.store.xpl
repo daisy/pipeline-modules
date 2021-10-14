@@ -33,7 +33,7 @@
     <p:option name="include-preview" select="'false'"/>
     <p:option name="include-brf" select="'false'"/>
     <p:option name="ascii-file-format" select="''"/>
-    <p:option name="ascii-table" select="''"/>
+    <p:option name="preview-table" select="''"/>
     
     <p:import href="http://www.daisy.org/pipeline/modules/braille/pef-utils/library.xpl"/>
 
@@ -90,8 +90,8 @@
                     <p:with-option name="brf-file-format" select="concat($ascii-file-format,'(locale:',(//pef:meta/dc:language,'und')[1],')')">
                         <p:pipe step="main" port="pef"/>
                     </p:with-option>
-                    <p:with-option name="brf-table" select="if ($ascii-table!='') then $ascii-table
-                                                            else concat('(locale:',(//pef:meta/dc:language,'und')[1],')')">
+                    <p:with-option name="preview-table" select="if ($preview-table!='') then $preview-table
+                                                                else concat('(locale:',(//pef:meta/dc:language,'und')[1],')')">
                         <p:pipe step="main" port="pef"/>
                     </p:with-option>
                 </pef:store>

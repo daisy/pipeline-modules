@@ -24,7 +24,7 @@
     <p:option name="include-preview" select="'false'"/>
     <p:option name="include-brf" select="'false'"/>
     <p:option name="ascii-file-format" select="''"/>
-    <p:option name="ascii-table" select="''"/>
+    <p:option name="preview-table" select="''"/>
     
     <p:import href="xml-to-pef.store.xpl">
         <p:documentation>
@@ -43,7 +43,7 @@
         <p:with-option name="include-brf" select="$include-brf"/>
         <p:with-option name="include-preview" select="$include-preview"/>
         <p:with-option name="ascii-file-format" select="$ascii-file-format"/>
-        <p:with-option name="ascii-table" select="$ascii-table"/>
+        <p:with-option name="preview-table" select="$preview-table"/>
         <p:with-option name="pef-output-dir" select="$pef-output-dir"/>
         <p:with-option name="brf-output-dir" select="$brf-output-dir"/>
         <p:with-option name="preview-output-dir" select="$preview-output-dir"/>
