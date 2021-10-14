@@ -26,9 +26,22 @@
     <p:option name="preview-href" required="false" select="''"/> <!-- URI -->
     <p:option name="preview-table" required="false" select="''"/> <!-- query -->
     
-    <p:import href="pef-to-html.convert.xpl"/>
-    <p:import href="pef2text.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl"/>
+    <p:import href="pef-to-html.convert.xpl">
+        <p:documentation>
+            px:pef-to-html.convert
+        </p:documentation>
+    </p:import>
+    <p:import href="pef2text.xpl">
+        <p:documentation>
+            pef:pef2text
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
+        <p:documentation>
+            px:mkdir
+            px:copy-resource
+        </p:documentation>
+    </p:import>
     
     <!-- ============ -->
     <!-- STORE AS PEF -->

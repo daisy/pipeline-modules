@@ -93,6 +93,7 @@ public class PEF2TextStep extends DefaultStep implements XProcStep {
 	public void run() throws SaxonApiException {
 		super.run();
 		MutableQuery q = mutableQuery(query(getOption(_file_format, "")));
+		q.removeAll("blank-last-page"); // has been handled in pef2text.xpl
 		addOption(_line_breaks, q);
 		addOption(_page_breaks, q);
 		addOption(_pad, q);
@@ -215,14 +216,14 @@ public class PEF2TextStep extends DefaultStep implements XProcStep {
 	
 	private void addOption(QName option, MutableQuery query) {
 		RuntimeValue v = getOption(option);
-		if (v != null)
+		if (v != null && !"".equals(v.getString()))
 			query.add(option.getLocalName(), v.getString());
 	}
 	
 	@Component(
-		name = "pef:pef2text",
+		name = "pxi:pef2text",
 		service = { XProcStepProvider.class },
-		property = { "type:String={http://www.daisy.org/ns/2008/pef}pef2text" }
+		property = { "type:String={http://www.daisy.org/ns/pipeline/xproc/internal}pef2text" }
 	)
 	public static class Provider implements XProcStepProvider {
 		
