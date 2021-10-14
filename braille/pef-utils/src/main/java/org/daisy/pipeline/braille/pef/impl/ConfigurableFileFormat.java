@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.NoSuchElementException;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.base.Optional;
@@ -56,6 +57,7 @@ public class ConfigurableFileFormat implements FileFormat {
 	
 	private final org.daisy.pipeline.braille.common.Provider<Query,Table> tableProvider;
 	private Table table;
+	private String documentLocale;
 	private String locale;
 	private LineBreaks lineBreaks;
 	private PageBreaks pageBreaks;
@@ -135,6 +137,15 @@ public class ConfigurableFileFormat implements FileFormat {
 					locale = (String)value;
 					return; }}
 			throw new IllegalArgumentException("Unsupported value for locale: " + value);
+		} else if ("document-locale".equals(key)) {
+			if (value != null) {
+				if (value instanceof Locale) {
+					documentLocale = ((Locale)value).toLanguageTag();
+					return; }
+				else if (value instanceof String) {
+					documentLocale = (String)value;
+					return; }}
+			throw new IllegalArgumentException("Unsupported value for document-locale: " + value);
 		} else if ("line-breaks".equals(key)) {
 			if (value != null) {
 				if (value instanceof LineBreaks) {
@@ -252,24 +263,22 @@ public class ConfigurableFileFormat implements FileFormat {
 	
 	private FileFormat build() {
 		if (table == null) {
-			if (locale == null)
-				setFeature("table", DEFAULT_TABLE);
-			else {
-				for (Table t : tableProvider.get(mutableQuery().add("locale", locale)))
+			if (locale != null || documentLocale != null)
+				for (Table t : tableProvider.get(mutableQuery().add("locale", locale != null ? locale : documentLocale)))
 					if (tableFilter.accept(t)) {
 						table = t;
 						break; }
-				if (table == null) {
-					setFeature("table", DEFAULT_TABLE);
-					logger.warn("Table " + table + " not compatible with locale " + locale); }}}
+			if (table == null)
+				setFeature("table", DEFAULT_TABLE); }
 		else if (locale != null) {
 			boolean match = false;
 			for (Table t : tableProvider.get(mutableQuery().add("locale", locale)))
 				if (t.equals(table)) {
 					match = true;
 					break; }
-			if (!match)
-				logger.warn("Table " + table + " not compatible with locale " + locale); }
+			if (!match) {
+				logger.warn("Table " + table + " not compatible with locale " + locale);
+				throw new NoSuchElementException(); }}
 		finalized = true;
 		return this;
 	}
