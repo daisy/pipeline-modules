@@ -23,6 +23,7 @@ import org.daisy.dotify.api.table.TableFilter;
 
 import static org.daisy.pipeline.braille.common.Provider.util.dispatch;
 import static org.daisy.pipeline.braille.common.Provider.util.memoize;
+import static org.daisy.pipeline.braille.common.util.Locales.parseLocale;
 import org.daisy.pipeline.braille.common.Provider.util.MemoizingProvider;
 import org.daisy.pipeline.braille.common.Query;
 import org.daisy.pipeline.braille.common.Query.Feature;
@@ -64,8 +65,16 @@ public class BrailleUtilsFileFormatCatalog implements FileFormatProvider {
 		final Iterable<Table> table; {
 			if (q.containsKey("table")) {
 				String id = q.removeOnly("table").getValue().get();
-				Query tableQuery = mutableQuery().add("id", id);
-				table = tableProvider.get(tableQuery); }
+				// table could be a locale
+				String locale; {
+					try {
+						locale = parseLocale(id).toLanguageTag(); }
+					catch (IllegalArgumentException e) {
+						locale = null; }}
+				table = locale != null
+					? concat(tableProvider.get(mutableQuery().add("locale", locale)),
+					         tableProvider.get(mutableQuery().add("id", id)))
+					: tableProvider.get(mutableQuery().add("id", id)); }
 			else if (q.containsKey("locale")) {
 				Feature locale = q.removeOnly("locale");
 				MutableQuery tableQuery = mutableQuery();

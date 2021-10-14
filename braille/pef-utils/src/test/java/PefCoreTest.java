@@ -51,18 +51,22 @@ public class PefCoreTest extends AbstractTest {
 	
 	@Test
 	public void testBrailleUtilsFileFormatCatalog() {
-		MutableQuery q = mutableQuery();
-		q.add("format", "org_daisy.BrailleEditorsFileFormatProvider.FileType.BRF");
-		q.add("table", "org_daisy.EmbosserTableProvider.TableType.MIT");
-		formatProvider.get(q).iterator().next();
+		formatProvider.get(
+			mutableQuery().add("format", "org_daisy.BrailleEditorsFileFormatProvider.FileType.BRF")
+			              .add("table", "org_daisy.EmbosserTableProvider.TableType.MIT")
+		).iterator().next();
 	}
 	
 	@Test
 	public void testBrailleUtilsEmbosserAsFileFormatCatalog() {
-		MutableQuery q = mutableQuery();
-		q.add("embosser", "com_braillo.BrailloEmbosserProvider.EmbosserType.BRAILLO_200");
-		q.add("locale", "nl");
-		formatProvider.get(q).iterator().next();
+		formatProvider.get(
+			mutableQuery().add("embosser", "com_braillo.BrailloEmbosserProvider.EmbosserType.BRAILLO_200")
+			              .add("locale", "nl")
+		).iterator().next();
+		formatProvider.get(
+			mutableQuery().add("embosser", "com_braillo.BrailloEmbosserProvider.EmbosserType.BRAILLO_200")
+			              .add("table", "nl")
+		).iterator().next();
 	}
 	
 	@Override

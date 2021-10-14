@@ -24,6 +24,7 @@ import org.daisy.dotify.api.table.TableFilter;
 
 import static org.daisy.pipeline.braille.common.Provider.util.dispatch;
 import static org.daisy.pipeline.braille.common.Provider.util.memoize;
+import static org.daisy.pipeline.braille.common.util.Locales.parseLocale;
 import org.daisy.pipeline.braille.common.Provider.util.MemoizingProvider;
 import org.daisy.pipeline.braille.common.Query;
 import org.daisy.pipeline.braille.common.Query.Feature;
@@ -122,11 +123,19 @@ public class ConfigurableFileFormat implements FileFormat {
 					if (tableFilter.accept(t)) {
 						table = (Table)value;
 						return; }}
-				else if (value instanceof String)
+				else if (value instanceof String) {
 					for (Table t : tableProvider.get(mutableQuery().add("id", (String)value)))
 						if (tableFilter.accept(t)) {
 							table = t;
-							return; }}
+							return; }
+					// table could be a locale
+					try {
+						String locale = parseLocale((String)value).toLanguageTag();
+						for (Table t : tableProvider.get(mutableQuery().add("locale", locale)))
+							if (tableFilter.accept(t)) {
+								table = t;
+								return; }}
+					catch (IllegalArgumentException e) {}}}
 			throw new IllegalArgumentException("Unsupported value for table: " + value);
 		} else if ("locale".equals(key)) {
 			if (value != null) {
