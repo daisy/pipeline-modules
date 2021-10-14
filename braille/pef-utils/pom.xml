@@ -81,6 +81,7 @@
       org.daisy.pipeline.braille.pef.impl.BrailleUtilsTableCatalog,
       org.daisy.pipeline.braille.pef.impl.ConfigurableFileFormat$Provider,
       org.daisy.pipeline.braille.pef.impl.LocaleBasedTableProvider,
+      org.daisy.pipeline.braille.pef.impl.PEFFileFormat$Provider,
       org.daisy.pipeline.braille.pef.calabash.impl.PEF2TextStep$Provider,
       org.daisy.pipeline.braille.pef.calabash.impl.Text2PEFStep$Provider,
       org.daisy.pipeline.braille.pef.calabash.impl.ValidateStep$Provider,

@@ -87,6 +87,7 @@
                                                                then $brf-output-dir
                                                                else ''"/>
                     <p:with-option name="brf-name-pattern" select="concat($name,'_vol-{}')"/>
+                    <p:with-option name="brf-single-volume-name" select="$name"/>
                     <p:with-option name="brf-file-format" select="concat($ascii-file-format,'(document-locale:',(//pef:meta/dc:language,'und')[1],')')">
                         <p:pipe step="main" port="pef"/>
                     </p:with-option>

@@ -244,6 +244,10 @@ public class BrailleUtilsFileFormatCatalog implements FileFormatProvider {
 			return embosser.supportsDuplex();
 		}
 
+		public boolean supportsVolumes() {
+			return false;
+		}
+
 		public String getFileExtension() {
 			return ".brf";
 		}

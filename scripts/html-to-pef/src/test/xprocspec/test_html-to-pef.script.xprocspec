@@ -70,7 +70,7 @@
         <x:option name="temp-dir" select="resolve-uri('ascii-table/temp-dir',$temp-dir)"/>
       </x:call>
       <x:context label="brf">
-        <x:document type="file" method="text" base-uri="temp-dir" href="ascii-table/output-dir/test_ascii-table_1_vol-1.brf"/>
+        <x:document type="file" method="text" base-uri="temp-dir" href="ascii-table/output-dir/test_ascii-table_1.brf"/>
       </x:context>
       <x:expect label="brf" type="compare" normalize-space="false">
         <x:document type="file" method="text" href="../resources/test_ascii-table_1.brf"/>
@@ -89,7 +89,7 @@
         <x:option name="temp-dir" select="resolve-uri('default-ascii-table/temp-dir',$temp-dir)"/>
       </x:call>
       <x:context label="brf">
-        <x:document type="file" method="text" base-uri="temp-dir" href="default-ascii-table/output-dir/test_ascii-table_2_vol-1.brf"/>
+        <x:document type="file" method="text" base-uri="temp-dir" href="default-ascii-table/output-dir/test_ascii-table_2.brf"/>
       </x:context>
       <x:expect label="brf" type="compare" normalize-space="false">
         <x:document type="file" method="text" href="../resources/test_ascii-table_2.brf"/>

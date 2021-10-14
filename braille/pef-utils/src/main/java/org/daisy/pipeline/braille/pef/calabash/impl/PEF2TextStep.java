@@ -114,6 +114,7 @@ public class PEF2TextStep extends DefaultStep implements XProcStep {
 				Serializer serializer = runtime.getProcessor().newSerializer();
 				serializer.setOutputStream(s);
 				serializer.setCloseOnCompletion(true);
+				serializer.setOutputProperty(Serializer.Property.INDENT, "yes");
 				serializer.serializeNode(source.read());
 				serializer.close();
 				InputStream pefStream = new ByteArrayInputStream(s.toByteArray());
@@ -126,6 +127,12 @@ public class PEF2TextStep extends DefaultStep implements XProcStep {
 					pattern = "volume-{}";
 				int match = pattern.indexOf("{}");
 				if (match < 0 || match != pattern.lastIndexOf("{}")) {
+					logger.error("name-pattern is invalid: '" + pattern + "'");
+					if (singleVolumeName.isEmpty())
+						throw new RuntimeException("name-pattern and single-volume-name may not both be empty");
+				}
+				if ((fileFormat.supportsVolumes() && !singleVolumeName.isEmpty())
+				    || match < 0 || match != pattern.lastIndexOf("{}")) {
 					// Output to single file
 					convertPEF2Text(pefStream,
 							new File(textDir, singleVolumeName + fileFormat.getFileExtension()), fileFormat);
@@ -189,14 +196,20 @@ public class PEF2TextStep extends DefaultStep implements XProcStep {
 	
 	private void convertPEF2Text(InputStream pefStream, File textFile, FileFormat fileFormat)
 			throws ParserConfigurationException, SAXException, IOException, UnsupportedWidthException {
-		// Create EmbosserWriter
 		OutputStream textStream = new FileOutputStream(textFile);
-		EmbosserWriter writer = fileFormat.newEmbosserWriter(textStream);
-		
-		// Parse PEF to text
-		PEFHandler.Builder builder = new PEFHandler.Builder(writer);
-		builder.range(null).align(Alignment.LEFT).offset(0);
-		parsePefFile(pefStream, builder.build());
+		if ("pef".equals(fileFormat.getIdentifier())) {
+
+			// just write pefStream to textFile without parsing it
+			byte[] buf = new byte[153600];
+			int length;
+			while ((length = pefStream.read(buf)) > 0)
+				textStream.write(buf, 0, length);
+		} else {
+			EmbosserWriter writer = fileFormat.newEmbosserWriter(textStream);
+			PEFHandler.Builder builder = new PEFHandler.Builder(writer);
+			builder.range(null).align(Alignment.LEFT).offset(0);
+			parsePefFile(pefStream, builder.build());
+		}
 		textStream.close();
 	}
 	

@@ -99,6 +99,10 @@ public class ConfigurableFileFormat implements FileFormat {
 		return false;
 	}
 	
+	public boolean supportsVolumes() {
+		return false;
+	}
+	
 	private final TableFilter tableFilter = new TableFilter() {
 		public boolean accept(FactoryProperties object) {
 			return true;
