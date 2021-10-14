@@ -9,6 +9,7 @@ import java.util.NoSuchElementException;
 import java.util.function.Supplier;
 
 import org.daisy.braille.css.SimpleInlineStyle;
+import org.daisy.braille.css.BrailleCSSProperty.Hyphens;
 import org.daisy.braille.css.BrailleCSSProperty.TextTransform;
 import org.daisy.dotify.api.translator.UnsupportedMetricException;
 import org.daisy.pipeline.braille.common.AbstractBrailleTranslator;
@@ -42,7 +43,8 @@ public class CompoundTranslator extends AbstractBrailleTranslator {
 	private static abstract class TransformImpl<T> {
 
 		abstract Iterable<T> transform(Iterable<CSSStyledText> styledText, int from, int to, String textTransform);
-
+		abstract Iterable<String> transformContext(Iterable<CSSStyledText> styledText, int from, int to, String textTransform);
+		
 		abstract boolean supports(String textTransform);
 
 		List<T> transform(Iterable<CSSStyledText> styledText, int from, int to) {
@@ -52,53 +54,100 @@ public class CompoundTranslator extends AbstractBrailleTranslator {
 				throw new IndexOutOfBoundsException();
 			List<T> transformed = new ArrayList<>();
 			if (from == to) return transformed;
+			List<CSSStyledText> styledTextList = new ArrayList<>();
+			styledText.forEach(styledTextList::add);
+			// segments with same text-transform to be transformed next
 			List<CSSStyledText> buffer = new ArrayList<CSSStyledText>();
-			String curTextTransform = "auto";
-			for (CSSStyledText st : styledText) {
-				SimpleInlineStyle style = st.getStyle();
-				String textTransform; {
-					textTransform = "auto";
-					if (style != null) {
-						CSSProperty val = style.getProperty("text-transform");
-						if (val != null) {
-							if (val == TextTransform.list_values) {
-								TermList values = style.getValue(TermList.class, "text-transform");
-								
-								// According to the spec values should be "applied" from left to right, and
-								// values of inner elements always come before values of outer elements (see
-								// http://braillespecs.github.io/braille-css/#the-text-transform-property).
-								// The way it works here is that the sub-translator that maps to the first
-								// text-transform value (starting from left) is used to translate the segment,
-								// and all values to the right are ignored.
-								Iterator<Term<?>> it = values.iterator();
-								while (it.hasNext()) {
-									String tt = ((TermIdent)it.next()).getValue();
-									if (supports(tt)) {
-										textTransform = tt;
-										it.remove();
-										while (it.hasNext()) {
-											it.next();
-											it.remove(); }
-										break; }}
-								if (values.isEmpty())
-									style.removeProperty("text-transform"); }}}
+			// already transformed segments (text-transform: none) to be used as context for next transformation
+			List<CSSStyledText> context = new ArrayList<CSSStyledText>();
+			String textTransform = "auto";
+			for (int i = styledTextList.size(); i >= 0; i--) {
+				CSSStyledText next;
+				String nextTextTransform; {
+					if (i == 0) {
+						next = null;
+						nextTextTransform = null;
+					} else {
+						next = styledTextList.get(i - 1);
+						nextTextTransform = "auto";
+						SimpleInlineStyle style = next.getStyle();
+						if (style != null) {
+							CSSProperty val = style.getProperty("text-transform");
+							if (val != null) {
+								if (val == TextTransform.list_values) {
+									TermList values = style.getValue(TermList.class, "text-transform");
+
+									// According to the spec values should be "applied" from left to right, and
+									// values of inner elements always come before values of outer elements (see
+									// http://braillespecs.github.io/braille-css/#the-text-transform-property).
+									// The way it works here is that the sub-translator that maps to the first
+									// text-transform value (starting from left) is used to translate the segment,
+									// and all values to the left and right are passed to the sub-translator.
+									Iterator<Term<?>> it = values.iterator();
+									while (it.hasNext()) {
+										String tt = ((TermIdent)it.next()).getValue();
+										if (supports(tt)) {
+											nextTextTransform = tt;
+											it.remove();
+											while (it.hasNext()) {
+												it.next();
+												it.remove(); }
+											break; }}
+									if (values.isEmpty())
+										style.removeProperty("text-transform"); }}}
+					}
 				}
-				if (textTransform != curTextTransform && !buffer.isEmpty()) {
-					if (from < buffer.size())
-						for (T s : transform(buffer, from, to < buffer.size() ? to : -1, curTextTransform))
-							transformed.add(s);
-					from -= buffer.size();
-					if (from < 0) from = 0;
-					if (to > 0) {
-						to -= buffer.size();
-						if (to <= 0)
-							return transformed; }
-					buffer = new ArrayList<CSSStyledText>(); }
-				curTextTransform = textTransform;
-				buffer.add(st); }
-			if (!buffer.isEmpty() && from < buffer.size())
-				for (T s : transform(buffer, from, to < buffer.size() ? to : -1, curTextTransform))
-					transformed.add(s);
+				if (next == null || (nextTextTransform != textTransform && buffer.size() > 0)) {
+					if (i < to) {
+						int j = 0;
+						for (T t : transform(org.daisy.pipeline.braille.common.util.Iterables.clone(
+						                         Iterables.concat(buffer, context)),
+						                     from > i ? from - i : 0,
+						                     to < i + buffer.size() ? to - i : buffer.size(),
+						                     textTransform))
+							transformed.add(j++, t);
+					}
+					if (i <= from)
+						return transformed;
+					else {
+						// set context for next transform
+						try {
+							int j = 0;
+							for (String s : transformContext(org.daisy.pipeline.braille.common.util.Iterables.clone(
+							                                     Iterables.concat(buffer, context)),
+							                                 from > i ? from - i : 0,
+							                                 buffer.size(),
+							                                 textTransform))
+								context.add(j++, new CSSStyledText(s, "text-transform: none"));
+							buffer.clear();
+						} catch (Exception e) {
+							if (transformed.size() > 0 && transformed.get(0) instanceof String)
+								throw e;
+							// could be non-standard hyphenation error; try without hyphenation
+							for (int j = buffer.size() - 1; j >= 0; j--) {
+								CSSStyledText st = (CSSStyledText)buffer.get(j).clone();
+								SimpleInlineStyle style = st.getStyle();
+								if (style != null && style.getProperty("hyphens") == Hyphens.AUTO)
+									style.removeProperty("hyphens");
+								buffer.set(j, st);
+								context.add(0,
+								            new CSSStyledText(
+								                transformContext(org.daisy.pipeline.braille.common.util.Iterables.clone(
+								                                     Iterables.concat(buffer, context)),
+								                                 j,
+								                                 j + 1,
+								                                 textTransform).iterator().next(),
+								                "text-transform: none"));
+								buffer.remove(j);
+							}
+						}
+					}
+				}
+				if (next != null) {
+					buffer.add(0, next);
+					textTransform = nextTextTransform;
+				}
+			}
 			return transformed;
 		}
 	}
@@ -112,6 +161,9 @@ public class CompoundTranslator extends AbstractBrailleTranslator {
 		TransformImpl<String> impl = new TransformImpl<String>() {
 			Iterable<String> transform(Iterable<CSSStyledText> styledText, int from, int to, String textTransform) {
 				return translators.get(textTransform).get().fromStyledTextToBraille().transform(styledText, from, to);
+			}
+			Iterable<String> transformContext(Iterable<CSSStyledText> styledText, int from, int to, String textTransform) {
+				return transform(styledText, from, to, textTransform);
 			}
 			boolean supports(String textTransform) {
 				if (translators.containsKey(textTransform))
@@ -138,6 +190,9 @@ public class CompoundTranslator extends AbstractBrailleTranslator {
 			Iterable<LineIterator> transform(Iterable<CSSStyledText> styledText, int from, int to, String textTransform) {
 				return Collections.singleton(
 					translators.get(textTransform).get().lineBreakingFromStyledText().transform(styledText, from, to));
+			}
+			Iterable<String> transformContext(Iterable<CSSStyledText> styledText, int from, int to, String textTransform) {
+				return translators.get(textTransform).get().fromStyledTextToBraille().transform(styledText, from, to);
 			}
 			boolean supports(String textTransform) {
 				if (translators.containsKey(textTransform))

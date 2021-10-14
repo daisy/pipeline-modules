@@ -175,6 +175,16 @@ public class LiblouisCoreTest extends AbstractTest {
 						"xxxxxxx abc def ", "",
 						"ghi", "text-transform: uncontracted")),
 				10));
+		assertEquals(
+			"xxxxxxx\n" +
+			"abc\n" +
+			"defghij",
+			fillLines(
+				translator.transform(
+					styledText(
+						"xxxxxxx abc def", "",
+						"ghij", "text-transform: uncontracted")),
+				10));
 	}
 	
 	@Test
