@@ -94,6 +94,7 @@ public class PEF2TextStep extends DefaultStep implements XProcStep {
 		super.run();
 		MutableQuery q = mutableQuery(query(getOption(_file_format, "")));
 		q.removeAll("blank-last-page"); // has been handled in pef2text.xpl
+		q.removeAll("sheets-multiple-of-two"); // has been handled in pef2text.xpl
 		addOption(_line_breaks, q);
 		addOption(_page_breaks, q);
 		addOption(_pad, q);

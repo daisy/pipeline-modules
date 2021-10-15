@@ -80,4 +80,40 @@
     </x:expect>
   </x:scenario>
 
+  <x:scenario label="test_03">
+    <x:documentation>
+      Tests the "sheets-multiple-of-two" feature of the "file-format" option.
+    </x:documentation>
+    <x:call step="pef:pef2text">
+      <x:input port="source">
+        <x:document type="inline">
+          <pef xmlns="http://www.daisy.org/ns/2008/pef" version="2008-1">
+            <body>
+              <volume cols="10" rows="5" rowgap="0" duplex="true">
+                <section>
+                  <page>
+                    <row>⠋⠕⠕</row>
+                  </page>
+                </section>
+              </volume>
+            </body>
+          </pef>
+        </x:document>
+      </x:input>
+      <x:option name="file-format" select="'(line-breaks:UNIX)
+                                            (page-breaks:&quot;---&quot;)
+                                            (table:&quot;org.daisy.braille.impl.table.DefaultTableProvider.TableType.EN_US&quot;)
+                                            (pad:BOTH)
+                                            (sheets-multiple-of-two)'"/>
+      <x:option name="output-dir" select="resolve-uri('test_03/', $temp-dir)"/>
+      <x:option name="single-volume-name" select="'text'"/>
+    </x:call>
+    <x:context label="result file">
+      <x:document type="file" method="text" base-uri="temp-dir" href="test_03/text.brf"/>
+    </x:context>
+    <x:expect label="result file" type="compare" normalize-space="false">
+      <x:document type="file" method="text" href="../resources/pef2text_03.brf"/>
+    </x:expect>
+  </x:scenario>
+
 </x:description>

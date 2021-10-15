@@ -74,6 +74,28 @@
         </p:otherwise>
     </p:choose>
 
+    <p:choose>
+        <p:xpath-context>
+            <p:pipe step="file-format" port="result"/>
+        </p:xpath-context>
+        <p:when test="//c:param[@name='sheets-multiple-of-two'][lower-case(@value)=('true','yes')]">
+            <!--
+                ensure volumes have a number of sheets that is a multiple of 2
+            -->
+            <p:xslt>
+                <p:input port="stylesheet">
+                    <p:document href="sheets-multiple-of-two.xsl"/>
+                </p:input>
+                <p:input port="parameters">
+                    <p:empty/>
+                </p:input>
+            </p:xslt>
+        </p:when>
+        <p:otherwise>
+            <p:identity/>
+        </p:otherwise>
+    </p:choose>
+
     <pxi:pef2text>
         <p:with-option name="output-dir" select="$output-dir"/>
         <p:with-option name="file-format" select="$file-format"/>
