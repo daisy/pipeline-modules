@@ -428,9 +428,10 @@ public class LiblouisTableJnaImplProvider extends AbstractTransformProvider<Libl
 		                                     .getDOMImplementation().createDocument(null, "choice", null);
 		List<String> values = new ArrayList<>();
 		Element choice = doc.getDocumentElement();
-		values.add("");
+		String defaultValue = " "; // don't use empty string because web UI would pass "-" (i.e. the description) instead
+		values.add(defaultValue);
 		choice.appendChild(doc.createElement("value"))
-		      .appendChild(doc.createTextNode(""));
+		      .appendChild(doc.createTextNode(defaultValue));
 		choice.appendChild(doc.createElementNS("http://relaxng.org/ns/compatibility/annotations/1.0", "documentation"))
 		      .appendChild(doc.createTextNode("-"));
 		List<Table> tables = new ArrayList<>();
