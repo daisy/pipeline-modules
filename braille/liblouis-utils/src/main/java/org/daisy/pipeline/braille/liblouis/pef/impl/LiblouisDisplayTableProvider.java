@@ -94,7 +94,7 @@ public class LiblouisDisplayTableProvider extends AbstractTableProvider {
 		}
 		
 		public BrailleConverter newBrailleConverter() {
-			return new LiblouisDisplayTableBrailleConverter(table);
+			return new LiblouisDisplayTableBrailleConverter(table.asDisplayTable());
 		}
 		
 		public void setFeature(String key, Object value) {

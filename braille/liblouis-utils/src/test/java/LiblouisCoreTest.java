@@ -591,6 +591,8 @@ public class LiblouisCoreTest extends AbstractTest {
 		BrailleConverter converter = table.newBrailleConverter();
 		assertEquals("⠋⠕⠕⠀⠃⠁⠗", converter.toBraille("foo bar"));
 		assertEquals("foo bar", converter.toText("⠋⠕⠕⠀⠃⠁⠗"));
+		// virtual dots
+		assertEquals("⠁⠃⠉⠀⠁⠃⠉", converter.toBraille("abc 123"));
 		
 		//  (locale: ...)
 		table = tableProvider.get(query("(locale:foo)")).iterator().next();
