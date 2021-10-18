@@ -53,9 +53,11 @@ import org.daisy.pipeline.braille.liblouis.LiblouisTableResolver;
 import org.daisy.pipeline.datatypes.DatatypeService;
 import org.daisy.pipeline.datatypes.ValidationResult;
 
-import org.liblouis.Louis;
 import org.liblouis.CompilationException;
+import org.liblouis.DisplayTable;
+import org.liblouis.DisplayTable.StandardDisplayTables;
 import org.liblouis.Logger.Level;
+import org.liblouis.Louis;
 import org.liblouis.Table;
 import org.liblouis.TableInfo;
 import org.liblouis.TableResolver;
@@ -89,16 +91,22 @@ public class LiblouisTableJnaImplProvider extends AbstractTransformProvider<Libl
 	public class LiblouisTableJnaImpl extends LiblouisTable implements Transform {
 		
 		private final Translator translator;
+		private final DisplayTable displayTable;
 		private final TableInfo info;
 		
-		private LiblouisTableJnaImpl(String table, TableInfo info) throws CompilationException {
-			super(table);
-			translator = new Translator(table);
+		private LiblouisTableJnaImpl(Translator translator, DisplayTable displayTable, TableInfo info) {
+			super(translator.getTable());
+			this.translator = translator;
+			this.displayTable = displayTable;
 			this.info = info;
 		}
 		
 		public Translator getTranslator() {
 			return translator;
+		}
+		
+		public DisplayTable getDisplayTable() {
+			return displayTable;
 		}
 		
 		public String getIdentifier() {
@@ -118,7 +126,8 @@ public class LiblouisTableJnaImplProvider extends AbstractTransformProvider<Libl
 	
 	private LiblouisTableRegistry tableRegistry;
 	
-	private File unicodeDisFile;
+	private DisplayTable unicodeDisplayTable;
+	private DisplayTable unicodeDisplayTableWithNoBreakSpace;
 	private File spacesFile;
 	
 	private void registerTableResolver() {
@@ -191,14 +200,21 @@ public class LiblouisTableJnaImplProvider extends AbstractTransformProvider<Libl
 			registerTableResolver();
 			// invoke after table resolver registered because otherwise default tables will be unpacked for no reason
 			logger.debug("liblouis version: {}", Louis.getVersion());
-			unicodeDisFile = new File(makeUnpackDir(), "unicode.dis");
+			File unicodeDisFile = new File(makeUnpackDir(), "unicode.dis");
 			unpack(
 				URLs.getResourceFromJAR("/tables/unicode.dis", LiblouisTableJnaImplProvider.class),
 				unicodeDisFile);
+			unicodeDisplayTable = DisplayTable.fromTable("" + URLs.asURI(unicodeDisFile));
 			spacesFile = new File(makeUnpackDir(), "spaces.cti");
 			unpack(
 				URLs.getResourceFromJAR("/tables/spaces.cti", LiblouisTableJnaImplProvider.class),
 				spacesFile);
+			File spacesDisFile = new File(makeUnpackDir(), "spaces.dis");
+			unpack(
+				URLs.getResourceFromJAR("/tables/spaces.dis", LiblouisTableJnaImplProvider.class),
+				spacesDisFile);
+			unicodeDisplayTableWithNoBreakSpace = DisplayTable.fromTable(
+				"" + URLs.asURI(unicodeDisFile) + "," + URLs.asURI(spacesDisFile));
 			Louis.setLogger(new org.liblouis.Logger() {
 					@Override
 					public void log(Level level, String message) {
@@ -345,10 +361,11 @@ public class LiblouisTableJnaImplProvider extends AbstractTransformProvider<Libl
 								catch (IllegalArgumentException e) {}
 								catch (NoSuchElementException e) {}}
 							if (table != null) {
+								DisplayTable displayTable = StandardDisplayTables.DEFAULT;
 								if (whiteSpace)
 									table = URLs.asURI(spacesFile) + "," + table;
 								if (unicode)
-									table = URLs.asURI(unicodeDisFile) + "," + table;
+									displayTable = whiteSpace ? unicodeDisplayTableWithNoBreakSpace : unicodeDisplayTable;
 								if (dotsForUndefinedChar != null) {
 									try {
 										File undefinedFile = createTempFile("undefined-", ".uti");
@@ -377,7 +394,7 @@ public class LiblouisTableJnaImplProvider extends AbstractTransformProvider<Libl
 									}
 								}
 								try {
-									return new LiblouisTableJnaImpl(table, tableInfo); }
+									return new LiblouisTableJnaImpl(new Translator(table), displayTable, tableInfo); }
 								catch (CompilationException e) {
 									__apply(
 										warn("Could not compile table " + table));

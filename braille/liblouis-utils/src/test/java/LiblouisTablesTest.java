@@ -42,7 +42,7 @@ public class LiblouisTablesTest extends AbstractTest {
 	@Test
 	public void testQueryTranslator() {
 		assertTrue(provider.get(query("(locale:nl-BE)")).iterator().next()
-		           .asLiblouisTable().asURIs()[2].toString().endsWith("/nl_BE.tbl"));
+		           .asLiblouisTable().asURIs()[1].toString().endsWith("/nl_BE.tbl"));
 	}
 	
 	@Test
