@@ -32,6 +32,7 @@ import cz.vutbr.web.css.TermIdent;
 import cz.vutbr.web.css.TermInteger;
 import cz.vutbr.web.css.TermList;
 
+import org.daisy.braille.css.BrailleCSSProperty.BrailleCharset;
 import org.daisy.braille.css.BrailleCSSProperty.Hyphens;
 import org.daisy.braille.css.BrailleCSSProperty.LetterSpacing;
 import org.daisy.braille.css.BrailleCSSProperty.TextTransform;
@@ -220,10 +221,11 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 			documentLocale,
 			hyphenator,
 			handleNonStandardHyphenation);
-		if (translators.iterator().hasNext()) {
+		if (translators.apply(null).iterator().hasNext()) {
 			// all translators use the same display table
 			DisplayTable displayTable = tableProvider.get(q).iterator().next().getDisplayTable();
-			BrailleTranslator unityTranslator = new UnityBrailleTranslator(new LiblouisDisplayTableBrailleConverter(displayTable));
+			BrailleTranslator unityTranslator = new UnityBrailleTranslator(
+				new LiblouisDisplayTableBrailleConverter(displayTable), false);
 			String contraction = q.containsKey("contraction")
 				? q.removeAll("contraction").iterator().next().getValue().get()
 				: null;
@@ -238,7 +240,7 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 						documentLocale,
 						hyphenator,
 						handleNonStandardHyphenation));
-				if (nonContractingTranslators.iterator().hasNext())
+				if (nonContractingTranslators.apply(null).iterator().hasNext())
 					return concat(
 						Iterables.transform(
 							combinations(
@@ -512,7 +514,8 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 			                      Hyphenator.LineBreaker lineBreaker,
 			                      FullHyphenator fullHyphenator,
 			                      FromStyledTextToBraille fullTranslator) {
-				super('\u2800', displayTable.encode('\u2824'), logger);
+				// Note that `displayTable.encode('\u2800')` is always a space because of the addition of spaces.dis
+				super(displayTable.encode('\u2800'), displayTable.encode('\u2824'), logger);
 				this.liblouisTranslator = liblouisTranslator;
 				this.displayTable = displayTable;
 				this.supportedTypeforms = supportedTypeforms;
@@ -687,6 +690,12 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 										// context segments. We assume that all Liblouis tables correctly handle Unicode
 										// braille. If this is not the case, it is not the end of the words because this
 										// is a context segment.
+										val = style.getProperty("braille-charset");
+										if (val != null) {
+											if (val == BrailleCharset.CUSTOM)
+												// translate to Unicode braille
+												text[i] = displayTable.decode(text[i]);
+											style.removeProperty("braille-charset"); }
 										style.removeProperty("text-transform");
 										continue; }
 									else if (val == TextTransform.AUTO) {}
@@ -1192,6 +1201,12 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 							// on (already translated) context segments. We assume that all Liblouis tables correctly
 							// handle Unicode braille. If this is not the case, it is not the end of the words because
 							// this is a context segment.
+							val = style.getProperty("braille-charset");
+							if (val != null) {
+								if (val == BrailleCharset.CUSTOM)
+									// translate to Unicode braille
+									text[i] = displayTable.decode(text[i]);
+								style.removeProperty("braille-charset"); }
 							style.removeProperty("text-transform");
 							continue; }
 						else if (val == TextTransform.AUTO) {}

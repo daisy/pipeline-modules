@@ -155,7 +155,6 @@ even though the provided CSS is more specific.
                                            apply-document-specific-stylesheets
                                            transform
                                            braille-code
-                                           preview-table
                                            ascii-file-format
                                            include-brf
                                            include-preview

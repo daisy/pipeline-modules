@@ -34,6 +34,7 @@ public class DotifyCoreTest extends AbstractTest {
 		return new String[] {
 			brailleModule("common-utils"),
 			brailleModule("css-utils"),
+			brailleModule("pef-utils"),
 			pipelineModule("css-utils"),
 			"org.daisy.pipeline:calabash-adapter:?",
 			// because the exclusion of com.fasterxml.woodstox:woodstox-core from the dotify.library

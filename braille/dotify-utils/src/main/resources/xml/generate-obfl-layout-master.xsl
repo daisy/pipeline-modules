@@ -3,10 +3,11 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
+                xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
+                xmlns:pef="http://www.daisy.org/ns/2008/pef"
+                xmlns:re="regex-utils"
                 xmlns:css="http://www.daisy.org/ns/pipeline/braille-css"
                 xmlns:obfl="http://www.daisy.org/ns/2011/obfl"
-                xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
-                xmlns:re="regex-utils"
                 exclude-result-prefixes="#all"
                 version="2.0">
     
@@ -17,6 +18,7 @@
     <xsl:param name="page-width" as="xs:string" required="yes"/>
     <xsl:param name="page-height" as="xs:string" required="yes"/>
     <xsl:param name="duplex" as="xs:string" required="yes"/>
+    <xsl:param name="braille-charset-table" as="xs:string" required="yes"/>
     
     <xsl:variable name="page-stylesheets" as="element(css:rule)*" select="/*/css:rule[@selector='@page']"/>
     
@@ -228,12 +230,17 @@
                     <xsl:if test="$footnotes-border-top!='none'">
                         <before>
                             <block translate="pre-translated-text-css">
-                                <leader pattern="{$footnotes-border-top}" position="100%" align="right"/>
+	                            <xsl:variable name="pattern"
+	                                          select="if ($braille-charset-table='')
+                                                      then $footnotes-border-top
+                                                      else pef:encode(concat('(id:&quot;',$braille-charset-table,'&quot;)'),
+                                                                      $footnotes-border-top)"/>
+                                <leader pattern="{$pattern}" position="100%" align="right"/>
                                 <!-- We add a single instance of the pattern in order to have some
                                      text after the leader and to make sure that the
                                      translate="pre-translated-text-css" has an effect on the leader
                                      (Dotify bug). -->
-                                <xsl:value-of select="$footnotes-border-top"/>
+                                <xsl:value-of select="$pattern"/>
                             </block>
                         </before>
                     </xsl:if>

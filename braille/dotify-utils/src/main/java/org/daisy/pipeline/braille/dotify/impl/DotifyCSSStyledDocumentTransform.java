@@ -1,9 +1,12 @@
 package org.daisy.pipeline.braille.dotify.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.net.URI;
+import javax.xml.namespace.QName;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
@@ -13,15 +16,20 @@ import com.xmlcalabash.core.XProcRuntime;
 import com.xmlcalabash.runtime.XAtomicStep;
 
 import org.daisy.common.file.URLs;
+import org.daisy.common.transform.InputValue;
+import org.daisy.common.transform.Mult;
+import org.daisy.common.transform.SingleInSingleOutXMLTransformer;
+import org.daisy.common.transform.XMLInputValue;
+import org.daisy.common.transform.XMLOutputValue;
 import org.daisy.common.xproc.calabash.XProcStep;
 import org.daisy.common.xproc.calabash.XProcStepProvider;
 
+import org.daisy.dotify.api.table.Table;
+
 import org.daisy.pipeline.braille.common.AbstractTransform;
 import org.daisy.pipeline.braille.common.AbstractTransformProvider;
-import org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Function;
 import org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Iterables;
 import org.daisy.pipeline.braille.common.calabash.CxEvalBasedTransformer;
-import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Iterables.transform;
 import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.logCreate;
 import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.logSelect;
 import org.daisy.pipeline.braille.common.BrailleTranslator;
@@ -30,10 +38,10 @@ import org.daisy.pipeline.braille.common.Query;
 import org.daisy.pipeline.braille.common.Query.Feature;
 import org.daisy.pipeline.braille.common.Query.MutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
+import static org.daisy.pipeline.braille.common.Query.util.query;
 import org.daisy.pipeline.braille.common.Transform;
 import org.daisy.pipeline.braille.common.TransformProvider;
-import static org.daisy.pipeline.braille.common.TransformProvider.util.dispatch;
-import static org.daisy.pipeline.braille.common.TransformProvider.util.memoize;
+import org.daisy.pipeline.braille.pef.TableProvider;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -91,25 +99,19 @@ public interface DotifyCSSStyledDocumentTransform {
 					}
 					final Query textTransformQuery = mutableQuery(q).add("input", "text-css").add("output", "braille");
 					final boolean _obfl = obfl;
-					
-					// only pre-translate if an intermediary OBFL with braille content is requested
-					if (obfl && braille || forcePretranslation) {
-						final MutableQuery blockTransformQuery = mutableQuery(q).add("input", "css")
-						                                                        .add("output", "css")
-						                                                        .add("output", "braille");
-						Iterable<BrailleTranslator> blockTransforms = logSelect(blockTransformQuery, brailleTranslatorProvider);
-						return transform(
-							blockTransforms,
-							new Function<BrailleTranslator,Transform>() {
-								public Transform _apply(BrailleTranslator blockTransform) {
-									return __apply(
-										logCreate(new TransformImpl(_obfl,
-										                            blockTransformQuery.toString(),
-										                            blockTransform,
-										                            textTransformQuery))); }}); }
-					else
-						return AbstractTransformProvider.util.Iterables.of(
-								logCreate(new TransformImpl(_obfl, "", null, textTransformQuery))); }}
+					if (logSelect(textTransformQuery, brailleTranslatorProvider).iterator().hasNext()) {
+						
+						// only pre-translate if an intermediary OBFL with braille content is requested
+						if (obfl && braille || forcePretranslation) {
+							final MutableQuery blockTransformQuery = mutableQuery(q).add("input", "css")
+							                                                        .add("output", "css")
+							                                                        .add("output", "braille");
+							if (logSelect(blockTransformQuery, brailleTranslatorProvider).iterator().hasNext())
+								return AbstractTransformProvider.util.Iterables.of(
+									logCreate(new TransformImpl(_obfl, blockTransformQuery, textTransformQuery))); }
+						else
+							return AbstractTransformProvider.util.Iterables.of(
+									logCreate(new TransformImpl(_obfl, null, textTransformQuery))); }}}
 			catch (IllegalStateException e) {}
 			return empty;
 		}
@@ -117,38 +119,103 @@ public interface DotifyCSSStyledDocumentTransform {
 		private class TransformImpl extends AbstractTransform implements XProcStepProvider {
 			
 			private final String output;
-			private final BrailleTranslator blockTransform;
+			private final Query blockTransformQuery;
+			private final Query textTransformQuery;
+			private final Query mode;
 			private final Map<String,String> options;
 			
 			private TransformImpl(boolean obfl,
-			                      String blockTransformQuery,
-			                      BrailleTranslator blockTransform,
+			                      Query blockTransformQuery,
 			                      Query textTransformQuery) {
 				String locale = "und";
 				if (textTransformQuery.containsKey("document-locale")) {
 					MutableQuery q = mutableQuery(textTransformQuery);
 					locale = q.removeOnly("document-locale").getValue().get();
-					textTransformQuery = q;
-				}
+					mode = q;
+				} else
+					mode = textTransformQuery;
 				this.output = obfl ? "obfl" : "pef";
 				options = ImmutableMap.of(
 					"output", this.output,
-					"css-block-transform", blockTransformQuery,
+					"css-block-transform", blockTransformQuery != null ? blockTransformQuery.toString() : "",
 					"locale", locale,
-					"mode", textTransformQuery.toString());
-				this.blockTransform = blockTransform;
+					"mode", mode.toString());
+				this.blockTransformQuery = blockTransformQuery;
+				this.textTransformQuery = textTransformQuery;
 			}
 			
 			@Override
 			public XProcStep newStep(XProcRuntime runtime, XAtomicStep step) {
-				return new CxEvalBasedTransformer(href, null, options).newStep(runtime, step);
+				return XProcStep.of(
+					new SingleInSingleOutXMLTransformer() {
+						public Runnable transform(XMLInputValue<?> source, XMLOutputValue<?> result, InputValue<?> params) {
+							return () -> {
+								Map<String,String> options = TransformImpl.this.options;
+								InputValue<?> paramsCopy = params;
+								// get value of preview-table parameter
+								try {
+									Mult<? extends InputValue<?>> m = params.mult(2); // multiply params input
+									paramsCopy = m.get();
+									Map map = m.get().asObject(Map.class);
+									Object v = map.get(new QName("preview-table"));
+									if (v != null)
+										if (v instanceof InputValue) {
+											m = ((InputValue<?>)v).mult(2); // multiply preview-table value
+											map.put(new QName("preview-table"), m.get());
+											try {
+												v = m.get().asObject();
+												if (v instanceof String) {
+													try {
+														Table previewTable = tableProvider.get(query((String)v)).iterator().next();
+														// Check if the output charset of the braille translator can be
+														// set to this table. If not, ignore preview-table.
+														MutableQuery q = mutableQuery(textTransformQuery).add("braille-charset",
+														                                                      previewTable.getIdentifier());
+														if (logSelect(q, brailleTranslatorProvider).iterator().hasNext()) {
+															q.removeAll("document-locale");
+															options = new HashMap<>(); {
+																options.putAll(TransformImpl.this.options);
+																options.put("css-block-transform",
+																            blockTransformQuery != null
+																                ? mutableQuery(blockTransformQuery)
+																                      .add("braille-charset", previewTable.getIdentifier())
+																                      .toString()
+																                : "");
+																options.put("braille-charset", previewTable.getIdentifier());
+															}
+														}
+													} catch (NoSuchElementException e) {
+													}
+												}
+											} catch (UnsupportedOperationException e) {
+											}
+										}
+								} catch (UnsupportedOperationException e) {
+								}
+								new CxEvalBasedTransformer(
+									href,
+									null,
+									options
+								).newStep(runtime, step).transform(
+									ImmutableMap.of(
+										new QName("source"), source,
+										new QName("parameters"), paramsCopy),
+									ImmutableMap.of(
+										new QName("result"), result)
+								).run();
+							};
+						}
+					},
+					runtime,
+					step
+				);
 			}
 			
 			@Override
 			public ToStringHelper toStringHelper() {
 				return MoreObjects.toStringHelper("o.d.p.b.dotify.impl.DotifyCSSStyledDocumentTransform$Provider$TransformImpl")
 					.add("output", output)
-					.add("blockTransform", blockTransform);
+					.add("textTransform", textTransformQuery);
 			}
 		}
 		
@@ -172,10 +239,30 @@ public interface DotifyCSSStyledDocumentTransform {
 		}
 	
 		private List<BrailleTranslatorProvider<BrailleTranslator>> brailleTranslatorProviders
-		= new ArrayList<BrailleTranslatorProvider<BrailleTranslator>>();
-		
+			= new ArrayList<BrailleTranslatorProvider<BrailleTranslator>>();
 		private TransformProvider.util.MemoizingProvider<BrailleTranslator> brailleTranslatorProvider
-		= memoize(dispatch(brailleTranslatorProviders));
+			= TransformProvider.util.memoize(TransformProvider.util.dispatch(brailleTranslatorProviders));
+		
+		@Reference(
+			name = "TableProvider",
+			unbind = "removeTableProvider",
+			service = TableProvider.class,
+			cardinality = ReferenceCardinality.MULTIPLE,
+			policy = ReferencePolicy.DYNAMIC
+		)
+		protected void addTableProvider(TableProvider provider) {
+			tableProviders.add(provider);
+		}
+		
+		protected void removeTableProvider(TableProvider provider) {
+			tableProviders.remove(provider);
+			this.tableProvider.invalidateCache();
+		}
+		
+		private List<TableProvider> tableProviders = new ArrayList<TableProvider>();
+		private org.daisy.pipeline.braille.common.Provider.util.MemoizingProvider<Query,Table> tableProvider
+			= org.daisy.pipeline.braille.common.Provider.util.memoize(
+				org.daisy.pipeline.braille.common.Provider.util.dispatch(tableProviders));
 		
 		@Override
 		public ToStringHelper toStringHelper() {

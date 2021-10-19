@@ -1,17 +1,27 @@
 package org.daisy.pipeline.braille.dotify.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
+
+import org.daisy.dotify.api.table.Table;
 
 import org.daisy.pipeline.braille.common.AbstractTransformProvider;
 import org.daisy.pipeline.braille.common.BrailleTranslator;
 import org.daisy.pipeline.braille.common.BrailleTranslatorProvider;
+import static org.daisy.pipeline.braille.common.Provider.util.dispatch;
+import static org.daisy.pipeline.braille.common.Provider.util.memoize;
 import org.daisy.pipeline.braille.common.Query;
 import org.daisy.pipeline.braille.common.Query.MutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
 import org.daisy.pipeline.braille.common.UnityBrailleTranslator;
 import static org.daisy.pipeline.braille.common.util.Locales.parseLocale;
+import org.daisy.pipeline.braille.pef.TableProvider;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
 /**
  * {@link BrailleTranslatorProvider} of PreTranslatedBrailleTranslator.
@@ -27,6 +37,9 @@ public class PreTranslatedBrailleTranslatorProvider extends AbstractTransformPro
 
 	protected Iterable<BrailleTranslator> _get(Query query) {
 		MutableQuery q = mutableQuery(query);
+		String brailleCharset = q.containsKey("braille-charset")
+			? q.removeOnly("braille-charset").getValue().get()
+			: null;
 		boolean isPreTranslatedQuery = false; {
 			for (Query.Feature f : q) {
 				String key = f.getKey();
@@ -49,8 +62,40 @@ public class PreTranslatedBrailleTranslatorProvider extends AbstractTransformPro
 				else {
 					isPreTranslatedQuery = false;
 					break; }}}
-		if (isPreTranslatedQuery)
-			return AbstractTransformProvider.util.Iterables.of(new UnityBrailleTranslator(null));
+		if (isPreTranslatedQuery) {
+			try {
+				return AbstractTransformProvider.util.Iterables.of(
+					new UnityBrailleTranslator(
+						brailleCharset != null
+							? tableProvider.get(mutableQuery().add("id", brailleCharset))
+							               .iterator().next()
+							               .newBrailleConverter()
+							: null,
+						true));
+			} catch (NoSuchElementException e) {
+				// should not happen
+			}
+		}
 		return AbstractTransformProvider.util.Iterables.<BrailleTranslator>empty();
+	}
+
+	private final List<TableProvider> tableProviders = new ArrayList<TableProvider>();
+	private final org.daisy.pipeline.braille.common.Provider.util.MemoizingProvider<Query,Table> tableProvider
+		= memoize(dispatch(tableProviders));
+
+	@Reference(
+		name = "TableProvider",
+		unbind = "removeTableProvider",
+		service = TableProvider.class,
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC
+	)
+	protected void addTableProvider(TableProvider provider) {
+		tableProviders.add(provider);
+	}
+
+	protected void removeTableProvider(TableProvider provider) {
+		tableProviders.remove(provider);
+		this.tableProvider.invalidateCache();
 	}
 }

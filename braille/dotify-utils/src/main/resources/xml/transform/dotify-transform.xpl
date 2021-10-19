@@ -18,6 +18,7 @@
 	<p:option name="css-block-transform" required="true"/> <!-- empty means disable pre-translation -->
 	<p:option name="locale" required="true"/>
 	<p:option name="mode" required="true"/>
+	<p:option name="braille-charset" select="''"/>
 	
 	<p:import href="http://www.daisy.org/pipeline/modules/braille/common-utils/library.xpl"/>
 	<p:import href="../library.xpl">
@@ -62,6 +63,7 @@
 	
 	<pxi:css-to-obfl px:message="Transforming from CSS to OBFL" px:progress=".83">
 		<p:with-option name="locale" select="$locale"/>
+		<p:with-option name="braille-charset" select="$braille-charset"/>
 		<p:with-option name="page-width" select="$page-width"/>
 		<p:with-option name="page-height" select="$page-height"/>
 		<p:with-option name="duplex" select="$duplex"/>

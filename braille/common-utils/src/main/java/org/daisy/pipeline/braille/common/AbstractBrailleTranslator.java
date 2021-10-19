@@ -30,6 +30,21 @@ import org.slf4j.Logger;
 
 public abstract class AbstractBrailleTranslator extends AbstractTransform implements BrailleTranslator {
 	
+	private final BrailleConverter brailleCharset;
+
+	protected AbstractBrailleTranslator() {
+		this(null);
+	}
+
+	/**
+	 * @param brailleCharset Used by default implementation of {@see #lineBreakingFromStyledText()}
+	 *                       to encode hyphen character when specified through "hyphenate-character"
+	 *                       property.
+	 */
+	protected AbstractBrailleTranslator(BrailleConverter brailleCharset) {
+		this.brailleCharset = brailleCharset;
+	}
+
 	public FromStyledTextToBraille fromStyledTextToBraille() throws UnsupportedOperationException {
 		throw new UnsupportedOperationException();
 	}
@@ -40,7 +55,13 @@ public abstract class AbstractBrailleTranslator extends AbstractTransform implem
 		// default implementation based on fromStyledTextToBraille()
 		if (lineBreakingFromStyledText == null) {
 			final FromStyledTextToBraille fromStyledTextToBraille = fromStyledTextToBraille();
-			lineBreakingFromStyledText = new util.DefaultLineBreaker('\u2800', '\u2824', null) {
+			Character blankChar = brailleCharset == null
+				? '\u2800'
+				: brailleCharset.toText("\u2800").toCharArray()[0];
+			Character defaultHyphenChar = brailleCharset == null
+				? '\u2824'
+				: brailleCharset.toText("\u2824").toCharArray()[0];
+			lineBreakingFromStyledText = new util.DefaultLineBreaker(blankChar, defaultHyphenChar, brailleCharset, null) {
 					protected BrailleStream translateAndHyphenate(Iterable<CSSStyledText> styledText, int from, int to) {
 						List<String> braille = new ArrayList<>();
 						Iterator<CSSStyledText> style = styledText.iterator();

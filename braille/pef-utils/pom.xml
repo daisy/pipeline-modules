@@ -85,7 +85,8 @@
       org.daisy.pipeline.braille.pef.calabash.impl.Text2PEFStep$Provider,
       org.daisy.pipeline.braille.pef.calabash.impl.ValidateStep$Provider,
       org.daisy.pipeline.braille.pef.saxon.impl.DecodeDefinition,
-      org.daisy.pipeline.braille.pef.saxon.impl.EncodeDefinition
+      org.daisy.pipeline.braille.pef.saxon.impl.EncodeDefinition,
+      org.daisy.pipeline.braille.pef.saxon.impl.GetTableIdDefinition
     </expose-services>
   </properties>
 

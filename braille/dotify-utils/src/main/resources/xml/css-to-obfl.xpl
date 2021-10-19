@@ -19,6 +19,7 @@
     <p:output port="result"/>
     
     <p:option name="locale" select="'und'"/>
+    <p:option name="braille-charset" select="''"/>
     <p:option name="page-width" select="'40'"/>
     <p:option name="page-height" select="'25'"/>
     <p:option name="duplex" select="'true'"/>
@@ -612,6 +613,7 @@
             <p:input port="definition">
                 <p:document href="obfl-css-definition.xsl"/>
             </p:input>
+            <p:with-param name="initial-braille-charset" select="if ($braille-charset='') then 'unicode' else 'custom'"/>
         </css:new-definition>
         <p:xslt px:progress=".03">
             <p:input port="parameters">
@@ -831,6 +833,9 @@
         <p:with-param name="locale" select="$locale">
             <p:empty/>
         </p:with-param>
+        <p:with-param name="braille-charset-table" select="$braille-charset">
+            <p:empty/>
+        </p:with-param>
         <p:with-param name="page-counters" select="$page-counters">
             <p:empty/>
         </p:with-param>
@@ -856,6 +861,9 @@
             <p:empty/>
         </p:with-param>
         <p:with-param name="duplex" select="$duplex">
+            <p:empty/>
+        </p:with-param>
+        <p:with-param name="braille-charset-table" select="$braille-charset">
             <p:empty/>
         </p:with-param>
     </p:xslt>

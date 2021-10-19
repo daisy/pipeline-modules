@@ -66,6 +66,11 @@ public class TextTransformParser {
 					             || d.get(0) instanceof TermURI
 					             || d.get(0) instanceof TermInteger)) {
 						String key = d.getProperty();
+						if (key.equals("charset") || key.equals("braille-charset")) {
+							// (silently) ignoring this feature because all braille translators
+							// used in the whole conversion must use the same output character set
+							continue;
+						}
 						String value;
 						if (d.get(0) instanceof TermURI) {
 							URL cssBase = ((TermURI)d.get(0)).getBase(); // this is always null because the source is a string

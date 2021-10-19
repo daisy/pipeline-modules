@@ -98,6 +98,7 @@ public interface CSSBlockTransform {
 					else
 						return empty;
 			}
+			final String brailleCharset = q.containsKey("braille-charset") ? q.getOnly("braille-charset").getValue().get() : null;
 			q.add("input", "text-css");
 			if (braille)
 				q.add("output", "braille");
@@ -107,7 +108,7 @@ public interface CSSBlockTransform {
 				new Function<BrailleTranslator,BrailleTranslator>() {
 					public BrailleTranslator _apply(BrailleTranslator translator) {
 						return __apply(
-							logCreate(new TransformImpl(translator, false, q))
+							logCreate(new TransformImpl(translator, false, brailleCharset, q))
 						);
 					}
 				}
@@ -134,8 +135,8 @@ public interface CSSBlockTransform {
 			 */
 			// FIXME: mainTranslator is optional if default translator has been defined in CSS (which we can not know in advance)
 			private TransformImpl(BrailleTranslator mainTranslator, boolean forceMainTranslator,
-			                      Query query) {
-				options = ImmutableMap.of();
+			                      String brailleCharset, Query query) {
+				options = ImmutableMap.of("braille-charset", brailleCharset != null ? brailleCharset : "");
 				this.mainTranslator = mainTranslator;
 				this.forceMainTranslator = forceMainTranslator;
 				mainQuery = query;

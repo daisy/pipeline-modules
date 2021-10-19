@@ -117,12 +117,8 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 	 * breaking according to CSS. Corresponds with translator query
 	 * `(input:braille)(input:text-css)(output:braille)`
 	 */
-	private final static String PRE_TRANSLATED_MODE = "pre-translated-text-css";
-	
 	private class BrailleTranslatorFactoryImpl implements BrailleTranslatorFactory {
 		public BrailleTranslator newTranslator(String locale, String mode) throws TranslatorConfigurationException {
-			if (PRE_TRANSLATED_MODE.equals(mode))
-				mode = "(input:braille)(input:text-css)(output:braille)";
 			Matcher m = QUERY.matcher(mode);
 			if (!m.matches())
 				throw new TranslatorConfigurationException();
@@ -180,7 +176,7 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 					// see org.daisy.dotify.formatter.impl.row.SegmentProcessor.layoutLeader
 					return new DefaultLineBreaker.LineIterator("", '\u2800', '\u2824', 1);
 				if (" ".equals(text))
-					// If input text is a space, it will be user for calculating the margin character
+					// If input text is a space, it may be used for calculating the margin character
 					// (see org.daisy.dotify.formatter.impl.common.FormatterCoreContext)
 					return new DefaultLineBreaker.LineIterator("\u2800", '\u2800', '\u2824', 1); }
 			return translate(cssStyledTextFromTranslatable(input), 0, -1);

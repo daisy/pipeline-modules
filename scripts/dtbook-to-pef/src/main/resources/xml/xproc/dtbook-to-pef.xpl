@@ -138,7 +138,6 @@ When `include-obfl` is set to true, the conversion may fail but still output a d
                                            transform
                                            braille-code
                                            ascii-file-format
-                                           preview-table
                                            include-brf
                                            include-preview
                                            include-obfl

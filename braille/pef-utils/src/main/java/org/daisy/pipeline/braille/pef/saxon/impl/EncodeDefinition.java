@@ -86,7 +86,7 @@ public class EncodeDefinition extends ExtensionFunctionDefinition {
 	
 	@Override
 	public SequenceType getResultType(SequenceType[] suppliedArgumentTypes) {
-		return SequenceType.OPTIONAL_STRING;
+		return SequenceType.SINGLE_STRING;
 	}
 	
 	@Override

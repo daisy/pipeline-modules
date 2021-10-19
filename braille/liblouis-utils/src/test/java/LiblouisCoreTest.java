@@ -177,7 +177,7 @@ public class LiblouisCoreTest extends AbstractTest {
 		                                                .lineBreakingFromStyledText();
 		assertEquals(
 			"xxxxxxx\n" +
-			"abc⠀def⠀\n" +
+			"abc def \n" +
 			"ghi",
 			fillLines(
 				translator.transform(
@@ -366,7 +366,7 @@ public class LiblouisCoreTest extends AbstractTest {
 		// test no-break space
 		assertEquals(
 			"⠁⠃⠉\n" +
-			"⠙⠑⠋⠀⠛⠓⠊⠚",
+			"⠙⠑⠋ ⠛⠓⠊⠚",
 			fillLines(
 				translator.lineBreakingFromStyledText()
 				          .transform(styledText("abc def ghij", "")),
@@ -471,10 +471,10 @@ public class LiblouisCoreTest extends AbstractTest {
 		                                                .get(query("(table:'foobar.uti')(charset:'foobar.dis')")).iterator().next()
 		                                                .lineBreakingFromStyledText();
 		assertEquals(
-			"foo⠀⠀bar",
+			"foo  bar",
 			translator.transform(styledText("foo bar", "word-spacing:2")).getTranslatedRemainder());
 		assertEquals(
-			"foo⠀⠀⠀bar",
+			"foo   bar",
 			translator.transform(styledText("foo bar", "word-spacing:3")).getTranslatedRemainder());
 	}
 
@@ -485,23 +485,23 @@ public class LiblouisCoreTest extends AbstractTest {
 		                                                .lineBreakingFromStyledText();
 		// space in input, two spaces in output
 		assertEquals(
-			"foo⠀⠀bar",
+			"foo  bar",
 			translator.transform(styledText("foo bar", "word-spacing:2")).getTranslatedRemainder());
 		// two spaces in input, two spaces in output
 		assertEquals(
-			"foo⠀⠀bar",
+			"foo  bar",
 			translator.transform(styledText("foo  bar", "word-spacing:2")).getTranslatedRemainder());
 		// newline + tab in input, two spaces in output
 		assertEquals(
-			"foo⠀⠀bar",
+			"foo  bar",
 			translator.transform(styledText("foo\n	bar", "word-spacing:2")).getTranslatedRemainder());
 		// no-break space in input, space in output
 		assertEquals(
-			"foo⠀bar",
+			"foo bar",
 			translator.transform(styledText("foo bar", "word-spacing:2")).getTranslatedRemainder());
 		// no-break space + space in input, three spaces in output
 		assertEquals(
-			"foo⠀⠀⠀bar",
+			"foo   bar",
 			translator.transform(styledText("foo  bar", "word-spacing:2")).getTranslatedRemainder());
 		// zero-width space in input, no space in output
 		assertEquals(
@@ -548,24 +548,24 @@ public class LiblouisCoreTest extends AbstractTest {
 		                                                .lineBreakingFromStyledText();
 		assertEquals(
 			//                   |<- 20
-			"foobar⠀⠀foobar\n" +
+			"foobar  foobar\n" +
 			"foobar",
 			fillLines(translator.transform(styledText("foobar foobar foobar", "word-spacing:2")), 20));
 		assertEquals(
 			//                   |<- 20
-			"f⠀o⠀o⠀b⠀a⠀r\n" +
-			"f⠀o⠀o⠀b⠀a⠀r\n" +
-			"f⠀o⠀o⠀b⠀a⠀r",
+			"f o o b a r\n" +
+			"f o o b a r\n" +
+			"f o o b a r",
 			fillLines(translator.transform(styledText("foobar foobar foobar", "letter-spacing:1; word-spacing:3")), 20));
 		assertEquals(
 			//                        |<- 25
-			"f⠀o⠀o⠀-⠀b⠀a⠀r⠀⠀⠀f⠀o⠀o⠀-\n" +
-			"b⠀a⠀r⠀⠀⠀f⠀o⠀o⠀-⠀b⠀a⠀r",
+			"f o o - b a r   f o o -\n" +
+			"b a r   f o o - b a r",
 			fillLines(translator.transform(styledText("foo-​bar foo-​bar foo-​bar", "letter-spacing:1; word-spacing:3")), 25)); // words are split up using hyphen + zwsp
 		assertEquals(
 			//                   |<- 20
-			"f⠀o⠀o⠀b⠀a⠀r⠀⠀⠀f⠀o⠀o-\n" +
-			"b⠀a⠀r⠀⠀⠀f⠀o⠀o⠀b⠀a⠀r",
+			"f o o b a r   f o o-\n" +
+			"b a r   f o o b a r",
 			fillLines(translator.transform(styledText("foo­bar foo­bar foo­bar", "letter-spacing:1; word-spacing:3")), 20)); // words are split up using shy
 	}
 

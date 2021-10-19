@@ -376,9 +376,7 @@ public class LiblouisTableJnaImplProvider extends AbstractTransformProvider<Libl
 										// catch CompilationException
 										displayTable = new Translator(charset).asDisplayTable(); }
 									catch (CompilationException e) {
-										__apply(
-											warn("Could not compile table " + table));
-										logger.warn("Could not compile table", e);
+										// the specified table is not a Liblouis table
 										throw new NoSuchElementException(); }
 								if (dotsForUndefinedChar != null) {
 									try {

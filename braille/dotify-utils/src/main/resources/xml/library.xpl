@@ -18,6 +18,7 @@
             <p:output port="result" sequence="false"/>
             <p:option name="locale" required="true"/>
             <p:option name="mode" required="true"/>
+            <p:option name="braille-charset" required="true"/>
             <p:option name="identifier" required="false" select="''"/>
             <p:option name="style-type" required="false" select="''"/>
             <p:option name="css-text-transform-definitions" required="false" select="''"/>
@@ -27,6 +28,21 @@
             -->
         </p:declare-step>
 
+        <p:add-attribute match="*[@translate='pre-translated-text-css']"
+                         attribute-name="translate"
+                         attribute-value="(input:braille)(input:text-css)(output:braille)"/>
+
+        <p:choose>
+            <p:when test="exists(/obfl:obfl/obfl:meta/dp2:braille-charset)">
+                <p:label-elements match="*[@translate[not(.='')]]"
+                                  attribute="translate"
+                                  label="concat(@translate,'(braille-charset:&quot;',/obfl:obfl/obfl:meta/dp2:braille-charset,'&quot;)')"/>
+            </p:when>
+            <p:otherwise>
+                <p:identity/>
+            </p:otherwise>
+        </p:choose>
+
         <p:delete match="/obfl:obfl/obfl:meta/dp2:style-type">
             <!-- We don't want this to end up in the PEF. We assume that the value is "text/css" and
                  that this is also what translators understand, meaning that $mode should contain
@@ -35,10 +51,17 @@
         <p:delete match="/obfl:obfl/obfl:meta/dp2:css-text-transform-definitions">
             <!-- We don't want this to end up in the PEF. -->
         </p:delete>
+        <p:delete match="/obfl:obfl/obfl:meta/dp2:braille-charset">
+            <!-- We don't want this to end up in the PEF. Another field "dp2:ascii-braille-charset"
+                 will be added through the "braille-charset" option. -->
+        </p:delete>
 
         <pxi:obfl-to-pef>
             <p:with-option name="locale" select="$locale"/>
             <p:with-option name="mode" select="$mode"/>
+            <p:with-option name="braille-charset" select="/obfl:obfl/obfl:meta/dp2:braille-charset">
+                <p:pipe step="main" port="source"/>
+            </p:with-option>
             <p:with-option name="identifier" select="$identifier"/>
             <p:with-option name="style-type" select="/obfl:obfl/obfl:meta/dp2:style-type[1]">
                 <p:pipe step="main" port="source"/>

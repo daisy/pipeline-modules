@@ -140,7 +140,7 @@ public class CompoundTranslator extends AbstractBrailleTranslator {
 							                                 from > i ? from - i : 0,
 							                                 buffer.size(),
 							                                 textTransform))
-								context.add(j++, new CSSStyledText(s, "text-transform: none"));
+								context.add(j++, new CSSStyledText(s, "text-transform: none; braille-charset: custom"));
 							buffer.clear();
 						} catch (Exception e) {
 							if (transformed.size() > 0 && transformed.get(0) instanceof String)
@@ -159,7 +159,7 @@ public class CompoundTranslator extends AbstractBrailleTranslator {
 								                                 j,
 								                                 j + 1,
 								                                 textTransform).iterator().next(),
-								                "text-transform: none"));
+								                "text-transform: none; braille-charset: custom"));
 								buffer.remove(j);
 							}
 						}

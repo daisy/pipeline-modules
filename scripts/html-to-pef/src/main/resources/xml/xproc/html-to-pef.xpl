@@ -148,7 +148,6 @@ sheet modules) are available for use in Sass style sheets:
                                            transform
                                            braille-code
                                            ascii-file-format
-                                           preview-table
                                            include-brf
                                            include-preview
                                            include-obfl

@@ -4,6 +4,7 @@
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                 xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                xmlns:dp2="http://www.daisy.org/ns/pipeline/"
                 xmlns:pef="http://www.daisy.org/ns/2008/pef"
                 xmlns:html="http://www.w3.org/1999/xhtml"
                 exclude-inline-prefixes="#all"
@@ -52,6 +53,13 @@
                     <p:pipe step="store" port="source"/>
                 </p:input>
             </p:identity>
+            <!--
+                delete dp2:ascii-braille-charset metadata and dp2:ascii attributes because we don't
+                want it to end up in the output if the format is PEF (in which case pef:pef2text
+                simply serializes the input PEF).
+            -->
+            <p:delete match="/pef:pef/pef:head/pef:meta/dp2:ascii-braille-charset|
+                             pef:row/@dp2:ascii"/>
             <pef:pef2text px:progress="1">
                 <p:with-option name="dir-href" select="$brf-dir-href"/>
                 <p:with-option name="name-pattern" select="$brf-name-pattern"/>

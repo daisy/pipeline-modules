@@ -11,6 +11,7 @@ import cz.vutbr.web.css.TermInteger;
 import org.daisy.dotify.api.table.BrailleConverter;
 
 import org.daisy.braille.css.SimpleInlineStyle;
+import org.daisy.braille.css.BrailleCSSProperty.BrailleCharset;
 import org.daisy.braille.css.BrailleCSSProperty.Hyphens;
 import org.daisy.braille.css.BrailleCSSProperty.WhiteSpace;
 import org.daisy.braille.css.BrailleCSSProperty.WordSpacing;
@@ -24,20 +25,28 @@ import org.slf4j.LoggerFactory;
 
 /**
  * {@link org.daisy.pipeline.braille.common.BrailleTranslator} that assumes input text exists of
- * only braille and white space characters. Supports CSS properties "word-spacing", "hyphens"
- * and "white-space".
+ * only braille and white space characters. Supports CSS properties "word-spacing", "hyphens",
+ * "white-space" and "braille-charset".
  */
 public  class UnityBrailleTranslator extends AbstractBrailleTranslator implements BrailleTranslator {
 
 	private static final Pattern SPECIAL_CHARS = Pattern.compile("[\\x20\t\\n\\r\\u2800\\xA0\u00AD\u200B\u2028]+");
 
 	private final BrailleConverter brailleCharset;
+	private final boolean useBrailleCharsetForInput;
 
 	/**
-	 * @param brailleCharset The character set of the output braille. <code>null</code> means Unicode braille.
+	 * @param brailleCharset            The character set of the output braille, and of the input in
+	 *                                  case it is styled as <code>braille-charset: custom</code> or if
+	 *                                  <code>useBrailleCharsetForInput</code> is <code>true</code>.
+	 *                                  <code>null</code> means Unicode braille.
+	 * @param useBrailleCharsetForInput Whether <code>brailleCharset</code> by default also applies to
+	 *                                  the input (if it does not have a <code>braille-charset</code>
+	 *                                  style).
 	 */
-	public UnityBrailleTranslator(BrailleConverter brailleCharset) {
+	public UnityBrailleTranslator(BrailleConverter brailleCharset, boolean useBrailleCharsetForInput) {
 		this.brailleCharset = brailleCharset;
+		this.useBrailleCharsetForInput = useBrailleCharsetForInput;
 	}
 
 	private FromStyledTextToBraille fromStyledTextToBraille = null;
@@ -52,6 +61,7 @@ public  class UnityBrailleTranslator extends AbstractBrailleTranslator implement
 								if (i >= from && (to < 0 || i < to)) {
 									SimpleInlineStyle style = styledText.getStyle();
 									String text = styledText.getText();
+									boolean unicodeBraille = brailleCharset == null || !useBrailleCharsetForInput;
 									if (style != null) {
 										CSSProperty val = style.getProperty("hyphens");
 										if (val == Hyphens.MANUAL || val == Hyphens.NONE) {
@@ -61,6 +71,13 @@ public  class UnityBrailleTranslator extends AbstractBrailleTranslator implement
 										val = style.getProperty("white-space");
 										if (val != null)
 											style.removeProperty("white-space");
+										val = style.getProperty("braille-charset");
+										if (val != null) {
+											if (val == BrailleCharset.CUSTOM)
+												unicodeBraille = false;
+											else if (val == BrailleCharset.UNICODE)
+												unicodeBraille = true;
+											style.removeProperty("braille-charset"); }
 										for (String prop : style.getPropertyNames()) {
 											logger.warn("'{}: {}' not supported in combination with 'text-transform: none'",
 											            prop, style.get(prop));
@@ -69,16 +86,19 @@ public  class UnityBrailleTranslator extends AbstractBrailleTranslator implement
 									if (attrs != null)
 										for (String k : attrs.keySet())
 											logger.warn("Text attribute \"{}:{}\" ignored", k, attrs.get(k));
-									StringBuilder b; {
-										b = new StringBuilder();
-										boolean special = false;
-										for (String s : splitInclDelimiter(text, SPECIAL_CHARS)) {
-											if (!s.isEmpty())
-												b.append(special ? s : brailleCharset.toText(s));
-											special = !special;
+									if (unicodeBraille && brailleCharset != null) {
+										StringBuilder b; {
+											b = new StringBuilder();
+											boolean special = false;
+											for (String s : splitInclDelimiter(text, SPECIAL_CHARS)) {
+												if (!s.isEmpty())
+													b.append(special ? s : brailleCharset.toText(s));
+												special = !special;
+											}
 										}
-									}
-									braille.add(b.toString());
+										braille.add(b.toString());
+									} else
+										braille.add(text);
 								}
 								i++;
 							}
@@ -104,6 +124,7 @@ public  class UnityBrailleTranslator extends AbstractBrailleTranslator implement
 								if (i >= from && (to < 0 || i < to)) {
 									SimpleInlineStyle style = styledText.getStyle();
 									int spacing = 1;
+									boolean unicodeBraille = brailleCharset == null || !useBrailleCharsetForInput;
 									if (style != null) {
 										CSSProperty val = style.getProperty("word-spacing");
 										if (val != null) {
@@ -125,6 +146,13 @@ public  class UnityBrailleTranslator extends AbstractBrailleTranslator implement
 											if (val == WhiteSpace.PRE_WRAP || val == WhiteSpace.PRE_LINE)
 												text = text.replaceAll("[\\n\\r]", "\u2028"); // LINE SEPARATOR
 											style.removeProperty("white-space"); }
+										val = style.getProperty("braille-charset");
+										if (val != null) {
+											if (val == BrailleCharset.CUSTOM)
+												unicodeBraille = false;
+											else if (val == BrailleCharset.UNICODE)
+												unicodeBraille = true;
+											style.removeProperty("braille-charset"); }
 										for (String prop : style.getPropertyNames()) {
 											logger.warn("'{}: {}' not supported in combination with 'text-transform: none'",
 											            prop, style.get(prop));
@@ -138,16 +166,19 @@ public  class UnityBrailleTranslator extends AbstractBrailleTranslator implement
 									if (attrs != null)
 										for (String k : attrs.keySet())
 											logger.warn("Text attribute \"{}:{}\" ignored", k, attrs.get(k));
-									StringBuilder b; {
-										b = new StringBuilder();
-										boolean special = false;
-										for (String s : splitInclDelimiter(text, SPECIAL_CHARS)) {
-											if (!s.isEmpty())
-												b.append(special ? s : brailleCharset.toText(s));
-											special = !special;
+									if (unicodeBraille && brailleCharset != null) {
+										StringBuilder b; {
+											b = new StringBuilder();
+											boolean special = false;
+											for (String s : splitInclDelimiter(text, SPECIAL_CHARS)) {
+												if (!s.isEmpty())
+													b.append(special ? s : brailleCharset.toText(s));
+												special = !special;
+											}
 										}
-									}
-									braille.add(b.toString());
+										braille.add(b.toString());
+									} else
+										braille.add(text);
 								} else {
 									// not converting to braille character set because not part of final output and we're not even
 									// sure that it is braille
@@ -168,12 +199,13 @@ public  class UnityBrailleTranslator extends AbstractBrailleTranslator implement
 							if (--to == 0)
 								toChar = brailleString.length();
 						}
-						return new DefaultLineBreaker.LineIterator(brailleString.toString(),
-						                                           fromChar,
-						                                           toChar,
-						                                           brailleCharset.toText("\u2800").toCharArray()[0],
-						                                           brailleCharset.toText("\u2824").toCharArray()[0],
-						                                           wordSpacing);
+						return new DefaultLineBreaker.LineIterator(
+							brailleString.toString(),
+							fromChar,
+							toChar,
+							brailleCharset == null ? '\u2800' : brailleCharset.toText("\u2800").toCharArray()[0],
+							brailleCharset == null ? '\u2824' : brailleCharset.toText("\u2824").toCharArray()[0],
+							wordSpacing);
 					}
 				};
 		return lineBreakingFromStyledText;

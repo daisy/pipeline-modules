@@ -38,11 +38,19 @@
 	
 	<xsl:template match="text()" mode="translate">
 		<xsl:param name="source-style" as="element()*" tunnel="yes"/>
-		<xsl:variable name="uppercase" as="xs:string" select="upper-case(.)"/>
+		<xsl:variable name="uppercase" as="xs:string"
+		              select="if ($source-style[@name='text-transform' and @value='none'])
+		                      then .
+		                      else upper-case(.)"/>
+		<xsl:variable name="encoded" as="xs:string"
+		              select="if ($source-style[@name='text-transform' and @value='none']
+		                          and $source-style[@name='braille-charset' and @value='unicode'])
+		                      then translate($uppercase,'⠁⠃⠉⠙⠑⠋⠛⠓⠊⠚⠅⠇⠍⠝⠕⠏⠟⠗⠎⠞⠥⠧⠺⠭⠽⠵','ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+		                      else $uppercase"/>
 		<xsl:variable name="normalised" as="xs:string"
 		              select="if ($source-style[@name='white-space' and not(@value='normal')])
-		                      then $uppercase
-		                      else normalize-space($uppercase)"/>
+		                      then $encoded
+		                      else normalize-space($encoded)"/>
 		<xsl:variable name="hyphenated" as="xs:string"
 		              select="if ($source-style[@name='hyphens' and @value='auto'])
 		                      then replace($normalised, 'FOOBAR', 'FOO=BAR')
