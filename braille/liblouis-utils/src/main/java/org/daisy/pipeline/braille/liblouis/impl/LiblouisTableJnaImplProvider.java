@@ -55,6 +55,7 @@ import org.daisy.pipeline.datatypes.ValidationResult;
 
 import org.liblouis.CompilationException;
 import org.liblouis.DisplayTable;
+import org.liblouis.DisplayTable.Fallback;
 import org.liblouis.Logger.Level;
 import org.liblouis.Louis;
 import org.liblouis.Table;
@@ -204,7 +205,7 @@ public class LiblouisTableJnaImplProvider extends AbstractTransformProvider<Libl
 			unpack(
 				URLs.getResourceFromJAR("/tables/unicode.dis", LiblouisTableJnaImplProvider.class),
 				unicodeDisFile);
-			unicodeDisplayTable = DisplayTable.fromTable("" + URLs.asURI(unicodeDisFile));
+			unicodeDisplayTable = DisplayTable.fromTable("" + URLs.asURI(unicodeDisFile), Fallback.MASK);
 			spacesFile = new File(makeUnpackDir(), "spaces.cti");
 			unpack(
 				URLs.getResourceFromJAR("/tables/spaces.cti", LiblouisTableJnaImplProvider.class),
@@ -214,7 +215,7 @@ public class LiblouisTableJnaImplProvider extends AbstractTransformProvider<Libl
 				URLs.getResourceFromJAR("/tables/spaces.dis", LiblouisTableJnaImplProvider.class),
 				spacesDisFile);
 			unicodeDisplayTableWithNoBreakSpace = DisplayTable.fromTable(
-				"" + URLs.asURI(unicodeDisFile) + "," + URLs.asURI(spacesDisFile));
+				"" + URLs.asURI(unicodeDisFile) + "," + URLs.asURI(spacesDisFile), Fallback.MASK);
 			Louis.setLogger(new org.liblouis.Logger() {
 					@Override
 					public void log(Level level, String message) {

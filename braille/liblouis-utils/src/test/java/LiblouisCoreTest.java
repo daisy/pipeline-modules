@@ -246,6 +246,14 @@ public class LiblouisCoreTest extends AbstractTest {
 	}
 	
 	@Test
+	public void testMaskVirtualDots() {
+		FromStyledTextToBraille translator = provider.withContext(messageBus)
+		                                             .get(query("(table:'foobar.utb')")).iterator().next()
+		                                             .fromStyledTextToBraille();
+		assertEquals(braille("⠁⠃⠉ ⠼⠁⠃⠉"), translator.transform(text("abc 123")));
+	}
+	
+	@Test
 	public void testHyphenate() {
 		assertEquals("foo\u00ADbar",
 		             hyphenatorProvider.withContext(messageBus)
