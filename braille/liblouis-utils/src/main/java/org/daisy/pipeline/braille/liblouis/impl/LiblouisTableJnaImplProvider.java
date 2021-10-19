@@ -55,7 +55,6 @@ import org.daisy.pipeline.datatypes.ValidationResult;
 
 import org.liblouis.CompilationException;
 import org.liblouis.DisplayTable;
-import org.liblouis.DisplayTable.StandardDisplayTables;
 import org.liblouis.Logger.Level;
 import org.liblouis.Louis;
 import org.liblouis.Table;
@@ -129,6 +128,7 @@ public class LiblouisTableJnaImplProvider extends AbstractTransformProvider<Libl
 	private DisplayTable unicodeDisplayTable;
 	private DisplayTable unicodeDisplayTableWithNoBreakSpace;
 	private File spacesFile;
+	private File spacesDisFile;
 	
 	private void registerTableResolver() {
 		Louis.setTableResolver(new TableResolver() {
@@ -209,7 +209,7 @@ public class LiblouisTableJnaImplProvider extends AbstractTransformProvider<Libl
 			unpack(
 				URLs.getResourceFromJAR("/tables/spaces.cti", LiblouisTableJnaImplProvider.class),
 				spacesFile);
-			File spacesDisFile = new File(makeUnpackDir(), "spaces.dis");
+			spacesDisFile = new File(makeUnpackDir(), "spaces.dis");
 			unpack(
 				URLs.getResourceFromJAR("/tables/spaces.dis", LiblouisTableJnaImplProvider.class),
 				spacesDisFile);
@@ -298,14 +298,11 @@ public class LiblouisTableJnaImplProvider extends AbstractTransformProvider<Libl
 						public LiblouisTableJnaImpl _apply() {
 							MutableQuery q = mutableQuery(query);
 							String table = null;
+							String charset = null;
 							TableInfo tableInfo = null;
-							boolean unicode = false;
 							boolean whiteSpace = false;
 							String dotsForUndefinedChar = null;
 							String documentLocale = null;
-							if (q.containsKey("unicode")) {
-								q.removeOnly("unicode");
-								unicode = true; }
 							if (q.containsKey("white-space")) {
 								q.removeOnly("white-space");
 								whiteSpace = true; }
@@ -318,6 +315,10 @@ public class LiblouisTableJnaImplProvider extends AbstractTransformProvider<Libl
 							}
 							if (q.containsKey("document-locale"))
 								documentLocale = q.removeOnly("document-locale").getValue().get();
+							if (q.containsKey("charset") || q.containsKey("braille-charset"))
+								charset = q.containsKey("charset")
+									? q.removeOnly("charset").getValue().get()
+									: q.removeOnly("braille-charset").getValue().get();
 							if (q.containsKey("table"))
 								// FIXME: display and remaining features in query are ignored
 								table = q.removeOnly("table").getValue().get();
@@ -361,11 +362,23 @@ public class LiblouisTableJnaImplProvider extends AbstractTransformProvider<Libl
 								catch (IllegalArgumentException e) {}
 								catch (NoSuchElementException e) {}}
 							if (table != null) {
-								DisplayTable displayTable = StandardDisplayTables.DEFAULT;
 								if (whiteSpace)
 									table = URLs.asURI(spacesFile) + "," + table;
-								if (unicode)
+								DisplayTable displayTable = null;
+								if (charset == null)
 									displayTable = whiteSpace ? unicodeDisplayTableWithNoBreakSpace : unicodeDisplayTable;
+								else
+									try {
+										if (whiteSpace)
+											charset = "" + URLs.asURI(spacesDisFile) + "," + charset;
+										// using Translator.asDisplayTable() and not DisplayTable.fromTable() so we can
+										// catch CompilationException
+										displayTable = new Translator(charset).asDisplayTable(); }
+									catch (CompilationException e) {
+										__apply(
+											warn("Could not compile table " + table));
+										logger.warn("Could not compile table", e);
+										throw new NoSuchElementException(); }
 								if (dotsForUndefinedChar != null) {
 									try {
 										File undefinedFile = createTempFile("undefined-", ".uti");

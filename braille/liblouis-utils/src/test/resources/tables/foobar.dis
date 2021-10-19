@@ -38,3 +38,9 @@ display \X0036 1249      6
 display \X0037 12459     7
 display \X0038 1259      8
 display \X0039 249       9
+
+display \X0023 3456      #
+display \X0027 4         '
+display \X002D 36        -
+display \X002E 46        .
+display \X2028 2d
