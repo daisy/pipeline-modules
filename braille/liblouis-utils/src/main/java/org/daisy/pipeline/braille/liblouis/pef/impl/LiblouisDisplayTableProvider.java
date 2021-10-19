@@ -70,8 +70,8 @@ public class LiblouisDisplayTableProvider extends AbstractTableProvider {
 			if (!q.isEmpty())
 				return empty;
 			q.add("liblouis-table", id); }
-		else
-			q.add("display");
+		if (!q.containsKey("liblouis-table"))
+			q.add("type", "display");
 		return filter(
 			transform(
 				tableProvider.get(q),

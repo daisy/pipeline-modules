@@ -286,7 +286,6 @@ public class LiblouisTableJnaImplProvider extends AbstractTransformProvider<Libl
 							boolean unicode = false;
 							boolean whiteSpace = false;
 							String dotsForUndefinedChar = null;
-							boolean display = false;
 							String documentLocale = null;
 							if (q.containsKey("unicode")) {
 								q.removeOnly("unicode");
@@ -301,12 +300,6 @@ public class LiblouisTableJnaImplProvider extends AbstractTransformProvider<Libl
 									throw new NoSuchElementException();
 								}
 							}
-							if (q.containsKey("display")) {
-								q.removeOnly("display");
-								if (unicode) {
-									logger.warn("A query with '(unicode)(display)' never matches anything");
-									throw new NoSuchElementException(); }
-								display = true; }
 							if (q.containsKey("document-locale"))
 								documentLocale = q.removeOnly("document-locale").getValue().get();
 							if (q.containsKey("table"))
@@ -321,10 +314,8 @@ public class LiblouisTableJnaImplProvider extends AbstractTransformProvider<Libl
 								if (q.isEmpty())
 									throw new NoSuchElementException();
 								StringBuilder b = new StringBuilder();
-								if (display)
-									b.append("type:display ");
 								
-								// FIXME: if !display, need to match for absence of "type:display"
+								// FIXME: if query does not contain (type:display), need to match for absence of "type:display"
 								// -> i.e. Liblouis query syntax must support negation!
 								// -> this used to be solved by matching "type:translation" but the downside of this
 								//    is that this feature had to be added to every table which is not desired
