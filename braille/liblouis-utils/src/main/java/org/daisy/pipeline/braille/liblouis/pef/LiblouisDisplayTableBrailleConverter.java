@@ -1,4 +1,4 @@
-package org.daisy.pipeline.braille.liblouis.pef.impl;
+package org.daisy.pipeline.braille.liblouis.pef;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -74,5 +74,10 @@ public class LiblouisDisplayTableBrailleConverter implements BrailleConverter {
 	
 	public boolean supportsEightDot() {
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return table.toString();
 	}
 }

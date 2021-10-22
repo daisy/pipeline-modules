@@ -47,6 +47,7 @@ import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.I
 import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Iterables.transform;
 import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.logCreate;
 import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.logSelect;
+import org.daisy.pipeline.braille.common.BrailleTranslator;
 import org.daisy.pipeline.braille.common.BrailleTranslatorProvider;
 import org.daisy.pipeline.braille.common.CSSStyledText;
 import org.daisy.pipeline.braille.common.Hyphenator;
@@ -58,6 +59,7 @@ import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
 import org.daisy.pipeline.braille.common.TransformProvider;
 import static org.daisy.pipeline.braille.common.TransformProvider.util.memoize;
 import static org.daisy.pipeline.braille.common.TransformProvider.util.dispatch;
+import org.daisy.pipeline.braille.common.UnityBrailleTranslator;
 import static org.daisy.pipeline.braille.common.util.Iterables.combinations;
 import static org.daisy.pipeline.braille.common.util.Locales.parseLocale;
 import static org.daisy.pipeline.braille.common.util.Strings.extractHyphens;
@@ -70,6 +72,7 @@ import org.daisy.pipeline.braille.css.CompoundTranslator;
 import org.daisy.pipeline.braille.liblouis.LiblouisTable;
 import org.daisy.pipeline.braille.liblouis.LiblouisTranslator;
 import org.daisy.pipeline.braille.liblouis.impl.LiblouisTableJnaImplProvider.LiblouisTableJnaImpl;
+import org.daisy.pipeline.braille.liblouis.pef.LiblouisDisplayTableBrailleConverter;
 
 import org.liblouis.DisplayException;
 import org.liblouis.DisplayTable;
@@ -218,6 +221,9 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 			hyphenator,
 			handleNonStandardHyphenation);
 		if (translators.iterator().hasNext()) {
+			// all translators use the same display table
+			DisplayTable displayTable = tableProvider.get(q).iterator().next().getDisplayTable();
+			BrailleTranslator unityTranslator = new UnityBrailleTranslator(new LiblouisDisplayTableBrailleConverter(displayTable));
 			String contraction = q.containsKey("contraction")
 				? q.removeAll("contraction").iterator().next().getValue().get()
 				: null;
@@ -241,7 +247,7 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 									contracted -> contracted ? translators : nonContractingTranslators)),
 							new Function<Map<Boolean,WithSideEffect<LiblouisTranslator,Logger>>,LiblouisTranslator>() {
 								public LiblouisTranslator _apply(Map<Boolean,WithSideEffect<LiblouisTranslator,Logger>> translators)
-									throws NoSuchElementException {
+										throws NoSuchElementException {
 									LiblouisTranslator t;
 									try {
 										t = __apply(translators.get(true));
@@ -252,11 +258,18 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 										__apply(translators.get(false));
 										throw e;
 									}
-									return new HandleTextTransformUncontracted(t, __apply(translators.get(false)));
+									return new HandleTextTransformNoneAndUncontracted(t,
+									                                                  __apply(translators.get(false)),
+									                                                  unityTranslator);
 								}
 							}),
 						translators);
-			}
+			} else
+				return Iterables.transform(
+					translators,
+					new Function<LiblouisTranslator,LiblouisTranslator>() {
+						public LiblouisTranslator _apply(LiblouisTranslator t) {
+							return new HandleTextTransformNoneAndUncontracted(t, null, unityTranslator); }});
 		}
 		return translators;
 	}
@@ -668,14 +681,13 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 								val = style.getProperty("text-transform");
 								if (val != null) {
 									if (val == TextTransform.NONE) {
+										// "text-transform: none" is handled by HandleTextTransformNone, but
+										// HandleTextTransformNone is a CompoundBrailleTranslator and
+										// CompoundBrailleTranslator puts "text-transform: none" on (already translated)
+										// context segments. We assume that all Liblouis tables correctly handle Unicode
+										// braille. If this is not the case, it is not the end of the words because this
+										// is a context segment.
 										style.removeProperty("text-transform");
-										if (WORD_SPLITTER.matcher(text[i]).matches())
-											style.removeProperty("hyphens");
-										if (!style.isEmpty()) {
-											String p = style.getPropertyNames().iterator().next();
-											CSSProperty v = style.getProperty(p);
-											logger.warn("'text-transform: none' can not be used in combination with '" + p + ": " + v + "'");
-											logger.debug("(text is: '" + text[i] + "')"); }
 										continue; }
 									else if (val == TextTransform.AUTO) {}
 									else if (val == TextTransform.list_values) {
@@ -1175,14 +1187,12 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 					val = style.getProperty("text-transform");
 					if (val != null) {
 						if (val == TextTransform.NONE) {
+							// "text-transform: none" is handled by HandleTextTransformNone, but HandleTextTransformNone
+							// is a CompoundBrailleTranslator and CompoundBrailleTranslator puts "text-transform: none"
+							// on (already translated) context segments. We assume that all Liblouis tables correctly
+							// handle Unicode braille. If this is not the case, it is not the end of the words because
+							// this is a context segment.
 							style.removeProperty("text-transform");
-							if (WORD_SPLITTER.matcher(text[i]).matches())
-								style.removeProperty("hyphens");
-							if (!style.isEmpty()) {
-								String p = style.getPropertyNames().iterator().next();
-								CSSProperty v = style.getProperty(p);
-								logger.warn("'text-transform: none' can not be used in combination with '" + p + ": " + v + "'");
-								logger.debug("(text is: '" + text[i] + "')"); }
 							continue; }
 						else if (val == TextTransform.AUTO) {}
 						else if (val == TextTransform.list_values) {
@@ -1616,14 +1626,19 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 		}
 	}
 	
-	private static class HandleTextTransformUncontracted extends CompoundTranslator implements LiblouisTranslator {
+	private static class HandleTextTransformNoneAndUncontracted extends CompoundTranslator implements LiblouisTranslator {
 		
 		final LiblouisTranslator translator;
 		
-		HandleTextTransformUncontracted(LiblouisTranslator translator,
-		                                LiblouisTranslator nonContractingTranslator) {
-			super(translator, ImmutableMap.of("uncontracted", () -> nonContractingTranslator,
-			                                  "contracted", () -> translator));
+		HandleTextTransformNoneAndUncontracted(LiblouisTranslator translator,
+		                                       BrailleTranslator nonContractingTranslator,
+		                                       BrailleTranslator unityTranslator) {
+			super(translator,
+			      nonContractingTranslator != null
+			          ? ImmutableMap.of("none", () -> unityTranslator,
+			                            "uncontracted", () -> nonContractingTranslator,
+			                            "contracted", () -> translator)
+			          : ImmutableMap.of("none", () -> unityTranslator));
 			this.translator = translator;
 		}
 		
@@ -1636,8 +1651,6 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 		public FromTypeformedTextToBraille fromTypeformedTextToBraille() {
 			return translator.fromTypeformedTextToBraille();
 		}
-		
-		
 	}
 	
 	private static class LiblouisTranslatorHyphenatorImpl extends LiblouisTranslatorImpl {
