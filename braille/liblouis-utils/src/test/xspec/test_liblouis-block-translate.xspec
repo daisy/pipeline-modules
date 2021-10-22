@@ -3,7 +3,6 @@
                stylesheet="http://www.daisy.org/pipeline/modules/braille/css-utils/transform/block-translator-from-text-transform.xsl">
   
   <x:param name="text-transform" select="'(locale:en-US)(grade:2)(hyphenator:hyphen)'"/>
-  <x:param name="main-locale" select="'en'"/>
   
   <x:scenario label="test_01">
     <x:context>

@@ -6,7 +6,6 @@
             exclude-inline-prefixes="#all">
 	
 	<p:option name="text-transform" select="''"/>
-	<p:option name="main-locale" select="''"/>
 	
 	<p:import href="../library.xpl"/>
 	
@@ -18,7 +17,6 @@
 			<p:document href="block-translator-from-text-transform.xsl"/>
 		</p:input>
 		<p:with-param name="text-transform" select="$text-transform"/>
-		<p:with-param name="main-locale" select="$main-locale"/>
 	</p:xslt>
 	
 </p:pipeline>

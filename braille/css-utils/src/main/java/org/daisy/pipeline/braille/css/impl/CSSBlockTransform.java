@@ -98,7 +98,6 @@ public interface CSSBlockTransform {
 					else
 						return empty;
 			}
-			final String locale = q.containsKey("locale") ? q.getOnly("locale").getValue().get() : null;
 			q.add("input", "text-css");
 			if (braille)
 				q.add("output", "braille");
@@ -108,7 +107,7 @@ public interface CSSBlockTransform {
 				new Function<BrailleTranslator,BrailleTranslator>() {
 					public BrailleTranslator _apply(BrailleTranslator translator) {
 						return __apply(
-							logCreate(new TransformImpl(translator, false, locale, q))
+							logCreate(new TransformImpl(translator, false, q))
 						);
 					}
 				}
@@ -135,8 +134,8 @@ public interface CSSBlockTransform {
 			 */
 			// FIXME: mainTranslator is optional if default translator has been defined in CSS (which we can not know in advance)
 			private TransformImpl(BrailleTranslator mainTranslator, boolean forceMainTranslator,
-			                      String mainLocale, Query query) {
-				options = ImmutableMap.of("main-locale", mainLocale != null ? mainLocale : "");
+			                      Query query) {
+				options = ImmutableMap.of();
 				this.mainTranslator = mainTranslator;
 				this.forceMainTranslator = forceMainTranslator;
 				mainQuery = query;
