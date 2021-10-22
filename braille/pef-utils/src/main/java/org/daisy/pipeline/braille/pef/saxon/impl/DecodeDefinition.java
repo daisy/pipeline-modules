@@ -106,6 +106,8 @@ public class DecodeDefinition extends ExtensionFunctionDefinition {
 						catch (NoSuchElementException e2) {
 							throw new XPathException("Could not find a table for query: " + tableQuery); }}
 					return new StringValue(table.newBrailleConverter().toBraille(text)); }
+				catch (XPathException e) {
+					throw e; }
 				catch (Throwable e) {
 					throw new XPathException("Unexpected error in pef:decode", e); }
 			}

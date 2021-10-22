@@ -103,6 +103,8 @@ public class HyphenateDefinition extends ExtensionFunctionDefinition {
 					catch (NoSuchElementException e) {
 						throw new XPathException("Could not find a hyphenator for query: " + query); }
 					return arrayToSequence(hyphenator.asFullHyphenator().transform(text));}
+				catch (XPathException e) {
+					throw e; }
 				catch (Throwable e) {
 					throw new XPathException("Unexpected error in louis:hyphenate", e); }
 			}

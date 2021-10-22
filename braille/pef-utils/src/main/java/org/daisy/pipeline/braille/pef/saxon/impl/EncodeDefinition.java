@@ -106,6 +106,8 @@ public class EncodeDefinition extends ExtensionFunctionDefinition {
 						catch (NoSuchElementException e2) {
 							throw new XPathException("Could not find a table for query: " + tableQuery); }}
 					return new StringValue(table.newBrailleConverter().toText(braille)); }
+				catch (XPathException e) {
+					throw e; }
 				catch (Throwable e) {
 					throw new XPathException("Unexpected error in pef:encode", e); }
 			}

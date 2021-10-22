@@ -91,6 +91,8 @@ public class HyphenateDefinition extends ExtensionFunctionDefinition {
 						throw new XPathException("Could not find a hyphenator for query: " + query); }
 					String[] text = sequenceToArray(arguments[1]);
 					return arrayToSequence(hyphenator.asFullHyphenator().transform(text)); }
+				catch (XPathException e) {
+					throw e; }
 				catch (Throwable e) {
 					throw new XPathException("Unexpected error in tex:hyphenate", e); }
 			}

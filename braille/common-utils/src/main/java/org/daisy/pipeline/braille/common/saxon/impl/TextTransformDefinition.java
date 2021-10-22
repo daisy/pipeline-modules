@@ -138,6 +138,8 @@ public class TextTransformDefinition extends ExtensionFunctionDefinition {
 							throw e; }
 					}
 					throw new XPathException("Could not find a BrailleTranslator for query: " + query); }
+				catch (XPathException e) {
+					throw e; }
 				catch (Throwable e) {
 					throw new XPathException("Unexpected error in pf:text-transform", e); }
 			}
