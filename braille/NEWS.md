@@ -1,5 +1,6 @@
 v1.14.4-SNAPSHOT
 =======
+- Update to Liblouis [3.19.0](https://github.com/liblouis/liblouis/releases/tag/v3.19.0)
 - Bugfixes
 
 v1.14.3
