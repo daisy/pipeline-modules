@@ -1,7 +1,6 @@
 package org.daisy.pipeline.tts.synthesize.calabash.impl;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -68,16 +67,6 @@ public interface TTSLog {
 		void setActualVoice(Voice v);
 
 		Voice getActualVoice();
-
-		/**
-		 * @param input is the actual string provided as input to the TTS
-		 *            processor
-		 */
-		void addTTSinput(String input);
-
-		List<String> getTTSinput();
-
-		void resetTTSinput();
 
 		/**
 		 * @param soundfile is a path of a wave, mp3 or ogg file

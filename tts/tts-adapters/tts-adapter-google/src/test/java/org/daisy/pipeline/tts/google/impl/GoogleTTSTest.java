@@ -1,11 +1,14 @@
 package org.daisy.pipeline.tts.google.impl;
 
+import java.io.StringReader;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
+import javax.xml.transform.sax.SAXSource;
 
 import org.daisy.pipeline.tts.AudioBuffer;
 import org.daisy.pipeline.tts.AudioBufferAllocator;
@@ -17,6 +20,12 @@ import org.daisy.pipeline.tts.Voice;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.xml.sax.InputSource;
+
+import net.sf.saxon.s9api.Processor;
+import net.sf.saxon.s9api.SaxonApiException;
+import net.sf.saxon.s9api.XdmNode;
+
 import org.junit.Before;
 import org.junit.Assume;
 
@@ -90,8 +99,9 @@ public class GoogleTTSTest {
 		GoogleRestTTSEngine engine = allocateEngine();
 
 		TTSResource resource = engine.allocateThreadResources();
-		Collection<AudioBuffer> li = engine.synthesize("<s>this is a test</s>", null, null,
-		        resource, BufferAllocator, false);
+		Collection<AudioBuffer> li = engine.synthesize(
+			parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">this is a test</s>"),
+			null, resource, null, null, BufferAllocator, false);
 		engine.releaseThreadResources(resource);
 
 		Assert.assertTrue(getSize(li) > 2000);
@@ -104,8 +114,9 @@ public class GoogleTTSTest {
 		GoogleRestTTSEngine engine = allocateEngine();
 
 		TTSResource resource = engine.allocateThreadResources();
-		Collection<AudioBuffer> li = engine.synthesize("<s>this is a test</s>", null, new Voice("google", "en-GB-Standard-B"),
-		        resource, BufferAllocator, false);
+		Collection<AudioBuffer> li = engine.synthesize(
+			parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">this is a test</s>"),
+			new Voice("google", "en-GB-Standard-B"), resource, null, null, BufferAllocator, false);
 		engine.releaseThreadResources(resource);
 
 		Assert.assertTrue(getSize(li) > 2000);
@@ -122,8 +133,9 @@ public class GoogleTTSTest {
 		Iterator<Voice> ite = engine.getAvailableVoices().iterator();
 		while (ite.hasNext()) {
 			Voice v = ite.next();
-			Collection<AudioBuffer> li = engine.synthesize("small test", null, v, resource,
-				       BufferAllocator, false);
+			Collection<AudioBuffer> li = engine.synthesize(
+				parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">small test</s>"),
+				v, resource, null, null, BufferAllocator, false);
 
 			sizes.add(getSize(li) / 4); //div 4 helps being more robust to tiny differences
 			totalVoices++;
@@ -142,8 +154,8 @@ public class GoogleTTSTest {
 		GoogleRestTTSEngine engine = allocateEngine();
 		TTSResource resource = engine.allocateThreadResources();
 		Collection<AudioBuffer> li = engine.synthesize(
-		        "<s>𝄞𝄞𝄞𝄞 水水水水水 𝄞水𝄞水𝄞水𝄞水 test 国Ø家Ť标准 ĜæŘ ß ŒÞ ๕</s>", null, null,
-		        resource, BufferAllocator, false);
+			parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">𝄞𝄞𝄞𝄞 水水水水水 𝄞水𝄞水𝄞水𝄞水 test 国Ø家Ť标准 ĜæŘ ß ŒÞ ๕</s>"),
+			null, resource, null, null, BufferAllocator, false);
 		engine.releaseThreadResources(resource);
 
 		Assert.assertTrue(getSize(li) > 2000);
@@ -170,9 +182,11 @@ public class GoogleTTSTest {
 					Collection<AudioBuffer> li = null;
 					for (int k = 0; k < 16; ++k) {
 						try {
-							li = engine.synthesize("<s>small test</s>", null, null, resource, BufferAllocator, false);
+							li = engine.synthesize(
+								parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">small test</s>"),
+								null, resource, null, null, BufferAllocator, false);
 
-						} catch (SynthesisException | InterruptedException | MemoryException e) {
+						} catch (SaxonApiException | SynthesisException | InterruptedException | MemoryException e) {
 							e.printStackTrace();
 							break;
 						}
@@ -206,7 +220,9 @@ public class GoogleTTSTest {
 		}
 		GoogleRestTTSEngine engine = allocateEngine();
 		TTSResource resource = engine.allocateThreadResources();
-		engine.synthesize(sentence, null, null,resource, BufferAllocator, false);
+		engine.synthesize(
+			parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">" + sentence + "</s>"),
+			null, resource, null, null, BufferAllocator, false);
 		engine.releaseThreadResources(resource);
 	}
 	
@@ -216,8 +232,15 @@ public class GoogleTTSTest {
 		String sentence = "I can pause <break time=\"3s\"/>.";
 		GoogleRestTTSEngine engine = allocateEngine();
 		TTSResource resource = engine.allocateThreadResources();
-		engine.synthesize(sentence, null, null,resource, BufferAllocator, false);
+		engine.synthesize(
+			parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">" + sentence + "</s>"),
+			null, resource, null, null, BufferAllocator, false);
 		engine.releaseThreadResources(resource);
 	}
-	
+
+	private static final Processor proc = new Processor(false);
+
+	private static XdmNode parseSSML(String ssml) throws SaxonApiException {
+		return proc.newDocumentBuilder().build(new SAXSource(new InputSource(new StringReader(ssml))));
+	}
 }

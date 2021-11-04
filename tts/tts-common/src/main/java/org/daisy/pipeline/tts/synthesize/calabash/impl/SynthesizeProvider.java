@@ -2,8 +2,6 @@ package org.daisy.pipeline.tts.synthesize.calabash.impl;
 
 import java.util.concurrent.Semaphore;
 
-import javax.xml.transform.URIResolver;
-
 import org.daisy.common.xproc.calabash.XProcStep;
 import org.daisy.common.xproc.calabash.XProcStepProvider;
 import org.daisy.pipeline.audio.AudioServices;
@@ -28,28 +26,6 @@ public class SynthesizeProvider implements XProcStepProvider {
 	private AudioServices mAudioServices;
 	private Semaphore mStartSemaphore; //counter to limit the number of simultaneous text-to-speech steps
 	private AudioBufferTracker mAudioBufferTracker;
-	private URIResolver mURIResolver;
-
-	/**
-	 * Service component callback
-	 */
-	@Reference(
-		name = "uri-resolver",
-		unbind = "-",
-		service = URIResolver.class,
-		cardinality = ReferenceCardinality.MANDATORY,
-		policy = ReferencePolicy.STATIC
-	)
-	public void setURIResolver(URIResolver uriResolver) {
-		mURIResolver = uriResolver;
-	}
-
-	/**
-	 * Service component callback
-	 */
-	public void unsetURIResolver(URIResolver uriResolver) {
-		mURIResolver = null;
-	}
 
 	@Override
 	public XProcStep newStep(XProcRuntime runtime, XAtomicStep step) {
@@ -79,7 +55,7 @@ public class SynthesizeProvider implements XProcStepProvider {
 		//even if it is unregistered.
 
 		return new SynthesizeStep(runtime, step, mRegistry, mAudioServices, mStartSemaphore,
-		        mAudioBufferTracker, mURIResolver);
+		        mAudioBufferTracker);
 	}
 
 	@Reference(

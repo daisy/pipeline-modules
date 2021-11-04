@@ -1,5 +1,7 @@
 package org.daisy.pipeline.tts.sapinative.impl;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -9,27 +11,30 @@ import java.util.Map;
 
 import javax.sound.sampled.AudioFormat;
 
+import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 
+import org.daisy.common.file.URLs;
 import org.daisy.pipeline.tts.AudioBuffer;
 import org.daisy.pipeline.tts.AudioBufferAllocator;
 import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
 import org.daisy.pipeline.tts.sapinative.SAPILib;
-import org.daisy.pipeline.tts.SimpleTTSEngine;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.Mark;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.Voice;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SAPIengine extends SimpleTTSEngine {
+public class SAPIengine extends TTSEngine {
 
-	private Logger Logger = LoggerFactory.getLogger(SAPIengine.class);
+	private static final Logger Logger = LoggerFactory.getLogger(SAPIengine.class);
+	private static final URL ssmlTransformer = URLs.getResourceFromJAR("/transform-ssml.xsl", SAPIengine.class);
 
-	private AudioFormat mAudioFormat;
-	private int mOverallPriority;
+	private final AudioFormat mAudioFormat;
+	private final int mOverallPriority;
 	private Map<String, Voice> mVoiceFormatConverter = null;
 
 	private static class ThreadResource extends TTSResource {
@@ -48,11 +53,21 @@ public class SAPIengine extends SimpleTTSEngine {
 	}
 
 	@Override
-	public Collection<AudioBuffer> synthesize(String ssml, Voice voice,
-	        TTSResource resource, List<Mark> marks, AudioBufferAllocator bufferAllocator,
-	        boolean retry) throws SynthesisException, InterruptedException, MemoryException {
+	public Collection<AudioBuffer> synthesize(XdmNode ssml, Voice voice,
+	        TTSResource resource, List<Mark> marks, List<String> expectedMarks,
+	        AudioBufferAllocator bufferAllocator, boolean retry)
+		throws SynthesisException, InterruptedException, MemoryException {
 
-		return speak(ssml, voice, resource, marks, bufferAllocator);
+		Map<String,Object> xsltParams = new HashMap<>(); {
+			xsltParams.put("voice", voice.name);
+			xsltParams.put("ending-mark", endingMark());
+		}
+		try {
+			return speak(transformSsmlNodeToString(ssml, ssmlTransformer, xsltParams),
+			             voice, resource, marks, bufferAllocator);
+		} catch (IOException | SaxonApiException e) {
+			throw new SynthesisException(e);
+		}
 	}
 
 	public Collection<AudioBuffer> speak(String ssml, Voice voice, TTSResource resource,

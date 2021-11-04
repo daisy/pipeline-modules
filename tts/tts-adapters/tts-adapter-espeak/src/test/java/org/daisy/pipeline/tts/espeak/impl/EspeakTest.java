@@ -1,10 +1,17 @@
 package org.daisy.pipeline.tts.espeak.impl;
 
+import java.io.StringReader;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
+import javax.xml.transform.sax.SAXSource;
+
+import net.sf.saxon.s9api.Processor;
+import net.sf.saxon.s9api.SaxonApiException;
+import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.common.shell.BinaryFinder;
 import org.daisy.pipeline.tts.AudioBuffer;
@@ -18,6 +25,8 @@ import org.daisy.pipeline.tts.Voice;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
+
+import org.xml.sax.InputSource;
 
 public class EspeakTest {
 
@@ -49,8 +58,9 @@ ESpeakService s = new ESpeakService();
 		ESpeakEngine engine = allocateEngine();
 
 		TTSResource resource = engine.allocateThreadResources();
-		Collection<AudioBuffer> li = engine.synthesize("<s>this is a test</s>", null, null,
-		        resource, BufferAllocator, false);
+		Collection<AudioBuffer> li = engine.synthesize(
+			parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">this is a test</s>"),
+			null, resource, null, null, BufferAllocator, false);
 		engine.releaseThreadResources(resource);
 
 		Assert.assertTrue(getSize(li) > 2000);
@@ -66,9 +76,10 @@ ESpeakService s = new ESpeakService();
 		Iterator<Voice> ite = engine.getAvailableVoices().iterator();
 		while (ite.hasNext()) {
 			Voice v = ite.next();
-			Collection<AudioBuffer> li = engine.synthesize("<s><voice name=\"" + v.name
-			        + "\">small test</voice></s>", null, null, resource,
-			        BufferAllocator, false);
+			Collection<AudioBuffer> li = engine.synthesize(
+				parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">"
+				          + "<voice name=\"" + v.name + "\">small test</voice></s>"),
+				null, resource, null, null, BufferAllocator, false);
 
 			sizes.add(getSize(li) / 4); //div 4 helps being more robust to tiny differences
 			totalVoices++;
@@ -86,8 +97,9 @@ ESpeakService s = new ESpeakService();
 		ESpeakEngine engine = allocateEngine();
 		TTSResource resource = engine.allocateThreadResources();
 		Collection<AudioBuffer> li = engine.synthesize(
-		        "<s>𝄞𝄞𝄞𝄞 水水水水水 𝄞水𝄞水𝄞水𝄞水 test 国Ø家Ť标准 ĜæŘ ß ŒÞ ๕</s>", null, null,
-		        resource, BufferAllocator, false);
+			parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">"
+			          + "𝄞𝄞𝄞𝄞 水水水水水 𝄞水𝄞水𝄞水𝄞水 test 国Ø家Ť标准 ĜæŘ ß ŒÞ ๕</s>"),
+			null, resource, null, null, BufferAllocator, false);
 		engine.releaseThreadResources(resource);
 
 		Assert.assertTrue(getSize(li) > 2000);
@@ -113,9 +125,10 @@ ESpeakService s = new ESpeakService();
 					Collection<AudioBuffer> li = null;
 					for (int k = 0; k < 16; ++k) {
 						try {
-							li = engine.synthesize("<s>small test</s>", null, null, resource, BufferAllocator, false);
-
-						} catch (SynthesisException | InterruptedException | MemoryException e) {
+							li = engine.synthesize(
+								parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">small test</s>"),
+								null, resource, null, null, BufferAllocator, false);
+						} catch (SynthesisException | InterruptedException | MemoryException | SaxonApiException e) {
 							e.printStackTrace();
 							break;
 						}
@@ -138,5 +151,11 @@ ESpeakService s = new ESpeakService();
 		for (int size : sizes) {
 			Assert.assertEquals(sizes[0], size);
 		}
+	}
+
+	private static final Processor proc = new Processor(false);
+
+	private static XdmNode parseSSML(String ssml) throws SaxonApiException {
+		return proc.newDocumentBuilder().build(new SAXSource(new InputSource(new StringReader(ssml))));
 	}
 }

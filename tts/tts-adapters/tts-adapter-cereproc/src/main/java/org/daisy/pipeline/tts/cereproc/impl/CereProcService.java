@@ -1,27 +1,19 @@
 package org.daisy.pipeline.tts.cereproc.impl;
 
 import java.io.File;
-import java.net.URL;
 import java.util.Map;
 
-import org.daisy.pipeline.tts.AbstractTTSService;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSService;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class CereProcService extends AbstractTTSService {
+public abstract class CereProcService implements TTSService {
 
 	private final static Logger logger = LoggerFactory.getLogger(CereProcService.class);
-
-	@Override
-	public URL getSSMLxslTransformerURL() {
-		return null;
-	}
 
 	@Override
 	public TTSEngine newEngine(Map<String,String> params) throws Throwable {

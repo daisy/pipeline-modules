@@ -1,12 +1,20 @@
 package org.daisy.pipeline.tts;
 
+import java.net.URL;
+import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.sound.sampled.AudioFormat;
 
+import net.sf.saxon.Configuration;
+import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 
+import org.daisy.common.xslt.ThreadUnsafeXslTransformer;
+import org.daisy.common.xslt.XslTransformCompiler;
 import org.daisy.pipeline.tts.AudioBuffer;
 import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
@@ -44,13 +52,7 @@ public abstract class TTSEngine {
 	 * This method must be thread-safe. But @param threadResources is here to
 	 * prevent the service from locking internal resources.
 	 * 
-	 * @param sentence is the sentence to synthesize. It is the serialized
-	 *            result of the SSML conversion performed by the XSLT whose URL
-	 *            is returned by {@link TTSService#getSSMLxslTransformerURL()},
-	 *            or <code>null</code> if that method returns <code>null</code>.
-	 * @param xmlSentence is the XML version of @param sentence. It should not
-	 *            be used unless one needs information that has been lost during
-	 *            the serialization process (e.g. marks or CSS)
+	 * @param sentence is the sentence to synthesize, as an SSML node.
 	 * @param voice is the voice the synthesizer must use. It is guaranteed to
 	 *            be one of those returned by getAvailableVoices(). This
 	 *            parameter can't be null.
@@ -82,8 +84,8 @@ public abstract class TTSEngine {
 	 * 
 	 * @return a list of adjacent PCM chunks produced by the TTS processor.
 	 */
-	abstract public Collection<AudioBuffer> synthesize(String sentence, XdmNode xmlSentence,
-	        Voice voice, TTSResource threadResources, List<Mark> marks, List<String> expectedMarks,
+	abstract public Collection<AudioBuffer> synthesize(XdmNode sentence, Voice voice,
+	        TTSResource threadResources, List<Mark> marks, List<String> expectedMarks,
 	        AudioBufferAllocator bufferAllocator, boolean retry) throws SynthesisException,
 	        InterruptedException, MemoryException;
 
@@ -174,4 +176,43 @@ public abstract class TTSEngine {
 	public String endingMark() {
 		return null; //marks not handled
 	}
+
+	/* -------------------------------------------- */
+	/*               HELPER FUNCTIONS               */
+	/* -------------------------------------------- */
+
+	/**
+	 * Transform an SSML node to a string using a given XSLT and parameter map
+	 */
+	protected String transformSsmlNodeToString(XdmNode ssml, URL xslt, Map<String,Object> params)
+			throws IOException, SaxonApiException {
+		return compileXslt(xslt, ssml.getUnderlyingNode().getConfiguration())
+			.transformToString(ssml, params);
+	}
+
+	/**
+	 * Compile an XSLT.
+	 */
+	private ThreadUnsafeXslTransformer compileXslt(URL xslt, Configuration config)
+			throws SaxonApiException, IOException {
+		Map<URL,ThreadUnsafeXslTransformer> cache = compiledXslts.get().get(config);
+		if (cache == null) {
+			cache = new HashMap<URL,ThreadUnsafeXslTransformer>();
+			compiledXslts.get().put(config, cache);
+		}
+		ThreadUnsafeXslTransformer transformer = cache.get(xslt);
+		if (transformer == null) {
+			transformer = new XslTransformCompiler(config)
+				.compileStylesheet(xslt.openStream())
+				.newTransformer();
+			cache.put(xslt, transformer);
+		}
+		return transformer;
+	}
+
+	// Normally the same thread uses only one Configuration so
+	// ThreadLocal<Map<URL,ThreadUnsafeXslTransformer>> would also work, but we do it this way to be safe.
+	private static ThreadLocal<Map<Configuration,Map<URL,ThreadUnsafeXslTransformer>>> compiledXslts
+		= ThreadLocal.withInitial(() -> {
+				return new HashMap<Configuration,Map<URL,ThreadUnsafeXslTransformer>>(); });
 }

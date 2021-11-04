@@ -9,7 +9,6 @@ import java.util.Random;
 import java.util.concurrent.Semaphore;
 
 import javax.sound.sampled.AudioFileFormat;
-import javax.xml.transform.URIResolver;
 
 import net.sf.saxon.s9api.Axis;
 import net.sf.saxon.s9api.QName;
@@ -62,7 +61,6 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 	private AudioServices mAudioServices;
 	private Semaphore mStartSemaphore;
 	private AudioBufferTracker mAudioBufferTracker;
-	private URIResolver mURIresolver;
 	private String mTempDirOpt;
 	private boolean mIncludeLogOpt;
 	private AudioFileFormat.Type mAudioFileType;
@@ -87,9 +85,8 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 
 	public SynthesizeStep(XProcRuntime runtime, XAtomicStep step, TTSRegistry ttsRegistry,
 	        AudioServices audioServices, Semaphore startSemaphore,
-	        AudioBufferTracker audioBufferTracker, URIResolver uriResolver) {
+	        AudioBufferTracker audioBufferTracker) {
 		super(runtime, step);
-		mURIresolver = uriResolver;
 		mStartSemaphore = startSemaphore;
 		mAudioBufferTracker = audioBufferTracker;
 		mAudioServices = audioServices;
@@ -205,7 +202,7 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 		audioOutputDir.deleteOnExit();
 
 		SSMLtoAudio ssmltoaudio = new SSMLtoAudio(audioOutputDir, mAudioFileType, mTTSRegistry, logger,
-		        mAudioBufferTracker, mRuntime.getProcessor(), mURIresolver, configExt, log);
+		        mAudioBufferTracker, mRuntime.getProcessor(), configExt, log);
 
 		Iterable<SoundFileLink> soundFragments = Collections.EMPTY_LIST;
 		mErrorCounter = 0;
@@ -333,14 +330,6 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 					xmlLog.addEndElement();
 				}else{
 					xmlLog.addText("No SSML available. This piece of text has probably been extracted from inside another sentence.");
-				}
-
-				if (le.getTTSinput() != null && !le.getTTSinput().isEmpty()) {
-					for (String inp : le.getTTSinput()) {
-						xmlLog.addStartElement(LogInpTag);
-						xmlLog.addText(inp);
-						xmlLog.addEndElement();
-					}
 				}
 
 				xmlLog.addEndElement(); //LogTextTag

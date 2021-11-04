@@ -17,14 +17,12 @@ import org.daisy.common.file.URLs;
 import org.daisy.pipeline.tts.AudioBuffer;
 import org.daisy.pipeline.tts.AudioBufferAllocator;
 import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
-import org.daisy.pipeline.tts.MarklessTTSEngine;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.Voice;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 
 import org.slf4j.Logger;
@@ -40,22 +38,16 @@ public class MockTTS implements TTSService {
 	final static URL alexWaveOut = URLs.getResourceFromJAR("/mock-tts/alex.wav", MockTTS.class);
 	final static URL vickiWaveOut = URLs.getResourceFromJAR("/mock-tts/vicki.wav", MockTTS.class);
 	final static URL daisyPipelineWaveOut = URLs.getResourceFromJAR("/mock-tts/daisy-pipeline.wav", MockTTS.class);
-	URL ssmlTransformer;
-	
-	@Activate
-	protected void activate() {
-		ssmlTransformer = URLs.getResourceFromJAR("/mock-tts/transform-ssml.xsl", MockTTS.class);
-	}
 	
 	@Override
 	public TTSEngine newEngine(Map<String,String> params) throws Throwable {
-		return new MarklessTTSEngine(MockTTS.this) {
+		return new TTSEngine(MockTTS.this) {
 			
 			AudioFormat audioFormat;
 			
 			@Override
-			public Collection<AudioBuffer> synthesize(String sentence, XdmNode xmlSentence,
-			                                          Voice voice, TTSResource threadResources,
+			public Collection<AudioBuffer> synthesize(XdmNode sentence, Voice voice, TTSResource threadResources,
+			                                          List<Mark> marks, List<String> expectedMarks,
 			                                          AudioBufferAllocator bufferAllocator, boolean retry)
 					throws SynthesisException, InterruptedException, MemoryException {
 				logger.debug("Synthesizing sentence: " + sentence);
@@ -102,11 +94,6 @@ public class MockTTS implements TTSService {
 				return 2;
 			}
 		};
-	}
-	
-	@Override
-	public URL getSSMLxslTransformerURL() {
-		return ssmlTransformer;
 	}
 	
 	@Override

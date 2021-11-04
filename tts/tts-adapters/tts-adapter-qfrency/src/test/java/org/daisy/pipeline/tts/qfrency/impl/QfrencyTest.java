@@ -1,30 +1,27 @@
 package org.daisy.pipeline.tts.qfrency.impl;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.io.StringReader;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
-import javax.sound.sampled.AudioFormat;
+import javax.xml.transform.sax.SAXSource;
+
+import net.sf.saxon.s9api.Processor;
+import net.sf.saxon.s9api.SaxonApiException;
+import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.pipeline.tts.AudioBuffer;
 import org.daisy.pipeline.tts.AudioBufferAllocator;
 import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
-import org.daisy.pipeline.tts.RoundRobinLoadBalancer;
 import org.daisy.pipeline.tts.StraightBufferAllocator;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
-import org.daisy.pipeline.tts.TTSService.Mark;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.Voice;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import org.xml.sax.InputSource;
 
 /*
  * Unit test for the Qfrency adapter.
@@ -74,14 +71,22 @@ public class QfrencyTest {
 	}
 	
 	@Test
-	public void simpleSpeak() throws SynthesisException, InterruptedException, MemoryException {
+	public void simpleSpeak() throws SynthesisException, InterruptedException, MemoryException, SaxonApiException {
 		TTSResource r = tts.allocateThreadResources();
 		Voice voice = getVoice();
 		Assert.assertTrue("At least one voice must be available", voice!=null);
-		int size = getSize(tts.synthesize(format("this is a test"), null, voice, r, null, null, BufferAllocator, true));
+		int size = getSize(
+			tts.synthesize(
+				parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">this is a test<s>"),
+				voice, r, null, null, BufferAllocator, true));
 		tts.releaseThreadResources(r);
 
 		Assert.assertTrue("audio output must be big enough", size > 2000);
 	}
 
+	private static final Processor proc = new Processor(false);
+
+	private static XdmNode parseSSML(String ssml) throws SaxonApiException {
+		return proc.newDocumentBuilder().build(new SAXSource(new InputSource(new StringReader(ssml))));
+	}
 }

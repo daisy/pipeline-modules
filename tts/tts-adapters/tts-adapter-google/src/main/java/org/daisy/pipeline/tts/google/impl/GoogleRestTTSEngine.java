@@ -6,23 +6,30 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.sound.sampled.AudioFormat;
 
+import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 
+import org.daisy.common.file.URLs;
 import org.daisy.pipeline.tts.AudioBuffer;
 import org.daisy.pipeline.tts.AudioBufferAllocator;
 import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
-import org.daisy.pipeline.tts.MarklessTTSEngine;
 import org.daisy.pipeline.tts.SoundUtil;
+import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
+import org.daisy.pipeline.tts.TTSService.Mark;
 import org.daisy.pipeline.tts.Voice;
 import org.daisy.pipeline.tts.rest.Request;
 import org.daisy.pipeline.tts.scheduler.ExponentialBackoffScheduler;
@@ -40,12 +47,14 @@ import org.json.JSONObject;
  *
  * @author Louis Caille @ braillenet.org
  */
-public class GoogleRestTTSEngine extends MarklessTTSEngine {
+public class GoogleRestTTSEngine extends TTSEngine {
 
-	private AudioFormat mAudioFormat;
-	private Scheduler<Schedulable> mRequestScheduler;
-	private int mPriority;
-	private GoogleRequestBuilder mRequestBuilder;
+	private final AudioFormat mAudioFormat;
+	private final Scheduler<Schedulable> mRequestScheduler;
+	private final int mPriority;
+	private final GoogleRequestBuilder mRequestBuilder;
+
+	private static final URL ssmlTransformer = URLs.getResourceFromJAR("/transform-ssml.xsl", GoogleRestTTSEngine.class);
 
 	public GoogleRestTTSEngine(GoogleTTSService googleService, String apiKey, AudioFormat audioFormat, int priority) {
 		super(googleService);
@@ -56,10 +65,22 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 	}
 
 	@Override
-	public Collection<AudioBuffer> synthesize(String sentence, XdmNode xmlSentence, Voice voice, TTSResource threadResources,
+	public Collection<AudioBuffer> synthesize(XdmNode ssml, Voice voice, TTSResource threadResources,
+	                                          List<Mark> marks, List<String> expectedMarks,
 	                                          AudioBufferAllocator bufferAllocator, boolean retry)
 			throws SynthesisException, InterruptedException, MemoryException {
 	
+		String sentence; {
+			Map<String,Object> xsltParams = new HashMap<>(); {
+				if (voice != null) xsltParams.put("voice", voice.name);
+			}
+			try {
+				sentence = transformSsmlNodeToString(ssml, ssmlTransformer, xsltParams);
+			} catch (IOException | SaxonApiException e) {
+				throw new SynthesisException(e);
+			}
+		}
+
 		if (sentence.length() > 5000) {
 			throw new SynthesisException("The number of characters in the sentence must not exceed 5000.");
 		}

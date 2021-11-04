@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -17,13 +16,10 @@ import javax.sound.sampled.AudioFormat;
 
 import net.sf.saxon.s9api.Axis;
 import net.sf.saxon.s9api.QName;
-import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmNodeKind;
 import net.sf.saxon.s9api.XdmSequenceIterator;
 
-import org.daisy.common.xslt.CompiledStylesheet;
-import org.daisy.common.xslt.ThreadUnsafeXslTransformer;
 import org.daisy.pipeline.tts.AudioBuffer;
 import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
 import org.daisy.pipeline.tts.AudioBufferTracker;
@@ -33,7 +29,6 @@ import org.daisy.pipeline.tts.SoundUtil;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSRegistry;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
-import org.daisy.pipeline.tts.TTSService;
 import org.daisy.pipeline.tts.TTSService.Mark;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.TTSTimeout;
@@ -43,6 +38,7 @@ import org.daisy.pipeline.tts.Voice.MarkSupport;
 import org.daisy.pipeline.tts.VoiceManager;
 import org.daisy.pipeline.tts.synthesize.calabash.impl.TimedTTSExecutor.TimeoutException;
 import org.daisy.pipeline.tts.synthesize.calabash.impl.TTSLog.ErrorCode;
+
 import org.slf4j.Logger;
 
 import com.google.common.collect.Iterables;
@@ -65,7 +61,6 @@ import com.google.common.collect.Iterables;
 public class TextToPcmThread implements FormatSpecifications {
 	private Logger mLogger;
 	private Map<TTSEngine, TTSResource> mResources = new HashMap<TTSEngine, TTSResource>();
-	private Map<TTSService, ThreadUnsafeXslTransformer> mTransforms = new HashMap<TTSService, ThreadUnsafeXslTransformer>();
 	private int mFileNrInSection; //usually = 0, but incremented when a flush occurs within a section
 	private List<SoundFileLink> mSoundFileLinks; //result provided back to the SynthesizeStep caller
 	private List<SoundFileLink> mLinksOfCurrentFile; //links under construction
@@ -78,8 +73,6 @@ public class TextToPcmThread implements FormatSpecifications {
 	private AudioFormat mLastFormat; //used for knowing if a flush is necessary
 	private AudioBufferTracker mAudioBufferTracker;
 	private SSMLMarkSplitter mSSMLSplitter;
-	private Map<String, Object> mTransformParams = new TreeMap<String, Object>();
-	private Map<TTSService, CompiledStylesheet> mSSMLTransformers;
 	private VoiceManager mVoiceManager;
 	private TTSLog mTTSLog;
 	private int mErrorCounter;
@@ -89,8 +82,7 @@ public class TextToPcmThread implements FormatSpecifications {
 	        TTSRegistry ttsregistry, VoiceManager voiceManager, SSMLMarkSplitter ssmlSplitter,
 	        final IProgressListener progressListener, Logger logger,
 	        AudioBufferTracker AudioBufferTracker, final int maxQueueEltSize,
-	        Map<TTSService, CompiledStylesheet> ssmlTransformers, TTSLog ttsLog) {
-		mSSMLTransformers = ssmlTransformers;
+	        TTSLog ttsLog) {
 		mSSMLSplitter = ssmlSplitter;
 		mSoundFileLinks = new ArrayList<SoundFileLink>();
 		mExecutor = executor;
@@ -228,38 +220,21 @@ public class TextToPcmThread implements FormatSpecifications {
 	}
 
 	/**
-	 * Wrapper around TTSService.synthesize() to transform the SSML into string
-	 */
-	private Collection<AudioBuffer> synthesizeSSML(
-			TTSTimeout timeout, TTSTimeout.ThreadFreeInterrupter interrupter, TTSLog.Entry logEntry,
-			XdmNode ssml, String sentenceId, int sentenceSize, TTSEngine tts, Voice voice,
-			TTSResource threadResources, List<Mark> marks, List<String> expectedMarks
-	) throws SaxonApiException, SynthesisException, TimeoutException, MemoryException {
-		String transformed = transformSSML(ssml, tts, voice);
-		if (transformed != null)
-			logEntry.addTTSinput(transformed);
-		logEntry.setActualVoice(voice);
-		return mExecutor.synthesizeWithTimeout(
-			timeout, interrupter, logEntry, transformed, ssml, sentenceSize, tts, voice,
-			threadResources, marks, expectedMarks, mAudioBufferTracker, false);
-	}
-
-	/**
-	 * Wrapper around synthesizeSSML() to handle marks
+	 * Wrapper around synthesizeWithTimeout() to handle marks
 	 */
 	private Iterable<AudioBuffer> synthesize(
 			TTSTimeout timeout, TTSTimeout.ThreadFreeInterrupter interrupter, TTSLog.Entry logEntry,
 			Sentence sentence, TTSEngine tts, Voice voice, TTSResource threadResources,
 			List<Mark> marks, List<String> expectedMarks
-	) throws SaxonApiException, SynthesisException, TimeoutException, MemoryException {
-		logEntry.resetTTSinput();
+	) throws SynthesisException, TimeoutException, MemoryException {
 		if (tts.endingMark() != null
 		        && voice.getMarkSupport() != MarkSupport.MARK_NOT_SUPPORTED){
 			//can handle mark
 			expectedMarks.set(expectedMarks.size()-1, tts.endingMark());
-			return synthesizeSSML(timeout, interrupter, logEntry, sentence.getText(),
-			                      sentence.getID(), sentence.getSize(), tts, voice,
-			                      threadResources, marks, expectedMarks);
+			logEntry.setActualVoice(voice);
+			return mExecutor.synthesizeWithTimeout(
+				timeout, interrupter, logEntry, sentence.getText(), sentence.getSize(), tts, voice,
+				threadResources, marks, expectedMarks, mAudioBufferTracker, false);
 		}
 		else {
 			Collection<Chunk> chunks = mSSMLSplitter.split(sentence.getText());
@@ -267,13 +242,13 @@ public class TextToPcmThread implements FormatSpecifications {
 			int offset = 0;
 			for (Chunk chunk : chunks) {
 				Collection<AudioBuffer> buffers = null;
+				logEntry.setActualVoice(voice);
 				try {
-					buffers = synthesizeSSML(timeout, interrupter, logEntry, chunk.ssml(),
-					                         sentence.getID(), Sentence.computeSize(chunk.ssml()),
-					                         tts, voice, threadResources, new ArrayList<Mark>(),
-					                         expectedMarks);
-				} catch (MemoryException | SaxonApiException | SynthesisException
-				        | TimeoutException e) {
+					buffers = mExecutor.synthesizeWithTimeout(
+						timeout, interrupter, logEntry, chunk.ssml(), Sentence.computeSize(chunk.ssml()),
+						tts, voice, threadResources, new ArrayList<Mark>(), expectedMarks,
+						mAudioBufferTracker, false);
+				} catch (MemoryException | SynthesisException | TimeoutException e) {
 					//TODO: flush the buffers here
 					SoundUtil.cancelFootPrint(result, mAudioBufferTracker);
 					throw e;
@@ -338,12 +313,6 @@ public class TextToPcmThread implements FormatSpecifications {
 				return null; //it will try with another TTS
 			}
 			mResources.put(tts, resource);
-
-			TTSService service = tts.getProvider();
-			if (!mTransforms.containsKey(service)) {
-				CompiledStylesheet transformer = mSSMLTransformers.get(service);
-				mTransforms.put(service, transformer != null ? transformer.newTransformer() : null);
-			}
 		}
 
 		//convert the input sentence into PCM using the TTS processor
@@ -392,13 +361,6 @@ public class TextToPcmThread implements FormatSpecifications {
 			return null;
 		} catch (MemoryException e) {
 			throw e;
-		} catch (SaxonApiException e) {
-			logEntry.addError(
-			        new TTSLog.Error(ErrorCode.WARNING,
-			                "error while transforming SSML with the XSLT of "
-			                        + TTSServiceUtil.displayName(tts.getProvider()) + " : "
-			                        + e));
-			return null;
 		}
 
 		//check validity of the result by using the ending mark
@@ -599,16 +561,5 @@ public class TextToPcmThread implements FormatSpecifications {
 
 	private static double convertBytesToSecond(AudioFormat format, int bytes) {
 		return (bytes / (format.getFrameRate() * format.getFrameSize()));
-	}
-
-	private String transformSSML(XdmNode ssml, TTSEngine engine, Voice v)
-	        throws SaxonApiException {
-		ThreadUnsafeXslTransformer transformer = mTransforms.get(engine.getProvider());
-		if (transformer == null)
-			return null;
-		mTransformParams.put("voice", v.name);
-		if (engine.endingMark() != null)
-			mTransformParams.put("ending-mark", engine.endingMark());
-		return transformer.transformToString(ssml, mTransformParams);
 	}
 }

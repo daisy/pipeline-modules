@@ -1,16 +1,22 @@
 package org.daisy.pipeline.tts.acapela.impl;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.sound.sampled.AudioFormat;
 
+import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 
+import org.daisy.common.file.URLs;
 import org.daisy.pipeline.tts.AudioBuffer;
 import org.daisy.pipeline.tts.AudioBufferAllocator;
 import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
@@ -42,11 +48,13 @@ public class AcapelaEngine extends TTSEngine {
 
 	//private Logger mLogger = LoggerFactory.getLogger(AcapelaEngine.class);
 
-	private AudioFormat mAudioFormat;
-	private LoadBalancer mLoadBalancer;
-	private int mMsPerWord;
-	private int mReserved;
-	private int mPriority;
+	private static final URL ssmlTransformer = URLs.getResourceFromJAR("/transform-ssml.xsl", AcapelaEngine.class);
+
+	private final AudioFormat mAudioFormat;
+	private final LoadBalancer mLoadBalancer;
+	private final int mMsPerWord;
+	private final int mReserved;
+	private final int mPriority;
 
 	public AcapelaEngine(AcapelaService provider, AudioFormat format,
 	        LoadBalancer loadBalancer, int speed, int reserved, int priority)
@@ -294,7 +302,7 @@ public class AcapelaEngine extends TTSEngine {
 	}
 
 	@Override
-	public Collection<AudioBuffer> synthesize(String ssml, XdmNode xmlSSML, Voice voice,
+	public Collection<AudioBuffer> synthesize(XdmNode ssml, Voice voice,
 	        TTSResource threadResources, List<Mark> marks, List<String> expectedMarks,
 	        AudioBufferAllocator bufferAllocator, boolean retry) throws SynthesisException,
 	        InterruptedException, MemoryException {
@@ -314,7 +322,15 @@ public class AcapelaEngine extends TTSEngine {
 		}
 		
 		//note: the Acapela's markup for SSML interpretation is active by default.
-		return speak(ssml, th, marks, bufferAllocator);
+		Map<String,Object> xsltParams = new HashMap<>(); {
+			xsltParams.put("voice", voice.name);
+			xsltParams.put("ending-mark", endingMark());
+		}
+		try {
+			return speak(transformSsmlNodeToString(ssml, ssmlTransformer, xsltParams), th, marks, bufferAllocator);
+		} catch (IOException | SaxonApiException e) {
+			throw new SynthesisException(e);
+		}
 	}
 
 	Collection<AudioBuffer> speak(String ssml, TTSResource tr, List<Mark> marks,

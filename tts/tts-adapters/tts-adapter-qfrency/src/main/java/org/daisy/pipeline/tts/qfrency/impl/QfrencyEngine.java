@@ -3,19 +3,25 @@ package org.daisy.pipeline.tts.qfrency.impl;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 
+import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 
+import org.daisy.common.file.URLs;
 import org.daisy.common.shell.CommandRunner;
 import org.daisy.pipeline.tts.AudioBuffer;
 import org.daisy.pipeline.tts.AudioBufferAllocator;
@@ -33,10 +39,12 @@ import org.slf4j.LoggerFactory;
 public class QfrencyEngine extends TTSEngine {
 
 	private AudioFormat mAudioFormat;
-	private String mHostAddress;
-	private String mQfrencyPath;
+	private final String mHostAddress;
+	private final String mQfrencyPath;
 	private final static int MIN_CHUNK_SIZE = 2048;
-	private int mPriority;
+	private final int mPriority;
+
+	private final static URL ssmlTransformer = URLs.getResourceFromJAR("/transform-ssml.xsl", QfrencyEngine.class);
 	private final static Logger mLogger = LoggerFactory.getLogger(QfrencyEngine.class);
 
 	public QfrencyEngine(QfrencyService qfrencyService, String qfrencyPath, String address, int priority) {
@@ -47,14 +55,24 @@ public class QfrencyEngine extends TTSEngine {
 	}
 
 	@Override
-	public Collection<AudioBuffer> synthesize(String sentence, XdmNode xmlSentence,
-											  Voice voice, TTSResource threadResources, List<Mark> marks, List<String> oldMarks,
-											  AudioBufferAllocator bufferAllocator, boolean retry) throws SynthesisException,
-																										  InterruptedException, MemoryException {
+	public Collection<AudioBuffer> synthesize(XdmNode ssml, Voice voice, TTSResource threadResources,
+	                                          List<Mark> marks, List<String> oldMarks,
+	                                          AudioBufferAllocator bufferAllocator, boolean retry)
+			throws SynthesisException, InterruptedException, MemoryException {
 
 		Collection<AudioBuffer> result = new ArrayList<AudioBuffer>();
 		File outFile = null;
 		String outPath = null;
+		String sentence; {
+			Map<String,Object> xsltParams = new HashMap<>(); {
+				xsltParams.put("voice", voice.name);
+			}
+			try {
+				sentence = transformSsmlNodeToString(ssml, ssmlTransformer, xsltParams);
+			} catch (IOException | SaxonApiException e) {
+				throw new SynthesisException(e);
+			}
+		}
 		sentence = stripSSML(sentence);
 		try {
 					outFile = File.createTempFile("dp2_qfrency_", ".wav");

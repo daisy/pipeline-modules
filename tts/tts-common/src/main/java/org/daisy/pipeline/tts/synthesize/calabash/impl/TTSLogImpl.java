@@ -56,16 +56,6 @@ public class TTSLogImpl implements TTSLog {
 		}
 
 		@Override
-		public void addTTSinput(String input) {
-			this.ttsinput.add(input);
-		}
-
-		@Override
-		public List<String> getTTSinput() {
-			return ttsinput;
-		}
-
-		@Override
 		public void setSoundfile(String soundfile) {
 			this.soundfile = soundfile;
 		}
@@ -92,11 +82,6 @@ public class TTSLogImpl implements TTSLog {
 		}
 
 		@Override
-		public void resetTTSinput() {
-			ttsinput.clear();
-		}
-
-		@Override
 		public void setTimeout(float secs) {
 			this.timeout = secs;
 		}
@@ -118,7 +103,6 @@ public class TTSLogImpl implements TTSLog {
 
 		private List<Error> errors = new ArrayList<Error>();
 		private XdmNode ssml; //SSML
-		private List<String> ttsinput = new ArrayList<String>();
 		private Voice selectedVoice;
 		private Voice actualVoice;
 		private String soundfile; //

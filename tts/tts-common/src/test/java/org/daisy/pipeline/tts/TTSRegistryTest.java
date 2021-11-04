@@ -21,12 +21,13 @@ import org.daisy.pipeline.tts.TTSService.Mark;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.VoiceInfo.Gender;
 import org.daisy.pipeline.tts.VoiceInfo.UnknownLanguage;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 public class TTSRegistryTest {
 
-	private static class SimplifiedService extends AbstractTTSService {
+	private static class SimplifiedService implements TTSService {
 
 		@Override
 		public TTSEngine newEngine(Map<String, String> params) throws SynthesisException,
@@ -40,7 +41,7 @@ public class TTSRegistryTest {
 		}
 	}
 
-	private static class SimplifiedProcessor extends SimpleTTSEngine {
+	private static class SimplifiedProcessor extends TTSEngine {
 
 		private Collection<Voice> mVoices;
 
@@ -61,8 +62,8 @@ public class TTSRegistryTest {
 		}
 
 		@Override
-		public Collection<AudioBuffer> synthesize(String sentence,
-		        Voice voice, TTSResource threadResources, List<Mark> marks,
+		public Collection<AudioBuffer> synthesize(XdmNode sentence, Voice voice,
+		        TTSResource threadResources, List<Mark> marks, List<String> expectedMarks,
 		        AudioBufferAllocator bufferAllocator, boolean retry)
 		        throws SynthesisException, InterruptedException, MemoryException {
 			return null;

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -17,11 +18,9 @@ import org.daisy.common.file.URLs;
 import org.daisy.pipeline.tts.AudioBuffer;
 import org.daisy.pipeline.tts.AudioBufferAllocator;
 import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
-import org.daisy.pipeline.tts.MarklessTTSEngine;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService;
-import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.Voice;
 
 import org.ops4j.pax.exam.util.PathUtils;
@@ -46,20 +45,22 @@ public class MockTTS implements TTSService {
 	
 	@Override
 	public TTSEngine newEngine(Map<String,String> params) throws Throwable {
-		return new MarklessTTSEngine(MockTTS.this) {
+		return new TTSEngine(MockTTS.this) {
 			
 			AudioFormat audioFormat;
 			
 			@Override
-			public Collection<AudioBuffer> synthesize(String sentence, XdmNode xmlSentence,
-			                                          Voice voice, TTSResource threadResources,
+			public Collection<AudioBuffer> synthesize(XdmNode ssml, Voice voice,
+			                                          TTSResource threadResources, List<Mark> marks,
+			                                          List<String> expectedMarks,
 			                                          AudioBufferAllocator bufferAllocator, boolean retry)
 					throws SynthesisException, InterruptedException, MemoryException {
 				if (!"mock-en".equals(voice.name)) {
 					throw new SynthesisException("Voice " + voice.name + " not supported");
 				}
-				File waveOut = sentence.length() < 50 ? MockTTS.shortWaveOut : MockTTS.longWaveOut;
 				try {
+					String sentence = transformSsmlNodeToString(ssml, ssmlTransformer, new TreeMap<String,Object>());
+					File waveOut = sentence.length() < 50 ? MockTTS.shortWaveOut : MockTTS.longWaveOut;
 					Collection<AudioBuffer> result = new ArrayList<AudioBuffer>();
 					BufferedInputStream in = new BufferedInputStream(new FileInputStream(waveOut));
 					AudioInputStream fi = AudioSystem.getAudioInputStream(in);
@@ -98,11 +99,6 @@ public class MockTTS implements TTSService {
 				return 2;
 			}
 		};
-	}
-	
-	@Override
-	public URL getSSMLxslTransformerURL() {
-		return ssmlTransformer;
 	}
 	
 	@Override

@@ -66,7 +66,7 @@ class TimedTTSExecutor {
 
 	public Collection<AudioBuffer> synthesizeWithTimeout(
 		TTSTimeout timeout, TTSTimeout.ThreadFreeInterrupter interrupter, TTSLog.Entry log,
-		String sentence, XdmNode xmlSentence, int sentenceSize, TTSEngine engine, Voice voice,
+		XdmNode sentence, int sentenceSize, TTSEngine engine, Voice voice,
 		TTSResource threadResources, List<Mark> marks, List<String> expectedMarks,
 		AudioBufferAllocator bufferAllocator, boolean retry
 	) throws SynthesisException, MemoryException, TimeoutException {
@@ -77,7 +77,7 @@ class TimedTTSExecutor {
 		try {
 			timeout.enableForCurrentThread(interrupter, timeoutSec);
 			Collection<AudioBuffer> result = engine.synthesize(
-				sentence, xmlSentence, voice, threadResources, marks, expectedMarks, bufferAllocator, retry);
+				sentence, voice, threadResources, marks, expectedMarks, bufferAllocator, retry);
 			Long millisecElapsed = System.currentTimeMillis() - startTime;
 			if (log != null)
 				log.setTimeElapsed((float)millisecElapsed / 1000);
