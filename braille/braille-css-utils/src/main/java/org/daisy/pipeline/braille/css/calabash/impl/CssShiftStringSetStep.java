@@ -1,6 +1,7 @@
 package org.daisy.pipeline.braille.css.calabash.impl;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Stack;
@@ -43,7 +44,6 @@ import org.daisy.common.xproc.calabash.XMLCalabashInputValue;
 import org.daisy.common.xproc.calabash.XMLCalabashOutputValue;
 import org.daisy.common.xproc.calabash.XProcStep;
 import org.daisy.common.xproc.calabash.XProcStepProvider;
-import org.daisy.pipeline.braille.common.util.Strings;
 import org.daisy.pipeline.braille.css.impl.BrailleCssSerializer;
 
 import org.osgi.service.component.annotations.Component;
@@ -265,7 +265,12 @@ public class CssShiftStringSetStep extends DefaultStep implements XProcStep {
 	private static String serializeStringSet(List<TermPair<String,TermList>> stringSet) {
 		if (stringSet.isEmpty())
 			return null;
-		return Strings.join(stringSet, ", ", BrailleCssSerializer::toString);
+		StringBuilder s = new StringBuilder();
+		Iterator<TermPair<String,TermList>> it = stringSet.iterator();
+		while (it.hasNext()) {
+			s.append(BrailleCssSerializer.toString(it.next()));
+			if (it.hasNext()) s.append(", "); }
+		return s.toString();
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(CssShiftStringSetStep.class);

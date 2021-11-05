@@ -31,6 +31,10 @@
       <artifactId>css-utils</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.daisy.pipeline.modules.braille</groupId>
+      <artifactId>braille-css-utils</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.daisy.dotify</groupId>
       <artifactId>dotify.library</artifactId>
     </dependency>
@@ -79,7 +83,8 @@
       org.daisy.pipeline.datatypes.impl.Datatype_transform_query,
       org.daisy.pipeline.braille.common.saxon.impl.TextTransformDefinition,
       org.daisy.pipeline.braille.common.calabash.impl.PxParseQueryStep$StepProvider,
-      org.daisy.pipeline.braille.common.calabash.impl.PxTransformStep$StepProvider
+      org.daisy.pipeline.braille.common.calabash.impl.PxTransformStep$StepProvider,
+      org.daisy.pipeline.braille.common.impl.CSSBlockTransform$Provider
     </expose-services>
   </properties>
   

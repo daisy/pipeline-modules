@@ -1,4 +1,4 @@
-package org.daisy.pipeline.braille.css;
+package org.daisy.pipeline.braille.common;
 
 import java.util.HashMap;
 import java.util.Map;

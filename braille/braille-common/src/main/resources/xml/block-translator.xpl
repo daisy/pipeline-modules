@@ -8,7 +8,7 @@
 	<p:option name="text-transform" select="''"/>
 	<p:option name="braille-charset" select="''"/>
 	
-	<p:import href="../library.xpl"/>
+	<p:import href="http://www.daisy.org/pipeline/modules/braille/css-utils/library.xpl"/>
 	
 	<css:parse-properties px:message="Parsing CSS properties" px:message-severity="DEBUG" px:progress=".05"
 	                      properties="display"/>

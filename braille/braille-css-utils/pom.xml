@@ -27,10 +27,6 @@
       <artifactId>css-utils</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.daisy.pipeline.modules.braille</groupId>
-      <artifactId>braille-common</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
@@ -75,8 +71,7 @@
       org.daisy.pipeline.braille.css.calabash.impl.CssShiftIdStep$Provider,
       org.daisy.pipeline.braille.css.calabash.impl.CssShiftStringSetStep$Provider,
       org.daisy.pipeline.braille.css.saxon.impl.ParseStylesheetDefinition,
-      org.daisy.pipeline.braille.css.saxon.impl.RenderTableByDefinition,
-      org.daisy.pipeline.braille.css.impl.CSSBlockTransform$Provider
+      org.daisy.pipeline.braille.css.saxon.impl.RenderTableByDefinition
     </expose-services>
   </properties>
 

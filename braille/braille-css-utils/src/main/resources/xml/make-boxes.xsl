@@ -8,7 +8,6 @@
                 version="2.0">
     
     <xsl:include href="library.xsl"/>
-    <xsl:include href="http://www.daisy.org/pipeline/modules/braille/common-utils/library.xsl"/>
     
     <xsl:template match="css:_|css:box">
         <xsl:copy>
@@ -156,19 +155,21 @@
     
     <xsl:template match="*[not(descendant::*[@css:table-cell])]/@css:display" mode="display-table">
         <xsl:if test="not(.='none')">
-            <xsl:call-template name="pf:warn">
-                <xsl:with-param name="msg">"display" property on "{}" element within table must be "none".</xsl:with-param>
-                <xsl:with-param name="args" select="name(parent::*)"/>
-            </xsl:call-template>
+            <xsl:message>
+                <xsl:text>"display" property on "</xsl:text>
+                <xsl:value-of select="name(parent::*)"/>
+                <xsl:text>" element within table must be "none".</xsl:text>
+            </xsl:message>
         </xsl:if>
     </xsl:template>
     
     <xsl:template match="@css:display" mode="display-table">
         <xsl:if test="not(.='inline')">
-            <xsl:call-template name="pf:warn">
-                <xsl:with-param name="msg">"display" property on "{}" element ignored.</xsl:with-param>
-                <xsl:with-param name="args" select="name(parent::*)"/>
-            </xsl:call-template>
+            <xsl:message>
+                <xsl:text>"display" property on "</xsl:text>
+                <xsl:value-of select="name(parent::*)"/>
+                <xsl:text>" element ignored.</xsl:text>
+            </xsl:message>
         </xsl:if>
     </xsl:template>
     

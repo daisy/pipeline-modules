@@ -1233,13 +1233,23 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 
 		public void write(XMLStreamWriter writer) throws XMLStreamException {
 			writer.writeStartElement(ns, type == CellType.TD ? "td" : "th");
-			if (axis != null)
-				writeAttribute(writer, _AXIS, Strings.join(axis, ","));
+			if (axis != null) {
+				StringBuilder s = new StringBuilder();
+				Iterator<String> it = axis.iterator();
+				while (it.hasNext()) {
+					s.append(it.next());
+					if (it.hasNext()) s.append(","); }
+				writeAttribute(writer, _AXIS, s.toString()); }
 			if (id != null && !written.get()) {
 				writeAttribute(writer, _ID, id);
 				written.set(true); }
-			if (headers != null)
-				writeAttribute(writer, _HEADERS, Strings.join(headers, " "));
+			if (headers != null) {
+				StringBuilder s = new StringBuilder();
+				Iterator<String> it = headers.iterator();
+				while (it.hasNext()) {
+					s.append(it.next());
+					if (it.hasNext()) s.append(" "); }
+				writeAttribute(writer, _HEADERS, s.toString()); }
 			if (style != null) {
 				String styleAttr = BrailleCssSerializer.toString(style);
 				if (styleAttr != null && !"".equals(styleAttr))

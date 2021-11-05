@@ -1,4 +1,4 @@
-package org.daisy.pipeline.braille.css.impl;
+package org.daisy.pipeline.braille.common.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,17 +35,17 @@ import org.daisy.pipeline.braille.common.calabash.CxEvalBasedTransformer;
 import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Iterables.transform;
 import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.logCreate;
 import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.logSelect;
+import org.daisy.pipeline.braille.common.CompoundBrailleTranslator;
 import org.daisy.pipeline.braille.common.Query;
 import org.daisy.pipeline.braille.common.Query.Feature;
 import org.daisy.pipeline.braille.common.Query.MutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
+import org.daisy.pipeline.braille.common.TextTransformParser;
 import org.daisy.pipeline.braille.common.TransformProvider;
 import static org.daisy.pipeline.braille.common.TransformProvider.util.dispatch;
 import static org.daisy.pipeline.braille.common.TransformProvider.util.memoize;
 import org.daisy.pipeline.braille.common.util.Function0;
 import org.daisy.pipeline.braille.common.util.Functions;
-import org.daisy.pipeline.braille.css.CompoundTranslator;
-import org.daisy.pipeline.braille.css.TextTransformParser;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -61,12 +61,12 @@ import org.w3c.dom.Node;
 
 /**
  * @see <a href="../../../../../../../README.md">Documentation</a>
- * @see <a href="../../../../../../../resources/xml/transform/block-translator.xpl">XProc code</a>
+ * @see <a href="../../../../../../../resources/xml/block-translator.xpl">XProc code</a>
  */
 public interface CSSBlockTransform {
 	
 	@Component(
-		name = "org.daisy.pipeline.braille.css.impl.CSSBlockTransform.Provider",
+		name = "org.daisy.pipeline.braille.common.impl.CSSBlockTransform.Provider",
 		service = {
 			BrailleTranslatorProvider.class,
 			TransformProvider.class
@@ -78,7 +78,7 @@ public interface CSSBlockTransform {
 		
 		@Activate
 		protected void activate(final Map<?,?> properties) {
-			href = URLs.asURI(URLs.getResourceFromJAR("xml/transform/block-translator.xpl", CSSBlockTransform.class));
+			href = URLs.asURI(URLs.getResourceFromJAR("xml/block-translator.xpl", CSSBlockTransform.class));
 		}
 		
 		private final static Iterable<BrailleTranslator> empty = Iterables.<BrailleTranslator>empty();
@@ -117,7 +117,7 @@ public interface CSSBlockTransform {
 			
 		@Override
 		public ToStringHelper toStringHelper() {
-			return MoreObjects.toStringHelper("o.d.p.b.css.impl.CSSBlockTransform$Provider");
+			return MoreObjects.toStringHelper("o.d.p.b.common.impl.CSSBlockTransform$Provider");
 		}
 		
 		private class TransformImpl extends AbstractBrailleTranslator implements XProcStepProvider {
@@ -163,7 +163,7 @@ public interface CSSBlockTransform {
 										Query defaultQuery = subTranslators.remove("auto");
 										if (!forceMainTranslator && defaultQuery != null && !defaultQuery.equals(mainQuery))
 											defaultTranslator = translatorProvider.get(defaultQuery).iterator().next();
-										compoundTranslator = new CompoundTranslator(
+										compoundTranslator = new CompoundBrailleTranslator(
 											defaultTranslator,
 											Maps.transformValues(
 												subTranslators,
@@ -201,7 +201,7 @@ public interface CSSBlockTransform {
 			
 			@Override
 			public ToStringHelper toStringHelper() {
-				return MoreObjects.toStringHelper("o.d.p.b.css.impl.CSSBlockTransform$Provider$TransformImpl")
+				return MoreObjects.toStringHelper("o.d.p.b.common.impl.CSSBlockTransform$Provider$TransformImpl")
 					.add("translator", mainTranslator);
 			}
 		}

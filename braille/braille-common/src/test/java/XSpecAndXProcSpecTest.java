@@ -13,6 +13,7 @@ public class XSpecAndXProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 			"org.daisy.pipeline:calabash-adapter:?",
 			pipelineModule("common-utils"),
 			pipelineModule("css-utils"),
+			brailleModule("braille-css-utils"),
 			// FIXME: make this dotify.library dependency optional
 			"org.liblouis:liblouis-java:4.3.1",
 			// because the exclusion of com.fasterxml.woodstox:woodstox-core from the dotify.library

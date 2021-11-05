@@ -2,6 +2,7 @@ package org.daisy.pipeline.braille.css.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -37,8 +38,6 @@ import org.daisy.braille.css.InlineStyle.RuleMainBlock;
 import org.daisy.braille.css.InlineStyle.RuleRelativeBlock;
 import org.daisy.braille.css.PropertyValue;
 import org.daisy.braille.css.SimpleInlineStyle;
-
-import org.daisy.pipeline.braille.common.util.Strings;
 
 public final class BrailleCssSerializer {
 
@@ -134,7 +133,13 @@ public final class BrailleCssSerializer {
 		for (String p : style.getPropertyNames())
 			declarations.add(p + ": " + serializePropertyValue(style.get(p)));
 		Collections.sort(declarations);
-		return Strings.join(declarations, "; ");
+		StringBuilder s = new StringBuilder();
+		Iterator<String> it = declarations.iterator();
+		while (it.hasNext()) {
+			s.append(it.next());
+			if (it.hasNext()) s.append("; ");
+		}
+		return s.toString();
 	}
 
 	public static String serializePropertyValue(PropertyValue propValue) {
@@ -209,13 +214,26 @@ public final class BrailleCssSerializer {
 		List<Declaration> sortedDeclarations = new ArrayList<Declaration>();
 		for (Declaration d : declarations) sortedDeclarations.add(d);
 		Collections.sort(sortedDeclarations);
-		return Strings.join(sortedDeclarations, "; ", d -> d.getProperty() + ": " + serializeTermList((List<Term<?>>)d));
+		StringBuilder s = new StringBuilder();
+		Iterator<Declaration> it = sortedDeclarations.iterator();
+		while (it.hasNext()) {
+			Declaration d = it.next();
+			s.append(d.getProperty() + ": " + serializeTermList((List<Term<?>>)d));
+			if (it.hasNext()) s.append("; ");
+		}
+		return s.toString();
 	}
 
 	private static String serializeDeclarationList2(List<Declaration> declarations) {
 		List<Declaration> sortedDeclarations = new ArrayList<Declaration>(declarations);
 		Collections.sort(sortedDeclarations);
-		return Strings.join(sortedDeclarations, " ", BrailleCssSerializer::toString);
+		StringBuilder s = new StringBuilder();
+		Iterator<Declaration> it = sortedDeclarations.iterator();
+		while (it.hasNext()) {
+			s.append(BrailleCssSerializer.toString(it.next()));
+			if (it.hasNext()) s.append(" ");
+		}
+		return s.toString();
 	}
 
 	/* =================================================== */

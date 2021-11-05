@@ -1,4 +1,4 @@
-package org.daisy.pipeline.braille.css;
+package org.daisy.pipeline.braille.common;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,9 +13,6 @@ import org.daisy.braille.css.SimpleInlineStyle;
 import org.daisy.braille.css.BrailleCSSProperty.Hyphens;
 import org.daisy.braille.css.BrailleCSSProperty.TextTransform;
 import org.daisy.dotify.api.translator.UnsupportedMetricException;
-import org.daisy.pipeline.braille.common.AbstractBrailleTranslator;
-import org.daisy.pipeline.braille.common.BrailleTranslator;
-import org.daisy.pipeline.braille.common.CSSStyledText;
 
 import com.google.common.collect.Iterables;
 
@@ -27,13 +24,13 @@ import cz.vutbr.web.css.TermList;
 /*
  * Translator that dispatches to sub-translator based on text-transform values.
  */
-public class CompoundTranslator extends AbstractBrailleTranslator {
+public class CompoundBrailleTranslator extends AbstractBrailleTranslator {
 
 	private final Map<String,BrailleTranslator> translators;
 	private final boolean implementsFromStyledTextToBraille;
 	private final boolean implementsLineBreakingFromStyledText;
 
-	public CompoundTranslator(BrailleTranslator mainTranslator, Map<String,Supplier<BrailleTranslator>> subTranslators) {
+	public CompoundBrailleTranslator(BrailleTranslator mainTranslator, Map<String,Supplier<BrailleTranslator>> subTranslators) {
 		if (subTranslators.containsKey("auto") || mainTranslator == null)
 			throw new IllegalArgumentException();
 		translators = new HashMap<>();

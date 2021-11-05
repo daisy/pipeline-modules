@@ -49,15 +49,15 @@ import org.daisy.dotify.api.writer.PagedMediaWriterConfigurationException;
 
 import org.daisy.pipeline.braille.common.BrailleTranslator;
 import org.daisy.pipeline.braille.common.BrailleTranslatorProvider;
+import org.daisy.pipeline.braille.common.CompoundBrailleTranslator;
 import static org.daisy.pipeline.braille.common.Provider.util.dispatch;
 import static org.daisy.pipeline.braille.common.Provider.util.memoize;
 import org.daisy.pipeline.braille.common.Query;
 import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.query;
+import org.daisy.pipeline.braille.common.TextTransformParser;
 import org.daisy.pipeline.braille.common.util.Function0;
 import org.daisy.pipeline.braille.common.util.Functions;
-import org.daisy.pipeline.braille.css.CompoundTranslator;
-import org.daisy.pipeline.braille.css.TextTransformParser;
 import org.daisy.pipeline.braille.pef.TableProvider;
 
 import org.osgi.framework.FrameworkUtil;
@@ -222,7 +222,7 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 								= Maps.transformValues(
 									subQueries,
 									q -> () -> brailleTranslatorProvider.get(q).iterator().next());
-							BrailleTranslator compoundTranslator = new CompoundTranslator(defaultTranslator, subTranslators);
+							BrailleTranslator compoundTranslator = new CompoundBrailleTranslator(defaultTranslator, subTranslators);
 							evictTempTranslator = temporaryBrailleTranslatorProvider.provideTemporarily(compoundTranslator);
 							mode = mutableQuery().add("id", compoundTranslator.getIdentifier()).toString();
 							locale = "und";
