@@ -309,6 +309,20 @@ public class LiblouisCoreTest extends AbstractTest {
 	}
 	
 	@Test
+	public void testHyphenateCharacter() {
+		LineBreakingFromStyledText translator = provider.withContext(messageBus)
+		                                                .get(query("(table:'foobar.ctb')(charset:'foobar.dis')")).iterator().next()
+		                                                .lineBreakingFromStyledText();
+		assertEquals(
+			"abc-\n" +
+			"def \n" +
+			"abc'\n" +
+			"def",
+			fillLines(translator.transform(styledText("abc\u00ADdef ", "",
+			                                          "abc\u00ADdef", "hyphenate-character: '⠈'")), 4));
+	}
+	
+	@Test
 	public void testTranslateAndHyphenateNonStandard() {
 		LineBreakingFromStyledText translator = provider.withContext(messageBus)
 		                                                .get(query("(table:'foobar.ctb')(hyphenator:mock)(charset:'foobar.dis')")).iterator().next()

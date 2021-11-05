@@ -7,17 +7,20 @@ import java.util.regex.Pattern;
 
 import cz.vutbr.web.css.CSSProperty;
 import cz.vutbr.web.css.TermInteger;
+import cz.vutbr.web.css.TermString;
 
 import org.daisy.dotify.api.table.BrailleConverter;
 
 import org.daisy.braille.css.SimpleInlineStyle;
 import org.daisy.braille.css.BrailleCSSProperty.BrailleCharset;
+import org.daisy.braille.css.BrailleCSSProperty.HyphenateCharacter;
 import org.daisy.braille.css.BrailleCSSProperty.Hyphens;
 import org.daisy.braille.css.BrailleCSSProperty.WhiteSpace;
 import org.daisy.braille.css.BrailleCSSProperty.WordSpacing;
 import org.daisy.pipeline.braille.common.AbstractBrailleTranslator;
 import org.daisy.pipeline.braille.common.AbstractBrailleTranslator.util.DefaultLineBreaker;
 import org.daisy.pipeline.braille.common.CSSStyledText;
+import static org.daisy.pipeline.braille.common.util.Strings.join;
 import static org.daisy.pipeline.braille.common.util.Strings.splitInclDelimiter;
 
 import org.slf4j.Logger;
@@ -26,7 +29,7 @@ import org.slf4j.LoggerFactory;
 /**
  * {@link org.daisy.pipeline.braille.common.BrailleTranslator} that assumes input text exists of
  * only braille and white space characters. Supports CSS properties "word-spacing", "hyphens",
- * "white-space" and "braille-charset".
+ * "hyphenate-character", "white-space", and "braille-charset".
  */
 public  class UnityBrailleTranslator extends AbstractBrailleTranslator implements BrailleTranslator {
 
@@ -116,6 +119,10 @@ public  class UnityBrailleTranslator extends AbstractBrailleTranslator implement
 			lineBreakingFromStyledText = new LineBreakingFromStyledText() {
 					public LineIterator transform(java.lang.Iterable<CSSStyledText> input, int from, int to) {
 						List<String> braille = new ArrayList<>();
+						Character blankChar = brailleCharset == null
+							? '\u2800'
+							: brailleCharset.toText("\u2800").toCharArray()[0];
+						List<Character> hyphenChars = new ArrayList<>();
 						int wordSpacing; {
 							wordSpacing = -1;
 							int i = 0;
@@ -125,6 +132,7 @@ public  class UnityBrailleTranslator extends AbstractBrailleTranslator implement
 									SimpleInlineStyle style = styledText.getStyle();
 									int spacing = 1;
 									boolean unicodeBraille = brailleCharset == null || !useBrailleCharsetForInput;
+									char hyphenChar = '\u2824'; // dots 36
 									if (style != null) {
 										CSSProperty val = style.getProperty("word-spacing");
 										if (val != null) {
@@ -138,6 +146,16 @@ public  class UnityBrailleTranslator extends AbstractBrailleTranslator implement
 										if (style.getProperty("hyphens") == Hyphens.NONE) {
 											text = text.replaceAll("[\u00AD\u200B]","");
 											style.removeProperty("hyphens"); }
+										val = style.getProperty("hyphenate-character");
+										if (val != null) {
+											if (val == HyphenateCharacter.braille_string) {
+												String s = style.getValue(TermString.class, "hyphenate-character").getValue();
+												if (s.length() == 1)
+													hyphenChar = s.charAt(0);
+												else
+													logger.warn("The 'hyphenate-character' property must be a single character, "
+													            + "but got {}", s); }
+											style.removeProperty("hyphenate-character"); }
 										val = style.getProperty("white-space");
 										if (val != null) {
 											if (val == WhiteSpace.PRE_WRAP)
@@ -179,6 +197,7 @@ public  class UnityBrailleTranslator extends AbstractBrailleTranslator implement
 										braille.add(b.toString());
 									} else
 										braille.add(text);
+									hyphenChars.add(hyphenChar);
 								} else {
 									// not converting to braille character set because not part of final output and we're not even
 									// sure that it is braille
@@ -189,23 +208,50 @@ public  class UnityBrailleTranslator extends AbstractBrailleTranslator implement
 							}
 							if (wordSpacing < 0) wordSpacing = 1;
 						}
-						StringBuilder brailleString = new StringBuilder();
-						int fromChar = 0;
-						int toChar = to >= 0 ? 0 : -1;
+						List<BrailleTranslator.LineIterator> lineIterators = new ArrayList<>();
+						String joinedBraille = join(braille);
+						Character hyphenChar = null;
+						Integer fromChar = null;
+						int toChar = 0;
+						int i = 0;
 						for (String s : braille) {
-							brailleString.append(s);
-							if (--from == 0)
-								fromChar = brailleString.length();
-							if (--to == 0)
-								toChar = brailleString.length();
+							if (to-- == 0)
+								break;
+							if (from-- == 0)
+								fromChar = toChar;
+							if (from < 0) {
+								Character nextHyphenChar = hyphenChars.get(i++);
+								if (hyphenChar != nextHyphenChar) {
+									if (toChar > fromChar) {
+										lineIterators.add(
+											new DefaultLineBreaker.LineIterator(
+												joinedBraille,
+												fromChar,
+												toChar,
+												blankChar,
+												brailleCharset == null
+													? hyphenChar
+													: brailleCharset.toText("" + hyphenChar).toCharArray()[0],
+												wordSpacing));
+										fromChar = toChar;
+									}
+									hyphenChar = nextHyphenChar;
+								}
+							}
+							toChar += s.length();
 						}
-						return new DefaultLineBreaker.LineIterator(
-							brailleString.toString(),
-							fromChar,
-							toChar,
-							brailleCharset == null ? '\u2800' : brailleCharset.toText("\u2800").toCharArray()[0],
-							brailleCharset == null ? '\u2824' : brailleCharset.toText("\u2824").toCharArray()[0],
-							wordSpacing);
+						if (fromChar != null && toChar > fromChar)
+							lineIterators.add(
+								new DefaultLineBreaker.LineIterator(
+									joinedBraille,
+									fromChar,
+									toChar,
+									blankChar,
+									brailleCharset == null
+										? hyphenChar
+										: brailleCharset.toText("" + hyphenChar).toCharArray()[0],
+									wordSpacing));
+						return CompoundBrailleTranslator.concatLineIterators(lineIterators);
 					}
 				};
 		return lineBreakingFromStyledText;

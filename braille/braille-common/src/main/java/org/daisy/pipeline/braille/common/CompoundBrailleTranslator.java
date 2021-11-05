@@ -224,7 +224,7 @@ public class CompoundBrailleTranslator extends AbstractBrailleTranslator {
 		return lineBreakingFromStyledText;
 	}
 
-	private static BrailleTranslator.LineIterator concatLineIterators(List<BrailleTranslator.LineIterator> iterators) {
+	static BrailleTranslator.LineIterator concatLineIterators(List<BrailleTranslator.LineIterator> iterators) {
 		if (iterators.size() == 0)
 			return new BrailleTranslator.LineIterator() {
 				public String nextTranslatedRow(int limit, boolean force, boolean wholeWordsOnly) {

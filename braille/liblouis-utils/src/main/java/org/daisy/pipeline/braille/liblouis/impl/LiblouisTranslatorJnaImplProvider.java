@@ -515,7 +515,10 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 			                      FullHyphenator fullHyphenator,
 			                      FromStyledTextToBraille fullTranslator) {
 				// Note that `displayTable.encode('\u2800')` is always a space because of the addition of spaces.dis
-				super(displayTable.encode('\u2800'), displayTable.encode('\u2824'), logger);
+				super(displayTable.encode('\u2800'),
+				      displayTable.encode('\u2824'),
+				      new LiblouisDisplayTableBrailleConverter(displayTable),
+				      logger);
 				this.liblouisTranslator = liblouisTranslator;
 				this.displayTable = displayTable;
 				this.supportedTypeforms = supportedTypeforms;

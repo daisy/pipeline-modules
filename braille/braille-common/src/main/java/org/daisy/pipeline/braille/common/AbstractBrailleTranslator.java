@@ -16,9 +16,12 @@ import com.google.common.collect.PeekingIterator;
 
 import cz.vutbr.web.css.CSSProperty;
 import cz.vutbr.web.css.TermInteger;
+import cz.vutbr.web.css.TermString;
 
+import org.daisy.dotify.api.table.BrailleConverter;
 import static org.daisy.pipeline.braille.common.util.Strings.extractHyphens;
 import static org.daisy.pipeline.braille.common.util.Tuple2;
+import org.daisy.braille.css.BrailleCSSProperty.HyphenateCharacter;
 import org.daisy.braille.css.BrailleCSSProperty.Hyphens;
 import org.daisy.braille.css.BrailleCSSProperty.WhiteSpace;
 import org.daisy.braille.css.BrailleCSSProperty.WordSpacing;
@@ -119,8 +122,8 @@ public abstract class AbstractBrailleTranslator extends AbstractTransform implem
 			
 			private final char blankChar;
 			
-			// FIXME: determine hyphenChar from CSS (hyphenate-character property)
-			private final char hyphenChar;
+			private final char defaultHyphenChar;
+			private final BrailleConverter brailleCharset;
 			private final Logger logger;
 			
 			public DefaultLineBreaker() {
@@ -131,9 +134,22 @@ public abstract class AbstractBrailleTranslator extends AbstractTransform implem
 				this('\u2800', '\u2824', logger);
 			}
 			
-			public DefaultLineBreaker(char blankChar, char hyphenChar, Logger logger) {
+			public DefaultLineBreaker(char blankChar, char defaultHyphenChar, Logger logger) {
+				this(blankChar, defaultHyphenChar, null, logger);
+			}
+
+			/**
+			 * @param blankChar         character to use as blank pattern. Must already be encoded in the correct
+			 *                          braille charset.
+			 * @param defaultHyphenChar hyphen character to use in case of "hyphenate-character: auto". Must
+			 *                          already be encoded in the correct braille charset.
+			 * @param brailleCharset    for encoding hyphen character when specified through "hyphenate-character"
+			 *                          property.
+			 */
+			public DefaultLineBreaker(char blankChar, char defaultHyphenChar, BrailleConverter brailleCharset, Logger logger) {
 				this.blankChar = blankChar;
-				this.hyphenChar = hyphenChar;
+				this.defaultHyphenChar = defaultHyphenChar;
+				this.brailleCharset = brailleCharset;
 				this.logger = logger;
 			}
 			
@@ -182,16 +198,29 @@ public abstract class AbstractBrailleTranslator extends AbstractTransform implem
 				public boolean hasPrecedingSpace();
 			}
 			
-			public LineIterator transform(final Iterable<CSSStyledText> text, int from, int to) throws TransformationException {
-				
-				// FIXME: determine wordSpacing of individual segments
+			public BrailleTranslator.LineIterator transform(final Iterable<CSSStyledText> text, int from, int to)
+					throws TransformationException {
+				List<Character> hyphenChars = new ArrayList<>();
 				int wordSpacing; {
 					wordSpacing = -1;
 					for (CSSStyledText st : text) {
 						SimpleInlineStyle style = st.getStyle();
+						char hyphenChar = defaultHyphenChar;
 						int spacing = 1;
 						if (style != null) {
-							CSSProperty val = style.getProperty("word-spacing");
+							CSSProperty val = style.getProperty("hyphenate-character");
+							if (val != null) {
+								if (val == HyphenateCharacter.braille_string) {
+									String s = style.getValue(TermString.class, "hyphenate-character").getValue();
+									if (s.length() == 1) {
+										hyphenChar = s.charAt(0);
+										if (brailleCharset != null)
+											hyphenChar = brailleCharset.toText("" + hyphenChar).toCharArray()[0];
+									} else
+										logger.warn("The 'hyphenate-character' property must be a single character, "
+										            + "but got {}", s); }
+								style.removeProperty("hyphenate-character"); }
+							val = style.getProperty("word-spacing");
 							if (val != null) {
 								if (val == WordSpacing.length) {
 									spacing = style.getValue(TermInteger.class, "word-spacing").getIntValue();
@@ -199,16 +228,34 @@ public abstract class AbstractBrailleTranslator extends AbstractTransform implem
 										if (logger != null)
 											logger.warn("word-spacing: {} not supported, must be non-negative", val);
 										spacing = 1; }}
-									
+								
 								// FIXME: assuming style is mutable and text.iterator() does not create copies
 								style.removeProperty("word-spacing"); }}
+						hyphenChars.add(hyphenChar);
 						if (wordSpacing < 0)
 							wordSpacing = spacing;
 						else if (wordSpacing != spacing)
 							throw new TransformationException("word-spacing must be constant, but both "
 							                                  + wordSpacing + " and " + spacing + " specified"); }
-					if (wordSpacing < 0) wordSpacing = 1; }
-				return new LineIterator(translateAndHyphenate(text, from, to), blankChar, hyphenChar, wordSpacing);
+					if (wordSpacing < 0) wordSpacing = 1;
+				}
+				List<BrailleTranslator.LineIterator> lineIterators = new ArrayList<>();
+				Character hyphenChar = null;
+				if (to < 0) to = hyphenChars.size();
+				int i = from;
+				while (i < to) {
+					Character nextHyphenChar = hyphenChars.get(i);
+					if (hyphenChar != nextHyphenChar) {
+						if (i > from) {
+							lineIterators.add(
+								new LineIterator(translateAndHyphenate(text, from, i), blankChar, hyphenChar, wordSpacing));
+							from = i; }
+						hyphenChar = nextHyphenChar; }
+					i++; }
+				if (i > from)
+					lineIterators.add(
+						new LineIterator(translateAndHyphenate(text, from, i), blankChar, hyphenChar, wordSpacing));
+				return CompoundBrailleTranslator.concatLineIterators(lineIterators);
 			}
 			
 			protected static class FullyHyphenatedAndTranslatedString implements BrailleStream {

@@ -41,11 +41,11 @@
 	
 	<xsl:template mode="style" match="text()" as="xs:string">
 		<xsl:param name="source-style" as="element()*" tunnel="yes"/>
-		<xsl:sequence select="css:serialize-declaration-list($source-style[not(@name='word-spacing')
+		<xsl:sequence select="css:serialize-declaration-list($source-style[not(@name=('word-spacing','hyphenate-character'))
 		                                                                   and not(@value=css:initial-value(@name))])"/>
 	</xsl:template>
 	
-	<xsl:template mode="translate-style" match="css:property[@name='word-spacing']">
+	<xsl:template mode="translate-style" match="css:property[@name=('word-spacing','hyphenate-character')]">
 		<xsl:sequence select="."/>
 	</xsl:template>
 	
