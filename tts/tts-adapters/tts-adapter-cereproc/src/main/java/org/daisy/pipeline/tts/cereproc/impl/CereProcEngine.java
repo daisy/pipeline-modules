@@ -60,6 +60,7 @@ public class CereProcEngine extends TTSEngine {
 	private static final Map<String,CereprocTTSUtil> ttsUtils = new HashMap<String,CereprocTTSUtil>() {
 		{
 			put("sv", new CereprocTTSUtil(Optional.of(new Locale("sv"))));
+			put("no", new CereprocTTSUtil(Optional.of(new Locale("no"))));
 			put("en", new CereprocTTSUtil(Optional.of(new Locale("en"))));
 		}
 	};
@@ -135,6 +136,8 @@ public class CereProcEngine extends TTSEngine {
 		List<Voice> voices = new ArrayList<>();
 		voices.add(new Voice(getProvider().getName(), "William", Locale.forLanguageTag("en-GB"), Gender.MALE_ADULT));
 		voices.add(new Voice(getProvider().getName(), "Ylva", Locale.forLanguageTag("sv"), Gender.FEMALE_ADULT));
+		voices.add(new Voice(getProvider().getName(), "Hulda", Locale.forLanguageTag("no"), Gender.FEMALE_ADULT));
+		voices.add(new Voice(getProvider().getName(), "Clara", Locale.forLanguageTag("no"), Gender.FEMALE_ADULT));
 		return voices;
 	}
 
