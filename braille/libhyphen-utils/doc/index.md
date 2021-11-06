@@ -13,7 +13,9 @@ features are:
 <!-- id:  If present it must be the only feature. Matches a hyphenator with a unique ID. -->
 
 `hyphenator`
-: Will only match if the value is "hyphen" or "libhyphen". <!-- or if it's a hyphenator's ID -->
+: Will only match if the value is "hyphen" or "libhyphen", or if the
+  value is a Hyphen table URI (see `libhyphen-table` feature
+  below). <!-- or if it's a hyphenator's ID -->
 
 `table`
 `hyphen-table`
