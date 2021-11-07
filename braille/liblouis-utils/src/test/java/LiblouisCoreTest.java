@@ -9,6 +9,8 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 
+import com.google.common.collect.ImmutableMap;
+
 import org.daisy.dotify.api.table.BrailleConverter;
 import org.daisy.dotify.api.table.Table;
 import org.daisy.dotify.api.table.TableCatalogService;
@@ -18,6 +20,7 @@ import org.daisy.pipeline.braille.common.BrailleTranslator;
 import org.daisy.pipeline.braille.common.BrailleTranslator.FromStyledTextToBraille;
 import org.daisy.pipeline.braille.common.BrailleTranslator.LineBreakingFromStyledText;
 import org.daisy.pipeline.braille.common.BrailleTranslator.LineIterator;
+import org.daisy.pipeline.braille.common.CompoundBrailleTranslator;
 import org.daisy.pipeline.braille.common.CSSStyledText;
 import org.daisy.pipeline.braille.common.Hyphenator;
 import org.daisy.pipeline.braille.common.HyphenatorProvider;
@@ -151,9 +154,15 @@ public class LiblouisCoreTest extends AbstractTest {
 	
 	@Test
 	public void testTextTransformUncontracted() {
-		FromStyledTextToBraille translator = provider.withContext(messageBus)
-		                                             .get(query("(locale:foo)(contraction:full)(charset:'foobar.dis')")).iterator().next()
-		                                             .fromStyledTextToBraille();
+		FromStyledTextToBraille translator = new CompoundBrailleTranslator(
+			provider.withContext(messageBus)
+			        .get(query("(locale:foo)(contraction:full)(charset:'foobar.dis')")).iterator().next(),
+			ImmutableMap.of(
+				"uncontracted",
+				() -> provider.withContext(messageBus)
+				              .get(query("(locale:foo)(contraction:no)(charset:'foobar.dis')")).iterator().next()
+			)
+		).fromStyledTextToBraille();
 		assertEquals(braille("fu ", "foo", " fu"),
 		             translator.transform(styledText("foo ", "",
 		                                             "foo",  "text-transform:uncontracted",
@@ -172,9 +181,15 @@ public class LiblouisCoreTest extends AbstractTest {
 	
 	@Test
 	public void testCompoundTranslator() {
-		LineBreakingFromStyledText translator = provider.withContext(messageBus)
-		                                                .get(query("(locale:foo)(contraction:full)(charset:'foobar.dis')")).iterator().next()
-		                                                .lineBreakingFromStyledText();
+		LineBreakingFromStyledText translator = new CompoundBrailleTranslator(
+			provider.withContext(messageBus)
+			        .get(query("(locale:foo)(contraction:full)(charset:'foobar.dis')")).iterator().next(),
+			ImmutableMap.of(
+				"uncontracted",
+				() -> provider.withContext(messageBus)
+				              .get(query("(locale:foo)(contraction:no)(charset:'foobar.dis')")).iterator().next()
+			)
+		).lineBreakingFromStyledText();
 		assertEquals(
 			"xxxxxxx\n" +
 			"abc def \n" +

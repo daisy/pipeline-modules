@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,7 +20,6 @@ import com.google.common.collect.ImmutableMap;
 import static com.google.common.collect.Iterables.size;
 import static com.google.common.collect.Iterables.toArray;
 import com.google.common.collect.Iterators;
-import com.google.common.collect.Maps;
 
 import cz.vutbr.web.css.CSSProperty;
 import cz.vutbr.web.css.CSSProperty.FontStyle;
@@ -62,14 +60,12 @@ import org.daisy.pipeline.braille.common.TransformProvider;
 import static org.daisy.pipeline.braille.common.TransformProvider.util.memoize;
 import static org.daisy.pipeline.braille.common.TransformProvider.util.dispatch;
 import org.daisy.pipeline.braille.common.UnityBrailleTranslator;
-import static org.daisy.pipeline.braille.common.util.Iterables.combinations;
 import static org.daisy.pipeline.braille.common.util.Locales.parseLocale;
 import static org.daisy.pipeline.braille.common.util.Strings.extractHyphens;
 import static org.daisy.pipeline.braille.common.util.Strings.insertHyphens;
 import static org.daisy.pipeline.braille.common.util.Strings.join;
 import static org.daisy.pipeline.braille.common.util.Strings.splitInclDelimiter;
 import static org.daisy.pipeline.braille.common.util.Tuple2;
-import org.daisy.pipeline.braille.common.WithSideEffect;
 import org.daisy.pipeline.braille.liblouis.LiblouisTable;
 import org.daisy.pipeline.braille.liblouis.LiblouisTranslator;
 import org.daisy.pipeline.braille.liblouis.impl.LiblouisTableJnaImplProvider.LiblouisTableJnaImpl;
@@ -222,54 +218,13 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 			DisplayTable displayTable = tableProvider.get(q).iterator().next().getDisplayTable();
 			BrailleTranslator unityTranslator = new UnityBrailleTranslator(
 				new LiblouisDisplayTableBrailleConverter(displayTable), false);
-			String contraction = q.containsKey("contraction")
-				? q.removeAll("contraction").iterator().next().getValue().get()
-				: null;
-			boolean computer = q.containsKey("type")
-				&& "computer".equals(q.get("type").iterator().next().getValue().orElse(null));
-			if (!computer && !"no".equals(contraction)) {
-				q.add("contraction", "no");
-				q.removeAll("grade");
-				Iterable<LiblouisTranslator> nonContractingTranslators = Iterables.memoize(
-					getSimpleTranslator(
-						q.asImmutable(),
-						documentLocale,
-						hyphenator,
-						handleNonStandardHyphenation));
-				if (nonContractingTranslators.apply(null).iterator().hasNext())
-					return concat(
-						Iterables.transform(
-							combinations(
-								Maps.toMap(
-									ImmutableList.<Boolean>of(Boolean.TRUE, Boolean.FALSE),
-									contracted -> contracted ? translators : nonContractingTranslators)),
-							new Function<Map<Boolean,WithSideEffect<LiblouisTranslator,Logger>>,LiblouisTranslator>() {
-								public LiblouisTranslator _apply(Map<Boolean,WithSideEffect<LiblouisTranslator,Logger>> translators)
-										throws NoSuchElementException {
-									LiblouisTranslator t;
-									try {
-										t = __apply(translators.get(true));
-									} catch (NoSuchElementException e) {
-										// make sure all elements that we get from an iterator are also
-										// dereferenced (because AbstractTransformProvider.util.concat
-										// requires it)
-										__apply(translators.get(false));
-										throw e;
-									}
-									return new HandleTextTransformNoneAndUncontracted(t,
-									                                                  __apply(translators.get(false)),
-									                                                  unityTranslator);
-								}
-							}),
-						translators);
-			} else
-				return Iterables.transform(
-					translators,
-					new Function<LiblouisTranslator,LiblouisTranslator>() {
-						public LiblouisTranslator _apply(LiblouisTranslator t) {
-							return new HandleTextTransformNoneAndUncontracted(t, null, unityTranslator); }});
-		}
-		return translators;
+			return Iterables.transform(
+				translators,
+				new Function<LiblouisTranslator,LiblouisTranslator>() {
+					public LiblouisTranslator _apply(LiblouisTranslator t) {
+						return new HandleTextTransformNone(t, unityTranslator); }});
+		} else
+			return translators;
 	}
 
 	/**
@@ -1650,19 +1605,12 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 		}
 	}
 	
-	private static class HandleTextTransformNoneAndUncontracted extends CompoundBrailleTranslator implements LiblouisTranslator {
+	private static class HandleTextTransformNone extends CompoundBrailleTranslator implements LiblouisTranslator {
 		
 		final LiblouisTranslator translator;
 		
-		HandleTextTransformNoneAndUncontracted(LiblouisTranslator translator,
-		                                       BrailleTranslator nonContractingTranslator,
-		                                       BrailleTranslator unityTranslator) {
-			super(translator,
-			      nonContractingTranslator != null
-			          ? ImmutableMap.of("none", () -> unityTranslator,
-			                            "uncontracted", () -> nonContractingTranslator,
-			                            "contracted", () -> translator)
-			          : ImmutableMap.of("none", () -> unityTranslator));
+		HandleTextTransformNone(LiblouisTranslator translator, BrailleTranslator unityTranslator) {
+			super(translator, ImmutableMap.of("none", () -> unityTranslator));
 			this.translator = translator;
 		}
 		
@@ -1830,7 +1778,7 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 				text = text.toUpperCase();
 			else if (tt.equals("lowercase"))
 				text = text.toLowerCase();
-			else if (!tt.equals("uncontracted") && !tt.equals("contracted") && !LOUIS_TEXT_TRANSFORM.matcher(tt).matches())
+			else if (!LOUIS_TEXT_TRANSFORM.matcher(tt).matches())
 				logger.warn("text-transform: {} not supported", tt);
 		}
 		return text;
@@ -1871,11 +1819,8 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 						            table.getTable());
 				}
 				continue;
-			} else if (tt.equals("uppercase") || tt.equals("lowercase") || tt.equals("uncontracted")) {
-				// - uppercase and lowercase handled in textFromTextTransform
-				// - uncontracted can be ignored because the current contraction grade is already 0
-				//   (otherwise uncontracted would already have been handled in
-				//   HandleTextTransformUncontracted)
+			} else if (tt.equals("uppercase") || tt.equals("lowercase")) {
+				// handled in textFromTextTransform
 				continue;
 			}
 			logger.warn("text-transform: {} not supported", tt);
