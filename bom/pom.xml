@@ -39,13 +39,13 @@
       -->
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
-        <artifactId>common-utils</artifactId>
-        <version>8.3.0-SNAPSHOT</version>
+        <artifactId>braille-common</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
-        <artifactId>css-utils</artifactId>
-        <version>5.2.2-SNAPSHOT</version>
+        <artifactId>braille-css-utils</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
@@ -56,25 +56,25 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>libhyphen-utils</artifactId>
-        <version>2.1.1</version>
+        <version>2.1.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>libhyphen-utils</artifactId>
         <classifier>linux</classifier>
-        <version>2.0.2</version>
+        <version>2.1.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>libhyphen-utils</artifactId>
         <classifier>mac</classifier>
-        <version>2.0.2</version>
+        <version>2.1.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>libhyphen-utils</artifactId>
         <classifier>windows</classifier>
-        <version>2.0.2</version>
+        <version>2.1.2-SNAPSHOT</version>
       </dependency>
       <!-- list main liblouis-utils first because this determines the version of the 'doc' artifact picked for the website -->
       <dependency>
@@ -86,19 +86,19 @@
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>liblouis-utils</artifactId>
         <classifier>linux</classifier>
-        <version>3.2.1</version>
+        <version>3.3.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>liblouis-utils</artifactId>
         <classifier>mac</classifier>
-        <version>3.2.1</version>
+        <version>3.3.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>liblouis-utils</artifactId>
         <classifier>windows</classifier>
-        <version>3.2.1</version>
+        <version>3.3.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
@@ -108,7 +108,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>texhyph-utils</artifactId>
-        <version>2.0.4</version>
+        <version>2.0.5-SNAPSHOT</version>
       </dependency>
       
       <!--
@@ -508,7 +508,7 @@
         <version>1.9.12</version>
       </dependency>
       <!--
-          for css-utils (braille) and css-speech
+          for braille-css-utils and css-speech
       -->
       <dependency>
         <groupId>org.daisy.libs</groupId>
@@ -521,7 +521,7 @@
         <version>1.1.0.RELEASE</version>
       </dependency>
       <!--
-          for braille/common-utils and braille/css-utils
+          for braille-common and braille-css-utils
       -->
       <dependency>
         <groupId>org.daisy.braille</groupId>
@@ -529,7 +529,7 @@
         <version>1.21.0</version>
       </dependency>
       <!--
-          for scripts-utils/css-utils, braille/common-utils and braille/css-utils
+          for css-utils, braille-common and braille-css-utils
       -->
       <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>
@@ -537,7 +537,7 @@
         <version>3.5.2_1</version>
       </dependency>
       <!--
-          for scripts-utils/css-utils
+          for css-utils
       -->
       <dependency>
         <groupId>org.daisy.libs</groupId>
@@ -560,7 +560,7 @@
         <version>1.4.1</version>
       </dependency>
       <!--
-          for braille/common-utils, dotify-utils and pef-utils
+          for braille-common, dotify-utils and pef-utils
       -->
       <dependency>
         <groupId>org.daisy.dotify</groupId>

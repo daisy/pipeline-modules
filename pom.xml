@@ -69,8 +69,8 @@
     <module>tts/tts-adapters/tts-adapter-cereproc</module>
     <module>tts/zedai-to-ssml</module>
     <module>tts/mathml-to-ssml</module>
-    <module>braille/common-utils</module>
-    <module>braille/css-utils</module>
+    <module>braille/braille-common</module>
+    <module>braille/braille-css-utils</module>
     <module>braille/pef-utils</module>
     <module>braille/obfl-utils</module>
     <module>braille/liblouis-utils</module>

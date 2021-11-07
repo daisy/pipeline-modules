@@ -23,8 +23,8 @@ public class XSpecAndXProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 	protected String[] testDependencies() {
 		return new String[] {
 			pipelineModule("common-utils"),
-			brailleModule("common-utils"),
-			brailleModule("css-utils"),
+			brailleModule("braille-common"),
+			brailleModule("braille-css-utils"),
 			brailleModule("libhyphen-utils"),
 			brailleModule("pef-utils"),
 			pipelineModule("file-utils"),

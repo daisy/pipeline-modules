@@ -30,10 +30,10 @@ public class XSpecAndXProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 	@Override
 	protected String[] testDependencies() {
 		return new String[] {
-			brailleModule("css-utils"),
+			brailleModule("braille-css-utils"),
 			brailleModule("pef-utils"),
 			brailleModule("obfl-utils"),
-			brailleModule("common-utils"),
+			brailleModule("braille-common"),
 			brailleModule("liblouis-utils"),
 			"org.daisy.pipeline.modules.braille:liblouis-utils:jar:" + thisPlatform() + ":?",
 			brailleModule("libhyphen-utils"),

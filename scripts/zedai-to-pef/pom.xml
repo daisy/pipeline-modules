@@ -28,7 +28,7 @@
     -->
     <dependency>
       <groupId>org.daisy.pipeline.modules.braille</groupId>
-      <artifactId>common-utils</artifactId>
+      <artifactId>braille-common</artifactId>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -38,7 +38,7 @@
     </dependency>
     <dependency>
       <groupId>org.daisy.pipeline.modules.braille</groupId>
-      <artifactId>css-utils</artifactId>
+      <artifactId>braille-css-utils</artifactId>
       <scope>runtime</scope>
     </dependency>
     <dependency>

@@ -32,8 +32,8 @@ public class DotifyCoreTest extends AbstractTest {
 	@Override
 	protected String[] testDependencies() {
 		return new String[] {
-			brailleModule("common-utils"),
-			brailleModule("css-utils"),
+			brailleModule("braille-common"),
+			brailleModule("braille-css-utils"),
 			brailleModule("pef-utils"),
 			pipelineModule("css-utils"),
 			"org.daisy.pipeline:calabash-adapter:?",

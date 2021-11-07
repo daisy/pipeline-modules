@@ -39,7 +39,7 @@ public class TexHyphenatorCoreTest extends AbstractTest {
 	protected String[] testDependencies() {
 		return new String[] {
 			pipelineModule("common-utils"),
-			brailleModule("common-utils"),
+			brailleModule("braille-common"),
 			"com.googlecode.texhyphj:texhyphj:?",
 			"org.daisy.dotify:dotify.library:?",
 			"org.daisy.libs:saxon-he:?",

@@ -11,11 +11,11 @@
   </parent>
 
   <groupId>org.daisy.pipeline.modules.braille</groupId>
-  <artifactId>css-utils</artifactId>
-  <version>5.2.2-SNAPSHOT</version>
+  <artifactId>braille-css-utils</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>bundle</packaging>
 
-  <name>DP2 Braille Modules :: css-utils</name>
+  <name>DP2 Braille Modules :: braille-css-utils</name>
   
   <dependencies>
     <dependency>
@@ -28,7 +28,7 @@
     </dependency>
     <dependency>
       <groupId>org.daisy.pipeline.modules.braille</groupId>
-      <artifactId>common-utils</artifactId>
+      <artifactId>braille-common</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -96,15 +96,6 @@
         <groupId>org.daisy.pipeline.build</groupId>
         <artifactId>modules-build-helper</artifactId>
         <executions>
-          <execution>
-            <id>process-catalog</id>
-            <configuration>
-              <!--
-                  avoid name collision
-              -->
-              <moduleName>braille-${project.artifactId}</moduleName>
-            </configuration>
-          </execution>
           <execution>
             <id>process-test-catalog</id>
             <phase>generate-test-sources</phase>
