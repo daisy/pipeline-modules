@@ -119,17 +119,16 @@ public class VoiceManager {
 					for (VoiceInfo best : voiceInfo) {
 						VoiceKey bestKey = new VoiceKey(best.voiceEngine, best.voiceName);
 						if (!mSecondaryVoices.containsKey(bestKey))
-							for (VoiceInfo fallback : availableVoiceInfo)
-								if (!fallback.equals(best))
+							for (VoiceInfo fallback : availableVoiceInfo) {
+								VoiceKey fallbackKey = new VoiceKey(fallback.voiceEngine, fallback.voiceName);
+								if (!fallbackKey.equals(bestKey))
 									if (fallback.isMultiLang()) {
 										if (!sameGender && !sameEngine) {
 											// multilang fallback voices are only considered when gender
 											// and engine are not criteria so as to prevent the algo
 											// from choosing a multilang voice with the same engine over
 											// a regular voice with a different engine.
-											mSecondaryVoices.put(bestKey,
-											                     mPrimaryVoices.get(new VoiceKey(fallback.voiceEngine,
-											                                                     fallback.voiceName)));
+											mSecondaryVoices.put(bestKey, mPrimaryVoices.get(fallbackKey));
 											break;
 										}
 									} else if (fallback.language.equals(best.language)
@@ -137,11 +136,10 @@ public class VoiceManager {
 									               || fallback.gender.equals(best.gender))
 									           && (!sameEngine
 									               || fallback.voiceEngine.equals(best.voiceEngine))) {
-										mSecondaryVoices.put(new VoiceKey(best.voiceEngine, best.voiceName),
-										                     mPrimaryVoices.get(new VoiceKey(fallback.voiceEngine,
-										                                                     fallback.voiceName)));
+										mSecondaryVoices.put(bestKey, mPrimaryVoices.get(fallbackKey));
 										break;
 									}
+							}
 					}
 		}
 
