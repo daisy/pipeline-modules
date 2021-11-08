@@ -429,14 +429,14 @@
                         <xsl:choose>
                             <xsl:when test="$white-space='pre-wrap'">
                                 <string value="{replace(.,'\s','&#x00A0;')}">
-                                    <xsl:if test="not($text-transform=('none','auto'))">
+                                    <xsl:if test="not($text-transform='auto')">
                                         <xsl:attribute name="text-style" select="concat('text-transform:',$text-transform)"/>
                                     </xsl:if>
                                 </string>
                             </xsl:when>
                             <xsl:otherwise>
                                 <string value="{.}">
-                                    <xsl:if test="not($text-transform=('none','auto'))">
+                                    <xsl:if test="not($text-transform='auto')">
                                         <xsl:attribute name="text-style" select="concat('text-transform:',$text-transform)"/>
                                     </xsl:if>
                                 </string>
@@ -447,7 +447,7 @@
             </xsl:when>
             <xsl:otherwise>
                 <string value="{string(@value)}">
-                    <xsl:if test="not($text-transform=('none','auto'))">
+                    <xsl:if test="not($text-transform='auto')">
                         <xsl:attribute name="text-style" select="concat('text-transform:',$text-transform)"/>
                     </xsl:if>
                 </string>
@@ -485,7 +485,7 @@
             <xsl:if test="matches(@style,re:exact($css:SYMBOLS_FN_RE))">
                 <xsl:sequence select="'-dotify-counter'"/>
             </xsl:if>
-            <xsl:sequence select="$text-transform[not(.=('none','auto'))]"/>
+            <xsl:sequence select="$text-transform[not(.='auto')]"/>
         </xsl:variable>
         <xsl:variable name="text-style" as="xs:string*">
             <xsl:if test="exists($text-transform)">
@@ -542,7 +542,7 @@
                 <xsl:with-param name="args" select="($white-space,@arg1,@arg2)"/>
             </xsl:call-template>
         </xsl:if>
-        <xsl:if test="$text-transform!='normal'">
+        <xsl:if test="$text-transform!='auto'">
             <xsl:call-template name="pf:warn">
                 <xsl:with-param name="msg">text-transform:{} could not be applied to -obfl-marker-indicator({}, {})</xsl:with-param>
                 <xsl:with-param name="args" select="($text-transform,@arg1,@arg2)"/>

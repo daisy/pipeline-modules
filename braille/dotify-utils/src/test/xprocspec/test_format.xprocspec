@@ -3491,7 +3491,7 @@
     <x:call step="dotify:format">
       <x:input port="source">
         <x:document type="inline">
-          <doc style="text-transform: none; @page { margin-top: 1; @top-left { content: '⠆' } }">
+          <doc style="text-transform: none; @page { margin-top: 1; @top-left { content: '⠆'; text-transform: none } }">
             <body>
               <p style="display:block">⠿⠿⠿⠿⠿⠿⠿⠿⠀⠿⠿⠿⠿⠿⠿⠿⠿</p>
             </body>
@@ -3512,7 +3512,7 @@
             <default-template>
               <header>
                 <field>
-                  <string value="⠆"/>
+                  <string value="⠆" text-style="text-transform:none"/>
                 </field>
                 <field>
                   <string value=""/>
