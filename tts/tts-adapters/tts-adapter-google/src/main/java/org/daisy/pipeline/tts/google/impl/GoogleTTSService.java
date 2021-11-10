@@ -41,11 +41,6 @@ public class GoogleTTSService extends AbstractTTSService {
 		return "google";
 	}
 
-	@Override
-	public String getVersion() {
-		return "rest";
-	}
-
 	private static int convertToInt(Map<String, String> params, String prop, int defaultVal)
 	        throws SynthesisException {
 		String str = params.get(prop);

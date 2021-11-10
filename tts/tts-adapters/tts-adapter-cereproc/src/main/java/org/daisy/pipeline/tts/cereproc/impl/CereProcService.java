@@ -76,11 +76,6 @@ public abstract class CereProcService extends AbstractTTSService {
 	public static class CereProcStandardService extends CereProcService {
 
 		@Override
-		public String getVersion() {
-			return "standard";
-		}
-
-		@Override
 		protected CereProcEngine newEngine(
 				String server, File client, int priority, Map<String,String> params) throws Throwable {
 
@@ -118,11 +113,6 @@ public abstract class CereProcService extends AbstractTTSService {
 		@Override
 		public String getName() {
 			return "cereproc-dnn";
-		}
-
-		@Override
-		public String getVersion() {
-			return "dnn";
 		}
 
 		@Override

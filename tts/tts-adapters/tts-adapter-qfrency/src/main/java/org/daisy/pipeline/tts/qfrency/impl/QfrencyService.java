@@ -57,9 +57,4 @@ public class QfrencyService extends AbstractTTSService {
 	public String getName() {
 		return "qfrency_cli";
 	}
-
-	@Override
-	public String getVersion() {
-		return "cli";
-	}
 }

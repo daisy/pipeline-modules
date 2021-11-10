@@ -62,12 +62,6 @@ public interface TTSService {
 	public String getName();
 
 	/**
-	 * @return the version or type (binary, in-memory) of the TTS service. Used
-	 *         only for printing information. Must be thread-safe.
-	 */
-	public String getVersion();
-
-	/**
 	 * Must be thread safe.
 	 *
 	 * @return the URL of the XSLT stylesheet to use for transforming SSML into

@@ -62,11 +62,6 @@ public class SAPIservice extends AbstractTTSService {
 		return "sapi";
 	}
 
-	@Override
-	public String getVersion() {
-		return "native";
-	}
-
 	@Activate
 	protected void loadSSMLadapter() {
 		super.loadSSMLadapter("/transform-ssml.xsl", SAPIservice.class);

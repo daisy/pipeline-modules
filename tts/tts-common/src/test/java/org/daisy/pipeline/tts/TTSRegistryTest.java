@@ -38,7 +38,6 @@ public class TTSRegistryTest {
 		public String getName() {
 			return "simplified-service";
 		}
-
 	}
 
 	private static class SimplifiedProcessor extends SimpleTTSEngine {

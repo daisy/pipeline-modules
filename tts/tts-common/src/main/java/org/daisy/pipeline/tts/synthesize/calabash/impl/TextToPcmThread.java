@@ -36,7 +36,6 @@ import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService;
 import org.daisy.pipeline.tts.TTSService.Mark;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
-import org.daisy.pipeline.tts.TTSServiceUtil;
 import org.daisy.pipeline.tts.TTSTimeout;
 import org.daisy.pipeline.tts.TTSTimeout.ThreadFreeInterrupter;
 import org.daisy.pipeline.tts.Voice;
@@ -145,7 +144,7 @@ public class TextToPcmThread implements FormatSpecifications {
 						releaseResource(e.getKey(), e.getValue());
 					} catch (Exception ex) {
 						String msg = "Error while releasing resource of "
-						        + TTSServiceUtil.displayName(e.getKey().getProvider()) + "; "
+						        + e.getKey().getProvider().getName() + "; "
 						        + ex.getMessage();
 						mLogger.warn(msg);
 						mTTSLog.addGeneralError(ErrorCode.WARNING, msg);
@@ -189,7 +188,7 @@ public class TextToPcmThread implements FormatSpecifications {
 				StringWriter sw = new StringWriter();
 				t.printStackTrace(new PrintWriter(sw));
 				String msg = "error while releasing resources of "
-				        + TTSServiceUtil.displayName(tts.getProvider()) + ": " + sw.toString();
+				        + tts.getProvider().getName() + ": " + sw.toString();
 				mTTSLog.addGeneralError(ErrorCode.WARNING, msg);
 			}
 		}
@@ -317,7 +316,7 @@ public class TextToPcmThread implements FormatSpecifications {
 				mTTSLog.getWritableEntry(sentence.getID()).addError(
 				        new TTSLog.Error(ErrorCode.WARNING,
 				                "Error while allocating resources for "
-				                        + TTSServiceUtil.displayName(tts.getProvider()) + ": "
+				                        + tts.getProvider().getName() + ": "
 				                        + e));
 
 				return null;
@@ -325,7 +324,7 @@ public class TextToPcmThread implements FormatSpecifications {
 				mTTSLog.getWritableEntry(sentence.getID()).addError(
 				        new TTSLog.Error(ErrorCode.WARNING,
 				                "Timeout while trying to allocate resources for "
-				                        + TTSServiceUtil.displayName(tts.getProvider())));
+				                        + tts.getProvider().getName()));
 				return null;
 			} finally {
 				timeout.disable();
@@ -334,7 +333,7 @@ public class TextToPcmThread implements FormatSpecifications {
 				//TTS not working anymore?
 				mTTSLog.getWritableEntry(sentence.getID()).addError(
 				        new TTSLog.Error(ErrorCode.WARNING, "Could not allocate resource for "
-				                + TTSServiceUtil.displayName(tts.getProvider())
+				                + tts.getProvider().getName()
 				                + " (it has probably been stopped)."));
 				return null; //it will try with another TTS
 			}
@@ -354,7 +353,7 @@ public class TextToPcmThread implements FormatSpecifications {
 			@Override
 			public void threadFreeInterrupt() {
 				String msg = "Forcing interruption of the current work of "
-				        + TTSServiceUtil.displayName(tts.getProvider()) + "...";
+				        + tts.getProvider().getName() + "...";
 				mLogger.warn(msg);
 				mTTSLog.getWritableEntry(sentence.getID()).addError(
 				        new TTSLog.Error(ErrorCode.WARNING, msg));
@@ -366,7 +365,7 @@ public class TextToPcmThread implements FormatSpecifications {
 			synchronized (resource) {
 				if (resource.invalid) {
 					String msg = "Resource of "
-					        + TTSServiceUtil.displayName(tts.getProvider())
+					        + tts.getProvider().getName()
 					        + " is no longer valid. The corresponding service has probably been stopped.";
 					mLogger.info(msg);
 					mTTSLog.getWritableEntry(sentence.getID()).addError(
@@ -380,14 +379,14 @@ public class TextToPcmThread implements FormatSpecifications {
 			logEntry.addError(
 			        new TTSLog.Error(ErrorCode.WARNING, "timeout (" + e.getSeconds()
 			                + " seconds) fired while speaking with "
-			                + TTSServiceUtil.displayName(tts.getProvider())));
+			                + tts.getProvider().getName()));
 			return null;
 		} catch (SynthesisException e) {
 			StringWriter sw = new StringWriter();
 			e.printStackTrace(new PrintWriter(sw));
 			logEntry.addError(
 			        new TTSLog.Error(ErrorCode.WARNING, "error while speaking with "
-			                + TTSServiceUtil.displayName(tts.getProvider()) + " : " + e + ":"
+			                + tts.getProvider().getName() + " : " + e + ":"
 			                + sw.toString()));
 
 			return null;
@@ -408,7 +407,7 @@ public class TextToPcmThread implements FormatSpecifications {
 			SoundUtil.cancelFootPrint(pcm, mAudioBufferTracker);
 			logEntry.addError(
 			        new TTSLog.Error(ErrorCode.WARNING, "missing ending mark with "
-			                + TTSServiceUtil.displayName(tts.getProvider())
+			                + tts.getProvider().getName()
 			                + ". Number of marks received: " + marks.size()));
 			return null;
 		}
@@ -418,7 +417,7 @@ public class TextToPcmThread implements FormatSpecifications {
 			SoundUtil.cancelFootPrint(pcm, mAudioBufferTracker);
 			mTTSLog.getWritableEntry(sentence.getID()).addError(
 			        new TTSLog.Error(ErrorCode.WARNING, "wrong number of marks with "
-			                + TTSServiceUtil.displayName(tts.getProvider())
+			                + tts.getProvider().getName()
 			                + ". Number of marks received: " + marksReceived +", expected number: "+expectedMarks.size()));
 			return null;
 		}
@@ -429,7 +428,7 @@ public class TextToPcmThread implements FormatSpecifications {
 				SoundUtil.cancelFootPrint(pcm, mAudioBufferTracker);
 				mTTSLog.getWritableEntry(sentence.getID()).addError(
 				        new TTSLog.Error(ErrorCode.WARNING, "mark name mismatch with "
-				                + TTSServiceUtil.displayName(tts.getProvider())
+				                + tts.getProvider().getName()
 				                + " actual: " + actualMark+", expected: "+expectedMark));
 				return null;
 			}

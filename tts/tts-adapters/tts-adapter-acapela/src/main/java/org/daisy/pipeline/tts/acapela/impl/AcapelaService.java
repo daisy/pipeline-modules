@@ -70,11 +70,6 @@ public class AcapelaService extends AbstractTTSService {
 		return "acapela";
 	}
 
-	@Override
-	public String getVersion() {
-		return "jna";
-	}
-
 	private static int convertToInt(Map<String, String> params, String prop, int defaultVal)
 	        throws SynthesisException {
 		String str = params.get(prop);

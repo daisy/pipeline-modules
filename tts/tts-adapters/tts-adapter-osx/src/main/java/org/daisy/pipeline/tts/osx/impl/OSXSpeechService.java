@@ -47,9 +47,4 @@ public class OSXSpeechService extends AbstractTTSService {
 	public String getName() {
 		return "osx-speech";
 	}
-
-	@Override
-	public String getVersion() {
-		return "cli";
-	}
 }

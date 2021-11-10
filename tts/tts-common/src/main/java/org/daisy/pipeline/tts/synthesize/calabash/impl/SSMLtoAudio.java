@@ -45,7 +45,6 @@ import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService;
 import org.daisy.pipeline.tts.TTSService.Mark;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
-import org.daisy.pipeline.tts.TTSServiceUtil;
 import org.daisy.pipeline.tts.TTSTimeout;
 import org.daisy.pipeline.tts.TTSTimeout.ThreadFreeInterrupter;
 import org.daisy.pipeline.tts.Voice;
@@ -177,13 +176,13 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 				workingEngines.add(engine);
 				if (transf != null)
 					mSSMLtransformers.put(service, transf);
-				engineStatus.add("[x] " + TTSServiceUtil.displayName(service));
+				engineStatus.add("[x] " + service.getName());
 			} catch (Throwable e) {
 				// Show the full error with stack trace only in the TTS log. A short version is included
 				// in the engine status summary. An engine that could not be activated is not an error
 				// unless no engines could be activated at all. This is to not confuse users because it
 				// is normal that only a part of the engines work.
-				String msg = TTSServiceUtil.displayName(service) + " could not be activated: " + e.getMessage();
+				String msg = service.getName() + " could not be activated: " + e.getMessage();
 				String stack = getStack(e);
 				mTTSlog.addGeneralError(ErrorCode.WARNING, msg + ": " + stack);
 				mLogger.debug(msg);
@@ -280,9 +279,9 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 			@Override
 			public void threadFreeInterrupt() {
 				String msg = "Timeout while initializing "
-				        + TTSServiceUtil.displayName(service)
+				        + service.getName()
 				        + ". Forcing interruption of the current work of "
-				        + TTSServiceUtil.displayName(service) + "... ";
+				        + service.getName() + "... ";
 				mLogger.warn(msg);
 				mTTSlog.addGeneralError(ErrorCode.WARNING, msg);
 				fengine.interruptCurrentWork(res);
@@ -308,7 +307,7 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 					engine.releaseThreadResources(res);
 				} catch (Exception e) {
 					String msg = "Error while releasing resource of "
-					        + TTSServiceUtil.displayName(service) + "; " + e.getMessage();
+					        + service.getName() + "; " + e.getMessage();
 					String stack = getStack(e);
 					mLogger.warn(msg);
 					mLogger.debug(stack);

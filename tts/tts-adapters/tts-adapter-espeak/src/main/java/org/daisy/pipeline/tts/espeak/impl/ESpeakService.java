@@ -65,9 +65,4 @@ public class ESpeakService extends AbstractTTSService {
 	public String getName() {
 		return "espeak";
 	}
-
-	@Override
-	public String getVersion() {
-		return "cli";
-	}
 }

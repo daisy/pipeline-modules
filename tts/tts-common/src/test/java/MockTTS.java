@@ -109,9 +109,4 @@ public class MockTTS implements TTSService {
 	public String getName() {
 		return "mock-tts";
 	}
-	
-	@Override
-	public String getVersion() {
-		return "1";
-	}
 }
