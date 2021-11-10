@@ -17,6 +17,7 @@ public class VoiceInfo {
 	        .compile("(\\p{Alpha}{2})(?:[-_](\\p{Alpha}{2}))?(?:[-_](\\p{Alnum}{1,8}))*");
 
 	public enum Gender {
+		ANY("*", "neutral"),
 		MALE_ADULT("male", "man", "male-adult"),
 		MALE_CHILD("boy", "male-young", "male-child"),
 		MALE_ELDERY("man-old", "male-old", "male-elder", "man-elder"),
@@ -43,17 +44,14 @@ public class VoiceInfo {
 						lookup.put(parts.get(1) + parts.get(0), gender);
 						lookup.put(parts.get(0) + '-' + parts.get(1), gender);
 						lookup.put(parts.get(1) + '-' + parts.get(0), gender);
-						lookup.put(parts.get(0) + '_' + parts.get(1), gender);
-						lookup.put(parts.get(1) + '_' + parts.get(0), gender);
 					}
 				}
 			}
 		}
 
 		public static Gender of(String gender) {
-			return lookup.get(gender);
+			return gender == null ? null : lookup.get(gender.toLowerCase().replace("_", "-"));
 		}
-
 	}
 	
 	public static class UnknownLanguage extends Exception{
@@ -154,4 +152,6 @@ public class VoiceInfo {
 	public float priority;
 	
 	public static Locale NO_DEFINITE_LANG = new Locale("mul");
+	public static Gender NO_DEFINITE_GENDER = Gender.ANY;
+
 }

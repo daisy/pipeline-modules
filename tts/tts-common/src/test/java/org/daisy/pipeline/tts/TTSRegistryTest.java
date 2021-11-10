@@ -468,4 +468,26 @@ public class TTSRegistryTest {
 		Assert.assertEquals("Vendor1", v.engine);
 		Assert.assertEquals("Voice1", v.name);
 	}
+
+	@Test
+	public void voiceWithKnownLanguageAndUnknownGender() throws UnknownLanguage {
+		List<Voice> availableVoices = new ArrayList<>(); {
+			availableVoices.add(new Voice("vendor", "voice1", Locale.forLanguageTag("en"), Gender.ANY));
+		}
+		List<VoiceInfo> voiceInfoFromConfig = EMPTY_LIST;
+		VoiceManager vm = new VoiceManager(
+			singletonList(new SimplifiedProcessor(availableVoices)),
+			voiceInfoFromConfig);
+		boolean[] exactMatch = new boolean[1];
+		Voice v = vm.findAvailableVoice(null, null, "en", null, exactMatch);
+		Assert.assertTrue(exactMatch[0]);
+		Assert.assertNotNull(v);
+		Assert.assertEquals("vendor", v.engine);
+		Assert.assertEquals("voice1", v.name);
+		v = vm.findAvailableVoice(null, null, "en", "male-adult", exactMatch);
+		Assert.assertTrue(exactMatch[0]);
+		Assert.assertNotNull(v);
+		Assert.assertEquals("vendor", v.engine);
+		Assert.assertEquals("voice1", v.name);
+	}
 }
