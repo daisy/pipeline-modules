@@ -9,6 +9,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -23,6 +24,8 @@ import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.Voice;
+import org.daisy.pipeline.tts.VoiceInfo;
+import org.daisy.pipeline.tts.VoiceInfo.Gender;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,12 +91,25 @@ public class OSXSpeechEngine extends TTSEngine {
 		try {
 			new CommandRunner(mSayPath, "-v", "?")
 				.consumeOutput(stream -> {
-						Matcher mr = Pattern.compile("(.*?)\\s+\\w{2}_\\w{2}").matcher("");
+						Matcher mr = Pattern.compile("(?<name>.*?)\\s+(?<locale>\\w{2}_\\w{2})\\s*(#.*)?").matcher("");
 						try (Scanner scanner = new Scanner(stream)) {
 							while (scanner.hasNextLine()) {
-								mr.reset(scanner.nextLine());
+								String line = scanner.nextLine();
+								mr.reset(line);
 								if (mr.find()) {
-									result.add(new Voice(getProvider().getName(), mr.group(1).trim()));
+									String name = mr.group("name").trim();
+									try {
+										Locale locale = VoiceInfo.tagToLocale(mr.group("locale"));
+										// Note that we could also maintain (hard-code) a mapping from voice to gender
+										Gender unknownGender = Gender.ANY;
+										result.add(new Voice(getProvider().getName(), name, locale, unknownGender));
+									} catch (VoiceInfo.UnknownLanguage e) {
+										mLogger.debug("Could not parse line from `say -v ?' output: " + line);
+										mLogger.debug("Reason: could not parse locale: " + mr.group("locale"));
+										result.add(new Voice(getProvider().getName(), name));
+									}
+								} else {
+									mLogger.debug("Could not parse line from `say -v ?' output: " + line);
 								}
 							}
 						}

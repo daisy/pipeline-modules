@@ -105,7 +105,7 @@ public class ESpeakEngine extends TTSEngine {
 								if (mr.find()) {
 									languages.add(mr.group(1).split("-")[0]);
 								} else {
-									mLogger.warn("Could not parse line from `espeak --voices' output: " + line);
+									mLogger.debug("Could not parse line from `espeak --voices' output: " + line);
 								}
 							}
 						}
@@ -140,7 +140,7 @@ public class ESpeakEngine extends TTSEngine {
 											result.add(new Voice(getProvider().getName(), name));
 										}
 									} else {
-										mLogger.warn("Could not parse line from `espeak --voices' output: " + line);
+										mLogger.debug("Could not parse line from `espeak --voices' output: " + line);
 									}
 								}
 							}
