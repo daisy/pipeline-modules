@@ -13,6 +13,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.VoiceInfo.Gender;
@@ -183,7 +184,30 @@ public class VoiceManager {
 			  .append(TTSServiceUtil.displayName(e.getValue().getProvider()))*/;
 		ServerLogger.debug(sb.toString());
 		sb = new StringBuilder("Voice selection data:");
-		for (VoiceInfo vi : availableVoiceInfo)
+		Collection<VoiceInfo> sortedAvailableVoiceInfo = new TreeSet<VoiceInfo>(
+			new Comparator<VoiceInfo>() {
+				public int compare(VoiceInfo vi1, VoiceInfo vi2) {
+					// first group by locale
+					// multi-lang voices last
+					if (vi1.isMultiLang() && !vi2.isMultiLang()) return 1;
+					else if (!vi1.isMultiLang() && vi2.isMultiLang()) return -1;
+					int compare = vi1.language.toString().compareTo(vi2.language.toString());
+					if (compare != 0) return compare;
+					// then group by gender
+					compare = vi1.gender.compareTo(vi2.gender);
+					if (compare != 0) return compare;
+					// remove duplicates
+					// (Note that the duplicate with the highest priority is kept because availableVoiceInfo
+					// is sorted by descending priority and because of the way TreeSet works)
+					if (vi1.voiceEngine.equals(vi2.voiceEngine) && vi1.voiceName.equals(vi2.voiceName))
+						return 0;
+					// highest priority first
+					return Float.valueOf(vi2.priority).compareTo(Float.valueOf(vi1.priority));
+				}
+			}
+		);
+		sortedAvailableVoiceInfo.addAll(availableVoiceInfo);
+		for (VoiceInfo vi : sortedAvailableVoiceInfo)
 			sb.append("\n * {")
 			  .append("locale:").append(vi.language == NO_DEFINITE_LANG ? "*" : vi.language)
 			  .append(", gender:").append(vi.gender)
