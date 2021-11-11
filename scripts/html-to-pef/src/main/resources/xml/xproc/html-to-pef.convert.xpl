@@ -118,8 +118,7 @@
                               (tokenize($stylesheet,'\s+')[not(.='')])[position()&gt;=$first-css-stylesheet-index]),' ')">
             <p:inline><_/></p:inline>
         </p:variable>
-        <p:identity px:message="stylesheets: {$stylesheets-to-be-inlined}" px:message-severity="DEBUG"/>
-        <px:apply-stylesheets px:progress="1">
+        <px:apply-stylesheets px:progress="1" px:message="stylesheets: {$stylesheets-to-be-inlined}" px:message-severity="DEBUG">
             <p:with-option name="stylesheets" select="$stylesheets-to-be-inlined"/>
             <p:with-option name="media"
                            select="concat(
@@ -164,8 +163,7 @@
             <p:group name="obfl" px:message="Transforming from XML with CSS to OBFL" px:progress=".5">
                 <p:output port="result"/>
                 <p:variable name="transform-query" select="concat('(input:css)(output:obfl)',$transform,$locale-query)"/>
-                <p:identity px:message-severity="DEBUG" px:message="px:transform query={$transform-query}"/>
-                <px:transform px:progress="1">
+                <px:transform px:progress="1" px:message-severity="DEBUG" px:message="px:transform query={$transform-query}">
                     <p:with-option name="query" select="$transform-query"/>
                     <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>
                     <p:input port="parameters">
@@ -182,7 +180,71 @@
                         </p:inline>
                     </p:output>
                     <p:variable name="transform-query" select="concat('(input:obfl)(input:text-css)(output:pef)',$transform,$locale-query)"/>
-                    <p:identity px:message-severity="DEBUG" px:message="px:transform query={$transform-query}"/>
+                    <px:transform px:progress="1" px:message-severity="DEBUG" px:message="px:transform query={$transform-query}">
+                        <p:with-option name="query" select="$transform-query"/>
+                        <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>
+                        <p:input port="parameters">
+                            <p:pipe port="result" step="parameters"/>
+                        </p:input>
+                    </px:transform>
+                </p:group>
+                <p:catch name="catch">
+                    <p:output port="pef" primary="true">
+                        <p:empty/>
+                    </p:output>
+                    <p:output port="status">
+                        <p:pipe step="status" port="result"/>
+                    </p:output>
+                    <p:identity>
+                        <p:input port="source">
+                            <p:inline>
+                                <d:status result="error"/>
+                            </p:inline>
+                        </p:input>
+                    </p:identity>
+                    <p:choose>
+                        <p:xpath-context>
+                            <p:pipe step="catch" port="error"/>
+                        </p:xpath-context>
+                        <p:when test="//c:error[@code='DOTIFY_FAILURE']">
+                            <p:variable name="message" select="//c:error[@code='DOTIFY_FAILURE'][1]/string(.)">
+                                <p:pipe step="catch" port="error"/>
+                            </p:variable>
+                            <p:identity px:message-severity="ERROR" px:message="{$message}"/>
+                            <p:identity px:message-severity="ERROR"
+                                        px:message="OBFL could not be formatted. Please style the HTML in a way it can be formatted."/>
+                        </p:when>
+                        <p:otherwise>
+                            <px:message severity="ERROR">
+                                <p:input port="error">
+                                    <p:pipe step="catch" port="error"/>
+                                </p:input>
+                            </px:message>
+                        </p:otherwise>
+                    </p:choose>
+                    <p:identity px:message-severity="ERROR" px:message="Failed to convert OBFL to PEF"/>
+                    <p:identity name="status"/>
+                    <p:sink/>
+                </p:catch>
+            </p:try>
+        </p:when>
+        <p:otherwise px:message="Transforming from XML with inline CSS to PEF">
+            <p:output port="pef" primary="true"/>
+            <p:output port="obfl">
+                <p:empty/>
+            </p:output>
+            <p:output port="status">
+                <p:pipe step="try-pef" port="status"/>
+            </p:output>
+            <p:variable name="transform-query" select="concat('(input:css)(output:pef)',$transform,$locale-query)"/>
+            <p:try name="try-pef" px:progress="1" px:message-severity="DEBUG" px:message="px:transform query={$transform-query}">
+                <p:group>
+                    <p:output port="pef" primary="true"/>
+                    <p:output port="status">
+                        <p:inline>
+                            <d:status result="ok"/>
+                        </p:inline>
+                    </p:output>
                     <px:transform px:progress="1">
                         <p:with-option name="query" select="$transform-query"/>
                         <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>
@@ -205,36 +267,32 @@
                             </p:inline>
                         </p:input>
                     </p:identity>
-                    <px:message severity="ERROR">
-                        <p:input port="error">
+                    <p:choose>
+                        <p:xpath-context>
                             <p:pipe step="catch" port="error"/>
-                        </p:input>
-                    </px:message>
-                    <p:identity px:message="Failed to convert OBFL to PEF" px:message-severity="ERROR"/>
+                        </p:xpath-context>
+                        <p:when test="//c:error[@code='DOTIFY_FAILURE']">
+                            <p:variable name="message" select="//c:error[@code='DOTIFY_FAILURE'][1]/string(.)">
+                                <p:pipe step="catch" port="error"/>
+                            </p:variable>
+                            <p:identity px:message-severity="ERROR" px:message="{$message}"/>
+                            <p:identity px:message-severity="ERROR"
+                                        px:message="OBFL could not be formatted. Please style the HTML in a way it can be formatted."/>
+                            <p:identity px:message-severity="ERROR" px:message="Failed to convert OBFL to PEF"/>
+                        </p:when>
+                        <p:otherwise>
+                            <px:message severity="ERROR">
+                                <p:input port="error">
+                                    <p:pipe step="catch" port="error"/>
+                                </p:input>
+                            </px:message>
+                            <p:identity px:message-severity="ERROR" px:message="Failed to convert XML with inline CSS to PEF"/>
+                        </p:otherwise>
+                    </p:choose>
                     <p:identity name="status"/>
                     <p:sink/>
                 </p:catch>
             </p:try>
-        </p:when>
-        <p:otherwise px:message="Transforming from XML with inline CSS to PEF">
-            <p:output port="pef" primary="true"/>
-            <p:output port="obfl">
-                <p:empty/>
-            </p:output>
-            <p:output port="status">
-                <p:inline>
-                    <d:status result="ok"/>
-                </p:inline>
-            </p:output>
-            <p:variable name="transform-query" select="concat('(input:css)(output:pef)',$transform,$locale-query)"/>
-            <p:identity px:message-severity="DEBUG" px:message="px:transform query={$transform-query}"/>
-            <px:transform px:progress="1">
-                <p:with-option name="query" select="$transform-query"/>
-                <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>
-                <p:input port="parameters">
-                    <p:pipe port="result" step="parameters"/>
-                </p:input>
-            </px:transform>
         </p:otherwise>
     </p:choose>
     

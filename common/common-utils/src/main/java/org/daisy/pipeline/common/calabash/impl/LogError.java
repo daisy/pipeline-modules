@@ -74,7 +74,10 @@ public class LogError implements XProcStepProvider {
 
 		private static void log(String severity, XProcError error) {
 			String message = error.getMessage();
-			message += " (Please see detailed log for more info.)";
+			if (error.getLocation().length > 0 || error.getCause() != null) {
+				message += " (Please see detailed log for more info.)";
+				LOGGER.debug(error.toString());
+			}
 			if ("TRACE".equals(severity))
 				LOGGER.trace(message);
 			else if ("DEBUG".equals(severity))
@@ -85,7 +88,6 @@ public class LogError implements XProcStepProvider {
 				LOGGER.warn(message);
 			else if ("ERROR".equals(severity))
 				LOGGER.error(message);
-			LOGGER.debug(error.toString());
 		}
 	}
 }

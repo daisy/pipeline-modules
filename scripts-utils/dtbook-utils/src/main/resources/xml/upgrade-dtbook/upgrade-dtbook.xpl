@@ -39,15 +39,20 @@
         </p:documentation>
     </p:option>
     
-    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
-    <p:import href="../validate-dtbook/dtbook-validator.select-schema.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/validation-utils/library.xpl"/>
+    <p:import href="../validate-dtbook/dtbook-validator.select-schema.xpl">
+        <p:documentation>
+            px:dtbook-validator.select-schema
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/validation-utils/library.xpl">
+        <p:documentation>
+            px:validate-with-relax-ng-and-report
+        </p:documentation>
+    </p:import>
     
     <p:variable name="version" select="(/dtb:dtbook|/dtbook)/@version"/>
     
-    <px:message severity="DEBUG">
-        <p:with-option name="message" select="concat('Input document version: ', $version)"/>    
-    </px:message>
+    <p:identity px:message="Input document version: {$version}" px:message-severity="DEBUG"/>
     
     <p:choose name="main">
         <p:when test="$version = '1.1.0'">
@@ -91,17 +96,11 @@
         </p:when>
         <p:when test="$version = '2005-3'">
             <p:output port="result"/>
-            <px:message severity="DEBUG">
-                <p:with-option name="message" select="concat('File is already the most recent version: ', $version)"/>
-            </px:message>
-            <p:identity/>
+            <p:identity px:message="File is already the most recent version: {$version}" px:message-severity="DEBUG"/>
         </p:when>
         <p:otherwise>
             <p:output port="result"/>
-            <px:message severity="DEBUG">
-                <p:with-option name="message" select="concat('Version not identified: ', $version)"/>
-            </px:message>
-            <p:identity/>
+            <p:identity px:message="Version not identified: {$version}" px:message-severity="DEBUG"/>
         </p:otherwise>
     </p:choose>
     

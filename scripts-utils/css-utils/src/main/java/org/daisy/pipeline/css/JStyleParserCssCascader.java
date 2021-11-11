@@ -255,6 +255,8 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 			writer.writeStartDocument();
 			traverse(document.getDocumentElement(), styleMap, writer);
 			writer.writeEndDocument();
+		} catch (TransformerException e) {
+			throw e;
 		} catch (Exception e) {
 			throw new TransformerException(e);
 		} finally {

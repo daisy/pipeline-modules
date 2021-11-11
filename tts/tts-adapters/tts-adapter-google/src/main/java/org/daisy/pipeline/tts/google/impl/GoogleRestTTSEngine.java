@@ -58,7 +58,7 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 	@Override
 	public Collection<AudioBuffer> synthesize(String sentence, XdmNode xmlSentence, Voice voice, TTSResource threadResources,
 	                                          AudioBufferAllocator bufferAllocator, boolean retry)
-			throws SynthesisException,InterruptedException, MemoryException {
+			throws SynthesisException, InterruptedException, MemoryException {
 	
 		if (sentence.length() > 5000) {
 			throw new SynthesisException("The number of characters in the sentence must not exceed 5000.");
@@ -126,11 +126,16 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 					throw new FatalError(e);
 				}
 			});
-		} catch (Exception e) { // include FatalError
+		} catch (InterruptedException e) {
+			throw e;
+		} catch (Exception e) {
 			SoundUtil.cancelFootPrint(result, bufferAllocator);
 			StringWriter sw = new StringWriter();
 			e.printStackTrace(new PrintWriter(sw));
-			throw new SynthesisException(e.getMessage(), e.getCause());
+			if (e instanceof FatalError)
+				throw new SynthesisException(e.getMessage(), e.getCause());
+			else
+				throw new SynthesisException(e);
 		}
 
 		return result;
@@ -173,11 +178,13 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 					throw new FatalError(e);
 				}
 			});
-
-		} catch (Exception e) { // Include FatalError
+		} catch (InterruptedException e) {
+			throw e;
+		} catch (FatalError e) {
 			throw new SynthesisException(e.getMessage(), e.getCause());
+		} catch (Exception e) {
+			throw new SynthesisException(e);
 		}
-
 		return result;
 	}
 
@@ -212,7 +219,7 @@ public class GoogleRestTTSEngine extends MarklessTTSEngine {
 	 *
 	 * @throws FatalError if <code>status</code> can not be retrieved.
 	 */
-	private static Response doRequest(Request request) throws FatalError {
+	private static Response doRequest(Request request) throws InterruptedException, FatalError {
 		Response r = new Response();
 		try {
 			r.body = request.send();

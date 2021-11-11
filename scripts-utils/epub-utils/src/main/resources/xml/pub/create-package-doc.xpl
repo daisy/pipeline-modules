@@ -289,7 +289,7 @@
     <p:sink/>
 
     <p:documentation>Get primary spine items</p:documentation>
-    <p:group name="content-docs-except-nav">
+    <p:group name="content-docs-except-nav" px:progress="1/10">
         <p:output port="result"/>
         <px:fileset-create/>
         <px:fileset-add-entry name="nav-doc.fileset">
@@ -339,7 +339,7 @@
     <p:sink/>
 
     <p:documentation>Create manifest</p:documentation>
-    <p:group name="manifest" px:progress="1/9"
+    <p:group name="manifest" px:progress="1/10"
              px:message="Creating package document manifest and fileset" px:message-severity="DEBUG">
         <p:output port="result" primary="true"/>
         <p:output port="as-fileset">
@@ -410,7 +410,7 @@
     <p:sink/>
 
     <p:documentation>Get spine</p:documentation>
-    <p:group name="spine" px:progress="1/9">
+    <p:group name="spine" px:progress="1/10">
         <p:output port="result"/>
 
         <p:documentation>Add secondary spine items and sort</p:documentation>
@@ -475,7 +475,7 @@
 
     <p:documentation>If the navigation document contains landmarks and compatibility-mode is
     enabled, generate the guide element based on the landmarks.</p:documentation>
-    <p:group name="guide" px:progress="1/9">
+    <p:group name="guide" px:progress="1/10">
         <p:output port="result" sequence="true"/>
         <p:filter select="//html:nav[@*[name()='epub:type']='landmarks']" name="guide.landmarks">
             <p:input port="source">
@@ -508,7 +508,7 @@
     </p:group>
     <p:sink/>
 
-    <p:group name="bindings" px:progress="1/9">
+    <p:group name="bindings" px:progress="1/10">
         <p:output port="result" sequence="true"/>
         <p:count>
             <p:input port="source">
@@ -544,7 +544,7 @@
     <p:sink/>
 
     <p:documentation>Create package document</p:documentation>
-    <p:group name="create-package-doc" px:progress="1/9">
+    <p:group name="create-package-doc" px:progress="1/10">
         <p:output port="result" primary="true">
             <p:pipe step="add-entry" port="result.in-memory"/>
         </p:output>
@@ -595,7 +595,7 @@
     </p:group>
 
     <p:documentation>Add metadata</p:documentation>
-    <p:group px:progress="1/9">
+    <p:group px:progress="1/10">
         <p:sink/>
         <px:epub3-add-metadata log-conflicts="false" name="add-metadata" px:progress="1">
             <p:input port="source.fileset">
@@ -618,7 +618,7 @@
     </p:group>
 
     <p:documentation>Set navigation document</p:documentation>
-    <p:group px:progress="1/9">
+    <p:group px:progress="1/10">
         <p:identity name="package-doc"/>
         <p:sink/>
         <px:fileset-join>
@@ -641,7 +641,7 @@
     </p:group>
 
     <p:documentation>Add properties of content documents</p:documentation>
-    <p:choose px:progress="1/9">
+    <p:choose px:progress="1/10">
         <p:when test="$detect-properties='true'">
             <pxi:epub3-detect-properties px:progress="1">
                 <p:input port="content-docs">
@@ -655,20 +655,20 @@
     </p:choose>
 
     <p:documentation>Add mediaoverlays</p:documentation>
-    <p:group name="result" px:progress="1/9">
+    <p:group name="result" px:progress="1/10">
         <p:output port="result" primary="true"/>
         <p:output port="fileset">
             <p:pipe step="load" port="result.fileset"/>
         </p:output>
         <p:identity name="package-doc"/>
         <p:sink/>
-        <px:fileset-join>
+        <px:fileset-join px:progress="1/5">
             <p:input port="source">
                 <p:pipe step="create-package-doc" port="fileset"/>
                 <p:pipe step="fileset-except-smil" port="result"/>
             </p:input>
         </px:fileset-join>
-        <px:epub3-add-mediaoverlays name="add-mediaoverlays" px:progress="1">
+        <px:epub3-add-mediaoverlays name="add-mediaoverlays" px:progress="3/5">
             <p:input port="source.in-memory">
                 <p:pipe step="main" port="source.in-memory"/>
                 <p:pipe step="package-doc" port="result"/>
@@ -682,7 +682,7 @@
             <p:with-option name="compatibility-mode" select="$compatibility-mode"/>
             <p:with-option name="reserved-prefixes" select="$reserved-prefixes"/>
         </px:epub3-add-mediaoverlays>
-        <px:fileset-load media-types="application/oebps-package+xml" name="load">
+        <px:fileset-load media-types="application/oebps-package+xml" name="load" px:progress="1/5">
             <p:input port="in-memory">
                 <p:pipe step="add-mediaoverlays" port="result.in-memory"/>
             </p:input>

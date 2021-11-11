@@ -161,7 +161,7 @@ public class ESpeakEngine extends MarklessTTSEngine {
 		} catch (InterruptedException e) {
 			throw e;
 		} catch (Throwable e) {
-			throw new SynthesisException(e.getMessage(), e.getCause());
+			throw new SynthesisException(e);
 		}
 
 		return result;

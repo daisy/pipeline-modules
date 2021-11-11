@@ -212,7 +212,12 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 			logger.error("Synthesis failed", e);
 			return;
 		} catch (EncodingException e) {
-			throw new XProcException(ENCODING_ERROR, step, e);
+			throw new XProcException(ENCODING_ERROR,
+			                         step,
+			                         "Encoding error",
+			                         XProcException.fromException(e)
+			                                       .rebase(step.getLocation(),
+			                                               new RuntimeException().getStackTrace()));
 		} catch (InterruptedException e) {
 			logger.error("Interrupted", e);
 			return;
@@ -279,7 +284,7 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 		 * Write the log file
 		 */
 		if (logEnabled) {
-			logger.info("writing TTS logs...");
+			logger.info("Writing TTS log");
 			TreeWriter xmlLog = new TreeWriter(runtime);
 			xmlLog.startDocument(runtime.getStaticBaseURI());
 			xmlLog.addStartElement(LogRootTag);

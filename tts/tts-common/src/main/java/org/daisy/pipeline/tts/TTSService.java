@@ -12,14 +12,9 @@ import java.util.Map;
 public interface TTSService {
 
 	class SynthesisException extends Exception {
-		public SynthesisException(String message, Throwable cause) {
-			super(message
-			        + (cause != null && cause.getMessage() != null ? ": " + cause.getMessage()
-			                : ""), cause);
-			if (cause != null) {
-				setStackTrace(cause.getStackTrace());
-			}
 
+		public SynthesisException(String message, Throwable cause) {
+			super(message, cause);
 		}
 
 		public SynthesisException(Throwable t) {

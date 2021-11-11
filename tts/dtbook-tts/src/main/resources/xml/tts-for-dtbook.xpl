@@ -206,7 +206,7 @@
 	  </p:input>
 	  <p:with-option name="test" select="concat('position()=', p:iteration-position())"/>
 	</p:split-sequence>
-	<px:dtbook-to-ssml name="ssml-gen">
+	<px:dtbook-to-ssml name="ssml-gen" px:message="SSML generation for DTBook">
 	  <p:input port="content.in">
 	    <p:pipe port="current" step="for-each.content"/>
 	  </p:input>

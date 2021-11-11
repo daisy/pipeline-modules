@@ -27,6 +27,7 @@ import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 
+import org.daisy.common.messaging.Message.Level;
 import org.daisy.common.messaging.MessageAppender;
 import org.daisy.common.messaging.MessageBuilder;
 import org.daisy.common.xslt.CompiledStylesheet;
@@ -249,7 +250,7 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 				throw new Exception("no voices available");
 			}
 		} catch (InterruptedException e) {
-			throw new Exception("timeout while retrieving voices  (exceeded "
+			throw new Exception("timeout while retrieving voices (exceeded "
 			                    + timeoutSecs + " seconds)");
 		} catch (Exception e) {
 			throw new Exception("failed to retreive voices: " + e.getMessage(), e);
@@ -568,19 +569,19 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 
 	@Override
 	synchronized public void notifyFinished(ContiguousText section) {
-		progress.append(
-			new MessageBuilder()
-				.withProgress(
-					new BigDecimal(section.getStringSize()).divide(new BigDecimal(mTotalTextSize), MathContext.DECIMAL128))
-		).close();
+		MessageBuilder m = new MessageBuilder()
+			.withProgress(
+				new BigDecimal(section.getStringSize()).divide(new BigDecimal(mTotalTextSize), MathContext.DECIMAL128));
 		mProgress += section.getStringSize();
 		if (mProgress - mPrintedProgress > mTotalTextSize / 15) {
 			int TTSMem = mAudioBufferTracker.getUnreleasedTTSMem() / 1000000;
 			int EncodeMem = mAudioBufferTracker.getUnreleasedEncondingMem() / 1000000;
-			mLogger.info("progress: " + 100 * mProgress / mTotalTextSize + "%  [TTS: "
-			        + TTSMem + "MB encoding: " + EncodeMem + "MB]");
+			m = m.withLevel(Level.INFO)
+			     .withText("progress: " + 100 * mProgress / mTotalTextSize + "%  [TTS: "
+			               + TTSMem + "MB encoding: " + EncodeMem + "MB]");
 			mPrintedProgress = mProgress;
 		}
+		progress.append(m).close();
 	}
 
 	private void reorganizeSections() {

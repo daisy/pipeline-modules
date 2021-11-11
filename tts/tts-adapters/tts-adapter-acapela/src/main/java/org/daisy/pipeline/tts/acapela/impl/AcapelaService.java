@@ -59,7 +59,7 @@ public class AcapelaService extends AbstractTTSService {
 		try {
 			Native.loadLibrary(NscubeLibrary.JNA_LIBRARY_NAME, NscubeLibrary.class);
 		} catch (Throwable e) {
-			throw new Exception("unable to load 'nscube' library", e);
+			throw new SynthesisException("unable to load 'nscube' library", e);
 		}
 
 		return new AcapelaEngine(this, format, balancer, speed, reserved, priority);
