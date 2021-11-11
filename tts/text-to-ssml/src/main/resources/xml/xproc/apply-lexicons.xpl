@@ -12,11 +12,6 @@
 
   <p:option name="lang" required="true"/>
 
-  <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
-    <p:documentation>
-      px:message
-    </p:documentation>
-  </p:import>
   <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
     <p:documentation>
       px:fileset-load
@@ -77,9 +72,7 @@
 	<p:load>
 	  <p:with-option name="href" select="concat('../lexicons/lexicon_', $lang,'.pls')"/>
 	</p:load>
-	<px:message>
-	  <p:with-option name="message" select="concat('loaded lexicon for language: ', $lang)"/>
-	</px:message>
+	<p:identity px:message="loaded lexicon for language: {$lang}" px:message-severity="DEBUG"/>
       </p:group>
       <p:catch>
 	<p:identity>
@@ -87,9 +80,7 @@
 	    <p:empty/>
 	  </p:input>
 	</p:identity>
-	<px:message>
-	  <p:with-option name="message" select="concat('could not find the builtin lexicon for language: ', $lang)"/>
-	</px:message>
+	<p:identity px:message="could not find the builtin lexicon for language: {$lang}" px:message-severity="DEBUG"/>
       </p:catch>
     </p:try>
   </p:for-each>

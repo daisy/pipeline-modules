@@ -183,7 +183,7 @@ public class VoiceManager {
 			  // with the same name (but different version) are currently not well supported.
 			  /*.append(" by ")
 			  .append(TTSServiceUtil.displayName(e.getValue().getProvider()))*/;
-		ServerLogger.info(sb.toString());
+		ServerLogger.debug(sb.toString());
 		sb = new StringBuilder("Voice selection data:");
 		for (VoiceInfo vi : availableVoiceInfo)
 			sb.append("\n * {")
@@ -192,7 +192,7 @@ public class VoiceManager {
 			  .append("}")
 			  .append(" -> ")
 			  .append(mPrimaryVoices.get(new VoiceKey(vi.voiceEngine, vi.voiceName)));
-		ServerLogger.info(sb.toString());
+		ServerLogger.debug(sb.toString());
 	}
 
 	/**

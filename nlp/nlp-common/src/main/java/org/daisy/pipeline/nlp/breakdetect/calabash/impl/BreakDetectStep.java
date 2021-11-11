@@ -26,9 +26,6 @@ import org.daisy.pipeline.nlp.lexing.LexService.LexerInitException;
 import org.daisy.pipeline.nlp.lexing.LexService.LexerToken;
 import org.daisy.pipeline.nlp.lexing.LexServiceRegistry;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.xmlcalabash.core.XProcException;
 import com.xmlcalabash.core.XProcRuntime;
 import com.xmlcalabash.io.ReadablePipe;
@@ -37,6 +34,9 @@ import com.xmlcalabash.library.DefaultStep;
 import com.xmlcalabash.model.RuntimeValue;
 import com.xmlcalabash.runtime.XAtomicStep;
 import com.xmlcalabash.util.TreeWriter;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * XprocStep built on the top of a Lexer meant to be provided by an OSGI service
@@ -174,10 +174,9 @@ public class BreakDetectStep extends DefaultStep implements TreeWriterFactory, I
 				continue;
 			}
 
-			mRuntime.info(null, null, "Total number of language(s): "
-			        + (langToToken.size() - 1));
+			mLogger.debug("Total number of language(s): " + (langToToken.size() - 1));
 			for (Map.Entry<Locale, LexerToken> entry : langToToken.entrySet()) {
-				mRuntime.info(null, null, "LexService for language '"
+				mLogger.debug("LexService for language '"
 				        + (entry.getKey() == null ? "<ANY>" : entry.getKey()) + "': "
 				        + entry.getValue().getLexService().getName());
 			}

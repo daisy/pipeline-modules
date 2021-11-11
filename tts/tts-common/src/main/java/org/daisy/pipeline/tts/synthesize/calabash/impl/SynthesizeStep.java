@@ -252,10 +252,10 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 		tw.endDocument();
 		result.write(tw.getResult());
 
-		logger.info("number of synthesized sound fragments: " + num);
-		logger.info("audio encoding unreleased bytes : "
+		logger.info("Number of synthesized sound fragments: " + num);
+		logger.debug("audio encoding unreleased bytes : "
 		        + mAudioBufferTracker.getUnreleasedEncondingMem());
-		logger.info("TTS unreleased bytes: " + mAudioBufferTracker.getUnreleasedTTSMem());
+		logger.debug("TTS unreleased bytes: " + mAudioBufferTracker.getUnreleasedTTSMem());
 
 		/*
 		 * Write status document

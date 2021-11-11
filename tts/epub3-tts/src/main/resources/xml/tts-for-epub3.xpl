@@ -252,7 +252,7 @@
           <p:rename match="tts:before|tts:after"
                     new-name="span" new-namespace="http://www.w3.org/1999/xhtml"/>
         </p:group>
-        <px:html-break-detect name="lexing" px:progress="1/2">
+        <px:html-break-detect name="lexing" px:progress="1/2" px:message="Performing sentence detection">
           <p:with-option name="id-prefix" select="concat($anti-conflict-prefix, p:iteration-position(), '-')"/>
         </px:html-break-detect>
         <px:isolate-skippable name="isolate-skippable"
@@ -266,7 +266,7 @@
           </p:input>
           <p:with-option name="id-prefix" select="concat('i', p:iteration-position())"/>
         </px:isolate-skippable>
-        <px:epub3-to-ssml name="ssml" px:progress="1/2">
+        <px:epub3-to-ssml name="ssml" px:progress="1/2" px:message="Generating SSML from EPUB 3">
           <p:input port="sentence-ids">
             <p:pipe port="sentence-ids" step="lexing"/>
           </p:input>
@@ -300,7 +300,7 @@
           </p:documentation>
         </px:html-unwrap-words>
       </p:for-each>
-      <px:ssml-to-audio name="to-audio" px:progress="8/9">
+      <px:ssml-to-audio name="to-audio" px:progress="8/9" px:message="Processing SSML">
         <p:input port="config">
           <p:pipe port="config" step="main"/>
         </p:input>
