@@ -314,6 +314,8 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 		if (attributes.hasNext()) {
 			AttributeWithContext a = attributes.next();
 			int w = a.getWidth();
+			if (w == 0)
+				return cssStyledTextFromTranslatable(preceding, text, following, attributes, parentStyle);
 			if (w <= precedingSize)
 				return concat(
 					cssStyledTextFromTranslatable(preceding.subList(0, w), null, null, a, parentStyle),
