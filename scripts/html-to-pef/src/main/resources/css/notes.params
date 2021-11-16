@@ -51,6 +51,11 @@ rule. Example:
 }
 ~~~
 </documentation>
+                    <value>custom</value>
+                    <documentation xml:lang="en" xml:space="preserve">Custom handling
+
+Special handling of notes is disabled. Notes are rendered as specified in custom style sheets.
+</documentation>
                 </choice>
             </px:type>
         </p:pipeinfo>
