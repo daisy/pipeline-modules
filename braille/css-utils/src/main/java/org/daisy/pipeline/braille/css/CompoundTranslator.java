@@ -2,6 +2,7 @@ package org.daisy.pipeline.braille.css;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +17,6 @@ import org.daisy.pipeline.braille.common.AbstractBrailleTranslator;
 import org.daisy.pipeline.braille.common.BrailleTranslator;
 import org.daisy.pipeline.braille.common.CSSStyledText;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 
 import cz.vutbr.web.css.CSSProperty;
@@ -29,15 +29,36 @@ import cz.vutbr.web.css.TermList;
  */
 public class CompoundTranslator extends AbstractBrailleTranslator {
 
-	private final Map<String,Supplier<BrailleTranslator>> translators;
+	private final Map<String,BrailleTranslator> translators;
+	private final boolean implementsFromStyledTextToBraille;
+	private final boolean implementsLineBreakingFromStyledText;
 
 	public CompoundTranslator(BrailleTranslator mainTranslator, Map<String,Supplier<BrailleTranslator>> subTranslators) {
 		if (subTranslators.containsKey("auto") || mainTranslator == null)
 			throw new IllegalArgumentException();
-		translators = ImmutableMap.<String,Supplier<BrailleTranslator>>builder()
-		                          .put("auto", () -> mainTranslator)
-		                          .putAll(subTranslators)
-		                          .build();
+		translators = new HashMap<>();
+		translators.put("auto", mainTranslator);
+		for (Map.Entry<String,Supplier<BrailleTranslator>> t : subTranslators.entrySet())
+			try {
+				translators.put(t.getKey(), t.getValue().get());
+			} catch (NoSuchElementException e) {
+			}
+		implementsFromStyledTextToBraille = Iterables.all(
+			translators.values(),
+			t -> {
+				try {
+					t.fromStyledTextToBraille();
+					return true; }
+				catch (UnsupportedOperationException e) {
+					return false; }} );
+		implementsLineBreakingFromStyledText = Iterables.all(
+			translators.values(),
+			t -> {
+				try {
+					t.lineBreakingFromStyledText();
+					return true; }
+				catch (UnsupportedOperationException e) {
+					return false; }} );
 	}
 
 	private static abstract class TransformImpl<T> {
@@ -149,62 +170,58 @@ public class CompoundTranslator extends AbstractBrailleTranslator {
 		}
 	}
 
+	private FromStyledTextToBraille fromStyledTextToBraille = null;
+
 	@Override
 	public FromStyledTextToBraille fromStyledTextToBraille() {
+		if (!implementsFromStyledTextToBraille)
+			throw new UnsupportedOperationException();
+		if (fromStyledTextToBraille == null)
+			fromStyledTextToBraille = new FromStyledTextToBraille() {
+					TransformImpl<String> impl = new TransformImpl<String>() {
+							Iterable<String> transform(Iterable<CSSStyledText> styledText, int from, int to, String textTransform) {
+								return translators.get(textTransform).fromStyledTextToBraille().transform(styledText, from, to);
+							}
+							Iterable<String> transformContext(Iterable<CSSStyledText> styledText, int from, int to, String textTransform) {
+								return transform(styledText, from, to, textTransform);
+							}
+							boolean supports(String textTransform) {
+								return translators.containsKey(textTransform);
+							}
+						};
+					public Iterable<String> transform(Iterable<CSSStyledText> styledText, int from, int to) {
+						return impl.transform(styledText, from, to);
+					}
+				};
 		return fromStyledTextToBraille;
 	}
 
-	private final FromStyledTextToBraille fromStyledTextToBraille = new FromStyledTextToBraille() {
-		TransformImpl<String> impl = new TransformImpl<String>() {
-			Iterable<String> transform(Iterable<CSSStyledText> styledText, int from, int to, String textTransform) {
-				return translators.get(textTransform).get().fromStyledTextToBraille().transform(styledText, from, to);
-			}
-			Iterable<String> transformContext(Iterable<CSSStyledText> styledText, int from, int to, String textTransform) {
-				return transform(styledText, from, to, textTransform);
-			}
-			boolean supports(String textTransform) {
-				if (translators.containsKey(textTransform))
-					try {
-						translators.get(textTransform).get();
-						return true;
-					} catch (NoSuchElementException e) {
-					}
-				return false;
-			}
-		};
-		public Iterable<String> transform(Iterable<CSSStyledText> styledText, int from, int to) {
-			return impl.transform(styledText, from, to);
-		}
-	};
+	private LineBreakingFromStyledText lineBreakingFromStyledText = null;
 
 	@Override
 	public LineBreakingFromStyledText lineBreakingFromStyledText() {
+		if (!implementsLineBreakingFromStyledText)
+			throw new UnsupportedOperationException();
+		if (lineBreakingFromStyledText == null)
+			lineBreakingFromStyledText = new LineBreakingFromStyledText() {
+					TransformImpl<LineIterator> impl = new TransformImpl<LineIterator>() {
+							Iterable<LineIterator> transform(Iterable<CSSStyledText> styledText, int from, int to, String textTransform) {
+								return Collections.singleton(
+									translators.get(textTransform).lineBreakingFromStyledText().transform(styledText, from, to));
+							}
+							Iterable<String> transformContext(Iterable<CSSStyledText> styledText, int from, int to, String textTransform) {
+								return translators.get(textTransform).fromStyledTextToBraille().transform(styledText, from, to);
+							}
+							boolean supports(String textTransform) {
+								return translators.containsKey(textTransform);
+							}
+						};
+					public LineIterator transform(Iterable<CSSStyledText> styledText, int from, int to) {
+						return concatLineIterators(impl.transform(styledText, from, to));
+					}
+				};
 		return lineBreakingFromStyledText;
 	}
-
-	private final LineBreakingFromStyledText lineBreakingFromStyledText = new LineBreakingFromStyledText() {
-		TransformImpl<LineIterator> impl = new TransformImpl<LineIterator>() {
-			Iterable<LineIterator> transform(Iterable<CSSStyledText> styledText, int from, int to, String textTransform) {
-				return Collections.singleton(
-					translators.get(textTransform).get().lineBreakingFromStyledText().transform(styledText, from, to));
-			}
-			Iterable<String> transformContext(Iterable<CSSStyledText> styledText, int from, int to, String textTransform) {
-				return translators.get(textTransform).get().fromStyledTextToBraille().transform(styledText, from, to);
-			}
-			boolean supports(String textTransform) {
-				if (translators.containsKey(textTransform))
-					try {
-						translators.get(textTransform).get();
-						return true;
-					} catch (NoSuchElementException e) {
-					}
-				return false;
-			}
-		};
-		public LineIterator transform(Iterable<CSSStyledText> styledText, int from, int to) {
-			return concatLineIterators(impl.transform(styledText, from, to));
-		}
-	};
 
 	private static BrailleTranslator.LineIterator concatLineIterators(List<BrailleTranslator.LineIterator> iterators) {
 		if (iterators.size() == 0)
