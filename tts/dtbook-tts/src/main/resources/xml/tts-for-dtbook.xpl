@@ -88,6 +88,12 @@
     </p:documentation>
   </p:option>
 
+  <p:option name="word-detection" required="false" select="'true'" cx:as="xs:string">
+    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <p>Whether to detect and mark up words with <code>&lt;w&gt;</code> tags.</p>
+    </p:documentation>
+  </p:option>
+
   <p:option name="temp-dir" select="''">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
       <p>Empty directory dedicated to this conversion. May be left empty in which case a temporary
@@ -103,6 +109,7 @@
   <p:import href="http://www.daisy.org/pipeline/modules/dtbook-break-detection/library.xpl">
     <p:documentation>
       px:dtbook-break-detect
+      px:dtbook-unwrap-words
     </p:documentation>
   </p:import>
   <p:import href="http://www.daisy.org/pipeline/modules/tts-common/library.xpl">
@@ -259,13 +266,21 @@
     </p:otherwise>
   </p:choose>
 
-  <p:for-each name="remove-css">
+  <p:for-each>
     <p:iteration-source>
       <p:pipe port="result" step="lexing"/>
     </p:iteration-source>
-    <p:output port="result"/>
     <px:css-speech-clean/>
   </p:for-each>
+  <p:choose>
+    <p:when test="$word-detection='false'">
+      <px:dtbook-unwrap-words/>
+    </p:when>
+    <p:otherwise>
+      <p:identity/>
+    </p:otherwise>
+  </p:choose>
+  <p:identity name="clean-dtbook"/>
   <p:sink/>
 
   <px:fileset-update name="update-fileset">
@@ -279,7 +294,7 @@
       <p:pipe step="dtbook" port="result.fileset"/>
     </p:input>
     <p:input port="update.in-memory">
-      <p:pipe step="remove-css" port="result"/>
+      <p:pipe step="clean-dtbook" port="result"/>
     </p:input>
   </px:fileset-update>
 

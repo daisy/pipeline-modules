@@ -134,6 +134,12 @@
     </p:documentation>
   </p:option>
 
+  <p:option name="word-detection" required="false" px:type="boolean" select="'true'" cx:as="xs:string">
+    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <p>Whether to detect and mark up words with <code>&lt;w&gt;</code> tags.</p>
+    </p:documentation>
+  </p:option>
+
   <p:option name="date" required="false" select="''">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
       <p>Date of publication of the DTB</p>
@@ -218,6 +224,7 @@
     <p:with-option name="audio" select="$audio"/>
     <p:with-option name="audio-file-type" select="$audio-file-type"/>
     <p:with-option name="include-log" select="$include-tts-log"/>
+    <p:with-option name="word-detection" select="$word-detection"/>
     <p:with-option name="temp-dir" select="$temp-dir"/>
   </px:tts-for-dtbook>
   <px:fileset-load media-types="application/x-dtbook+xml" name="tts-enriched-dtbook">

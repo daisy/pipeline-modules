@@ -77,6 +77,16 @@ When text-to-speech is enabled, the conversion may output a (incomplete) DAISY 3
     </p:documentation>
   </p:option>
 
+  <p:option name="word-detection" required="false" px:type="boolean" select="'true'">
+    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <h2 px:role="name">Detect words</h2>
+      <p px:role="desc" xml:space="preserve">Whether to detect and mark up words with `&lt;w&gt;` tags.
+
+By default word detection is performed but an option is provided to disable it because some DAISY 3
+reading systems can't handle the word tags.</p>
+    </p:documentation>
+  </p:option>
+
   <!-- TODO: throw an error if both 'audio' and 'with-text' are false -->
 
   <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
@@ -113,6 +123,7 @@ When text-to-speech is enabled, the conversion may output a (incomplete) DAISY 3
     <p:with-option name="audio" select="$audio"/>
     <p:with-option name="audio-only" select="$with-text = 'false'"/>
     <p:with-option name="audio-file-type" select="$audio-file-type"/>
+    <p:with-option name="word-detection" select="$word-detection"/>
     <p:with-option name="include-tts-log" select="$include-tts-log"/>
   </px:dtbook-to-daisy3>
 
