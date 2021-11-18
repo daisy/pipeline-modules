@@ -1,47 +1,39 @@
 package org.daisy.pipeline.audio.lame.impl;
 
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Map;
 import java.util.Optional;
 
 import javax.sound.sampled.AudioFormat;
 
 import org.daisy.common.shell.CommandRunner;
-import org.daisy.common.shell.BinaryFinder;
 import org.daisy.pipeline.audio.AudioBuffer;
 import org.daisy.pipeline.audio.AudioEncoder;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.osgi.service.component.annotations.Component;
-
-@Component(
-	name = "audio-encoder-lame",
-	immediate = true,
-	service = { AudioEncoder.class }
-)
 public class LameEncoder implements AudioEncoder {
 
-	static private class LameEncodingOptions implements EncodingOptions {
-		private String binpath;
-		private String[] cliOptions;
+	static class LameEncodingOptions {
+		String binpath;
+		String[] cliOptions;
 	}
 
-	private Logger mLogger = LoggerFactory.getLogger(LameEncoder.class);
+	private static final Logger mLogger = LoggerFactory.getLogger(LameEncoder.class);
 	private static final String OutputFormat = ".mp3";
+
+	private final LameEncodingOptions lameOpts;
+
+	LameEncoder(LameEncodingOptions lameOpts) {
+		this.lameOpts = lameOpts;
+	}
 
 	@Override
 	public Optional<String> encode(Iterable<AudioBuffer> pcm, AudioFormat audioFormat,
-	        File outputDir, String filePrefix, EncodingOptions options) throws Throwable {
-
-		LameEncodingOptions lameOpts = (LameEncodingOptions) options;
+	                               File outputDir, String filePrefix) throws Throwable {
 
 		File encodedFile = new File(outputDir, filePrefix + OutputFormat);
 		String freq = String.valueOf((Float.valueOf(audioFormat.getSampleRate()) / 1000));
@@ -124,56 +116,5 @@ public class LameEncoder implements AudioEncoder {
 			.run();
 
 		return Optional.of(encodedFile.toURI().toString());
-	}
-
-	@Override
-	public EncodingOptions parseEncodingOptions(Map<String, String> params) {
-		LameEncodingOptions opts = new LameEncodingOptions();
-
-		opts.cliOptions = new String[0];
-		String cliextra = params.get("org.daisy.pipeline.tts.lame.cli.options");
-		if (cliextra != null) {
-			opts.cliOptions = cliextra.split(" ");
-		}
-
-		String lamePathProp = "org.daisy.pipeline.tts.lame.path";
-		opts.binpath = params.get(lamePathProp);
-		if (opts.binpath == null) {
-			Optional<String> lpath = BinaryFinder.find("lame");
-			if (lpath.isPresent())
-				opts.binpath = lpath.get();
-		}
-
-		return opts;
-	}
-
-	@Override
-	public void test(EncodingOptions options) throws Exception {
-		LameEncodingOptions lameOpts = (LameEncodingOptions) options;
-		if (lameOpts.binpath == null) {
-			throw new RuntimeException("Lame encoder not found.");
-		}
-		if (!new File(lameOpts.binpath).exists()) {
-			throw new RuntimeException(lameOpts.binpath + " not found");
-		}
-
-		//check that the encoder can run
-		String[] cmd = new String[]{
-		        lameOpts.binpath, "--help"
-		};
-		Process p = null;
-		try {
-			p = Runtime.getRuntime().exec(cmd);
-			//read the output to prevent the process from sleeping
-			BufferedReader stdOut = new BufferedReader(new InputStreamReader(p
-			        .getInputStream()));
-			while ((stdOut.readLine()) != null) {
-			}
-			p.waitFor();
-		} catch (Exception e) {
-			if (p != null)
-				p.destroy();
-			throw e;
-		}
 	}
 }

@@ -1,8 +1,9 @@
 package org.daisy.pipeline.audio;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Map;
+import java.util.Optional;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -13,30 +14,31 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 	name = "audio-services",
 	service = { AudioServices.class }
 )
-public class AudioServices {
+public class AudioServices implements AudioEncoderService {
 
-	private final Collection<AudioEncoder> encoders = new CopyOnWriteArrayList<AudioEncoder>();
-
-	public AudioEncoder getEncoder() {
-		Iterator<AudioEncoder> it = encoders.iterator();
-		if (it.hasNext())
-			return it.next();
-		return null;
+	public Optional<AudioEncoder> newEncoder(Map<String,String> params) {
+		for (AudioEncoderService s : encoderServices) {
+			Optional<AudioEncoder> e = s.newEncoder(params);
+			if (e.isPresent())
+				return e;
+		}
+		return Optional.empty();
 	}
 
+	private final Collection<AudioEncoderService> encoderServices = new CopyOnWriteArrayList<>();
+
 	@Reference(
-		name = "audio-encoder",
-		unbind = "removeEncoder",
-		service = AudioEncoder.class,
+		name = "audio-encoder-service",
+		unbind = "removeEncoderService",
+		service = AudioEncoderService.class,
 		cardinality = ReferenceCardinality.MULTIPLE,
 		policy = ReferencePolicy.DYNAMIC
 	)
-	public void addEncoder(AudioEncoder encoder) {
-		encoders.add(encoder);
+	public void addEncoderService(AudioEncoderService service) {
+		encoderServices.add(service);
 	}
 
-	public void removeEncoder(AudioEncoder encoder) {
-		encoders.remove(encoder);
+	public void removeEncoderService(AudioEncoderService service) {
+		encoderServices.remove(service);
 	}
-
 }

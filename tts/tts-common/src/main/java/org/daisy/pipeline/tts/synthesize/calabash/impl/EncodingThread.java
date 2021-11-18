@@ -58,25 +58,13 @@ public class EncodingThread {
 
 		//Eventually, we should select the encoder using the audio format as criterion, but for now
 		//we always employ the same encoder for every chunk of PCM
-		AudioEncoder encoder = encoderRegistry.getEncoder();
-		AudioEncoder.EncodingOptions encodingOptions = null;
+		AudioEncoder encoder = encoderRegistry.newEncoder(TTSproperties).orElse(null);
 		if (encoder == null) {
 			String msg = "No audio encoder found";
 			logger.info(msg);
 			ttslog.addGeneralError(ErrorCode.CRITICAL_ERROR, msg);
-		} else {
-			encodingOptions = encoder.parseEncodingOptions(TTSproperties);
-			try {
-				encoder.test(encodingOptions);
-			} catch (Exception e) {
-				String msg = "audio encoder does not work: " + getStack(e);
-				logger.info(msg);
-				ttslog.addGeneralError(ErrorCode.CRITICAL_ERROR, msg);
-				encoder = null;
-			}
 		}
 
-		final AudioEncoder.EncodingOptions options = encodingOptions;
 		final AudioEncoder fencoder = encoder;
 		final float fEncodingSpeed = encodingSpeed;
 		final TTSTimeout timeout = new TTSTimeout();
@@ -107,7 +95,7 @@ public class EncodingThread {
 								timeout.enableForCurrentThread(maxTime);
 								Optional<String> destURI = fencoder.encode(job.getBuffers(), job
 								                                           .getAudioFormat(), job.getDestinationDirectory(), job
-								                                           .getDestinationFilePrefix(), options);
+								                                           .getDestinationFilePrefix());
 								if (destURI.isPresent()) {
 									job.getURIholder().append(destURI.get());
 								} else {

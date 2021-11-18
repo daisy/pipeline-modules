@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.Random;
 
@@ -15,6 +15,7 @@ import javax.sound.sampled.AudioFormat.Encoding;
 import org.daisy.common.shell.BinaryFinder;
 import org.daisy.pipeline.audio.AudioBuffer;
 import org.daisy.pipeline.audio.AudioEncoder;
+
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
@@ -104,7 +105,7 @@ public class LameTest {
 	private static AudioBuffer ref;
 	private static AudioFormat refFormat;
 	private static String mp3ref;
-	private static LameEncoder lame;
+	private static AudioEncoder lame;
 
 	@BeforeClass
 	public static void buildReference() throws Throwable {
@@ -128,17 +129,15 @@ public class LameTest {
 		}
 
 		//dump the reference on the disk using Lame
-		lame = new LameEncoder();
-		AudioEncoder.EncodingOptions opts = lame.parseEncodingOptions(Collections.EMPTY_MAP);
+		lame = new LameEncoderService().newEncoder(new HashMap<String,String>()).get();
 		Optional<String> uri = lame.encode(Arrays.asList(ref), refFormat, new File(System
-		        .getProperty("java.io.tmpdir")), "mp3ref", opts);
+		        .getProperty("java.io.tmpdir")), "mp3ref");
 		if (!uri.isPresent())
 			throw new RuntimeException("Could not encode the reference mp3");
 		mp3ref = uri.get();
 	}
 
 	private boolean isValid(AudioFormat sourceFormat) throws Throwable {
-		AudioEncoder.EncodingOptions opts = lame.parseEncodingOptions(Collections.EMPTY_MAP);
 
 		//use avconv to create a new version of the PCM reference encoded with sourceFormat
 		byte[] audio = mp3ToPCM(sourceFormat, mp3ref);
@@ -146,7 +145,7 @@ public class LameTest {
 		//use lame to convert it to MP3
 		AudioBuffer b = new AudioBufferTest(audio, audio.length);
 		Optional<String> lameMp3 = lame.encode(Arrays.asList(b), sourceFormat, new File(System
-		        .getProperty("java.io.tmpdir")), "lametest", opts);
+		        .getProperty("java.io.tmpdir")), "lametest");
 
 		if (!lameMp3.isPresent()) {
 			System.err.println("Lame could not encode the data");
