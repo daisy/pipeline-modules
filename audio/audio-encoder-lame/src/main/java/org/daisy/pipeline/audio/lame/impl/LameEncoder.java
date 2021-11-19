@@ -46,10 +46,18 @@ public class LameEncoder implements AudioEncoder {
 		String endianness = audioFormat.isBigEndian() ? "--big-endian" : "--little-endian";
 		Consumer<OutputStream> lameInput;
 
+		if (!(audioFormat.getEncoding() == AudioFormat.Encoding.PCM_UNSIGNED
+		      || audioFormat.getEncoding() == AudioFormat.Encoding.PCM_SIGNED
+		      || audioFormat.getEncoding() == AudioFormat.Encoding.PCM_FLOAT)) {
+			throw new RuntimeException("Expected PCM encoded audio");
+		}
+
 		// Lame cannot deal with unsigned encoding for other bitwidths than 8
 		if (audioFormat.getEncoding() == AudioFormat.Encoding.PCM_UNSIGNED
-		        && audioFormat.getSampleSizeInBits() > 8
-		        && (audioFormat.getSampleSizeInBits() % 8) == 0) {
+		    && audioFormat.getSampleSizeInBits() > 8) {
+			if ((audioFormat.getSampleSizeInBits() % 8) != 0) {
+				throw new RuntimeException("Expected a bitwidth that is a multiple of 8");
+			}
 			// downsampling: keep the most significant bit only, in order to produce 8-bit unsigned data
 			int ratio = audioFormat.getSampleSizeInBits() / 8;
 			int mse = audioFormat.isBigEndian() ? 0 : (ratio - 1);
@@ -65,7 +73,8 @@ public class LameEncoder implements AudioEncoder {
 		} else if (audioFormat.getEncoding() == AudioFormat.Encoding.PCM_FLOAT) {
 			// convert [-1.0, 1.0] values to regular 32-bit signed integers
 			// FIXME: find a faster and more accurate way
-			if (audioFormat.getSampleSizeInBits() == 32) {
+			switch (audioFormat.getSampleSizeInBits()) {
+			case 32:
 				lameInput = stream -> {
 					try (BufferedOutputStream out = new BufferedOutputStream(stream)) {
 						ByteBuffer frame = ByteBuffer.wrap(new byte[audioFormat.getFrameSize()]);
@@ -79,7 +88,9 @@ public class LameEncoder implements AudioEncoder {
 						}
 					}
 				};
-			} else { // Lame cannot handle 64-bit data => downsampling to 32-bit
+				break;
+			case 64:
+				// Lame cannot handle 64-bit data => downsampling to 32-bit
 				bitwidth = "32";
 				lameInput = stream -> {
 					try (BufferedOutputStream out = new BufferedOutputStream(stream)) {
@@ -94,6 +105,9 @@ public class LameEncoder implements AudioEncoder {
 						}
 					}
 				};
+				break;
+			default:
+				throw new RuntimeException("Expected either 32- or 64-bit samples");
 			}
 		} else {
 			lameInput = stream -> {
