@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
-import java.util.Optional;
 import java.util.Random;
 
 import javax.sound.sampled.AudioFormat;
@@ -15,6 +14,7 @@ import javax.sound.sampled.AudioInputStream;
 
 import org.daisy.common.shell.BinaryFinder;
 import org.daisy.pipeline.audio.AudioEncoder;
+import static org.daisy.pipeline.audio.AudioFileTypes.MP3;
 
 import org.junit.Assert;
 import org.junit.Assume;
@@ -122,11 +122,9 @@ public class LameTest {
 			new ByteArrayInputStream(ref),
 			refFormat,
 			ref.length / refFormat.getFrameSize());
-		Optional<String> uri = lame.encode(audioStream, new File(System
-		        .getProperty("java.io.tmpdir")), "mp3ref");
-		if (!uri.isPresent())
-			throw new RuntimeException("Could not encode the reference mp3");
-		mp3ref = uri.get();
+		File encodedFile = new File(new File(System.getProperty("java.io.tmpdir")), "mp3ref.mp3");
+		lame.encode(audioStream, MP3, encodedFile);
+		mp3ref = encodedFile.toURI().toString();
 	}
 
 	private boolean isValid(AudioFormat sourceFormat) throws Throwable {
@@ -139,16 +137,12 @@ public class LameTest {
 			new ByteArrayInputStream(audio),
 			sourceFormat,
 			audio.length / sourceFormat.getFrameSize());
-		Optional<String> lameMp3 = lame.encode(audioStream, new File(System
-		        .getProperty("java.io.tmpdir")), "lametest");
-
-		if (!lameMp3.isPresent()) {
-			System.err.println("Lame could not encode the data");
-			return false;
-		}
+		File encodedFile = new File(new File(System.getProperty("java.io.tmpdir")), "lametest.mp3");
+		lame.encode(audioStream, MP3, encodedFile);
+		String lameMp3 = encodedFile.toURI().toString();
 
 		//convert it back to PCM in order to compare them
-		byte[] lameAudio = mp3ToPCM(refFormat, lameMp3.get());
+		byte[] lameAudio = mp3ToPCM(refFormat, lameMp3);
 
 		//compare
 		//TODO: proper convolution or frequency-based comparison (after FFT)

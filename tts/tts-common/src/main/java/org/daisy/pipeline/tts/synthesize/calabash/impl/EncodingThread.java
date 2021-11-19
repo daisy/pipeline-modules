@@ -1,5 +1,6 @@
 package org.daisy.pipeline.tts.synthesize.calabash.impl;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -7,9 +8,9 @@ import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 
+import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 
@@ -43,7 +44,7 @@ public class EncodingThread {
 	private Thread mThread;
 	private Throwable criticalError;
 
-	void start(final AudioServices encoderRegistry,
+	void start(final AudioFileFormat.Type fileType, final AudioServices encoderRegistry,
 	        final BlockingQueue<ContiguousPCM> inputPCM, final Logger logger,
 	        final AudioBufferTracker audioBufferTracker, Map<String, String> TTSproperties,
 	        final TTSLog ttslog) {
@@ -66,7 +67,7 @@ public class EncodingThread {
 
 		//Eventually, we should select the encoder using the audio format as criterion, but for now
 		//we always employ the same encoder for every chunk of PCM
-		AudioEncoder encoder = encoderRegistry.newEncoder(TTSproperties).orElse(null);
+		AudioEncoder encoder = encoderRegistry.newEncoder(fileType, TTSproperties).orElse(null);
 		if (encoder == null) {
 			String msg = "No audio encoder found";
 			logger.info(msg);
@@ -102,17 +103,14 @@ public class EncodingThread {
 							int maxTime = (int) (1.0 + secs / fEncodingSpeed);
 							try {
 								timeout.enableForCurrentThread(maxTime);
-								Optional<String> destURI = fencoder.encode(
-									createAudioStream(job.getAudioFormat(), job.getBuffers()),
+								File encodedFile = new File(
 									job.getDestinationDirectory(),
-									job.getDestinationFilePrefix());
-								if (destURI.isPresent()) {
-									job.getURIholder().append(destURI.get());
-								} else {
-									String msg = "Audio encoder failed to encode to "
-										+ job.getDestinationFilePrefix();
-									ttslog.addGeneralError(ErrorCode.CRITICAL_ERROR, msg);
-								}
+									job.getDestinationFilePrefix() + "." + fileType.getExtension());
+								fencoder.encode(
+									createAudioStream(job.getAudioFormat(), job.getBuffers()),
+									fileType,
+									encodedFile);
+								job.getURIholder().append(encodedFile.toURI().toString());
 							} catch (InterruptedException e) {
 								String msg = "timeout while encoding audio to "
 									+ job.getDestinationFilePrefix() + ": " + getStack(e);

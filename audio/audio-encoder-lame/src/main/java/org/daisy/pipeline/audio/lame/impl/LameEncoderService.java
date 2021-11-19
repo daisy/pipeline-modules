@@ -6,9 +6,12 @@ import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.sound.sampled.AudioFileFormat;
+
 import org.daisy.common.shell.BinaryFinder;
 import org.daisy.pipeline.audio.AudioEncoder;
 import org.daisy.pipeline.audio.AudioEncoderService;
+import static org.daisy.pipeline.audio.AudioFileTypes.MP3;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -23,6 +26,11 @@ import org.slf4j.LoggerFactory;
 public class LameEncoderService implements AudioEncoderService {
 
 	private static final Logger logger = LoggerFactory.getLogger(LameEncoderService.class);
+
+	@Override
+	public boolean supportsFileType(AudioFileFormat.Type fileType) {
+		 return MP3.equals(fileType);
+	}
 
 	@Override
 	public Optional<AudioEncoder> newEncoder(Map<String,String> params) {

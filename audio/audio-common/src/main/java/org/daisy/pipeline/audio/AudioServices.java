@@ -5,6 +5,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.sound.sampled.AudioFileFormat;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -14,13 +16,15 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 	name = "audio-services",
 	service = { AudioServices.class }
 )
-public class AudioServices implements AudioEncoderService {
+public class AudioServices {
 
-	public Optional<AudioEncoder> newEncoder(Map<String,String> params) {
+	public Optional<AudioEncoder> newEncoder(AudioFileFormat.Type fileType, Map<String,String> params) {
 		for (AudioEncoderService s : encoderServices) {
-			Optional<AudioEncoder> e = s.newEncoder(params);
-			if (e.isPresent())
-				return e;
+			if (s.supportsFileType(fileType)) {
+				Optional<AudioEncoder> e = s.newEncoder(params);
+				if (e.isPresent())
+					return e;
+			}
 		}
 		return Optional.empty();
 	}

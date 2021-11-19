@@ -6,10 +6,12 @@ import java.io.OutputStream;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
 
 import org.daisy.pipeline.audio.AudioEncoder;
 import org.daisy.pipeline.audio.AudioEncoderService;
+import static org.daisy.pipeline.audio.AudioFileTypes.MP3;
 
 import org.ops4j.pax.exam.util.PathUtils;
 
@@ -24,22 +26,28 @@ public class MockEncoder implements AudioEncoderService {
 	private final static File mp3Out = new File(PathUtils.getBaseDir(), "src/test/resources/mock-encoder/mock_short.mp3");
 
 	@Override
+	public boolean supportsFileType(AudioFileFormat.Type fileType) {
+		return MP3.equals(fileType);
+	}
+
+	@Override
 	public Optional<AudioEncoder> newEncoder(Map<String,String> params) {
 		return Optional.of(
 			new AudioEncoder() {
 				@Override
-				public Optional<String> encode(AudioInputStream pcm, File outputDir, String filePrefix)
+				public void encode(AudioInputStream pcm, AudioFileFormat.Type outputFileType, File outputFile)
 						throws Throwable {
+					if (!MP3.equals(outputFileType))
+						throw new IllegalArgumentException();
 					long size = pcm.getFrameLength() * pcm.getFormat().getFrameSize(); // size in bytes
 					if (size > 100000) {
 						throw new RuntimeException("Encoding failed");
 					}
-					File encodedFile = new File(outputDir, filePrefix + ".mp3");
 					InputStream from = null;
 					OutputStream to = null;
 					try {
 						from = new FileInputStream(mp3Out);
-						to = new FileOutputStream(encodedFile);
+						to = new FileOutputStream(outputFile);
 						byte[] buffer = new byte[1024];
 						int length;
 						while ((length = from.read(buffer)) > 0) {
@@ -49,7 +57,6 @@ public class MockEncoder implements AudioEncoderService {
 						if (from != null) from.close();
 						if (to != null) to.close();
 					}
-					return Optional.of(encodedFile.toURI().toString());
 				}
 			}
 		);

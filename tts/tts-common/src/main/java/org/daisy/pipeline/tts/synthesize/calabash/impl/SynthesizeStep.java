@@ -17,6 +17,7 @@ import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmSequenceIterator;
 
 import org.daisy.common.xproc.calabash.XProcStep;
+import static org.daisy.pipeline.audio.AudioFileTypes.MP3;
 import org.daisy.pipeline.audio.AudioServices;
 import org.daisy.pipeline.tts.AudioBufferTracker;
 import org.daisy.pipeline.tts.TTSRegistry;
@@ -194,7 +195,7 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 		audioOutputDir.mkdirs();
 		audioOutputDir.deleteOnExit();
 
-		SSMLtoAudio ssmltoaudio = new SSMLtoAudio(audioOutputDir, mTTSRegistry, logger,
+		SSMLtoAudio ssmltoaudio = new SSMLtoAudio(audioOutputDir, MP3, mTTSRegistry, logger,
 		        mAudioBufferTracker, mRuntime.getProcessor(), mURIresolver, configExt, log);
 
 		Iterable<SoundFileLink> soundFragments = Collections.EMPTY_LIST;

@@ -3,7 +3,14 @@ package org.daisy.pipeline.audio;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.sound.sampled.AudioFileFormat;
+
 public interface AudioEncoderService {
+
+	/**
+	 * Whether this encoder supports encoding to a certain file format.
+	 */
+	boolean supportsFileType(AudioFileFormat.Type fileType);
 
 	/**
 	 * @param params contains various key-value pairs. Some of them might be parameters for the

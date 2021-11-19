@@ -44,14 +44,26 @@
 							<c:file name="content.html"/>
 							<c:file name="cover.smil"/>
 							<c:file name="front.smil"/>
-							<c:file name="mock.mp3"/>
 							<c:file name="ncc.html"/>
+							<c:file name="part0000_00_000.mp3"/>
+							<c:file name="part0001_00_000.mp3"/>
+							<c:file name="part0001_01_000.mp3"/>
+							<c:file name="part0001_02_000.mp3"/>
+							<c:file name="part0001_03_000.mp3"/>
+							<c:file name="part0002_00_000.mp3"/>
+							<c:file name="part0002_01_000.mp3"/>
 						</c:directory>
 					</c:directory>
 					<c:directory name="daisy3">
 						<c:directory name="EPUB">
 							<c:directory name="audio">
-								<c:file name="mock.mp3"/>
+								<c:file name="part0000_00_000.mp3"/>
+								<c:file name="part0001_00_000.mp3"/>
+								<c:file name="part0001_01_000.mp3"/>
+								<c:file name="part0001_02_000.mp3"/>
+								<c:file name="part0001_03_000.mp3"/>
+								<c:file name="part0002_00_000.mp3"/>
+								<c:file name="part0002_01_000.mp3"/>
 							</c:directory>
 						</c:directory>
 						<c:file name="book.opf"/>
@@ -66,7 +78,13 @@
 					<c:directory name="epub3">
 						<c:directory name="EPUB">
 							<c:directory name="audio">
-								<c:file name="mock.mp3"/>
+								<c:file name="part0000_00_000.mp3"/>
+								<c:file name="part0001_00_000.mp3"/>
+								<c:file name="part0001_01_000.mp3"/>
+								<c:file name="part0001_02_000.mp3"/>
+								<c:file name="part0001_03_000.mp3"/>
+								<c:file name="part0002_00_000.mp3"/>
+								<c:file name="part0002_01_000.mp3"/>
 							</c:directory>
 							<c:file name="chapter.xhtml"/>
 							<c:file name="cover.xhtml"/>
