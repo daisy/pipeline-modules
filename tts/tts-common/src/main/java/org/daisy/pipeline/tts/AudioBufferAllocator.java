@@ -1,7 +1,5 @@
 package org.daisy.pipeline.tts;
 
-import org.daisy.pipeline.audio.AudioBuffer;
-
 public interface AudioBufferAllocator {
 	public class MemoryException extends Exception {
 		public MemoryException(String message) {

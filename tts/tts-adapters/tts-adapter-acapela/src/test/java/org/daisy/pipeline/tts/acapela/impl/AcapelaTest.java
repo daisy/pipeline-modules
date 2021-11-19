@@ -13,7 +13,7 @@ import java.util.Set;
 
 import javax.sound.sampled.AudioFormat;
 
-import org.daisy.pipeline.audio.AudioBuffer;
+import org.daisy.pipeline.tts.AudioBuffer;
 import org.daisy.pipeline.tts.AudioBufferAllocator;
 import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
 import org.daisy.pipeline.tts.RoundRobinLoadBalancer;

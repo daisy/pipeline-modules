@@ -4,9 +4,8 @@ import java.io.FileOutputStream;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
 
-import org.daisy.pipeline.audio.AudioBuffer;
 import org.daisy.pipeline.audio.AudioEncoder;
 import org.daisy.pipeline.audio.AudioEncoderService;
 
@@ -27,8 +26,7 @@ public class MockEncoder implements AudioEncoderService {
 		return Optional.of(
 			new AudioEncoder() {
 				@Override
-				public Optional<String> encode(Iterable<AudioBuffer> pcm, AudioFormat audioFormat,
-				                               File outputDir, String filePrefix) throws Throwable {
+				public Optional<String> encode(AudioInputStream pcm, File outputDir, String filePrefix) throws Throwable {
 					if (!mp3Out.exists()) {
 						mp3Out.getParentFile().mkdirs();
 						mp3Out.createNewFile();

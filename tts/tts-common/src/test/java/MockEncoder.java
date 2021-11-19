@@ -6,9 +6,8 @@ import java.io.OutputStream;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
 
-import org.daisy.pipeline.audio.AudioBuffer;
 import org.daisy.pipeline.audio.AudioEncoder;
 import org.daisy.pipeline.audio.AudioEncoderService;
 
@@ -29,11 +28,9 @@ public class MockEncoder implements AudioEncoderService {
 		return Optional.of(
 			new AudioEncoder() {
 				@Override
-				public Optional<String> encode(Iterable<AudioBuffer> pcm, AudioFormat audioFormat,
-				                               File outputDir, String filePrefix) throws Throwable {
-					int size = 0;
-					for (AudioBuffer b : pcm)
-						size += b.size;
+				public Optional<String> encode(AudioInputStream pcm, File outputDir, String filePrefix)
+						throws Throwable {
+					long size = pcm.getFrameLength() * pcm.getFormat().getFrameSize(); // size in bytes
 					if (size > 100000) {
 						throw new RuntimeException("Encoding failed");
 					}

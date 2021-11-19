@@ -44,7 +44,7 @@ import org.daisy.common.stax.XMLStreamWriterHelper;
 import org.daisy.common.xslt.CompiledStylesheet;
 import org.daisy.common.xslt.ThreadUnsafeXslTransformer;
 import org.daisy.common.xslt.XslTransformCompiler;
-import org.daisy.pipeline.audio.AudioBuffer;
+import org.daisy.pipeline.tts.AudioBuffer;
 import org.daisy.pipeline.tts.AudioBufferAllocator;
 import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
 import org.daisy.pipeline.tts.MarklessTTSEngine;

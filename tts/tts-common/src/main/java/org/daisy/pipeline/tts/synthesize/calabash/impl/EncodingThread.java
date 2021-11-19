@@ -1,13 +1,21 @@
 package org.daisy.pipeline.tts.synthesize.calabash.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+
 import org.daisy.pipeline.audio.AudioEncoder;
 import org.daisy.pipeline.audio.AudioServices;
+import org.daisy.pipeline.tts.AudioBuffer;
 import org.daisy.pipeline.tts.AudioBufferTracker;
 import org.daisy.pipeline.tts.TTSTimeout;
 import org.daisy.pipeline.tts.synthesize.calabash.impl.TTSLog.ErrorCode;
@@ -88,14 +96,16 @@ public class EncodingThread {
 							break;
 						}
 						int jobSize = job.sizeInBytes();
+						// FIXME: why do we end up in endless loop when encoder is null??
 						if (fencoder != null) {
 							float secs = jobSize / (job.getAudioFormat().getFrameRate());
 							int maxTime = (int) (1.0 + secs / fEncodingSpeed);
 							try {
 								timeout.enableForCurrentThread(maxTime);
-								Optional<String> destURI = fencoder.encode(job.getBuffers(), job
-								                                           .getAudioFormat(), job.getDestinationDirectory(), job
-								                                           .getDestinationFilePrefix());
+								Optional<String> destURI = fencoder.encode(
+									createAudioStream(job.getAudioFormat(), job.getBuffers()),
+									job.getDestinationDirectory(),
+									job.getDestinationFilePrefix());
 								if (destURI.isPresent()) {
 									job.getURIholder().append(destURI.get());
 								} else {
@@ -155,4 +165,37 @@ public class EncodingThread {
 		return writer.toString();
 	}
 
+	/**
+	 * Create an {@see AudioInputStream} from an {@see AudioFormat} and the audio data.
+	 */
+	private static AudioInputStream createAudioStream(AudioFormat format, Iterable<AudioBuffer> data) {
+		long totalBytes = 0; {
+			for (AudioBuffer b : data)
+				totalBytes += b.size;
+		}
+		return new AudioInputStream(
+			new InputStream() {
+				Iterator<AudioBuffer> nextBuffers = data.iterator();
+				AudioBuffer buffer = null;
+				int indexInBuffer = 0;
+				boolean done = false;
+				public int read() throws IOException {
+					if (done) return -1;
+					if (buffer != null && indexInBuffer < buffer.size)
+						return Byte.toUnsignedInt(buffer.data[indexInBuffer++]);
+					else {
+						try {
+							buffer = nextBuffers.next();
+						} catch (NoSuchElementException e) {
+							done = true;
+							return -1;
+						}
+						indexInBuffer = 0;
+						return read();
+					}
+				}
+			},
+			format,
+			totalBytes / format.getFrameSize());
+	}
 }

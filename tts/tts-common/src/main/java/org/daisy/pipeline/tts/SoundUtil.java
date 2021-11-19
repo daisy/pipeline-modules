@@ -1,7 +1,5 @@
 package org.daisy.pipeline.tts;
 
-import org.daisy.pipeline.audio.AudioBuffer;
-
 public class SoundUtil {
 
 	static public void realloc(AudioBuffer buffer, int extra) {

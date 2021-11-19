@@ -11,7 +11,7 @@ import javax.sound.sampled.AudioFormat;
 
 import net.sf.saxon.s9api.XdmNode;
 
-import org.daisy.pipeline.audio.AudioBuffer;
+import org.daisy.pipeline.tts.AudioBuffer;
 import org.daisy.pipeline.tts.AudioBufferAllocator;
 import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
 import org.daisy.pipeline.tts.sapinative.SAPILib;

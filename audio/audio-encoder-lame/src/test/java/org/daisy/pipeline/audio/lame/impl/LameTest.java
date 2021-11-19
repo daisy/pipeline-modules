@@ -1,19 +1,19 @@
 package org.daisy.pipeline.audio.lame.impl;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.Random;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioFormat.Encoding;
+import javax.sound.sampled.AudioInputStream;
 
 import org.daisy.common.shell.BinaryFinder;
-import org.daisy.pipeline.audio.AudioBuffer;
 import org.daisy.pipeline.audio.AudioEncoder;
 
 import org.junit.Assert;
@@ -34,18 +34,6 @@ import com.google.common.io.Files;
  * - Read and write permissions on the OS' tmp directory
  */
 public class LameTest {
-
-	static class AudioBufferTest extends AudioBuffer {
-		public AudioBufferTest(int size) {
-			data = new byte[size];
-			this.size = size;
-		}
-
-		public AudioBufferTest(byte[] data, int size) {
-			this.data = data;
-			this.size = size;
-		}
-	}
 
 	@Before
 	public void cleanProperties() {
@@ -102,7 +90,7 @@ public class LameTest {
 		return Files.toByteArray(pcmFile);
 	}
 
-	private static AudioBuffer ref;
+	private static byte[] ref;
 	private static AudioFormat refFormat;
 	private static String mp3ref;
 	private static AudioEncoder lame;
@@ -115,22 +103,26 @@ public class LameTest {
 		
 		refFormat = new AudioFormat(8000, 8, 1, true, true); //8 bits signed big-endian (for easy comparisons)
 
-		ref = new AudioBufferTest(1024 * 100);
+		ref = new byte[1024 * 100];
 		Random r = new Random();
 		r.setSeed(0);
-		ref.data[0] = (byte) r.nextInt(256);
-		for (int i = 1; i < ref.size; ++i) {
-			int next = (r.nextInt(3) - 1) + ref.data[i - 1];
+		ref[0] = (byte) r.nextInt(256);
+		for (int i = 1; i < ref.length; ++i) {
+			int next = (r.nextInt(3) - 1) + ref[i - 1];
 			if (next > 127)
 				next = 127;
 			else if (next < -127)
 				next = -127;
-			ref.data[i] = (byte) next;
+			ref[i] = (byte) next;
 		}
 
 		//dump the reference on the disk using Lame
 		lame = new LameEncoderService().newEncoder(new HashMap<String,String>()).get();
-		Optional<String> uri = lame.encode(Arrays.asList(ref), refFormat, new File(System
+		AudioInputStream audioStream = new AudioInputStream(
+			new ByteArrayInputStream(ref),
+			refFormat,
+			ref.length / refFormat.getFrameSize());
+		Optional<String> uri = lame.encode(audioStream, new File(System
 		        .getProperty("java.io.tmpdir")), "mp3ref");
 		if (!uri.isPresent())
 			throw new RuntimeException("Could not encode the reference mp3");
@@ -143,8 +135,11 @@ public class LameTest {
 		byte[] audio = mp3ToPCM(sourceFormat, mp3ref);
 
 		//use lame to convert it to MP3
-		AudioBuffer b = new AudioBufferTest(audio, audio.length);
-		Optional<String> lameMp3 = lame.encode(Arrays.asList(b), sourceFormat, new File(System
+		AudioInputStream audioStream = new AudioInputStream(
+			new ByteArrayInputStream(audio),
+			sourceFormat,
+			audio.length / sourceFormat.getFrameSize());
+		Optional<String> lameMp3 = lame.encode(audioStream, new File(System
 		        .getProperty("java.io.tmpdir")), "lametest");
 
 		if (!lameMp3.isPresent()) {
@@ -157,18 +152,18 @@ public class LameTest {
 
 		//compare
 		//TODO: proper convolution or frequency-based comparison (after FFT)
-		byte[] small = ref.data;
+		byte[] small = ref;
 		byte[] big = lameAudio;
-		if (ref.data.length > lameAudio.length) {
-			big = ref.data;
+		if (ref.length > lameAudio.length) {
+			big = ref;
 			small = lameAudio;
 		}
 		int diff = big.length - small.length;
-		if (diff > 3 * ref.data.length / 100) {
+		if (diff > 3 * ref.length / 100) {
 			System.err.println("size differs too much");
 			return false;
 		}
-		int window = Math.min(ref.data.length, lameAudio.length);
+		int window = Math.min(ref.length, lameAudio.length);
 		long minerror = Long.MAX_VALUE;
 		for (int d = 0; d < diff; d += 2) {
 			long e = 0;
@@ -264,15 +259,14 @@ public class LameTest {
 
 	@Test
 	public void floatingpoint64bigEndian() throws Throwable {
-		boolean valid = isValid(new AudioFormat(Encoding.PCM_FLOAT, 8000, 64, 1, 4, 8000, true));
+		boolean valid = isValid(new AudioFormat(Encoding.PCM_FLOAT, 8000, 64, 1, 8, 8000, true));
 		Assert.assertTrue(valid);
 	}
 
 	@Test
 	public void floatingpoint64littleEndian() throws Throwable {
-		boolean valid = isValid(new AudioFormat(Encoding.PCM_FLOAT, 8000, 64, 1, 4, 8000,
+		boolean valid = isValid(new AudioFormat(Encoding.PCM_FLOAT, 8000, 64, 1, 8, 8000,
 		        false));
 		Assert.assertTrue(valid);
 	}
-
 }

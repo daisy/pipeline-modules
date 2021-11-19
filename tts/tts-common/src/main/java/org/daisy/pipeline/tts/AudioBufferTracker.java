@@ -2,7 +2,6 @@ package org.daisy.pipeline.tts;
 
 import java.util.concurrent.Semaphore;
 
-import org.daisy.pipeline.audio.AudioBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
