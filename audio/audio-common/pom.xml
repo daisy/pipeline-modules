@@ -28,6 +28,7 @@
   <properties>
     <expose-services>
       org.daisy.pipeline.audio.AudioServices,
+      org.daisy.pipeline.audio.impl.SystemAudioDecoder,
       org.daisy.pipeline.audio.impl.SystemAudioEncoder
     </expose-services>
   </properties>

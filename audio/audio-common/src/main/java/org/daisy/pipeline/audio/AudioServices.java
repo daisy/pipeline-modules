@@ -29,7 +29,19 @@ public class AudioServices {
 		return Optional.empty();
 	}
 
+	public Optional<AudioDecoder> newDecoder(AudioFileFormat.Type fileType, Map<String,String> params) {
+		for (AudioDecoderService s : decoderServices) {
+			if (s.supportsFileType(fileType)) {
+				Optional<AudioDecoder> d = s.newDecoder(params);
+				if (d.isPresent())
+					return d;
+			}
+		}
+		return Optional.empty();
+	}
+
 	private final Collection<AudioEncoderService> encoderServices = new CopyOnWriteArrayList<>();
+	private final Collection<AudioDecoderService> decoderServices = new CopyOnWriteArrayList<>();
 
 	@Reference(
 		name = "audio-encoder-service",
@@ -44,5 +56,20 @@ public class AudioServices {
 
 	public void removeEncoderService(AudioEncoderService service) {
 		encoderServices.remove(service);
+	}
+
+	@Reference(
+		name = "audio-decoder-service",
+		unbind = "removeDecoderService",
+		service = AudioDecoderService.class,
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC
+	)
+	public void addDecoderService(AudioDecoderService service) {
+		decoderServices.add(service);
+	}
+
+	public void removeDecoderService(AudioDecoderService service) {
+		decoderServices.remove(service);
 	}
 }
