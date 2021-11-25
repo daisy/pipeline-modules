@@ -6,7 +6,7 @@
                 xmlns:m="http://www.w3.org/1998/Math/MathML"
                 exclude-result-prefixes="#all">
 
-	<!-- Return a fileset of a DTBook and all the resources referenced from it (i.e. images and PLS lexicons) -->
+	<!-- Return a fileset of a DTBook and all the resources referenced from it (i.e. images, CSS and PLS lexicons) -->
 
 	<xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl"/>
 
@@ -15,8 +15,15 @@
 		<d:fileset>
 			<xsl:attribute name="xml:base" select="replace($base,'[^/]+$','')"/>
 			<d:file href="{replace($base,'^.*/([^/]+)$','$1')}" media-type="application/x-dtbook+xml" original-href="{$base}"/>
-			<xsl:for-each select="//dtb:link[@rel='pronunciation']/@href">
-				<d:file href="{pf:relativize-uri(resolve-uri(.,pf:base-uri(.)),$base)}" original-href="{resolve-uri(.,pf:base-uri(.))}">
+			<xsl:for-each select="//dtb:link[@rel='stylesheet'][empty(@type) or @type='text/css']/@href[normalize-space()]">
+				<d:file href="{pf:relativize-uri(resolve-uri(normalize-space(.),pf:base-uri(.)),$base)}"
+				        original-href="{resolve-uri(normalize-space(.),pf:base-uri(.))}">
+					<xsl:attribute name="media-type" select="'text/css'"/>
+				</d:file>
+			</xsl:for-each>
+			<xsl:for-each select="//dtb:link[@rel='pronunciation']/@href[normalize-space()]">
+				<d:file href="{pf:relativize-uri(resolve-uri(normalize-space(.),pf:base-uri(.)),$base)}"
+				        original-href="{resolve-uri(normalize-space(.),pf:base-uri(.))}">
 					<xsl:if test="../@type">
 						<xsl:attribute name="media-type" select="../@type"/>
 					</xsl:if>

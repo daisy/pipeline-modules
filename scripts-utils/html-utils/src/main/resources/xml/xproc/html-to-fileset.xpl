@@ -6,7 +6,6 @@
 	
 	<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 		<p px:role="desc">Creates a fileset document for an XHTML document.</p>
-		<p>The fileset entries are ordered as the resources appear in the input document</p>
 	</p:documentation>
 	
 	<p:input port="source" primary="true">
@@ -32,9 +31,9 @@
 	<p:output port="result">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>A <code>d:fileset</code> document with the XHTML file itself and all the resources
-			referenced from the XHTML, in the order in which they appear. Some media types are
-			inferred – users may have to apply additional type detection. A <code>@kind</code>
-			attribute is used to annotate the kind of resource:</p>
+			referenced from the XHTML. Some media types are inferred – users may have to apply
+			additional type detection. A <code>@kind</code> attribute is used to annotate the kind
+			of resource:</p>
 			<ul>
 				<li>stylesheet</li>
 				<li>media</li>
@@ -53,6 +52,16 @@
 	
 	<p:serialization port="result" indent="true"/>
 
+	<p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
+		<p:documentation>
+			px:parse-xml-stylesheet-instructions
+		</p:documentation>
+	</p:import>
+	<p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
+		<p:documentation>
+			px:fileset-join
+		</p:documentation>
+	</p:import>
 	<p:import href="http://www.daisy.org/pipeline/modules/mediatype-utils/library.xpl">
 		<p:documentation>
 			px:mediatype-detect
@@ -75,6 +84,28 @@
 		</p:with-param>
 	</p:xslt>
 	
-	<px:mediatype-detect/>
+	<px:mediatype-detect name="html-and-resources"/>
+	<p:sink/>
+
+	<px:parse-xml-stylesheet-instructions name="parse-pi">
+		<p:input port="source">
+			<p:pipe step="main" port="source"/>
+		</p:input>
+	</px:parse-xml-stylesheet-instructions>
+	<p:sink/>
+	<p:identity>
+		<p:input port="source">
+			<p:pipe step="parse-pi" port="fileset"/>
+		</p:input>
+	</p:identity>
+	<p:add-attribute match="d:file" attribute-name="kind" attribute-value="stylesheet" name="stylesheets-from-pi"/>
+	<p:sink/>
+
+	<px:fileset-join>
+		<p:input port="source">
+			<p:pipe step="html-and-resources" port="result"/>
+			<p:pipe step="stylesheets-from-pi" port="result"/>
+		</p:input>
+	</px:fileset-join>
 	
 </p:declare-step>

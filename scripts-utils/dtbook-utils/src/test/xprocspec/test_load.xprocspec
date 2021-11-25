@@ -34,7 +34,7 @@
 		          type="custom" href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl" step="x:fileset-compare">
 			<x:document type="inline">
 				<d:fileset xml:base="file:/">
-					<d:file href="style.css" media-type="text/css"/>
+					<d:file href="style.css" media-type="text/css" original-href="style.css"/>
 					<d:file href="lexicon.pls" media-type="application/pls+xml" original-href="file:/lexicon.pls"/>
 					<d:file href="foo.xml" original-href="foo.xml" media-type="application/x-dtbook+xml"/>
 					<d:file href="image.png" original-href="image.png" media-type="image/png"/>
@@ -42,7 +42,33 @@
 			</x:document>
 		</x:expect>
 	</x:scenario>
-	
+
+	<x:scenario label="css from links and xml-stylesheet instructions">
+		<x:call step="px:dtbook-load">
+			<x:input port="source">
+				<x:document type="file" href="../resources/dtbook-with-stylesheets.xml"/>
+			</x:input>
+		</x:call>
+		<x:context label="the fileset">
+			<x:document type="port" port="fileset.out"/>
+		</x:context>
+		<x:expect label="the fileset"
+		          type="custom" href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl" step="x:fileset-compare">
+			<x:document type="inline">
+				<d:fileset>
+					<d:file href="../resources/dtbook-with-stylesheets.xml" media-type="application/x-dtbook+xml"
+					        original-href="../resources/dtbook-with-stylesheets.xml"/>
+					<d:file href="../resources/test1.css" media-type="text/css"/>
+					<d:file href="../resources/test2.css" media-type="text/css"/>
+					<d:file href="../resources/test3.css" media-type="text/css"/>
+					<d:file href="../resources/test6.css" media-type="text/css" original-href="../resources/test6.css"/>
+					<d:file href="../resources/test7.css" media-type="text/css" original-href="../resources/test7.css"/>
+					<d:file href="../resources/test11.css" media-type="text/css" original-href="../resources/test11.css"/>
+				</d:fileset>
+			</x:document>
+		</x:expect>
+	</x:scenario>
+
 	<x:scenario label="if the base uri starts with file:///">
 		<x:call step="px:dtbook-load">
 			<x:input port="source">
@@ -72,8 +98,8 @@
 			<x:document type="inline">
 				<d:fileset xml:base="file:/">
 					<d:file href="foo.xml" original-href="file:/foo.xml" media-type="application/x-dtbook+xml"/>
+					<d:file href="style.css" original-href="file:/style.css" media-type="text/css"/>
 					<d:file href="image.png" original-href="file:/image.png" media-type="image/png"/>
-					<d:file href="style.css" media-type="text/css"/>
 				</d:fileset>
 			</x:document>
 		</x:expect>

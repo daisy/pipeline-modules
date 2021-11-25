@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 type="px:dtbook-load" name="main">
 
     <p:documentation> Loads the DTBook XML fileset. </p:documentation>
@@ -30,6 +31,7 @@
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
         <p:documentation>
             px:message
+            px:parse-xml-stylesheet-instructions
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
@@ -40,11 +42,6 @@
     <p:import href="http://www.daisy.org/pipeline/modules/mediatype-utils/library.xpl">
         <p:documentation>
             px:mediatype-detect
-        </p:documentation>
-    </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/css-utils/library.xpl">
-        <p:documentation>
-            px:xml-to-css-fileset
         </p:documentation>
     </p:import>
 
@@ -65,32 +62,26 @@
     <p:identity name="dtbook-resources-mathml"/>
     <p:sink/>
     
-    <!-- add any linked CSS stylesheets -->
+    <!-- add any CSS stylesheets from xml-stylesheet instructions  -->
     <p:for-each>
         <p:iteration-source>
             <p:pipe step="main" port="source"/>
         </p:iteration-source>
-        <p:try>
-            <p:group>
-                <px:xml-to-css-fileset include-links="true"/>
-            </p:group>
-            <p:catch>
-                <px:message message="CSS stylesheet URI(s) are malformed." severity="WARNING"/>
-                <p:identity>
-                    <p:input port="source">
-                        <p:empty/>
-                    </p:input>
-                </p:identity>
-            </p:catch>
-        </p:try>
+        <px:parse-xml-stylesheet-instructions name="parse-pi"/>
+        <p:sink/>
+        <p:delete match="d:file[not(@media-type='text/css')]">
+            <p:input port="source">
+                <p:pipe step="parse-pi" port="fileset"/>
+            </p:input>
+        </p:delete>
     </p:for-each>
-    <p:identity name="css"/>
+    <p:identity name="css-from-pi"/>
     <p:sink/>
 
     <px:fileset-join>
         <p:input port="source">
             <p:pipe step="dtbook-resources-mathml" port="result"/>
-            <p:pipe step="css" port="result"/>
+            <p:pipe step="css-from-pi" port="result"/>
         </p:input>
     </px:fileset-join>
     

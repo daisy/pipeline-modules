@@ -57,18 +57,6 @@
         <xsl:apply-templates select="node()|@*"/>
     </xsl:template>
 
-    <xsl:template match="/processing-instruction('xml-stylesheet')">
-        <xsl:variable name="href" select="replace(.,'^.*href=(&amp;apos;|&quot;)(.*?)\1.*$','$2')"/>
-        <xsl:variable name="type" select="replace(.,'^.*type=(&amp;apos;|&quot;)(.*?)\1.*$','$2')"/>
-        <xsl:sequence
-            select="f:fileset-entry($href,
-            if ($type) then $type
-            else if (pf:get-extension($href)='css') then 'text/css'
-            else if (pf:get-extension($href)=('xsl','xslt')) then 'application/xslt+xml'
-            else '','stylesheet')"
-        />
-    </xsl:template>
-
     <xsl:template match="@aria-describedat[not(starts-with(.,'#'))]">
         <xsl:sequence select="f:fileset-entry(.,(),'description')"/>
     </xsl:template>

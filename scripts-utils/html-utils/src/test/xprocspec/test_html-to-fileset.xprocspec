@@ -370,7 +370,7 @@
 			<x:document type="port" port="result"/>
 		</x:context>
 		<x:expect label="the fileset"
-		          type="custom" href="../../../../../common/fileset-utils/src/main/resources/xml/xproc/fileset-library.xpl"
+		          type="custom" href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"
 		          step="x:fileset-compare">
 			<x:document type="inline">
 				<d:fileset>
@@ -379,6 +379,27 @@
 					<d:file href="font.ttf" original-href="font.ttf" media-type="application/x-font-ttf"/>
 					<d:file href="img.png" original-href="img.png" media-type="image/png" kind="image"/>
 					<d:file href="img2.jpg" original-href="img2.jpg" media-type="image/jpeg" kind="image"/>
+				</d:fileset>
+			</x:document>
+		</x:expect>
+	</x:scenario>
+
+	<x:scenario label="xml-stylesheet instruction">
+		<x:call step="px:html-to-fileset">
+			<x:input port="source">
+				<x:document type="file" href="../resources/html-with-xml-stylesheet-processing-instruction.xml"/>
+			</x:input>
+		</x:call>
+		<x:context label="the fileset">
+			<x:document type="port" port="result"/>
+		</x:context>
+		<x:expect label="the fileset"
+		          type="custom" href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"
+		          step="x:fileset-compare">
+			<x:document type="inline">
+				<d:fileset>
+					<d:file href="../resources/html-with-xml-stylesheet-processing-instruction.xml" media-type="application/xhtml+xml"/>
+					<d:file href="../resources/foo.css" media-type="text/css" kind="stylesheet"/>
 				</d:fileset>
 			</x:document>
 		</x:expect>
