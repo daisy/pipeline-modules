@@ -38,6 +38,7 @@
 					<d:file href="lexicon.pls" media-type="application/pls+xml" original-href="file:/lexicon.pls"/>
 					<d:file href="foo.xml" original-href="foo.xml" media-type="application/x-dtbook+xml"/>
 					<d:file href="image.png" original-href="image.png" media-type="image/png"/>
+					<d:file href="font.ttf" original-href="font.ttf" media-type="application/x-font-ttf"/>
 				</d:fileset>
 			</x:document>
 		</x:expect>

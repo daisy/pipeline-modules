@@ -44,6 +44,11 @@
             px:mediatype-detect
         </p:documentation>
     </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/css-utils/library.xpl">
+        <p:documentation>
+            px:css-to-fileset
+        </p:documentation>
+    </p:import>
 
     <p:identity name="dtbook"/>
     
@@ -78,10 +83,23 @@
     <p:identity name="css-from-pi"/>
     <p:sink/>
 
+    <p:group name="referenced-from-css">
+        <p:output port="result"/>
+        <px:fileset-join>
+            <p:input port="source">
+                <p:pipe step="dtbook-resources-mathml" port="result"/>
+                <p:pipe step="css-from-pi" port="result"/>
+            </p:input>
+        </px:fileset-join>
+        <px:css-to-fileset/>
+    </p:group>
+    <p:sink/>
+
     <px:fileset-join>
         <p:input port="source">
             <p:pipe step="dtbook-resources-mathml" port="result"/>
             <p:pipe step="css-from-pi" port="result"/>
+            <p:pipe step="referenced-from-css" port="result"/>
         </p:input>
     </px:fileset-join>
     
