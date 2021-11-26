@@ -43,7 +43,7 @@
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
         <p:documentation>
-            px:html-to-fileset
+            px:html-load
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
@@ -140,7 +140,7 @@
         <px:message severity="DEBUG" message="Listing all resources referenced from the HTML files"/>
         <p:for-each>
             <p:variable name="filename" select="replace(base-uri(/*),'^.*/','')"/>
-            <px:html-to-fileset px:message="extracting list of resources from {$filename}" px:message-severity="DEBUG"/>
+            <px:html-load px:message="extracting list of resources from {$filename}" px:message-severity="DEBUG"/>
         </p:for-each>
         <px:fileset-join/>
         <!-- omit HTML files except those referenced from iframes -->

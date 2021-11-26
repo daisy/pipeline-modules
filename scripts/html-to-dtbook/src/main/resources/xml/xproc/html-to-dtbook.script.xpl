@@ -38,7 +38,7 @@
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
         <p:documentation>
-            px:html-to-fileset
+            px:html-load
         </p:documentation>
     </p:import>
     <p:import href="html-to-dtbook.xpl">
@@ -63,7 +63,7 @@
             <p:with-option name="href" select="$html"/>
         </px:fileset-add-entry>
         <px:fileset-load name="html"/>
-        <px:html-to-fileset/>
+        <px:html-load/>
     </p:group>
 
     <p:documentation>

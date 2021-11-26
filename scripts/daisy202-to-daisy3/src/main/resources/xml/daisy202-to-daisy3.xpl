@@ -57,7 +57,7 @@
 	</p:import>
 	<p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
 		<p:documentation>
-			px:html-to-fileset
+			px:html-load
 		</p:documentation>
 	</p:import>
 	<p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
@@ -365,14 +365,14 @@
 				<p:iteration-source>
 					<p:pipe step="html" port="in-memory"/>
 				</p:iteration-source>
-				<px:html-to-fileset>
+				<px:html-load>
 					<p:input port="context.fileset">
 						<p:pipe step="copy" port="result.fileset"/>
 					</p:input>
 					<p:input port="context.in-memory">
 						<p:pipe step="copy" port="result.in-memory"/>
 					</p:input>
-				</px:html-to-fileset>
+				</px:html-load>
 			</p:for-each>
 			<px:fileset-join name="html-fileset"/>
 			<px:fileset-diff>

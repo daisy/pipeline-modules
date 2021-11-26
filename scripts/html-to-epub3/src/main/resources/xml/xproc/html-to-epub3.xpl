@@ -67,7 +67,7 @@ element in the OPF namespace. If not specified, metadata is extracted from the H
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
         <p:documentation>
-            px:html-to-fileset
+            px:html-load
         </p:documentation>
     </p:import>
     <p:import href="html-to-epub3.convert.xpl">
@@ -106,7 +106,7 @@ element in the OPF namespace. If not specified, metadata is extracted from the H
                 <px:fileset-load/>
             </p:for-each>
             <p:for-each>
-                <px:html-to-fileset/>
+                <px:html-load/>
             </p:for-each>
             <px:fileset-join/>
         </p:group>

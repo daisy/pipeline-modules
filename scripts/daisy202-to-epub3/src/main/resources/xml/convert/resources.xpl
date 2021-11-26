@@ -32,7 +32,11 @@
 
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
+        <p:documentation>
+            px:html-load
+        </p:documentation>
+    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/mediatype-utils/library.xpl"/>
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
         <p:documentation>
@@ -55,7 +59,7 @@
             <p:with-option name="base-uri" select="$original-href"/>
         </px:set-base-uri>
         <p:add-xml-base/>
-        <px:html-to-fileset/>
+        <px:html-load/>
         <!-- not using fileset-filter because we don't want to delete files references from iframes -->
         <p:delete match="d:file[@media-type='application/xhtml+xml' and not(@kind='content')]"/>
         <px:message message="extracted list of resources from $1">

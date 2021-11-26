@@ -2,7 +2,7 @@
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
-                type="px:html-to-fileset" name="main">
+                type="px:html-load" name="main">
 	
 	<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 		<p px:role="desc">Creates a fileset document for an XHTML document.</p>

@@ -4,10 +4,10 @@
                xmlns:d="http://www.daisy.org/ns/pipeline/data"
                xmlns:c="http://www.w3.org/ns/xproc-step"
                xmlns="http://www.w3.org/1999/xhtml"
-               script="../../main/resources/xml/xproc/html-to-fileset.xpl">
+               script="../../main/resources/xml/xproc/html-load.xpl">
 
 	<x:scenario label="For a regular document">
-		<x:call step="px:html-to-fileset"/>
+		<x:call step="px:html-load"/>
 
 		<x:scenario label="the base URI of the HTML document is set to the fileset">
 			<x:call>
@@ -53,7 +53,7 @@
 	</x:scenario>
 
 	<x:scenario label="'img' element">
-		<x:call step="px:html-to-fileset"/>
+		<x:call step="px:html-load"/>
 
 		<x:scenario label="with no @src">
 			<x:call>
@@ -193,7 +193,7 @@
 	</x:scenario>
 
 	<x:scenario label="'longdesc' attribute">
-		<x:call step="px:html-to-fileset"/>
+		<x:call step="px:html-load"/>
 
 		<x:scenario label="pointing to an external resource">
 			<x:call>
@@ -247,7 +247,7 @@
 	</x:scenario>
 
 	<x:scenario label="'aria-descrbedat' attribute">
-		<x:call step="px:html-to-fileset"/>
+		<x:call step="px:html-load"/>
 
 		<x:scenario label="on an image">
 			<x:call>
@@ -302,7 +302,7 @@
 	</x:scenario>
 
 	<x:scenario label="nested structure">
-		<x:call step="px:html-to-fileset">
+		<x:call step="px:html-load">
 			<x:input port="source">
 				<x:document type="inline" xml:base="file:/example/doc.html">
 					<html>
@@ -328,7 +328,7 @@
 	</x:scenario>
 
 	<x:scenario label="various">
-		<x:call step="px:html-to-fileset">
+		<x:call step="px:html-load">
 			<x:input port="source">
 				<x:document type="inline">
 					<html xmlns="http://www.w3.org/1999/xhtml">
@@ -374,7 +374,7 @@
 		          step="x:fileset-compare">
 			<x:document type="inline">
 				<d:fileset>
-					<d:file href="test_html-to-fileset.xprocspec" media-type="application/xhtml+xml"/>
+					<d:file href="test_html-load.xprocspec" media-type="application/xhtml+xml"/>
 					<d:file href="foo.css" media-type="text/css"/>
 					<d:file href="font.ttf" original-href="font.ttf" media-type="application/x-font-ttf"/>
 					<d:file href="img.png" original-href="img.png" media-type="image/png" kind="image"/>
@@ -385,7 +385,7 @@
 	</x:scenario>
 
 	<x:scenario label="xml-stylesheet instruction">
-		<x:call step="px:html-to-fileset">
+		<x:call step="px:html-load">
 			<x:input port="source">
 				<x:document type="file" href="../resources/html-with-xml-stylesheet-processing-instruction.xml"/>
 			</x:input>

@@ -73,7 +73,7 @@
     <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
         <p:documentation>
             px:html-merge
-            px:html-to-fileset
+            px:html-load
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/dtbook-utils/library.xpl">
@@ -486,7 +486,7 @@
                 <p:pipe step="copy" port="result.in-memory"/>
             </p:input>
         </px:fileset-load>
-        <px:html-to-fileset name="html-fileset"/>
+        <px:html-load name="html-fileset"/>
         <px:fileset-diff name="unreferenced-resources">
             <p:input port="secondary">
                 <p:pipe step="dtbook-fileset" port="fileset.out"/>

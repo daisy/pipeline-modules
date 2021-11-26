@@ -132,7 +132,7 @@ sheet modules) are available for use in Sass style sheets:
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
         <p:documentation>
-            px:html-to-fileset
+            px:html-load
         </p:documentation>
     </p:import>
     
@@ -184,7 +184,7 @@ sheet modules) are available for use in Sass style sheets:
         <p:with-option name="href" select="$html"/>
     </px:fileset-add-entry>
     <px:fileset-load name="html" px:message="Loading HTML" px:progress=".03"/>
-    <px:html-to-fileset/>
+    <px:html-load/>
     
     <!-- ============ -->
     <!-- HTML TO PEF -->

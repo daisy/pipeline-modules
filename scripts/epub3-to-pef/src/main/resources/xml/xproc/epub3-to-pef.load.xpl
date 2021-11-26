@@ -26,7 +26,7 @@
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
         <p:documentation>
-            px:html-to-fileset
+            px:html-load
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/epub-utils/library.xpl">
@@ -64,11 +64,11 @@
     
     <p:choose>
         <p:when test="$preamble!=''">
-            <px:html-to-fileset>
+            <px:html-load>
                 <p:input port="source">
                     <p:pipe step="preamble.in-memory" port="result"/>
                 </p:input>
-            </px:html-to-fileset>
+            </px:html-load>
             <px:fileset-add-entry replace-attributes="true">
                 <p:input port="entry">
                     <p:pipe step="preamble.in-memory" port="result"/>
