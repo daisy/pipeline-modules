@@ -78,14 +78,6 @@
                 else '',$rel)"
             />
         </xsl:if>
-        <xsl:if test="$rel='stylesheet' and (@type='text/css' or pf:get-extension(@href)='css')">
-            <xsl:variable name="href" select="resolve-uri(@href,base-uri(.))"/>
-            <xsl:if test="unparsed-text-available($href)">
-                <xsl:for-each select="pf:css-to-fileset(unparsed-text($href),$href,$context.fileset,$context.in-memory)">
-                    <xsl:sequence select="f:fileset-entry(.,(),'')"/>
-                </xsl:for-each>
-            </xsl:if>
-        </xsl:if>
     </xsl:template>
 
     <xsl:template match="style">

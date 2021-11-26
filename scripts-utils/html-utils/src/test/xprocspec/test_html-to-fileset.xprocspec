@@ -389,6 +389,23 @@
 			<x:input port="source">
 				<x:document type="file" href="../resources/html-with-xml-stylesheet-processing-instruction.xml"/>
 			</x:input>
+			<x:input port="context.fileset">
+				<x:document type="inline">
+					<d:fileset>
+						<d:file href="foo.css" media-type="text/css"/>
+					</d:fileset>
+				</x:document>
+			</x:input>
+			<x:input port="context.in-memory">
+				<x:document type="inline" xml:base="../resources/foo.css">
+					<c:data content-type="text/plain">
+						@font-face {
+							font-family: "My font";
+							src: url("font.ttf");
+						}
+					</c:data>
+				</x:document>
+			</x:input>
 		</x:call>
 		<x:context label="the fileset">
 			<x:document type="port" port="result"/>
@@ -400,6 +417,7 @@
 				<d:fileset>
 					<d:file href="../resources/html-with-xml-stylesheet-processing-instruction.xml" media-type="application/xhtml+xml"/>
 					<d:file href="../resources/foo.css" media-type="text/css" kind="stylesheet"/>
+					<d:file href="../resources/font.ttf" media-type="application/x-font-ttf" original-href="../resources/font.ttf"/>
 				</d:fileset>
 			</x:document>
 		</x:expect>

@@ -67,6 +67,11 @@
 			px:mediatype-detect
 		</p:documentation>
 	</p:import>
+	<p:import href="http://www.daisy.org/pipeline/modules/css-utils/library.xpl">
+		<p:documentation>
+			px:css-to-fileset
+		</p:documentation>
+	</p:import>
 	
 	<p:add-attribute match="/*" attribute-name="xml:base">
 		<p:with-option name="attribute-value" select="base-uri(/*)"/>
@@ -101,10 +106,28 @@
 	<p:add-attribute match="d:file" attribute-name="kind" attribute-value="stylesheet" name="stylesheets-from-pi"/>
 	<p:sink/>
 
+	<p:group name="referenced-from-css">
+		<p:output port="result"/>
+		<px:fileset-join>
+			<p:input port="source">
+				<p:pipe step="html-and-resources" port="result"/>
+				<p:pipe step="stylesheets-from-pi" port="result"/>
+				<p:pipe step="main" port="context.fileset"/>
+			</p:input>
+		</px:fileset-join>
+		<px:css-to-fileset>
+			<p:input port="source.in-memory">
+				<p:pipe step="main" port="context.in-memory"/>
+			</p:input>
+		</px:css-to-fileset>
+	</p:group>
+	<p:sink/>
+
 	<px:fileset-join>
 		<p:input port="source">
 			<p:pipe step="html-and-resources" port="result"/>
 			<p:pipe step="stylesheets-from-pi" port="result"/>
+			<p:pipe step="referenced-from-css" port="result"/>
 		</p:input>
 	</px:fileset-join>
 	
