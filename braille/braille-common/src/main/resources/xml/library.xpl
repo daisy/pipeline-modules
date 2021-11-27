@@ -2,7 +2,6 @@
 <p:library xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
            xmlns:px="http://www.daisy.org/ns/pipeline/xproc">
 
-    <p:import href="validate-braille.xpl"/>
     <p:import href="mark-transitions.xpl"/>
     <p:import href="select-by-base.xpl"/>
     <p:import href="select-by-position.xpl"/>
