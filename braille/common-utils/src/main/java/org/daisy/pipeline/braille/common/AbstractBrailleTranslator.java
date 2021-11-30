@@ -1,6 +1,7 @@
 package org.daisy.pipeline.braille.common;
 
 import static java.lang.Math.min;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
@@ -18,6 +19,8 @@ import cz.vutbr.web.css.TermInteger;
 
 import static org.daisy.pipeline.braille.common.util.Strings.extractHyphens;
 import static org.daisy.pipeline.braille.common.util.Tuple2;
+import org.daisy.braille.css.BrailleCSSProperty.Hyphens;
+import org.daisy.braille.css.BrailleCSSProperty.WhiteSpace;
 import org.daisy.braille.css.BrailleCSSProperty.WordSpacing;
 import org.daisy.braille.css.SimpleInlineStyle;
 import org.daisy.dotify.api.translator.UnsupportedMetricException;
@@ -31,8 +34,47 @@ public abstract class AbstractBrailleTranslator extends AbstractTransform implem
 		throw new UnsupportedOperationException();
 	}
 	
+	private LineBreakingFromStyledText lineBreakingFromStyledText = null;
+	
 	public LineBreakingFromStyledText lineBreakingFromStyledText() throws UnsupportedOperationException {
-		throw new UnsupportedOperationException();
+		// default implementation based on fromStyledTextToBraille()
+		if (lineBreakingFromStyledText == null) {
+			final FromStyledTextToBraille fromStyledTextToBraille = fromStyledTextToBraille();
+			lineBreakingFromStyledText = new util.DefaultLineBreaker('\u2800', '\u2824', null) {
+					protected BrailleStream translateAndHyphenate(Iterable<CSSStyledText> styledText, int from, int to) {
+						List<String> braille = new ArrayList<>();
+						Iterator<CSSStyledText> style = styledText.iterator();
+						for (String s : fromStyledTextToBraille.transform(styledText)) {
+							SimpleInlineStyle st = style.next().getStyle();
+							if (st != null) {
+								if (st.getProperty("hyphens") == Hyphens.NONE) {
+									s = s.replaceAll("[\u00AD\u200B]","");
+									st.removeProperty("hyphens"); }
+								CSSProperty ws = st.getProperty("white-space");
+								if (ws != null) {
+									if (ws == WhiteSpace.PRE_WRAP)
+										s = s.replaceAll("[\\x20\t\\u2800]+", "$0\u200B")
+											.replaceAll("[\\x20\t\\u2800]", "\u00A0");
+									if (ws == WhiteSpace.PRE_WRAP || ws == WhiteSpace.PRE_LINE)
+										s = s.replaceAll("[\\n\\r]", "\u2028");
+									st.removeProperty("white-space"); }}
+							braille.add(s);
+						}
+						StringBuilder brailleString = new StringBuilder();
+						int fromChar = 0;
+						int toChar = to >= 0 ? 0 : -1;
+						for (String s : braille) {
+							brailleString.append(s);
+							if (--from == 0)
+								fromChar = brailleString.length();
+							if (--to == 0)
+								toChar = brailleString.length();
+						}
+						return new FullyHyphenatedAndTranslatedString(brailleString.toString(), fromChar, toChar);
+					}
+				};
+		}
+		return lineBreakingFromStyledText;
 	}
 	
 	/* ================== */

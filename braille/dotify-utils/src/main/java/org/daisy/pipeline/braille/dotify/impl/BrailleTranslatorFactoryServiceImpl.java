@@ -22,9 +22,7 @@ import cz.vutbr.web.css.TermIdent;
 import cz.vutbr.web.css.TermList;
 import cz.vutbr.web.css.TermString;
 
-import org.daisy.braille.css.BrailleCSSProperty.Hyphens;
 import org.daisy.braille.css.BrailleCSSProperty.TextTransform;
-import org.daisy.braille.css.BrailleCSSProperty.WhiteSpace;
 import org.daisy.braille.css.SimpleInlineStyle;
 
 import org.daisy.dotify.api.translator.AttributeWithContext;
@@ -133,7 +131,7 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 				query = mutableQuery(query).add("locale", locale);
 			for (org.daisy.pipeline.braille.common.BrailleTranslator t : brailleTranslatorProvider.get(query))
 				try {
-					return new BrailleTranslatorFromBrailleTranslator(mode, t); }
+					return new BrailleTranslatorFromBrailleTranslator(mode, t.lineBreakingFromStyledText()); }
 				catch (UnsupportedOperationException e) {}
 			throw new TranslatorConfigurationException("Factory does not support " + locale + "/" + mode);
 		}
@@ -166,20 +164,13 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 	private static class BrailleTranslatorFromBrailleTranslator implements BrailleTranslator {
 		
 		final String mode;
-		org.daisy.pipeline.braille.common.BrailleTranslator.LineBreakingFromStyledText lineBreakingFromStyledText;
-		org.daisy.pipeline.braille.common.BrailleTranslator.FromStyledTextToBraille fromStyledTextToBraille;
+		final org.daisy.pipeline.braille.common.BrailleTranslator.LineBreakingFromStyledText translator;
 		
 		private BrailleTranslatorFromBrailleTranslator(
 				String mode,
-				org.daisy.pipeline.braille.common.BrailleTranslator translator)
-				throws UnsupportedOperationException {
+				org.daisy.pipeline.braille.common.BrailleTranslator.LineBreakingFromStyledText translator) {
 			this.mode = mode;
-			try {
-				this.lineBreakingFromStyledText = translator.lineBreakingFromStyledText();
-				this.fromStyledTextToBraille = null; }
-			catch (UnsupportedOperationException e) {
-				this.lineBreakingFromStyledText = null;
-				this.fromStyledTextToBraille = translator.fromStyledTextToBraille(); }
+			this.translator = translator;
 		}
 		
 		public BrailleTranslatorResult translate(Translatable input) throws TranslationException {
@@ -211,39 +202,7 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 		}
 		
 		private BrailleTranslatorResult translate(Iterable<CSSStyledText> styledText, int from, int to) throws TranslationException {
-			if (lineBreakingFromStyledText != null)
-				return lineBreakingFromStyledText.transform(styledText, from, to);
-			else {
-				List<String> braille = new ArrayList<>();
-				Iterator<CSSStyledText> style = styledText.iterator();
-				for (String s : fromStyledTextToBraille.transform(styledText)) {
-					SimpleInlineStyle st = style.next().getStyle();
-					if (st != null) {
-						if (st.getProperty("hyphens") == Hyphens.NONE) {
-							s = s.replaceAll("[\u00AD\u200B]","");
-							st.removeProperty("hyphens"); }
-						CSSProperty ws = st.getProperty("white-space");
-						if (ws != null) {
-							if (ws == WhiteSpace.PRE_WRAP)
-								s = s.replaceAll("[\\x20\t\\u2800]+", "$0\u200B")
-								     .replaceAll("[\\x20\t\\u2800]", "\u00A0");
-							if (ws == WhiteSpace.PRE_WRAP || ws == WhiteSpace.PRE_LINE)
-								s = s.replaceAll("[\\n\\r]", "\u2028");
-							st.removeProperty("white-space"); }}
-					braille.add(s);
-				}
-				StringBuilder brailleString = new StringBuilder();
-				int fromChar = 0;
-				int toChar = to >= 0 ? 0 : -1;
-				for (String s : braille) {
-					brailleString.append(s);
-					if (--from == 0)
-						fromChar = brailleString.length();
-					if (--to == 0)
-						toChar = brailleString.length();
-				}
-				return new DefaultLineBreaker.LineIterator(brailleString.toString(), fromChar, toChar, '\u2800', '\u2824', 1);
-			}
+			return translator.transform(styledText, from, to);
 		}
 		
 		public String getTranslatorMode() {

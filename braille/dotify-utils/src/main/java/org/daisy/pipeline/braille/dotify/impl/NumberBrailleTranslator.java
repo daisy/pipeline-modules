@@ -1,8 +1,6 @@
 package org.daisy.pipeline.braille.dotify.impl;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,7 +14,6 @@ import org.daisy.braille.css.BrailleCSSProperty.WhiteSpace;
 import org.daisy.braille.css.SimpleInlineStyle;
 
 import org.daisy.pipeline.braille.common.AbstractBrailleTranslator;
-import org.daisy.pipeline.braille.common.AbstractBrailleTranslator.util.DefaultLineBreaker;
 import org.daisy.pipeline.braille.common.BrailleTranslator;
 import org.daisy.pipeline.braille.common.CSSStyledText;
 
@@ -73,34 +70,6 @@ class NumberBrailleTranslator extends AbstractBrailleTranslator implements Brail
 		@Override
 		public String toString() {
 			return NumberBrailleTranslator.this + ".fromStyledTextToBraille()";
-		}
-	};
-
-	@Override
-	public LineBreakingFromStyledText lineBreakingFromStyledText() {
-		return lineBreakingFromStyledText;
-	}
-
-	private final LineBreakingFromStyledText lineBreakingFromStyledText = new LineBreakingFromStyledText() {
-		public LineIterator transform(java.lang.Iterable<CSSStyledText> styledText, int from, int to) {
-			List<String> braille = new ArrayList<>();
-			for (CSSStyledText t : styledText)
-				braille.add(NumberBrailleTranslator.this.transform(t));
-			StringBuilder brailleString = new StringBuilder();
-			int fromChar = 0;
-			int toChar = to >= 0 ? 0 : -1;
-			for (String s : braille) {
-				brailleString.append(s);
-				if (--from == 0)
-					fromChar = brailleString.length();
-				if (--to == 0)
-					toChar = brailleString.length();
-			}
-			return new DefaultLineBreaker.LineIterator(brailleString.toString(), fromChar, toChar, '\u2800', '\u2824', 1);
-		}
-		@Override
-		public String toString() {
-			return NumberBrailleTranslator.this + ".lineBreakingFromStyledText()";
 		}
 	};
 
