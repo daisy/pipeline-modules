@@ -5994,7 +5994,7 @@
               <footer/>
               <margin-region align="left" width="2">
                 <indicators>
-                  <marker-indicator markers="indicator/pagenum" indicator="⠿"/>
+                  <marker-indicator markers="indicator/pagenum" indicator="⠿" text-style="text-transform: none"/>
                 </indicators>
               </margin-region>
             </default-template>
