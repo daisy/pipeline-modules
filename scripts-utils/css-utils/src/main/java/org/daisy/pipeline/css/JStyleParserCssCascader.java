@@ -1,6 +1,5 @@
 package org.daisy.pipeline.css;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -9,6 +8,7 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.function.Function;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -25,6 +25,7 @@ import cz.vutbr.web.css.NetworkProcessor;
 import cz.vutbr.web.css.NodeData;
 import cz.vutbr.web.css.RuleFactory;
 import cz.vutbr.web.css.Selector.PseudoElement;
+import cz.vutbr.web.css.SourceLocator;
 import cz.vutbr.web.css.StyleSheet;
 import cz.vutbr.web.css.SupportedCSS;
 import cz.vutbr.web.css.Term;
@@ -34,12 +35,15 @@ import cz.vutbr.web.css.TermString;
 import cz.vutbr.web.csskit.antlr.CSSParserFactory;
 import cz.vutbr.web.csskit.antlr.CSSSource;
 import cz.vutbr.web.csskit.antlr.CSSSourceReader;
+import cz.vutbr.web.csskit.antlr.DefaultCSSSourceReader;
 import cz.vutbr.web.csskit.antlr.SourceMap;
 import cz.vutbr.web.csskit.DefaultNetworkProcessor;
 import cz.vutbr.web.csskit.RuleXslt;
 import cz.vutbr.web.domassign.Analyzer;
 import cz.vutbr.web.domassign.DeclarationTransformer;
 import cz.vutbr.web.domassign.StyleMap;
+import net.sf.saxon.dom.NodeOverNodeInfo;
+import net.sf.saxon.om.NodeInfo;
 
 import org.apache.commons.io.input.BOMInputStream;
 
@@ -97,13 +101,35 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 		this.supportedCSS = supportedCSS;
 		this.declarationTransformer = declarationTransformer;
 		this.xsltProcessor = xsltProcessor;
-		NetworkProcessor defaultNetwork = new DefaultNetworkProcessor();
+		NetworkProcessor network = new DefaultNetworkProcessor() {
+				@Override
+				public InputStream fetch(URL url) throws IOException {
+					InputStream is;
+					logger.debug("Fetching style sheet: " + url);
+					Source resolved; {
+						try {
+							resolved = uriResolver.resolve(URLs.asURI(url).toASCIIString(), ""); }
+						catch (javax.xml.transform.TransformerException e) {
+							throw new IOException(e); }}
+					if (resolved != null && resolved instanceof StreamSource)
+						is = ((StreamSource)resolved).getInputStream();
+					else {
+						if (resolved != null)
+							url = new URL(resolved.getSystemId());
+						is = super.fetch(url);
+					}
+					// skip BOM
+					is = new BOMInputStream(is);
+					return is;
+				}
+			};
 		/*
 		 * CSSSourceReader that handles media types supported by preProcessor. Throws a
 		 * IOException if something goes wrong when resolving the source or if the
 		 * pre-processing fails.
 		 */
-		this.cssReader = new CSSSourceReader() {
+		this.cssReader = new DefaultCSSSourceReader(network) {
+				@Override
 				public boolean supportsMediaType(String mediaType, URL url) {
 					if ("text/css".equals(mediaType))
 						return true;
@@ -114,56 +140,62 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 					else
 						return preProcessor.supportsMediaType(mediaType, url);
 				}
+				@Override
 				public CSSInputStream read(CSSSource source) throws IOException {
-					URL url = null;
-					InputStream is;
-					SourceMap sourceMap = null; {
-						switch (source.type) {
-						case INLINE:
-						case EMBEDDED:
-							is = new ByteArrayInputStream(((String)source.source).getBytes());
-							break;
-						case URL:
-							url = (URL)source.source;
-							logger.debug("Fetching style sheet: " + url);
-							Source resolved; {
-								try {
-									resolved = uriResolver.resolve(URLs.asURI(url).toASCIIString(), ""); }
-								catch (javax.xml.transform.TransformerException e) {
-									throw new IOException(e); }}
-							if (resolved != null) {
-								url = new URL(resolved.getSystemId());
-								logger.debug("Resolved to :" + url); }
-							if (resolved != null && resolved instanceof StreamSource)
-								is = ((StreamSource)resolved).getInputStream();
-							else
-								is = defaultNetwork.fetch(url);
-							// skip BOM
-							is = new BOMInputStream(is);
-							break;
-						default:
-							throw new RuntimeException("coding error");
+					if (source.type == CSSSource.SourceType.URL) {
+						try {
+							Source resolved = uriResolver.resolve(URLs.asURI((URL)source.source).toASCIIString(), "");
+							if (resolved != null)
+								source = new CSSSource(new URL(resolved.getSystemId()), source.encoding, source.mediaType);
+						} catch (javax.xml.transform.TransformerException e) {
+							throw new IOException(e);
 						}
 					}
-					URL base = url != null ? url : source.base;
-					if (!supportsMediaType(source.mediaType, url))
-						throw new IllegalArgumentException();
+					CSSInputStream stream = super.read(source);
 					if (!("text/css".equals(source.mediaType)
-					      || source.mediaType == null && (url == null || url.toString().endsWith(".css")))) {
+					      || source.mediaType == null && (source.type != CSSSource.SourceType.URL
+					                                      || ((URL)source.source).toString().endsWith(".css")))) {
 						// preProcessor must be non-null
 						try {
 							CssPreProcessor.PreProcessingResult result
-								= preProcessor.compile(is, url != null ? url : source.base, source.encoding);
-							is = result.stream;
-							if (result.sourceMap != null)
-								sourceMap = SourceMapReader.read(result.sourceMap, result.base);
+								= preProcessor.compile(stream.stream, stream.base, stream.encoding);
+							SourceMap sourceMap; {
+								if (result.sourceMap != null) {
+									SourceMap m = SourceMapReader.read(result.sourceMap, result.base);
+									if (stream.sourceMap != null) {
+										sourceMap = new SourceMap() {
+											public SourceLocator get(int line, int column) {
+												SourceLocator loc = m.get(line, column);
+												if (loc != null && loc.getURL().equals(stream.base))
+													loc = stream.sourceMap.get(loc.getLineNumber(), loc.getColumnNumber());
+												return loc;
+											}
+											public SourceLocator floor(int line, int column) {
+												SourceLocator loc = m.floor(line, column);
+												if (loc != null && loc.getURL().equals(stream.base))
+													loc = stream.sourceMap.floor(loc.getLineNumber(), loc.getColumnNumber());
+												return loc;
+											}
+											public SourceLocator ceiling(int line, int column) {
+												SourceLocator loc = m.ceiling(line, column);
+												if (loc != null && loc.getURL().equals(stream.base))
+													loc = stream.sourceMap.ceiling(loc.getLineNumber(), loc.getColumnNumber());
+												return loc;
+											}
+										};
+									} else
+										sourceMap = m;
+								} else
+									sourceMap = stream.sourceMap;
+							}
+							return new CSSInputStream(result.stream, stream.encoding, stream.base, sourceMap);
 						} catch (RuntimeException e) {
 							throw new IOException(
 								(source.mediaType != null ? (source.mediaType + " p") : "P")
 								+ "re-processing failed: " + e.getMessage(), e);
 						}
-					}
-					return new CSSInputStream(is, source.encoding, base, sourceMap);
+					} else
+						return stream;
 				}
 			};
 	}
@@ -184,14 +216,34 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 		BaseURIAwareXMLStreamWriter writer = output;
 		try {
 			URI baseURI = new URI(document.getBaseURI());
-			URL baseURL; {
-				if (baseURI == null || baseURI.toString().equals(""))
-					// handling the case where base URI is empty, although this should in theory never happen
-					// FIXME: find out why it happens
-					baseURL = null;
-				else
-					baseURL = URLs.asURL(baseURI);
-			}
+			Function<Node,SourceLocator> nodeLocator = n -> {
+				if (n instanceof NodeOverNodeInfo) {
+					NodeInfo info = ((NodeOverNodeInfo)n).getUnderlyingNodeInfo();
+					return new SourceLocator() {
+						public URL getURL() {
+							return URLs.asURL(URI.create(info.getBaseURI()));
+						}
+						public int getLineNumber() {
+							return info.getLineNumber();
+						}
+						public int getColumnNumber() {
+							return info.getColumnNumber();
+						}
+					};
+				} else {
+					return new SourceLocator() {
+						public URL getURL() {
+							return URLs.asURL(URI.create(n.getBaseURI()));
+						}
+						public int getLineNumber() {
+							return 0;
+						}
+						public int getColumnNumber() {
+							return 0;
+						}
+					};
+				}
+			};
 			StyleMap styleMap;
 			synchronized(JStyleParserCssCascader.class) {
 				// CSSParserFactory injected in CSSAssignTraversal.<init> in CSSFactory.getUsedStyles
@@ -221,7 +273,7 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 				}
 				styleSheet = (StyleSheet)ruleFactory.createStyleSheet().unlock();
 				styleSheet.addAll(defaultStyleSheet);
-				styleSheet = CSSFactory.getUsedStyles(document, null, baseURL, medium, cssReader, styleSheet);
+				styleSheet = CSSFactory.getUsedStyles(document, null, nodeLocator, medium, cssReader, styleSheet);
 				XMLInputValue<?> transformed = null;
 				for (RuleXslt r : Iterables.filter(styleSheet, RuleXslt.class)) {
 					Map<String,String> params = new HashMap<>();
@@ -260,7 +312,7 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 					// are attached to an element in the original document.
 					styleSheet = (StyleSheet)ruleFactory.createStyleSheet().unlock();
 					styleSheet.addAll(defaultStyleSheet);
-					styleSheet = CSSFactory.getUsedStyles(document, null, baseURL, medium, cssReader, styleSheet);
+					styleSheet = CSSFactory.getUsedStyles(document, null, nodeLocator, medium, cssReader, styleSheet);
 				}
 				styleMap = new Analyzer(styleSheet).evaluateDOM(document, medium, false);
 			}

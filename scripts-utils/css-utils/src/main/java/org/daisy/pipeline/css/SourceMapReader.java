@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
-import cz.vutbr.web.csskit.antlr.SourceLocator;
+import cz.vutbr.web.css.SourceLocator;
 import cz.vutbr.web.csskit.antlr.SourceMap;
 
 import mjson.Json;
@@ -147,7 +147,7 @@ public final class SourceMapReader {
 				return 0;
 		}
 		public String toString() {
-			return "(" + line + ", " + column + ")";
+			return line + ":" + column;
 		}
 	}
 
@@ -170,7 +170,7 @@ public final class SourceMapReader {
 			return column;
 		}
 		public String toString() {
-			return "(" + url + ", " + line + ", " + column + ")";
+			return url + ":" + line + ":" + column;
 		}
 	}
 
