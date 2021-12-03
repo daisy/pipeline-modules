@@ -450,12 +450,14 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 		mCurrentSection = null;
 	}
 
-	private MessageAppender progress;
+	private MessageAppender progress = null;
 
 	public Iterable<SoundFileLink> blockingRun(AudioServices audioServices)
 	        throws SynthesisException, InterruptedException, EncodingException {
 
-		progress = MessageAppender.getActiveBlock().append(new MessageBuilder().withProgress(BigDecimal.ONE));
+		MessageAppender activeBlock = MessageAppender.getActiveBlock();
+		if (activeBlock != null)
+			progress = activeBlock.append(new MessageBuilder().withProgress(BigDecimal.ONE));
 		try {
 
 		//SSML mark splitter shared by the threads:
@@ -558,7 +560,8 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 		return Iterables.concat(fragments);
 
 		} finally {
-			progress.close();
+			if (progress != null)
+				progress.close();
 			progress = null;
 		}
 	}
@@ -581,7 +584,8 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 			               + TTSMem + "MB encoding: " + EncodeMem + "MB]");
 			mPrintedProgress = mProgress;
 		}
-		progress.append(m).close();
+		if (progress != null)
+			progress.append(m).close();
 	}
 
 	private void reorganizeSections() {
