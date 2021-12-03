@@ -17,10 +17,8 @@ import static com.google.common.collect.Iterables.concat;
 
 import cz.vutbr.web.css.CSSProperty;
 import cz.vutbr.web.css.Term;
-import cz.vutbr.web.css.TermFunction;
 import cz.vutbr.web.css.TermIdent;
 import cz.vutbr.web.css.TermList;
-import cz.vutbr.web.css.TermString;
 
 import org.daisy.braille.css.BrailleCSSProperty.TextTransform;
 import org.daisy.braille.css.SimpleInlineStyle;
@@ -50,6 +48,7 @@ import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.query;
 import static org.daisy.pipeline.braille.common.Query.util.QUERY;
 import static org.daisy.pipeline.braille.common.Provider.util.dispatch;
+import org.daisy.pipeline.braille.css.CounterStyle;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -425,29 +424,11 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 						if ("??".equals(t)) {
 						} else {
 							int counterValue = Integer.parseInt(t);
-							Term<?> counterStyle = s.getValue(TermFunction.class, "-dotify-counter-style");
-							if (counterStyle instanceof TermFunction
-							    && ((TermFunction)counterStyle).getFunctionName().equals("symbols")) {
-								String system = null;
-								List<String> symbols = new ArrayList<String>();
-								for (Term<?> term : (TermFunction)counterStyle) {
-									if (system == null) {
-										if (term instanceof TermIdent)
-											system = ((TermIdent)term).getValue();
-										else
-											system = "symbolic"; }
-									else
-										symbols.add(((TermString)term).getValue()); }
-								if (system.equals("alphabetic"))
-									t = counterRepresentationAlphabetic(counterValue, symbols);
-								else if (system.equals("numeric"))
-									t = counterRepresentationNumeric(counterValue, symbols);
-								else if (system.equals("cyclic"))
-									t = counterRepresentationCyclic(counterValue, symbols);
-								else if (system.equals("fixed"))
-									t = counterRepresentationFixed(counterValue, symbols);
-								else if (system.equals("symbolic"))
-									t = counterRepresentationSymbolic(counterValue, symbols); }}}}
+							Term<?> counterStyle = s.getValue("-dotify-counter-style");
+							if (counterStyle != null) {
+								try {
+									t = new CounterStyle(counterStyle).format(counterValue); }
+								catch (IllegalArgumentException e) {}}}}}
 				s.removeProperty("-dotify-counter-style"); }
 			if (segment != null)
 				segments.add(new CSSStyledText(segment, style, attrs));
@@ -457,53 +438,5 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 		if (segment != null)
 			segments.add(new CSSStyledText(segment, style, attrs));
 		return segments;
-	}
-
-	private static int mod(int a, int n) {
-		int result = a % n;
-		if (result < 0)
-			result += n;
-		return result;
-	}
-
-	static String counterRepresentationAlphabetic(int counterValue, List<String> symbols) {
-		if (counterValue < 1)
-			return "";
-		if (counterValue > symbols.size())
-			return counterRepresentationAlphabetic((counterValue - 1) / symbols.size(), symbols)
-				+ symbols.get(mod(counterValue - 1, symbols.size()));
-		else
-			return symbols.get(counterValue - 1);
-	}
-
-	static String counterRepresentationCyclic(int counterValue, List<String> symbols) {
-		return symbols.get(mod(counterValue - 1, symbols.size()));
-	}
-
-	static String counterRepresentationFixed(int counterValue, List<String> symbols) {
-		if (counterValue < 1 || counterValue > symbols.size())
-			return "";
-		else
-			return symbols.get(counterValue - 1);
-	}
-
-	static String counterRepresentationNumeric(int counterValue, List<String> symbols) {
-		if (counterValue < 0)
-			return "-" + counterRepresentationNumeric(- counterValue, symbols);
-		if (counterValue >= symbols.size())
-			return counterRepresentationNumeric(counterValue / symbols.size(), symbols)
-				+ symbols.get(mod(counterValue, symbols.size()));
-		else
-			return symbols.get(counterValue);
-	}
-
-	static String counterRepresentationSymbolic(int counterValue, List<String> symbols) {
-		if (counterValue < 1)
-			return "";
-		String symbol = symbols.get(mod(counterValue - 1, symbols.size()));
-		String s = symbol;
-		for (int i = 0; i < ((counterValue - 1) / symbols.size()); i++)
-			s += symbol;
-		return s;
 	}
 }
