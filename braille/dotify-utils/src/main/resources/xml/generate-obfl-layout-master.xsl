@@ -98,14 +98,6 @@
         <field allow-text-flow="true"/>
     </xsl:variable>
     
-    <xsl:template mode="obfl:generate-layout-master" match="css:rule[@selector='@page']" priority="1">
-        <xsl:call-template name="pf:next-match-with-generated-ids">
-            <xsl:with-param name="prefix" select="'tmp_'"/>
-            <xsl:with-param name="for-elements" select="descendant::css:string[@name][not(@target)]"/>
-            <xsl:with-param name="in-use" select="()"/>
-        </xsl:call-template>
-    </xsl:template>
-    
     <xsl:template mode="obfl:generate-layout-master" match="css:rule[@selector='@page']">
         <xsl:param name="name" tunnel="yes" as="xs:string"/>
         <xsl:param name="default-page-counter-name" tunnel="yes" as="xs:string"/> <!-- "page"|"pre-page"|"post-page" -->

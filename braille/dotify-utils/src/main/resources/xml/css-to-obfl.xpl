@@ -918,11 +918,12 @@
                                      //obfl:marker-indicator[tokenize(normalize-space(@markers),' ')=$class])]"/>
 
     <!--
-        because empty marker values would be regarded as absent in BrailleFilterImpl
+        FIXME: because otherwise empty marker values would be regarded as absent in Dotify
+        (FieldResolver.resolveCompoundMarkerReferenceField)
     -->
     <p:add-attribute px:progress=".005"
                      match="obfl:marker[@value='']" attribute-name="value" attribute-value="&#x200B;"/>
-    
+
     <!--
         move table-of-contents elements to the right place
     -->

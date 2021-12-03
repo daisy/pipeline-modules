@@ -1025,16 +1025,6 @@
     <!-- Block boxes -->
     <!-- =========== -->
     
-    <xsl:template priority="1"
-                  mode="sequence sequence-interrupted-resumed"
-                  match="css:box[@type='block']">
-        <xsl:call-template name="pf:next-match-with-generated-ids">
-            <xsl:with-param name="prefix" select="'tmp_'"/>
-            <xsl:with-param name="for-elements" select="descendant::css:string[@name][not(@target)][@scope]"/>
-            <xsl:with-param name="in-use" select="()"/>
-        </xsl:call-template>
-    </xsl:template>
-    
     <xsl:template mode="sequence item td sequence-interrupted-resumed"
                   match="css:box[@type='block']">
         <xsl:apply-templates mode="block" select="."/>
@@ -2128,26 +2118,12 @@
                         <xsl:with-param name="args" select="(@name,@scope,@scope)"/>
                     </xsl:call-template>
                 </xsl:if>
-                <xsl:variable name="marker-references" as="element(obfl:marker-reference)*">
-                    <xsl:apply-templates mode="marker-reference" select="."/>
-                </xsl:variable>
-                <xsl:for-each select="$marker-references">
+                <xsl:apply-templates mode="marker-reference" select=".">
                     <!--
                         text-style attribute is only for marker-reference inside field
                     -->
-                    <xsl:choose>
-                        <xsl:when test="@text-style">
-                            <style name="{@text-style}">
-                                <xsl:copy>
-                                    <xsl:sequence select="@* except @text-style"/>
-                                </xsl:copy>
-                            </style>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <xsl:sequence select="."/>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:for-each>
+                    <xsl:with-param name="allow-style-element" tunnel="yes" select="true()"/>
+                </xsl:apply-templates>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
@@ -2466,9 +2442,10 @@
             <xsl:variable name="value" as="xs:string*">
                 <xsl:apply-templates mode="css:eval-string-set" select="css:parse-content-list(@value, ())"/>
             </xsl:variable>
-            <marker class="{@name}/if-not-set-next/prev"/>
-            <marker class="{@name}/if-not-set-next"
-                    value="{replace(string-join($value,''),'^\s+|\s+$','')}"/>
+            <xsl:variable name="value" as="xs:string" select="string-join($value,'')"/>
+            <xsl:variable name="value" as="xs:string" select="replace($value,'^\s+|\s+$','')"/> <!-- trim -->
+            <marker class="{@name}/if-not-set-next/prev"/> <!-- value will be filled later -->
+            <marker class="{@name}/if-not-set-next" value="{$value}"/>
         </xsl:for-each>
     </xsl:template>
     
@@ -2481,11 +2458,12 @@
             <xsl:variable name="value" as="xs:string*">
                 <xsl:apply-templates mode="css:eval-string-set" select="css:parse-content-list(@value, ())"/>
             </xsl:variable>
-            <marker class="{@name}/prev"/>
-            <marker class="{@name}" value="{replace(string-join($value,''),'^\s+|\s+$','')}"/>
-            <marker class="{@name}/if-not-set-next/prev"/>
-            <marker class="{@name}/if-not-set-next"
-                    value="{if ($markers-wrapped) then '' else replace(string-join($value,''),'^\s+|\s+$','')}"/>
+            <xsl:variable name="value" as="xs:string" select="string-join($value,'')"/>
+            <xsl:variable name="value" as="xs:string" select="replace($value,'^\s+|\s+$','')"/> <!-- trim -->
+            <marker class="{@name}/prev"/> <!-- value will be filled later -->
+            <marker class="{@name}" value="{$value}"/>
+            <marker class="{@name}/if-not-set-next/prev"/> <!-- value will be filled later -->
+            <marker class="{@name}/if-not-set-next" value="{if ($markers-wrapped) then '' else $value}"/>
         </xsl:for-each>
     </xsl:template>
     

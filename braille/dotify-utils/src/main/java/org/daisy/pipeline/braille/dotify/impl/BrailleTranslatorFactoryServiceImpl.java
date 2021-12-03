@@ -149,10 +149,6 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 	 * not. Regardless of this setting, hyphenation characters (SHY and ZWSP) in the input are used
 	 * in line breaking, except when overridden with a <code>hyphens: none</code> style.
 	 *
-	 * Supports special variable assignments (in the form of "<code>-dotify-def:foo</code>") and
-	 * tests (in the form of "<code>-dotify-ifdef:foo</code>" or "<code>-dotify-ifndef:foo</code>")
-	 * in text attributes in order to support special ad hoc handling of marker-references.
-	 *
 	 * Support <code>text-transform</code> value "<code>-dotify-counter</code>" which causes numbers
 	 * to be formatted according to the value of the <code>-dotify-counter-style</code> property.
 	 */
@@ -218,12 +214,11 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 	 */
 	protected static Iterable<CSSStyledText> cssStyledTextFromTranslatable(Translatable specification) {
 		return handleCounterStyles(
-			handleVariables(
-				cssStyledTextFromTranslatable(
-					specification.getText(),
-					specification.getAttributes(),
-					specification.isHyphenating(),
-					null)));
+			cssStyledTextFromTranslatable(
+				specification.getText(),
+				specification.getAttributes(),
+				specification.isHyphenating(),
+				null));
 	}
 
 	private static Iterable<CSSStyledText> cssStyledTextFromTranslatable(String text,
@@ -268,13 +263,12 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 	 */
 	private static Iterable<CSSStyledText> cssStyledTextFromTranslatable(TranslatableWithContext specification) {
 		return handleCounterStyles(
-			handleVariables(
-				cssStyledTextFromTranslatable(
-					specification.getPrecedingText(),
-					specification.getTextToTranslate(),
-					specification.getFollowingText(),
-					specification.getAttributes().orElse(null),
-					null)));
+			cssStyledTextFromTranslatable(
+				specification.getPrecedingText(),
+				specification.getTextToTranslate(),
+				specification.getFollowingText(),
+				specification.getAttributes().orElse(null),
+					null));
 	}
 
 	private static Iterable<CSSStyledText> cssStyledTextFromTranslatable(List<PrecedingText> preceding,
@@ -363,48 +357,6 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 	}
 
 	private static Iterable<CSSStyledText> empty = Optional.<CSSStyledText>absent().asSet();
-
-	private static Iterable<CSSStyledText> handleVariables(Iterable<CSSStyledText> styledText) {
-		List<CSSStyledText> segments = new ArrayList<CSSStyledText>();
-		Set<String> env = null;
-		String segment = null;
-		SimpleInlineStyle style = null;
-		Map<String,String> attrs = null;
-		for (CSSStyledText st : styledText) {
-			String t = st.getText();
-			SimpleInlineStyle s = st.getStyle();
-			Map<String,String> a = st.getTextAttributes();
-			if (s != null) {
-				Collection<String> properties = s.getPropertyNames();
-				String key = null;
-				if (properties.contains("-dotify-def")) {
-					key = "-dotify-def"; }
-				else if (properties.contains("-dotify-ifdef")) {
-					key = "-dotify-ifdef"; }
-				else if (properties.contains("-dotify-ifndef")) {
-					key = "-dotify-ifndef"; }
-				else if (properties.contains("-dotify-defifndef")) {
-					key = "-dotify-defifndef"; }
-				if (key != null) {
-					if (!"".equals(t)) {
-						String var = s.getProperty(key, true).toString();
-						if (env == null)
-							env = new HashSet<String>();
-						if (key.equals("-dotify-ifdef") && !env.contains(var)
-						    || (key.equals("-dotify-ifndef") || key.equals("-dotify-defifndef")) && env.contains(var))
-							t = "";
-						if (key.equals("-dotify-def") || key.equals("-dotify-defifndef"))
-							env.add(var); }
-					s.removeProperty(key); }}
-			if (segment != null)
-				segments.add(new CSSStyledText(segment, style, attrs));
-			segment = t;
-			style = s;
-			attrs = a; }
-		if (segment != null)
-			segments.add(new CSSStyledText(segment, style, attrs));
-		return segments;
-	}
 
 	private static Iterable<CSSStyledText> handleCounterStyles(Iterable<CSSStyledText> styledText) {
 		List<CSSStyledText> segments = new ArrayList<CSSStyledText>();
