@@ -12,7 +12,7 @@
       <p:output port="obfl" sequence="false">
         <p:pipe step="obfl" port="result"/>
       </p:output>
-      <p:option name="text-transform" select="''"/>
+      <p:option name="text-transform" select="'(input:braille)'"/>
       <p:option name="skip-margin-top-of-page" select="'false'"/>
       <p:variable name="allow-text-overflow-trimming" select="'true'"/>
       <p:import href="../../main/resources/xml/css-to-obfl.xpl"/>
@@ -470,6 +470,7 @@
           </doc>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -2173,6 +2174,7 @@
           </doc>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -2371,6 +2373,7 @@
           </doc>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -2531,6 +2534,7 @@
           </doc>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -3894,6 +3898,7 @@
           </doc>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -4703,6 +4708,7 @@
           </doc>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -4961,6 +4967,7 @@
           </doc>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -5111,6 +5118,7 @@
           </doc>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -6246,6 +6254,7 @@
           </table>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -6910,6 +6919,7 @@
           </body>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -7138,6 +7148,7 @@
           </body>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -7602,6 +7613,7 @@
           </doc>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -7940,6 +7952,7 @@
           </doc>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -8227,6 +8240,7 @@
           </body>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -8336,6 +8350,7 @@
           </doc>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -9110,6 +9125,7 @@
           </body>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -9343,6 +9359,7 @@
           </doc>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -9524,6 +9541,7 @@
           </doc>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -9797,6 +9815,7 @@
           </doc>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -9871,6 +9890,7 @@
           </doc>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -11039,6 +11059,7 @@
           </doc>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -11262,6 +11283,7 @@
           </doc>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -11580,6 +11602,7 @@
           </doc>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -12181,6 +12204,7 @@
           </doc>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -12331,6 +12355,7 @@
           </doc>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -12886,6 +12911,7 @@
           </doc>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -13423,6 +13449,7 @@
           </body>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -14741,6 +14768,7 @@
           </doc>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -15562,6 +15590,7 @@
           </body>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -16075,6 +16104,12 @@
           </doc>
         </x:document>
       </x:input>
+       <!--
+           Trick to select UnityBrailleTranslator as main translator while still being able to
+           select NumberBrailleTranslator using @text-transform. We can't do this with
+           "(input:braille)".
+       -->
+      <x:option name="text-transform" select="'(document-locale:und-Brai)'"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>

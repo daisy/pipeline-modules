@@ -8,7 +8,7 @@
     <p:declare-step type="pxi:test" version="1.0">
       <p:input port="source"/>
       <p:output port="result"/>
-      <p:option name="text-transform" select="''"/>
+      <p:option name="text-transform" select="'(input:braille)'"/>
       <p:import href="../../main/resources/xml/obfl-normalize-space.xpl"/>
       <p:import href="http://www.daisy.org/pipeline/modules/braille/dotify-utils/library.xpl"/>
       <pxi:obfl-normalize-space/>
@@ -409,6 +409,7 @@
           </obfl>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -795,6 +796,7 @@
           </obfl>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -933,6 +935,7 @@
           </obfl>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -1043,6 +1046,7 @@
           </obfl>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -3271,6 +3275,7 @@
           </obfl>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -3469,6 +3474,7 @@
           </obfl>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -3608,6 +3614,7 @@
           </obfl>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -3776,6 +3783,7 @@
           </obfl>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -3905,6 +3913,7 @@
           </obfl>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -4121,6 +4130,7 @@
           </obfl>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -4218,6 +4228,7 @@
           </obfl>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -4330,6 +4341,7 @@
           </obfl>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -4487,6 +4499,7 @@
           </obfl>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -4651,6 +4664,7 @@
           </obfl>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -4844,6 +4858,7 @@
           </obfl>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -5038,6 +5053,7 @@
           </obfl>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -5340,6 +5356,7 @@
           </obfl>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -5689,6 +5706,7 @@
           </obfl>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -5762,6 +5780,7 @@
           </obfl>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -6114,6 +6133,7 @@
           </obfl>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -7599,6 +7619,7 @@
           </obfl>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -7706,6 +7727,7 @@
           </obfl>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -8486,6 +8508,7 @@
           </obfl>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -8630,6 +8653,7 @@
           </obfl>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -8955,6 +8979,7 @@
           </obfl>
         </x:document>
       </x:input>
+      <x:option name="text-transform" select="'(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
