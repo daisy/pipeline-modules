@@ -8,7 +8,7 @@
             <x:input port="source">
                 <x:document type="file" href="../resources/document-with-xml-stylesheet-instructions-2.xml"/>
             </x:input>
-            <x:param port="parameters" name="uppercase" select="true()"/>
+            <x:param port="parameters" name="uppercase" select="'true'"/>
         </x:call>
         <x:context label="result">
             <x:document type="port" port="result"/>

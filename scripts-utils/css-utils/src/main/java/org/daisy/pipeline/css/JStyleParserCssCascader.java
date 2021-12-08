@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.function.Function;
@@ -274,27 +276,31 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 				styleSheet = (StyleSheet)ruleFactory.createStyleSheet().unlock();
 				styleSheet.addAll(defaultStyleSheet);
 				styleSheet = CSSFactory.getUsedStyles(document, null, nodeLocator, medium, cssReader, styleSheet);
+
+				// FIXME: use a dedicated parser to parse @xslt rules (and ignore all the rest)
 				XMLInputValue<?> transformed = null;
 				for (RuleXslt r : Iterables.filter(styleSheet, RuleXslt.class)) {
-					Map<String,String> params = new HashMap<>();
+					Map<QName,InputValue<?>> params = new HashMap<>();
 					for (Declaration d : r) {
-						StringBuilder val = new StringBuilder();
+						List<Object> val = new ArrayList<>();
 						boolean invalid = false;
 						for (Term<?> t : d) {
 							if (t instanceof TermIdent || t instanceof TermString) {
-								if (val.length() > 0) val.append(' ');
-								val.append(((Term<String>)t).getValue());
-							} else if (t instanceof TermInteger) {
-								if (val.length() > 0) val.append(' ');
-								val.append(""+((TermInteger)t).getIntValue());
-							} else {
+								String v = ((Term<String>)t).getValue();
+								if (t instanceof TermIdent && ("true".equals(v) || "false".equals(v)))
+									val.add(Boolean.valueOf(v));
+								else
+									val.add(v);
+							} else if (t instanceof TermInteger)
+								val.add(((TermInteger)t).getIntValue());
+							else {
 								logger.warn("@xslt parameter value must be a sequence of string, ident or integer, but got " + d);
 								invalid = true;
 								break;
 							}
 						}
 						if (!invalid)
-							params.put(d.getProperty(), val.toString());
+							params.put(new QName(d.getProperty()), new InputValue<>(val));
 					}
 					transformed = xsltProcessor.transform(
 						URLs.resolve(URLs.asURI(r.base), URLs.asURI(r.uri)),
