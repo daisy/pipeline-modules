@@ -212,6 +212,10 @@ public class BrailleCssCascader implements CssCascader {
 			else
 				return null;
 		}
+
+		protected String serializeValue(Term<?> value) {
+			return BrailleCssSerializer.toString(value);
+		}
 	}
 
 	@SuppressWarnings("unused")

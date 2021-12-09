@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.StringTokenizer;
 import java.util.function.Function;
 
@@ -21,6 +22,7 @@ import javax.xml.transform.URIResolver;
 import com.google.common.collect.Iterables;
 
 import cz.vutbr.web.css.CSSFactory;
+import cz.vutbr.web.css.CSSProperty;
 import cz.vutbr.web.css.Declaration;
 import cz.vutbr.web.css.MediaSpec;
 import cz.vutbr.web.css.NetworkProcessor;
@@ -261,17 +263,19 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 				// - Repeater.assignDefaults in DeclarationTransformer.parseDeclaration in SingleMapNodeData.push in Analyzer.evaluateDOM
 				// - Variator.assignDefaults in DeclarationTransformer.parseDeclaration in SingleMapNodeData.push in Analyzer.evaluateDOM
 				CSSFactory.registerSupportedCSS(supportedCSS);
-				StyleSheet defaultStyleSheet = (StyleSheet)ruleFactory.createStyleSheet().unlock();
-				if (defaultStyleSheets != null) {
-					StringTokenizer t = new StringTokenizer(defaultStyleSheets);
-					while (t.hasMoreTokens()) {
-						URL u = URLs.asURL(URLs.resolve(baseURI, URLs.asURI(t.nextToken())));
-						if (!cssReader.supportsMediaType(null, u))
-							logger.warn("Style sheet type not supported: " + u);
-						else
-							defaultStyleSheet
-								= parserFactory.append(new CSSSource(u, (Charset)null, (String)null), cssReader, defaultStyleSheet);
+				StyleSheet defaultStyleSheet; {
+					StyleSheet s = (StyleSheet)ruleFactory.createStyleSheet().unlock();
+					if (defaultStyleSheets != null) {
+						StringTokenizer t = new StringTokenizer(defaultStyleSheets);
+						while (t.hasMoreTokens()) {
+							URL u = URLs.asURL(URLs.resolve(baseURI, URLs.asURI(t.nextToken())));
+							if (!cssReader.supportsMediaType(null, u))
+								logger.warn("Style sheet type not supported: " + u);
+							else
+								s = parserFactory.append(new CSSSource(u, (Charset)null, (String)null), cssReader, s);
+						}
 					}
+					defaultStyleSheet = s;
 				}
 				styleSheet = (StyleSheet)ruleFactory.createStyleSheet().unlock();
 				styleSheet.addAll(defaultStyleSheet);
@@ -302,6 +306,29 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 						if (!invalid)
 							params.put(new QName(d.getProperty()), new InputValue<>(val));
 					}
+					params.put(new QName("style"),
+					           new InputValue<>(
+					               new StyleAccessor() {
+					                   StyleMap style = null;
+					                   public Optional<String> get(Element element, String property) {
+					                       if (style == null) {
+					                           // getting the document through getOwnerDocument() and not directly from
+					                           // the existing "document" variable because for some unknown reason the
+					                           // underlying NodeInfo are not equal
+					                           StyleSheet s = (StyleSheet)ruleFactory.createStyleSheet().unlock();
+					                           s.addAll(defaultStyleSheet);
+					                           s = CSSFactory.getUsedStyles(element.getOwnerDocument(), null, nodeLocator, medium, cssReader, s);
+					                           style = new Analyzer(s).evaluateDOM(element.getOwnerDocument(), medium, true); }
+					                       NodeData data = style.get(element);
+					                       if (data != null) {
+					                           Term<?> value = data.getValue(property, true);
+					                           if (value != null)
+					                               return Optional.of(serializeValue(value));
+					                           else {
+					                               CSSProperty p = data.getProperty(property);
+					                               if (p != null)
+					                                   return Optional.of(p.toString()); }}
+					                       return Optional.empty(); }}));
 					transformed = xsltProcessor.transform(
 						URLs.resolve(URLs.asURI(r.base), URLs.asURI(r.uri)),
 						transformed != null ? transformed : source.get(),
@@ -336,6 +363,8 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 	}
 
 	protected abstract String serializeStyle(NodeData mainStyle, Map<PseudoElement,NodeData> pseudoStyles, Element context);
+
+	protected abstract String serializeValue(Term<?> value);
 
 	protected StyleSheet getParsedStyleSheet() {
 		if (styleSheet == null)
