@@ -28,6 +28,11 @@ The footnotes area can be styled using a `@footnotes` rule. Example:
 }
 ~~~
 </documentation>
+                    <value>end-of-block</value>
+                    <documentation xml:lang="en" xml:space="preserve">At the end of the block
+
+Notes are rendered after the block (e.g. paragraph) in which they occur.
+</documentation>
                     <value>end-of-volume</value>
                     <documentation xml:lang="en" xml:space="preserve">At the end of the volume
 
@@ -63,14 +68,15 @@ Special handling of notes is disabled. Notes are rendered as specified in custom
             <h2 px:role="name">Placement of content: Notes placement</h2>
             <p px:role="desc" xml:space="preserve">Placement of notes
 
-Notes, i.e. `note` elements that are referenced by a `noteref` element , can be rendered either at
-the bottom of the page on which they occur (on which they are referenced), at the end of the volume
-in which they occur, or at the end of the book. `note` elements that are not referenced by a
-`noteref` are not rendered.
+Notes, i.e. `note` elements that are referenced by a `noteref` element, can be rendered either at
+the bottom of the page on which they occur (on which they are referenced), at the end of the block
+in which they occur, at the end of the volume in which they occur, or at the end of the book. `note`
+elements that are not referenced by a `noteref` are not rendered.
 
-Note references and notes can be styled using `noteref` and `noteref::alternate` rules,
-respectively. A title can be inserted at the beginning of an endnotes section using a
-`#endnotes-section::-obfl-on-collection-start` rule. Example:
+Note references can be styled using a `noteref` rule. Notes that are placed at the end of the block
+can be styled with a `note` rule. Notes that are placed at the bottom of the page or at the end of a
+volume can be styled with a `noteref::alternate` rule. A title can be inserted at the beginning of
+an endnotes section using a `#endnotes-section::-obfl-on-collection-start` rule. Example:
 
 ~~~css
 #endnotes-section::-obfl-on-collection-start {
