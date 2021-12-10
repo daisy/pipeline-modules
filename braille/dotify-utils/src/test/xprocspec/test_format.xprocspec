@@ -6929,7 +6929,8 @@
     <x:documentation>
       Tests numbering of footnotes. Numbers are added both to the note itself and to the note
       reference. The numbering is not reset on each page. Two alternative methods are used for
-      adding a number to the note itself.
+      adding a number to the note itself. The third noteref has the text content "*" which is
+      replaced with the number.
     </x:documentation>
     <x:call step="dotify:format">
       <x:input port="source">
@@ -6954,11 +6955,23 @@
                                 display: block;
                                 content: target-content(attr(ref)); }
                               &amp;::alternate::before { content: counter(footnote) ' '; }"/>
+              ⠤⠤⠤
+              <noteref ref="note_1"
+                       style="flow: null;
+                              counter-increment: footnote;
+                              &amp;::alternate { content: '⠦' counter(footnote) '⠴'; }
+                              &amp;::alternate::alternate {
+                                flow: footnotes;
+                                display: block;
+                                content: counter(footnote) ' ' target-content(attr(ref)); }">*</noteref>
             </p>
             <note id="note_1" style="display:none">
               ⠿⠿⠿
             </note>
             <note id="note_2" style="display:none">
+              ⠿⠿⠿
+            </note>
+            <note id="note_3" style="display:none">
               ⠿⠿⠿
             </note>
           </body>
@@ -6971,7 +6984,7 @@
     </x:context>
     <x:expect label="obfl" type="custom" href="http://www.daisy.org/pipeline/modules/braille/obfl-utils/library.xpl" step="x:obfl-compare">
       <x:document type="inline">
-        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
+        <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false">
           <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
             <dp2:style-type>text/css</dp2:style-type>
           </meta>
@@ -6984,18 +6997,29 @@
           </layout-master>
           <collection name="footnotes">
             <item id="a">
-              <block> <span translate="">1</span> ⠿⠿⠿ </block>
+              <block translate="pre-translated-text-css">
+                <span translate="">1</span> ⠿⠿⠿
+              </block>
             </item>
             <item id="b">
-              <block> <span translate="">2</span> ⠿⠿⠿ </block>
+              <block translate="pre-translated-text-css">
+                <span translate="">2</span> ⠿⠿⠿
+              </block>
+            </item>
+            <item id="c">
+              <block translate="pre-translated-text-css">
+                <span translate="">3</span> ⠿⠿⠿
+              </block>
             </item>
           </collection>
           <sequence master="main">
-            <block>
+            <block translate="pre-translated-text-css">
               ⠤⠤⠤ ⠦<span translate="">1</span>⠴
               <anchor item="a"/>
               ⠤⠤⠤ ⠦<span translate="">2</span>⠴
               <anchor item="b"/>
+              ⠤⠤⠤ ⠦<span translate="">3</span>⠴
+              <anchor item="c"/>
             </block>
           </sequence>
         </obfl>
@@ -7017,11 +7041,11 @@
               <section>
                 <page>
                   <row>⠤⠤⠤⠀⠦⠼⠁⠴⠀⠤⠤⠤⠀⠦⠼⠃⠴</row>
-                  <row/>
-                  <row/>
+                  <row>⠤⠤⠤⠀⠦⠼⠉⠴</row>
                   <row/>
                   <row>⠼⠁⠀⠿⠿⠿</row>
                   <row>⠼⠃⠀⠿⠿⠿</row>
+                  <row>⠼⠉⠀⠿⠿⠿</row>
                 </page>
               </section>
             </volume>
