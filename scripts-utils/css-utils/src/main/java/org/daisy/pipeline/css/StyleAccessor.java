@@ -28,4 +28,11 @@ public abstract class StyleAccessor {
 	 */
 	public abstract Optional<String> get(Element element, String property);
 
+	/**
+	 * Test whether an element matches a CSS selector.
+	 *
+	 * @throws IllegalArgumentException if the selector can not be compiled
+	 */
+	public abstract boolean matches(Element element, String selector);
+
 }

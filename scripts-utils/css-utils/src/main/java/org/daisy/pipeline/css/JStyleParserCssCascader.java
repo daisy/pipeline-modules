@@ -21,6 +21,7 @@ import javax.xml.transform.URIResolver;
 
 import com.google.common.collect.Iterables;
 
+import cz.vutbr.web.css.CombinedSelector;
 import cz.vutbr.web.css.CSSFactory;
 import cz.vutbr.web.css.CSSProperty;
 import cz.vutbr.web.css.Declaration;
@@ -28,6 +29,8 @@ import cz.vutbr.web.css.MediaSpec;
 import cz.vutbr.web.css.NetworkProcessor;
 import cz.vutbr.web.css.NodeData;
 import cz.vutbr.web.css.RuleFactory;
+import cz.vutbr.web.css.Selector;
+import cz.vutbr.web.css.Selector.Combinator;
 import cz.vutbr.web.css.Selector.PseudoElement;
 import cz.vutbr.web.css.SourceLocator;
 import cz.vutbr.web.css.StyleSheet;
@@ -306,29 +309,88 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 						if (!invalid)
 							params.put(new QName(d.getProperty()), new InputValue<>(val));
 					}
-					params.put(new QName("style"),
-					           new InputValue<>(
-					               new StyleAccessor() {
-					                   StyleMap style = null;
-					                   public Optional<String> get(Element element, String property) {
-					                       if (style == null) {
-					                           // getting the document through getOwnerDocument() and not directly from
-					                           // the existing "document" variable because for some unknown reason the
-					                           // underlying NodeInfo are not equal
-					                           StyleSheet s = (StyleSheet)ruleFactory.createStyleSheet().unlock();
-					                           s.addAll(defaultStyleSheet);
-					                           s = CSSFactory.getUsedStyles(element.getOwnerDocument(), null, nodeLocator, medium, cssReader, s);
-					                           style = new Analyzer(s).evaluateDOM(element.getOwnerDocument(), medium, true); }
-					                       NodeData data = style.get(element);
-					                       if (data != null) {
-					                           Term<?> value = data.getValue(property, true);
-					                           if (value != null)
-					                               return Optional.of(serializeValue(value));
-					                           else {
-					                               CSSProperty p = data.getProperty(property);
-					                               if (p != null)
-					                                   return Optional.of(p.toString()); }}
-					                       return Optional.empty(); }}));
+					params.put(
+						new QName("style"),
+						new InputValue<>(
+							new StyleAccessor() {
+								StyleMap style = null;
+								public Optional<String> get(Element element, String property) {
+									if (style == null) {
+										// getting the document through getOwnerDocument() and not directly from
+										// the existing "document" variable because for some unknown reason the
+										// underlying NodeInfo are not equal
+										StyleSheet s = (StyleSheet)ruleFactory.createStyleSheet().unlock();
+										s.addAll(defaultStyleSheet);
+										s = CSSFactory.getUsedStyles(element.getOwnerDocument(), null, nodeLocator, medium, cssReader, s);
+										style = new Analyzer(s).evaluateDOM(element.getOwnerDocument(), medium, true); }
+									NodeData data = style.get(element);
+									if (data != null) {
+										Term<?> value = data.getValue(property, true);
+										if (value != null)
+											return Optional.of(serializeValue(value));
+										else {
+											CSSProperty p = data.getProperty(property);
+											if (p != null)
+												return Optional.of(p.toString()); }}
+									return Optional.empty();
+								}
+
+								Map<String,List<CombinedSelector>> selectorCache = null; // cache of compiled selectors
+								public boolean matches(Element element, String selector) {
+									List<CombinedSelector> compiledSelector;
+									if (selectorCache == null)
+										selectorCache = new HashMap<>();
+									if (selectorCache.containsKey(selector))
+										compiledSelector = selectorCache.get(selector);
+									else {
+										compiledSelector = parserFactory.parseSelector(selector, r.namespaces);
+										if (compiledSelector != null)
+											selectorCache.put(selector, compiledSelector); }
+									if (compiledSelector == null)
+										return false;
+									for (CombinedSelector sel : compiledSelector) {
+										boolean match = false;
+										Combinator combinator = null;
+										for (int i = sel.size() - 1; i >= 0; i--) {
+											Selector s = sel.get(i);
+											if (combinator == null)
+												match = s.matches(element);
+											else if (combinator == Combinator.ADJACENT) {
+												Node adjacent = element.getPreviousSibling();
+												while (adjacent != null && !(adjacent instanceof Element))
+													adjacent = adjacent.getPreviousSibling();
+												match = adjacent != null && s.matches((Element)adjacent); }
+											else if (combinator == Combinator.PRECEDING) {
+												match = false;
+												Node preceding = element.getPreviousSibling();
+												while (!match) {
+													while (preceding != null && !(preceding instanceof Element))
+														preceding = preceding.getPreviousSibling();
+													if (preceding != null)
+														break;
+													match = s.matches((Element)preceding);
+													preceding = preceding.getPreviousSibling(); }}
+											else if (combinator == Combinator.DESCENDANT) {
+												match = false;
+												Node ancestor = element.getParentNode();
+												while (!match && ancestor != null) {
+													match = s.matches((Element)ancestor);
+													ancestor = ancestor.getParentNode(); }}
+											else if (combinator == Combinator.CHILD) {
+												Element parent = (Element)element.getParentNode();
+												match = parent != null && s.matches(parent); }
+											combinator = s.getCombinator();
+											if (!match)
+												return false;
+										}
+										if (match == true)
+											return true;
+									}
+									return false;
+								}
+							}
+						)
+					);
 					transformed = xsltProcessor.transform(
 						URLs.resolve(URLs.asURI(r.base), URLs.asURI(r.uri)),
 						transformed != null ? transformed : source.get(),
