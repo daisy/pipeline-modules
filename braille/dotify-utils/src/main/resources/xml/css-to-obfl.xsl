@@ -449,14 +449,22 @@
                                                                                     <xsl:with-param name="white-space" tunnel="yes" select="$white-space"/>
                                                                                 </xsl:call-template>
                                                                             </xsl:variable>
-                                                                            <xsl:element name="{if ($sequence/self::obfl:list-of-references) then 'dynamic-sequence' else 'sequence'}">
-                                                                                <xsl:attribute name="css:page" select="$page-style/@style"/>
-                                                                                <xsl:if test="$first">
-                                                                                    <xsl:sequence select="$initial-page-number"/>
-                                                                                </xsl:if>
-                                                                                <xsl:sequence select="$page-number-counter"/>
-                                                                                <xsl:sequence select="$sequence"/>
-                                                                            </xsl:element>
+                                                                            <xsl:for-each-group select="$sequence"
+                                                                                                group-starting-with="obfl:list-of-references[not(starts-with(@collection,'meta/'))]">
+                                                                                <xsl:variable name="first" as="xs:boolean" select="$first and position()=1"/>
+                                                                                <xsl:for-each-group select="current-group()"
+                                                                                                    group-ending-with="obfl:list-of-references[not(starts-with(@collection,'meta/'))]">
+                                                                                    <xsl:variable name="first" as="xs:boolean" select="$first and position()=1"/>
+                                                                                    <xsl:element name="{if (current-group()/self::obfl:list-of-references) then 'dynamic-sequence' else 'sequence'}">
+                                                                                        <xsl:attribute name="css:page" select="$page-style/@style"/>
+                                                                                        <xsl:if test="$first">
+                                                                                            <xsl:sequence select="$initial-page-number"/>
+                                                                                        </xsl:if>
+                                                                                        <xsl:sequence select="$page-number-counter"/>
+                                                                                        <xsl:sequence select="current-group()"/>
+                                                                                    </xsl:element>
+                                                                                </xsl:for-each-group>
+                                                                            </xsl:for-each-group>
                                                                         </xsl:when>
                                                                         <xsl:otherwise>
                                                                             <xsl:variable name="toc" as="element()" select="current-group()"/>

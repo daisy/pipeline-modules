@@ -6724,8 +6724,11 @@
   
   <x:scenario label="test_63">
     <x:documentation>
-      Tests volume notes using ::alternate pseudo-element and target-content() and volume range flow(). Also test that
-      content included before the `flow(endnotes, volume)' is automatically skipped when the volume contains no notes.
+      Tests volume notes using ::alternate pseudo-element and target-content() and volume range
+      flow(). Note that there are sheet breaks between the `flow(endnotes, volume)' and any content
+      that is included before and after it, and that the content before and after is not
+      automatically skipped when the volume contains no notes. To accomplish this you need to use
+      `display: -obfl-list-of-references' and a `::-obfl-on-collection-start' pseudo-element.
     </x:documentation>
     <x:call step="dotify:format">
       <x:input port="source">
@@ -6733,7 +6736,7 @@
           <doc style="text-transform: none;
                       @page { size: 10 6 }
                       @volume {
-                        max-length: 3;
+                        max-length: 4;
                         @end {
                           content: flow(volume-notes-title) flow(endnotes, volume) }}">
             <body style="&amp;::alternate {
@@ -6783,10 +6786,12 @@
               <footer/>
             </default-template>
           </layout-master>
-          <volume-template sheets-in-volume-max="3">
+          <volume-template sheets-in-volume-max="4">
             <post-content>
-              <dynamic-sequence master="main">
+              <sequence master="main">
                 <block>⠭⠭⠭</block>
+              </sequence>
+              <dynamic-sequence master="main">
                 <list-of-references collection="endnotes" range="volume"/>
               </dynamic-sequence>
             </post-content>
@@ -6865,6 +6870,10 @@
               <section>
                 <page>
                   <row>⠭⠭⠭</row>
+                </page>
+              </section>
+              <section>
+                <page>
                   <row>⠿⠿⠿</row>
                 </page>
               </section>
@@ -6907,6 +6916,10 @@
               <section>
                 <page>
                   <row>⠭⠭⠭</row>
+                </page>
+              </section>
+              <section>
+                <page>
                   <row>⠿⠿⠿⠿⠿⠿</row>
                 </page>
               </section>
@@ -6916,6 +6929,11 @@
                 <page>
                   <row>⠤⠤⠤⠤⠤</row>
                   <row>⠤⠤⠤⠤⠤</row>
+                </page>
+              </section>
+              <section>
+                <page>
+                  <row>⠭⠭⠭</row>
                 </page>
               </section>
             </volume>
