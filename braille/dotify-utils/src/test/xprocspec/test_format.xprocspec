@@ -5301,7 +5301,7 @@
     <x:call step="dotify:format">
       <x:input port="source">
         <x:document type="inline">
-          <doc style="text-transform: none; @page { size: 15 5 } @volume { @begin { content: flow(titlepage) }}">
+          <doc style="text-transform: none; @page { size: 15 5 } @volume { @begin { content: flow(titlepage, document) }}">
             <front>
               <titlepage style="display: block; flow: titlepage">
                 ⠿⠿⠿
@@ -6538,7 +6538,7 @@
       <x:input port="source">
         <x:document type="inline">
           <body style="text-transform: none;
-                       @page { size: 10 6; @footnotes { content: flow(footnotes) }}">
+                       @page { size: 10 6; @footnotes { content: flow(footnotes, page) }}">
             <p style="display: block">
               ⠤⠤⠤
               <note style="flow: footnotes;
@@ -6647,7 +6647,7 @@
       <x:input port="source">
         <x:document type="inline">
           <body style="text-transform: none;
-                       @page { size: 10 6; @footnotes { content: flow(footnotes) }}">
+                       @page { size: 10 6; @footnotes { content: flow(footnotes, page) }}">
             <p style="display:block">
               ⠤⠤⠤
               <noteref ref="note_1"
@@ -6738,7 +6738,7 @@
                       @volume {
                         max-length: 4;
                         @end {
-                          content: flow(volume-notes-title) flow(endnotes, volume) }}">
+                          content: flow(volume-notes-title, document) flow(endnotes, volume) }}">
             <body style="&amp;::alternate {
                            flow: volume-notes-title;
                            display: block;
@@ -6954,7 +6954,7 @@
       <x:input port="source">
         <x:document type="inline">
           <body style="text-transform: none;
-                       @page { size: 20 6; @footnotes { content: flow(footnotes) }}">
+                       @page { size: 20 6; @footnotes { content: flow(footnotes, page) }}">
             <p style="display:block">
               ⠤⠤⠤
               <noteref ref="note_1"
@@ -7299,7 +7299,7 @@
     <x:call step="dotify:format">
       <x:input port="source">
         <x:document type="inline">
-          <body style="@page { size: 10 6; @footnotes { content: flow(footnotes) }}">
+          <body style="@page { size: 10 6; @footnotes { content: flow(footnotes, page) }}">
             <p style="display:block">
               ⠤⠤⠤
               <noteref ref="note_1" style="&amp;::alternate { flow:footnotes; display:block; content:target-content(attr(ref)) }">
@@ -7397,7 +7397,7 @@
                        @page {
                          size: 20 10;
                          @footnotes {
-                           content: flow(footnotes);
+                           content: flow(footnotes, page);
                            -obfl-fallback-collection: endnotes; }}
                        @volume {
                          @end {
@@ -7516,7 +7516,7 @@
                        @page {
                          size: 20 10;
                          @footnotes {
-                           content: flow(footnotes);
+                           content: flow(footnotes, page);
                            -obfl-fallback-collection: endnotes; }}
                        @volume {
                          @end {
@@ -7649,8 +7649,8 @@
                         size: 15 7;
                         margin-bottom: 1;
                         @bottom-right { content: counter(page) }}
-                      @volume:first { max-length: 4; @begin { content: flow(first-front) }}
-                      @volume { max-length: 4; @begin { content: flow(next-front) }}">
+                      @volume:first { max-length: 4; @begin { content: flow(first-front, document) }}
+                      @volume { max-length: 4; @begin { content: flow(next-front, document) }}">
             <front>
               <h1 style="display: block; flow: first-front">
                 ⠿ ⠿ ⠿ ⠿
@@ -8010,7 +8010,7 @@
                         size: 15 7;
                         margin-bottom: 1;
                         @bottom-right {content: counter(page) }}
-                      @volume { @begin { content: flow(front) }}">
+                      @volume { @begin { content: flow(front, document) }}">
             <front>
               <toc id="ch_0"
                    style="display: -obfl-toc;
@@ -8206,7 +8206,7 @@
     <x:call step="dotify:format">
       <x:input port="source">
         <x:document type="inline">
-          <body style="text-transform: none; @volume { @begin { content: flow(foo) flow(bar); }}">
+          <body style="text-transform: none; @volume { @begin { content: flow(foo, document) flow(bar, document); }}">
             <level1 style="display: block; page-break-after: always; flow: foo;">
               <p style="display: block">⠤⠤⠤</p>
             </level1>
@@ -8317,7 +8317,7 @@
     <x:call step="dotify:format">
       <x:input port="source">
         <x:document type="inline">
-          <body style="@volume { @begin { content: flow(front); }}">
+          <body style="@volume { @begin { content: flow(front, document); }}">
             <level1 style="display: block; flow: front; page-break-before: always;">
               <h1 style="display: block">⠿⠿⠿ 0</h1>
             </level1>
@@ -8431,7 +8431,7 @@
                           content: counter(page); }}
                       @volume {
                         @begin {
-                          content: flow(titlepage);
+                          content: flow(titlepage, document);
                           @page { size: 15 5 }}}">
             <front>
               <titlepage style="display: block; flow: titlepage">
@@ -8530,7 +8530,7 @@
                        @page {
                          size: 10 6;
                          @footnotes {
-                           content: flow(footnotes);
+                           content: flow(footnotes, page);
                            max-height: 4;
                            border-top-pattern: ⠒; }}">
             <p style="display:block">
@@ -9211,7 +9211,7 @@
           <body style="text-transform: none;
                        display: block;
                        @page { size: 15 5; }
-                       @volume { max-length: 3; @begin { content: flow(pre) }}">
+                       @volume { max-length: 3; @begin { content: flow(pre, document) }}">
             <p style="display: block; text-transform: auto; flow: pre">
               <span style="&amp;::before { content: -obfl-evaluate('(round $sheets-in-volume)') ' ⠌ ' -obfl-evaluate('(round $sheets-in-document)') }"/>
             </p>
@@ -9348,7 +9348,7 @@
     <x:call step="dotify:format">
       <x:input port="source">
         <x:document type="inline">
-          <body style="text-transform: none; @page { size: 10 6; @footnotes { content: flow(footnotes) }}">
+          <body style="text-transform: none; @page { size: 10 6; @footnotes { content: flow(footnotes, page) }}">
             <p style="display:block">
               ⠤⠤⠤
               <note style="flow:footnotes; display:block">⠿</note>
@@ -9436,7 +9436,7 @@
           <doc style="text-transform: none;
                       @page { size: 15 7 }
                       @volume { max-length: 2 }
-                      @volume:last { max-length: 2; @begin { content: flow(toc) }}">
+                      @volume:last { max-length: 2; @begin { content: flow(toc, document) }}">
             <toc style="display:-obfl-toc; flow:toc; text-transform:auto">
               <entry ref="ch_1"
                      style="display: block; &amp;::after { content: ' ⠄⠄⠄⠄⠄⠄⠄⠄⠄ ' target-counter(attr(ref), page) }"> 1 </entry>
@@ -9618,7 +9618,7 @@
           <doc style="text-transform: none;
                       @page { size: 15 7 }
                       @volume { max-length: 2 }
-                      @volume:last { max-length: 2; @end { content: flow(toc) }}">
+                      @volume:last { max-length: 2; @end { content: flow(toc, document) }}">
             <toc style="display:-obfl-toc; flow:toc; text-transform:auto">
               <entry ref="ch_1"
                      style="display: block; &amp;::after { content: ' ⠄⠄⠄⠄⠄⠄⠄⠄⠄ ' target-counter(attr(ref), page) }"> 1 </entry>
@@ -9799,7 +9799,7 @@
         <x:document type="inline">
           <doc style="text-transform: none;
                       @page { size: 20 10 }
-                      @volume:first { @begin { content: flow(front); @page { size: 10 5 }}}">
+                      @volume:first { @begin { content: flow(front, document); @page { size: 10 5 }}}">
             <front style="display: block; flow: front">
               ⠤⠤⠤⠤⠤
               <toc style="display: block; @page { size: 10 10 }">
@@ -9975,7 +9975,7 @@
     <x:call step="dotify:format">
       <x:input port="source">
         <x:document type="inline">
-          <doc style="text-transform: none; @volume { @begin { content: flow(titlepage) }}">
+          <doc style="text-transform: none; @volume { @begin { content: flow(titlepage, document) }}">
             <titlepage style="display: block; flow: titlepage">
               ⠤⠤⠤⠤⠤
               <span style="&amp;::before {
@@ -10066,7 +10066,7 @@
     <x:call step="dotify:format">
       <x:input port="source">
         <x:document type="inline">
-          <doc style="text-transform: none; @volume { @begin { content: flow(titlepage) }}">
+          <doc style="text-transform: none; @volume { @begin { content: flow(titlepage, document) }}">
             <titlepage style="display: block; flow: titlepage; text-transform: auto">
               1<span style="&amp;::after {
                               text-transform: downshift;
@@ -10167,11 +10167,11 @@
                        @page {
                          size: 20 10;
                          @footnotes {
-                           content: flow(footnotes);
+                           content: flow(footnotes, page);
                            -obfl-fallback-collection: endnotes; }}
                        @volume {
                          @begin {
-                           content: flow(front) }
+                           content: flow(front, document) }
                          @end {
                            content: flow(endnotes, volume); }}">
             <p style="display: block; flow: front; -obfl-use-when-collection-not-empty: footnotes">
@@ -11148,7 +11148,7 @@
                           content: counter(page) }}
                       @volume {
                         @begin {
-                          content: flow(titlepage) }}">
+                          content: flow(titlepage, document) }}">
             <front>
               <titlepage style="display: block; flow: titlepage; counter-set: pre-page 11">
                 ⠿⠿⠿
@@ -11500,7 +11500,7 @@
                       @volume:last {
                         max-length: 3;
                         @end {
-                          content: flow(endnotes) }}">
+                          content: flow(endnotes, document) }}">
             <body>
               <p style="display:block">
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
@@ -11669,11 +11669,11 @@
                       @volume:last {
                         max-length: 3;
                         @end {
-                          content: flow(endnotes-container) }}">
+                          content: flow(endnotes-container, document) }}">
             <body style="&amp;::alternate {
                            display: -obfl-list-of-references;
                            flow: endnotes-container;
-                           content: -obfl-collection(endnotes); }
+                           content: -obfl-collection(endnotes, document); }
                          &amp;::alternate::-obfl-on-volume-start {
                            display: block;
                            border-bottom-pattern: ⠒;
@@ -11858,7 +11858,7 @@
         <x:document type="inline">
           <doc style="text-transform: none;
                       @page { size: 15 5 }
-                      @volume { @begin { content: flow(titlepage1) flow(titlepage2) }}">
+                      @volume { @begin { content: flow(titlepage1, document) flow(titlepage2, document) }}">
             <front>
               <titlepage style="display: block; flow: titlepage1">
                 ⠿⠿⠿
@@ -12444,7 +12444,7 @@
                         @bottom-right {
                           content: counter(page) }}
                       @volume {
-                        @begin { content: flow(titlepage) }}">
+                        @begin { content: flow(titlepage, document) }}">
             <front>
               <titlepage style="display: block; flow: titlepage">
                 ⠿⠿⠿
@@ -14299,8 +14299,8 @@
                         size: 15 7;
                         margin-bottom: 1;
                         @bottom-right { content: counter(page) }}
-                      @volume:first { @begin { content: flow(first-front) }}
-                      @volume { @begin { content: flow(next-front) }}">
+                      @volume:first { @begin { content: flow(first-front, document) }}
+                      @volume { @begin { content: flow(next-front, document) }}">
             <front>
               <ol style="display: -obfl-toc;
                          flow: first-front;
@@ -15612,7 +15612,7 @@
       <x:input port="source">
         <x:document type="inline">
           <body style="text-transform: none;
-                       @volume { @begin { content: flow(front); }}">
+                       @volume { @begin { content: flow(front, document); }}">
             <list style="display: -obfl-toc; flow: front"/>
             <h1 style="display: block">⠿⠿⠿</h1>
           </body>
@@ -15681,7 +15681,7 @@
       <x:input port="source">
         <x:document type="inline">
           <body style="text-transform: none;
-                       @volume { @begin { content: flow(front); }}">
+                       @volume { @begin { content: flow(front, document); }}">
             <list style="display: -obfl-toc; flow: front">
               <li style="display: block"/>
               <li style="display: block">
@@ -16097,7 +16097,7 @@
           <body style="text-transform: none;
                        @page {
                          size: 10 10;
-                         @footnotes { content: flow(footnotes) }}">
+                         @footnotes { content: flow(footnotes, page) }}">
             <table style="display: block;
                           render-table-by: row, column;
                           &amp;::table-by(row)::list-item {
@@ -16362,7 +16362,7 @@
           <body style="text-transform: none;
                        @page {
                          size: 20 10;
-                         @footnotes { content: flow(footnotes) }}">
+                         @footnotes { content: flow(footnotes, page) }}">
             <p>
               <a href="#note_1"
                  style="display: none

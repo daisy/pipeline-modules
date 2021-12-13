@@ -139,7 +139,7 @@
         <xsl:for-each select="$page-stylesheets">
             <xsl:sequence select="css:rule[@selector='@footnotes'][1]
                                   /css:property[@name='content'][1]
-                                  /css:flow[@from and (not(@scope) or @scope='page')]/@from"/>
+                                  /css:flow[@from][@scope='page']/@from"/>
         </xsl:for-each>
         <xsl:for-each select="$volume-stylesheets">
             <xsl:for-each select="(.|*[matches(@selector,'^&amp;:')])
@@ -147,13 +147,13 @@
                 <xsl:variable name="volume-area-content" as="element()*"
                               select="(if (css:property) then . else *[not(@selector)])
                                       /css:property[@name='content'][1]/*"/>
-                <xsl:sequence select="$volume-area-content/self::css:flow[@from and @scope='volume']/@from"/>
+                <xsl:sequence select="$volume-area-content/self::css:flow[@from][@scope='volume']/@from"/>
                 <xsl:for-each select="distinct-values(
-                                        $volume-area-content/self::css:flow[@from][(@scope,'document')[1]='document']/@from)">
+                                        $volume-area-content/self::css:flow[@from][@scope='document']/@from)">
                     <xsl:variable name="flow" as="xs:string" select="."/>
                     <xsl:sequence select="$sections/*[@css:flow=$flow]
                                           /css:box[@type='block' and @css:_obfl-list-of-references]
-                                          //css:custom-func[@name='-obfl-collection' and @arg1 and not(@arg2)]/@arg1"/>
+                                          //css:flow[@from][@scope=('volume','-obfl-document')]/@from"/>
                 </xsl:for-each>
             </xsl:for-each>
         </xsl:for-each>
@@ -790,17 +790,7 @@
                                 <xsl:sequence select="."/>
                             </xsl:when>
                             <xsl:otherwise> <!-- css:box[@type='block' and @css:_obfl-list-of-references] -->
-                                <xsl:variable name="collection" as="element()*">
-                                    <xsl:apply-templates mode="display-obfl-list-of-references" select="."/>
-                                </xsl:variable>
-                                <xsl:if test="not(count($collection)=1)">
-                                    <xsl:message terminate="yes">
-                                      <xsl:text>The 'content' property on an element with 'display: -obfl-list-of-references' </xsl:text>
-                                      <xsl:text>must consist of exactly one -obfl-collection().</xsl:text>
-                                    </xsl:message>
-                                </xsl:if>
                                 <xsl:variable name="self" as="element()" select="."/>
-                                <xsl:variable name="range" as="xs:string" select="(@css:_obfl-list-of-references-range,'document')[1]"/>
                                 <xsl:variable name="on-collection-start" as="element()*"
                                               select="if (@css:_obfl-on-collection-start)
                                                       then $sections/*[@css:flow=concat('-obfl-on-collection-start/',
@@ -811,46 +801,92 @@
                                                       then $sections/*[@css:flow=concat('-obfl-on-collection-end/',
                                                                                         $self/@css:_obfl-on-collection-end)]/*
                                                       else ()"/>
-                                <xsl:variable name="on-volume-start" as="element()*"
-                                              select="if ($range='document' and @css:_obfl-on-volume-start)
-                                                      then $sections/*[@css:flow=concat('-obfl-on-volume-start/',
-                                                                                        $self/@css:_obfl-on-volume-start)]/*
-                                                      else ()"/>
-                                <xsl:variable name="on-volume-end" as="element()*"
-                                              select="if ($range='document' and @css:_obfl-on-volume-end)
-                                                      then $sections/*[@css:flow=concat('-obfl-on-volume-end/',
-                                                                                        $self/@css:_obfl-on-volume-end)]/*
-                                                      else ()"/>
-                                <list-of-references collection="{$collection/@arg1}" range="{$range}">
-                                    <xsl:if test="exists($on-collection-start)">
-                                        <on-collection-start>
-                                            <xsl:for-each select="$on-collection-start">
-                                                <xsl:apply-templates mode="sequence" select="."/>
-                                            </xsl:for-each>
-                                        </on-collection-start>
-                                    </xsl:if>
-                                    <xsl:if test="exists($on-collection-end)">
-                                        <on-collection-end>
-                                            <xsl:for-each select="$on-collection-end">
-                                                <xsl:apply-templates mode="sequence" select="."/>
-                                            </xsl:for-each>
-                                        </on-collection-end>
-                                    </xsl:if>
-                                    <xsl:if test="exists($on-volume-start)">
-                                        <on-volume-start>
-                                            <xsl:for-each select="$on-volume-start">
-                                                <xsl:apply-templates mode="sequence" select="."/>
-                                            </xsl:for-each>
-                                        </on-volume-start>
-                                    </xsl:if>
-                                    <xsl:if test="exists($on-volume-end)">
-                                        <on-volume-end>
-                                            <xsl:for-each select="$on-volume-end">
-                                                <xsl:apply-templates mode="sequence" select="."/>
-                                            </xsl:for-each>
-                                        </on-volume-end>
-                                    </xsl:if>
-                                </list-of-references>
+                                <xsl:choose>
+                                    <xsl:when test=".//css:flow">
+                                        <!--
+                                            not evaluated yet because @scope is "volume" or because a ::-obfl-on-volume-start
+                                            or ::-obfl-on-volume-end is present
+                                        -->
+                                        <xsl:variable name="flow" as="element()*"> <!-- css:flow -->
+                                            <xsl:apply-templates mode="display-obfl-list-of-references" select="."/>
+                                        </xsl:variable>
+                                        <xsl:if test="not(count($flow)=1)">
+                                            <!-- should not happen (already checked) -->
+                                            <xsl:message terminate="yes">
+                                                <xsl:text>An element with 'display: -obfl-list-of-references' must contain</xsl:text>
+                                                <xsl:text>exactly one -obfl-collection() or flow() and nothing more.</xsl:text>
+                                            </xsl:message>
+                                        </xsl:if>
+                                        <xsl:variable name="range" as="xs:string?" select="if ($flow/@scope='-obfl-document')
+                                                                                           then 'document'
+                                                                                           else $flow/@scope"/>
+                                        <xsl:if test="not($range=('volume','document'))">
+                                            <!-- should not happen -->
+                                            <xsl:message terminate="yes">
+                                                <xsl:text>The range of the flow() or -obfl-collection() function inside a </xsl:text>
+                                                <xsl:text>'display: -obfl-list-of-references' element that is flowed into a volume </xsl:text>
+                                                <xsl:text>area must be either 'volume' or 'document'.</xsl:text>
+                                            </xsl:message>
+                                        </xsl:if>
+                                        <xsl:variable name="on-volume-start" as="element()*"
+                                                      select="if ($range='document' and @css:_obfl-on-volume-start)
+                                                              then $sections/*[@css:flow=concat('-obfl-on-volume-start/',
+                                                                                                $self/@css:_obfl-on-volume-start)]/*
+                                                              else ()"/>
+                                        <xsl:variable name="on-volume-end" as="element()*"
+                                                      select="if ($range='document' and @css:_obfl-on-volume-end)
+                                                              then $sections/*[@css:flow=concat('-obfl-on-volume-end/',
+                                                                                                $self/@css:_obfl-on-volume-end)]/*
+                                                              else ()"/>
+                                        <list-of-references collection="{$flow/@from}" range="{$range}">
+                                            <xsl:if test="exists($on-collection-start)">
+                                                <on-collection-start>
+                                                    <xsl:apply-templates mode="sequence" select="$on-collection-start"/>
+                                                </on-collection-start>
+                                            </xsl:if>
+                                            <xsl:if test="exists($on-collection-end)">
+                                                <on-collection-end>
+                                                    <xsl:apply-templates mode="sequence" select="$on-collection-end"/>
+                                                </on-collection-end>
+                                            </xsl:if>
+                                            <xsl:if test="exists($on-volume-start)">
+                                                <on-volume-start>
+                                                    <xsl:apply-templates mode="sequence" select="$on-volume-start"/>
+                                                </on-volume-start>
+                                            </xsl:if>
+                                            <xsl:if test="exists($on-volume-end)">
+                                                <on-volume-end>
+                                                    <xsl:apply-templates mode="sequence" select="$on-volume-end"/>
+                                                </on-volume-end>
+                                            </xsl:if>
+                                        </list-of-references>
+                                    </xsl:when>
+                                    <xsl:when test=".//css:box//text()">
+                                        <!--
+                                            already evaluated and not empty
+                                        -->
+                                        <xsl:variable name="collection" as="element()">
+                                            <xsl:apply-templates mode="sequence" select=".">
+                                                <xsl:with-param name="ignore-obfl-list-of-references" tunnel="yes" select="true()"/>
+                                            </xsl:apply-templates>
+                                        </xsl:variable>
+                                        <xsl:choose>
+                                            <xsl:when test="exists(($on-collection-start,$on-collection-end))">
+                                                <xsl:for-each select="$collection">
+                                                    <xsl:copy>
+                                                        <xsl:sequence select="@*"/>
+                                                        <xsl:apply-templates mode="sequence" select="$on-collection-start"/>
+                                                        <xsl:sequence select="node()"/>
+                                                        <xsl:apply-templates mode="sequence" select="$on-collection-end"/>
+                                                    </xsl:copy>
+                                                </xsl:for-each>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:sequence select="$collection"/>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </xsl:when>
+                                </xsl:choose>
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:for-each>
@@ -919,7 +955,6 @@
                                                                        @css:hyphens|
                                                                        @css:hyphenate-character|
                                                                        @css:_obfl-list-of-references|
-                                                                       @css:_obfl-list-of-references-range|
                                                                        @css:_obfl-on-collection-start|
                                                                        @css:_obfl-on-collection-end|
                                                                        @css:_obfl-on-volume-start|
@@ -934,7 +969,7 @@
     </xsl:template>
     
     <xsl:template mode="display-obfl-list-of-references"
-                  match="css:custom-func[@name='-obfl-collection' and @arg1 and not(@arg2)]">
+                  match="css:flow[@from][@scope=('volume','-obfl-document')]">
         <xsl:sequence select="."/>
     </xsl:template>
     
@@ -1673,7 +1708,13 @@
                          /css:_/*[@css:_obfl-toc]/@css:_obfl-on-toc-start|
                          /css:_/*[@css:_obfl-toc]/@css:_obfl-on-volume-start|
                          /css:_/*[@css:_obfl-toc]/@css:_obfl-on-volume-end|
-                         /css:_/*[@css:_obfl-toc]/@css:_obfl-on-toc-end"/>
+                         /css:_/*[@css:_obfl-toc]/@css:_obfl-on-toc-end|
+                         /css:_/*/@css:_obfl-list-of-references|
+                         /css:_/*[@css:_obfl-list-of-references]/@css:_obfl-on-collection-start|
+                         /css:_/*[@css:_obfl-list-of-references]/@css:_obfl-on-volume-start|
+                         /css:_/*[@css:_obfl-list-of-references]/@css:_obfl-on-volume-start|
+                         /css:_/*[@css:_obfl-list-of-references]/@css:_obfl-on-collection-end
+                         "/>
     
     <xsl:template mode="block-attr table-attr"
                   match="css:box[@type=('block','table')]/@css:margin-left|
@@ -2699,19 +2740,25 @@
         </css:box>
     </xsl:template>
     
-    <!--
-        default scope within volume area is 'document'
-    -->
     <xsl:template mode="css:eval-volume-area-content-list
                         css:eval-sequence-interrupted-resumed-content-list"
-                  match="css:flow[@from and (not(@scope) or @scope='document')]">
+                  match="css:flow[@from][@scope='document']"
+                  priority="0.6">
         <xsl:variable name="flow" as="xs:string" select="@from"/>
         <xsl:sequence select="$sections/*[@css:flow=$flow]"/>
     </xsl:template>
     
     <xsl:template mode="css:eval-volume-area-content-list"
-                  match="css:flow[@from=$collection-flows and @scope='volume']">
+                  match="css:flow[@from=$collection-flows][@scope='volume']"
+                  priority="0.6">
         <list-of-references collection="{@from}" range="volume"/>
+    </xsl:template>
+    
+    <xsl:template mode="css:eval-volume-area-content-list"
+                  match="css:flow[@from]">
+        <xsl:call-template name="pf:warn">
+            <xsl:with-param name="msg">The range of a flow() function inside a volume area must be either 'volume' or 'document'</xsl:with-param>
+        </xsl:call-template>
     </xsl:template>
     
     <xsl:template mode="css:eval-volume-area-content-list
@@ -2732,9 +2779,10 @@
     </xsl:template>
     
     <xsl:template mode="css:eval-volume-area-content-list"
-                  match="css:custom-func[@name='-obfl-evaluate']">
+                  match="css:custom-func[@name]">
         <xsl:call-template name="pf:warn">
-            <xsl:with-param name="msg">-obfl-evaluate() function not supported in volume area</xsl:with-param>
+            <xsl:with-param name="msg">{}() function not supported in volume area</xsl:with-param>
+            <xsl:with-param name="args" select="@name"/>
         </xsl:call-template>
     </xsl:template>
     

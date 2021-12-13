@@ -21,7 +21,11 @@ note {
 	display: -obfl-list-of-references;
 	flow: endnotes-container;
 	&::after {
-		content: -obfl-collection(endnotes);
+		@if $notes-placement == end-of-book {
+			content: flow(endnotes, document);
+		} @else {
+			content: flow(endnotes, volume);
+		}
 	}
 }
 
@@ -31,8 +35,8 @@ note {
 	}
 	@page {
 		@footnotes {
-			content: flow(footnotes);
-            -obfl-fallback-collection: endnotes;
+			content: flow(footnotes, page);
+			-obfl-fallback-collection: endnotes;
 		}
 	}
 
@@ -45,16 +49,13 @@ note {
 @if $notes-placement == end-of-book {
 	@volume:last {
 		@end {
-			content: flow(endnotes-container);
+			content: flow(endnotes-container, document);
 		}
 	}
 } @else {
-	#endnotes-section {
-		-obfl-list-of-references-range: volume;
-	}
 	@volume {
 		@end {
-			content: flow(endnotes-container);
+			content: flow(endnotes-container, document);
 		}
 	}
 }

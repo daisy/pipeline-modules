@@ -484,11 +484,61 @@
         </p:with-option>
     </css:eval-counter>
     
-    <css:flow-from px:progress=".03">
-        <p:documentation>
-            Evaluate css:flow elements. <!-- depends on parse-content and eval-counter -->
-        </p:documentation>
-    </css:flow-from>
+    <p:group px:progress=".03">
+        <p:for-each>
+            <p:group>
+                <p:documentation>
+                    Rename -obfl-collection() to flow() so that css:flow-from will process them.
+                </p:documentation>
+                <p:label-elements match="*[@css:_obfl-list-of-references]
+                                          //css:custom-func[@name='-obfl-collection'][@arg1]"
+                                  attribute="from" label="@arg1"/>
+                <p:rename match="css:custom-func[@name='-obfl-collection'][@from]" new-name="css:flow"/>
+                <p:label-elements match="css:flow[@name='-obfl-collection'][@arg2]" attribute="scope" label="@arg2"/>
+                <p:delete match="css:flow[@name='-obfl-collection']/@name|
+                                 css:flow[@name='-obfl-collection']/@arg1|
+                                 css:flow[@name='-obfl-collection']/@arg2"/>
+            </p:group>
+            <p:group>
+                <p:documentation>
+                    Change scope 'document' to '-obfl-document' when ::-obfl-on-volume-start or
+                    ::-obfl-on-volume-end pseudo-elements are present.
+                </p:documentation>
+                <p:label-elements match="*[@css:_obfl-list-of-references]
+                                          [@css:_obfl-on-volume-start or @css:_obfl-on-volume-start]
+                                          //css:flow[@from][@scope='document']"
+                                  attribute="scope" label="'-obfl-document'"/>
+            </p:group>
+            <px:assert error-code="XXX"
+                       message="An element with 'display: -obfl-list-of-references' must consist of exactly one
+ -obfl-collection() or flow() and nothing more.">
+                <p:documentation>
+                    Check that elements with "display: -obfl-list-of-references" contain exactly one
+                    -obfl-collection() or flow().
+                </p:documentation>
+                <p:with-option name="test" select="every $e in //*[@css:_obfl-list-of-references] satisfies
+                                                   not($e//node()[not(self::css:box[@type='inline']|
+                                                                      self::css:_|
+                                                                      self::css:flow)])"/>
+            </px:assert>
+        </p:for-each>
+        <css:flow-from px:progress=".03">
+            <p:documentation>
+                Evaluate css:flow elements. <!-- depends on parse-content and eval-counter -->
+            </p:documentation>
+        </css:flow-from>
+        <p:for-each>
+            <p:documentation>
+                Wrap unevaluated css:flow in block box so that we can be sure that when evaluated
+                later inline boxes have no descendant block boxes (see also css:make-anonymous-inline-boxes).
+            </p:documentation>
+            <p:wrap match="css:flow[not(ancestor::*[@css:_obfl-list-of-references])]"
+                    wrapper="css:_block-box_"
+                    group-adjacent="?"/>
+            <p:add-attribute match="css:_block-box_" attribute-name="type" attribute-value="block"/>
+            <p:rename match="css:_block-box_" new-name="css:box"/>
+        </p:for-each>
+    </p:group>
     
     <css:eval-target-text px:progress=".01">
         <p:documentation>

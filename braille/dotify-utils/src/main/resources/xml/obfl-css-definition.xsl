@@ -11,7 +11,7 @@
                   select="('margin-left',           'page-break-before', 'text-indent', 'text-transform',      '-obfl-vertical-align',
                            'margin-right',          'page-break-after',  'text-align',  'braille-charset',     '-obfl-vertical-position',
                            'margin-top',            'page-break-inside', 'line-height', 'hyphens',             '-obfl-toc-range',
-                           'margin-bottom',         'orphans',                          'hyphenate-character', '-obfl-list-of-references-range',
+                           'margin-bottom',         'orphans',                          'hyphenate-character',
                            'padding-left',          'widows',                           'white-space',         '-obfl-table-col-spacing',
                            'padding-right',         'volume-break-before',              'word-spacing',        '-obfl-table-row-spacing',
                            'padding-top',           'volume-break-after',               'letter-spacing',      '-obfl-preferred-empty-space',
@@ -40,8 +40,6 @@
                                 then matches($css:property/@value,'^auto|0|[1-9][0-9]*$')
                                 else if ($css:property/@name='-obfl-toc-range')
                                 then ($context/@css:_obfl-toc and $css:property/@value=('document','volume'))
-                                else if ($css:property/@name='-obfl-list-of-references-range')
-                                then ($context/@css:_obfl-list-of-references and $css:property/@value=('document','volume'))
                                 else if ($css:property/@name='-obfl-use-when-collection-not-empty')
                                 then matches($css:property/@value,re:exact($css:IDENT_RE))
                                 else if ($css:property/@name='-obfl-underline')
@@ -79,7 +77,7 @@
                               then 'after'
                               else if ($property='-obfl-vertical-position')
                               then 'auto'
-                              else if ($property=('-obfl-toc-range','-obfl-list-of-references-range'))
+                              else if ($property='-obfl-toc-range')
                               then 'document'
                               else if ($property=('-obfl-table-col-spacing','-obfl-table-row-spacing'))
                               then '0'
