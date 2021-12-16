@@ -33,6 +33,11 @@ The footnotes area can be styled using a `@footnotes` rule. Example:
 
 Notes are rendered after the block (e.g. paragraph) in which they occur.
 </documentation>
+                    <value>end-of-chapter</value>
+                    <documentation xml:lang="en" xml:space="preserve">At the end of the chapter
+
+Notes are rendered at the end of the chapter (`section`) in which they occur.
+</documentation>
                     <value>end-of-volume</value>
                     <documentation xml:lang="en" xml:space="preserve">At the end of the volume
 
@@ -46,11 +51,11 @@ Notes are rendered in the [`@end`](http://braillespecs.github.io/braille-css/#th
 the last volume.
 
 Notes can be grouped by volume using a
-[`#endnotes-section::-obfl-on-volume-start`](http://braillespecs.github.io/braille-css/obfl#extending-the-display-property-with--obfl-list-of-references)
+[`.endnotes-section::-obfl-on-volume-start`](http://braillespecs.github.io/braille-css/obfl#extending-the-display-property-with--obfl-list-of-references)
 rule. Example:
 
 ~~~css
-#endnotes-section::-obfl-on-volume-start {
+.endnotes-section::-obfl-on-volume-start {
    content: "Notes in volume " -obfl-evaluate("$started-volume-number");
    margin: 1 0;
 }
@@ -77,12 +82,12 @@ by a noteref are not rendered.
 Note references can be styled using a `a[epub|type~='noteref']` rule. Notes that are placed at the
 end of the block can be styled with a `[epub|type~='notes'], [epub|type~='footnotes'],
 [epub|type~='endnotes'], [epub|type~='rearnotes']` rule. Notes that are placed at the bottom of the
-page or at the end of a volume can be styled with a `a[epub|type~='noteref']::alternate` rule. A
-title can be inserted at the beginning of an endnotes section using a
-`#endnotes-section::-obfl-on-collection-start` rule. Example:
+page or at the end of a chapter, volume or the end of the book can be styled with a
+`a[epub|type~='noteref']::alternate` rule. A title can be inserted at the beginning of an endnotes
+section using a `.endnotes-section::-obfl-on-collection-start` rule. Example:
 
 ~~~css
-#endnotes-section::-obfl-on-collection-start {
+.endnotes-section::-obfl-on-collection-start {
    content: "Notes in this volume";
    text-align: center;
    margin-bottom: 1;

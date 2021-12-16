@@ -12,7 +12,8 @@
   -->
 
   <xsl:param name="notes-placement" as="xs:string" select="'end-of-book'"/>
-  <xsl:param name="endnotes-section-id" as="xs:string" select="''"/>
+  <xsl:param name="endnotes-section-class" as="xs:string" select="''"/>
+  <xsl:param name="chapter-selector" as="xs:string" select="''"/>
 
   <xsl:param name="style"/>
 
@@ -21,12 +22,18 @@
   <xsl:template match="/*">
     <xsl:choose>
       <xsl:when test="$notes-placement=('bottom-of-page','end-of-volume','end-of-book')
-                      and $endnotes-section-id!=''
+                      and $endnotes-section-class!=''
                       and //noteref">
         <xsl:copy>
           <xsl:sequence select="@*|node()"/>
-          <div id="{$endnotes-section-id}"/>
+          <div class="{$endnotes-section-class}"/>
         </xsl:copy>
+      </xsl:when>
+      <xsl:when test="$notes-placement='end-of-chapter'
+                      and $endnotes-section-class!=''
+                      and $chapter-selector!=''
+                      and //noteref">
+        <xsl:apply-templates mode="insert-chapter-notes-sections" select="."/>
       </xsl:when>
       <xsl:when test="$notes-placement='end-of-block'">
         <xsl:apply-templates mode="move-notes" select="."/>
@@ -77,7 +84,18 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template mode="move-notes" match="@*|node()" priority="-1">
+  <xsl:template mode="insert-chapter-notes-sections" match="*">
+    <xsl:copy>
+      <xsl:apply-templates mode="#current" select="@*|node()"/>
+      <xsl:if test="css:matches($style,.,$chapter-selector)">
+        <div class="{$endnotes-section-class}"/>
+      </xsl:if>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template mode="move-notes
+                      insert-chapter-notes-sections"
+                match="@*|node()" priority="-1">
     <xsl:copy>
       <xsl:apply-templates mode="#current" select="@*|node()"/>
     </xsl:copy>
