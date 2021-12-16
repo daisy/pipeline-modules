@@ -947,8 +947,7 @@
     </xsl:template>
     
     <xsl:template mode="display-obfl-list-of-references"
-                  match="/css:_
-                         /css:box[@type='block' and @css:_obfl-list-of-references]">
+                  match="css:box[@type='block' and @css:_obfl-list-of-references]">
         <xsl:apply-templates mode="assert-nil-attr" select="@* except (@type|
                                                                        @css:text-transform|
                                                                        @css:braille-charset|
@@ -963,8 +962,15 @@
     </xsl:template>
     
     <xsl:template mode="display-obfl-list-of-references"
-                  match="css:box[@type='inline']">
-        <xsl:apply-templates mode="#current" select="@* except @type"/>
+                  match="css:box[@type='inline']|
+                         css:box[@type='inline']/css:_">
+        <xsl:apply-templates mode="assert-nil-attr" select="@css:id"/>
+        <xsl:apply-templates mode="#current" select="@* except (@type|
+                                                                @css:id|
+                                                                @css:text-transform|
+                                                                @css:braille-charset|
+                                                                @css:hyphens|
+                                                                @css:hyphenate-character)"/>
         <xsl:apply-templates mode="#current"/>
     </xsl:template>
     
@@ -1267,6 +1273,49 @@
                                 </xsl:with-param>
                             </xsl:call-template>
                         </xsl:if>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    
+    <!--
+        Block boxes with "display: -obfl-list-of-references" outside of @begin or @end area. These
+        can not be converted to a list-of-references element (OBFL does not support this), but we
+        can handle them here as long as the range is not "volume".
+    -->
+    <xsl:template mode="sequence td block"
+                  match="css:box[@type='block' and @css:_obfl-list-of-references]"
+                  priority="0.9">
+        <xsl:param name="ignore-obfl-list-of-references" tunnel="true" select="false()"/>
+        <xsl:choose>
+            <xsl:when test="$ignore-obfl-list-of-references">
+                <xsl:next-match/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:variable name="list-of-references" as="element()*">
+                    <xsl:call-template name="apply-templates-within-post-or-pre-content-sequence">
+                        <xsl:with-param name="select" select="."/>
+                    </xsl:call-template>
+                </xsl:variable>
+                <xsl:choose>
+                    <xsl:when test="$list-of-references/self::obfl:list-of-references">
+                        <xsl:if test="$list-of-references/@scope='volume'">
+                            <xsl:message terminate="yes">
+                                <xsl:text>An element with 'display: -obfl-list-of-references' that occurs outside a </xsl:text>
+                                <xsl:text>@begin or @end area can not have a "volume" range.</xsl:text>
+                            </xsl:message>
+                        </xsl:if>
+                        <xsl:if test="$list-of-references/@scope='document'">
+                            <xsl:message terminate="yes">
+                                <xsl:text>An element with 'display: -obfl-list-of-references' that occurs outside a </xsl:text>
+                                <xsl:text>@begin or @end area can not have a ::-obfl-on-volume-start or </xsl:text>
+                                <xsl:text>::-obfl-on-volume-end pseudo-element.</xsl:text>
+                            </xsl:message>
+                        </xsl:if>
+                    </xsl:when>
+                    <xsl:otherwise> <!-- block -->
+                        <xsl:sequence select="$list-of-references"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:otherwise>
@@ -1709,11 +1758,11 @@
                          /css:_/*[@css:_obfl-toc]/@css:_obfl-on-volume-start|
                          /css:_/*[@css:_obfl-toc]/@css:_obfl-on-volume-end|
                          /css:_/*[@css:_obfl-toc]/@css:_obfl-on-toc-end|
-                         /css:_/*/@css:_obfl-list-of-references|
-                         /css:_/*[@css:_obfl-list-of-references]/@css:_obfl-on-collection-start|
-                         /css:_/*[@css:_obfl-list-of-references]/@css:_obfl-on-volume-start|
-                         /css:_/*[@css:_obfl-list-of-references]/@css:_obfl-on-volume-start|
-                         /css:_/*[@css:_obfl-list-of-references]/@css:_obfl-on-collection-end
+                         css:box[@type='block']/@css:_obfl-list-of-references|
+                         css:box[@type='block'][@css:_obfl-list-of-references]/@css:_obfl-on-collection-start|
+                         css:box[@type='block'][@css:_obfl-list-of-references]/@css:_obfl-on-volume-start|
+                         css:box[@type='block'][@css:_obfl-list-of-references]/@css:_obfl-on-volume-start|
+                         css:box[@type='block'][@css:_obfl-list-of-references]/@css:_obfl-on-collection-end
                          "/>
     
     <xsl:template mode="block-attr table-attr"
@@ -2412,6 +2461,16 @@
     
     <xsl:template mode="block-attr span-attr assert-nil-attr"
                   match="css:box/@css:anchor"/>
+    
+    <xsl:template mode="assert-nil-attr"
+                  match="css:box[@type='inline']/@css:id|
+                         css:box[@type='inline']/css:_/@css:id">
+        <xsl:variable name="id" as="xs:string" select="."/>
+        <xsl:if test="(not(ancestor::*/@css:flow[not(.='normal')]) and $id=($page-number-references,$toc-entry-references))
+                      or (some $s in $sections[/*[@css:flow=$collection-flows]] satisfies $s/*/*/@css:anchor=$id)">
+            <xsl:next-match/>
+        </xsl:if>
+    </xsl:template>
     
     <!-- ======= -->
     <!-- Markers -->

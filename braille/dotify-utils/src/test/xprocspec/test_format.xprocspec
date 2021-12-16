@@ -7075,14 +7075,17 @@
   
   <x:scenario label="test_65">
     <x:documentation>
-      Tests chapter endnotes using flow() function in ::after pseudo-element.
+      Tests chapter endnotes using flow() function in ::after pseudo-element. Also tests that
+      `display: -obfl-list-of-references' can occur outside of a @begin or @end area.
     </x:documentation>
     <x:call step="dotify:format">
       <x:input port="source">
         <x:document type="inline">
           <body style="text-transform: none; @page { size: 20 6 }">
             <section style="display: block;
-                            &amp;::after { display:block; content: flow(chapter-notes)}">
+                            &amp;::after {
+                              display: block;
+                              content: flow(chapter-notes) }">
               <h1 style="display:block; page-break-before:always">
                 ⠤⠤⠤
               </h1>
@@ -7101,7 +7104,9 @@
               ⠤⠤⠤
             </section>
             <section style="display: block;
-                            &amp;::after { display:block; content: flow(chapter-notes)}">
+                            &amp;::after {
+                              display: -obfl-list-of-references;
+                              content: flow(chapter-notes) }">
               <h1 style="display:block; page-break-before:always">
                 ⠤⠤⠤
               </h1>

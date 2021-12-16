@@ -620,8 +620,13 @@
     </css:shift-id>
     
     <p:for-each px:progress=".27">
-        <p:unwrap name="unwrap-css-_"
-                  match="css:_[not(@css:* except @css:_obfl-on-resumed) and parent::*]">
+        <p:unwrap match="css:_[not(@css:* except (@css:_obfl-on-resumed|
+                                                  @css:_obfl-list-of-references|
+                                                  @css:_obfl-on-collection-start|
+                                                  @css:_obfl-on-collection-end|
+                                                  @css:_obfl-on-volume-start|
+                                                  @css:_obfl-on-volume-end))
+                               and parent::*]">
             <p:documentation>
                 All css:_ elements except for root elements, top-level elements in named flows (with
                 css:anchor attribute), and empty elements with a css:id, css:string-set or
