@@ -85,8 +85,23 @@
         </p:documentation>
     </p:import>
 
-    <p:documentation>Add xml:base and normalize fileset</p:documentation>
-    <p:add-xml-base/>
+    <p:documentation>Check that the base directory (@xml:base) is specified.</p:documentation>
+    <p:choose>
+        <p:when test="not($flatten)">
+            <px:assert error-code="XXXX" message="Fileset must have a base directory (@xml:base attribute)">
+                <p:with-option name="test" select="exists(/*/@xml:base)"/>
+            </px:assert>
+        </p:when>
+        <p:otherwise>
+            <p:identity/>
+        </p:otherwise>
+    </p:choose>
+    
+    <p:add-xml-base>
+        <!-- make @xml:base absolute -->
+    </p:add-xml-base>
+
+    <p:documentation>Normalize fileset</p:documentation>
     <px:fileset-join/>
 
     <p:label-elements match="/*/d:file" attribute="href-before-move" label="resolve-uri(@href, base-uri(.))"/>

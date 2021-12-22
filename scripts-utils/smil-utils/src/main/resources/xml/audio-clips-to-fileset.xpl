@@ -34,6 +34,9 @@
   </p:xslt>
 
   <p:documentation>Normalize the hrefs</p:documentation>
+  <p:add-xml-base>
+    <!-- first add xml:base because in the absence of a xml:base the base URI of the fileset after px:fileset-join is undetermined -->
+  </p:add-xml-base>
   <px:fileset-join/>
 
 </p:declare-step>
