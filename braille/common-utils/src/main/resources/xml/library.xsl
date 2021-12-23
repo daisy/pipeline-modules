@@ -12,137 +12,6 @@
         -->
     </xsl:import>
 
-    <xsl:function name="pf:error">
-        <xsl:param name="msg" as="xs:string"/>
-        <xsl:sequence select="pf:error($msg, ())"/>
-    </xsl:function>
-
-    <xsl:function name="pf:error">
-        <xsl:param name="msg" as="xs:string"/>
-        <xsl:param name="args"/>
-        <xsl:sequence select="pf:error($msg, $args, true())"/>
-    </xsl:function>
-
-    <xsl:function name="pf:error">
-        <xsl:param name="msg" as="xs:string"/>
-        <xsl:param name="args"/>
-        <xsl:param name="terminate" as="xs:boolean"/>
-        <xsl:sequence select="pf:message('ERROR', $msg, $args)"/>
-        <xsl:if test="$terminate">
-            <xsl:message terminate="yes"/>
-        </xsl:if>
-    </xsl:function>
-
-    <xsl:template name="pf:error">
-        <xsl:param name="msg" as="xs:string" required="yes"/>
-        <xsl:param name="args" required="no" select="()"/>
-        <xsl:param name="terminate" as="xs:boolean" required="no" select="true()"/>
-        <xsl:sequence select="pf:error($msg, $args, $terminate)"/>
-    </xsl:template>
-
-    <xsl:function name="pf:warn">
-        <xsl:param name="msg" as="xs:string"/>
-        <xsl:sequence select="pf:warn($msg, ())"/>
-    </xsl:function>
-
-    <xsl:function name="pf:warn">
-        <xsl:param name="msg" as="xs:string"/>
-        <xsl:param name="args"/>
-        <xsl:sequence select="pf:message('WARN', $msg, $args)"/>
-    </xsl:function>
-
-    <xsl:template name="pf:warn">
-        <xsl:param name="msg" as="xs:string" required="yes"/>
-        <xsl:param name="args" required="no" select="()"/>
-        <xsl:sequence select="pf:warn($msg, $args)"/>
-    </xsl:template>
-
-    <xsl:function name="pf:info">
-        <xsl:param name="msg" as="xs:string"/>
-        <xsl:sequence select="pf:info($msg, ())"/>
-    </xsl:function>
-
-    <xsl:function name="pf:info">
-        <xsl:param name="msg" as="xs:string"/>
-        <xsl:param name="args"/>
-        <xsl:sequence select="pf:message('INFO', $msg, $args)"/>
-    </xsl:function>
-
-    <xsl:template name="pf:info">
-        <xsl:param name="msg" as="xs:string" required="yes"/>
-        <xsl:param name="args" required="no" select="()"/>
-        <xsl:sequence select="pf:info($msg, $args)"/>
-    </xsl:template>
-
-    <xsl:function name="pf:debug">
-        <xsl:param name="msg" as="xs:string"/>
-        <xsl:sequence select="pf:debug($msg, ())"/>
-    </xsl:function>
-
-    <xsl:function name="pf:debug">
-        <xsl:param name="msg" as="xs:string"/>
-        <xsl:param name="args"/>
-        <xsl:sequence select="pf:message('DEBUG', $msg, $args)"/>
-    </xsl:function>
-
-    <xsl:template name="pf:debug">
-        <xsl:param name="msg" as="xs:string" required="yes"/>
-        <xsl:param name="args" required="no" select="()"/>
-        <xsl:sequence select="pf:debug($msg, $args)"/>
-    </xsl:template>
-
-    <xsl:function name="pf:trace">
-        <xsl:param name="msg" as="xs:string"/>
-        <xsl:sequence select="pf:trace($msg, ())"/>
-    </xsl:function>
-
-    <xsl:function name="pf:trace">
-        <xsl:param name="msg" as="xs:string"/>
-        <xsl:param name="args"/>
-        <xsl:sequence select="pf:message('TRACE', $msg, $args)"/>
-    </xsl:function>
-
-    <xsl:template name="pf:trace">
-        <xsl:param name="msg" as="xs:string" required="yes"/>
-        <xsl:param name="args" required="no" select="()"/>
-        <xsl:sequence select="pf:trace($msg, $args)"/>
-    </xsl:template>
-
-    <doc xmlns="http://www.oxygenxml.com/ns/doc/xsl">
-        <desc>
-            <p>Create a log message.</p>
-        </desc>
-    </doc>
-    <java:function name="pf:message">
-        <xsl:param name="level" as="xs:string"/>
-        <xsl:param name="msg" as="xs:string"/>
-    </java:function>
-    <java:function name="pf:message">
-        <xsl:param name="level" as="xs:string"/>
-        <xsl:param name="msg" as="xs:string"/>
-        <xsl:param name="args" as="xs:string*"/>
-        <!--
-            Implemented in ../../java/org/daisy/pipeline/braille/common/saxon/impl/MessageDefinition.java
-        -->
-    </java:function>
-
-    <doc xmlns="http://www.oxygenxml.com/ns/doc/xsl">
-        <desc>
-            <p>Update the progress.</p>
-        </desc>
-    </doc>
-    <java:function name="pf:progress">
-        <xsl:param name="progress" as="xs:string"/>
-        <!--
-            Implemented in ../../java/org/daisy/pipeline/braille/common/saxon/impl/ProgressDefinition.java
-        -->
-    </java:function>
-
-    <xsl:template name="pf:progress">
-        <xsl:param name="progress" as="xs:string" required="yes"/>
-        <xsl:sequence select="pf:progress($progress)"/>
-    </xsl:template>
-
     <doc xmlns="http://www.oxygenxml.com/ns/doc/xsl">
         <desc>
             <p>Apply a text transformer to a string sequence.</p>
@@ -166,5 +35,10 @@
             Implemented in ../../java/org/daisy/pipeline/braille/common/saxon/impl/TextTransformDefinition.java
         -->
     </java:function>
+
+    <!--
+        FIXME: delete when major version is updated
+    -->
+    <xsl:include href="http://www.daisy.org/pipeline/modules/common-utils/library.xsl"/>
 
 </xsl:stylesheet>

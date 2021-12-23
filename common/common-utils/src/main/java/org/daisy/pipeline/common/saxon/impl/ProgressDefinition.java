@@ -1,4 +1,4 @@
-package org.daisy.pipeline.braille.common.saxon.impl;
+package org.daisy.pipeline.common.saxon.impl;
 
 import java.math.BigDecimal;
 

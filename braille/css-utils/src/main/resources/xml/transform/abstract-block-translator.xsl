@@ -7,7 +7,7 @@
                 exclude-result-prefixes="#all">
 	
 	<xsl:import href="../library.xsl"/>
-	<xsl:include href="http://www.daisy.org/pipeline/modules/braille/common-utils/library.xsl"/>
+	<xsl:include href="http://www.daisy.org/pipeline/modules/common-utils/library.xsl"/>
 	
 	<!--
 	    API: implement xsl:template match="css:block"

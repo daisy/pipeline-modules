@@ -78,8 +78,6 @@
       org.daisy.pipeline.modules.impl.Module_braille_common_utils,
       org.daisy.pipeline.datatypes.impl.Datatype_transform_query,
       org.daisy.pipeline.braille.common.saxon.impl.TextTransformDefinition,
-      org.daisy.pipeline.braille.common.saxon.impl.MessageDefinition,
-      org.daisy.pipeline.braille.common.saxon.impl.ProgressDefinition,
       org.daisy.pipeline.braille.common.calabash.impl.PxParseQueryStep$StepProvider,
       org.daisy.pipeline.braille.common.calabash.impl.PxTransformStep$StepProvider
     </expose-services>

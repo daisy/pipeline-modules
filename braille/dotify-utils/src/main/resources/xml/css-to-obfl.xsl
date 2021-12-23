@@ -14,7 +14,7 @@
     
     <xsl:namespace-alias stylesheet-prefix="_xsl" result-prefix="xsl"/>
     
-    <xsl:include href="http://www.daisy.org/pipeline/modules/braille/common-utils/library.xsl"/>
+    <xsl:include href="http://www.daisy.org/pipeline/modules/common-utils/library.xsl"/>
     <xsl:include href="http://www.daisy.org/pipeline/modules/braille/css-utils/library.xsl"/>
     <xsl:include href="marker-reference.xsl"/>
     
