@@ -6,6 +6,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Optional;
 
 import org.daisy.common.file.URLs;
 
@@ -33,6 +34,52 @@ public final class FileUtils {
 	/* ============= */
 	/* URI functions */
 	/* ============= */
+
+	/**
+	 * Relativize a URI against a base URI.
+	 *
+	 * This functions differs from {@link URI#relativize} in that it is also able to find
+	 * relative paths when the URI does not start with the base URI (in which case the
+	 * resulting URI will contain ".." segments).
+	 */
+	public static URI relativizeURI(URI uri, URI base) {
+		try {
+			if (base.isOpaque() || uri.isOpaque()
+			    || !Optional.ofNullable(base.getScheme()).orElse("").equalsIgnoreCase(Optional.ofNullable(uri.getScheme()).orElse(""))
+			    || !Optional.ofNullable(base.getAuthority()).equals(Optional.ofNullable(uri.getAuthority())))
+				return uri;
+			else {
+				String up = uri.normalize().getPath();
+				String bp = base.normalize().getPath();
+				String relativizedPath;
+				if (up.startsWith("/")) {
+					String[] upSegments = up.split("/", -1);
+					String[] bpSegments = bp.split("/", -1);
+					int i = bpSegments.length - 1;
+					int j = 0;
+					while (i > 0) {
+						if (bpSegments[j].equals(upSegments[j])) {
+							i--;
+							j++; }
+						else
+							break; }
+					relativizedPath = "";
+					while (i > 0) {
+						relativizedPath += "../";
+						i--; }
+					while (j < upSegments.length) {
+						relativizedPath += upSegments[j] + "/";
+						j++; }
+					relativizedPath = relativizedPath.substring(0, relativizedPath.length() - 1); }
+				else
+					relativizedPath = up;
+				if (relativizedPath.isEmpty())
+					relativizedPath = "./";
+				return new URI(null, null, relativizedPath, uri.getQuery(), uri.getFragment()); }
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 	public static URI normalizeURI(URI uri) {
 		try {
@@ -114,5 +161,4 @@ public final class FileUtils {
 			return URLs.asURI(file);
 		}
 	}
->>>>>>> 4952ccbdbf (Implement px:normalize-uri in Java)
 }

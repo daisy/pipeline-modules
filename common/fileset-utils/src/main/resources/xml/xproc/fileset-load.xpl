@@ -449,7 +449,7 @@
         <p:pipe step="normalized.in-memory" port="result"/>
       </p:output>
       <p:output port="filesets" sequence="true" primary="true">
-        <p:pipe step="normalized.fileset" port="result"/>
+        <p:pipe step="normalized.fileset" port="result.fileset"/>
       </p:output>
       <p:variable name="base-uri" select="string(/*)">
         <p:pipe step="normalize-uri" port="normalized"/>
@@ -458,7 +458,7 @@
   
       <px:fileset-add-entry name="normalized.fileset">
         <p:with-option name="href" select="$base-uri"/>
-        <p:input port="source">
+        <p:input port="source.fileset">
           <p:pipe port="result" step="fileset.in-memory-base"/>
         </p:input>
       </px:fileset-add-entry>

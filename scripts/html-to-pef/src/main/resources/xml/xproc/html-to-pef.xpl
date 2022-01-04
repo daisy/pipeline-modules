@@ -177,7 +177,7 @@ sheet modules) are available for use in Sass style sheets:
     <!-- LOAD HTML -->
     <!-- ========= -->
     <px:fileset-add-entry media-type="application/xhtml+xml">
-        <p:input port="source">
+        <p:input port="source.fileset">
           <p:inline><d:fileset/></p:inline>
         </p:input>
         <p:with-option name="href" select="$html"/>

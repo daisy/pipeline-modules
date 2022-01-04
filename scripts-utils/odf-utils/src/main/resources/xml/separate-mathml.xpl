@@ -24,9 +24,24 @@
 		<p:pipe step="update" port="result.in-memory"/>
 	</p:output>
 	
-	<p:import href="get-file.xpl"/>
-	<p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
-	<p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
+	<p:import href="get-file.xpl">
+		<p:documentation>
+			odt:get-file
+		</p:documentation>
+	</p:import>
+	<p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
+		<p:documentation>
+			px:fileset-create
+			px:fileset-add-entry
+			px:fileset-join
+			px:fileset-update
+		</p:documentation>
+	</p:import>
+	<p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
+		<p:documentation>
+			px:message
+		</p:documentation>
+	</p:import>
 	
 	<p:variable name="base" select="//d:file[starts-with(@media-type,'application/vnd.oasis.opendocument')]/resolve-uri(@href, base-uri(.))"/>
 	<p:variable name="numbering-offset"
@@ -73,7 +88,7 @@
 			<p:pipe step="mathml" port="result"/>
 		</p:iteration-source>
 		<px:fileset-add-entry media-type="application/mathml+xml">
-			<p:input port="source">
+			<p:input port="source.fileset">
 				<p:pipe step="base" port="result"/>
 			</p:input>
 			<p:with-option name="href" select="base-uri(/*)"/>

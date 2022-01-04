@@ -284,7 +284,7 @@
       <p:with-option name="uid" select="$uid"/>
       <p:with-option name="output-base-uri" select="concat($output-fileset-base, replace(base-uri(/),'^.*/([^/]+)$','$1'))"/>
       <p:input port="mathml-altimg-fallback">
-        <p:pipe step="mathml-altimg-fallback" port="result"/>
+        <p:pipe step="mathml-altimg-fallback" port="result.fileset"/>
       </p:input>
     </px:daisy3-prepare-dtbook>
 
