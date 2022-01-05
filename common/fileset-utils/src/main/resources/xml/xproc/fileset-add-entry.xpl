@@ -58,7 +58,6 @@
   </p:option>
 
   <p:option name="media-type" select="''"/>
-  <p:option name="ref" select="''"><!-- if relative; will be resolved relative to the file --></p:option>
   <p:option name="original-href" select="''"><!-- if relative; will be resolved relative to the file --></p:option>
   <p:option name="first" cx:as="xs:boolean" select="false()"/>
   <p:option name="replace" cx:as="xs:boolean" select="false()"/>
@@ -86,11 +85,6 @@
   <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
     <p:documentation>
       px:set-base-uri
-    </p:documentation>
-  </p:import>
-  <p:import href="fileset-add-ref.xpl">
-    <p:documentation>
-      px:fileset-add-ref
     </p:documentation>
   </p:import>
   <cx:import href="http://www.daisy.org/pipeline/modules/file-utils/uri-functions.xsl" type="application/xslt+xml">
@@ -287,18 +281,6 @@
           </p:otherwise>
         </p:choose>
         <p:identity name="in-memory"/>
-      </p:otherwise>
-    </p:choose>
-
-    <p:choose>
-      <p:when test="$ref=''">
-        <p:identity/>
-      </p:when>
-      <p:otherwise>
-        <px:fileset-add-ref>
-          <p:with-option name="href" select="$href-normalized"/>
-          <p:with-option name="ref" select="$ref"/>
-        </px:fileset-add-ref>
       </p:otherwise>
     </p:choose>
   </p:group>
