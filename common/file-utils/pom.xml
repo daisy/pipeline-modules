@@ -56,6 +56,7 @@
       org.daisy.pipeline.modules.impl.Module_file_utils,
       org.daisy.common.xproc.calabash.impl.ConfigurationFileProvider_file_utils,
       org.daisy.pipeline.file.calabash.impl.CopyResourceProvider,
+      org.daisy.pipeline.file.calabash.impl.NormalizeURIProvider,
       org.daisy.pipeline.file.calabash.impl.PeekProvider,
       org.daisy.pipeline.file.calabash.impl.SetDoctypeProvider,
       org.daisy.pipeline.file.calabash.impl.SetXmlDeclarationProvider,
