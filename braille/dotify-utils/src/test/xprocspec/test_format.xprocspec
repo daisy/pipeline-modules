@@ -15474,11 +15474,11 @@
               <block>
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
               </block>
-              <block display-when="(! $starts-at-top-of-page)" keep="page">⠿</block>
+              <block display-when="(! $starts-at-top-of-page)">⠿</block>
               <block>
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
               </block>
-              <block display-when="(! $starts-at-top-of-page)" keep="page">⠿</block>
+              <block display-when="(! $starts-at-top-of-page)">⠿</block>
               <block>
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
               </block>

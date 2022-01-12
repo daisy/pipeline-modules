@@ -6000,16 +6000,18 @@
       <x:input port="source">
         <x:document type="inline">
           <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false">
-            <layout-master name="a" page-width="40" page-height="25" duplex="true">
+            <layout-master name="a" page-width="10" page-height="5" duplex="true">
               <default-template>
                 <header/>
                 <footer/>
               </default-template>
             </layout-master>
             <sequence master="a">
-              <block margin-top="1" display-when="(! $starts-at-top-of-page)" keep="page"/>
+              <block margin-top="1" display-when="(! $starts-at-top-of-page)"/>
               <block> ⠿ </block>
-              <block margin-top="1" display-when="(! $starts-at-top-of-page)" keep="page"/>
+              <block margin-top="1" display-when="(! $starts-at-top-of-page)"/>
+              <block> ⠿ </block>
+              <block> ⠿ </block>
               <block> ⠿ </block>
             </sequence>
           </obfl>
@@ -6028,11 +6030,13 @@
             </meta>
           </head>
           <body>
-            <volume rows="25" cols="40" rowgap="0" duplex="true">
+            <volume rows="5" cols="10" rowgap="0" duplex="true">
               <section>
                 <page>
                   <row>⠿</row>
                   <row/>
+                  <row>⠿</row>
+                  <row>⠿</row>
                   <row>⠿</row>
                 </page>
               </section>
@@ -6043,12 +6047,12 @@
     </x:expect>
   </x:scenario>
   
-  <x:scenario label="display-when-bug" xfail="">
+  <x:scenario label="display-when">
     <x:documentation>
-      The current implementation of display-when has a limitation, namely that the page breaking
-      does not take into account that certain rows will not take up space so that some available
-      space at the bottom the page might not be used. (See
-      https://github.com/mtmse/dotify.library/issues/22.)
+      The old implementation of display-when had a limitation, namely that the page breaking did not
+      take into account that certain rows will not take up space so that some available space at the
+      bottom the page might not be used. (See https://github.com/mtmse/dotify.library/issues/22.)
+      THis has been fixed.
     </x:documentation>
     <x:call step="pxi:test">
       <x:input port="source">
@@ -6061,7 +6065,7 @@
               </default-template>
             </layout-master>
             <sequence master="a">
-              <block display-when="(! $starts-at-top-of-page)" keep="page">
+              <block display-when="(! $starts-at-top-of-page)">
                 ⠤⠤⠤⠤⠤
                 ⠤⠤⠤⠤⠤
                 ⠤⠤⠤⠤⠤
@@ -10074,6 +10078,7 @@
               </default-template>
             </layout-master>
             <sequence master="master">
+              <block margin-top="1" display-when="(! $starts-at-top-of-page)"/>
               <block row-spacing="2"> ⠿ </block>
               <block> ⠿ </block>
               <block> ⠿ </block>
