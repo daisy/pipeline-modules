@@ -514,7 +514,6 @@
                                                                                             <xsl:with-param name="pending-hyphenate-character" tunnel="yes" select="$pending-hyphenate-character"/>
                                                                                             <xsl:with-param name="word-spacing" tunnel="yes" select="$word-spacing"/>
                                                                                             <xsl:with-param name="white-space" tunnel="yes" select="$white-space"/>
-                                                                                            <xsl:with-param name="top-of-page" tunnel="yes" select="true()"/> <!-- toc-sequence always starts on new sheet -->
                                                                                         </xsl:apply-templates>
                                                                                     </on-toc-start>
                                                                                 </xsl:if>
@@ -756,7 +755,6 @@
                                                          select="current-group()[1]/(@* except (@css:page|@css:volume|@css:string-entry|@css:counter-set))"/>
                                     <xsl:apply-templates mode="sequence"
                                                          select="current-group()[1]/(@css:string-entry|*)">
-                                        <xsl:with-param name="top-of-page" tunnel="yes" select="true()"/> <!-- sequence starts on new sheet -->
                                         <xsl:with-param name="volume-break-handled" tunnel="yes"
                                                         select="current-group()/*/(@css:volume-break-before[.='always']|
                                                                                    @css:volume-break-after[.='always'])"/>
@@ -907,9 +905,7 @@
                                     <list-of-references collection="meta/{$flow}" range="document">
                                         <on-collection-start>
                                             <xsl:for-each select="current-group()">
-                                                <xsl:apply-templates mode="sequence" select=".">
-                                                    <xsl:with-param name="top-of-page" tunnel="yes" select="$first and position()=1"/>
-                                                </xsl:apply-templates>
+                                                <xsl:apply-templates mode="sequence" select="."/>
                                             </xsl:for-each>
                                         </on-collection-start>
                                     </list-of-references>
@@ -918,7 +914,6 @@
                             <xsl:otherwise>
                                 <xsl:for-each select="current-group()">
                                     <xsl:apply-templates mode="sequence" select=".">
-                                        <xsl:with-param name="top-of-page" tunnel="yes" select="$first and position()=1"/>
                                         <xsl:with-param name="last-of-sequence" tunnel="yes" select="$last and position()=last()"/>
                                     </xsl:apply-templates>
                                 </xsl:for-each>
@@ -1183,7 +1178,38 @@
                              select="@* except (@type|
                                                 @css:text-transform|@css:braille-charset|@css:hyphens|@css:hyphenate-character|
                                                 @css:line-height|@css:text-align|@css:text-indent|@css:_obfl-right-text-indent|
-                                                @css:page-break-inside)"/>
+                                                @css:page-break-inside|@css:margin-top-skip-if-top-of-page|
+                                                @css:padding-top|@css:padding-bottom|@css:padding-left|@css:padding-right|
+                                                @css:border-top-pattern|@css:border-left-pattern|@css:border-right-pattern)"/>
+        <xsl:next-match/>
+    </xsl:template>
+    
+    <!--
+        wrap content of main block in additional block when margin-top-skip-if-top-of-page is present
+    -->
+    <xsl:template priority="0.63"
+                  mode="block toc-block"
+                  match="css:box[@type='block']
+                                [@css:margin-top-skip-if-top-of-page]">
+        <xsl:variable name="block-tag" as="xs:string">
+            <xsl:apply-templates select="$pxi:print-mode" mode="#current"/>
+        </xsl:variable>
+        <block display-when="(! $starts-at-top-of-page)">
+            <xsl:attribute name="margin-top" select="format-number(xs:integer(number(@css:margin-top-skip-if-top-of-page)), '0')"/>
+        </block>
+        <xsl:element name="{$block-tag}">
+            <xsl:next-match/>
+        </xsl:element>
+    </xsl:template>
+    <!--
+        attributes that apply on inner block if present, or main block otherwise
+    -->
+    <xsl:template priority="0.62"
+                  mode="block toc-block"
+                  match="css:box[@type='block']">
+        <xsl:apply-templates mode="block-attr"
+                             select="@css:padding-top|@css:padding-bottom|@css:padding-left|@css:padding-right|
+                                     @css:border-top-pattern|@css:border-left-pattern|@css:border-right-pattern"/>
         <xsl:next-match/>
     </xsl:template>
     
@@ -1194,7 +1220,7 @@
                   mode="block toc-block"
                   match="css:box[@type='block']
                                 [@css:line-height
-                                 and (@css:margin-top or @css:margin-top-skip-if-top-of-page or @css:margin-bottom or
+                                 and (@css:margin-top or @css:margin-bottom or
                                       @css:border-top-pattern or @css:border-bottom-pattern)]">
         <xsl:variable name="block-tag" as="xs:string">
             <xsl:apply-templates select="$pxi:print-mode" mode="#current"/>
@@ -1207,9 +1233,8 @@
             <xsl:next-match/>
         </xsl:element>
     </xsl:template>
-    
     <!--
-        attributes that apply on inner block if present, or main block otherwise
+        attributes that apply on inner block if present, or containing block otherwise
     -->
     <xsl:template priority="0.6"
                   mode="block toc-block"
@@ -1746,14 +1771,6 @@
                 </xsl:message>
             </xsl:otherwise>
         </xsl:choose>
-    </xsl:template>
-    
-    <xsl:template mode="block-attr table-attr toc-entry-attr"
-                  match="css:box[@type='block']/@css:margin-top-skip-if-top-of-page">
-        <xsl:param name="top-of-page" as="xs:boolean" tunnel="yes" select="false()"/>
-        <xsl:if test="not($top-of-page)">
-            <xsl:attribute name="margin-top" select="format-number(xs:integer(number(.)), '0')"/>
-        </xsl:if>
     </xsl:template>
     
     <!--

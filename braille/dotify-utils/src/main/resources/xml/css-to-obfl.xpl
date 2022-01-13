@@ -594,7 +594,7 @@
                               label="(ancestor::*[@css:volume])[last()]/@css:volume"/>
             <p:delete match="css:_/@css:volume"/>
         </p:group>
-        <p:delete match="css:box[@type='box']/@css:top-of-page">
+        <p:delete match="css:box[@type='inline']/@css:top-of-page">
             <p:documentation>
                 :top-of-page is only supported on block elements.
             </p:documentation>
@@ -835,13 +835,15 @@
     <p:for-each px:progress=".01">
         <p:choose px:progress="1">
             <p:documentation>
-                Delete css:margin-top from first non-empty block and move css:margin-top of other
-                blocks to css:margin-bottom of their preceding block.
+                Move css:margin-top of blocks that have a preceding (non-empty) block to
+                css:margin-bottom of their preceding block, and rename other css:margin-top to
+                css:margin-top-skip-if-top-of-page.
             </p:documentation>
             <p:when test="$skip-margin-top-of-page='true'">
                 <p:label-elements px:progress=".20"
                                   match="css:box
                                            [@type='block']
+                                           [descendant::css:box[@type='inline' and child::node()]]
                                            [following-sibling::*[1]
                                               [some $self in . satisfies
                                                  $self/descendant-or-self::*
@@ -859,14 +861,7 @@
                                                    [last()][@css:_margin-bottom_]]"/>
                 <p:rename match="@css:_margin-bottom_" new-name="css:margin-bottom"/>
                 <p:rename px:progress=".20"
-                          match="css:box
-                                   [@type='block']
-                                   [@css:margin-top]
-                                   [not(preceding::css:box[@type='inline' and child::node()
-                                                           or @css:border-top-pattern or @css:border-top-style
-                                                           or @css:border-bottom-pattern or @css:border-bottom-style])]
-                                   [not(ancestor::*[@css:border-top-pattern or @css:border-top-style])]
-                                 /@css:margin-top"
+                          match="css:box[@type='block'][@css:margin-top]/@css:margin-top"
                           new-name="css:margin-top-skip-if-top-of-page"/>
             </p:when>
             <p:otherwise>
