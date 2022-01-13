@@ -1034,16 +1034,6 @@
         <xsl:apply-templates mode="toc-block" select="."/>
     </xsl:template>
     
-    <!--
-        block or toc-block element depending on context
-    -->
-    <xsl:template priority="0.8"
-                  mode="block"
-                  match="css:box[@type='block']">
-        <block>
-            <xsl:next-match/>
-        </block>
-    </xsl:template>
     <xsl:template priority="0.8"
                   mode="toc-block"
                   match="css:box[@type='block']">
@@ -1063,15 +1053,13 @@
                 -->
             </xsl:when>
             <xsl:otherwise>
-                <toc-block>
-                    <xsl:next-match/>
-                </toc-block>
+                <xsl:next-match/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
     
     <!--
-        wrap content in additional (toc-)block element when page-break-before is combined with padding-top and string-set:
+        wrap main block in additional block when page-break-before is combined with padding-top and string-set:
         the marker needs to come before the padding in order to make page-start and page-start-except-last behave correctly
         
         FIXME: this probably breaks page-start-except-first
@@ -1079,12 +1067,6 @@
     <xsl:template priority="0.73"
                   mode="block toc-block"
                   match="css:box[@type='block'][@css:page-break-before]">
-          <xsl:apply-templates mode="block-attr" select="@css:page-break-before"/>
-          <xsl:next-match/>
-    </xsl:template>
-    <xsl:template priority="0.72"
-                  mode="block"
-                  match="css:box[@type='block'][@css:page-break-before]">
         <xsl:variable name="first-inline" as="element()?" select="(descendant::css:box[@type='inline'])[1]"/>
         <xsl:variable name="string-set-on-first-inline" as="attribute()*"
                       select="$first-inline/@css:string-set|
@@ -1096,121 +1078,144 @@
                               $first-inline/css:_[not(preceding-sibling::*) and
                                                   not(preceding-sibling::text()[not(matches(string(),'^[\s&#x2800;]*$'))])]
                                            //@css:id"/>
+        <xsl:variable name="block-tag" as="xs:string">
+            <xsl:apply-templates select="$pxi:print-mode" mode="#current"/>
+        </xsl:variable>
         <xsl:choose>
             <xsl:when test="($string-set-on-first-inline or $id-on-first-inline)
                             and (descendant-or-self::css:box[@type='block'] intersect $first-inline/ancestor::*)/@css:padding-top
                             and not((descendant::css:box[@type='block'] intersect $first-inline/ancestor::*)/@css:page-break-before)">
-                <xsl:apply-templates mode="marker" select="$string-set-on-first-inline"/>
-                <xsl:apply-templates mode="#current" select="$id-on-first-inline"/>
-                <block>
+                <xsl:element name="{$block-tag}">
+                    <xsl:apply-templates mode="block-attr" select="@css:page-break-before"/>
+                    <xsl:apply-templates mode="marker" select="$string-set-on-first-inline"/>
+                    <xsl:apply-templates mode="#current" select="$id-on-first-inline"/>
                     <xsl:next-match>
+                        <xsl:with-param name="page-break-before-handled" tunnel="yes" select="true()"/>
                         <xsl:with-param name="string-set-handled" tunnel="yes" select="$string-set-on-first-inline"/>
                         <xsl:with-param name="id-handled" tunnel="yes" select="$id-on-first-inline"/>
                     </xsl:next-match>
-                </block>
+                </xsl:element>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:next-match/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-    <xsl:template priority="0.72"
-                  mode="toc-block"
-                  match="css:box[@type='block'][@css:page-break-before]">
-        <xsl:variable name="first-inline" as="element()?" select="(descendant::css:box[@type='inline'])[1]"/>
-        <xsl:variable name="string-set-on-first-inline" as="attribute()*"
-                      select="$first-inline/@css:string-set|
-                              $first-inline/css:_[not(preceding-sibling::*) and
-                                                  not(preceding-sibling::text()[not(matches(string(),'^[\s&#x2800;]*$'))])]
-                                           //@css:string-set"/>
-        <xsl:variable name="id-on-first-inline" as="attribute()*"
-                      select="$first-inline/@css:id|
-                              $first-inline/css:_[not(preceding-sibling::*) and
-                                                  not(preceding-sibling::text()[not(matches(string(),'^[\s&#x2800;]*$'))])]
-                                           //@css:id"/>
-        <xsl:choose>
-            <xsl:when test="($string-set-on-first-inline or $id-on-first-inline)
-                            and (descendant-or-self::css:box[@type='block'] intersect $first-inline/ancestor::*)/@css:padding-top
-                            and not((descendant::css:box[@type='block'] intersect $first-inline/ancestor::*)/@css:page-break-before)">
-                <xsl:apply-templates mode="marker" select="$string-set-on-first-inline"/>
-                <xsl:apply-templates mode="#current" select="$id-on-first-inline"/>
-                <toc-block>
-                    <xsl:next-match>
-                        <xsl:with-param name="string-set-handled" tunnel="yes" select="$string-set-on-first-inline"/>
-                        <xsl:with-param name="id-handled" tunnel="yes" select="$id-on-first-inline"/>
-                    </xsl:next-match>
-                </toc-block>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:next-match/>
-            </xsl:otherwise>
-        </xsl:choose>
+    <xsl:template priority="0.73"
+                  mode="block-attr"
+                  match="css:box[@type='block']/@css:page-break-before">
+        <xsl:param name="page-break-before-handled" tunnel="yes" select="false()"/>
+        <xsl:if test="not($page-break-before-handled)">
+            <xsl:next-match/>
+        </xsl:if>
     </xsl:template>
-    
-    <xsl:template priority="0.7" mode="marker" match="@css:string-set">
+    <xsl:template priority="0.73" mode="marker" match="@css:string-set">
         <xsl:param name="string-set-handled" as="attribute()*" tunnel="yes" select="()"/>
         <xsl:if test="not(. intersect $string-set-handled)">
             <xsl:next-match/>
         </xsl:if>
     </xsl:template>
-    <xsl:template priority="0.7" mode="block td toc-entry" match="@css:id">
+    <xsl:template priority="0.73" mode="block td toc-entry" match="@css:id">
         <xsl:param name="id-handled" as="attribute()*" tunnel="yes" select="()"/>
         <xsl:if test="not(. intersect $id-handled)">
             <xsl:next-match/>
         </xsl:if>
     </xsl:template>
-    
+
     <!--
-        wrap content in additional (toc-)block element when line-height > 1 is combined with
-        top/bottom margin or border
+        main block
     -->
-    <xsl:template priority="0.61"
-                  mode="block"
-                  match="css:box[@type='block']
-                                [@css:line-height
-                                 and (@css:margin-top or @css:margin-top-skip-if-top-of-page or @css:margin-bottom or
-                                      @css:border-top-pattern or @css:border-bottom-pattern)]">
-        <block>
-            <xsl:next-match/>
-        </block>
-    </xsl:template>
-    <xsl:template priority="0.61"
-                  mode="toc-block"
-                  match="css:box[@type='block']
-                                [@css:line-height
-                                 and (@css:margin-top or @css:margin-top-skip-if-top-of-page or @css:margin-bottom or
-                                      @css:border-top-pattern or @css:border-bottom-pattern)]">
-        <toc-block>
-            <xsl:next-match/>
-        </toc-block>
-    </xsl:template>
-    
-    <!--
-        attributes that apply on inner block if content is wrapped in additional block
-    -->
-    <xsl:template priority="0.6"
+    <xsl:template priority="0.72"
                   mode="block toc-block"
-                  match="css:box[@type='block']
-                                [not(@css:line-height
-                                     and (@css:margin-top or @css:margin-top-skip-if-top-of-page or @css:margin-bottom or
-                                          @css:border-top-pattern or @css:border-bottom-pattern))]">
+                  match="css:box[@type='block']">
+        <xsl:variable name="block-tag" as="xs:string">
+            <xsl:apply-templates select="$pxi:print-mode" mode="#current"/>
+        </xsl:variable>
+        <xsl:element name="{$block-tag}">
+            <xsl:next-match/>
+        </xsl:element>
+    </xsl:template>
+    
+    <!--
+        attributes translate and hyphenate
+    -->
+    <xsl:template priority="0.71"
+                  mode="block toc-block"
+                  match="css:box[@type='block']"
+                  name="insert-text-attributes-and-next-match">
+        <xsl:param name="text-transform" as="xs:string" tunnel="yes"/>
+        <xsl:param name="hyphens" as="xs:string" tunnel="yes"/>
+        <xsl:param name="pending-braille-charset" as="xs:string?" tunnel="yes" select="()"/>
+        <xsl:param name="pending-hyphenate-character" as="xs:string?" tunnel="yes" select="()"/>
+        <xsl:variable name="new-text-transform" as="xs:string?">
+            <xsl:apply-templates mode="css:text-transform" select="."/>
+        </xsl:variable>
+        <xsl:variable name="new-hyphens" as="xs:string?">
+            <xsl:apply-templates mode="css:hyphens" select="."/>
+        </xsl:variable>
+        <xsl:call-template name="obfl:translate">
+            <xsl:with-param name="new-text-transform" select="$new-text-transform"/>
+        </xsl:call-template>
+        <xsl:call-template name="obfl:hyphenate">
+            <xsl:with-param name="new-hyphens" select="$new-hyphens"/>
+        </xsl:call-template>
+        <xsl:variable name="pending-braille-charset" as="xs:string?"
+                      select="(@css:braille-charset/string(),$pending-braille-charset)[1]"/>
+        <xsl:variable name="pending-hyphenate-character" as="xs:string?"
+                      select="(@css:hyphenate-character/string(),$pending-hyphenate-character)[1]"/>
+        <xsl:next-match>
+            <xsl:with-param name="text-transform" tunnel="yes" select="($new-text-transform,$text-transform)[1]"/>
+            <xsl:with-param name="hyphens" tunnel="yes" select="($new-hyphens,$hyphens)[1]"/>
+            <xsl:with-param name="pending-text-transform" tunnel="yes" select="()"/>
+            <xsl:with-param name="pending-braille-charset" tunnel="yes" select="$pending-braille-charset"/>
+            <xsl:with-param name="pending-hyphens" tunnel="yes" select="()"/>
+            <xsl:with-param name="pending-hyphenate-character" tunnel="yes" select="$pending-hyphenate-character"/>
+        </xsl:next-match>
+    </xsl:template>
+    
+    <!--
+        other attributes that apply on main block
+    -->
+    <xsl:template priority="0.7"
+                  mode="block toc-block"
+                  match="css:box[@type='block']">
         <xsl:apply-templates mode="block-attr"
-                             select="@css:line-height|@css:text-align|@css:text-indent|@css:_obfl-right-text-indent|@css:page-break-inside"/>
+                             select="@* except (@type|
+                                                @css:text-transform|@css:braille-charset|@css:hyphens|@css:hyphenate-character|
+                                                @css:line-height|@css:text-align|@css:text-indent|@css:_obfl-right-text-indent|
+                                                @css:page-break-inside)"/>
         <xsl:next-match/>
-        <xsl:apply-templates mode="anchor" select="@css:id"/>
     </xsl:template>
-    <xsl:template priority="0.6"
+    
+    <!--
+        wrap content in additional block when line-height > 1 is combined with top/bottom margin or border
+    -->
+    <xsl:template priority="0.61"
                   mode="block toc-block"
                   match="css:box[@type='block']
                                 [@css:line-height
                                  and (@css:margin-top or @css:margin-top-skip-if-top-of-page or @css:margin-bottom or
                                       @css:border-top-pattern or @css:border-bottom-pattern)]">
+        <xsl:variable name="block-tag" as="xs:string">
+            <xsl:apply-templates select="$pxi:print-mode" mode="#current"/>
+        </xsl:variable>
+        <xsl:element name="{$block-tag}">
+            <!--
+                repeat orphans/widows (why?)
+            -->
+            <xsl:apply-templates mode="block-attr" select="@css:orphans|@css:widows"/>
+            <xsl:next-match/>
+        </xsl:element>
+    </xsl:template>
+    
+    <!--
+        attributes that apply on inner block if present, or main block otherwise
+    -->
+    <xsl:template priority="0.6"
+                  mode="block toc-block"
+                  match="css:box[@type='block']">
         <xsl:apply-templates mode="block-attr"
                              select="@css:line-height|@css:text-align|@css:text-indent|@css:_obfl-right-text-indent|@css:page-break-inside"/>
-        <!--
-            repeat orphans/widows (why?)
-        -->
-        <xsl:apply-templates mode="block-attr" select="@css:orphans|@css:widows"/>
         <xsl:next-match/>
         <xsl:apply-templates mode="anchor" select="@css:id"/>
     </xsl:template>
@@ -1351,57 +1356,6 @@
                   mode="toc-block"
                   match="css:box[@type='block']">
         <xsl:apply-templates mode="assert-nil-attr" select="@css:_obfl-scenarios"/>
-        <xsl:next-match/>
-    </xsl:template>
-    
-    <!--
-        attributes translate, hyphenate
-    -->
-    <xsl:template priority="0.71"
-                  mode="block toc-block"
-                  match="css:box[@type='block']"
-                  name="insert-text-attributes-and-next-match">
-        <xsl:param name="text-transform" as="xs:string" tunnel="yes"/>
-        <xsl:param name="hyphens" as="xs:string" tunnel="yes"/>
-        <xsl:param name="pending-braille-charset" as="xs:string?" tunnel="yes" select="()"/>
-        <xsl:param name="pending-hyphenate-character" as="xs:string?" tunnel="yes" select="()"/>
-        <xsl:variable name="new-text-transform" as="xs:string?">
-            <xsl:apply-templates mode="css:text-transform" select="."/>
-        </xsl:variable>
-        <xsl:variable name="new-hyphens" as="xs:string?">
-            <xsl:apply-templates mode="css:hyphens" select="."/>
-        </xsl:variable>
-        <xsl:call-template name="obfl:translate">
-            <xsl:with-param name="new-text-transform" select="$new-text-transform"/>
-        </xsl:call-template>
-        <xsl:call-template name="obfl:hyphenate">
-            <xsl:with-param name="new-hyphens" select="$new-hyphens"/>
-        </xsl:call-template>
-        <xsl:variable name="pending-braille-charset" as="xs:string?"
-                      select="(@css:braille-charset/string(),$pending-braille-charset)[1]"/>
-        <xsl:variable name="pending-hyphenate-character" as="xs:string?"
-                      select="(@css:hyphenate-character/string(),$pending-hyphenate-character)[1]"/>
-        <xsl:next-match>
-            <xsl:with-param name="text-transform" tunnel="yes" select="($new-text-transform,$text-transform)[1]"/>
-            <xsl:with-param name="hyphens" tunnel="yes" select="($new-hyphens,$hyphens)[1]"/>
-            <xsl:with-param name="pending-text-transform" tunnel="yes" select="()"/>
-            <xsl:with-param name="pending-braille-charset" tunnel="yes" select="$pending-braille-charset"/>
-            <xsl:with-param name="pending-hyphens" tunnel="yes" select="()"/>
-            <xsl:with-param name="pending-hyphenate-character" tunnel="yes" select="$pending-hyphenate-character"/>
-        </xsl:next-match>
-    </xsl:template>
-    
-    <!--
-        all other attributes
-    -->
-    <xsl:template priority="0.7"
-                  mode="block toc-block"
-                  match="css:box[@type='block']">
-        <xsl:apply-templates mode="block-attr"
-                             select="@* except (@type|
-                                                @css:text-transform|@css:braille-charset|@css:hyphens|@css:hyphenate-character|
-                                                @css:line-height|@css:text-align|@css:text-indent|@css:_obfl-right-text-indent|
-                                                @css:page-break-inside|@css:page-break-before)"/>
         <xsl:next-match/>
     </xsl:template>
     
