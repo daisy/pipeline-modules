@@ -25,15 +25,14 @@
       <p:import href="../../main/resources/xml/obfl-normalize-space.xpl"/>
       <p:import href="http://www.daisy.org/pipeline/modules/braille/dotify-utils/library.xpl"/>
       <pxi:css-to-obfl name="obfl" px:message="css-to-obfl" px:progress=".89"
-                       duplex="true" locale="und">
+                       duplex="true" document-locale="und">
         <p:with-option name="braille-charset" select="$braille-charset"/>
         <p:with-option name="skip-margin-top-of-page" select="$skip-margin-top-of-page"/>
       </pxi:css-to-obfl>
       <pxi:obfl-normalize-space px:progress=".01"/>
       <p:try px:progress=".10">
         <p:group>
-          <px:obfl-to-pef px:message="obfl-to-pef" px:progress="1"
-                          locale="und">
+          <px:obfl-to-pef px:message="obfl-to-pef" px:progress="1">
             <p:with-option name="mode" select="concat($text-transform,'(input:text-css)(output:braille)')"/>
             <p:with-param port="parameters" name="allow-text-overflow-trimming" select="$allow-text-overflow-trimming"/>
           </px:obfl-to-pef>

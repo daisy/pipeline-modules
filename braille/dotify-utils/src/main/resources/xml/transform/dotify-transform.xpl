@@ -16,18 +16,32 @@
 	
 	<p:option name="output" select="pef"/> <!-- pef | obfl -->
 	<p:option name="css-block-transform" required="true"/> <!-- empty means disable pre-translation -->
-	<p:option name="locale" required="true"/>
+	<p:option name="document-locale" required="true"/>
 	<p:option name="mode" required="true"/>
 	<p:option name="braille-charset" select="''"/>
 	
-	<p:import href="http://www.daisy.org/pipeline/modules/braille/common-utils/library.xpl"/>
+	<p:import href="http://www.daisy.org/pipeline/modules/braille/common-utils/library.xpl">
+		<p:documentation>
+			px:transform
+			px:add-parameters
+			px:merge-parameters
+		</p:documentation>
+	</p:import>
 	<p:import href="../library.xpl">
 		<p:documentation>
 			px:obfl-to-pef
 		</p:documentation>
 	</p:import>
-	<p:import href="../css-to-obfl.xpl"/>
-	<p:import href="../obfl-normalize-space.xpl"/>
+	<p:import href="../css-to-obfl.xpl">
+		<p:documentation>
+			pxi:css-to-obfl
+		</p:documentation>
+	</p:import>
+	<p:import href="../obfl-normalize-space.xpl">
+		<p:documentation>
+			pxi:obfl-normalize-space
+		</p:documentation>
+	</p:import>
 	
 	<p:variable name="page-width" cx:as="xs:string"
 	               select="(//c:param[@name='page-width' and not(@namespace[not(.='')])]/@value,'40')[1]">
@@ -62,7 +76,7 @@
 	</p:choose>
 	
 	<pxi:css-to-obfl px:message="Transforming from CSS to OBFL" px:progress=".83">
-		<p:with-option name="locale" select="$locale"/>
+		<p:with-option name="document-locale" select="$document-locale"/>
 		<p:with-option name="braille-charset" select="$braille-charset"/>
 		<p:with-option name="page-width" select="$page-width"/>
 		<p:with-option name="page-height" select="$page-height"/>
@@ -101,7 +115,6 @@
 				<p:input port="source">
 					<p:pipe step="obfl" port="result"/>
 				</p:input>
-				<p:with-option name="locale" select="$locale"/>
 				<p:with-option name="mode" select="$mode"/>
 				<p:input port="parameters">
 					<p:pipe step="parameters" port="result"/>

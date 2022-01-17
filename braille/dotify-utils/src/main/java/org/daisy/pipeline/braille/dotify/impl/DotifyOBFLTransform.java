@@ -75,17 +75,8 @@ public interface DotifyOBFLTransform {
 			private final Map<String,String> options;
 			
 			private TransformImpl(Query textTransformQuery) {
-				String locale = "und";
-				Query mode;
-				if (textTransformQuery.containsKey("document-locale")) {
-					MutableQuery q = mutableQuery(textTransformQuery);
-					locale = q.removeOnly("document-locale").getValue().get();
-					mode = q;
-				} else
-					mode = textTransformQuery;
 				options = ImmutableMap.of(
-					"locale", locale,
-					"mode", mode.toString());
+					"mode", textTransformQuery.toString());
 			}
 			
 			@Override

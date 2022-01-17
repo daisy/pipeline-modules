@@ -47,7 +47,7 @@
         </p:otherwise>
       </p:choose>
       <pxi:obfl-normalize-space/>
-      <px:obfl-to-pef locale="und">
+      <px:obfl-to-pef>
         <p:with-option name="mode" select="concat($text-transform,'(input:text-css)(output:braille)')"/>
       </px:obfl-to-pef>
       <p:delete match="/pef:pef/pef:head/pef:meta/dp2:ascii-braille-charset"/>

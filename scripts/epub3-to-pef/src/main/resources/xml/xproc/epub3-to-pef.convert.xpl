@@ -290,8 +290,7 @@
             <p:group name="obfl" px:message="Transforming from XML with inline CSS to OBFL" px:progress=".40">
                 <p:output port="result"/>
                 <p:variable name="transform-query" select="concat('(input:css)(output:obfl)',$transform,$locale-query)"/>
-                <p:identity px:message-severity="DEBUG" px:message="px:transform query={$transform-query}"/>
-                <px:transform px:progress="1">
+                <px:transform px:progress="1" px:message-severity="DEBUG" px:message="px:transform query={$transform-query}">
                     <p:with-option name="query" select="$transform-query"/>
                     <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>
                     <p:input port="parameters">
@@ -307,9 +306,8 @@
                             <d:status result="ok"/>
                         </p:inline>
                     </p:output>
-                    <p:variable name="transform-query" select="concat('(input:obfl)(input:text-css)(output:pef)',$transform,$locale-query)"/>
-                    <p:identity px:message-severity="DEBUG" px:message="px:transform query={$transform-query}"/>
-                    <px:transform px:progress="1">
+                    <p:variable name="transform-query" select="concat('(input:obfl)(input:text-css)(output:pef)',$transform)"/>
+                    <px:transform px:progress="1" px:message-severity="DEBUG" px:message="px:transform query={$transform-query}">
                         <p:with-option name="query" select="$transform-query"/>
                         <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>
                         <p:input port="parameters">
@@ -353,8 +351,7 @@
                 </p:inline>
             </p:output>
             <p:variable name="transform-query" select="concat('(input:css)(output:pef)',$transform,$locale-query)"/>
-            <p:identity px:message-severity="DEBUG" px:message="px:transform query={$transform-query}"/>
-            <px:transform px:progress="1">
+            <px:transform px:progress="1" px:message-severity="DEBUG" px:message="px:transform query={$transform-query}">
                 <p:with-option name="query" select="$transform-query"/>
                 <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>
                 <p:input port="parameters">

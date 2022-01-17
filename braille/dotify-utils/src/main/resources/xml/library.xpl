@@ -8,7 +8,6 @@
     <p:declare-step type="px:obfl-to-pef" name="main">
         <p:input port="source" sequence="false"/>
         <p:output port="result" sequence="false"/>
-        <p:option name="locale" required="true"/>
         <p:option name="mode" required="true"/>
         <p:option name="identifier" required="false" select="''"/>
         <p:input port="parameters" kind="parameter" primary="false"/>
@@ -57,7 +56,7 @@
         </p:delete>
 
         <pxi:obfl-to-pef>
-            <p:with-option name="locale" select="$locale"/>
+            <p:with-option name="locale" select="(/obfl:obfl/@xml:lang,'und')[1]"/>
             <p:with-option name="mode" select="$mode"/>
             <p:with-option name="braille-charset" select="/obfl:obfl/obfl:meta/dp2:braille-charset">
                 <p:pipe step="main" port="source"/>

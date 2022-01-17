@@ -138,7 +138,7 @@ public interface DotifyCSSStyledDocumentTransform {
 				options = ImmutableMap.of(
 					"output", this.output,
 					"css-block-transform", blockTransformQuery != null ? blockTransformQuery.toString() : "",
-					"locale", locale,
+					"document-locale", locale,
 					"mode", mode.toString());
 				this.blockTransformQuery = blockTransformQuery;
 				this.textTransformQuery = textTransformQuery;

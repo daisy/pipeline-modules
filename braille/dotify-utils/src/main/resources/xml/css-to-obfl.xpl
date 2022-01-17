@@ -18,7 +18,7 @@
     <p:input port="source"/>
     <p:output port="result"/>
     
-    <p:option name="locale" select="'und'"/>
+    <p:option name="document-locale" select="'und'"/>
     <p:option name="braille-charset" select="''"/>
     <p:option name="page-width" select="'40'"/>
     <p:option name="page-height" select="'25'"/>
@@ -880,7 +880,7 @@
         <p:input port="stylesheet">
             <p:document href="css-to-obfl.xsl"/>
         </p:input>
-        <p:with-param name="locale" select="$locale">
+        <p:with-param name="document-locale" select="$document-locale">
             <p:empty/>
         </p:with-param>
         <p:with-param name="braille-charset-table" select="$braille-charset">

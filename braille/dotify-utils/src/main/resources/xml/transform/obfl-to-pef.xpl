@@ -11,7 +11,6 @@
 	<p:input port="source"/>
 	<p:output port="result"/>
 	
-	<p:option name="locale" required="true"/>
 	<p:option name="mode" required="true"/>
 	<p:input port="parameters" kind="parameter" primary="false"/>
 	
@@ -53,7 +52,6 @@
 	</pxi:obfl-normalize-space>
 	
 	<px:obfl-to-pef px:progress=".90">
-		<p:with-option name="locale" select="$locale"/>
 		<p:with-option name="mode" select="$mode"/>
 		<p:input port="parameters">
 			<p:pipe step="parameters" port="result"/>
