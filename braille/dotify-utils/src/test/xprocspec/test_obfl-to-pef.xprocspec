@@ -16,21 +16,21 @@
       <p:import href="../../main/resources/xml/obfl-normalize-space.xpl"/>
       <p:import href="http://www.daisy.org/pipeline/modules/braille/dotify-utils/library.xpl"/>
       <p:choose>
+        <p:when test="not(exists(/obfl:obfl/meta))">
+          <p:insert match="/obfl:obfl" position="first-child">
+            <p:input port="insertion">
+              <p:inline>
+                <obfl:meta/>
+              </p:inline>
+            </p:input>
+          </p:insert>
+        </p:when>
+        <p:otherwise>
+          <p:identity/>
+        </p:otherwise>
+      </p:choose>
+      <p:choose>
         <p:when test="$braille-charset!=''">
-          <p:choose>
-            <p:when test="not(exists(/obfl:obfl/meta))">
-              <p:insert match="/obfl:obfl" position="first-child">
-                <p:input port="insertion">
-                  <p:inline>
-                    <obfl:meta/>
-                  </p:inline>
-                </p:input>
-              </p:insert>
-            </p:when>
-            <p:otherwise>
-              <p:identity/>
-            </p:otherwise>
-          </p:choose>
           <p:insert match="/obfl:obfl/obfl:meta" position="last-child">
             <p:input port="insertion">
               <p:inline>
@@ -46,10 +46,20 @@
           <p:identity/>
         </p:otherwise>
       </p:choose>
+      <p:group>
+        <p:insert match="/obfl:obfl/obfl:meta" position="last-child">
+          <p:input port="insertion">
+            <p:inline>
+              <dp2:default-mode>{}</dp2:default-mode>
+            </p:inline>
+          </p:input>
+        </p:insert>
+        <p:string-replace match="/obfl:obfl/obfl:meta/dp2:default-mode/text()">
+          <p:with-option name="replace" select='concat("&apos;",$text-transform,"&apos;")'/>
+        </p:string-replace>
+      </p:group>
       <pxi:obfl-normalize-space/>
-      <px:obfl-to-pef>
-        <p:with-option name="mode" select="concat($text-transform,'(input:text-css)(output:braille)')"/>
-      </px:obfl-to-pef>
+      <px:obfl-to-pef/>
       <p:delete match="/pef:pef/pef:head/pef:meta/dp2:ascii-braille-charset"/>
     </p:declare-step>
   </x:script>
@@ -445,7 +455,7 @@
           </obfl>
         </x:document>
       </x:input>
-      <x:option name="text-transform" select="'(number-translator)'"/>
+      <x:option name="text-transform" select="'(input:text-css)(output:braille)(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -568,7 +578,7 @@
           </obfl>
         </x:document>
       </x:input>
-      <x:option name="text-transform" select="'(number-translator)'"/>
+      <x:option name="text-transform" select="'(input:text-css)(output:braille)(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -832,7 +842,7 @@
           </obfl>
         </x:document>
       </x:input>
-      <x:option name="text-transform" select="'(number-translator)'"/>
+      <x:option name="text-transform" select="'(input:text-css)(output:braille)(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -971,7 +981,7 @@
           </obfl>
         </x:document>
       </x:input>
-      <x:option name="text-transform" select="'(number-translator)'"/>
+      <x:option name="text-transform" select="'(input:text-css)(output:braille)(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -1082,7 +1092,7 @@
           </obfl>
         </x:document>
       </x:input>
-      <x:option name="text-transform" select="'(number-translator)'"/>
+      <x:option name="text-transform" select="'(input:text-css)(output:braille)(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -3308,7 +3318,7 @@
           </obfl>
         </x:document>
       </x:input>
-      <x:option name="text-transform" select="'(number-translator)'"/>
+      <x:option name="text-transform" select="'(input:text-css)(output:braille)(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -3507,7 +3517,7 @@
           </obfl>
         </x:document>
       </x:input>
-      <x:option name="text-transform" select="'(number-translator)'"/>
+      <x:option name="text-transform" select="'(input:text-css)(output:braille)(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -3647,7 +3657,7 @@
           </obfl>
         </x:document>
       </x:input>
-      <x:option name="text-transform" select="'(number-translator)'"/>
+      <x:option name="text-transform" select="'(input:text-css)(output:braille)(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -3816,7 +3826,7 @@
           </obfl>
         </x:document>
       </x:input>
-      <x:option name="text-transform" select="'(number-translator)'"/>
+      <x:option name="text-transform" select="'(input:text-css)(output:braille)(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -3946,7 +3956,7 @@
           </obfl>
         </x:document>
       </x:input>
-      <x:option name="text-transform" select="'(number-translator)'"/>
+      <x:option name="text-transform" select="'(input:text-css)(output:braille)(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -4163,7 +4173,7 @@
           </obfl>
         </x:document>
       </x:input>
-      <x:option name="text-transform" select="'(number-translator)'"/>
+      <x:option name="text-transform" select="'(input:text-css)(output:braille)(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -4261,7 +4271,7 @@
           </obfl>
         </x:document>
       </x:input>
-      <x:option name="text-transform" select="'(number-translator)'"/>
+      <x:option name="text-transform" select="'(input:text-css)(output:braille)(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -4373,7 +4383,7 @@
           </obfl>
         </x:document>
       </x:input>
-      <x:option name="text-transform" select="'(number-translator)'"/>
+      <x:option name="text-transform" select="'(input:text-css)(output:braille)(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -4529,7 +4539,7 @@
           </obfl>
         </x:document>
       </x:input>
-      <x:option name="text-transform" select="'(number-translator)'"/>
+      <x:option name="text-transform" select="'(input:text-css)(output:braille)(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -4690,7 +4700,7 @@
           </obfl>
         </x:document>
       </x:input>
-      <x:option name="text-transform" select="'(number-translator)'"/>
+      <x:option name="text-transform" select="'(input:text-css)(output:braille)(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -4882,7 +4892,7 @@
           </obfl>
         </x:document>
       </x:input>
-      <x:option name="text-transform" select="'(number-translator)'"/>
+      <x:option name="text-transform" select="'(input:text-css)(output:braille)(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -5074,7 +5084,7 @@
           </obfl>
         </x:document>
       </x:input>
-      <x:option name="text-transform" select="'(number-translator)'"/>
+      <x:option name="text-transform" select="'(input:text-css)(output:braille)(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -5377,7 +5387,7 @@
           </obfl>
         </x:document>
       </x:input>
-      <x:option name="text-transform" select="'(number-translator)'"/>
+      <x:option name="text-transform" select="'(input:text-css)(output:braille)(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -5727,7 +5737,7 @@
           </obfl>
         </x:document>
       </x:input>
-      <x:option name="text-transform" select="'(number-translator)'"/>
+      <x:option name="text-transform" select="'(input:text-css)(output:braille)(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -5801,7 +5811,7 @@
           </obfl>
         </x:document>
       </x:input>
-      <x:option name="text-transform" select="'(number-translator)'"/>
+      <x:option name="text-transform" select="'(input:text-css)(output:braille)(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -6210,7 +6220,7 @@
           </obfl>
         </x:document>
       </x:input>
-      <x:option name="text-transform" select="'(number-translator)'"/>
+      <x:option name="text-transform" select="'(input:text-css)(output:braille)(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -7696,7 +7706,7 @@
           </obfl>
         </x:document>
       </x:input>
-      <x:option name="text-transform" select="'(number-translator)'"/>
+      <x:option name="text-transform" select="'(input:text-css)(output:braille)(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -7804,7 +7814,7 @@
           </obfl>
         </x:document>
       </x:input>
-      <x:option name="text-transform" select="'(number-translator)'"/>
+      <x:option name="text-transform" select="'(input:text-css)(output:braille)(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -8585,7 +8595,7 @@
           </obfl>
         </x:document>
       </x:input>
-      <x:option name="text-transform" select="'(number-translator)'"/>
+      <x:option name="text-transform" select="'(input:text-css)(output:braille)(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -8730,7 +8740,7 @@
           </obfl>
         </x:document>
       </x:input>
-      <x:option name="text-transform" select="'(number-translator)'"/>
+      <x:option name="text-transform" select="'(input:text-css)(output:braille)(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>
@@ -9056,7 +9066,7 @@
           </obfl>
         </x:document>
       </x:input>
-      <x:option name="text-transform" select="'(number-translator)'"/>
+      <x:option name="text-transform" select="'(input:text-css)(output:braille)(number-translator)'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>

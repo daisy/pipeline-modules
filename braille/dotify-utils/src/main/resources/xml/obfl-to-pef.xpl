@@ -10,7 +10,6 @@
 	<p:output port="result" sequence="false">
 		<p:pipe step="pef" port="result"/>
 	</p:output>
-	<p:option name="mode" required="true"/>
 	<p:option name="identifier" required="false" select="''"/>
 	<p:input port="parameters" kind="parameter" primary="false"/>
 
@@ -56,6 +55,9 @@
 		     that this is also what translators understand, meaning that $mode should contain
 		     "(input:text-css)". -->
 	</p:delete>
+	<p:delete match="/obfl:obfl/obfl:meta/dp2:default-mode">
+		<!-- We don't want this to end up in the PEF. -->
+	</p:delete>
 	<p:delete match="/obfl:obfl/obfl:meta/dp2:css-text-transform-definitions">
 		<!-- We don't want this to end up in the PEF. -->
 	</p:delete>
@@ -66,7 +68,9 @@
 
 	<pxi:obfl-to-pef name="pef">
 		<p:with-option name="locale" select="(/obfl:obfl/@xml:lang,'und')[1]"/>
-		<p:with-option name="mode" select="$mode"/>
+		<p:with-option name="mode" select="/obfl:obfl/obfl:meta/dp2:default-mode">
+			<p:pipe step="main" port="source"/>
+		</p:with-option>
 		<p:with-option name="braille-charset" select="/obfl:obfl/obfl:meta/dp2:braille-charset">
 			<p:pipe step="main" port="source"/>
 		</p:with-option>

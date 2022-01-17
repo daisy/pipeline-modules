@@ -11,7 +11,6 @@
 	<p:input port="source"/>
 	<p:output port="result"/>
 
-	<p:option name="mode" required="true"/>
 	<p:input port="parameters" kind="parameter" primary="false"/>
 
 	<p:import href="../obfl-normalize-space.xpl">
@@ -31,7 +30,6 @@
 	</pxi:obfl-normalize-space>
 
 	<px:obfl-to-pef px:progress=".90">
-		<p:with-option name="mode" select="$mode"/>
 		<p:input port="parameters">
 			<p:pipe step="main" port="parameters"/>
 		</p:input>

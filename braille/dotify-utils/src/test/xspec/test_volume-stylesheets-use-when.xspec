@@ -7,6 +7,7 @@
   <x:param name="document-locale"></x:param>
   <x:param name="page-counters">page</x:param>
   <x:param name="braille-charset-table" select="''"/>
+  <x:param name="default-text-transform" select="''"/>
   
   <x:scenario label="test_01">
     <x:call function="obfl:volume-stylesheets-use-when">

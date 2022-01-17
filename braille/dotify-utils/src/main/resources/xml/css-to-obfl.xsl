@@ -23,6 +23,7 @@
     <xsl:param name="braille-charset-table" as="xs:string" required="yes"/>
     <xsl:param name="page-counters" as="xs:string" required="yes"/>
     <xsl:param name="volume-transition" as="xs:string?" required="no"/>
+    <xsl:param name="default-text-transform" as="xs:string" required="yes"/>
     <xsl:param name="text-transforms" as="xs:string?" required="no"/>
     
     <xsl:variable name="sections" select="collection()[position() &lt; last()]"/>
@@ -293,6 +294,9 @@
                 <dp2:style-type>text/css</dp2:style-type>
                 <xsl:if test="$braille-charset-table!=''">
                     <dp2:braille-charset><xsl:value-of select="$braille-charset-table"/></dp2:braille-charset>
+                </xsl:if>
+                <xsl:if test="$default-text-transform!=''">
+                    <dp2:default-mode><xsl:value-of select="$default-text-transform"/></dp2:default-mode>
                 </xsl:if>
                 <xsl:if test="exists($text-transform-rule)">
                     <dp2:css-text-transform-definitions>

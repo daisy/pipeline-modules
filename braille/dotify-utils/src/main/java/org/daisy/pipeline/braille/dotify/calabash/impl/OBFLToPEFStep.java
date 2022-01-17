@@ -191,6 +191,8 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 				} catch (Exception e) {
 					throw new IllegalArgumentException("Expected mode in query format: " + mode, e);
 				}
+				mainQuery = mutableQuery(mainQuery).add("input", "text-css").add("output", "braille");
+				mode = mainQuery.toString();
 				if (locale != null && !"und".equals(locale))
 					mainQuery = mutableQuery(mainQuery).add("document-locale", locale);
 				BrailleTranslator mainTranslator;
