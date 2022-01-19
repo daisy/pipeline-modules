@@ -387,9 +387,7 @@
                                         </xsl:message>
                                     </xsl:if>
                                     <xsl:variable name="volume-area-counter-set" as="element()*"
-                                                  select="css:parse-counter-set(
-                                                            ($volume-area-properties[@name='counter-set']/@value,$default-page-counter-name)[1]
-                                                            ,0)"/>
+                                                  select="css:parse-counter-set($volume-area-properties[@name='counter-set']/@value,0)"/>
                                     <xsl:if test="$volume-area-content">
                                         <xsl:element name="{$space}-content">
                                             <xsl:variable name="default-page-style" as="xs:string" select="($volume-area-page-style,$default-page-style)[1]"/>
@@ -411,7 +409,8 @@
                                                         </xsl:if>
                                                     </xsl:variable>
                                                             <xsl:variable name="counter-set" as="element()*"
-                                                                          select="current-group()[1]/@css:counter-set/css:parse-counter-set(.,0)"/>
+                                                                          select="($volume-area-counter-set,
+                                                                                   current-group()[1]/@css:counter-set/css:parse-counter-set(.,0))"/>
                                                             <xsl:if test="$counter-set[not(@name=$counter-increment/@name)]">
                                                                 <xsl:message terminate="yes">
                                                                     <xsl:apply-templates mode="css:serialize" select="$counter-set[not(@name=$counter-increment/@name)][1]"/>

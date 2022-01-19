@@ -12314,6 +12314,7 @@
                            @bottom-right { content: counter(page); }}
                          @volume:first {
                            @begin {
+                             counter-set: custom-page 11;
                              content: flow(begin, document);
                              @page {
                                counter-increment: custom-page;
@@ -12400,7 +12401,7 @@
           <volume-template sheets-in-volume-max="1000" use-when="(! (= $volume 1))"/>
           <volume-template sheets-in-volume-max="1000" use-when="(= $volume 1)">
             <pre-content>
-              <sequence master="c" page-number-counter="custom-page">
+              <sequence master="c" page-number-counter="custom-page" initial-page-number="11">
                 <block>
                   ⠿⠿⠿
                 </block>
@@ -12450,7 +12451,7 @@
                   <row/>
                   <row/>
                   <row/>
-                  <row>⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁</row>
+                  <row>⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁⠁</row>
                 </page>
               </section>
               <section>
@@ -12482,7 +12483,7 @@
                   <row/>
                   <row/>
                   <row/>
-                  <row>⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉</row>
+                  <row>⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁⠉</row>
                 </page>
               </section>
               <section>
