@@ -145,6 +145,9 @@
         <layout-master name="{$name}" duplex="{$duplex}"
                        page-width="{$page-width}" page-height="{$page-height}">
             <xsl:if test="$right-page-stylesheet">
+                <!--
+                    FIXME: need better way to determine whether we are on right or left page: https://github.com/mtmse/obfl/issues/22
+                -->
                 <template use-when="(= (% $page 2) 1)">
                     <xsl:call-template name="template">
                         <xsl:with-param name="stylesheet" select="$right-page-stylesheet"/>

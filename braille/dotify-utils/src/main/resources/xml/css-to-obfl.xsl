@@ -424,6 +424,9 @@
                                                             <xsl:variable name="initial-page-number" as="attribute()?">
                                                                 <xsl:if test="$counter-set">
                                                                     <xsl:if test="(xs:integer($counter-set/@value) mod 2)=0">
+                                                                        <!--
+                                                                            FIXME: see https://github.com/mtmse/obfl/issues/22
+                                                                        -->
                                                                         <xsl:message terminate="yes">
                                                                             <xsl:apply-templates mode="css:serialize" select="$counter-set"/>
                                                                             <xsl:text>: page counter may not be set to an even value</xsl:text>
@@ -743,6 +746,9 @@
                                     <xsl:variable name="counter-set" as="element()?" select="$counter-set[last()]"/>
                                     <xsl:if test="$counter-set">
                                         <xsl:if test="(xs:integer($counter-set/@value) mod 2)=0">
+                                            <!--
+                                                FIXME: see https://github.com/mtmse/obfl/issues/22
+                                            -->
                                             <xsl:message terminate="yes">
                                                 <xsl:apply-templates mode="css:serialize" select="$counter-set"/>
                                                 <xsl:text>: page counter may not be set to an even value</xsl:text>
