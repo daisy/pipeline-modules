@@ -124,6 +124,10 @@ public final class SourceMapReader {
 				Map.Entry<LineColumn,SourceLocator> entry = sourceMap.ceilingEntry(new LineColumn(line, column));
 				return entry == null ? null : entry.getValue();
 			}
+			@Override
+			public String toString() {
+				return sourceMap.toString();
+			}
 		};
 	}
 
