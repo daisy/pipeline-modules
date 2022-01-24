@@ -328,6 +328,7 @@ tts-adapter-attbin:
 
 `org.daisy.pipeline.tts.lame.cli.options`
 : Additional command line options passed to lame
+: Deprecated
 
 ## CSS
 
