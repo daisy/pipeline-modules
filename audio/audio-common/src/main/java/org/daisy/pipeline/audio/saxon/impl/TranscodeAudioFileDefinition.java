@@ -11,6 +11,7 @@ import javax.sound.sampled.AudioInputStream;
 import net.sf.saxon.expr.XPathContext;
 import net.sf.saxon.lib.ExtensionFunctionCall;
 import net.sf.saxon.lib.ExtensionFunctionDefinition;
+import net.sf.saxon.om.Item;
 import net.sf.saxon.om.Sequence;
 import net.sf.saxon.om.StructuredQName;
 import net.sf.saxon.trans.XPathException;
@@ -45,7 +46,7 @@ public class TranscodeAudioFileDefinition extends ExtensionFunctionDefinition {
 	public SequenceType[] getArgumentTypes() {
 		return new SequenceType[] {
 			SequenceType.SINGLE_STRING,
-			SequenceType.SINGLE_STRING,
+			SequenceType.OPTIONAL_STRING,
 			SequenceType.SINGLE_STRING,
 			SequenceType.SINGLE_STRING
 		};
@@ -69,11 +70,14 @@ public class TranscodeAudioFileDefinition extends ExtensionFunctionDefinition {
 					}
 					if (!inputFile.isFile())
 						throw new XPathException("File does not exist: " + inputFile);
-					AudioFileFormat.Type oldFileType; {
-						String mediaType = arguments[1].head().getStringValue();
-						oldFileType = AudioFileTypes.fromMediaType(mediaType);
-						if (oldFileType == null)
-							throw new XPathException("new-file-type parameter is not a recognized mime type: " + mediaType);
+					Optional<AudioFileFormat.Type> oldFileType; {
+						Item mediaType = arguments[1].head();
+						if (mediaType != null) {
+							oldFileType = Optional.ofNullable(AudioFileTypes.fromMediaType(mediaType.getStringValue()));
+							if (!oldFileType.isPresent())
+								throw new XPathException("new-file-type parameter is not a recognized mime type: " + mediaType);
+						} else
+							oldFileType = Optional.empty();
 					}
 					AudioFileFormat.Type newFileType; {
 						String mediaType = arguments[2].head().getStringValue();
@@ -102,9 +106,14 @@ public class TranscodeAudioFileDefinition extends ExtensionFunctionDefinition {
 							} while (outputFile.exists());
 						}
 					}
-					Optional<AudioDecoder> decoder = audioServices.newDecoder(oldFileType, new HashMap<String,String>());
-					if (!decoder.isPresent())
-						throw new XPathException("No decoder found for file type " + oldFileType);
+					Optional<AudioDecoder> decoder; {
+						if (oldFileType.isPresent()) {
+							decoder = audioServices.newDecoder(oldFileType.get(), new HashMap<String,String>());
+							if (!decoder.isPresent())
+								throw new XPathException("No decoder found for file type " + oldFileType);
+						} else
+							decoder = audioServices.newDecoder(new HashMap<String,String>());
+					}
 					Optional<AudioEncoder> encoder = audioServices.newEncoder(newFileType, new HashMap<String,String>());
 					if (!encoder.isPresent())
 						throw new XPathException("No encoder found for file type " + newFileType);

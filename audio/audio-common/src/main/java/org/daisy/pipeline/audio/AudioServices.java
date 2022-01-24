@@ -35,6 +35,37 @@ public class AudioServices {
 		return Optional.empty();
 	}
 
+	/**
+	 * Create a Decoder that can handle any file format supported by the system.
+	 */
+	public Optional<AudioDecoder> newDecoder(Map<String,String> params) {
+		List<AudioDecoder> decoders = new ArrayList<>();
+		Iterator<AudioDecoderService> decoderServices = this.decoderServices.iterator();
+		return Optional.of(
+			new AudioDecoder() {
+				public AudioInputStream decode(File inputFile) throws UnsupportedAudioFileException, Throwable {
+					for (AudioDecoder d : decoders) {
+						try {
+							return d.decode(inputFile);
+						} catch (UnsupportedAudioFileException e) {
+						}
+					}
+					while (decoderServices.hasNext()) {
+						Optional<AudioDecoder> d = decoderServices.next().newDecoder(params);
+						if (d.isPresent()) {
+							decoders.add(d.get());
+							try {
+								return d.get().decode(inputFile);
+							} catch (UnsupportedAudioFileException e) {
+							}
+						}
+					}
+					throw new UnsupportedAudioFileException();
+				}
+			}
+		);
+	}
+
 	public Optional<AudioDecoder> newDecoder(AudioFileFormat.Type fileType, Map<String,String> params) {
 		for (AudioDecoderService s : decoderServices) {
 			if (s.supportsFileType(fileType)) {

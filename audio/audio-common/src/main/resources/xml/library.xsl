@@ -14,7 +14,7 @@
 	</doc>
 	<java:function name="pf:transcode-audio-file" as="xs:anyURI">
 		<xsl:param name="href" as="xs:anyURI"/>
-		<xsl:param name="old-file-type" as="xs:string"/>
+		<xsl:param name="old-file-type" as="xs:string?"/>
 		<xsl:param name="new-file-type" as="xs:string"/>
 		<xsl:param name="output-dir" as="xs:anyURI"/>
 		<!--
