@@ -222,9 +222,17 @@
                 <xsl:sequence select="($formatted-value,$text-transform)"/>
             </xsl:when>
             <xsl:otherwise>
+                <xsl:variable name="style" as="element()">
+                    <xsl:for-each select="css:named-counter-style($style/@fallback)">
+                        <xsl:copy>
+                            <xsl:sequence select="@* except (@prefix|@suffix|@text-transform)"/>
+                            <xsl:sequence select="$style/(@prefix|@suffix|@text-transform)"/>
+                        </xsl:copy>
+                    </xsl:for-each>
+                </xsl:variable>
                 <xsl:call-template name="css:counter-representation">
                     <xsl:with-param name="value" select="$value"/>
-                    <xsl:with-param name="style" select="css:named-counter-style($style/@fallback)"/>
+                    <xsl:with-param name="style" select="$style"/>
                 </xsl:call-template>
             </xsl:otherwise>
         </xsl:choose>
