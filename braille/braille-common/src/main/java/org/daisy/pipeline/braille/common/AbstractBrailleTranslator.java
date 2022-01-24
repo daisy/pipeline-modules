@@ -267,6 +267,9 @@ public abstract class AbstractBrailleTranslator extends AbstractTransform implem
 				private final char hyphenChar;
 				// SPACE, TAB, LF, CR, BLANK or LS
 				private final static Pattern WORD_BOUNDARY = Pattern.compile("[\\x20\t\\n\\r\\u2800\u2028]");
+				public FullyHyphenatedAndTranslatedString(String string) {
+					this(string, 0, -1);
+				}
 				public FullyHyphenatedAndTranslatedString(String string, int from, int to) {
 					this(string, from, to, '\u2824');
 				}

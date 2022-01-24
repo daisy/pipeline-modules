@@ -111,7 +111,7 @@ public class DotifyTranslatorImpl extends AbstractBrailleTranslator implements D
 	private final LineBreakingFromStyledText lineBreakingFromStyledText
 	= new DefaultLineBreaker() {
 		protected BrailleStream translateAndHyphenate(final java.lang.Iterable<CSSStyledText> styledText, int from, int to) {
-			return new FullyHyphenatedAndTranslatedString(join(fromStyledTextToBraille.transform(styledText)), from, to);
+			return new FullyHyphenatedAndTranslatedString(join(fromStyledTextToBraille.transform(styledText, from, to)));
 		}
 	};
 	

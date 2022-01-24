@@ -102,6 +102,15 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 	
 	private final static char SHY = '\u00AD';  // soft hyphen
 	private final static char ZWSP = '\u200B'; // zero-width space
+	private final static char NBSP = '\u00A0'; // no-break space
+	private final static char LS = '\u2028';   // line separator
+	private final static char RS = '\u001E';   // (for segmentation)
+	private final static char US = '\u001F';   // (for segmentation)
+	private final static Splitter SEGMENT_SPLITTER = Splitter.on(RS);
+	private final static Pattern ON_NBSP_SPLITTER = Pattern.compile("[" + SHY + ZWSP + "]*" + NBSP + "[" + SHY + ZWSP + NBSP + "]*");
+	private final static Pattern ON_SPACE_SPLITTER = Pattern.compile("[" + SHY + ZWSP + "]*[\\x20\t\\n\\r\\u2800" + NBSP + "][" + SHY + ZWSP + "\\x20\t\\n\\r\\u2800" + NBSP+ "]*");
+	private final static Pattern LINE_SPLITTER = Pattern.compile("[" + SHY + ZWSP + "]*[\\n\\r][" + SHY + ZWSP + "\\n\\r]*");
+	private final static Pattern WORD_SPLITTER = Pattern.compile("[\\x20\t\\n\\r\\u2800" + NBSP + "]+");
 	
 	private LiblouisTableJnaImplProvider tableProvider;
 	
@@ -447,8 +456,6 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 			return lineBreakingFromStyledText;
 		}
 		
-		private final static Pattern WORD_SPLITTER = Pattern.compile("[\\x20\t\\n\\r\\u2800\\xA0]+");
-		
 		static class LineBreaker extends DefaultLineBreaker {
 			
 			final Translator liblouisTranslator;
@@ -499,28 +506,33 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 					                             to); }
 				// style is mutated and may not be empty
 				Iterator<SimpleInlineStyle> style = Iterators.transform(styledTextCopy.iterator(), CSSStyledText::getStyle);
-				StringBuilder brailleString = new StringBuilder();
+				List<String> brailleWithPreservedWS = new ArrayList(); {
+					for (String s : braille) {
+						// the only property expected in the output is white-space
+						// ignore other properties
+						SimpleInlineStyle st = style.next();
+						if (st != null) {
+							CSSProperty ws = st.getProperty("white-space");
+							if (ws != null) {
+								if (ws == WhiteSpace.PRE_WRAP)
+									s = s.replaceAll("[\\x20\t\\u2800]+", "$0"+ZWSP)
+										.replaceAll("[\\x20\t\\u2800]", ""+NBSP);
+								if (ws == WhiteSpace.PRE_WRAP || ws == WhiteSpace.PRE_LINE)
+									s = s.replaceAll("[\\n\\r]", ""+LS); }}
+						brailleWithPreservedWS.add(s);
+					}
+				}
+				StringBuilder joined = new StringBuilder();
 				int fromChar = 0;
 				int toChar = to >= 0 ? 0 : -1;
-				for (String s : braille) {
-					// the only property expected in the output is white-space
-					// ignore other properties
-					SimpleInlineStyle st = style.next();
-					if (st != null) {
-						CSSProperty ws = st.getProperty("white-space");
-						if (ws != null) {
-							if (ws == WhiteSpace.PRE_WRAP)
-								s = s.replaceAll("[\\x20\t\\u2800]+", "$0\u200B")
-									.replaceAll("[\\x20\t\\u2800]", "\u00A0");
-							if (ws == WhiteSpace.PRE_WRAP || ws == WhiteSpace.PRE_LINE)
-								s = s.replaceAll("[\\n\\r]", "\u2028"); }}
-					brailleString.append(s);
+				for (String s : brailleWithPreservedWS) {
+					joined.append(s);
 					if (--from == 0)
-						fromChar = brailleString.length();
+						fromChar = joined.length();
 					if (--to == 0)
-						toChar = brailleString.length();
+						toChar = joined.length();
 				}
-				return new FullyHyphenatedAndTranslatedString(brailleString.toString(), fromChar, toChar);
+				return new FullyHyphenatedAndTranslatedString(joined.toString(), fromChar, toChar, '\u2824');
 			}
 			
 			static class BrailleStreamImpl implements BrailleStream {
@@ -1235,15 +1247,6 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 				letterSpacing[i] = 0; }
 			return transform(text, typeform, hyphenate, preserveLines, preserveSpace, letterSpacing, false, false);
 		}
-		
-		protected final static char RS = '\u001E';   // (for segmentation)
-		protected final static char US = '\u001F';   // (for segmentation)
-		protected final static char LS = '\u2028';   // line separator
-		protected final static char NBSP = '\u00A0'; // no-break space
-		protected final static Splitter SEGMENT_SPLITTER = Splitter.on(RS);
-		private final static Pattern ON_NBSP_SPLITTER = Pattern.compile("[\\xAD\\u200B]*\\xA0[\\xAD\\u200B\\xA0]*");
-		private final static Pattern ON_SPACE_SPLITTER = Pattern.compile("[\\xAD\\u200B]*[\\x20\t\\n\\r\\u2800\\xA0][\\xAD\\u200B\\x20\t\\n\\r\\u2800\\xA0]*");
-		private final static Pattern LINE_SPLITTER = Pattern.compile("[\\xAD\\u200B]*[\\n\\r][\\xAD\\u200B\\n\\r]*");
 		
 		// the positions in the text where spacing must be inserted have been previously indicated with a US control character
 		private static String applyLetterSpacing(String text, int letterSpacing) {

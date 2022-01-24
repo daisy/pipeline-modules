@@ -55,7 +55,6 @@ import org.daisy.common.stax.BaseURIAwareXMLStreamWriter;
 import static org.daisy.common.stax.XMLStreamWriterHelper.writeAttribute;
 import static org.daisy.common.stax.XMLStreamWriterHelper.writeElement;
 import static org.daisy.common.stax.XMLStreamWriterHelper.writeStartElement;
-import org.daisy.pipeline.braille.common.util.Strings;
 import org.daisy.pipeline.braille.css.impl.BrailleCssSerializer;
 
 public class TableAsList extends SingleInSingleOutXMLTransformer {
@@ -324,7 +323,7 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 													builder.add(ruleblock); }}
 										else
 											throw new RuntimeException("Unexpected style " + block); }
-									newStyle = serializeRuleBlockList(builder); }
+									newStyle = BrailleCssSerializer.serializeRuleBlockList(builder); }
 								if (!newStyle.isEmpty())
 									writeActions.add(w -> writeAttribute(w, attrName, newStyle)); }
 							else if (isCell && _STYLE.equals(attrName))
@@ -970,7 +969,7 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 
 		@Override
 		public String toString() {
-			return serializeRuleBlockList(ruleBlocks.values());
+			return BrailleCssSerializer.serializeRuleBlockList(ruleBlocks.values());
 		}
 	}
 
@@ -1403,28 +1402,6 @@ public class TableAsList extends SingleInSingleOutXMLTransformer {
 		}
 	}
 	
-	private static String serializeRuleBlockList(Iterable<? extends RuleBlock<? extends Rule<?>>> ruleBlocks) {
-		String b = null;
-		for (RuleBlock<? extends Rule<?>> r : ruleBlocks) {
-			String s;
-			if (r instanceof RuleMainBlock)
-				s = BrailleCssSerializer.toString((RuleMainBlock)r);
-			else if (r instanceof RuleRelativeBlock)
-				s = BrailleCssSerializer.toString((RuleRelativeBlock)r);
-			else
-				s = BrailleCssSerializer.toString(r);
-			if (!s.isEmpty())
-				if (b == null)
-					b = s;
-				else {
-					if (!(b.endsWith("}") || b.endsWith(";")))
-						b = b + ";";
-					b += " ";
-					b += s; }}
-		if (b == null) b = "";
-		return b;
-	}
-
 	private static String elementToString(XMLInputValue<?> element) {
 		ToStringWriter xml = new ToStringWriter() {
 				int skipElement = 0;

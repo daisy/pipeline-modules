@@ -102,7 +102,7 @@ public final class BrailleCssSerializer {
 		StringBuilder b = new StringBuilder();
 		StringBuilder rel = new StringBuilder();
 		if (style.declarations != null)
-			b.append(serializeDeclarationList2(style.declarations));
+			b.append(serializeDeclarationList(style.declarations));
 		if (style.nestedStyles != null)
 			for (Map.Entry<String,BrailleCssTreeBuilder.Style> e : style.nestedStyles.entrySet()) {
 				if (base != null && e.getKey().startsWith("&")) {
@@ -194,7 +194,29 @@ public final class BrailleCssSerializer {
 				BrailleCssTreeBuilder.Style.of(page)));
 	}
 
-	/* =================================================== */
+	public static String serializeRuleBlockList(Iterable<? extends RuleBlock<? extends Rule<?>>> ruleBlocks) {
+		String b = null;
+		for (RuleBlock<? extends Rule<?>> r : ruleBlocks) {
+			String s;
+			if (r instanceof RuleMainBlock)
+				s = BrailleCssSerializer.toString((RuleMainBlock)r);
+			else if (r instanceof RuleRelativeBlock)
+				s = BrailleCssSerializer.toString((RuleRelativeBlock)r);
+			else
+				s = BrailleCssSerializer.toString(r);
+			if (!s.isEmpty())
+				if (b == null)
+					b = s;
+				else {
+					if (!(b.endsWith("}") || b.endsWith(";")))
+						b = b + ";";
+					b += " ";
+					b += s; }}
+		if (b == null) b = "";
+		return b;
+	}
+
+	/* = PRIVATE ========================================= */
 
 	private static String serializeTermList(List<Term<?>> termList) {
 		String s = "";
@@ -213,19 +235,6 @@ public final class BrailleCssSerializer {
 	private static String serializeDeclarationList(Iterable<Declaration> declarations) {
 		List<Declaration> sortedDeclarations = new ArrayList<Declaration>();
 		for (Declaration d : declarations) sortedDeclarations.add(d);
-		Collections.sort(sortedDeclarations);
-		StringBuilder s = new StringBuilder();
-		Iterator<Declaration> it = sortedDeclarations.iterator();
-		while (it.hasNext()) {
-			Declaration d = it.next();
-			s.append(d.getProperty() + ": " + serializeTermList((List<Term<?>>)d));
-			if (it.hasNext()) s.append("; ");
-		}
-		return s.toString();
-	}
-
-	private static String serializeDeclarationList2(List<Declaration> declarations) {
-		List<Declaration> sortedDeclarations = new ArrayList<Declaration>(declarations);
 		Collections.sort(sortedDeclarations);
 		StringBuilder s = new StringBuilder();
 		Iterator<Declaration> it = sortedDeclarations.iterator();
@@ -260,7 +269,7 @@ public final class BrailleCssSerializer {
 			if (!deep || !recursive || style.nestedStyles != null)
 				writeStartElement(w, CSS_RULE);
 			if (!deep)
-				writeAttribute(w, STYLE, serializeDeclarationList2(style.declarations));
+				writeAttribute(w, STYLE, serializeDeclarationList(style.declarations));
 			if (deep) {
 				for (Declaration d : style.declarations) {
 					writeStartElement(w, CSS_PROPERTY);
