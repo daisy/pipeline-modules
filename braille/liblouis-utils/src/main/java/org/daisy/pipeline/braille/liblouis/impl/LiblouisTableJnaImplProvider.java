@@ -455,7 +455,7 @@ public class LiblouisTableJnaImplProvider extends AbstractTransformProvider<Libl
 		                                     .getDOMImplementation().createDocument(null, "choice", null);
 		List<String> values = new ArrayList<>();
 		Element choice = doc.getDocumentElement();
-		String defaultValue = " "; // don't use empty string because web UI would pass "-" (i.e. the description) instead
+		String defaultValue = "";
 		values.add(defaultValue);
 		choice.appendChild(doc.createElement("value"))
 		      .appendChild(doc.createTextNode(defaultValue));
