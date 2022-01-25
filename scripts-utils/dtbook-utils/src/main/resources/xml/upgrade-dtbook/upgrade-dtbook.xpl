@@ -5,13 +5,14 @@
                 exclude-inline-prefixes="#all"
                 type="px:dtbook-upgrade">
 
-    <!-- 
-        TODO: 
-        * copy referenced resources (such as images)
+    <!--
+        FIXME: copy referenced resources (such as images)
     -->
+
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-    	<h1 px:role="name">Upgrade DTBook</h1>
-        <p px:role="desc">Upgrade a DTBook document from version 1.1.0, 2005-1, or 2005-2 to version 2005-3. This module was imported from the Pipeline 1.</p>
+        <h1 px:role="name">Upgrade DTBook</h1>
+        <p px:role="desc">Upgrade a DTBook document from version 1.1.0, 2005-1, or 2005-2 to version
+        2005-3. This module was imported from the Pipeline 1.</p>
         <div px:role="author maintainer">
             <p px:role="name">Marisa DeMeglio</p>
             <a px:role="contact" href="mailto:marisa.demeglio@gmail.com">marisa.demeglio@gmail.com</a>
@@ -19,17 +20,17 @@
         </div>
     </p:documentation>
 
-    <p:input port="source" primary="true" px:name="in" px:media-type="application/x-dtbook+xml">
+    <p:input port="source" primary="true" px:media-type="application/x-dtbook+xml">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-        	<h2 px:role="name">in</h2>
-        	<p px:role="desc">Single DTBook file</p>
+            <h2 px:role="name">in</h2>
+            <p px:role="desc">Single DTBook file</p>
         </p:documentation>
     </p:input>
     <p:input port="parameters" kind="parameter"/>
     <p:output port="result">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-        	<h2 px:role="name">out</h2>
-        	<p px:role="desc">The result</p>
+            <h2 px:role="name">out</h2>
+            <p px:role="desc">The result</p>
         </p:documentation>
     </p:output>
     
