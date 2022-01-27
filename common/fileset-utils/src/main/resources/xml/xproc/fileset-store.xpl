@@ -53,7 +53,7 @@
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>The output fileset is a copy of the input fileset but with <code>original-href</code>
             attributes added (or overwritten) with the same value as <code>href</code>. Missing
-            files are removed if the "fail-or-error" option is not set (default).</p>
+            files are removed if the "fail-on-error" option is not set (default).</p>
         </p:documentation>
         <p:pipe port="result" step="store"/>
     </p:output>
@@ -169,6 +169,10 @@
                 </px:fileset-add-entry>
                 <px:fileset-load/>
                 <p:store cx:decode="true" encoding="base64" name="store-binary">
+                    <!--
+                        Note that if the final target location is a file inside a ZIP, the temporary
+                        location will be a file within a regular directory ending with a '!'.
+                    -->
                     <p:with-option name="href" select="resolve-uri($href,$unzip-dir)"/>
                 </p:store>
                 <p:add-attribute match="/*" attribute-name="original-href">

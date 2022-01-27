@@ -74,8 +74,16 @@
             px:set-base-uri
         </p:documentation>
     </p:import>
-    <p:import href="fileset-join.xpl"/>
-    <p:import href="fileset-apply.xpl"/>
+    <p:import href="fileset-join.xpl">
+        <p:documentation>
+            px:fileset-join
+        </p:documentation>
+    </p:import>
+    <p:import href="fileset-apply.xpl">
+        <p:documentation>
+            px:fileset-apply
+        </p:documentation>
+    </p:import>
 
     <p:documentation>Add xml:base and normalize fileset</p:documentation>
     <p:add-xml-base/>

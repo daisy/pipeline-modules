@@ -556,7 +556,8 @@
         </css:shift-string-set>
         <pxi:shift-obfl-marker px:progress=".15">
             <p:documentation>
-                Move css:_obfl-marker attributes. <!-- depends on make-anonymous-inline-boxes -->
+                Move css:_obfl-marker attributes to inline css:box elements. <!-- depends on
+                make-anonymous-inline-boxes -->
             </p:documentation>
         </pxi:shift-obfl-marker>
     </p:for-each>

@@ -86,7 +86,11 @@
     </p:import>
 
     <p:group name="opf">
-        <p:documentation>Normalize base URI of OPF</p:documentation>
+        <p:documentation>
+          Normalize base URI of OPF
+          <!-- Note that this is only needed for the tests because when called from
+               px:epub3-to-daisy202 the base is already normalized -->
+        </p:documentation>
         <p:output port="result"/>
         <px:fileset-create/>
         <px:fileset-add-entry>

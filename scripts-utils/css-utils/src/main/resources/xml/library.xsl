@@ -114,7 +114,7 @@
 
 	<doc xmlns="http://www.oxygenxml.com/ns/doc/xsl">
 		<desc>
-			<p>Test whether a media query matches a medium..</p>
+			<p>Test whether a media query matches a medium.</p>
 		</desc>
 	</doc>
 	<java:function name="pf:media-query-matches" as="xs:boolean">
