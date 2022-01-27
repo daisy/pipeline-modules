@@ -84,7 +84,7 @@
 
 	<p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
 		<p:documentation>
-			px:log-error
+			px:message
 		</p:documentation>
 	</p:import>
 	<p:import href="http://www.daisy.org/pipeline/modules/epub2-to-epub3/library.xpl">
@@ -210,11 +210,11 @@
 					</p:inline>
 				</p:input>
 			</p:identity>
-			<px:log-error severity="ERROR">
+			<px:message>
 				<p:input port="error">
 					<p:pipe step="catch" port="error"/>
 				</p:input>
-			</px:log-error>
+			</px:message>
 			<p:identity px:message="Failed to convert to DAISY 2.02 and DAISY 3" px:message-severity="ERROR"/>
 		</p:catch>
 	</p:try>
