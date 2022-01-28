@@ -73,9 +73,10 @@
 	<!--
 	    dtbook-to-daisy3
 	    dtbook-to-epub3
+	    epub3-to-epub3
 	    zedai-to-epub3
 	-->
-	<p:option name="include-tts-log" select="'false'">
+	<p:option name="include-tts-log" px:type="boolean" select="'false'">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Enable TTS log</h2>
 			<p px:role="desc">Whether or not to make the TTS log available.</p>

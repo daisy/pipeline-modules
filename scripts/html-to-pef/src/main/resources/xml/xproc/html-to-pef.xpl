@@ -43,6 +43,18 @@ When `include-obfl` is set to true, the conversion may fail but still output a d
     </p:output>
     
     <p:option name="stylesheet" px:sequence="true">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+          <p px:role="desc" xml:space="preserve" px:inherit="prepend">
+
+A number of [partials](https://sass-lang.com/documentation/at-rules/import#partials) (helper style
+sheet modules) are available for use in Sass style sheets:
+
+- [http://www.daisy.org/pipeline/modules/braille/html-to-pef/_tables.scss](http://daisy.github.io/pipeline/modules/braille/html-to-pef/src/main/resources/css/tables):
+  for styling tables
+- [http://www.daisy.org/pipeline/modules/braille/html-to-pef/_definition-lists.scss](http://daisy.github.io/pipeline/modules/braille/html-to-pef/src/main/resources/css/definition-lists):
+  for styling definition lists
+</p>
+        </p:documentation>
         <p:pipeinfo>
             <px:type>
                 <choice>
