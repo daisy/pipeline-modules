@@ -58,7 +58,7 @@
         <p:pipe port="result" step="store"/>
     </p:output>
 
-    <p:option name="fail-on-error" required="false" select="'false'">
+    <p:option name="fail-on-error" required="false" select="false()">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>Whether to ignore missing files or raise an error.</p>
         </p:documentation>
@@ -106,7 +106,7 @@
 
     <p:variable name="fileset-base" select="base-uri(/*)"/>
 
-    <pxi:fileset-fix-original-hrefs name="fix">
+    <pxi:fileset-fix-original-hrefs name="fix" purge="true">
         <p:documentation>
             Make the original-href attributes reflect what is actually stored on disk. Also normalizes
             @xml:base, @href and @original-href, relativizes @href against @xml:base, makes
@@ -116,7 +116,6 @@
             <p:pipe step="main" port="in-memory.in"/>
         </p:input>
         <p:with-option name="fail-on-missing" select="$fail-on-error"/>
-        <p:with-option name="purge" select="'true'"/>
     </pxi:fileset-fix-original-hrefs>
 
     <p:viewport match="d:file">

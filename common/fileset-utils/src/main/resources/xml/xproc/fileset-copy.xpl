@@ -45,7 +45,7 @@
             <p>The target directory.</p>
         </p:documentation>
     </p:option>
-    <p:option name="flatten" cx:as="xs:string" required="false" select="'false'">
+    <p:option name="flatten" cx:as="xs:boolean" required="false" select="false()">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>Move all files to a single directory.</p>
             <p>Renames files when needed to avoid that files would overwrite each other.</p>
@@ -57,7 +57,7 @@
             <p>Only if "flatten" option is set.</p>
         </p:documentation>
     </p:option>
-    <p:option name="dry-run" cx:as="xs:string" required="false" select="'false'">
+    <p:option name="dry-run" cx:as="xs:boolean" required="false" select="false()">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>Don't actually perform the copy operation, only return the list of intended rename
             actions on the "mapping" port.</p>
@@ -93,7 +93,7 @@
 
     <p:documentation>Flatten fileset</p:documentation>
     <p:choose>
-        <p:when test="$flatten='true'">
+        <p:when test="$flatten">
             <p:xslt>
                 <p:input port="stylesheet">
                     <p:document href="../xslt/fileset-flatten.xsl"/>
@@ -141,7 +141,7 @@
     <p:sink/>
 
     <p:choose name="maybe-apply">
-        <p:when test="$dry-run='true'">
+        <p:when test="$dry-run">
             <p:output port="fileset" primary="true"/>
             <p:output port="in-memory" sequence="true">
                 <p:pipe step="main" port="source.in-memory"/>

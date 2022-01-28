@@ -29,7 +29,7 @@
 		<p:pipe step="in-memory-fileset" port="result.in-memory"/>
 	</p:output>
 
-	<p:option name="detect-existing" select="'false'" cx:as="xs:string">
+	<p:option name="detect-existing" select="false()" cx:as="xs:boolean">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>Whether to set original-href attributes of files that exist on disk according to
 			@href. Any existing original-href attributes will be overwritten, so by setting this
@@ -37,12 +37,12 @@
 			documents).</p>
 		</p:documentation>
 	</p:option>
-	<p:option name="fail-on-missing" select="'false'" cx:as="xs:string">
+	<p:option name="fail-on-missing" select="false()" cx:as="xs:boolean">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>Whether to raise an error for files that are neither on disk or exist in memory.</p>
 		</p:documentation>
 	</p:option>
-	<p:option name="purge" select="'false'" cx:as="xs:string">
+	<p:option name="purge" select="false()" cx:as="xs:boolean">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>Whether to remove files that are neither on disk or exist in memory.</p>
 		</p:documentation>
@@ -196,7 +196,7 @@
 			</p:when>
 			<p:otherwise>
 				<p:choose name="href-on-disk">
-					<p:when test="$detect-existing='true'">
+					<p:when test="$detect-existing">
 						<p:output port="result" primary="true"/>
 						<p:output port="on-disk">
 							<p:pipe step="file-on-disk" port="on-disk"/>
@@ -239,12 +239,12 @@
 								            select="concat('Found document in fileset that was declared as being on disk but was neither stored on disk nor in memory: ',
 								                           $original-href)"/>
 								<p:choose>
-									<p:when test="$fail-on-missing='true'">
+									<p:when test="$fail-on-missing">
 										<px:error code="PEZE01">
 											<p:with-option name="message" select="$message"/>
 										</px:error>
 									</p:when>
-									<p:when test="$purge='true'">
+									<p:when test="$purge">
 										<p:identity>
 											<p:input port="source">
 												<p:empty/>
@@ -272,12 +272,12 @@
 						<p:variable name="message"
 						            select="concat('Found document in fileset that is neither stored on disk nor in memory: ', $href)"/>
 						<p:choose>
-							<p:when test="$fail-on-missing='true'">
+							<p:when test="$fail-on-missing">
 								<px:error code="PEZE00">
 									<p:with-option name="message" select="$message"/>
 								</px:error>
 							</p:when>
-							<p:when test="$purge='true'">
+							<p:when test="$purge">
 								<p:identity>
 									<p:input port="source">
 										<p:empty/>

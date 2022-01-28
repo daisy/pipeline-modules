@@ -59,9 +59,9 @@
   <p:option name="media-type" select="''"/>
   <p:option name="ref" select="''"><!-- if relative; will be resolved relative to the file --></p:option>
   <p:option name="original-href" select="''"><!-- if relative; will be resolved relative to the file --></p:option>
-  <p:option name="first" cx:as="xs:string" select="'false'"/>
-  <p:option name="replace" cx:as="xs:string" select="'false'"/>
-  <p:option name="replace-attributes" cx:as="xs:string" select="'false'"/>
+  <p:option name="first" cx:as="xs:boolean" select="false()"/>
+  <p:option name="replace" cx:as="xs:boolean" select="false()"/>
+  <p:option name="replace-attributes" cx:as="xs:boolean" select="false()"/>
 
   <p:input port="file-attributes" kind="parameter" primary="false">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -246,13 +246,13 @@
       </p:input>
     </p:identity>
     <p:choose name="if-present-in-input">
-      <p:when test="not($replace='true') and /*/d:file[@href=$href-normalized]">
+      <p:when test="not($replace) and /*/d:file[@href=$href-normalized]">
         <p:output port="fileset" primary="true"/>
         <p:output port="in-memory" sequence="true">
           <p:pipe step="main" port="source.in-memory"/>
         </p:output>
         <p:choose>
-          <p:when test="$replace-attributes='true'">
+          <p:when test="$replace-attributes">
             <p:set-attributes>
               <p:input port="attributes">
                 <p:pipe step="new-entry" port="result"/>
@@ -274,7 +274,7 @@
           <p:pipe step="in-memory" port="result"/>
         </p:output>
         <p:choose>
-          <p:when test="$replace='true'">
+          <p:when test="$replace">
             <p:delete>
               <p:with-option name="match" select="concat('d:file[@href=&quot;',$href-normalized,'&quot;]')"/>
             </p:delete>
@@ -287,10 +287,10 @@
           <p:input port="insertion">
             <p:pipe port="result" step="new-entry"/>
           </p:input>
-          <p:with-option name="position" select="if ($first='true') then 'first-child' else 'last-child'"/>
+          <p:with-option name="position" select="if ($first) then 'first-child' else 'last-child'"/>
         </p:insert>
         <p:choose>
-          <p:when test="$first='false'">
+          <p:when test="not($first)">
             <p:identity>
               <p:input port="source">
                 <p:pipe step="main" port="source.in-memory"/>
