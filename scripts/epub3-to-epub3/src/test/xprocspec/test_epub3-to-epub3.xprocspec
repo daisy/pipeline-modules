@@ -150,7 +150,11 @@
 							<link rel="prev" href="front.xhtml"/>
 						</head>
 						<body id="chap_1" epub:type="bodymatter chapter">
-							<h1 id="h_1">Chapter <span ssml:ph="wʌn">I</span></h1>
+							<!-- Note that ssml:phoneme is also recognized as an inline element
+							     although it is not officially allowed in EPUB -->
+							<h1 id="h_1">Chapter <span ssml:ph="wʌn">I</span>
+							<ssml:phoneme alphabet="ipa" ph="tuː">two</ssml:phoneme>
+							</h1>
 							<p>
 								This paragraph contains
 								<span id="page_5" class="page-normal" epub:type="pagebreak" title="5"/>
@@ -400,7 +404,8 @@
 						</head>
 						<body id="chap_1" epub:type="bodymatter chapter">
 							<h1 id="h_1">
-								<span id="st3-1">Chapter <span ssml:ph="wʌn">I</span></span>
+								<span id="st3-1">Chapter <span ssml:ph="wʌn">I</span>
+								<ssml:phoneme alphabet="ipa" ph="tuː">two</ssml:phoneme></span>
 							</h1>
 							<p>
 								<span id="st3-2">
@@ -681,7 +686,8 @@
 						</head>
 						<body id="chap_1" epub:type="bodymatter chapter">
 							<h1 id="h_1">
-								<span id="st3-1" class="sentence">Chapter <span ssml:ph="wʌn">I</span></span>
+								<span id="st3-1" class="sentence">Chapter <span ssml:ph="wʌn">I</span>
+								<ssml:phoneme alphabet="ipa" ph="tuː">two</ssml:phoneme></span>
 							</h1>
 							<p>
 								<span id="st3-2" class="sentence">
