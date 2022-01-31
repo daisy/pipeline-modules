@@ -557,7 +557,7 @@
         </p:input>
     </p:insert>
     <p:add-attribute match="/*" attribute-name="lang">
-        <p:with-option name="attribute-value" select="/*/html:head/html:meta[@name='dc:language']/@content"/>
+        <p:with-option name="attribute-value" select="(/*/html:head/html:meta[@name='dc:language']/@content)[1]"/>
     </p:add-attribute>
     <p:identity name="ncc"/>
     <p:sink/>
