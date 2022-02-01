@@ -49,7 +49,6 @@ element in the OPF namespace. If not specified, metadata is extracted from the H
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
         <p:documentation>
-            px:fileset-create
             px:fileset-add-entry
             px:fileset-load
             px:fileset-join
@@ -99,16 +98,15 @@ element in the OPF namespace. If not specified, metadata is extracted from the H
             <p:for-each name="html">
                 <p:output port="result" sequence="true"/>
                 <p:variable name="single-html" select="."/>
-                <px:fileset-create/>
                 <px:fileset-add-entry media-type="application/xhtml+xml">
+                    <p:input port="source">
+                        <p:inline><d:fileset/></p:inline>
+                    </p:input>
                     <p:with-option name="href" select="$single-html"/>
                 </px:fileset-add-entry>
-                <px:fileset-load/>
-            </p:for-each>
-            <p:for-each>
-                <px:html-load/>
             </p:for-each>
             <px:fileset-join/>
+            <px:html-load/>
         </p:group>
 
         <px:html-to-epub3 name="convert">

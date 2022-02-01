@@ -7,18 +7,26 @@
                script="../../main/resources/xml/xproc/html-load.xpl">
 
 	<x:scenario label="For a regular document">
-		<x:call step="px:html-load"/>
+		<x:call step="px:html-load">
+			<x:input port="source.fileset">
+				<x:document type="inline">
+					<d:fileset>
+						<d:file href="file:/example/doc.html" media-type="application/xhtml+xml"/>
+					</d:fileset>
+				</x:document>
+			</x:input>
+		</x:call>
 
 		<x:scenario label="the base URI of the HTML document is set to the fileset">
 			<x:call>
-				<x:input port="source">
+				<x:input port="source.in-memory">
 					<x:document type="inline" xml:base="file:/example/doc.html">
 						<html/>
 					</x:document>
 				</x:input>
 			</x:call>
-			<x:context label="result">
-				<x:document type="port" port="result"/>
+			<x:context label="result.fileset">
+				<x:document type="port" port="result.fileset"/>
 			</x:context>
 			<x:expect type="compare" label="result">
 				<x:document type="inline">
@@ -31,7 +39,7 @@
 
 		<x:scenario label="non-resources text nodes and attributes are ignored">
 			<x:call>
-				<x:input port="source">
+				<x:input port="source.in-memory">
 					<x:document type="inline" xml:base="file:/example/doc.html">
 						<html>
 							<p class="foo">bar</p>
@@ -39,8 +47,8 @@
 					</x:document>
 				</x:input>
 			</x:call>
-			<x:context label="result">
-				<x:document type="port" port="result"/>
+			<x:context label="result.fileset">
+				<x:document type="port" port="result.fileset"/>
 			</x:context>
 			<x:expect type="compare" label="result">
 				<x:document type="inline">
@@ -53,11 +61,19 @@
 	</x:scenario>
 
 	<x:scenario label="'img' element">
-		<x:call step="px:html-load"/>
+		<x:call step="px:html-load">
+			<x:input port="source.fileset">
+				<x:document type="inline">
+					<d:fileset>
+						<d:file href="file:/example/doc.html" media-type="application/xhtml+xml"/>
+					</d:fileset>
+				</x:document>
+			</x:input>
+		</x:call>
 
 		<x:scenario label="with no @src">
 			<x:call>
-				<x:input port="source">
+				<x:input port="source.in-memory">
 					<x:document type="inline" xml:base="file:/example/doc.html">
 						<html>
 							<img/>
@@ -65,8 +81,8 @@
 					</x:document>
 				</x:input>
 			</x:call>
-			<x:context label="result">
-				<x:document type="port" port="result"/>
+			<x:context label="result.fileset">
+				<x:document type="port" port="result.fileset"/>
 			</x:context>
 			<x:expect type="compare" label="result">
 				<x:document type="inline">
@@ -79,7 +95,7 @@
 
 		<x:scenario label="with an empty @src">
 			<x:call>
-				<x:input port="source">
+				<x:input port="source.in-memory">
 					<x:document type="inline" xml:base="file:/example/doc.html">
 						<html>
 							<img src=""/>
@@ -87,8 +103,8 @@
 					</x:document>
 				</x:input>
 			</x:call>
-			<x:context label="result">
-				<x:document type="port" port="result"/>
+			<x:context label="result.fileset">
+				<x:document type="port" port="result.fileset"/>
 			</x:context>
 			<x:expect type="compare" label="result">
 				<x:document type="inline">
@@ -101,7 +117,7 @@
 
 		<x:scenario label="with a relative URI">
 			<x:call>
-				<x:input port="source">
+				<x:input port="source.in-memory">
 					<x:document type="inline" xml:base="file:/example/doc.html">
 						<html>
 							<img src="my-image.png" xml:base="file:/example/images/"/>
@@ -109,8 +125,8 @@
 					</x:document>
 				</x:input>
 			</x:call>
-			<x:context label="result">
-				<x:document type="port" port="result"/>
+			<x:context label="result.fileset">
+				<x:document type="port" port="result.fileset"/>
 			</x:context>
 			<x:expect type="compare" label="result">
 				<x:document type="inline">
@@ -125,7 +141,7 @@
 
 		<x:scenario label="with an absolute file URI">
 			<x:call>
-				<x:input port="source">
+				<x:input port="source.in-memory">
 					<x:document type="inline" xml:base="file:/example/doc.html">
 						<html>
 							<img src="file:/example/my-image.png"/>
@@ -133,8 +149,8 @@
 					</x:document>
 				</x:input>
 			</x:call>
-			<x:context label="result">
-				<x:document type="port" port="result"/>
+			<x:context label="result.fileset">
+				<x:document type="port" port="result.fileset"/>
 			</x:context>
 			<x:expect type="compare" label="result">
 				<x:document type="inline">
@@ -149,7 +165,7 @@
 
 		<x:scenario label="with a 'data' URI">
 			<x:call>
-				<x:input port="source">
+				<x:input port="source.in-memory">
 					<x:document type="inline" xml:base="file:/example/doc.html">
 						<html>
 							<img src="data:image/png;base64,ABCDEFG"/>
@@ -157,8 +173,8 @@
 					</x:document>
 				</x:input>
 			</x:call>
-			<x:context label="result">
-				<x:document type="port" port="result"/>
+			<x:context label="result.fileset">
+				<x:document type="port" port="result.fileset"/>
 			</x:context>
 			<x:expect type="compare" label="result">
 				<x:document type="inline">
@@ -171,7 +187,7 @@
 
 		<x:scenario label="with an absolute remote URI">
 			<x:call>
-				<x:input port="source">
+				<x:input port="source.in-memory">
 					<x:document type="inline" xml:base="file:/example/doc.html">
 						<html>
 							<img src="http:/www.example.org/my-image.png"/>
@@ -179,8 +195,8 @@
 					</x:document>
 				</x:input>
 			</x:call>
-			<x:context label="result">
-				<x:document type="port" port="result"/>
+			<x:context label="result.fileset">
+				<x:document type="port" port="result.fileset"/>
 			</x:context>
 			<x:expect type="compare" label="result">
 				<x:document type="inline">
@@ -193,11 +209,19 @@
 	</x:scenario>
 
 	<x:scenario label="'longdesc' attribute">
-		<x:call step="px:html-load"/>
+		<x:call step="px:html-load">
+			<x:input port="source.fileset">
+				<x:document type="inline">
+					<d:fileset>
+						<d:file href="file:/example/doc.html" media-type="application/xhtml+xml"/>
+					</d:fileset>
+				</x:document>
+			</x:input>
+		</x:call>
 
 		<x:scenario label="pointing to an external resource">
 			<x:call>
-				<x:input port="source">
+				<x:input port="source.in-memory">
 					<x:document type="inline" xml:base="file:/example/doc.html">
 						<html>
 							<img src="my-image.png" xml:base="file:/example/images/" longdesc="desc.xml"/>
@@ -205,8 +229,8 @@
 					</x:document>
 				</x:input>
 			</x:call>
-			<x:context label="result">
-				<x:document type="port" port="result"/>
+			<x:context label="result.fileset">
+				<x:document type="port" port="result.fileset"/>
 			</x:context>
 			<x:expect type="compare" label="result">
 				<x:document type="inline">
@@ -223,7 +247,7 @@
 
 		<x:scenario label="pointing to local content">
 			<x:call>
-				<x:input port="source">
+				<x:input port="source.in-memory">
 					<x:document type="inline" xml:base="file:/example/doc.html">
 						<html>
 							<img src="my-image.png" xml:base="file:/my-base/" longdesc="#foo"/>
@@ -231,8 +255,8 @@
 					</x:document>
 				</x:input>
 			</x:call>
-			<x:context label="result">
-				<x:document type="port" port="result"/>
+			<x:context label="result.fileset">
+				<x:document type="port" port="result.fileset"/>
 			</x:context>
 			<x:expect type="compare" label="result">
 				<x:document type="inline">
@@ -247,11 +271,19 @@
 	</x:scenario>
 
 	<x:scenario label="'aria-descrbedat' attribute">
-		<x:call step="px:html-load"/>
+		<x:call step="px:html-load">
+			<x:input port="source.fileset">
+				<x:document type="inline">
+					<d:fileset>
+						<d:file href="file:/example/doc.html" media-type="application/xhtml+xml"/>
+					</d:fileset>
+				</x:document>
+			</x:input>
+		</x:call>
 
 		<x:scenario label="on an image">
 			<x:call>
-				<x:input port="source">
+				<x:input port="source.in-memory">
 					<x:document type="inline" xml:base="file:/example/doc.html">
 						<html>
 							<img src="my-image.png" xml:base="file:/example/images/"
@@ -260,8 +292,8 @@
 					</x:document>
 				</x:input>
 			</x:call>
-			<x:context label="result">
-				<x:document type="port" port="result"/>
+			<x:context label="result.fileset">
+				<x:document type="port" port="result.fileset"/>
 			</x:context>
 			<x:expect type="compare" label="result">
 				<x:document type="inline">
@@ -278,7 +310,7 @@
 
 		<x:scenario label="on any element">
 			<x:call>
-				<x:input port="source">
+				<x:input port="source.in-memory">
 					<x:document type="inline" xml:base="file:/example/doc.html">
 						<html>
 							<span xml:base="file:/example/images/" aria-describedat="desc.xml"/>
@@ -286,8 +318,8 @@
 					</x:document>
 				</x:input>
 			</x:call>
-			<x:context label="result">
-				<x:document type="port" port="result"/>
+			<x:context label="result.fileset">
+				<x:document type="port" port="result.fileset"/>
 			</x:context>
 			<x:expect type="compare" label="result">
 				<x:document type="inline">
@@ -303,7 +335,14 @@
 
 	<x:scenario label="nested structure">
 		<x:call step="px:html-load">
-			<x:input port="source">
+			<x:input port="source.fileset">
+				<x:document type="inline">
+					<d:fileset>
+						<d:file href="file:/example/doc.html" media-type="application/xhtml+xml"/>
+					</d:fileset>
+				</x:document>
+			</x:input>
+			<x:input port="source.in-memory">
 				<x:document type="inline" xml:base="file:/example/doc.html">
 					<html>
 						<a href="#">
@@ -313,8 +352,8 @@
 				</x:document>
 			</x:input>
 		</x:call>
-		<x:context label="result">
-			<x:document type="port" port="result"/>
+		<x:context label="result.fileset">
+			<x:document type="port" port="result.fileset"/>
 		</x:context>
 		<x:expect type="compare" label="result">
 			<x:document type="inline">
@@ -329,8 +368,16 @@
 
 	<x:scenario label="various">
 		<x:call step="px:html-load">
-			<x:input port="source">
+			<x:input port="source.fileset">
 				<x:document type="inline">
+					<d:fileset>
+						<d:file href="doc.html" media-type="application/xhtml+xml"/>
+						<d:file href="foo.css" media-type="text/css"/>
+					</d:fileset>
+				</x:document>
+			</x:input>
+			<x:input port="source.in-memory">
+				<x:document type="inline" xml:base="doc.html">
 					<html xmlns="http://www.w3.org/1999/xhtml">
 						<head>
 							<meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type"/>
@@ -347,15 +394,6 @@
 						</body>
 					</html>
 				</x:document>
-			</x:input>
-			<x:input port="context.fileset">
-				<x:document type="inline">
-					<d:fileset>
-						<d:file href="foo.css" media-type="text/css"/>
-					</d:fileset>
-				</x:document>
-			</x:input>
-			<x:input port="context.in-memory">
 				<x:document type="inline" xml:base="foo.css">
 					<c:data content-type="text/plain">
 						@font-face {
@@ -367,14 +405,14 @@
 			</x:input>
 		</x:call>
 		<x:context label="the fileset">
-			<x:document type="port" port="result"/>
+			<x:document type="port" port="result.fileset"/>
 		</x:context>
 		<x:expect label="the fileset"
 		          type="custom" href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"
 		          step="x:fileset-compare">
 			<x:document type="inline">
 				<d:fileset>
-					<d:file href="test_html-load.xprocspec" media-type="application/xhtml+xml"/>
+					<d:file href="doc.html" media-type="application/xhtml+xml"/>
 					<d:file href="foo.css" media-type="text/css"/>
 					<d:file href="font.ttf" original-href="font.ttf" media-type="application/x-font-ttf"/>
 					<d:file href="img.png" original-href="img.png" media-type="image/png" kind="image"/>
@@ -386,17 +424,15 @@
 
 	<x:scenario label="xml-stylesheet instruction">
 		<x:call step="px:html-load">
-			<x:input port="source">
-				<x:document type="file" href="../resources/html-with-xml-stylesheet-processing-instruction.xml"/>
-			</x:input>
-			<x:input port="context.fileset">
+			<x:input port="source.fileset">
 				<x:document type="inline">
 					<d:fileset>
-						<d:file href="foo.css" media-type="text/css"/>
+						<d:file href="../resources/html-with-xml-stylesheet-processing-instruction.xml" media-type="application/xhtml+xml"/>
+						<d:file href="../resources/foo.css" media-type="text/css"/>
 					</d:fileset>
 				</x:document>
 			</x:input>
-			<x:input port="context.in-memory">
+			<x:input port="source.in-memory">
 				<x:document type="inline" xml:base="../resources/foo.css">
 					<c:data content-type="text/plain">
 						@font-face {
@@ -408,7 +444,7 @@
 			</x:input>
 		</x:call>
 		<x:context label="the fileset">
-			<x:document type="port" port="result"/>
+			<x:document type="port" port="result.fileset"/>
 		</x:context>
 		<x:expect label="the fileset"
 		          type="custom" href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"

@@ -15,9 +15,7 @@
   </p:documentation>
 
   <p:input port="source" primary="true">
-    <p:inline exclude-inline-prefixes="#all">
-      <d:fileset/>
-    </p:inline>
+    <p:inline exclude-inline-prefixes="#all"><d:fileset/></p:inline>
   </p:input>
   <p:input port="source.in-memory" sequence="true">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
