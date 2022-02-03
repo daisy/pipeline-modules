@@ -13,9 +13,13 @@ import org.json.JSONObject;
 public class GoogleRequestBuilder {
 
 	/**
+	 * Google API address
+	 */
+	private final String serverAddress;
+	/**
 	 * Google API key
 	 */
-	private String apiKey;
+	private final String apiKey;
 
 	/**
 	 * Encoding sample rate (if null, uses the default encoding)
@@ -32,8 +36,9 @@ public class GoogleRequestBuilder {
 	 *
 	 * @param apiKey the API key to access google services (to create from your google cloud console API identifiers)
 	 */
-	public GoogleRequestBuilder(String apiKey) {
+	public GoogleRequestBuilder(String serverAddress, String apiKey) {
 		this.apiKey = apiKey;
+		this.serverAddress = serverAddress;
 	}
 
 	/**
@@ -92,7 +97,7 @@ public class GoogleRequestBuilder {
 	 * @return a new builder to use for building a request
 	 */
 	public GoogleRequestBuilder newRequest() {
-		return new GoogleRequestBuilder(apiKey);
+		return new GoogleRequestBuilder(serverAddress, apiKey);
 	}
 
 	/**
@@ -144,7 +149,7 @@ public class GoogleRequestBuilder {
 
 		return new Request<JSONObject>(
 			action.method,
-			"https://texttospeech.googleapis.com" + action.domain + "?key=" + apiKey,
+			serverAddress + action.domain + "?key=" + apiKey,
 			headers,
 			parameters);
 	}

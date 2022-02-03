@@ -50,12 +50,12 @@ public class GoogleRestTTSEngine extends TTSEngine {
 
 	private static final URL ssmlTransformer = URLs.getResourceFromJAR("/transform-ssml.xsl", GoogleRestTTSEngine.class);
 
-	public GoogleRestTTSEngine(GoogleTTSService googleService, String apiKey, AudioFormat audioFormat, int priority) {
+	public GoogleRestTTSEngine(GoogleTTSService googleService, String serverAddress, String apiKey, AudioFormat audioFormat, int priority) {
 		super(googleService);
 		mPriority = priority;
 		mAudioFormat = audioFormat;
 		mRequestScheduler = new ExponentialBackoffScheduler<Schedulable>();
-		mRequestBuilder = new GoogleRequestBuilder(apiKey);
+		mRequestBuilder = new GoogleRequestBuilder(serverAddress, apiKey);
 	}
 
 	@Override
