@@ -1,9 +1,7 @@
 package org.daisy.pipeline.braille.dotify.impl;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.net.URI;
@@ -34,7 +32,7 @@ import org.daisy.pipeline.braille.common.calabash.CxEvalBasedTransformer;
 import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.logCreate;
 import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.logSelect;
 import org.daisy.pipeline.braille.common.BrailleTranslator;
-import org.daisy.pipeline.braille.common.BrailleTranslatorProvider;
+import org.daisy.pipeline.braille.common.BrailleTranslatorRegistry;
 import org.daisy.pipeline.braille.common.Query;
 import org.daisy.pipeline.braille.common.Query.Feature;
 import org.daisy.pipeline.braille.common.Query.MutableQuery;
@@ -42,7 +40,7 @@ import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.query;
 import org.daisy.pipeline.braille.common.Transform;
 import org.daisy.pipeline.braille.common.TransformProvider;
-import org.daisy.pipeline.braille.pef.TableProvider;
+import org.daisy.pipeline.braille.pef.TableRegistry;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -99,14 +97,14 @@ public interface DotifyCSSStyledDocumentTransform {
 						q.removeOnly("force-pre-translation");
 					}
 					Query textTransformQuery = mutableQuery(q).add("input", "text-css").add("output", "braille");
-					if (logSelect(textTransformQuery, brailleTranslatorProvider).apply(null).iterator().hasNext()) {
+					if (logSelect(textTransformQuery, translatorRegistry).apply(null).iterator().hasNext()) {
 						MutableQuery blockTransformQuery = null; {
 							// only pre-translate if an intermediary OBFL with braille content is requested
 							if (obfl && braille || forcePretranslation) {
 								blockTransformQuery = mutableQuery(q).add("input", "css")
 								                                     .add("output", "css")
 								                                     .add("output", "braille");
-								if (!logSelect(blockTransformQuery, brailleTranslatorProvider).iterator().hasNext())
+								if (!logSelect(blockTransformQuery, translatorRegistry).iterator().hasNext())
 									return empty;
 							}
 						}
@@ -172,12 +170,12 @@ public interface DotifyCSSStyledDocumentTransform {
 												v = m.get().asObject();
 												if (v instanceof String) {
 													try {
-														Table previewTable = tableProvider.get(query((String)v)).iterator().next();
+														Table previewTable = tableRegistry.get(query((String)v)).iterator().next();
 														// Check if the output charset of the braille translator can be
 														// set to this table. If not, ignore preview-table.
 														MutableQuery q = mutableQuery(textTransformQuery).add("braille-charset",
 														                                                      previewTable.getIdentifier());
-														if (logSelect(q, brailleTranslatorProvider).iterator().hasNext()) {
+														if (logSelect(q, translatorRegistry).iterator().hasNext()) {
 															q.removeAll("document-locale");
 															options = new HashMap<>(); {
 																options.putAll(TransformImpl.this.options);
@@ -226,49 +224,30 @@ public interface DotifyCSSStyledDocumentTransform {
 		}
 		
 		@Reference(
-			name = "BrailleTranslatorProvider",
-			unbind = "unbindBrailleTranslatorProvider",
-			service = BrailleTranslatorProvider.class,
-			cardinality = ReferenceCardinality.MULTIPLE,
-			policy = ReferencePolicy.DYNAMIC
+			name = "BrailleTranslatorRegistry",
+			unbind = "-",
+			service = BrailleTranslatorRegistry.class,
+			cardinality = ReferenceCardinality.MANDATORY,
+			policy = ReferencePolicy.STATIC
 		)
-		@SuppressWarnings(
-			"unchecked" // safe cast to BrailleTranslatorProvider<BrailleTranslator>
-		)
-		public void bindBrailleTranslatorProvider(BrailleTranslatorProvider<?> provider) {
-			brailleTranslatorProviders.add((BrailleTranslatorProvider<BrailleTranslator>)provider);
+		protected void bindBrailleTranslatorRegistry(BrailleTranslatorRegistry registry) {
+			translatorRegistry = registry;
 		}
 		
-		public void unbindBrailleTranslatorProvider(BrailleTranslatorProvider<?> provider) {
-			brailleTranslatorProviders.remove(provider);
-			brailleTranslatorProvider.invalidateCache();
-		}
-	
-		private List<BrailleTranslatorProvider<BrailleTranslator>> brailleTranslatorProviders
-			= new ArrayList<BrailleTranslatorProvider<BrailleTranslator>>();
-		private TransformProvider.util.MemoizingProvider<BrailleTranslator> brailleTranslatorProvider
-			= TransformProvider.util.memoize(TransformProvider.util.dispatch(brailleTranslatorProviders));
+		private BrailleTranslatorRegistry translatorRegistry;
 		
 		@Reference(
-			name = "TableProvider",
-			unbind = "removeTableProvider",
-			service = TableProvider.class,
-			cardinality = ReferenceCardinality.MULTIPLE,
-			policy = ReferencePolicy.DYNAMIC
+			name = "TableRegistry",
+			unbind = "-",
+			service = TableRegistry.class,
+			cardinality = ReferenceCardinality.MANDATORY,
+			policy = ReferencePolicy.STATIC
 		)
-		protected void addTableProvider(TableProvider provider) {
-			tableProviders.add(provider);
+		protected void bindTableRegistry(TableRegistry registry) {
+			tableRegistry = registry;
 		}
 		
-		protected void removeTableProvider(TableProvider provider) {
-			tableProviders.remove(provider);
-			this.tableProvider.invalidateCache();
-		}
-		
-		private List<TableProvider> tableProviders = new ArrayList<TableProvider>();
-		private org.daisy.pipeline.braille.common.Provider.util.MemoizingProvider<Query,Table> tableProvider
-			= org.daisy.pipeline.braille.common.Provider.util.memoize(
-				org.daisy.pipeline.braille.common.Provider.util.dispatch(tableProviders));
+		private TableRegistry tableRegistry;
 		
 		@Override
 		public ToStringHelper toStringHelper() {

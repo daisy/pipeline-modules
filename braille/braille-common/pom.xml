@@ -81,6 +81,8 @@
     <expose-services>
       org.daisy.pipeline.modules.impl.Module_braille_common,
       org.daisy.pipeline.datatypes.impl.Datatype_transform_query,
+      org.daisy.pipeline.braille.common.BrailleTranslatorRegistry,
+      org.daisy.pipeline.braille.common.HyphenatorRegistry,
       org.daisy.pipeline.braille.common.saxon.impl.TextTransformDefinition,
       org.daisy.pipeline.braille.common.calabash.impl.PxParseQueryStep$StepProvider,
       org.daisy.pipeline.braille.common.calabash.impl.PxTransformStep$StepProvider,

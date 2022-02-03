@@ -113,6 +113,7 @@ public class LibhyphenCoreTest extends AbstractTest {
 	
 	@ProbeBuilder
 	public TestProbeBuilder probeConfiguration(TestProbeBuilder probe) {
+		// needed because it can not be generated with maven-bundle-plugin
 		probe.setHeader("Service-Component", "OSGI-INF/table-path.xml");
 		return probe;
 	}

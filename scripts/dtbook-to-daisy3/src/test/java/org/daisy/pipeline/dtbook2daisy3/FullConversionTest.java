@@ -151,6 +151,7 @@ public class FullConversionTest extends AbstractTest implements DifferenceListen
 	@ProbeBuilder
 	public TestProbeBuilder probeConfiguration(TestProbeBuilder probe) {
 		probe.setHeader("Bundle-Name", "DTBook TTS MOCK");
+		// needed because it can not be generated with maven-bundle-plugin
 		probe.setHeader("Service-Component", "OSGI-INF/module.xml");
 		probe.setHeader("SPI-Consumer", "javax.xml.parsers.SAXParserFactory#newInstance");
 		return probe;

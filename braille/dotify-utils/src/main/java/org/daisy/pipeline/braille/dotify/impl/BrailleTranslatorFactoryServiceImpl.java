@@ -39,15 +39,12 @@ import org.daisy.dotify.api.translator.TranslatorConfigurationException;
 import org.daisy.dotify.api.translator.TranslatorSpecification;
 
 import org.daisy.pipeline.braille.common.AbstractBrailleTranslator.util.DefaultLineBreaker;
-import org.daisy.pipeline.braille.common.BrailleTranslatorProvider;
+import org.daisy.pipeline.braille.common.BrailleTranslatorRegistry;
 import org.daisy.pipeline.braille.common.CSSStyledText;
-import org.daisy.pipeline.braille.common.Provider;
-import static org.daisy.pipeline.braille.common.Provider.util.memoize;
 import org.daisy.pipeline.braille.common.Query;
 import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.query;
 import static org.daisy.pipeline.braille.common.Query.util.QUERY;
-import static org.daisy.pipeline.braille.common.Provider.util.dispatch;
 import org.daisy.pipeline.braille.css.CounterStyle;
 
 import org.osgi.service.component.annotations.Component;
@@ -67,31 +64,18 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 	public void setCreatedWithSPI() {}
 	
 	@Reference(
-		name = "BrailleTranslatorProvider",
-		unbind = "unbindBrailleTranslatorProvider",
-		service = BrailleTranslatorProvider.class,
-		cardinality = ReferenceCardinality.MULTIPLE,
-		policy = ReferencePolicy.DYNAMIC
+		name = "BrailleTranslatorRegistry",
+		unbind = "-",
+		service = BrailleTranslatorRegistry.class,
+		cardinality = ReferenceCardinality.MANDATORY,
+		policy = ReferencePolicy.STATIC
 	)
-	@SuppressWarnings(
-		"unchecked" // safe cast to BrailleTranslatorProvider<BrailleTranslator>
-	)
-	protected void bindBrailleTranslatorProvider(BrailleTranslatorProvider<?> provider) {
-		brailleTranslatorProviders.add((BrailleTranslatorProvider<org.daisy.pipeline.braille.common.BrailleTranslator>)provider);
-		logger.debug("Adding BrailleTranslator provider: {}", provider);
+	protected void bindBrailleTranslatorRegistry(BrailleTranslatorRegistry registry) {
+		translatorRegistry = registry;
+		logger.debug("Binding BrailleTranslator registry: {}", registry);
 	}
 	
-	protected void unbindBrailleTranslatorProvider(BrailleTranslatorProvider<?> provider) {
-		brailleTranslatorProviders.remove(provider);
-		brailleTranslatorProvider.invalidateCache();
-		logger.debug("Removing BrailleTranslator provider: {}", provider);
-	}
-	
-	private final List<BrailleTranslatorProvider<org.daisy.pipeline.braille.common.BrailleTranslator>> brailleTranslatorProviders
-	= new ArrayList<BrailleTranslatorProvider<org.daisy.pipeline.braille.common.BrailleTranslator>>();
-	
-	private final Provider.util.MemoizingProvider<Query,org.daisy.pipeline.braille.common.BrailleTranslator> brailleTranslatorProvider
-	= memoize(dispatch(brailleTranslatorProviders));
+	private BrailleTranslatorRegistry translatorRegistry;
 	
 	public boolean supportsSpecification(String locale, String mode) {
 		try {
@@ -124,7 +108,7 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 			Query query = query(mode);
 			if (locale != null && !"und".equals(locale))
 				query = mutableQuery(query).add("document-locale", locale);
-			for (org.daisy.pipeline.braille.common.BrailleTranslator t : brailleTranslatorProvider.get(query))
+			for (org.daisy.pipeline.braille.common.BrailleTranslator t : translatorRegistry.get(query))
 				try {
 					return new BrailleTranslatorFromBrailleTranslator(mode, t.lineBreakingFromStyledText()); }
 				catch (UnsupportedOperationException e) {}

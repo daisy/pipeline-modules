@@ -49,7 +49,6 @@ import static org.daisy.pipeline.braille.common.util.Files.normalize;
 import static org.daisy.pipeline.braille.common.util.Strings.join;
 import org.daisy.pipeline.braille.common.WithSideEffect;
 import org.daisy.pipeline.braille.liblouis.LiblouisTable;
-import org.daisy.pipeline.braille.liblouis.LiblouisTableResolver;
 import org.daisy.pipeline.datatypes.DatatypeService;
 import org.daisy.pipeline.datatypes.ValidationResult;
 

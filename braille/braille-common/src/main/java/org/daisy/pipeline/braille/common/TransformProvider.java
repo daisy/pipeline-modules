@@ -49,7 +49,7 @@ public interface TransformProvider<T extends Transform> extends Provider<Query,T
 			return new MemoizeFromProvider<T>(provider);
 		}
 		
-		private static abstract class Memoize<T extends Transform>
+		public static abstract class Memoize<T extends Transform>
 				extends Provider.util.Memoize<Query,T> implements MemoizingProvider<T> {
 			
 			private Map<Logger,TransformProvider<T>> providerCache = new HashMap<Logger,TransformProvider<T>>();

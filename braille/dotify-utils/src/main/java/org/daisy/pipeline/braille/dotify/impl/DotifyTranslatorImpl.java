@@ -36,14 +36,12 @@ import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.l
 import org.daisy.pipeline.braille.common.BrailleTranslatorProvider;
 import org.daisy.pipeline.braille.common.CSSStyledText;
 import org.daisy.pipeline.braille.common.Hyphenator;
-import org.daisy.pipeline.braille.common.HyphenatorProvider;
+import org.daisy.pipeline.braille.common.HyphenatorRegistry;
 import org.daisy.pipeline.braille.common.Query;
 import org.daisy.pipeline.braille.common.Query.Feature;
 import org.daisy.pipeline.braille.common.Query.MutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
 import org.daisy.pipeline.braille.common.TransformProvider;
-import static org.daisy.pipeline.braille.common.TransformProvider.util.dispatch;
-import static org.daisy.pipeline.braille.common.TransformProvider.util.memoize;
 import static org.daisy.pipeline.braille.common.TransformProvider.util.varyLocale;
 import static org.daisy.pipeline.braille.common.util.Locales.parseLocale;
 import static org.daisy.pipeline.braille.common.util.Strings.join;
@@ -224,7 +222,7 @@ public class DotifyTranslatorImpl extends AbstractBrailleTranslator implements D
 											if (!"auto".equals(hyphenator))
 												hyphenatorQuery.add("hyphenator", hyphenator);
 											hyphenatorQuery.add("locale", documentLocale != null ? documentLocale : locale);
-											Iterable<Hyphenator> hyphenators = logSelect(hyphenatorQuery, hyphenatorProvider);
+											Iterable<Hyphenator> hyphenators = logSelect(hyphenatorQuery, hyphenatorRegistry);
 											translators = Iterables.transform(
 												hyphenators,
 												new Function<Hyphenator,DotifyTranslator>() {
@@ -274,33 +272,19 @@ public class DotifyTranslatorImpl extends AbstractBrailleTranslator implements D
 			invalidateCache();
 		}
 		
+		private HyphenatorRegistry hyphenatorRegistry;
+		
 		@Reference(
-			name = "HyphenatorProvider",
-			unbind = "unbindHyphenatorProvider",
-			service = HyphenatorProvider.class,
-			cardinality = ReferenceCardinality.MULTIPLE,
-			policy = ReferencePolicy.DYNAMIC
+			name = "HyphenatorRegistry",
+			unbind = "-",
+			service = HyphenatorRegistry.class,
+			cardinality = ReferenceCardinality.MANDATORY,
+			policy = ReferencePolicy.STATIC
 		)
-		@SuppressWarnings(
-			"unchecked" // safe cast to TransformProvider<Hyphenator>
-		)
-		protected void bindHyphenatorProvider(HyphenatorProvider<?> provider) {
-			hyphenatorProviders.add((TransformProvider<Hyphenator>)provider);
-			hyphenatorProvider.invalidateCache();
-			logger.debug("Adding Hyphenator provider: " + provider);
+		protected void bindHyphenatorRegistry(HyphenatorRegistry registry) {
+			hyphenatorRegistry = registry;
+			logger.debug("Binding hyphenator registry: " + registry);
 		}
-		
-		protected void unbindHyphenatorProvider(HyphenatorProvider<?> provider) {
-			hyphenatorProviders.remove(provider);
-			hyphenatorProvider.invalidateCache();
-			logger.debug("Removing Hyphenator provider: " + provider);
-		}
-		
-		private List<TransformProvider<Hyphenator>> hyphenatorProviders
-		= new ArrayList<TransformProvider<Hyphenator>>();
-		
-		private TransformProvider.util.MemoizingProvider<Hyphenator> hyphenatorProvider
-		= memoize(dispatch(hyphenatorProviders));
 		
 		@Override
 		public ToStringHelper toStringHelper() {

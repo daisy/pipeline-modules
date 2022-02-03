@@ -43,17 +43,13 @@ public class HyphenateDefinition extends ExtensionFunctionDefinition {
 	
 	@Reference(
 		name = "TexHyphenatorProvider",
-		unbind = "unbindHyphenatorProvider",
+		unbind = "-",
 		service = TexHyphenator.Provider.class,
 		cardinality = ReferenceCardinality.MANDATORY,
 		policy = ReferencePolicy.STATIC
 	)
 	protected void bindHyphenatorProvider(TexHyphenator.Provider provider) {
 		this.provider = provider;
-	}
-	
-	protected void unbindHyphenatorProvider(TexHyphenator.Provider provider) {
-		this.provider = null;
 	}
 	
 	public StructuredQName getFunctionQName() {

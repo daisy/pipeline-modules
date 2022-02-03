@@ -1,7 +1,5 @@
 package org.daisy.pipeline.braille.pef.saxon.impl;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 import net.sf.saxon.expr.XPathContext;
@@ -15,12 +13,9 @@ import net.sf.saxon.value.SequenceType;
 import net.sf.saxon.value.StringValue;
 
 import org.daisy.dotify.api.table.Table;
-import org.daisy.pipeline.braille.common.Provider;
-import static org.daisy.pipeline.braille.common.Provider.util.dispatch;
-import static org.daisy.pipeline.braille.common.Provider.util.memoize;
 import org.daisy.pipeline.braille.common.Query;
 import static org.daisy.pipeline.braille.common.Query.util.query;
-import org.daisy.pipeline.braille.pef.TableProvider;
+import org.daisy.pipeline.braille.pef.TableRegistry;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -37,23 +32,17 @@ public class GetTableIdDefinition extends ExtensionFunctionDefinition {
 			"http://www.daisy.org/ns/2008/pef", "get-table-id");
 	
 	@Reference(
-		name = "TableProvider",
-		unbind = "unbindTableProvider",
-		service = TableProvider.class,
-		cardinality = ReferenceCardinality.MULTIPLE,
-		policy = ReferencePolicy.DYNAMIC
+		name = "TableRegistry",
+		unbind = "-",
+		service = TableRegistry.class,
+		cardinality = ReferenceCardinality.MANDATORY,
+		policy = ReferencePolicy.STATIC
 	)
-	protected void bindTableProvider(TableProvider provider) {
-		tableProviders.add(provider);
+	protected void bindTableRegistry(TableRegistry registry) {
+		tableRegistry = registry;
 	}
 	
-	protected void unbindTableProvider(TableProvider provider) {
-		tableProviders.remove(provider);
-		this.tableProvider.invalidateCache();
-	}
-	
-	private final List<TableProvider> tableProviders = new ArrayList<TableProvider>();
-	private Provider.util.MemoizingProvider<Query,Table> tableProvider = memoize(dispatch(tableProviders));
+	private TableRegistry tableRegistry;
 	
 	@Override
 	public StructuredQName getFunctionQName() {
@@ -89,7 +78,7 @@ public class GetTableIdDefinition extends ExtensionFunctionDefinition {
 					Query tableQuery = query(arguments[0].head().getStringValue());
 					Table table;
 					try {
-						table = tableProvider.get(tableQuery).iterator().next(); }
+						table = tableRegistry.get(tableQuery).iterator().next(); }
 					catch (NoSuchElementException e) {
 						return EmptySequence.getInstance(); }
 					return new StringValue(table.getIdentifier()); }

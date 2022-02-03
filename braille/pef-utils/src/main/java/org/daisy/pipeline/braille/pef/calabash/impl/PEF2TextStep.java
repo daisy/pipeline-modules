@@ -11,8 +11,6 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -38,13 +36,11 @@ import org.daisy.common.xproc.calabash.XProcStep;
 import org.daisy.common.xproc.calabash.XProcStepProvider;
 import org.daisy.dotify.api.embosser.EmbosserWriter;
 import org.daisy.dotify.api.embosser.FileFormat;
-import static org.daisy.pipeline.braille.common.Provider.util.dispatch;
-import static org.daisy.pipeline.braille.common.Provider.util.memoize;
 import org.daisy.pipeline.braille.common.Query;
 import org.daisy.pipeline.braille.common.Query.MutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.query;
-import org.daisy.pipeline.braille.pef.FileFormatProvider;
+import org.daisy.pipeline.braille.pef.FileFormatRegistry;
 
 import org.xml.sax.SAXException;
 
@@ -68,15 +64,15 @@ public class PEF2TextStep extends DefaultStep implements XProcStep {
 	private static final QName _number_width = new QName("number-width");
 	private static final QName _single_volume_name = new QName("single-volume-name");
 	
-	private final org.daisy.pipeline.braille.common.Provider<Query,FileFormat> fileFormatProvider;
+	private final FileFormatRegistry fileFormatRegistry;
 	
 	private ReadablePipe source = null;
 	
 	private PEF2TextStep(XProcRuntime runtime,
 	                     XAtomicStep step,
-	                     org.daisy.pipeline.braille.common.Provider<Query,FileFormat> fileFormatProvider) {
+	                     FileFormatRegistry fileFormatRegistry) {
 		super(runtime, step);
-		this.fileFormatProvider = fileFormatProvider;
+		this.fileFormatRegistry = fileFormatRegistry;
 	}
 	
 	@Override
@@ -100,7 +96,7 @@ public class PEF2TextStep extends DefaultStep implements XProcStep {
 		addOption(_pad, q);
 		addOption(_charset, q);
 		logger.debug("Finding file format for query: " + q);
-		Iterable<FileFormat> fileFormats = fileFormatProvider.get(q);
+		Iterable<FileFormat> fileFormats = fileFormatRegistry.get(q);
 		if (!fileFormats.iterator().hasNext()) {
 			throw new XProcException(step, "No file format found for query: " + q); }
 		for (FileFormat fileFormat : fileFormats) {
@@ -230,28 +226,21 @@ public class PEF2TextStep extends DefaultStep implements XProcStep {
 		
 		@Override
 		public XProcStep newStep(XProcRuntime runtime, XAtomicStep step) {
-			return new PEF2TextStep(runtime, step, fileFormatProvider);
+			return new PEF2TextStep(runtime, step, fileFormatRegistry);
 		}
 		
 		@Reference(
-			name = "FileFormatProvider",
-			unbind = "unbindFileFormatProvider",
-			service = FileFormatProvider.class,
-			cardinality = ReferenceCardinality.MULTIPLE,
-			policy = ReferencePolicy.DYNAMIC
+			name = "FileFormatRegistry",
+			unbind = "-",
+			service = FileFormatRegistry.class,
+			cardinality = ReferenceCardinality.MANDATORY,
+			policy = ReferencePolicy.STATIC
 		)
-		protected void bindFileFormatProvider(FileFormatProvider provider) {
-			fileFormatProviders.add(provider);
+		protected void bindFileFormatRegistry(FileFormatRegistry registry) {
+			fileFormatRegistry = registry;
 		}
 		
-		protected void unbindFileFormatProvider(FileFormatProvider provider) {
-			fileFormatProviders.remove(provider);
-			this.fileFormatProvider.invalidateCache();
-		}
-		
-		private List<FileFormatProvider> fileFormatProviders = new ArrayList<FileFormatProvider>();
-		private org.daisy.pipeline.braille.common.Provider.util.MemoizingProvider<Query,FileFormat> fileFormatProvider
-		= memoize(dispatch(fileFormatProviders));
+		private FileFormatRegistry fileFormatRegistry;
 		
 	}
 	

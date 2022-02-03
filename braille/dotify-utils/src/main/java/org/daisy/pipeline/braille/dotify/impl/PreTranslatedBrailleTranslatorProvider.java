@@ -9,14 +9,12 @@ import org.daisy.dotify.api.table.Table;
 import org.daisy.pipeline.braille.common.AbstractTransformProvider;
 import org.daisy.pipeline.braille.common.BrailleTranslator;
 import org.daisy.pipeline.braille.common.BrailleTranslatorProvider;
-import static org.daisy.pipeline.braille.common.Provider.util.dispatch;
-import static org.daisy.pipeline.braille.common.Provider.util.memoize;
 import org.daisy.pipeline.braille.common.Query;
 import org.daisy.pipeline.braille.common.Query.MutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
 import org.daisy.pipeline.braille.common.UnityBrailleTranslator;
 import static org.daisy.pipeline.braille.common.util.Locales.parseLocale;
-import org.daisy.pipeline.braille.pef.TableProvider;
+import org.daisy.pipeline.braille.pef.TableRegistry;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -67,7 +65,7 @@ public class PreTranslatedBrailleTranslatorProvider extends AbstractTransformPro
 				return AbstractTransformProvider.util.Iterables.of(
 					new UnityBrailleTranslator(
 						brailleCharset != null
-							? tableProvider.get(mutableQuery().add("id", brailleCharset))
+							? tableRegistry.get(mutableQuery().add("id", brailleCharset))
 							               .iterator().next()
 							               .newBrailleConverter()
 							: null,
@@ -79,23 +77,16 @@ public class PreTranslatedBrailleTranslatorProvider extends AbstractTransformPro
 		return AbstractTransformProvider.util.Iterables.<BrailleTranslator>empty();
 	}
 
-	private final List<TableProvider> tableProviders = new ArrayList<TableProvider>();
-	private final org.daisy.pipeline.braille.common.Provider.util.MemoizingProvider<Query,Table> tableProvider
-		= memoize(dispatch(tableProviders));
+	private TableRegistry tableRegistry;
 
 	@Reference(
-		name = "TableProvider",
-		unbind = "removeTableProvider",
-		service = TableProvider.class,
-		cardinality = ReferenceCardinality.MULTIPLE,
-		policy = ReferencePolicy.DYNAMIC
+		name = "TableRegistry",
+		unbind = "-",
+		service = TableRegistry.class,
+		cardinality = ReferenceCardinality.MANDATORY,
+		policy = ReferencePolicy.STATIC
 	)
-	protected void addTableProvider(TableProvider provider) {
-		tableProviders.add(provider);
-	}
-
-	protected void removeTableProvider(TableProvider provider) {
-		tableProviders.remove(provider);
-		this.tableProvider.invalidateCache();
+	protected void bindTableRegistry(TableRegistry registry) {
+		tableRegistry = registry;
 	}
 }

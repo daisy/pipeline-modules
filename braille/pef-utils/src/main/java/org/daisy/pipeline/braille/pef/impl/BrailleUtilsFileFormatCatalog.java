@@ -21,16 +21,13 @@ import org.daisy.dotify.api.factory.FactoryProperties;
 import org.daisy.dotify.api.table.Table;
 import org.daisy.dotify.api.table.TableFilter;
 
-import static org.daisy.pipeline.braille.common.Provider.util.dispatch;
-import static org.daisy.pipeline.braille.common.Provider.util.memoize;
 import static org.daisy.pipeline.braille.common.util.Locales.parseLocale;
-import org.daisy.pipeline.braille.common.Provider.util.MemoizingProvider;
 import org.daisy.pipeline.braille.common.Query;
 import org.daisy.pipeline.braille.common.Query.Feature;
 import org.daisy.pipeline.braille.common.Query.MutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
 import org.daisy.pipeline.braille.pef.FileFormatProvider;
-import org.daisy.pipeline.braille.pef.TableProvider;
+import org.daisy.pipeline.braille.pef.TableRegistry;
 
 import org.osgi.framework.FrameworkUtil;
 
@@ -72,17 +69,17 @@ public class BrailleUtilsFileFormatCatalog implements FileFormatProvider {
 					catch (IllegalArgumentException e) {
 						locale = null; }}
 				table = locale != null
-					? concat(tableProvider.get(mutableQuery().add("locale", locale)),
-					         tableProvider.get(mutableQuery().add("id", id)))
-					: tableProvider.get(mutableQuery().add("id", id)); }
+					? concat(tableRegistry.get(mutableQuery().add("locale", locale)),
+					         tableRegistry.get(mutableQuery().add("id", id)))
+					: tableRegistry.get(mutableQuery().add("id", id)); }
 			else if (q.containsKey("locale")) {
 				Feature locale = q.removeOnly("locale");
 				MutableQuery tableQuery = mutableQuery();
 				tableQuery.add(locale);
-				table = tableProvider.get(tableQuery); }
+				table = tableRegistry.get(tableQuery); }
 			else if (documentLocale != null) {
 				Query tableQuery = mutableQuery().add("locale", documentLocale);
-				table = tableProvider.get(tableQuery); }
+				table = tableRegistry.get(tableQuery); }
 			else
 				table = Collections.singleton(null); }
 		return concat(
@@ -102,7 +99,7 @@ public class BrailleUtilsFileFormatCatalog implements FileFormatProvider {
 											if (table != null && "locale".equals(f.getKey())) {
 												String locale = f.getValue().get();
 												boolean match = false;
-												for (Table t : tableProvider.get(mutableQuery().add("locale", locale)))
+												for (Table t : tableRegistry.get(mutableQuery().add("locale", locale)))
 													if (t.equals(table)) {
 														match = true;
 														break; }
@@ -184,24 +181,17 @@ public class BrailleUtilsFileFormatCatalog implements FileFormatProvider {
 		embosserProviders.remove(provider);
 	}
 		
-	private List<TableProvider> tableProviders = new ArrayList<TableProvider>();
-	private MemoizingProvider<Query,Table> tableProvider
-	= memoize(dispatch(tableProviders));
+	private TableRegistry tableRegistry;
 	
 	@Reference(
-		name = "TableProvider",
-		unbind = "removeTableProvider",
-		service = TableProvider.class,
-		cardinality = ReferenceCardinality.MULTIPLE,
-		policy = ReferencePolicy.DYNAMIC
+		name = "TableRegistry",
+		unbind = "-",
+		service = TableRegistry.class,
+		cardinality = ReferenceCardinality.MANDATORY,
+		policy = ReferencePolicy.STATIC
 	)
-	protected void addTableProvider(TableProvider provider) {
-		tableProviders.add(provider);
-	}
-		
-	protected void removeTableProvider(TableProvider provider) {
-		tableProviders.remove(provider);
-		this.tableProvider.invalidateCache();
+	protected void bindTableRegistry(TableRegistry registry) {
+		tableRegistry = registry;
 	}
 	
 	private static class EmbosserAsFileFormat implements FileFormat {

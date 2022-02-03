@@ -48,17 +48,15 @@ import org.daisy.dotify.api.writer.PagedMediaWriter;
 import org.daisy.dotify.api.writer.PagedMediaWriterConfigurationException;
 
 import org.daisy.pipeline.braille.common.BrailleTranslator;
-import org.daisy.pipeline.braille.common.BrailleTranslatorProvider;
+import org.daisy.pipeline.braille.common.BrailleTranslatorRegistry;
 import org.daisy.pipeline.braille.common.CompoundBrailleTranslator;
-import static org.daisy.pipeline.braille.common.Provider.util.dispatch;
-import static org.daisy.pipeline.braille.common.Provider.util.memoize;
 import org.daisy.pipeline.braille.common.Query;
 import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.query;
 import org.daisy.pipeline.braille.common.TextTransformParser;
 import org.daisy.pipeline.braille.common.util.Function0;
 import org.daisy.pipeline.braille.common.util.Functions;
-import org.daisy.pipeline.braille.pef.TableProvider;
+import org.daisy.pipeline.braille.pef.TableRegistry;
 
 import org.osgi.framework.FrameworkUtil;
 
@@ -103,8 +101,8 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 	private final FormatterFactory formatterFactory;
 	private final ObflParserFactoryService obflParserFactoryService;
 	private final TextBorderFactoryService textBorderFactoryService;
-	private final org.daisy.pipeline.braille.common.Provider<Query,BrailleTranslator> brailleTranslatorProvider;
-	private final org.daisy.pipeline.braille.common.Provider<Query,Table> tableProvider;
+	private final BrailleTranslatorRegistry brailleTranslatorRegistry;
+	private final TableRegistry tableRegistry;
 	private final TemporaryBrailleTranslatorProvider temporaryBrailleTranslatorProvider;
 	
 	public OBFLToPEFStep(XProcRuntime runtime,
@@ -113,16 +111,16 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 	                     FormatterFactory formatterFactory,
 	                     ObflParserFactoryService obflParserFactoryService,
 	                     TextBorderFactoryService textBorderFactoryService,
-	                     org.daisy.pipeline.braille.common.Provider<Query,BrailleTranslator> brailleTranslatorProvider,
-	                     org.daisy.pipeline.braille.common.Provider<Query,Table> tableProvider,
+	                     BrailleTranslatorRegistry brailleTranslatorRegistry,
+	                     TableRegistry tableRegistry,
 	                     TemporaryBrailleTranslatorProvider temporaryBrailleTranslatorProvider) {
 		super(runtime, step);
 		this.formatterEngineFactoryService = formatterEngineFactoryService;
 		this.formatterFactory = formatterFactory;
 		this.obflParserFactoryService = obflParserFactoryService;
 		this.textBorderFactoryService = textBorderFactoryService;
-		this.brailleTranslatorProvider = brailleTranslatorProvider;
-		this.tableProvider = tableProvider;
+		this.brailleTranslatorRegistry = brailleTranslatorRegistry;
+		this.tableRegistry = tableRegistry;
 		if (temporaryBrailleTranslatorProvider == null) throw new IllegalStateException();
 		this.temporaryBrailleTranslatorProvider = temporaryBrailleTranslatorProvider;
 	}
@@ -197,7 +195,7 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 					mainQuery = mutableQuery(mainQuery).add("document-locale", locale);
 				BrailleTranslator mainTranslator;
 				try {
-					mainTranslator = brailleTranslatorProvider.get(mainQuery).iterator().next();
+					mainTranslator = brailleTranslatorRegistry.get(mainQuery).iterator().next();
 				} catch (NoSuchElementException e) {
 					throw new XProcException(
 						step.getNode(),
@@ -214,7 +212,7 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 						Query defaultQuery = subQueries.remove("auto");
 						if (defaultQuery != null && !defaultQuery.equals(mainQuery))
 							try {
-								defaultTranslator = brailleTranslatorProvider.get(defaultQuery).iterator().next();
+								defaultTranslator = brailleTranslatorRegistry.get(defaultQuery).iterator().next();
 							} catch (NoSuchElementException e) {
 								throw new XProcException(
 									step.getNode(), "No translator available for " + defaultQuery + "");
@@ -223,7 +221,7 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 							Map<String,Supplier<BrailleTranslator>> subTranslators
 								= Maps.transformValues(
 									subQueries,
-									q -> () -> brailleTranslatorProvider.get(q).iterator().next());
+									q -> () -> brailleTranslatorRegistry.get(q).iterator().next());
 							BrailleTranslator compoundTranslator = new CompoundBrailleTranslator(defaultTranslator, subTranslators);
 							evictTempTranslator = temporaryBrailleTranslatorProvider.provideTemporarily(compoundTranslator);
 							mode = mutableQuery().add("id", compoundTranslator.getIdentifier()).toString();
@@ -273,7 +271,7 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 				config.ignoreStyle("em").ignoreStyle("strong");
 			Table brailleCharsetTable = "".equals(brailleCharset)
 				? null
-				: tableProvider.get(mutableQuery().add("id", brailleCharset)).iterator().next();
+				: tableRegistry.get(mutableQuery().add("id", brailleCharset)).iterator().next();
 			FormatterEngine engine = newFormatterEngine(config.build(),
 			                                            newPEFWriter(identifier, brailleCharsetTable),
 			                                            brailleCharsetTable == null
@@ -385,8 +383,8 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 			                         formatterFactory,
 			                         obflParserFactoryService,
 			                         textBorderFactoryService,
-			                         brailleTranslatorProvider,
-			                         tableProvider,
+			                         brailleTranslatorRegistry,
+			                         tableRegistry,
 			                         temporaryBrailleTranslatorProvider);
 		}
 		
@@ -475,28 +473,18 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 			textBorderFactoryService = service;
 		}
 		
-		private final List<BrailleTranslatorProvider<BrailleTranslator>> brailleTranslatorProviders
-			= new ArrayList<BrailleTranslatorProvider<BrailleTranslator>>();
-		private final org.daisy.pipeline.braille.common.Provider.util.MemoizingProvider<Query,BrailleTranslator> brailleTranslatorProvider
-			= memoize(dispatch(brailleTranslatorProviders));
+		private BrailleTranslatorRegistry brailleTranslatorRegistry;
 		
 		@Reference(
-			name = "BrailleTranslatorProvider",
-			unbind = "unbindBrailleTranslatorProvider",
-			service = BrailleTranslatorProvider.class,
-			cardinality = ReferenceCardinality.MULTIPLE,
-			policy = ReferencePolicy.DYNAMIC
+			name = "BrailleTranslatorRegistry",
+			unbind = "-",
+			service = BrailleTranslatorRegistry.class,
+			cardinality = ReferenceCardinality.MANDATORY,
+			policy = ReferencePolicy.STATIC
 		)
-		@SuppressWarnings(
-			"unchecked" // safe cast to BrailleTranslatorProvider<BrailleTranslator>
-		)
-		protected void bindBrailleTranslatorProvider(BrailleTranslatorProvider<?> provider) {
-			brailleTranslatorProviders.add((BrailleTranslatorProvider<BrailleTranslator>)provider);
-		}
-
-		protected void unbindBrailleTranslatorProvider(BrailleTranslatorProvider<?> provider) {
-			brailleTranslatorProviders.remove(provider);
-			brailleTranslatorProvider.invalidateCache();
+		protected void bindBrailleTranslatorRegistry(BrailleTranslatorRegistry registry) {
+			brailleTranslatorRegistry = registry;
+			logger.debug("Binding BrailleTranslator registry: {}", registry);
 		}
 
 		private TemporaryBrailleTranslatorProvider temporaryBrailleTranslatorProvider = null;
@@ -511,24 +499,17 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 			temporaryBrailleTranslatorProvider = provider;
 		}
 		
-		private final List<TableProvider> tableProviders = new ArrayList<TableProvider>();
-		private final org.daisy.pipeline.braille.common.Provider.util.MemoizingProvider<Query,Table> tableProvider
-			= memoize(dispatch(tableProviders));
+		private TableRegistry tableRegistry;
 		
 		@Reference(
-			name = "TableProvider",
-			unbind = "removeTableProvider",
-			service = TableProvider.class,
-			cardinality = ReferenceCardinality.MULTIPLE,
-			policy = ReferencePolicy.DYNAMIC
+			name = "TableRegistry",
+			unbind = "-",
+			service = TableRegistry.class,
+			cardinality = ReferenceCardinality.MANDATORY,
+			policy = ReferencePolicy.STATIC
 		)
-		protected void addTableProvider(TableProvider provider) {
-			tableProviders.add(provider);
-		}
-		
-		protected void removeTableProvider(TableProvider provider) {
-			tableProviders.remove(provider);
-			this.tableProvider.invalidateCache();
+		protected void bindTableRegistry(TableRegistry registry) {
+			tableRegistry = registry;
 		}
 	}
 	

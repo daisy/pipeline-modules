@@ -19,13 +19,10 @@ import net.sf.saxon.value.StringValue;
 
 import org.daisy.pipeline.braille.common.BrailleTranslator;
 import org.daisy.pipeline.braille.common.BrailleTranslator.FromStyledTextToBraille;
-import org.daisy.pipeline.braille.common.BrailleTranslatorProvider;
+import org.daisy.pipeline.braille.common.BrailleTranslatorRegistry;
 import org.daisy.pipeline.braille.common.CSSStyledText;
-import org.daisy.pipeline.braille.common.Provider;
-import static org.daisy.pipeline.braille.common.Provider.util.memoize;
 import org.daisy.pipeline.braille.common.Query;
 import static org.daisy.pipeline.braille.common.Query.util.query;
-import static org.daisy.pipeline.braille.common.TransformProvider.util.dispatch;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -46,31 +43,18 @@ public class TextTransformDefinition extends ExtensionFunctionDefinition {
 			"http://www.daisy.org/ns/pipeline/functions", "text-transform");
 	
 	@Reference(
-		name = "BrailleTranslatorProvider",
-		unbind = "unbindBrailleTranslatorProvider",
-		service = BrailleTranslatorProvider.class,
-		cardinality = ReferenceCardinality.MULTIPLE,
-		policy = ReferencePolicy.DYNAMIC
+		name = "BrailleTranslatorRegistry",
+		unbind = "-",
+		service = BrailleTranslatorRegistry.class,
+		cardinality = ReferenceCardinality.MANDATORY,
+		policy = ReferencePolicy.STATIC
 	)
-	@SuppressWarnings(
-		"unchecked" // safe cast to BrailleTranslatorProvider<BrailleTranslator>
-	)
-	protected void bindBrailleTranslatorProvider(BrailleTranslatorProvider<?> provider) {
-		providers.add((BrailleTranslatorProvider<BrailleTranslator>)provider);
-		logger.debug("Adding BrailleTranslator provider: {}", provider);
+	protected void bindBrailleTranslatorRegistry(BrailleTranslatorRegistry registry) {
+		translatorRegistry = registry;
+		logger.debug("Binding BrailleTranslator registry: {}", registry);
 	}
 	
-	protected void unbindBrailleTranslatorProvider(BrailleTranslatorProvider<?> provider) {
-		providers.remove(provider);
-		translators.invalidateCache();
-		logger.debug("Removing BrailleTranslator provider: {}", provider);
-	}
-	
-	private List<BrailleTranslatorProvider<BrailleTranslator>> providers
-	= new ArrayList<BrailleTranslatorProvider<BrailleTranslator>>();
-	
-	private Provider.util.MemoizingProvider<Query,BrailleTranslator> translators
-	= memoize(dispatch(providers));
+	private BrailleTranslatorRegistry translatorRegistry;
 	
 	public StructuredQName getFunctionQName() {
 		return funcname;
@@ -124,7 +108,7 @@ public class TextTransformDefinition extends ExtensionFunctionDefinition {
 					else
 						for (int i = 0; i < text.size(); i++)
 							styledText.add(new CSSStyledText(text.get(i)));
-					for (BrailleTranslator t : translators.get(query)) {
+					for (BrailleTranslator t : translatorRegistry.get(query)) {
 						FromStyledTextToBraille fsttb;
 						try {
 							fsttb = t.fromStyledTextToBraille(); }

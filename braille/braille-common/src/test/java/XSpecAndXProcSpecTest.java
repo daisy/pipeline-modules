@@ -24,6 +24,7 @@ public class XSpecAndXProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 	
 	@ProbeBuilder
 	public TestProbeBuilder probeConfiguration(TestProbeBuilder probe) {
+		// needed because it can not be generated with maven-bundle-plugin
 		probe.setHeader("Service-Component", "OSGI-INF/uppercase-transform-provider.xml");
 		return probe;
 	}

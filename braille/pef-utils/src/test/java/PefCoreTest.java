@@ -10,21 +10,18 @@ import org.daisy.pipeline.braille.common.Query;
 import org.daisy.pipeline.braille.common.Query.MutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.query;
-import org.daisy.pipeline.braille.pef.FileFormatProvider;
-import org.daisy.pipeline.braille.pef.TableProvider;
+import org.daisy.pipeline.braille.pef.FileFormatRegistry;
+import org.daisy.pipeline.braille.pef.TableRegistry;
 
 import org.daisy.pipeline.junit.AbstractTest;
 
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
-import org.ops4j.pax.exam.ProbeBuilder;
-import org.ops4j.pax.exam.TestProbeBuilder;
-
 public class PefCoreTest extends AbstractTest {
 	
 	@Inject
-	public DispatchingTableProvider tableProvider;
+	public TableRegistry tableProvider;
 	
 	@Test
 	public void testBrailleUtilsTableCatalog() {
@@ -47,7 +44,7 @@ public class PefCoreTest extends AbstractTest {
 	}
 	
 	@Inject
-	public DispatchingFileFormatProvider formatProvider;
+	public FileFormatRegistry formatProvider;
 	
 	@Test
 	public void testBrailleUtilsFileFormatCatalog() {
@@ -80,12 +77,5 @@ public class PefCoreTest extends AbstractTest {
 			// dependencies causes stax2-api to be excluded too
 			"org.codehaus.woodstox:stax2-api:jar:?",
 		};
-	}
-	
-	@ProbeBuilder
-	public TestProbeBuilder probeConfiguration(TestProbeBuilder probe) {
-		probe.setHeader("Service-Component", "OSGI-INF/dispatching-table-provider.xml,"
-		                                   + "OSGI-INF/dispatching-file-format-provider.xml");
-		return probe;
 	}
 }

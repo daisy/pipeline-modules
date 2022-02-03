@@ -39,7 +39,7 @@ public class XSpecAndXProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 	@ProbeBuilder
 	public TestProbeBuilder probeConfiguration(TestProbeBuilder probe) {
 		probe.setHeader("Bundle-Name", "test-module");
-		// FIXME: can not delete this yet because it can not be generated with maven-bundle-plugin
+		// needed because it can not be generated with maven-bundle-plugin
 		probe.setHeader("Service-Component", "OSGI-INF/table-path.xml");
 		return probe;
 	}

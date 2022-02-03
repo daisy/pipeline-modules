@@ -52,14 +52,12 @@ import org.daisy.pipeline.braille.common.CompoundBrailleTranslator;
 import org.daisy.pipeline.braille.common.CSSStyledText;
 import org.daisy.pipeline.braille.common.Hyphenator;
 import org.daisy.pipeline.braille.common.Hyphenator.NonStandardHyphenationException;
-import org.daisy.pipeline.braille.common.HyphenatorProvider;
+import org.daisy.pipeline.braille.common.HyphenatorRegistry;
 import org.daisy.pipeline.braille.common.Query;
 import org.daisy.pipeline.braille.common.Query.Feature;
 import org.daisy.pipeline.braille.common.Query.MutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
 import org.daisy.pipeline.braille.common.TransformProvider;
-import static org.daisy.pipeline.braille.common.TransformProvider.util.memoize;
-import static org.daisy.pipeline.braille.common.TransformProvider.util.dispatch;
 import org.daisy.pipeline.braille.common.UnityBrailleTranslator;
 import static org.daisy.pipeline.braille.common.util.Locales.parseLocale;
 import static org.daisy.pipeline.braille.common.util.Strings.extractHyphens;
@@ -129,38 +127,20 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 	protected void unbindLiblouisTableJnaImplProvider(LiblouisTableJnaImplProvider provider) {
 		tableProvider = null;
 	}
-	
+
 	@Reference(
-		name = "HyphenatorProvider",
-		unbind = "unbindHyphenatorProvider",
-		service = HyphenatorProvider.class,
-		cardinality = ReferenceCardinality.MULTIPLE,
-		policy = ReferencePolicy.DYNAMIC
+		name = "HyphenatorRegistry",
+		unbind = "-",
+		service = HyphenatorRegistry.class,
+		cardinality = ReferenceCardinality.MANDATORY,
+		policy = ReferencePolicy.STATIC
 	)
-	@SuppressWarnings(
-		"unchecked" // safe cast to TransformProvider<Hyphenator>
-	)
-	protected void bindHyphenatorProvider(HyphenatorProvider<?> provider) {
-		if (provider instanceof LiblouisHyphenatorJnaImplProvider)
-			return;
-		hyphenatorProviders.add((TransformProvider<Hyphenator>)provider);
-		hyphenatorProvider.invalidateCache();
-		logger.debug("Adding Hyphenator provider: " + provider);
+	protected void bindHyphenatorRegistry(HyphenatorRegistry registry) {
+		hyphenatorRegistry = registry;
+		logger.debug("Binding hyphenator registry: " + registry);
 	}
 	
-	protected void unbindHyphenatorProvider(HyphenatorProvider<?> provider) {
-		if (provider instanceof LiblouisHyphenatorJnaImplProvider)
-			return;
-		hyphenatorProviders.remove(provider);
-		hyphenatorProvider.invalidateCache();
-		logger.debug("Removing Hyphenator provider: " + provider);
-	}
-	
-	private List<TransformProvider<Hyphenator>> hyphenatorProviders
-	= new ArrayList<TransformProvider<Hyphenator>>();
-	
-	private TransformProvider.util.MemoizingProvider<Hyphenator> hyphenatorProvider
-	= memoize(dispatch(hyphenatorProviders));
+	private HyphenatorRegistry hyphenatorRegistry;
 	
 	private final static Iterable<LiblouisTranslator> empty
 	= Iterables.<LiblouisTranslator>empty();
@@ -269,13 +249,13 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 									hyphenatorQuery.add("hyphenator", hyphenator);
 								if (documentLocale != null)
 									hyphenatorQuery.add("locale", documentLocale);
-								Iterable<Hyphenator> hyphenators = logSelect(hyphenatorQuery.asImmutable(), hyphenatorProvider);
+								Iterable<Hyphenator> hyphenators = logSelect(hyphenatorQuery.asImmutable(), hyphenatorRegistry);
 								if (documentLocale != null && !"auto".equals(hyphenator)) {
 									// also search without locale because "hyphenator" feature might be an ID
 									hyphenatorQuery.removeAll("locale");
 									hyphenators = concat(
 										hyphenators,
-										logSelect(hyphenatorQuery.asImmutable(), hyphenatorProvider)); }
+										logSelect(hyphenatorQuery.asImmutable(), hyphenatorRegistry)); }
 								translators = concat(
 									translators,
 									transform(

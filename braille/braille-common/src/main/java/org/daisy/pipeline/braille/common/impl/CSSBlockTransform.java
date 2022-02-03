@@ -1,7 +1,5 @@
 package org.daisy.pipeline.braille.common.impl;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.net.URI;
 import javax.xml.namespace.QName;
@@ -31,6 +29,7 @@ import org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Function
 import org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Iterables;
 import org.daisy.pipeline.braille.common.BrailleTranslator;
 import org.daisy.pipeline.braille.common.BrailleTranslatorProvider;
+import org.daisy.pipeline.braille.common.BrailleTranslatorRegistry;
 import org.daisy.pipeline.braille.common.calabash.CxEvalBasedTransformer;
 import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Iterables.transform;
 import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.logCreate;
@@ -42,8 +41,6 @@ import org.daisy.pipeline.braille.common.Query.MutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
 import org.daisy.pipeline.braille.common.TextTransformParser;
 import org.daisy.pipeline.braille.common.TransformProvider;
-import static org.daisy.pipeline.braille.common.TransformProvider.util.dispatch;
-import static org.daisy.pipeline.braille.common.TransformProvider.util.memoize;
 import org.daisy.pipeline.braille.common.util.Function0;
 import org.daisy.pipeline.braille.common.util.Functions;
 
@@ -102,7 +99,7 @@ public interface CSSBlockTransform {
 			q.add("input", "text-css");
 			if (braille)
 				q.add("output", "braille");
-			Iterable<BrailleTranslator> translators = logSelect(q, translatorProvider);
+			Iterable<BrailleTranslator> translators = logSelect(q, translatorRegistry);
 			return transform(
 				translators,
 				new Function<BrailleTranslator,BrailleTranslator>() {
@@ -162,12 +159,12 @@ public interface CSSBlockTransform {
 										BrailleTranslator defaultTranslator = mainTranslator;
 										Query defaultQuery = subTranslators.remove("auto");
 										if (!forceMainTranslator && defaultQuery != null && !defaultQuery.equals(mainQuery))
-											defaultTranslator = translatorProvider.get(defaultQuery).iterator().next();
+											defaultTranslator = translatorRegistry.get(defaultQuery).iterator().next();
 										compoundTranslator = new CompoundBrailleTranslator(
 											defaultTranslator,
 											Maps.transformValues(
 												subTranslators,
-												q -> () -> translatorProvider.get(q).iterator().next()));
+												q -> () -> translatorRegistry.get(q).iterator().next()));
 										evictTempTranslator = Provider.this.provideTemporarily(compoundTranslator);
 									} else {
 										compoundTranslator = mainTranslator;
@@ -214,30 +211,21 @@ public interface CSSBlockTransform {
 			return TextTransformParser.getBrailleTranslatorQueries(style, baseURI, baseQuery);
 		}
 		
+		// FIXME: should ideally bind BrailleTranslatorRegistry, but does not work because
+		// BrailleTranslatorRegistry binds BrailleTranslatorProvider, which CSSBlockTransform
+		// implements (so there's a cyclic dependency)
 		@Reference(
 			name = "BrailleTranslatorProvider",
-			unbind = "unbindBrailleTranslatorProvider",
+			unbind = "-",
 			service = BrailleTranslatorProvider.class,
 			cardinality = ReferenceCardinality.MULTIPLE,
-			policy = ReferencePolicy.DYNAMIC
-		)
-		@SuppressWarnings(
-			"unchecked" // safe cast
+			policy = ReferencePolicy.STATIC
 		)
 		protected void bindBrailleTranslatorProvider(BrailleTranslatorProvider<?> provider) {
-			translatorProviders.add((BrailleTranslatorProvider<BrailleTranslator>)provider);
-			logger.debug("Adding BrailleTranslator provider: {}", provider);
+			translatorRegistry.addProvider(provider);
 		}
 		
-		protected void unbindBrailleTranslatorProvider(BrailleTranslatorProvider<?> provider) {
-			translatorProviders.remove(provider);
-			translatorProvider.invalidateCache();
-			logger.debug("Removing BrailleTranslator provider: {}", provider);
-		}
-		
-		private List<BrailleTranslatorProvider<BrailleTranslator>> translatorProviders = new ArrayList<>();
-		private TransformProvider.util.MemoizingProvider<BrailleTranslator> translatorProvider
-		= memoize(dispatch(translatorProviders));
+		private BrailleTranslatorRegistry translatorRegistry = new BrailleTranslatorRegistry();
 		
 		private static final Logger logger = LoggerFactory.getLogger(Provider.class);
 		

@@ -1,12 +1,14 @@
+package org.daisy.pipeline.braille.pef;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.daisy.dotify.api.table.Table;
 
 import org.daisy.pipeline.braille.common.Provider;
-import org.daisy.pipeline.braille.common.Provider.util.Dispatch;
+import static org.daisy.pipeline.braille.common.Provider.util.dispatch;
+import org.daisy.pipeline.braille.common.Provider.util.Memoize;
 import org.daisy.pipeline.braille.common.Query;
-import org.daisy.pipeline.braille.pef.TableProvider;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -14,12 +16,13 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 
 @Component(
-	name = "dispatching-table-provider",
-	service = { DispatchingTableProvider.class }
+	name = "table-registry",
+	service = { TableRegistry.class }
 )
-public class DispatchingTableProvider extends Dispatch<Query,Table> {
+public class TableRegistry extends Memoize<Query,Table> implements TableProvider {
 	
-	private List<Provider<Query,Table>> dispatch = new ArrayList<Provider<Query,Table>>();
+	private List<Provider<Query,Table>> providers = new ArrayList<Provider<Query,Table>>();
+	private Provider<Query,Table> dispatch = dispatch(providers);
 	
 	@Reference(
 		name = "TableProvider",
@@ -29,10 +32,10 @@ public class DispatchingTableProvider extends Dispatch<Query,Table> {
 		policy = ReferencePolicy.STATIC
 	)
 	public void addProvider(TableProvider p) {
-		dispatch.add(p);
+		providers.add(p);
 	}
 	
-	public Iterable<Provider<Query,Table>> dispatch() {
-		return dispatch;
+	public Iterable<Table> _get(Query q) {
+		return dispatch.get(q);
 	}
 }

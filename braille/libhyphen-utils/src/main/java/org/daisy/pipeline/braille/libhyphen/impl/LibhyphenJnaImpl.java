@@ -34,7 +34,6 @@ import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.I
 import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.logCreate;
 import org.daisy.pipeline.braille.common.HyphenatorProvider;
 import org.daisy.pipeline.braille.common.NativePath;
-import org.daisy.pipeline.braille.common.ResourceResolver;
 import org.daisy.pipeline.braille.common.Query;
 import org.daisy.pipeline.braille.common.Query.MutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
@@ -48,8 +47,6 @@ import static org.daisy.pipeline.braille.common.util.Strings.splitInclDelimiter;
 import org.daisy.pipeline.braille.common.util.Tuple2;
 import org.daisy.pipeline.braille.common.WithSideEffect;
 import org.daisy.pipeline.braille.libhyphen.LibhyphenHyphenator;
-import org.daisy.pipeline.braille.libhyphen.LibhyphenTableProvider;
-import org.daisy.pipeline.braille.libhyphen.LibhyphenTableResolver;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -80,8 +77,7 @@ public class LibhyphenJnaImpl extends AbstractTransformProvider<LibhyphenHyphena
 	private final static char SHY = '\u00AD';
 	private final static char ZWSP = '\u200B';
 	
-	private ResourceResolver tableResolver;
-	private LibhyphenTableProvider tableProvider;
+	private LibhyphenTableRegistry tableRegistry;
 	
 	@Activate
 	protected void activate() {
@@ -108,27 +104,15 @@ public class LibhyphenJnaImpl extends AbstractTransformProvider<LibhyphenHyphena
 	}
 	
 	@Reference(
-		name = "LibhyphenTableResolver",
+		name = "LibhyphenTableRegistry",
 		unbind = "-",
-		service = LibhyphenTableResolver.class,
+		service = LibhyphenTableRegistry.class,
 		cardinality = ReferenceCardinality.MANDATORY,
 		policy = ReferencePolicy.STATIC
 	)
-	protected void bindTableResolver(LibhyphenTableResolver resolver) {
-		tableResolver = resolver;
-		logger.debug("Registering libhyphen table resolver: " + resolver);
-	}
-	
-	@Reference(
-		name = "LibhyphenTableProvider",
-		unbind = "-",
-		service = LibhyphenTableProvider.class,
-		cardinality = ReferenceCardinality.MANDATORY,
-		policy = ReferencePolicy.STATIC
-	)
-	protected void bindTableProvider(LibhyphenTableProvider provider) {
-		tableProvider = provider;
-		logger.debug("Registering libhyphen table provider: " + provider);
+	protected void bindTableRegistry(LibhyphenTableRegistry registry) {
+		tableRegistry = registry;
+		logger.debug("Registering libhyphen table registry: " + registry);
 	}
 	
 	private final static Iterable<LibhyphenHyphenator> empty
@@ -170,23 +154,21 @@ public class LibhyphenJnaImpl extends AbstractTransformProvider<LibhyphenHyphena
 				            + q.iterator().next().getKey() + "' never matches anything");
 				return empty; }
 			return of(get(URLs.asURI(table))); }
-		if (tableProvider != null) {
-			Locale locale; {
-				String loc = "und";
-				if (q.containsKey("locale"))
-					loc = q.removeOnly("locale").getValue().get();
-				try {
-					locale = parseLocale(loc); }
-				catch (IllegalArgumentException e) {
-					logger.error("Invalid locale", e);
-					return empty; }
-			}
-			return transform(
-				tableProvider.get(locale),
-				new Function<URI,LibhyphenHyphenator>() {
-					public LibhyphenHyphenator _apply(URI table) {
-						return __apply(get(table)); }}); }
-		return empty;
+		Locale locale; {
+			String loc = "und";
+			if (q.containsKey("locale"))
+				loc = q.removeOnly("locale").getValue().get();
+			try {
+				locale = parseLocale(loc); }
+			catch (IllegalArgumentException e) {
+				logger.error("Invalid locale", e);
+				return empty; }
+		}
+		return transform(
+			tableRegistry.get(locale),
+			new Function<URI,LibhyphenHyphenator>() {
+				public LibhyphenHyphenator _apply(URI table) {
+					return __apply(get(table)); }});
 	}
 	
 	private WithSideEffect<LibhyphenHyphenator,Logger> get(final URI table) {
@@ -358,7 +340,7 @@ public class LibhyphenJnaImpl extends AbstractTransformProvider<LibhyphenHyphena
 	}
 	
 	private File resolveTable(URI table) throws FileNotFoundException {
-		URL resolvedTable = isAbsoluteFile(table) ? URLs.asURL(table) : tableResolver.resolve(table);
+		URL resolvedTable = isAbsoluteFile(table) ? URLs.asURL(table) : tableRegistry.resolve(table);
 		if (resolvedTable == null)
 			throw new FileNotFoundException("Hyphenation table " + table + " could not be resolved");
 		return asFile(resolvedTable);

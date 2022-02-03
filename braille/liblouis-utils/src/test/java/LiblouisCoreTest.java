@@ -23,17 +23,15 @@ import org.daisy.pipeline.braille.common.BrailleTranslator.LineIterator;
 import org.daisy.pipeline.braille.common.CompoundBrailleTranslator;
 import org.daisy.pipeline.braille.common.CSSStyledText;
 import org.daisy.pipeline.braille.common.Hyphenator;
-import org.daisy.pipeline.braille.common.HyphenatorProvider;
 import org.daisy.pipeline.braille.common.Provider;
 import org.daisy.pipeline.braille.common.TransformProvider;
-import static org.daisy.pipeline.braille.common.Provider.util.dispatch;
 import static org.daisy.pipeline.braille.common.Query.util.query;
 import static org.daisy.pipeline.braille.common.util.Files.asFile;
-
 import org.daisy.pipeline.braille.liblouis.LiblouisHyphenator;
 import org.daisy.pipeline.braille.liblouis.LiblouisTable;
 import org.daisy.pipeline.braille.liblouis.LiblouisTableResolver;
 import org.daisy.pipeline.braille.liblouis.LiblouisTranslator;
+import org.daisy.pipeline.braille.pef.TableRegistry;
 
 import org.daisy.pipeline.junit.AbstractTest;
 
@@ -92,9 +90,8 @@ public class LiblouisCoreTest extends AbstractTest {
 	@ProbeBuilder
 	public TestProbeBuilder probeConfiguration(TestProbeBuilder probe) {
 		probe.setHeader("Bundle-Name", "test-module");
-		// FIXME: can not delete this yet because it can not be generated with maven-bundle-plugin
+		// needed because it can not be generated with maven-bundle-plugin
 		probe.setHeader("Service-Component", "OSGI-INF/mock-hyphenator-provider.xml,"
-		                                   + "OSGI-INF/dispatching-table-provider.xml,"
 		                                   + "OSGI-INF/table-path.xml");
 		return probe;
 	}
@@ -644,7 +641,7 @@ public class LiblouisCoreTest extends AbstractTest {
 	}
 	
 	@Inject
-	public DispatchingTableProvider tableProvider;
+	public TableRegistry tableProvider;
 	
 	@Test
 	public void testDisplayTableProvider() {

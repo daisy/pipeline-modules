@@ -46,6 +46,7 @@ public class XSpecAndXProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 	
 	@ProbeBuilder
 	public TestProbeBuilder probeConfiguration(TestProbeBuilder probe) {
+		// needed because it can not be generated with maven-bundle-plugin
 		probe.setHeader("Service-Component", "OSGI-INF/number-braille-translator-provider.xml");
 		return probe;
 	}
