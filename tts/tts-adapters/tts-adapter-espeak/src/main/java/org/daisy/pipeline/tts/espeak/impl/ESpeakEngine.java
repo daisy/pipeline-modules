@@ -28,6 +28,7 @@ import org.daisy.pipeline.tts.SoundUtil;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.Voice;
+import org.daisy.pipeline.tts.VoiceInfo;
 import org.daisy.pipeline.tts.VoiceInfo.Gender;
 
 import org.slf4j.Logger;
@@ -142,12 +143,17 @@ public class ESpeakEngine extends MarklessTTSEngine {
 									String line = scanner.nextLine();
 									mr.reset(line);
 									if (mr.find()) {
-										Locale locale = Locale.forLanguageTag(mr.group("locale"));
-										Gender gender = "f".equals(mr.group("gender").trim().toLowerCase())
-											? Gender.FEMALE_ADULT
-											: Gender.MALE_ADULT;
 										String name = mr.group("name");
-										result.add(new Voice(getProvider().getName(), name, locale, gender));
+										try {
+											Locale locale = VoiceInfo.tagToLocale(mr.group("locale"));
+											Gender gender = "f".equals(mr.group("gender").trim().toLowerCase())
+												? Gender.FEMALE_ADULT
+												: Gender.MALE_ADULT;
+											result.add(new Voice(getProvider().getName(), name, locale, gender));
+										} catch (VoiceInfo.UnknownLanguage e) {
+											mLogger.debug("Could not parse line from `espeak --voices' output: " + line);
+											mLogger.debug("Reason: could not parse locale: " + mr.group("locale"));
+										}
 									} else {
 										mLogger.warn("Could not parse line from `espeak --voices' output: " + line);
 									}

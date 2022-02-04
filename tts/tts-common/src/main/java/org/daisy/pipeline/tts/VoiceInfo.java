@@ -63,22 +63,9 @@ public class VoiceInfo {
 	public static Locale tagToLocale(String langtag) throws UnknownLanguage {
 		if (langtag == null || "*".equals(langtag) || "mul".equals(langtag))
 			return NO_DEFINITE_LANG;
-		
-		//TODO: in Java7 we would use:
-		//return Locale.forLanguageTag(lang)
-		//=> this works with BCP47 tags, and should work with old tags from RFC 3066
-		//TODO: use a common function for pipeline-mod-nlp and pipeline-mod-tts
-		Locale locale = null;
-		if (langtag != null) {
-			Matcher m = localePattern.matcher(langtag.toLowerCase());
-			if (m.matches()) {
-				locale = new Locale(m.group(1), m.group(2) != null ? m.group(2) : "");
-			}
-		}
-		
-		if (locale == null)
+		Locale locale = Locale.forLanguageTag(langtag.replace("_", "-"));
+		if (locale == null || "und".equals(locale.toLanguageTag()))
 			throw new UnknownLanguage(langtag);
-		
 		return locale;
 	}
 
