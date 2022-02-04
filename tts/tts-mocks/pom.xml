@@ -40,7 +40,8 @@
 
   <properties>
     <expose-services>
-      org.daisy.pipeline.tts.mock.impl.MockTTS
+      org.daisy.pipeline.tts.mock.impl.MockTTS,
+      org.daisy.pipeline.tts.mock.impl.MockGoogle
     </expose-services>
   </properties>
 

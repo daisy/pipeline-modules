@@ -14,6 +14,7 @@ import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.Voice;
+import org.daisy.pipeline.tts.VoiceInfo;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -56,7 +57,7 @@ public class MockTTS implements TTSService {
 				List<Voice> voices = new ArrayList<Voice>();
 				voices.add(new Voice(getProvider().getName(), "alex"));
 				voices.add(new Voice(getProvider().getName(), "vicki"));
-				voices.add(new Voice(getProvider().getName(), "foo"));
+				voices.add(new Voice(getProvider().getName(), "foo", VoiceInfo.NO_DEFINITE_LANG, VoiceInfo.NO_DEFINITE_GENDER));
 				return voices;
 			}
 			

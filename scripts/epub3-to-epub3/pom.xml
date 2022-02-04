@@ -198,6 +198,11 @@
         </dependency>
         <dependency>
           <groupId>org.daisy.pipeline.modules</groupId>
+          <artifactId>tts-adapter-google</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.daisy.pipeline.modules</groupId>
           <artifactId>audio-encoder-lame</artifactId>
           <scope>test</scope>
         </dependency>
@@ -215,6 +220,14 @@
                     <systemProperty>
                       <key>org.daisy.pipeline.tts.config</key>
                       <value>${project.basedir}/src/test/resources/webserver-tts-config.xml</value>
+                    </systemProperty>
+                    <systemProperty>
+                      <key>org.daisy.pipeline.tts.google.address</key>
+                      <value>http://localhost:8080</value>
+                    </systemProperty>
+                    <systemProperty>
+                      <key>org.daisy.pipeline.tts.google.apikey</key>
+                      <value>mykey</value>
                     </systemProperty>
                   </systemProperties>
                 </configuration>
