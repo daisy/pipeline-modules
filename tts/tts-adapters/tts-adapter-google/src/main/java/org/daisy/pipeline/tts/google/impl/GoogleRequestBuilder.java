@@ -119,31 +119,16 @@ public class GoogleRequestBuilder {
 			break;
 		case SPEECH:
 			// speech synthesis errors handling
-			if (this.text == null || text.length() == 0) 
+			if (this.text == null || text.length() == 0)
 				throw new Exception("Speech request without text.");
 			if (languageCode == null || languageCode.length() == 0)
 				throw new Exception("Language code definition is mandatory, please set one (speech request for " + text + ")");
-			
-			String jsonParameters =
-				"{"
-					+ "\"input\":{"
-						+ "\"ssml\":\"" + text + "\""
-					+ "},"
-					+ "\"voice\":{"
-						+ "\"languageCode\":\"" + languageCode + "\""
-						+ (voice != null && voice.length() > 0
-							? ",\"name\":\"" + voice + "\""
-							: "")
-					+"},"
-					+ "\"audioConfig\":{"
-						+ "\"audioEncoding\":\"LINEAR16\""
-						+ (sampleRate != null
-							? ",\"sampleRateHertz\":\"" + sampleRate + "\""
-							: "")
-					+ "}"
-				+ "}";
-
-			parameters = new JSONObject(jsonParameters);
+			parameters = new JSONObject()
+				.put("input", new JSONObject().put("ssml", text))
+				.put("voice", new JSONObject().put("languageCode", languageCode)
+				                              .putOpt("name", voice))
+				.put("audioConfig", new JSONObject().put("audioEncoding", "LINEAR16")
+				                                    .putOpt("sampleRateHertz", sampleRate));
 			break;
 		}
 
