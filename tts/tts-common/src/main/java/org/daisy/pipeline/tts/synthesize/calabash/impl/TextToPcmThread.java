@@ -153,8 +153,8 @@ public class TextToPcmThread implements FormatSpecifications {
 
 				//release the TTS resources
 				for (Map.Entry<TTSEngine, TTSResource> e : mResources.entrySet()) {
+					timeout.enableForCurrentThread(2);
 					try {
-						timeout.enableForCurrentThread(2);
 						releaseResource(e.getKey(), e.getValue());
 					} catch (Exception ex) {
 						String msg = "Error while releasing resource of "
@@ -316,8 +316,8 @@ public class TextToPcmThread implements FormatSpecifications {
 		//allocate a TTS resource if necessary
 		TTSResource resource = mResources.get(tts);
 		if (resource == null) {
+			timeout.enableForCurrentThread(3);
 			try {
-				timeout.enableForCurrentThread(3); //3 seconds
 				resource = mTTSRegistry.allocateResourceFor(tts);
 			} catch (SynthesisException e) {
 				mTTSLog.getWritableEntry(sentence.getID()).addError(

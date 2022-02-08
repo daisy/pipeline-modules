@@ -41,8 +41,8 @@ public class VoiceManager {
 			TTSTimeout timeout = new TTSTimeout();
 			int timeoutSecs = 30;
 			for (TTSEngine tts : engines) {
+				timeout.enableForCurrentThread(timeoutSecs);
 				try {
-					timeout.enableForCurrentThread(timeoutSecs);
 					Collection<Voice> voices = tts.getAvailableVoices();
 					if (voices != null)
 						for (Voice v : voices) {

@@ -1,5 +1,8 @@
 package org.daisy.pipeline.tts.synthesize.calabash.impl;
 
+import static java.lang.Math.addExact;
+import static java.lang.Math.multiplyExact;
+import static java.lang.Math.toIntExact;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,25 +39,29 @@ class TimedTTSExecutor {
 				// initially base timeout on engine.expectedMillisecPerWord()
 				// adding initial offset because the processing time is not always directly
 				// proportional to the length of the sentence
-				safeMillisec = 5000 + 10 * engine.expectedMillisecPerWord() * wordCount;
+				safeMillisec = addExact(5000,
+				                        multiplyExact(wordCount,
+				                                      multiplyExact(10,
+				                                                    engine.expectedMillisecPerWord())));
 			if (n == null)
 				return safeMillisec;
 			else {
 				// in the long run base timeout on maxMicrosecPerCharacter and maxMillisecOfShortSentence
-				Integer estimatedMicrosec = maxMicrosecPerCharacter.get(engine) * sentenceSize;
+				Integer estimatedMicrosec = multiplyExact(maxMicrosecPerCharacter.get(engine), sentenceSize);
 				Integer minMillisec = maxMillisecOfShortSentence.get(engine);
 				if (minMillisec != null) {
-					if (estimatedMicrosec < minMillisec * 1000)
-						estimatedMicrosec = minMillisec * 1000;
+					if (estimatedMicrosec < multiplyExact(minMillisec, 1000))
+						estimatedMicrosec = multiplyExact(minMillisec, 1000);
 				} else if (sentenceSize < SHORT_SENTENCE_THRESHOLD)
-					estimatedMicrosec = maxMicrosecPerCharacter.get(engine) * SHORT_SENTENCE_THRESHOLD;
+					estimatedMicrosec = multiplyExact(maxMicrosecPerCharacter.get(engine), SHORT_SENTENCE_THRESHOLD);
 				if (n < FIRST_CHARACTERS)
 					// interpolate
-					return
-						+ safeMillisec * (FIRST_CHARACTERS - n) / FIRST_CHARACTERS
-						+ 3 * estimatedMicrosec * n / 1000 / FIRST_CHARACTERS;
+					return toIntExact(
+						addExact(
+							multiplyExact((long)safeMillisec, FIRST_CHARACTERS - n) / FIRST_CHARACTERS,
+							multiplyExact((long)estimatedMicrosec, 3 * n) / 1000 / FIRST_CHARACTERS));
 				else
-					return 3 * estimatedMicrosec / 1000;
+					return multiplyExact(3, estimatedMicrosec) / 1000;
 			}
 		}
 	}
@@ -68,26 +75,28 @@ class TimedTTSExecutor {
 		int timeoutSec = maximumMillisec(engine, sentenceSize) / 1000;
 		if (log != null)
 			log.setTimeout(timeoutSec);
+		timeout.enableForCurrentThread(interrupter, timeoutSec);
 		try {
-			timeout.enableForCurrentThread(interrupter, timeoutSec);
 			SynthesisResult result = engine.synthesize(
 				sentence, voice, threadResources);
 			Long millisecElapsed = System.currentTimeMillis() - startTime;
 			if (log != null)
 				log.setTimeElapsed((float)millisecElapsed / 1000);
 			synchronized(totalCharacters) {
-				Long microsecElapsedPerCharacter = millisecElapsed * 1000 / sentenceSize;
+				Long microsecElapsedPerCharacter = sentenceSize == 0
+					? 0
+					: multiplyExact(millisecElapsed, 1000) / sentenceSize;
 				int max = 1000; // don't go below 1 ms
 				if (maxMicrosecPerCharacter.containsKey(engine))
 					max = maxMicrosecPerCharacter.get(engine);
 				else
 					maxMicrosecPerCharacter.put(engine, max);
 				if (microsecElapsedPerCharacter > max)
-					maxMicrosecPerCharacter.put(engine, microsecElapsedPerCharacter.intValue());
+					maxMicrosecPerCharacter.put(engine, toIntExact(microsecElapsedPerCharacter));
 				if (sentenceSize < SHORT_SENTENCE_THRESHOLD
 				    && maxMillisecOfShortSentence.containsKey(engine)
 				    && millisecElapsed > maxMillisecOfShortSentence.get(engine))
-					maxMillisecOfShortSentence.put(engine, millisecElapsed.intValue());
+					maxMillisecOfShortSentence.put(engine, toIntExact(millisecElapsed));
 				Integer n = totalCharacters.get(engine);
 				if (n == null) n = 0;
 				if (n < FIRST_CHARACTERS)
