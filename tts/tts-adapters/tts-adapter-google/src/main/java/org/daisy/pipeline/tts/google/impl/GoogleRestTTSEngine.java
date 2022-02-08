@@ -201,13 +201,6 @@ public class GoogleRestTTSEngine extends TTSEngine {
 		return new TTSResource();
 	}
 
-	@Override
-	public int expectedMillisecPerWord() {
-		// Worst case scenario with quotas:
-		// the thread can wait for a bit more than a minute for a anwser
-		return 64000;
-	}
-
 	private static class Response {
 		int status;
 		InputStream body;
