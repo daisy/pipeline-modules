@@ -5,5 +5,5 @@
 # org/daisy/pipeline/tts/TimeoutTest.java
 # org/daisy/pipeline/tts/config/ConfigReaderTest.java
 # org/daisy/pipeline/tts/config/URITest.java
-# org/daisy/pipeline/tts/synthesize/calabash/impl/ConfigReaderTest.java
-# org/daisy/pipeline/tts/synthesize/calabash/impl/SSMLtoAudioTest.java
+# org/daisy/pipeline/tts/calabash/impl/ConfigReaderTest.java
+# org/daisy/pipeline/tts/calabash/impl/SSMLtoAudioTest.java

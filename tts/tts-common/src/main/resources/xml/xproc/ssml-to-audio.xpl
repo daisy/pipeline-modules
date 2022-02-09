@@ -53,7 +53,7 @@
   </p:option>
 
   <!--
-      Implemented in ../../../java/org/daisy/pipeline/tts/synthesize/calabash/impl/SynthesizeStep.java
+      Implemented in ../../../java/org/daisy/pipeline/tts/calabash/impl/SynthesizeStep.java
   -->
 
 </p:declare-step>

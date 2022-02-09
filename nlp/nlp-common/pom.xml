@@ -70,7 +70,7 @@
     <expose-services>
       org.daisy.pipeline.modules.impl.Module_nlp_common,
       org.daisy.pipeline.nlp.lexing.LexServiceRegistry,
-      org.daisy.pipeline.nlp.breakdetect.calabash.impl.BreakDetectProvider
+      org.daisy.pipeline.nlp.calabash.impl.BreakDetectProvider
     </expose-services>
   </properties>
   
