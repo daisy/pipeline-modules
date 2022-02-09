@@ -76,17 +76,13 @@ public abstract class TTSEngine {
 	 *            the TTS processor or @param voice cannot handle marks. 
 	 * @param bufferAllocator is the object that the TTS Service must use to
 	 *            allocate new audio buffers.
-	 * @param retry is true when this is not the first time the thread attempts
-	 *            to synthesize @param sentence. In such cases, you may
-	 *            reinitialize the connection to remote TTS servers if there are
-	 *            any.
 	 * 
 	 * 
 	 * @return a list of adjacent PCM chunks produced by the TTS processor.
 	 */
 	abstract public Collection<AudioBuffer> synthesize(XdmNode sentence, Voice voice,
 	        TTSResource threadResources, List<Mark> marks, List<String> expectedMarks,
-	        AudioBufferAllocator bufferAllocator, boolean retry) throws SynthesisException,
+	        AudioBufferAllocator bufferAllocator) throws SynthesisException,
 	        InterruptedException, MemoryException;
 
 	/**

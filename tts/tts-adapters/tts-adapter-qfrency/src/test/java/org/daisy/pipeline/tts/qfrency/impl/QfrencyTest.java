@@ -78,7 +78,7 @@ public class QfrencyTest {
 		int size = getSize(
 			tts.synthesize(
 				parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">this is a test<s>"),
-				voice, r, null, null, BufferAllocator, true));
+				voice, r, null, null, BufferAllocator));
 		tts.releaseThreadResources(r);
 
 		Assert.assertTrue("audio output must be big enough", size > 2000);

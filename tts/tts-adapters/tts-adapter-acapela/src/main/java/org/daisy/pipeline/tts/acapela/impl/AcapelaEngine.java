@@ -304,18 +304,10 @@ public class AcapelaEngine extends TTSEngine {
 	@Override
 	public Collection<AudioBuffer> synthesize(XdmNode ssml, Voice voice,
 	        TTSResource threadResources, List<Mark> marks, List<String> expectedMarks,
-	        AudioBufferAllocator bufferAllocator, boolean retry) throws SynthesisException,
+	        AudioBufferAllocator bufferAllocator) throws SynthesisException,
 	        InterruptedException, MemoryException {
 
 		ThreadResources th = (ThreadResources) threadResources;
-		if (retry) {
-			releaseThreadResources(th);
-			ThreadResources newth = (ThreadResources) allocateThreadResources();
-			th.server = newth.server;
-			th.dispatcher = newth.dispatcher;
-			th.channelId = newth.channelId;
-			th.totalMarks = 0;
-		}
 
 		for (String expected : expectedMarks){
 			marks.add(new Mark(expected, 0));

@@ -55,7 +55,7 @@ public class SAPIengine extends TTSEngine {
 	@Override
 	public Collection<AudioBuffer> synthesize(XdmNode ssml, Voice voice,
 	        TTSResource resource, List<Mark> marks, List<String> expectedMarks,
-	        AudioBufferAllocator bufferAllocator, boolean retry)
+	        AudioBufferAllocator bufferAllocator)
 		throws SynthesisException, InterruptedException, MemoryException {
 
 		Map<String,Object> xsltParams = new HashMap<>(); {

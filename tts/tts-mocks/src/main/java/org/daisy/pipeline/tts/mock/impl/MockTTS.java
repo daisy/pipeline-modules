@@ -48,7 +48,7 @@ public class MockTTS implements TTSService {
 			@Override
 			public Collection<AudioBuffer> synthesize(XdmNode sentence, Voice voice, TTSResource threadResources,
 			                                          List<Mark> marks, List<String> expectedMarks,
-			                                          AudioBufferAllocator bufferAllocator, boolean retry)
+			                                          AudioBufferAllocator bufferAllocator)
 					throws SynthesisException, InterruptedException, MemoryException {
 				logger.debug("Synthesizing sentence: " + sentence);
 				try {

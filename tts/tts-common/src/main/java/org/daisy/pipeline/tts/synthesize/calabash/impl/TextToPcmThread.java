@@ -234,7 +234,7 @@ public class TextToPcmThread implements FormatSpecifications {
 			logEntry.setActualVoice(voice);
 			return mExecutor.synthesizeWithTimeout(
 				timeout, interrupter, logEntry, sentence.getText(), sentence.getSize(), tts, voice,
-				threadResources, marks, expectedMarks, mAudioBufferTracker, false);
+				threadResources, marks, expectedMarks, mAudioBufferTracker);
 		}
 		else {
 			Collection<Chunk> chunks = mSSMLSplitter.split(sentence.getText());
@@ -247,7 +247,7 @@ public class TextToPcmThread implements FormatSpecifications {
 					buffers = mExecutor.synthesizeWithTimeout(
 						timeout, interrupter, logEntry, chunk.ssml(), Sentence.computeSize(chunk.ssml()),
 						tts, voice, threadResources, new ArrayList<Mark>(), expectedMarks,
-						mAudioBufferTracker, false);
+						mAudioBufferTracker);
 				} catch (MemoryException | SynthesisException | TimeoutException e) {
 					//TODO: flush the buffers here
 					SoundUtil.cancelFootPrint(result, mAudioBufferTracker);

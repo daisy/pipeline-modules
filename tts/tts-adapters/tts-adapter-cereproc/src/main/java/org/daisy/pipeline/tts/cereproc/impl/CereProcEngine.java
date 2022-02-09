@@ -159,8 +159,7 @@ public class CereProcEngine extends TTSEngine {
 	                                          TTSResource threadResources,
 	                                          List<Mark> marks,
 	                                          List<String> expectedMarks,
-	                                          AudioBufferAllocator bufferAllocator,
-	                                          boolean retry)
+	                                          AudioBufferAllocator bufferAllocator)
 			throws SynthesisException, InterruptedException, MemoryException {
 		Collection<AudioBuffer> result = new ArrayList<>();
 		StringWriter out = new StringWriter();

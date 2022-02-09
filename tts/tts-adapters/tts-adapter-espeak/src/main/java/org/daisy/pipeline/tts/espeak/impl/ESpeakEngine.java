@@ -65,7 +65,7 @@ public class ESpeakEngine extends TTSEngine {
 	@Override
 	public Collection<AudioBuffer> synthesize(XdmNode ssml, Voice voice, TTSResource threadResources,
 	                                          List<Mark> marks, List<String> expectedMarks,
-	                                          AudioBufferAllocator bufferAllocator, boolean retry)
+	                                          AudioBufferAllocator bufferAllocator)
 			throws SynthesisException,InterruptedException, MemoryException {
 
 		String sentence; {

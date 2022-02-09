@@ -64,7 +64,7 @@ public class TTSRegistryTest {
 		@Override
 		public Collection<AudioBuffer> synthesize(XdmNode sentence, Voice voice,
 		        TTSResource threadResources, List<Mark> marks, List<String> expectedMarks,
-		        AudioBufferAllocator bufferAllocator, boolean retry)
+		        AudioBufferAllocator bufferAllocator)
 		        throws SynthesisException, InterruptedException, MemoryException {
 			return null;
 		}

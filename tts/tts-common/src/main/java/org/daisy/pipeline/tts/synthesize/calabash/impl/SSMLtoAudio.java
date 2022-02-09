@@ -258,7 +258,7 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 		try {
 			audioBuffers = mExecutor.synthesizeWithTimeout(
 				timeout, interrupter, null, testingXML, Sentence.computeSize(testingXML),
-				engine, firstVoice, res, marks, expectedMarks, new StraightBufferAllocator(), false);
+				engine, firstVoice, res, marks, expectedMarks, new StraightBufferAllocator());
 		} catch (Exception e) {
 			throw new Exception("test failed: " + e.getMessage(), e);
 		} finally {
