@@ -181,6 +181,7 @@
 			<x:option name="audio-only" select="false()"/>
 			<x:option name="date" select="'2020-02-27'"/>
 			<x:option name="output-fileset-base" select="resolve-uri('result/')"/>
+			<x:option name="word-detection" select="'false'"/>
 		</x:call>
 		<x:context label="the fileset.out port">
 			<x:document type="port" port="fileset.out"/>
@@ -226,11 +227,15 @@
 					</head>
 					<book>
 						<frontmatter>
-							<doctitle smilref="mo0.smil#sdoctitle" id="doctitle">title</doctitle>
+							<doctitle smilref="mo0.smil#sdoctitle" id="doctitle">
+								<sent smilref="mo0.smil#sst1" id="st1">title</sent>
+							</doctitle>
 						</frontmatter>
 						<bodymatter>
 							<level1>
-								<h1 smilref="mo0.smil#sch1" id="ch1">chapter</h1>
+								<h1 smilref="mo0.smil#sch1" id="ch1">
+									<sent smilref="mo0.smil#sst2" id="st2">chapter</sent>
+								</h1>
 								<p smilref="mo0.smil#sp1" id="p1">
 									<m:math dtb:smilref="mo0.smil#sm1" id="m1" alttext="Math Formulae" altimg="math-formulae.png">
 										<m:mrow>
@@ -266,12 +271,16 @@
 					</head>
 					<body>
 						<seq id="root-seq">
-							<par id="sdoctitle" class="doctitle">
-								<text src="dtbook.xml#doctitle"/>
-							</par>
-							<par id="sch1" class="h1">
-								<text src="dtbook.xml#ch1"/>
-							</par>
+							<seq id="sdoctitle" class="doctitle">
+								<par id="sst1" class="sent">
+									<text src="dtbook.xml#st1"/>
+								</par>
+							</seq>
+							<seq id="sch1" class="h1">
+								<par id="sst2" class="sent">
+									<text src="dtbook.xml#st2"/>
+								</par>
+							</seq>
 							<seq id="sp1" class="p">
 								<seq id="sm1" class="math" end="DTBuserEscape;sm1-par.end">
 									<par id="sm1-par" class="math">
