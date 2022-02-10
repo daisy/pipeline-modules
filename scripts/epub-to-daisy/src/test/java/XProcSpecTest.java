@@ -16,7 +16,7 @@ public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 			pipelineModule("epub3-to-daisy202"),
 			pipelineModule("epub3-to-daisy3"),
 			pipelineModule("nlp-omnilang-lexer"),
-			pipelineModule("tts-common"),
+			pipelineModule("tts-mocks"),
 			pipelineModule("audio-common"),
 		};
 	}
@@ -24,8 +24,7 @@ public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 	@ProbeBuilder
 	public TestProbeBuilder probeConfiguration(TestProbeBuilder probe) {
 		// needed because it can not be generated with maven-bundle-plugin
-		probe.setHeader("Service-Component", "OSGI-INF/mock-tts.xml," +
-		                                     "OSGI-INF/mock-encoder.xml");
+		probe.setHeader("Service-Component", "OSGI-INF/mock-encoder.xml");
 		return probe;
 	}
 }

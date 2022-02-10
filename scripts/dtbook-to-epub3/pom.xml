@@ -75,7 +75,7 @@
     </dependency>
     <dependency>
       <groupId>org.daisy.pipeline.modules</groupId>
-      <artifactId>tts-common</artifactId>
+      <artifactId>tts-mocks</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -86,26 +86,5 @@
       org.daisy.pipeline.script.impl.XProcScript_dtbook_to_epub3
     </expose-services>
   </properties>
-  
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.daisy.pipeline.build</groupId>
-        <artifactId>ds-to-spi-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>generate-spi-test-classes</id>
-            <phase>process-test-sources</phase>
-            <goals>
-              <goal>generate-spi-test-classes</goal>
-            </goals>
-            <configuration>
-              <includes>MockTTS</includes>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
-  
+
 </project>

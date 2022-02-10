@@ -1,6 +1,6 @@
+package org.daisy.pipeline.tts.mock.impl;
+
 import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,10 +24,11 @@ import org.daisy.pipeline.tts.TTSService;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.Voice;
 
-import org.ops4j.pax.exam.util.PathUtils;
-
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component(
 	name = "mock-tts",
@@ -35,8 +36,10 @@ import org.osgi.service.component.annotations.Component;
 )
 public class MockTTS implements TTSService {
 	
-	final static File alexWaveOut = new File(PathUtils.getBaseDir(), "src/test/resources/mock-tts/alex.wav");
-	final static File vickiWaveOut = new File(PathUtils.getBaseDir(), "src/test/resources/mock-tts/vicki.wav");
+	final static Logger logger = LoggerFactory.getLogger(MockTTS.class);
+	final static URL alexWaveOut = URLs.getResourceFromJAR("/mock-tts/alex.wav", MockTTS.class);
+	final static URL vickiWaveOut = URLs.getResourceFromJAR("/mock-tts/vicki.wav", MockTTS.class);
+	final static URL daisyPipelineWaveOut = URLs.getResourceFromJAR("/mock-tts/daisy-pipeline.wav", MockTTS.class);
 	URL ssmlTransformer;
 	
 	@Activate
@@ -55,14 +58,17 @@ public class MockTTS implements TTSService {
 			                                          Voice voice, TTSResource threadResources,
 			                                          AudioBufferAllocator bufferAllocator, boolean retry)
 					throws SynthesisException, InterruptedException, MemoryException {
+				logger.debug("Synthesizing sentence: " + sentence);
 				try {
 					Collection<AudioBuffer> result = new ArrayList<AudioBuffer>();
 					BufferedInputStream in = new BufferedInputStream(
-						new FileInputStream(
-							voice.name.equals("alex") ? MockTTS.alexWaveOut : MockTTS.vickiWaveOut));
+						(voice.name.equals("alex")
+							? MockTTS.alexWaveOut
+							: voice.name.equals("vicki")
+								? MockTTS.vickiWaveOut
+								: MockTTS.daisyPipelineWaveOut).openStream());
 					AudioInputStream fi = AudioSystem.getAudioInputStream(in);
-					if (audioFormat == null)
-						audioFormat = fi.getFormat();
+					audioFormat = fi.getFormat();
 					while (true) {
 						AudioBuffer b = bufferAllocator.allocateBuffer(2048 + fi.available());
 						int ret = fi.read(b.data, 0, b.size);
@@ -87,6 +93,7 @@ public class MockTTS implements TTSService {
 				List<Voice> voices = new ArrayList<Voice>();
 				voices.add(new Voice(getProvider().getName(), "alex"));
 				voices.add(new Voice(getProvider().getName(), "vicki"));
+				voices.add(new Voice(getProvider().getName(), "foo"));
 				return voices;
 			}
 			

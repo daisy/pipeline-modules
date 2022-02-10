@@ -70,7 +70,7 @@
     </dependency>
     <dependency>
       <groupId>org.daisy.pipeline.modules</groupId>
-      <artifactId>tts-common</artifactId>
+      <artifactId>tts-mocks</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -103,7 +103,6 @@
             </goals>
             <configuration>
               <includes>
-                MockTTS,
                 MockEncoder
               </includes>
             </configuration>

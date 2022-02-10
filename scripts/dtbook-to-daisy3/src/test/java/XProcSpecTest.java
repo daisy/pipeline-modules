@@ -20,6 +20,7 @@ public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 			pipelineModule("nlp-omnilang-lexer"),
 			pipelineModule("audio-encoder-lame"),
 			pipelineModule("tts-common"),
+			pipelineModule("tts-mocks"),
 		};
 	}
 	
@@ -27,8 +28,7 @@ public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 	public TestProbeBuilder probeConfiguration(TestProbeBuilder probe) {
 		probe.setHeader("Bundle-Name", "test-module");
 		// needed because it can not be generated with maven-bundle-plugin
-		probe.setHeader("Service-Component", "OSGI-INF/module.xml," +
-		                                     "OSGI-INF/mock-tts.xml");
+		probe.setHeader("Service-Component", "OSGI-INF/module.xml");
 		return probe;
 	}
 }
