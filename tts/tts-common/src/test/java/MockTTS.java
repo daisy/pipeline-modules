@@ -51,8 +51,7 @@ public class MockTTS implements TTSService {
 			
 			@Override
 			public Collection<AudioBuffer> synthesize(XdmNode ssml, Voice voice,
-			                                          TTSResource threadResources, List<Mark> marks,
-			                                          List<String> expectedMarks,
+			                                          TTSResource threadResources, List<Integer> marks,
 			                                          AudioBufferAllocator bufferAllocator)
 					throws SynthesisException, InterruptedException, MemoryException {
 				if (!"mock-en".equals(voice.name)) {

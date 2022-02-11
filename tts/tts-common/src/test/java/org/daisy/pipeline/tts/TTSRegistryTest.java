@@ -17,7 +17,6 @@ import net.sf.saxon.s9api.XdmNode;
 import org.daisy.pipeline.tts.AudioBuffer;
 import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
-import org.daisy.pipeline.tts.TTSService.Mark;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.VoiceInfo.Gender;
 import org.daisy.pipeline.tts.VoiceInfo.UnknownLanguage;
@@ -63,7 +62,7 @@ public class TTSRegistryTest {
 
 		@Override
 		public Collection<AudioBuffer> synthesize(XdmNode sentence, Voice voice,
-		        TTSResource threadResources, List<Mark> marks, List<String> expectedMarks,
+		        TTSResource threadResources, List<Integer> marks,
 		        AudioBufferAllocator bufferAllocator)
 		        throws SynthesisException, InterruptedException, MemoryException {
 			return null;

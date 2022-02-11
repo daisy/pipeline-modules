@@ -25,7 +25,6 @@ import org.daisy.pipeline.tts.LoadBalancer.Host;
 import org.daisy.pipeline.tts.SoundUtil;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
-import org.daisy.pipeline.tts.TTSService.Mark;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.Voice;
 import org.daisy.pipeline.tts.acapela.impl.NscubeLibrary.PNSC_FNSPEECH_DATA;
@@ -73,8 +72,7 @@ public class AcapelaEngine extends TTSEngine {
 		PointerByReference channelLock;
 		Pointer server;
 		List<AudioBuffer> chunks;
-		List<Mark> marks;
-		int totalMarks = 0;
+		List<Integer> marks;
 		NSC_EXEC_DATA execData;
 		AudioBufferAllocator audioBufferAllocator;
 		int outOfMemBytes;
@@ -110,14 +108,11 @@ public class AcapelaEngine extends TTSEngine {
 				public int apply(int nEventID, int cbEventDataSize, NSC_EVENT_DATA pEventData,
 				        Pointer pAppInstanceData) {
 					
-					if (totalMarks == marks.size())
-						return 0; //TODO: raise an error if nEventID is a bookmark?
-					
 					if (nEventID == NscubeLibrary.NSC_EVID_ENUM.NSC_EVID_BOOKMARK) {
 						NSC_EVENT_DATA_Bookmark bookmark = new NSC_EVENT_DATA_Bookmark(
 						        pEventData.getPointer());
 						bookmark.read();
-						marks.get(totalMarks++).offsetInAudio = bookmark.uiByteCount;
+						marks.add(bookmark.uiByteCount);
 					} else if (nEventID == NscubeLibrary.NSC_EVID_ENUM.NSC_EVID_BOOKMARK_EXT) {
 						// In regular cases, this should not happen because the marks are numeric.
 						// It is only used for running the tests for which the SSML serialization
@@ -125,23 +120,8 @@ public class AcapelaEngine extends TTSEngine {
 						NSC_EVENT_DATA_BookmarkExt bookmark = new NSC_EVENT_DATA_BookmarkExt(
 						        pEventData.getPointer());
 						bookmark.read();
-						marks.get(totalMarks++).offsetInAudio = bookmark.uiByteCount;
+						marks.add(bookmark.uiByteCount);
 					}
-					/* if we need to read the mark names: */
-					/*
-					if (nEventID == NscubeLibrary.NSC_EVID_ENUM.NSC_EVID_BOOKMARK) {
-						NSC_EVENT_DATA_Bookmark bookmark = new NSC_EVENT_DATA_Bookmark(
-						        pEventData.getPointer());
-						bookmark.read();
-						String bookmarkName = String.valueOf(bookmark.uiVal);
-						marks.add(new Mark(bookmarkName, bookmark.uiByteCount));
-					} else if (nEventID == NscubeLibrary.NSC_EVID_ENUM.NSC_EVID_BOOKMARK_EXT) {
-						NSC_EVENT_DATA_BookmarkExt bookmark = new NSC_EVENT_DATA_BookmarkExt(
-						        pEventData.getPointer());
-						bookmark.read();
-						String bookmarkName = new String(bookmark.szVal).trim();
-						marks.add(new Mark(bookmarkName, bookmark.uiByteCount));
-					}*/
 
 					return 0;
 				}
@@ -303,35 +283,35 @@ public class AcapelaEngine extends TTSEngine {
 
 	@Override
 	public Collection<AudioBuffer> synthesize(XdmNode ssml, Voice voice,
-	        TTSResource threadResources, List<Mark> marks, List<String> expectedMarks,
+	        TTSResource threadResources, List<Integer> marks,
 	        AudioBufferAllocator bufferAllocator) throws SynthesisException,
 	        InterruptedException, MemoryException {
 
 		ThreadResources th = (ThreadResources) threadResources;
 
-		for (String expected : expectedMarks){
-			marks.add(new Mark(expected, 0));
-		}
-		
 		//note: the Acapela's markup for SSML interpretation is active by default.
 		Map<String,Object> xsltParams = new HashMap<>(); {
 			xsltParams.put("voice", voice.name);
-			xsltParams.put("ending-mark", endingMark());
+			// add ending mark to ensure the complete SSML is processed
+			xsltParams.put("ending-mark", "ending-mark");
 		}
 		try {
-			return speak(transformSsmlNodeToString(ssml, ssmlTransformer, xsltParams), th, marks, bufferAllocator);
+			Collection<AudioBuffer> result
+				= speak(transformSsmlNodeToString(ssml, ssmlTransformer, xsltParams), th, marks, bufferAllocator);
+			// remove ending mark
+			marks.subList(marks.size() - 1, marks.size()).clear();
+			return result;
 		} catch (IOException | SaxonApiException e) {
 			throw new SynthesisException(e);
 		}
 	}
 
-	Collection<AudioBuffer> speak(String ssml, TTSResource tr, List<Mark> marks,
+	Collection<AudioBuffer> speak(String ssml, TTSResource tr, List<Integer> marks,
 	        AudioBufferAllocator bufferAllocator) throws SynthesisException, MemoryException {
 		ThreadResources th = (ThreadResources) tr;
 		th.chunks = new ArrayList<AudioBuffer>();
 		th.audioBufferAllocator = bufferAllocator;
 		th.marks = marks;
-		th.totalMarks = 0;
 		th.channelLock = new PointerByReference();
 		th.outOfMemBytes = 0;
 		NscubeLibrary lib = NscubeLibrary.INSTANCE;
@@ -357,9 +337,6 @@ public class AcapelaEngine extends TTSEngine {
 			SoundUtil.cancelFootPrint(th.chunks, bufferAllocator);
 			throw new MemoryException(th.outOfMemBytes);
 		}
-		
-		
-		marks.subList(th.totalMarks, marks.size()).clear();
 
 		return th.chunks;
 	}
@@ -439,8 +416,7 @@ public class AcapelaEngine extends TTSEngine {
 	}
 
 	@Override
-	public String endingMark() {
-		return "ending-mark";
+	public boolean handlesMarks() {
+		return true;
 	}
-
 }

@@ -60,7 +60,6 @@ public class CereProcServiceTest extends AbstractTest {
 				new Voice(null, "William"),
 				resource,
 				null, // marks,
-				null, // expectedMarks
 				new StraightBufferAllocator()
 			);
 			Assert.assertTrue(audio.stream().mapToInt(x -> x.size).sum() > 10000);

@@ -67,7 +67,7 @@ public class OSXSpeechTest {
 		TTSResource resource = engine.allocateThreadResources();
 		Collection<AudioBuffer> li = engine.synthesize(
 			parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">this is a test</s>"),
-			voice, resource, null, null, BufferAllocator);
+			voice, resource, null, BufferAllocator);
 		engine.releaseThreadResources(resource);
 
 		Assert.assertTrue(getSize(li) > 2000);
@@ -85,7 +85,7 @@ public class OSXSpeechTest {
 			Voice v = ite.next();
 			Collection<AudioBuffer> li = engine.synthesize(
 				parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">small test</s>"),
-				v, resource, null, null, BufferAllocator);
+				v, resource, null, BufferAllocator);
 
 			sizes.add(getSize(li) / 4); //div 4 helps being more robust to tiny differences
 			totalVoices++;
@@ -106,7 +106,7 @@ public class OSXSpeechTest {
 		Collection<AudioBuffer> li = engine.synthesize(
 			parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">"
 			          + "𝄞𝄞𝄞𝄞 水水水水水 𝄞水𝄞水𝄞水𝄞水 test 国aØ家Ť标准 ĜæŘ ß ŒÞ ๕</s>"),
-			voice, resource, null, null, BufferAllocator);
+			voice, resource, null, BufferAllocator);
 		engine.releaseThreadResources(resource);
 
 		Assert.assertTrue(getSize(li) > 2000);
@@ -136,7 +136,7 @@ public class OSXSpeechTest {
 						try {
 							li = engine.synthesize(
 								parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">small test</s>"),
-								voice, resource, null, null, BufferAllocator);
+								voice, resource, null, BufferAllocator);
 
 						} catch (SaxonApiException | SynthesisException | InterruptedException | MemoryException e) {
 							e.printStackTrace();

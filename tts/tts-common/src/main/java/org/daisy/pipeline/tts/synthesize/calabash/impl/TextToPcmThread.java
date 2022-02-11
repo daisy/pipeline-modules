@@ -29,7 +29,6 @@ import org.daisy.pipeline.tts.SoundUtil;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSRegistry;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
-import org.daisy.pipeline.tts.TTSService.Mark;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.TTSTimeout;
 import org.daisy.pipeline.tts.TTSTimeout.ThreadFreeInterrupter;
@@ -48,11 +47,11 @@ import com.google.common.collect.Iterables;
  * output, which in turn are pushed to another shared queue consumed by the
  * EncodingThreads. PCM is produced by calling TTS processors.
  *
- * TTS processors may fail for some reasons, e.g. after a timeout or because the
- * ending SSML mark is missing. In such cases, TextToPcmThread will clean up the
- * resources and attempt to synthesize the current sentence with another TTS
- * processor chosen by the TTSRegistry, unless the error is a MemoryException,
- * in which case the thread gives up on the guilty sentence.
+ * TTS processors may fail for some reasons, e.g. after a timeout, or if marks
+ * are missing. In such cases, TextToPcmThread will clean up the resources and
+ * attempt to synthesize the current sentence with another TTS processor chosen
+ * by the TTSRegistry, unless the error is a MemoryException, in which case the
+ * thread gives up on the guilty sentence.
  *
  * The resources of the TTS processors (e.g. sockets) are allocated on-the-fly
  * and are all released at the end of the thread execution.
@@ -76,6 +75,24 @@ public class TextToPcmThread implements FormatSpecifications {
 	private VoiceManager mVoiceManager;
 	private TTSLog mTTSLog;
 	private int mErrorCounter;
+
+	/**
+	 * Java counterpart of SSML's marks
+	 */
+	private class Mark {
+		public Mark(String name, int offset) {
+			this.offsetInAudio = offset;
+			this.name = name;
+		}
+		/**
+		 * Name
+		 */
+		public String name;
+		/**
+		 * Offset in bytes
+		 */
+		public int offsetInAudio;
+	}
 
 	void start(final ConcurrentLinkedQueue<ContiguousText> input,
 	        final BlockingQueue<ContiguousPCM> pcmOutput, TimedTTSExecutor executor,
@@ -225,18 +242,29 @@ public class TextToPcmThread implements FormatSpecifications {
 	private Iterable<AudioBuffer> synthesize(
 			TTSTimeout timeout, TTSTimeout.ThreadFreeInterrupter interrupter, TTSLog.Entry logEntry,
 			Sentence sentence, TTSEngine tts, Voice voice, TTSResource threadResources,
-			List<Mark> marks, List<String> expectedMarks
+			List<Mark> marks, List<String> markNames
 	) throws SynthesisException, TimeoutException, MemoryException {
-		if (tts.endingMark() != null
+		if (tts.handlesMarks()
 		        && voice.getMarkSupport() != MarkSupport.MARK_NOT_SUPPORTED){
-			//can handle mark
-			expectedMarks.set(expectedMarks.size()-1, tts.endingMark());
 			logEntry.setActualVoice(voice);
-			return mExecutor.synthesizeWithTimeout(
+			List<Integer> markOffsets = new ArrayList<>();
+			Iterable<AudioBuffer> result = mExecutor.synthesizeWithTimeout(
 				timeout, interrupter, logEntry, sentence.getText(), sentence.getSize(), tts, voice,
-				threadResources, marks, expectedMarks, mAudioBufferTracker);
-		}
-		else {
+				threadResources, markOffsets, mAudioBufferTracker);
+			if (markNames.size() != markOffsets.size()){
+				SoundUtil.cancelFootPrint(result, mAudioBufferTracker);
+				mTTSLog.getWritableEntry(sentence.getID()).addError(
+				        new TTSLog.Error(ErrorCode.WARNING, "wrong number of marks with "
+				                + tts.getProvider().getName()
+				                + ". Number of marks received: " + markOffsets.size()
+				                + ", expected number: " + markNames.size()));
+				return null;
+			}
+			for (int i = 0; i < markNames.size(); i++) {
+				marks.add(new Mark(markNames.get(i), markOffsets.get(i)));
+			}
+			return result;
+		} else {
 			Collection<Chunk> chunks = mSSMLSplitter.split(sentence.getText());
 			Iterable<AudioBuffer> result = new ArrayList<AudioBuffer>();
 			int offset = 0;
@@ -246,8 +274,7 @@ public class TextToPcmThread implements FormatSpecifications {
 				try {
 					buffers = mExecutor.synthesizeWithTimeout(
 						timeout, interrupter, logEntry, chunk.ssml(), Sentence.computeSize(chunk.ssml()),
-						tts, voice, threadResources, new ArrayList<Mark>(), expectedMarks,
-						mAudioBufferTracker);
+						tts, voice, threadResources, new ArrayList<Integer>(), mAudioBufferTracker);
 				} catch (MemoryException | SynthesisException | TimeoutException e) {
 					//TODO: flush the buffers here
 					SoundUtil.cancelFootPrint(result, mAudioBufferTracker);
@@ -267,10 +294,9 @@ public class TextToPcmThread implements FormatSpecifications {
 				}
 				result = Iterables.concat(result, buffers);
 			}
-			
-			//add an empty ending-mark
-			marks.add(new Mark(tts.endingMark(), 0));
-
+			if (markNames.size() != marks.size()) {
+				throw new RuntimeException(); // should not happen
+			}
 			return result;
 		}
 	}
@@ -279,7 +305,7 @@ public class TextToPcmThread implements FormatSpecifications {
 	 * @return null if something went wrong
 	 */
 	private Iterable<AudioBuffer> speakWithVoice(final Sentence sentence, Voice v,
-	        final TTSEngine tts, List<Mark> marks, List<String> expectedMarks, TTSTimeout timeout)
+	        final TTSEngine tts, List<Mark> marks, List<String> markNames, TTSTimeout timeout)
 	        		throws MemoryException {
 		//allocate a TTS resource if necessary
 		TTSResource resource = mResources.get(tts);
@@ -316,7 +342,6 @@ public class TextToPcmThread implements FormatSpecifications {
 		}
 
 		//convert the input sentence into PCM using the TTS processor
-		Iterable<AudioBuffer> pcm = null;
 		final TTSResource fresource = resource;
 		TTSTimeout.ThreadFreeInterrupter interrupter = new ThreadFreeInterrupter() {
 			@Override
@@ -341,8 +366,8 @@ public class TextToPcmThread implements FormatSpecifications {
 					        new TTSLog.Error(ErrorCode.WARNING, msg));
 					return null;
 				}
-				pcm = synthesize(timeout, interrupter, logEntry,
-				                 sentence, tts, v, resource, marks, expectedMarks);
+				return synthesize(timeout, interrupter, logEntry,
+				                 sentence, tts, v, resource, marks, markNames);
 			}
 		} catch (TimeoutException e) {
 			logEntry.addError(
@@ -362,44 +387,9 @@ public class TextToPcmThread implements FormatSpecifications {
 		} catch (MemoryException e) {
 			throw e;
 		}
-
-		//check validity of the result by using the ending mark
-		if (marks.size() == 0 || (tts.endingMark() != null && !tts.endingMark().equals(
-		                marks.get(marks.size() - 1).name))) {
-			SoundUtil.cancelFootPrint(pcm, mAudioBufferTracker);
-			logEntry.addError(
-			        new TTSLog.Error(ErrorCode.WARNING, "missing ending mark with "
-			                + tts.getProvider().getName()
-			                + ". Number of marks received: " + marks.size()));
-			return null;
-		}
-		
-		int marksReceived = marks.size();
-		if (expectedMarks.size() != marksReceived){
-			SoundUtil.cancelFootPrint(pcm, mAudioBufferTracker);
-			mTTSLog.getWritableEntry(sentence.getID()).addError(
-			        new TTSLog.Error(ErrorCode.WARNING, "wrong number of marks with "
-			                + tts.getProvider().getName()
-			                + ". Number of marks received: " + marksReceived +", expected number: "+expectedMarks.size()));
-			return null;
-		}
-		for (int i = 0; i < expectedMarks.size(); ++i){
-			String expectedMark = expectedMarks.get(i);
-			String actualMark = marks.get(i).name;
-			if ((actualMark == null && expectedMark != null) || (actualMark != null && !actualMark.equals(expectedMark))){
-				SoundUtil.cancelFootPrint(pcm, mAudioBufferTracker);
-				mTTSLog.getWritableEntry(sentence.getID()).addError(
-				        new TTSLog.Error(ErrorCode.WARNING, "mark name mismatch with "
-				                + tts.getProvider().getName()
-				                + " actual: " + actualMark+", expected: "+expectedMark));
-				return null;
-			}
-		}
-		
-		return pcm;
 	}
 	
-	private List<String> getMarkNames(XdmNode ssml){
+	static List<String> getMarkNames(XdmNode ssml) {
 		XdmSequenceIterator iter = ssml.axisIterator(Axis.DESCENDANT);
 		ArrayList<String> markNames = new ArrayList<String>();
 		while (iter.hasNext()){
@@ -417,15 +407,14 @@ public class TextToPcmThread implements FormatSpecifications {
 	private boolean speak(ContiguousText section, Sentence sentence,
 	        BlockingQueue<ContiguousPCM> pcmOutput, TTSTimeout timeout, int maxQueueEltSize) {
 		
-		List<String> expectedMarks = getMarkNames(sentence.getText());
-		expectedMarks.add(null); //makes room for the ending-mark
+		List<String> markNames = getMarkNames(sentence.getText());
 		
 		TTSEngine tts = sentence.getTTSproc();
 		Voice originalVoice = sentence.getVoice();
 		List<Mark> marks = new ArrayList<Mark>();
 		Iterable<AudioBuffer> pcm;
 		try {
-			pcm = speakWithVoice(sentence, originalVoice, tts, marks, expectedMarks, timeout);
+			pcm = speakWithVoice(sentence, originalVoice, tts, marks, markNames, timeout);
 		} catch (MemoryException e) {
 			flush(section, pcmOutput);
 			printMemError(sentence, e);
@@ -451,7 +440,7 @@ public class TextToPcmThread implements FormatSpecifications {
 			//Try with the new engine
 			marks.clear();
 			try {
-				pcm = speakWithVoice(sentence, newVoice, tts, marks, expectedMarks, timeout);
+				pcm = speakWithVoice(sentence, newVoice, tts, marks, markNames, timeout);
 			} catch (MemoryException e) {
 				flush(section, pcmOutput);
 				printMemError(sentence, e);
@@ -481,11 +470,6 @@ public class TextToPcmThread implements FormatSpecifications {
 		} catch (InterruptedException e) {
 			// Should never happen since interruptions only occur during calls to TTS processors.
 			mLogger.warn("interruption exception while queuing the PCM buffers");
-		}
-
-		if (marks.size() > 0) {
-			//remove the ending mark
-			marks = marks.subList(0, marks.size() - 1);
 		}
 
 		// keep track of where the sound begins and where it ends within the audio buffers

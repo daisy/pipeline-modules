@@ -40,7 +40,6 @@ import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSRegistry;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService;
-import org.daisy.pipeline.tts.TTSService.Mark;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.Voice;
 import org.daisy.pipeline.tts.VoiceInfo;
@@ -132,17 +131,14 @@ public class SSMLtoAudioTest {
 
 		@Override
 		public Collection<AudioBuffer> synthesize(XdmNode sentence, Voice voice,
-				TTSResource threadResources, List<Mark> marks, List<String> expectedMarks,
-				AudioBufferAllocator bufferAllocator) throws SynthesisException,
-				InterruptedException, MemoryException {
+				TTSResource threadResources, List<Integer> marks, AudioBufferAllocator bufferAllocator)
+			throws SynthesisException, InterruptedException, MemoryException {
 
 			int size = 8192;
 			AudioBuffer res = bufferAllocator.allocateBuffer(size);
-
-			if (endingMark() != null) {
-				marks.add(new Mark(endingMark(), size - 512));
-			}
-
+			if (handlesMarks())
+				for (int i = TextToPcmThread.getMarkNames(sentence).size(); i > 0; i--)
+					marks.add(size - i * 512);
 			return Arrays.asList(res);
 		}
 
@@ -180,10 +176,8 @@ public class SSMLtoAudioTest {
 		}
 
 		@Override
-		public String endingMark() {
-			if (handleMark)
-				return "mark";
-			return null;
+		public boolean handlesMarks() {
+			return handleMark;
 		}
 	}
 
@@ -375,7 +369,7 @@ public class SSMLtoAudioTest {
 
 			@Override
 			public Collection<AudioBuffer> synthesize(XdmNode sentence, Voice voice,
-					TTSResource threadResources, List<Mark> marks, List<String> expectedMarks,
+					TTSResource threadResources, List<Integer> marks,
 					AudioBufferAllocator bufferAllocator) throws SynthesisException,
 					InterruptedException, MemoryException {
 				throw new SynthesisException("error");
@@ -397,7 +391,7 @@ public class SSMLtoAudioTest {
 
 			@Override
 			public Collection<AudioBuffer> synthesize(XdmNode sentence, Voice voice,
-					TTSResource threadResources, List<Mark> marks, List<String> expectedMarks,
+					TTSResource threadResources, List<Integer> marks,
 					AudioBufferAllocator bufferAllocator) throws SynthesisException,
 					InterruptedException, MemoryException {
 				throw new MemoryException(5000);
@@ -419,7 +413,7 @@ public class SSMLtoAudioTest {
 
 			@Override
 			public Collection<AudioBuffer> synthesize(XdmNode sentence, Voice voice,
-					TTSResource threadResources, List<Mark> marks, List<String> expectedMarks,
+					TTSResource threadResources, List<Integer> marks,
 					AudioBufferAllocator bufferAllocator) throws SynthesisException,
 					InterruptedException, MemoryException {
 				throw new InterruptedException();
@@ -441,7 +435,7 @@ public class SSMLtoAudioTest {
 
 			@Override
 			public Collection<AudioBuffer> synthesize(XdmNode sentence, Voice voice,
-					TTSResource threadResources, List<Mark> marks, List<String> expectedMarks,
+					TTSResource threadResources, List<Integer> marks,
 					AudioBufferAllocator bufferAllocator) throws SynthesisException,
 					InterruptedException, MemoryException {
 				Thread.sleep(6000);
@@ -468,14 +462,14 @@ public class SSMLtoAudioTest {
 
 			@Override
 			public Collection<AudioBuffer> synthesize(XdmNode sentence, Voice voice,
-					TTSResource threadResources, List<Mark> marks, List<String> expectedMarks,
+					TTSResource threadResources, List<Integer> marks,
 					AudioBufferAllocator bufferAllocator) throws SynthesisException,
 					InterruptedException, MemoryException {
 
 				if (sentenceToString(sentence).contains(key))
 					throw new InterruptedException();
 
-				return super.synthesize(sentence, voice, threadResources, marks, expectedMarks,
+				return super.synthesize(sentence, voice, threadResources, marks,
 						bufferAllocator);
 			}
 
@@ -499,14 +493,14 @@ public class SSMLtoAudioTest {
 
 			@Override
 			public Collection<AudioBuffer> synthesize(XdmNode sentence, Voice voice,
-					TTSResource threadResources, List<Mark> marks, List<String> expectedMarks,
+					TTSResource threadResources, List<Integer> marks,
 					AudioBufferAllocator bufferAllocator) throws SynthesisException,
 					InterruptedException, MemoryException {
 
 				if (sentenceToString(sentence).contains(key))
 					throw new SynthesisException("error");
 
-				return super.synthesize(sentence, voice, threadResources, marks, expectedMarks,
+				return super.synthesize(sentence, voice, threadResources, marks,
 				        bufferAllocator);
 			}
 
@@ -530,7 +524,7 @@ public class SSMLtoAudioTest {
 
 			@Override
 			public Collection<AudioBuffer> synthesize(XdmNode sentence, Voice voice,
-					TTSResource threadResources, List<Mark> marks, List<String> expectedMarks,
+					TTSResource threadResources, List<Integer> marks,
 					AudioBufferAllocator bufferAllocator) throws SynthesisException,
 					InterruptedException, MemoryException {
 
@@ -538,7 +532,7 @@ public class SSMLtoAudioTest {
 					Thread.sleep(10000);
 				}
 
-				return super.synthesize(sentence, voice, threadResources, marks, expectedMarks,
+				return super.synthesize(sentence, voice, threadResources, marks,
 				        bufferAllocator);
 			}
 
@@ -562,14 +556,14 @@ public class SSMLtoAudioTest {
 
 			@Override
 			public Collection<AudioBuffer> synthesize(XdmNode sentence, Voice voice,
-					TTSResource threadResources, List<Mark> marks, List<String> expectedMarks,
+					TTSResource threadResources, List<Integer> marks,
 					AudioBufferAllocator bufferAllocator) throws SynthesisException,
 					InterruptedException, MemoryException {
 
 				if (sentenceToString(sentence).contains(key))
 					throw new MemoryException(5000);
 
-				return super.synthesize(sentence, voice, threadResources, marks, expectedMarks,
+				return super.synthesize(sentence, voice, threadResources, marks,
 				        bufferAllocator);
 			}
 

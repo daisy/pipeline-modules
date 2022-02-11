@@ -26,19 +26,6 @@ public interface TTSService {
 	}
 
 	/**
-	 * Java counterpart of SSML's marks and TTS processors' bookmarks.
-	 */
-	class Mark {
-		public Mark(String name, int offset) {
-			this.offsetInAudio = offset;
-			this.name = name;
-		}
-
-		public int offsetInAudio; //in bytes
-		public String name;
-	}
-
-	/**
 	 * Allocate a new TTSEngine (e.g. eSpeak or SAPI).
 	 * 
 	 * @param params contains various key-value pairs. Some of them might be options

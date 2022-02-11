@@ -18,7 +18,6 @@ import org.daisy.common.xslt.XslTransformCompiler;
 import org.daisy.pipeline.tts.AudioBuffer;
 import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
-import org.daisy.pipeline.tts.TTSService.Mark;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 
 /**
@@ -62,18 +61,12 @@ public abstract class TTSEngine {
 	 *            boolean field 'released' is guaranteed to be false, i.e. the
 	 *            resource provided is always valid and will remain so during
 	 *            the call.
-	 * @param marks are the returned pairs (markName, offset-in-output)
-	 *            corresponding to the ssml:marks of @param sentence. The order
-	 *            must be kept. The provided list is always empty. The
-	 *            offset-in-outputs are relative to the new buffers returned by
-	 *            synthesize(). That is, they start at 0. If the service doesn't
-	 *            handle SSML marks (i.e. endingmark() returns null). This
-	 *            parameter may be set to null.
-	 * @param expectedMarks are the mark names extracted from @param xmlSentence. The
-	 * 	          TTS engine can use them if it doesn't play well with complicated/long
-	 *            mark names, but it will harder to detect errors. It does include
-	 *            the TTS provider's ending mark. The ending-mark can be set to anything if
-	 *            the TTS processor or @param voice cannot handle marks. 
+	 * @param marks are the returned mark offsets (in bytes) corresponding to
+	 *            the ssml:marks of @param sentence. The order must be kept. The
+	 *            provided list is always empty. The offsets are relative to the
+	 *            output returned by synthesize(). That is, they start at 0. If
+	 *            the service doesn't handle SSML marks, this parameter may be
+	 *            set to null.
 	 * @param bufferAllocator is the object that the TTS Service must use to
 	 *            allocate new audio buffers.
 	 * 
@@ -81,9 +74,8 @@ public abstract class TTSEngine {
 	 * @return a list of adjacent PCM chunks produced by the TTS processor.
 	 */
 	abstract public Collection<AudioBuffer> synthesize(XdmNode sentence, Voice voice,
-	        TTSResource threadResources, List<Mark> marks, List<String> expectedMarks,
-	        AudioBufferAllocator bufferAllocator) throws SynthesisException,
-	        InterruptedException, MemoryException;
+	        TTSResource threadResources, List<Integer> marks, AudioBufferAllocator bufferAllocator)
+		throws SynthesisException, InterruptedException, MemoryException;
 
 	/**
 	 * @return the audio format (sample rate etc.) of the data produced by
@@ -165,12 +157,11 @@ public abstract class TTSEngine {
 	}
 
 	/**
-	 * @return the name of the mark that will be added to check whether all the
-	 *         SSML have been successfully synthesized. TTS processors that
-	 *         cannot handle marks must return null. Must be thread-safe.
+	 * @return <code>true</code> if the TTS engine handles SSML marks,
+	 *         <code>false</code> otherwise. Must be thread-safe.
 	 */
-	public String endingMark() {
-		return null; //marks not handled
+	public boolean handlesMarks() {
+		return false;
 	}
 
 	/* -------------------------------------------- */

@@ -21,7 +21,6 @@ import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
 import org.daisy.pipeline.tts.sapinative.SAPILib;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
-import org.daisy.pipeline.tts.TTSService.Mark;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.Voice;
 
@@ -48,30 +47,33 @@ public class SAPIengine extends TTSEngine {
 	}
 
 	@Override
-	public String endingMark() {
-		return "ending-mark";
+	public boolean handlesMarks() {
+		return true;
 	}
 
 	@Override
 	public Collection<AudioBuffer> synthesize(XdmNode ssml, Voice voice,
-	        TTSResource resource, List<Mark> marks, List<String> expectedMarks,
-	        AudioBufferAllocator bufferAllocator)
+	        TTSResource resource, List<Integer> marks, AudioBufferAllocator bufferAllocator)
 		throws SynthesisException, InterruptedException, MemoryException {
 
 		Map<String,Object> xsltParams = new HashMap<>(); {
 			xsltParams.put("voice", voice.name);
-			xsltParams.put("ending-mark", endingMark());
+			// add ending mark to ensure the complete SSML is processed
+			xsltParams.put("ending-mark", "ending-mark");
 		}
 		try {
-			return speak(transformSsmlNodeToString(ssml, ssmlTransformer, xsltParams),
+			Collection<AudioBuffer> result = speak(transformSsmlNodeToString(ssml, ssmlTransformer, xsltParams),
 			             voice, resource, marks, bufferAllocator);
+			// remove ending mark
+			marks.subList(marks.size() - 1, marks.size()).clear();
+			return result;
 		} catch (IOException | SaxonApiException e) {
 			throw new SynthesisException(e);
 		}
 	}
 
 	public Collection<AudioBuffer> speak(String ssml, Voice voice, TTSResource resource,
-	        List<Mark> marks, AudioBufferAllocator bufferAllocator) throws SynthesisException,
+	        List<Integer> marks, AudioBufferAllocator bufferAllocator) throws SynthesisException,
 	        MemoryException {
 
 		voice = mVoiceFormatConverter.get(voice.name.toLowerCase());
@@ -88,14 +90,13 @@ public class SAPIengine extends TTSEngine {
 		AudioBuffer result = bufferAllocator.allocateBuffer(size);
 		SAPILib.readStream(tr.connection, result.data, 0);
 
-		String[] names = SAPILib.getBookmarkNames(tr.connection);
 		long[] pos = SAPILib.getBookmarkPositions(tr.connection);
 
 		float sampleRate = mAudioFormat.getSampleRate();
 		int bytesPerSample = mAudioFormat.getSampleSizeInBits() / 8;
-		for (int i = 0; i < names.length; ++i) {
+		for (int i = 0; i < pos.length; ++i) {
 			int offset = (int) ((pos[i] * sampleRate * bytesPerSample) / 1000);
-			marks.add(new Mark(names[i], offset));
+			marks.add(offset);
 		}
 
 		return Arrays.asList(result);

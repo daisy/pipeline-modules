@@ -29,7 +29,6 @@ import org.daisy.pipeline.tts.SoundUtil;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
-import org.daisy.pipeline.tts.TTSService.Mark;
 import org.daisy.pipeline.tts.Voice;
 import org.daisy.pipeline.tts.rest.Request;
 import org.daisy.pipeline.tts.scheduler.ExponentialBackoffScheduler;
@@ -66,8 +65,7 @@ public class GoogleRestTTSEngine extends TTSEngine {
 
 	@Override
 	public Collection<AudioBuffer> synthesize(XdmNode ssml, Voice voice, TTSResource threadResources,
-	                                          List<Mark> marks, List<String> expectedMarks,
-	                                          AudioBufferAllocator bufferAllocator)
+	                                          List<Integer> marks, AudioBufferAllocator bufferAllocator)
 			throws SynthesisException, InterruptedException, MemoryException {
 	
 		String sentence; {

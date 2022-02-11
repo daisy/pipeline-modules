@@ -37,7 +37,6 @@ import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSRegistry;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService;
-import org.daisy.pipeline.tts.TTSService.Mark;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.TTSTimeout;
 import org.daisy.pipeline.tts.TTSTimeout.ThreadFreeInterrupter;
@@ -124,17 +123,25 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 		 * Create a piece of SSML that will be used for testing. Useless
 		 * attributes and namespaces are inserted on purpose.
 		 */
-		String ssml = "<s:speak version=\"1.0\" xmlns:s=\"http://www.w3.org/2001/10/synthesis\">"
-		        + "<s:s xmlns:tmp=\"http://\" id=\"s1\"><s:token>small</s:token> sentence</s:s></s:speak>";
-		DocumentBuilder builder = proc.newDocumentBuilder();
-		SAXSource source = new SAXSource(new InputSource(new StringReader(ssml)));
-		XdmNode testingXML = null;
-		try {
-			testingXML = builder.build(source);
-		} catch (SaxonApiException e1) {
-			//that should not happen
-			mLogger.error("could not compile testing SSML " + ssml);
-			return;
+		DocumentBuilder docBuilder = proc.newDocumentBuilder();
+		XdmNode testingSSMLWithoutMark; {
+			String ssml = "<s:speak version=\"1.0\" xmlns:s=\"http://www.w3.org/2001/10/synthesis\">"
+			        + "<s:s xmlns:tmp=\"http://\" id=\"s1\"><s:token>small</s:token> sentence</s:s></s:speak>";
+			try {
+				testingSSMLWithoutMark = docBuilder.build(new SAXSource(new InputSource(new StringReader(ssml))));
+			} catch (SaxonApiException e) {
+				throw new RuntimeException(e); // should not happen
+			}
+		}
+		XdmNode testingSSMLWithMark; {
+			String ssml = "<s:speak version=\"1.0\" xmlns:s=\"http://www.w3.org/2001/10/synthesis\">"
+			        + "<s:s xmlns:tmp=\"http://\" id=\"s1\"><s:token>small</s:token> sentence</s:s>"
+			        + "<s:mark name=\"mark\"></s:mark></s:speak>";
+			try {
+				testingSSMLWithMark = docBuilder.build(new SAXSource(new InputSource(new StringReader(ssml))));
+			} catch (SaxonApiException e) {
+				throw new RuntimeException(e); // should not happen
+			}
 		}
 
 		/*
@@ -148,7 +155,8 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 		for (TTSService service : ttsregistry.getServices()) {
 			TTSEngine engine = null;
 			try {
-				engine = createAndTestEngine(service, mProperties, testingXML, timeout);
+				engine = createAndTestEngine(
+					service, mProperties, testingSSMLWithoutMark, testingSSMLWithMark, timeout);
 				workingEngines.add(engine);
 				engineStatus.add("[x] " + service.getName());
 			} catch (Throwable e) {
@@ -186,8 +194,10 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 	 *                   included in the TTS and the message is included in the engine status
 	 *                   summary. The stack trace is printed in the detailed log.
 	 */
-	private TTSEngine createAndTestEngine(final TTSService service,
-	        Map<String, String> properties, XdmNode testingXML, TTSTimeout timeout) throws Throwable {
+	private TTSEngine createAndTestEngine(final TTSService service, Map<String, String> properties,
+	                                      XdmNode testingSSMLWithoutMark, XdmNode testingSSMLWithMark,
+	                                      TTSTimeout timeout)
+			throws Throwable {
 
 		//create the engine
 		TTSEngine engine = null;
@@ -204,8 +214,7 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 		try {
 			timeout.enableForCurrentThread(timeoutSecs);
 			for (Voice v : engine.getAvailableVoices()) {
-				if (engine.endingMark() == null
-				        || v.getMarkSupport() != MarkSupport.MARK_NOT_SUPPORTED) {
+				if (!engine.handlesMarks() || v.getMarkSupport() != MarkSupport.MARK_NOT_SUPPORTED) {
 					firstVoice = v;
 					break;
 				}
@@ -251,14 +260,12 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 
 		//run the text-to-speech on the testing input
 		Collection<AudioBuffer> audioBuffers = null;
-		List<TTSService.Mark> marks = new ArrayList<TTSService.Mark>();
-		List<String> expectedMarks = new ArrayList<String>();
-		if (engine.endingMark() != null)
-			expectedMarks.add(engine.endingMark());
+		List<Integer> marks = new ArrayList<>();
 		try {
+			XdmNode ssml = engine.handlesMarks() ? testingSSMLWithMark : testingSSMLWithoutMark;
 			audioBuffers = mExecutor.synthesizeWithTimeout(
-				timeout, interrupter, null, testingXML, Sentence.computeSize(testingXML),
-				engine, firstVoice, res, marks, expectedMarks, new StraightBufferAllocator());
+				timeout, interrupter, null, ssml, Sentence.computeSize(ssml),
+				engine, firstVoice, res, marks, new StraightBufferAllocator());
 		} catch (Exception e) {
 			throw new Exception("test failed: " + e.getMessage(), e);
 		} finally {
@@ -287,20 +294,16 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 			msg = "Audio output is not big enough. ";
 		}
 
-		//check the ending mark
-		if (engine.endingMark() != null) {
+		if (engine.handlesMarks()) {
+			// test SSML contains one mark
 			String details = " voice: "+firstVoice;
 			if (marks.size() != 1) {
 				msg += "One bookmark events expected, but received " + marks.size() + " events instead. "+details;
 			} else {
-				Mark mark = marks.get(0);
-				if (!engine.endingMark().equals(mark.name)) {
-					msg += "Expecting ending mark " + engine.endingMark() + ", got "
-					        + mark.name + " instead. "+details;
-				}
-				if (mark.offsetInAudio < 2500) {
-					msg += "Expecting ending mark offset to be bigger, got "
-					        + mark.offsetInAudio + " as offset. "+details;
+				int offset = marks.get(0);
+				if (offset < 2500) {
+					msg += "Expecting mark offset to be bigger, got "
+					        + offset + " as offset. "+details;
 				}
 			}
 		}

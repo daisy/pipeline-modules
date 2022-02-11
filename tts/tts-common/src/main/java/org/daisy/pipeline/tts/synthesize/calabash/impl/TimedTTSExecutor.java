@@ -10,7 +10,6 @@ import org.daisy.pipeline.tts.AudioBufferAllocator;
 import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
-import org.daisy.pipeline.tts.TTSService.Mark;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.TTSTimeout;
 import org.daisy.pipeline.tts.Voice;
@@ -67,8 +66,7 @@ class TimedTTSExecutor {
 	public Collection<AudioBuffer> synthesizeWithTimeout(
 		TTSTimeout timeout, TTSTimeout.ThreadFreeInterrupter interrupter, TTSLog.Entry log,
 		XdmNode sentence, int sentenceSize, TTSEngine engine, Voice voice,
-		TTSResource threadResources, List<Mark> marks, List<String> expectedMarks,
-		AudioBufferAllocator bufferAllocator
+		TTSResource threadResources, List<Integer> marks, AudioBufferAllocator bufferAllocator
 	) throws SynthesisException, MemoryException, TimeoutException {
 		long startTime = System.currentTimeMillis();
 		int timeoutSec = maximumMillisec(engine, sentenceSize) / 1000;
@@ -77,7 +75,7 @@ class TimedTTSExecutor {
 		try {
 			timeout.enableForCurrentThread(interrupter, timeoutSec);
 			Collection<AudioBuffer> result = engine.synthesize(
-				sentence, voice, threadResources, marks, expectedMarks, bufferAllocator);
+				sentence, voice, threadResources, marks, bufferAllocator);
 			Long millisecElapsed = System.currentTimeMillis() - startTime;
 			if (log != null)
 				log.setTimeElapsed((float)millisecElapsed / 1000);

@@ -33,7 +33,6 @@ import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
 import org.daisy.pipeline.tts.SoundUtil;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
-import org.daisy.pipeline.tts.TTSService.Mark;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.Voice;
 import org.daisy.pipeline.tts.VoiceInfo;
@@ -64,8 +63,7 @@ public class ESpeakEngine extends TTSEngine {
 
 	@Override
 	public Collection<AudioBuffer> synthesize(XdmNode ssml, Voice voice, TTSResource threadResources,
-	                                          List<Mark> marks, List<String> expectedMarks,
-	                                          AudioBufferAllocator bufferAllocator)
+	                                          List<Integer> marks, AudioBufferAllocator bufferAllocator)
 			throws SynthesisException,InterruptedException, MemoryException {
 
 		String sentence; {
@@ -174,6 +172,7 @@ public class ESpeakEngine extends TTSEngine {
 										} catch (VoiceInfo.UnknownLanguage e) {
 											mLogger.debug("Could not parse line from `espeak --voices' output: " + line);
 											mLogger.debug("Reason: could not parse locale: " + mr.group("locale"));
+											result.add(new Voice(getProvider().getName(), name));
 										}
 									} else {
 										mLogger.warn("Could not parse line from `espeak --voices' output: " + line);
