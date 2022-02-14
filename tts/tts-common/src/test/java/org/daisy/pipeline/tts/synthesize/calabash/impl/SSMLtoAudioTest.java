@@ -428,8 +428,8 @@ public class SSMLtoAudioTest {
 			public SynthesisResult synthesize(XdmNode sentence, Voice voice,
 					TTSResource threadResources) throws SynthesisException,
 					InterruptedException {
-				Thread.sleep(6000);
-				return null;
+				Thread.sleep(31000);
+				return super.synthesize(sentence, voice, threadResources);
 			}
 
 		};
