@@ -3,21 +3,18 @@ package org.daisy.pipeline.tts.sapinative.impl;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
 
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.common.file.URLs;
-import org.daisy.pipeline.tts.AudioBuffer;
-import org.daisy.pipeline.tts.AudioBufferAllocator;
-import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
 import org.daisy.pipeline.tts.sapinative.SAPILib;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
@@ -52,9 +49,9 @@ public class SAPIengine extends TTSEngine {
 	}
 
 	@Override
-	public Collection<AudioBuffer> synthesize(XdmNode ssml, Voice voice,
-	        TTSResource resource, List<Integer> marks, AudioBufferAllocator bufferAllocator)
-		throws SynthesisException, InterruptedException, MemoryException {
+	public AudioInputStream synthesize(XdmNode ssml, Voice voice,
+	        TTSResource resource, List<Integer> marks)
+		throws SynthesisException, InterruptedException {
 
 		Map<String,Object> xsltParams = new HashMap<>(); {
 			xsltParams.put("voice", voice.name);
@@ -62,8 +59,8 @@ public class SAPIengine extends TTSEngine {
 			xsltParams.put("ending-mark", "ending-mark");
 		}
 		try {
-			Collection<AudioBuffer> result = speak(transformSsmlNodeToString(ssml, ssmlTransformer, xsltParams),
-			             voice, resource, marks, bufferAllocator);
+			AudioInputStream result = speak(transformSsmlNodeToString(ssml, ssmlTransformer, xsltParams),
+			             voice, resource, marks);
 			// remove ending mark
 			marks.subList(marks.size() - 1, marks.size()).clear();
 			return result;
@@ -72,9 +69,8 @@ public class SAPIengine extends TTSEngine {
 		}
 	}
 
-	public Collection<AudioBuffer> speak(String ssml, Voice voice, TTSResource resource,
-	        List<Integer> marks, AudioBufferAllocator bufferAllocator) throws SynthesisException,
-	        MemoryException {
+	public AudioInputStream speak(String ssml, Voice voice, TTSResource resource,
+	        List<Integer> marks) throws SynthesisException {
 
 		voice = mVoiceFormatConverter.get(voice.name.toLowerCase());
 
@@ -86,9 +82,8 @@ public class SAPIengine extends TTSEngine {
 		}
 
 		int size = SAPILib.getStreamSize(tr.connection);
-
-		AudioBuffer result = bufferAllocator.allocateBuffer(size);
-		SAPILib.readStream(tr.connection, result.data, 0);
+		byte[] data = new byte[size];
+		SAPILib.readStream(tr.connection, data, 0);
 
 		long[] pos = SAPILib.getBookmarkPositions(tr.connection);
 
@@ -99,7 +94,7 @@ public class SAPIengine extends TTSEngine {
 			marks.add(offset);
 		}
 
-		return Arrays.asList(result);
+		return createAudioStream(mAudioFormat, data);
 	}
 
 	@Override
@@ -137,13 +132,7 @@ public class SAPIengine extends TTSEngine {
 	}
 
 	@Override
-	public AudioFormat getAudioOutputFormat() {
-		return mAudioFormat;
-	}
-
-	@Override
 	public int getOverallPriority() {
 		return mOverallPriority;
 	}
-
 }

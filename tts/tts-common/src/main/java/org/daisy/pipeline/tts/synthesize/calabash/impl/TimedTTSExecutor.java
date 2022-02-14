@@ -1,13 +1,11 @@
 package org.daisy.pipeline.tts.synthesize.calabash.impl;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.daisy.pipeline.tts.AudioBuffer;
-import org.daisy.pipeline.tts.AudioBufferAllocator;
-import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
+import javax.sound.sampled.AudioInputStream;
+
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
@@ -63,19 +61,19 @@ class TimedTTSExecutor {
 		}
 	}
 
-	public Collection<AudioBuffer> synthesizeWithTimeout(
+	public AudioInputStream synthesizeWithTimeout(
 		TTSTimeout timeout, TTSTimeout.ThreadFreeInterrupter interrupter, TTSLog.Entry log,
 		XdmNode sentence, int sentenceSize, TTSEngine engine, Voice voice,
-		TTSResource threadResources, List<Integer> marks, AudioBufferAllocator bufferAllocator
-	) throws SynthesisException, MemoryException, TimeoutException {
+		TTSResource threadResources, List<Integer> marks
+	) throws SynthesisException, TimeoutException {
 		long startTime = System.currentTimeMillis();
 		int timeoutSec = maximumMillisec(engine, sentenceSize) / 1000;
 		if (log != null)
 			log.setTimeout(timeoutSec);
 		try {
 			timeout.enableForCurrentThread(interrupter, timeoutSec);
-			Collection<AudioBuffer> result = engine.synthesize(
-				sentence, voice, threadResources, marks, bufferAllocator);
+			AudioInputStream result = engine.synthesize(
+				sentence, voice, threadResources, marks);
 			Long millisecElapsed = System.currentTimeMillis() - startTime;
 			if (log != null)
 				log.setTimeElapsed((float)millisecElapsed / 1000);

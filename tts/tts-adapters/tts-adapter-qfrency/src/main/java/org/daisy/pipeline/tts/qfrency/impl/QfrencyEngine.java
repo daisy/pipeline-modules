@@ -1,6 +1,5 @@
 package org.daisy.pipeline.tts.qfrency.impl;
 
-import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -14,19 +13,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
 
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.common.file.URLs;
 import org.daisy.common.shell.CommandRunner;
-import org.daisy.pipeline.tts.AudioBuffer;
-import org.daisy.pipeline.tts.AudioBufferAllocator;
-import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
-import org.daisy.pipeline.tts.SoundUtil;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
@@ -37,10 +30,8 @@ import org.slf4j.LoggerFactory;
 
 public class QfrencyEngine extends TTSEngine {
 
-	private AudioFormat mAudioFormat;
 	private final String mHostAddress;
 	private final String mQfrencyPath;
-	private final static int MIN_CHUNK_SIZE = 2048;
 	private final int mPriority;
 
 	private final static URL ssmlTransformer = URLs.getResourceFromJAR("/transform-ssml.xsl", QfrencyEngine.class);
@@ -54,11 +45,10 @@ public class QfrencyEngine extends TTSEngine {
 	}
 
 	@Override
-	public Collection<AudioBuffer> synthesize(XdmNode ssml, Voice voice, TTSResource threadResources,
-	                                          List<Integer> marks, AudioBufferAllocator bufferAllocator)
-			throws SynthesisException, InterruptedException, MemoryException {
+	public AudioInputStream synthesize(XdmNode ssml, Voice voice, TTSResource threadResources,
+	                                   List<Integer> marks)
+			throws SynthesisException, InterruptedException {
 
-		Collection<AudioBuffer> result = new ArrayList<AudioBuffer>();
 		File outFile = null;
 		String outPath = null;
 		String sentence; {
@@ -73,9 +63,9 @@ public class QfrencyEngine extends TTSEngine {
 		}
 		sentence = stripSSML(sentence);
 		try {
-					outFile = File.createTempFile("dp2_qfrency_", ".wav");
-		outFile.deleteOnExit();
-		outPath = outFile.getPath();
+			outFile = File.createTempFile("dp2_qfrency_", ".wav");
+			outFile.deleteOnExit();
+			outPath = outFile.getPath();
 			String [] lCmd = new String[7];
 			lCmd[0]=mQfrencyPath;
 			lCmd[1]="-a";
@@ -84,56 +74,27 @@ public class QfrencyEngine extends TTSEngine {
 			lCmd[4]=outPath;
 			lCmd[5]=voice.name;
 			lCmd[6]="\'"+sentence+"\'";
-
 			new CommandRunner(lCmd)
 				.consumeError(mLogger)
 				.run();
-
-			BufferedInputStream in = new BufferedInputStream(new FileInputStream(outFile));
-			AudioInputStream fi = AudioSystem.getAudioInputStream(in);
-
-			if (mAudioFormat == null)
-				mAudioFormat = fi.getFormat();
-
-			while (true) {
-				AudioBuffer b = bufferAllocator
-					.allocateBuffer(MIN_CHUNK_SIZE + fi.available());
-				int ret = fi.read(b.data, 0, b.size);
-				if (ret == -1) {
-					bufferAllocator.releaseBuffer(b);
-					break;
-				}
-				b.size = ret;
-				result.add(b);
-			}
-			fi.close();
-
-
-		} catch (MemoryException|InterruptedException e) {
-			SoundUtil.cancelFootPrint(result, bufferAllocator);
+			AudioInputStream result = createAudioStream(
+				new FileInputStream(outFile));
+			outFile.delete();
+			new File(outPath+".sutt").delete();
+			new File(outPath+".TextGrid").delete();
+			return result;
+		} catch (InterruptedException e) {
 			throw e;
 		} catch (Throwable e) {
-			SoundUtil.cancelFootPrint(result, bufferAllocator);
 			StringWriter sw = new StringWriter();
 			e.printStackTrace(new PrintWriter(sw));
 			throw new SynthesisException(e);
 		}
-		outFile.delete();
-		new File(outPath+".sutt").delete();
-		new File(outPath+".TextGrid").delete();
-		return result;
 	}
 
 	public int reservedThreadNum() {
 		return 1;
 	}
-
-	
-	@Override
-	public AudioFormat getAudioOutputFormat() {
-		return mAudioFormat;
-	}
-
 
 	/**
 	 * Need not be thread-safe. This method is called from the main thread.

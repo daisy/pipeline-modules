@@ -1,10 +1,10 @@
 package org.daisy.pipeline.tts.acapela.impl;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -12,17 +12,14 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
 
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.common.file.URLs;
-import org.daisy.pipeline.tts.AudioBuffer;
-import org.daisy.pipeline.tts.AudioBufferAllocator;
-import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
 import org.daisy.pipeline.tts.LoadBalancer;
 import org.daisy.pipeline.tts.LoadBalancer.Host;
-import org.daisy.pipeline.tts.SoundUtil;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
@@ -71,11 +68,10 @@ public class AcapelaEngine extends TTSEngine {
 		NativeLong channelId;
 		PointerByReference channelLock;
 		Pointer server;
-		List<AudioBuffer> chunks;
+		OutputStream audio;
 		List<Integer> marks;
 		NSC_EXEC_DATA execData;
-		AudioBufferAllocator audioBufferAllocator;
-		int outOfMemBytes;
+		IOException error;
 
 		public ThreadResources() {
 			execData = new NSC_EXEC_DATA();
@@ -89,17 +85,15 @@ public class AcapelaEngine extends TTSEngine {
 				@Override
 				public int apply(Pointer pData, int cbDataSize, NSC_SOUND_DATA pSoundData,
 				        Pointer pAppInstanceData) {
-
-					if (outOfMemBytes == 0) {
+					if (error == null) {
+						byte[] chunk = new byte[cbDataSize];
+						pData.read(0, chunk, 0, cbDataSize);
 						try {
-							AudioBuffer b = audioBufferAllocator.allocateBuffer(cbDataSize);
-							pData.read(0, b.data, 0, cbDataSize);
-							chunks.add(b);
-						} catch (MemoryException e) {
-							outOfMemBytes = cbDataSize;
+							audio.write(chunk);
+						} catch (IOException e) {
+							error = e;
 						}
 					}
-
 					return cbDataSize;
 				}
 			};
@@ -282,10 +276,9 @@ public class AcapelaEngine extends TTSEngine {
 	}
 
 	@Override
-	public Collection<AudioBuffer> synthesize(XdmNode ssml, Voice voice,
-	        TTSResource threadResources, List<Integer> marks,
-	        AudioBufferAllocator bufferAllocator) throws SynthesisException,
-	        InterruptedException, MemoryException {
+	public AudioInputStream synthesize(XdmNode ssml, Voice voice,
+	        TTSResource threadResources, List<Integer> marks) throws SynthesisException,
+	        InterruptedException {
 
 		ThreadResources th = (ThreadResources) threadResources;
 
@@ -296,8 +289,8 @@ public class AcapelaEngine extends TTSEngine {
 			xsltParams.put("ending-mark", "ending-mark");
 		}
 		try {
-			Collection<AudioBuffer> result
-				= speak(transformSsmlNodeToString(ssml, ssmlTransformer, xsltParams), th, marks, bufferAllocator);
+			AudioInputStream result
+				= speak(transformSsmlNodeToString(ssml, ssmlTransformer, xsltParams), th, marks);
 			// remove ending mark
 			marks.subList(marks.size() - 1, marks.size()).clear();
 			return result;
@@ -306,39 +299,38 @@ public class AcapelaEngine extends TTSEngine {
 		}
 	}
 
-	Collection<AudioBuffer> speak(String ssml, TTSResource tr, List<Integer> marks,
-	        AudioBufferAllocator bufferAllocator) throws SynthesisException, MemoryException {
+	AudioInputStream speak(String ssml, TTSResource tr, List<Integer> marks)
+			throws SynthesisException, IOException {
+
 		ThreadResources th = (ThreadResources) tr;
-		th.chunks = new ArrayList<AudioBuffer>();
-		th.audioBufferAllocator = bufferAllocator;
+		ByteArrayOutputStream audio = new ByteArrayOutputStream();
+		th.audio = audio;
 		th.marks = marks;
 		th.channelLock = new PointerByReference();
-		th.outOfMemBytes = 0;
+		th.error = null;
 		NscubeLibrary lib = NscubeLibrary.INSTANCE;
 
 		int ret = lib.nscLockChannel(th.server, th.channelId, th.dispatcher, th.channelLock);
 		if (ret != NscubeLibrary.NSC_OK)
-			return Collections.EMPTY_LIST; //TODO: proper error
+			throw new SynthesisException("nscLockChannel returned error code: " + ret);
 
 		ret = lib.nscAddTextUTF8(th.channelLock.getValue(), ssml, null);
 		if (ret != NscubeLibrary.NSC_OK) {
 			lib.nscUnlockChannel(th.channelLock.getValue());
-			return Collections.EMPTY_LIST;
+			throw new SynthesisException("nscAddTextUTF8 returned error code: " + ret);
 		}
 
 		ret = lib.nscExecChannel(th.channelLock.getValue(), th.execData);
 		lib.nscUnlockChannel(th.channelLock.getValue());
 		if (ret != NscubeLibrary.NSC_OK) {
-			SoundUtil.cancelFootPrint(th.chunks, bufferAllocator);
 			throw new SynthesisException("nscExecChannel returned error code: " + ret);
 		}
 
-		if (th.outOfMemBytes > 0) {
-			SoundUtil.cancelFootPrint(th.chunks, bufferAllocator);
-			throw new MemoryException(th.outOfMemBytes);
+		if (th.error != null) {
+			throw th.error;
 		}
 
-		return th.chunks;
+		return createAudioStream(mAudioFormat, audio.toByteArray());
 	}
 
 	@Override
@@ -396,11 +388,6 @@ public class AcapelaEngine extends TTSEngine {
 	@Override
 	public int getOverallPriority() {
 		return mPriority;
-	}
-
-	@Override
-	public AudioFormat getAudioOutputFormat() {
-		return mAudioFormat;
 	}
 
 	@Override

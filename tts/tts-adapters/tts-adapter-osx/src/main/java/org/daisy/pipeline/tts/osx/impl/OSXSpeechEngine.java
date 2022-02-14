@@ -1,6 +1,5 @@
 package org.daisy.pipeline.tts.osx.impl;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -16,19 +15,13 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
 
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.common.file.URLs;
 import org.daisy.common.shell.CommandRunner;
-import org.daisy.pipeline.tts.AudioBuffer;
-import org.daisy.pipeline.tts.AudioBufferAllocator;
-import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
-import org.daisy.pipeline.tts.SoundUtil;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
@@ -39,12 +32,10 @@ import org.slf4j.LoggerFactory;
 
 public class OSXSpeechEngine extends TTSEngine {
 
-	private AudioFormat mAudioFormat;
 	private final String mSayPath;
 	private final int mPriority;
 
 	private final static URL ssmlTransformer = URLs.getResourceFromJAR("/transform-ssml.xsl", OSXSpeechEngine.class);
-	private final static int MIN_CHUNK_SIZE = 2048;
 	private final static Logger mLogger = LoggerFactory.getLogger(OSXSpeechEngine.class);
 
 	public OSXSpeechEngine(OSXSpeechService service, String osxPath, int priority) {
@@ -54,9 +45,9 @@ public class OSXSpeechEngine extends TTSEngine {
 	}
 
 	@Override
-	public Collection<AudioBuffer> synthesize(XdmNode ssml, Voice voice, TTSResource threadResources,
-	                                          List<Integer> marks, AudioBufferAllocator bufferAllocator)
-			throws SynthesisException, InterruptedException, MemoryException {
+	public AudioInputStream synthesize(XdmNode ssml, Voice voice, TTSResource threadResources,
+	                                   List<Integer> marks)
+			throws SynthesisException, InterruptedException {
 		
 		String sentence; {
 			Map<String,Object> xsltParams = new HashMap<>(); {
@@ -68,7 +59,6 @@ public class OSXSpeechEngine extends TTSEngine {
 				throw new SynthesisException(e);
 			}
 		}
-		Collection<AudioBuffer> result = new ArrayList<AudioBuffer>();
 		File waveOut = null;
 		try {
 			waveOut = File.createTempFile("pipeline", ".wav");
@@ -79,32 +69,11 @@ public class OSXSpeechEngine extends TTSEngine {
 				.run();
 			
 			// read the wave on the standard output
-			BufferedInputStream in = new BufferedInputStream(new FileInputStream(waveOut));
-			AudioInputStream fi = AudioSystem.getAudioInputStream(in);
-
-			if (mAudioFormat == null)
-				mAudioFormat = fi.getFormat();
-
-			while (true) {
-				AudioBuffer b = bufferAllocator
-				        .allocateBuffer(MIN_CHUNK_SIZE + fi.available());
-				int ret = fi.read(b.data, 0, b.size);
-				if (ret == -1) {
-					//note: perhaps it would be better to call allocateBuffer()
-					//somewhere else in order to avoid this extra call:
-					bufferAllocator.releaseBuffer(b);
-					break;
-				}
-				b.size = ret;
-				result.add(b);
-			}
-
-			fi.close();
-		} catch (MemoryException|InterruptedException e) {
-			SoundUtil.cancelFootPrint(result, bufferAllocator);
+			return createAudioStream(
+				new FileInputStream(waveOut));
+		} catch (InterruptedException e) {
 			throw e;
 		} catch (Throwable e) {
-			SoundUtil.cancelFootPrint(result, bufferAllocator);
 			StringWriter sw = new StringWriter();
 			e.printStackTrace(new PrintWriter(sw));
 			throw new SynthesisException(e);
@@ -112,15 +81,9 @@ public class OSXSpeechEngine extends TTSEngine {
 			if (waveOut != null)
 				waveOut.delete();
 		}
-		return result;
 	}
 
-	@Override
-	public AudioFormat getAudioOutputFormat() {
-		return mAudioFormat;
-	}
-
-	@Override
+		@Override
 	public Collection<Voice> getAvailableVoices() throws SynthesisException,
 	        InterruptedException {
 

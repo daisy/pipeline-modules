@@ -1,18 +1,24 @@
 package org.daisy.pipeline.tts.synthesize.calabash.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
 
 import net.sf.saxon.s9api.Axis;
 import net.sf.saxon.s9api.QName;
@@ -20,12 +26,10 @@ import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmNodeKind;
 import net.sf.saxon.s9api.XdmSequenceIterator;
 
-import org.daisy.pipeline.tts.AudioBuffer;
-import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
-import org.daisy.pipeline.tts.AudioBufferTracker;
+import org.daisy.pipeline.tts.AudioFootprintMonitor;
+import org.daisy.pipeline.tts.AudioFootprintMonitor.MemoryException;
 import org.daisy.pipeline.tts.SSMLMarkSplitter;
 import org.daisy.pipeline.tts.SSMLMarkSplitter.Chunk;
-import org.daisy.pipeline.tts.SoundUtil;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSRegistry;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
@@ -63,14 +67,14 @@ public class TextToPcmThread implements FormatSpecifications {
 	private int mFileNrInSection; //usually = 0, but incremented when a flush occurs within a section
 	private List<SoundFileLink> mSoundFileLinks; //result provided back to the SynthesizeStep caller
 	private List<SoundFileLink> mLinksOfCurrentFile; //links under construction
-	private Iterable<AudioBuffer> mBuffersOfCurrentFile; //buffers under construction
+	private Iterable<AudioInputStream> mAudioOfCurrentFile; // audio file under construction
 	private int mOffsetInFile; // reset after every flush
 	private int mMemFootprint; //reset after every flush
 	private Thread mThread;
 	private TimedTTSExecutor mExecutor;
 	private TTSRegistry mTTSRegistry;
 	private AudioFormat mLastFormat; //used for knowing if a flush is necessary
-	private AudioBufferTracker mAudioBufferTracker;
+	private AudioFootprintMonitor mAudioFootprintMonitor;
 	private SSMLMarkSplitter mSSMLSplitter;
 	private VoiceManager mVoiceManager;
 	private TTSLog mTTSLog;
@@ -98,14 +102,14 @@ public class TextToPcmThread implements FormatSpecifications {
 	        final BlockingQueue<ContiguousPCM> pcmOutput, TimedTTSExecutor executor,
 	        TTSRegistry ttsregistry, VoiceManager voiceManager, SSMLMarkSplitter ssmlSplitter,
 	        final IProgressListener progressListener, Logger logger,
-	        AudioBufferTracker AudioBufferTracker, final int maxQueueEltSize,
+	        AudioFootprintMonitor audioFootprintMonitor, final int maxQueueEltSize,
 	        TTSLog ttsLog) {
 		mSSMLSplitter = ssmlSplitter;
 		mSoundFileLinks = new ArrayList<SoundFileLink>();
 		mExecutor = executor;
 		mTTSRegistry = ttsregistry;
 		mLogger = logger;
-		mAudioBufferTracker = AudioBufferTracker;
+		mAudioFootprintMonitor = audioFootprintMonitor;
 		mVoiceManager = voiceManager;
 		mTTSLog = ttsLog;
 		mErrorCounter = 0;
@@ -212,13 +216,13 @@ public class TextToPcmThread implements FormatSpecifications {
 				        .getDocumentPosition(), section.getDocumentSplitPosition(),
 				        mFileNrInSection);
 
-				ContiguousPCM pcm = new ContiguousPCM(mLastFormat, mBuffersOfCurrentFile,
+				ContiguousPCM pcm = new ContiguousPCM(concat(mAudioOfCurrentFile),
 				        section.getAudioOutputDir(), filePrefix);
 				for (SoundFileLink clip : mLinksOfCurrentFile) {
 					clip.soundFileURIHolder = pcm.getURIholder();
 				}
 				try {
-					mAudioBufferTracker.transferToEncoding(mMemFootprint, pcm.sizeInBytes());
+					mAudioFootprintMonitor.transferToEncoding(mMemFootprint, pcm.sizeInBytes());
 				} catch (InterruptedException e) {
 					// Should never happen since interruptions only occur during calls to TTS processors.
 					mLogger.warn("interruption of memory transfer");
@@ -230,16 +234,18 @@ public class TextToPcmThread implements FormatSpecifications {
 			}
 		}
 		mLinksOfCurrentFile = new ArrayList<SoundFileLink>();
-		mBuffersOfCurrentFile = new ArrayList<AudioBuffer>();
+		mAudioOfCurrentFile = new ArrayList<AudioInputStream>();
 		mOffsetInFile = 0;
 		mMemFootprint = 0;
 		mLastFormat = null;
 	}
 
 	/**
-	 * Wrapper around synthesizeWithTimeout() to handle marks
+	 * Wrapper around {@link TimedTTSExecutor#synthesizeWithTimeout()} to handle
+	 * marks. Returns a sequence of {@link AudioInputStream} with the same audio
+	 * format.
 	 */
-	private Iterable<AudioBuffer> synthesize(
+	private Iterable<AudioInputStream> synthesize(
 			TTSTimeout timeout, TTSTimeout.ThreadFreeInterrupter interrupter, TTSLog.Entry logEntry,
 			Sentence sentence, TTSEngine tts, Voice voice, TTSResource threadResources,
 			List<Mark> marks, List<String> markNames
@@ -248,11 +254,10 @@ public class TextToPcmThread implements FormatSpecifications {
 		        && voice.getMarkSupport() != MarkSupport.MARK_NOT_SUPPORTED){
 			logEntry.setActualVoice(voice);
 			List<Integer> markOffsets = new ArrayList<>();
-			Iterable<AudioBuffer> result = mExecutor.synthesizeWithTimeout(
+			AudioInputStream result = mExecutor.synthesizeWithTimeout(
 				timeout, interrupter, logEntry, sentence.getText(), sentence.getSize(), tts, voice,
-				threadResources, markOffsets, mAudioBufferTracker);
-			if (markNames.size() != markOffsets.size()){
-				SoundUtil.cancelFootPrint(result, mAudioBufferTracker);
+				threadResources, markOffsets);
+			if (markNames.size() != markOffsets.size()) {
 				mTTSLog.getWritableEntry(sentence.getID()).addError(
 				        new TTSLog.Error(ErrorCode.WARNING, "wrong number of marks with "
 				                + tts.getProvider().getName()
@@ -263,36 +268,36 @@ public class TextToPcmThread implements FormatSpecifications {
 			for (int i = 0; i < markNames.size(); i++) {
 				marks.add(new Mark(markNames.get(i), markOffsets.get(i)));
 			}
-			return result;
+			mAudioFootprintMonitor.acquireTTSMemory(result);
+			return Collections.singletonList(result);
 		} else {
 			Collection<Chunk> chunks = mSSMLSplitter.split(sentence.getText());
-			Iterable<AudioBuffer> result = new ArrayList<AudioBuffer>();
+			List<AudioInputStream> result = new ArrayList<>();
 			int offset = 0;
 			for (Chunk chunk : chunks) {
-				Collection<AudioBuffer> buffers = null;
 				logEntry.setActualVoice(voice);
 				try {
-					buffers = mExecutor.synthesizeWithTimeout(
+					AudioInputStream stream = mExecutor.synthesizeWithTimeout(
 						timeout, interrupter, logEntry, chunk.ssml(), Sentence.computeSize(chunk.ssml()),
-						tts, voice, threadResources, new ArrayList<Integer>(), mAudioBufferTracker);
+						tts, voice, threadResources, new ArrayList<Integer>());
+					if (chunk.leftMark() != null) {
+						marks.add(new Mark(chunk.leftMark(), offset));
+					}
+					int size = AudioFootprintMonitor.getFootprint(stream);
+					offset += size;
+					mAudioFootprintMonitor.acquireTTSMemory(size);
+					result.add(stream);
 				} catch (MemoryException | SynthesisException | TimeoutException e) {
-					//TODO: flush the buffers here
-					SoundUtil.cancelFootPrint(result, mAudioBufferTracker);
+					// TODO: flush here
+					for (AudioInputStream s : result)
+						mAudioFootprintMonitor.releaseTTSMemory(s);
 					throw e;
 				} catch (Throwable t) {
-
-					//TODO: flush the buffers here
-					SoundUtil.cancelFootPrint(result, mAudioBufferTracker);
+					// TODO: flush here
+					for (AudioInputStream s : result)
+						mAudioFootprintMonitor.releaseTTSMemory(s);
 					throw new SynthesisException(t);
 				}
-
-				if (chunk.leftMark() != null) {
-					marks.add(new Mark(chunk.leftMark(), offset));
-				}
-				for (AudioBuffer b : buffers) {
-					offset += b.size;
-				}
-				result = Iterables.concat(result, buffers);
 			}
 			if (markNames.size() != marks.size()) {
 				throw new RuntimeException(); // should not happen
@@ -304,7 +309,7 @@ public class TextToPcmThread implements FormatSpecifications {
 	/**
 	 * @return null if something went wrong
 	 */
-	private Iterable<AudioBuffer> speakWithVoice(final Sentence sentence, Voice v,
+	private Iterable<AudioInputStream> speakWithVoice(final Sentence sentence, Voice v,
 	        final TTSEngine tts, List<Mark> marks, List<String> markNames, TTSTimeout timeout)
 	        		throws MemoryException {
 		//allocate a TTS resource if necessary
@@ -384,8 +389,6 @@ public class TextToPcmThread implements FormatSpecifications {
 			                + sw.toString()));
 
 			return null;
-		} catch (MemoryException e) {
-			throw e;
 		}
 	}
 	
@@ -412,7 +415,7 @@ public class TextToPcmThread implements FormatSpecifications {
 		TTSEngine tts = sentence.getTTSproc();
 		Voice originalVoice = sentence.getVoice();
 		List<Mark> marks = new ArrayList<Mark>();
-		Iterable<AudioBuffer> pcm;
+		Iterable<AudioInputStream> pcm;
 		try {
 			pcm = speakWithVoice(sentence, originalVoice, tts, marks, markNames, timeout);
 		} catch (MemoryException e) {
@@ -459,20 +462,15 @@ public class TextToPcmThread implements FormatSpecifications {
 			mLogger.info("something went wrong with " + originalVoice + ". Voice " + newVoice
 			        + " used instead to synthesize sentence");
 
-			if (mLastFormat != null && !tts.getAudioOutputFormat().matches(mLastFormat))
+			if (mLastFormat != null && !pcm.iterator().next().getFormat().matches(mLastFormat))
 				flush(section, pcmOutput);
 		}
-		mLastFormat = tts.getAudioOutputFormat();
+		mLastFormat = pcm.iterator().next().getFormat();
 
 		int begin = mOffsetInFile;
-		try {
-			addBuffers(pcm);
-		} catch (InterruptedException e) {
-			// Should never happen since interruptions only occur during calls to TTS processors.
-			mLogger.warn("interruption exception while queuing the PCM buffers");
-		}
+		addAudio(pcm);
 
-		// keep track of where the sound begins and where it ends within the audio buffers
+		// keep track of where the sound begins and where it ends within the audio file
 		if (marks.size() == 0) {
 			SoundFileLink sf = new SoundFileLink();
 			sf.xmlid = sentence.getID();
@@ -535,12 +533,80 @@ public class TextToPcmThread implements FormatSpecifications {
 		        new TTSLog.Error(ErrorCode.AUDIO_MISSING, msg));
 	}
 
-	private void addBuffers(Iterable<AudioBuffer> toadd) throws InterruptedException {
-		for (AudioBuffer b : toadd) {
-			mOffsetInFile += b.size;
-			mMemFootprint += mAudioBufferTracker.getFootPrint(b);
+	private void addAudio(Iterable<AudioInputStream> toadd) {
+		for (AudioInputStream b : toadd) {
+			int size = AudioFootprintMonitor.getFootprint(b);
+			mOffsetInFile += size;
+			mMemFootprint += size;
 		}
-		mBuffersOfCurrentFile = Iterables.concat(mBuffersOfCurrentFile, toadd);
+		mAudioOfCurrentFile = Iterables.concat(mAudioOfCurrentFile, toadd);
+	}
+
+	/**
+	 * Concatenate a sequence of {@link AudioInputStream} into a single {@link AudioInputStream}.
+	 */
+	private static AudioInputStream concat(Iterable<AudioInputStream> streams) {
+		int count = 0;
+		long _totalLength = 0;
+		AudioFormat format = null;
+		for (AudioInputStream s : streams) {
+			count++;
+			_totalLength += s.getFrameLength();
+			if (format == null)
+				format = s.getFormat();
+			else if (!format.matches(s.getFormat()))
+				throw new IllegalArgumentException("Can not concatenate AudioInputStream with different audio formats");
+		}
+		if (count == 0)
+			throw new IllegalArgumentException("At least one AudioInputStream expected");
+		if (count == 1)
+			return streams.iterator().next();
+		long totalLength = _totalLength;
+		int frameSize = format.getFrameSize();
+		return new AudioInputStream(
+			new InputStream() {
+				Iterator<AudioInputStream> nextStreams = streams.iterator();
+				AudioInputStream stream = null;
+				byte[] frame = new byte[frameSize];
+				long availableFrames = totalLength;
+				int availableInFrame = 0;
+				public int read() throws IOException {
+					if (availableFrames == 0 && availableInFrame == 0)
+						return -1;
+					if (availableInFrame > 0)
+						return frame[frameSize - (availableInFrame--)] & 0xFF;
+					if (stream != null) {
+						availableInFrame = stream.read(frame);
+						if (availableInFrame > 0) {
+							availableFrames--;
+							return frame[frameSize - (availableInFrame--)] & 0xFF;
+						}
+					}
+					try {
+						if (stream != null)
+							stream.close();
+						stream = nextStreams.next();
+					} catch (NoSuchElementException e) {
+						return -1;
+					}
+					return read();
+				}
+				public int available() {
+					try {
+						return Math.toIntExact(Math.multiplyExact(availableFrames, frameSize)) + availableInFrame;
+					} catch (ArithmeticException e) {
+						return Integer.MAX_VALUE;
+					}
+				}
+				public void close() throws IOException {
+					if (stream != null)
+						stream.close();
+					while (nextStreams.hasNext())
+						nextStreams.next().close();
+				}
+			},
+			format,
+			totalLength);
 	}
 
 	private static double convertBytesToSecond(AudioFormat format, int bytes) {

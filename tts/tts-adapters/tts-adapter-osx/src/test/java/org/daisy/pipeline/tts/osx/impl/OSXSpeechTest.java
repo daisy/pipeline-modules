@@ -7,13 +7,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.sound.sampled.AudioInputStream;
 import javax.xml.transform.sax.SAXSource;
 
 import org.daisy.common.shell.BinaryFinder;
-import org.daisy.pipeline.tts.AudioBuffer;
-import org.daisy.pipeline.tts.AudioBufferAllocator;
-import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
-import org.daisy.pipeline.tts.StraightBufferAllocator;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.Voice;
@@ -29,14 +26,9 @@ import net.sf.saxon.s9api.XdmNode;
 
 public class OSXSpeechTest {
 
-	static AudioBufferAllocator BufferAllocator = new StraightBufferAllocator();
-
-	private static int getSize(Collection<AudioBuffer> buffers) {
-		int res = 0;
-		for (AudioBuffer buf : buffers) {
-			res += buf.size;
-		}
-		return res;
+	private static int getSize(AudioInputStream audio) {
+		return Math.toIntExact(
+			audio.getFrameLength() * audio.getFormat().getFrameSize());
 	}
 
 	private static OSXSpeechEngine allocateEngine() throws Throwable {
@@ -65,12 +57,12 @@ public class OSXSpeechTest {
 		Voice voice = getAnyVoice(engine);
 
 		TTSResource resource = engine.allocateThreadResources();
-		Collection<AudioBuffer> li = engine.synthesize(
+		AudioInputStream audio = engine.synthesize(
 			parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">this is a test</s>"),
-			voice, resource, null, BufferAllocator);
+			voice, resource, null);
 		engine.releaseThreadResources(resource);
 
-		Assert.assertTrue(getSize(li) > 2000);
+		Assert.assertTrue(getSize(audio) > 2000);
 	}
 
 	@Test
@@ -83,11 +75,11 @@ public class OSXSpeechTest {
 		Iterator<Voice> ite = engine.getAvailableVoices().iterator();
 		while (ite.hasNext()) {
 			Voice v = ite.next();
-			Collection<AudioBuffer> li = engine.synthesize(
+			AudioInputStream audio = engine.synthesize(
 				parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">small test</s>"),
-				v, resource, null, BufferAllocator);
+				v, resource, null);
 
-			sizes.add(getSize(li) / 4); //div 4 helps being more robust to tiny differences
+			sizes.add(getSize(audio) / 4); //div 4 helps being more robust to tiny differences
 			totalVoices++;
 		}
 		engine.releaseThreadResources(resource);
@@ -103,13 +95,13 @@ public class OSXSpeechTest {
 		OSXSpeechEngine engine = allocateEngine();
 		TTSResource resource = engine.allocateThreadResources();
 		Voice voice = getAnyVoice(engine);
-		Collection<AudioBuffer> li = engine.synthesize(
+		AudioInputStream audio = engine.synthesize(
 			parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">"
 			          + "𝄞𝄞𝄞𝄞 水水水水水 𝄞水𝄞水𝄞水𝄞水 test 国aØ家Ť标准 ĜæŘ ß ŒÞ ๕</s>"),
-			voice, resource, null, BufferAllocator);
+			voice, resource, null);
 		engine.releaseThreadResources(resource);
 
-		Assert.assertTrue(getSize(li) > 2000);
+		Assert.assertTrue(getSize(audio) > 2000);
 	}
 
 	@Test
@@ -131,18 +123,18 @@ public class OSXSpeechTest {
 						return;
 					}
 
-					Collection<AudioBuffer> li = null;
+					AudioInputStream audio = null;
 					for (int k = 0; k < 16; ++k) {
 						try {
-							li = engine.synthesize(
+							audio = engine.synthesize(
 								parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">small test</s>"),
-								voice, resource, null, BufferAllocator);
+								voice, resource, null);
 
-						} catch (SaxonApiException | SynthesisException | InterruptedException | MemoryException e) {
+						} catch (SaxonApiException | SynthesisException | InterruptedException e) {
 							e.printStackTrace();
 							break;
 						}
-						sizes[j] += getSize(li);
+						sizes[j] += getSize(audio);
 					}
 					try {
 						engine.releaseThreadResources(resource);

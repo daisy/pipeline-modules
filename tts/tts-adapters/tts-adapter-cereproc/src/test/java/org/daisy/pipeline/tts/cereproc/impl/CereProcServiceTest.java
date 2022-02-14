@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.sound.sampled.AudioInputStream;
 import javax.xml.transform.sax.SAXSource;
 
 import com.google.common.collect.ImmutableSet;
@@ -15,9 +16,7 @@ import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 
-import org.daisy.pipeline.tts.AudioBuffer;
 import org.daisy.pipeline.junit.AbstractTest;
-import org.daisy.pipeline.tts.StraightBufferAllocator;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService;
@@ -55,14 +54,13 @@ public class CereProcServiceTest extends AbstractTest {
 		                  || "cereproc-dnn".equals(ttsService.getName()));
 		TTSResource resource = engine.allocateThreadResources();
 		try {
-			Collection<AudioBuffer> audio = engine.synthesize(
+			AudioInputStream audio = engine.synthesize(
 				parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">Hi, my name is William</s>"),
 				new Voice(null, "William"),
 				resource,
-				null, // marks,
-				new StraightBufferAllocator()
+				null // marks
 			);
-			Assert.assertTrue(audio.stream().mapToInt(x -> x.size).sum() > 10000);
+			Assert.assertTrue(audio.getFrameLength() * audio.getFormat().getFrameSize() > 10000);
 		} finally {
 			engine.releaseThreadResources(resource);
 		}

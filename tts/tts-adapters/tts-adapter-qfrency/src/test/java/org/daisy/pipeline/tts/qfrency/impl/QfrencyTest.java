@@ -3,16 +3,13 @@ package org.daisy.pipeline.tts.qfrency.impl;
 import java.io.StringReader;
 import java.util.Collection;
 
+import javax.sound.sampled.AudioInputStream;
 import javax.xml.transform.sax.SAXSource;
 
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 
-import org.daisy.pipeline.tts.AudioBuffer;
-import org.daisy.pipeline.tts.AudioBufferAllocator;
-import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
-import org.daisy.pipeline.tts.StraightBufferAllocator;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.Voice;
@@ -32,8 +29,6 @@ import org.xml.sax.InputSource;
 public class QfrencyTest {
 	QfrencyEngine tts;
 
-	static AudioBufferAllocator BufferAllocator = new StraightBufferAllocator();
-
 	private String format(String str) {
 		return str;
 	}
@@ -42,14 +37,9 @@ public class QfrencyTest {
 		return "\\voice{" + speakerName + "}" + str;
 	}
 
-	static private int getSize(Collection<AudioBuffer> buffers) {
-		if (buffers == null)
-			return -1;
-		int size = 0;
-		for (AudioBuffer b : buffers) {
-			size += b.size;
-		}
-		return size;
+	static private int getSize(AudioInputStream audio) {
+		return Math.toIntExact(
+			audio.getFrameLength() * audio.getFormat().getFrameSize());
 	}
 
 	@Before
@@ -71,14 +61,14 @@ public class QfrencyTest {
 	}
 	
 	@Test
-	public void simpleSpeak() throws SynthesisException, InterruptedException, MemoryException, SaxonApiException {
+	public void simpleSpeak() throws SynthesisException, InterruptedException, SaxonApiException {
 		TTSResource r = tts.allocateThreadResources();
 		Voice voice = getVoice();
 		Assert.assertTrue("At least one voice must be available", voice!=null);
 		int size = getSize(
 			tts.synthesize(
 				parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">this is a test<s>"),
-				voice, r, null, BufferAllocator));
+				voice, r, null));
 		tts.releaseThreadResources(r);
 
 		Assert.assertTrue("audio output must be big enough", size > 2000);

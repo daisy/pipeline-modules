@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -40,10 +41,6 @@ import org.daisy.common.saxon.SaxonInputValue;
 import org.daisy.common.saxon.SaxonOutputValue;
 import org.daisy.common.shell.CommandRunner;
 import org.daisy.common.stax.XMLStreamWriterHelper;
-import org.daisy.pipeline.tts.AudioBuffer;
-import org.daisy.pipeline.tts.AudioBufferAllocator;
-import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
-import org.daisy.pipeline.tts.SoundUtil;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
@@ -129,11 +126,6 @@ public class CereProcEngine extends TTSEngine {
 	}
 
 	@Override
-	public AudioFormat getAudioOutputFormat() {
-		return audioFormat;
-	}
-
-	@Override
 	public int expectedMillisecPerWord() {
 		return expectedMillisecPerWord;
 	}
@@ -153,13 +145,11 @@ public class CereProcEngine extends TTSEngine {
 	}
 
 	@Override
-	public Collection<AudioBuffer> synthesize(XdmNode sentence,
-	                                          Voice voice,
-	                                          TTSResource threadResources,
-	                                          List<Integer> marks,
-	                                          AudioBufferAllocator bufferAllocator)
-			throws SynthesisException, InterruptedException, MemoryException {
-		Collection<AudioBuffer> result = new ArrayList<>();
+	public AudioInputStream synthesize(XdmNode sentence,
+	                                   Voice voice,
+	                                   TTSResource threadResources,
+	                                   List<Integer> marks)
+			throws SynthesisException, InterruptedException {
 		StringWriter out = new StringWriter();
 		StringWriter err = new StringWriter();
 		File txtFile;
@@ -215,20 +205,15 @@ public class CereProcEngine extends TTSEngine {
 				int len;
 				while ((len = is.read(buf)) > 0)
 					bytes.write(buf, 0, len);
-				AudioBuffer b = bufferAllocator.allocateBuffer(bytes.size());
-				System.arraycopy(bytes.toByteArray(), 0, b.data, 0, b.data.length);
-				result.add(b);
+				return createAudioStream(audioFormat, bytes.toByteArray());
 			}
-		} catch (MemoryException|InterruptedException e) {
-			SoundUtil.cancelFootPrint(result, bufferAllocator);
+		} catch (InterruptedException e) {
 			throw e;
 		} catch (Throwable e) {
-			SoundUtil.cancelFootPrint(result, bufferAllocator);
 			logger.error(out.toString());
 			logger.error(err.toString());
 			throw new SynthesisException(e);
 		}
-		return result;
 	}
 
 	/**

@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioInputStream;
 import javax.xml.transform.sax.SAXSource;
 
 import net.sf.saxon.s9api.DocumentBuilder;
@@ -28,10 +29,8 @@ import org.daisy.common.messaging.Message.Level;
 import org.daisy.common.messaging.MessageAppender;
 import org.daisy.common.messaging.MessageBuilder;
 import org.daisy.pipeline.audio.AudioServices;
-import org.daisy.pipeline.tts.AudioBuffer;
-import org.daisy.pipeline.tts.AudioBufferTracker;
+import org.daisy.pipeline.tts.AudioFootprintMonitor;
 import org.daisy.pipeline.tts.SSMLMarkSplitter;
-import org.daisy.pipeline.tts.StraightBufferAllocator;
 import org.daisy.pipeline.tts.StructuredSSMLSplitter;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSRegistry;
@@ -77,7 +76,7 @@ import com.google.common.collect.Iterables;
  * 
  * The queue of PCM chunks, along with the queues of other TTS steps, share a
  * global max size so as to make sure that they won't grow too much if the
- * encoding is slower than the synthesizing (see AudioBuffersTracker).
+ * encoding is slower than the synthesizing (see AudioFootprintMonitor).
  * 
  * If an EncodingThread fails to encode samples, it won't set the URI attribute
  * of the audio chunks. In that way, SSMLtoAudio is informed not to include the
@@ -96,7 +95,7 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 	private long mProgress;
 	private int mDocumentPosition;
 	private Map<TTSEngine, List<ContiguousText>> mOrganizedText;
-	private AudioBufferTracker mAudioBufferTracker;
+	private AudioFootprintMonitor mAudioFootprintMonitor;
 	private Processor mProc;
 	private VoiceManager mVoiceManager;
 	private TimedTTSExecutor mExecutor = new TimedTTSExecutor();
@@ -106,14 +105,14 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 
 	public SSMLtoAudio(File audioDir, AudioFileFormat.Type audioFileFormat,
 	        TTSRegistry ttsregistry, Logger logger,
-	        AudioBufferTracker audioBufferTracker, Processor proc,
+	        AudioFootprintMonitor audioFootprintMonitor, Processor proc,
 	        VoiceConfigExtension configExt, TTSLog logs) {
 		mTTSRegistry = ttsregistry;
 		mLogger = logger;
 		mCurrentSection = null;
 		mDocumentPosition = 0;
 		mOrganizedText = new HashMap<TTSEngine, List<ContiguousText>>();
-		mAudioBufferTracker = audioBufferTracker;
+		mAudioFootprintMonitor = audioFootprintMonitor;
 		mProc = proc;
 		mAudioDir = audioDir;
 		mAudioFileFormat = audioFileFormat;
@@ -259,13 +258,13 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 		};
 
 		//run the text-to-speech on the testing input
-		Collection<AudioBuffer> audioBuffers = null;
+		AudioInputStream audio = null;
 		List<Integer> marks = new ArrayList<>();
 		try {
 			XdmNode ssml = engine.handlesMarks() ? testingSSMLWithMark : testingSSMLWithoutMark;
-			audioBuffers = mExecutor.synthesizeWithTimeout(
+			audio = mExecutor.synthesizeWithTimeout(
 				timeout, interrupter, null, ssml, Sentence.computeSize(ssml),
-				engine, firstVoice, res, marks, new StraightBufferAllocator());
+				engine, firstVoice, res, marks);
 		} catch (Exception e) {
 			throw new Exception("test failed: " + e.getMessage(), e);
 		} finally {
@@ -287,10 +286,7 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 
 		//check that the output buffer is big enough
 		String msg = "";
-		int size = 0;
-		for (AudioBuffer buff : audioBuffers)
-			size += buff.size;
-		if (size < 2500) {
+		if (audio.getFrameLength() * audio.getFormat().getFrameSize() < 2500) {
 			msg = "Audio output is not big enough. ";
 		}
 
@@ -389,10 +385,7 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 
 		if (newSynth != mLastTTS) {
 			if (mLastTTS != null
-			        && (poolkey != null || mLastTTS.reservedThreadNum() != 0
-			                || mLastTTS.getAudioOutputFormat() == null
-			                || newSynth.getAudioOutputFormat() == null || !mLastTTS
-			                .getAudioOutputFormat().matches(newSynth.getAudioOutputFormat())))
+			        && (poolkey != null || mLastTTS.reservedThreadNum() > 0))
 				endSection(); // necessary because the same thread wouldn't be able to
 				              // concatenate outputs of different formats
 			mLastTTS = newSynth;
@@ -452,9 +445,9 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 		mLogger.info("Number of regular text-to-speech threads: " + regularTTSthreadNum);
 		mLogger.info("Number of reserved text-to-speech threads: " + reservedThreadNum);
 		mLogger.info("Max TTS memory footprint (encoding excluded): "
-		        + mAudioBufferTracker.getSpaceForTTS() / 1000000 + "MB");
+		        + mAudioFootprintMonitor.getSpaceForTTS() / 1000000 + "MB");
 		mLogger.info("Max encoding memory footprint: "
-		        + mAudioBufferTracker.getSpaceForEncoding() / 1000000 + "MB");
+		        + mAudioFootprintMonitor.getSpaceForEncoding() / 1000000 + "MB");
 
 		//input queue common to all the threads
 		BlockingQueue<ContiguousPCM> pcmQueue = new PriorityBlockingQueue<ContiguousPCM>();
@@ -471,7 +464,7 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 		for (; i < regularTTSthreadNum; ++i) {
 			tpt[i] = new TextToPcmThread();
 			tpt[i].start(stext, pcmQueue, mExecutor, mTTSRegistry, mVoiceManager, ssmlSplitter, this,
-			             mLogger, mAudioBufferTracker, maxMemPerTTSThread, mTTSlog);
+			             mLogger, mAudioFootprintMonitor, maxMemPerTTSThread, mTTSlog);
 		}
 		for (Map.Entry<TTSEngine, List<ContiguousText>> e : mOrganizedText.entrySet()) {
 			TTSEngine tts = e.getKey();
@@ -480,7 +473,7 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 				for (int j = 0; j < tts.reservedThreadNum(); ++i, ++j) {
 					tpt[i] = new TextToPcmThread();
 					tpt[i].start(stext, pcmQueue, mExecutor, mTTSRegistry, mVoiceManager, ssmlSplitter,
-					        this, mLogger, mAudioBufferTracker, maxMemPerTTSThread, mTTSlog);
+					        this, mLogger, mAudioFootprintMonitor, maxMemPerTTSThread, mTTSlog);
 				}
 			}
 		}
@@ -491,7 +484,7 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 		for (int j = 0; j < encodingTh.length; ++j) {
 			encodingTh[j] = new EncodingThread();
 			encodingTh[j].start(mAudioFileFormat, audioServices, pcmQueue, mLogger,
-					 mAudioBufferTracker, mProperties, mTTSlog);
+					 mAudioFootprintMonitor, mProperties, mTTSlog);
 		}
 		mLogger.info("Encoding threads started.");
 
@@ -543,8 +536,8 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 				new BigDecimal(section.getStringSize()).divide(new BigDecimal(mTotalTextSize), MathContext.DECIMAL128));
 		mProgress += section.getStringSize();
 		if (mProgress - mPrintedProgress > mTotalTextSize / 15) {
-			int TTSMem = mAudioBufferTracker.getUnreleasedTTSMem() / 1000000;
-			int EncodeMem = mAudioBufferTracker.getUnreleasedEncondingMem() / 1000000;
+			int TTSMem = mAudioFootprintMonitor.getUnreleasedTTSMem() / 1000000;
+			int EncodeMem = mAudioFootprintMonitor.getUnreleasedEncondingMem() / 1000000;
 			m = m.withLevel(Level.INFO)
 			     .withText("progress: " + 100 * mProgress / mTotalTextSize + "%  [TTS: "
 			               + TTSMem + "MB encoding: " + EncodeMem + "MB]");

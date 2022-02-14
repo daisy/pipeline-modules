@@ -2,13 +2,13 @@ package org.daisy.pipeline.tts.synthesize.calabash.impl;
 
 import java.io.File;
 
-import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
 
-import org.daisy.pipeline.tts.AudioBuffer;
+import org.daisy.pipeline.tts.AudioFootprintMonitor;
 
 /**
  * ContiguousPCMs are the message objects sent from TTS processors to the
- * encoders. Every ContiguousPCM contains a list of audio buffers and attributes
+ * encoders. Every ContiguousPCM contains a AudioInputStream and attributes
  * related to the URI of the sound file to produce.
  */
 class ContiguousPCM implements Comparable<ContiguousPCM> {
@@ -24,20 +24,14 @@ class ContiguousPCM implements Comparable<ContiguousPCM> {
 		return (mEncodingTimeApprox == -1);
 	}
 
-	ContiguousPCM(AudioFormat audioformat, Iterable<AudioBuffer> buffers, File destdir,
-	        String destFilePrefix) {
+	ContiguousPCM(AudioInputStream audio, File destdir, String destFilePrefix) {
 		mDestURI = new StringBuilder();
-		mAudioFormat = audioformat;
-		mBuffers = buffers;
+		mAudio = audio;
 		mDestDir = destdir;
 		mDestFilePrefix = destFilePrefix;
-		mEncodingTimeApprox = 0;
-		for (AudioBuffer buffer : buffers)
-			mEncodingTimeApprox += buffer.size;
-		mEncodingTimeApprox /= mAudioFormat.getSampleSizeInBits();
-		mSizeInBytes = minByteSize();
-		for (AudioBuffer buffer : buffers)
-			mSizeInBytes += buffer.data.length;
+		int size = AudioFootprintMonitor.getFootprint(audio);
+		mSizeInBytes = minByteSize() + size;
+		mEncodingTimeApprox = size / audio.getFormat().getSampleSizeInBits();
 	}
 
 	@Override
@@ -53,12 +47,8 @@ class ContiguousPCM implements Comparable<ContiguousPCM> {
 		return mDestDir;
 	}
 
-	AudioFormat getAudioFormat() {
-		return mAudioFormat;
-	}
-
-	Iterable<AudioBuffer> getBuffers() {
-		return mBuffers;
+	AudioInputStream getAudio() {
+		return mAudio;
 	}
 
 	StringBuilder getURIholder() {
@@ -73,10 +63,9 @@ class ContiguousPCM implements Comparable<ContiguousPCM> {
 		return 500;//rough approximation of an empty ContiguousPCM's memory footprint
 	}
 
-	private Iterable<AudioBuffer> mBuffers;
+	private AudioInputStream mAudio;
 	private int mEncodingTimeApprox; //used for sorting
 	private int mSizeInBytes; //used for monitoring the memory footprint
-	private AudioFormat mAudioFormat;
 	private File mDestDir;
 	private String mDestFilePrefix;
 	private StringBuilder mDestURI; //simple way to hold a string

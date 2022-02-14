@@ -1,13 +1,21 @@
 package org.daisy.pipeline.tts;
 
 import java.net.URL;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.io.ByteStreams;
+
 import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 import net.sf.saxon.Configuration;
 import net.sf.saxon.s9api.SaxonApiException;
@@ -15,8 +23,6 @@ import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.common.xslt.ThreadUnsafeXslTransformer;
 import org.daisy.common.xslt.XslTransformCompiler;
-import org.daisy.pipeline.tts.AudioBuffer;
-import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 
@@ -67,25 +73,16 @@ public abstract class TTSEngine {
 	 *            output returned by synthesize(). That is, they start at 0. If
 	 *            the service doesn't handle SSML marks, this parameter may be
 	 *            set to null.
-	 * @param bufferAllocator is the object that the TTS Service must use to
-	 *            allocate new audio buffers.
-	 * 
-	 * 
-	 * @return a list of adjacent PCM chunks produced by the TTS processor.
+	 *
+	 * @return audio produced by the TTS processor as a {@see
+	 *         AudioInputStream}. The {@link AudioFormat} of the stream must be
+	 *         the same every time the same voice is used.
 	 */
-	abstract public Collection<AudioBuffer> synthesize(XdmNode sentence, Voice voice,
-	        TTSResource threadResources, List<Integer> marks, AudioBufferAllocator bufferAllocator)
-		throws SynthesisException, InterruptedException, MemoryException;
-
-	/**
-	 * @return the audio format (sample rate etc.) of the data produced by
-	 *         synthesize(). The engine is assumed to use the same audio format
-	 *         every time. It is okay to return null before the first call to
-	 *         synthesize(), though it is better to return non-null values for
-	 *         optimization purposes. It must, however, return a non-null value
-	 *         once synthesize() has been called. Must be thread-safe.
-	 */
-	abstract public AudioFormat getAudioOutputFormat();
+	abstract public AudioInputStream synthesize(XdmNode sentence,
+	                                            Voice voice,
+	                                            TTSResource threadResources,
+	                                            List<Integer> marks)
+		throws SynthesisException, InterruptedException;
 
 	/**
 	 * Need not be thread-safe. This method is called from the main thread.
@@ -202,4 +199,35 @@ public abstract class TTSEngine {
 	private static ThreadLocal<Map<Configuration,Map<URL,ThreadUnsafeXslTransformer>>> compiledXslts
 		= ThreadLocal.withInitial(() -> {
 				return new HashMap<Configuration,Map<URL,ThreadUnsafeXslTransformer>>(); });
+
+	/**
+	 * Create an {@see AudioInputStream} from an {@see AudioFormat} and the audio data.
+	 */
+	protected static AudioInputStream createAudioStream(AudioFormat format, byte[] data) {
+		return createAudioStream(format, new ByteArrayInputStream(data));
+	}
+
+	protected static AudioInputStream createAudioStream(AudioFormat format, ByteArrayInputStream data) {
+		return new AudioInputStream(data,
+		                            format,
+		                            // ByteArrayInputStream.available() returns
+		                            // the total number of bytes
+		                            data.available() / format.getFrameSize());
+	}
+
+	/**
+	 * Create a {@see AudioInputStream} from a {@see InputStream}.
+	 *
+	 * This is to work around a bug in {@link javax.sound.sampled.AudioSystem}
+	 * which may return {@see AudioInputStream} with a wrong {@see
+	 * AudioInputStream#getFrameLength()}.
+	 */
+	protected static AudioInputStream createAudioStream(InputStream stream)
+			throws UnsupportedAudioFileException, IOException {
+		AudioInputStream audio = AudioSystem.getAudioInputStream(new BufferedInputStream(stream));
+		byte[] data = ByteStreams.toByteArray(audio);
+		audio.close();
+		audio = createAudioStream(audio.getFormat(), data);
+		return audio;
+	}
 }

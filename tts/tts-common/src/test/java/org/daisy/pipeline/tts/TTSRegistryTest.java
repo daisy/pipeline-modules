@@ -8,14 +8,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
 
 import net.sf.saxon.Configuration;
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.XdmNode;
 
-import org.daisy.pipeline.tts.AudioBuffer;
-import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.VoiceInfo.Gender;
@@ -50,21 +48,15 @@ public class TTSRegistryTest {
 		}
 
 		@Override
-		public AudioFormat getAudioOutputFormat() {
-			return null;
-		}
-
-		@Override
 		public Collection<Voice> getAvailableVoices() throws SynthesisException,
 		        InterruptedException {
 			return mVoices;
 		}
 
 		@Override
-		public Collection<AudioBuffer> synthesize(XdmNode sentence, Voice voice,
-		        TTSResource threadResources, List<Integer> marks,
-		        AudioBufferAllocator bufferAllocator)
-		        throws SynthesisException, InterruptedException, MemoryException {
+		public AudioInputStream synthesize(XdmNode sentence, Voice voice,
+		        TTSResource threadResources, List<Integer> marks)
+		        throws SynthesisException, InterruptedException {
 			return null;
 		}
 	}
