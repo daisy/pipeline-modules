@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -276,8 +277,8 @@ public class AcapelaEngine extends TTSEngine {
 	}
 
 	@Override
-	public AudioInputStream synthesize(XdmNode ssml, Voice voice,
-	        TTSResource threadResources, List<Integer> marks) throws SynthesisException,
+	public SynthesisResult synthesize(XdmNode ssml, Voice voice,
+	        TTSResource threadResources) throws SynthesisException,
 	        InterruptedException {
 
 		ThreadResources th = (ThreadResources) threadResources;
@@ -289,11 +290,12 @@ public class AcapelaEngine extends TTSEngine {
 			xsltParams.put("ending-mark", "ending-mark");
 		}
 		try {
-			AudioInputStream result
+			List<Integer> marks = new ArrayList<>();
+			AudioInputStream audio
 				= speak(transformSsmlNodeToString(ssml, ssmlTransformer, xsltParams), th, marks);
 			// remove ending mark
 			marks.subList(marks.size() - 1, marks.size()).clear();
-			return result;
+			return new SynthesisResult(audio, marks);
 		} catch (IOException | SaxonApiException e) {
 			throw new SynthesisException(e);
 		}

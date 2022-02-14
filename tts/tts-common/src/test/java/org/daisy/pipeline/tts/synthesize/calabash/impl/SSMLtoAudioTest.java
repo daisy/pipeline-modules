@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -129,15 +130,15 @@ public class SSMLtoAudioTest {
 		private final AudioFormat audioFormat = new AudioFormat(8000, 8, 1, true, true);
 
 		@Override
-		public AudioInputStream synthesize(XdmNode sentence, Voice voice,
-				TTSResource threadResources, List<Integer> marks)
+		public SynthesisResult synthesize(XdmNode sentence, Voice voice, TTSResource threadResources)
 			throws SynthesisException, InterruptedException {
 
 			int size = 8192;
+			List<Integer> marks = new ArrayList<>();
 			if (handlesMarks())
 				for (int i = TextToPcmThread.getMarkNames(sentence).size(); i > 0; i--)
 					marks.add(size - i * 512);
-			return createAudioStream(audioFormat, new byte[size]);
+			return new SynthesisResult(createAudioStream(audioFormat, new byte[size]), marks);
 		}
 
 		protected String sentenceToString(XdmNode sentence) {
@@ -361,8 +362,8 @@ public class SSMLtoAudioTest {
 		service.engine = new DefaultTTSEngine(service) {
 
 			@Override
-			public AudioInputStream synthesize(XdmNode sentence, Voice voice,
-					TTSResource threadResources, List<Integer> marks) throws SynthesisException,
+			public SynthesisResult synthesize(XdmNode sentence, Voice voice,
+					TTSResource threadResources) throws SynthesisException,
 					InterruptedException {
 				throw new SynthesisException("error");
 			}
@@ -382,8 +383,8 @@ public class SSMLtoAudioTest {
 		service.engine = new DefaultTTSEngine(service) {
 
 			@Override
-			public AudioInputStream synthesize(XdmNode sentence, Voice voice,
-					TTSResource threadResources, List<Integer> marks) throws SynthesisException,
+			public SynthesisResult synthesize(XdmNode sentence, Voice voice,
+					TTSResource threadResources) throws SynthesisException,
 					InterruptedException {
 				throw new SynthesisException("");
 			}
@@ -403,8 +404,8 @@ public class SSMLtoAudioTest {
 		service.engine = new DefaultTTSEngine(service) {
 
 			@Override
-			public AudioInputStream synthesize(XdmNode sentence, Voice voice,
-					TTSResource threadResources, List<Integer> marks) throws SynthesisException,
+			public SynthesisResult synthesize(XdmNode sentence, Voice voice,
+					TTSResource threadResources) throws SynthesisException,
 					InterruptedException {
 				throw new InterruptedException();
 			}
@@ -424,8 +425,8 @@ public class SSMLtoAudioTest {
 		service.engine = new DefaultTTSEngine(service) {
 
 			@Override
-			public AudioInputStream synthesize(XdmNode sentence, Voice voice,
-					TTSResource threadResources, List<Integer> marks) throws SynthesisException,
+			public SynthesisResult synthesize(XdmNode sentence, Voice voice,
+					TTSResource threadResources) throws SynthesisException,
 					InterruptedException {
 				Thread.sleep(6000);
 				return null;
@@ -450,14 +451,14 @@ public class SSMLtoAudioTest {
 		service.engine = new DefaultTTSEngine(service) {
 
 			@Override
-			public AudioInputStream synthesize(XdmNode sentence, Voice voice,
-					TTSResource threadResources, List<Integer> marks) throws SynthesisException,
+			public SynthesisResult synthesize(XdmNode sentence, Voice voice,
+					TTSResource threadResources) throws SynthesisException,
 					InterruptedException {
 
 				if (sentenceToString(sentence).contains(key))
 					throw new InterruptedException();
 
-				return super.synthesize(sentence, voice, threadResources, marks);
+				return super.synthesize(sentence, voice, threadResources);
 			}
 
 		};
@@ -479,14 +480,14 @@ public class SSMLtoAudioTest {
 		service.engine = new DefaultTTSEngine(service) {
 
 			@Override
-			public AudioInputStream synthesize(XdmNode sentence, Voice voice,
-					TTSResource threadResources, List<Integer> marks) throws SynthesisException,
+			public SynthesisResult synthesize(XdmNode sentence, Voice voice,
+					TTSResource threadResources) throws SynthesisException,
 					InterruptedException {
 
 				if (sentenceToString(sentence).contains(key))
 					throw new SynthesisException("error");
 
-				return super.synthesize(sentence, voice, threadResources, marks);
+				return super.synthesize(sentence, voice, threadResources);
 			}
 
 		};
@@ -508,15 +509,15 @@ public class SSMLtoAudioTest {
 		service.engine = new DefaultTTSEngine(service) {
 
 			@Override
-			public AudioInputStream synthesize(XdmNode sentence, Voice voice,
-					TTSResource threadResources, List<Integer> marks) throws SynthesisException,
+			public SynthesisResult synthesize(XdmNode sentence, Voice voice,
+					TTSResource threadResources) throws SynthesisException,
 					InterruptedException {
 
 				if (sentenceToString(sentence).contains(key)) {
 					Thread.sleep(10000);
 				}
 
-				return super.synthesize(sentence, voice, threadResources, marks);
+				return super.synthesize(sentence, voice, threadResources);
 			}
 
 		};

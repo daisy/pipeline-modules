@@ -57,9 +57,8 @@ public class CereProcServiceTest extends AbstractTest {
 			AudioInputStream audio = engine.synthesize(
 				parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">Hi, my name is William</s>"),
 				new Voice(null, "William"),
-				resource,
-				null // marks
-			);
+				resource
+			).audio;
 			Assert.assertTrue(audio.getFrameLength() * audio.getFormat().getFrameSize() > 10000);
 		} finally {
 			engine.releaseThreadResources(resource);

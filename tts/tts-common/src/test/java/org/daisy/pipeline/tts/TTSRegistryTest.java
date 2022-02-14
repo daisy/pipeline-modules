@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.sound.sampled.AudioInputStream;
-
 import net.sf.saxon.Configuration;
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.XdmNode;
@@ -54,8 +52,8 @@ public class TTSRegistryTest {
 		}
 
 		@Override
-		public AudioInputStream synthesize(XdmNode sentence, Voice voice,
-		        TTSResource threadResources, List<Integer> marks)
+		public SynthesisResult synthesize(XdmNode sentence, Voice voice,
+		        TTSResource threadResources)
 		        throws SynthesisException, InterruptedException {
 			return null;
 		}

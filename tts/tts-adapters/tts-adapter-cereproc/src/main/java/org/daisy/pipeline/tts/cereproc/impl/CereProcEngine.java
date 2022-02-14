@@ -25,7 +25,6 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -145,10 +144,9 @@ public class CereProcEngine extends TTSEngine {
 	}
 
 	@Override
-	public AudioInputStream synthesize(XdmNode sentence,
-	                                   Voice voice,
-	                                   TTSResource threadResources,
-	                                   List<Integer> marks)
+	public SynthesisResult synthesize(XdmNode sentence,
+	                                  Voice voice,
+	                                  TTSResource threadResources)
 			throws SynthesisException, InterruptedException {
 		StringWriter out = new StringWriter();
 		StringWriter err = new StringWriter();
@@ -205,7 +203,7 @@ public class CereProcEngine extends TTSEngine {
 				int len;
 				while ((len = is.read(buf)) > 0)
 					bytes.write(buf, 0, len);
-				return createAudioStream(audioFormat, bytes.toByteArray());
+				return new SynthesisResult(createAudioStream(audioFormat, bytes.toByteArray()));
 			}
 		} catch (InterruptedException e) {
 			throw e;

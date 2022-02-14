@@ -31,6 +31,7 @@ import org.daisy.pipeline.tts.AudioFootprintMonitor.MemoryException;
 import org.daisy.pipeline.tts.SSMLMarkSplitter;
 import org.daisy.pipeline.tts.SSMLMarkSplitter.Chunk;
 import org.daisy.pipeline.tts.TTSEngine;
+import org.daisy.pipeline.tts.TTSEngine.SynthesisResult;
 import org.daisy.pipeline.tts.TTSRegistry;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
@@ -253,10 +254,10 @@ public class TextToPcmThread implements FormatSpecifications {
 		if (tts.handlesMarks()
 		        && voice.getMarkSupport() != MarkSupport.MARK_NOT_SUPPORTED){
 			logEntry.setActualVoice(voice);
-			List<Integer> markOffsets = new ArrayList<>();
-			AudioInputStream result = mExecutor.synthesizeWithTimeout(
+			SynthesisResult result = mExecutor.synthesizeWithTimeout(
 				timeout, interrupter, logEntry, sentence.getText(), sentence.getSize(), tts, voice,
-				threadResources, markOffsets);
+				threadResources);
+			List<Integer> markOffsets = result.marks;
 			if (markNames.size() != markOffsets.size()) {
 				mTTSLog.getWritableEntry(sentence.getID()).addError(
 				        new TTSLog.Error(ErrorCode.WARNING, "wrong number of marks with "
@@ -268,8 +269,8 @@ public class TextToPcmThread implements FormatSpecifications {
 			for (int i = 0; i < markNames.size(); i++) {
 				marks.add(new Mark(markNames.get(i), markOffsets.get(i)));
 			}
-			mAudioFootprintMonitor.acquireTTSMemory(result);
-			return Collections.singletonList(result);
+			mAudioFootprintMonitor.acquireTTSMemory(result.audio);
+			return Collections.singletonList(result.audio);
 		} else {
 			Collection<Chunk> chunks = mSSMLSplitter.split(sentence.getText());
 			List<AudioInputStream> result = new ArrayList<>();
@@ -279,7 +280,7 @@ public class TextToPcmThread implements FormatSpecifications {
 				try {
 					AudioInputStream stream = mExecutor.synthesizeWithTimeout(
 						timeout, interrupter, logEntry, chunk.ssml(), Sentence.computeSize(chunk.ssml()),
-						tts, voice, threadResources, new ArrayList<Integer>());
+						tts, voice, threadResources).audio;
 					if (chunk.leftMark() != null) {
 						marks.add(new Mark(chunk.leftMark(), offset));
 					}

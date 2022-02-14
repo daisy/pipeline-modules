@@ -11,13 +11,11 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
 
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
@@ -61,8 +59,7 @@ public class GoogleRestTTSEngine extends TTSEngine {
 	}
 
 	@Override
-	public AudioInputStream synthesize(XdmNode ssml, Voice voice, TTSResource threadResources,
-	                                   List<Integer> marks)
+	public SynthesisResult synthesize(XdmNode ssml, Voice voice, TTSResource threadResources)
 			throws SynthesisException, InterruptedException {
 	
 		String sentence; {
@@ -138,7 +135,7 @@ public class GoogleRestTTSEngine extends TTSEngine {
 					throw new FatalError(e);
 				}
 			});
-			return createAudioStream(mAudioFormat, result.get(0));
+			return new SynthesisResult(createAudioStream(mAudioFormat, result.get(0)));
 		} catch (InterruptedException e) {
 			throw e;
 		} catch (Exception e) {

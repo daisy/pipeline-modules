@@ -36,6 +36,29 @@ import org.daisy.pipeline.tts.TTSService.SynthesisException;
  */
 public abstract class TTSEngine {
 
+	public static class SynthesisResult {
+		/**
+		 * The audio produced by the TTS processor. The {@link AudioFormat} of
+		 * the stream must be the same every time the same voice is used.
+		 */
+		public final AudioInputStream audio;
+		/**
+		 * The mark offsets (in bytes) corresponding to the
+		 * <code>ssml:mark</code> elements of the input SSML. The order must be
+		 * kept. The offsets are relative to the {@link AudioInputStream}. That
+		 * is, they start at 0. May be <code>null</code> if the TTS processor
+		 * doesn't handle SSML marks.
+		 */
+		public final List<Integer> marks;
+		public SynthesisResult(AudioInputStream audio) {
+			this(audio, null);
+		}
+		public SynthesisResult(AudioInputStream audio, List<Integer> marks) {
+			this.audio = audio;
+			this.marks = marks;
+		}
+	}
+
 	/**
 	 * @param provider is the service from which the TTSEngine has been
 	 *            allocated.
@@ -67,21 +90,13 @@ public abstract class TTSEngine {
 	 *            boolean field 'released' is guaranteed to be false, i.e. the
 	 *            resource provided is always valid and will remain so during
 	 *            the call.
-	 * @param marks are the returned mark offsets (in bytes) corresponding to
-	 *            the ssml:marks of @param sentence. The order must be kept. The
-	 *            provided list is always empty. The offsets are relative to the
-	 *            output returned by synthesize(). That is, they start at 0. If
-	 *            the service doesn't handle SSML marks, this parameter may be
-	 *            set to null.
 	 *
-	 * @return audio produced by the TTS processor as a {@see
-	 *         AudioInputStream}. The {@link AudioFormat} of the stream must be
-	 *         the same every time the same voice is used.
+	 * @return a {@see SynthesisResult} object containing the audio data and the
+	 *         mark offsets.
 	 */
-	abstract public AudioInputStream synthesize(XdmNode sentence,
-	                                            Voice voice,
-	                                            TTSResource threadResources,
-	                                            List<Integer> marks)
+	abstract public SynthesisResult synthesize(XdmNode sentence,
+	                                           Voice voice,
+	                                           TTSResource threadResources)
 		throws SynthesisException, InterruptedException;
 
 	/**

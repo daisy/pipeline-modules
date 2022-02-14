@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.sound.sampled.AudioInputStream;
-
 import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.common.file.URLs;
@@ -42,8 +40,7 @@ public class MockTTS implements TTSService {
 		return new TTSEngine(MockTTS.this) {
 			
 			@Override
-			public AudioInputStream synthesize(XdmNode ssml, Voice voice,
-			                                   TTSResource threadResources, List<Integer> marks)
+			public SynthesisResult synthesize(XdmNode ssml, Voice voice, TTSResource threadResources)
 					throws SynthesisException, InterruptedException {
 				if (!"mock-en".equals(voice.name)) {
 					throw new SynthesisException("Voice " + voice.name + " not supported");
@@ -51,8 +48,9 @@ public class MockTTS implements TTSService {
 				try {
 					String sentence = transformSsmlNodeToString(ssml, ssmlTransformer, new TreeMap<String,Object>());
 					File waveOut = sentence.length() < 50 ? MockTTS.shortWaveOut : MockTTS.longWaveOut;
-					return createAudioStream(
-						new FileInputStream(waveOut));
+					return new SynthesisResult(
+						createAudioStream(
+							new FileInputStream(waveOut)));
 				} catch (Exception e) {
 					throw new SynthesisException(e); }
 			}

@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Scanner;
@@ -53,8 +52,7 @@ public class ESpeakEngine extends TTSEngine {
 	}
 
 	@Override
-	public AudioInputStream synthesize(XdmNode ssml, Voice voice, TTSResource threadResources,
-	                                   List<Integer> marks)
+	public SynthesisResult synthesize(XdmNode ssml, Voice voice, TTSResource threadResources)
 			throws SynthesisException,InterruptedException {
 
 		String sentence; {
@@ -78,7 +76,7 @@ public class ESpeakEngine extends TTSEngine {
 								stream)); })
 				.consumeError(mLogger)
 				.run();
-			return result.get(0);
+			return new SynthesisResult(result.get(0));
 		} catch (InterruptedException e) {
 			throw e;
 		} catch (Throwable e) {

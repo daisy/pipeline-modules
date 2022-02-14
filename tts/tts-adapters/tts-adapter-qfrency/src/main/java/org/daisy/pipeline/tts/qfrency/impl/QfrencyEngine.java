@@ -9,7 +9,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -45,8 +44,7 @@ public class QfrencyEngine extends TTSEngine {
 	}
 
 	@Override
-	public AudioInputStream synthesize(XdmNode ssml, Voice voice, TTSResource threadResources,
-	                                   List<Integer> marks)
+	public SynthesisResult synthesize(XdmNode ssml, Voice voice, TTSResource threadResources)
 			throws SynthesisException, InterruptedException {
 
 		File outFile = null;
@@ -77,12 +75,12 @@ public class QfrencyEngine extends TTSEngine {
 			new CommandRunner(lCmd)
 				.consumeError(mLogger)
 				.run();
-			AudioInputStream result = createAudioStream(
+			AudioInputStream audio = createAudioStream(
 				new FileInputStream(outFile));
 			outFile.delete();
 			new File(outPath+".sutt").delete();
 			new File(outPath+".TextGrid").delete();
-			return result;
+			return new SynthesisResult(audio);
 		} catch (InterruptedException e) {
 			throw e;
 		} catch (Throwable e) {

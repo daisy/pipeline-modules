@@ -93,7 +93,7 @@ public class GoogleTTSTest {
 		TTSResource resource = engine.allocateThreadResources();
 		AudioInputStream audio = engine.synthesize(
 			parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">this is a test</s>"),
-			null, resource, null);
+			null, resource).audio;
 		engine.releaseThreadResources(resource);
 
 		Assert.assertTrue(getSize(audio) > 2000);
@@ -127,7 +127,7 @@ public class GoogleTTSTest {
 			Voice v = ite.next();
 			AudioInputStream audio = engine.synthesize(
 				parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">small test</s>"),
-				v, resource, null);
+				v, resource).audio;
 
 			sizes.add(getSize(audio) / 4); //div 4 helps being more robust to tiny differences
 			totalVoices++;
@@ -147,7 +147,7 @@ public class GoogleTTSTest {
 		TTSResource resource = engine.allocateThreadResources();
 		AudioInputStream audio = engine.synthesize(
 			parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">𝄞𝄞𝄞𝄞 水水水水水 𝄞水𝄞水𝄞水𝄞水 test 国Ø家Ť标准 ĜæŘ ß ŒÞ ๕</s>"),
-			null, resource, null);
+			null, resource).audio;
 		engine.releaseThreadResources(resource);
 
 		Assert.assertTrue(getSize(audio) > 2000);
@@ -176,7 +176,7 @@ public class GoogleTTSTest {
 						try {
 							audio = engine.synthesize(
 								parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">small test</s>"),
-								null, resource, null);
+								null, resource).audio;
 
 						} catch (SaxonApiException | SynthesisException | InterruptedException e) {
 							e.printStackTrace();
@@ -214,7 +214,7 @@ public class GoogleTTSTest {
 		TTSResource resource = engine.allocateThreadResources();
 		engine.synthesize(
 			parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">" + sentence + "</s>"),
-			null, resource, null);
+			null, resource);
 		engine.releaseThreadResources(resource);
 	}
 	
@@ -226,7 +226,7 @@ public class GoogleTTSTest {
 		TTSResource resource = engine.allocateThreadResources();
 		engine.synthesize(
 			parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">" + sentence + "</s>"),
-			null, resource, null);
+			null, resource);
 		engine.releaseThreadResources(resource);
 	}
 

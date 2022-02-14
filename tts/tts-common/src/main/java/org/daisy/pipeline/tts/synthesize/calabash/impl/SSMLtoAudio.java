@@ -17,7 +17,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import javax.sound.sampled.AudioFileFormat;
-import javax.sound.sampled.AudioInputStream;
 import javax.xml.transform.sax.SAXSource;
 
 import net.sf.saxon.s9api.DocumentBuilder;
@@ -33,6 +32,7 @@ import org.daisy.pipeline.tts.AudioFootprintMonitor;
 import org.daisy.pipeline.tts.SSMLMarkSplitter;
 import org.daisy.pipeline.tts.StructuredSSMLSplitter;
 import org.daisy.pipeline.tts.TTSEngine;
+import org.daisy.pipeline.tts.TTSEngine.SynthesisResult;
 import org.daisy.pipeline.tts.TTSRegistry;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService;
@@ -258,13 +258,12 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 		};
 
 		//run the text-to-speech on the testing input
-		AudioInputStream audio = null;
-		List<Integer> marks = new ArrayList<>();
+		SynthesisResult result = null;
 		try {
 			XdmNode ssml = engine.handlesMarks() ? testingSSMLWithMark : testingSSMLWithoutMark;
-			audio = mExecutor.synthesizeWithTimeout(
+			result = mExecutor.synthesizeWithTimeout(
 				timeout, interrupter, null, ssml, Sentence.computeSize(ssml),
-				engine, firstVoice, res, marks);
+				engine, firstVoice, res);
 		} catch (Exception e) {
 			throw new Exception("test failed: " + e.getMessage(), e);
 		} finally {
@@ -286,17 +285,17 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 
 		//check that the output buffer is big enough
 		String msg = "";
-		if (audio.getFrameLength() * audio.getFormat().getFrameSize() < 2500) {
+		if (result.audio.getFrameLength() * result.audio.getFormat().getFrameSize() < 2500) {
 			msg = "Audio output is not big enough. ";
 		}
 
 		if (engine.handlesMarks()) {
 			// test SSML contains one mark
 			String details = " voice: "+firstVoice;
-			if (marks.size() != 1) {
-				msg += "One bookmark events expected, but received " + marks.size() + " events instead. "+details;
+			if (result.marks.size() != 1) {
+				msg += "One bookmark events expected, but received " + result.marks.size() + " events instead. "+details;
 			} else {
-				int offset = marks.get(0);
+				int offset = result.marks.get(0);
 				if (offset < 2500) {
 					msg += "Expecting mark offset to be bigger, got "
 					        + offset + " as offset. "+details;

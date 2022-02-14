@@ -6,8 +6,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import javax.sound.sampled.AudioInputStream;
-
 import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.common.file.URLs;
@@ -38,17 +36,17 @@ public class MockTTS implements TTSService {
 		return new TTSEngine(MockTTS.this) {
 			
 			@Override
-			public AudioInputStream synthesize(XdmNode sentence, Voice voice, TTSResource threadResources,
-			                                   List<Integer> marks)
+			public SynthesisResult synthesize(XdmNode sentence, Voice voice, TTSResource threadResources)
 					throws SynthesisException, InterruptedException {
 				logger.debug("Synthesizing sentence: " + sentence);
 				try {
-					return createAudioStream(
-						(voice.name.equals("alex")
-							? MockTTS.alexWaveOut
-							: voice.name.equals("vicki")
-								? MockTTS.vickiWaveOut
-								: MockTTS.daisyPipelineWaveOut).openStream()); }
+					return new SynthesisResult(
+						createAudioStream(
+							(voice.name.equals("alex")
+								? MockTTS.alexWaveOut
+								: voice.name.equals("vicki")
+									? MockTTS.vickiWaveOut
+									: MockTTS.daisyPipelineWaveOut).openStream())); }
 				catch (Exception e) {
 					throw new SynthesisException(e); }
 			}

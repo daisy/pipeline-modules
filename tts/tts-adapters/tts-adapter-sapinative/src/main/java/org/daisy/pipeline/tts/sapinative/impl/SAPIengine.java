@@ -49,8 +49,7 @@ public class SAPIengine extends TTSEngine {
 	}
 
 	@Override
-	public AudioInputStream synthesize(XdmNode ssml, Voice voice,
-	        TTSResource resource, List<Integer> marks)
+	public SynthesisResult synthesize(XdmNode ssml, Voice voice, TTSResource resource)
 		throws SynthesisException, InterruptedException {
 
 		Map<String,Object> xsltParams = new HashMap<>(); {
@@ -59,11 +58,12 @@ public class SAPIengine extends TTSEngine {
 			xsltParams.put("ending-mark", "ending-mark");
 		}
 		try {
-			AudioInputStream result = speak(transformSsmlNodeToString(ssml, ssmlTransformer, xsltParams),
+			List<Integer> marks = new ArrayList<>();
+			AudioInputStream audio = speak(transformSsmlNodeToString(ssml, ssmlTransformer, xsltParams),
 			             voice, resource, marks);
 			// remove ending mark
 			marks.subList(marks.size() - 1, marks.size()).clear();
-			return result;
+			return new SynthesisResult(audio, marks);
 		} catch (IOException | SaxonApiException e) {
 			throw new SynthesisException(e);
 		}

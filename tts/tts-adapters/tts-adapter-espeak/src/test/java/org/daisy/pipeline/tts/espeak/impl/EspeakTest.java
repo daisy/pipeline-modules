@@ -52,7 +52,7 @@ ESpeakService s = new ESpeakService();
 		TTSResource resource = engine.allocateThreadResources();
 		AudioInputStream audio = engine.synthesize(
 			parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">this is a test</s>"),
-			null, resource, null);
+			null, resource).audio;
 		engine.releaseThreadResources(resource);
 
 		Assert.assertTrue(getSize(audio) > 2000);
@@ -71,7 +71,7 @@ ESpeakService s = new ESpeakService();
 			AudioInputStream audio = engine.synthesize(
 				parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">"
 				          + "<voice name=\"" + v.name + "\">small test</voice></s>"),
-				null, resource, null);
+				null, resource).audio;
 
 			sizes.add(getSize(audio) / 4); //div 4 helps being more robust to tiny differences
 			totalVoices++;
@@ -91,7 +91,7 @@ ESpeakService s = new ESpeakService();
 		AudioInputStream audio = engine.synthesize(
 			parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">"
 			          + "𝄞𝄞𝄞𝄞 水水水水水 𝄞水𝄞水𝄞水𝄞水 test 国Ø家Ť标准 ĜæŘ ß ŒÞ ๕</s>"),
-			null, resource, null);
+			null, resource).audio;
 		engine.releaseThreadResources(resource);
 
 		Assert.assertTrue(getSize(audio) > 2000);
@@ -119,7 +119,7 @@ ESpeakService s = new ESpeakService();
 						try {
 							audio = engine.synthesize(
 								parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">small test</s>"),
-								null, resource, null);
+								null, resource).audio;
 						} catch (SynthesisException | InterruptedException | SaxonApiException e) {
 							e.printStackTrace();
 							break;

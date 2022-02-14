@@ -59,7 +59,7 @@ public class OSXSpeechTest {
 		TTSResource resource = engine.allocateThreadResources();
 		AudioInputStream audio = engine.synthesize(
 			parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">this is a test</s>"),
-			voice, resource, null);
+			voice, resource).audio;
 		engine.releaseThreadResources(resource);
 
 		Assert.assertTrue(getSize(audio) > 2000);
@@ -77,7 +77,7 @@ public class OSXSpeechTest {
 			Voice v = ite.next();
 			AudioInputStream audio = engine.synthesize(
 				parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">small test</s>"),
-				v, resource, null);
+				v, resource).audio;
 
 			sizes.add(getSize(audio) / 4); //div 4 helps being more robust to tiny differences
 			totalVoices++;
@@ -98,7 +98,7 @@ public class OSXSpeechTest {
 		AudioInputStream audio = engine.synthesize(
 			parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">"
 			          + "𝄞𝄞𝄞𝄞 水水水水水 𝄞水𝄞水𝄞水𝄞水 test 国aØ家Ť标准 ĜæŘ ß ŒÞ ๕</s>"),
-			voice, resource, null);
+			voice, resource).audio;
 		engine.releaseThreadResources(resource);
 
 		Assert.assertTrue(getSize(audio) > 2000);
@@ -128,7 +128,7 @@ public class OSXSpeechTest {
 						try {
 							audio = engine.synthesize(
 								parseSSML("<s xmlns=\"http://www.w3.org/2001/10/synthesis\">small test</s>"),
-								voice, resource, null);
+								voice, resource).audio;
 
 						} catch (SaxonApiException | SynthesisException | InterruptedException e) {
 							e.printStackTrace();
