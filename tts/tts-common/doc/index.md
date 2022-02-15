@@ -126,6 +126,9 @@ properties. The following properties are available:
 : Temporary directory used during audio synthesis
 : Defaults to "${java.io.tmpdir}"
 
+`org.daisy.pipeline.tts.mp3.bitrate`
+: Bit rate of MP3 files
+
 `org.daisy.pipeline.tts.maxmem`
 : Maximum amount of memory in Mb to be used by TTS and audio encoding
 : Defaults to 50% of the total amount of memory that the JVM will

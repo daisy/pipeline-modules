@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
@@ -22,7 +24,8 @@ public class LameEncoder implements AudioEncoder {
 
 	static class LameEncodingOptions {
 		String binpath;
-		String[] cliOptions;
+		Integer bitrate;
+		String[] extraCliArguments;
 	}
 
 	private static final Logger mLogger = LoggerFactory.getLogger(LameEncoder.class);
@@ -119,24 +122,32 @@ public class LameEncoder implements AudioEncoder {
 			};
 		}
 
-		//-r: raw pcm
-		//-s: sample rate in kHz
-		//-mm: mono
-		//-: PCM read on the standard input
-		String[] cmdbegin = new String[]{
-		        lameOpts.binpath, "-r", "-s", freq, "--bitwidth", bitwidth, signedOpt,
-		        endianness, "-m", "m", "--silent"
-		};
-		String[] cmdend = new String[]{"-", outputFile.getAbsolutePath()};
-
-		String[] cmd = new String[cmdbegin.length + lameOpts.cliOptions.length
-		        + cmdend.length];
-		System.arraycopy(cmdbegin, 0, cmd, 0, cmdbegin.length);
-		System.arraycopy(lameOpts.cliOptions, 0, cmd, cmdbegin.length,
-		        lameOpts.cliOptions.length);
-		System.arraycopy(cmdend, 0, cmd, cmdbegin.length + lameOpts.cliOptions.length,
-		        cmdend.length);
-		new CommandRunner(cmd)
+		List<String> cmd = new ArrayList<>(); {
+			cmd.add(lameOpts.binpath);
+			// input options
+			cmd.add("-r");         // raw PCM
+			cmd.add("-s");         // sample rate (kHz)
+			cmd.add(freq);
+			cmd.add("--bitwidth"); // bits per sample
+			cmd.add(bitwidth);
+			cmd.add(signedOpt);    // --unsigned | --signed
+			cmd.add(endianness);   // --big-endian | --little-endian";
+			cmd.add("-m");         // mode
+			cmd.add("m");          // mono
+			// output options
+			if (lameOpts.bitrate != null) {
+				cmd.add("-b");     // minimum bitrate to be used
+				cmd.add("" + lameOpts.bitrate);
+			}
+			if (lameOpts.extraCliArguments != null)
+				for (String arg : lameOpts.extraCliArguments)
+					cmd.add(arg);
+			// verbosity
+			cmd.add("--silent");
+			cmd.add("-");          // read from stdin
+			cmd.add(outputFile.getAbsolutePath());
+		}
+		new CommandRunner(cmd.toArray(new String[cmd.size()]))
 			.feedInput(lameInput)
 			.consumeError(mLogger)
 			.run();
