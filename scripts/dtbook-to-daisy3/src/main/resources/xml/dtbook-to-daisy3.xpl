@@ -68,6 +68,8 @@ When text-to-speech is enabled, the conversion may output a (incomplete) DAISY 3
     <!-- defined in common-options.xpl -->
   </p:option>
 
+  <p:option name="audio-file-type" select="'audio/mpeg'" px:hidden="true"/>
+
   <p:option name="with-text" required="false" px:type="boolean" select="'true'">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
       <h2 px:role="name">With text</h2>
@@ -110,6 +112,7 @@ When text-to-speech is enabled, the conversion may output a (incomplete) DAISY 3
     </p:with-option>
     <p:with-option name="audio" select="$audio"/>
     <p:with-option name="audio-only" select="$with-text = 'false'"/>
+    <p:with-option name="audio-file-type" select="$audio-file-type"/>
     <p:with-option name="include-tts-log" select="$include-tts-log"/>
   </px:dtbook-to-daisy3>
 

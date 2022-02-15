@@ -88,6 +88,13 @@
     </p:documentation>
   </p:option>
 
+  <p:option name="temp-dir" select="''">
+    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <p>Empty directory dedicated to this conversion. May be left empty in which case a temporary
+      directory will be automatically created.</p>
+    </p:documentation>
+  </p:option>
+
   <p:import href="dtbook-to-ssml.xpl">
     <p:documentation>
       px:dtbook-to-ssml
@@ -245,6 +252,9 @@
 	<p:input port="config">
 	  <p:pipe port="config" step="main"/>
 	</p:input>
+	<p:with-option name="temp-dir" select="if ($temp-dir!='') then concat($temp-dir,'audio/') else ''">
+	  <p:empty/>
+	</p:with-option>
       </px:ssml-to-audio>
     </p:otherwise>
   </p:choose>

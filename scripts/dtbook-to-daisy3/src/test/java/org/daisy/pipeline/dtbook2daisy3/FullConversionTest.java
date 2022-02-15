@@ -92,7 +92,6 @@ public class FullConversionTest extends AbstractTest implements DifferenceListen
 			"org.daisy.pipeline:xproc-api:?",
 			pipelineModule("nlp-omnilang-lexer"),
 			pipelineModule("tts-mocks"),
-			pipelineModule("audio-encoder-lame"),
 		};
 	}
 	
@@ -311,6 +310,7 @@ public class FullConversionTest extends AbstractTest implements DifferenceListen
 		if (audio) {
 			xprocInput = xprocInput
 				.withOption(new QName("audio"), "true")
+				.withOption(new QName("audio-file-type"), "audio/x-wav")
 				.withInput("tts-config", Suppliers.ofInstance(ttsConfig));
 		}
 
@@ -322,7 +322,7 @@ public class FullConversionTest extends AbstractTest implements DifferenceListen
 
 		if (audio) {
 			Assert.assertTrue("No audio was generated",
-			                  outputDir.list((dir, name) -> name.endsWith(".mp3")).length > 0);
+			                  outputDir.list((dir, name) -> name.endsWith(".wav")).length > 0);
 		}
 
 		ZedVal zv = new ZedVal();
