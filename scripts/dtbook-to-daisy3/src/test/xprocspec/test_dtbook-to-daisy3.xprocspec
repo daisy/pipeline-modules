@@ -181,6 +181,77 @@
 				</x:document>
 			</x:expect>
 		</x:scenario>
+		<x:scenario label="audio only">
+			<x:call>
+				<x:option name="audio" select="true()"/>
+				<x:option name="audio-file-type" select="'audio/x-wav'"/>
+				<x:option name="audio-only" select="true()"/>
+				<x:option name="temp-dir"
+				          select="resolve-uri('../../../target/xprocspec/test_dtbook-to-daisy3/shuffled_7019_xmldtbook_1/audio-only/')"/>
+			</x:call>
+			<x:context label="the fileset.out port">
+				<x:document type="port" port="fileset.out"/>
+			</x:context>
+			<x:expect label="the fileset.out port"
+			          type="custom" href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl" step="x:fileset-compare">
+				<x:document type="inline">
+					<d:fileset>
+						<d:file href="result/mo1.smil" media-type="application/smil" indent="true"
+						        doctype-system="http://www.daisy.org/z3986/2005/dtbsmil-2005-2.dtd"
+						        doctype-public="-//NISO//DTD dtbsmil 2005-2//EN"/>
+						<d:file href="result/mo2.smil" media-type="application/smil" indent="true"
+						        doctype-system="http://www.daisy.org/z3986/2005/dtbsmil-2005-2.dtd"
+						        doctype-public="-//NISO//DTD dtbsmil 2005-2//EN"/>
+						<d:file href="result/mo3.smil" media-type="application/smil" indent="true"
+						        doctype-system="http://www.daisy.org/z3986/2005/dtbsmil-2005-2.dtd"
+						        doctype-public="-//NISO//DTD dtbsmil 2005-2//EN"/>
+						<d:file href="result/navigation.ncx" media-type="application/x-dtbncx+xml"
+						        indent="true"
+						        doctype-public="-//NISO//DTD ncx 2005-1//EN"
+						        doctype-system="http://www.daisy.org/z3986/2005/ncx-2005-1.dtd"/>
+						<d:file href="result/resources.res" media-type="application/x-dtbresource+xml"
+						        doctype-public="-//NISO//DTD resource 2005-1//EN"
+						        doctype-system="http://www.daisy.org/z3986/2005/resource-2005-1.dtd"/>
+						<d:file href="result/book.opf" media-type="text/xml"
+						        indent="true"
+						        doctype-public="+//ISBN 0-9673008-1-9//DTD OEB 1.2 Package//EN"
+						        doctype-system="http://openebook.org/dtds/oeb-1.2/oebpkg12.dtd"/>
+						<d:file href="result/part0000_00_000.wav" media-type="audio/x-wav"
+						        original-href="../../../target/xprocspec/test_dtbook-to-daisy3/shuffled_7019_xmldtbook_1/audio-only/audio/part0000_00_000.wav"/>
+						<d:file href="result/part0000_01_000.wav" media-type="audio/x-wav"
+						        original-href="../../../target/xprocspec/test_dtbook-to-daisy3/shuffled_7019_xmldtbook_1/audio-only/audio/part0000_01_000.wav"/>
+						<d:file href="result/part0000_02_000.wav" media-type="audio/x-wav"
+						        original-href="../../../target/xprocspec/test_dtbook-to-daisy3/shuffled_7019_xmldtbook_1/audio-only/audio/part0000_02_000.wav"/>
+						<d:file href="result/part0001_00_000.wav" media-type="audio/x-wav"
+						        original-href="../../../target/xprocspec/test_dtbook-to-daisy3/shuffled_7019_xmldtbook_1/audio-only/audio/part0001_00_000.wav"/>
+						<d:file href="result/part0001_01_000.wav" media-type="audio/x-wav"
+						        original-href="../../../target/xprocspec/test_dtbook-to-daisy3/shuffled_7019_xmldtbook_1/audio-only/audio/part0001_01_000.wav"/>
+						<d:file href="result/part0001_02_000.wav" media-type="audio/x-wav"
+						        original-href="../../../target/xprocspec/test_dtbook-to-daisy3/shuffled_7019_xmldtbook_1/audio-only/audio/part0001_02_000.wav"/>
+						<d:file href="result/part0002_00_000.wav" media-type="audio/x-wav"
+						        original-href="../../../target/xprocspec/test_dtbook-to-daisy3/shuffled_7019_xmldtbook_1/audio-only/audio/part0002_00_000.wav"/>
+						<d:file href="result/part0002_01_000.wav" media-type="audio/x-wav"
+						        original-href="../../../target/xprocspec/test_dtbook-to-daisy3/shuffled_7019_xmldtbook_1/audio-only/audio/part0002_01_000.wav"/>
+						<d:file href="result/part0002_02_000.wav" media-type="audio/x-wav"
+						        original-href="../../../target/xprocspec/test_dtbook-to-daisy3/shuffled_7019_xmldtbook_1/audio-only/audio/part0002_02_000.wav"/>
+						<d:file href="result/part0002_03_000.wav" media-type="audio/x-wav"
+						        original-href="../../../target/xprocspec/test_dtbook-to-daisy3/shuffled_7019_xmldtbook_1/audio-only/audio/part0002_03_000.wav"/>
+						<d:file href="result/part0003_00_000.wav" media-type="audio/x-wav"
+						        original-href="../../../target/xprocspec/test_dtbook-to-daisy3/shuffled_7019_xmldtbook_1/audio-only/audio/part0003_00_000.wav"/>
+						<d:file href="result/part0003_01_000.wav" media-type="audio/x-wav"
+						        original-href="../../../target/xprocspec/test_dtbook-to-daisy3/shuffled_7019_xmldtbook_1/audio-only/audio/part0003_01_000.wav"/>
+						<d:file href="result/part0003_02_000.wav" media-type="audio/x-wav"
+						        original-href="../../../target/xprocspec/test_dtbook-to-daisy3/shuffled_7019_xmldtbook_1/audio-only/audio/part0003_02_000.wav"/>
+						<d:file href="result/part0003_03_000.wav" media-type="audio/x-wav"
+						        original-href="../../../target/xprocspec/test_dtbook-to-daisy3/shuffled_7019_xmldtbook_1/audio-only/audio/part0003_03_000.wav"/>
+						<d:file href="result/part0004_00_000.wav" media-type="audio/x-wav"
+						        original-href="../../../target/xprocspec/test_dtbook-to-daisy3/shuffled_7019_xmldtbook_1/audio-only/audio/part0004_00_000.wav"/>
+						<d:file href="result/part0004_01_000.wav" media-type="audio/x-wav"
+						        original-href="../../../target/xprocspec/test_dtbook-to-daisy3/shuffled_7019_xmldtbook_1/audio-only/audio/part0004_01_000.wav"/>
+					</d:fileset>
+				</x:document>
+			</x:expect>
+		</x:scenario>
 	</x:scenario>
 	
 	<x:scenario label="minimal book with mathml">
