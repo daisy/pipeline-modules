@@ -16,9 +16,12 @@ import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.common.file.URLs;
 import org.daisy.pipeline.tts.sapinative.SAPILib;
+import org.daisy.pipeline.tts.sapinative.SAPILibResult;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
+import org.daisy.pipeline.tts.VoiceInfo;
+import org.daisy.pipeline.tts.VoiceInfo.Gender;
 import org.daisy.pipeline.tts.Voice;
 
 import org.slf4j.Logger;
@@ -54,15 +57,11 @@ public class SAPIengine extends TTSEngine {
 
 		Map<String,Object> xsltParams = new HashMap<>(); {
 			xsltParams.put("voice", voice.name);
-			// add ending mark to ensure the complete SSML is processed
-			xsltParams.put("ending-mark", "ending-mark");
 		}
 		try {
 			List<Integer> marks = new ArrayList<>();
 			AudioInputStream audio = speak(transformSsmlNodeToString(ssml, ssmlTransformer, xsltParams),
 			             voice, resource, marks);
-			// remove ending mark
-			marks.subList(marks.size() - 1, marks.size()).clear();
 			return new SynthesisResult(audio, marks);
 		} catch (IOException | SaxonApiException e) {
 			throw new SynthesisException(e);
@@ -76,9 +75,9 @@ public class SAPIengine extends TTSEngine {
 
 		ThreadResource tr = (ThreadResource) resource;
 		int res = SAPILib.speak(tr.connection, voice.engine, voice.name, ssml);
-		if (res != 0) {
-			throw new SynthesisException("SAPI speak error number " + res + " with voice "
-			        + voice);
+		if (res != SAPILibResult.SAPINATIVE_OK.value()) {
+			throw new SynthesisException("SAPI speak error " + res + " raised with voice "
+			        + voice + ": " +  SAPILibResult.valueOfCode(res));
 		}
 
 		int size = SAPILib.getStreamSize(tr.connection);
@@ -117,17 +116,71 @@ public class SAPIengine extends TTSEngine {
 			mVoiceFormatConverter = new HashMap<String, Voice>();
 			String[] names = SAPILib.getVoiceNames();
 			String[] vendors = SAPILib.getVoiceVendors();
+			String[] locale = SAPILib.getVoiceLocales();
+			String[] gender = SAPILib.getVoiceGenders();
+			String[] age = SAPILib.getVoiceAges();
 			for (int i = 0; i < names.length; ++i) {
-				mVoiceFormatConverter.put(names[i].toLowerCase(), new Voice(vendors[i],
-				        names[i]));
+				String currentGender = gender[i];
+				String currentAge = age[i];
+				Gender selected = Gender.FEMALE_ADULT;
+				switch (currentGender.toLowerCase()) {
+					case "male":
+						switch(currentAge.toLowerCase()){
+							case "child":
+								selected = Gender.MALE_CHILD;
+								break;
+							case "elderly":
+								selected = Gender.MALE_ELDERY;
+								break;
+							case "adult":
+							default:
+								selected = Gender.MALE_ADULT;
+								break;
+						}
+						break;
+					case "female":
+					default:
+						switch(currentAge.toLowerCase()){
+							case "child":
+								selected = Gender.FEMALE_CHILD;
+								break;
+							case "elderly":
+								selected = Gender.FEMALE_ELDERY;
+								break;
+							case "adult":
+							default:
+								selected = Gender.FEMALE_ADULT;
+								break;
+						}
+						break;
+				}
+				try {
+					mVoiceFormatConverter.put(
+						names[i].toLowerCase(),
+						new Voice(
+							vendors[i],
+							names[i],
+							VoiceInfo.tagToLocale(locale[i]),
+							selected
+						)
+					);
+				} catch (VoiceInfo.UnknownLanguage e) {
+					Logger.debug("Not a valid locale: " + locale[i]);
+				}
 			}
 		}
-
 		List<Voice> voices = new ArrayList<Voice>();
 		for (String sapiVoice : mVoiceFormatConverter.keySet()) {
-			voices.add(new Voice(getProvider().getName(), sapiVoice));
+			Voice original = mVoiceFormatConverter.get(sapiVoice);
+			voices.add(
+				new Voice(
+					getProvider().getName(),
+					sapiVoice,
+					original.getLocale().get(),
+					original.getGender().get()
+				)
+			);
 		}
-
 		return voices;
 	}
 
