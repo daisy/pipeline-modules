@@ -1,7 +1,6 @@
 package org.daisy.pipeline.css;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
@@ -40,10 +39,16 @@ public final class SourceMapReader {
 					for (Json s : jsonArray.asJsonList()) {
 						if (!s.isString())
 							throw new RuntimeException("Expected string");
-						try {
-							sources.add(URLs.asURL(URLs.resolve(base, new URI(null, null, s.asString(), null)))); }
-						catch (URISyntaxException e) {
-							throw new RuntimeException(e); } // should not happen
+						// the source can be either
+						if (s.asString().matches("^\\w+:"))
+							// an absolute URL (with encoded path)
+							sources.add(URLs.asURL(URLs.resolve(base, URLs.asURI(s.asString()))));
+						else
+							// or a (unencoded) file path (relative to the current working directory)
+							try {
+								sources.add(URLs.asURL(URLs.resolve(base, new URI(null, null, s.asString(), null)))); }
+							catch (java.net.URISyntaxException e) {
+								throw new RuntimeException(e); } // should not happen
 					}
 				}
 				CharacterIterator mappings; {
