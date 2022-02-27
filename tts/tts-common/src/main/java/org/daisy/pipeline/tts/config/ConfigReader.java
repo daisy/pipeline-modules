@@ -47,7 +47,7 @@ public class ConfigReader implements ConfigProperties {
 	public ConfigReader(Processor saxonproc, XdmNode doc, Extension... extensions) {
 		String staticConfigPath = Properties.getProperty(ttsConfigProperty);
 		if (staticConfigPath != null) {
-			XdmNode content = readFromURIinsideConfig(staticConfigPath, saxonproc, URLs.asURI(new File("./")));
+			XdmNode content = readFromURL(staticConfigPath, saxonproc);
 			if (content != null)
 				readConfig(null, content, extensions);
 		}
@@ -68,46 +68,58 @@ public class ConfigReader implements ConfigProperties {
 			mAllProps.putAll(mDynamicProps);
 	}
 
-	static public URL URIinsideConfig(String pathOrURI, URI relativeTo) {
-		URI uri= null;
-		if (pathOrURI.startsWith("/")) {
-			uri = URLs.asURI(new File(pathOrURI));
-		} else {
-			try {
-				uri = URLs.asURI(pathOrURI);
-			} catch (Exception e) {
-				Logger.debug("URI " + uri + ": wrong format " + e);
-				return null;
-			}
-		}
-		if (!uri.isAbsolute()) {
-			if (relativeTo == null) {
-				Logger.debug("URI " + uri + " must be absolute");
-				return null;
-			}
-			uri = relativeTo.resolve(uri);
-		}
+	/**
+	 * Resolve URL within TTS configuration document.
+	 *
+	 * @param url  The URL to resolve.
+	 * @param base The base URI of the configuration document.
+	 */
+	public static URL URIinsideConfig(String url, URI base) {
 		try {
-			return URLs.asURL(uri);
+			return URLs.asURL(URLs.resolve(base, URLs.asURI(url)));
 		} catch (Exception e) {
-			Logger.debug("Malformed URL: " + uri);
+			Logger.debug("Malformed URL: " + url);
 			return null;
 		}
 	}
 
-	static public XdmNode readFromURIinsideConfig(String pathOrURI, Processor saxonproc,
-	        URI relativeTo) {
-		URL url = URIinsideConfig(pathOrURI, relativeTo);
-		if (url != null) {
-			try {
-				SAXSource source = new SAXSource(new InputSource(url.openStream()));
-				source.setSystemId(url.toString());
-				return saxonproc.newDocumentBuilder().build(source);
-			} catch (Exception e) {
-				Logger.debug("error while reading " + url + ": " + e);
-			}
+	/**
+	 * Read document from URL within TTS configuration document.
+	 *
+	 * @param url  The URL to read from. If relative, it is resolved
+	 *             against the base URI of the configuration document.
+	 * @param base The base URI of the configuration document.
+	 */
+	public static XdmNode readFromURIinsideConfig(String url, Processor saxonproc, URI base) {
+		return readFromURL(URIinsideConfig(url, base), saxonproc);
+	}
+
+	/**
+	 * Read document from URL.
+	 *
+	 * @param url The URL to read from. If relative, it is resolved
+	 *            against the current directory.
+	 */
+	private static XdmNode readFromURL(String url, Processor saxonproc) {
+		return readFromURIinsideConfig(url, saxonproc, URLs.asURI(new File("./")));
+	}
+
+	/**
+	 * Read document from URL.
+	 *
+	 * @param url The URL to read from.
+	 */
+	private static XdmNode readFromURL(URL url, Processor saxonproc) {
+		if (url == null)
+			return null;
+		try {
+			SAXSource source = new SAXSource(new InputSource(url.openStream()));
+			source.setSystemId(url.toString());
+			return saxonproc.newDocumentBuilder().build(source);
+		} catch (Exception e) {
+			Logger.debug("error while reading " + url + ": " + e);
+			return null;
 		}
-		return null;
 	}
 
 	private void readConfig(Map<String, String> props, XdmNode doc, Extension... extensions) {
