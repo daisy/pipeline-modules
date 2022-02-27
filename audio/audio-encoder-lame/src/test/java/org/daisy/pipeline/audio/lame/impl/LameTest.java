@@ -27,10 +27,7 @@ import com.google.common.io.Files;
 /**
  * Pre-requisites:
  * 
- * - Lame installed
- * 
  * - avconv installed
- * 
  * - Read and write permissions on the OS' tmp directory
  */
 public class LameTest {
@@ -93,9 +90,6 @@ public class LameTest {
 	@BeforeClass
 	public static void buildReference() throws Throwable {
 		
-		Assume.assumeTrue("Test can not be run because lame not present",
-		                  BinaryFinder.find("lame").isPresent());
-		
 		refFormat = new AudioFormat(8000, 8, 1, true, true); //8 bits signed big-endian (for easy comparisons)
 
 		ref = new byte[1024 * 100];
@@ -112,7 +106,9 @@ public class LameTest {
 		}
 
 		//dump the reference on the disk using Lame
-		lame = new LameEncoderService().newEncoder(new HashMap<String,String>()).get();
+		lame = new LameEncoderService().newEncoder(new HashMap<String,String>()).orElse(null);
+		Assume.assumeTrue("Test can not be run because lame not present", lame != null);
+
 		AudioInputStream audioStream = new AudioInputStream(
 			new ByteArrayInputStream(ref),
 			refFormat,
