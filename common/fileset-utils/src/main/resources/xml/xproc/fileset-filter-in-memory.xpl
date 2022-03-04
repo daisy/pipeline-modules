@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
                 type="px:fileset-filter-in-memory" name="main">
 	
 	<p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -58,21 +59,21 @@
 	<px:fileset-join name="fileset-from-in-memory"/>
 	<p:sink/>
 	
-	<px:fileset-intersect name="result">
+	<px:fileset-intersect name="result" cx:pure="true">
 		<p:input port="source">
 			<p:pipe step="main" port="source.fileset"/>
 			<p:pipe step="fileset-from-in-memory" port="result"/>
 		</p:input>
 	</px:fileset-intersect>
-	<px:fileset-load name="result.in-memory">
+	<px:fileset-load name="result.in-memory" cx:pure="true">
 		<!-- this will just pick documents, everything is already loaded -->
 		<p:input port="in-memory">
 			<p:pipe step="main" port="source.in-memory"/>
 		</p:input>
 	</px:fileset-load>
-	<p:sink/>
+	<p:sink cx:pure="true"/>
 	
-	<px:fileset-diff name="not-in-manifest">
+	<px:fileset-diff name="not-in-manifest" cx:pure="true">
 		<p:input port="source">
 			<p:pipe step="fileset-from-in-memory" port="result"/>
 		</p:input>
@@ -80,9 +81,9 @@
 			<p:pipe step="main" port="source.fileset"/>
 		</p:input>
 	</px:fileset-diff>
-	<p:sink/>
+	<p:sink cx:pure="true"/>
 	
-	<px:fileset-diff name="not-in-memory">
+	<px:fileset-diff name="not-in-memory" cx:pure="true">
 		<p:input port="source">
 			<p:pipe step="main" port="source.fileset"/>
 		</p:input>
@@ -90,6 +91,6 @@
 			<p:pipe step="fileset-from-in-memory" port="result"/>
 		</p:input>
 	</px:fileset-diff>
-	<p:sink/>
+	<p:sink cx:pure="true"/>
 	
 </p:declare-step>
