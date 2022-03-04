@@ -64,6 +64,13 @@
         </p:documentation>
     </p:option>
 
+    <p:option name="temp-dir" select="''">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>If set, this is the directory that will be used for extracting zipped files before
+            they are stored at the final location (for testing purposes).</p>
+        </p:documentation>
+    </p:option>
+
     <p:import href="fileset-library.xpl">
         <p:documentation>
             px:fileset-create
@@ -144,7 +151,25 @@
         <p:when test="//d:file[@original-href[contains(resolve-uri(.,base-uri(..)),'!/') or matches(.,'^(bundle|jar):')]]">
             <p:identity name="fileset"/>
             <p:sink/>
-            <px:tempdir delete-on-exit="true"/>
+            <p:choose>
+                <p:when test="not($temp-dir='')">
+                    <p:in-scope-names name="vars"/>
+                    <p:template>
+                        <p:input port="template">
+                            <p:inline><c:result>{$temp-dir}/</c:result></p:inline>
+                        </p:input>
+                        <p:input port="parameters">
+                            <p:pipe step="vars" port="result"/>
+                        </p:input>
+                        <p:input port="source">
+                            <p:empty/>
+                        </p:input>
+                    </p:template>
+                </p:when>
+                <p:otherwise>
+                    <px:tempdir delete-on-exit="true"/>
+                </p:otherwise>
+            </p:choose>
             <px:normalize-uri name="unzip-dir">
                 <p:with-option name="href" select="string(/*)"/>
             </px:normalize-uri>
@@ -215,7 +240,25 @@
                     </p:output>
                     <p:identity name="zip-fileset"/>
                     <p:sink/>
-                    <px:tempdir delete-on-exit="true"/>
+                    <p:choose>
+                        <p:when test="not($temp-dir='')">
+                            <p:in-scope-names name="vars"/>
+                            <p:template>
+                                <p:input port="template">
+                                    <p:inline><c:result>{$temp-dir}/</c:result></p:inline>
+                                </p:input>
+                                <p:input port="parameters">
+                                    <p:pipe step="vars" port="result"/>
+                                </p:input>
+                                <p:input port="source">
+                                    <p:empty/>
+                                </p:input>
+                            </p:template>
+                        </p:when>
+                        <p:otherwise>
+                            <px:tempdir delete-on-exit="true"/>
+                        </p:otherwise>
+                    </p:choose>
                     <px:normalize-uri name="unzip-dir">
                         <p:with-option name="href" select="string(/*)"/>
                     </px:normalize-uri>

@@ -15,6 +15,7 @@
         <p:pipe step="store" port="fileset.out"/>
       </p:output>
       <p:option name="target-base" required="true"/>
+      <p:option name="temp-dir" select="''"/>
       <p:import href="../../main/resources/xml/xproc/fileset-library.xpl"/>
       <p:add-xml-base/>
       <px:fileset-copy name="copy">
@@ -27,6 +28,7 @@
         <p:input port="in-memory.in">
           <p:pipe step="copy" port="result.in-memory"/>
         </p:input>
+        <p:with-option name="temp-dir" select="$temp-dir"/>
       </px:fileset-store>
     </p:declare-step>
   </x:script>
@@ -434,6 +436,7 @@
 </root></x:document>
       </x:input>
       <x:option name="target-base" select="resolve-uri('9/',$temp-dir)"/>
+      <x:option name="temp-dir" select="resolve-uri('9-tmp/',$temp-dir)"/>
     </x:call>
     <x:context label="The result fileset">
       <x:document type="port" port="result.fileset"/>
@@ -551,6 +554,7 @@
         </x:document>
       </x:input>
       <x:option name="target-base" select="resolve-uri('11/', $temp-dir)"/>
+      <x:option name="temp-dir" select="resolve-uri('11-tmp/',$temp-dir)"/>
     </x:call>
     <x:context label="The result fileset">
       <x:document type="port" port="result.fileset"/>
