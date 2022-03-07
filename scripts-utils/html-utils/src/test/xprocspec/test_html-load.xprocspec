@@ -63,9 +63,10 @@
 	<x:scenario label="'img' element">
 		<x:call step="px:html-load">
 			<x:input port="source.fileset">
-				<x:document type="inline">
+				<x:document type="inline" xml:base="file:/example/">
 					<d:fileset>
-						<d:file href="file:/example/doc.html" media-type="application/xhtml+xml"/>
+						<d:file href="doc.html" media-type="application/xhtml+xml"/>
+						<d:file href="images/my-image.png"/>
 					</d:fileset>
 				</x:document>
 			</x:input>
@@ -123,29 +124,8 @@
 							<img src="my-image.png" xml:base="file:/example/images/"/>
 						</html>
 					</x:document>
-				</x:input>
-			</x:call>
-			<x:context label="result.fileset">
-				<x:document type="port" port="result.fileset"/>
-			</x:context>
-			<x:expect type="compare" label="result">
-				<x:document type="inline">
-					<d:fileset xml:base="file:/example/">
-						<d:file href="doc.html" media-type="application/xhtml+xml"/>
-						<d:file href="images/my-image.png" media-type="image/png"
-						        original-href="file:/example/images/my-image.png" kind="image"/>
-					</d:fileset>
-				</x:document>
-			</x:expect>
-		</x:scenario>
-
-		<x:scenario label="with an absolute file URI">
-			<x:call>
-				<x:input port="source.in-memory">
-					<x:document type="inline" xml:base="file:/example/doc.html">
-						<html>
-							<img src="file:/example/my-image.png"/>
-						</html>
+					<x:document type="inline" xml:base="file:/example/images/my-image.png">
+						<c:data content-type="text/plain"/>
 					</x:document>
 				</x:input>
 			</x:call>
@@ -156,8 +136,33 @@
 				<x:document type="inline">
 					<d:fileset xml:base="file:/example/">
 						<d:file href="doc.html" media-type="application/xhtml+xml"/>
-						<d:file href="my-image.png" media-type="image/png"
-						        original-href="file:/example/my-image.png" kind="image"/>
+						<d:file href="images/my-image.png" media-type="image/png" kind="image"/>
+					</d:fileset>
+				</x:document>
+			</x:expect>
+		</x:scenario>
+
+		<x:scenario label="with an absolute file URI">
+			<x:call>
+				<x:input port="source.in-memory">
+					<x:document type="inline" xml:base="file:/example/doc.html">
+						<html>
+							<img src="file:/example/images/my-image.png"/>
+						</html>
+					</x:document>
+					<x:document type="inline" xml:base="file:/example/images/my-image.png">
+						<c:data content-type="text/plain"/>
+					</x:document>
+				</x:input>
+			</x:call>
+			<x:context label="result.fileset">
+				<x:document type="port" port="result.fileset"/>
+			</x:context>
+			<x:expect type="compare" label="result">
+				<x:document type="inline">
+					<d:fileset xml:base="file:/example/">
+						<d:file href="doc.html" media-type="application/xhtml+xml"/>
+						<d:file href="images/my-image.png" media-type="image/png" kind="image"/>
 					</d:fileset>
 				</x:document>
 			</x:expect>
@@ -211,9 +216,11 @@
 	<x:scenario label="'longdesc' attribute">
 		<x:call step="px:html-load">
 			<x:input port="source.fileset">
-				<x:document type="inline">
+				<x:document type="inline" xml:base="file:/example/">
 					<d:fileset>
-						<d:file href="file:/example/doc.html" media-type="application/xhtml+xml"/>
+						<d:file href="doc.html" media-type="application/xhtml+xml"/>
+						<d:file href="images/my-image.png"/>
+						<d:file href="images/desc.xml"/>
 					</d:fileset>
 				</x:document>
 			</x:input>
@@ -227,31 +234,11 @@
 							<img src="my-image.png" xml:base="file:/example/images/" longdesc="desc.xml"/>
 						</html>
 					</x:document>
-				</x:input>
-			</x:call>
-			<x:context label="result.fileset">
-				<x:document type="port" port="result.fileset"/>
-			</x:context>
-			<x:expect type="compare" label="result">
-				<x:document type="inline">
-					<d:fileset xml:base="file:/example/">
-						<d:file href="doc.html" media-type="application/xhtml+xml"/>
-						<d:file href="images/my-image.png" original-href="file:/example/images/my-image.png"
-						        media-type="image/png" kind="image"/>
-						<d:file href="images/desc.xml" original-href="file:/example/images/desc.xml"
-						        media-type="application/xml" kind="description"/>
-					</d:fileset>
-				</x:document>
-			</x:expect>
-		</x:scenario>
-
-		<x:scenario label="pointing to local content">
-			<x:call>
-				<x:input port="source.in-memory">
-					<x:document type="inline" xml:base="file:/example/doc.html">
-						<html>
-							<img src="my-image.png" xml:base="file:/my-base/" longdesc="#foo"/>
-						</html>
+					<x:document type="inline" xml:base="file:/example/images/my-image.png">
+						<c:data content-type="text/plain"/>
+					</x:document>
+					<x:document type="inline" xml:base="file:/example/images/desc.xml">
+						<c:data content-type="text/plain"/>
 					</x:document>
 				</x:input>
 			</x:call>
@@ -262,8 +249,34 @@
 				<x:document type="inline">
 					<d:fileset xml:base="file:/example/">
 						<d:file href="doc.html" media-type="application/xhtml+xml"/>
-						<d:file href="../my-base/my-image.png" original-href="file:/my-base/my-image.png"
-						        media-type="image/png" kind="image"/>
+						<d:file href="images/my-image.png" media-type="image/png" kind="image"/>
+						<d:file href="images/desc.xml" media-type="application/xml" kind="description"/>
+					</d:fileset>
+				</x:document>
+			</x:expect>
+		</x:scenario>
+
+		<x:scenario label="pointing to local content">
+			<x:call>
+				<x:input port="source.in-memory">
+					<x:document type="inline" xml:base="file:/example/doc.html">
+						<html>
+							<img src="my-image.png" xml:base="file:/example/images/" longdesc="#foo"/>
+						</html>
+					</x:document>
+					<x:document type="inline" xml:base="file:/example/images/my-image.png">
+						<c:data content-type="text/plain"/>
+					</x:document>
+				</x:input>
+			</x:call>
+			<x:context label="result.fileset">
+				<x:document type="port" port="result.fileset"/>
+			</x:context>
+			<x:expect type="compare" label="result">
+				<x:document type="inline">
+					<d:fileset xml:base="file:/example/">
+						<d:file href="doc.html" media-type="application/xhtml+xml"/>
+						<d:file href="images/my-image.png" media-type="image/png" kind="image"/>
 					</d:fileset>
 				</x:document>
 			</x:expect>
@@ -273,9 +286,11 @@
 	<x:scenario label="'aria-descrbedat' attribute">
 		<x:call step="px:html-load">
 			<x:input port="source.fileset">
-				<x:document type="inline">
+				<x:document type="inline" xml:base="file:/example/">
 					<d:fileset>
-						<d:file href="file:/example/doc.html" media-type="application/xhtml+xml"/>
+						<d:file href="doc.html" media-type="application/xhtml+xml"/>
+						<d:file href="images/my-image.png"/>
+						<d:file href="images/desc.xml"/>
 					</d:fileset>
 				</x:document>
 			</x:input>
@@ -290,6 +305,12 @@
 							     aria-describedat="desc.xml"/>
 						</html>
 					</x:document>
+					<x:document type="inline" xml:base="file:/example/images/my-image.png">
+						<c:data content-type="text/plain"/>
+					</x:document>
+					<x:document type="inline" xml:base="file:/example/images/desc.xml">
+						<c:data content-type="text/plain"/>
+					</x:document>
 				</x:input>
 			</x:call>
 			<x:context label="result.fileset">
@@ -299,10 +320,8 @@
 				<x:document type="inline">
 					<d:fileset xml:base="file:/example/">
 						<d:file href="doc.html" media-type="application/xhtml+xml"/>
-						<d:file href="images/my-image.png" original-href="file:/example/images/my-image.png"
-						        media-type="image/png" kind="image"/>
-						<d:file href="images/desc.xml" original-href="file:/example/images/desc.xml"
-						        media-type="application/xml" kind="description"/>
+						<d:file href="images/my-image.png" media-type="image/png" kind="image"/>
+						<d:file href="images/desc.xml" media-type="application/xml" kind="description"/>
 					</d:fileset>
 				</x:document>
 			</x:expect>
@@ -316,6 +335,9 @@
 							<span xml:base="file:/example/images/" aria-describedat="desc.xml"/>
 						</html>
 					</x:document>
+					<x:document type="inline" xml:base="file:/example/images/desc.xml">
+						<c:data content-type="text/plain"/>
+					</x:document>
 				</x:input>
 			</x:call>
 			<x:context label="result.fileset">
@@ -325,8 +347,7 @@
 				<x:document type="inline">
 					<d:fileset xml:base="file:/example/">
 						<d:file href="doc.html" media-type="application/xhtml+xml"/>
-						<d:file href="images/desc.xml" original-href="file:/example/images/desc.xml"
-						        media-type="application/xml" kind="description"/>
+						<d:file href="images/desc.xml" media-type="application/xml" kind="description"/>
 					</d:fileset>
 				</x:document>
 			</x:expect>
@@ -336,9 +357,10 @@
 	<x:scenario label="nested structure">
 		<x:call step="px:html-load">
 			<x:input port="source.fileset">
-				<x:document type="inline">
+				<x:document type="inline" xml:base="file:/example/">
 					<d:fileset>
-						<d:file href="file:/example/doc.html" media-type="application/xhtml+xml"/>
+						<d:file href="doc.html" media-type="application/xhtml+xml"/>
+						<d:file href="images/my-image.png"/>
 					</d:fileset>
 				</x:document>
 			</x:input>
@@ -350,6 +372,9 @@
 						</a>
 					</html>
 				</x:document>
+				<x:document type="inline" xml:base="file:/example/images/my-image.png">
+					<c:data content-type="text/plain"/>
+				</x:document>
 			</x:input>
 		</x:call>
 		<x:context label="result.fileset">
@@ -359,8 +384,7 @@
 			<x:document type="inline">
 				<d:fileset xml:base="file:/example/">
 					<d:file href="doc.html" media-type="application/xhtml+xml"/>
-					<d:file href="images/my-image.png" media-type="image/png"
-					        original-href="file:/example/images/my-image.png" kind="image"/>
+					<d:file href="images/my-image.png" media-type="image/png" kind="image"/>
 				</d:fileset>
 			</x:document>
 		</x:expect>
@@ -373,6 +397,9 @@
 					<d:fileset>
 						<d:file href="doc.html" media-type="application/xhtml+xml"/>
 						<d:file href="foo.css" media-type="text/css"/>
+						<d:file href="font.ttf"/>
+						<d:file href="img.png"/>
+						<d:file href="img2.jpg"/>
 					</d:fileset>
 				</x:document>
 			</x:input>
@@ -402,6 +429,15 @@
 						}
 					</c:data>
 				</x:document>
+				<x:document type="inline" xml:base="font.ttf">
+					<c:data content-type="text/plain"/>
+				</x:document>
+				<x:document type="inline" xml:base="img.png">
+					<c:data content-type="text/plain"/>
+				</x:document>
+				<x:document type="inline" xml:base="img2.jpg">
+					<c:data content-type="text/plain"/>
+				</x:document>
 			</x:input>
 		</x:call>
 		<x:context label="the fileset">
@@ -414,9 +450,9 @@
 				<d:fileset>
 					<d:file href="doc.html" media-type="application/xhtml+xml"/>
 					<d:file href="foo.css" media-type="text/css"/>
-					<d:file href="font.ttf" original-href="font.ttf" media-type="application/x-font-ttf"/>
-					<d:file href="img.png" original-href="img.png" media-type="image/png" kind="image"/>
-					<d:file href="img2.jpg" original-href="img2.jpg" media-type="image/jpeg" kind="image"/>
+					<d:file href="font.ttf" media-type="application/x-font-ttf"/>
+					<d:file href="img.png" media-type="image/png" kind="image"/>
+					<d:file href="img2.jpg" media-type="image/jpeg" kind="image"/>
 				</d:fileset>
 			</x:document>
 		</x:expect>
@@ -428,7 +464,8 @@
 				<x:document type="inline">
 					<d:fileset>
 						<d:file href="../resources/html-with-xml-stylesheet-processing-instruction.xml" media-type="application/xhtml+xml"/>
-						<d:file href="../resources/foo.css" media-type="text/css"/>
+						<d:file href="../resources/foo.css"/>
+						<d:file href="../resources/font.ttf"/>
 					</d:fileset>
 				</x:document>
 			</x:input>
@@ -440,6 +477,9 @@
 							src: url("font.ttf");
 						}
 					</c:data>
+				</x:document>
+				<x:document type="inline" xml:base="../resources/font.ttf">
+					<c:data content-type="text/plain"/>
 				</x:document>
 			</x:input>
 		</x:call>
@@ -453,7 +493,7 @@
 				<d:fileset>
 					<d:file href="../resources/html-with-xml-stylesheet-processing-instruction.xml" media-type="application/xhtml+xml"/>
 					<d:file href="../resources/foo.css" media-type="text/css" kind="stylesheet"/>
-					<d:file href="../resources/font.ttf" media-type="application/x-font-ttf" original-href="../resources/font.ttf"/>
+					<d:file href="../resources/font.ttf" media-type="application/x-font-ttf"/>
 				</d:fileset>
 			</x:document>
 		</x:expect>

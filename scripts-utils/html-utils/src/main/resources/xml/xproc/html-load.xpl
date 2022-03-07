@@ -40,7 +40,9 @@
 				<li>animation</li>
 				<li>font</li>
 			</ul>
-			<p>The HTML documents are loaded into memory.</p>
+			<p>Only contains resources that actually exist on disk. The HTML documents are loaded
+			into memory. The <code>original-href</code> attributes reflects which files are stored
+			on disk.</p>
 		</p:documentation>
 	</p:output>
 	<p:output port="result.in-memory" sequence="true">
@@ -149,6 +151,16 @@
 	</p:for-each>
 	<px:fileset-join/>
 	
+	<!--
+	    remove files that are not on disk or in memory, and make @original-href reflect which files are in memory
+	-->
+	<px:fileset-purge>
+		<p:input port="source.in-memory">
+			<p:pipe step="htmls" port="result"/>
+			<p:pipe step="main" port="source.in-memory"/>
+		</p:input>
+	</px:fileset-purge>
+
 	<!--
 	    copy attributes from source fileset
 	-->
