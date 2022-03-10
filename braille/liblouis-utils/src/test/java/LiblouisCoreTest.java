@@ -367,6 +367,13 @@ public class LiblouisCoreTest extends AbstractTest {
 		assertEquals(
 			"fubarz",
 			fillLines(translator.transform(styledText("foobarz", "hyphens:auto")), 6));
+		assertEquals(
+			"fuba\n" +
+			"rz\n" +
+			"fub-\n" +
+			"barz",
+			fillLines(translator.transform(styledText("foobarz ", "",
+			                                          "foobarz", "hyphens:auto")), 4));
 	}
 	
 	@Test

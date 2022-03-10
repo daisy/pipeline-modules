@@ -48,6 +48,10 @@ public interface Hyphenator extends Transform {
 	@SuppressWarnings("serial")
 	public class NonStandardHyphenationException extends RuntimeException {
 
+		public NonStandardHyphenationException() {
+			super();
+		}
+
 		public NonStandardHyphenationException(Throwable cause) {
 			super(cause);
 		}
