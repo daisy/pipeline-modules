@@ -174,7 +174,7 @@
     </x:expect>
   </x:scenario>
   
-  <x:scenario label="levels-in-footer" pending="liblouis translation bug">
+  <x:scenario label="levels-in-footer">
     <x:documentation>
       Tests levels-in-footer option.
     </x:documentation>
@@ -600,7 +600,7 @@
         </x:document>
       </x:expect>
     </x:scenario>
-    <x:scenario label="enabled">
+    <x:scenario label="disabled">
       <x:call>
         <x:option name="include-line-groups" select="'false'"/>
         <x:option name="pef-output-dir" select="concat($temp-dir,'include-line-groups/disabled/output-dir/')"/>
