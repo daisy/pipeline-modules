@@ -76,13 +76,9 @@
     </dependency>
     <dependency>
       <groupId>org.daisy.pipeline.modules.braille</groupId>
+      <!-- note that Dotify is also used for hyphenation -->
       <artifactId>dotify-utils</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.daisy.pipeline.modules.braille</groupId>
-      <artifactId>libhyphen-utils</artifactId>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.daisy.pipeline.modules.braille</groupId>

@@ -1,13 +1,16 @@
 package org.daisy.pipeline.braille.liblouis.impl;
 
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 import java.util.regex.Pattern;
 
 import com.google.common.base.Function;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.base.Optional;
+import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
+import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.toArray;
 import static com.google.common.collect.Iterables.transform;
 
@@ -114,11 +117,16 @@ public class LiblouisHyphenatorJnaImplProvider implements LiblouisHyphenator.Pro
 					logger.error("Invalid locale", e);
 					return empty; }
 			Iterable<LiblouisTableJnaImpl> tables = tableProvider.get(q.asImmutable());
-			return transform(
-				tables,
-				new Function<LiblouisTableJnaImpl,LiblouisHyphenator>() {
-					public LiblouisHyphenator apply(LiblouisTableJnaImpl table) {
-						return new LiblouisHyphenatorImpl(table.getTranslator()); }});
+			return filter(
+				transform(
+					tables,
+					new Function<LiblouisTableJnaImpl,LiblouisHyphenator>() {
+						public LiblouisHyphenator apply(LiblouisTableJnaImpl table) {
+							try {
+								return new LiblouisHyphenatorImpl(table.getTranslator()); }
+							catch (IllegalArgumentException e) {
+								return null; }}}),
+				Predicates.notNull());
 		}
 	};
 	
@@ -130,6 +138,18 @@ public class LiblouisHyphenatorJnaImplProvider implements LiblouisHyphenator.Pro
 		private LiblouisHyphenatorImpl(Translator translator) {
 			this.table = new LiblouisTable(translator.getTable());
 			this.translator = translator;
+
+			// The table is not guaranteed to contain a hyphenation (.dic) sub-table. We
+			// can find out by hyphenating a test string.
+			try {
+				translator.hyphenate("foobar");
+			} catch (TranslationException e) {
+				// Note that Liblouis raises this error but does not log an error
+				// message. We assume that the reason of the failure is because
+				// `table->hyphenStatesArray == 0' (in other words, because no hyphenation
+				// sub-table was encountered).
+				throw new IllegalArgumentException("Table does not support hyphenation: " + translator.getTable());
+			}
 		}
 		
 		public LiblouisTable asLiblouisTable() {
