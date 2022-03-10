@@ -13,6 +13,7 @@ import org.daisy.braille.css.SimpleInlineStyle;
 import org.daisy.braille.css.BrailleCSSProperty.Hyphens;
 import org.daisy.braille.css.BrailleCSSProperty.TextTransform;
 import org.daisy.dotify.api.translator.UnsupportedMetricException;
+import org.daisy.pipeline.braille.common.Hyphenator.NonStandardHyphenationException;
 
 import com.google.common.collect.Iterables;
 
@@ -139,10 +140,8 @@ public class CompoundBrailleTranslator extends AbstractBrailleTranslator {
 							                                 textTransform))
 								context.add(j++, new CSSStyledText(s, "text-transform: none; braille-charset: custom"));
 							buffer.clear();
-						} catch (Exception e) {
-							if (transformed.size() > 0 && transformed.get(0) instanceof String)
-								throw e;
-							// could be non-standard hyphenation error; try without hyphenation
+						} catch (NonStandardHyphenationException e) {
+							// try without hyphenation
 							for (int j = buffer.size() - 1; j >= 0; j--) {
 								CSSStyledText st = (CSSStyledText)buffer.get(j).clone();
 								SimpleInlineStyle style = st.getStyle();

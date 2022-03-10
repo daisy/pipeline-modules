@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 import ch.sbs.jhyphen.CompilationException;
 import ch.sbs.jhyphen.Hyphen;
 import ch.sbs.jhyphen.Hyphenator;
+import ch.sbs.jhyphen.StandardHyphenationException;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
@@ -225,10 +226,10 @@ public class LibhyphenJnaImpl extends AbstractTransformProvider<LibhyphenHyphena
 		}
 		
 		private final FullHyphenator fullHyphenator = new FullHyphenator() {
-			public String transform(String text) {
+			public String transform(String text) throws NonStandardHyphenationException {
 				return LibhyphenHyphenatorImpl.this.transform(text);
 			}
-			public String[] transform(String[] text) {
+			public String[] transform(String[] text) throws NonStandardHyphenationException {
 				return LibhyphenHyphenatorImpl.this.transform(text);
 			}
 		};
@@ -256,6 +257,8 @@ public class LibhyphenJnaImpl extends AbstractTransformProvider<LibhyphenHyphena
 				if (t._1.length() == 0)
 					return text;
 				return insertHyphens(t._1, transform(t._2, t._1), false, SHY, ZWSP); }
+			catch (NonStandardHyphenationException e) {
+				throw e; }
 			catch (Exception e) {
 				throw new RuntimeException("Error during libhyphen hyphenation", e); }
 		}
@@ -283,6 +286,8 @@ public class LibhyphenJnaImpl extends AbstractTransformProvider<LibhyphenHyphena
 					while(i < text.length)
 						rv[i++] = "";
 					return rv; }}
+			catch (NonStandardHyphenationException e) {
+				throw e; }
 			catch (Exception e) {
 				throw new RuntimeException("Error during libhyphen hyphenation", e); }
 		}
@@ -310,9 +315,13 @@ public class LibhyphenJnaImpl extends AbstractTransformProvider<LibhyphenHyphena
 									wordHasManualHyphens = true;
 									break; }}
 						if (!wordHasManualHyphens) {
-							byte[] wordHyphens = hyphenator.hyphenate(segment);
-							for (int k = 0; k < len - 1; k++)
-								hyphens[pos + k] |= wordHyphens[k];
+							try {
+								byte[] wordHyphens = hyphenator.hyphenate(segment);
+								for (int k = 0; k < len - 1; k++)
+									hyphens[pos + k] |= wordHyphens[k];
+							} catch (StandardHyphenationException e) {
+								throw new NonStandardHyphenationException(e);
+							}
 						}
 					}
 					pos += segment.length();
@@ -320,7 +329,11 @@ public class LibhyphenJnaImpl extends AbstractTransformProvider<LibhyphenHyphena
 				}
 				return hyphens;
 			} else
-				return hyphenator.hyphenate(textWithoutManualHyphens);
+				try {
+					return hyphenator.hyphenate(textWithoutManualHyphens);
+				} catch (StandardHyphenationException e) {
+					throw new NonStandardHyphenationException(e);
+				}
 		}
 		
 		@Override

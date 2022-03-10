@@ -51,6 +51,7 @@ import org.daisy.pipeline.braille.common.BrailleTranslatorProvider;
 import org.daisy.pipeline.braille.common.CompoundBrailleTranslator;
 import org.daisy.pipeline.braille.common.CSSStyledText;
 import org.daisy.pipeline.braille.common.Hyphenator;
+import org.daisy.pipeline.braille.common.Hyphenator.NonStandardHyphenationException;
 import org.daisy.pipeline.braille.common.HyphenatorProvider;
 import org.daisy.pipeline.braille.common.Query;
 import org.daisy.pipeline.braille.common.Query.Feature;
@@ -486,7 +487,7 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 				java.lang.Iterable<String> braille;
 				try {
 					braille = fullTranslator.transform(styledTextCopy); }
-				catch (Exception e) {
+				catch (NonStandardHyphenationException e) {
 					return new BrailleStreamImpl(liblouisTranslator,
 					                             displayTable,
 					                             supportedTypeforms,
@@ -806,7 +807,7 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 								curPos = curSegmentEnd;
 								curPosInBraille = curSegmentEndInBraille;
 								continue segments; }
-							catch (Exception e) {}}
+							catch (NonStandardHyphenationException e) {}}
 						
 						// loop over words in segment
 						Matcher m = WORD_SPLITTER.matcher(segment);
@@ -836,7 +837,7 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 											available -= wordInBraille.length();
 											curPos = wordEnd;
 											curPosInBraille = wordEndInBraille; }
-										catch (Exception ee) {
+										catch (NonStandardHyphenationException ee) {
 											
 											// before we try non-standard hyphenation, return what we have already
 											// we do this because we are not sure that the value of "available" is accurate
@@ -846,6 +847,7 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 												break segments;
 											
 											// try non-standard hyphenation
+											if (lineBreaker == null) throw ee;
 											Hyphenator.LineIterator lines = lineBreaker.transform(word);
 											
 											// do a binary search for the optimal break point
