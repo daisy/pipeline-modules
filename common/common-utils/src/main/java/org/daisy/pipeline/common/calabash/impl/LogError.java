@@ -1,22 +1,14 @@
 package org.daisy.pipeline.common.calabash.impl;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Stack;
 import javax.xml.namespace.QName;
-import static javax.xml.stream.XMLStreamConstants.CHARACTERS;
-import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
 import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.SourceLocator;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterators;
 
 import com.xmlcalabash.core.XProcRuntime;
 import com.xmlcalabash.io.ReadablePipe;
@@ -49,12 +41,6 @@ public class LogError implements XProcStepProvider {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(LogError.class);
 	private static final QName C_ERROR = new QName("http://www.w3.org/ns/xproc-step", "error");
-	private static final QName PX_LOCATION = new QName("http://www.daisy.org/ns/pipeline/xproc", "location");
-	private static final QName PX_FILE = new QName("http://www.daisy.org/ns/pipeline/xproc", "file");
-	private static final QName PX_CAUSE = new QName("http://www.daisy.org/ns/pipeline/xproc", "cause");
-	private static final QName _CODE = new QName("code");
-	private static final QName _HREF = new QName("href");
-	private static final QName _LINE = new QName("line");
 
 	public XProcStep newStep(XProcRuntime runtime, XAtomicStep step) {
 		return new LogErrorStep(runtime, step);
@@ -83,7 +69,7 @@ public class LogError implements XProcStepProvider {
 			try {
 				new ErrorReporter(getOption(_severity, "INFO"))
 					.transform(
-						ImmutableMap.of(new QName("source"), new XMLCalabashInputValue(errorPipe, runtime)),
+						ImmutableMap.of(new QName("source"), new XMLCalabashInputValue(errorPipe)),
 						ImmutableMap.of())
 					.run();
 			} catch (Throwable e) {
@@ -134,7 +120,7 @@ public class LogError implements XProcStepProvider {
 							switch (event) {
 							case START_ELEMENT:
 								if (C_ERROR.equals(reader.getName())) {
-									XProcError xprocError = parseXProcError(reader);
+									XProcError xprocError = XProcError.parse(reader);
 									log(xprocError.getMessage() + " (Please see detailed log for more info.)");
 									LOGGER.debug(xprocError.toString());
 								}
@@ -148,126 +134,6 @@ public class LogError implements XProcStepProvider {
 					throw new TransformerException(e);
 				}
 			}
-		}
-
-		private static XProcError parseXProcError(XMLStreamReader reader) throws XMLStreamException {
-			if (!C_ERROR.equals(reader.getName()))
-				throw new IllegalArgumentException();
-			String code = null;
-			String message = null;
-			List<SourceLocator> location = null;
-			XProcError cause = null;
-			for (int i = 0; i < reader.getAttributeCount(); i++) {
-				QName name = reader.getAttributeName(i);
-				String value = reader.getAttributeValue(i);
-				if (_CODE.equals(name)) {
-					code = value;
-					break;
-				}
-			}
-			Stack<QName> parents = new Stack<>();
-			int event = reader.next();
-			while (true)
-				try {
-					switch (event) {
-					case START_ELEMENT:
-						if (C_ERROR.equals(reader.getName())) {
-							if (parents.size() == 1 && PX_CAUSE.equals(parents.peek()))
-								cause = parseXProcError(reader);
-							else
-								skipElement(reader);
-						} else if (PX_FILE.equals(reader.getName())) {
-							if (parents.size() == 1 && PX_LOCATION.equals(parents.peek())) {
-								if (location == null) location = new ArrayList<>();
-								location.add(new PxFileLocation(reader));
-							} else
-								skipElement(reader);
-						} else
-							parents.add(reader.getName());
-						break;
-					case END_ELEMENT:
-						if (C_ERROR.equals(reader.getName())) {
-							String _code = code;
-							String _message = message;
-							SourceLocator[] _location = location == null
-								? new SourceLocator[]{}
-								: location.toArray(new SourceLocator[location.size()]);
-							XProcError _cause = cause;
-							return new XProcError() {
-								public String getCode() { return _code; }
-								public String getMessage() { return _message; }
-								public XProcError getCause() { return _cause; }
-								public SourceLocator[] getLocation() { return _location; }
-							};
-						}
-						parents.pop();
-						break;
-					case CHARACTERS:
-						message = message == null ? reader.getText() : (message + reader.getText());
-						break;
-					default:
-					}
-					event = reader.next();
-				} catch (NoSuchElementException e) {
-					break;
-				}
-			throw new RuntimeException("coding error");
-		}
-
-		private static class PxFileLocation implements SourceLocator {
-			private String href = "";
-			private int line = -1;
-			PxFileLocation(XMLStreamReader reader) throws XMLStreamException {
-				if (!PX_FILE.equals(reader.getName()))
-					throw new IllegalArgumentException();
-				for (int i = 0; i < reader.getAttributeCount(); i++) {
-					QName name = reader.getAttributeName(i);
-					String value = reader.getAttributeValue(i);
-					if (_HREF.equals(name))
-						href = value;
-					else if (_LINE.equals(name))
-						line = Integer.parseInt(value);
-				}
-				skipElement(reader);
-			}
-			public String getPublicId() { return null; }
-			public String getSystemId() { return href; }
-			public int getLineNumber() { return line; }
-			public int getColumnNumber() { return -1; }
-			@Override
-			public String toString() {
-				StringBuilder s = new StringBuilder();
-				String fileName = getSystemId();
-				if (fileName != null && !"".equals(fileName)) {
-					if (fileName.lastIndexOf('/') >= 0)
-						fileName = fileName.substring(fileName.lastIndexOf('/') + 1);
-					s.append(fileName);
-					int line = getLineNumber();
-					if (line > 0)
-						s.append(":" + getLineNumber());
-				}
-				return s.toString();
-			}
-		}
-
-		private static int skipElement(XMLStreamReader reader) throws XMLStreamException {
-			int depth = 0;
-			while (true)
-				try {
-					int event = reader.next();
-					switch (event) {
-					case START_ELEMENT:
-						depth++;
-						break;
-					case END_ELEMENT:
-						if (--depth < 0) return event;
-						break;
-					default:
-					}
-				} catch (NoSuchElementException e) {
-					break;
-				}
-			throw new RuntimeException("coding error");
 		}
 	}
 }

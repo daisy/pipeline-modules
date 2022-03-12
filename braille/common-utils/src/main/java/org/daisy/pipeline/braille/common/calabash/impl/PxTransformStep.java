@@ -103,7 +103,7 @@ public class PxTransformStep extends DefaultStep implements XProcStep {
 				throw new XProcException(step, "Could not find a Transform for query: " + query);
 			xmlTransformer.transform(
 				ImmutableMap.of(
-					new QName("source"), new XMLCalabashInputValue(source, runtime),
+					new QName("source"), new XMLCalabashInputValue(source),
 					new QName("parameters"), new XMLCalabashParameterInputValue(params)),
 				ImmutableMap.of(
 					new QName("result"), new XMLCalabashOutputValue(result, runtime))

@@ -106,7 +106,7 @@ public class CssShiftIdStep extends DefaultStep implements XProcStep {
 			         new SaxonBuffer(runtime.getProcessor().getUnderlyingConfiguration()),
 			         false)
 			.transform(
-				new XMLCalabashInputValue(sourcePipe, runtime),
+				new XMLCalabashInputValue(sourcePipe),
 				new XMLCalabashOutputValue(resultPipe, runtime))
 			.run(); }
 		catch (Throwable e) {

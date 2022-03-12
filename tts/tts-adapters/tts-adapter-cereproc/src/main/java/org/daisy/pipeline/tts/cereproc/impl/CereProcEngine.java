@@ -247,7 +247,7 @@ public class CereProcEngine extends MarklessTTSEngine {
 	String transformSSML(XdmNode ssmlIn, Voice v) throws SynthesisException, SaxonApiException, XMLStreamException {
 		List<XdmItem> ssmlProcessed = new ArrayList<>();
 		Configuration conf = ssmlIn.getUnderlyingNode().getConfiguration();
-		XMLStreamReader reader = new SaxonInputValue(ssmlIn, conf).asXMLStreamReader();
+		XMLStreamReader reader = new SaxonInputValue(ssmlIn).asXMLStreamReader();
 		XMLStreamWriter writer = new SaxonOutputValue(item -> {
 				if (item instanceof XdmNode) {
 					ssmlProcessed.add(item);

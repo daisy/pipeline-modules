@@ -101,7 +101,7 @@ public class CssShiftStringSetStep extends DefaultStep implements XProcStep {
 		try {
 			new CssShiftStringSetTransformer()
 			.transform(
-				new XMLCalabashInputValue(sourcePipe, runtime),
+				new XMLCalabashInputValue(sourcePipe),
 				new XMLCalabashOutputValue(resultPipe, runtime))
 			.run(); }
 		catch (Throwable e) {

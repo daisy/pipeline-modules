@@ -23,7 +23,6 @@ import com.xmlcalabash.library.DefaultStep;
 import com.xmlcalabash.model.RuntimeValue;
 import com.xmlcalabash.runtime.XAtomicStep;
 
-import net.sf.saxon.Configuration;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
 
@@ -137,7 +136,7 @@ public class CssCascadeStep extends DefaultStep implements XProcStep {
 						new XSLT(runtime, step),
 						SaxonHelper.jaxpQName(attributeName)
 					).transform(
-						new XMLCalabashInputValue(sourcePipe, runtime),
+						new XMLCalabashInputValue(sourcePipe),
 						new XMLCalabashOutputValue(resultPipe, runtime)
 					).run();
 					return; }
@@ -173,13 +172,12 @@ public class CssCascadeStep extends DefaultStep implements XProcStep {
 		public XMLInputValue<Void> transform(URI stylesheetURI,
 		                                     XMLInputValue<?> source,
 		                                     Map<String,String> parameters) {
-			Configuration conf = runtime.getProcessor().getUnderlyingConfiguration();
-			XMLInputValue<Void> stylesheet = new SaxonInputValue(runtime.parse(stylesheetURI.toASCIIString(), null), conf);
+			XMLInputValue<Void> stylesheet = new SaxonInputValue(runtime.parse(stylesheetURI.toASCIIString(), null));
 			Map<javax.xml.namespace.QName,InputValue<?>> params = new HashMap<>(); {
 				for (String p : parameters.keySet())
 					params.put(new javax.xml.namespace.QName(p),
-					           new SaxonInputValue(new RuntimeValue(parameters.get(p)).getUntypedAtomic(runtime), conf)); }
-			SaxonBuffer buf = new SaxonBuffer(conf);
+					           new SaxonInputValue(new RuntimeValue(parameters.get(p)).getUntypedAtomic(runtime))); }
+			SaxonBuffer buf = new SaxonBuffer(runtime.getProcessor().getUnderlyingConfiguration());
 			transform(
 				ImmutableMap.of(
 					new javax.xml.namespace.QName("source"), source,

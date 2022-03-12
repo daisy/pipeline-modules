@@ -40,17 +40,17 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>common-utils</artifactId>
-        <version>8.2.1</version>
+        <version>8.2.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>css-utils</artifactId>
-        <version>5.2.1</version>
+        <version>5.2.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>dotify-utils</artifactId>
-        <version>4.1.1</version>
+        <version>4.1.2-SNAPSHOT</version>
       </dependency>
       <!-- list main libhyphen-utils first because this determines the version of the 'doc' artifact picked for the website -->
       <dependency>
@@ -117,7 +117,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>common-utils</artifactId>
-        <version>1.4.0</version>
+        <version>1.4.1-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
@@ -215,7 +215,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>css-utils</artifactId>
-        <version>3.1.0</version>
+        <version>3.1.1-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
@@ -438,7 +438,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>tts-adapter-cereproc</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
