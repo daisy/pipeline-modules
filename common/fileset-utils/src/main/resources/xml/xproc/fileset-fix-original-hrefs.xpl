@@ -166,15 +166,23 @@
 	</px:fileset-filter-in-memory>
 	<p:sink/>
 
-	<!--
-	    FIXME: make xml:base absolute because if it is relative the p:delete below will mess things
-	    up for some reason (Calabash bug?)
-	-->
-	<p:add-xml-base>
+	<p:identity>
 		<p:input port="source">
 			<p:pipe step="main" port="source.fileset"/>
 		</p:input>
-	</p:add-xml-base>
+	</p:identity>
+	<p:choose>
+		<p:when test="/*/@xml:base">
+			<!--
+			    FIXME: make xml:base absolute because if it is relative the p:delete below will mess
+			    things up for some reason (Calabash bug?)
+			-->
+			<p:add-xml-base/>
+		</p:when>
+		<p:otherwise>
+			<p:identity/>
+		</p:otherwise>
+	</p:choose>
 
 	<px:fileset-join name="source.fileset">
 		<p:documentation>Normalize @href and @original-href</p:documentation>
