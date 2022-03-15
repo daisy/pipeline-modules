@@ -15,7 +15,6 @@
     <!-- <xsl:use-package name="http://www.daisy.org/pipeline/modules/css-utils/library.xsl"/> -->
     <xsl:import href="http://www.daisy.org/pipeline/modules/css-utils/library.xsl"/>
 
-    <xsl:strip-space elements="*"/>
     <xsl:output indent="yes"/>
 
     <xsl:param name="context.fileset" as="document-node(element(d:fileset))?"/>
@@ -213,17 +212,11 @@
             <xsl:variable name="resolved"
                 select="
                 if ($uri instance of attribute()) then
-                    resolve-uri($href,base-uri($uri))
+                    resolve-uri($href,pf:base-uri($uri))
                 else
                     $href
                 "/>
-            <d:file
-                href="{if (starts-with($href,'file:')) then
-                           pf:relativize-uri($href,$doc-base)
-                       else if (pf:is-relative($href) and  $uri instance of attribute() and base-uri($uri) ne $doc-base) then
-                           pf:relativize-uri($resolved,$doc-base)
-                       else
-                           $href}">
+            <d:file href="{pf:relativize-uri($resolved,$doc-base)}">
                 <xsl:if test="not($context.fileset//d:file[resolve-uri(@href,base-uri(.))=$resolved]
                                                           [1][not(@original-href)])">
                     <xsl:attribute name="original-href" select="$resolved"/>
