@@ -10048,9 +10048,9 @@
     </x:expect>
   </x:scenario>
 
-  <x:scenario label="allow-text-flow" pending="Dotify bug">
+  <x:scenario label="allow-text-flow">
     <x:documentation>
-      Expose a bug in handling of &lt;field allow-text-flow="true"/&gt;.
+      Tests &lt;field allow-text-flow="true"/&gt;.
     </x:documentation>
     <x:call step="pxi:test">
       <x:input port="source">
