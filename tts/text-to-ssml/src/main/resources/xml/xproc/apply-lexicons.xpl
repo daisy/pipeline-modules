@@ -18,7 +18,8 @@
     </p:documentation>
   </p:import>
 
-  <!-- load lexicons from disk -->
+  <!-- load lexicons associated with the source document (detected by px:dtbook-load and
+       px:epub-load) -->
   <p:group name="doc-lexicons">
     <p:output port="result" sequence="true"/>
     <px:fileset-load media-types="application/pls+xml">

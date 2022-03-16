@@ -6,6 +6,8 @@
                 xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:c="http://www.w3.org/ns/xproc-step"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 exclude-inline-prefixes="px pxi"
                 name="main">
 	
@@ -93,15 +95,15 @@
 	<p:declare-step type="pxi:recursive-xslt" name="recursive-xslt">
 		<p:input port="source"/>
 		<p:output port="result"/>
-		<p:option name="stylesheets" required="true"/>
+		<p:option name="stylesheets" cx:as="xs:string*" required="true"/>
 		<p:input kind="parameter" port="parameters" primary="true"/>
 		<p:choose px:progress="1">
-			<p:when test="exists(tokenize($stylesheets,'\s+')[not(.='')])">
-				<p:variable name="stylesheet" select="tokenize($stylesheets,'\s+')[not(.='')][1]"/>
+			<p:when test="exists($stylesheets)">
+				<p:variable name="stylesheet" select="$stylesheets[1]"/>
 				<p:load name="stylesheet">
 					<p:with-option name="href" select="resolve-uri($stylesheet,base-uri(/*))"/>
 				</p:load>
-				<p:xslt px:message="Applying {$stylesheet}" px:progress="1/{count(tokenize($stylesheets,'\s+'))}">
+				<p:xslt px:message="Applying {$stylesheet}" px:progress="1/{count($stylesheets)}">
 					<p:input port="source">
 						<p:pipe step="recursive-xslt" port="source"/>
 					</p:input>
@@ -109,8 +111,8 @@
 						<p:pipe step="stylesheet" port="result"/>
 					</p:input>
 				</p:xslt>
-				<pxi:recursive-xslt px:progress="{count(tokenize($stylesheets,'\s+')) - 1}/{count(tokenize($stylesheets,'\s+'))}">
-					<p:with-option name="stylesheets" select="string-join(tokenize($stylesheets,'\s+')[not(.='')][position()&gt;1],' ')"/>
+				<pxi:recursive-xslt px:progress="{count($stylesheets) - 1}/{count($stylesheets)}">
+					<p:with-option name="stylesheets" select="$stylesheets[position()&gt;1]"/>
 				</pxi:recursive-xslt>
 			</p:when>
 			<p:otherwise>
@@ -122,6 +124,7 @@
 	<p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
 		<p:documentation>
 			px:error
+			px:parse-xml-stylesheet-instructions
 		</p:documentation>
 	</p:import>
 	<p:import href="http://www.daisy.org/pipeline/modules/css-utils/library.xpl">
@@ -129,17 +132,12 @@
 			px:css-cascade
 		</p:documentation>
 	</p:import>
-	<p:import href="parse-xml-stylesheet-instructions.xpl">
-		<p:documentation>
-			px:parse-xml-stylesheet-instructions
-		</p:documentation>
-	</p:import>
 	
-	<p:variable name="xslt-stylesheets" select="string-join(tokenize($stylesheets,'\s+')[matches(.,'\.xslt?$')],' ')"/>
-	<p:variable name="css-stylesheets" select="string-join(tokenize($stylesheets,'\s+')[matches(.,'\.s?css$')],' ')"/>
+	<p:variable name="xslt-stylesheets" cx:as="xs:string*" select="tokenize($stylesheets,'\s+')[matches(.,'\.xslt?$')]"/>
+	<p:variable name="css-stylesheets" cx:as="xs:string*" select="tokenize($stylesheets,'\s+')[matches(.,'\.s?css$')]"/>
 	
 	<p:choose>
-		<p:when test="not(string-join(($xslt-stylesheets,$css-stylesheets)[not(.='')],' ')=normalize-space($stylesheets))">
+		<p:when test="not(string-join(($xslt-stylesheets,$css-stylesheets),' ')=normalize-space($stylesheets))">
 			<px:error code="BRL01" message="Invalid `stylesheets` option specified: $1">
 				<p:with-option name="param1" select="$stylesheets"/>
 			</px:error>
@@ -150,26 +148,28 @@
 	</p:choose>
 	
 	<px:parse-xml-stylesheet-instructions name="xml-stylesheet-instructions" px:progress=".05"/>
+	<p:sink/>
+	<p:identity>
+		<p:input port="source">
+			<p:pipe step="xml-stylesheet-instructions" port="fileset"/>
+		</p:input>
+	</p:identity>
 	
 	<p:group px:progress=".95">
-		<p:variable name="all-xslt-stylesheets"
-		            select="string-join((
-		                      $xslt-stylesheets,
-		                      /d:xml-stylesheets/d:xml-stylesheet
-		                        [('text/xsl','application/xslt+xml')=tokenize($type,'\s+')
-	                             and (
-		                           @type=('text/xsl','application/xslt+xml')
-		                           or (not(@type) and matches(@href,'\.xslt?$')))]
-		                      /@href),' ')"/>
-		<p:variable name="all-css-stylesheets"
-		            select="string-join((
-		                      $css-stylesheets,
-		                      /d:xml-stylesheets/d:xml-stylesheet
-		                        [not(@media) or pf:media-query-matches(@media,$media)]
-		                        [(@type=('text/css','text/x-scss') and @type=tokenize($type,'\s+'))
-		                         or ('text/css'=tokenize($type,'\s+') and not(@type) and matches(@href,'\.css$'))
-		                         or ('text/x-scss'=tokenize($type,'\s+') and not(@type) and matches(@href,'\.scss$'))]
-		                      /@href),' ')"/>
+		<p:variable name="all-xslt-stylesheets" cx:as="xs:string*"
+		            select="($xslt-stylesheets,
+		                     /d:fileset/d:file
+		                       [('text/xsl','application/xslt+xml')=tokenize($type,'\s+')
+	                            and (
+		                          @media-type=('text/xsl','application/xslt+xml'))]
+		                     /string(@href))"/>
+		<p:variable name="all-css-stylesheets" cx:as="xs:string*"
+		            select="($css-stylesheets,
+		                     /d:fileset/d:file
+		                       [not(@stylesheet-media) or pf:media-query-matches(@stylesheet-media,$media)]
+		                       [(@media-type=('text/css','text/x-scss') and @media-type=tokenize($type,'\s+'))]
+		                     /string(@href))"/>
+		<p:sink/>
 		<p:identity>
 			<p:input port="source">
 				<p:pipe step="main" port="source"/>
@@ -183,10 +183,12 @@
 		</pxi:recursive-xslt>
 		<p:choose px:progress=".50">
 			<p:when test="tokenize($type,'\s')=('text/css','text/x-scss')">
-				<px:css-cascade px:message="Applying CSS{if (exists(tokenize($all-css-stylesheets,'\s+')[not(.='')]))
-				                                         then concat(':',string-join(('',tokenize($all-css-stylesheets,'\s+')[not(.='')]),'&#x0A;- '))
+				<px:css-cascade px:message="Applying CSS{if (exists($all-css-stylesheets))
+				                                         then concat(':',if (count($all-css-stylesheets)=1)
+				                                                         then concat(' ',$all-css-stylesheets[1])
+				                                                         else string-join(('',$all-css-stylesheets),'&#x0A;- '))
 				                                         else ''}">
-					<p:with-option name="default-stylesheet" select="$all-css-stylesheets"/>
+					<p:with-option name="default-stylesheet" select="string-join($all-css-stylesheets,' ')"/>
 					<p:with-option name="type" select="string-join(tokenize($type,'\s')[.=('text/css','text/x-scss')],' ')"/>
 					<p:with-option name="media" select="$media"/>
 					<p:input port="context">

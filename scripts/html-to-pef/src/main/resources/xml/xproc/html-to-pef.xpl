@@ -125,14 +125,12 @@ sheet modules) are available for use in Sass style sheets:
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
         <p:documentation>
-            px:fileset-create
             px:fileset-add-entry
-            px:fileset-load
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
         <p:documentation>
-            px:html-to-fileset
+            px:html-load
         </p:documentation>
     </p:import>
     
@@ -179,19 +177,20 @@ sheet modules) are available for use in Sass style sheets:
     <!-- ========= -->
     <!-- LOAD HTML -->
     <!-- ========= -->
-    <px:fileset-create/>
     <px:fileset-add-entry media-type="application/xhtml+xml">
+        <p:input port="source">
+          <p:inline><d:fileset/></p:inline>
+        </p:input>
         <p:with-option name="href" select="$html"/>
     </px:fileset-add-entry>
-    <px:fileset-load name="html" px:message="Loading HTML" px:progress=".03"/>
-    <px:html-to-fileset/>
+    <px:html-load name="html" px:message="Loading HTML" px:progress=".03"/>
     
     <!-- ============ -->
     <!-- HTML TO PEF -->
     <!-- ============ -->
     <px:html-to-pef name="convert" px:message="Converting from HTML to PEF" px:progress=".90">
         <p:input port="source.in-memory">
-            <p:pipe step="html" port="result"/>
+            <p:pipe step="html" port="result.in-memory"/>
         </p:input>
         <p:with-option name="temp-dir" select="concat(string(/c:result),'convert/')">
             <p:pipe step="temp-dir" port="result"/>
@@ -214,7 +213,7 @@ sheet modules) are available for use in Sass style sheets:
             <p:pipe step="convert" port="obfl"/>
         </p:input>
         <p:input port="html">
-            <p:pipe step="html" port="result"/>
+            <p:pipe step="html" port="result.in-memory"/>
         </p:input>
         <p:with-option name="include-brf" select="$include-brf"/>
         <p:with-option name="include-preview" select="$include-preview"/>
