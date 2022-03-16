@@ -125,9 +125,9 @@ public interface DotifyCSSStyledDocumentTransform {
 			                      BrailleTranslator blockTransform,
 			                      Query textTransformQuery) {
 				String locale = "und";
-				if (textTransformQuery.containsKey("locale")) {
+				if (textTransformQuery.containsKey("document-locale")) {
 					MutableQuery q = mutableQuery(textTransformQuery);
-					locale = q.removeOnly("locale").getValue().get();
+					locale = q.removeOnly("document-locale").getValue().get();
 					textTransformQuery = q;
 				}
 				this.output = obfl ? "obfl" : "pef";

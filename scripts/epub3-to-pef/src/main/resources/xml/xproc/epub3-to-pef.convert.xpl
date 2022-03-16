@@ -262,7 +262,7 @@
         <p:variable name="lang" select="(/*/opf:metadata/dc:language[not(@refines)])[1]/text()">
             <p:pipe port="result" step="opf"/>
         </p:variable>
-        <p:variable name="locale-query" select="if (//c:param[@name='locale']) then '' else concat('(locale:',$lang,')')">
+        <p:variable name="locale-query" select="concat('(locale:',(//c:param[@name='locale']/@value,$lang)[1],')')">
             <p:pipe step="parsed-transform-query" port="result"/>
         </p:variable>
         <p:viewport px:progress="1"
@@ -278,9 +278,7 @@
         <p:variable name="lang" select="(/*/opf:metadata/dc:language[not(@refines)])[1]/text()">
             <p:pipe port="result" step="opf"/>
         </p:variable>
-        <p:variable name="locale-query" select="if (//c:param[@name='locale']) then '' else concat('(locale:',$lang,')')">
-            <p:pipe step="parsed-transform-query" port="result"/>
-        </p:variable>
+        <p:variable name="locale-query" select="concat('(document-locale:',$lang,')')"/>
         <p:when test="$include-obfl='true'">
             <p:output port="pef" primary="true" sequence="true"/>
             <p:output port="obfl">

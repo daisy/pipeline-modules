@@ -42,19 +42,19 @@ public class PreTranslatedBrailleTranslatorProvider extends AbstractTransformPro
 	private static final Logger logger = LoggerFactory.getLogger(PreTranslatedBrailleTranslatorProvider.class);
 
 	protected Iterable<BrailleTranslator> _get(Query query) {
+		MutableQuery q = mutableQuery(query);
+		q.removeAll("document-locale");
 		boolean isPreTranslatedQuery = false; {
-			for (Query.Feature f : query)
+			for (Query.Feature f : q)
 				if ("input".equals(f.getKey()) && "braille".equals(f.getValue().orElse(null)))
 					isPreTranslatedQuery = true;
-				else if (!("locale".equals(f.getKey()) ||
-				           "input".equals(f.getKey()) && "text-css".equals(f.getValue().orElse(null)) ||
+				else if (!("input".equals(f.getKey()) && "text-css".equals(f.getValue().orElse(null)) ||
 				           "output".equals(f.getKey()) && "braille".equals(f.getValue().orElse(null)))) {
 					isPreTranslatedQuery = false;
 					break; }}
 		if (isPreTranslatedQuery)
 			return AbstractTransformProvider.util.Iterables.of(PreTranslatedBrailleTranslator.getInstance());
 		try {
-			MutableQuery q = mutableQuery(query);
 			for (Query.Feature f : q.removeAll("input"))
 				if (!"text-css".equals(f.getValue().get()))
 					throw new NoSuchElementException();

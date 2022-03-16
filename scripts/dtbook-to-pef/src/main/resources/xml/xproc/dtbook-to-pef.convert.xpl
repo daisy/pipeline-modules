@@ -144,10 +144,14 @@
         <p:when test="//math:math">
             <p:viewport px:message="Transforming MathML"
                         match="math:math">
+                <p:variable name="lang" select="(/*/@xml:lang,'und')[1]">
+                    <p:pipe step="dtbook" port="result"/>
+                </p:variable>
+                <p:variable name="locale-query" select="concat('(locale:',(//c:param[@name='locale']/@value,$lang)[1],')')">
+                    <p:pipe step="parsed-transform-query" port="result"/>
+                </p:variable>
                 <px:transform px:progress="1">
-                    <p:with-option name="query" select="concat('(input:mathml)(locale:',(/*/@xml:lang,'und')[1],')')">
-                        <p:pipe step="dtbook" port="result"/>
-                    </p:with-option>
+                    <p:with-option name="query" select="concat('(input:mathml)',$locale-query)"/>
                     <p:input port="parameters">
                         <p:pipe port="result" step="parameters"/>
                     </p:input>
@@ -162,9 +166,7 @@
     
     <p:choose name="transform" px:progress=".83">
         <p:variable name="lang" select="(/*/@xml:lang,'und')[1]"/>
-        <p:variable name="locale-query" select="if (//c:param[@name='locale']) then '' else concat('(locale:',$lang,')')">
-            <p:pipe step="parsed-transform-query" port="result"/>
-        </p:variable>
+        <p:variable name="locale-query" select="concat('(document-locale:',$lang,')')"/>
         <p:when test="$include-obfl='true'">
             <p:output port="pef" primary="true" sequence="true"/>
             <p:output port="obfl">
