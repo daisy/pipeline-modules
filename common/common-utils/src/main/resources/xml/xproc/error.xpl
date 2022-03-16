@@ -46,14 +46,20 @@
         <p:input port="source">
             <p:inline><message>MESSAGE</message></p:inline>
         </p:input>
-        <p:with-option name="replace" use-when="p:system-property('p:xpath-version')='1.0'" select="concat('&quot;',$message,'&quot;')">
-            <!-- replace(...) not supported in XPath 1.0 -->
-            <p:inline>
-                <irrelevant/>
-            </p:inline>
-        </p:with-option>
-        <p:with-option name="replace" use-when="not(p:system-property('p:xpath-version')='1.0')"
-            select="concat('&quot;',replace(replace(replace(replace(replace(replace(replace(replace(replace($message,'\$1',replace($param1,'\$','\\\$')),'\$2',replace($param2,'\$','\\\$')),'\$3',replace($param3,'\$','\\\$')),'\$4',replace($param4,'\$','\\\$')),'\$5',replace($param5,'\$','\\\$')),'\$6',replace($param6,'\$','\\\$')),'\$7',replace($param7,'\$','\\\$')),'\$8',replace($param8,'\$','\\\$')),'\$9',replace($param9,'\$','\\\$')),'&quot;')">
+        <p:with-option name="replace"
+                       select="concat('&quot;',
+                                      replace(replace(replace(replace(replace(replace(replace(replace(replace(
+                                        $message,
+                                        '\$1',replace($param1,'\$','\\\$')),
+                                        '\$2',replace($param2,'\$','\\\$')),
+                                        '\$3',replace($param3,'\$','\\\$')),
+                                        '\$4',replace($param4,'\$','\\\$')),
+                                        '\$5',replace($param5,'\$','\\\$')),
+                                        '\$6',replace($param6,'\$','\\\$')),
+                                        '\$7',replace($param7,'\$','\\\$')),
+                                        '\$8',replace($param8,'\$','\\\$')),
+                                        '\$9',replace($param9,'\$','\\\$')),
+                                        '&quot;')">
             <p:inline>
                 <irrelevant/>
             </p:inline>
@@ -61,11 +67,7 @@
     </p:string-replace>
     
     <p:group>
-        <p:variable name="code-localName" use-when="p:system-property('p:xpath-version')='1.0'" select="concat(
-            substring(substring-after($code,':'), 1, number(contains($code,':')) * string-length(substring-after($code,':'))),
-            substring($code, 1, number(not(contains($code,':'))) * string-length($code))
-            )"/>
-        <p:variable name="code-localName" use-when="not(p:system-property('p:xpath-version')='1.0')" select="if (contains($code,':')) then substring-after($code,':') else $code"/>
+        <p:variable name="code-localName" select="if (contains($code,':')) then substring-after($code,':') else $code"/>
         <p:variable name="prefix" select="concat(substring-before($code,':'),$code-prefix)"/>
         <p:choose>
             <p:when test="not($code-namespace='') and not($prefix='')">

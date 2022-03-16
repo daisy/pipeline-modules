@@ -60,7 +60,6 @@
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
         <p:documentation>
             px:message
-            px:log-error
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/epub-utils/library.xpl">
@@ -334,11 +333,11 @@
                             </p:inline>
                         </p:input>
                     </p:identity>
-                    <px:log-error severity="ERROR">
+                    <px:message>
                         <p:input port="error">
                             <p:pipe step="catch" port="error"/>
                         </p:input>
-                    </px:log-error>
+                    </px:message>
                     <p:identity px:message="Failed to convert OBFL to PEF" px:message-severity="ERROR"/>
                     <p:identity name="status"/>
                     <p:sink/>
