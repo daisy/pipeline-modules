@@ -89,6 +89,11 @@
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>Parameters that are passed to XSLT transformations and SCSS style sheets (as <a
 			href="https://sass-lang.com/documentation/variables#scope">global variables</a>).</p>
+			<!-- Note that parameters are always strings. This is due to a limitation in
+			     XMLCalabash. Because of this, parameters in XSLT style sheets need to be declared
+			     as xs:string. In SCSS style sheets the parameters are interpreted as a number, a
+			     color or an ident if possible. If a parameter is passed from a SCSS style sheet to
+			     an XSLT using an @xslt rule, the idents true and false become booleans. -->
 		</p:documentation>
 	</p:input>
 	
