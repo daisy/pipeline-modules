@@ -11,19 +11,36 @@
             <h1> chapter 1 </h1>
             <noteref css:id="a">(1)</noteref>
             <noteref css:id="b">(2)</noteref>
-            <css:flow from="chapter-notes"/>
+            <css:flow from="notes"/>
             <h1> chapter 2 </h1>
             <noteref css:id="c">(3)</noteref>
-            <noteref css:id="d">(4)</noteref>
-            <css:flow from="chapter-notes"/>
+            <span css:id="d"/>
+            <span css:id="f"/>
+            <noteref css:id="g">(5)</noteref>
+            <css:flow from="y" scope="document"/>
           </body>
         </x:document>
         <x:document type="inline">
-          <css:_ css:flow="chapter-notes">
+          <css:_ css:flow="notes">
             <note css:anchor="a"> note 1 </note>
             <note css:anchor="b"> note 2 </note>
             <note css:anchor="c"> note 3 </note>
-            <note css:anchor="d"> note 4 </note>
+            <note css:anchor="e"> note 4 </note>
+            <note css:anchor="g"> note 5 </note>
+          </css:_>
+        </x:document>
+        <x:document type="inline">
+          <css:_ css:flow="x">
+            <div css:anchor="d">
+              <noteref css:id="e">(4)</noteref>
+            </div>
+          </css:_>
+        </x:document>
+        <x:document type="inline">
+          <css:_ css:flow="y">
+            <div css:anchor="f">
+              <css:flow from="notes"/>
+            </div>
           </css:_>
         </x:document>
       </x:input>
@@ -41,17 +58,37 @@
           <note css:anchor="b"> note 2 </note>
           <h1> chapter 2 </h1>
           <noteref css:id="c">(3)</noteref>
-          <noteref css:id="d">(4)</noteref>
-          <note css:anchor="c"> note 3 </note>
-          <note css:anchor="d"> note 4 </note>
+          <span css:id="d"/>
+          <span css:id="f"/>
+          <noteref css:id="g">(5)</noteref>
+          <div css:anchor="f">
+            <note css:anchor="c"> note 3 </note>
+            <note css:anchor="e"> note 4 </note>
+          </div>
         </body>
       </x:document>
       <x:document type="inline">
-        <css:_ css:flow="chapter-notes">
+        <css:_ css:flow="notes">
           <note css:anchor="a"> note 1 </note>
           <note css:anchor="b"> note 2 </note>
           <note css:anchor="c"> note 3 </note>
-          <note css:anchor="d"> note 4 </note>
+          <note css:anchor="e"> note 4 </note>
+          <note css:anchor="g"> note 5 </note>
+        </css:_>
+      </x:document>
+      <x:document type="inline">
+        <css:_ css:flow="x">
+          <div css:anchor="d">
+            <noteref css:id="e">(4)</noteref>
+          </div>
+        </css:_>
+      </x:document>
+      <x:document type="inline">
+        <css:_ css:flow="y">
+          <div css:anchor="f">
+            <note css:anchor="c"> note 3 </note>
+            <note css:anchor="e"> note 4 </note>
+          </div>
         </css:_>
       </x:document>
     </x:expect>

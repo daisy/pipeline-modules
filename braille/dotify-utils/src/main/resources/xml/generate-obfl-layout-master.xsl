@@ -178,9 +178,11 @@
                     <xsl:with-param name="msg">not more than one flow() function supported in footnotes area</xsl:with-param>
                 </xsl:call-template>
             </xsl:if>
-             <!--
-                 default scope within footnotes area is 'page'
-             -->
+             <xsl:if test="$footnotes-content[self::css:flow[@from]][1][not(@scope)]">
+                <xsl:call-template name="pf:warn">
+                    <xsl:with-param name="msg">flow() function without scope argument not allowed within footnotes area</xsl:with-param>
+                </xsl:call-template>
+            </xsl:if>
             <xsl:if test="$footnotes-content[self::css:flow[@from]][1]/@scope[not(.='page')]">
                 <xsl:call-template name="pf:warn">
                     <xsl:with-param name="msg">{} argument of flow() function not allowed within footnotes area</xsl:with-param>

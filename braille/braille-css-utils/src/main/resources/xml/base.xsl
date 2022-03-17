@@ -169,9 +169,9 @@
     <xsl:variable name="css:LEADER_FN_RE_groups" select="$css:LEADER_FN_RE_alignment"/>
     
     <!--
-        flow(<ident>,<scope>?): http://braillespecs.github.io/braille-css/#dfn-flow-1
+        flow(<ident>[,<scope>]?): http://braillespecs.github.io/braille-css/#dfn-flow-1
     -->
-    <xsl:variable name="css:FLOW_FN_RE" select="concat('flow\(\s*(',$css:IDENT_RE,')\s*(,\s*(document|volume)\s*)?\)')"/>
+    <xsl:variable name="css:FLOW_FN_RE" select="concat('flow\(\s*(',$css:IDENT_RE,')\s*(,\s*(document|volume|page)\s*)?\)')"/>
     <xsl:variable name="css:FLOW_FN_RE_ident" select="1"/>
     <xsl:variable name="css:FLOW_FN_RE_scope" select="$css:FLOW_FN_RE_ident + $css:IDENT_RE_groups + 2"/>
     <xsl:variable name="css:FLOW_FN_RE_groups" select="$css:FLOW_FN_RE_scope"/>
@@ -563,7 +563,7 @@
                             </css:leader>
                         </xsl:when>
                         <!--
-                            flow(<ident>)
+                            flow(<ident>[,<scope>]?)
                         -->
                         <xsl:when test="regex-group($css:CONTENT_RE_flow_fn)!=''">
                             <css:flow from="{regex-group($css:CONTENT_RE_flow_fn_ident)}">

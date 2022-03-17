@@ -15,11 +15,13 @@
       </p:output>
       <p:import href="../../main/resources/xml/flow-into.xpl"/>
       <css:flow-into name="flow-into"/>
-      <p:delete match="@xml:base" name="delete-xml-base">
-        <p:input port="source">
+      <p:for-each name="delete-xml-base">
+        <p:iteration-source>
           <p:pipe step="flow-into" port="flows"/>
-        </p:input>
-      </p:delete>
+        </p:iteration-source>
+        <p:output port="result"/>
+        <p:delete match="@xml:base" />
+      </p:for-each>
     </p:declare-step>
   </x:script>
   
@@ -152,6 +154,47 @@
       <x:document type="inline">
         <css:_ css:flow="foo">
           <div css:anchor="x"/>
+        </css:_>
+      </x:document>
+    </x:expect>
+  </x:scenario>
+  
+  <x:scenario label="test_05">
+    <x:call step="pxi:test">
+      <x:input port="source">
+        <x:document type="inline">
+          <body>
+            <div css:flow="foo" css:id="x">
+              <div css:flow="bar" css:id="y"/>
+            </div>
+          </body>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="result" type="compare">
+      <x:document type="inline">
+        <body>
+          <css:_ css:id="x"/>
+        </body>
+      </x:document>
+    </x:expect>
+    <x:context label="flows">
+      <x:document type="port" port="flows"/>
+    </x:context>
+    <x:expect label="flows" type="compare">
+      <x:document type="inline">
+        <css:_ css:flow="foo">
+          <div css:anchor="x">
+            <css:_ css:id="y"/>
+          </div>
+        </css:_>
+      </x:document>
+      <x:document type="inline">
+        <css:_ css:flow="bar">
+          <div css:anchor="y"/>
         </css:_>
       </x:document>
     </x:expect>
