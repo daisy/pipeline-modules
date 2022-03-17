@@ -1,12 +1,11 @@
-#include "queue_stream.h"
+#include "pch.h"
 
-#include <Shlwapi.h>
 
 WinQueueStream::WinQueueStream():base_(0){
+	memset(audio_, 0, AUDIO_CHUNK_SIZE);
 }
 
-bool
-WinQueueStream::initialize(){
+bool WinQueueStream::initialize(){
 	base_ = SHCreateMemStream(NULL, 0);
 	if (base_ == 0)
 		return false;
@@ -14,20 +13,17 @@ WinQueueStream::initialize(){
 	return true;
 }
 
-IStream*
-WinQueueStream::getBaseStream(){
+IStream* WinQueueStream::getBaseStream(){
 	return base_;
 }
 	
-void
-WinQueueStream::startWritingPhase(){
+void WinQueueStream::startWritingPhase(){
 	LARGE_INTEGER zero = { 0 };
 	base_->Seek(zero, STREAM_SEEK_SET, NULL);
 	base_->SetSize(*reinterpret_cast<ULARGE_INTEGER*>(&zero));
 }
 	
-void
-WinQueueStream::endWritingPhase(){
+void WinQueueStream::endWritingPhase(){
 	LARGE_INTEGER zero = { 0 };
 	base_->Seek(zero, STREAM_SEEK_SET, NULL);
 }
@@ -37,11 +33,11 @@ int WinQueueStream::in_avail(){
 		return 0;
 	STATSTG stats;
 	base_->Stat(&stats, STATFLAG_NONAME);
-	return (stats.cbSize.HighPart == 0 ? stats.cbSize.LowPart : stats.cbSize.HighPart); //agnostic to endianness
+	cbSize_ = stats.cbSize;
+	return (cbSize_.HighPart == 0 ? cbSize_.LowPart : cbSize_.HighPart); //agnostic to endianness
 }
 	
-const char*
-WinQueueStream::nextChunk(int* size){
+const signed char* WinQueueStream::nextChunk(int* size){
 	ULONG read = 0;
 	base_->Read(audio_, AUDIO_CHUNK_SIZE, &read);
 	if (read == 0)
