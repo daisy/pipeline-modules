@@ -13,7 +13,7 @@ public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 			pipelineModule("file-utils"),
 			pipelineModule("zedai-to-epub3"),
 			pipelineModule("nlp-omnilang-lexer"),
-			pipelineModule("audio-encoder-lame"),
+			pipelineModule("audio-common"),
 			pipelineModule("tts-mocks"),
 		};
 	}

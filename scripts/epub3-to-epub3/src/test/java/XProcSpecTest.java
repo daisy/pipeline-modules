@@ -2,9 +2,6 @@ import org.daisy.pipeline.junit.AbstractXSpecAndXProcSpecTest;
 
 import static org.daisy.pipeline.pax.exam.Options.thisPlatform;
 
-import org.ops4j.pax.exam.ProbeBuilder;
-import org.ops4j.pax.exam.TestProbeBuilder;
-
 public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 	
 	@Override
@@ -27,12 +24,5 @@ public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 			pipelineModule("audio-common"),
 			"org.daisy.pipeline:calabash-adapter:?"
 		};
-	}
-	
-	@ProbeBuilder
-	public TestProbeBuilder probeConfiguration(TestProbeBuilder probe) {
-		// needed because it can not be generated with maven-bundle-plugin
-		probe.setHeader("Service-Component", "OSGI-INF/mock-encoder.xml");
-		return probe;
 	}
 }

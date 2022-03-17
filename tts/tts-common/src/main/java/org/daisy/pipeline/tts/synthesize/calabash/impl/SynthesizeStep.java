@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.Semaphore;
 
+import javax.sound.sampled.AudioFileFormat;
 import javax.xml.transform.URIResolver;
 
 import net.sf.saxon.s9api.Axis;
@@ -17,7 +18,7 @@ import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmSequenceIterator;
 
 import org.daisy.common.xproc.calabash.XProcStep;
-import static org.daisy.pipeline.audio.AudioFileTypes.MP3;
+import org.daisy.pipeline.audio.AudioFileTypes;
 import org.daisy.pipeline.audio.AudioServices;
 import org.daisy.pipeline.tts.AudioBufferTracker;
 import org.daisy.pipeline.tts.TTSRegistry;
@@ -64,6 +65,7 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 	private URIResolver mURIresolver;
 	private String mTempDirOpt;
 	private boolean mIncludeLogOpt;
+	private AudioFileFormat.Type mAudioFileType;
 	private int mSentenceCounter = 0;
 	private int mErrorCounter = 0;
 
@@ -120,6 +122,13 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 			mTempDirOpt = value.getString();
 		} else if ("include-log".equals(name.getLocalName())) {
 			mIncludeLogOpt = value.getBoolean();
+		} else if ("audio-file-type".equals(name.getLocalName())) {
+			mAudioFileType = AudioFileTypes.fromMediaType(value.getString());
+			if (mAudioFileType == null) {
+				logger.warn("Audio file type not recognized or not supported: " + value.getString()
+				            + ". Falling back to MP3.");
+				mAudioFileType = AudioFileTypes.MP3;
+			}
 		} else
 			super.setOption(name, value);
 	}
@@ -195,7 +204,7 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 		audioOutputDir.mkdirs();
 		audioOutputDir.deleteOnExit();
 
-		SSMLtoAudio ssmltoaudio = new SSMLtoAudio(audioOutputDir, MP3, mTTSRegistry, logger,
+		SSMLtoAudio ssmltoaudio = new SSMLtoAudio(audioOutputDir, mAudioFileType, mTTSRegistry, logger,
 		        mAudioBufferTracker, mRuntime.getProcessor(), mURIresolver, configExt, log);
 
 		Iterable<SoundFileLink> soundFragments = Collections.EMPTY_LIST;

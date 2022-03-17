@@ -71,9 +71,27 @@
     </p:documentation>
   </p:option>
 
+  <p:option name="audio-file-type" select="'audio/mpeg'">
+    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <p>The desired file type of the generated audio files, specified as a MIME type.</p>
+      <p>Examples:</p>
+      <ul>
+        <li>"audio/mpeg"</li>
+        <li>"audio/x-wav"</li>
+      </ul>
+    </p:documentation>
+  </p:option>
+
   <p:option name="process-css" required="false" select="'true'" cx:as="xs:string">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
       <p>Set to false to bypass aural CSS processing.</p>
+    </p:documentation>
+  </p:option>
+
+  <p:option name="temp-dir" select="''">
+    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <p>Empty directory dedicated to this conversion. May be left empty in which case a temporary
+      directory will be automatically created.</p>
     </p:documentation>
   </p:option>
 
@@ -225,12 +243,18 @@
 	</px:dtbook-to-ssml>
       </p:for-each>
       <px:ssml-to-audio name="to-audio" px:progress="1">
+	<p:with-option name="audio-file-type" select="$audio-file-type">
+	  <p:empty/>
+	</p:with-option>
 	<p:with-option name="include-log" select="$include-log">
 	  <p:empty/>
 	</p:with-option>
 	<p:input port="config">
 	  <p:pipe port="config" step="main"/>
 	</p:input>
+	<p:with-option name="temp-dir" select="if ($temp-dir!='') then concat($temp-dir,'audio/') else ''">
+	  <p:empty/>
+	</p:with-option>
       </px:ssml-to-audio>
     </p:otherwise>
   </p:choose>

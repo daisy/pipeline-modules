@@ -14,7 +14,6 @@ public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 			pipelineModule("file-utils"),
 			pipelineModule("smil-utils"),
 			pipelineModule("nlp-omnilang-lexer"),
-			pipelineModule("audio-encoder-lame"),
 			pipelineModule("tts-mocks"),
 		};
 	}

@@ -17,6 +17,10 @@ import org.ops4j.pax.exam.util.PathUtils;
 
 import org.osgi.service.component.annotations.Component;
 
+/**
+ * Audio encoder that raises an exception when the audio data is too
+ * long. This is used to test the handling of encoding errors.
+ */
 @Component(
 	name = "mock-encoder",
 	service = { AudioEncoderService.class }

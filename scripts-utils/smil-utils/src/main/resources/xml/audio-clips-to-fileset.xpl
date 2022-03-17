@@ -23,6 +23,11 @@
       px:fileset-join
     </p:documentation>
   </p:import>
+  <p:import href="http://www.daisy.org/pipeline/modules/mediatype-utils/library.xpl">
+    <p:documentation>
+      px:mediatype-detect
+    </p:documentation>
+  </p:import>
 
   <p:xslt>
     <p:input port="stylesheet">
@@ -32,6 +37,7 @@
       <p:empty/>
     </p:input>
   </p:xslt>
+  <px:mediatype-detect/>
 
   <p:documentation>Normalize the hrefs</p:documentation>
   <p:add-xml-base>
