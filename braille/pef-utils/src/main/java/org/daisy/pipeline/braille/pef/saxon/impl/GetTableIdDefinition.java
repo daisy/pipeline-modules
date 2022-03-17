@@ -7,10 +7,10 @@ import java.util.NoSuchElementException;
 import net.sf.saxon.expr.XPathContext;
 import net.sf.saxon.lib.ExtensionFunctionCall;
 import net.sf.saxon.lib.ExtensionFunctionDefinition;
-import net.sf.saxon.om.AtomicSequence;
 import net.sf.saxon.om.Sequence;
 import net.sf.saxon.om.StructuredQName;
 import net.sf.saxon.trans.XPathException;
+import net.sf.saxon.value.EmptySequence;
 import net.sf.saxon.value.SequenceType;
 import net.sf.saxon.value.StringValue;
 
@@ -19,7 +19,6 @@ import org.daisy.pipeline.braille.common.Provider;
 import static org.daisy.pipeline.braille.common.Provider.util.dispatch;
 import static org.daisy.pipeline.braille.common.Provider.util.memoize;
 import org.daisy.pipeline.braille.common.Query;
-import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.query;
 import org.daisy.pipeline.braille.pef.TableProvider;
 
@@ -28,18 +27,14 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 @Component(
-	name = "pef:decode",
+	name = "pef:get-table-id",
 	service = { ExtensionFunctionDefinition.class }
 )
-@SuppressWarnings("serial")
-public class DecodeDefinition extends ExtensionFunctionDefinition {
+public class GetTableIdDefinition extends ExtensionFunctionDefinition {
 	
 	private static final StructuredQName funcname = new StructuredQName("pef",
-			"http://www.daisy.org/ns/2008/pef", "decode");
+			"http://www.daisy.org/ns/2008/pef", "get-table-id");
 	
 	@Reference(
 		name = "TableProvider",
@@ -58,10 +53,7 @@ public class DecodeDefinition extends ExtensionFunctionDefinition {
 	}
 	
 	private final List<TableProvider> tableProviders = new ArrayList<TableProvider>();
-	private Provider.util.MemoizingProvider<Query,Table> tableProvider
-	= memoize(dispatch(tableProviders));
-	private final Query fallbackQuery = mutableQuery()
-		.add("id", "org.daisy.braille.impl.table.DefaultTableProvider.TableType.EN_US");
+	private Provider.util.MemoizingProvider<Query,Table> tableProvider = memoize(dispatch(tableProviders));
 	
 	@Override
 	public StructuredQName getFunctionQName() {
@@ -70,24 +62,23 @@ public class DecodeDefinition extends ExtensionFunctionDefinition {
 	
 	@Override
 	public int getMinimumNumberOfArguments() {
-		return 2;
+		return 1;
 	}
 	
 	@Override
 	public int getMaximumNumberOfArguments() {
-		return 2;
+		return 1;
 	}
 	
 	@Override
 	public SequenceType[] getArgumentTypes() {
 		return new SequenceType[] {
-				SequenceType.SINGLE_STRING,
 				SequenceType.SINGLE_STRING};
 	}
 	
 	@Override
 	public SequenceType getResultType(SequenceType[] suppliedArgumentTypes) {
-		return SequenceType.SINGLE_STRING;
+		return SequenceType.OPTIONAL_STRING;
 	}
 	
 	@Override
@@ -95,25 +86,16 @@ public class DecodeDefinition extends ExtensionFunctionDefinition {
 		return new ExtensionFunctionCall() {
 			public Sequence call(XPathContext context, Sequence[] arguments) throws XPathException {
 				try {
-					Query tableQuery = query(((AtomicSequence)arguments[0]).getStringValue());
-					String text = ((AtomicSequence)arguments[1]).getStringValue();
+					Query tableQuery = query(arguments[0].head().getStringValue());
 					Table table;
 					try {
 						table = tableProvider.get(tableQuery).iterator().next(); }
 					catch (NoSuchElementException e) {
-						try {
-							table = tableProvider.get(fallbackQuery).iterator().next(); }
-						catch (NoSuchElementException e2) {
-							throw new XPathException("Could not find a table for query: " + tableQuery); }}
-					return new StringValue(table.newBrailleConverter().toBraille(text)); }
-				catch (XPathException e) {
-					throw e; }
+						return EmptySequence.getInstance(); }
+					return new StringValue(table.getIdentifier()); }
 				catch (Throwable e) {
-					throw new XPathException("Unexpected error in pef:decode", e); }
+					throw new XPathException("Unexpected error in pef:get-table-id", e); }
 			}
 		};
 	}
-	
-	private static final Logger logger = LoggerFactory.getLogger(EncodeDefinition.class);
-	
 }

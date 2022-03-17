@@ -44,6 +44,12 @@ can be selected using a query that contains
 `locale`
 : Matches only Liblouis translators with this locale.
 
+<!-- `charset`
+     `braille-charset`
+     : The character set in which the output braille should be encoded. The
+       value has the same format as the `table` feature.
+     : By default the braille character set is Unicode braille. -->
+
 <!-- handle-non-standard-hyphenation
      : Specifies how non-standard hyphenation is handled in pre-translation
        mode. Can be "ignore", "defer" or "fail". -->

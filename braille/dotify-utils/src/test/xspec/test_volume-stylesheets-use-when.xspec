@@ -6,6 +6,7 @@
   
   <x:param name="locale"></x:param>
   <x:param name="page-counters">page</x:param>
+  <x:param name="braille-charset-table" select="''"/>
   
   <x:scenario label="test_01">
     <x:call function="obfl:volume-stylesheets-use-when">

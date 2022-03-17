@@ -68,6 +68,7 @@
                  'min-length',
                  'max-length',
                  'text-transform',
+                 'braille-charset',
                  'font-style',
                  'font-weight',
                  'text-decoration',
@@ -132,6 +133,7 @@
                  re:exact(re:or(($css:NON_NEGATIVE_INTEGER_RE,'auto'))),
                  re:exact(re:or(($css:NON_NEGATIVE_INTEGER_RE,'auto'))),
                  re:exact(re:or((re:space-separated(re:or(($css:IDENT_RE,$css:VENDOR_PRF_IDENT_RE))),'auto','none'))),
+                 re:exact(re:or(('unicode','custom'))),
                  re:exact(re:or(('normal','italic','oblique'))),
                  re:exact(re:or(('normal','bold','100','200','300','400','500','600','700','800','900'))),
                  re:exact(re:or(('none','underline','overline','line-through','blink'))),
@@ -200,6 +202,7 @@
                  '.*',
                  '.*',
                  '.*',
+                 '.*',
                  '^(block|table|list-item)$',
                  '.*',
                  '.*',
@@ -260,6 +263,7 @@
                  'auto',
                  'auto',
                  'auto',
+                 'unicode',
                  'normal',
                  'normal',
                  'none',
@@ -273,6 +277,7 @@
     
     <xsl:variable name="css:media" as="xs:string*"
         select="('embossed',
+                 'embossed',
                  'embossed',
                  'embossed',
                  'embossed',
@@ -350,6 +355,7 @@
                  'letter-spacing',
                  'word-spacing',
                  'text-transform',
+                 'braille-charset',
                  '-obfl-right-text-indent')"/>
     
     <xsl:variable name="css:paged-media-properties" as="xs:string*"

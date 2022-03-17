@@ -12,7 +12,7 @@
 
   <groupId>org.daisy.pipeline.modules.braille</groupId>
   <artifactId>pef-utils</artifactId>
-  <version>4.0.5-SNAPSHOT</version>
+  <version>5.0.0-SNAPSHOT</version>
   <packaging>bundle</packaging>
 
   <name>DP2 Braille Modules :: pef-utils</name>
@@ -85,7 +85,8 @@
       org.daisy.pipeline.braille.pef.calabash.impl.Text2PEFStep$Provider,
       org.daisy.pipeline.braille.pef.calabash.impl.ValidateStep$Provider,
       org.daisy.pipeline.braille.pef.saxon.impl.DecodeDefinition,
-      org.daisy.pipeline.braille.pef.saxon.impl.EncodeDefinition
+      org.daisy.pipeline.braille.pef.saxon.impl.EncodeDefinition,
+      org.daisy.pipeline.braille.pef.saxon.impl.GetTableIdDefinition
     </expose-services>
   </properties>
 

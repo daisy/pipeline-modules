@@ -152,7 +152,7 @@ public class LiblouisCoreTest extends AbstractTest {
 	@Test
 	public void testTextTransformUncontracted() {
 		FromStyledTextToBraille translator = provider.withContext(messageBus)
-		                                             .get(query("(locale:foo)(contraction:full)(output:ascii)")).iterator().next()
+		                                             .get(query("(locale:foo)(contraction:full)(charset:'foobar.dis')")).iterator().next()
 		                                             .fromStyledTextToBraille();
 		assertEquals(braille("fu ", "foo", " fu"),
 		             translator.transform(styledText("foo ", "",
@@ -161,13 +161,23 @@ public class LiblouisCoreTest extends AbstractTest {
 	}
 	
 	@Test
+	public void testTextTransformNone() {
+		assertEquals(braille("foo", "bar"),
+		             provider.withContext(messageBus)
+		                     .get(query("(table:'foobar.uti')(charset:'foobar.dis')")).iterator().next()
+		                     .fromStyledTextToBraille().transform(
+		                         styledText("foo", "",
+		                                    "⠃⠁⠗", "text-transform: none")));
+	}
+	
+	@Test
 	public void testCompoundTranslator() {
 		LineBreakingFromStyledText translator = provider.withContext(messageBus)
-		                                                .get(query("(locale:foo)(contraction:full)(output:ascii)")).iterator().next()
+		                                                .get(query("(locale:foo)(contraction:full)(charset:'foobar.dis')")).iterator().next()
 		                                                .lineBreakingFromStyledText();
 		assertEquals(
 			"xxxxxxx\n" +
-			"abc⠀def⠀\n" +
+			"abc def \n" +
 			"ghi",
 			fillLines(
 				translator.transform(
@@ -246,6 +256,14 @@ public class LiblouisCoreTest extends AbstractTest {
 	}
 	
 	@Test
+	public void testMaskVirtualDots() {
+		FromStyledTextToBraille translator = provider.withContext(messageBus)
+		                                             .get(query("(table:'foobar.utb')")).iterator().next()
+		                                             .fromStyledTextToBraille();
+		assertEquals(braille("⠁⠃⠉ ⠼⠁⠃⠉"), translator.transform(text("abc 123")));
+	}
+	
+	@Test
 	public void testHyphenate() {
 		assertEquals("foo\u00ADbar",
 		             hyphenatorProvider.withContext(messageBus)
@@ -293,7 +311,7 @@ public class LiblouisCoreTest extends AbstractTest {
 	@Test
 	public void testTranslateAndHyphenateNonStandard() {
 		LineBreakingFromStyledText translator = provider.withContext(messageBus)
-		                                                .get(query("(table:'foobar.ctb')(hyphenator:mock)(output:ascii)")).iterator().next()
+		                                                .get(query("(table:'foobar.ctb')(hyphenator:mock)(charset:'foobar.dis')")).iterator().next()
 		                                                .lineBreakingFromStyledText();
 		assertEquals(
 			"fu\n" +
@@ -301,11 +319,11 @@ public class LiblouisCoreTest extends AbstractTest {
 			"z",
 			fillLines(translator.transform(styledText("foobarz", "hyphens:auto")), 3));
 		assertEquals(
-			"fub⠤\n" +
+			"fub-\n" +
 			"barz",
 			fillLines(translator.transform(styledText("foobarz", "hyphens:auto")), 4));
 		assertEquals(
-			"fub⠤\n" +
+			"fub-\n" +
 			"barz",
 			fillLines(translator.transform(styledText("foobarz", "hyphens:auto")), 5));
 		assertEquals(
@@ -348,7 +366,7 @@ public class LiblouisCoreTest extends AbstractTest {
 		// test no-break space
 		assertEquals(
 			"⠁⠃⠉\n" +
-			"⠙⠑⠋⠀⠛⠓⠊⠚",
+			"⠙⠑⠋ ⠛⠓⠊⠚",
 			fillLines(
 				translator.lineBreakingFromStyledText()
 				          .transform(styledText("abc def ghij", "")),
@@ -373,7 +391,7 @@ public class LiblouisCoreTest extends AbstractTest {
 	@Test
 	public void testSegmentationPreservedDespiteSpacesCollapsed() {
 		FromStyledTextToBraille translator = provider.withContext(messageBus)
-		                                             .get(query("(table:'foobar.uti,squash-ws.utb')(output:ascii)")).iterator().next()
+		                                             .get(query("(table:'foobar.uti,squash-ws.utb')(charset:'foobar.dis')")).iterator().next()
 		                                             .fromStyledTextToBraille();
 		int n = 10000;
 		String[] textSegments = new String[n]; {
@@ -394,7 +412,7 @@ public class LiblouisCoreTest extends AbstractTest {
 	@Test
 	public void testTranslateWithLetterSpacingAndPunctuations() {
 		FromStyledTextToBraille translator = provider.withContext(messageBus)
-		                                             .get(query("(table:'foobar.uti')(output:ascii)")).iterator().next()
+		                                             .get(query("(table:'foobar.uti')(charset:'foobar.dis')")).iterator().next()
 		                                             .fromStyledTextToBraille();
 		assertEquals(
 			braille("f o o b a r."),
@@ -407,7 +425,7 @@ public class LiblouisCoreTest extends AbstractTest {
 	@Test
 	public void testTranslateWithLetterSpacingAndHyphenation() {
 		FromStyledTextToBraille translator = provider.withContext(messageBus)
-		                                             .get(query("(table:'foobar.uti,foobar.dic')(output:ascii)")).iterator().next()
+		                                             .get(query("(table:'foobar.uti,foobar.dic')(charset:'foobar.dis')")).iterator().next()
 		                                             .fromStyledTextToBraille();
 		assertEquals(
 			braille("f o o\u00AD b a r"),
@@ -417,7 +435,7 @@ public class LiblouisCoreTest extends AbstractTest {
 	@Test
 	public void testTranslateWithLetterSpacingAndContractions() {
 		FromStyledTextToBraille translator = provider.withContext(messageBus)
-		                                             .get(query("(table:'foobar.ctb')(output:ascii)")).iterator().next()
+		                                             .get(query("(table:'foobar.ctb')(charset:'foobar.dis')")).iterator().next()
 		                                             .fromStyledTextToBraille();
 		assertEquals(
 			braille("fu b a r"),
@@ -430,7 +448,7 @@ public class LiblouisCoreTest extends AbstractTest {
 	@Test
 	public void testTranslateWithLetterSpacingAndContractionsFuzzy() {
 		FromStyledTextToBraille translator = provider.withContext(messageBus)
-		                                             .get(query("(table:'foobar.ctb')(output:ascii)")).iterator().next()
+		                                             .get(query("(table:'foobar.ctb')(charset:'foobar.dis')")).iterator().next()
 		                                             .fromStyledTextToBraille();
 		assertEquals(braille("fu ","b a r"),
 		             translator.transform(styledText("foo", "letter-spacing:1",
@@ -450,40 +468,40 @@ public class LiblouisCoreTest extends AbstractTest {
 	@Test
 	public void testTranslateWithWordSpacing() {
 		LineBreakingFromStyledText translator = provider.withContext(messageBus)
-		                                                .get(query("(table:'foobar.uti')(output:ascii)")).iterator().next()
+		                                                .get(query("(table:'foobar.uti')(charset:'foobar.dis')")).iterator().next()
 		                                                .lineBreakingFromStyledText();
 		assertEquals(
-			"foo⠀⠀bar",
+			"foo  bar",
 			translator.transform(styledText("foo bar", "word-spacing:2")).getTranslatedRemainder());
 		assertEquals(
-			"foo⠀⠀⠀bar",
+			"foo   bar",
 			translator.transform(styledText("foo bar", "word-spacing:3")).getTranslatedRemainder());
 	}
 
 	@Test
 	public void testTranslateWithWhiteSpaceProcessingAndWordSpacing() {
 		LineBreakingFromStyledText translator = provider.withContext(messageBus)
-		                                                .get(query("(table:'foobar.uti')(output:ascii)")).iterator().next()
+		                                                .get(query("(table:'foobar.uti')(charset:'foobar.dis')")).iterator().next()
 		                                                .lineBreakingFromStyledText();
 		// space in input, two spaces in output
 		assertEquals(
-			"foo⠀⠀bar",
+			"foo  bar",
 			translator.transform(styledText("foo bar", "word-spacing:2")).getTranslatedRemainder());
 		// two spaces in input, two spaces in output
 		assertEquals(
-			"foo⠀⠀bar",
+			"foo  bar",
 			translator.transform(styledText("foo  bar", "word-spacing:2")).getTranslatedRemainder());
 		// newline + tab in input, two spaces in output
 		assertEquals(
-			"foo⠀⠀bar",
+			"foo  bar",
 			translator.transform(styledText("foo\n	bar", "word-spacing:2")).getTranslatedRemainder());
 		// no-break space in input, space in output
 		assertEquals(
-			"foo⠀bar",
+			"foo bar",
 			translator.transform(styledText("foo bar", "word-spacing:2")).getTranslatedRemainder());
 		// no-break space + space in input, three spaces in output
 		assertEquals(
-			"foo⠀⠀⠀bar",
+			"foo   bar",
 			translator.transform(styledText("foo  bar", "word-spacing:2")).getTranslatedRemainder());
 		// zero-width space in input, no space in output
 		assertEquals(
@@ -494,67 +512,67 @@ public class LiblouisCoreTest extends AbstractTest {
 	@Test
 	public void testTranslateWithLetterSpacing() {
 		LineBreakingFromStyledText translator = provider.withContext(messageBus)
-		                                                .get(query("(table:'foobar.uti')(output:ascii)")).iterator().next()
+		                                                .get(query("(table:'foobar.uti')(charset:'foobar.dis')")).iterator().next()
 		                                                .lineBreakingFromStyledText();
 		assertEquals(
-			"f⠀o⠀o⠀b⠀a⠀r⠀⠀⠀q⠀u⠀u⠀x⠀⠀⠀#abcdef",
+			"f o o b a r   q u u x   #123456",
 			translator.transform(styledText("foobar quux 123456", "letter-spacing:1; word-spacing:3")).getTranslatedRemainder());
 		assertEquals(
-			"f⠀⠀o⠀⠀o⠀⠀b⠀⠀a⠀⠀r⠀⠀⠀⠀⠀q⠀⠀u⠀⠀u⠀⠀x⠀⠀⠀⠀⠀#abcdef",
+			"f  o  o  b  a  r     q  u  u  x     #123456",
 			translator.transform(styledText("foobar quux 123456", "letter-spacing:2; word-spacing:5")).getTranslatedRemainder());
 	}
 
 	@Test
 	public void testTranslateWithLetterSpacingAndWordSpacing() {
 		LineBreakingFromStyledText translator = provider.withContext(messageBus)
-		                                                .get(query("(table:'foobar.uti')(output:ascii)")).iterator().next()
+		                                                .get(query("(table:'foobar.uti')(charset:'foobar.dis')")).iterator().next()
 		                                                .lineBreakingFromStyledText();
 		assertEquals(
-			"f⠀o⠀o⠀b⠀a⠀r⠀⠀q⠀u⠀u⠀x⠀⠀#abcdef",
+			"f o o b a r  q u u x  #123456",
 			translator.transform(styledText("foobar quux 123456", "letter-spacing:1; word-spacing:2")).getTranslatedRemainder());
 		assertEquals(
-			"f⠀o⠀o⠀b⠀a⠀r⠀⠀⠀q⠀u⠀u⠀x⠀⠀⠀#abcdef",
+			"f o o b a r   q u u x   #123456",
 			translator.transform(styledText("foobar quux 123456", "letter-spacing:1; word-spacing:3")).getTranslatedRemainder());
 		assertEquals(
-			"f⠀⠀o⠀⠀o⠀⠀b⠀⠀a⠀⠀r⠀⠀⠀⠀q⠀⠀u⠀⠀u⠀⠀x⠀⠀⠀⠀#abcdef",
+			"f  o  o  b  a  r    q  u  u  x    #123456",
 			translator.transform(styledText("foobar quux 123456", "letter-spacing:2; word-spacing:4")).getTranslatedRemainder());
 		assertEquals(
-			"f⠀⠀o⠀⠀o⠀⠀b⠀⠀a⠀⠀r⠀⠀⠀⠀⠀q⠀⠀u⠀⠀u⠀⠀x⠀⠀⠀⠀⠀#abcdef",
+			"f  o  o  b  a  r     q  u  u  x     #123456",
 			translator.transform(styledText("foobar quux 123456", "letter-spacing:2; word-spacing:5")).getTranslatedRemainder());
 	}
 
 	@Test
 	public void testTranslateWithWordSpacingAndLineBreaking() {
 		LineBreakingFromStyledText translator = provider.withContext(messageBus)
-		                                                .get(query("(table:'foobar.uti')(output:ascii)")).iterator().next()
+		                                                .get(query("(table:'foobar.uti')(charset:'foobar.dis')")).iterator().next()
 		                                                .lineBreakingFromStyledText();
 		assertEquals(
 			//                   |<- 20
-			"foobar⠀⠀foobar\n" +
+			"foobar  foobar\n" +
 			"foobar",
 			fillLines(translator.transform(styledText("foobar foobar foobar", "word-spacing:2")), 20));
 		assertEquals(
 			//                   |<- 20
-			"f⠀o⠀o⠀b⠀a⠀r\n" +
-			"f⠀o⠀o⠀b⠀a⠀r\n" +
-			"f⠀o⠀o⠀b⠀a⠀r",
+			"f o o b a r\n" +
+			"f o o b a r\n" +
+			"f o o b a r",
 			fillLines(translator.transform(styledText("foobar foobar foobar", "letter-spacing:1; word-spacing:3")), 20));
 		assertEquals(
 			//                        |<- 25
-			"f⠀o⠀o⠀-⠀b⠀a⠀r⠀⠀⠀f⠀o⠀o⠀-\n" +
-			"b⠀a⠀r⠀⠀⠀f⠀o⠀o⠀-⠀b⠀a⠀r",
+			"f o o - b a r   f o o -\n" +
+			"b a r   f o o - b a r",
 			fillLines(translator.transform(styledText("foo-​bar foo-​bar foo-​bar", "letter-spacing:1; word-spacing:3")), 25)); // words are split up using hyphen + zwsp
 		assertEquals(
 			//                   |<- 20
-			"f⠀o⠀o⠀b⠀a⠀r⠀⠀⠀f⠀o⠀o⠤\n" +
-			"b⠀a⠀r⠀⠀⠀f⠀o⠀o⠀b⠀a⠀r",
+			"f o o b a r   f o o-\n" +
+			"b a r   f o o b a r",
 			fillLines(translator.transform(styledText("foo­bar foo­bar foo­bar", "letter-spacing:1; word-spacing:3")), 20)); // words are split up using shy
 	}
 
 	@Test
 	public void testTranslateWithPreservedLineBreaks() {
 		LineBreakingFromStyledText translator = provider.withContext(messageBus)
-		                                                .get(query("(table:'foobar.uti')(output:ascii)")).iterator().next()
+		                                                .get(query("(table:'foobar.uti')(charset:'foobar.dis')")).iterator().next()
 		                                                .lineBreakingFromStyledText();
 		assertEquals(
 			//                   |<- 20
@@ -591,6 +609,8 @@ public class LiblouisCoreTest extends AbstractTest {
 		BrailleConverter converter = table.newBrailleConverter();
 		assertEquals("⠋⠕⠕⠀⠃⠁⠗", converter.toBraille("foo bar"));
 		assertEquals("foo bar", converter.toText("⠋⠕⠕⠀⠃⠁⠗"));
+		// virtual dots
+		assertEquals("⠁⠃⠉⠀⠁⠃⠉", converter.toBraille("abc 123"));
 		
 		//  (locale: ...)
 		table = tableProvider.get(query("(locale:foo)")).iterator().next();

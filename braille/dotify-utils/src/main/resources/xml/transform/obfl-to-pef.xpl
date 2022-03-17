@@ -4,6 +4,7 @@
             xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
             xmlns:obfl="http://www.daisy.org/ns/2011/obfl"
             xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
+            xmlns:dp2="http://www.daisy.org/ns/pipeline/"
             exclude-inline-prefixes="#all"
             name="main">
 	

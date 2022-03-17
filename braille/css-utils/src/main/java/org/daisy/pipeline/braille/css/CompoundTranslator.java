@@ -95,7 +95,11 @@ public class CompoundTranslator extends AbstractBrailleTranslator {
 						if (style != null) {
 							CSSProperty val = style.getProperty("text-transform");
 							if (val != null) {
-								if (val == TextTransform.list_values) {
+								if (val == TextTransform.NONE) {
+									if (supports("none")) {
+										nextTextTransform = "none";
+										style.removeProperty("text-transform"); }
+								} else if (val == TextTransform.list_values) {
 									TermList values = style.getValue(TermList.class, "text-transform");
 
 									// According to the spec values should be "applied" from left to right, and
@@ -136,7 +140,7 @@ public class CompoundTranslator extends AbstractBrailleTranslator {
 							                                 from > i ? from - i : 0,
 							                                 buffer.size(),
 							                                 textTransform))
-								context.add(j++, new CSSStyledText(s, "text-transform: none"));
+								context.add(j++, new CSSStyledText(s, "text-transform: none; braille-charset: custom"));
 							buffer.clear();
 						} catch (Exception e) {
 							if (transformed.size() > 0 && transformed.get(0) instanceof String)
@@ -155,7 +159,7 @@ public class CompoundTranslator extends AbstractBrailleTranslator {
 								                                 j,
 								                                 j + 1,
 								                                 textTransform).iterator().next(),
-								                "text-transform: none"));
+								                "text-transform: none; braille-charset: custom"));
 								buffer.remove(j);
 							}
 						}

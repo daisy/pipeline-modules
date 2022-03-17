@@ -3,6 +3,7 @@ package org.daisy.pipeline.braille.dotify.calabash.impl;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.function.Supplier;
 import java.util.HashMap;
@@ -33,11 +34,18 @@ import org.daisy.common.xproc.calabash.XProcStepProvider;
 import org.daisy.dotify.api.engine.FormatterEngine;
 import org.daisy.dotify.api.engine.FormatterEngineFactoryService;
 import org.daisy.dotify.api.formatter.FormatterConfiguration;
-import org.daisy.dotify.api.writer.MediaTypes;
+import org.daisy.dotify.api.formatter.FormatterFactory;
+import org.daisy.dotify.api.obfl.ObflParserFactoryService;
+import org.daisy.dotify.api.table.BrailleConverter;
+import org.daisy.dotify.api.table.Table;
+import org.daisy.dotify.api.translator.TextBorderConfigurationException;
+import org.daisy.dotify.api.translator.TextBorderFactory;
+import org.daisy.dotify.api.translator.TextBorderFactoryMakerService;
+import org.daisy.dotify.api.translator.TextBorderFactoryService;
+import org.daisy.dotify.api.translator.TextBorderStyle;
 import org.daisy.dotify.api.writer.MetaDataItem;
 import org.daisy.dotify.api.writer.PagedMediaWriter;
 import org.daisy.dotify.api.writer.PagedMediaWriterConfigurationException;
-import org.daisy.dotify.api.writer.PagedMediaWriterFactoryService;
 
 import org.daisy.pipeline.braille.common.BrailleTranslator;
 import org.daisy.pipeline.braille.common.BrailleTranslatorProvider;
@@ -50,9 +58,11 @@ import org.daisy.pipeline.braille.common.util.Function0;
 import org.daisy.pipeline.braille.common.util.Functions;
 import org.daisy.pipeline.braille.css.CompoundTranslator;
 import org.daisy.pipeline.braille.css.TextTransformParser;
+import org.daisy.pipeline.braille.pef.TableProvider;
 
 import org.osgi.framework.FrameworkUtil;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -71,6 +81,7 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 	
 	private static final QName _locale = new QName("locale");
 	private static final QName _mode = new QName("mode");
+	private static final QName _braille_charset = new QName("braille-charset");
 	private static final QName _identifier = new QName("identifier");
 	private static final QName _style_type = new QName("style-type");
 	private static final QName _css_text_transform_definitions = new QName("css-text-transform-definitions");
@@ -88,21 +99,30 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 	private WritablePipe result = null;
 	private final Map<String,String> params = new HashMap<String,String>();
 	
-	private final Iterable<PagedMediaWriterFactoryService> writerFactoryServices;
-	private final Iterable<FormatterEngineFactoryService> engineFactoryServices;
+	private final FormatterEngineFactoryService formatterEngineFactoryService;
+	private final FormatterFactory formatterFactory;
+	private final ObflParserFactoryService obflParserFactoryService;
+	private final TextBorderFactoryService textBorderFactoryService;
 	private final org.daisy.pipeline.braille.common.Provider<Query,BrailleTranslator> brailleTranslatorProvider;
+	private final org.daisy.pipeline.braille.common.Provider<Query,Table> tableProvider;
 	private final TemporaryBrailleTranslatorProvider temporaryBrailleTranslatorProvider;
 	
 	public OBFLToPEFStep(XProcRuntime runtime,
 	                     XAtomicStep step,
-	                     Iterable<PagedMediaWriterFactoryService> writerFactoryServices,
-	                     Iterable<FormatterEngineFactoryService> engineFactoryServices,
+	                     FormatterEngineFactoryService formatterEngineFactoryService,
+	                     FormatterFactory formatterFactory,
+	                     ObflParserFactoryService obflParserFactoryService,
+	                     TextBorderFactoryService textBorderFactoryService,
 	                     org.daisy.pipeline.braille.common.Provider<Query,BrailleTranslator> brailleTranslatorProvider,
+	                     org.daisy.pipeline.braille.common.Provider<Query,Table> tableProvider,
 	                     TemporaryBrailleTranslatorProvider temporaryBrailleTranslatorProvider) {
 		super(runtime, step);
-		this.writerFactoryServices = writerFactoryServices;
-		this.engineFactoryServices = engineFactoryServices;
+		this.formatterEngineFactoryService = formatterEngineFactoryService;
+		this.formatterFactory = formatterFactory;
+		this.obflParserFactoryService = obflParserFactoryService;
+		this.textBorderFactoryService = textBorderFactoryService;
 		this.brailleTranslatorProvider = brailleTranslatorProvider;
+		this.tableProvider = tableProvider;
 		if (temporaryBrailleTranslatorProvider == null) throw new IllegalStateException();
 		this.temporaryBrailleTranslatorProvider = temporaryBrailleTranslatorProvider;
 	}
@@ -148,7 +168,19 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 			String styleType = getOption(_style_type, "");
 			String mode = getOption(_mode).getString();
 			String locale = getOption(_locale).getString();
-			
+			String brailleCharset = getOption(_braille_charset, "");
+
+			if (brailleCharset != null && !"".equals(brailleCharset)) {
+				// if braille-charset is specified we can assume that mode is in query format
+				Query modeQuery;
+				try {
+					modeQuery = query(mode);
+				} catch (Exception e) {
+					throw new IllegalArgumentException("Expected mode in query format: " + mode, e);
+				}
+				mode = mutableQuery(modeQuery).add("braille-charset", brailleCharset).toString();
+			}
+
 			if ("text/css".equals(styleType)) {
 				
 				// We're assuming that no other translators than the DAISY Pipeline implementations
@@ -237,8 +269,14 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 				.allowsEndingVolumeOnHyphen(allowEndingVolumeOnHyphen);
 			if (removeStyles)
 				config.ignoreStyle("em").ignoreStyle("strong");
-			
-			FormatterEngine engine = newFormatterEngine(config.build(), identifier);
+			Table brailleCharsetTable = "".equals(brailleCharset)
+				? null
+				: tableProvider.get(mutableQuery().add("id", brailleCharset)).iterator().next();
+			FormatterEngine engine = newFormatterEngine(config.build(),
+			                                            newPEFWriter(identifier, brailleCharsetTable),
+			                                            brailleCharsetTable == null
+			                                                ? null
+			                                                : brailleCharsetTable.newBrailleConverter());
 			s = new ByteArrayOutputStream();
 			engine.convert(obflStream, s);
 			obflStream.close();
@@ -260,31 +298,74 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 			evictTempTranslator.apply(); }
 	}
 	
-	private PagedMediaWriter newPagedMediaWriter(String target) throws PagedMediaWriterConfigurationException {
-		target = target.toLowerCase();
-		for (PagedMediaWriterFactoryService s : writerFactoryServices)
-			if (s.supportsMediaType(target))
-				return s.newFactory(target).newPagedMediaWriter();
-		throw new RuntimeException("Cannot find a PagedMediaWriter factory for " + target);
+	private PagedMediaWriter newPEFWriter(String identifier, Table brailleCharset) throws PagedMediaWriterConfigurationException {
+		PagedMediaWriter writer = null;
+		List<MetaDataItem> meta = new ArrayList<MetaDataItem>();
+		if (brailleCharset != null)
+			meta.add(new MetaDataItem(new javax.xml.namespace.QName("http://www.daisy.org/ns/pipeline/",
+			                                                        "ascii-braille-charset",
+			                                                        "dp2"),
+			                          brailleCharset.getIdentifier()));
+		if (!"".equals(identifier))
+			meta.add(new MetaDataItem(new javax.xml.namespace.QName("http://purl.org/dc/elements/1.1/", "identifier", "dc"),
+			                          identifier));
+		writer = new PEFWriter(brailleCharset);
+		if (!meta.isEmpty())
+			writer.prepare(meta);
+		return writer;
 	}
 	
-	private PagedMediaWriter newPEFWriter(String identifier) throws PagedMediaWriterConfigurationException {
-		PagedMediaWriter ret = newPagedMediaWriter(MediaTypes.PEF_MEDIA_TYPE);
-		if (!"".equals(identifier)) {
-			List<MetaDataItem> meta = new ArrayList<MetaDataItem>();
-			javax.xml.namespace.QName name = new javax.xml.namespace.QName("http://purl.org/dc/elements/1.1/", "identifier", "dc");
-			meta.add(new MetaDataItem(name, identifier));
-			ret.prepare(meta);
+	private FormatterEngine newFormatterEngine(FormatterConfiguration config,
+	                                           PagedMediaWriter writer,
+	                                           BrailleConverter brailleCharset) {
+		if (brailleCharset != null) {
+			// HACK: We create a new TextBorderFactoryMakerService that uses the default
+			// TextBorderFactoryService to create Unicode braille patterns and encodes them with the
+			// given BrailleConverter. We then make the default FormatterEngineFactoryService,
+			// FormatterFactory and ObflParserFactoryService use this TextBorderFactoryMakerService
+			// by using reflection. This assumes that the FormatterEngineFactoryService is a
+			// org.daisy.dotify.formatter.impl.engine.LayoutEngineFactoryImpl, the FormatterFactory
+			// is a org.daisy.dotify.formatter.impl.FormatterFactoryImpl, and the
+			// ObflParserFactoryService is a
+			// org.daisy.dotify.formatter.impl.obfl.ObflParserFactoryImpl, and that these are the
+			// only classes that bind a TextBorderFactoryMakerService.
+			TextBorderFactoryMakerService asciiTextBorderFactoryMakerService = new TextBorderFactoryMakerService() {
+					public TextBorderStyle newTextBorderStyle(Map<String,Object> features)
+							throws TextBorderConfigurationException {
+						TextBorderFactory f = textBorderFactoryService.newFactory();
+						for (String k : features.keySet())
+							f.setFeature(k, features.get(k));
+						TextBorderStyle style = f.newTextBorderStyle();
+						return new TextBorderStyle.Builder()
+							.topLeftCorner    (brailleCharset.toText(style.getTopLeftCorner()))
+							.topBorder        (brailleCharset.toText(style.getTopBorder()))
+							.topRightCorner   (brailleCharset.toText(style.getTopRightCorner()))
+							.leftBorder       (brailleCharset.toText(style.getLeftBorder()))
+							.rightBorder      (brailleCharset.toText(style.getRightBorder()))
+							.bottomLeftCorner (brailleCharset.toText(style.getBottomLeftCorner()))
+							.bottomBorder     (brailleCharset.toText(style.getBottomBorder()))
+							.bottomRightCorner(brailleCharset.toText(style.getBottomRightCorner()))
+							.build();
+					}
+				};
+			for (Object object : new Object[]{formatterEngineFactoryService,
+			                                  formatterFactory,
+			                                  obflParserFactoryService}) {
+				try {
+					object.getClass()
+						.getMethod(object == formatterFactory ? "setTextBorderFactory" : "setTextBorderFactoryMaker",
+						           TextBorderFactoryMakerService.class)
+						.invoke(object, asciiTextBorderFactoryMakerService);
+				} catch (NoSuchMethodException |
+				         SecurityException |
+				         IllegalAccessException |
+				         IllegalArgumentException |
+				         InvocationTargetException e) {
+					throw new RuntimeException(e);
+				}
+			}
 		}
-		return ret;
-	}
-	
-	private FormatterEngine newFormatterEngine(FormatterConfiguration config, PagedMediaWriter writer) {
-		return engineFactoryServices.iterator().next().newFormatterEngine(config, writer);
-	}
-	
-	private FormatterEngine newFormatterEngine(FormatterConfiguration config, String identifier) throws PagedMediaWriterConfigurationException {
-		return newFormatterEngine(config, newPEFWriter(identifier));
+		return formatterEngineFactoryService.newFormatterEngine(config, writer);
 	}
 	
 	@Component(
@@ -298,38 +379,48 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 		public XProcStep newStep(XProcRuntime runtime, XAtomicStep step) {
 			return new OBFLToPEFStep(runtime,
 			                         step,
-			                         writerFactoryServices,
-			                         engineFactoryServices,
+			                         formatterEngineFactoryService,
+			                         formatterFactory,
+			                         obflParserFactoryService,
+			                         textBorderFactoryService,
 			                         brailleTranslatorProvider,
+			                         tableProvider,
 			                         temporaryBrailleTranslatorProvider);
 		}
 		
-		private final List<PagedMediaWriterFactoryService> writerFactoryServices
-			= new ArrayList<PagedMediaWriterFactoryService>();
-		
-		@Reference(
-			name = "PagedMediaWriterFactoryService",
-			unbind = "unbindPagedMediaWriterFactoryService",
-			service = PagedMediaWriterFactoryService.class,
-			cardinality = ReferenceCardinality.AT_LEAST_ONE,
-			policy = ReferencePolicy.DYNAMIC
-		)
-		protected void bindPagedMediaWriterFactoryService(PagedMediaWriterFactoryService service) {
-			if (!OSGiHelper.inOSGiContext())
-				service.setCreatedWithSPI();
-			writerFactoryServices.add(service);
+		@Activate
+		protected void connectDotifyServices() {
+			for (Object object : new Object[]{formatterEngineFactoryService,
+			                                  obflParserFactoryService}) {
+				try {
+					object.getClass()
+						.getMethod("setFormatterFactory", FormatterFactory.class)
+						.invoke(object, formatterFactory);
+				} catch (NoSuchMethodException |
+				         SecurityException |
+				         IllegalAccessException |
+				         IllegalArgumentException |
+				         InvocationTargetException e) {
+					throw new RuntimeException(e);
+				}
+			}
+			try {
+				formatterEngineFactoryService.getClass()
+					.getMethod("setObflParserFactory", ObflParserFactoryService.class)
+					.invoke(formatterEngineFactoryService, obflParserFactoryService);
+			} catch (NoSuchMethodException |
+			         SecurityException |
+			         IllegalAccessException |
+			         IllegalArgumentException |
+			         InvocationTargetException e) {
+				throw new RuntimeException(e);
+			}
 		}
 		
-		protected void unbindPagedMediaWriterFactoryService(PagedMediaWriterFactoryService service) {
-			writerFactoryServices.remove(service);
-		}
-		
-		private final List<FormatterEngineFactoryService> engineFactoryServices
-			= new ArrayList<FormatterEngineFactoryService>();
+		private FormatterEngineFactoryService formatterEngineFactoryService;
 		
 		@Reference(
 			name = "FormatterEngineFactoryService",
-			unbind = "unbindFormatterEngineFactoryService",
 			service = FormatterEngineFactoryService.class,
 			cardinality = ReferenceCardinality.MANDATORY,
 			policy = ReferencePolicy.STATIC
@@ -337,16 +428,53 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 		protected void bindFormatterEngineFactoryService(FormatterEngineFactoryService service) {
 			if (!OSGiHelper.inOSGiContext())
 				service.setCreatedWithSPI();
-			engineFactoryServices.add(service);
+			formatterEngineFactoryService = service;
 		}
 		
-		protected void unbindFormatterEngineFactoryService(FormatterEngineFactoryService service) {
-			engineFactoryServices.remove(service);
+		private FormatterFactory formatterFactory;
+		
+		@Reference(
+			name = "FormatterFactory",
+			service = FormatterFactory.class,
+			cardinality = ReferenceCardinality.MANDATORY,
+			policy = ReferencePolicy.STATIC
+		)
+		protected void bindFormatterFactory(FormatterFactory factory) {
+			if (!OSGiHelper.inOSGiContext())
+				factory.setCreatedWithSPI();
+			formatterFactory = factory;
+		}
+		
+		private ObflParserFactoryService obflParserFactoryService;
+		
+		@Reference(
+			name = "ObflParserFactoryService",
+			service = ObflParserFactoryService.class,
+			cardinality = ReferenceCardinality.MANDATORY,
+			policy = ReferencePolicy.STATIC
+		)
+		protected void bindObflParserFactoryService(ObflParserFactoryService service) {
+			if (!OSGiHelper.inOSGiContext())
+				service.setCreatedWithSPI();
+			obflParserFactoryService = service;
+		}
+		
+		private TextBorderFactoryService textBorderFactoryService;
+		
+		@Reference(
+			name = "TextBorderFactoryService",
+			service = TextBorderFactoryService.class,
+			cardinality = ReferenceCardinality.MANDATORY,
+			policy = ReferencePolicy.STATIC
+		)
+		protected void bindTextBorderFactoryService(TextBorderFactoryService service) {
+			if (!OSGiHelper.inOSGiContext())
+				service.setCreatedWithSPI();
+			textBorderFactoryService = service;
 		}
 		
 		private final List<BrailleTranslatorProvider<BrailleTranslator>> brailleTranslatorProviders
 			= new ArrayList<BrailleTranslatorProvider<BrailleTranslator>>();
-		
 		private final org.daisy.pipeline.braille.common.Provider.util.MemoizingProvider<Query,BrailleTranslator> brailleTranslatorProvider
 			= memoize(dispatch(brailleTranslatorProviders));
 		
@@ -379,6 +507,26 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 		)
 		protected void bindTemporaryBrailleTranslatorProvider(TemporaryBrailleTranslatorProvider provider) {
 			temporaryBrailleTranslatorProvider = provider;
+		}
+		
+		private final List<TableProvider> tableProviders = new ArrayList<TableProvider>();
+		private final org.daisy.pipeline.braille.common.Provider.util.MemoizingProvider<Query,Table> tableProvider
+			= memoize(dispatch(tableProviders));
+		
+		@Reference(
+			name = "TableProvider",
+			unbind = "removeTableProvider",
+			service = TableProvider.class,
+			cardinality = ReferenceCardinality.MULTIPLE,
+			policy = ReferencePolicy.DYNAMIC
+		)
+		protected void addTableProvider(TableProvider provider) {
+			tableProviders.add(provider);
+		}
+		
+		protected void removeTableProvider(TableProvider provider) {
+			tableProviders.remove(provider);
+			this.tableProvider.invalidateCache();
 		}
 	}
 	

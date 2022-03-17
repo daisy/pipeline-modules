@@ -40,7 +40,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>common-utils</artifactId>
-        <version>8.2.2-SNAPSHOT</version>
+        <version>8.3.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
@@ -103,7 +103,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>pef-utils</artifactId>
-        <version>4.0.5-SNAPSHOT</version>
+        <version>5.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
@@ -319,7 +319,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>dtbook-to-pef</artifactId>
-        <version>7.2.2-SNAPSHOT</version>
+        <version>8.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
@@ -364,7 +364,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>epub3-to-pef</artifactId>
-        <version>4.2.2-SNAPSHOT</version>
+        <version>5.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
@@ -384,7 +384,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>html-to-pef</artifactId>
-        <version>4.2.2-SNAPSHOT</version>
+        <version>5.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
@@ -404,7 +404,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>zedai-to-pef</artifactId>
-        <version>5.0.3-SNAPSHOT</version>
+        <version>6.0.0-SNAPSHOT</version>
       </dependency>
       
       <!--
@@ -595,7 +595,7 @@
       <dependency>
         <groupId>org.liblouis</groupId>
         <artifactId>liblouis-java</artifactId>
-        <version>4.4.0</version>
+        <version>5.0.1</version>
       </dependency>
       <dependency>
         <groupId>net.java.dev.jna</groupId>

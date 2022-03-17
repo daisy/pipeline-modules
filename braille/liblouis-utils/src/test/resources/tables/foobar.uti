@@ -13,3 +13,4 @@ sign \x00AD 2c
 sign \x2028 2d
 
 include ital.cti
+include braille-patterns.cti

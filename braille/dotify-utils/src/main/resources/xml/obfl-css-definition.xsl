@@ -4,21 +4,23 @@
                 xmlns:new="css:new-definition"
                 xmlns:css="http://www.daisy.org/ns/pipeline/braille-css"
                 xmlns:re="regex-utils">
-  
+    
+    <xsl:param name="initial-braille-charset" select="'unicode'"/>
+
     <xsl:variable name="new:properties" as="xs:string*"
-                  select="('margin-left',           'page-break-before', 'text-indent', 'text-transform', '-obfl-vertical-align',
-                           'margin-right',          'page-break-after',  'text-align',  'hyphens',        '-obfl-vertical-position',
-                           'margin-top',            'page-break-inside', 'line-height', 'white-space',    '-obfl-toc-range',
-                           'margin-bottom',         'orphans',                          'word-spacing',   '-obfl-list-of-references-range',
-                           'padding-left',          'widows',                           'letter-spacing', '-obfl-table-col-spacing',
-                           'padding-right',         'volume-break-before',                                '-obfl-table-row-spacing',
-                           'padding-top',           'volume-break-after',                                 '-obfl-preferred-empty-space',
-                           'padding-bottom',        'volume-break-inside',                                '-obfl-use-when-collection-not-empty',
-                           'border-left-pattern',   'border-left-style',                                  '-obfl-underline',
-                           'border-right-pattern',  'border-right-style',                                 '-obfl-keep-with-previous-sheets',
-                           'border-top-pattern',    'border-top-style',                                   '-obfl-keep-with-next-sheets',
-                           'border-bottom-pattern', 'border-bottom-style',                                '-obfl-scenario-cost',
-                                                                                                          '-obfl-right-text-indent'
+                  select="('margin-left',           'page-break-before', 'text-indent', 'text-transform',  '-obfl-vertical-align',
+                           'margin-right',          'page-break-after',  'text-align',  'braille-charset', '-obfl-vertical-position',
+                           'margin-top',            'page-break-inside', 'line-height', 'hyphens',         '-obfl-toc-range',
+                           'margin-bottom',         'orphans',                          'white-space',     '-obfl-list-of-references-range',
+                           'padding-left',          'widows',                           'word-spacing',    '-obfl-table-col-spacing',
+                           'padding-right',         'volume-break-before',              'letter-spacing',  '-obfl-table-row-spacing',
+                           'padding-top',           'volume-break-after',                                  '-obfl-preferred-empty-space',
+                           'padding-bottom',        'volume-break-inside',                                 '-obfl-use-when-collection-not-empty',
+                           'border-left-pattern',   'border-left-style',                                   '-obfl-underline',
+                           'border-right-pattern',  'border-right-style',                                  '-obfl-keep-with-previous-sheets',
+                           'border-top-pattern',    'border-top-style',                                    '-obfl-keep-with-next-sheets',
+                           'border-bottom-pattern', 'border-bottom-style',                                 '-obfl-scenario-cost',
+                                                                                                           '-obfl-right-text-indent'
                            )"/>
     
     <xsl:variable name="_OBFL_KEEP_FN_RE">-obfl-keep\(\s*[1-9]\s*\)</xsl:variable>
@@ -91,6 +93,8 @@
                               then '0'
                               else if ($property='-obfl-scenario-cost')
                               then 'none'
+                              else if ($property='braille-charset')
+                              then $initial-braille-charset
                               else css:initial-value($property)"/>
     </xsl:function>
     
@@ -103,7 +107,7 @@
     <xsl:function name="new:applies-to" as="xs:boolean">
         <xsl:param name="property" as="xs:string"/>
         <xsl:param name="context" as="element()"/>
-        <xsl:sequence select="$property=('text-transform','hyphens','word-spacing')
+        <xsl:sequence select="$property=('text-transform','braille-charset','hyphens','word-spacing')
                               or (
                                 if (matches($property,'^(border|margin|padding)-'))
                                 then $context/@type=('block','table','table-cell')

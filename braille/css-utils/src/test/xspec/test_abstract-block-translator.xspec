@@ -3,6 +3,8 @@
                xmlns:css="http://www.daisy.org/ns/pipeline/braille-css"
                stylesheet="../resources/uppercase-block-translator.xsl">
   
+  <x:param name="braille-charset" select="'custom'"/>
+  
   <x:scenario label="test_01">
     <x:context>
       <doc>
@@ -13,7 +15,7 @@
       </doc>
     </x:context>
     <x:expect label="result">
-      <doc style="text-transform: none">
+      <doc style="text-transform: none; braille-charset: custom">
         <h style="display: block; string-set: running-footer &quot;foobar&quot;">FOOBAR</h>
         <p style="display: block &amp;::after {{ content: &quot;BAR&quot; }} &amp;::before {{ content: &quot;bar&quot; counter(page); text-transform: auto }}">FOO</p>
         <pagenum style="display: none; string-set: print-page &quot;ii&quot;, foo &quot;bar&quot;">II</pagenum>
@@ -28,7 +30,7 @@
       </doc>
     </x:context>
     <x:expect label="result">
-      <doc xml:lang="en-Brai" style="text-transform: none">
+      <doc xml:lang="en-Brai" style="text-transform: none; braille-charset: custom">
         <br style="&amp;::before {{ content: &quot;\A &quot;; white-space: pre-line }}"/>
       </doc>
     </x:expect>
@@ -41,7 +43,7 @@
       </div>
     </x:context>
     <x:expect label="result">
-      <div style="text-transform: none">
+      <div style="text-transform: none; braille-charset: custom">
         <p>FOO=BAR</p>
       </div>
     </x:expect>
@@ -54,7 +56,7 @@
       </doc>
     </x:context>
     <x:expect label="result">
-      <doc style="text-transform: none">
+      <doc style="text-transform: none; braille-charset: custom">
         <div style="&amp;::after {{ content: &quot;FOO&quot; }} &amp;::after::before {{ display: block; content: &quot;BAR&quot; }}"/>
       </doc>
     </x:expect>
@@ -67,7 +69,7 @@
       </doc>
     </x:context>
     <x:expect label="result">
-      <doc style="text-transform: none">
+      <doc style="text-transform: none; braille-charset: custom">
         <div style="&amp;::table-by(foo)::list-item::after {{ content: &quot;,&quot; }} &amp;::table-by(foo)::list-item:last-child::after {{ content: none }}"/>
       </doc>
     </x:expect>
@@ -83,7 +85,7 @@
       </doc>
     </x:context>
     <x:expect label="result">
-      <doc style="text-transform: none">
+      <doc style="text-transform: none; braille-charset: custom">
         <a href="foo" style="&amp;::after {{ content: target-counter(url(&quot;#foo&quot;), page) target-string(url(&quot;foo&quot;), print-page) target-text(url(&quot;foo&quot;)) target-content(url(&quot;foo&quot;)); text-transform: auto }}"/>
       </doc>
     </x:expect>
@@ -97,10 +99,29 @@
                       text-transform: uncontracted; }} }}"/>
     </x:context>
     <x:expect label="result">
-      <doc style="text-transform: none @page {{ @bottom-right {{ content: counter(page, lower-roman); text-transform: uncontracted }} }}">
+      <doc style="text-transform: none; braille-charset: custom @page {{ @bottom-right {{ content: counter(page, lower-roman); text-transform: uncontracted }} }}">
 
       </doc>
     </x:expect>
   </x:scenario>
-  
+
+  <x:scenario label="test_08">
+    <x:context>
+      <doc>
+        <p css:display="block">foo<span style="text-transform: none">⠃⠁⠗</span></p>
+        <p css:display="block">foo<span style="text-transform: none; braille-charset: custom">BAR</span></p>
+        <p css:display="block" style="&amp;::after {{ content: '⠃⠁⠗'; text-transform: none }}">foo</p>
+        <p css:display="block" style="&amp;::after {{ content: leader('⠀') '⠃⠁⠗'; text-transform: none }}">foo</p>
+      </doc>
+    </x:context>
+    <x:expect label="result">
+      <doc style="text-transform: none; braille-charset: custom">
+        <p style="display: block">FOO<span>BAR</span></p>
+        <p style="display: block">FOO<span>BAR</span></p>
+        <p style="display: block &amp;::after {{ content: &quot;BAR&quot; }}">FOO</p>
+        <p style="display: block &amp;::after {{ content: leader(&quot;⠀&quot;) &quot;⠃⠁⠗&quot;; braille-charset: unicode }}">FOO</p>
+      </doc>
+    </x:expect>
+  </x:scenario>
+
 </x:description>

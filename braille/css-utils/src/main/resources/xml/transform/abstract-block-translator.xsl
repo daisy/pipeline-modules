@@ -9,6 +9,8 @@
 	<xsl:import href="../library.xsl"/>
 	<xsl:include href="http://www.daisy.org/pipeline/modules/common-utils/library.xsl"/>
 	
+	<xsl:param name="braille-charset"/>
+	
 	<!--
 	    API: implement xsl:template match="css:block"
 	-->
@@ -250,18 +252,29 @@
 							</xsl:call-template>
 						</xsl:variable>
 						<xsl:variable name="properties" as="element()*" select="css:property"/>
+						<xsl:variable name="translated-properties" as="element()*">
+							<xsl:choose>
+								<xsl:when test="$restore-text-style">
+									<xsl:apply-templates mode="restore-text-style-and-translate-other-style"
+									                     select="($properties,$source-style[not(@name=$properties/@name)])">
+										<xsl:with-param name="source-style" tunnel="yes"
+										                select="($source-style,$properties[@name='content'])"/>
+									</xsl:apply-templates>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:apply-templates mode="#current" select="($properties,$source-style[not(@name=$properties/@name)])">
+										<xsl:with-param name="source-style" tunnel="yes" select="$source-style"/>
+									</xsl:apply-templates>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:variable>
 						<xsl:choose>
-							<xsl:when test="$restore-text-style">
-								<xsl:apply-templates mode="restore-text-style-and-translate-other-style"
-								                     select="($properties,$source-style[not(@name=$properties/@name)])">
-									<xsl:with-param name="source-style" tunnel="yes"
-									                select="($source-style,$properties[@name='content'])"/>
-								</xsl:apply-templates>
+							<!-- only include braille-charset if text-transform is "none" -->
+							<xsl:when test="$translated-properties[@name='text-transform' and @value='none']">
+								<xsl:sequence select="$translated-properties"/>
 							</xsl:when>
 							<xsl:otherwise>
-								<xsl:apply-templates mode="#current" select="($properties,$source-style[not(@name=$properties/@name)])">
-									<xsl:with-param name="source-style" tunnel="yes" select="$source-style"/>
-								</xsl:apply-templates>
+								<xsl:sequence select="$translated-properties[not(@name='braille-charset')]"/>
 							</xsl:otherwise>
 						</xsl:choose>
 					</xsl:otherwise>
@@ -287,6 +300,10 @@
 	
 	<xsl:template mode="translate-style" match="css:property[@name='text-transform']">
 		<css:property name="text-transform" value="none"/>
+	</xsl:template>
+	
+	<xsl:template mode="translate-style" match="css:property[@name='braille-charset']">
+		<css:property name="braille-charset" value="{if ($braille-charset!='') then 'custom' else 'unicode'}"/>
 	</xsl:template>
 	
 	<xsl:template mode="translate-style" match="css:property[@name='string-set']">
