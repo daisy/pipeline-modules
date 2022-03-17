@@ -8,46 +8,73 @@
                 xmlns:pef="http://www.daisy.org/ns/2008/pef"
                 xmlns:html="http://www.w3.org/1999/xhtml"
                 exclude-inline-prefixes="#all"
-                type="pef:store" name="store" version="1.0">
+                type="px:pef-store" name="store" version="1.0">
     
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-        <p>Store a PEF document to disk, possibly in an ASCII-based format or with an HTML preview.</p>
+        <p>Convert a PEF document to another braille file format and store to disk. Optionally also
+        store a HTML preview and the PEF itself.</p>
     </p:documentation>
     
     <p:input port="source" primary="true" px:media-type="application/x-pef+xml"/>
     
-    <p:option name="href" required="true"/>
-    <p:option name="preview-href" required="false" select="''"/>
-    <p:option name="preview-table" required="false" select="''"/>
-    <p:option name="brf-dir-href" required="false" select="''"/>
-    <p:option name="brf-name-pattern" required="false" select="''"/>
-    <p:option name="brf-single-volume-name" required="false" select="''"/>
-    <p:option name="brf-number-width" required="false" select="''"/>
-    <p:option name="brf-file-format" required="false" select="''"/>
+    <p:option name="output-dir" required="false" select="''"/> <!-- URI -->
+    <p:option name="file-format" required="false" select="''"/> <!-- query -->
+    <p:option name="name-pattern" required="false" select="''"/>
+    <p:option name="single-volume-name" required="false" select="''"/>
+    <p:option name="number-width" required="false" select="''"/>
+    <p:option name="pef-href" required="false"/> <!-- URI -->
+    <p:option name="preview-href" required="false" select="''"/> <!-- URI -->
+    <p:option name="preview-table" required="false" select="''"/> <!-- query -->
     
-    <p:import href="pef-to-html.convert.xpl"/>
-    <p:import href="pef2text.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl"/>
+    <p:import href="pef-to-html.convert.xpl">
+        <p:documentation>
+            px:pef-to-html.convert
+        </p:documentation>
+    </p:import>
+    <p:import href="pef2text.xpl">
+        <p:documentation>
+            pef:pef2text
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
+        <p:documentation>
+            px:mkdir
+            px:copy-resource
+        </p:documentation>
+    </p:import>
     
     <!-- ============ -->
     <!-- STORE AS PEF -->
     <!-- ============ -->
     
-    <p:store name="store.pef" px:message="Storing PEF as '{$href}'" px:message-severity="DEBUG" px:progress=".01"
-             indent="true" encoding="utf-8" omit-xml-declaration="false">
-        <p:input port="source">
-            <p:pipe step="store" port="source"/>
-        </p:input>
-        <p:with-option name="href" select="$href"/>
-    </p:store>
+    <p:choose px:progress=".01">
+        <p:when test="not($pef-href='')">
+            <p:identity px:message="Storing PEF">
+                <p:input port="source">
+                    <p:pipe step="store" port="source"/>
+                </p:input>
+            </p:identity>
+            <p:store name="store.pef" px:message="Storing PEF to '{$pef-href}'" px:message-severity="DEBUG"
+                     indent="true" encoding="utf-8" omit-xml-declaration="false">
+                <p:with-option name="href" select="$pef-href"/>
+            </p:store>
+        </p:when>
+        <p:otherwise>
+            <p:sink>
+                <p:input port="source">
+                    <p:empty/>
+                </p:input>
+            </p:sink>
+        </p:otherwise>
+    </p:choose>
     
-    <!-- ============ -->
-    <!-- STORE AS BRF -->
-    <!-- ============ -->
+    <!-- ===================== -->
+    <!-- STORE AS BRAILLE FILE -->
+    <!-- ==================== -->
 
     <p:choose px:progress=".17">
-        <p:when test="not($brf-dir-href='')"
-                px:message="Storing BRF as '{$brf-dir-href}'" px:message-severity="DEBUG">
+        <p:when test="not($output-dir='')" px:message="Storing braille file">
+            <p:variable name="format" select="if (not($file-format='')) then $file-format else '(format:pef)'"/>
             <p:identity>
                 <p:input port="source">
                     <p:pipe step="store" port="source"/>
@@ -60,19 +87,15 @@
             -->
             <p:delete match="/pef:pef/pef:head/pef:meta/dp2:ascii-braille-charset|
                              pef:row/@dp2:ascii"/>
-            <pef:pef2text px:progress="1">
-                <p:with-option name="dir-href" select="$brf-dir-href"/>
-                <p:with-option name="name-pattern" select="$brf-name-pattern"/>
-                <p:with-option name="single-volume-name" select="$brf-single-volume-name"/>
-                <p:with-option name="number-width" select="$brf-number-width"/>
-                <p:with-option name="file-format" select="if (not($brf-file-format=''))
-                                                          then $brf-file-format
-                                                          else '(table:&quot;org.daisy.braille.impl.table.DefaultTableProvider.TableType.EN_US&quot;)
-                                                                (line-breaks:DEFAULT)
-                                                                (pad:BOTH)'"/>
+            <pef:pef2text px:progress="1" px:message="Storing braille file to '{$output-dir}' in format '{$format}'" px:message-severity="DEBUG">
+                <p:with-option name="output-dir" select="$output-dir"/>
+                <p:with-option name="name-pattern" select="$name-pattern"/>
+                <p:with-option name="single-volume-name" select="$single-volume-name"/>
+                <p:with-option name="number-width" select="$number-width"/>
+                <p:with-option name="file-format" select="$format"/>
             </pef:pef2text>
         </p:when>
-        <p:otherwise px:message="Not storing as BRF" px:message-severity="DEBUG">
+        <p:otherwise>
             <p:sink>
                 <p:input port="source">
                     <p:empty/>
@@ -86,7 +109,7 @@
     <!-- ==================== -->
     
     <p:choose px:progress=".82">
-        <p:when test="not($preview-href='')">
+        <p:when test="not($preview-href='')" px:message="Storing HTML preview">
             <p:variable name="table" select="if (not($preview-table=''))
                                              then $preview-table
                                              else '(id:&quot;org.daisy.braille.impl.table.DefaultTableProvider.TableType.EN_US&quot;)'"/>
@@ -95,7 +118,7 @@
                     <p:pipe step="store" port="source"/>
                 </p:input>
             </p:identity>
-            <px:pef-to-html.convert px:message="Converting PEF to HTML preview using the BRF table '{$table}'"
+            <px:pef-to-html.convert px:message="Storing HTML preview to '{$preview-href}' using table '{$table}'"
                                     px:message-severity="DEBUG" px:progress="80/82">
                 <p:with-option name="table" select="$table"/>
             </px:pef-to-html.convert>

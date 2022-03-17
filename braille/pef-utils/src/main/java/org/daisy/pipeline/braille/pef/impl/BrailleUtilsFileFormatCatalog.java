@@ -23,6 +23,7 @@ import org.daisy.dotify.api.table.TableFilter;
 
 import static org.daisy.pipeline.braille.common.Provider.util.dispatch;
 import static org.daisy.pipeline.braille.common.Provider.util.memoize;
+import static org.daisy.pipeline.braille.common.util.Locales.parseLocale;
 import org.daisy.pipeline.braille.common.Provider.util.MemoizingProvider;
 import org.daisy.pipeline.braille.common.Query;
 import org.daisy.pipeline.braille.common.Query.Feature;
@@ -37,6 +38,9 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component(
 	name = "org.daisy.pipeline.braille.pef.impl.BrailleUtilsFileFormatCatalog",
@@ -55,15 +59,29 @@ public class BrailleUtilsFileFormatCatalog implements FileFormatProvider {
 				format = getEmbosserAsFileFormat(id); }
 			else
 				return empty; }
+		final String documentLocale = q.containsKey("document-locale")
+			? q.removeOnly("document-locale").getValue().get()
+			: null;
 		final Iterable<Table> table; {
 			if (q.containsKey("table")) {
 				String id = q.removeOnly("table").getValue().get();
-				Query tableQuery = mutableQuery().add("id", id);
-				table = tableProvider.get(tableQuery); }
+				// table could be a locale
+				String locale; {
+					try {
+						locale = parseLocale(id).toLanguageTag(); }
+					catch (IllegalArgumentException e) {
+						locale = null; }}
+				table = locale != null
+					? concat(tableProvider.get(mutableQuery().add("locale", locale)),
+					         tableProvider.get(mutableQuery().add("id", id)))
+					: tableProvider.get(mutableQuery().add("id", id)); }
 			else if (q.containsKey("locale")) {
 				Feature locale = q.removeOnly("locale");
 				MutableQuery tableQuery = mutableQuery();
 				tableQuery.add(locale);
+				table = tableProvider.get(tableQuery); }
+			else if (documentLocale != null) {
+				Query tableQuery = mutableQuery().add("locale", documentLocale);
 				table = tableProvider.get(tableQuery); }
 			else
 				table = Collections.singleton(null); }
@@ -80,11 +98,21 @@ public class BrailleUtilsFileFormatCatalog implements FileFormatProvider {
 										FileFormat frmt = format.get();
 										if (table != null)
 											frmt.setFeature("table", table);
-										for (Feature f : q)
+										for (Feature f : q) {
+											if (table != null && "locale".equals(f.getKey())) {
+												String locale = f.getValue().get();
+												boolean match = false;
+												for (Table t : tableProvider.get(mutableQuery().add("locale", locale)))
+													if (t.equals(table)) {
+														match = true;
+														break; }
+												if (!match) {
+													logger.warn("Table " + table + " not compatible with locale " + locale);
+													return null; }}
 											try {
 												frmt.setFeature(f.getKey(), f.getValue().orElse(f.getKey())); }
 											catch (Exception e) {
-												return null; }
+												return null; }}
 										return frmt; }}),
 							notNull());
 					}
@@ -216,6 +244,10 @@ public class BrailleUtilsFileFormatCatalog implements FileFormatProvider {
 			return embosser.supportsDuplex();
 		}
 
+		public boolean supportsVolumes() {
+			return false;
+		}
+
 		public String getFileExtension() {
 			return ".brf";
 		}
@@ -242,4 +274,6 @@ public class BrailleUtilsFileFormatCatalog implements FileFormatProvider {
 			}
 		}
 	}
+
+	private static final Logger logger = LoggerFactory.getLogger(BrailleUtilsFileFormatCatalog.class);
 }

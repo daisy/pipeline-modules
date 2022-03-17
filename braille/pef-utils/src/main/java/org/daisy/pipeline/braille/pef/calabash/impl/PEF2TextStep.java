@@ -58,7 +58,7 @@ import org.slf4j.LoggerFactory;
 
 public class PEF2TextStep extends DefaultStep implements XProcStep {
 	
-	private static final QName _dir_href = new QName("dir-href");
+	private static final QName _output_dir = new QName("output-dir");
 	private static final QName _file_format = new QName("file-format");
 	private static final QName _line_breaks = new QName("line-breaks");
 	private static final QName _page_breaks = new QName("page-breaks");
@@ -93,6 +93,8 @@ public class PEF2TextStep extends DefaultStep implements XProcStep {
 	public void run() throws SaxonApiException {
 		super.run();
 		MutableQuery q = mutableQuery(query(getOption(_file_format, "")));
+		q.removeAll("blank-last-page"); // has been handled in pef2text.xpl
+		q.removeAll("sheets-multiple-of-two"); // has been handled in pef2text.xpl
 		addOption(_line_breaks, q);
 		addOption(_page_breaks, q);
 		addOption(_pad, q);
@@ -106,7 +108,7 @@ public class PEF2TextStep extends DefaultStep implements XProcStep {
 				logger.debug("Storing PEF to file format: " + fileFormat);
 				
 				// Initialize output directory
-				File textDir = new File(new URI(getOption(_dir_href).getString()));
+				File textDir = new File(new URI(getOption(_output_dir).getString()));
 				textDir.mkdirs();
 				
 				// Read source PEF
@@ -114,6 +116,7 @@ public class PEF2TextStep extends DefaultStep implements XProcStep {
 				Serializer serializer = runtime.getProcessor().newSerializer();
 				serializer.setOutputStream(s);
 				serializer.setCloseOnCompletion(true);
+				serializer.setOutputProperty(Serializer.Property.INDENT, "yes");
 				serializer.serializeNode(source.read());
 				serializer.close();
 				InputStream pefStream = new ByteArrayInputStream(s.toByteArray());
@@ -126,6 +129,12 @@ public class PEF2TextStep extends DefaultStep implements XProcStep {
 					pattern = "volume-{}";
 				int match = pattern.indexOf("{}");
 				if (match < 0 || match != pattern.lastIndexOf("{}")) {
+					logger.error("name-pattern is invalid: '" + pattern + "'");
+					if (singleVolumeName.isEmpty())
+						throw new RuntimeException("name-pattern and single-volume-name may not both be empty");
+				}
+				if ((fileFormat.supportsVolumes() && !singleVolumeName.isEmpty())
+				    || match < 0 || match != pattern.lastIndexOf("{}")) {
 					// Output to single file
 					convertPEF2Text(pefStream,
 							new File(textDir, singleVolumeName + fileFormat.getFileExtension()), fileFormat);
@@ -189,27 +198,33 @@ public class PEF2TextStep extends DefaultStep implements XProcStep {
 	
 	private void convertPEF2Text(InputStream pefStream, File textFile, FileFormat fileFormat)
 			throws ParserConfigurationException, SAXException, IOException, UnsupportedWidthException {
-		// Create EmbosserWriter
 		OutputStream textStream = new FileOutputStream(textFile);
-		EmbosserWriter writer = fileFormat.newEmbosserWriter(textStream);
-		
-		// Parse PEF to text
-		PEFHandler.Builder builder = new PEFHandler.Builder(writer);
-		builder.range(null).align(Alignment.LEFT).offset(0);
-		parsePefFile(pefStream, builder.build());
+		if ("pef".equals(fileFormat.getIdentifier())) {
+
+			// just write pefStream to textFile without parsing it
+			byte[] buf = new byte[153600];
+			int length;
+			while ((length = pefStream.read(buf)) > 0)
+				textStream.write(buf, 0, length);
+		} else {
+			EmbosserWriter writer = fileFormat.newEmbosserWriter(textStream);
+			PEFHandler.Builder builder = new PEFHandler.Builder(writer);
+			builder.range(null).align(Alignment.LEFT).offset(0);
+			parsePefFile(pefStream, builder.build());
+		}
 		textStream.close();
 	}
 	
 	private void addOption(QName option, MutableQuery query) {
 		RuntimeValue v = getOption(option);
-		if (v != null)
+		if (v != null && !"".equals(v.getString()))
 			query.add(option.getLocalName(), v.getString());
 	}
 	
 	@Component(
-		name = "pef:pef2text",
+		name = "pxi:pef2text",
 		service = { XProcStepProvider.class },
-		property = { "type:String={http://www.daisy.org/ns/2008/pef}pef2text" }
+		property = { "type:String={http://www.daisy.org/ns/pipeline/xproc/internal}pef2text" }
 	)
 	public static class Provider implements XProcStepProvider {
 		

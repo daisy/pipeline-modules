@@ -9,7 +9,7 @@
                 name="main">
     
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-        <h1 px:role="name">HTML to PEF</h1>
+        <h1 px:role="name">HTML to braille</h1>
         <p px:role="desc">Transforms a HTML document into an embosser ready braille document.</p>
         <a px:role="homepage" href="http://daisy.github.io/pipeline/Get-Help/User-Guide/Scripts/html-to-pef/">
             Online documentation
@@ -73,9 +73,9 @@ sheet modules) are available for use in Sass style sheets:
     <p:option name="braille-code"/>
     <p:option name="transform"/>
     <p:option name="include-preview"/>
-    <p:option name="include-brf"/>
+    <p:option name="include-pef"/>
     <p:option name="include-obfl"/>
-    <p:option name="ascii-file-format"/>
+    <p:option name="output-file-format"/>
     <p:option name="preview-table"/>
     <p:option name="page-width"/>
     <p:option name="page-height"/>
@@ -97,8 +97,8 @@ sheet modules) are available for use in Sass style sheets:
     <p:option name="allow-volume-break-inside-leaf-section-factor"/>
     <p:option name="prefer-volume-break-before-higher-level-factor"/>
     <p:option name="notes-placement"/>
+    <p:option name="output-dir"/>
     <p:option name="pef-output-dir"/>
-    <p:option name="brf-output-dir"/>
     <p:option name="preview-output-dir"/>
     <p:option name="obfl-output-dir"/>
     <p:option name="temp-dir"/>
@@ -147,12 +147,12 @@ sheet modules) are available for use in Sass style sheets:
                                            stylesheet-parameters
                                            transform
                                            braille-code
-                                           ascii-file-format
-                                           include-brf
+                                           output-file-format
+                                           include-pef
                                            include-preview
                                            include-obfl
+                                           output-dir
                                            pef-output-dir
-                                           brf-output-dir
                                            preview-output-dir
                                            obfl-output-dir
                                            temp-dir">
@@ -170,7 +170,7 @@ sheet modules) are available for use in Sass style sheets:
     <!-- CREATE TEMP DIR -->
     <!-- =============== -->
     <px:tempdir name="temp-dir" px:message="Creating temporary directory" px:message-severity="DEBUG" px:progress=".01">
-        <p:with-option name="href" select="if ($temp-dir!='') then $temp-dir else $pef-output-dir"/>
+        <p:with-option name="href" select="if ($temp-dir!='') then $temp-dir else $output-dir"/>
     </px:tempdir>
     
     <!-- ========= -->
@@ -214,12 +214,12 @@ sheet modules) are available for use in Sass style sheets:
         <p:input port="html">
             <p:pipe step="html" port="result.in-memory"/>
         </p:input>
-        <p:with-option name="include-brf" select="$include-brf"/>
+        <p:with-option name="include-pef" select="$include-pef"/>
         <p:with-option name="include-preview" select="$include-preview"/>
-        <p:with-option name="ascii-file-format" select="$ascii-file-format"/>
+        <p:with-option name="output-file-format" select="$output-file-format"/>
         <p:with-option name="preview-table" select="$preview-table"/>
+        <p:with-option name="output-dir" select="$output-dir"/>
         <p:with-option name="pef-output-dir" select="$pef-output-dir"/>
-        <p:with-option name="brf-output-dir" select="$brf-output-dir"/>
         <p:with-option name="preview-output-dir" select="$preview-output-dir"/>
         <p:with-option name="obfl-output-dir" select="$obfl-output-dir"/>
     </px:html-to-pef.store>
