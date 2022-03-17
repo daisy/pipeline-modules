@@ -3184,9 +3184,6 @@
     </x:expect>
   </x:scenario>
   
-  <!--
-      note that generate-dotify-tests.xsl hides the issue at the beginning of a blocks
-  -->
   <x:scenario label="white-space-normalization-around-marker">
     <x:documentation>
       Tests white space normalisation near marker elements. Tests that white space at the beginning
@@ -5999,11 +5996,6 @@
   </x:scenario>
 
   <x:scenario label="collapsing-margin-top-of-page">
-    <x:documentation>
-      Tests that the bottom margin of an empty block is not rendered if at the top of a page.
-      
-      TODO: use this trick to implement the "skip-margin-top-of-page" parameter.
-    </x:documentation>
     <x:call step="pxi:test">
       <x:input port="source">
         <x:document type="inline">
@@ -6015,15 +6007,9 @@
               </default-template>
             </layout-master>
             <sequence master="a">
-              <block margin-top="1"> ⠿ </block>
-            </sequence>
-            <sequence master="a">
-              <block margin-bottom="1"/>
+              <block margin-top="1" display-when="(! $starts-at-top-of-page)" keep="page"/>
               <block> ⠿ </block>
-            </sequence>
-            <sequence master="a">
-              <block> ⠿ </block>
-              <block margin-bottom="1"/>
+              <block margin-top="1" display-when="(! $starts-at-top-of-page)" keep="page"/>
               <block> ⠿ </block>
             </sequence>
           </obfl>
@@ -6045,17 +6031,6 @@
             <volume rows="25" cols="40" rowgap="0" duplex="true">
               <section>
                 <page>
-                  <row/>
-                  <row>⠿</row>
-                </page>
-              </section>
-              <section>
-                <page>
-                  <row>⠿</row>
-                </page>
-              </section>
-              <section>
-                <page>
                   <row>⠿</row>
                   <row/>
                   <row>⠿</row>
@@ -6067,7 +6042,81 @@
       </x:document>
     </x:expect>
   </x:scenario>
-
+  
+  <x:scenario label="display-when-bug" xfail="">
+    <x:documentation>
+      The current implementation of display-when has a limitation, namely that the page breaking
+      does not take into account that certain rows will not take up space so that some available
+      space at the bottom the page might not be used. (See
+      https://github.com/mtmse/dotify.library/issues/22.)
+    </x:documentation>
+    <x:call step="pxi:test">
+      <x:input port="source">
+        <x:document type="inline">
+          <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false">
+            <layout-master name="a" page-width="10" page-height="10" duplex="true">
+              <default-template>
+                <header/>
+                <footer/>
+              </default-template>
+            </layout-master>
+            <sequence master="a">
+              <block display-when="(! $starts-at-top-of-page)" keep="page">
+                ⠤⠤⠤⠤⠤
+                ⠤⠤⠤⠤⠤
+                ⠤⠤⠤⠤⠤
+                ⠤⠤⠤⠤⠤
+                ⠤⠤⠤⠤⠤
+              </block>
+              <block> ⠿ </block>
+              <block> ⠿ </block>
+              <block> ⠿ </block>
+              <block> ⠿ </block>
+              <block> ⠿ </block>
+              <block> ⠿ </block>
+              <block> ⠿ </block>
+              <block> ⠿ </block>
+              <block> ⠿ </block>
+              <block> ⠿ </block>
+            </sequence>
+          </obfl>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="result" type="custom" href="http://www.daisy.org/pipeline/modules/braille/pef-utils/library.xpl" step="x:pef-compare">
+      <x:document type="inline">
+        <pef xmlns="http://www.daisy.org/ns/2008/pef" version="2008-1">
+          <head xmlns:dc="http://purl.org/dc/elements/1.1/">
+            <meta>
+              <dc:format>application/x-pef+xml</dc:format>
+            </meta>
+          </head>
+          <body>
+            <volume rows="10" cols="10" rowgap="0" duplex="true">
+              <section>
+                <page>
+                  <row>⠿</row>
+                  <row>⠿</row>
+                  <row>⠿</row>
+                  <row>⠿</row>
+                  <row>⠿</row>
+                  <row>⠿</row>
+                  <row>⠿</row>
+                  <row>⠿</row>
+                  <row>⠿</row>
+                  <row>⠿</row>
+                </page>
+              </section>
+            </volume>
+          </body>
+        </pef>
+      </x:document>
+    </x:expect>
+  </x:scenario>
+  
   <x:scenario label="row-spacing-nested-blocks">
     <x:documentation>
       Tests row-spacing on block nested in block with border bottom and default row-spacing.
