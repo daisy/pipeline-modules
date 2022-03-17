@@ -27,8 +27,8 @@ public interface Hyphenator extends Transform {
 	
 	public interface FullHyphenator {
 		
-		public String transform(String text);
-		public String[] transform(String[] text);
+		public String transform(String text) throws NonStandardHyphenationException;
+		public String[] transform(String[] text) throws NonStandardHyphenationException;
 		
 	}
 	
@@ -42,6 +42,21 @@ public interface Hyphenator extends Transform {
 		
 	}
 	
+	/**
+	 * Thrown by {@link FullHyphenator} if non-standard breaks are present.
+	 */
+	@SuppressWarnings("serial")
+	public class NonStandardHyphenationException extends RuntimeException {
+
+		public NonStandardHyphenationException() {
+			super();
+		}
+
+		public NonStandardHyphenationException(Throwable cause) {
+			super(cause);
+		}
+	}
+
 	/* ------------ */
 	/* LineIterator */
 	/* ------------ */
