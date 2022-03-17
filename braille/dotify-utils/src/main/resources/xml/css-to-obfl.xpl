@@ -935,9 +935,4 @@
         </p:input>
     </p:xslt>
     
-    <!--
-        display-when="..." also requires keep="page"
-    -->
-    <p:add-attribute match="obfl:block[@display-when]" attribute-name="keep" attribute-value="page"/>
-    
 </p:declare-step>
