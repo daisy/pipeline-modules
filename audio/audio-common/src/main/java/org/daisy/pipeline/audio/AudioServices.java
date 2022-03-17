@@ -1,11 +1,17 @@
 package org.daisy.pipeline.audio;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.Map;
 import java.util.Optional;
 
 import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -29,7 +35,50 @@ public class AudioServices {
 		return Optional.empty();
 	}
 
+	/**
+	 * Create a Decoder that can handle any file format supported by the system.
+	 */
+	public Optional<AudioDecoder> newDecoder(Map<String,String> params) {
+		List<AudioDecoder> decoders = new ArrayList<>();
+		Iterator<AudioDecoderService> decoderServices = this.decoderServices.iterator();
+		return Optional.of(
+			new AudioDecoder() {
+				public AudioInputStream decode(File inputFile) throws UnsupportedAudioFileException, Throwable {
+					for (AudioDecoder d : decoders) {
+						try {
+							return d.decode(inputFile);
+						} catch (UnsupportedAudioFileException e) {
+						}
+					}
+					while (decoderServices.hasNext()) {
+						Optional<AudioDecoder> d = decoderServices.next().newDecoder(params);
+						if (d.isPresent()) {
+							decoders.add(d.get());
+							try {
+								return d.get().decode(inputFile);
+							} catch (UnsupportedAudioFileException e) {
+							}
+						}
+					}
+					throw new UnsupportedAudioFileException();
+				}
+			}
+		);
+	}
+
+	public Optional<AudioDecoder> newDecoder(AudioFileFormat.Type fileType, Map<String,String> params) {
+		for (AudioDecoderService s : decoderServices) {
+			if (s.supportsFileType(fileType)) {
+				Optional<AudioDecoder> d = s.newDecoder(params);
+				if (d.isPresent())
+					return d;
+			}
+		}
+		return Optional.empty();
+	}
+
 	private final Collection<AudioEncoderService> encoderServices = new CopyOnWriteArrayList<>();
+	private final Collection<AudioDecoderService> decoderServices = new CopyOnWriteArrayList<>();
 
 	@Reference(
 		name = "audio-encoder-service",
@@ -44,5 +93,20 @@ public class AudioServices {
 
 	public void removeEncoderService(AudioEncoderService service) {
 		encoderServices.remove(service);
+	}
+
+	@Reference(
+		name = "audio-decoder-service",
+		unbind = "removeDecoderService",
+		service = AudioDecoderService.class,
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC
+	)
+	public void addDecoderService(AudioDecoderService service) {
+		decoderServices.add(service);
+	}
+
+	public void removeDecoderService(AudioDecoderService service) {
+		decoderServices.remove(service);
 	}
 }

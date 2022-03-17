@@ -21,6 +21,8 @@ public final class AudioFileTypes {
 		mediaTypes.put("audio/wave", WAVE);
 		mediaTypes.put("audio/x-wav", WAVE);
 		mediaTypes.put("audio/vnd.wave", WAVE);
+		mediaTypes.put("audio/aiff", AudioFileFormat.Type.AIFF);
+		mediaTypes.put("audio/x-aiff", AudioFileFormat.Type.AIFF);
 	}
 	
 	public static AudioFileFormat.Type fromMediaType(String mediaType) {
