@@ -3,7 +3,9 @@ package org.daisy.pipeline.tts.config;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.transform.sax.SAXSource;
@@ -26,8 +28,10 @@ public class ConfigReader implements ConfigProperties {
 
 	private static Logger Logger = LoggerFactory.getLogger(ConfigReader.class);
 
-	public static final String HostProtectionProperty = "org.daisy.pipeline.tts.host.protection";
+	static final String HostProtectionProperty = "org.daisy.pipeline.tts.host.protection";
 	private static final String ttsConfigProperty = "org.daisy.pipeline.tts.config";
+	private static final List<String> safeProperties = Arrays.asList(new String[] {
+			"org.daisy.pipeline.tts.mp3.bitrate" });
 
 	public interface Extension {
 		/**
@@ -64,8 +68,16 @@ public class ConfigReader implements ConfigProperties {
 		}
 		mAllProps = new HashMap<String, String>();
 		mAllProps.putAll(mStaticProps);
-		if (Properties.getProperty(HostProtectionProperty, "true").equalsIgnoreCase("false"))
+		String hostProtection = Properties.getProperty(HostProtectionProperty);
+		if (hostProtection != null)
+			Logger.warn("'" + HostProtectionProperty + "' setting is deprecated. " +
+			            "It may become unavailable in future version of DAISY Pipeline.");
+		if (hostProtection != null && hostProtection.equalsIgnoreCase("false"))
 			mAllProps.putAll(mDynamicProps);
+		else
+			for (String k : mDynamicProps.keySet())
+				if (safeProperties.contains(k))
+					mAllProps.put(k, mDynamicProps.get(k));
 	}
 
 	/**
@@ -148,7 +160,6 @@ public class ConfigReader implements ConfigProperties {
 						        + node.toString());
 					} else if (props != null) {
 						if (!key.startsWith("org.daisy.pipeline.tts."))
-							// for backwards compatibility
 							key = "org.daisy.pipeline.tts." + key;
 						props.put(key, value);
 					} else {

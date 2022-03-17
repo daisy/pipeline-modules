@@ -46,17 +46,33 @@ public class LameEncoderService implements AudioEncoderService {
 
 	private static LameEncoder.LameEncodingOptions parseEncodingOptions(Map<String,String> params) {
 		LameEncoder.LameEncodingOptions opts = new LameEncoder.LameEncodingOptions();
-		opts.cliOptions = new String[0];
-		String cliextra = params.get("org.daisy.pipeline.tts.lame.cli.options");
-		if (cliextra != null) {
-			opts.cliOptions = cliextra.split(" ");
+		{
+			String prop = "org.daisy.pipeline.tts.mp3.bitrate";
+			String bitrate = params.get(prop);
+			if (bitrate != null) {
+				try {
+					opts.bitrate = Integer.valueOf(bitrate);
+				} catch (NumberFormatException e) {
+					logger.warn(prop + ": " + bitrate + "is not a valid number");
+				}
+			}
 		}
-		String lamePathProp = "org.daisy.pipeline.tts.lame.path";
-		opts.binpath = params.get(lamePathProp);
-		if (opts.binpath == null) {
-			Optional<String> lpath = BinaryFinder.find("lame");
-			if (lpath.isPresent())
-				opts.binpath = lpath.get();
+		{
+			String prop = "org.daisy.pipeline.tts.lame.cli.options";
+			String extraCliArguments = params.get(prop);
+			if (extraCliArguments != null) {
+				logger.warn("'" + prop + "' setting is deprecated. It may become unavailable in future version of DAISY Pipeline.");
+				opts.extraCliArguments = extraCliArguments.split(" ");
+			}
+		}
+		{
+			String prop = "org.daisy.pipeline.tts.lame.path";
+			opts.binpath = params.get(prop);
+			if (opts.binpath == null) {
+				Optional<String> lpath = BinaryFinder.find("lame");
+				if (lpath.isPresent())
+					opts.binpath = lpath.get();
+			}
 		}
 		return opts;
 	}

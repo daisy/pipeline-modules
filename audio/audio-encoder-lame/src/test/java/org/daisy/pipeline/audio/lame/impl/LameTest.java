@@ -35,11 +35,6 @@ import com.google.common.io.Files;
  */
 public class LameTest {
 
-	@Before
-	public void cleanProperties() {
-		System.setProperty("org.daisy.pipeline.tts.host.protection", "true");
-	}
-
 	private static byte[] mp3ToPCM(AudioFormat originalFormat, String mp3File)
 	        throws IOException, InterruptedException {
 
@@ -169,13 +164,6 @@ public class LameTest {
 		double error = ((double) minerror) / window;
 
 		return (error < 10.0);
-	}
-
-	@Test
-	public void noHostProtection() throws Throwable {
-		System.setProperty("org.daisy.pipeline.tts.host.protection", "false");
-		boolean valid = isValid(new AudioFormat(8000, 8, 1, true, true));
-		Assert.assertTrue(valid);
 	}
 
 	@Test
