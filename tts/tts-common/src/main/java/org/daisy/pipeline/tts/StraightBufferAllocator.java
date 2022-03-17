@@ -1,7 +1,5 @@
 package org.daisy.pipeline.tts;
 
-import org.daisy.pipeline.audio.AudioBuffer;
-
 public class StraightBufferAllocator implements AudioBufferAllocator {
 
 	private static class AllocableAudioBuffer extends AudioBuffer {

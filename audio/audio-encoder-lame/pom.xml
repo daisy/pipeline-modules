@@ -41,7 +41,7 @@
 
   <properties>
     <expose-services>
-      org.daisy.pipeline.audio.lame.impl.LameEncoder
+      org.daisy.pipeline.audio.lame.impl.LameEncoderService
     </expose-services>
   </properties>
 

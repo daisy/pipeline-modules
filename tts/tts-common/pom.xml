@@ -125,7 +125,10 @@
               <goal>generate-spi-test-classes</goal>
             </goals>
             <configuration>
-              <includes>MockEncoder,MockTTS</includes>
+              <includes>
+                  MockEncoder,
+                  MockTTS
+              </includes>
             </configuration>
           </execution>
         </executions>

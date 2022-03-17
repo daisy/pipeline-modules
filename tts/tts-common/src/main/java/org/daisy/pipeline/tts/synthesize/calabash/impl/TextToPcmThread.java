@@ -24,7 +24,7 @@ import net.sf.saxon.s9api.XdmSequenceIterator;
 
 import org.daisy.common.xslt.CompiledStylesheet;
 import org.daisy.common.xslt.ThreadUnsafeXslTransformer;
-import org.daisy.pipeline.audio.AudioBuffer;
+import org.daisy.pipeline.tts.AudioBuffer;
 import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
 import org.daisy.pipeline.tts.AudioBufferTracker;
 import org.daisy.pipeline.tts.SSMLMarkSplitter;
@@ -45,7 +45,6 @@ import org.daisy.pipeline.tts.VoiceManager;
 import org.daisy.pipeline.tts.synthesize.calabash.impl.TimedTTSExecutor.TimeoutException;
 import org.daisy.pipeline.tts.synthesize.calabash.impl.TTSLog.ErrorCode;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Iterables;
 

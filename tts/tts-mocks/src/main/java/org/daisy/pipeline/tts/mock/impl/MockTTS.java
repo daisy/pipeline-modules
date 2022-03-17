@@ -14,7 +14,7 @@ import javax.sound.sampled.AudioSystem;
 import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.common.file.URLs;
-import org.daisy.pipeline.audio.AudioBuffer;
+import org.daisy.pipeline.tts.AudioBuffer;
 import org.daisy.pipeline.tts.AudioBufferAllocator;
 import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
 import org.daisy.pipeline.tts.MarklessTTSEngine;

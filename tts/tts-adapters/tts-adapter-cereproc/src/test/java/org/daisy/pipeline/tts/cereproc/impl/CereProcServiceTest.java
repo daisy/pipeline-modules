@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import org.daisy.pipeline.audio.AudioBuffer;
+import org.daisy.pipeline.tts.AudioBuffer;
 import org.daisy.pipeline.junit.AbstractTest;
 import org.daisy.pipeline.tts.StraightBufferAllocator;
 import org.daisy.pipeline.tts.TTSEngine;

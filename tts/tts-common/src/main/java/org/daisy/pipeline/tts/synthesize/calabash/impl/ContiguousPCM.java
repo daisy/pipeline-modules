@@ -4,7 +4,7 @@ import java.io.File;
 
 import javax.sound.sampled.AudioFormat;
 
-import org.daisy.pipeline.audio.AudioBuffer;
+import org.daisy.pipeline.tts.AudioBuffer;
 
 /**
  * ContiguousPCMs are the message objects sent from TTS processors to the

@@ -19,6 +19,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 
+import javax.sound.sampled.AudioFileFormat;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.sax.SAXSource;
 
@@ -32,8 +33,8 @@ import org.daisy.common.messaging.MessageAppender;
 import org.daisy.common.messaging.MessageBuilder;
 import org.daisy.common.xslt.CompiledStylesheet;
 import org.daisy.common.xslt.XslTransformCompiler;
-import org.daisy.pipeline.audio.AudioBuffer;
 import org.daisy.pipeline.audio.AudioServices;
+import org.daisy.pipeline.tts.AudioBuffer;
 import org.daisy.pipeline.tts.AudioBufferTracker;
 import org.daisy.pipeline.tts.SSMLMarkSplitter;
 import org.daisy.pipeline.tts.StraightBufferAllocator;
@@ -95,6 +96,7 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 	private Logger mLogger;
 	private ContiguousText mCurrentSection;
 	private File mAudioDir; //where all the sound files will be stored
+	private final AudioFileFormat.Type mAudioFileFormat;
 	private long mTotalTextSize; //used for the progress bar
 	private long mPrintedProgress;
 	private long mProgress;
@@ -109,7 +111,8 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 	private TTSLog mTTSlog;
 	private int mErrorCounter;
 
-	public SSMLtoAudio(File audioDir, TTSRegistry ttsregistry, Logger logger,
+	public SSMLtoAudio(File audioDir, AudioFileFormat.Type audioFileFormat,
+	        TTSRegistry ttsregistry, Logger logger,
 	        AudioBufferTracker audioBufferTracker, Processor proc, URIResolver uriResolver,
 	        VoiceConfigExtension configExt, TTSLog logs) {
 		mTTSRegistry = ttsregistry;
@@ -120,6 +123,7 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 		mAudioBufferTracker = audioBufferTracker;
 		mProc = proc;
 		mAudioDir = audioDir;
+		mAudioFileFormat = audioFileFormat;
 		mTTSlog = logs;
 		mSSMLtransformers = new HashMap<TTSService, CompiledStylesheet>();
 
@@ -524,8 +528,8 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 		EncodingThread[] encodingTh = new EncodingThread[encodingThreadNum];
 		for (int j = 0; j < encodingTh.length; ++j) {
 			encodingTh[j] = new EncodingThread();
-			encodingTh[j].start(audioServices, pcmQueue, mLogger, mAudioBufferTracker,
-			        mProperties, mTTSlog);
+			encodingTh[j].start(mAudioFileFormat, audioServices, pcmQueue, mLogger,
+					 mAudioBufferTracker, mProperties, mTTSlog);
 		}
 		mLogger.info("Encoding threads started.");
 
