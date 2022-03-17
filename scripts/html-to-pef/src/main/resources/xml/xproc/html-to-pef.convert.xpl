@@ -181,7 +181,7 @@
                             <d:status result="ok"/>
                         </p:inline>
                     </p:output>
-                    <p:variable name="transform-query" select="concat('(input:obfl)(input:text-css)(output:pef)',$transform,$locale-query)"/>
+                    <p:variable name="transform-query" select="'(input:obfl)(input:text-css)(output:pef)'"/>
                     <px:transform px:progress="1" px:message-severity="DEBUG" px:message="px:transform query={$transform-query}">
                         <p:with-option name="query" select="$transform-query"/>
                         <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>

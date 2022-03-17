@@ -2,6 +2,7 @@ package org.daisy.pipeline.braille.dotify.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -97,21 +98,20 @@ public interface DotifyCSSStyledDocumentTransform {
 						forcePretranslation = true;
 						q.removeOnly("force-pre-translation");
 					}
-					final Query textTransformQuery = mutableQuery(q).add("input", "text-css").add("output", "braille");
-					final boolean _obfl = obfl;
-					if (logSelect(textTransformQuery, brailleTranslatorProvider).iterator().hasNext()) {
-						
-						// only pre-translate if an intermediary OBFL with braille content is requested
-						if (obfl && braille || forcePretranslation) {
-							final MutableQuery blockTransformQuery = mutableQuery(q).add("input", "css")
-							                                                        .add("output", "css")
-							                                                        .add("output", "braille");
-							if (logSelect(blockTransformQuery, brailleTranslatorProvider).iterator().hasNext())
-								return AbstractTransformProvider.util.Iterables.of(
-									logCreate(new TransformImpl(_obfl, blockTransformQuery, textTransformQuery))); }
-						else
-							return AbstractTransformProvider.util.Iterables.of(
-									logCreate(new TransformImpl(_obfl, null, textTransformQuery))); }}}
+					Query textTransformQuery = mutableQuery(q).add("input", "text-css").add("output", "braille");
+					if (logSelect(textTransformQuery, brailleTranslatorProvider).apply(null).iterator().hasNext()) {
+						MutableQuery blockTransformQuery = null; {
+							// only pre-translate if an intermediary OBFL with braille content is requested
+							if (obfl && braille || forcePretranslation) {
+								blockTransformQuery = mutableQuery(q).add("input", "css")
+								                                     .add("output", "css")
+								                                     .add("output", "braille");
+								if (!logSelect(blockTransformQuery, brailleTranslatorProvider).iterator().hasNext())
+									return empty;
+							}
+						}
+						return AbstractTransformProvider.util.Iterables.of(
+							logCreate(new TransformImpl(obfl, blockTransformQuery, textTransformQuery))); }}}
 			catch (IllegalStateException e) {}
 			return empty;
 		}
@@ -121,25 +121,31 @@ public interface DotifyCSSStyledDocumentTransform {
 			private final String output;
 			private final Query blockTransformQuery;
 			private final Query textTransformQuery;
-			private final Query mode;
 			private final Map<String,String> options;
 			
 			private TransformImpl(boolean obfl,
 			                      Query blockTransformQuery,
 			                      Query textTransformQuery) {
+				MutableQuery mode = mutableQuery(textTransformQuery);
 				String locale = "und";
-				if (textTransformQuery.containsKey("document-locale")) {
-					MutableQuery q = mutableQuery(textTransformQuery);
-					locale = q.removeOnly("document-locale").getValue().get();
-					mode = q;
-				} else
-					mode = textTransformQuery;
+				if (mode.containsKey("document-locale"))
+					locale = mode.removeOnly("document-locale").getValue().get();
+				// (input:text-css) is assumed
+				Iterator<Feature> input = mode.get("input").iterator();
+				while (input.hasNext())
+					if ("text-css".equals(input.next().getValue().get()))
+						input.remove();
+				// (output:braille) is assumed
+				Iterator<Feature> output = mode.get("output").iterator();
+				while (output.hasNext())
+					if ("braille".equals(output.next().getValue().get()))
+						output.remove();
 				this.output = obfl ? "obfl" : "pef";
 				options = ImmutableMap.of(
 					"output", this.output,
 					"css-block-transform", blockTransformQuery != null ? blockTransformQuery.toString() : "",
-					"locale", locale,
-					"mode", mode.toString());
+					"document-locale", locale,
+					"text-transform", mode.toString());
 				this.blockTransformQuery = blockTransformQuery;
 				this.textTransformQuery = textTransformQuery;
 			}

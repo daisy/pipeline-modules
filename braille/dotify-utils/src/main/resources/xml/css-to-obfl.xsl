@@ -19,10 +19,11 @@
     <xsl:include href="http://www.daisy.org/pipeline/modules/braille/css-utils/library.xsl"/>
     <xsl:include href="marker-reference.xsl"/>
     
-    <xsl:param name="locale" as="xs:string" required="yes"/>
+    <xsl:param name="document-locale" as="xs:string" required="yes"/>
     <xsl:param name="braille-charset-table" as="xs:string" required="yes"/>
     <xsl:param name="page-counters" as="xs:string" required="yes"/>
     <xsl:param name="volume-transition" as="xs:string?" required="no"/>
+    <xsl:param name="default-text-transform" as="xs:string" required="yes"/>
     <xsl:param name="text-transforms" as="xs:string?" required="no"/>
     
     <xsl:variable name="sections" select="collection()[position() &lt; last()]"/>
@@ -282,7 +283,7 @@
         <xsl:call-template name="pf:progress">
             <xsl:with-param name="progress" select="concat('1/',$progress-total)"/>
         </xsl:call-template>
-        <obfl version="2011-1" xml:lang="{$locale}">
+        <obfl version="2011-1" xml:lang="{$document-locale}">
             <xsl:variable name="translate" as="xs:string" select="if ($initial-text-transform='none') then 'pre-translated-text-css' else ''"/>
             <xsl:variable name="hyphenate" as="xs:string" select="string($initial-hyphens='auto')"/>
             <xsl:attribute name="hyphenate" select="$hyphenate"/>
@@ -293,6 +294,9 @@
                 <dp2:style-type>text/css</dp2:style-type>
                 <xsl:if test="$braille-charset-table!=''">
                     <dp2:braille-charset><xsl:value-of select="$braille-charset-table"/></dp2:braille-charset>
+                </xsl:if>
+                <xsl:if test="$default-text-transform!=''">
+                    <dp2:default-mode><xsl:value-of select="$default-text-transform"/></dp2:default-mode>
                 </xsl:if>
                 <xsl:if test="exists($text-transform-rule)">
                     <dp2:css-text-transform-definitions>

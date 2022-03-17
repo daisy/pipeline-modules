@@ -18,7 +18,8 @@
     <p:input port="source"/>
     <p:output port="result"/>
     
-    <p:option name="locale" select="'und'"/>
+    <p:option name="document-locale" select="'und'"/>
+    <p:option name="text-transform" select="''"/>
     <p:option name="braille-charset" select="''"/>
     <p:option name="page-width" select="'40'"/>
     <p:option name="page-height" select="'25'"/>
@@ -880,7 +881,7 @@
         <p:input port="stylesheet">
             <p:document href="css-to-obfl.xsl"/>
         </p:input>
-        <p:with-param name="locale" select="$locale">
+        <p:with-param name="document-locale" select="$document-locale">
             <p:empty/>
         </p:with-param>
         <p:with-param name="braille-charset-table" select="$braille-charset">
@@ -891,6 +892,9 @@
         </p:with-param>
         <p:with-param name="volume-transition" select="/_/*/@css:_obfl-volume-transition">
             <p:pipe step="assert-volume-transition-only-on-root" port="result"/>
+        </p:with-param>
+        <p:with-param name="default-text-transform" select="$text-transform">
+            <p:empty/>
         </p:with-param>
         <p:with-param name="text-transforms" select="/_/*/@css:text-transform">
             <p:pipe step="assert-text-transform-only-on-root" port="result"/>
