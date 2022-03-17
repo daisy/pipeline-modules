@@ -200,8 +200,8 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 
 		//create the engine
 		TTSEngine engine = null;
+		timeout.enableForCurrentThread(2);
 		try {
-			timeout.enableForCurrentThread(2);
 			engine = service.newEngine(properties);
 		} finally {
 			timeout.disable();
@@ -210,8 +210,8 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 		//get a voice supporting SSML marks (so far as they are supported by the engine)
 		Voice firstVoice = null;
 		int timeoutSecs = 30;
+		timeout.enableForCurrentThread(timeoutSecs);
 		try {
-			timeout.enableForCurrentThread(timeoutSecs);
 			for (Voice v : engine.getAvailableVoices()) {
 				if (!engine.handlesMarks() || v.getMarkSupport() != MarkSupport.MARK_NOT_SUPPORTED) {
 					firstVoice = v;
@@ -233,8 +233,8 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 		//allocate resources for testing purpose
 		final TTSEngine fengine = engine;
 		TTSResource resource = null;
+		timeout.enableForCurrentThread(2);
 		try {
-			timeout.enableForCurrentThread(2);
 			resource = engine.allocateThreadResources();
 		} catch (Exception e) {
 			throw new Exception("could not allocate resources: " + e.getMessage(), e);
@@ -268,8 +268,8 @@ public class SSMLtoAudio implements IProgressListener, FormatSpecifications {
 			throw new Exception("test failed: " + e.getMessage(), e);
 		} finally {
 			if (res != null)
+				timeout.enableForCurrentThread(2);
 				try {
-					timeout.enableForCurrentThread(2);
 					engine.releaseThreadResources(res);
 				} catch (Exception e) {
 					String msg = "Error while releasing resource of "

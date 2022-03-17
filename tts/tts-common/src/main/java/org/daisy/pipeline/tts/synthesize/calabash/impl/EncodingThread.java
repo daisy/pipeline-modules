@@ -96,8 +96,8 @@ public class EncodingThread {
 							AudioInputStream audio = job.getAudio();
 							float secs = jobSize / audio.getFormat().getFrameRate();
 							int maxTime = (int) (1.0 + secs / fEncodingSpeed);
+							timeout.enableForCurrentThread(maxTime);
 							try {
-								timeout.enableForCurrentThread(maxTime);
 								File encodedFile = new File(
 									job.getDestinationDirectory(),
 									job.getDestinationFilePrefix() + "." + fileType.getExtension());

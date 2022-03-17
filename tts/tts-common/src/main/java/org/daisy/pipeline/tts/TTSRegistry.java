@@ -114,8 +114,8 @@ public class TTSRegistry {
 		TTSTimeout timeout = new TTSTimeout();
 		List<Voice> result = new ArrayList<Voice>();
 		for (TTSService service : mServices) {
+			timeout.enableForCurrentThread(30);
 			try {
-				timeout.enableForCurrentThread(30);
 				TTSEngine engine = service.newEngine(cr.getStaticProperties());
 				result.addAll(engine.getAvailableVoices());
 			} catch (Throwable e) {
