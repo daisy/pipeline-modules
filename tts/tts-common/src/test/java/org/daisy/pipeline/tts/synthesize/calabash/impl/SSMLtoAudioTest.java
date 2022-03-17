@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,16 +32,12 @@ import org.daisy.pipeline.audio.AudioEncoder;
 import org.daisy.pipeline.audio.AudioEncoderService;
 import static org.daisy.pipeline.audio.AudioFileTypes.MP3;
 import org.daisy.pipeline.audio.AudioServices;
-import org.daisy.pipeline.tts.AudioBuffer;
-import org.daisy.pipeline.tts.AudioBufferAllocator;
-import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
-import org.daisy.pipeline.tts.AudioBufferTracker;
+import org.daisy.pipeline.tts.AudioFootprintMonitor;
 import org.daisy.pipeline.tts.synthesize.calabash.impl.EncodingThread.EncodingException;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSRegistry;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService;
-import org.daisy.pipeline.tts.TTSService.Mark;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.Voice;
 import org.daisy.pipeline.tts.VoiceInfo;
@@ -130,20 +127,18 @@ public class SSMLtoAudioTest {
 
 	static class DefaultTTSEngine extends TTSEngine implements DynamicMarkHandler {
 
+		private final AudioFormat audioFormat = new AudioFormat(8000, 8, 1, true, true);
+
 		@Override
-		public Collection<AudioBuffer> synthesize(XdmNode sentence, Voice voice,
-				TTSResource threadResources, List<Mark> marks, List<String> expectedMarks,
-				AudioBufferAllocator bufferAllocator, boolean retry) throws SynthesisException,
-				InterruptedException, MemoryException {
+		public SynthesisResult synthesize(XdmNode sentence, Voice voice, TTSResource threadResources)
+			throws SynthesisException, InterruptedException {
 
 			int size = 8192;
-			AudioBuffer res = bufferAllocator.allocateBuffer(size);
-
-			if (endingMark() != null) {
-				marks.add(new Mark(endingMark(), size - 512));
-			}
-
-			return Arrays.asList(res);
+			List<Integer> marks = new ArrayList<>();
+			if (handlesMarks())
+				for (int i = TextToPcmThread.getMarkNames(sentence).size(); i > 0; i--)
+					marks.add(size - i * 512);
+			return new SynthesisResult(createAudioStream(audioFormat, new byte[size]), marks);
 		}
 
 		protected String sentenceToString(XdmNode sentence) {
@@ -154,11 +149,6 @@ public class SSMLtoAudioTest {
 			} catch (SaxonApiException e) {
 				throw new RuntimeException(e);
 			}
-		}
-
-		@Override
-		public AudioFormat getAudioOutputFormat() {
-			return new AudioFormat(8000, 8, 1, true, true);
 		}
 
 		@Override
@@ -180,10 +170,8 @@ public class SSMLtoAudioTest {
 		}
 
 		@Override
-		public String endingMark() {
-			if (handleMark)
-				return "mark";
-			return null;
+		public boolean handlesMarks() {
+			return handleMark;
 		}
 	}
 
@@ -236,11 +224,11 @@ public class SSMLtoAudioTest {
 			TTSRegistry registry = new TTSRegistry();
 			registry.addTTS(ttsservice);
 
-			AudioBufferTracker tracker = new AudioBufferTracker();
+			AudioFootprintMonitor monitor = new AudioFootprintMonitor();
 			TTSLog logs = new TTSLogImpl();
 
 			SSMLtoAudio ssmlToAudio = new SSMLtoAudio(new File("/tmp/"), MP3, registry, Logger,
-			        tracker, Proc, config, logs);
+			        monitor, Proc, config, logs);
 
 			for (String text : ssml) {
 				ssmlToAudio.dispatchSSML(SSMLinXML(text));
@@ -268,9 +256,9 @@ public class SSMLtoAudioTest {
 				}
 			}
 
-			Assert.assertEquals("There should not be unreleased encoding bytes", 0, tracker
+			Assert.assertEquals("There should not be unreleased encoding bytes", 0, monitor
 			        .getUnreleasedEncondingMem());
-			Assert.assertEquals("There should not be unreleased TTS bytes", 0, tracker
+			Assert.assertEquals("There should not be unreleased TTS bytes", 0, monitor
 			        .getUnreleasedTTSMem());
 			Assert.assertEquals("There must be the right number of general errors",
 			        expectedGeneralErrors, logs.readonlyGeneralErrors().size());
@@ -374,10 +362,9 @@ public class SSMLtoAudioTest {
 		service.engine = new DefaultTTSEngine(service) {
 
 			@Override
-			public Collection<AudioBuffer> synthesize(XdmNode sentence, Voice voice,
-					TTSResource threadResources, List<Mark> marks, List<String> expectedMarks,
-					AudioBufferAllocator bufferAllocator, boolean retry) throws SynthesisException,
-					InterruptedException, MemoryException {
+			public SynthesisResult synthesize(XdmNode sentence, Voice voice,
+					TTSResource threadResources) throws SynthesisException,
+					InterruptedException {
 				throw new SynthesisException("error");
 			}
 
@@ -396,11 +383,10 @@ public class SSMLtoAudioTest {
 		service.engine = new DefaultTTSEngine(service) {
 
 			@Override
-			public Collection<AudioBuffer> synthesize(XdmNode sentence, Voice voice,
-					TTSResource threadResources, List<Mark> marks, List<String> expectedMarks,
-					AudioBufferAllocator bufferAllocator, boolean retry) throws SynthesisException,
-					InterruptedException, MemoryException {
-				throw new MemoryException(5000);
+			public SynthesisResult synthesize(XdmNode sentence, Voice voice,
+					TTSResource threadResources) throws SynthesisException,
+					InterruptedException {
+				throw new SynthesisException("");
 			}
 
 		};
@@ -418,10 +404,9 @@ public class SSMLtoAudioTest {
 		service.engine = new DefaultTTSEngine(service) {
 
 			@Override
-			public Collection<AudioBuffer> synthesize(XdmNode sentence, Voice voice,
-					TTSResource threadResources, List<Mark> marks, List<String> expectedMarks,
-					AudioBufferAllocator bufferAllocator, boolean retry) throws SynthesisException,
-					InterruptedException, MemoryException {
+			public SynthesisResult synthesize(XdmNode sentence, Voice voice,
+					TTSResource threadResources) throws SynthesisException,
+					InterruptedException {
 				throw new InterruptedException();
 			}
 
@@ -440,12 +425,11 @@ public class SSMLtoAudioTest {
 		service.engine = new DefaultTTSEngine(service) {
 
 			@Override
-			public Collection<AudioBuffer> synthesize(XdmNode sentence, Voice voice,
-					TTSResource threadResources, List<Mark> marks, List<String> expectedMarks,
-					AudioBufferAllocator bufferAllocator, boolean retry) throws SynthesisException,
-					InterruptedException, MemoryException {
+			public SynthesisResult synthesize(XdmNode sentence, Voice voice,
+					TTSResource threadResources) throws SynthesisException,
+					InterruptedException {
 				Thread.sleep(6000);
-				return Collections.EMPTY_LIST;
+				return null;
 			}
 
 		};
@@ -467,16 +451,14 @@ public class SSMLtoAudioTest {
 		service.engine = new DefaultTTSEngine(service) {
 
 			@Override
-			public Collection<AudioBuffer> synthesize(XdmNode sentence, Voice voice,
-					TTSResource threadResources, List<Mark> marks, List<String> expectedMarks,
-					AudioBufferAllocator bufferAllocator, boolean retry) throws SynthesisException,
-					InterruptedException, MemoryException {
+			public SynthesisResult synthesize(XdmNode sentence, Voice voice,
+					TTSResource threadResources) throws SynthesisException,
+					InterruptedException {
 
 				if (sentenceToString(sentence).contains(key))
 					throw new InterruptedException();
 
-				return super.synthesize(sentence, voice, threadResources, marks, expectedMarks,
-						bufferAllocator, retry);
+				return super.synthesize(sentence, voice, threadResources);
 			}
 
 		};
@@ -498,16 +480,14 @@ public class SSMLtoAudioTest {
 		service.engine = new DefaultTTSEngine(service) {
 
 			@Override
-			public Collection<AudioBuffer> synthesize(XdmNode sentence, Voice voice,
-					TTSResource threadResources, List<Mark> marks, List<String> expectedMarks,
-					AudioBufferAllocator bufferAllocator, boolean retry) throws SynthesisException,
-					InterruptedException, MemoryException {
+			public SynthesisResult synthesize(XdmNode sentence, Voice voice,
+					TTSResource threadResources) throws SynthesisException,
+					InterruptedException {
 
 				if (sentenceToString(sentence).contains(key))
 					throw new SynthesisException("error");
 
-				return super.synthesize(sentence, voice, threadResources, marks, expectedMarks,
-				        bufferAllocator, retry);
+				return super.synthesize(sentence, voice, threadResources);
 			}
 
 		};
@@ -529,54 +509,21 @@ public class SSMLtoAudioTest {
 		service.engine = new DefaultTTSEngine(service) {
 
 			@Override
-			public Collection<AudioBuffer> synthesize(XdmNode sentence, Voice voice,
-					TTSResource threadResources, List<Mark> marks, List<String> expectedMarks,
-					AudioBufferAllocator bufferAllocator, boolean retry) throws SynthesisException,
-					InterruptedException, MemoryException {
+			public SynthesisResult synthesize(XdmNode sentence, Voice voice,
+					TTSResource threadResources) throws SynthesisException,
+					InterruptedException {
 
 				if (sentenceToString(sentence).contains(key)) {
 					Thread.sleep(10000);
 				}
 
-				return super.synthesize(sentence, voice, threadResources, marks, expectedMarks,
-				        bufferAllocator, retry);
+				return super.synthesize(sentence, voice, threadResources);
 			}
 
 		};
 
 		DefaultAudioEncoder encoder = new DefaultAudioEncoder();
 		runTest(service, (DynamicMarkHandler) service.engine, encoder, 0, 2,
-		        new CustomVoiceConfig(), ssml);
-		Assert.assertEquals("No PCM chunk can be produced", 0, encoder.count);
-	}
-
-	@Test
-	public void errorInSynthesis3() throws SynthesisException, InterruptedException,
-	        SaxonApiException {
-
-		final String key = "__key__";
-		String ssml = "<ssml id=\"s1\" xml:lang=\"en\">" + key + "</ssml>";
-
-		DefaultTTSService service = new DefaultTTSService();
-		service.engine = new DefaultTTSEngine(service) {
-
-			@Override
-			public Collection<AudioBuffer> synthesize(XdmNode sentence, Voice voice,
-					TTSResource threadResources, List<Mark> marks, List<String> expectedMarks,
-					AudioBufferAllocator bufferAllocator, boolean retry) throws SynthesisException,
-					InterruptedException, MemoryException {
-
-				if (sentenceToString(sentence).contains(key))
-					throw new MemoryException(5000);
-
-				return super.synthesize(sentence, voice, threadResources, marks, expectedMarks,
-				        bufferAllocator, retry);
-			}
-
-		};
-
-		DefaultAudioEncoder encoder = new DefaultAudioEncoder();
-		runTest(service, (DynamicMarkHandler) service.engine, encoder, 0, 1,
 		        new CustomVoiceConfig(), ssml);
 		Assert.assertEquals("No PCM chunk can be produced", 0, encoder.count);
 	}

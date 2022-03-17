@@ -2,12 +2,10 @@ package org.daisy.pipeline.tts.synthesize.calabash.impl;
 
 import java.util.concurrent.Semaphore;
 
-import javax.xml.transform.URIResolver;
-
 import org.daisy.common.xproc.calabash.XProcStep;
 import org.daisy.common.xproc.calabash.XProcStepProvider;
 import org.daisy.pipeline.audio.AudioServices;
-import org.daisy.pipeline.tts.AudioBufferTracker;
+import org.daisy.pipeline.tts.AudioFootprintMonitor;
 import org.daisy.pipeline.tts.TTSRegistry;
 
 import com.xmlcalabash.core.XProcRuntime;
@@ -27,29 +25,7 @@ public class SynthesizeProvider implements XProcStepProvider {
 	private TTSRegistry mRegistry;
 	private AudioServices mAudioServices;
 	private Semaphore mStartSemaphore; //counter to limit the number of simultaneous text-to-speech steps
-	private AudioBufferTracker mAudioBufferTracker;
-	private URIResolver mURIResolver;
-
-	/**
-	 * Service component callback
-	 */
-	@Reference(
-		name = "uri-resolver",
-		unbind = "-",
-		service = URIResolver.class,
-		cardinality = ReferenceCardinality.MANDATORY,
-		policy = ReferencePolicy.STATIC
-	)
-	public void setURIResolver(URIResolver uriResolver) {
-		mURIResolver = uriResolver;
-	}
-
-	/**
-	 * Service component callback
-	 */
-	public void unsetURIResolver(URIResolver uriResolver) {
-		mURIResolver = null;
-	}
+	private AudioFootprintMonitor mAudioFootprintMonitor;
 
 	@Override
 	public XProcStep newStep(XProcRuntime runtime, XAtomicStep step) {
@@ -57,8 +33,8 @@ public class SynthesizeProvider implements XProcStepProvider {
 			mStartSemaphore = new Semaphore(3, true);
 		}
 
-		if (mAudioBufferTracker == null) {
-			mAudioBufferTracker = new AudioBufferTracker();
+		if (mAudioFootprintMonitor == null) {
+			mAudioFootprintMonitor = new AudioFootprintMonitor();
 		}
 
 		boolean error = false;
@@ -79,7 +55,7 @@ public class SynthesizeProvider implements XProcStepProvider {
 		//even if it is unregistered.
 
 		return new SynthesizeStep(runtime, step, mRegistry, mAudioServices, mStartSemaphore,
-		        mAudioBufferTracker, mURIResolver);
+		        mAudioFootprintMonitor);
 	}
 
 	@Reference(

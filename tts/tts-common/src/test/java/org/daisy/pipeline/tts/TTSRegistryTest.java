@@ -8,25 +8,21 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.sound.sampled.AudioFormat;
-
 import net.sf.saxon.Configuration;
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.XdmNode;
 
-import org.daisy.pipeline.tts.AudioBuffer;
-import org.daisy.pipeline.tts.AudioBufferAllocator.MemoryException;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
-import org.daisy.pipeline.tts.TTSService.Mark;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.VoiceInfo.Gender;
 import org.daisy.pipeline.tts.VoiceInfo.UnknownLanguage;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 public class TTSRegistryTest {
 
-	private static class SimplifiedService extends AbstractTTSService {
+	private static class SimplifiedService implements TTSService {
 
 		@Override
 		public TTSEngine newEngine(Map<String, String> params) throws SynthesisException,
@@ -38,10 +34,9 @@ public class TTSRegistryTest {
 		public String getName() {
 			return "simplified-service";
 		}
-
 	}
 
-	private static class SimplifiedProcessor extends SimpleTTSEngine {
+	private static class SimplifiedProcessor extends TTSEngine {
 
 		private Collection<Voice> mVoices;
 
@@ -51,21 +46,15 @@ public class TTSRegistryTest {
 		}
 
 		@Override
-		public AudioFormat getAudioOutputFormat() {
-			return null;
-		}
-
-		@Override
 		public Collection<Voice> getAvailableVoices() throws SynthesisException,
 		        InterruptedException {
 			return mVoices;
 		}
 
 		@Override
-		public Collection<AudioBuffer> synthesize(String sentence,
-		        Voice voice, TTSResource threadResources, List<Mark> marks,
-		        AudioBufferAllocator bufferAllocator, boolean retry)
-		        throws SynthesisException, InterruptedException, MemoryException {
+		public SynthesisResult synthesize(XdmNode sentence, Voice voice,
+		        TTSResource threadResources)
+		        throws SynthesisException, InterruptedException {
 			return null;
 		}
 	}

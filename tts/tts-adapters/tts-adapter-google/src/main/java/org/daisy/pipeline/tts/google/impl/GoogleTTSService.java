@@ -4,11 +4,9 @@ import java.util.Map;
 
 import javax.sound.sampled.AudioFormat;
 
-import org.daisy.pipeline.tts.AbstractTTSService;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSService;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 
 /**
@@ -20,12 +18,7 @@ import org.osgi.service.component.annotations.Component;
 	name = "google-tts-service",
 	service = { TTSService.class }
 )
-public class GoogleTTSService extends AbstractTTSService {
-
-	@Activate
-	protected void loadSSMLadapter() {
-		super.loadSSMLadapter("/transform-ssml.xsl", GoogleTTSService.class);
-	}
+public class GoogleTTSService implements TTSService {
 
 	@Override
 	public TTSEngine newEngine(Map<String, String> params) throws Throwable {
@@ -39,11 +32,6 @@ public class GoogleTTSService extends AbstractTTSService {
 	@Override
 	public String getName() {
 		return "google";
-	}
-
-	@Override
-	public String getVersion() {
-		return "rest";
 	}
 
 	private static int convertToInt(Map<String, String> params, String prop, int defaultVal)

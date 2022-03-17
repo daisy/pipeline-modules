@@ -32,7 +32,6 @@ public interface FormatSpecifications {
 	public static final QName LogErrorTag = new QName(LogNS, "error");
 	public static final QName LogTextTag = new QName(LogNS, "text");
 	public static final QName LogSsmlTag = new QName(LogNS, "ssml");
-	public static final QName LogInpTag = new QName(LogNS, "input");
 	public static final QName Log_attr_code = new QName("", "key");
 	public static final QName Log_attr_file = new QName("", "file");
 	public static final QName Log_attr_id = new QName("", "id");

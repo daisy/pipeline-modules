@@ -2,7 +2,6 @@ package org.daisy.pipeline.tts.synthesize.calabash.impl;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 import net.sf.saxon.s9api.XdmNode;
@@ -52,15 +51,6 @@ public class TTSLogEmpty implements TTSLog {
 		}
 
 		@Override
-		public void addTTSinput(String input) {
-		}
-
-		@Override
-		public List<String> getTTSinput() {
-			return Collections.EMPTY_LIST;
-		}
-
-		@Override
 		public void setSoundfile(String soundfile) {
 		}
 
@@ -81,10 +71,6 @@ public class TTSLogEmpty implements TTSLog {
 		@Override
 		public double getEndInFile() {
 			return 0;
-		}
-
-		@Override
-		public void resetTTSinput() {
 		}
 
 		@Override

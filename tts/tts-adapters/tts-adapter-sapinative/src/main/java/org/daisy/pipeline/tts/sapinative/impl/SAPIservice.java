@@ -5,12 +5,10 @@ import java.util.Map;
 import javax.naming.directory.InvalidAttributeValueException;
 import javax.sound.sampled.AudioFormat;
 
-import org.daisy.pipeline.tts.AbstractTTSService;
 import org.daisy.pipeline.tts.sapinative.SAPILib;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSService;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 
@@ -18,7 +16,7 @@ import org.osgi.service.component.annotations.Deactivate;
 	name = "sapinative-tts-service",
 	service = { TTSService.class }
 )
-public class SAPIservice extends AbstractTTSService {
+public class SAPIservice implements TTSService {
 
 	private boolean mFirstLoad = true;
 	private AudioFormat mAudioFormat = null;
@@ -60,16 +58,6 @@ public class SAPIservice extends AbstractTTSService {
 	@Override
 	public String getName() {
 		return "sapi";
-	}
-
-	@Override
-	public String getVersion() {
-		return "native";
-	}
-
-	@Activate
-	protected void loadSSMLadapter() {
-		super.loadSSMLadapter("/transform-ssml.xsl", SAPIservice.class);
 	}
 
 	@Deactivate

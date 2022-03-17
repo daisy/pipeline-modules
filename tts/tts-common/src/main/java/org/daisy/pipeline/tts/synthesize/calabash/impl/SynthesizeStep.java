@@ -9,7 +9,6 @@ import java.util.Random;
 import java.util.concurrent.Semaphore;
 
 import javax.sound.sampled.AudioFileFormat;
-import javax.xml.transform.URIResolver;
 
 import net.sf.saxon.s9api.Axis;
 import net.sf.saxon.s9api.QName;
@@ -20,7 +19,7 @@ import net.sf.saxon.s9api.XdmSequenceIterator;
 import org.daisy.common.xproc.calabash.XProcStep;
 import org.daisy.pipeline.audio.AudioFileTypes;
 import org.daisy.pipeline.audio.AudioServices;
-import org.daisy.pipeline.tts.AudioBufferTracker;
+import org.daisy.pipeline.tts.AudioFootprintMonitor;
 import org.daisy.pipeline.tts.TTSRegistry;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.config.ConfigReader;
@@ -61,8 +60,7 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 	private Random mRandGenerator;
 	private AudioServices mAudioServices;
 	private Semaphore mStartSemaphore;
-	private AudioBufferTracker mAudioBufferTracker;
-	private URIResolver mURIresolver;
+	private AudioFootprintMonitor mAudioFootprintMonitor;
 	private String mTempDirOpt;
 	private boolean mIncludeLogOpt;
 	private AudioFileFormat.Type mAudioFileType;
@@ -87,11 +85,10 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 
 	public SynthesizeStep(XProcRuntime runtime, XAtomicStep step, TTSRegistry ttsRegistry,
 	        AudioServices audioServices, Semaphore startSemaphore,
-	        AudioBufferTracker audioBufferTracker, URIResolver uriResolver) {
+	        AudioFootprintMonitor audioFootprintMonitor) {
 		super(runtime, step);
-		mURIresolver = uriResolver;
 		mStartSemaphore = startSemaphore;
-		mAudioBufferTracker = audioBufferTracker;
+		mAudioFootprintMonitor = audioFootprintMonitor;
 		mAudioServices = audioServices;
 		mRuntime = runtime;
 		mTTSRegistry = ttsRegistry;
@@ -205,7 +202,7 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 		audioOutputDir.deleteOnExit();
 
 		SSMLtoAudio ssmltoaudio = new SSMLtoAudio(audioOutputDir, mAudioFileType, mTTSRegistry, logger,
-		        mAudioBufferTracker, mRuntime.getProcessor(), mURIresolver, configExt, log);
+		        mAudioFootprintMonitor, mRuntime.getProcessor(), configExt, log);
 
 		Iterable<SoundFileLink> soundFragments = Collections.EMPTY_LIST;
 		mErrorCounter = 0;
@@ -269,8 +266,8 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 
 		logger.info("Number of synthesized sound fragments: " + num);
 		logger.debug("audio encoding unreleased bytes : "
-		        + mAudioBufferTracker.getUnreleasedEncondingMem());
-		logger.debug("TTS unreleased bytes: " + mAudioBufferTracker.getUnreleasedTTSMem());
+		        + mAudioFootprintMonitor.getUnreleasedEncondingMem());
+		logger.debug("TTS unreleased bytes: " + mAudioFootprintMonitor.getUnreleasedTTSMem());
 
 		/*
 		 * Write status document
@@ -333,14 +330,6 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 					xmlLog.addEndElement();
 				}else{
 					xmlLog.addText("No SSML available. This piece of text has probably been extracted from inside another sentence.");
-				}
-
-				if (le.getTTSinput() != null && !le.getTTSinput().isEmpty()) {
-					for (String inp : le.getTTSinput()) {
-						xmlLog.addStartElement(LogInpTag);
-						xmlLog.addText(inp);
-						xmlLog.addEndElement();
-					}
 				}
 
 				xmlLog.addEndElement(); //LogTextTag

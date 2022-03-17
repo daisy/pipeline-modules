@@ -54,12 +54,12 @@ public class VoiceManager {
 						}
 				} catch (SynthesisException e) {
 					ServerLogger.error("error while retrieving the voices of "
-					                   + TTSServiceUtil.displayName(tts.getProvider()));
-					ServerLogger.debug(TTSServiceUtil.displayName(tts.getProvider())
+					                   + tts.getProvider().getName());
+					ServerLogger.debug(tts.getProvider().getName()
 					                   + " getAvailableVoices error: " + getStack(e));
 				} catch (InterruptedException e) {
 					ServerLogger.error("timeout while retrieving the voices of "
-					                   + TTSServiceUtil.displayName(tts.getProvider())
+					                   + tts.getProvider().getName()
 					                   + " (exceeded " + timeoutSecs + " seconds)");
 				} finally {
 					timeout.disable();
@@ -200,11 +200,7 @@ public class VoiceManager {
 		StringBuilder sb = new StringBuilder("Available voices:");
 		for (Entry<Voice,TTSEngine> e : mBestEngines.entrySet())
 			sb.append("\n * ")
-			  .append(e.getKey())
-			  // Commented out because engine name already included in voice and multiple engines
-			  // with the same name (but different version) are currently not well supported.
-			  /*.append(" by ")
-			  .append(TTSServiceUtil.displayName(e.getValue().getProvider()))*/;
+			  .append(e.getKey());
 		ServerLogger.debug(sb.toString());
 		sb = new StringBuilder("Voice selection data:");
 		Collection<VoiceInfo> sortedAvailableVoiceInfo = new TreeSet<VoiceInfo>(
