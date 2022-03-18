@@ -91,7 +91,7 @@ public abstract class TTSEngine {
 	 *            resource provided is always valid and will remain so during
 	 *            the call.
 	 *
-	 * @return a {@see SynthesisResult} object containing the audio data and the
+	 * @return a {@link SynthesisResult} object containing the audio data and the
 	 *         mark offsets.
 	 */
 	abstract public SynthesisResult synthesize(XdmNode sentence,
@@ -216,7 +216,7 @@ public abstract class TTSEngine {
 				return new HashMap<Configuration,Map<URL,ThreadUnsafeXslTransformer>>(); });
 
 	/**
-	 * Create an {@see AudioInputStream} from an {@see AudioFormat} and the audio data.
+	 * Create an {@link AudioInputStream} from an {@link AudioFormat} and the audio data.
 	 */
 	protected static AudioInputStream createAudioStream(AudioFormat format, byte[] data) {
 		return createAudioStream(format, new ByteArrayInputStream(data));
@@ -231,10 +231,10 @@ public abstract class TTSEngine {
 	}
 
 	/**
-	 * Create a {@see AudioInputStream} from a {@see InputStream}.
+	 * Create a {@link AudioInputStream} from a {@link InputStream}.
 	 *
 	 * This is to work around a bug in {@link javax.sound.sampled.AudioSystem}
-	 * which may return {@see AudioInputStream} with a wrong {@see
+	 * which may return {@link AudioInputStream} with a wrong {@link
 	 * AudioInputStream#getFrameLength()}.
 	 */
 	protected static AudioInputStream createAudioStream(InputStream stream)
