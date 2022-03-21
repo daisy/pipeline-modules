@@ -40,7 +40,7 @@ public abstract class AbstractBrailleTranslator extends AbstractTransform implem
 	}
 
 	/**
-	 * @param brailleCharset Used by default implementation of {@see #lineBreakingFromStyledText()}
+	 * @param brailleCharset Used by default implementation of {@link #lineBreakingFromStyledText()}
 	 *                       to encode hyphen character when specified through "hyphenate-character"
 	 *                       property.
 	 */

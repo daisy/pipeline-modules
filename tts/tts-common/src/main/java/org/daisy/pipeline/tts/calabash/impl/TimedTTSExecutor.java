@@ -25,7 +25,7 @@ class TimedTTSExecutor {
 
 	/**
 	 * The maximum number of milliseconds the TTS engine is allowed to spend on a single word. This
-	 * takes into account {@see TTSEngine#expectedMillisecPerWord()}, the number of words processed
+	 * takes into account {@link TTSEngine#expectedMillisecPerWord()}, the number of words processed
 	 * so far, and the time the engine has spent on previous sentences. A large enough safety factor
 	 * is taken into account for long words and other deviations.
 	 */
