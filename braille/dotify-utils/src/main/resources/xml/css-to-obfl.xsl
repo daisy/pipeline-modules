@@ -21,25 +21,14 @@
     
     <xsl:param name="document-locale" as="xs:string" required="yes"/>
     <xsl:param name="braille-charset-table" as="xs:string" required="yes"/>
-    <xsl:param name="page-counters" as="xs:string" required="yes"/>
+    <xsl:param name="page-counters" as="xs:string*" required="yes"/>
     <xsl:param name="volume-transition" as="xs:string?" required="no"/>
     <xsl:param name="default-text-transform" as="xs:string" required="yes"/>
     <xsl:param name="text-transforms" as="xs:string?" required="no"/>
+    <xsl:param name="page-and-volume-styles" as="element()*" required="no"/>
     
-    <xsl:variable name="sections" select="collection()[position() &lt; last()]"/>
-    <xsl:variable name="page-and-volume-styles" select="collection()[position()=last()]/*/*"/>
-    <xsl:variable name="page-counter-names" as="xs:string*" select="tokenize($page-counters,' ')"/>
+    <xsl:variable name="sections" select="collection()"/>
     
-    <xsl:variable name="volume-transition-rule" as="element()?">
-        <xsl:if test="exists($volume-transition)">
-            <xsl:sequence select="css:deep-parse-stylesheet(concat('@-obfl-volume-transition { ',$volume-transition,' }'))"/>
-        </xsl:if>
-    </xsl:variable>
-    <xsl:variable name="text-transform-rule" as="element()?">
-        <xsl:if test="exists($text-transforms) and not($text-transforms='')">
-            <css:rule selector="@text-transform" style="{$text-transforms}"/>
-        </xsl:if>
-    </xsl:variable>
     
     <!-- ====================== -->
     <!-- Page and volume styles -->
@@ -298,6 +287,11 @@
                 <xsl:if test="$default-text-transform!=''">
                     <dp2:default-mode><xsl:value-of select="$default-text-transform"/></dp2:default-mode>
                 </xsl:if>
+                <xsl:variable name="text-transform-rule" as="element(css:rule)?">
+                    <xsl:if test="exists($text-transforms) and not($text-transforms='')">
+                        <css:rule selector="@text-transform" style="{$text-transforms}"/>
+                    </xsl:if>
+                </xsl:variable>
                 <xsl:if test="exists($text-transform-rule)">
                     <dp2:css-text-transform-definitions>
                         <xsl:text>&#xa;</xsl:text>
@@ -578,6 +572,11 @@
             Note that a volume-keep-priority attribute is not needed to prefer volume breaking
             before a block over inside a block, but for now we have the conditional anyway.
         -->
+        <xsl:variable name="volume-transition-rule" as="element()?">
+            <xsl:if test="exists($volume-transition)">
+                <xsl:sequence select="css:deep-parse-stylesheet(concat('@-obfl-volume-transition { ',$volume-transition,' }'))"/>
+            </xsl:if>
+        </xsl:variable>
         <xsl:if test="exists($volume-transition-rule) or $sections//@css:volume-break-inside">
             <volume-transition range="sheet">
                 <xsl:for-each select="$volume-transition-rule/css:rule[matches(@selector,'@(sequence|any)-(interrupted|resumed)')
@@ -1727,7 +1726,7 @@
                   mode="block span td table toc-entry"
                   match="css:box[@css:white-space]|
                          css:string[@name][@css:white-space]|
-                         css:counter[@target][@name=$page-counter-names][@css:white-space]|
+                         css:counter[@target][@name=$page-counters][@css:white-space]|
                          css:custom-func[@name='-obfl-evaluate'][@css:white-space]">
         <xsl:next-match>
             <xsl:with-param name="white-space" tunnel="yes" select="@css:white-space"/>
@@ -2171,7 +2170,7 @@
     -->
     <xsl:template mode="span block toc-entry"
                   priority="1"
-                  match="css:counter[@target][@name=$page-counter-names]">
+                  match="css:counter[@target][@name=$page-counters]">
         <xsl:variable name="target" as="xs:string" select="@target"/>
         <xsl:variable name="target" as="element()*" select="$sections//*[@css:id=$target]"/>
         <xsl:choose>
@@ -2211,14 +2210,14 @@
         </xsl:choose>
     </xsl:template>
     
-    <xsl:template mode="span" match="css:counter[@target][@name=$page-counter-names]" priority="0.6">
+    <xsl:template mode="span" match="css:counter[@target][@name=$page-counters]" priority="0.6">
         <xsl:next-match>
             <xsl:with-param name="inside-span" select="true()"/>
         </xsl:next-match>
     </xsl:template>
     
     <xsl:template mode="span block toc-entry"
-                  match="css:counter[@target][@name=$page-counter-names]">
+                  match="css:counter[@target][@name=$page-counters]">
         <xsl:param name="text-transform" as="xs:string" tunnel="yes"/>
         <xsl:param name="braille-charset" as="xs:string" tunnel="yes"/>
         <xsl:param name="hyphens" as="xs:string" tunnel="yes"/>
