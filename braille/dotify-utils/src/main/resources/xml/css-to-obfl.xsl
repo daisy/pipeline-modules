@@ -33,6 +33,18 @@
     
     <xsl:variable name="custom-counter-style-names" as="xs:string*"
                   select="map:keys(css:parse-counter-styles($counter-styles))"/>
+    <!--
+        except for $volume these OBFL variables are not really counters, but they are numeric so we
+        allow applying a @counter-style to them through the counter() function
+    -->
+    <xsl:variable name="obfl-variables" as="xs:string*" select="('-obfl-volume',
+                                                                 '-obfl-volumes',
+                                                                 '-obfl-sheets-in-document',
+                                                                 '-obfl-sheets-in-volume',
+                                                                 '-obfl-started-volume-number',
+                                                                 '-obfl-started-page-number',
+                                                                 '-obfl-started-volume-first-content-page'
+                                                                 )"/>
     
     <!-- ====================== -->
     <!-- Page and volume styles -->
@@ -1743,6 +1755,7 @@
                   match="css:box[@css:white-space]|
                          css:string[@name][@css:white-space]|
                          css:counter[@target][@name=$page-counters][@css:white-space]|
+                         css:counter[not(@target)][@name=('volume',$obfl-variables)][@css:white-space]|
                          css:custom-func[@name='-obfl-evaluate'][@css:white-space]">
         <xsl:next-match>
             <xsl:with-param name="white-space" tunnel="yes" select="@css:white-space"/>
@@ -2183,7 +2196,10 @@
     
     <!--
         target-counter(page)
+        counter(volume)
+        counter(-obfl-*)
     -->
+    
     <xsl:template mode="span block toc-entry"
                   priority="1"
                   match="css:counter[@target][@name=$page-counters]">
@@ -2226,14 +2242,19 @@
         </xsl:choose>
     </xsl:template>
     
-    <xsl:template mode="span" match="css:counter[@target][@name=$page-counters]" priority="0.6">
+    <!-- page-number and evaluate not allowed inside span -->
+    <xsl:template mode="span"
+                  match="css:counter[@target][@name=$page-counters]|
+                         css:counter[not(@target)][@name=('volume',$obfl-variables)]"
+                  priority="0.6">
         <xsl:next-match>
             <xsl:with-param name="inside-span" select="true()"/>
         </xsl:next-match>
     </xsl:template>
     
     <xsl:template mode="span block toc-entry"
-                  match="css:counter[@target][@name=$page-counters]">
+                  match="css:counter[@target][@name=$page-counters]|
+                         css:counter[not(@target)][@name=('volume',$obfl-variables)]">
         <xsl:param name="text-transform" as="xs:string" tunnel="yes"/>
         <xsl:param name="braille-charset" as="xs:string" tunnel="yes"/>
         <xsl:param name="hyphens" as="xs:string" tunnel="yes"/>
@@ -2279,20 +2300,30 @@
                 <xsl:sequence select="concat('-dotify-counter-style: ',@style)"/>
             </xsl:if>
         </xsl:variable>
-        <xsl:variable name="page-number" as="element()">
-            <page-number ref-id="{@target}"
-                         number-format="{if (@style=('roman', 'upper-roman', 'lower-roman', 'upper-alpha', 'lower-alpha')
-                                             and not(@style=$custom-counter-style-names))
-                                         then @style else 'default'}"/>
+        <xsl:variable name="page-number-or-evaluate" as="element()">
+            <xsl:choose>
+                <xsl:when test="@target">
+                    <page-number ref-id="{@target}"
+                                 number-format="{if (@style=('roman', 'upper-roman', 'lower-roman', 'upper-alpha', 'lower-alpha')
+                                                     and not(@style=$custom-counter-style-names))
+                                                 then @style else 'default'}"/>
+                </xsl:when>
+                <xsl:when test="@name='volume'">
+                    <evaluate expression="$volume"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <evaluate expression="${replace(@name,'^-obfl-','')}"/>
+                </xsl:otherwise>
+            </xsl:choose>
         </xsl:variable>
         <xsl:choose>
             <xsl:when test="exists($style) or $inside-span">
                 <style name="{string-join($style,'; ')}">
-                    <xsl:sequence select="$page-number"/>
+                    <xsl:sequence select="$page-number-or-evaluate"/>
                 </style>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:sequence select="$page-number"/>
+                <xsl:sequence select="$page-number-or-evaluate"/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
@@ -2334,6 +2365,8 @@
     <!--
         -obfl-evaluate
     -->
+    
+    <!-- evaluate not allowed inside span -->
     <xsl:template priority="0.6"
                   mode="span"
                   match="css:custom-func[@name='-obfl-evaluate'][matches(@arg1,$css:STRING_RE) and not (@arg2)]">
@@ -2825,9 +2858,8 @@
                          css:content[@target]|
                          css:content[not(@target)]|
                          css:string[@name][@target]|
-                         css:counter[not(@target)]|
+                         css:counter[@target or not(@name=('volume',$obfl-variables))]|
                          css:text[@target]|
-                         css:counter[@target]|
                          css:leader">
         <xsl:call-template name="pf:warn">
             <xsl:with-param name="msg">{}{}() function not supported in volume area or volume transition</xsl:with-param>
@@ -2846,7 +2878,8 @@
     
     <xsl:template mode="css:eval-sequence-interrupted-resumed-content-list"
                   match="css:custom-func[@name='-obfl-evaluate']|
-                         css:string[@name][not(@target)]">
+                         css:string[@name][not(@target)]|
+                         css:counter[not(@target) and @name=('volume',$obfl-variables)]">
         <css:box type="inline">
             <xsl:sequence select="."/>
         </css:box>

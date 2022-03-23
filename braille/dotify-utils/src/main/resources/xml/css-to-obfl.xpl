@@ -478,7 +478,15 @@
             css:counter-reset attributes in the output will be manipulating page counters. <!--
             depends on label-targets, parse-content and make-boxes -->
         </p:documentation>
-        <p:with-option name="exclude-counters" select="string-join($page-counters,' ')">
+        <p:with-option name="exclude-counters" select="string-join(($page-counters,
+                                                                    'volume',
+                                                                    '-obfl-volume',
+                                                                    '-obfl-volumes',
+                                                                    '-obfl-sheets-in-document',
+                                                                    '-obfl-sheets-in-volume',
+                                                                    '-obfl-started-volume-number',
+                                                                    '-obfl-started-page-number',
+                                                                    '-obfl-started-volume-first-content-page'),' ')">
             <p:empty/>
         </p:with-option>
         <p:with-option name="counter-styles" select="css:parse-counter-styles(/_/*/@css:counter-style)">

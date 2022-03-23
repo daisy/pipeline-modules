@@ -25,6 +25,14 @@
     <xsl:variable name="page-stylesheets" as="element(css:rule)*" select="/*/css:rule[@selector='@page']"/>
     <xsl:variable name="custom-counter-style-names" as="xs:string*"
                   select="map:keys(css:parse-counter-styles($counter-styles))"/>
+    <xsl:variable name="obfl-variables" as="xs:string*" select="('-obfl-volume',
+                                                                 '-obfl-volumes',
+                                                                 '-obfl-sheets-in-document',
+                                                                 '-obfl-sheets-in-volume',
+                                                                 '-obfl-started-volume-number',
+                                                                 '-obfl-started-page-number',
+                                                                 '-obfl-started-volume-first-content-page'
+                                                                 )"/>
     
     <xsl:function name="pxi:layout-master-name" as="xs:string">
         <xsl:param name="page-stylesheet" as="xs:string"/>
@@ -460,7 +468,7 @@
         <xsl:param name="white-space" as="xs:string" select="'normal'"/>
         <xsl:param name="text-transform" as="xs:string" select="'auto'"/>
         <xsl:param name="page-counter-name" as="xs:string" tunnel="yes"/>
-        <xsl:if test="not(@name=$page-counter-name)">
+        <xsl:if test="not(@name=($page-counter-name,'volume',$obfl-variables))">
             <xsl:choose>
                 <xsl:when test="@name='page'">
                     <xsl:message>
@@ -503,13 +511,24 @@
                 <xsl:sequence select="concat('-dotify-counter-style: ',@style)"/>
             </xsl:if>
         </xsl:variable>
-        <current-page number-format="{if (@style=('roman', 'upper-roman', 'lower-roman', 'upper-alpha', 'lower-alpha')
-                                          and not(@style=$custom-counter-style-names))
-                                      then @style else 'default'}">
-            <xsl:if test="exists($text-style)">
-                <xsl:attribute name="text-style" select="string-join($text-style,'; ')"/>
-            </xsl:if>
-        </current-page>
+        <xsl:choose>
+            <xsl:when test="@name=($page-counter-name,'page')">
+                <current-page number-format="{if (@style=('roman', 'upper-roman', 'lower-roman', 'upper-alpha', 'lower-alpha')
+                                                  and not(@style=$custom-counter-style-names))
+                                              then @style else 'default'}">
+                    <xsl:if test="exists($text-style)">
+                        <xsl:attribute name="text-style" select="string-join($text-style,'; ')"/>
+                    </xsl:if>
+                </current-page>
+            </xsl:when>
+            <xsl:otherwise>
+                <evaluate expression="${replace(@name,'^-obfl-','')}">
+                    <xsl:if test="exists($text-style)">
+                        <xsl:attribute name="text-style" select="string-join($text-style,'; ')"/>
+                    </xsl:if>
+                </evaluate>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
     
     <xsl:template match="css:string[@name][not(@target)]" mode="eval-content-list-top-bottom">
