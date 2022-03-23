@@ -894,6 +894,9 @@
         <p:with-param name="text-transforms" select="/_/*/@css:text-transform">
             <p:pipe step="assert-text-transform-only-on-root" port="result"/>
         </p:with-param>
+        <p:with-param name="counter-styles" select="/_/*/@css:counter-style">
+            <p:pipe step="assert-counter-style-only-on-root" port="result"/>
+        </p:with-param>
         <p:with-param name="page-and-volume-styles" select="/*/*">
             <p:pipe step="extract-page-and-volume-styles" port="styles"/>
         </p:with-param>
@@ -917,6 +920,9 @@
         </p:with-param>
         <p:with-param name="braille-charset-table" select="$braille-charset">
             <p:empty/>
+        </p:with-param>
+        <p:with-param name="counter-styles" select="/_/*/@css:counter-style">
+            <p:pipe step="assert-counter-style-only-on-root" port="result"/>
         </p:with-param>
     </p:xslt>
     

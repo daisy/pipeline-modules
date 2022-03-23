@@ -3,6 +3,7 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:_xsl="http://www.w3.org/1999/XSL/TransformAlias"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:map="http://www.w3.org/2005/xpath-functions/map"
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                 xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
                 xmlns:pef="http://www.daisy.org/ns/2008/pef"
@@ -25,10 +26,13 @@
     <xsl:param name="volume-transition" as="xs:string?" required="no"/>
     <xsl:param name="default-text-transform" as="xs:string" required="yes"/>
     <xsl:param name="text-transforms" as="xs:string?" required="no"/>
+    <xsl:param name="counter-styles" as="attribute(css:counter-style)?" required="no"/>
     <xsl:param name="page-and-volume-styles" as="element()*" required="no"/>
     
     <xsl:variable name="sections" select="collection()"/>
     
+    <xsl:variable name="custom-counter-style-names" as="xs:string*"
+                  select="map:keys(css:parse-counter-styles($counter-styles))"/>
     
     <!-- ====================== -->
     <!-- Page and volume styles -->
@@ -298,6 +302,18 @@
                         <xsl:value-of select="css:serialize-stylesheet($text-transform-rule,(),1,'    ')"/>
                         <xsl:text>&#xa;</xsl:text>
                     </dp2:css-text-transform-definitions>
+                </xsl:if>
+                <xsl:variable name="counter-style-rule" as="element(css:rule)?">
+                    <xsl:if test="exists($counter-styles) and not($counter-styles='')">
+                        <css:rule selector="@counter-style" style="{$counter-styles}"/>
+                    </xsl:if>
+                </xsl:variable>
+                <xsl:if test="exists($counter-style-rule)">
+                    <dp2:css-counter-style-definitions>
+                        <xsl:text>&#xa;</xsl:text>
+                        <xsl:value-of select="css:serialize-stylesheet($counter-style-rule,(),1,'    ')"/>
+                        <xsl:text>&#xa;</xsl:text>
+                    </dp2:css-counter-style-definitions>
                 </xsl:if>
             </meta>
             <xsl:call-template name="_start">
@@ -2236,9 +2252,11 @@
         <xsl:variable name="hyphens" as="xs:string" select="($pending-hyphens,$hyphens)[1]"/>
         <xsl:variable name="style" as="xs:string*">
             <xsl:variable name="text-transform" as="xs:string*">
-                <xsl:if test="matches(@style,re:exact($css:SYMBOLS_FN_RE))">
+                <xsl:if test="@style=$custom-counter-style-names
+                              or matches(@style,re:exact($css:SYMBOLS_FN_RE))">
                     <xsl:sequence select="'-dotify-counter'"/>
                 </xsl:if>
+                <!-- 'none' and 'auto' already handled -->
                 <xsl:sequence select="$text-transform[not(.=('none','auto'))]"/>
             </xsl:variable>
             <xsl:if test="exists($text-transform)">
@@ -2256,13 +2274,15 @@
             <xsl:if test="$white-space[not(.='normal')]">
                 <xsl:sequence select="concat('white-space: ',$white-space)"/>
             </xsl:if>
-            <xsl:if test="matches(@style,re:exact($css:SYMBOLS_FN_RE))">
+            <xsl:if test="@style=$custom-counter-style-names
+                          or matches(@style,re:exact($css:SYMBOLS_FN_RE))">
                 <xsl:sequence select="concat('-dotify-counter-style: ',@style)"/>
             </xsl:if>
         </xsl:variable>
         <xsl:variable name="page-number" as="element()">
             <page-number ref-id="{@target}"
-                         number-format="{if (@style=('roman', 'upper-roman', 'lower-roman', 'upper-alpha', 'lower-alpha'))
+                         number-format="{if (@style=('roman', 'upper-roman', 'lower-roman', 'upper-alpha', 'lower-alpha')
+                                             and not(@style=$custom-counter-style-names))
                                          then @style else 'default'}"/>
         </xsl:variable>
         <xsl:choose>

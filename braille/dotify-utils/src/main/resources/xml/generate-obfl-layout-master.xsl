@@ -2,6 +2,7 @@
 <xsl:stylesheet xmlns="http://www.daisy.org/ns/2011/obfl"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:map="http://www.w3.org/2005/xpath-functions/map"
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                 xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
                 xmlns:pef="http://www.daisy.org/ns/2008/pef"
@@ -19,8 +20,11 @@
     <xsl:param name="page-height" as="xs:string" required="yes"/>
     <xsl:param name="duplex" as="xs:string" required="yes"/>
     <xsl:param name="braille-charset-table" as="xs:string" required="yes"/>
+    <xsl:param name="counter-styles" as="attribute(css:counter-style)?" required="no"/>
     
     <xsl:variable name="page-stylesheets" as="element(css:rule)*" select="/*/css:rule[@selector='@page']"/>
+    <xsl:variable name="custom-counter-style-names" as="xs:string*"
+                  select="map:keys(css:parse-counter-styles($counter-styles))"/>
     
     <xsl:function name="pxi:layout-master-name" as="xs:string">
         <xsl:param name="page-stylesheet" as="xs:string"/>
@@ -479,9 +483,12 @@
             </xsl:choose>
         </xsl:if>
         <xsl:variable name="text-transform" as="xs:string*">
-            <xsl:if test="matches(@style,re:exact($css:SYMBOLS_FN_RE))">
+            <xsl:if test="@style=$custom-counter-style-names
+                          or matches(@style,re:exact($css:SYMBOLS_FN_RE))">
                 <xsl:sequence select="'-dotify-counter'"/>
             </xsl:if>
+            <!-- Note that '-dotify-counter' does not replace 'none', as would be the case with a
+                 real text-transform. The text-transform property is merely used as a hack here. -->
             <xsl:sequence select="$text-transform[not(.='auto')]"/>
         </xsl:variable>
         <xsl:variable name="text-style" as="xs:string*">
@@ -491,11 +498,13 @@
             <xsl:if test="not($white-space='normal')">
                 <xsl:sequence select="concat('white-space: ',$white-space)"/>
             </xsl:if>
-            <xsl:if test="matches(@style,re:exact($css:SYMBOLS_FN_RE))">
+            <xsl:if test="@style=$custom-counter-style-names
+                          or matches(@style,re:exact($css:SYMBOLS_FN_RE))">
                 <xsl:sequence select="concat('-dotify-counter-style: ',@style)"/>
             </xsl:if>
         </xsl:variable>
-        <current-page number-format="{if (@style=('roman', 'upper-roman', 'lower-roman', 'upper-alpha', 'lower-alpha'))
+        <current-page number-format="{if (@style=('roman', 'upper-roman', 'lower-roman', 'upper-alpha', 'lower-alpha')
+                                          and not(@style=$custom-counter-style-names))
                                       then @style else 'default'}">
             <xsl:if test="exists($text-style)">
                 <xsl:attribute name="text-style" select="string-join($text-style,'; ')"/>

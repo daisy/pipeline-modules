@@ -16353,8 +16353,12 @@
                      list-style-type: dice;
                      @counter-style dice {
                        system: additive;
-                       additive-symbols: 6 '⠿', 5 '⠟', 4 '⠛', 3 '⠋', 2 '⠉', 1 '⠁';
-                       text-transform: none; }">
+                       additive-symbols: 6 '⠿', 5 '⠻', 4 '⠛', 3 '⠙', 2 '⠉', 1 '⠈';
+                       text-transform: none; }
+                     @page {
+                       size: 15 5;
+                       @top-right {
+                         content: counter(page, dice); }}">
             <li style="display: list-item">⠤⠤⠤</li>
             <li style="display: list-item">⠤⠤⠤</li>
             <li style="display: list-item">⠤⠤⠤</li>
@@ -16374,19 +16378,33 @@
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="und" hyphenate="false" translate="pre-translated-text-css">
           <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
             <dp2:style-type>text/css</dp2:style-type>
+            <dp2:css-counter-style-definitions>
+              @counter-style dice {
+                system: additive;
+                additive-symbols: 6 '⠿', 5 '⠟', 4 '⠛', 3 '⠋', 2 '⠉', 1 '⠁';
+                text-transform: none
+              }
+            </dp2:css-counter-style-definitions>
           </meta>
-          <layout-master name="body" page-width="40" page-height="25" duplex="true">
+          <layout-master name="body" page-width="15" page-height="5" duplex="true">
             <default-template>
-              <header/>
+              <header>
+                <field>
+                  <string value=""/>
+                </field>
+                <field>
+                  <current-page number-format="default" text-style="text-transform: -dotify-counter; -dotify-counter-style: dice"/>
+                </field>
+              </header>
               <footer/>
             </default-template>
           </layout-master>
           <sequence master="body">
-            <block>⠁ ⠤⠤⠤</block>
+            <block>⠈ ⠤⠤⠤</block>
             <block>⠉ ⠤⠤⠤</block>
-            <block>⠋ ⠤⠤⠤</block>
+            <block>⠙ ⠤⠤⠤</block>
             <block>⠛ ⠤⠤⠤</block>
-            <block>⠟ ⠤⠤⠤</block>
+            <block>⠻ ⠤⠤⠤</block>
             <block>⠿ ⠤⠤⠤</block>
             <block>⠿⠁ ⠤⠤⠤</block>
           </sequence>
@@ -16405,16 +16423,20 @@
             </meta>
           </head>
           <body>
-            <volume rows="25" cols="40" rowgap="0" duplex="true">
+            <volume rows="5" cols="15" rowgap="0" duplex="true">
               <section>
                 <page>
-                  <row>⠁⠀⠤⠤⠤</row>
+                  <row>⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈</row>
+                  <row>⠈⠀⠤⠤⠤</row>
                   <row>⠉⠀⠤⠤⠤</row>
-                  <row>⠋⠀⠤⠤⠤</row>
+                  <row>⠙⠀⠤⠤⠤</row>
                   <row>⠛⠀⠤⠤⠤</row>
-                  <row>⠟⠀⠤⠤⠤</row>
+                </page>
+                <page>
+                  <row>⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉</row>
+                  <row>⠻⠀⠤⠤⠤</row>
                   <row>⠿⠀⠤⠤⠤</row>
-                  <row>⠿⠁⠀⠤⠤⠤</row>
+                  <row>⠿⠈⠀⠤⠤⠤</row>
                 </page>
               </section>
             </volume>
