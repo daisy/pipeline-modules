@@ -42,7 +42,10 @@ can be selected using a query that contains
   `locale`.
 
 `locale`
-: Matches only Liblouis translators with this locale.
+: Matches only Liblouis translators with this locale. By default the
+  document locale is used. In that case an automatic fallback
+  mechanism is used: if nothing is found for language-COUNTRY-variant,
+  then language-COUNTRY is searched, then language.
 
 <!-- `charset`
      `braille-charset`

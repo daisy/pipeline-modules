@@ -50,10 +50,10 @@ can be selected using a transformer query that contains
 : Will only match if the value is "dotify"
 
 `locale`
-: Matches only Dotify translators for that locale. An automatic
-  fallback mechanism is used: if nothing is found for
-  language-COUNTRY-variant, then language-COUNTRY is searched, then
-  language.
+: Matches only Dotify translators for this locale. By default the
+  document locale is used. In that case an automatic fallback
+  mechanism is used: if nothing is found for language-COUNTRY-variant,
+  then language-COUNTRY is searched, then language.
 
 `hyphenator`
 : A value "none" will disable hyphenation. "auto" is the default and
@@ -80,14 +80,12 @@ can be selected using a transformer query that contains
 `hyphenator`
 : Will only match if the value is "dotify".
 
-`locale`
-: Required.
-: Matches only Dotify hyphenators for that locale. An automatic
-  fallback mechanism is used: if nothing is found for
-  language-COUNTRY-variant, then language-COUNTRY is searched, then
-  language.
-
 No other features are allowed.
+
+The document locale is used to select the hyphenator. An automatic
+fallback mechanism is used: if no hyphenator is found for
+language-COUNTRY-variant, then language-COUNTRY is searched, then
+language.
 
 
 [Dotify]: https://github.com/mtmse/dotify.formatter.impl
