@@ -49,11 +49,24 @@ can be selected using a transformer query that contains
 `translator`
 : Will only match if the value is "dotify"
 
+`language`
+: The primary target language of the Liblouis translator. Must be a
+  [RFC 5646](https://tools.ietf.org/html/rfc5646) language tag. By
+  default the document locale is used. In that case an automatic
+  fallback mechanism is used: if nothing is found for
+  language-COUNTRY-variant, then language-COUNTRY is searched, then
+  language. If the document locale is of the form language-COUNTRY,
+  only the language subtag is used.
+
+`region`
+: The region or community in which the braille code applies. Must be a
+  [RFC 5646](https://tools.ietf.org/html/rfc5646) language tag. By
+  default the document locale is used if it is of the form
+  language-COUNTRY. (The same automatic fallback mechanism as
+  described above is used.)
+
 `locale`
-: Matches only Dotify translators for this locale. By default the
-  document locale is used. In that case an automatic fallback
-  mechanism is used: if nothing is found for language-COUNTRY-variant,
-  then language-COUNTRY is searched, then language.
+: Shorthand for `language` and `region`.
 
 `hyphenator`
 : A value "none" will disable hyphenation. "auto" is the default and
