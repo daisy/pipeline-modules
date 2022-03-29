@@ -1,5 +1,20 @@
-v1.14.6-SNAPSHOT
+v1.14.6
 =======
+
+Changes
+-------
+- Update to Liblouis [3.21.0](https://github.com/liblouis/liblouis/releases/tag/v3.21.0)
+- Support for `volume` counter
+- Support applying custom counter styles (defined with `@counter-style`) to page and volume counters
+- Support applying counter style (using the `counter()` function) to the following numeric OBFL
+  variables:
+  - `-obfl-volume`
+  - `-obfl-volumes`
+  - `-obfl-sheets-in-document`
+  - `-obfl-sheets-in-volume`
+  - `-obfl-started-volume-number`
+  - `-obfl-started-page-number`
+  - `-obfl-started-volume-first-content-page`
 
 Components
 ----------
