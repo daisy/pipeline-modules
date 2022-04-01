@@ -37,7 +37,8 @@
         except for $volume these OBFL variables are not really counters, but they are numeric so we
         allow applying a @counter-style to them through the counter() function
     -->
-    <xsl:variable name="obfl-variables" as="xs:string*" select="('-obfl-volume',
+    <xsl:variable name="obfl-variables" as="xs:string*" select="('-obfl-page',
+                                                                 '-obfl-volume',
                                                                  '-obfl-volumes',
                                                                  '-obfl-sheets-in-document',
                                                                  '-obfl-sheets-in-volume',
