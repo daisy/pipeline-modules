@@ -1,3 +1,11 @@
+v1.14.8
+=======
+
+Changes
+-------
+- Deprecated the support for XSLT braille style sheets. It is now advised to apply any XSLT style
+  sheets during pre-processing.
+
 v1.14.7
 =======
 

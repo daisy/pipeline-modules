@@ -149,7 +149,10 @@ split up if they exceed the given maximum size.</p>
 	<p:option name="stylesheet" required="false" px:type="string" select="''" px:sequence="true" px:media-type="text/css application/xslt+xml">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Style sheets</h2>
-			<p px:role="desc" xml:space="preserve">A list of XSLT or CSS/Sass style sheets to apply.
+			<p px:role="desc" xml:space="preserve">A list of CSS/Sass style sheets to apply.
+
+DEPRECATION WARNING: XSLT style sheets are also supported, but this feature might be removed in the
+future. It is recommended to apply any XSLT style sheets during pre-processing of the document.
 
 Must be a space separated list of URIs, absolute or relative to the input.
 
