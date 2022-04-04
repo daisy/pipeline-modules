@@ -566,12 +566,34 @@
                                           else (css:property[@name='symbols']/@value)[1]"/>
                     <xsl:if test="$system=('cyclic','numeric','alphabetic','symbolic','additive','fixed')
                                   and exists($symbols)">
-                        <xsl:variable name="negative" as="xs:string" select="(css:property[@name='negative']/@value,
-                                                                              '-')[1]"/>
-                        <xsl:variable name="prefix" as="xs:string" select="(css:property[@name='prefix']/@value,
-                                                                            '')[1]"/>
-                        <xsl:variable name="suffix" as="xs:string" select="(css:property[@name='suffix']/@value,
-                                                                            ' ')[1]"/>
+                        <xsl:variable name="negative" as="xs:string?"
+                                      select="for $s in css:property[@name='negative']/@value
+                                              return replace(replace(replace(
+                                                 substring($s,2,string-length($s)-2),
+                                                 '\\A\s?','&#xA;'),
+                                                 '\\27\s?',''''),
+                                                 '\\22\s?','&quot;')">
+                           <!-- FIXME: this assumes the value is a string, but both
+                                css:parse-string($s)/@value and matches($s,re:exact($css:STRING_RE))
+                                result in an error -->
+                        </xsl:variable>
+                        <xsl:variable name="prefix" as="xs:string?"
+                                      select="for $s in css:property[@name='prefix']/@value
+                                              return replace(replace(replace(
+                                                 substring($s,2,string-length($s)-2),
+                                                 '\\A\s?','&#xA;'),
+                                                 '\\27\s?',''''),
+                                                 '\\22\s?','&quot;')"/>
+                        <xsl:variable name="suffix" as="xs:string?"
+                                      select="for $s in css:property[@name='suffix']/@value
+                                              return replace(replace(replace(
+                                                 substring($s,2,string-length($s)-2),
+                                                 '\\A\s?','&#xA;'),
+                                                 '\\27\s?',''''),
+                                                 '\\22\s?','&quot;')"/>
+                        <xsl:variable name="negative" as="xs:string" select="($negative,'-')[1]"/>
+                        <xsl:variable name="prefix" as="xs:string" select="($prefix,'')[1]"/>
+                        <xsl:variable name="suffix" as="xs:string" select="($suffix,' ')[1]"/>
                         <xsl:variable name="fallback" as="xs:string" select="(css:property[@name='fallback']/@value,
                                                                               'decimal')[1]"/>
                         <xsl:variable name="text-transform" as="xs:string" select="(css:property[@name='text-transform']/@value,

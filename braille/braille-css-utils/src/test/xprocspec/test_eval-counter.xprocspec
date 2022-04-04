@@ -78,7 +78,8 @@
       <x:option name="counter-styles" select="'@counter-style written-out {
                                                  system: fixed;
                                                  symbols: ''one'' ''two'' ''three'';
-                                                 fallback: upper-roman; }'"/>
+                                                 fallback: upper-roman;
+                                                 suffix: '' ''; }'"/>
       <x:input port="source">
         <x:document type="inline">
           <body>
