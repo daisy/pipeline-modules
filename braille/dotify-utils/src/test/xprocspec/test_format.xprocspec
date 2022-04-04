@@ -2106,13 +2106,13 @@
             </default-template>
           </layout-master>
           <sequence master="body">
-            <block><span translate="">1 </span>⠤⠤⠤ </block>
-            <block><span translate="">2 </span>⠤⠤⠤ </block>
-            <block><span translate="">i </span>⠤⠤⠤ </block>
-            <block><span translate="">ii </span>⠤⠤⠤ </block>
+            <block><span translate="">1. </span>⠤⠤⠤ </block>
+            <block><span translate="">2. </span>⠤⠤⠤ </block>
+            <block><span translate="">i. </span>⠤⠤⠤ </block>
+            <block><span translate="">ii. </span>⠤⠤⠤ </block>
             <block>⠶ ⠤⠤⠤ </block>
             <block>⠶ ⠤⠤⠤ </block>
-            <block><span translate="">3 </span>⠤⠤⠤ </block>
+            <block><span translate="">3. </span>⠤⠤⠤ </block>
           </sequence>
         </obfl>
       </x:document>
@@ -2132,13 +2132,13 @@
             <volume rows="25" cols="40" rowgap="0" duplex="true">
               <section>
                 <page>
-                  <row>⠼⠁⠀⠤⠤⠤</row>
-                  <row>⠼⠃⠀⠤⠤⠤</row>
-                  <row>⠊⠀⠤⠤⠤</row>
-                  <row>⠊⠊⠀⠤⠤⠤</row>
+                  <row>⠼⠁.⠀⠤⠤⠤</row>
+                  <row>⠼⠃.⠀⠤⠤⠤</row>
+                  <row>⠊.⠀⠤⠤⠤</row>
+                  <row>⠊⠊.⠀⠤⠤⠤</row>
                   <row>⠶⠀⠤⠤⠤</row>
                   <row>⠶⠀⠤⠤⠤</row>
-                  <row>⠼⠉⠀⠤⠤⠤</row>
+                  <row>⠼⠉.⠀⠤⠤⠤</row>
                 </page>
               </section>
             </volume>
@@ -6333,9 +6333,9 @@
                 <tbody>
                   <tr>
                     <td>
-                      <block><span translate="">1</span></block>
-                      <block><span translate="">2</span></block>
-                      <block><span translate="">3</span></block>
+                      <block><span translate="">1.</span></block>
+                      <block><span translate="">2.</span></block>
+                      <block><span translate="">3.</span></block>
                     </td>
                     <td>⠤⠤⠤</td>
                     <td>⠤⠤⠤</td>
@@ -6386,9 +6386,9 @@
                   <row>⠀⠀⠀⠀⠀⠀⠀⠀⠿⠿⠿⠿</row>
                   <row>⠀⠤⠤⠤⠀⠀⠀⠀⠀⠀⠀⠀⠀⠤⠤⠤</row>
                   <row>⠀⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠀⠀⠒⠒⠒⠒⠒</row>
-                  <row>⠀⠼⠁⠀⠀⠀⠀⠤⠤⠤⠀⠀⠀⠤⠤⠤</row>
-                  <row>⠀⠼⠃⠀⠀⠀⠀⠀⠀⠀⠀</row>
-                  <row>⠀⠼⠉⠀⠀⠀⠀⠀⠀⠀⠀</row>
+                  <row>⠀⠼⠁.⠀⠀⠀⠤⠤⠤⠀⠀⠀⠤⠤⠤</row>
+                  <row>⠀⠼⠃.</row>
+                  <row>⠀⠼⠉.</row>
                   <row>⠀⠤⠤⠤⠀⠀⠀⠤⠤⠤⠀⠀⠀⠤⠤⠤</row>
                   <row>⠀⠤⠤⠤⠀⠀⠀⠤⠤⠤⠀⠀⠀⠤⠤⠤</row>
                   <row>⠀⠀⠀⠀⠀⠀⠀⠤⠤⠤⠀⠀⠀⠤⠤⠤</row>
@@ -16385,6 +16385,7 @@
                      @counter-style dice {
                        system: additive;
                        additive-symbols: 6 '⠿', 5 '⠻', 4 '⠛', 3 '⠙', 2 '⠉', 1 '⠈';
+                       suffix: ' ';
                        text-transform: none; }
                      @page {
                        size: 15 5;
@@ -16420,6 +16421,7 @@
               @counter-style dice {
                 system: additive;
                 additive-symbols: 6 '⠿', 5 '⠻', 4 '⠛', 3 '⠙', 2 '⠉', 1 '⠈';
+                suffix: ' ';
                 text-transform: none
               }
             </dp2:css-counter-style-definitions>

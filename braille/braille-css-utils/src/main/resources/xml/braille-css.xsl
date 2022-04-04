@@ -479,7 +479,7 @@
                         <xsl:attribute name="negative" select="($style/@negative,'-')[1]"/>
                     </xsl:if>
                     <xsl:attribute name="prefix" select="($style/@prefix,'')[1]"/>
-                    <xsl:attribute name="suffix" select="($style/@suffix,' ')[1]"/>
+                    <xsl:attribute name="suffix" select="($style/@suffix,'. ')[1]"/>
                     <xsl:attribute name="fallback" select="($style/@fallback,'decimal')[1]"/>
                     <xsl:attribute name="text-transform" select="($style/@text-transform,'auto')[1]"/>
                 </xsl:element>
@@ -489,13 +489,14 @@
                                    symbols="'0' '1' '2' '3' '4' '5' '6' '7' '8' '9'"
                                    negative="-"
                                    prefix=""
-                                   suffix=" "
+                                   suffix=". "
                                    fallback="decimal"
                                    text-transform="auto"/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:function>
     
+	<!-- see https://www.w3.org/TR/css-counter-styles-3/#predefined-counters -->
     <xsl:variable name="css:predefined-counter-styles" as="element()*">
         <!-- FIXME: the "range" descriptor is not taken into account -->
         <css:counter-style name="decimal"
@@ -593,7 +594,7 @@
                                                  '\\22\s?','&quot;')"/>
                         <xsl:variable name="negative" as="xs:string" select="($negative,'-')[1]"/>
                         <xsl:variable name="prefix" as="xs:string" select="($prefix,'')[1]"/>
-                        <xsl:variable name="suffix" as="xs:string" select="($suffix,' ')[1]"/>
+                        <xsl:variable name="suffix" as="xs:string" select="($suffix,'. ')[1]"/>
                         <xsl:variable name="fallback" as="xs:string" select="(css:property[@name='fallback']/@value,
                                                                               'decimal')[1]"/>
                         <xsl:variable name="text-transform" as="xs:string" select="(css:property[@name='text-transform']/@value,
