@@ -68,6 +68,9 @@ list[type="ol"][enum="U"] { list-style-type: upper-alpha; }
 list[type="ol"][enum="i"] { list-style-type: lower-roman; }
 list[type="ol"][enum="X"] { list-style-type: upper-roman; }
 
+/* handle list[start] */
+@xslt "lists.xsl";
+
 head {
 	display: none;
 }

@@ -3,6 +3,7 @@ v1.14.8
 
 Changes
 -------
+- Default handling of lists, including support for `start` and `value` attributes
 - Changed default suffix of counter styles to ". "
 - Deprecated the support for XSLT braille style sheets. It is now advised to apply any XSLT style
   sheets during pre-processing.

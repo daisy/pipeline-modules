@@ -48,6 +48,9 @@ ol[type="A"] { list-style-type: upper-alpha; }
 ol[type="i"] { list-style-type: lower-roman; }
 ol[type="I"] { list-style-type: upper-roman; }
 
+/* handle ol[start] and li[value] */
+@xslt "lists.xsl";
+
 head {
 	display: none
 }
