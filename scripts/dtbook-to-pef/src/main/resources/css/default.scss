@@ -53,6 +53,21 @@ table {
 	display: block;
 }
 
+li {
+	display: list-item;
+}
+
+list {
+	counter-reset: list-item;
+}
+
+list[type="ol"],
+list[type="ol"][enum="1"] { list-style-type: decimal;     }
+list[type="ol"][enum="a"] { list-style-type: lower-alpha; }
+list[type="ol"][enum="U"] { list-style-type: upper-alpha; }
+list[type="ol"][enum="i"] { list-style-type: lower-roman; }
+list[type="ol"][enum="X"] { list-style-type: upper-roman; }
+
 head {
 	display: none;
 }
