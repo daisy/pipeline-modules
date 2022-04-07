@@ -3,6 +3,7 @@ v1.14.8
 
 Changes
 -------
+- New option to control hyphenation at page and volume boundaries
 - Allow disabling hyphenation completely (also where there are soft hyphens)
 - Default handling of lists, including support for `start` and `value` attributes
 - Changed default suffix of counter styles to ". "

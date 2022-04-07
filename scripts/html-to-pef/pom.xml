@@ -83,7 +83,8 @@
       org.daisy.pipeline.datatypes.impl.Datatype_px_html_to_pef_script_stylesheet,
       org.daisy.pipeline.datatypes.impl.Datatype_px_html_to_pef_script_line_spacing,
       org.daisy.pipeline.datatypes.impl.Datatype_px_html_to_pef_script_notes_placement,
-      org.daisy.pipeline.datatypes.impl.Datatype_px_html_to_pef_script_hyphenation
+      org.daisy.pipeline.datatypes.impl.Datatype_px_html_to_pef_script_hyphenation,
+      org.daisy.pipeline.datatypes.impl.Datatype_px_html_to_pef_script_hyphenation_at_page_breaks
     </expose-services>
   </properties>
   
