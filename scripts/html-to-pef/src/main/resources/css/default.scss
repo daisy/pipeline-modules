@@ -88,9 +88,9 @@ $include-production-notes: false !default;
 
 @namespace epub url(http://www.idpf.org/2007/ops);
 
-@if $hyphenation {
+@if $hyphenation != manual {
 	:root {
-		hyphens: auto;
+		hyphens: $hyphenation;
 	}
 }
 

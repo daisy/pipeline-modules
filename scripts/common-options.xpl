@@ -181,6 +181,11 @@ manual](http://sass-lang.com/documentation/file.SASS_REFERENCE.html).</p>
 		</p:documentation>
 	</p:option>
 
+	<!--
+	    dtbook-to-pef
+	    html-to-pef
+	    epub3-to-pef
+	-->
 	<p:option name="stylesheet-parameters" required="false" px:type="transform-query" select="''">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Style sheet parameters</h2>
@@ -192,6 +197,11 @@ set these parameters.</p>
 		</p:documentation>
 	</p:option>
 
+	<!--
+	    dtbook-to-pef
+	    html-to-pef
+	    epub3-to-pef
+	-->
 	<p:option name="braille-code" px:type="liblouis-table-query" required="false" select="''">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Braille code</h2>
@@ -203,6 +213,11 @@ language and the "Transformer features" option.</p>
 		</p:documentation>
 	</p:option>
 
+	<!--
+	    dtbook-to-pef
+	    html-to-pef
+	    epub3-to-pef
+	-->
 	<p:option name="transform" required="false" px:type="transform-query" select="'(translator:liblouis)(formatter:dotify)'">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Transformer features</h2>
@@ -214,6 +229,12 @@ with the "Braille code" option this determines the transformer that is selected.
 		</p:documentation>
 	</p:option>
 
+	<!--
+	    dtbook-to-pef
+	    html-to-pef
+	    epub3-to-pef
+	    zedai-to-pef
+	-->
 	<p:option name="output-dir" required="true" px:output="result" px:type="anyDirURI" px:media-type="text">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Output file</h2>
@@ -221,6 +242,12 @@ with the "Braille code" option this determines the transformer that is selected.
 		</p:documentation>
 	</p:option>
 
+	<!--
+	    dtbook-to-pef
+	    html-to-pef
+	    epub3-to-pef
+	    zedai-to-pef
+	-->
 	<p:option name="output-file-format" required="false" px:type="transform-query" select="''">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Output file format</h2>
@@ -230,6 +257,12 @@ If left blank, the braille will be stored in PEF format.</p>
 		</p:documentation>
 	</p:option>
 
+	<!--
+	    dtbook-to-pef
+	    html-to-pef
+	    epub3-to-pef
+	    zedai-to-pef
+	-->
 	<p:option name="include-preview" required="false" px:type="boolean" select="'false'">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Include preview</h2>
@@ -237,6 +270,12 @@ If left blank, the braille will be stored in PEF format.</p>
 		</p:documentation>
 	</p:option>
 
+	<!--
+	    dtbook-to-pef
+	    html-to-pef
+	    epub3-to-pef
+	    zedai-to-pef
+	-->
 	<p:option name="preview-table" required="false" px:type="transform-query" select="''">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">ASCII braille table for HTML preview</h2>
@@ -246,6 +285,12 @@ If left blank, the locale information in the input document will be used to sele
 		</p:documentation>
 	</p:option>
 
+	<!--
+	    dtbook-to-pef
+	    html-to-pef
+	    epub3-to-pef
+	    zedai-to-pef
+	-->
 	<p:option name="preview-output-dir" required="false" px:output="result" px:type="anyDirURI" px:media-type="text/html" select="''">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Preview</h2>
@@ -253,6 +298,12 @@ If left blank, the locale information in the input document will be used to sele
 		</p:documentation>
 	</p:option>
 
+	<!--
+	    dtbook-to-pef
+	    html-to-pef
+	    epub3-to-pef
+	    zedai-to-pef
+	-->
 	<p:option name="include-pef" required="false" px:type="boolean" select="'false'">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Include PEF</h2>
@@ -260,6 +311,12 @@ If left blank, the locale information in the input document will be used to sele
 		</p:documentation>
 	</p:option>
 
+	<!--
+	    dtbook-to-pef
+	    html-to-pef
+	    epub3-to-pef
+	    zedai-to-pef
+	-->
 	<p:option name="pef-output-dir" required="false" px:output="result" px:type="anyDirURI" px:media-type="application/x-pef+xml" select="''">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">PEF</h2>
@@ -267,6 +324,11 @@ If left blank, the locale information in the input document will be used to sele
 		</p:documentation>
 	</p:option>
 
+	<!--
+	    dtbook-to-pef
+	    html-to-pef
+	    epub3-to-pef
+	-->
 	<p:option name="include-obfl" required="false" px:type="boolean" select="'false'">
 		<p:documentation>
 			<h2 px:role="name">Include OBFL</h2>
@@ -274,6 +336,11 @@ If left blank, the locale information in the input document will be used to sele
 		</p:documentation>
 	</p:option>
 
+	<!--
+	    dtbook-to-pef
+	    html-to-pef
+	    epub3-to-pef
+	-->
 	<p:option name="obfl-output-dir" required="false" px:output="result" px:type="anyDirURI" px:media-type="text/html" select="''">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">OBFL</h2>
