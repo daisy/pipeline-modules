@@ -5,15 +5,16 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.junit.Test;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-
 import org.daisy.pipeline.braille.common.AbstractBrailleTranslator;
 import org.daisy.pipeline.braille.common.AbstractHyphenator;
 import org.daisy.pipeline.braille.common.CSSStyledText;
 import org.daisy.pipeline.braille.common.BrailleTranslator;
 import org.daisy.pipeline.braille.common.Hyphenator;
+import static org.daisy.pipeline.braille.common.util.Strings.extractHyphens;
+
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 public class DefaultLineBreakerTest {
 	
@@ -187,18 +188,18 @@ public class DefaultLineBreakerTest {
 			return fullHyphenator;
 		}
 		
-		private static final FullHyphenator fullHyphenator = new FullHyphenator() {
-			public String transform(String text) {
+		private static final FullHyphenator fullHyphenator = new AbstractHyphenator.util.DefaultFullHyphenator() {
+
+			private final static char SHY = '\u00AD';
+			private final static char ZWSP = '\u200B';
+
+			protected boolean isCodePointAware() { return false; }
+		
+			protected byte[] getHyphenationOpportunities(String text) throws RuntimeException {
 				if (text.contains("busstopp"))
 					throw new RuntimeException("text contains non-standard break points");
 				else
-					return text;
-			}
-			public String[] transform(String[] text) {
-				String[] r = new String[text.length];
-				for (int i = 0; i < r.length; i++)
-					r[i] = transform(text[i]);
-				return r;
+					return extractHyphens(text, false, SHY, ZWSP)._2;
 			}
 		};
 		

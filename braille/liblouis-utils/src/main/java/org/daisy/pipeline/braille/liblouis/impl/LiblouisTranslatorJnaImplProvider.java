@@ -39,6 +39,7 @@ import org.daisy.braille.css.SimpleInlineStyle;
 
 import org.daisy.pipeline.braille.common.AbstractBrailleTranslator;
 import org.daisy.pipeline.braille.common.AbstractBrailleTranslator.util.DefaultLineBreaker;
+import org.daisy.pipeline.braille.common.AbstractHyphenator.util.DefaultFullHyphenator;
 import org.daisy.pipeline.braille.common.AbstractTransformProvider;
 import org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Iterables;
 import org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Function;
@@ -1661,62 +1662,30 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 		public byte[] hyphenate(String text);
 	}
 	
-	private static class LiblouisTranslatorAsFullHyphenator implements FullHyphenator {
+	private static class LiblouisTranslatorAsFullHyphenator extends DefaultFullHyphenator implements FullHyphenator {
 		
 		private final Translator translator;
-		private final static Pattern ON_SPACE_SPLITTER = Pattern.compile("\\s+");
 		
 		private LiblouisTranslatorAsFullHyphenator(Translator translator) {
 			this.translator = translator;
 		}
 		
-		// FIXME: code duplication with LiblouisHyphenatorJnaImplProvider
+		protected boolean isCodePointAware() { return true; }
+		
+		protected byte[] getHyphenationOpportunities(String textWithoutHyphens) throws RuntimeException {
+			try {
+				return translator.hyphenate(textWithoutHyphens); }
+			catch (TranslationException e) {
+				throw new RuntimeException(e); }
+		}
+		
 		public byte[] hyphenate(String text) {
 			if (text.isEmpty())
 				return null;
 			Tuple2<String,byte[]> t = extractHyphens(text, true, SHY, ZWSP);
 			if (t._1.isEmpty())
 				return null;
-			String textWithoutManualHyphens = t._1;
-			byte[] manualHyphens = t._2;
-			boolean hasManualHyphens = false; {
-				if (manualHyphens != null)
-					for (byte b : manualHyphens)
-						if (b == (byte)1 || b == (byte)2) {
-							hasManualHyphens = true;
-							break; }}
-			if (hasManualHyphens) {
-				// input contains SHY or ZWSP; hyphenate only the words without SHY or ZWSP
-				byte[] hyphens = Arrays.copyOf(manualHyphens, manualHyphens.length);
-				boolean word = true;
-				int pos = 0;
-				for (String segment : splitInclDelimiter(textWithoutManualHyphens, ON_SPACE_SPLITTER)) {
-					if (word && !segment.isEmpty()) {
-						int len = lengthByCodePoints(segment);
-						boolean wordHasManualHyphens = false; {
-							for (int k = 0; k < len - 1; k++)
-								if (hyphens[pos + k] != 0) {
-									wordHasManualHyphens = true;
-									break; }}
-						if (!wordHasManualHyphens) {
-							byte[] wordHyphens; {
-								try {
-									wordHyphens = translator.hyphenate(segment); }
-								catch (TranslationException e) {
-									throw new RuntimeException(e); }}
-							for (int k = 0; k < len - 1; k++)
-								hyphens[pos + k] |= wordHyphens[k];
-						}
-					}
-					pos += lengthByCodePoints(segment);
-					word = !word;
-				}
-				return hyphens;
-			} else
-				try {
-					return translator.hyphenate(textWithoutManualHyphens); }
-				catch (TranslationException e) {
-					throw new RuntimeException(e); }
+			return transform(t._2, t._1);
 		}
 	}
 	

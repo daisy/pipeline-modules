@@ -8,12 +8,10 @@ import java.net.URL;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.nio.file.Files;
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.regex.Pattern;
 
 import ch.sbs.jhyphen.CompilationException;
 import ch.sbs.jhyphen.Hyphen;
@@ -24,11 +22,11 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.base.Splitter;
 import com.google.common.cache.CacheBuilder;
-import static com.google.common.collect.Iterables.toArray;
 import static com.google.common.collect.Iterables.transform;
 
 import org.daisy.common.file.URLs;
 import org.daisy.pipeline.braille.common.AbstractHyphenator;
+import org.daisy.pipeline.braille.common.AbstractHyphenator.util.DefaultFullHyphenator;
 import org.daisy.pipeline.braille.common.AbstractHyphenator.util.DefaultLineBreaker;
 import org.daisy.pipeline.braille.common.AbstractTransformProvider;
 import org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Function;
@@ -47,11 +45,6 @@ import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
 import static org.daisy.pipeline.braille.common.util.Files.asFile;
 import static org.daisy.pipeline.braille.common.util.Files.isAbsoluteFile;
 import static org.daisy.pipeline.braille.common.util.Locales.parseLocale;
-import static org.daisy.pipeline.braille.common.util.Strings.extractHyphens;
-import static org.daisy.pipeline.braille.common.util.Strings.insertHyphens;
-import static org.daisy.pipeline.braille.common.util.Strings.join;
-import static org.daisy.pipeline.braille.common.util.Strings.splitInclDelimiter;
-import org.daisy.pipeline.braille.common.util.Tuple2;
 import org.daisy.pipeline.braille.common.WithSideEffect;
 import org.daisy.pipeline.braille.libhyphen.LibhyphenHyphenator;
 
@@ -80,9 +73,6 @@ import org.slf4j.LoggerFactory;
 )
 public class LibhyphenJnaImpl extends AbstractTransformProvider<LibhyphenHyphenator>
 	                          implements LibhyphenHyphenator.Provider {
-	
-	private final static char SHY = '\u00AD';
-	private final static char ZWSP = '\u200B';
 	
 	private LibhyphenTableRegistry tableRegistry;
 	
@@ -191,10 +181,6 @@ public class LibhyphenJnaImpl extends AbstractTransformProvider<LibhyphenHyphena
 		}
 	}
 	
-	private final static char US = '\u001F';
-	private final static Splitter SEGMENT_SPLITTER = Splitter.on(US);
-	private final static Pattern ON_SPACE_SPLITTER = Pattern.compile("\\s+");
-	
 	private class LibhyphenHyphenatorImpl extends AbstractHyphenator implements LibhyphenHyphenator {
 		
 		private final URI table;
@@ -214,12 +200,20 @@ public class LibhyphenJnaImpl extends AbstractTransformProvider<LibhyphenHyphena
 			return fullHyphenator;
 		}
 		
-		private final FullHyphenator fullHyphenator = new FullHyphenator() {
-			public String transform(String text) throws NonStandardHyphenationException {
-				return LibhyphenHyphenatorImpl.this.transform(text);
+		private final FullHyphenator fullHyphenator = new DefaultFullHyphenator() {
+			protected boolean isCodePointAware() { return false; }
+			protected byte[] getHyphenationOpportunities(String textWithoutHyphens) throws NonStandardHyphenationException, RuntimeException {
+				try {
+					return hyphenator.hyphenate(textWithoutHyphens);
+				} catch (StandardHyphenationException e) {
+					throw new NonStandardHyphenationException(e);
+				} catch (Exception e) {
+					throw new RuntimeException("Error during libhyphen hyphenation", e);
+				}
 			}
-			public String[] transform(String[] text) throws NonStandardHyphenationException {
-				return LibhyphenHyphenatorImpl.this.transform(text);
+			@Override
+			public String toString() {
+				return LibhyphenHyphenatorImpl.this.toString();
 			}
 		};
 		
@@ -236,94 +230,11 @@ public class LibhyphenJnaImpl extends AbstractTransformProvider<LibhyphenHyphena
 				else
 					return new Break(br.getText(), br.getBreakPosition(), br.hasHyphen());
 			}
+			@Override
+			public String toString() {
+				return LibhyphenHyphenatorImpl.this.toString();
+			}
 		};
-		
-		private String transform(String text) {
-			if (text.length() == 0)
-				return text;
-			try {
-				Tuple2<String,byte[]> t = extractHyphens(text, false, SHY, ZWSP);
-				if (t._1.length() == 0)
-					return text;
-				return insertHyphens(t._1, transform(t._2, t._1), false, SHY, ZWSP); }
-			catch (NonStandardHyphenationException e) {
-				throw e; }
-			catch (Exception e) {
-				throw new RuntimeException("Error during libhyphen hyphenation", e); }
-		}
-		
-		private String[] transform(String[] text) {
-			try {
-				Tuple2<String,byte[]> t = extractHyphens(join(text, US), false, SHY, ZWSP);
-				String[] unhyphenated = toArray(SEGMENT_SPLITTER.split(t._1), String.class);
-				t = extractHyphens(t._2, t._1, false, null, null, US);
-				String _text = t._1;
-				// This byte array is used not only to track the hyphen
-				// positions but also the segment boundaries.
-				byte[] positions = t._2;
-				positions = transform(positions, _text);
-				_text = insertHyphens(_text, positions, false, SHY, ZWSP, US);
-				if (text.length == 1)
-					return new String[]{_text};
-				else {
-					String[] rv = new String[text.length];
-					int i = 0;
-					for (String s : SEGMENT_SPLITTER.split(_text)) {
-						while (unhyphenated[i].length() == 0)
-							rv[i++] = "";
-						rv[i++] = s; }
-					while(i < text.length)
-						rv[i++] = "";
-					return rv; }}
-			catch (NonStandardHyphenationException e) {
-				throw e; }
-			catch (Exception e) {
-				throw new RuntimeException("Error during libhyphen hyphenation", e); }
-		}
-		
-		private byte[] transform(byte[] manualHyphens, String textWithoutManualHyphens) {
-			if (textWithoutManualHyphens.length() == 0)
-				return manualHyphens;
-			boolean hasManualHyphens = false; {
-				if (manualHyphens != null)
-					for (byte b : manualHyphens)
-						if (b == (byte)1 || b == (byte)2) {
-							hasManualHyphens = true;
-							break; }}
-			if (hasManualHyphens) {
-				// input contains SHY or ZWSP; hyphenate only the words without SHY or ZWSP
-				byte[] hyphens = Arrays.copyOf(manualHyphens, manualHyphens.length);
-				boolean word = true;
-				int pos = 0;
-				for (String segment : splitInclDelimiter(textWithoutManualHyphens, ON_SPACE_SPLITTER)) {
-					if (word && segment.length() > 0) {
-						int len = segment.length();
-						boolean wordHasManualHyphens = false; {
-							for (int k = 0; k < len - 1; k++)
-								if (hyphens[pos + k] != 0) {
-									wordHasManualHyphens = true;
-									break; }}
-						if (!wordHasManualHyphens) {
-							try {
-								byte[] wordHyphens = hyphenator.hyphenate(segment);
-								for (int k = 0; k < len - 1; k++)
-									hyphens[pos + k] |= wordHyphens[k];
-							} catch (StandardHyphenationException e) {
-								throw new NonStandardHyphenationException(e);
-							}
-						}
-					}
-					pos += segment.length();
-					word = !word;
-				}
-				return hyphens;
-			} else
-				try {
-					return hyphenator.hyphenate(textWithoutManualHyphens);
-				} catch (StandardHyphenationException e) {
-					throw new NonStandardHyphenationException(e);
-				}
-		}
 		
 		@Override
 		public ToStringHelper toStringHelper() {
