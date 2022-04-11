@@ -5,12 +5,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.daisy.pipeline.braille.common.AbstractBrailleTranslator;
-import org.daisy.pipeline.braille.common.AbstractHyphenator;
-import org.daisy.pipeline.braille.common.CSSStyledText;
-import org.daisy.pipeline.braille.common.BrailleTranslator;
-import org.daisy.pipeline.braille.common.Hyphenator;
 import static org.daisy.pipeline.braille.common.util.Strings.extractHyphens;
+import org.daisy.pipeline.braille.css.CSSStyledText;
 
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;

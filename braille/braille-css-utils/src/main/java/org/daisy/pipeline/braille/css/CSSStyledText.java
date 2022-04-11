@@ -1,7 +1,9 @@
-package org.daisy.pipeline.braille.common;
+package org.daisy.pipeline.braille.css;
 
+import java.util.function.Function;
 import java.util.HashMap;
 import java.util.Map;
+import java.lang.reflect.InvocationTargetException;
 
 import org.daisy.braille.css.InlineStyle;
 import org.daisy.braille.css.InlineStyle.RuleMainBlock;
@@ -20,6 +22,8 @@ public class CSSStyledText implements Cloneable {
 	private final String text;
 	private Map<String,String> textAttributes;
 	private Style style;
+	
+	private static final Function<String,Style> parseCSS = memoize(Style::parse);
 	
 	public CSSStyledText(String text, SimpleInlineStyle style) {
 		this(text, style, null);
@@ -103,11 +107,28 @@ public class CSSStyledText implements Cloneable {
 			s += "{" + style.properties + "}";
 		return s;
 	}
-	
-	// TODO: Does this need to be evicted? There is an infinite number of
-	// distinct styles due to things like "-dotify-def: tmp_d52242e3"
-	private static Memoizing<String,Style> parseCSS = new Memoizing.util.CloningMemoizing<String,Style>() {
-		protected Style _apply(String style) {
+
+	private static class Style implements Cloneable {
+
+		SimpleInlineStyle properties;
+		RuleTextTransform defaultTextTransformDef;
+		Map<String,RuleTextTransform> textTransformDefs;
+
+		@Override
+		public Object clone() {
+			Style clone; {
+				try {
+					clone = (Style)super.clone();
+				} catch (CloneNotSupportedException e) {
+					throw new InternalError("coding error");
+				}
+			}
+			if (properties != null)
+				clone.properties = (SimpleInlineStyle)properties.clone();
+			return clone;
+		}
+
+		public static Style parse(String style) {
 			InlineStyle inlineStyle = new InlineStyle(style);
 			Style s = new Style();
 			s.properties = new SimpleInlineStyle(inlineStyle.getMainStyle());
@@ -126,24 +147,33 @@ public class CSSStyledText implements Cloneable {
 					throw new RuntimeException("Unexpected style: " + b);
 			return s;
 		}
-	};
-	
-	private static class Style implements Cloneable {
-		SimpleInlineStyle properties;
-		RuleTextTransform defaultTextTransformDef;
-		Map<String,RuleTextTransform> textTransformDefs;
-		@Override
-		public Object clone() {
-			Style clone; {
-				try {
-					clone = (Style)super.clone();
-				} catch (CloneNotSupportedException e) {
-					throw new InternalError("coding error");
+	}
+
+	private static <K,V extends Cloneable> Function<K,V> memoize(Function<K,V> function) {
+		Map<K,V> cache = new HashMap<K,V>();
+		return new Function<K,V>() {
+			public V apply(K key) {
+				V value;
+				if (cache.containsKey(key))
+					value = cache.get(key);
+				else {
+					value = function.apply(key);
+					if (value != null)
+						cache.put(key, value); }
+				if (value == null)
+					return null;
+				else {
+					try {
+						return (V)value.getClass().getMethod("clone").invoke(value); }
+					catch (IllegalAccessException
+					       | IllegalArgumentException
+					       | InvocationTargetException
+					       | NoSuchMethodException
+					       | SecurityException e) {
+						throw new RuntimeException("Could not invoke clone() method", e);
+					}
 				}
 			}
-			if (properties != null)
-				clone.properties = (SimpleInlineStyle)properties.clone();
-			return clone;
-		}
+		};
 	}
 }

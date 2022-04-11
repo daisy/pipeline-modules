@@ -21,12 +21,12 @@ import org.daisy.pipeline.braille.common.BrailleTranslator.FromStyledTextToBrail
 import org.daisy.pipeline.braille.common.BrailleTranslator.LineBreakingFromStyledText;
 import org.daisy.pipeline.braille.common.BrailleTranslator.LineIterator;
 import org.daisy.pipeline.braille.common.CompoundBrailleTranslator;
-import org.daisy.pipeline.braille.common.CSSStyledText;
 import org.daisy.pipeline.braille.common.Hyphenator;
 import org.daisy.pipeline.braille.common.Provider;
 import org.daisy.pipeline.braille.common.TransformProvider;
 import static org.daisy.pipeline.braille.common.Query.util.query;
 import static org.daisy.pipeline.braille.common.util.Files.asFile;
+import org.daisy.pipeline.braille.css.CSSStyledText;
 import org.daisy.pipeline.braille.liblouis.LiblouisHyphenator;
 import org.daisy.pipeline.braille.liblouis.LiblouisTable;
 import org.daisy.pipeline.braille.liblouis.LiblouisTableResolver;
