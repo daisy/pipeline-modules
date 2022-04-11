@@ -285,29 +285,29 @@ public class LiblouisCoreTest extends AbstractTest {
 	
 	@Test
 	public void testHyphenate() {
-		assertEquals("foo\u00ADbar",
+		assertEquals(text("foo\u00ADbar"),
 		             hyphenatorProvider.withContext(messageBus)
 		                 .get(query("(table:'foobar.uti,foobar.dic')")).iterator().next()
 		                 .asFullHyphenator()
-		                 .transform("foobar"));
+		                 .transform(styledText("foobar", "hyphens: auto")));
 	}
 	
 	@Test
 	public void testHyphenateCompoundWord() {
-		assertEquals("foo-\u200Bbar",
+		assertEquals(text("foo-\u200Bbar"),
 		             hyphenatorProvider.withContext(messageBus)
 		                 .get(query("(table:'foobar.uti,foobar.dic')")).iterator().next()
 		                 .asFullHyphenator()
-		                 .transform("foo-bar"));
+		                 .transform(styledText("foo-bar", "hyphens: auto")));
 	}
 	
 	@Test
 	public void testManualWordBreak() {
-		assertEquals("foo\u00ADbar foo\u00ADbar foob\u00ADar",
+		assertEquals(text("foo\u00ADbar foo\u00ADbar foob\u00ADar"),
 		             hyphenatorProvider.withContext(messageBus)
 		                 .get(query("(table:'foobar.uti,foobar.dic')")).iterator().next()
 		                 .asFullHyphenator()
-		                 .transform("foobar foo\u00ADbar foob\u00ADar"));
+		                 .transform(styledText("foobar foo\u00ADbar foob\u00ADar", "hyphens: auto")));
 		assertEquals(braille("⠋⠕⠕\u00AD⠃⠁⠗ ⠋⠕⠕\u00AD⠃⠁⠗ ⠋⠕⠕⠃\u00AD⠁⠗"),
 		             provider.withContext(messageBus)
 		                     .get(query("(table:'foobar.uti,foobar.dic')")).iterator().next()

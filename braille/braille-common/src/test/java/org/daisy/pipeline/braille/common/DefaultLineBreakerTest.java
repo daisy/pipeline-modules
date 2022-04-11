@@ -1,10 +1,12 @@
 package org.daisy.pipeline.braille.common;
 
 import java.util.ArrayList;
+import static java.util.Collections.singleton;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.daisy.braille.css.SimpleInlineStyle;
 import static org.daisy.pipeline.braille.common.util.Strings.extractHyphens;
 import org.daisy.pipeline.braille.css.CSSStyledText;
 
@@ -227,6 +229,7 @@ public class DefaultLineBreakerTest {
 		}
 		
 		private final static Pattern WORD_SPLITTER = Pattern.compile("[\\x20\t\\n\\r\\u2800\\xA0]+");
+		private final static SimpleInlineStyle HYPHENS_AUTO = new SimpleInlineStyle("hyphens: auto");
 		
 		private final LineBreakingFromStyledText lineBreaker = new AbstractBrailleTranslator.util.DefaultLineBreaker(' ', '-', null) {
 			protected BrailleStream translateAndHyphenate(final Iterable<CSSStyledText> styledText, int from, int to) {
@@ -254,7 +257,8 @@ public class DefaultLineBreakerTest {
 							pos = end; }
 						else {
 							try {
-								next = hyphenator.asFullHyphenator().transform(text.substring(pos));
+								next = hyphenator.asFullHyphenator().transform(
+									singleton(new CSSStyledText(text.substring(pos), HYPHENS_AUTO))).iterator().next().getText();
 								pos = end; }
 							catch (Exception e) {
 								Matcher m = WORD_SPLITTER.matcher(text.substring(pos));

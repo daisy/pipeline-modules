@@ -1,5 +1,7 @@
 package org.daisy.pipeline.braille.common;
 
+import org.daisy.pipeline.braille.css.CSSStyledText;
+
 /**
  * Hyphenation means morphological breaking within <em>words</em>. However this class is
  * not only responsible for providing hyphenation opportunities, but all soft wrap
@@ -30,8 +32,7 @@ public interface Hyphenator extends Transform {
 	
 	public interface FullHyphenator {
 		
-		public String transform(String text) throws NonStandardHyphenationException;
-		public String[] transform(String[] text) throws NonStandardHyphenationException;
+		public Iterable<CSSStyledText> transform(Iterable<CSSStyledText> text) throws NonStandardHyphenationException;
 		
 	}
 	

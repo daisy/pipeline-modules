@@ -1,16 +1,23 @@
 package org.daisy.pipeline.braille.common;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import com.google.common.base.Splitter;
-import static com.google.common.collect.Iterables.toArray;
+import com.google.common.collect.Iterables;
 
+import cz.vutbr.web.css.CSSProperty;
+
+import org.daisy.braille.css.BrailleCSSProperty.Hyphens;
+import org.daisy.braille.css.SimpleInlineStyle;
 import static org.daisy.pipeline.braille.common.util.Strings.extractHyphens;
 import static org.daisy.pipeline.braille.common.util.Strings.insertHyphens;
 import static org.daisy.pipeline.braille.common.util.Strings.join;
 import static org.daisy.pipeline.braille.common.util.Strings.splitInclDelimiter;
 import static org.daisy.pipeline.braille.common.util.Tuple2;
+import org.daisy.pipeline.braille.css.CSSStyledText;
 
 public abstract class AbstractHyphenator extends AbstractTransform implements Hyphenator {
 	
@@ -52,47 +59,58 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 			private final static char US = '\u001F';
 			private final static Splitter SEGMENT_SPLITTER = Splitter.on(US);
 
-			@Override
-			public String transform(String text) throws NonStandardHyphenationException {
-				if (text.length() == 0)
-					return text;
-				Tuple2<String,byte[]> t = extractHyphens(text, isCodePointAware(), SHY, ZWSP);
-				if (t._1.length() == 0)
-					return text;
-				return insertHyphens(t._1, transform(t._2, t._1), isCodePointAware(), SHY, ZWSP);
-			}
-
-			@Override
-			public String[] transform(String text[]) throws NonStandardHyphenationException {
-				Tuple2<String,byte[]> t = extractHyphens(join(text, US), isCodePointAware(), SHY, ZWSP);
-				String[] unhyphenated = toArray(SEGMENT_SPLITTER.split(t._1), String.class);
+			public Iterable<CSSStyledText> transform(Iterable<CSSStyledText> text) throws NonStandardHyphenationException {
+				List<CSSStyledText> result = new ArrayList<>();
+				List<CSSProperty> hyphenate = new ArrayList<>();
+				boolean someHyphenate = false;
+				for (CSSStyledText t : text) {
+					t = t.clone();
+					SimpleInlineStyle style = t.getStyle();
+					CSSProperty h = style != null ? style.getProperty("hyphens") : null;
+					if (h == null) h = Hyphens.MANUAL;
+					hyphenate.add(h);
+					if (h == Hyphens.AUTO)
+						someHyphenate = true;
+					if (style != null)
+						style.removeProperty("hyphens");
+					result.add(t);
+				}
+				if (result.size() == 0)
+					return result;
+				Tuple2<String,byte[]> t = extractHyphens(
+					join(Iterables.transform(text, CSSStyledText::getText), US), isCodePointAware(), SHY, ZWSP);
+				List<String> textWithoutHyphens = SEGMENT_SPLITTER.splitToList(t._1);
 				t = extractHyphens(t._2, t._1, isCodePointAware(), null, null, US);
-				String _text = t._1;
-				// This byte array is used not only to track the hyphen
-				// positions but also the segment boundaries.
-				byte[] positions = t._2;
-				positions = transform(positions, _text);
-				_text = insertHyphens(_text, positions, isCodePointAware(), SHY, ZWSP, US);
-				if (text.length == 1)
-					return new String[]{_text};
-				else {
-					String[] rv = new String[text.length];
-					int i = 0;
-					for (String s : SEGMENT_SPLITTER.split(_text)) {
-						while (unhyphenated[i].length() == 0)
-							rv[i++] = "";
-						rv[i++] = s; }
-					while(i < text.length)
-						rv[i++] = "";
-					return rv; }
+				String joinedTextWithoutHyphens = t._1;
+				byte[] manualHyphensAndSegmentBoundaries = t._2;
+				byte[] hyphensAndSegmentBoundaries = someHyphenate
+					? transform(manualHyphensAndSegmentBoundaries, joinedTextWithoutHyphens)
+					: manualHyphensAndSegmentBoundaries;
+				List<String> textWithHyphens =
+					SEGMENT_SPLITTER.splitToList(
+						insertHyphens(
+							joinedTextWithoutHyphens, hyphensAndSegmentBoundaries, isCodePointAware(), SHY, ZWSP, US));
+				int i = 0;
+				for (String s : textWithHyphens) {
+					while (textWithoutHyphens.get(i).isEmpty()) {
+						result.set(i, new CSSStyledText("", result.get(i).getStyle()));
+						i++; }
+					CSSProperty h = hyphenate.get(i);
+					if (h == Hyphens.AUTO)
+						result.set(i, new CSSStyledText(s, result.get(i).getStyle()));
+					else if (h == Hyphens.NONE)
+						result.set(i, new CSSStyledText(textWithoutHyphens.get(i), result.get(i).getStyle()));
+					i++;
+				}
+				return result;
 			}
 
 			/**
-			 * @param manualHyphens      SHY and ZWSP characters that were extracted from the original
+			 * @param manualHyphens      SHY, ZWSP and US characters that were extracted from the original
 			 *                           text, which resulted in <code>textWithoutHyphens</code>
-			 * @param textWithoutHyphens text without SHY and ZWSP characters
+			 * @param textWithoutHyphens text without SHY, ZWSP and US characters
 			 */
-			protected byte[] transform(byte[] manualHyphens, String textWithoutHyphens) throws NonStandardHyphenationException {
+			protected final byte[] transform(byte[] manualHyphens, String textWithoutHyphens) throws NonStandardHyphenationException {
 				if (textWithoutHyphens.length() == 0)
 					return manualHyphens;
 				boolean hasManualHyphens = false; {
@@ -127,8 +145,13 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 						word = !word;
 					}
 					return hyphens;
-				} else
-					return getHyphenationOpportunities(textWithoutHyphens);
+				} else {
+					byte[] hyphens = getHyphenationOpportunities(textWithoutHyphens);
+					if (manualHyphens != null)
+						for (int k = 0; k < hyphens.length; k++)
+							hyphens[k] |= manualHyphens[k];
+					return hyphens;
+				}
 			}
 		}
 		
