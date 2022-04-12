@@ -349,6 +349,36 @@ public class LiblouisCoreTest extends AbstractTest {
 	}
 	
 	@Test
+	public void testTranslateAndHyphenateCompoundWord() {
+		FromStyledTextToBraille translator = provider.withContext(messageBus)
+		                                             .get(query("(table:'foobar.utb,foobar.dic')(hyphenator:auto)")).iterator().next()
+		                                             .fromStyledTextToBraille();
+		assertEquals(
+			braille("⠋⠕⠕⠤\u200B⠃⠁⠗"),
+			translator.transform(styledText("foo-bar", "hyphens:auto")));
+		// break opportunity expected after '-' regardless of value of hyphens
+		assertEquals(
+			braille("⠋⠕⠕⠤\u200B⠃⠁⠗"),
+			translator.transform(styledText("foo-bar", "hyphens:manual")));
+		assertEquals(
+			braille("⠋⠕⠕⠤\u200B⠃⠁⠗"),
+			translator.transform(styledText("foo-bar", "hyphens:none")));
+		// and regardless of value of hyphenator feature
+		translator = provider.withContext(messageBus)
+		                     .get(query("(table:'foobar.utb,foobar.dic')(hyphenator:none)")).iterator().next()
+		                    .fromStyledTextToBraille();
+		assertEquals(
+			braille("⠋⠕⠕⠤\u200B⠃⠁⠗"),
+			translator.transform(styledText("foo-bar", "hyphens:auto")));
+		assertEquals(
+			braille("⠋⠕⠕⠤\u200B⠃⠁⠗"),
+			translator.transform(styledText("foo-bar", "hyphens:manual")));
+		assertEquals(
+			braille("⠋⠕⠕⠤\u200B⠃⠁⠗"),
+			translator.transform(styledText("foo-bar", "hyphens:none")));
+	}
+	
+	@Test
 	public void testTranslateAndHyphenateNonStandard() {
 		LineBreakingFromStyledText translator = provider.withContext(messageBus)
 		                                                .get(query("(table:'foobar.ctb')(hyphenator:mock)(charset:'foobar.dis')")).iterator().next()

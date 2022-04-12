@@ -42,6 +42,7 @@ import org.daisy.braille.css.SimpleInlineStyle;
 import org.daisy.pipeline.braille.common.AbstractBrailleTranslator;
 import org.daisy.pipeline.braille.common.AbstractBrailleTranslator.util.DefaultLineBreaker;
 import org.daisy.pipeline.braille.common.AbstractHyphenator.util.DefaultFullHyphenator;
+import org.daisy.pipeline.braille.common.AbstractHyphenator.util.NoHyphenator;
 import org.daisy.pipeline.braille.common.AbstractTransformProvider;
 import org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Iterables;
 import org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Function;
@@ -354,7 +355,9 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 			                           Normalizer.Form unicodeNormalization) {
 			this(translator, displayTable, handleNonStandardHyphenation, unicodeNormalization);
 			this.hyphenator = hyphenator;
-			if (hyphenator != null) {
+			if (hyphenator == null)
+				fullHyphenator = compoundWordHyphenator;
+			else {
 				try {
 					fullHyphenator = new HyphenatorAsFullHyphenator(hyphenator); }
 				catch (UnsupportedOperationException e) {}
@@ -785,13 +788,9 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 								curPosInBraille = curSegmentEndInBraille;
 								continue segments; }}
 						
-						// don't hyphenate if hyphenation is disabled, no hyphenator is
-						// available, or the segment fits in the available space
-						if (segmentInBraille.length() <= available || !hyphenate[textWithWsMapping[curSegment]]
-						    || (fullHyphenator == null && lineBreaker == null)) {
-							
-							if (fullHyphenator == null && lineBreaker == null)
-								logger.warn("hyphens: auto not supported");
+						// don't hyphenate if the segment fits in the available space
+						// FIXME: we don't know for sure that the segment fits because there might be letter spacing!
+						if (segmentInBraille.length() <= available) {
 							segmentInBraille = addLetterSpacing(segment, segmentInBraille, curPos, curPosInBraille,
 							                                    letterSpacing[textWithWsMapping[curSegment]]);
 							next += segmentInBraille;
@@ -799,11 +798,24 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 							curPos = curSegmentEnd;
 							curPosInBraille = curSegmentEndInBraille;
 							continue segments; }
-							
+						
+						// don't hyphenate if hyphenation is disabled for this segment, but do break compound words with a hyphen
+						if (!hyphenate[textWithWsMapping[curSegment]]) {
+							segmentInBraille = addHyphensAndLetterSpacing(compoundWordHyphenator,
+							                                              segment, segmentInBraille, curPos, curPosInBraille,
+							                                              segmentManualHyphens, letterSpacing[textWithWsMapping[curSegment]]);
+							next += segmentInBraille;
+							available -= segmentInBraille.length();
+							curPos = curSegmentEnd;
+							curPosInBraille = curSegmentEndInBraille;
+							continue segments; }
+						
 						// try standard hyphenation of the whole segment
 						if (fullHyphenator != null) {
+							if (fullHyphenator == compoundWordHyphenator)
+								logger.warn("hyphens: auto not supported");
 							try {
-								segmentInBraille = addHyphensAndLetterSpacing(segment, segmentInBraille, curPos, curPosInBraille,
+								segmentInBraille = addHyphensAndLetterSpacing(fullHyphenator, segment, segmentInBraille, curPos, curPosInBraille,
 								                                              segmentManualHyphens, letterSpacing[textWithWsMapping[curSegment]]);
 								next += segmentInBraille;
 								available -= segmentInBraille.length();
@@ -838,7 +850,7 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 										// try standard hyphenation of the whole word
 										try {
 											if (fullHyphenator == null) throw new NonStandardHyphenationException();
-											wordInBraille = addHyphensAndLetterSpacing(word, wordInBraille, curPos, curPosInBraille,
+											wordInBraille = addHyphensAndLetterSpacing(fullHyphenator, word, wordInBraille, curPos, curPosInBraille,
 											                                           wordManualHyphens, letterSpacing[textWithWsMapping[curSegment]]);
 											next += wordInBraille;
 											available -= wordInBraille.length();
@@ -1000,7 +1012,8 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 					return posInBraille;
 				}
 				
-				private String addHyphensAndLetterSpacing(String segment,
+				private String addHyphensAndLetterSpacing(FullHyphenator fullHyphenator,
+				                                          String segment,
 				                                          String segmentInBraille,
 				                                          int curPos,
 				                                          int curPosInBraille,
@@ -1140,15 +1153,12 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 		                               boolean forceBraille,
 		                               boolean failWhenNonStandardHyphenation) {
 			try {
-				if (fullHyphenator == null) {
+				if (fullHyphenator == compoundWordHyphenator)
 					if (any(styledText, t -> {
 								SimpleInlineStyle style = t.getStyle();
 								return style != null && style.getProperty("hyphens") == Hyphens.AUTO; }))
 						logger.warn("hyphens: auto not supported");
-					if (lineBreaker != null)
-						throw new NonStandardHyphenationException(); }
-				else {
-					styledText = fullHyphenator.transform(styledText); }}
+				styledText = fullHyphenator.transform(styledText); }
 			catch (NonStandardHyphenationException e) {
 				if (failWhenNonStandardHyphenation)
 					throw e;
@@ -1629,6 +1639,24 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 	
 	private interface FullHyphenator extends Hyphenator.FullHyphenator {
 		public byte[] hyphenate(String text);
+	}
+	
+	/**
+	  * Hyphenator that add a zero-width space after hard hyphens ("-" followed and preceded
+	  * by a letter or number)
+	  */
+	private final static FullHyphenator compoundWordHyphenator = new CompoundWordHyphenator();
+	
+	private static class CompoundWordHyphenator extends NoHyphenator implements FullHyphenator {
+
+		public byte[] hyphenate(String text) {
+			if (text.isEmpty())
+				return null;
+			Tuple2<String,byte[]> t = extractHyphens(text, true, SHY, ZWSP);
+			if (t._1.isEmpty())
+				return null;
+			return transform(t._2, t._1);
+		}
 	}
 	
 	private static class LiblouisTranslatorAsFullHyphenator extends DefaultFullHyphenator implements FullHyphenator {

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
@@ -36,6 +37,7 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 	public static abstract class util {
 		
 		private final static Pattern ON_SPACE_SPLITTER = Pattern.compile("\\s+");
+		private final static Pattern COMPOUND_WORD_HYPHEN = Pattern.compile("[\\p{L}\\p{N}]-(?=[\\p{L}\\p{N}])");
 
 		public static abstract class DefaultFullHyphenator implements FullHyphenator {
 
@@ -80,27 +82,65 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 				Tuple2<String,byte[]> t = extractHyphens(
 					join(Iterables.transform(text, CSSStyledText::getText), US), isCodePointAware(), SHY, ZWSP);
 				List<String> textWithoutHyphens = SEGMENT_SPLITTER.splitToList(t._1);
-				t = extractHyphens(t._2, t._1, isCodePointAware(), null, null, US);
+				t = extractHyphens(t._2, t._1, isCodePointAware(), null, null, null, US);
 				String joinedTextWithoutHyphens = t._1;
 				byte[] manualHyphensAndSegmentBoundaries = t._2;
+				// insert zero-width space after hard hyphens ("-" followed and preceded by a letter
+				// or number)
+				byte[] hardHyphens; {
+					int len = joinedTextWithoutHyphens.length();
+					if (len > 1) {
+						hardHyphens = new byte[len - 1]; {
+							Matcher m = COMPOUND_WORD_HYPHEN.matcher(joinedTextWithoutHyphens);
+							while (m.find())
+								hardHyphens[m.start() + 1] = 4; }
+						if (isCodePointAware())
+							hardHyphens = extractHyphens(
+								insertHyphens(joinedTextWithoutHyphens, hardHyphens, false, null, null, ZWSP),
+								true, null, null, ZWSP)._2;
+					} else
+						hardHyphens = null;
+				}
+				if (hardHyphens != null) {
+					if (manualHyphensAndSegmentBoundaries == null)
+						manualHyphensAndSegmentBoundaries = hardHyphens;
+					else
+						for (int k = 0; k < hardHyphens.length - 1; k++)
+							manualHyphensAndSegmentBoundaries[k] |= hardHyphens[k];
+				}
 				byte[] hyphensAndSegmentBoundaries = someHyphenate
 					? transform(manualHyphensAndSegmentBoundaries, joinedTextWithoutHyphens)
 					: manualHyphensAndSegmentBoundaries;
-				List<String> textWithHyphens =
+				List<String> textWithHyphensAuto =
 					SEGMENT_SPLITTER.splitToList(
 						insertHyphens(
-							joinedTextWithoutHyphens, hyphensAndSegmentBoundaries, isCodePointAware(), SHY, ZWSP, US));
-				int i = 0;
-				for (String s : textWithHyphens) {
-					while (textWithoutHyphens.get(i).isEmpty()) {
+							joinedTextWithoutHyphens, hyphensAndSegmentBoundaries, isCodePointAware(), SHY, ZWSP, ZWSP, US)
+						.replace("" + ZWSP + ZWSP, "" + ZWSP));
+				List<String> textWithHyphensManual =
+					SEGMENT_SPLITTER.splitToList(
+						insertHyphens(
+							joinedTextWithoutHyphens, manualHyphensAndSegmentBoundaries, isCodePointAware(), SHY, ZWSP, ZWSP, US)
+						.replace("" + ZWSP + ZWSP, "" + ZWSP));
+				List<String> textWithHyphensNone =
+					SEGMENT_SPLITTER.splitToList(
+						insertHyphens(
+							joinedTextWithoutHyphens, manualHyphensAndSegmentBoundaries, isCodePointAware(), null, null, ZWSP, US));
+				int j = 0;
+				for (int i = 0; i < result.size(); i++) {
+					if (textWithoutHyphens.get(i).isEmpty())
 						result.set(i, new CSSStyledText("", result.get(i).getStyle()));
-						i++; }
-					CSSProperty h = hyphenate.get(i);
-					if (h == Hyphens.AUTO)
-						result.set(i, new CSSStyledText(s, result.get(i).getStyle()));
-					else if (h == Hyphens.NONE)
-						result.set(i, new CSSStyledText(textWithoutHyphens.get(i), result.get(i).getStyle()));
-					i++;
+					else {
+						CSSProperty h = hyphenate.get(i);
+						if (h == Hyphens.AUTO)
+							result.set(i, new CSSStyledText(textWithHyphensAuto.get(j++), result.get(i).getStyle()));
+						else if (h == Hyphens.MANUAL)
+							result.set(i, new CSSStyledText(textWithHyphensManual.get(j++), result.get(i).getStyle()));
+						else // h == Hyphens.NONE
+							// FIXME: better would be to only remove SHY and ZWSP within words, but the
+							// issue with this is that what constitutes a "word" is language dependent
+							// and finding words requires NLP
+							result.set(i, new CSSStyledText(textWithHyphensNone.get(j++), result.get(i).getStyle()));
+					}
 				}
 				return result;
 			}
@@ -120,8 +160,9 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 								hasManualHyphens = true;
 								break; }}
 				if (hasManualHyphens) {
-					// input contains SHY or ZWSP; hyphenate only the words (sequences of non white space)
-					// without SHY or ZWSP
+					// input contains SHY or ZWSP; hyphenate only the words without SHY or ZWSP
+					// FIXME: for simplicity a "word" means a sequence of non white space here, but
+					// a better definition is needed
 					byte[] hyphens = Arrays.copyOf(manualHyphens, manualHyphens.length);
 					boolean word = true;
 					int pos = 0;
@@ -137,8 +178,9 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 										break; }}
 							if (!wordHasManualHyphens) {
 								byte[] wordHyphens = getHyphenationOpportunities(segment);
-								for (int k = 0; k < len - 1; k++)
-									hyphens[pos + k] |= wordHyphens[k];
+								if (wordHyphens != null)
+									for (int k = 0; k < len - 1; k++)
+										hyphens[pos + k] |= wordHyphens[k];
 							}
 						}
 						pos += len;
@@ -147,18 +189,60 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 					return hyphens;
 				} else {
 					byte[] hyphens = getHyphenationOpportunities(textWithoutHyphens);
-					if (manualHyphens != null)
-						for (int k = 0; k < hyphens.length; k++)
-							hyphens[k] |= manualHyphens[k];
+					if (manualHyphens != null) {
+						if (hyphens == null)
+							hyphens = manualHyphens;
+						else
+							for (int k = 0; k < hyphens.length; k++)
+								hyphens[k] |= manualHyphens[k]; }
 					return hyphens;
 				}
+			}
+		}
+		
+		/**
+		 * {@link FullHyphenator} that does not provide any hyphenation opportunities (only soft
+		 * wrap opportunities outside words).
+		 */
+		public static class NoHyphenator extends DefaultFullHyphenator {
+			
+			public Iterable<CSSStyledText> transform(java.lang.Iterable<CSSStyledText> text) {
+				if (COMPOUND_WORD_HYPHEN.matcher(
+					    join(com.google.common.collect.Iterables.transform(text, CSSStyledText::getText))).find())
+					return super.transform(text);
+				else
+					return text;
+			}
+			
+			protected boolean isCodePointAware() { return true; }
+			protected boolean isLanguageAdaptive() { return false; }
+			
+			protected byte[] getHyphenationOpportunities(String textWithoutManualHyphens) {
+				return null;
 			}
 		}
 		
 		// TODO: caching?
 		public static abstract class DefaultLineBreaker implements LineBreaker {
 			
-			protected abstract Break breakWord(String word, int limit, boolean force);
+			/**
+			 * This method should be overriden. The default behavior is that a word is only broken
+			 * after hard hyphens, or if the <code>force</code> argument is <code>true</code>.
+			 */
+			protected Break breakWord(String word, int limit, boolean force) {
+				if (word.length() <= limit)
+					return new Break(word, limit, false);
+				// break after hard hyphens
+				Matcher m = COMPOUND_WORD_HYPHEN.matcher(word);
+				if (m.find()) {
+					int len = m.start() + 2;
+					if (len <= limit)
+						return new Break(word, len, false);
+				}
+				if (force)
+					return new Break(word, limit, false);
+				return new Break(word, 0, false);
+			}
 			
 			protected static class Break {
 				private final String text;

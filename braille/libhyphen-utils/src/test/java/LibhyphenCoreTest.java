@@ -51,6 +51,7 @@ public class LibhyphenCoreTest extends AbstractTest {
 		                                   .asFullHyphenator();
 		assertEquals(text("foo\u00ADbar"), hyphenator.transform(styledText("foobar", "hyphens: auto")));
 		assertEquals(text("foo-\u200Bbar"), hyphenator.transform(styledText("foo-bar", "hyphens: auto")));
+		assertEquals(text("foo-\u200Bbar"), hyphenator.transform(styledText("foo-bar", "hyphens: none")));
 		assertEquals(text("foo\u00ADbar foob\u00ADar"), hyphenator.transform(styledText("foobar foob\u00ADar", "hyphens: auto")));
 	}
 	
