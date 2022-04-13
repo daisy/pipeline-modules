@@ -72,20 +72,25 @@
 
 	<!--
 	    dtbook-to-daisy3
-	    dtbook-to-epub3
 	    epub3-to-epub3
 	    zedai-to-epub3
 	-->
 	<p:option name="include-tts-log" px:type="boolean" select="'false'">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Enable TTS log</h2>
-			<p px:role="desc">Whether or not to make the TTS log available.</p>
+			<p px:role="desc" xml:space="preserve">Whether or not to make the TTS log available.
+
+The TTS log contains a great deal of additional information that is not present in the main job log
+and that is helpful for troubleshooting. Most of the log entries concern particular chunks of text
+of the input document.
+</p>
 		</p:documentation>
 	</p:option>
 
 	<!--
 	    dtbook-to-daisy3
 	    dtbook-to-epub3
+	    epub3-to-epub3
 	    zedai-to-epub3
 	-->
 	<p:output port="tts-log" sequence="true">

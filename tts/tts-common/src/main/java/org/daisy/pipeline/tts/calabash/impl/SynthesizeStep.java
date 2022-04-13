@@ -167,9 +167,13 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 
 		boolean logEnabled = mIncludeLogOpt;
 		if (!logEnabled) {
-			String logEnabledProp = cr.getDynamicProperties().get("org.daisy.pipeline.tts.log");
+			String prop = "org.daisy.pipeline.tts.log";
+			String logEnabledProp = cr.getDynamicProperties().get(prop);
 			if (logEnabledProp == null)
-				logEnabledProp = cr.getStaticProperties().get("org.daisy.pipeline.tts.log");
+				logEnabledProp = cr.getStaticProperties().get(prop);
+			if (logEnabledProp != null)
+				logger.warn("'" + prop + "' setting is deprecated. " +
+				            "It may become unavailable in future version of DAISY Pipeline.");;
 			logEnabled = "true".equalsIgnoreCase(logEnabledProp);
 		}
 		TTSLog log;
