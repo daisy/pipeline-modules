@@ -1,6 +1,8 @@
 package org.daisy.pipeline.tts.calabash.impl;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
@@ -176,11 +178,7 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 				            "It may become unavailable in future version of DAISY Pipeline.");;
 			logEnabled = "true".equalsIgnoreCase(logEnabledProp);
 		}
-		TTSLog log;
-		if (logEnabled) {
-			log = new TTSLogImpl();
-		} else
-			log = new TTSLogEmpty();
+		TTSLog log = new TTSLog(logger);
 		File audioOutputDir; {
 			if (mTempDirOpt != null && !mTempDirOpt.isEmpty()) {
 				try {
@@ -349,7 +347,18 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 	private static void writeXMLerror(TreeWriter tw, TTSLog.Error err) {
 		tw.addStartElement(LogErrorTag);
 		tw.addAttribute(Log_attr_code, err.getErrorCode().toString());
-		tw.addText(err.getMessage());
+		String message = err.getMessage();
+		if (err.getCause() != null)
+			message += ("\nError stack trace: " + getStack(err.getCause()));
+		tw.addText(message);
 		tw.addEndElement();
+	}
+
+	private static String getStack(Throwable t) {
+		StringWriter writer = new StringWriter();
+		PrintWriter printWriter = new PrintWriter(writer);
+		t.printStackTrace(printWriter);
+		printWriter.flush();
+		return writer.toString();
 	}
 }
