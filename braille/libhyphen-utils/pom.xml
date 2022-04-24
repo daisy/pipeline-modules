@@ -12,7 +12,7 @@
 
   <groupId>org.daisy.pipeline.modules.braille</groupId>
   <artifactId>libhyphen-utils</artifactId>
-  <version>2.1.4-SNAPSHOT</version>
+  <version>2.2.0-SNAPSHOT</version>
   <packaging>bundle</packaging>
 
   <name>DP2 Braille Modules :: libhyphen-utils</name>
@@ -29,6 +29,11 @@
         <groupId>ch.sbs.pipeline</groupId>
         <artifactId>sbs-hyphenation-tables</artifactId>
         <version>1.23</version>
+      </dependency>
+      <dependency>
+        <groupId>no.nlb</groupId>
+        <artifactId>spell-no-patterns</artifactId>
+        <version>1.1.0</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -462,10 +467,36 @@
       <build>
         <plugins>
           <plugin>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>unpack-nlb-tables</id>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <outputDirectory>${project.build.directory}/generated-resources/tables</outputDirectory>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>no.nlb</groupId>
+                      <artifactId>spell-no-patterns</artifactId>
+                      <type>zip</type>
+                    </artifactItem>
+                  </artifactItems>
+                  <includes>
+                    hyph_no_NO.dic
+                  </includes>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
             <artifactId>maven-antrun-plugin</artifactId>
             <executions>
               <execution>
-                <phase>generate-resources</phase>
+                <!-- <phase>generate-resources</phase> -->
+                <phase>none</phase>
                 <goals>
                   <goal>run</goal>
                 </goals>
@@ -477,6 +508,8 @@
                       <patternset>
                         <include name="**/hyph_*.dic" />
                         <exclude name="**/hyph_de.dic" />
+                        <exclude name="**/hyph_nb_NO.dic" />
+                        <exclude name="**/hyph_nn_NO.dic" />
                       </patternset>
                       <mapper type="flatten" />
                     </unzip>
@@ -489,5 +522,19 @@
       </build>
     </profile>
   </profiles>
+
+  <repositories>
+    <repository>
+      <!-- FIXME: this only works if you have a personal access token (with "read:packages" scope) in your settings.xml -->
+      <id>github</id>
+      <url>https://maven.pkg.github.com/nlbdev/spell-no</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
 
 </project>

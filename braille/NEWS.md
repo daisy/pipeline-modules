@@ -9,6 +9,7 @@ Changes
 - Changed default suffix of counter styles to ". "
 - Deprecated the support for XSLT braille style sheets. It is now advised to apply any XSLT style
   sheets during pre-processing.
+- Improved hyphenation of Norwegian text.
 
 v1.14.7
 =======
