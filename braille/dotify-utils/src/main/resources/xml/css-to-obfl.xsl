@@ -810,6 +810,9 @@
         </xsl:for-each-group>
     </xsl:template>
     
+    <!--
+        also used to process block boxes with "display: -obfl-list-of-references" outside of @begin or @end area
+    -->
     <xsl:template name="apply-templates-within-post-or-pre-content-sequence" as="element()*"> <!-- block|list-of-references -->
         <xsl:param name="select" as="element()*" required="yes"/> <!-- (css:box|obfl:list-of-references)* -->
         <xsl:for-each-group select="$select" group-adjacent="boolean(self::obfl:list-of-references or
@@ -1353,7 +1356,7 @@
     <xsl:template mode="sequence td block"
                   match="css:box[@type='block' and @css:_obfl-list-of-references]"
                   priority="0.9">
-        <xsl:param name="ignore-obfl-list-of-references" tunnel="true" select="false()"/>
+        <xsl:param name="ignore-obfl-list-of-references" tunnel="yes" select="false()"/>
         <xsl:choose>
             <xsl:when test="$ignore-obfl-list-of-references">
                 <xsl:next-match/>
@@ -2745,6 +2748,18 @@
                 <xsl:text>::-obfl-on-resumed pseudo-element must have its own block box</xsl:text>
             </xsl:message>
         </xsl:if>
+    </xsl:template>
+    
+    <!-- unevaluated flow() functions -->
+    <xsl:template match="css:flow[@from][@scope[not(.=('document'))]]
+                                        [not(ancestor::*[@css:_obfl-list-of-references])]"
+                  mode="block">
+        <xsl:call-template name="pf:warn">
+            <xsl:with-param name="msg">
+                <xsl:text>The flow() function does not support the range '{}' in this context.</xsl:text>
+            </xsl:with-param>
+            <xsl:with-param name="args" select="(@scope)"/>
+        </xsl:call-template>
     </xsl:template>
     
     <xsl:template priority="-10"

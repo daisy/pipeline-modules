@@ -540,11 +540,16 @@
         <p:for-each>
             <p:documentation>
                 Wrap unevaluated css:flow in block box so that we can be sure that when evaluated
-                later inline boxes have no descendant block boxes (see also css:make-anonymous-inline-boxes).
+                later inline boxes have no descendant block boxes (see also
+                css:make-anonymous-inline-boxes).
+                
+                Note that this is currently a pointless step because unless they are a descendant of
+                a "list-of-references" element, unevaluated css:flow elements will be ignored (and
+                result in a warning) later.
             </p:documentation>
             <p:wrap match="css:flow[not(ancestor::*[@css:_obfl-list-of-references])]"
                     wrapper="css:_block-box_"
-                    group-adjacent="?"/>
+                    group-adjacent="true()"/>
             <p:add-attribute match="css:_block-box_" attribute-name="type" attribute-value="block"/>
             <p:rename match="css:_block-box_" new-name="css:box"/>
         </p:for-each>
