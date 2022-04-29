@@ -8,8 +8,8 @@
             <p px:role="desc" xml:space="preserve">The depth of the table of contents hierarchy to include. '0' means no table of contents.
 
 A table of contents will be generated from the heading elements present in the document: from `h1`
-elements if the specified value for "depth" is 1, from `h1` and `h2` elements if the specified value
-is 2, etc. The resulting table of contents has the following nested structure:
+elements if the specified value for the depth is 1, from `h1` and `h2` elements if the specified
+value is 2, etc. The resulting table of contents has the following nested structure:
 
 ~~~xml
 &lt;ol id="generated-document-toc"&gt;
@@ -33,8 +33,8 @@ is 2, etc. The resulting table of contents has the following nested structure:
 
 Another one of these is generated but with ID `generated-volume-toc`. `ch_1`, `ch_1_2` etc. are the
 IDs of the heading elements from which the list was constructed, and the content of the links are
-exact copies of the content of the heading elements. By default the list is not rendered. The list
-should be styled and positioned with CSS. The following rules are included by default:
+exact copies of the content of the heading elements. By default the lists are not rendered. The
+lists should be styled and positioned with CSS. The following rules are included by default:
 
 ~~~css
 #generated-document-toc {
@@ -81,6 +81,16 @@ space in between:
 #generated-document-toc li > a,
 #generated-volume-toc li > a {
   content: ' ' target-counter(attr(href), page);
+}
+~~~
+
+Note that there is only a single "depth" setting for both lists. If you wish to include less levels
+of headings in the document TOC, you have to achieve it through CSS styling. For example, to get
+only one level of headings in the document TOC, make all nested `ol` elements invisible:
+
+~~~css
+#generated-document-toc > li > ol {
+  display: none;
 }
 ~~~
 
