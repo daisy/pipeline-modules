@@ -72,15 +72,29 @@ content at the beginning of every other volume, include the following additional
 }
 ~~~
 
+By default, the table of contents is styled as a normal unordered list, only including the text of
+the headings. Including the braille page numbers of the headings can be done using the
+`target-counter` function. For example, to place the page number after the heading title, with a
+space in between:
+
+~~~css
+#generated-document-toc li > a,
+#generated-volume-toc li > a {
+  content: ' ' target-counter(attr(href), page);
+}
+~~~
+
 See the CSS specification for more info:
 
 - the [`display:
-  obfl-toc`](http://braillespecs.github.io/braille-css/obfl#extending-the-display-property-with--obfl-toc)
+  -obfl-toc`](http://braillespecs.github.io/braille-css/obfl#extending-the-display-property-with--obfl-toc)
   value
 - the [`flow`](http://braillespecs.github.io/braille-css/#the-flow-property) property
 - the [`flow()`](http://braillespecs.github.io/braille-css/#h4_the-flow-function) function
 - the [`@volume`](http://braillespecs.github.io/braille-css/#h3_the-volume-rule) rule
 - the [`@begin`](http://braillespecs.github.io/braille-css/#h3_the-begin-and-end-rules) rule
+- the [`target-counter()`](http://braillespecs.github.io/braille-css/#h4_the-target-counter-function) function
+- the [`page`](http://braillespecs.github.io/braille-css/#h4_creating-and-inheriting-counters) counter
 </p>
         </p:documentation>
     </p:option>
