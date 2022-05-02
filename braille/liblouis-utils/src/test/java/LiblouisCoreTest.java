@@ -456,7 +456,7 @@ public class LiblouisCoreTest extends AbstractTest {
 		                                             .get(query("(table:'foobar.uti,delete-ws.utb')")).iterator().next()
 		                                             .fromStyledTextToBraille();
 		assertEquals(braille("",
-		                     "⠋⠕⠕⠃⠁⠗\u00AD",
+		                     "⠋⠕⠕⠃⠁⠗",
 		                     "",
 		                     "⠃⠁⠵"),
 		             translator.transform(styledText("",             "",

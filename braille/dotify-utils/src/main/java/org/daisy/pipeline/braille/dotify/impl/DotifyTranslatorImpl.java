@@ -260,7 +260,7 @@ public class DotifyTranslatorImpl extends AbstractBrailleTranslator implements D
 														return __apply(
 															logCreate(
 																(DotifyTranslator)new DotifyTranslatorImpl(filter, hyphenator))); }}); }
-										if ("auto".equals(hyphenator))
+										if ("auto".equals(hyphenator) || "dotify".equals(hyphenator))
 											translators = concat(
 												translators,
 												Iterables.of(

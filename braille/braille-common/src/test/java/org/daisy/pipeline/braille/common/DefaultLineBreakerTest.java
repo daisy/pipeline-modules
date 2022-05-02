@@ -3,6 +3,7 @@ package org.daisy.pipeline.braille.common;
 import java.util.ArrayList;
 import static java.util.Collections.singleton;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -221,8 +222,9 @@ public class DefaultLineBreakerTest {
 			private final static char ZWSP = '\u200B';
 
 			protected boolean isCodePointAware() { return false; }
+			protected boolean isLanguageAdaptive() { return false; }
 		
-			protected byte[] getHyphenationOpportunities(String text) throws RuntimeException {
+			protected byte[] getHyphenationOpportunities(String text, Locale language) throws RuntimeException {
 				if (text.contains("busstopp"))
 					throw new RuntimeException("text contains non-standard break points");
 				else
@@ -236,7 +238,7 @@ public class DefaultLineBreakerTest {
 		}
 		
 		private final LineBreaker lineBreaker = new AbstractHyphenator.util.DefaultLineBreaker() {
-			protected Break breakWord(String word, int limit, boolean force) {
+			protected Break breakWord(String word, Locale language, int limit, boolean force) {
 				if (limit >= 4 && word.equals("busstopp"))
 					return new Break("bussstopp", 4, true);
 				else if (limit >= word.length())
@@ -304,7 +306,7 @@ public class DefaultLineBreakerTest {
 										else if (available <= 0)
 											break;
 										else {
-											Hyphenator.LineIterator lines = hyphenator.asLineBreaker().transform(word);
+											Hyphenator.LineIterator lines = hyphenator.asLineBreaker().transform(word, null);
 											String line = lines.nextLine(available, force, allowHyphens);
 											if (line.length() == available && lines.lineHasHyphen()) {
 												lines.reset();

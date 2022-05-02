@@ -1,3 +1,5 @@
+import java.util.Locale;
+
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 
@@ -14,7 +16,7 @@ import org.osgi.service.component.annotations.Component;
 public class MockHyphenator extends AbstractHyphenator {
 	
 	private static final LineBreaker lineBreaker = new DefaultLineBreaker() {
-		protected Break breakWord(String word, int limit, boolean force) {
+		protected Break breakWord(String word, Locale language, int limit, boolean force) {
 			if (limit >= 3 && word.equals("foobarz"))
 				return new Break("fubbarz", 3, true);
 			else if (limit >= word.length())

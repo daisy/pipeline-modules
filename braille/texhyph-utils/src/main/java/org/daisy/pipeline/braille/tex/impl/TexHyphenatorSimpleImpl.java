@@ -149,8 +149,12 @@ public class TexHyphenatorSimpleImpl extends AbstractTransformProvider<TexHyphen
 				private final static char ZWSP = '\u200B';
 
 				protected boolean isCodePointAware() { return true; }
+				protected boolean isLanguageAdaptive() { return true; }
 		
-				protected byte[] getHyphenationOpportunities(String textWithoutHyphens) throws RuntimeException {
+				/**
+				 * @param language ignored
+				 */
+				protected byte[] getHyphenationOpportunities(String textWithoutHyphens, Locale language) throws RuntimeException {
 					try {
 						Tuple2<String,byte[]> t = extractHyphens(
 							hyphenator.hyphenate(textWithoutHyphens), true, SHY, ZWSP);

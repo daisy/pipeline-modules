@@ -7,6 +7,7 @@ import java.util.Arrays;
 import static java.util.Collections.singleton;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.regex.Matcher;
@@ -485,6 +486,8 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 			
 			class BrailleStreamImpl implements BrailleStream {
 				
+				final Locale[] languages;
+				
 				// FIXME: remove duplication!!
 				
 				// convert style into typeform, hyphenate, preserveLines, preserveSpace and letterSpacing arrays
@@ -543,11 +546,13 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 					
 					// FIXME: handle from and to properly
 					String[] text = new String[size];
-					SimpleInlineStyle[] styles = new SimpleInlineStyle[size]; {
+					SimpleInlineStyle[] styles = new SimpleInlineStyle[size];
+					languages = new Locale[size]; {
 						int i = 0;
 						for (CSSStyledText t : styledText) {
 							text[i] = t.getText();
 							styles[i] = t.getStyle();
+							languages[i] = t.getLanguage();
 							i++; }}
 					
 					// perform Unicode normalization
@@ -737,10 +742,12 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 							continue segments; }
 						
 						// don't hyphenate if hyphenation is disabled for this segment, but do break compound words with a hyphen
+						Locale language = languages[textWithWsMapping[curSegment]];
 						if (!hyphenate[textWithWsMapping[curSegment]]) {
 							segmentInBraille = addHyphensAndLetterSpacing(compoundWordHyphenator,
 							                                              segment, segmentInBraille, curPos, curPosInBraille,
-							                                              segmentManualHyphens, letterSpacing[textWithWsMapping[curSegment]]);
+							                                              segmentManualHyphens, language,
+							                                              letterSpacing[textWithWsMapping[curSegment]]);
 							next += segmentInBraille;
 							available -= segmentInBraille.length();
 							curPos = curSegmentEnd;
@@ -753,7 +760,8 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 								logger.warn("hyphens: auto not supported");
 							try {
 								segmentInBraille = addHyphensAndLetterSpacing(fullHyphenator, segment, segmentInBraille, curPos, curPosInBraille,
-								                                              segmentManualHyphens, letterSpacing[textWithWsMapping[curSegment]]);
+								                                              segmentManualHyphens, language,
+								                                              letterSpacing[textWithWsMapping[curSegment]]);
 								next += segmentInBraille;
 								available -= segmentInBraille.length();
 								curPos = curSegmentEnd;
@@ -788,7 +796,8 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 										try {
 											if (fullHyphenator == null) throw new NonStandardHyphenationException();
 											wordInBraille = addHyphensAndLetterSpacing(fullHyphenator, word, wordInBraille, curPos, curPosInBraille,
-											                                           wordManualHyphens, letterSpacing[textWithWsMapping[curSegment]]);
+											                                           wordManualHyphens, language,
+											                                           letterSpacing[textWithWsMapping[curSegment]]);
 											next += wordInBraille;
 											available -= wordInBraille.length();
 											curPos = wordEnd;
@@ -804,7 +813,7 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 											
 											// try non-standard hyphenation
 											if (lineBreaker == null) throw ee;
-											Hyphenator.LineIterator lines = lineBreaker.transform(word);
+											Hyphenator.LineIterator lines = lineBreaker.transform(word, language);
 											
 											// do a binary search for the optimal break point
 											LineBreakSolution bestSolution = null;
@@ -948,10 +957,12 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 				                                          int curPos,
 				                                          int curPosInBraille,
 				                                          byte[] manualHyphens,
+				                                          Locale language,
 				                                          int letterSpacing) {
 					byte[] hyphens = fullHyphenator.hyphenate(
 						// insert manual hyphens first so that hyphenator knows which words to skip
-						insertHyphens(segment, manualHyphens, true, SHY, ZWSP));
+						insertHyphens(segment, manualHyphens, true, SHY, ZWSP),
+						language);
 					// FIXME: don't hard-code the number 4
 					byte[] hyphensAndLetterBoundaries
 						= (letterSpacing > 0) ? detectLetterBoundaries(hyphens, segment, (byte)4) : hyphens;
@@ -1562,7 +1573,7 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 	}
 	
 	private interface FullHyphenator extends Hyphenator.FullHyphenator {
-		public byte[] hyphenate(String text);
+		public byte[] hyphenate(String text, Locale language);
 	}
 	
 	/**
@@ -1573,13 +1584,13 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 	
 	private static class CompoundWordHyphenator extends NoHyphenator implements FullHyphenator {
 
-		public byte[] hyphenate(String text) {
+		public byte[] hyphenate(String text, Locale language) {
 			if (text.isEmpty())
 				return null;
 			Tuple2<String,byte[]> t = extractHyphens(text, true, SHY, ZWSP);
 			if (t._1.isEmpty())
 				return null;
-			return transform(t._2, t._1);
+			return transform(t._2, t._1, language);
 		}
 	}
 	
@@ -1592,21 +1603,25 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 		}
 		
 		protected boolean isCodePointAware() { return true; }
+		protected boolean isLanguageAdaptive() { return false; }
 		
-		protected byte[] getHyphenationOpportunities(String textWithoutHyphens) throws RuntimeException {
+		/**
+		 * @param language ignored
+		 */
+		protected byte[] getHyphenationOpportunities(String textWithoutHyphens, Locale language) throws RuntimeException {
 			try {
 				return translator.hyphenate(textWithoutHyphens); }
 			catch (TranslationException e) {
 				throw new RuntimeException(e); }
 		}
 		
-		public byte[] hyphenate(String text) {
+		public byte[] hyphenate(String text, Locale language) {
 			if (text.isEmpty())
 				return null;
 			Tuple2<String,byte[]> t = extractHyphens(text, true, SHY, ZWSP);
 			if (t._1.isEmpty())
 				return null;
-			return transform(t._2, t._1);
+			return transform(t._2, t._1, language);
 		}
 	}
 	
@@ -1624,9 +1639,9 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 		
 		private final static SimpleInlineStyle HYPHENS_AUTO = new SimpleInlineStyle("hyphens: auto");
 		
-		public byte[] hyphenate(String text) {
+		public byte[] hyphenate(String text, Locale language) {
 			return extractHyphens(
-				hyphenator.transform(singleton(new CSSStyledText(text, HYPHENS_AUTO))).iterator().next().getText(),
+				hyphenator.transform(singleton(new CSSStyledText(text, HYPHENS_AUTO, language))).iterator().next().getText(),
 				true, SHY, ZWSP)._2;
 		}
 	}

@@ -3,6 +3,11 @@ package org.daisy.pipeline.braille.common;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.collect.Iterables;
+
+import org.daisy.pipeline.braille.common.Query.MutableQuery;
+import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
+import static org.daisy.pipeline.braille.common.Query.util.query;
 import static org.daisy.pipeline.braille.common.TransformProvider.util.dispatch;
 import org.daisy.pipeline.braille.common.TransformProvider.util.Memoize;
 import org.daisy.pipeline.braille.common.util.Strings;
@@ -39,8 +44,18 @@ public class HyphenatorRegistry extends Memoize<Hyphenator> implements Hyphenato
 	}
 
 	public Iterable<Hyphenator> _get(Query q) {
-		return dispatch.get(q);
+		if (q.containsKey("document-locale")) {
+			MutableQuery fallbackQuery = mutableQuery(q);
+			fallbackQuery.removeAll("document-locale");
+			fallbackQuery.addAll(FALLBACK_QUERY);
+			return Iterables.concat(
+				dispatch.get(q),
+				dispatch.get(fallbackQuery));
+		} else
+			return dispatch.get(q);
 	}
+
+	private final static Query FALLBACK_QUERY = query("(document-locale:und)");
 
 	public TransformProvider<Hyphenator> _withContext(Logger context) {
 		return dispatch.withContext(context);

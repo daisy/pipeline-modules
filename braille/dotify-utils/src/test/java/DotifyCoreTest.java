@@ -55,7 +55,7 @@ public class DotifyCoreTest extends AbstractTest {
 	@Test
 	public void testTranslateAndHyphenate() {
 		assertEquals(braille("⠋⠕⠕\u00AD⠃⠁⠗"),
-		             provider.get(query("(locale:sv-SE)")).iterator().next()
+		             provider.get(query("(locale:sv-SE)(hyphenator:dotify)")).iterator().next()
 		                     .fromStyledTextToBraille()
 		                     .transform(styledText("foobar","hyphens:auto")));
 

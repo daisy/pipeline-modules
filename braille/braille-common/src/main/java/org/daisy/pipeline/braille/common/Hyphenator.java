@@ -1,5 +1,7 @@
 package org.daisy.pipeline.braille.common;
 
+import java.util.Locale;
+
 import org.daisy.pipeline.braille.css.CSSStyledText;
 
 /**
@@ -42,7 +44,7 @@ public interface Hyphenator extends Transform {
 	
 	public interface LineBreaker {
 		
-		public LineIterator transform(String input);
+		public LineIterator transform(String input, Locale language);
 		
 	}
 	

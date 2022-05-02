@@ -1,6 +1,6 @@
 package org.daisy.pipeline.braille.liblouis.impl;
 
-import java.util.NoSuchElementException;
+import java.util.Locale;
 
 import com.google.common.base.Function;
 import com.google.common.base.MoreObjects;
@@ -155,7 +155,11 @@ public class LiblouisHyphenatorJnaImplProvider implements LiblouisHyphenator.Pro
 		
 		private final FullHyphenator fullHyphenator = new DefaultFullHyphenator() {
 			protected boolean isCodePointAware() { return true; }
-			protected byte[] getHyphenationOpportunities(String textWithoutHyphens) throws RuntimeException {
+			protected boolean isLanguageAdaptive() { return false; }
+			/**
+			 * @param language ignored
+			 */
+			protected byte[] getHyphenationOpportunities(String textWithoutHyphens, Locale language) throws RuntimeException {
 				try {
 					return translator.hyphenate(textWithoutHyphens); }
 				catch (TranslationException e) {

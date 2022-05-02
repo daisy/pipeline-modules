@@ -3,6 +3,8 @@ package org.daisy.pipeline.braille.common;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -49,12 +51,19 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 			protected abstract boolean isCodePointAware();
 
 			/**
+			 * Whether {@link #getHyphenationOpportunities()} takes into account the
+			 * <code>language</code> argument.
+			 */
+			protected abstract boolean isLanguageAdaptive();
+
+			/**
 			 * Get hyphenation opportunities as a byte array (1 = SHY, 2 = ZWSP)
 			 *
 			 * @param textWithoutHyphens text that does not contain SHY and ZWSP characters (and from
 			 *                           which no SHY and ZWSP characters were extracted either)
 			 */
-			protected abstract byte[] getHyphenationOpportunities(String textWithoutHyphens) throws NonStandardHyphenationException;
+			protected abstract byte[] getHyphenationOpportunities(String textWithoutHyphens, Locale language)
+				throws NonStandardHyphenationException;
 
 			private final static char SHY = '\u00AD';
 			private final static char ZWSP = '\u200B';
@@ -62,6 +71,46 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 			private final static Splitter SEGMENT_SPLITTER = Splitter.on(US);
 
 			public Iterable<CSSStyledText> transform(Iterable<CSSStyledText> text) throws NonStandardHyphenationException {
+				if (!isLanguageAdaptive())
+					return transform(text, null);
+				else {
+					// chunk up in chunks of same language
+					Locale singleLang = null;
+					boolean mixedLang = false; {
+						boolean first = false;
+						for (CSSStyledText t : text)
+							if (first) {
+								singleLang = t.getLanguage();
+								first = false;
+							} else if (!Objects.equals(singleLang, t.getLanguage())) {
+								mixedLang = true;
+								break;
+							}
+					}
+					if (mixedLang) {
+						List<CSSStyledText> result = new ArrayList<>();
+						List<CSSStyledText> cur = null;
+						Locale curLang = null;
+						for (CSSStyledText t : text) {
+							Locale lang = t.getLanguage();
+							if (cur != null && !Objects.equals(curLang, lang)) {
+								for (CSSStyledText tt : transform(cur, curLang)) result.add(tt);
+								cur = null;
+							}
+							if (cur == null) cur = new ArrayList<>();
+							cur.add(t);
+							curLang = lang;
+						}
+						if (cur != null)
+							for (CSSStyledText tt : transform(cur, curLang)) result.add(tt);
+						return result;
+					} else {
+						return transform(text, singleLang);
+					}
+				}
+			}
+
+			private Iterable<CSSStyledText> transform(Iterable<CSSStyledText> text, Locale language) throws NonStandardHyphenationException {
 				List<CSSStyledText> result = new ArrayList<>();
 				List<CSSProperty> hyphenate = new ArrayList<>();
 				boolean someHyphenate = false;
@@ -109,7 +158,7 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 							manualHyphensAndSegmentBoundaries[k] |= hardHyphens[k];
 				}
 				byte[] hyphensAndSegmentBoundaries = someHyphenate
-					? transform(manualHyphensAndSegmentBoundaries, joinedTextWithoutHyphens)
+					? transform(manualHyphensAndSegmentBoundaries, joinedTextWithoutHyphens, language)
 					: manualHyphensAndSegmentBoundaries;
 				List<String> textWithHyphensAuto =
 					SEGMENT_SPLITTER.splitToList(
@@ -128,18 +177,30 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 				int j = 0;
 				for (int i = 0; i < result.size(); i++) {
 					if (textWithoutHyphens.get(i).isEmpty())
-						result.set(i, new CSSStyledText("", result.get(i).getStyle()));
+						result.set(i, new CSSStyledText("",
+						                                result.get(i).getStyle(),
+						                                result.get(i).getLanguage(),
+						                                result.get(i).getTextAttributes()));
 					else {
 						CSSProperty h = hyphenate.get(i);
 						if (h == Hyphens.AUTO)
-							result.set(i, new CSSStyledText(textWithHyphensAuto.get(j++), result.get(i).getStyle()));
+							result.set(i, new CSSStyledText(textWithHyphensAuto.get(j++),
+							                                result.get(i).getStyle(),
+							                                result.get(i).getLanguage(),
+							                                result.get(i).getTextAttributes()));
 						else if (h == Hyphens.MANUAL)
-							result.set(i, new CSSStyledText(textWithHyphensManual.get(j++), result.get(i).getStyle()));
+							result.set(i, new CSSStyledText(textWithHyphensManual.get(j++),
+							                                result.get(i).getStyle(),
+							                                result.get(i).getLanguage(),
+							                                result.get(i).getTextAttributes()));
 						else // h == Hyphens.NONE
 							// FIXME: better would be to only remove SHY and ZWSP within words, but the
 							// issue with this is that what constitutes a "word" is language dependent
 							// and finding words requires NLP
-							result.set(i, new CSSStyledText(textWithHyphensNone.get(j++), result.get(i).getStyle()));
+							result.set(i, new CSSStyledText(textWithHyphensNone.get(j++),
+							                                result.get(i).getStyle(),
+							                                result.get(i).getLanguage(),
+							                                result.get(i).getTextAttributes()));
 					}
 				}
 				return result;
@@ -150,7 +211,8 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 			 *                           text, which resulted in <code>textWithoutHyphens</code>
 			 * @param textWithoutHyphens text without SHY, ZWSP and US characters
 			 */
-			protected final byte[] transform(byte[] manualHyphens, String textWithoutHyphens) throws NonStandardHyphenationException {
+			protected final byte[] transform(byte[] manualHyphens, String textWithoutHyphens, Locale language)
+					throws NonStandardHyphenationException {
 				if (textWithoutHyphens.length() == 0)
 					return manualHyphens;
 				boolean hasManualHyphens = false; {
@@ -177,7 +239,7 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 										wordHasManualHyphens = true;
 										break; }}
 							if (!wordHasManualHyphens) {
-								byte[] wordHyphens = getHyphenationOpportunities(segment);
+								byte[] wordHyphens = getHyphenationOpportunities(segment, language);
 								if (wordHyphens != null)
 									for (int k = 0; k < len - 1; k++)
 										hyphens[pos + k] |= wordHyphens[k];
@@ -188,7 +250,7 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 					}
 					return hyphens;
 				} else {
-					byte[] hyphens = getHyphenationOpportunities(textWithoutHyphens);
+					byte[] hyphens = getHyphenationOpportunities(textWithoutHyphens, language);
 					if (manualHyphens != null) {
 						if (hyphens == null)
 							hyphens = manualHyphens;
@@ -217,7 +279,7 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 			protected boolean isCodePointAware() { return true; }
 			protected boolean isLanguageAdaptive() { return false; }
 			
-			protected byte[] getHyphenationOpportunities(String textWithoutManualHyphens) {
+			protected byte[] getHyphenationOpportunities(String textWithoutManualHyphens, Locale language) {
 				return null;
 			}
 		}
@@ -227,9 +289,10 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 			
 			/**
 			 * This method should be overriden. The default behavior is that a word is only broken
-			 * after hard hyphens, or if the <code>force</code> argument is <code>true</code>.
+			 * after hard hyphens, or if the <code>force</code> argument is <code>true</code>. The
+			 * <code>language</code> argument is ignored.
 			 */
-			protected Break breakWord(String word, int limit, boolean force) {
+			protected Break breakWord(String word, Locale language, int limit, boolean force) {
 				if (word.length() <= limit)
 					return new Break(word, limit, false);
 				// break after hard hyphens
@@ -265,7 +328,7 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 				}
 			}
 			
-			public LineIterator transform(final String text) {
+			public LineIterator transform(final String text, final Locale language) {
 				
 				return new LineIterator() {
 					
@@ -300,7 +363,7 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 										available -= segment.length();
 										word = !word; }
 									else if (word && allowHyphens) {
-										Break brokenWord = breakWord(segment, available, force && (available == limit));
+										Break brokenWord = breakWord(segment, language, available, force && (available == limit));
 										line += brokenWord.firstLine();
 										lineHasHyphen = brokenWord.hyphen;
 										r += brokenWord.secondLine();
