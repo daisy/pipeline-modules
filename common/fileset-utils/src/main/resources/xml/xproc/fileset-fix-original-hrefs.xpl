@@ -2,6 +2,7 @@
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
+                xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
@@ -48,16 +49,6 @@
 		</p:documentation>
 	</p:option>
 
-	<p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
-		<p:documentation>
-			px:info
-		</p:documentation>
-	</p:import>
-	<p:import href="http://www.daisy.org/pipeline/modules/zip-utils/library.xpl">
-		<p:documentation>
-			px:unzip
-		</p:documentation>
-	</p:import>
 	<p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
 		<p:documentation>
 			px:message
@@ -74,89 +65,11 @@
 			px:fileset-filter-in-memory
 		</p:documentation>
 	</p:import>
-
-	<p:declare-step type="pxi:file-on-disk">
+	<cx:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl" type="application/xslt+xml">
 		<p:documentation>
-			Return &lt;c:result&gt;true&lt;/c:result&gt; if file at "href" exists on disk. Also
-			works for zipped files.
+			pf:file-exists
 		</p:documentation>
-		<p:option name="href" required="true"/>
-		<p:input port="source"/>
-		<p:output port="result" primary="true">
-			<p:pipe step="source" port="result"/>
-		</p:output>
-		<p:output port="on-disk">
-			<p:pipe step="on-disk" port="result"/>
-		</p:output>
-		<p:identity name="source"/>
-		<p:sink/>
-		<p:try>
-			<p:group>
-				<p:variable name="file" select="replace(replace($href,'^(jar|bundle):',''),'^([^!]+)!/(.+)$', '$1')"/>
-				<px:info>
-					<p:with-option name="href" select="$file"/>
-				</px:info>
-				<p:choose>
-					<p:when test="contains($href,'!/')">
-						<p:xslt template-name="main">
-							<p:input port="source">
-								<p:empty/>
-							</p:input>
-							<p:input port="stylesheet">
-								<p:inline>
-									<xsl:stylesheet version="2.0" xmlns:pf="http://www.daisy.org/ns/pipeline/functions">
-										<xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/uri-functions.xsl"/>
-										<xsl:param name="uri" required="yes"/>
-										<xsl:template name="main">
-											<c:result>
-												<xsl:value-of select="pf:unescape-uri($uri)"/>
-											</c:result>
-										</xsl:template>
-									</xsl:stylesheet>
-								</p:inline>
-							</p:input>
-							<p:with-param name="uri" select="replace($href, '^([^!]+)!/(.+)$', '$2')"/>
-						</p:xslt>
-						<p:group>
-							<p:variable name="escaped-path-in-zip" select="."/>
-							<p:sink/>
-							<px:unzip>
-								<p:with-option name="href" select="$file"/>
-							</px:unzip>
-							<p:filter>
-								<p:with-option name="select"
-								               select="concat(
-								                        '/c:zipfile/c:file[@name=&quot;',
-								                        $escaped-path-in-zip,
-								                        '&quot;]')"/>
-							</p:filter>
-						</p:group>
-					</p:when>
-					<p:otherwise>
-						<p:identity/>
-					</p:otherwise>
-				</p:choose>
-				<p:count/>
-			</p:group>
-			<p:catch>
-				<!-- FIXME: only catch error with code "err:FU01" -->
-				<p:identity>
-					<p:input port="source">
-						<p:inline>
-							<c:result>0</c:result>
-						</p:inline>
-					</p:input>
-				</p:identity>
-			</p:catch>
-		</p:try>
-		<p:string-replace match="/c:result/text()" replace="if (string(.)='0') then 'false' else 'true'"/>
-		<p:group>
-			<p:variable name="on-disk" select="string(/*)"/>
-			<p:identity px:message="File at {$href} {if ($on-disk='true') then 'exists' else 'does not exist'}"
-			            px:message-severity="DEBUG"/>
-		</p:group>
-		<p:identity name="on-disk"/>
-	</p:declare-step>
+	</cx:import>
 
 	<px:fileset-filter-in-memory name="in-memory-fileset">
 		<p:documentation>Also normalizes @href</p:documentation>
@@ -203,49 +116,37 @@
 				<p:delete match="@original-href"/>
 			</p:when>
 			<p:otherwise>
-				<p:choose name="href-on-disk">
+				<p:variable name="href-on-disk" cx:as="xs:boolean"
+				            select="$detect-existing and pf:file-exists(replace($href,'^(jar|bundle):',''))"/>
+				<p:choose>
 					<p:when test="$detect-existing">
-						<p:output port="result" primary="true"/>
-						<p:output port="on-disk">
-							<p:pipe step="file-on-disk" port="on-disk"/>
-						</p:output>
-						<pxi:file-on-disk name="file-on-disk">
-							<p:with-option name="href" select="$href"/>
-						</pxi:file-on-disk>
+						<p:identity px:message="File at {$href} {if ($href-on-disk) then 'exists' else 'does not exist'}"
+						            px:message-severity="DEBUG"/>
 					</p:when>
 					<p:otherwise>
-						<p:output port="result" primary="true"/>
-						<p:output port="on-disk">
-							<p:inline><c:result>false</c:result></p:inline>
-						</p:output>
 						<p:identity/>
 					</p:otherwise>
 				</p:choose>
 				<p:choose>
-					<p:xpath-context>
-						<p:pipe step="href-on-disk" port="on-disk"/>
-					</p:xpath-context>
 					<p:documentation>Else if href exists on disk, set original-href</p:documentation>
-					<p:when test="string(/*)='true'">
+					<p:when test="$href-on-disk">
 						<p:add-attribute match="/*" attribute-name="original-href">
 							<p:with-option name="attribute-value" select="$href"/>
 						</p:add-attribute>
 					</p:when>
 					<p:when test="$original-href!=''">
-						<pxi:file-on-disk name="original-href-on-disk">
-							<p:with-option name="href" select="$original-href"/>
-						</pxi:file-on-disk>
+						<p:variable name="original-href-on-disk" cx:as="xs:boolean"
+						            select="pf:file-exists(replace($original-href,'^(jar|bundle):',''))"/>
+						<p:identity px:message="File at {$original-href} {if ($original-href-on-disk) then 'exists' else 'does not exist'}"
+						            px:message-severity="DEBUG"/>
 						<p:choose>
-							<p:xpath-context>
-								<p:pipe step="original-href-on-disk" port="on-disk"/>
-							</p:xpath-context>
 							<p:documentation>
 								Else if it does not exist on disk, remove original-href or remove file if purge is set.
 							</p:documentation>
-							<p:when test="not(string(/*)='true')">
+							<p:when test="not($original-href-on-disk)">
 								<p:variable name="message"
-								            select="concat('Found document in fileset that was declared as being on disk but was neither stored on disk nor in memory: ',
-								                           $original-href)"/>
+								            select="concat('Found document in fileset that was declared as being on disk ',
+								                           'but was neither stored on disk nor in memory: ', $original-href)"/>
 								<p:choose>
 									<p:when test="$fail-on-missing">
 										<px:error code="PEZE01">
