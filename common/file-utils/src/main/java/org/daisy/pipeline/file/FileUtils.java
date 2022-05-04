@@ -35,15 +35,31 @@ public final class FileUtils {
 	/* ============= */
 
 	public static URI normalizeURI(URI uri) {
+		return normalizeURI(uri, false);
+	}
+
+	public static URI normalizeURI(URI uri, boolean dropFragment) {
 		try {
+			if (uri.isOpaque())
+				return uri;
 			if ("jar".equals(uri.getScheme()))
 				return URLs.asURI("jar:" + normalizeURI(URLs.asURI(uri.toASCIIString().substring(4))).toASCIIString());
 			uri = uri.normalize();
 			String scheme = uri.getScheme();
-			String authority = uri.getAuthority();
 			if (scheme != null) scheme = scheme.toLowerCase();
+			String authority = uri.getAuthority();
 			if (authority != null) authority = authority.toLowerCase();
-			uri = new URI(scheme, authority, uri.getPath(), uri.getQuery(), uri.getFragment());
+			if (authority != null && "http".equals(scheme) && authority.endsWith(":80"))
+				authority = authority.substring(0, authority.length() - 3);
+			uri = new URI(scheme, authority, uri.getPath(), uri.getQuery(), dropFragment ? null : uri.getFragment());
+			// fix path
+			String path = uri.getPath(); {
+				// add "/" after trailing ".."
+				path = path.replaceAll("(^|/)\\.\\.$", "$1../");
+				// remove leading "/.."
+				path = path.replaceAll("^/(\\.\\./)+", "/");
+			}
+			uri = new URI(uri.getScheme(), uri.getAuthority(), path, uri.getQuery(), uri.getFragment());
 			uri = expand83(uri);
 			return uri;
 		} catch (URISyntaxException e) {

@@ -62,7 +62,8 @@
       org.daisy.pipeline.file.calabash.impl.SetXmlDeclarationProvider,
       org.daisy.pipeline.file.calabash.impl.XMLPeekProvider,
       org.daisy.pipeline.file.saxon.impl.Expand83,
-      org.daisy.pipeline.file.saxon.impl.FileExists
+      org.daisy.pipeline.file.saxon.impl.FileExists,
+      org.daisy.pipeline.file.saxon.impl.NormalizeURI
     </expose-services>
   </properties>
   
