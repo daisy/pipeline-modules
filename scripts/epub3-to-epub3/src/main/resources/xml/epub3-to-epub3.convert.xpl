@@ -1000,7 +1000,7 @@
                         <p:pipe step="for-each" port="css"/>
                     </p:iteration-source>
                     <px:fileset-add-entry>
-                        <p:input port="source">
+                        <p:input port="source.fileset">
                             <p:pipe step="base" port="result"/>
                         </p:input>
                         <p:with-option name="href" select="base-uri(/*)"/>
@@ -1114,7 +1114,7 @@
             
             <p:group name="add-metadata-xml">
                 <p:output port="fileset" primary="true">
-                    <p:pipe step="add-entry" port="result"/>
+                    <p:pipe step="add-entry" port="result.fileset"/>
                 </p:output>
                 <p:output port="in-memory" sequence="true">
                     <p:pipe step="add-entry" port="result.in-memory"/>
@@ -1166,7 +1166,7 @@
             -->
             <p:group name="add-rendition-mapping">
                 <p:output port="fileset" primary="true">
-                    <p:pipe step="add-entry" port="result"/>
+                    <p:pipe step="add-entry" port="result.fileset"/>
                 </p:output>
                 <p:output port="in-memory" sequence="true">
                     <p:pipe step="add-entry" port="result.in-memory"/>

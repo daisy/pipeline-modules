@@ -14,7 +14,7 @@
     <p>Add a new entry to a fileset.</p>
   </p:documentation>
 
-  <p:input port="source" primary="true">
+  <p:input port="source.fileset" primary="true">
     <p:inline exclude-inline-prefixes="#all"><d:fileset/></p:inline>
   </p:input>
   <p:input port="source.in-memory" sequence="true">
@@ -24,7 +24,7 @@
     <p:empty/>
   </p:input>
 
-  <p:output port="result" primary="true"/>
+  <p:output port="result.fileset" primary="true"/>
   <p:output port="result.in-memory" sequence="true">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
       <p>The fileset with the new entry added</p>
@@ -110,7 +110,7 @@
 
   <p:identity>
     <p:input port="source">
-      <p:pipe step="main" port="source"/>
+      <p:pipe step="main" port="source.fileset"/>
     </p:input>
   </p:identity>
   <p:choose name="check-base">
@@ -213,7 +213,7 @@
     </p:variable>
     <p:identity>
       <p:input port="source">
-        <p:pipe port="source" step="main"/>
+        <p:pipe step="main" port="source.fileset"/>
       </p:input>
     </p:identity>
     <p:choose name="if-present-in-input">

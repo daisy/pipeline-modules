@@ -62,8 +62,18 @@
             px:message
         </p:documentation>
     </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl"/>
-    <p:import href="http://www.daisy.org/pipeline/modules/mediatype-utils/library.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
+        <p:documentation>
+            px:fileset-create
+            px:fileset-add-entry
+            px:fileset-join
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/mediatype-utils/library.xpl">
+        <p:documentation>
+            px:mediatype-detect
+        </p:documentation>
+    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/epub-utils/library.xpl">
         <p:documentation>
             px:epub3-create-package-doc
@@ -152,7 +162,7 @@
         <px:fileset-join>
             <p:input port="source">
                 <p:pipe port="result" step="result-fileset.with-epub-base"/>
-                <p:pipe port="result" step="result-fileset.with-package"/>
+                <p:pipe port="result.fileset" step="result-fileset.with-package"/>
             </p:input>
         </px:fileset-join>
         <px:mediatype-detect/>

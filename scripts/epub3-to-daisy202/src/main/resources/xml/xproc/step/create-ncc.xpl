@@ -113,7 +113,7 @@
     </p:documentation>
     <px:fileset-add-entry name="daisy202-with-opf"
                           media-type="application/oebps-package+xml">
-        <p:input port="source">
+        <p:input port="source.fileset">
             <p:pipe step="main" port="source.fileset"/>
         </p:input>
         <p:input port="entry">
@@ -189,7 +189,7 @@
         <p:for-each>
             <px:fileset-add-entry>
                 <p:with-option name="href" select="/*/resolve-uri(@href,base-uri())"/>
-                <p:input port="source">
+                <p:input port="source.fileset">
                     <p:inline>
                         <d:fileset/>
                     </p:inline>
@@ -323,7 +323,7 @@
     <p:for-each>
         <px:fileset-add-entry>
             <p:with-option name="href" select="/*/resolve-uri(@href,base-uri())"/>
-            <p:input port="source">
+            <p:input port="source.fileset">
                 <p:inline>
                     <d:fileset/>
                 </p:inline>
@@ -436,7 +436,7 @@
     <p:for-each>
         <px:fileset-add-entry media-type="application/smil+xml">
             <p:with-option name="href" select="resolve-uri(base-uri(/*))"/>
-            <p:input port="source">
+            <p:input port="source.fileset">
                 <p:inline>
                     <d:fileset/>
                 </p:inline>

@@ -99,7 +99,7 @@ element in the OPF namespace. If not specified, metadata is extracted from the H
                 <p:output port="result" sequence="true"/>
                 <p:variable name="single-html" select="."/>
                 <px:fileset-add-entry media-type="application/xhtml+xml">
-                    <p:input port="source">
+                    <p:input port="source.fileset">
                         <p:inline><d:fileset/></p:inline>
                     </p:input>
                     <p:with-option name="href" select="$single-html"/>

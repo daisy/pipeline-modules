@@ -121,7 +121,7 @@
         </p:iteration-source>
         <p:variable name="uri" select="base-uri(/*)"/>
         <px:fileset-add-entry>
-            <p:input port="source">
+            <p:input port="source.fileset">
                 <p:pipe port="result" step="empty-fileset"/>
             </p:input>
             <p:with-option name="href" select="$uri"/>

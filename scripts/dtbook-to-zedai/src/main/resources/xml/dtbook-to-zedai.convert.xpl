@@ -596,10 +596,10 @@
 
         <px:fileset-join>
             <p:input port="source">
-                <p:pipe port="result" step="result.fileset.zedai"/>
+                <p:pipe port="result.fileset" step="result.fileset.zedai"/>
                 <p:pipe port="result" step="result.fileset.resources"/>
                 <p:pipe port="result" step="result.fileset.generated-css"/>
-                <p:pipe port="result" step="result.fileset.mods"/>
+                <p:pipe port="result.fileset" step="result.fileset.mods"/>
             </p:input>
         </px:fileset-join>
         <p:documentation>Determine the media type of files</p:documentation>
