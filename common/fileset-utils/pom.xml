@@ -55,7 +55,7 @@
   <properties>
     <expose-services>
       org.daisy.pipeline.modules.impl.Module_fileset_utils,
-      org.daisy.pipeline.fileset.calabash.impl.AddEntryStep$StepProvider
+      org.daisy.pipeline.fileset.calabash.impl.AddEntriesStep$StepProvider
     </expose-services>
   </properties>
   

@@ -8,10 +8,10 @@
                xmlns:epub="http://www.idpf.org/2007/ops"
                xmlns:html="http://www.w3.org/1999/xhtml"
                xmlns:opf="http://www.idpf.org/2007/opf"
-               script="../../main/resources/xml/xproc/fileset-add-entry.xpl">
+               script="../../main/resources/xml/xproc/fileset-add-entries.xpl">
 
     <x:scenario label="add-entry">
-        <x:call step="px:fileset-add-entry">
+        <x:call step="px:fileset-add-entries">
             <x:option name="href" select="'doc.html'"/>
             <x:input port="source.fileset">
                 <x:document type="inline">
@@ -32,7 +32,7 @@
     </x:scenario>
 
     <x:scenario label="add-entry-with-media-type">
-        <x:call step="px:fileset-add-entry">
+        <x:call step="px:fileset-add-entries">
             <x:option name="href" select="'doc.html'"/>
             <x:option name="media-type" select="'text/html'"/>
             <x:input port="source.fileset">
@@ -54,7 +54,7 @@
     </x:scenario>
 
     <x:scenario label="add-entry-first">
-        <x:call step="px:fileset-add-entry">
+        <x:call step="px:fileset-add-entries">
             <x:option name="href" select="'doc.html'"/>
             <x:option name="first" select="true()"/>
             <x:input port="source.fileset">
@@ -79,7 +79,7 @@
     </x:scenario>
 
     <x:scenario label="add-entry-absolute">
-        <x:call step="px:fileset-add-entry">
+        <x:call step="px:fileset-add-entries">
             <x:option name="href" select="'file:/doc.html'"/>
             <x:input port="source.fileset">
                 <x:document type="inline">
@@ -100,7 +100,7 @@
     </x:scenario>
 
     <x:scenario label="add-entry-absolute-same-base">
-        <x:call step="px:fileset-add-entry">
+        <x:call step="px:fileset-add-entries">
             <x:option name="href" select="'file:/Users/me/dir/doc.html'"/>
             <x:input port="source.fileset">
                 <x:document type="inline">
@@ -121,7 +121,7 @@
     </x:scenario>
     
     <x:scenario label="add-entry-absolute-same-base-triple-slash">
-        <x:call step="px:fileset-add-entry">
+        <x:call step="px:fileset-add-entries">
             <x:option name="href" select="'file:///Users/me/dir/doc.html'"/>
             <x:input port="source.fileset">
                 <x:document type="inline">
@@ -142,7 +142,7 @@
     </x:scenario>
     
     <x:scenario label="add-entry-absolute-root-directory">
-        <x:call step="px:fileset-add-entry">
+        <x:call step="px:fileset-add-entries">
             <x:option name="href" select="'file:/Users/me/dir/doc.html'"/>
             <x:input port="source.fileset">
                 <x:document type="inline">
@@ -163,7 +163,7 @@
     </x:scenario>
     
     <x:scenario label="add-entry-absolute-root-directory-triple-slash">
-        <x:call step="px:fileset-add-entry">
+        <x:call step="px:fileset-add-entries">
             <x:option name="href" select="'file:///Users/me/dir/doc.html'"/>
             <x:input port="source.fileset">
                 <x:document type="inline">
@@ -184,7 +184,7 @@
     </x:scenario>
     
     <x:scenario label="add-absolute-entry-no-fileset-base">
-        <x:call step="px:fileset-add-entry">
+        <x:call step="px:fileset-add-entries">
             <x:option name="href" select="'file:/Users/me/dir/doc.html'"/>
             <x:input port="source.fileset">
                 <x:document type="inline">
@@ -205,7 +205,7 @@
     </x:scenario>
 
     <x:scenario label="add-entry-original-href">
-        <x:call step="px:fileset-add-entry">
+        <x:call step="px:fileset-add-entries">
             <x:option name="href" select="'doc.html'"/>
             <x:option name="original-href" select="'file:/private/var/folders/mr/f6s9zqtn03d8rgzxb96_2bh00000gn/T/-1kf6683sr37ic7r60abkgeaant/doc.html'"/>
             <x:input port="source.fileset">
@@ -228,7 +228,7 @@
     </x:scenario>
     
     <x:scenario label="add-entry-original-href-no-fileset-base">
-        <x:call step="px:fileset-add-entry">
+        <x:call step="px:fileset-add-entries">
             <x:option name="href" select="'file:/Users/me/dir/doc.html'"/>
             <x:option name="original-href" select="'file:/private/var/folders/mr/f6s9zqtn03d8rgzxb96_2bh00000gn/T/-1kf6683sr37ic7r60abkgeaant/doc.html'"/>
             <x:input port="source.fileset">
@@ -251,8 +251,8 @@
     </x:scenario>
     
     <x:scenario label="add-entry-document">
-        <x:call step="px:fileset-add-entry">
-            <x:input port="entry">
+        <x:call step="px:fileset-add-entries">
+            <x:input port="entries">
                 <x:document type="inline" xml:base="file:/Users/me/dir/doc.html">
                     <doc/>
                 </x:document>
@@ -285,7 +285,7 @@
     </x:scenario>
 
     <x:scenario label="add-entry-with-attribute">
-        <x:call step="px:fileset-add-entry">
+        <x:call step="px:fileset-add-entries">
             <x:input port="source.fileset">
                 <x:document type="inline">
                     <d:fileset xml:base="file:/Users/me/dir/"/>
@@ -307,7 +307,7 @@
     </x:scenario>
 
     <x:scenario label="add-disallowed-attribute">
-        <x:call step="px:fileset-add-entry">
+        <x:call step="px:fileset-add-entries">
             <x:input port="source.fileset">
                 <x:document type="inline">
                     <d:fileset xml:base="file:/Users/me/dir/"/>
@@ -324,7 +324,7 @@
     </x:scenario>
 
     <x:scenario label="add-existing-entry">
-        <x:call step="px:fileset-add-entry">
+        <x:call step="px:fileset-add-entries">
             <x:input port="source.fileset">
                 <x:document type="inline">
                     <d:fileset xml:base="file:/Users/me/dir/">
@@ -347,7 +347,7 @@
     </x:scenario>
 
     <x:scenario label="add-mediatype-to-existing-entry">
-        <x:call step="px:fileset-add-entry">
+        <x:call step="px:fileset-add-entries">
             <x:input port="source.fileset">
                 <x:document type="inline">
                     <d:fileset xml:base="file:/Users/me/dir/">
@@ -372,7 +372,7 @@
     </x:scenario>
 
     <x:scenario label="add-attribute-to-existing-entry">
-        <x:call step="px:fileset-add-entry">
+        <x:call step="px:fileset-add-entries">
             <x:input port="source.fileset">
                 <x:document type="inline">
                     <d:fileset xml:base="file:/Users/me/dir/">
@@ -397,7 +397,7 @@
     </x:scenario>
 
     <x:scenario label="replace-existing-entry">
-        <x:call step="px:fileset-add-entry">
+        <x:call step="px:fileset-add-entries">
             <x:input port="source.fileset">
                 <x:document type="inline">
                     <d:fileset xml:base="file:/Users/me/dir/">

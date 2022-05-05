@@ -23,6 +23,7 @@ import com.xmlcalabash.library.DefaultStep;
 import com.xmlcalabash.model.RuntimeValue;
 import com.xmlcalabash.runtime.XAtomicStep;
 
+import net.sf.saxon.s9api.XdmItem;
 import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.SaxonApiException;
 
@@ -43,17 +44,17 @@ import org.osgi.service.component.annotations.Component;
 
 import org.slf4j.Logger;
 
-public class AddEntryStep extends DefaultStep implements XProcStep {
+public class AddEntriesStep extends DefaultStep implements XProcStep {
 
 	@Component(
-		name = "pxi:fileset-add-entry",
+		name = "pxi:fileset-add-entries",
 		service = { XProcStepProvider.class },
-		property = { "type:String={http://www.daisy.org/ns/pipeline/xproc/internal}fileset-add-entry" }
+		property = { "type:String={http://www.daisy.org/ns/pipeline/xproc/internal}fileset-add-entries" }
 	)
 	public static class StepProvider implements XProcStepProvider {
 		@Override
 		public XProcStep newStep(XProcRuntime runtime, XAtomicStep step) {
-			return new AddEntryStep(runtime, step);
+			return new AddEntriesStep(runtime, step);
 		}
 	}
 
@@ -63,17 +64,18 @@ public class AddEntryStep extends DefaultStep implements XProcStep {
 	private static final net.sf.saxon.s9api.QName _FIRST = new net.sf.saxon.s9api.QName("first");
 	private static final net.sf.saxon.s9api.QName _REPLACE = new net.sf.saxon.s9api.QName("replace");
 	private static final net.sf.saxon.s9api.QName _REPLACE_ATTRIBUTES = new net.sf.saxon.s9api.QName("replace-attributes");
+	private static final net.sf.saxon.s9api.QName _ASSERT_SINGLE_ENTRY = new net.sf.saxon.s9api.QName("assert-single-entry");
 	private static final QName XML_BASE = new QName(XMLConstants.XML_NS_URI, "base", "xml");
 	private static final QName D_FILE = new QName("http://www.daisy.org/ns/pipeline/data", "file", "d");
 
 	private ReadablePipe sourceFilesetPipe = null;
 	private ReadablePipe sourceInMemoryPipe = null;
-	private ReadablePipe entryPipe = null;
+	private ReadablePipe entriesPipe = null;
 	private WritablePipe resultFilesetPipe = null;
 	private WritablePipe resultInMemoryPipe = null;
 	private Map<QName,String> fileAttributes = null;
 
-	private AddEntryStep(XProcRuntime runtime, XAtomicStep step) {
+	private AddEntriesStep(XProcRuntime runtime, XAtomicStep step) {
 		super(runtime, step);
 	}
 
@@ -83,8 +85,8 @@ public class AddEntryStep extends DefaultStep implements XProcStep {
 			sourceFilesetPipe = pipe;
 		else if ("source.in-memory".equals(port))
 			sourceInMemoryPipe = pipe;
-		else if ("entry".equals(port))
-			entryPipe = pipe;
+		else if ("entries".equals(port))
+			entriesPipe = pipe;
 	}
 
 	@Override
@@ -99,7 +101,7 @@ public class AddEntryStep extends DefaultStep implements XProcStep {
 	public void reset() {
 		sourceFilesetPipe.resetReader();
 		sourceInMemoryPipe.resetReader();
-		entryPipe.resetReader();
+		entriesPipe.resetReader();
 		resultFilesetPipe.resetWriter();
 		resultInMemoryPipe.resetWriter();
 		if (fileAttributes != null) fileAttributes.clear();
@@ -119,19 +121,32 @@ public class AddEntryStep extends DefaultStep implements XProcStep {
 	public void run() throws SaxonApiException {
 		super.run();
 		try {
-			File entry; {
-				String href = getOption(new net.sf.saxon.s9api.QName(_HREF), "");
-				if ("".equals(href)) {
-					if (!entryPipe.moreDocuments())
+			List<File> entries; {
+				entries = new ArrayList<>();
+				boolean assertSingleEntry = getOption(_ASSERT_SINGLE_ENTRY, false);
+				RuntimeValue href = getOption(new net.sf.saxon.s9api.QName(_HREF));
+				if (href != null)
+					for (XdmItem i : href.getValue())
+						entries.add(new File(URI.create(i.getStringValue())));
+				if (entriesPipe.moreDocuments()) {
+					if (!entries.isEmpty())
 						throw TransformerException.wrap(
-							new IllegalArgumentException("Expected 1 document on the entry port"));
-					entry = new File(entryPipe.read());
-				} else {
-					if (entryPipe.moreDocuments())
-						throw TransformerException.wrap(
-							new IllegalArgumentException("Expected 0 documents on the entry port"));
-					entry = new File(URI.create(href));
-				}
+							new IllegalArgumentException(
+								assertSingleEntry
+								? "Expected 0 documents on the entry port"
+								: "Expected 0 documents on the entries port"));
+					entries.add(new File(entriesPipe.read()));
+					if (entriesPipe.moreDocuments()) {
+						if (assertSingleEntry)
+							throw TransformerException.wrap(
+								new IllegalArgumentException("Expected exactly 1 document on the entry port (got more)"));
+						entries.add(new File(entriesPipe.read()));
+						while (entriesPipe.moreDocuments())
+							entries.add(new File(entriesPipe.read()));
+					}
+				} else if (assertSingleEntry && entries.isEmpty())
+					throw TransformerException.wrap(
+						new IllegalArgumentException("Expected 1 document on the entry port (got 0)"));
 			}
 			URI originalHref; {
 				String option = getOption(new net.sf.saxon.s9api.QName(_ORIGINAL_HREF), "");
@@ -142,15 +157,17 @@ public class AddEntryStep extends DefaultStep implements XProcStep {
 			}
 			String mediaType = getOption(new net.sf.saxon.s9api.QName(_MEDIA_TYPE), "");
 			if ("".equals(mediaType)) mediaType = null;
-			entry.originalHref = originalHref;
-			entry.mediaType = mediaType;
-			entry.otherAttributes = fileAttributes;
+			for (File f : entries) {
+				f.originalHref = originalHref;
+				f.mediaType = mediaType;
+				f.otherAttributes = fileAttributes;
+			}
 			boolean first = getOption(_FIRST, false);
 			boolean replace = getOption(_REPLACE, false);
 			boolean replaceAttributes = getOption(_REPLACE_ATTRIBUTES, false);
-			List<File> added = addEntry(new XMLCalabashInputValue(sourceFilesetPipe).asXMLStreamReader(),
-			                             new XMLCalabashOutputValue(resultFilesetPipe, runtime).asXMLStreamWriter(),
-			                             entry, first, replace, replaceAttributes, logger);
+			List<File> added = addEntries(new XMLCalabashInputValue(sourceFilesetPipe).asXMLStreamReader(),
+			                              new XMLCalabashOutputValue(resultFilesetPipe, runtime).asXMLStreamWriter(),
+			                              entries, first, replace, replaceAttributes, logger);
 			if (first)
 				for (File f : added)
 					if (f.node != null)
@@ -166,16 +183,16 @@ public class AddEntryStep extends DefaultStep implements XProcStep {
 		}
 	}
 
-	private static List<File> addEntry(BaseURIAwareXMLStreamReader source, BaseURIAwareXMLStreamWriter result,
-	                                   File entry, boolean first, boolean replace, boolean replaceAttributes, Logger logger)
+	private static List<File> addEntries(BaseURIAwareXMLStreamReader source, BaseURIAwareXMLStreamWriter result,
+	                                     List<File> entries, boolean first, boolean replace, boolean replaceAttributes, Logger logger)
 			throws XMLStreamException {
 		FileSet added = new FileSet();
+		added.addAll(entries);
 		URI filesetBase = source.getBaseURI();
 		result.setBaseURI(filesetBase);
 		result.writeStartDocument();
 		result = new BufferedXMLStreamWriter(result);
 		int depth = 0;
-		boolean exists = false;
 		boolean hasXmlBase = false;
 	  document: while (true)
 			try {
@@ -186,7 +203,9 @@ public class AddEntryStep extends DefaultStep implements XProcStep {
 				case END_DOCUMENT:
 					break document;
 				case START_ELEMENT:
-					if (depth == 0) {
+					if (entries.isEmpty())
+						XMLStreamWriterHelper.writeElement(result, source);
+					else if (depth == 0) {
 						// <d:fileset>
 						for (int i = 0; i < source.getAttributeCount(); i++)
 							if (XML_BASE.equals(source.getAttributeName(i))) {
@@ -195,32 +214,37 @@ public class AddEntryStep extends DefaultStep implements XProcStep {
 								break;
 							}
 						filesetBase = FileUtils.normalizeURI(filesetBase);
-						entry.base = FileUtils.normalizeURI(filesetBase.resolve(entry.href));
-						if (hasXmlBase)
-							entry.href = FileUtils.relativizeURI(entry.base, filesetBase);
-						else if (!entry.href.isAbsolute())
-							logger.warn("Adding a relative resource to a file set with no base directory");
-						if (entry.originalHref != null)
-							entry.originalHref = FileUtils.normalizeURI(filesetBase.resolve(entry.originalHref));
+						for (File f : added) {
+							f.base = FileUtils.normalizeURI(filesetBase.resolve(f.href));
+							if (hasXmlBase)
+								f.href = FileUtils.relativizeURI(f.base, filesetBase);
+							else if (!f.href.isAbsolute())
+								logger.warn("Adding a relative resource to a file set with no base directory");
+							if (f.originalHref != null)
+								f.originalHref = FileUtils.normalizeURI(filesetBase.resolve(f.originalHref));
+						}
 						XMLStreamWriterHelper.writeStartElement(result, source.getName());
 						XMLStreamWriterHelper.writeAttributes(result, source);
 						depth++;
 						if (first)
-							// insert entry
+							// insert entries
 							((BufferedXMLStreamWriter)result).writeEvent(added);
 					} else if (depth == 1) {
 						// <d:file>
-						boolean match = false; {
-							if (!exists)
-								for (int i = 0; i < source.getAttributeCount(); i++)
-									if (_HREF.equals(source.getAttributeName(i))) {
-										URI base = FileUtils.normalizeURI(filesetBase.resolve(source.getAttributeValue(i)));
-										match = entry.base.equals(base);
-										break;
-									}
+						File match = null; {
+							for (int i = 0; i < source.getAttributeCount(); i++)
+								if (_HREF.equals(source.getAttributeName(i))) {
+									URI base = FileUtils.normalizeURI(filesetBase.resolve(source.getAttributeValue(i)));
+									for (File f : entries)
+										if (f.base.equals(base)) {
+											match = f;
+											break;
+										}
+									break;
+								}
 						}
-						if (match) {
-							exists = true;
+						if (match != null) {
+							entries.remove(match);
 							if (replace) {
 								// skip entry
 							  element: while (true) {
@@ -236,18 +260,21 @@ public class AddEntryStep extends DefaultStep implements XProcStep {
 									default:
 									}
 								}
-							} else if (replaceAttributes) {
-								// update entry
-								XMLStreamWriterHelper.writeStartElement(result, source.getName());
-								Map<QName,String> existingAttributes = new HashMap<>(); {
-									for (int i = 0; i < source.getAttributeCount(); i++)
-										existingAttributes.put(source.getAttributeName(i), source.getAttributeValue(i));
-								}
-								writeFileAttributes(result, existingAttributes, entry.originalHref, entry.mediaType, entry.otherAttributes);
-								depth++;
-							} else
-								// keep entry
-								XMLStreamWriterHelper.writeElement(result, source);
+							} else {
+								added.remove(match);
+								if (replaceAttributes) {
+									// update entry
+									XMLStreamWriterHelper.writeStartElement(result, source.getName());
+									Map<QName,String> existingAttributes = new HashMap<>(); {
+										for (int i = 0; i < source.getAttributeCount(); i++)
+											existingAttributes.put(source.getAttributeName(i), source.getAttributeValue(i));
+									}
+									writeFileAttributes(result, existingAttributes, match.originalHref, match.mediaType, match.otherAttributes);
+									depth++;
+								} else
+									// keep entry
+									XMLStreamWriterHelper.writeElement(result, source);
+							}
 						} else
 							// keep entry
 							XMLStreamWriterHelper.writeElement(result, source);
@@ -260,7 +287,7 @@ public class AddEntryStep extends DefaultStep implements XProcStep {
 					if (depth == 0) {
 						// </d:fileset>
 						if (!first)
-							// insert entry
+							// insert entries
 							((BufferedXMLStreamWriter)result).writeEvent(added);
 					}
 				default:
@@ -270,8 +297,6 @@ public class AddEntryStep extends DefaultStep implements XProcStep {
 				break;
 			}
 		result.writeEndDocument();
-		if (replace || !exists)
-			added.add(entry);
 		added.ready = true;
 		result.flush();
 		return added;
