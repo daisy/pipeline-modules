@@ -128,7 +128,10 @@
             px:fileset-load
             px:fileset-create
             px:fileset-add-entry
+            px:fileset-add-entries
             px:fileset-join
+            px:fileset-intersect
+            px:fileset-copy
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/mediatype-utils/library.xpl">
@@ -517,35 +520,28 @@
         <p:choose name="result.fileset.resources">
             <p:when test="$opt-copy-external-resources = 'true'">
                 <p:documentation>Add all the auxiliary resources to the fileset.</p:documentation>
-                <p:output port="result" sequence="true">
-                    <p:pipe port="result" step="for-each-resource"/>
-                </p:output>
-                <p:for-each name="for-each-resource">
-                    <p:output port="result" sequence="true"/>
-                    <p:iteration-source select="//*[@src]">
+                <p:output port="result" sequence="true"/>
+                <px:fileset-create>
+                    <p:with-option name="base" select="$dtbook-base"/>
+                </px:fileset-create>
+                <px:fileset-add-entries name="referenced-from-dtbook">
+                    <p:with-option name="href" select="//*[@src]/string(@src)">
                         <p:pipe step="validate-zedai" port="result"/>
-                    </p:iteration-source>
-                    <p:variable name="src" select="/*/@src"/>
-                    <p:variable name="dtbook-source-uri" select="resolve-uri($src, $dtbook-base)"/>
-                    <p:variable name="source-uri"
-                        select="(//d:file[resolve-uri(@href,base-uri(.)) = $dtbook-source-uri]/@original-href, $dtbook-source-uri)[1]">
-                        <p:pipe port="fileset.in" step="main"/>
-                    </p:variable>
-                    <p:variable name="result-uri" select="resolve-uri($src, $output-dir)"/>
-
-                    <p:identity px:message-severity="DEBUG" px:message="{$source-uri} --> {$result-uri}"/>
-                    <p:sink/>
-
-                    <px:fileset-create>
-                        <p:with-option name="base" select="$output-dir"/>
-                    </px:fileset-create>
-                    <px:fileset-add-entry>
-                        <p:with-option name="href" select="resolve-uri($src,$zedai-file)"/>
-                    </px:fileset-add-entry>
-                    <p:add-attribute match="/*/*" attribute-name="original-href">
-                        <p:with-option name="attribute-value" select="$source-uri"/>
-                    </p:add-attribute>
-                </p:for-each>
+                    </p:with-option>
+                </px:fileset-add-entries>
+                <p:sink/>
+                <px:fileset-intersect>
+                    <p:input port="source">
+                        <p:pipe step="main" port="fileset.in"/>
+                        <p:pipe step="referenced-from-dtbook" port="result.fileset"/>
+                    </p:input>
+                </px:fileset-intersect>
+                <px:fileset-rebase>
+                    <p:with-option name="new-base" select="$dtbook-base"/>
+                </px:fileset-rebase>
+                <px:fileset-copy>
+                    <p:with-option name="target" select="$output-dir"/>
+                </px:fileset-copy>
             </p:when>
             <p:otherwise px:message-severity="DEBUG" px:message="NOT copying external resources">
                 <p:output port="result" sequence="true"/>

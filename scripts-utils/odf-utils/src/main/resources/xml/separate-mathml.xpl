@@ -32,7 +32,7 @@
 	<p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
 		<p:documentation>
 			px:fileset-create
-			px:fileset-add-entry
+			px:fileset-add-entries
 			px:fileset-join
 			px:fileset-update
 		</p:documentation>
@@ -77,24 +77,16 @@
 			<p:pipe step="content.temp" port="result"/>
 		</p:input>
 	</p:delete>
-	
-	<px:fileset-create name="base">
+
+	<p:sink/>
+	<px:fileset-create>
 		<p:with-option name="base" select="$base"/>
 	</px:fileset-create>
-	<p:sink/>
-	
-	<p:for-each>
-		<p:iteration-source>
+	<px:fileset-add-entries media-type="application/mathml+xml">
+		<p:input port="entries">
 			<p:pipe step="mathml" port="result"/>
-		</p:iteration-source>
-		<px:fileset-add-entry media-type="application/mathml+xml">
-			<p:input port="source.fileset">
-				<p:pipe step="base" port="result"/>
-			</p:input>
-			<p:with-option name="href" select="base-uri(/*)"/>
-		</px:fileset-add-entry>
-	</p:for-each>
-	
+		</p:input>
+	</px:fileset-add-entries>
 	<px:fileset-join name="fileset.mathml"/>
 	
 	<px:fileset-join name="fileset.with-mathml">

@@ -36,32 +36,25 @@
 	</p:output>
 	
 	<p:import href="fileset-create.xpl"/>
-	<p:import href="fileset-add-entry.xpl"/>
-	<p:import href="fileset-join.xpl"/>
+	<p:import href="fileset-add-entries.xpl"/>
 	<p:import href="fileset-intersect.xpl"/>
 	<p:import href="fileset-diff.xpl"/>
 	<p:import href="fileset-load.xpl"/>
 	
-	<px:fileset-create name="base"/>
-	
-	<p:for-each>
-		<p:iteration-source>
+	<p:sink/>
+	<px:fileset-create/>
+	<px:fileset-add-entries name="fileset-from-in-memory">
+		<p:input port="entries">
 			<p:pipe step="main" port="source.in-memory"/>
-		</p:iteration-source>
-		<px:fileset-add-entry>
-			<p:with-option name="href" select="resolve-uri(base-uri(/*))"/>
-			<p:input port="source.fileset">
-				<p:pipe step="base" port="result"/>
-			</p:input>
-		</px:fileset-add-entry>
-	</p:for-each>
-	<px:fileset-join name="fileset-from-in-memory"/>
+		</p:input>
+	</px:fileset-add-entries>
 	<p:sink/>
 	
 	<px:fileset-intersect name="result">
+		<!-- px:fileset-intersect also normalizes filesets -->
 		<p:input port="source">
 			<p:pipe step="main" port="source.fileset"/>
-			<p:pipe step="fileset-from-in-memory" port="result"/>
+			<p:pipe step="fileset-from-in-memory" port="result.fileset"/>
 		</p:input>
 	</px:fileset-intersect>
 	<px:fileset-load name="result.in-memory">
@@ -73,8 +66,9 @@
 	<p:sink/>
 	
 	<px:fileset-diff name="not-in-manifest">
+		<!-- px:fileset-diff also normalizes filesets -->
 		<p:input port="source">
-			<p:pipe step="fileset-from-in-memory" port="result"/>
+			<p:pipe step="fileset-from-in-memory" port="result.fileset"/>
 		</p:input>
 		<p:input port="secondary">
 			<p:pipe step="main" port="source.fileset"/>
@@ -83,11 +77,12 @@
 	<p:sink/>
 	
 	<px:fileset-diff name="not-in-memory">
+		<!-- px:fileset-diff also normalizes filesets -->
 		<p:input port="source">
 			<p:pipe step="main" port="source.fileset"/>
 		</p:input>
 		<p:input port="secondary">
-			<p:pipe step="fileset-from-in-memory" port="result"/>
+			<p:pipe step="fileset-from-in-memory" port="result.fileset"/>
 		</p:input>
 	</px:fileset-diff>
 	<p:sink/>

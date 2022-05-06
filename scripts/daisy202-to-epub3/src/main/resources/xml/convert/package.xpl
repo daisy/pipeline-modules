@@ -66,6 +66,7 @@
         <p:documentation>
             px:fileset-create
             px:fileset-add-entry
+            px:fileset-add-entries
             px:fileset-join
         </p:documentation>
     </p:import>
@@ -99,20 +100,16 @@
 
     <p:group name="manifest">
         <p:output port="result"/>
-        <p:for-each name="manifest-without-resources">
-            <p:iteration-source>
+        <px:fileset-create/>
+        <px:fileset-add-entries>
+            <p:input port="entries">
                 <p:pipe step="package" port="navigation"/>
                 <p:pipe step="package" port="content-docs"/>
                 <p:pipe step="package" port="mediaoverlay"/>
-            </p:iteration-source>
-            <p:output port="result"/>
-            <px:fileset-create/>
-            <px:fileset-add-entry>
-                <p:input port="entry">
-                    <p:pipe step="manifest-without-resources" port="current"/>
-                </p:input>
-            </px:fileset-add-entry>
-        </p:for-each>
+            </p:input>
+        </px:fileset-add-entries>
+        <p:identity name="manifest-without-resources"/>
+        <p:sink/>
         <px:fileset-join>
             <p:input port="source">
                 <p:pipe step="manifest-without-resources" port="result"/>
