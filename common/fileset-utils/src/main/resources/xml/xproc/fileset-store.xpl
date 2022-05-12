@@ -73,9 +73,6 @@
 
     <p:import href="fileset-library.xpl">
         <p:documentation>
-            px:fileset-create
-            px:fileset-add-entry
-            px:fileset-load
             px:fileset-copy
             px:fileset-update
             px:fileset-invert
@@ -103,6 +100,7 @@
             px:set-xml-declaration
             px:normalize-uri
             px:set-base-uri
+            px:data
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/zip-utils/library.xpl">
@@ -186,12 +184,12 @@
                 <p:variable name="unzip-dir" select="string(/*)">
                     <p:pipe step="unzip-dir" port="normalized"/>
                 </p:variable>
-                <px:fileset-create/>
-                <px:fileset-add-entry>
-                    <p:with-option name="href" select="$original-href"/>
-                    <p:with-param port="file-attributes" name="method" select="'binary'"/>
-                </px:fileset-add-entry>
-                <px:fileset-load/>
+                <p:sink/>
+                <px:data content-type="binary/octet-stream">
+                    <p:with-option name="href" select="if (contains($original-href,'!/'))
+                                                       then replace($original-href,'^file:','jar:file:')
+                                                       else $original-href"/>
+                </px:data>
                 <p:store cx:decode="true" encoding="base64" name="store-binary">
                     <!--
                         Note that if the final target location is a file inside a ZIP, the temporary

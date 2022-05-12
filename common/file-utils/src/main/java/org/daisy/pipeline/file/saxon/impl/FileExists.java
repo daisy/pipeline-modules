@@ -10,7 +10,6 @@ import java.nio.file.FileSystems;
 import net.sf.saxon.expr.XPathContext;
 import net.sf.saxon.lib.ExtensionFunctionCall;
 import net.sf.saxon.lib.ExtensionFunctionDefinition;
-import net.sf.saxon.om.AtomicSequence;
 import net.sf.saxon.om.Sequence;
 import net.sf.saxon.om.StructuredQName;
 import net.sf.saxon.trans.XPathException;
@@ -56,7 +55,7 @@ public class FileExists extends ExtensionFunctionDefinition {
 			@SuppressWarnings({ "unchecked", "rawtypes" })
 			public Sequence call(XPathContext context, Sequence[] arguments) throws XPathException {
 				try {
-					String uri = ((AtomicSequence) arguments[0]).getStringValue();
+					String uri = arguments[0].head().getStringValue();
 					return new BooleanValue(exists(URLs.asURI(uri)), BuiltInAtomicType.BOOLEAN);
 				} catch (Throwable e) {
 					throw new XPathException("Unexpected error in pf:file-exists", e);
