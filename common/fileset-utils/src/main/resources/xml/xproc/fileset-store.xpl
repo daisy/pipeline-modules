@@ -395,8 +395,14 @@
         fileset.</p:documentation>
     <p:viewport match="d:file" name="store">
         <p:output port="result"/>
+        <p:variable name="target" select="/*/resolve-uri(@href,base-uri(.))"/>
+        <p:choose>
+        <p:when test="contains($target,'!/')">
+        <p:documentation>File already zipped (handled above)</p:documentation>
+        <p:identity/>
+        </p:when>
+        <p:otherwise>
         <p:variable name="on-disk" select="(/*/@original-href, '')[1]"/>
-        <p:variable name="target" select="/*/resolve-uri(@href, base-uri(.))"/>
         <p:variable name="href" select="/*/@href"/>
         <p:variable name="media-type" select="/*/@media-type"/>
         <!--serialization options:-->
@@ -418,10 +424,6 @@
         <p:variable name="xml-declaration" select="/*/@xml-declaration"/>
 
         <p:choose>
-            <p:when test="contains($target, '!/')">
-                <p:documentation>File already zipped (handled above)</p:documentation>
-                <p:identity/>
-            </p:when>
             <p:when test="$on-disk">
                 <p:documentation>File is on disk and not in memory (handle below)</p:documentation>
                 <p:identity/>
@@ -538,7 +540,7 @@
         </p:choose>
 
         <p:choose>
-            <p:when test="$on-disk and not(contains($target, '!/'))">
+            <p:when test="$on-disk">
                 <p:documentation>File is on disk and not in memory; copy it to the new location.</p:documentation>
                 <p:variable name="target-dir" select="replace($target,'[^/]+$','')"/>
                 
@@ -639,7 +641,8 @@
                 <p:identity/>
             </p:otherwise>
         </p:choose>
-        
+        </p:otherwise>
+        </p:choose>
         <p:documentation>Add original-href attribute so that the in-memory documents can be
         discarded and px:fileset-store called again without resulting in a "neither stored on disk
         nor in memory" error.</p:documentation>
