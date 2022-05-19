@@ -10353,15 +10353,25 @@
       <x:input port="source">
         <x:document type="inline">
           <body style="text-transform: none; @page { size: 10 10 }">
-            <h1 style="display: block; -obfl-underline:⠒">
+            <h1 style="display: block; -obfl-underline: ⠒">
               ⠿⠿⠿⠿⠿⠿⠿⠿ ⠿⠿⠿⠿
             </h1>
-            <h2 style="display: block; -obfl-underline:⠂">
+            <h2 style="display: block; -obfl-underline: ⠂">
               ⠿⠿⠿⠿⠿⠿⠿⠿
             </h2>
+            <br style="display: block; page-break-before: always"/>
+            <p style="display: block; -obfl-underline: ⠒" id="a">
+              ⠿⠿⠿⠿⠿⠿
+              <a href="a" style="&amp;::after { content: target-counter(attr(href), page) }"/>
+            </p>
+            <br style="display: block; page-break-before: always"/>
+            <p style="display: block; -obfl-underline: ⠒; margin-top: 1">
+              ⠿⠿⠿⠿⠿⠿
+            </p>
           </body>
         </x:document>
       </x:input>
+      <x:option name="skip-margin-top-of-page" select="true()"/>
     </x:call>
     <x:context label="obfl">
       <x:document type="port" port="obfl"/>
@@ -10381,6 +10391,19 @@
           <sequence master="master_1">
             <block underline-pattern="⠒"> ⠿⠿⠿⠿⠿⠿⠿⠿ ⠿⠿⠿⠿ </block>
             <block underline-pattern="⠂"> ⠿⠿⠿⠿⠿⠿⠿⠿ </block>
+            <block break-before="page"/>
+            <block underline-pattern="⠒">
+              <block>
+                <span id="a"/>
+              </block>
+              ⠿⠿⠿⠿⠿⠿
+              <page-number ref-id="a" number-format="default"/>
+            </block>
+            <block break-before="page"/>
+            <block>
+              <block margin-top="1" display-when="(! $starts-at-top-of-page)"/>
+              <block underline-pattern="⠒"> ⠿⠿⠿⠿⠿⠿ </block>
+            </block>
           </sequence>
         </obfl>
       </x:document>
@@ -10405,6 +10428,14 @@
                   <row>⠒⠒⠒⠒⠒⠒⠒⠒</row>
                   <row>⠿⠿⠿⠿⠿⠿⠿⠿</row>
                   <row>⠂⠂⠂⠂⠂⠂⠂⠂</row>
+                </page>
+                <page>
+                  <row>⠿⠿⠿⠿⠿⠿⠀2</row>
+                  <row>⠒⠒⠒⠒⠒⠒⠒⠒</row>
+                </page>
+                <page>
+                  <row>⠿⠿⠿⠿⠿⠿</row>
+                  <row>⠒⠒⠒⠒⠒⠒</row>
                 </page>
               </section>
             </volume>

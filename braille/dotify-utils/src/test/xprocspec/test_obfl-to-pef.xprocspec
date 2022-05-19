@@ -9002,9 +9002,10 @@
     </x:expect>
   </x:scenario>
 
-  <x:scenario label="block-underline-with-child-block" pending="undefined behavior">
+  <x:scenario label="block-underline-with-child-block">
     <x:documentation>
-      Tests underlining of a block with a child block. Currently causes an error because the behavior is undefined.
+      Tests underlining of a block with a child block. The OBFL spec says the behavior is undefined
+      in this case. This test shows the behavior of Dotify.
     </x:documentation>
     <x:call step="pxi:test">
       <x:input port="source">
@@ -9028,6 +9029,31 @@
         </x:document>
       </x:input>
     </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="result" type="custom" href="http://www.daisy.org/pipeline/modules/braille/pef-utils/library.xpl" step="x:pef-compare">
+      <x:document type="inline">
+        <pef xmlns="http://www.daisy.org/ns/2008/pef" version="2008-1">
+          <head xmlns:dc="http://purl.org/dc/elements/1.1/">
+            <meta>
+              <dc:format>application/x-pef+xml</dc:format>
+            </meta>
+          </head>
+          <body>
+            <volume cols="15" rows="15" rowgap="0" duplex="false">
+              <section>
+                <page>
+                  <row>⠌⠌⠌⠌</row>
+                  <row>⠤⠤⠤⠤</row>
+                  <row>⠌⠌⠌⠌</row>
+                </page>
+              </section>
+            </volume>
+          </body>
+        </pef>
+      </x:document>
+    </x:expect>
   </x:scenario>
 
   <x:scenario label="manual-volume-breaking-toc">

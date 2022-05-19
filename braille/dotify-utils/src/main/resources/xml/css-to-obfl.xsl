@@ -1216,7 +1216,7 @@
         <xsl:apply-templates mode="block-attr"
                              select="@* except (@type|
                                                 @css:text-transform|@css:braille-charset|@css:hyphens|@css:hyphenate-character|
-                                                @css:line-height|@css:text-align|@css:text-indent|@css:_obfl-right-text-indent|
+                                                @css:line-height|@css:text-align|@css:text-indent|@css:_obfl-right-text-indent|@css:_obfl-underline|
                                                 @css:page-break-inside|@css:margin-top-skip-if-top-of-page|
                                                 @css:padding-top|@css:padding-bottom|@css:padding-left|@css:padding-right|
                                                 @css:border-top-pattern|@css:border-left-pattern|@css:border-right-pattern)"/>
@@ -1279,7 +1279,8 @@
                   mode="block toc-block"
                   match="css:box[@type='block']">
         <xsl:apply-templates mode="block-attr"
-                             select="@css:line-height|@css:text-align|@css:text-indent|@css:_obfl-right-text-indent|@css:page-break-inside"/>
+                             select="@css:line-height|@css:text-align|@css:text-indent|@css:_obfl-right-text-indent|@css:_obfl-underline|
+                                     @css:page-break-inside"/>
         <xsl:next-match/>
         <xsl:apply-templates mode="anchor" select="@css:id"/>
     </xsl:template>
