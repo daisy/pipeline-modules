@@ -18,6 +18,7 @@
 			<x:option name="assert-valid" select="true()"/>
 			<x:option name="filename" select="'minimal'"/>
 			<x:option name="output-dir" select="resolve-uri('result/')"/>
+			<x:option name="temp-dir" select="resolve-uri('minimal/',$temp-dir)"/>
 		</x:call>
 		<x:context label="the result.fileset port">
 			<x:document type="port" port="result.fileset"/>

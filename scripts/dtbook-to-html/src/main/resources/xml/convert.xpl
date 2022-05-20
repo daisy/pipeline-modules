@@ -34,6 +34,7 @@
 	<p:option name="chunk-size" required="false" select="'-1'"/>
 	<p:option name="filename" required="true"/>
 	<p:option name="output-dir" required="true"/>
+	<p:option name="temp-dir" required="true"/>
 	
 	<p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
 		<p:documentation>
@@ -55,7 +56,7 @@
 		<p:input port="in-memory.in">
 			<p:pipe step="main" port="source.in-memory"/>
 		</p:input>
-		<p:with-option name="opt-output-dir" select="concat($output-dir,'zedai/')"/>
+		<p:with-option name="opt-output-dir" select="concat($temp-dir,'zedai/')"/>
 		<p:with-option name="opt-zedai-filename" select="concat($filename,'.xml')"/>
 		<p:with-option name="opt-lang" select="$language"/>
 		<p:with-option name="opt-assert-valid" select="$assert-valid"/>
