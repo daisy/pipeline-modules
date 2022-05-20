@@ -308,7 +308,7 @@
     -->
     <p:documentation>Generate CSS from the visual property attributes in the ZedAI
         document</p:documentation>
-    <p:xslt name="generate-css" px:progress="1/23" px:message="Generating CSS">
+    <p:xslt px:progress="1/23" px:message="Generating CSS">
         <p:with-param name="css-file" select="$css-file"/>
         <p:input port="stylesheet">
             <p:inline>
@@ -316,17 +316,21 @@
                 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
                     xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp">
                     <xsl:import href="generate-css.xsl"/>
-                    <xsl:param name="css-file" required="yes"/>
                     <xsl:template match="/">
                         <tmp:wrapper>
-                            <xsl:attribute name="xml:base" select="$css-file"/>
                             <xsl:apply-imports/>
                         </tmp:wrapper>
                     </xsl:template>
                 </xsl:stylesheet>
             </p:inline>
         </p:input>
+        <p:input port="parameters">
+            <p:empty/>
+        </p:input>
     </p:xslt>
+    <px:set-base-uri name="generate-css">
+        <p:with-option name="base-uri" select="$css-file"/>
+    </px:set-base-uri>
 
     <p:documentation>If CSS was generated, add a reference to the ZedAI document</p:documentation>
     <p:choose name="add-css-reference" px:progress="1/23">
