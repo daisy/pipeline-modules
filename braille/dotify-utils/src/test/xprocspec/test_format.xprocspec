@@ -6075,22 +6075,26 @@
   <x:scenario label="test_57">
     <x:documentation>
       Tests -obfl-marker-indicator() in @left when @page has no margin-left.
+
+      Also tests that content in left margin is trimmed when needed. (Note that if
+      allow-text-overflow-trimming is set to false, this would result in an error.)
     </x:documentation>
     <x:call step="dotify:format">
       <x:input port="source">
         <x:document type="inline">
-          <doc style="text-transform: none;
-                      @page { size: 15 5; @left { content: -obfl-marker-indicator(pagenum, '⠿') }}">
-            <body style="display: block">
+          <doc style="text-transform: none;">
+            <section style="display: block; @page { size: 15 5; @left { content: -obfl-marker-indicator(pagenum, '⠿') }}">
               <pagenum style="display: none; -obfl-marker: pagenum">1</pagenum>
               ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
               ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
               <pagenum style="display: none; -obfl-marker: pagenum">2</pagenum>
               ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
+            </section>
+            <section style="display: block; @page { size: 15 5; @left { content: -obfl-marker-indicator(pagenum, '⠿⠿⠿') }}">
               ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
               ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
               <pagenum style="display: none; -obfl-marker: pagenum">3</pagenum>
-            </body>
+            </section>
           </doc>
         </x:document>
       </x:input>
@@ -6104,7 +6108,7 @@
           <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
             <dp2:style-type>text/css</dp2:style-type>
           </meta>
-          <layout-master name="body" page-width="15" page-height="5" duplex="true">
+          <layout-master name="a" page-width="15" page-height="5" duplex="true">
             <default-template>
               <header/>
               <footer/>
@@ -6115,13 +6119,28 @@
               </margin-region>
             </default-template>
           </layout-master>
-          <sequence master="body">
+          <layout-master name="b" page-width="15" page-height="5" duplex="true">
+            <default-template>
+              <header/>
+              <footer/>
+              <margin-region align="left" width="1">
+                <indicators>
+                  <marker-indicator markers="indicator/pagenum" indicator="⠿⠿⠿"/>
+                </indicators>
+              </margin-region>
+            </default-template>
+          </layout-master>
+          <sequence master="a">
             <block>
               <marker class="indicator/pagenum" value="x"/>
               ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
               ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
               <marker class="indicator/pagenum" value="x"/>
               ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
+            </block>
+          </sequence>
+          <sequence master="b">
+            <block break-before="sheet">
               ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
               ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
               <marker class="indicator/pagenum" value="x"/>
@@ -6148,6 +6167,10 @@
                   <row>⠿⠤⠤⠤⠀⠤⠤⠤⠀⠤⠤⠤</row>
                   <row>⠿⠤⠤⠤⠀⠤⠤⠤⠀⠤⠤⠤</row>
                   <row>⠀⠤⠤⠤⠀⠤⠤⠤⠀⠤⠤⠤</row>
+                </page>
+              </section>
+              <section>
+                <page>
                   <row>⠀⠤⠤⠤⠀⠤⠤⠤⠀⠤⠤⠤</row>
                   <row>⠿⠤⠤⠤⠀⠤⠤⠤⠀⠤⠤⠤</row>
                 </page>
