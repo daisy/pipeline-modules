@@ -24,7 +24,6 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
-import cz.vutbr.web.css.CSSFactory;
 import cz.vutbr.web.css.CSSProperty;
 import cz.vutbr.web.css.Declaration;
 import cz.vutbr.web.css.NodeData;
@@ -109,19 +108,14 @@ public class BrailleCssCascader implements CssCascader {
 
 	// medium print
 	private static final SupportedCSS printCSS = SupportedPrintCSS.getInstance();
-	private static DeclarationTransformer printDeclarationTransformer; static {
-		// SupportedCSS injected via CSSFactory in DeclarationTransformer.<init>
-		CSSFactory.registerSupportedCSS(printCSS);
-		printDeclarationTransformer = new DeclarationTransformer() {}; }
+	private static DeclarationTransformer printDeclarationTransformer = new DeclarationTransformer(printCSS);
 	private static final RuleFactory printRuleFactory = RuleFactoryImpl.getInstance();
 	private static final CSSParserFactory printParserFactory = CSSParserFactory.getInstance();
 
 	// medium embossed
 	private static final SupportedCSS brailleCSS = new SupportedBrailleCSS(false, true);
-	private static DeclarationTransformer brailleDeclarationTransformer; static {
-		// SupportedCSS injected via CSSFactory in DeclarationTransformer.<init>
-		CSSFactory.registerSupportedCSS(brailleCSS);
-		brailleDeclarationTransformer = new BrailleCSSDeclarationTransformer(); }
+	private static DeclarationTransformer brailleDeclarationTransformer
+		= new BrailleCSSDeclarationTransformer(brailleCSS);
 	private static final RuleFactory brailleRuleFactory = new BrailleCSSRuleFactory();
 	private static final CSSParserFactory brailleParserFactory = new BrailleCSSParserFactory();
 
@@ -311,7 +305,7 @@ public class BrailleCssCascader implements CssCascader {
 
 	private static void insertMarginStyle(StringBuilder builder, RuleMargin ruleMargin) {
 		builder.append("@").append(ruleMargin.getMarginArea()).append(" { ");
-		insertStyle(builder, new SimpleInlineStyle(ruleMargin));
+		insertStyle(builder, new SimpleInlineStyle(ruleMargin, null, brailleDeclarationTransformer, brailleCSS));
 		builder.append("} ");
 	}
 
