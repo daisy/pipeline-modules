@@ -59,7 +59,7 @@
 		<p:with-option name="opt-output-dir" select="concat($temp-dir,'zedai/')"/>
 		<p:with-option name="opt-zedai-filename" select="concat($filename,'.xml')"/>
 		<p:with-option name="opt-lang" select="$language"/>
-		<p:with-option name="opt-assert-valid" select="$assert-valid"/>
+		<p:with-option name="validation" select="if ($assert-valid='true') then 'abort' else 'report'"/>
 	</px:dtbook-to-zedai>
 
 	<px:zedai-to-html name="to-html" px:message="Converting ZedAI to XHTML 5" px:progress="1/2">

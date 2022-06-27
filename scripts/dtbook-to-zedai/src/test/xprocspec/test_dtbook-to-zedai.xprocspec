@@ -20,7 +20,7 @@
 			<x:option name="opt-mods-filename" select="''"/>
 			<x:option name="opt-css-filename" select="''"/>
 			<x:option name="opt-lang" select="''"/>
-			<x:option name="opt-assert-valid" select="true()"/>
+			<x:option name="validation" select="'abort'"/>
 			<x:option name="opt-copy-external-resources" select="true()"/>
 			<x:option name="opt-output-dir" select="resolve-uri('result/')"/>
 		</x:call>
@@ -93,7 +93,7 @@
 			<x:option name="opt-mods-filename" select="''"/>
 			<x:option name="opt-css-filename" select="''"/>
 			<x:option name="opt-lang" select="''"/>
-			<x:option name="opt-assert-valid" select="true()"/>
+			<x:option name="validation" select="'abort'"/>
 			<x:option name="opt-copy-external-resources" select="true()"/>
 			<x:option name="opt-output-dir" select="resolve-uri('result/')"/>
 		</x:call>

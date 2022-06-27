@@ -96,7 +96,7 @@
 		<p:with-option name="opt-output-dir" select="concat($output-dir,'zedai/')"/>
 		<p:with-option name="opt-zedai-filename" select="concat($output-name,'.xml')"/>
 		<p:with-option name="opt-lang" select="$language"/>
-		<p:with-option name="opt-assert-valid" select="$assert-valid"/>
+		<p:with-option name="validation" select="if ($assert-valid='true') then 'abort' else 'report'"/>
 	</px:dtbook-to-zedai>
 
 	<!--TODO better handle core media type filtering-->

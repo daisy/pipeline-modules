@@ -83,9 +83,10 @@
             Language code of the input document.
         </p:documentation>
     </p:option>
-    <p:option name="opt-assert-valid" required="false" px:type="boolean" select="'true'" cx:as="xs:string">
+    <p:option name="validation" required="false" select="'abort'">
         <p:documentation>
-            Whether to stop processing and raise an error on validation issues.
+            Whether to stop processing and raise an error on validation issues (abort), only report
+            them (report), or to ignore any validation issues (off).
         </p:documentation>
     </p:option>
 
@@ -213,40 +214,95 @@
     <!-- UPGRADE -->
     <!-- =============================================================== -->
     <p:documentation>Upgrade the DTBook document(s) to 2005-3</p:documentation>
-    <p:group name="upgrade-dtbook" px:progress="2/23" px:message="Upgrading DTBook to 2005-3">
+    <p:for-each name="upgrade-dtbook" px:progress="2/23" px:message="Upgrading DTBook to 2005-3">
         <p:output port="result" sequence="true"/>
-        <p:for-each px:progress="0.75">
-            <px:dtbook-upgrade/>
-        </p:for-each>
-        <p:for-each px:progress="0.25" px:message="Validating">
-            <px:validate-with-relax-ng-and-report px:progress="1">
-                <p:input port="schema">
-                    <p:pipe port="result" step="dtbook-schema"/>
-                </p:input>
-                <p:with-option name="assert-valid" select="$opt-assert-valid='true'"/>
-            </px:validate-with-relax-ng-and-report>
-        </p:for-each>
+        <px:dtbook-upgrade/>
+    </p:for-each>
+
+    <!-- =============================================================== -->
+    <!-- VALIDATE -->
+    <!-- =============================================================== -->
+    <p:documentation>Validate the DTBook input</p:documentation>
+    <p:group name="validate-dtbook" px:message="Validating DTBook" px:progress="3/23">
+        <p:output port="result" sequence="true"/>
+        <p:choose name="validate" px:progress="1">
+            <p:xpath-context>
+                <p:empty/>
+            </p:xpath-context>
+            <p:when test="$validation=('abort','report')" px:message="Validating">
+                <p:for-each px:progress="1">
+                    <px:css-speech-clean px:progress="1/3">
+                        <p:documentation>Remove the Aural CSS attributes before validation</p:documentation>
+                    </px:css-speech-clean>
+                    <px:validate-with-relax-ng-and-report px:progress="2/3">
+                        <p:input port="schema">
+                            <p:pipe port="result" step="dtbook-schema"/>
+                        </p:input>
+                        <p:with-option name="assert-valid" select="$validation='abort'"/>
+                    </px:validate-with-relax-ng-and-report>
+                </p:for-each>
+            </p:when>
+            <p:otherwise>
+                <p:identity/>
+            </p:otherwise>
+        </p:choose>
+        <p:sink/>
+        <p:identity cx:depends-on="validate">
+            <p:input port="source">
+                <p:pipe step="upgrade-dtbook" port="result"/>
+            </p:input>
+        </p:identity>
     </p:group>
+    <p:sink/>
+    <p:documentation>Schema selector for DTBook validation</p:documentation>
+    <px:dtbook-validator.select-schema name="dtbook-schema" dtbook-version="2005-3" mathml-version="2.0"/>
+    <p:sink/>
 
     <!-- =============================================================== -->
     <!-- MERGE -->
     <!-- =============================================================== -->
     <p:documentation>If there is more than one input DTBook document, merge them into a single
         document.</p:documentation>
-    <p:count name="num-input-documents" limit="2"/>
-
+    <p:count name="num-input-documents" limit="2">
+        <p:input port="source">
+            <p:pipe port="result" step="validate-dtbook"/>
+        </p:input>
+    </p:count>
     <p:choose name="choose-to-merge-dtbook-files" px:progress="2/23">
         <p:when test=".//c:result[. > 1]" px:message="Merging DTBook files">
             <p:output port="result" primary="true"/>
             <p:output port="mapping">
                 <p:pipe step="merge" port="mapping"/>
             </p:output>
-            <px:dtbook-merge name="merge" px:progress="1">
+            <px:dtbook-merge name="merge" px:progress="0.75">
                 <p:input port="source">
-                    <p:pipe port="result" step="upgrade-dtbook"/>
+                    <p:pipe port="result" step="validate-dtbook"/>
                 </p:input>
                 <p:with-option name="output-base-uri" select="$zedai-file"/>
             </px:dtbook-merge>
+            <p:choose px:progress="0.25" px:message="Validating">
+                <p:when test="$validation='abort'" px:message="Validating">
+                    <!-- input DTBooks are valid, so we expect the merged DTBook to be valid too -->
+                    <px:css-speech-clean px:progress="1/3">
+                        <p:documentation>Remove the Aural CSS attributes before validation</p:documentation>
+                    </px:css-speech-clean>
+                    <px:validate-with-relax-ng-and-report name="validate" px:progress="2/3" assert-valid="true">
+                        <p:input port="schema">
+                            <p:pipe port="result" step="dtbook-schema"/>
+                        </p:input>
+                    </px:validate-with-relax-ng-and-report>
+                    <p:sink/>
+                    <p:identity cx:depends-on="validate">
+                        <p:input port="source">
+                            <p:pipe step="merge" port="result"/>
+                        </p:input>
+                    </p:identity>
+                </p:when>
+                <p:otherwise>
+                    <!-- reporting validation issues in intermediary documents is not helpful for user -->
+                    <p:identity/>
+                </p:otherwise>
+            </p:choose>
         </p:when>
         <p:otherwise>
             <p:output port="result" primary="true">
@@ -272,36 +328,10 @@
     </p:choose>
 
     <!-- =============================================================== -->
-    <!-- Validate the DTBook -->
-    <!-- =============================================================== -->
-    <p:documentation>Validate the DTBook input</p:documentation>
-
-    <p:group name="validate-dtbook" px:message="Validating DTBook" px:progress="3/23">
-        <p:output port="result"/>
-        <p:documentation>Remove the Aural CSS attributes before validation</p:documentation>
-        <px:css-speech-clean px:progress="1/3"/>
-        <px:validate-with-relax-ng-and-report name="validate" px:progress="2/3">
-            <p:input port="schema">
-                <p:pipe port="result" step="dtbook-schema"/>
-            </p:input>
-            <p:with-option name="assert-valid" select="$opt-assert-valid='true'"/>
-        </px:validate-with-relax-ng-and-report>
-    </p:group>
-    <p:sink/>
-    <p:documentation>Schema selector for DTBook validation</p:documentation>
-    <px:dtbook-validator.select-schema name="dtbook-schema" dtbook-version="2005-3" mathml-version="2.0"/>
-    <p:sink/>
-
-    <!-- =============================================================== -->
     <!-- CREATE ZEDAI -->
     <!-- =============================================================== -->
 
     <p:documentation>Convert DTBook 2005-3 to ZedAI</p:documentation>
-    <p:identity cx:depends-on="validate-dtbook">
-      <p:input port="source">
-          <p:pipe step="choose-to-merge-dtbook-files" port="result"/>
-      </p:input>
-    </p:identity>
     <pxi:dtbook2005-3-to-zedai name="transform-to-zedai" px:progress="5/23"/>
 
     <!-- =============================================================== -->
@@ -405,10 +435,19 @@
     <p:documentation>Generate MODS metadata</p:documentation>
     <px:dtbook-to-mods-meta px:progress="2/23" px:message="Generating MODS metadata">
         <p:input port="source">
-            <p:pipe step="validate-dtbook" port="result"/>
+            <p:pipe step="choose-to-merge-dtbook-files" port="result"/>
         </p:input>
     </px:dtbook-to-mods-meta>
-    <px:validate-mods/>
+    <p:choose>
+        <p:when test="$validation='abort'">
+            <!-- DTBook is valid, so we expect the resulting MODS document to be valid too -->
+            <px:validate-mods/>
+        </p:when>
+        <p:otherwise>
+            <!-- reporting validation issues in intermediary documents is not helpful for user -->
+            <p:identity/>
+        </p:otherwise>
+    </p:choose>
     <px:set-base-uri>
         <p:with-option name="base-uri" select="$mods-file"/>
     </px:set-base-uri>
@@ -418,7 +457,7 @@
     <p:documentation>Generate ZedAI metadata</p:documentation>
     <px:dtbook-to-zedai-meta name="generate-zedai-metadata" px:progress="2/23" px:message="Generating ZedAI metadata">
         <p:input port="source">
-            <p:pipe step="validate-dtbook" port="result"/>
+            <p:pipe step="choose-to-merge-dtbook-files" port="result"/>
         </p:input>
     </px:dtbook-to-zedai-meta>
 

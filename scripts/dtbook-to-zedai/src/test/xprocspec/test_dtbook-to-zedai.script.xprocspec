@@ -77,7 +77,7 @@
 				</x:document>
 			</x:input>
 			<x:option name="zedai-filename" select="'result.xml'"/>
-			<x:option name="assert-valid" select="'false'"/>
+			<x:option name="validation" select="'report'"/>
 			<x:option name="output-dir" select="resolve-uri('issue-94/output-dir/',$temp-dir)"/>
 		</x:call>
 		<x:context label="the output ZedAI">
