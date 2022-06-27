@@ -101,7 +101,7 @@
 			               select="substring-after(
 			                       (if (starts-with($original-href, $base))
 			                         then $original-href
-			                         else //d:file[resolve-uri(@original-href,base-uri(.))=$original-href]/resolve-uri(@href,base-uri(.))),
+			                         else //d:file[resolve-uri(@original-href,base-uri(.))=$original-href][1]/resolve-uri(@href,base-uri(.))),
 			                       $base)">
 				<p:pipe step="fileset.images" port="result"/>
 			</p:with-option>
