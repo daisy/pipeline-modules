@@ -154,6 +154,11 @@
             px:set-base-uri
         </p:documentation>
     </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/metadata-utils/library.xpl">
+        <p:documentation>
+            px:validate-mods
+        </p:documentation>
+    </p:import>
 
 
     <p:variable name="output-dir"
@@ -208,17 +213,20 @@
     <!-- UPGRADE -->
     <!-- =============================================================== -->
     <p:documentation>Upgrade the DTBook document(s) to 2005-3</p:documentation>
-    <p:for-each name="upgrade-dtbook" px:progress="2/23" px:message="Upgrading DTBook to 2005-3">
-        <p:output port="result"/>
-        <px:dtbook-upgrade>
-            <p:input port="parameters">
-                <p:empty/>
-            </p:input>
-            <p:with-option name="assert-valid" select="'false'">
-                <p:empty/>
-            </p:with-option>
-        </px:dtbook-upgrade>
-    </p:for-each>
+    <p:group name="upgrade-dtbook" px:progress="2/23" px:message="Upgrading DTBook to 2005-3">
+        <p:output port="result" sequence="true"/>
+        <p:for-each px:progress="0.75">
+            <px:dtbook-upgrade/>
+        </p:for-each>
+        <p:for-each px:progress="0.25" px:message="Validating">
+            <px:validate-with-relax-ng-and-report px:progress="1">
+                <p:input port="schema">
+                    <p:pipe port="result" step="dtbook-schema"/>
+                </p:input>
+                <p:with-option name="assert-valid" select="$opt-assert-valid='true'"/>
+            </px:validate-with-relax-ng-and-report>
+        </p:for-each>
+    </p:group>
 
     <!-- =============================================================== -->
     <!-- MERGE -->
@@ -228,19 +236,15 @@
     <p:count name="num-input-documents" limit="2"/>
 
     <p:choose name="choose-to-merge-dtbook-files" px:progress="2/23">
-        <p:when test=".//c:result[. > 1]">
+        <p:when test=".//c:result[. > 1]" px:message="Merging DTBook files">
             <p:output port="result" primary="true"/>
             <p:output port="mapping">
                 <p:pipe step="merge" port="mapping"/>
             </p:output>
-            <px:dtbook-merge name="merge" px:progress="1" px:message="Merging DTBook files">
-                <p:input port="parameters">
-                    <p:empty/>
-                </p:input>
+            <px:dtbook-merge name="merge" px:progress="1">
                 <p:input port="source">
                     <p:pipe port="result" step="upgrade-dtbook"/>
                 </p:input>
-                <p:with-option name="assert-valid" select="$opt-assert-valid"/>
                 <p:with-option name="output-base-uri" select="$zedai-file"/>
             </px:dtbook-merge>
         </p:when>
@@ -272,19 +276,20 @@
     <!-- =============================================================== -->
     <p:documentation>Validate the DTBook input</p:documentation>
 
-    <p:documentation>Remove the Aural CSS attributes before validation</p:documentation>
-    <px:css-speech-clean name="dtbook-validation-input" px:progress="1/23"/>
+    <p:group name="validate-dtbook" px:message="Validating DTBook" px:progress="3/23">
+        <p:output port="result"/>
+        <p:documentation>Remove the Aural CSS attributes before validation</p:documentation>
+        <px:css-speech-clean px:progress="1/3"/>
+        <px:validate-with-relax-ng-and-report name="validate" px:progress="2/3">
+            <p:input port="schema">
+                <p:pipe port="result" step="dtbook-schema"/>
+            </p:input>
+            <p:with-option name="assert-valid" select="$opt-assert-valid='true'"/>
+        </px:validate-with-relax-ng-and-report>
+    </p:group>
+    <p:sink/>
     <p:documentation>Schema selector for DTBook validation</p:documentation>
     <px:dtbook-validator.select-schema name="dtbook-schema" dtbook-version="2005-3" mathml-version="2.0"/>
-    <px:validate-with-relax-ng-and-report name="validate-dtbook" px:message="Validating DTBook" px:progress="2/23">
-        <p:input port="source">
-            <p:pipe port="result" step="dtbook-validation-input"/>
-        </p:input>
-        <p:input port="schema">
-            <p:pipe port="result" step="dtbook-schema"/>
-        </p:input>
-        <p:with-option name="assert-valid" select="$opt-assert-valid"/>
-    </px:validate-with-relax-ng-and-report>
     <p:sink/>
 
     <!-- =============================================================== -->
@@ -292,9 +297,9 @@
     <!-- =============================================================== -->
 
     <p:documentation>Convert DTBook 2005-3 to ZedAI</p:documentation>
-    <p:identity>
+    <p:identity cx:depends-on="validate-dtbook">
       <p:input port="source">
-	<p:pipe port="result" step="choose-to-merge-dtbook-files"/>
+          <p:pipe step="choose-to-merge-dtbook-files" port="result"/>
       </p:input>
     </p:identity>
     <pxi:dtbook2005-3-to-zedai name="transform-to-zedai" px:progress="5/23"/>
@@ -323,9 +328,6 @@
                     </xsl:template>
                 </xsl:stylesheet>
             </p:inline>
-        </p:input>
-        <p:input port="parameters">
-            <p:empty/>
         </p:input>
     </p:xslt>
     <px:set-base-uri name="generate-css">
@@ -402,28 +404,22 @@
     <!-- =============================================================== -->
     <p:documentation>Generate MODS metadata</p:documentation>
     <px:dtbook-to-mods-meta px:progress="2/23" px:message="Generating MODS metadata">
-        <p:input port="parameters">
-            <p:empty/>
-        </p:input>
         <p:input port="source">
             <p:pipe step="validate-dtbook" port="result"/>
         </p:input>
-        <p:with-option name="assert-valid" select="$opt-assert-valid"/>
     </px:dtbook-to-mods-meta>
+    <px:validate-mods/>
     <px:set-base-uri>
         <p:with-option name="base-uri" select="$mods-file"/>
     </px:set-base-uri>
     <p:add-xml-base name="generate-mods-metadata"/>
+    <p:sink/>
 
     <p:documentation>Generate ZedAI metadata</p:documentation>
     <px:dtbook-to-zedai-meta name="generate-zedai-metadata" px:progress="2/23" px:message="Generating ZedAI metadata">
-        <p:input port="parameters">
-            <p:empty/>
-        </p:input>
         <p:input port="source">
             <p:pipe step="validate-dtbook" port="result"/>
         </p:input>
-        <p:with-option name="assert-valid" select="$opt-assert-valid"/>
     </px:dtbook-to-zedai-meta>
 
     <p:group name="insert-zedai-meta">
