@@ -15,15 +15,14 @@
         Transforms DTBook XML into ZedAI XML.
     </p:documentation>
 
-    <p:input port="fileset.in" primary="true">
+    <p:input port="source.fileset" primary="true">
         <p:documentation>
             A fileset containing references to all the DTBook files and any resources they reference (images etc.).
             The xml:base is also set with an absolute URI for each file, and is intended to represent the "original file", while the href can change during
             conversions to reflect the path and filename of the resource in the output fileset.
         </p:documentation>
     </p:input>
-
-    <p:input port="in-memory.in" sequence="true">
+    <p:input port="source.in-memory" sequence="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             One or more DTBook documents to be transformed. In the case of multiple documents, a merge will be performed.
             While all resources are referenced in the fileset on the `fileset` output port, the `in-memory`-port can contain pre-loaded documents so that they won't
@@ -32,7 +31,7 @@
         </p:documentation>
     </p:input>
 
-    <p:output port="fileset.out" primary="true">
+    <p:output port="result.fileset" primary="true">
         <p:documentation>
             A fileset containing references to the DTBook file and any resources it references
             (images etc.). For each file that is not stored in memory, the xml:base is set with
@@ -42,8 +41,7 @@
         </p:documentation>
         <p:pipe port="result" step="result.fileset"/>
     </p:output>
-
-    <p:output port="in-memory.out" sequence="true">
+    <p:output port="result.in-memory" sequence="true">
         <p:documentation>The ZedAI and MODS metadata documents.</p:documentation>
         <p:pipe port="result" step="result.in-memory"/>
     </p:output>
@@ -56,29 +54,28 @@
         <p:pipe step="choose-to-merge-dtbook-files" port="mapping"/>
     </p:output>
 
-    <p:option name="opt-output-dir" required="true" px:dir="output" px:type="anyDirURI">
+    <p:option name="output-dir" required="true" px:type="anyDirURI">
         <p:documentation>
             The directory to store the generated files in.
         </p:documentation>
     </p:option>
 
-    <p:option name="opt-zedai-filename" required="false" px:dir="output" px:type="string"
-        select="''">
+    <p:option name="zedai-filename" required="false" cx:as="xs:string" select="'zedai.xml'">
         <p:documentation>
             Filename for the generated ZedAI file
         </p:documentation>
     </p:option>
-    <p:option name="opt-mods-filename" required="false" px:dir="output" px:type="string" select="''">
+    <p:option name="mods-filename" required="false" cx:as="xs:string" select="'zedai-mods.xml'">
         <p:documentation>
             Filename for the generated MODS file
         </p:documentation>
     </p:option>
-    <p:option name="opt-css-filename" required="false" px:dir="output" px:type="string" select="''">
+    <p:option name="css-filename" required="false" cx:as="xs:string" select="'zedai-css.css'">
         <p:documentation>
             Filename for the generated CSS file
         </p:documentation>
     </p:option>
-    <p:option name="opt-lang" required="false" px:dir="output" px:type="string" select="''">
+    <p:option name="lang" required="false" cx:type="xs:string" select="''">
         <p:documentation>
             Language code of the input document.
         </p:documentation>
@@ -89,8 +86,7 @@
             them (report), or to ignore any validation issues (off).
         </p:documentation>
     </p:option>
-
-    <p:option name="opt-copy-external-resources" select="'true'" cx:as="xs:string">
+    <p:option name="copy-external-resources" select="'true'" cx:as="xs:boolean">
         <p:documentation>
             Whether or not to include any referenced external resources like images and CSS-files in the output.
         </p:documentation>
@@ -162,34 +158,12 @@
     </p:import>
 
 
-    <p:variable name="output-dir"
-        select="resolve-uri(
-                    if (ends-with($opt-output-dir, '/')) then $opt-output-dir
-                                                         else concat($opt-output-dir, '/')
-                )"/>
+    <p:variable name="output-dir-with-slash"
+                select="resolve-uri(if (ends-with($output-dir,'/')) then $output-dir else concat($output-dir,'/'))"/>
 
-    <p:variable name="default-zedai-filename" select="'zedai.xml'"/>
-    <p:variable name="default-mods-filename" select="'zedai-mods.xml'"/>
-    <p:variable name="default-css-filename" select="'zedai-css.css'"/>
-
-    <p:variable name="zedai-filename"
-        select="if (string-length($opt-zedai-filename) > 0)
-                    then $opt-zedai-filename
-                    else $default-zedai-filename"/>
-
-    <p:variable name="mods-filename"
-        select="if (string-length($opt-mods-filename) > 0)
-                    then $opt-mods-filename
-                    else $default-mods-filename"/>
-
-    <p:variable name="css-filename"
-        select="if (string-length($opt-css-filename) > 0)
-                    then $opt-css-filename
-                    else $default-css-filename"/>
-
-    <p:variable name="zedai-file" select="concat($output-dir, $zedai-filename)"/>
-    <p:variable name="mods-file" select="concat($output-dir, $mods-filename)"/>
-    <p:variable name="css-file" select="concat($output-dir, $css-filename)"/>
+    <p:variable name="zedai-file" select="concat($output-dir-with-slash, $zedai-filename)"/>
+    <p:variable name="mods-file" select="concat($output-dir-with-slash, $mods-filename)"/>
+    <p:variable name="css-file" select="concat($output-dir-with-slash, $css-filename)"/>
 
     <p:identity px:message-severity="DEBUG" px:message="ZedAI file name: {$zedai-filename}"/>
     <p:identity px:message-severity="DEBUG" px:message="MODS file name: {$mods-filename}"/>
@@ -202,7 +176,7 @@
         <p:output port="result" sequence="true"/>
         <px:fileset-load media-types="application/x-dtbook+xml">
             <p:input port="in-memory">
-                <p:pipe step="main" port="in-memory.in"/>
+                <p:pipe step="main" port="source.in-memory"/>
             </p:input>
         </px:fileset-load>
         <!-- TODO: describe the error on the wiki and insert correct error code -->
@@ -506,7 +480,7 @@
     <!-- unwrap the meta list that was wrapped with tmp:wrapper -->
     <p:unwrap name="unwrap-meta-list" match="//z:head/tmp:wrapper"/>
 
-    <!-- add xml:lang if not already present AND if specified by the opt-lang option -->
+    <!-- add xml:lang if not already present AND if specified by the lang option -->
     <p:documentation>Add the xml:lang attribute</p:documentation>
     <p:choose>
         <p:when test="//z:document/@xml:lang">
@@ -514,10 +488,10 @@
         </p:when>
         <p:otherwise>
             <p:choose>
-                <p:when test="string-length($opt-lang) > 0">
+                <p:when test="string-length($lang) > 0">
                     <p:add-attribute match="//z:document">
                         <p:with-option name="attribute-name" select="'xml:lang'"/>
-                        <p:with-option name="attribute-value" select="$opt-lang"/>
+                        <p:with-option name="attribute-value" select="$lang"/>
                     </p:add-attribute>
                 </p:when>
                 <p:otherwise>
@@ -544,12 +518,12 @@
         <p:output port="result"/>
         <p:variable name="dtbook-base"
             select="replace(//d:file[@media-type = 'application/x-dtbook+xml'][1]/resolve-uri(@href,base-uri(.)),'^(.*/)[^/]*$','$1')">
-            <p:pipe port="fileset.in" step="main"/>
+            <p:pipe step="main" port="source.fileset"/>
         </p:variable>
 
         <p:documentation>Add the ZedAI document to the fileset.</p:documentation>
         <px:fileset-create>
-            <p:with-option name="base" select="$output-dir"/>
+            <p:with-option name="base" select="$output-dir-with-slash"/>
         </px:fileset-create>
         <px:fileset-add-entry name="result.fileset.zedai">
             <p:with-option name="href" select="$zedai-file"/>
@@ -557,7 +531,7 @@
         </px:fileset-add-entry>
 
         <p:choose name="result.fileset.resources">
-            <p:when test="$opt-copy-external-resources = 'true'">
+            <p:when test="$copy-external-resources">
                 <p:documentation>Add all the auxiliary resources to the fileset.</p:documentation>
                 <p:output port="result" sequence="true"/>
                 <px:fileset-create>
@@ -571,7 +545,7 @@
                 <p:sink/>
                 <px:fileset-intersect>
                     <p:input port="source">
-                        <p:pipe step="main" port="fileset.in"/>
+                        <p:pipe step="main" port="source.fileset"/>
                         <p:pipe step="referenced-from-dtbook" port="result.fileset"/>
                     </p:input>
                 </px:fileset-intersect>
@@ -579,7 +553,7 @@
                     <p:with-option name="new-base" select="$dtbook-base"/>
                 </px:fileset-rebase>
                 <px:fileset-copy>
-                    <p:with-option name="target" select="$output-dir"/>
+                    <p:with-option name="target" select="$output-dir-with-slash"/>
                 </px:fileset-copy>
             </p:when>
             <p:otherwise px:message-severity="DEBUG" px:message="NOT copying external resources">
@@ -601,7 +575,7 @@
             <p:when test="//tmp:wrapper/text()">
                 <p:output port="result"/>
                 <px:fileset-create>
-                    <p:with-option name="base" select="$output-dir">
+                    <p:with-option name="base" select="$output-dir-with-slash">
                         <p:empty/><!--required since the XPath context can be a sequence here, causing err:XD0008 -->
                     </p:with-option>
                 </px:fileset-create>
@@ -622,7 +596,7 @@
 
         <p:documentation>Add the MODS document to the fileset.</p:documentation>
         <px:fileset-create>
-            <p:with-option name="base" select="$output-dir"/>
+            <p:with-option name="base" select="$output-dir-with-slash"/>
         </px:fileset-create>
         <px:fileset-add-entry name="result.fileset.mods">
             <p:with-option name="href" select="$mods-file"/>

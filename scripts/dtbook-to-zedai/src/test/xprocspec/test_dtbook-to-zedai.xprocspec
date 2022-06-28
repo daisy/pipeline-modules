@@ -7,7 +7,7 @@
 
 	<x:scenario label="minimal">
 		<x:call step="px:dtbook-to-zedai">
-			<x:input port="fileset.in">
+			<x:input port="source.fileset">
 				<x:document type="inline">
 					<d:fileset>
 						<d:file href="../resources/minimal.xml" media-type="application/x-dtbook+xml"/>
@@ -15,19 +15,17 @@
 					</d:fileset>
 				</x:document>
 			</x:input>
-			<x:input port="in-memory.in"/>
-			<x:option name="opt-zedai-filename" select="'minimal.xml'"/>
-			<x:option name="opt-mods-filename" select="''"/>
-			<x:option name="opt-css-filename" select="''"/>
-			<x:option name="opt-lang" select="''"/>
+			<x:input port="source.in-memory"/>
+			<x:option name="zedai-filename" select="'minimal.xml'"/>
+			<x:option name="lang" select="''"/>
 			<x:option name="validation" select="'abort'"/>
-			<x:option name="opt-copy-external-resources" select="true()"/>
-			<x:option name="opt-output-dir" select="resolve-uri('result/')"/>
+			<x:option name="copy-external-resources" select="true()"/>
+			<x:option name="output-dir" select="resolve-uri('result/')"/>
 		</x:call>
-		<x:context label="the fileset.out port">
-			<x:document type="port" port="fileset.out"/>
+		<x:context label="the result.fileset port">
+			<x:document type="port" port="result.fileset"/>
 		</x:context>
-		<x:expect label="the fileset.out port"
+		<x:expect label="the result.fileset port"
 		          type="custom" href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl" step="x:fileset-compare">
 			<x:document type="inline">
 				<d:fileset>
@@ -38,7 +36,7 @@
 			</x:document>
 		</x:expect>
 		<x:context label="the ZedAI document">
-			<x:document type="port" port="in-memory.out" select="/*[base-uri()=resolve-uri('result/minimal.xml')]//z:body"/>
+			<x:document type="port" port="result.in-memory" select="/*[base-uri()=resolve-uri('result/minimal.xml')]//z:body"/>
 		</x:context>
 		<x:expect label="the ZedAI document" type="compare">
 			<x:document type="inline">
@@ -79,7 +77,7 @@
 
 	<x:scenario label="two dtbooks">
 		<x:call step="px:dtbook-to-zedai">
-			<x:input port="fileset.in">
+			<x:input port="source.fileset">
 				<x:document type="inline">
 					<d:fileset>
 						<d:file href="part1.xml" original-href="../resources/minimal.xml" media-type="application/x-dtbook+xml"/>
@@ -88,19 +86,17 @@
 					</d:fileset>
 				</x:document>
 			</x:input>
-			<x:input port="in-memory.in"/>
-			<x:option name="opt-zedai-filename" select="'minimal.xml'"/>
-			<x:option name="opt-mods-filename" select="''"/>
-			<x:option name="opt-css-filename" select="''"/>
-			<x:option name="opt-lang" select="''"/>
+			<x:input port="source.in-memory"/>
+			<x:option name="zedai-filename" select="'minimal.xml'"/>
+			<x:option name="lang" select="''"/>
 			<x:option name="validation" select="'abort'"/>
-			<x:option name="opt-copy-external-resources" select="true()"/>
-			<x:option name="opt-output-dir" select="resolve-uri('result/')"/>
+			<x:option name="copy-external-resources" select="true()"/>
+			<x:option name="output-dir" select="resolve-uri('result/')"/>
 		</x:call>
-		<x:context label="the fileset.out port">
-			<x:document type="port" port="fileset.out"/>
+		<x:context label="the result.fileset port">
+			<x:document type="port" port="result.fileset"/>
 		</x:context>
-		<x:expect label="the fileset.out port"
+		<x:expect label="the result.fileset port"
 		          type="custom" href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl" step="x:fileset-compare">
 			<x:document type="inline">
 				<d:fileset>
@@ -111,7 +107,7 @@
 			</x:document>
 		</x:expect>
 		<x:context label="the ZedAI document">
-			<x:document type="port" port="in-memory.out" select="/*[base-uri()=resolve-uri('result/minimal.xml')]//z:body"/>
+			<x:document type="port" port="result.in-memory" select="/*[base-uri()=resolve-uri('result/minimal.xml')]//z:body"/>
 		</x:context>
 		<x:expect label="the ZedAI document" type="compare">
 			<x:document type="inline">
