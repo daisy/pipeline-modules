@@ -657,7 +657,7 @@
                         </p:input>
                         <p:with-option name="audio-file-type" select="$tts-audio-file-type"/>
                         <p:with-option name="include-log" select="$include-tts-log"/>
-                        <p:with-option name="temp-dir" select="$temp-dir"/>
+                        <p:with-option name="temp-dir" select="if ($temp-dir='') then $temp-dir else concat($temp-dir,'tts/')"/>
                     </px:tts-for-epub3>
                     <p:sink/>
                     <px:fileset-update name="update">

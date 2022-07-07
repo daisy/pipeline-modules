@@ -222,23 +222,23 @@
 						<d:file href="result/EPUB/mo/front.smil" media-type="application/smil+xml"/>
 						<d:file href="result/EPUB/mo/chapter.smil" media-type="application/smil+xml"/>
 						<d:file href="result/EPUB/audio/part0000_00_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/minimal/audio/part0000_00_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/minimal/tts/audio/part0000_00_000.wav"/>
 						<d:file href="result/EPUB/audio/part0001_00_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/minimal/audio/part0001_00_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/minimal/tts/audio/part0001_00_000.wav"/>
 						<d:file href="result/EPUB/audio/part0001_01_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/minimal/audio/part0001_01_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/minimal/tts/audio/part0001_01_000.wav"/>
 						<d:file href="result/EPUB/audio/part0001_02_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/minimal/audio/part0001_02_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/minimal/tts/audio/part0001_02_000.wav"/>
 						<d:file href="result/EPUB/audio/part0002_00_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/minimal/audio/part0002_00_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/minimal/tts/audio/part0002_00_000.wav"/>
 						<d:file href="result/EPUB/audio/part0002_01_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/minimal/audio/part0002_01_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/minimal/tts/audio/part0002_01_000.wav"/>
 						<d:file href="result/EPUB/audio/part0002_02_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/minimal/audio/part0002_02_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/minimal/tts/audio/part0002_02_000.wav"/>
 						<d:file href="result/EPUB/audio/part0002_03_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/minimal/audio/part0002_03_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/minimal/tts/audio/part0002_03_000.wav"/>
 						<d:file href="result/EPUB/audio/part0002_04_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/minimal/audio/part0002_04_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/minimal/tts/audio/part0002_04_000.wav"/>
 					</d:fileset>
 				</x:document>
 			</x:expect>
@@ -1174,67 +1174,67 @@
 						<d:file href="result/EPUB/mo/C00000-2-frontmatter.smil" media-type="application/smil+xml"/>
 						<d:file href="result/EPUB/mo/C00000-3-chapter.smil" media-type="application/smil+xml"/>
 						<d:file href="result/EPUB/audio/part0000_00_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0000_00_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0000_00_000.wav"/>
 						<d:file href="result/EPUB/audio/part0001_00_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0001_00_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0001_00_000.wav"/>
 						<d:file href="result/EPUB/audio/part0002_00_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0002_00_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0002_00_000.wav"/>
 						<d:file href="result/EPUB/audio/part0003_00_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0003_00_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0003_00_000.wav"/>
 						<d:file href="result/EPUB/audio/part0004_00_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0004_00_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0004_00_000.wav"/>
 						<d:file href="result/EPUB/audio/part0005_00_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0005_00_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0005_00_000.wav"/>
 						<d:file href="result/EPUB/audio/part0006_00_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0006_00_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0006_00_000.wav"/>
 						<d:file href="result/EPUB/audio/part0007_00_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0007_00_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0007_00_000.wav"/>
 						<d:file href="result/EPUB/audio/part0007_01_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0007_01_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0007_01_000.wav"/>
 						<d:file href="result/EPUB/audio/part0008_00_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0008_00_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0008_00_000.wav"/>
 						<d:file href="result/EPUB/audio/part0008_01_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0008_01_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0008_01_000.wav"/>
 						<d:file href="result/EPUB/audio/part0009_00_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0009_00_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0009_00_000.wav"/>
 						<d:file href="result/EPUB/audio/part0009_01_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0009_01_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0009_01_000.wav"/>
 						<d:file href="result/EPUB/audio/part0010_00_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0010_00_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0010_00_000.wav"/>
 						<d:file href="result/EPUB/audio/part0010_01_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0010_01_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0010_01_000.wav"/>
 						<d:file href="result/EPUB/audio/part0011_00_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0011_00_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0011_00_000.wav"/>
 						<d:file href="result/EPUB/audio/part0011_01_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0011_01_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0011_01_000.wav"/>
 						<d:file href="result/EPUB/audio/part0012_00_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0012_00_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0012_00_000.wav"/>
 						<d:file href="result/EPUB/audio/part0012_01_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0012_01_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0012_01_000.wav"/>
 						<d:file href="result/EPUB/audio/part0013_00_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0013_00_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0013_00_000.wav"/>
 						<d:file href="result/EPUB/audio/part0013_01_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0013_01_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0013_01_000.wav"/>
 						<d:file href="result/EPUB/audio/part0014_00_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0014_00_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0014_00_000.wav"/>
 						<d:file href="result/EPUB/audio/part0015_00_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0015_00_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0015_00_000.wav"/>
 						<d:file href="result/EPUB/audio/part0016_00_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0016_00_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0016_00_000.wav"/>
 						<d:file href="result/EPUB/audio/part0017_00_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0017_00_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0017_00_000.wav"/>
 						<d:file href="result/EPUB/audio/part0018_00_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0018_00_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0018_00_000.wav"/>
 						<d:file href="result/EPUB/audio/part0019_00_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0019_00_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0019_00_000.wav"/>
 						<d:file href="result/EPUB/audio/part0019_01_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0019_01_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0019_01_000.wav"/>
 						<d:file href="result/EPUB/audio/part0020_00_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0020_00_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0020_00_000.wav"/>
 						<d:file href="result/EPUB/audio/part0021_00_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0021_00_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0021_00_000.wav"/>
 						<d:file href="result/EPUB/audio/part0022_00_000.wav" media-type="audio/x-wav"
-						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/audio/part0022_00_000.wav"/>
+						        original-href="../../../target/xprocspec/test_epub3-to-epub3/valentin/tts/audio/part0022_00_000.wav"/>
 					</d:fileset>
 				</x:document>
 			</x:expect>

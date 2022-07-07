@@ -183,7 +183,7 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 			if (mTempDirOpt != null && !mTempDirOpt.isEmpty()) {
 				try {
 					audioOutputDir = new File(new URI(mTempDirOpt));
-				} catch (URISyntaxException e) {
+				} catch (URISyntaxException|IllegalArgumentException e) {
 					throw new RuntimeException("temp-dir option invalid: " + mTempDirOpt);
 				}
 				if (audioOutputDir.exists())

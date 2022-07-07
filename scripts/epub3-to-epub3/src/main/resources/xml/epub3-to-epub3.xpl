@@ -305,8 +305,9 @@ elements that represent the sentences.</p>
         </p:documentation>
     </p:import>
 
-    <px:epub-load version="3" name="load" px:progress="0.1" px:message="Loading EPUB">
+    <px:epub-load version="3" store-to-disk="true" name="load" px:progress="0.1" px:message="Loading EPUB">
         <p:with-option name="href" select="$source"/>
+        <p:with-option name="temp-dir" select="concat($temp-dir,'load/')"/>
     </px:epub-load>
     
     <px:epub3-to-epub3 name="convert" px:progress="0.8">
@@ -335,7 +336,7 @@ elements that represent the sentences.</p>
         <p:input port="tts-config">
             <p:pipe step="main" port="tts-config"/>
         </p:input>
-        <p:with-option name="temp-dir" select="$temp-dir"/>
+        <p:with-option name="temp-dir" select="concat($temp-dir,'convert/')"/>
     </px:epub3-to-epub3>
     
     <px:fileset-store name="store" px:progress="0.1" px:message="Storing EPUB">
