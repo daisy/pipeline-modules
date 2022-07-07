@@ -16,11 +16,11 @@
                 type="px:epub3-to-epub3"
                 name="main">
     
-    <p:input port="epub.in.fileset" primary="true"/>
-    <p:input port="epub.in.in-memory" sequence="true"/>
+    <p:input port="source.fileset" primary="true"/>
+    <p:input port="source.in-memory" sequence="true"/>
     
-    <p:output port="epub.out.fileset" primary="true"/>
-    <p:output port="epub.out.in-memory" sequence="true">
+    <p:output port="result.fileset" primary="true"/>
+    <p:output port="result.in-memory" sequence="true">
         <p:pipe step="add-braille-rendition" port="in-memory"/>
     </p:output>
     
@@ -162,7 +162,7 @@
     
     <p:identity>
         <p:input port="source">
-            <p:pipe step="main" port="epub.in.fileset"/>
+            <p:pipe step="main" port="source.fileset"/>
         </p:input>
     </p:identity>
     
@@ -196,14 +196,14 @@
             <px:fileset-copy name="copy">
                 <p:with-option name="target" select="$result-base"/>
                 <p:input port="source.in-memory">
-                    <p:pipe step="main" port="epub.in.in-memory"/>
+                    <p:pipe step="main" port="source.in-memory"/>
                 </p:input>
             </px:fileset-copy>
         </p:when>
         <p:otherwise>
             <p:output port="fileset" primary="true"/>
             <p:output port="in-memory" sequence="true">
-                <p:pipe step="main" port="epub.in.in-memory"/>
+                <p:pipe step="main" port="source.in-memory"/>
             </p:output>
             <p:identity/>
         </p:otherwise>

@@ -288,9 +288,9 @@ elements that represent the sentences.</p>
         <p:pipe step="convert" port="tts-log"/>
     </p:output>
     
-    <p:import href="epub3-to-epub3.load.xpl">
+    <p:import href="http://www.daisy.org/pipeline/modules/epub-utils/library.xpl">
         <p:documentation>
-            px:epub3-to-epub3.load
+            px:epub-load
         </p:documentation>
     </p:import>
     <p:import href="epub3-to-epub3.convert.xpl">
@@ -305,13 +305,13 @@ elements that represent the sentences.</p>
         </p:documentation>
     </p:import>
 
-    <px:epub3-to-epub3.load name="load" px:progress="0.1">
-        <p:with-option name="epub" select="$source"/>
-    </px:epub3-to-epub3.load>
+    <px:epub-load version="3" name="load" px:progress="0.1">
+        <p:with-option name="href" select="$source"/>
+    </px:epub-load>
     
     <px:epub3-to-epub3 name="convert" px:progress="0.8">
-        <p:input port="epub.in.in-memory">
-            <p:pipe step="load" port="in-memory"/>
+        <p:input port="source.in-memory">
+            <p:pipe step="load" port="result.in-memory"/>
         </p:input>
         <p:with-option name="result-base"
                        select="concat($output-dir,'/',replace(replace($source,'(\.epub|/mimetype)$',''),'^.*/([^/]+)$','$1'),'.epub!/')"/>
@@ -340,7 +340,7 @@ elements that represent the sentences.</p>
     
     <px:fileset-store name="store" px:progress="0.1">
         <p:input port="in-memory.in">
-            <p:pipe step="convert" port="epub.out.in-memory"/>
+            <p:pipe step="convert" port="result.in-memory"/>
         </p:input>
     </px:fileset-store>
     
