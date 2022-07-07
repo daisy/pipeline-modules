@@ -305,7 +305,7 @@ elements that represent the sentences.</p>
         </p:documentation>
     </p:import>
 
-    <px:epub-load version="3" name="load" px:progress="0.1">
+    <px:epub-load version="3" name="load" px:progress="0.1" px:message="Loading EPUB">
         <p:with-option name="href" select="$source"/>
     </px:epub-load>
     
@@ -338,7 +338,7 @@ elements that represent the sentences.</p>
         <p:with-option name="temp-dir" select="$temp-dir"/>
     </px:epub3-to-epub3>
     
-    <px:fileset-store name="store" px:progress="0.1">
+    <px:fileset-store name="store" px:progress="0.1" px:message="Storing EPUB">
         <p:input port="in-memory.in">
             <p:pipe step="convert" port="result.in-memory"/>
         </p:input>
