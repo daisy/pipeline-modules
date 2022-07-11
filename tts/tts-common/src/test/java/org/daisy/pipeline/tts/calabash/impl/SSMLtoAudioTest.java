@@ -233,7 +233,6 @@ public class SSMLtoAudioTest {
 			for (String text : ssml) {
 				ssmlToAudio.dispatchSSML(SSMLinXML(text));
 			}
-			ssmlToAudio.endSection();
 
 			AudioServices audioRegistry = new AudioServices();
 			audioRegistry.addEncoderService(audioEncoder);

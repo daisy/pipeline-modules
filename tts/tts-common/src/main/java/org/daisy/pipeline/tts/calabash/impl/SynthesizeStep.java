@@ -12,11 +12,8 @@ import java.util.concurrent.Semaphore;
 
 import javax.sound.sampled.AudioFileFormat;
 
-import net.sf.saxon.s9api.Axis;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
-import net.sf.saxon.s9api.XdmNode;
-import net.sf.saxon.s9api.XdmSequenceIterator;
 
 import org.daisy.common.xproc.calabash.XProcStep;
 import org.daisy.pipeline.audio.AudioFileTypes;
@@ -47,11 +44,6 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 
 	private static QName ENCODING_ERROR = new QName("TTS01");
 
-	/*
-	 * The maximum number of sentences that a section (ContiguousText) can contain.
-	 */
-	private static int MAX_SENTENCES_PER_SECTION = 100;
-	
 	private ReadablePipe source = null;
 	private ReadablePipe config = null;
 	private WritablePipe result = null;
@@ -66,23 +58,12 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 	private String mTempDirOpt;
 	private boolean mIncludeLogOpt;
 	private AudioFileFormat.Type mAudioFileType;
-	private int mSentenceCounter = 0;
-	private int mErrorCounter = 0;
 
 	private static String convertSecondToString(double seconds) {
 		int iseconds = (int) (Math.floor(seconds));
 		int milliseconds = (int) (Math.floor(1000 * (seconds - iseconds)));
 		return String.format("%d:%02d:%02d.%03d", iseconds / 3600, (iseconds / 60) % 60,
 		        (iseconds % 60), milliseconds);
-	}
-
-	public static XdmNode getFirstChild(XdmNode node) {
-		XdmSequenceIterator iter = node.axisIterator(Axis.CHILD);
-		if (iter.hasNext()) {
-			return (XdmNode) iter.next();
-		} else {
-			return null;
-		}
 	}
 
 	public SynthesizeStep(XProcRuntime runtime, XAtomicStep step, TTSRegistry ttsRegistry,
@@ -140,20 +121,6 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 		logOutput.resetWriter();
 	}
 
-	public void traverse(XdmNode node, SSMLtoAudio pool) throws SynthesisException {
-		if (SentenceTag.equals(node.getNodeName())) {
-			if (!pool.dispatchSSML(node))
-				mErrorCounter++;
-			if (++mSentenceCounter % MAX_SENTENCES_PER_SECTION == 0)
-				pool.endSection();
-		} else {
-			XdmSequenceIterator iter = node.axisIterator(Axis.CHILD);
-			while (iter.hasNext()) {
-				traverse((XdmNode) iter.next(), pool);
-			}
-		}
-	}
-
 	public void run() throws SaxonApiException {
 		super.run();
 
@@ -207,15 +174,11 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 		        mAudioFootprintMonitor, mRuntime.getProcessor(), configExt, log);
 
 		Iterable<SoundFileLink> soundFragments = Collections.EMPTY_LIST;
-		mErrorCounter = 0;
-		mSentenceCounter = 0;
 		try {
 			while (source.moreDocuments()) {
-				traverse(getFirstChild(source.read()), ssmltoaudio);
-				ssmltoaudio.endSection();
+				ssmltoaudio.feedSSML(source.read());
 			}
 			Iterable<SoundFileLink> newfrags = ssmltoaudio.blockingRun(mAudioServices);
-			mErrorCounter += ssmltoaudio.getErrorCount();
 			soundFragments = Iterables.concat(soundFragments, newfrags);
 		} catch (SynthesisException e) {
 			logger.error("Synthesis failed", e);
@@ -278,12 +241,11 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 		tw = new TreeWriter(runtime);
 		tw.startDocument(runtime.getStaticBaseURI());
 		tw.addStartElement(StatusRootTag);
-		if (mErrorCounter == 0)
+		if (ssmltoaudio.getErrorRate() == 0)
 			tw.addAttribute(Status_attr_result, "ok");
 		else {
 			tw.addAttribute(Status_attr_result, "error");
-			tw.addAttribute(Status_attr_success_rate,
-			                (int)Math.floor(100 * (1 - (double)mErrorCounter/mSentenceCounter)) + "%");
+			tw.addAttribute(Status_attr_success_rate, (int)Math.floor(100 * (1 - ssmltoaudio.getErrorRate())) + "%");
 		}
 		tw.addEndElement();
 		tw.endDocument();
