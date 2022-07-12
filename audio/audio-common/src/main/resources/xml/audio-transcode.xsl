@@ -37,7 +37,7 @@
 				<xsl:for-each select="d:file">
 					<xsl:copy>
 						<xsl:attribute name="href" select="resolve-uri(replace(@href,'^.*/([^/]*)$','$1'),
-						                                   $new-audio-dir)"/>
+						                                               $new-audio-dir)"/>
 						<xsl:attribute name="original-href" select="@href"/>
 						<xsl:attribute name="media-type" select="$new-audio-file-type"/>
 					</xsl:copy>
