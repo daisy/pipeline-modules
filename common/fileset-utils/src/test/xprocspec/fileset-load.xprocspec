@@ -702,5 +702,31 @@
         </x:context>
         <x:expect type="count" label="a file should be read from memory" min="1"/>
     </x:scenario>
-    
+
+    <x:scenario label="test-detect-serialization-properties">
+        <x:call step="px:fileset-load">
+            <x:input port="fileset">
+                <x:document type="inline">
+                    <d:fileset>
+                        <d:file href="samples/fileset2/a.zip!/e.svg" media-type="image/svg+xml"/>
+                    </d:fileset>
+                </x:document>
+            </x:input>
+            <x:input port="in-memory"/>
+            <x:option name="detect-serialization-properties" select="true()"/>
+        </x:call>
+        <x:context label="the result.fileset port">
+            <x:document type="port" port="result.fileset"/>
+        </x:context>
+        <x:expect label="should be as expected" type="custom"
+                  href="../../main/resources/xml/xproc/xprocspec-fileset-compare.xpl" step="x:fileset-compare">
+            <x:document type="inline">
+                <d:fileset>
+                    <d:file href="samples/fileset2/a.zip!/e.svg" media-type="image/svg+xml"
+                            doctype="&lt;!DOCTYPE svg PUBLIC &quot;-//W3C//DTD SVG 1.1//EN&quot; &quot;http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd&quot; [&#xD;&#xA;&#x9;&lt;!ENTITY ns_svg &quot;http://www.w3.org/2000/svg&quot;&gt;&#xD;&#xA;&#x9;&lt;!ENTITY ns_xlink &quot;http://www.w3.org/1999/xlink&quot;&gt;&#xD;&#xA;]&gt;"/>
+                </d:fileset>
+            </x:document>
+        </x:expect>
+    </x:scenario>
+
 </x:description>
