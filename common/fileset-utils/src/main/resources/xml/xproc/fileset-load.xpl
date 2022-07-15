@@ -13,6 +13,9 @@
   <p:input port="fileset" primary="true"/>
   <p:input port="in-memory" sequence="true">
     <p:empty/>
+    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <p>The input fileset.</p>
+    </p:documentation>
   </p:input>
 
   <p:output port="result.fileset">
@@ -27,6 +30,18 @@
       input.</p>
       <p>"original-href" attributes are removed from the manifest.</p>
     </p:documentation>
+  </p:output>
+
+  <p:output port="unfiltered.fileset">
+    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <p>The unfiltered result.</p>
+      <p>A copy of the source fileset but with all matched files (matched by the <code>href</code>,
+      <code>media-types</code> and <code>not-media-types</code> options) loaded into memory.</p>
+    </p:documentation>
+    <p:pipe step="unfiltered" port="result.fileset"/>
+  </p:output>
+  <p:output port="unfiltered.in-memory" sequence="true">
+    <p:pipe step="unfiltered" port="result.in-memory"/>
   </p:output>
 
   <p:option name="href" select="''"/>
@@ -55,6 +70,7 @@
       px:fileset-create
       px:fileset-add-entry
       px:fileset-join
+      px:fileset-update
     </p:documentation>
   </p:import>
   <p:import href="load-html.xpl">
@@ -127,6 +143,44 @@
     </p:otherwise>
   </p:choose>
   <p:identity name="result.fileset"/>
+  <p:sink/>
+
+  <!--
+      input fileset updated with result fileset
+  -->
+  <p:choose name="unfiltered" cx:pure="true">
+    <p:when test="$href='' and $media-types='' and $not-media-types=''">
+      <p:output port="result.fileset" primary="true"/>
+      <p:output port="result.in-memory" sequence="true">
+        <p:pipe step="load" port="result"/>
+      </p:output>
+      <p:identity>
+        <p:input port="source">
+          <p:pipe step="result.fileset" port="result"/>
+        </p:input>
+      </p:identity>
+    </p:when>
+    <p:otherwise>
+      <p:output port="result.fileset" primary="true"/>
+      <p:output port="result.in-memory" sequence="true">
+        <p:pipe step="update" port="result.in-memory"/>
+      </p:output>
+      <px:fileset-update name="update">
+        <p:input port="source.fileset">
+          <p:pipe step="main" port="fileset"/>
+        </p:input>
+        <p:input port="source.in-memory">
+          <p:pipe step="main" port="in-memory"/>
+        </p:input>
+        <p:input port="update.fileset">
+          <p:pipe step="result.fileset" port="result"/>
+        </p:input>
+        <p:input port="update.in-memory">
+          <p:pipe step="load" port="result"/>
+        </p:input>
+      </px:fileset-update>
+    </p:otherwise>
+  </p:choose>
   <p:sink/>
 
   <p:count limit="1">
