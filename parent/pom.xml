@@ -445,6 +445,11 @@
           test dependencies
       -->
       <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.10</version>
+      </dependency>
+      <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>obfl-utils</artifactId>
         <version>2.0.1</version>
@@ -458,13 +463,11 @@
         <groupId>org.daisy.maven</groupId>
         <artifactId>xproc-engine-daisy-pipeline</artifactId>
         <version>1.14.1</version>
-        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>tts-mocks</artifactId>
         <version>1.0.0</version>
-        <scope>test</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
