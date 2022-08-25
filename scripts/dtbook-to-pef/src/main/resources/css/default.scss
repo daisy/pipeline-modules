@@ -91,7 +91,7 @@ br::before {
 
 /* ======= Implementation of script options =============== */
 
-$hyphenation: true !default;
+$hyphenation: auto !default;
 $line-spacing: single !default;
 $capital-letters: true !default;
 $include-captions: true !default;
@@ -105,9 +105,9 @@ $include-production-notes: false !default;
 @import "volume-breaking.scss";
 @import "notes.scss";
 
-@if $hyphenation {
+@if $hyphenation != manual {
 	:root {
-		hyphens: auto;
+		hyphens: $hyphenation;
 	}
 }
 
