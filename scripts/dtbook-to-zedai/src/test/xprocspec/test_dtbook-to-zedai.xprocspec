@@ -11,6 +11,7 @@
 				<x:document type="inline">
 					<d:fileset>
 						<d:file href="../resources/minimal.xml" media-type="application/x-dtbook+xml"/>
+						<d:file href="../resources/image.jpg" media-type="image/jpeg"/>
 					</d:fileset>
 				</x:document>
 			</x:input>
@@ -31,6 +32,7 @@
 			<x:document type="inline">
 				<d:fileset>
 					<d:file href="result/minimal.xml" media-type="application/z3998-auth+xml"/>
+					<d:file href="result/image.jpg" media-type="image/jpeg" original-href="../resources/image.jpg"/>
 					<d:file href="result/zedai-mods.xml" media-type="application/mods+xml"/>
 				</d:fileset>
 			</x:document>
@@ -38,23 +40,25 @@
 		<x:context label="the ZedAI document">
 			<x:document type="port" port="in-memory.out" select="/*[base-uri()=resolve-uri('result/minimal.xml')]//z:body"/>
 		</x:context>
-		<x:expect label="the ZedAI document"
-		          type="custom" href="http://www.daisy.org/xprocspec/custom-assertion-steps.xpl" step="x:compare-except-ids">
+		<x:expect label="the ZedAI document" type="compare">
 			<x:document type="inline">
 				<body xmlns="http://www.daisy.org/ns/z3998/authoring/">
 					<frontmatter>
-						<section xml:id="a">
+						<section xml:id="id_1">
 							<h role="title">Minimal DTBook</h>
 							<p role="author">Bert</p>
 						</section>
 					</frontmatter>
 					<bodymatter>
-						<section xml:id="b">
+						<section xml:id="id_2">
 							<pagebreak value="1" xml:id="page_1"/>
 							<h>Chapter</h>
 							<p>Paragraph</p>
 							<pagebreak value="2" xml:id="page_2"/>
 							<p>Another paragraph</p>
+							<object src="image.jpg" xml:id="id_3">
+								<description ref="id_3">image</description>
+							</object>
 						</section>
 					</bodymatter>
 				</body>
@@ -80,6 +84,7 @@
 					<d:fileset>
 						<d:file href="part1.xml" original-href="../resources/minimal.xml" media-type="application/x-dtbook+xml"/>
 						<d:file href="part2.xml" original-href="../resources/minimal.xml" media-type="application/x-dtbook+xml"/>
+						<d:file href="image.jpg" original-href="../resources/image.jpg" media-type="image/jpeg"/>
 					</d:fileset>
 				</x:document>
 			</x:input>
@@ -100,6 +105,7 @@
 			<x:document type="inline">
 				<d:fileset>
 					<d:file href="result/minimal.xml" media-type="application/z3998-auth+xml"/>
+					<d:file href="result/image.jpg" media-type="image/jpeg" original-href="../resources/image.jpg"/>
 					<d:file href="result/zedai-mods.xml" media-type="application/mods+xml"/>
 				</d:fileset>
 			</x:document>
@@ -107,30 +113,35 @@
 		<x:context label="the ZedAI document">
 			<x:document type="port" port="in-memory.out" select="/*[base-uri()=resolve-uri('result/minimal.xml')]//z:body"/>
 		</x:context>
-		<x:expect label="the ZedAI document"
-		          type="custom" href="http://www.daisy.org/xprocspec/custom-assertion-steps.xpl" step="x:compare-except-ids">
+		<x:expect label="the ZedAI document" type="compare">
 			<x:document type="inline">
 				<body xmlns="http://www.daisy.org/ns/z3998/authoring/">
 					<frontmatter>
-						<section xml:id="a">
+						<section xml:id="id_1">
 							<h role="title">Minimal DTBook</h>
 							<p role="author">Bert</p>
 						</section>
 					</frontmatter>
 					<bodymatter>
-						<section xml:id="b">
+						<section xml:id="id_2">
 							<pagebreak value="1" xml:id="page_1"/>
 							<h>Chapter</h>
 							<p>Paragraph</p>
 							<pagebreak value="2" xml:id="page_2"/>
 							<p>Another paragraph</p>
+							<object src="image.jpg" xml:id="id_3">
+								<description ref="id_3">image</description>
+							</object>
 						</section>
-						<section xml:id="c">
+						<section xml:id="id_4">
 							<pagebreak value="1" xml:id="page_1"/>
 							<h>Chapter</h>
 							<p>Paragraph</p>
 							<pagebreak value="2" xml:id="page_2"/>
 							<p>Another paragraph</p>
+							<object src="image.jpg" xml:id="id_5">
+								<description ref="id_5">image</description>
+							</object>
 						</section>
 					</bodymatter>
 				</body>
