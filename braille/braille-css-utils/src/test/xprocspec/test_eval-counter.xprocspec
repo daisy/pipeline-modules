@@ -18,9 +18,21 @@
                 <css:marker>
                   <css:counter name="list-item"/>
                 </css:marker>
+                <ul css:counter-reset="list-item">
+                  <li css:counter-increment="list-item">
+                    <css:marker>
+                      <css:counter name="list-item"/>
+                    </css:marker>
+                  </li>
+                  <li css:counter-increment="list-item">
+                    <css:marker>
+                      <css:counter name="list-item"/>
+                    </css:marker>
+                  </li>
+                </ul>
               </li>
             </ul>
-            <ul css:counter-reset="list-item">
+            <ul>
               <li css:counter-increment="list-item">
                 <css:marker>
                   <css:counter name="list-item"
@@ -54,6 +66,18 @@
               <css:marker>
                 <css:box type="inline" css:text-transform="auto"> 2. </css:box>
               </css:marker>
+              <ul>
+                <li>
+                  <css:marker>
+                    <css:box type="inline" css:text-transform="auto"> 1. </css:box>
+                  </css:marker>
+                </li>
+                <li>
+                  <css:marker>
+                    <css:box type="inline" css:text-transform="auto"> 2. </css:box>
+                  </css:marker>
+                </li>
+              </ul>
             </li>
           </ul>
           <ul>
@@ -83,7 +107,7 @@
       <x:input port="source">
         <x:document type="inline">
           <body>
-            <ul css:counter-reset="list-item">
+            <ul>
               <li css:counter-increment="list-item">
                 <css:marker>
                   <css:counter name="list-item" style="written-out"/>

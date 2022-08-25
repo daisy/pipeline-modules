@@ -41,12 +41,14 @@ should be styled and positioned with CSS. The following rules are included by de
   flow: document-toc;
   display: -obfl-toc;
   -obfl-toc-range: document;
+  list-style-type: none;
 }
 
 #generated-volume-toc {
   flow: volume-toc;
   display: -obfl-toc;
   -obfl-toc-range: volume;
+  list-style-type: none;
 }
 ~~~
 
