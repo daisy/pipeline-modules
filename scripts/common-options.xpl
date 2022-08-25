@@ -22,6 +22,7 @@
 	    epub2-to-epub3
 	    epub3-to-daisy202
 	    epub3-to-daisy3
+        dtbook-to-zedai
 	-->
 	<p:option name="validation" required="false" select="'off'">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
