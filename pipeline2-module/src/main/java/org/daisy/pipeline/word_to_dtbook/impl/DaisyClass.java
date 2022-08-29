@@ -2659,7 +2659,7 @@ public class DaisyClass {
 		 */
         public void PushCharacterStyle(String tag)
         {
-            characterStyle.add(tag);
+            characterStyle.push(tag);
         }
 
 		/**
