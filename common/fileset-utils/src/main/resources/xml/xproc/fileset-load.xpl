@@ -28,6 +28,7 @@
       <p>All files are loaded into memory, unless if the "load-if-not-in-memory" option is set, then
       the "result" port will only contain documents that were already present in the "in-memory"
       input.</p>
+      <p>The fileset ("xml:base" and "href" attributes and base URIs of documents) is normalized.</p>
       <p>"original-href" attributes are removed from the manifest.</p>
     </p:documentation>
   </p:output>
@@ -60,7 +61,7 @@
           <li>doctype-system</li>
       </ul>
       <p>These attributes are expected not to be present in the input unless the file is already
-      loaded into memory. If they are present they will be overwritten.</p>
+      loaded into memory (if they are present they will not be overwritten).</p>
     </p:documentation>
   </p:option>
 

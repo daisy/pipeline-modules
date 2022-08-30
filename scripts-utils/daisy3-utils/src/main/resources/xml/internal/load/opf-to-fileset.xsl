@@ -12,42 +12,15 @@
         <d:fileset>
             <xsl:attribute name="xml:base" select="replace(base-uri(.),'[^/]+$','')"/>
 
-            <!--get the SMILs in spine order-->
-            <xsl:variable name="smils" as="element()*">
+            <!-- start with the SMILs in spine order -->
+            <xsl:variable name="smils" as="element(item)*">
                 <xsl:for-each select="spine/itemref">
                     <xsl:sequence select="//manifest/item[@id=current()/@idref]"/>
                 </xsl:for-each>
             </xsl:variable>
-
-            <!--get the DTBooks in reading order-->
-            <xsl:variable name="dtbooks" as="element()*">
-                <xsl:sequence select="manifest/item[@media-type='application/x-dtbook+xml']"/>
-                <!--
-                NOTE:
-                  The following wasn't working when invoked in XProc.
-                  Ordering has been implemented in the caller XProc script
-                -->
-                <!--<xsl:choose>
-                    <xsl:when test="count(manifest/item[@media-type='application/x-dtbook+xml'])=1">
-                        <!-\-if there is only one DTBook no need to compute the order-\->
-                        <xsl:sequence select="manifest/item[@media-type='application/x-dtbook+xml']"
-                        />
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <!-\-else we load and parse each SMIL to get DTBook references in document order-\->
-                        <xsl:variable name="dtbook-uris"
-                            select="distinct-values(document($smils/resolve-uri(@href,base-uri(.)))//smil:text/replace(@src,'#.*$',''))" as="xs:string*"/>
-                        <xsl:message select="concat('uris=',string-join($dtbook-uris,','))"></xsl:message>
-                        <xsl:sequence select="manifest/item[@href=$dtbook-uris]"/>
-                    </xsl:otherwise>
-                </xsl:choose>-->
-            </xsl:variable>
-            <!--Finally apply templates to create the fileset: first SMIL, then DTBooks, then resources-->
             <xsl:apply-templates select="$smils"/>
-            <xsl:apply-templates select="$dtbooks"/>
-            <xsl:apply-templates
-                select="manifest/item[not(@media-type=('application/smil','application/x-dtbook+xml'))]"
-            />
+
+            <xsl:apply-templates select="manifest/item[not(@media-type='application/smil')]"/>
         </d:fileset>
     </xsl:template>
 
