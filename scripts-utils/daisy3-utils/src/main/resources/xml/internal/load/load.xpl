@@ -34,9 +34,10 @@
               <code>application/smil+xml</code> (as opposed to <code>application/smil</code> in DAISY
               3) and the media type of the OPF document will be
               <code>application/oebps-package+xml</code> (as opposed to <code>text/xml</code> in DAISY
-              3). The media type of the NCX document will always be
-              <code>application/x-dtbncx+xml</code> (even though in the 1.1.0 version of DAISY 3 it
-              is <code>text/xml</code>).</p>
+              3). The media type of the NCX, DTBook and resources documents will always be
+              <code>application/x-dtbncx+xml</code>, <code>application/x-dtbook+xml</code> and
+              <code>application/x-dtbresource+xml</code> (even though in the 1.1.0 version of DAISY
+              3 it is <code>text/xml</code>).</p>
         </p:documentation>
     </p:output>
     <p:output port="result.in-memory" sequence="true">

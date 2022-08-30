@@ -26,9 +26,11 @@
 
     <xsl:template match="item">
         <d:file href="{@href}" media-type="{
-            if(@media-type='application/smil') then 'application/smil+xml'
+            if (@media-type='application/smil')                          then 'application/smil+xml'
             else if (@media-type='text/xml' and ends-with(@href,'.opf')) then 'application/oebps-package+xml'
             else if (@media-type='text/xml' and ends-with(@href,'.ncx')) then 'application/x-dtbncx+xml'
+            else if (@media-type='text/xml' and ends-with(@href,'.xml')) then 'application/x-dtbook+xml'
+            else if (@media-type='text/xml' and ends-with(@href,'.res')) then 'application/x-dtbresource+xml'
             else @media-type}"/>
     </xsl:template>
 

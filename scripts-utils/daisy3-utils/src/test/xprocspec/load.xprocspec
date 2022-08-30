@@ -27,7 +27,7 @@
 				<d:fileset>
 					<d:file href="../resources/1.1.0/mo.smil" media-type="application/smil+xml"/>
 					<d:file href="../resources/1.1.0/book.opf" media-type="application/oebps-package+xml"/>
-					<d:file href="../resources/1.1.0/content.xml" media-type="text/xml"/>
+					<d:file href="../resources/1.1.0/content.xml" media-type="application/x-dtbook+xml"/>
 					<d:file href="../resources/1.1.0/navigation.ncx" media-type="application/x-dtbncx+xml"/>
 					<d:file href="../resources/1.1.0/audio.wav" media-type="audio/x-wav"/>
 					<d:file href="../resources/1.1.0/ncx110.dtd" media-type="text/xml"/>
