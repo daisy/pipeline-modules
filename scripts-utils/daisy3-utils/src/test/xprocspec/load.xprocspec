@@ -25,10 +25,18 @@
 			-->
 			<x:document type="inline">
 				<d:fileset>
-					<d:file href="../resources/1.1.0/mo.smil" media-type="application/smil+xml"/>
-					<d:file href="../resources/1.1.0/book.opf" media-type="application/oebps-package+xml"/>
-					<d:file href="../resources/1.1.0/content.xml" media-type="application/x-dtbook+xml"/>
-					<d:file href="../resources/1.1.0/navigation.ncx" media-type="application/x-dtbncx+xml"/>
+					<d:file href="../resources/1.1.0/book.opf" media-type="application/oebps-package+xml" media-version="1.0.1"
+					        doctype-public="+//ISBN 0-9673008-1-9//DTD OEB 1.0.1 Package//EN"
+					        doctype-system="oebpkg101.dtd"/>
+					<d:file href="../resources/1.1.0/mo.smil" media-type="application/smil+xml" media-version="dtb-1.1.0"
+					        doctype-public="-//NISO//DTD dtbsmil v1.1.0//EN"
+					        doctype-system="dtbsmil110.dtd"/>
+					<d:file href="../resources/1.1.0/content.xml" media-type="application/x-dtbook+xml" media-version="1.1.0"
+					        doctype-public="-//NISO//DTD dtbook v1.1.0//EN"
+					        doctype-system="dtbook110.dtd"/>
+					<d:file href="../resources/1.1.0/navigation.ncx" media-type="application/x-dtbncx+xml" media-version="1.1.0"
+					        doctype-public="-//NISO//DTD ncx v1.1.0//EN"
+					        doctype-system="ncx110.dtd"/>
 					<d:file href="../resources/1.1.0/audio.wav" media-type="audio/x-wav"/>
 					<d:file href="../resources/1.1.0/ncx110.dtd" media-type="text/xml"/>
 					<d:file href="../resources/1.1.0/oebpkg101.dtd" media-type="text/xml"/>
