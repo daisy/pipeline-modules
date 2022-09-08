@@ -27,6 +27,10 @@
       <artifactId>saxon-he</artifactId>
     </dependency>
     <dependency>
+        <groupId>com.googlecode.soundlibs</groupId>
+        <artifactId>jlayer</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <scope>provided</scope>
@@ -50,6 +54,7 @@
     <expose-services>
       org.daisy.pipeline.audio.AudioServices,
       org.daisy.pipeline.audio.impl.SystemAudioDecoder,
+      org.daisy.pipeline.audio.impl.JLayerMP3Decoder,
       org.daisy.pipeline.audio.impl.SystemAudioEncoder,
       org.daisy.pipeline.audio.saxon.impl.TranscodeAudioFileDefinition,
       org.daisy.pipeline.modules.impl.Module_audio_common

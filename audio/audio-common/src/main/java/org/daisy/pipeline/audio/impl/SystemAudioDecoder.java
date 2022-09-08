@@ -7,6 +7,7 @@ import java.util.Optional;
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 import org.daisy.pipeline.audio.AudioDecoder;
 import org.daisy.pipeline.audio.AudioDecoderService;
@@ -28,16 +29,19 @@ public class SystemAudioDecoder implements AudioDecoderService {
 
 	@Override
 	public Optional<AudioDecoder> newDecoder(Map<String,String> params) {
+		return Optional.of(getInstance());
+	}
+
+	static AudioDecoder instance = null;
+
+	static AudioDecoder getInstance() {
 		if (instance == null)
 			instance = new AudioDecoder() {
 					@Override
-					public AudioInputStream decode(File inputFile) throws Throwable {
+					public AudioInputStream decode(File inputFile) throws UnsupportedAudioFileException, Throwable {
 						return AudioSystem.getAudioInputStream(inputFile);
 					}
 				};
-		return Optional.of(instance);
+		return instance;
 	}
-
-	private static AudioDecoder instance = null;
-
 }

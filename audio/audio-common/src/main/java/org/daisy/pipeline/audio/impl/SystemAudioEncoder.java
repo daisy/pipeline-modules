@@ -60,7 +60,8 @@ public class SystemAudioEncoder implements AudioEncoderService {
 
 									// AudioSystem creates the wrong file header. We fix the wrong bytes here.
 									// see http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html
-									File tmpFile = new File(outputFile.getAbsolutePath() + ".tmp");
+									File tmpFile = File.createTempFile("wrong-header-", ".wav.tmp");
+									tmpFile.deleteOnExit();
 									AudioSystem.write(pcm, outputFileType, tmpFile);
 									try (FileInputStream wrongFile = new FileInputStream(tmpFile);
 									     FileOutputStream correctedFile = new FileOutputStream(outputFile)) {
