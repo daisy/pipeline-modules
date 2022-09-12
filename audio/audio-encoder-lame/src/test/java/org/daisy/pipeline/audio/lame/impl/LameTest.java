@@ -1,7 +1,6 @@
 package org.daisy.pipeline.audio.lame.impl;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -15,6 +14,7 @@ import javax.sound.sampled.AudioInputStream;
 import org.daisy.common.shell.BinaryFinder;
 import org.daisy.pipeline.audio.AudioEncoder;
 import static org.daisy.pipeline.audio.AudioFileTypes.MP3;
+import org.daisy.pipeline.audio.AudioUtils;
 
 import org.junit.Assert;
 import org.junit.Assume;
@@ -109,10 +109,7 @@ public class LameTest {
 		lame = new LameEncoderService().newEncoder(new HashMap<String,String>()).orElse(null);
 		Assume.assumeTrue("Test can not be run because lame not present", lame != null);
 
-		AudioInputStream audioStream = new AudioInputStream(
-			new ByteArrayInputStream(ref),
-			refFormat,
-			ref.length / refFormat.getFrameSize());
+		AudioInputStream audioStream = AudioUtils.createAudioStream(refFormat, ref);
 		File encodedFile = new File(new File(System.getProperty("java.io.tmpdir")), "mp3ref.mp3");
 		lame.encode(audioStream, MP3, encodedFile);
 		mp3ref = encodedFile.toURI().toString();
@@ -124,10 +121,7 @@ public class LameTest {
 		byte[] audio = mp3ToPCM(sourceFormat, mp3ref);
 
 		//use lame to convert it to MP3
-		AudioInputStream audioStream = new AudioInputStream(
-			new ByteArrayInputStream(audio),
-			sourceFormat,
-			audio.length / sourceFormat.getFrameSize());
+		AudioInputStream audioStream = AudioUtils.createAudioStream(sourceFormat, audio);
 		File encodedFile = new File(new File(System.getProperty("java.io.tmpdir")), "lametest.mp3");
 		lame.encode(audioStream, MP3, encodedFile);
 		String lameMp3 = encodedFile.toURI().toString();

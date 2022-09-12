@@ -1,6 +1,5 @@
 package org.daisy.pipeline.audio.impl;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -16,6 +15,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 import org.daisy.pipeline.audio.AudioEncoder;
 import org.daisy.pipeline.audio.AudioFileTypes;
+import org.daisy.pipeline.audio.AudioUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -47,10 +47,7 @@ public class WaveAudioEncoderTest {
 			}
 		}
 		AudioEncoder encoder = new SystemAudioEncoder().newEncoder(new HashMap<String,String>()).get();
-		AudioInputStream audioStream = new AudioInputStream(
-			new ByteArrayInputStream(pcm),
-			format,
-			pcm.length / format.getFrameSize());
+		AudioInputStream audioStream = AudioUtils.createAudioStream(format, pcm);
 		File wav; {
 			try {
 				wav = File.createTempFile("ref", ".wav");
@@ -69,7 +66,7 @@ public class WaveAudioEncoderTest {
 			audioStream = AudioSystem.getAudioInputStream(wav);
 			// audio format is not automatically the same as before the encoding
 			if (!format.matches(audioStream.getFormat())) {
-				audioStream = AudioSystem.getAudioInputStream(format, audioStream);
+				audioStream = AudioUtils.convertAudioStream(format, audioStream);
 				if (!format.matches(audioStream.getFormat()))
 					throw new AssertionError(
 						"audio stream is expected to have the same audio format after encoding and decoding");
