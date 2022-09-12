@@ -14,6 +14,7 @@ import javax.sound.sampled.AudioSystem;
 
 import org.daisy.pipeline.audio.AudioEncoder;
 import org.daisy.pipeline.audio.AudioEncoderService;
+import org.daisy.pipeline.audio.AudioUtils;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -38,39 +39,64 @@ public class SystemAudioEncoder implements AudioEncoderService {
 						AudioFormat format = pcm.getFormat();
 						if (outputFileType == AudioFileFormat.Type.WAVE) {
 							if (format.getEncoding() == Encoding.PCM_FLOAT) {
-								if (format.isBigEndian())
-									// FIXME: AudioSystem stores this as big-endian which is not according to the WAV standard
-									throw new IllegalArgumentException(
-										"Can not store {PCM_FLOAT, big-endian} audio as WAV");
+								if (format.isBigEndian()) {
 
-								// AudioSystem creates the wrong file header. We fix the wrong bytes here.
-								// see http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html
-								File tmpFile = new File(outputFile.getAbsolutePath() + ".tmp");
-								AudioSystem.write(pcm, outputFileType, tmpFile);
-								try (FileInputStream wrongFile = new FileInputStream(tmpFile);
-								     FileOutputStream correctedFile = new FileOutputStream(outputFile)) {
-									byte[] header = new byte[44];
-									wrongFile.read(header);
-									// format = WAVE_FORMAT_IEEE_FLOAT
-									header[20] = (byte)3;
-									correctedFile.write(header);
-									byte[] buf = new byte[1024];
-									while (true) {
-										int bytesRead = wrongFile.read(buf);
-										if (bytesRead == -1)
-											break;
-										correctedFile.write(buf, 0, bytesRead);
+									// AudioSystem stores this as big-endian which is not according
+									// to the WAV standard. To work around this issue first convert
+									// the samples to little-endian.
+									encode(
+										AudioUtils.convertAudioStream(
+											new AudioFormat(format.getEncoding(),
+											                format.getSampleRate(),
+											                format.getSampleSizeInBits(),
+											                format.getChannels(),
+											                format.getFrameSize(),
+											                format.getFrameRate(),
+											                false), // little endian
+											pcm),
+										outputFileType,
+										outputFile);
+								} else {
+
+									// AudioSystem creates the wrong file header. We fix the wrong bytes here.
+									// see http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html
+									File tmpFile = new File(outputFile.getAbsolutePath() + ".tmp");
+									AudioSystem.write(pcm, outputFileType, tmpFile);
+									try (FileInputStream wrongFile = new FileInputStream(tmpFile);
+									     FileOutputStream correctedFile = new FileOutputStream(outputFile)) {
+										byte[] header = new byte[44];
+										wrongFile.read(header);
+										// format = WAVE_FORMAT_IEEE_FLOAT
+										header[20] = (byte)3;
+										correctedFile.write(header);
+										byte[] buf = new byte[1024];
+										while (true) {
+											int bytesRead = wrongFile.read(buf);
+											if (bytesRead == -1)
+												break;
+											correctedFile.write(buf, 0, bytesRead);
+										}
 									}
+									tmpFile.delete();
 								}
-								tmpFile.delete();
 							} else if (format.getEncoding() == Encoding.PCM_UNSIGNED
-							           && format.getFrameSize() > 1
+							           && format.getSampleSizeInBits() > 8
 							           && !format.isBigEndian()) {
 
-								// FIXME: AudioSystem stores this as signed little-endian (according to the WAV standard)
-								// but does not convert the data
-								throw new IllegalArgumentException(
-									"Can not store {PCM_UNSIGNED, " + format.getFrameSize() + " bytes/frame, little-endian} audio as WAV");
+								// AudioSystem writes this as signed little-endian (according to the WAV standard)
+								// but does not convert the data. This is probably because com.sun.media.sound.PCMtoPCMCodec
+								// does not correctly convert unsigned little-endian to signed little-endian.
+								// To work around this issue first convert the samples to big-endian.
+								encode(
+									AudioUtils.convertAudioStream(
+										new AudioFormat(format.getSampleRate(),
+										                format.getSampleSizeInBits(),
+										                format.getChannels(),
+										                false, // unsigned
+										                true), // big endian
+										pcm),
+									outputFileType,
+									outputFile);
 							} else
 								AudioSystem.write(pcm, outputFileType, outputFile);
 						} else

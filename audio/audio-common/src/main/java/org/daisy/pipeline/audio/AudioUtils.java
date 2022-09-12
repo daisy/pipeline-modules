@@ -3,6 +3,8 @@ package org.daisy.pipeline.audio;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.io.IOException;
@@ -10,6 +12,7 @@ import java.io.IOException;
 import com.google.common.io.ByteStreams;
 
 import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioFormat.Encoding;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -133,6 +136,60 @@ public final class AudioUtils {
 	 * Convert audio from one format to another.
 	 */
 	public static AudioInputStream convertAudioStream(AudioFormat newFormat, AudioInputStream stream) {
+		AudioFormat format = stream.getFormat();
+		if (format.getSampleSizeInBits() > 8
+		    && newFormat.getSampleSizeInBits() > 8
+		    && !format.isBigEndian()
+		    && !newFormat.isBigEndian()
+		    && ((format.getEncoding() == Encoding.PCM_UNSIGNED
+		         && newFormat.getEncoding() == Encoding.PCM_SIGNED)
+		        || (format.getEncoding() == Encoding.PCM_SIGNED
+		            && newFormat.getEncoding() == Encoding.PCM_UNSIGNED))) {
+
+			// com.sun.media.sound.PCMtoPCMCodec does not correctly convert unsigned little-endian
+			// to signed little-endian or visa-versa. Work around this by first converting the
+			// samples to big-endian.
+			return convertAudioStream(
+				newFormat,
+				convertAudioStream(
+					new AudioFormat(format.getSampleRate(),
+					                format.getSampleSizeInBits(),
+					                format.getChannels(),
+					                format.getEncoding() == Encoding.PCM_SIGNED,
+					                true), // big endian
+					stream));
+		} else if (format.getEncoding() == Encoding.PCM_FLOAT
+		           && newFormat.getEncoding() == Encoding.PCM_FLOAT
+		           && format.getSampleSizeInBits() == 64
+		           && newFormat.getSampleSizeInBits() == 64
+		           && format.isBigEndian() != newFormat.isBigEndian()) {
+
+			// AudioSystem.getAudioInputStream() introduces a rounding error, so we do the byte
+			// order conversion ourselves.
+			AudioFormat otherEndian = new AudioFormat(format.getEncoding(),
+			                                          format.getSampleRate(),
+			                                          format.getSampleSizeInBits(),
+			                                          format.getChannels(),
+			                                          format.getFrameSize(),
+			                                          format.getFrameRate(),
+			                                          !format.isBigEndian());
+			ByteBuffer bytes; {
+				try {
+					bytes = ByteBuffer.wrap(ByteStreams.toByteArray(stream));
+				} catch (IOException e) {
+					throw new RuntimeException(e); // should not happen
+				}
+			}
+			ByteBuffer reorderedBytes  = ByteBuffer.wrap(new byte[bytes.array().length]);
+			reorderedBytes = reorderedBytes.order(ByteOrder.LITTLE_ENDIAN);
+			while (bytes.hasRemaining())
+				reorderedBytes.putLong(bytes.getLong());
+			stream = createAudioStream(otherEndian, reorderedBytes.array());
+			if (otherEndian.matches(newFormat))
+				return stream;
+			else
+				return convertAudioStream(newFormat, stream);
+		}
 		return AudioSystem.getAudioInputStream(newFormat, stream);
 	}
 
