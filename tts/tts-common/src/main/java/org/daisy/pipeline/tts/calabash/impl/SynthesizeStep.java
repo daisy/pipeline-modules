@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Random;
@@ -16,6 +17,7 @@ import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
 
 import org.daisy.common.xproc.calabash.XProcStep;
+import org.daisy.pipeline.audio.AudioClip;
 import org.daisy.pipeline.audio.AudioFileTypes;
 import org.daisy.pipeline.audio.AudioServices;
 import org.daisy.pipeline.tts.AudioFootprintMonitor;
@@ -59,11 +61,16 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 	private boolean mIncludeLogOpt;
 	private AudioFileFormat.Type mAudioFileType;
 
-	private static String convertSecondToString(double seconds) {
-		int iseconds = (int) (Math.floor(seconds));
-		int milliseconds = (int) (Math.floor(1000 * (seconds - iseconds)));
-		return String.format("%d:%02d:%02d.%03d", iseconds / 3600, (iseconds / 60) % 60,
-		        (iseconds % 60), milliseconds);
+	private static String convertDurationToString(Duration duration) {
+		long hours = duration.toHours();
+		long minutes = duration.toMinutes();
+		long seconds = duration.getSeconds();
+		long milliseconds = duration.getNano() / 1000000;
+		return String.format("%d:%02d:%02d.%03d",
+		                     hours,
+		                     minutes,
+		                     seconds,
+		                     milliseconds);
 	}
 
 	public SynthesizeStep(XProcRuntime runtime, XAtomicStep step, TTSRegistry ttsRegistry,
@@ -202,25 +209,25 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 		tw.addStartElement(OutputRootTag);
 
 		int num = 0;
-		for (SoundFileLink sf : soundFragments) {
-			String soundFileURI = sf.soundFileURIHolder.toString();
-			if (!soundFileURI.isEmpty()) {
-				if (sf.clipBegin < sf.clipEnd){
-					//sf.clipBegin = sf.clipEnd if the input text is empty. Those clips are not useful
-					//and they can eventually lead to validation errors
+		for (SoundFileLink link : soundFragments) {
+			AudioClip clip = link.getAudioFragment(log);
+			if (clip != null) {
+				if (!clip.clipEnd.equals(clip.clipBegin)) { // empty clips are not useful and can eventually
+				                                            // lead to validation errors
 					tw.addStartElement(ClipTag);
-					tw.addAttribute(Audio_attr_id, sf.xmlid);
-					tw.addAttribute(Audio_attr_clipBegin, convertSecondToString(sf.clipBegin));
-					tw.addAttribute(Audio_attr_clipEnd, convertSecondToString(sf.clipEnd));
-					tw.addAttribute(Audio_attr_src, soundFileURI);
+					tw.addAttribute(Audio_attr_id, link.getTextFragment());
+					tw.addAttribute(Audio_attr_clipBegin,
+					                convertDurationToString(clip.clipBegin));
+					tw.addAttribute(Audio_attr_clipEnd,
+					                convertDurationToString(clip.clipEnd));
+					tw.addAttribute(Audio_attr_src, clip.file.toURI().toString());
 					tw.addEndElement();
 				}
 				++num;
-				TTSLog.Entry entry = log.getOrCreateEntry(sf.xmlid);
-				entry.setSoundfile(soundFileURI);
-				entry.setPositionInFile(sf.clipBegin, sf.clipEnd);
+				TTSLog.Entry entry = log.getOrCreateEntry(link.getTextFragment());
+				entry.setClip(clip);
 			} else {
-				log.getOrCreateEntry(sf.xmlid).addError(
+				log.getOrCreateEntry(link.getTextFragment()).addError(
 				        new TTSLog.Error(ErrorCode.AUDIO_MISSING,
 				                "not synthesized or not encoded"));
 			}
@@ -268,11 +275,11 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 				xmlLog.addStartElement(LogTextTag);
 
 				xmlLog.addAttribute(Log_attr_id, entry.getKey());
-				if (le.getSoundFile() != null) {
-					String basename = new File(le.getSoundFile()).getName();
+				if (le.getClip() != null) {
+					String basename = le.getClip().file.getName();
 					xmlLog.addAttribute(Log_attr_file, basename);
-					xmlLog.addAttribute(Log_attr_begin, String.valueOf(le.getBeginInFile()));
-					xmlLog.addAttribute(Log_attr_end, String.valueOf(le.getEndInFile()));
+					xmlLog.addAttribute(Log_attr_begin, String.valueOf(le.getClip().clipBegin)); // ISO-8601 seconds based representation
+					xmlLog.addAttribute(Log_attr_end, String.valueOf(le.getClip().clipEnd));
 				}
 
 				xmlLog.addAttribute(Log_attr_timeout, "" + le.getTimeout() + "s");

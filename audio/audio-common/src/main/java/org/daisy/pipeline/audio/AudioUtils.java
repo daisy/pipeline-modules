@@ -3,11 +3,12 @@ package org.daisy.pipeline.audio;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.time.Duration;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.io.IOException;
 
 import com.google.common.io.ByteStreams;
 
@@ -57,6 +58,27 @@ public final class AudioUtils {
 			audio = createAudioStream(format, data);
 		}
 		return audio;
+	}
+
+	/**
+	 * Get the duration of a PCM encoded audio stream.
+	 */
+	public static Duration getDuration(AudioInputStream stream) {
+		return getDurationFromFrames(stream.getFormat(), stream.getFrameLength());
+	}
+
+	public static Duration getDuration(AudioFormat format, int bytes) {
+		if (format.getFrameSize() == AudioSystem.NOT_SPECIFIED)
+			throw new IllegalArgumentException();
+		return getDurationFromFrames(format, (long)(bytes / format.getFrameSize()));
+	}
+
+	private static Duration getDurationFromFrames(AudioFormat format, Long frames) {
+		if (!isPCM(format))
+			throw new IllegalArgumentException();
+		if (format.getFrameRate() == AudioSystem.NOT_SPECIFIED)
+			throw new IllegalArgumentException();
+		return Duration.ofMillis((long)(frames.floatValue() / (format.getFrameRate() / 1000)));
 	}
 
 	/**

@@ -3,8 +3,11 @@ package org.daisy.pipeline.audio.saxon.impl;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.math.BigDecimal;
 import java.net.URI;
+import java.time.Duration;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.sound.sampled.AudioFileFormat;
@@ -12,10 +15,12 @@ import javax.sound.sampled.AudioInputStream;
 
 import org.daisy.common.xpath.saxon.ExtensionFunctionProvider;
 import org.daisy.common.xpath.saxon.ReflexiveExtensionFunctionProvider;
+import org.daisy.pipeline.audio.AudioClip;
 import org.daisy.pipeline.audio.AudioDecoder;
 import org.daisy.pipeline.audio.AudioEncoder;
 import org.daisy.pipeline.audio.AudioFileTypes;
 import org.daisy.pipeline.audio.AudioServices;
+import org.daisy.pipeline.audio.AudioUtils;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -47,7 +52,7 @@ public class TranscodeAudioFileDefinition extends ReflexiveExtensionFunctionProv
 
 	public class TranscodeAudioFile {
 
-		public URI run(URI href, Optional<String> oldMediaType, String newMediaType, URI outputDirURI) {
+		public Map<String,Object> run(URI href, Optional<String> oldMediaType, String newMediaType, URI outputDirURI) {
 			File inputFile; {
 				try {
 					inputFile = new File(href);
@@ -113,8 +118,17 @@ public class TranscodeAudioFileDefinition extends ReflexiveExtensionFunctionProv
 				}
 			}
 			try {
-				encoder.get().encode(pcm, newFileType, outputFile);
-				return outputFile.toURI();
+				AudioClip clip = encoder.get().encode(pcm, newFileType, outputFile);
+				Map<String,Object> rv = new HashMap<>();
+				rv.put("href", outputFile.toURI());
+				Duration originalDuration = AudioUtils.getDuration(pcm);
+				if (!(clip.clipBegin.equals(Duration.ZERO) && clip.clipEnd.equals(originalDuration))) {
+					rv.put("clipBegin", new BigDecimal(clip.clipBegin.toMillis()).movePointLeft(3));
+					rv.put("clipEnd", new BigDecimal(clip.clipEnd.toMillis()).movePointLeft(3));
+					rv.put("original-clipBegin", BigDecimal.ZERO);
+					rv.put("original-clipEnd", new BigDecimal(originalDuration.toMillis()).movePointLeft(3));
+				}
+				return rv;
 			} catch (Throwable e) {
 				throw new UncheckedIOException(
 					new IOException("Audio could not be written to file type: " + newFileType, e));

@@ -3,6 +3,7 @@
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
+                xmlns:map="http://www.w3.org/2005/xpath-functions/map"
                 exclude-result-prefixes="#all">
 
 	<xsl:include href="library.xsl"/>
@@ -19,12 +20,21 @@
 			<xsl:copy>
 				<xsl:for-each select="d:file">
 					<xsl:copy>
-						<xsl:attribute name="href" select="pf:transcode-audio-file(
-						                                     resolve-uri((@original-href,@href)[1],base-uri(.)),
-						                                     @media-type,
-						                                     $new-audio-file-type,
-						                                     $temp-dir)"/>
+						<xsl:variable name="clip" as="map(*)" select="pf:transcode-audio-file(
+						                                                resolve-uri((@original-href,@href)[1],base-uri(.)),
+						                                                @media-type,
+						                                                $new-audio-file-type,
+						                                                $temp-dir)"/>
+						<xsl:attribute name="href" select="$clip('href')"/>
 						<xsl:attribute name="original-href" select="@href"/>
+						<xsl:if test="map:contains($clip,'clipBegin')">
+							<xsl:element name="d:clip">
+								<xsl:attribute name="clipBegin" select="$clip('clipBegin')"/>
+								<xsl:attribute name="clipEnd" select="$clip('clipEnd')"/>
+								<xsl:attribute name="original-clipBegin" select="$clip('original-clipBegin')"/>
+								<xsl:attribute name="original-clipEnd" select="$clip('original-clipEnd')"/>
+							</xsl:element>
+						</xsl:if>
 					</xsl:copy>
 				</xsl:for-each>
 			</xsl:copy>
@@ -55,6 +65,7 @@
 							<xsl:attribute name="href" select="resolve-uri(replace(@href,'^.*/([^/]*)$','$1'),
 							                                               $new-audio-dir)"/>
 							<xsl:attribute name="original-href" select="resolve-uri(@original-href,base-uri(.))"/>
+							<xsl:sequence select="d:clip"/>
 						</xsl:copy>
 					</xsl:for-each>
 				</xsl:copy>

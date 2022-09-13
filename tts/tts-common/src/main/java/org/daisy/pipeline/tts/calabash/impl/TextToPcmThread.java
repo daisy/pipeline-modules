@@ -240,8 +240,8 @@ public class TextToPcmThread implements FormatSpecifications {
 
 				ContiguousPCM pcm = new ContiguousPCM(
 					AudioUtils.concat(mAudioOfCurrentFile), section.getAudioOutputDir(), filePrefix);
-				for (SoundFileLink clip : mLinksOfCurrentFile) {
-					clip.soundFileURIHolder = pcm.getURIholder();
+				for (SoundFileLink link : mLinksOfCurrentFile) {
+					link.clipBase = pcm.getDestinationFile();
 				}
 				try {
 					mAudioFootprintMonitor.transferToEncoding(mMemFootprint, pcm.sizeInBytes());
@@ -496,11 +496,11 @@ public class TextToPcmThread implements FormatSpecifications {
 
 		// keep track of where the sound begins and where it ends within the audio file
 		if (marks.size() == 0) {
-			SoundFileLink sf = new SoundFileLink();
-			sf.xmlid = sentence.getID();
-			sf.clipBegin = convertBytesToSecond(mLastFormat, begin);
-			sf.clipEnd = convertBytesToSecond(mLastFormat, mOffsetInFile);
-			mLinksOfCurrentFile.add(sf);
+			mLinksOfCurrentFile.add(
+				new SoundFileLink(
+					sentence.getID(),
+					AudioUtils.getDuration(mLastFormat, begin),
+					AudioUtils.getDuration(mLastFormat, mOffsetInFile)));
 		} else {
 			Map<String, Integer> starts = new HashMap<String, Integer>();
 			Map<String, Integer> ends = new HashMap<String, Integer>();
@@ -518,17 +518,17 @@ public class TextToPcmThread implements FormatSpecifications {
 				}
 			}
 			for (String id : all) {
-				SoundFileLink sf = new SoundFileLink();
-				sf.xmlid = id;
-				if (starts.containsKey(id))
-					sf.clipBegin = convertBytesToSecond(mLastFormat, begin + starts.get(id));
-				else
-					sf.clipBegin = convertBytesToSecond(mLastFormat, begin);
-				if (ends.containsKey(id))
-					sf.clipEnd = convertBytesToSecond(mLastFormat, begin + ends.get(id));
-				else
-					sf.clipEnd = convertBytesToSecond(mLastFormat, mOffsetInFile);
-				mLinksOfCurrentFile.add(sf);
+				mLinksOfCurrentFile.add(
+					new SoundFileLink(
+						id,
+						AudioUtils.getDuration(mLastFormat,
+						                       starts.containsKey(id)
+						                           ? begin + starts.get(id)
+						                           : begin),
+						AudioUtils.getDuration(mLastFormat,
+						                       ends.containsKey(id)
+						                           ? begin + ends.get(id)
+						                           : mOffsetInFile)));
 			}
 			/*
 			 * note: if marks.size() > 0 but all.size() == 0, it means that no
@@ -563,9 +563,5 @@ public class TextToPcmThread implements FormatSpecifications {
 			mMemFootprint += size;
 		}
 		mAudioOfCurrentFile = Iterables.concat(mAudioOfCurrentFile, toadd);
-	}
-
-	private static double convertBytesToSecond(AudioFormat format, int bytes) {
-		return (bytes / (format.getFrameRate() * format.getFrameSize()));
 	}
 }

@@ -3,6 +3,7 @@ package org.daisy.pipeline.audio.impl;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
 
@@ -12,6 +13,7 @@ import javax.sound.sampled.AudioFormat.Encoding;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 
+import org.daisy.pipeline.audio.AudioClip;
 import org.daisy.pipeline.audio.AudioEncoder;
 import org.daisy.pipeline.audio.AudioEncoderService;
 import org.daisy.pipeline.audio.AudioUtils;
@@ -35,7 +37,7 @@ public class SystemAudioEncoder implements AudioEncoderService {
 		if (instance == null)
 			instance = new AudioEncoder() {
 					@Override
-					public void encode(AudioInputStream pcm, AudioFileFormat.Type outputFileType, File outputFile) throws Throwable {
+					public AudioClip encode(AudioInputStream pcm, AudioFileFormat.Type outputFileType, File outputFile) throws Throwable {
 						AudioFormat format = pcm.getFormat();
 						if (outputFileType == AudioFileFormat.Type.WAVE) {
 							if (format.getEncoding() == Encoding.PCM_FLOAT) {
@@ -44,7 +46,7 @@ public class SystemAudioEncoder implements AudioEncoderService {
 									// AudioSystem stores this as big-endian which is not according
 									// to the WAV standard. To work around this issue first convert
 									// the samples to little-endian.
-									encode(
+									return encode(
 										AudioUtils.convertAudioStream(
 											new AudioFormat(format.getEncoding(),
 											                format.getSampleRate(),
@@ -88,7 +90,7 @@ public class SystemAudioEncoder implements AudioEncoderService {
 								// but does not convert the data. This is probably because com.sun.media.sound.PCMtoPCMCodec
 								// does not correctly convert unsigned little-endian to signed little-endian.
 								// To work around this issue first convert the samples to big-endian.
-								encode(
+								return encode(
 									AudioUtils.convertAudioStream(
 										new AudioFormat(format.getSampleRate(),
 										                format.getSampleSizeInBits(),
@@ -102,6 +104,7 @@ public class SystemAudioEncoder implements AudioEncoderService {
 								AudioSystem.write(pcm, outputFileType, outputFile);
 						} else
 							AudioSystem.write(pcm, outputFileType, outputFile);
+						return new AudioClip(outputFile, Duration.ZERO, AudioUtils.getDuration(pcm));
 					}
 				};
 		return Optional.of(instance);

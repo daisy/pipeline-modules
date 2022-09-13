@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -28,10 +29,12 @@ import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 
+import org.daisy.pipeline.audio.AudioClip;
 import org.daisy.pipeline.audio.AudioEncoder;
 import org.daisy.pipeline.audio.AudioEncoderService;
 import static org.daisy.pipeline.audio.AudioFileTypes.MP3;
 import org.daisy.pipeline.audio.AudioServices;
+import org.daisy.pipeline.audio.AudioUtils;
 import org.daisy.pipeline.tts.AudioFootprintMonitor;
 import org.daisy.pipeline.tts.calabash.impl.EncodingThread.EncodingException;
 import org.daisy.pipeline.tts.TTSEngine;
@@ -186,11 +189,12 @@ public class SSMLtoAudioTest {
 			return Optional.of(
 				new AudioEncoder() {
 					@Override
-					public void encode(AudioInputStream pcm, AudioFileFormat.Type outputFileType, File outputFile)
+					public AudioClip encode(AudioInputStream pcm, AudioFileFormat.Type outputFileType, File outputFile)
 							throws Throwable {
 						synchronized (DefaultAudioEncoder.this) {
 							++count;
 						}
+						return new AudioClip(outputFile, Duration.ZERO, AudioUtils.getDuration(pcm));
 					}
 				}
 			);
@@ -538,7 +542,7 @@ public class SSMLtoAudioTest {
 				return Optional.of(
 					new AudioEncoder() {
 						@Override
-						public void encode(AudioInputStream pcm, AudioFileFormat.Type outputFileType, File outputFile)
+						public AudioClip encode(AudioInputStream pcm, AudioFileFormat.Type outputFileType, File outputFile)
 								throws Throwable {
 							throw new RuntimeException();
 						}
@@ -567,10 +571,11 @@ public class SSMLtoAudioTest {
 				return Optional.of(
 					new AudioEncoder() {
 						@Override
-						public void encode(AudioInputStream pcm, AudioFileFormat.Type outputFileType, File outputFile)
+						public AudioClip encode(AudioInputStream pcm, AudioFileFormat.Type outputFileType, File outputFile)
 								throws Throwable {
 							try {
 								Thread.sleep(5000);
+								return new AudioClip(outputFile, Duration.ZERO, AudioUtils.getDuration(pcm));
 							} catch (InterruptedException e) {
 								interrupted.set(true);
 								throw e;
