@@ -199,15 +199,15 @@ public class SSMLtoAudioTest {
 
 	public void runTest(TTSService ttsservice, DynamicMarkHandler markHandler,
 	        AudioEncoderService audioEncoder, int expectedGeneralErrors, int expectedSentErrors)
-	        throws SynthesisException, InterruptedException, SaxonApiException {
+	        throws SynthesisException, EncodingException, InterruptedException, SaxonApiException {
 		runTest(ttsservice, markHandler, audioEncoder, expectedGeneralErrors,
 		        expectedSentErrors, new CustomVoiceConfig());
 	}
 
 	public void runTest(TTSService ttsservice, DynamicMarkHandler markHandler,
 	        AudioEncoderService audioEncoder, int expectedGeneralErrors, int expectedSentErrors,
-	        VoiceConfigExtension config) throws SynthesisException, InterruptedException,
-	        SaxonApiException {
+	        VoiceConfigExtension config) throws SynthesisException, EncodingException,
+	        InterruptedException, SaxonApiException {
 		runTest(ttsservice, markHandler, audioEncoder, expectedGeneralErrors,
 		        expectedSentErrors, config, "<ssml xml:lang=\"en\" id=\"s1\">test</ssml>",
 		        "<ssml xml:lang=\"en\" id=\"s2\">test</ssml>");
@@ -572,7 +572,7 @@ public class SSMLtoAudioTest {
 								throws Throwable {
 							try {
 								Thread.sleep(5000);
-							} catch (Exception e) {
+							} catch (InterruptedException e) {
 								interrupted.set(true);
 								throw e;
 							}
@@ -582,9 +582,13 @@ public class SSMLtoAudioTest {
 			}
 		};
 
-		runTest(service, (DynamicMarkHandler) service.engine, encoder, 1, 0,
-		        new VoiceConfigForSingleThread(),
-		        "<ssml xml:lang=\"en\" id=\"s1\">test</ssml>");
+		try {
+			runTest(service, (DynamicMarkHandler) service.engine, encoder, 1, 0,
+			        new VoiceConfigForSingleThread(),
+			        "<ssml xml:lang=\"en\" id=\"s1\">test</ssml>");
+			Assert.fail("EncodingException expected");
+		} catch (EncodingException e) {}
+
 		Assert.assertTrue("The audio encoding should have been interrupted", interrupted.get());
 	}
 

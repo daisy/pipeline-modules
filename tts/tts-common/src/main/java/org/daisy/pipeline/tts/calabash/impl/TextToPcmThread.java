@@ -82,6 +82,7 @@ public class TextToPcmThread implements FormatSpecifications {
 	private VoiceManager mVoiceManager;
 	private TTSLog mTTSLog;
 	private int mErrorCounter;
+	private Throwable uncaughtException;
 
 	/**
 	 * Java counterpart of SSML's marks
@@ -190,6 +191,9 @@ public class TextToPcmThread implements FormatSpecifications {
 				}
 			}
 		};
+		mThread.setUncaughtExceptionHandler(
+			(thread, throwable) -> { uncaughtException = throwable; }
+		);
 		mThread.start();
 	}
 
@@ -202,6 +206,9 @@ public class TextToPcmThread implements FormatSpecifications {
 				mLogger.warn("TextToPCMThread interruption");
 			}
 			mThread = null;
+			if (uncaughtException != null) {
+				throw new RuntimeException("unexpected error", uncaughtException); // should not happen
+			}
 		}
 
 		return mSoundFileLinks;

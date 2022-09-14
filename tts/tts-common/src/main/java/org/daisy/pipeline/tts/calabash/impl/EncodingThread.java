@@ -140,16 +140,16 @@ public class EncodingThread {
 	}
 
 	void waitToFinish() throws EncodingException {
-		if (criticalError != null) {
-			if (criticalError instanceof EncodingException)
-				throw (EncodingException)criticalError;
-			else
-				throw new RuntimeException("coding error");
-		}
 		try {
 			mThread.join();
 		} catch (InterruptedException e) {
 			throw new RuntimeException(); // should not happen
+		}
+		if (criticalError != null) {
+			if (criticalError instanceof EncodingException)
+				throw (EncodingException)criticalError;
+			else
+				throw new RuntimeException("coding error", criticalError); // should not happen
 		}
 	}
 }
