@@ -5,6 +5,7 @@
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:c="http://www.w3.org/ns/xproc-step"
                 xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 type="px:audio-transcode"
                 name="main">
 
@@ -105,10 +106,10 @@
 			<!--
 			    initially place new audio files in temporary directory
 			-->
-			<p:with-param name="new-audio-dir" select="string(/*)">
+			<p:with-param name="new-audio-dir" select="xs:anyURI(string(/*))">
 				<p:pipe step="temp-dir" port="result"/>
 			</p:with-param>
-			<p:with-param name="temp-dir" select="string(/*)">
+			<p:with-param name="temp-dir" select="xs:anyURI(string(/*))">
 				<p:pipe step="temp-dir" port="result"/>
 			</p:with-param>
 		</p:xslt>

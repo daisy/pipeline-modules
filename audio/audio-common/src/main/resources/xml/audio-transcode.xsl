@@ -7,9 +7,9 @@
 
 	<xsl:include href="library.xsl"/>
 
-	<xsl:param name="new-audio-file-type" required="yes"/>
-	<xsl:param name="new-audio-dir" required="yes"/>
-	<xsl:param name="temp-dir" required="yes"/>
+	<xsl:param name="new-audio-file-type" as="xs:string" required="yes"/>
+	<xsl:param name="new-audio-dir" as="xs:anyURI" required="yes"/>
+	<xsl:param name="temp-dir" as="xs:anyURI" required="yes"/>
 
 	<xsl:template match="/d:fileset">
 		<!--
