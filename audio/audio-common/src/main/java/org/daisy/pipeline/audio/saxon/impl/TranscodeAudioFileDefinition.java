@@ -12,6 +12,7 @@ import java.util.Optional;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 import org.daisy.common.xpath.saxon.ExtensionFunctionProvider;
 import org.daisy.common.xpath.saxon.ReflexiveExtensionFunctionProvider;
@@ -110,7 +111,7 @@ public class TranscodeAudioFileDefinition extends ReflexiveExtensionFunctionProv
 			AudioInputStream pcm; {
 				try {
 					pcm = decoder.get().decode(inputFile);
-				} catch (IllegalArgumentException e) {
+				} catch (UnsupportedAudioFileException e) {
 					throw new UncheckedIOException(
 						new IOException("Audio file could not be read (unsupported file type): " + inputFile, e));
 				} catch (Throwable e) {
@@ -131,7 +132,7 @@ public class TranscodeAudioFileDefinition extends ReflexiveExtensionFunctionProv
 				return rv;
 			} catch (Throwable e) {
 				throw new UncheckedIOException(
-					new IOException("Audio could not be written to file type: " + newFileType, e));
+					new IOException("Audio could not be written to file (type " + newFileType + "): " + outputFile, e));
 			}
 		}
 	}

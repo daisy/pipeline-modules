@@ -220,7 +220,7 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 					                convertDurationToString(clip.clipBegin));
 					tw.addAttribute(Audio_attr_clipEnd,
 					                convertDurationToString(clip.clipEnd));
-					tw.addAttribute(Audio_attr_src, clip.file.toURI().toString());
+					tw.addAttribute(Audio_attr_src, clip.src.toString());
 					tw.addEndElement();
 				}
 				++num;
@@ -276,7 +276,7 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 
 				xmlLog.addAttribute(Log_attr_id, entry.getKey());
 				if (le.getClip() != null) {
-					String basename = le.getClip().file.getName();
+					String basename = new File(le.getClip().src).getName();
 					xmlLog.addAttribute(Log_attr_file, basename);
 					xmlLog.addAttribute(Log_attr_begin, String.valueOf(le.getClip().clipBegin)); // ISO-8601 seconds based representation
 					xmlLog.addAttribute(Log_attr_end, String.valueOf(le.getClip().clipEnd));

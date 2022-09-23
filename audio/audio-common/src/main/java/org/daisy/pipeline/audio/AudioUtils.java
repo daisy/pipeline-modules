@@ -7,9 +7,11 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import com.google.common.collect.AbstractIterator;
 import com.google.common.io.ByteStreams;
 
 import javax.sound.sampled.AudioFormat;
@@ -62,23 +64,32 @@ public final class AudioUtils {
 
 	/**
 	 * Get the duration of a PCM encoded audio stream.
+	 *
+	 * @throws IllegalArgumentException if format is not PCM encoded with specified frame rate.
 	 */
 	public static Duration getDuration(AudioInputStream stream) {
-		return getDurationFromFrames(stream.getFormat(), stream.getFrameLength());
+		return getDurationFromFrames(PCMAudioFormat.of(stream.getFormat()), stream.getFrameLength());
 	}
 
+	/**
+	 * @throws IllegalArgumentException if format is not PCM encoded with specified frame rate
+	 *                                  and frame size.
+	 */
 	public static Duration getDuration(AudioFormat format, int bytes) {
-		if (format.getFrameSize() == AudioSystem.NOT_SPECIFIED)
-			throw new IllegalArgumentException();
-		return getDurationFromFrames(format, (long)(bytes / format.getFrameSize()));
+		format = PCMAudioFormat.of(format);
+		return getDurationFromFrames((PCMAudioFormat)format, (long)(bytes / format.getFrameSize()));
 	}
 
-	private static Duration getDurationFromFrames(AudioFormat format, Long frames) {
-		if (!isPCM(format))
-			throw new IllegalArgumentException();
-		if (format.getFrameRate() == AudioSystem.NOT_SPECIFIED)
-			throw new IllegalArgumentException();
+	private static Duration getDurationFromFrames(PCMAudioFormat format, Long frames) {
 		return Duration.ofMillis((long)(frames.floatValue() / (format.getFrameRate() / 1000)));
+	}
+
+	/**
+	 * @return the number of frames needed to contain the given duration of audio.
+	 */
+	public static long getLengthInFrames(PCMAudioFormat format, Duration duration) {
+		// rounding to the next natural number if needed
+		return (long)Math.ceil((double)(format.getFrameRate() / 1000) * duration.toMillis());
 	}
 
 	/**
@@ -89,16 +100,16 @@ public final class AudioUtils {
 	public static AudioInputStream concat(Iterable<AudioInputStream> streams) {
 		int count = 0;
 		long _totalLength = 0;
-		AudioFormat format = null;
+		PCMAudioFormat format = null;
 		for (AudioInputStream s : streams) {
 			count++;
 			_totalLength += s.getFrameLength();
 			if (format == null) {
-				format = s.getFormat();
-				if (!isPCM(format))
-					throw new IllegalArgumentException("AudioInputStream must be PCM encoded, but got: "+ format);
-				if (format.getFrameSize() == AudioSystem.NOT_SPECIFIED)
-					throw new IllegalArgumentException();
+				try {
+					format = PCMAudioFormat.of(s.getFormat());
+				} catch (IllegalArgumentException e) {
+					throw new IllegalArgumentException("AudioInputStream must be PCM encoded, but got: "+ s.getFormat());
+				}
 			} else if (!format.matches(s.getFormat()))
 				throw new IllegalArgumentException("Can not concatenate AudioInputStream with different audio formats");
 		}
@@ -152,6 +163,114 @@ public final class AudioUtils {
 			},
 			format,
 			totalLength);
+	}
+
+	/**
+	 * Split a {@link AudioInputStream} into a sequence of {@link AudioInputStream}.
+	 *
+	 * @param stream Must be PCM encoded.
+	 * @param splitPoints Are relative to the beginning of the stream.
+	 * @return A sequence of streams. The number of streams is one more than the number of split points.
+	 *         The durations are approximately (apart from rounding errors due to sampling) the time
+	 *         between the split points.
+	 * @throws IllegalArgumentException if a negative split point is provided, a split point exceeds
+	 *                                  the total length of the input stream, or a split point is not
+	 *                                  greater than or equal to the preceding split point ,and also
+	 *                                  if the audio format is not PCM encoded with specified frame
+	 *                                  rate and frame size.
+	 */
+	public static Iterable<AudioInputStream> split(AudioInputStream stream, Duration... splitPoints) {
+		long[] splitPointsInFrames = new long[splitPoints.length];
+		PCMAudioFormat format = PCMAudioFormat.of(stream.getFormat());
+		for (int i = 0; i < splitPoints.length; i++)
+			splitPointsInFrames[i] = getLengthInFrames(format, splitPoints[i]);
+		return split(stream, splitPointsInFrames);
+	}
+
+	public static Iterable<AudioInputStream> split(AudioInputStream stream, long... splitPoints) {
+		if (splitPoints.length == 0)
+			return Collections.singleton(stream);
+		PCMAudioFormat format = PCMAudioFormat.of(stream.getFormat());
+		long totalFrames = stream.getFrameLength();
+		{ // validate splitPoints
+			long begin = 0;
+			for (long end : splitPoints) {
+				if (end < begin)
+					throw new IllegalArgumentException();
+				begin = end; }
+			if (totalFrames < begin)
+				// could be a rounding error due to sampling: provide margin of one frame
+				if (totalFrames + 1 < begin)
+					throw new IllegalArgumentException();
+		}
+		int frameSize = format.getFrameSize();
+		return new Iterable<AudioInputStream>() {
+			public Iterator<AudioInputStream> iterator() {
+				return new AbstractIterator<AudioInputStream>() {
+					long framesAvailable = totalFrames;
+					long framesConsumed = 0;
+					int i = 0;
+					protected AudioInputStream computeNext() {
+						if (i > splitPoints.length)
+							return endOfData();
+						else if (i == splitPoints.length)
+							// we're at the last chunk, so we can simply return remaining stream
+							return stream;
+						long splitPoint = splitPoints[i];
+						long frames = splitPoint - framesConsumed;
+						if (frames > framesAvailable)
+							throw new IllegalStateException("coding error");
+						// In theory a byte array can hold 2 Gb of memory, which should be more than
+						// enough for audio. Note that when a lot of AudioInputStreams are open,
+						// there is still a risk for out-of-memory errors, but normally the streams
+						// are consumed in order so that should be okay as well. An alternative
+						// solution would be to not use byte arrays and enforce that streams are
+						// fully consumed before the next is computed.
+						byte[] bytes = new byte[Math.toIntExact(frames * frameSize)];
+						if (frames > 0) {
+							try {
+								if (stream.read(bytes) < bytes.length)
+									throw new IllegalStateException("coding error");
+							} catch (IOException e) {
+								throw new RuntimeException(e);
+							}
+							framesConsumed += frames;
+							framesAvailable -= frames;
+						}
+						i++;
+						return createAudioStream(format, bytes);
+					}
+				};
+			}
+		};
+	}
+
+	/**
+	 * @param format must be PCM encoded
+	 * @param duration must not be negative
+	 * @return <code>null</code> if <code>duration</code> is too short
+	 */
+	public static AudioInputStream createSilence(PCMAudioFormat format, Duration duration) {
+		if (duration.compareTo(Duration.ZERO) < 0)
+			throw new IllegalArgumentException();
+		long frames = getLengthInFrames(format, duration);
+		if (frames == 0)
+			return null;
+		else
+			return createSilence(format, frames);
+	}
+
+	/**
+	 * @param frames must not be negative
+	 * @return <code>null</code> if <code>frames</code> is <code>0</code>
+	 */
+	public static AudioInputStream createSilence(AudioFormat format, long frames) {
+		format = PCMAudioFormat.of(format);
+		if (frames < 0)
+			throw new IllegalArgumentException();
+		if (frames == 0)
+			return null;
+		throw new UnsupportedOperationException("Not implemented"); // FIXME
 	}
 
 	/**

@@ -66,7 +66,7 @@ class SoundFileLink {
 						new TTSLog.Error(TTSLog.ErrorCode.AUDIO_MISSING, "part of clip not encoded"));
 				end = base.clipEnd;
 			}
-			clip = new AudioClip(base.file, begin, end);
+			clip = new AudioClip(base.src, begin, end);
 		}
 		return clip;
 	}
