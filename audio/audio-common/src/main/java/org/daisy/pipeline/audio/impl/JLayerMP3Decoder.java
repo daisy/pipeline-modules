@@ -1,6 +1,8 @@
 package org.daisy.pipeline.audio.impl;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
 
@@ -8,6 +10,8 @@ import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
 
 import javazoom.jl.converter.Converter;
+
+import com.google.common.io.ByteStreams;
 
 import org.daisy.pipeline.audio.AudioDecoder;
 import org.daisy.pipeline.audio.AudioDecoderService;
@@ -40,6 +44,16 @@ public class JLayerMP3Decoder implements AudioDecoderService {
 	public Optional<AudioDecoder> newDecoder(Map<String,String> params) {
 		if (instance == null)
 			instance = new AudioDecoder() {
+					@Override
+					public AudioInputStream decode(InputStream input) throws Throwable {
+						File tmpMp3 = File.createTempFile("mp3-to-wav-", ".mp3");
+						ByteStreams.copy(input, new FileOutputStream(tmpMp3));
+						try {
+							return decode(tmpMp3);
+						} finally {
+							tmpMp3.delete();
+						}
+					}
 					@Override
 					public AudioInputStream decode(File inputFile) throws Throwable {
 						File tmpWav = File.createTempFile("mp3-to-wav-", ".wav");

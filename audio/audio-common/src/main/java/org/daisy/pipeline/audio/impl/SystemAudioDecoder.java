@@ -1,6 +1,7 @@
 package org.daisy.pipeline.audio.impl;
 
-import java.io.File;
+import java.io.BufferedInputStream;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
 
@@ -38,8 +39,17 @@ public class SystemAudioDecoder implements AudioDecoderService {
 		if (instance == null)
 			instance = new AudioDecoder() {
 					@Override
-					public AudioInputStream decode(File inputFile) throws UnsupportedAudioFileException, Throwable {
-						return AudioSystem.getAudioInputStream(inputFile);
+					public AudioInputStream decode(InputStream input) throws UnsupportedAudioFileException, Throwable {
+						/* Javadoc of AudioSystem.getAudioInputStream: The implementation of this
+						 * method may require multiple parsers to examine the stream to determine
+						 * whether they support it. These parsers must be able to mark the stream,
+						 * read enough data to determine whether they support the stream, and, if
+						 * not, reset the stream's read pointer to its original position. If the
+						 * input stream does not support these operation, this method may fail with
+						 * an IOException. */
+						if (!input.markSupported())
+							input = new BufferedInputStream(input);
+						return AudioSystem.getAudioInputStream(input);
 					}
 				};
 		return instance;
