@@ -20,7 +20,7 @@
 						<d:file href="content.xml" media-type="application/x-dtbook+xml"/>
 						<d:file href="navigation.ncx" media-type="application/x-dtbncx+xml"/>
 						<d:file href="resources.res" media-type="application/x-dtbresource+xml"/>
-						<d:file href="audio.wav" media-type="audio/x-wav"/>
+						<d:file href="audio.wav" media-type="audio/x-wav" original-href="../resources/1.1.0/audio.wav"/>
 					</d:fileset>
 				</x:document>
 			</x:input>
