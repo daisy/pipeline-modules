@@ -274,7 +274,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>daisy202-to-epub3</artifactId>
-        <version>2.0.6</version>
+        <version>2.0.7-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
@@ -284,7 +284,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>daisy202-to-daisy3</artifactId>
-        <version>1.0.2</version>
+        <version>1.0.3-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
@@ -294,12 +294,12 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>daisy3-to-daisy202</artifactId>
-        <version>2.0.6</version>
+        <version>2.0.7-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>daisy3-to-epub3</artifactId>
-        <version>2.0.7</version>
+        <version>2.0.8-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
@@ -309,87 +309,87 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>dtbook-to-daisy3</artifactId>
-        <version>3.2.2</version>
+        <version>3.2.3-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>dtbook-to-epub3</artifactId>
-        <version>2.2.2</version>
+        <version>2.2.3-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>dtbook-to-html</artifactId>
-        <version>3.0.0</version>
+        <version>3.0.1-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>dtbook-to-odt</artifactId>
-        <version>2.1.6</version>
+        <version>2.1.7-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>dtbook-to-pef</artifactId>
-        <version>9.0.0</version>
+        <version>9.0.1-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>dtbook-to-rtf</artifactId>
-        <version>2.0.5</version>
+        <version>2.0.6-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>dtbook-to-zedai</artifactId>
-        <version>3.0.0</version>
+        <version>3.0.1-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>dtbook-validator</artifactId>
-        <version>3.0.4</version>
+        <version>3.0.5-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>epub-to-daisy</artifactId>
-        <version>1.1.1</version>
+        <version>1.1.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>epub2-to-epub3</artifactId>
-        <version>1.0.3</version>
+        <version>1.0.4-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>epub3-to-daisy202</artifactId>
-        <version>2.2.2</version>
+        <version>2.2.3-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>epub3-to-daisy3</artifactId>
-        <version>1.0.4</version>
+        <version>1.0.5-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>epub3-to-epub3</artifactId>
-        <version>4.0.0</version>
+        <version>4.0.1-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>epub3-to-pef</artifactId>
-        <version>6.0.0</version>
+        <version>6.0.1-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>epub3-validator</artifactId>
-        <version>2.0.2</version>
+        <version>2.0.3-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>html-to-dtbook</artifactId>
-        <version>2.0.1</version>
+        <version>2.0.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>html-to-epub3</artifactId>
-        <version>2.2.1</version>
+        <version>2.2.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
@@ -399,22 +399,22 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>nimas-fileset-validator</artifactId>
-        <version>2.0.6</version>
+        <version>2.0.7-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>zedai-to-epub3</artifactId>
-        <version>2.3.2</version>
+        <version>2.3.3-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>zedai-to-html</artifactId>
-        <version>2.1.5</version>
+        <version>2.1.6-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>zedai-to-pef</artifactId>
-        <version>6.0.2</version>
+        <version>6.0.3-SNAPSHOT</version>
       </dependency>
       
       <!--
