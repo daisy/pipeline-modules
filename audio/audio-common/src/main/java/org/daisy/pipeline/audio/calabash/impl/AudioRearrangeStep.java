@@ -182,7 +182,7 @@ public class AudioRearrangeStep extends DefaultStep implements XProcStep {
 					} catch (URISyntaxException e) {
 						throw new RuntimeException("temp-dir option invalid: " + tempDirOption);
 					}
-					if (tempDir.exists())
+					if (tempDir.exists() && tempDir.listFiles().length > 0)
 						throw new RuntimeException("temp-dir option must be a non-existing directory: " + tempDirOption);
 				} else {
 					try {
