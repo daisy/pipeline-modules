@@ -123,6 +123,14 @@ public class LiblouisTableJnaImplProvider extends AbstractTransformProvider<Libl
 					} catch (IllegalArgumentException e) {}}
 			return null;
 		}
+		
+		@Override
+		public String toString() {
+			return MoreObjects.toStringHelper(this)
+			                  .add("translator", super.toString())
+			                  .add("displayTable", displayTable)
+			                  .toString();
+		}
 	}
 	
 	private LiblouisTableRegistry tableRegistry;
