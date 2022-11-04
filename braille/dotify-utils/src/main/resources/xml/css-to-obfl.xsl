@@ -2869,6 +2869,13 @@
         </xsl:call-template>
     </xsl:template>
     
+    <xsl:template mode="css:eval-sequence-interrupted-resumed-content-list"
+                  match="css:flow[@from]">
+        <xsl:call-template name="pf:warn">
+            <xsl:with-param name="msg">The range of a flow() function inside a volume transition must be 'document'</xsl:with-param>
+        </xsl:call-template>
+    </xsl:template>
+    
     <xsl:template mode="css:eval-volume-area-content-list
                         css:eval-sequence-interrupted-resumed-content-list"
                   match="css:attr|
