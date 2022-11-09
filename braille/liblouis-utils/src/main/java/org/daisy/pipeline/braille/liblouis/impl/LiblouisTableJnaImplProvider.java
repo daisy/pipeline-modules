@@ -337,7 +337,7 @@ public class LiblouisTableJnaImplProvider extends AbstractTransformProvider<Libl
 								if (q.containsKey("locale")) {
 									// locale is shorthand for language + region
 									String locale = q.removeOnly("locale").getValue().get();
-									q.add("locale", locale);
+									q.add("language", locale);
 									q.add("region", locale);
 								}
 								for (Feature f : q)
