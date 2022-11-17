@@ -198,6 +198,8 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 			null);
 	}
 
+	private final static SimpleInlineStyle HYPHENS_AUTO = new CSSStyledText("x", "hyphens: auto").getStyle();
+
 	private static Iterable<CSSStyledText> cssStyledTextFromTranslatable(String text,
 	                                                                     TextAttribute attributes,
 	                                                                     Locale language,
@@ -205,20 +207,33 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 	                                                                     SimpleInlineStyle parentStyle) {
 		if (attributes != null && attributes.getWidth() != text.length())
 			throw new RuntimeException("Coding error");
-		SimpleInlineStyle style; {
+		CSSStyledText styledText = null;
+		SimpleInlineStyle style = null; {
 			String s = attributes != null ? attributes.getDictionaryIdentifier() : null;
-			if (s == null && parentStyle == null)
-				style = null;
-			else
+			if (s != null || parentStyle != null) {
 				// FIXME: extend caching of parsed CSS to support parentStyle!
-				style = new SimpleInlineStyle(s != null ? s : "", parentStyle);
-			if (hyphenating && (style == null || style.getProperty("hyphens") == null))
-				// FIXME: add hyphens declaration through braille-css model
-				style = new SimpleInlineStyle("hyphens: auto", style); }
+				styledText = new CSSStyledText(text, s != null ? s : "", language);
+				style = styledText.getStyle();
+				if (parentStyle != null)
+					style = style.inheritFrom(parentStyle).concretize();
+			}
+			if (hyphenating) {
+				if (style == null) {
+					style = HYPHENS_AUTO;
+					styledText = null;
+				} else if (style.getProperty("hyphens") == null) {
+					style = HYPHENS_AUTO.inheritFrom(style);
+					styledText = null;
+				}
+			}
+		}
 		if (attributes != null && attributes.hasChildren())
 			return cssStyledTextFromTranslatable(text, attributes.iterator(), language, false, style);
-		else
-			return Collections.singleton(new CSSStyledText(text, style, language));
+		else {
+			if (styledText == null)
+				styledText = new CSSStyledText(text, style, language);
+			return Collections.singleton(styledText);
+		}
 	}
 
 	private static Iterable<CSSStyledText> cssStyledTextFromTranslatable(String text,
@@ -261,11 +276,13 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 			throw new RuntimeException("Coding error");
 		SimpleInlineStyle style; {
 			String s = attributes != null ? attributes.getName().orElse(null) : null;
-			if (s == null && parentStyle == null)
-				style = null;
-			else
+			if (s != null || parentStyle != null) {
 				// FIXME: extend caching of parsed CSS to support parentStyle!
-				style = new SimpleInlineStyle(s != null ? s : "", parentStyle);
+				style = new CSSStyledText("x", s != null ? s : "").getStyle();
+				if (parentStyle != null)
+					style = style.inheritFrom(parentStyle).concretize();
+			} else
+				style = null;
 		}
 		if (attributes != null && attributes.hasChildren())
 			return cssStyledTextFromTranslatable(preceding, text, following, attributes.iterator(), style);
@@ -311,28 +328,29 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 		List<CSSStyledText> styledText = new ArrayList<>();
 		for (Object t : precedingOrFollowingText) {
 			String text;
-			String locale;
+			String lang;
 			boolean hyphenate; {
 				if (t instanceof PrecedingText) {
 					text = ((PrecedingText)t).resolve();
-					locale = ((PrecedingText)t).getLocale().orElse(null);
+					lang = ((PrecedingText)t).getLocale().orElse(null);
 					hyphenate = ((PrecedingText)t).shouldHyphenate(); }
 				else if (t instanceof FollowingText) {
 					text = ((FollowingText)t).peek();
-					locale = ((FollowingText)t).getLocale().orElse(null);
+					lang = ((FollowingText)t).getLocale().orElse(null);
 					hyphenate = ((FollowingText)t).shouldHyphenate(); }
 				else
 					throw new RuntimeException();
 			}
-			SimpleInlineStyle style; {
-				if (hyphenate && (parentStyle == null || parentStyle.getProperty("hyphens") == null))
-					style = new SimpleInlineStyle("hyphens: auto", parentStyle);
-				else if (parentStyle == null)
-					style = null;
+			Locale locale = lang != null ? parseLocale(lang) : null;
+			SimpleInlineStyle style = null; {
+				if (hyphenate && parentStyle == null)
+					style = HYPHENS_AUTO;
+				else if (hyphenate &&  parentStyle.getProperty("hyphens") == null)
+					style = HYPHENS_AUTO.inheritFrom(parentStyle);
 				else
-					style = new SimpleInlineStyle("", parentStyle);
+					style = parentStyle;
 			}
-			styledText.add(new CSSStyledText(text, style, locale != null ? parseLocale(locale) : null));
+			styledText.add(new CSSStyledText(text, style, locale));
 		}
 		return styledText;
 	}
