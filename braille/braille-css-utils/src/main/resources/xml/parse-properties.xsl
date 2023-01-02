@@ -16,63 +16,33 @@
         </xsl:copy>
     </xsl:template>
     
-    <xsl:template match="css:counter/@style">
-        <xsl:sequence select="."/>
-    </xsl:template>
-    
-    <xsl:template match="@style">
-        <xsl:variable name="rules" as="element(css:rule)*" select="s:toXml(css:parse-stylesheet(string(.)))"/>
-        <xsl:variable name="properties" as="element(css:property)*" select="$rules[not(@selector)]/css:property"/>
-        <!--
-            filter
-        -->
-        <xsl:variable name="rules" as="element(css:rule)*">
-            <xsl:sequence select="$rules[@selector]"/>
-            <xsl:if test="not($property-names='#all')">
-                <xsl:variable name="properties" as="element(css:property)*" select="$properties[not(@name=$property-names)]"/>
-                <xsl:if test="exists($properties)">
-                    <css:rule>
-                        <xsl:sequence select="$properties"/>
-                    </css:rule>
-                </xsl:if>
-            </xsl:if>
-        </xsl:variable>
-        <xsl:if test="exists($rules)">
-            <xsl:attribute name="style" select="css:serialize-stylesheet($rules)"/>
-        </xsl:if>
-        <xsl:variable name="properties" as="element(css:property)*"
-                      select="for $n in distinct-values(if ($property-names='#all')
-                                                        then $properties/@name
-                                                        else $property-names)
-                              return $properties[@name=$n][last()]"/>
-        <!--
-            inherit
-        -->
-        <xsl:variable name="properties" as="element(css:property)*">
-            <xsl:apply-templates select="$properties" mode="css:inherit">
-                <xsl:with-param name="context" select="parent::*"/>
+    <xsl:template match="*[not(self::css:_|self::css:counter)]">
+        <xsl:param name="parent-style" as="item()?" tunnel="yes" select="()"/>
+        <xsl:param name="parent-rest-style" as="item()?" tunnel="yes" select="()"/>
+        <xsl:copy>
+            <xsl:apply-templates select="@* except @style"/>
+            <!--
+                inherit
+            -->
+            <xsl:variable name="style" as="item()?" select="css:parse-stylesheet(string(@style),$parent-style)"/>
+            <!--
+                filter
+            -->
+            <xsl:variable name="properties" as="item()*" select="s:iterate($style)[s:property(.)=$property-names]"/>
+            <xsl:variable name="rest-style" as="item()?"
+                          select="s:remove($style,for $s in $properties return s:property($s))"/>
+            <xsl:sequence select="css:style-attribute(s:toString($rest-style,$parent-rest-style))"/>
+            <!--
+                make attributes
+            -->
+            <xsl:variable name="properties" as="element(css:property)*"
+                          select="for $p in $properties return s:toXml($p)"/>
+            <xsl:apply-templates mode="css:property-as-attribute" select="$properties"/>
+            <xsl:apply-templates select="node()">
+                <xsl:with-param name="parent-style" tunnel="yes" select="$style"/>
+                <xsl:with-param name="parent-rest-style" tunnel="yes" select="$rest-style"/>
             </xsl:apply-templates>
-        </xsl:variable>
-        <!--
-            default
-        -->
-        <xsl:variable name="properties" as="element(css:property)*">
-            <xsl:apply-templates select="$properties" mode="css:default"/>
-        </xsl:variable>
-        <!--
-            computed value
-        -->
-        <xsl:variable name="properties" as="element(css:property)*">
-            <xsl:apply-templates select="$properties" mode="css:compute">
-                <xsl:with-param name="concretize-inherit" select="true()"/>
-                <xsl:with-param name="concretize-initial" select="true()"/>
-                <xsl:with-param name="context" select="parent::*"/>
-            </xsl:apply-templates>
-        </xsl:variable>
-        <!--
-            make attributes
-        -->
-        <xsl:apply-templates select="$properties" mode="css:property-as-attribute"/>
+        </xsl:copy>
     </xsl:template>
     
 </xsl:stylesheet>
