@@ -7,7 +7,8 @@
                 exclude-result-prefixes="#all">
 	
 	<xsl:import href="abstract-block-translator.xsl"/>
-	
+	<xsl:include href="library.xsl"/>
+
 	<xsl:param name="text-transform"/>
 	
 	<xsl:template match="css:block">
