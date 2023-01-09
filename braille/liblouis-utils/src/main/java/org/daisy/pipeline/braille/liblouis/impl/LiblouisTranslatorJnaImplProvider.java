@@ -605,10 +605,6 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 					SimpleInlineStyle[] styles = new SimpleInlineStyle[size]; {
 						int i = 0;
 						for (CSSStyledText t : styledText) {
-							Map<String,String> attrs = t.getTextAttributes();
-							if (attrs != null)
-								for (String k : attrs.keySet())
-									logger.warn("Text attribute \"{}:{}\" ignored", k, attrs.get(k));
 							text[i] = t.getText();
 							styles[i] = t.getStyle();
 							i++; }}
@@ -1186,10 +1182,6 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 			SimpleInlineStyle[] style = new SimpleInlineStyle[size];
 			int i = 0;
 			for (CSSStyledText t : styledText) {
-				Map<String,String> attrs = t.getTextAttributes();
-				if (attrs != null)
-					for (String k : attrs.keySet())
-						logger.warn("Text attribute \"{}:{}\" ignored", k, attrs.get(k));
 				text[i] = t.getText();
 				style[i] = t.getStyle();
 				if (style[i] != null)
