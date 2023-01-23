@@ -1,3 +1,17 @@
+v1.14.11
+========
+
+Changes
+-------
+- Update to Liblouis [3.24.0](https://github.com/liblouis/liblouis/releases/tag/v3.24.0)
+
+v1.14.10
+========
+
+Changes
+-------
+- Various bugfixes
+
 v1.14.8
 =======
 
