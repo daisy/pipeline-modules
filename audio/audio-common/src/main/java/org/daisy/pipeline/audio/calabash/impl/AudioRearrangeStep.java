@@ -3,6 +3,7 @@ package org.daisy.pipeline.audio.calabash.impl;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.nio.file.Files;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -40,6 +41,8 @@ import com.xmlcalabash.runtime.XAtomicStep;
 
 import net.sf.saxon.s9api.SaxonApiException;
 
+import org.daisy.common.messaging.MessageAppender;
+import org.daisy.common.messaging.MessageBuilder;
 import org.daisy.common.stax.BaseURIAwareXMLStreamReader;
 import org.daisy.common.transform.InputValue;
 import org.daisy.common.transform.OutputValue;
@@ -363,6 +366,9 @@ public class AudioRearrangeStep extends DefaultStep implements XProcStep {
 						List<AudioInputStream> currentDestinationPCM = new ArrayList<>();
 						long currentDestinationElapsed = 0; // in frames
 						int fileCounter = 0;
+						MessageAppender progress = MessageAppender.getActiveBlock(); // px:audio-rearrange step
+						BigDecimal progressInc = BigDecimal.TEN.divide(new BigDecimal(desired.size()), MathContext.DECIMAL128);
+						int clipCounter = 0;
 						for (Map.Entry<AudioClip,AudioClip> entry : desired.entrySet()) {
 							AudioClip destinationClip = entry.getKey(); // destination clips are in order and don't overlap
 							AudioClip sourceClip = entry.getValue();
@@ -457,7 +463,12 @@ public class AudioRearrangeStep extends DefaultStep implements XProcStep {
 							currentDestinationPCM.add(clipPCM);
 							currentDestinationElapsed += clipPCM.getFrameLength();
 							prevSourceClip = sourceClip;
+							if (++clipCounter == 10) {
+								clipCounter = 0;
+								progress.append(new MessageBuilder().withProgress(progressInc)).close();
+							}
 						}
+						progress.append(new MessageBuilder().withProgress(progressInc)).close();
 						File resultFile = new File(currentDestinationFile);
 						File tempFile = new File(tempDir, "tmp" + (++fileCounter) + "." + getFileExtension(resultFile.getName()));
 						try {
