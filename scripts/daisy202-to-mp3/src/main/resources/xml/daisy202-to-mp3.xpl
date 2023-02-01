@@ -83,7 +83,8 @@
 				<p:with-option name="test" select="$type!=''"/>
 			</px:assert>
 			<px:assert error-code="XXXX" message="The input DTB type ('$1') is not supported.">
-				<p:with-option name="test" select="$type=('audioOnly','audioNcc','audioPartText','audioFullText')"/>
+				<p:with-option name="test" select="some $t in ('audioOnly','audioNcc','audioPartText','audioFullText')
+				                                   satisfies lower-case($t)=lower-case($type)"/>
 				<p:with-option name="param1" select="$type"/>
 			</px:assert>
 		</p:group>
