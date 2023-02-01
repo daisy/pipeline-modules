@@ -112,7 +112,7 @@
 									                        else (for $x in 1 to $level - 1 return $dest-file[$x],
 									                              $dest-file[$level] + 1,
 									                              for $x in $level + 1 to $depth return 1)"/>
-									<xsl:with-param name="label" select="string(.)"/>
+									<xsl:with-param name="label" select="normalize-space(string(.))"/>
 									<xsl:with-param name="clips-for-dest-file" select="()"/>
 								</xsl:next-iteration>
 							</xsl:when>
