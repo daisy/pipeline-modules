@@ -24,7 +24,7 @@
 		</xsl:map>
 	</xsl:variable>
 
-	<xsl:key name="id" match="par[@id]|seq[@id]" use="@id"/>
+	<xsl:key name="id" match="par[@id]|seq[@id]|text[@id]" use="@id"/>
 
 	<xsl:template match="/html:html">
 		<d:fileset>
@@ -68,6 +68,10 @@
 						              select="if (exists($to-smil-doc))
 						                      then key('id',substring-after($src,'#'),$smils[$to-smil-doc])
 						                      else ()"/>
+						<xsl:variable name="to-smil-elem" as="element()?"
+						              select="if ($to-smil-elem/self::text)
+						                      then $to-smil-elem/parent::*
+						                      else $to-smil-elem"/>
 						<xsl:if test="not(exists($to-smil-elem))">
 							<xsl:call-template name="pf:error">
 								<xsl:with-param name="msg">NCC invalid: "href" attribute contains a broken
