@@ -31,21 +31,7 @@
         </p:documentation>
     </p:input>
     
-    <p:option name="stylesheet" px:sequence="true">
-        <p:pipeinfo>
-            <px:type>
-                <choice>
-                    <data type="anyFileURI" datatypeLibrary="http://www.daisy.org/ns/pipeline/xproc">
-                        <documentation xml:lang="en">File path relative to input ZedAI.</documentation>
-                    </data>
-                    <data type="anyURI">
-                        <documentation xml:lang="en">Any other absolute URI</documentation>
-                    </data>
-                </choice>
-            </px:type>
-        </p:pipeinfo>
-    </p:option>
-    
+    <p:option name="stylesheet"/>
     <p:option name="transform"/>
     <p:option name="output-dir"/>
     <p:option name="output-file-format"/>

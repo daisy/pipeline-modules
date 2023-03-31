@@ -212,7 +212,7 @@ marked up.</p>
         </p:documentation>
     </p:option>
     
-    <p:option name="stylesheet" required="false" px:type="string" select="''">
+    <p:option name="stylesheet" select="''">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h2 px:role="name">Style sheets</h2>
             <p px:role="desc" xml:space="preserve">CSS style sheets to apply. A space separated list of URIs, absolute or relative to source.

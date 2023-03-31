@@ -45,7 +45,7 @@ When `include-obfl` is set to true, the conversion may fail but still output a d
         <p:pipe step="convert" port="status"/>
     </p:output>
 
-    <p:option name="stylesheet" px:sequence="true">
+    <p:option name="stylesheet">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
           <p px:role="desc" xml:space="preserve" px:inherit="prepend">
 
@@ -58,18 +58,6 @@ sheet modules) are available for use in Sass style sheets:
   for styling definition lists
 </p>
         </p:documentation>
-        <p:pipeinfo>
-            <px:type>
-                <choice>
-                    <data type="anyFileURI" datatypeLibrary="http://www.daisy.org/ns/pipeline/xproc">
-                        <documentation xml:lang="en">File path relative to input EPUB 3.</documentation>
-                    </data>
-                    <data type="anyURI">
-                        <documentation xml:lang="en">Any other absolute URI</documentation>
-                    </data>
-                </choice>
-            </px:type>
-        </p:pipeinfo>
     </p:option>
     
     <p:option name="apply-document-specific-stylesheets" px:type="boolean" select="'false'">

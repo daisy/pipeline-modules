@@ -151,8 +151,10 @@ split up if they exceed the given maximum size.</p>
 	    html-to-pef
 	    epub3-to-pef
 	    zedai-to-pef
+	    epub3-to-epub3
 	-->
-	<p:option name="stylesheet" required="false" px:type="string" select="''" px:sequence="true" px:media-type="text/css application/xslt+xml">
+	<p:option name="stylesheet" required="false" px:type="xs:anyURI" select="''" px:sequence="true" px:separator=" "
+              px:media-type="text/css application/xslt+xml">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Style sheets</h2>
 			<p px:role="desc" xml:space="preserve">A list of CSS/Sass style sheets to apply.
