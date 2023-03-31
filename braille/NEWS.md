@@ -1,3 +1,10 @@
+v1.14.13
+========
+
+Changes
+-------
+- Fix unneeded repeating of headings in a new volume when headings have a top margin.
+
 v1.14.11
 ========
 

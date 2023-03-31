@@ -5964,20 +5964,31 @@
         <x:document type="inline">
           <doc style="text-transform: none;
                       @page {
-                        size: 15 5;
+                        size: 15 10;
                         margin-left: 2;
                         @left {
                           content: -obfl-marker-indicator(pagenum, '⠿');
                           text-transform: none; }}">
             <body style="display: block">
-              <pagenum style="display: none; -obfl-marker: pagenum">1</pagenum>
-              ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
-              ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
-              <pagenum style="display: none; -obfl-marker: pagenum">2</pagenum>
-              ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
-              ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
-              ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
-              <pagenum style="display: none; -obfl-marker: pagenum">3</pagenum>
+              <section style="display: block">
+                <pagenum style="display: none; -obfl-marker: pagenum">1</pagenum>
+                ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
+                ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
+                <pagenum style="display: none; -obfl-marker: pagenum">2</pagenum>
+                ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
+                ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
+                ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
+                <pagenum style="display: none; -obfl-marker: pagenum">3</pagenum>
+              </section>
+              <section style="display: block">
+                <pagenum style="display: none; -obfl-marker: pagenum">3</pagenum>
+                <h style="display: block;
+                          margin-top: 1">
+                  ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
+                </h>
+                ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
+                ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
+              </section>
             </body>
           </doc>
         </x:document>
@@ -5992,7 +6003,7 @@
           <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
             <dp2:style-type>text/css</dp2:style-type>
           </meta>
-          <layout-master name="body" page-width="15" page-height="5" duplex="true">
+          <layout-master name="body" page-width="15" page-height="10" duplex="true">
             <default-template>
               <header/>
               <footer/>
@@ -6005,14 +6016,26 @@
           </layout-master>
           <sequence master="body">
             <block>
-              <marker class="indicator/pagenum" value="x"/>
-              ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
-              ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
-              <marker class="indicator/pagenum" value="x"/>
-              ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
-              ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
-              ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
-              <marker class="indicator/pagenum" value="x"/>
+              <block>
+                <marker class="indicator/pagenum" value="x"/>
+                ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
+                ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
+                <marker class="indicator/pagenum" value="x"/>
+                ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
+                ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
+                ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
+                <marker class="indicator/pagenum" value="x"/>
+              </block>
+              <block>
+                <block margin-top="1">
+                  <marker class="indicator/pagenum" value="x"/>
+                  ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
+                </block>
+                <block>
+                  ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
+                  ⠤⠤⠤ ⠤⠤⠤ ⠤⠤⠤
+                </block>
+              </block>
             </block>
           </sequence>
         </obfl>
@@ -6030,7 +6053,7 @@
             </meta>
           </head>
           <body>
-            <volume cols="15" rows="5" rowgap="0" duplex="true">
+            <volume cols="15" rows="10" rowgap="0" duplex="true">
               <section>
                 <page>
                   <row>⠿⠀⠤⠤⠤⠀⠤⠤⠤⠀⠤⠤⠤</row>
@@ -6038,6 +6061,10 @@
                   <row>⠀⠀⠤⠤⠤⠀⠤⠤⠤⠀⠤⠤⠤</row>
                   <row>⠀⠀⠤⠤⠤⠀⠤⠤⠤⠀⠤⠤⠤</row>
                   <row>⠿⠀⠤⠤⠤⠀⠤⠤⠤⠀⠤⠤⠤</row>
+                  <row/>
+                  <row>⠿⠀⠤⠤⠤⠀⠤⠤⠤⠀⠤⠤⠤</row>
+                  <row>⠀⠀⠤⠤⠤⠀⠤⠤⠤⠀⠤⠤⠤</row>
+                  <row>⠀⠀⠤⠤⠤⠀⠤⠤⠤⠀⠤⠤⠤</row>
                 </page>
               </section>
             </volume>
@@ -11405,7 +11432,7 @@
     <x:documentation>
       Tests rendering of the range of print pages covered on the current page when a print page
       break coincides with a braille page break and the first element on the new page has a top
-      padding.
+      margin, border or padding.
     </x:documentation>
     <x:call step="dotify:format">
       <x:input port="source">
@@ -11424,7 +11451,18 @@
                                         print-page-dash content() '⠒'">1</pagenum>
             <!-- begin page -->
             <p style="display: block">⠁⠁⠁</p>
-            <p style="display: block">⠁⠁⠁</p>
+            <!-- begin page -->
+            <pagenum style="display: none;
+                            string-set: print-page content(),
+                                        dash-print-page '⠒' content(),
+                                        print-page-dash content() '⠒'">2</pagenum>
+            <p style="display: block; page-break-before: always; padding-top: 1">⠁⠁⠁</p>
+            <!-- begin page -->
+            <pagenum style="display: none;
+                            string-set: print-page content(),
+                                        dash-print-page '⠒' content(),
+                                        print-page-dash content() '⠒'">3</pagenum>
+            <p style="display: block; page-break-before: always; border-top-pattern: ⠿">⠁⠁⠁</p>
             <p style="display: block">⠁⠁⠁</p>
             <p style="display: block">⠁⠁⠁</p>
             <p style="display: block">⠁⠁⠁</p>
@@ -11432,11 +11470,8 @@
             <pagenum style="display: none;
                             string-set: print-page content(),
                                         dash-print-page '⠒' content(),
-                                        print-page-dash content() '⠒'">2</pagenum>
-            <p style="display: block; page-break-before: always; padding-top: 1">⠁⠁⠁</p>
-            <p style="display: block">⠁⠁⠁</p>
-            <p style="display: block">⠁⠁⠁</p>
-            <p style="display: block">⠁⠁⠁</p>
+                                        print-page-dash content() '⠒'">4</pagenum>
+            <p style="display: block; margin-top: 1">⠁⠁⠁</p>
           </doc>
         </x:document>
       </x:input>
@@ -11480,10 +11515,6 @@
               </block>
               ⠁⠁⠁
             </block>
-            <block>⠁⠁⠁</block>
-            <block>⠁⠁⠁</block>
-            <block>⠁⠁⠁</block>
-            <block>⠁⠁⠁</block>
             <!-- begin page -->
             <block break-before="page">
               <block>
@@ -11494,9 +11525,29 @@
                 ⠁⠁⠁
               </block>
             </block>
+            <!-- begin page -->
+            <block break-before="page">
+              <block>
+                <marker class="print-page" value="3"/>
+                <marker class="print-page-dash/prev" value="2⠒"/>
+              </block>
+              <block border-top-style="solid" border-top-width="3">
+                ⠁⠁⠁
+              </block>
+            </block>
             <block>⠁⠁⠁</block>
             <block>⠁⠁⠁</block>
             <block>⠁⠁⠁</block>
+            <!-- begin page -->
+            <block>
+              <block>
+                <marker class="print-page" value="4"/>
+                <marker class="print-page-dash/prev" value="3⠒"/>
+              </block>
+              <block margin-top="1">
+                ⠁⠁⠁
+              </block>
+            </block>
           </sequence>
         </obfl>
       </x:document>
@@ -11518,17 +11569,23 @@
                 <page>
                   <row>⠼⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀</row>
                   <row>⠁⠁⠁</row>
+                </page>
+                <page>
+                  <row>⠼⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀</row>
+                  <row/>
+                  <row>⠁⠁⠁</row>
+                </page>
+                <page>
+                  <row>⠼⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀</row>
+                  <row>⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿</row>
                   <row>⠁⠁⠁</row>
                   <row>⠁⠁⠁</row>
                   <row>⠁⠁⠁</row>
                   <row>⠁⠁⠁</row>
                 </page>
                 <page>
-                  <row>⠼⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀</row>
+                  <row>⠼⠙⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀</row>
                   <row/>
-                  <row>⠁⠁⠁</row>
-                  <row>⠁⠁⠁</row>
-                  <row>⠁⠁⠁</row>
                   <row>⠁⠁⠁</row>
                 </page>
               </section>
@@ -14465,7 +14522,7 @@
               ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
               <h1 id="ch_2" style="display:block; text-transform:auto"> 2 </h1>
               <br style="display: block; volume-break-before: always"/>
-              <h2 id="ch_2_1" style="display:block; text-transform:auto"> 2.1 </h2>
+              <h2 id="ch_2_1" style="display:block; margin-top: 1; text-transform:auto"> 2.1 </h2>
               ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
               ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
               <h2 id="ch_2_2" style="display:block; text-transform:auto"> 2.2 </h2>
@@ -14617,11 +14674,13 @@
           <sequence master="main" break-before="volume">
             <block translate="pre-translated-text-css">
               <block/>
-              <block translate="">
+              <block>
                 <block>
                   <span id="ch_2_1"/>
                 </block>
-                2.1
+                <block translate="" margin-top="1">
+                  2.1
+                </block>
               </block>
               <block>
                 ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤ ⠤⠤⠤⠤⠤
@@ -14667,7 +14726,7 @@
                 </page>
                 <page>
                   <row>⠀⠼⠃⠲⠁⠀⠐⠐⠐⠐⠐⠐⠀⠼⠛</row>
-                  <row>⠀⠼⠃⠲⠃⠀⠐⠐⠐⠐⠐⠐⠀⠼⠓</row>
+                  <row>⠀⠼⠃⠲⠃⠀⠐⠐⠐⠐⠐⠐⠀⠼⠊</row>
                   <row/>
                   <row/>
                   <row/>
@@ -14748,7 +14807,7 @@
               <section>
                 <page>
                   <row>⠀⠼⠃⠲⠁⠀⠐⠐⠐⠐⠐⠐⠀⠼⠛</row>
-                  <row>⠀⠼⠃⠲⠃⠀⠐⠐⠐⠐⠐⠐⠀⠼⠓</row>
+                  <row>⠀⠼⠃⠲⠃⠀⠐⠐⠐⠐⠐⠐⠀⠼⠊</row>
                   <row/>
                   <row/>
                   <row/>
@@ -14758,8 +14817,8 @@
               </section>
               <section>
                 <page>
+                  <row/>
                   <row>⠼⠃⠲⠁</row>
-                  <row>⠤⠤⠤⠤⠤⠀⠤⠤⠤⠤⠤</row>
                   <row>⠤⠤⠤⠤⠤⠀⠤⠤⠤⠤⠤</row>
                   <row>⠤⠤⠤⠤⠤⠀⠤⠤⠤⠤⠤</row>
                   <row>⠤⠤⠤⠤⠤⠀⠤⠤⠤⠤⠤</row>
@@ -14772,11 +14831,11 @@
                   <row>⠤⠤⠤⠤⠤⠀⠤⠤⠤⠤⠤</row>
                   <row>⠤⠤⠤⠤⠤⠀⠤⠤⠤⠤⠤</row>
                   <row>⠤⠤⠤⠤⠤⠀⠤⠤⠤⠤⠤</row>
-                  <row>⠼⠃⠲⠃</row>
+                  <row>⠤⠤⠤⠤⠤⠀⠤⠤⠤⠤⠤</row>
                   <row>⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠓</row>
                 </page>
                 <page>
-                  <row>⠤⠤⠤⠤⠤⠀⠤⠤⠤⠤⠤</row>
+                  <row>⠼⠃⠲⠃</row>
                   <row>⠤⠤⠤⠤⠤⠀⠤⠤⠤⠤⠤</row>
                   <row>⠤⠤⠤⠤⠤⠀⠤⠤⠤⠤⠤</row>
                   <row>⠤⠤⠤⠤⠤⠀⠤⠤⠤⠤⠤</row>
@@ -14789,7 +14848,7 @@
                   <row>⠤⠤⠤⠤⠤⠀⠤⠤⠤⠤⠤</row>
                   <row>⠤⠤⠤⠤⠤⠀⠤⠤⠤⠤⠤</row>
                   <row>⠤⠤⠤⠤⠤⠀⠤⠤⠤⠤⠤</row>
-                  <row/>
+                  <row>⠤⠤⠤⠤⠤⠀⠤⠤⠤⠤⠤</row>
                   <row/>
                   <row>⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁⠚</row>
                 </page>
@@ -15058,7 +15117,7 @@
   
   <x:scenario label="test_124">
     <x:documentation>
-      Tests string() inside @-obfl-volume-transition rule.
+      Tests string(..., start-except-first) inside @-obfl-volume-transition rule.
     </x:documentation>
     <x:call step="dotify:format">
       <x:input port="source">
@@ -15085,6 +15144,7 @@
             </h1>
             <p style="display: block">⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿</p>
             <h1 style="display: block;
+                       margin-top: 1;
                        string-set: foo '⠤⠤⠤ ⠿';
                        page-break-before: right">
               ⠤⠤⠤
@@ -15150,9 +15210,11 @@
                 <marker class="foo/if-not-set-next/prev" value="⠤⠤ ⠿"/>
                 <marker class="foo/if-not-set-next" value="​"/>
               </block>
-              <marker class="foo/if-not-set-next/prev" value="​"/>
-              <marker class="foo/if-not-set-next" value="⠤⠤⠤ ⠿"/>
-              ⠤⠤⠤
+              <block margin-top="1">
+                <marker class="foo/if-not-set-next/prev" value="​"/>
+                <marker class="foo/if-not-set-next" value="⠤⠤⠤ ⠿"/>
+                ⠤⠤⠤
+              </block>
             </block>
             <block>⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿</block>
             <block>⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿ ⠿⠿⠿⠿⠿</block>
@@ -15257,10 +15319,10 @@
             <volume cols="8" rows="4" rowgap="0" duplex="true">
               <section>
                 <page>
+                  <row></row>
                   <row>⠤⠤⠤</row>
                   <row>⠿⠿⠿⠿⠿</row>
                   <row>⠿⠿⠿⠿⠿</row>
-                  <row>⠿⠿⠿⠿⠿</row>
                 </page>
                 <page>
                   <row>⠿⠿⠿⠿⠿</row>
@@ -15275,6 +15337,7 @@
                   <row>⠿⠿⠿⠿⠿</row>
                 </page>
                 <page>
+                  <row>⠿⠿⠿⠿⠿</row>
                   <row>⠿⠿⠿⠿⠿</row>
                   <row>⠿⠿⠿⠿⠿</row>
                   <row>⠿⠿⠿⠿⠿</row>
