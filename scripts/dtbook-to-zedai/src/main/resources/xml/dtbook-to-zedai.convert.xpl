@@ -2,6 +2,7 @@
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
+                xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
                 xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp"
                 xmlns:z="http://www.daisy.org/ns/z3998/authoring/"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
@@ -156,6 +157,11 @@
             px:validate-mods
         </p:documentation>
     </p:import>
+    <cx:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl" type="application/xslt+xml">
+		<p:documentation>
+			pf:normalize-uri
+		</p:documentation>
+	</cx:import>
 
 
     <p:variable name="output-dir-with-slash"
@@ -604,6 +610,7 @@
         </px:fileset-add-entry>
 
         <px:fileset-join>
+            <p:documentation>This normalizes the fileset</p:documentation>
             <p:input port="source">
                 <p:pipe port="result.fileset" step="result.fileset.zedai"/>
                 <p:pipe port="result" step="result.fileset.resources"/>
@@ -629,15 +636,16 @@
             <p:pipe port="result" step="generate-css"/>
             <p:pipe step="generate-mods-metadata" port="result"/>
         </p:iteration-source>
-        <p:variable name="in-memory-base" select="base-uri(/*)"/>
+        <p:variable name="in-memory-base" select="pf:normalize-uri(resolve-uri(base-uri(/*)))"/>
         <p:variable name="fileset-base" select="base-uri(/*)">
+            <!-- fileset is normalized -->
             <p:pipe port="result" step="result.fileset"/>
         </p:variable>
         <p:choose>
             <p:xpath-context>
                 <p:pipe port="result" step="result.fileset"/>
             </p:xpath-context>
-            <p:when test="//d:file[resolve-uri(@href,$fileset-base) = resolve-uri($in-memory-base)]">
+            <p:when test="//d:file[resolve-uri(@href,$fileset-base) = $in-memory-base]">
                 <!-- document is in the fileset; keep it -->
                 <p:identity/>
             </p:when>
