@@ -936,7 +936,7 @@
                     <px:transform name="transform">
                         <p:with-option name="query" select="concat('(input:html)(input:css)(output:html)(output:css)(output:braille)',
                                                                    $braille-translator,
-                                                                   '(locale:',$lang,')')"/>
+                                                                   '(document-locale:',$lang,')')"/>
                     </px:transform>
                     <p:group name="extract-css">
                         <p:output port="result" primary="true">
