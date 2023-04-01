@@ -918,7 +918,7 @@
                         <p:when test="$apply-document-specific-stylesheets='true'">
                             <px:message severity="DEBUG" message="Inlining document-specific CSS"/>
                             <!-- media="braille" would be more appropriate, see https://github.com/braillespecs/braille-css/issues/1 -->
-                            <px:apply-stylesheets type="text/css text/scss" media="embossed">
+                            <px:apply-stylesheets type="text/css text/x-scss" media="embossed">
                                 <p:input port="context">
                                     <p:pipe step="add-mediaoverlays" port="in-memory"/>
                                 </p:input>
@@ -930,7 +930,7 @@
                     </p:choose>
                     <css:delete-stylesheets/>
                     <!-- media="braille" would be more appropriate, see https://github.com/braillespecs/braille-css/issues/1 -->
-                    <px:apply-stylesheets type="text/css text/scss" media="embossed">
+                    <px:apply-stylesheets type="text/css text/x-scss" media="embossed">
                         <p:with-option name="stylesheets" select="($stylesheet,$default-stylesheet)[not(.='')][1]"/>
                     </px:apply-stylesheets>
                     <px:transform name="transform">
