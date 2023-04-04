@@ -66,6 +66,11 @@
     </dependency>
     <dependency>
       <groupId>org.daisy.pipeline.modules.braille</groupId>
+      <artifactId>libhyphen-utils</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.daisy.pipeline.modules.braille</groupId>
       <artifactId>dotify-utils</artifactId>
       <scope>test</scope>
     </dependency>
@@ -118,6 +123,12 @@
           <classifier>mac</classifier>
           <scope>test</scope>
         </dependency>
+        <dependency>
+          <groupId>org.daisy.pipeline.modules.braille</groupId>
+          <artifactId>libhyphen-utils</artifactId>
+          <classifier>mac</classifier>
+          <scope>test</scope>
+        </dependency>
       </dependencies>
     </profile>
     <profile>
@@ -134,6 +145,12 @@
           <classifier>linux</classifier>
           <scope>test</scope>
         </dependency>
+        <dependency>
+          <groupId>org.daisy.pipeline.modules.braille</groupId>
+          <artifactId>libhyphen-utils</artifactId>
+          <classifier>linux</classifier>
+          <scope>test</scope>
+        </dependency>
       </dependencies>
     </profile>
     <profile>
@@ -147,6 +164,12 @@
         <dependency>
           <groupId>org.daisy.pipeline.modules.braille</groupId>
           <artifactId>liblouis-utils</artifactId>
+          <classifier>windows</classifier>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.daisy.pipeline.modules.braille</groupId>
+          <artifactId>libhyphen-utils</artifactId>
           <classifier>windows</classifier>
           <scope>test</scope>
         </dependency>
