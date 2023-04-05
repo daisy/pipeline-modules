@@ -22,8 +22,9 @@ public class DefaultLineBreakerTest {
 		TestHyphenator hyphenator = new TestHyphenator();
 		TestTranslator translator = new TestTranslator(hyphenator);
 		assertEquals(
-			"BUSS\n" +
-			"TOPP",
+			"BUS\n" +
+			"STOP\n" +
+			"P",
 			fillLines(translator.lineBreakingFromStyledText().transform(text("busstopp")), 4));
 		assertEquals(
 			"BUSS-\n" +

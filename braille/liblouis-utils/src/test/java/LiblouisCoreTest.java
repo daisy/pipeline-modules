@@ -337,9 +337,15 @@ public class LiblouisCoreTest extends AbstractTest {
 			"abc-\n" +
 			"def \n" +
 			"abc'\n" +
+			"def \n" +
+			"abc'\n" +
 			"def",
 			fillLines(translator.transform(styledText("abc\u00ADdef ", "",
-			                                          "abc\u00ADdef", "hyphenate-character: '⠈'")), 4));
+			                                          "abc\u00ADdef ", "hyphenate-character: '⠈'",
+			                                          "ab",            "",
+			                                          "c\u00ADd",      "hyphenate-character: '⠈'",
+			                                          "ef",            "")),
+			          4));
 	}
 	
 	@Test

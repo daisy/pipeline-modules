@@ -223,6 +223,11 @@ public class CompoundBrailleTranslator extends AbstractBrailleTranslator {
 		return lineBreakingFromStyledText;
 	}
 
+	/*
+	 * Note that this function can not be used to concatenate any LineIterator. It is assumed that
+	 * the LineIterator are translations of consecutive segments of the same string, where each
+	 * translation has taken into account the whole context.
+	 */
 	static BrailleTranslator.LineIterator concatLineIterators(List<BrailleTranslator.LineIterator> iterators) {
 		if (iterators.size() == 0)
 			return new BrailleTranslator.LineIterator() {

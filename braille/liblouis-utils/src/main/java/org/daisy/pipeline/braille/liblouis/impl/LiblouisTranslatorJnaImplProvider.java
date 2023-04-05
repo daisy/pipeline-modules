@@ -515,7 +515,7 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 					if (--to == 0)
 						toChar = joined.length();
 				}
-				return new FullyHyphenatedAndTranslatedString(joined.toString(), fromChar, toChar, '\u2824');
+				return new FullyHyphenatedAndTranslatedString(joined.toString(), fromChar, toChar);
 			}
 			
 			static class BrailleStreamImpl implements BrailleStream {
