@@ -783,9 +783,9 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 						// available, or the segment fits in the available space
 						if (segmentInBraille.length() <= available || !hyphenate[textWithWsMapping[curSegment]]
 						    || (fullHyphenator == null && lineBreaker == null)) {
-							if (hyphenate[textWithWsMapping[curSegment]] || segmentInBraille.length() > available)
-								logger.warn("hyphens: auto not supported");
 							
+							if (fullHyphenator == null && lineBreaker == null)
+								logger.warn("hyphens: auto not supported");
 							segmentInBraille = addLetterSpacing(segment, segmentInBraille, curPos, curPosInBraille,
 							                                    letterSpacing[textWithWsMapping[curSegment]]);
 							next += segmentInBraille;
