@@ -43,6 +43,7 @@ import org.daisy.pipeline.braille.common.AbstractTransformProvider;
 import org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Iterables;
 import org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Function;
 import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Iterables.concat;
+import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Iterables.memoize;
 import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Iterables.transform;
 import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.logCreate;
 import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.logSelect;
@@ -198,13 +199,15 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 		if (documentLocale != null)
 			q.add("document-locale", documentLocale);
 		q.add("white-space");
-		Iterable<LiblouisTranslator> translators = getSimpleTranslator(
-			q.asImmutable(),
-			documentLocale,
-			hyphenator,
-			handleNonStandardHyphenation);
+		Iterable<LiblouisTranslator> translators = memoize(
+			getSimpleTranslator(
+				q.asImmutable(),
+				documentLocale,
+				hyphenator,
+				handleNonStandardHyphenation));
 		if (translators.apply(null).iterator().hasNext()) {
 			// all translators use the same display table
+			// FIXME: display table has already been computed in the getSimpleTranslator() call above
 			DisplayTable displayTable = tableProvider.get(q).iterator().next().getDisplayTable();
 			BrailleTranslator unityTranslator = new UnityBrailleTranslator(
 				new LiblouisDisplayTableBrailleConverter(displayTable), false);

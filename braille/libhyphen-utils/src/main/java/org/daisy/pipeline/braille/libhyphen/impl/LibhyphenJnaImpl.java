@@ -2,10 +2,16 @@ package org.daisy.pipeline.braille.libhyphen.impl;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
+import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 import java.util.Locale;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.regex.Pattern;
 
@@ -17,6 +23,7 @@ import ch.sbs.jhyphen.StandardHyphenationException;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.base.Splitter;
+import com.google.common.cache.CacheBuilder;
 import static com.google.common.collect.Iterables.toArray;
 import static com.google.common.collect.Iterables.transform;
 
@@ -195,7 +202,7 @@ public class LibhyphenJnaImpl extends AbstractTransformProvider<LibhyphenHyphena
 		
 		private LibhyphenHyphenatorImpl(URI table) throws CompilationException, FileNotFoundException {
 			this.table = table;
-			hyphenator = new Hyphenator(resolveTable(table));
+			hyphenator = compileTable(table);
 		}
 		
 		public URI asLibhyphenTable() {
@@ -339,13 +346,36 @@ public class LibhyphenJnaImpl extends AbstractTransformProvider<LibhyphenHyphena
 		}
 	}
 	
+	private Hyphenator compileTable(URI table) throws FileNotFoundException, CompilationException {
+		if ("volatile-file".equals(table.getScheme()))
+			try {
+				table = new URI("file", table.getSchemeSpecificPart(), table.getFragment());
+			} catch (Exception e) {
+				// should not happen
+				throw new IllegalStateException(e);
+			}
+		ModifiedFile tableFile = new ModifiedFile(resolveTable(table));
+		Hyphenator hyphenator = tableCache.get(tableFile);
+		if (hyphenator == null) {
+			hyphenator = new Hyphenator(tableFile.file);
+			tableCache.put(tableFile, hyphenator);
+		}
+		return hyphenator;
+	}
+	
 	private File resolveTable(URI table) throws FileNotFoundException {
 		URL resolvedTable = isAbsoluteFile(table) ? URLs.asURL(table) : tableRegistry.resolve(table);
 		if (resolvedTable == null)
 			throw new FileNotFoundException("Hyphenation table " + table + " could not be resolved");
 		return asFile(resolvedTable);
 	}
-	
+
+	private final Map<ModifiedFile,Hyphenator> tableCache
+		= CacheBuilder.newBuilder()
+		              .expireAfterAccess(300, TimeUnit.SECONDS)
+		              .<ModifiedFile,Hyphenator>build()
+		              .asMap();
+
 	@Override
 	public ToStringHelper toStringHelper() {
 		return MoreObjects.toStringHelper(LibhyphenJnaImpl.class.getName());
@@ -353,4 +383,46 @@ public class LibhyphenJnaImpl extends AbstractTransformProvider<LibhyphenHyphena
 	
 	private static final Logger logger = LoggerFactory.getLogger(LibhyphenJnaImpl.class);
 	
+	private static class ModifiedFile {
+		
+		public final File file;
+		public final FileTime lastModifiedTime;
+		
+		public ModifiedFile(File file) {
+			this.file = file;
+			try {
+				BasicFileAttributes attrs = Files.readAttributes(
+					file.toPath(),
+					BasicFileAttributes.class);
+				this.lastModifiedTime = attrs.lastModifiedTime();
+			} catch (IOException e) {
+				throw new RuntimeException(e); // should not happen
+			}
+		}
+		
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + file.hashCode();
+			result = prime * result + lastModifiedTime.hashCode();
+			return result;
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			ModifiedFile other = (ModifiedFile)obj;
+			if (!file.equals(other.file))
+				return false;
+			if (!lastModifiedTime.equals(other.lastModifiedTime))
+				return false;
+			return true;
+		}
+	}
 }
