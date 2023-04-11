@@ -3,6 +3,7 @@ v1.14.13
 
 Changes
 -------
+- Update to Liblouis [3.25.0](https://github.com/liblouis/liblouis/releases/tag/v3.25.0)
 - Fix unneeded repeating of headings in a new volume when headings have a top margin.
 
 v1.14.11
