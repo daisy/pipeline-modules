@@ -151,13 +151,13 @@
             </x:document>
         </x:expect>
         <x:context label="the content file">
-            <x:document type="file" base-uri="temp-dir" href="issue-94/output-dir/test_dtbook-to-epub3.script.epub!/EPUB/test_dtbook-to-epub3.script-2.xhtml" select="//html:h1[1]"/>
+            <x:document type="file" base-uri="temp-dir" href="issue-94/output-dir/test_dtbook-to-epub3.script.epub!/EPUB/test_dtbook-to-epub3.script-2.xhtml" select="//(html:h1|html:h2|html:h3|html:h4|html:h5|html:h6)[1]"/>
         </x:context>
         <x:expect label="the white space in between the 'em' elements should be preserved" type="compare" normalize-space="false">
             <x:document type="inline">
-                <h1 xmlns="http://www.w3.org/1999/xhtml" id="chapter_1">
+                <h3 xmlns="http://www.w3.org/1999/xhtml" id="chapter_1">
                                         <em>CHAPTER 1</em> <em>THE LAST JUDGEMENT (MICHAEL ANGELO)</em>
-                                    </h1>
+                                    </h3>
             </x:document>
         </x:expect>
     </x:scenario>
@@ -182,17 +182,16 @@
         <x:context label="the result HTML file">
             <x:document type="file" base-uri="temp-dir" href="dtbook110/output-dir/dtbook110.epub!/EPUB/dtbook110-1.xhtml"/>
         </x:context>
-        <x:expect label="the result HTML file"
-                  type="custom" href="http://www.daisy.org/xprocspec/custom-assertion-steps.xpl" step="x:compare-except-ids">
+        <x:expect label="the result HTML file" type="compare">
             <x:document type="inline">
                 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
                     <head>
                         <meta charset="UTF-8"/>
                         <title>Title</title>
                     </head>
-                    <body id="a" epub:type="frontmatter">
-                        <section id="b">
-                            <h1 id="c" epub:type="title">Title</h1>
+                    <body id="id_3" epub:type="frontmatter">
+                        <section id="id_4">
+                            <h3 id="id_5" epub:type="title">Title</h3>
                         </section>
                     </body>
                 </html>
