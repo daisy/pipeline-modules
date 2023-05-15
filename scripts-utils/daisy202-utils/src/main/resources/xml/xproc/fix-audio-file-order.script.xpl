@@ -16,6 +16,9 @@
 			<dt>E-mail:</dt>
 			<dd><a px:role="contact" href="mailto:bertfrees@gmail.com">bertfrees@gmail.com</a></dd>
 		</dl>
+		<a px:role="homepage" href="http://daisy.github.io/pipeline/Get-Help/User-Guide/Scripts/daisy202-unscrambler/">
+			Online documentation
+		</a>
 	</p:documentation>
 
 	<p:option name="source" required="true" px:type="anyFileURI" px:media-type="application/xhtml+xml text/html">
