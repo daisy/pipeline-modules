@@ -25,5 +25,6 @@
     <p:import href="internal/resources/create-res-file.xpl"/>
     <p:import href="internal/audio-transcode.xpl"/>
     <p:import href="internal/update-links.xpl"/>
+    <p:import href="internal/upgrade.xpl"/>
 
 </p:library>
