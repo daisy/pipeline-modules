@@ -37,10 +37,12 @@
 			<p>The desired file type of the transcoded audio files, specified as a MIME type.</p>
 		</p:documentation>
 	</p:option>
-	<p:option name="new-audio-dir" required="true">
+	<p:option name="new-audio-dir" required="false" select="''">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>URI of the folder within the output fileset that should contain the transcoded audio
 			files.</p>
+			<p>If not specified or empty, will use the deepest common directory that contains all
+			the matched files.</p>
 			<p>The actual files will be stored in a temporary location.</p>
 		</p:documentation>
 	</p:option>
@@ -89,10 +91,11 @@
 	<cx:import href="http://www.daisy.org/pipeline/modules/file-utils/uri-functions.xsl" type="application/xslt+xml">
 		<p:documentation>
 			pf:normalize-uri
+			pf:longest-common-uri
 		</p:documentation>
 	</cx:import>
 
-	<px:fileset-filter>
+	<px:fileset-filter name="input-audio">
 		<p:with-option name="media-types" select="$media-types"/>
 		<p:with-option name="not-media-types" select="$not-media-types"/>
 	</px:fileset-filter>
@@ -175,20 +178,26 @@
 				<p:output port="mapping">
 					<p:pipe step="move" port="mapping"/>
 				</p:output>
+				<p:variable name="target" select="pf:normalize-uri(
+				                                    if ($new-audio-dir!='')
+				                                    then $new-audio-dir
+				                                    else pf:longest-common-uri(//d:file/resolve-uri(@href,base-uri(.))))">
+					<p:pipe step="input-audio" port="result"/>
+				</p:variable>
 				<p:delete>
 					<p:with-option name="match"
 					               select="concat(
 					                         'd:file[not(resolve-uri(&quot;./&quot;,resolve-uri(@href,base-uri(.)))=(&quot;',
 					                         pf:normalize-uri(string(/*)),
 					                         '&quot;,&quot;',
-					                         pf:normalize-uri($new-audio-dir),
+					                         $target,
 					                         '&quot;))]'
 					                         )">
 						<p:pipe step="temp-dir" port="result"/>
 					</p:with-option>
 				</p:delete>
 				<px:fileset-copy flatten="true" dry-run="true" name="move">
-					<p:with-option name="target" select="$new-audio-dir"/>
+					<p:with-option name="target" select="$target"/>
 				</px:fileset-copy>
 				<p:sink/>
 				<px:fileset-apply>

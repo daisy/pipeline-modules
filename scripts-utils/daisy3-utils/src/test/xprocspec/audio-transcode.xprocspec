@@ -10,7 +10,6 @@
 	<x:scenario label="test">
 		<x:call step="px:daisy3-audio-transcode">
 			<x:option name="new-audio-file-type" select="'audio/aiff'"/>
-			<x:option name="new-audio-dir" select="resolve-uri('./')"/>
 			<x:option name="temp-dir" select="resolve-uri('../../../target/xprocspec/test_audio-transcode/')"/>
 			<x:input port="source.fileset">
 				<x:document type="inline">
