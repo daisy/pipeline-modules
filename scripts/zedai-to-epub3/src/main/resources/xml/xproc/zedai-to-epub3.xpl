@@ -110,7 +110,8 @@
               <p:pipe step="main" port="tts-config"/>
             </p:input>
             <p:with-option name="output-dir" select="$temp-dir"/>
-	    <p:with-option name="audio" select="$audio"/>
+            <p:with-option name="audio" select="$audio"/>
+            <p:with-option name="chunk-size" xmlns:_="zedai" select="$_:chunk-size"/>
             <p:with-option name="include-tts-log" select="$include-tts-log"/>
         </px:zedai-to-epub3>
 
