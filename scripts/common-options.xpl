@@ -135,6 +135,21 @@ split up if they exceed the given maximum size.</p>
 	</p:option>
 
 	<!--
+	    daisy3-upgrader
+	-->
+	<p:option xmlns:_="daisy3" name="_:ensure-core-media" px:type="boolean" select="'false'">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<h2 px:role="name">Ensure core media</h2>
+			<p px:role="desc" xml:space="preserve">Ensure that the output DAISY 3 uses allowed file formats only.
+
+[Allowed
+formats](https://daisy.org/activities/standards/daisy/daisy-3/z39-86-2005-r2012-specifications-for-the-digital-talking-book/#d-pacfile#para_53c)
+for audio files are MP3, MPEG-4 AAC and WAVE. Audio files in other formats are transcoded to
+MP3.</p>
+		</p:documentation>
+	</p:option>
+
+	<!--
 	    dtbook-to-pef
 	    html-to-pef
 	    epub3-to-pef
