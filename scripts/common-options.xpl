@@ -6,18 +6,6 @@
 	<!-- ================================================= -->
 
 	<!--
-	    dtbook-to-pef
-	    html-to-pef
-	    epub3-to-pef
-	-->
-	<p:option name="temp-dir" required="false" px:output="temp" px:type="anyDirURI" select="''">
-		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			<h2 px:role="name">Temporary directory</h2>
-			<p px:role="desc">Directory for storing temporary files during conversion.</p>
-		</p:documentation>
-	</p:option>
-
-	<!--
 	    epub-to-daisy
 	    epub2-to-epub3
 	    epub3-to-daisy202
@@ -154,7 +142,7 @@ split up if they exceed the given maximum size.</p>
 	    epub3-to-epub3
 	-->
 	<p:option name="stylesheet" required="false" px:type="xs:anyURI" select="''" px:sequence="true" px:separator=" "
-              px:media-type="text/css application/xslt+xml">
+	          px:media-type="text/css application/xslt+xml">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Style sheets</h2>
 			<p px:role="desc" xml:space="preserve">A list of CSS/Sass style sheets to apply.

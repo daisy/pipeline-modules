@@ -3,7 +3,6 @@
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
-                xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp"
                 type="px:nimas-fileset-validator.script"
                 px:input-filesets="nimas dtbook daisy3"
                 exclude-inline-prefixes="#all">
@@ -14,12 +13,17 @@
         <a px:role="homepage" href="http://daisy.github.io/pipeline/Get-Help/User-Guide/Scripts/nimas-fileset-validator/">
             Online documentation
         </a>
-        <div px:role="author maintainer">
-            <p px:role="name">Marisa DeMeglio</p>
-            <a px:role="contact" href="mailto:marisa.demeglio@gmail.com"
-                >marisa.demeglio@gmail.com</a>
-            <p px:role="organization">DAISY Consortium</p>
-        </div>
+        <address>
+            Authors:
+            <dl px:role="author">
+                <dt>Name:</dt>
+                <dd px:role="name">Marisa DeMeglio</dd>
+                <dt>E-mail:</dt>
+                <dd><a href="mailto:marisa.demeglio@gmail.com">marisa.demeglio@gmail.com</a></dd>
+                <dt>Organization:</dt>
+                <dd px:role="organization">DAISY Consortium</dd>
+            </dl>
+        </address>
     </p:documentation>
 
     <!-- ***************************************************** -->
@@ -53,12 +57,7 @@
     </p:output>
 
     <p:output port="validation-status" px:media-type="application/vnd.pipeline.status+xml">
-        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h1 px:role="name">Validation Status</h1>
-            <p px:role="desc" xml:space="preserve">The validation status
-
-[More details on the file format](http://daisy.github.io/pipeline/StatusXML).</p>
-        </p:documentation>
+        <!-- whether the validation was successful -->
         <p:pipe step="validate-nimas-fileset" port="validation-status"/>
     </p:output>
 

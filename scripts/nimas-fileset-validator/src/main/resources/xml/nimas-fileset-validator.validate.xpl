@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step version="1.0" name="main"
-                type="px:nimas-fileset-validator"
-                xmlns:p="http://www.w3.org/ns/xproc"
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-                xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp"
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:pkg="http://openebook.org/namespaces/oeb-package/1.0/"
+                type="px:nimas-fileset-validator" name="main"
                 exclude-inline-prefixes="#all">
 
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-        <h1 px:role="name">NIMAS Fileset Validator: Validate</h1>
-        <p px:role="desc">Internal step.</p>
+        <h1>NIMAS Fileset Validator: Validate</h1>
+        <p>Internal step.</p>
     </p:documentation>
 
     <!-- ***************************************************** -->
@@ -24,8 +22,8 @@
 
     <p:output port="html-report" primary="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h1 px:role="name">HTML Report</h1>
-            <p px:role="desc">An HTML-formatted validation report comprising all documents'
+            <h1>HTML Report</h1>
+            <p>An HTML-formatted validation report comprising all documents'
                 reports.</p>
         </p:documentation>
         <p:pipe step="html-report" port="result"/>
@@ -33,24 +31,24 @@
 
     <p:output port="package-doc-validation-report">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h1 px:role="name">Package Document XML Report</h1>
-            <p px:role="desc">Raw validation output for the package document.</p>
+            <h1>Package Document XML Report</h1>
+            <p>Raw validation output for the package document.</p>
         </p:documentation>
         <p:pipe step="if-package-wellformed" port="package-doc-validation-report"/>
     </p:output>
 
     <p:output port="dtbook-validation-report" sequence="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h1 px:role="name">DTBook XML Report</h1>
-            <p px:role="desc">Raw validation output for the DTBook file(s).</p>
+            <h1>DTBook XML Report</h1>
+            <p>Raw validation output for the DTBook file(s).</p>
         </p:documentation>
         <p:pipe step="if-package-wellformed" port="dtbook-validation-report"/>
     </p:output>
 
     <p:output port="validation-status">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h1 px:role="name">Validation Status</h1>
-            <p px:role="desc">Validation status (http://daisy.github.io/pipeline/StatusXML)</p>
+            <h1>Validation Status</h1>
+            <p>Validation status (http://daisy.github.io/pipeline/StatusXML)</p>
         </p:documentation>
         <p:pipe step="validation-status" port="result"/>
     </p:output>
@@ -89,8 +87,6 @@
             pxi:nimas-fileset-validator.validate-package-doc
         </p:documentation>
     </p:import>
-
-    <p:import href="nimas-fileset-validator.fileset-filter.xpl"/>
 
     <p:variable name="package-doc-filename" select="tokenize($base-uri, '/')[last()]"/>
 

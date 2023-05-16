@@ -55,7 +55,7 @@
         <p:pipe step="choose-to-merge-dtbook-files" port="mapping"/>
     </p:output>
 
-    <p:option name="output-dir" required="true" px:type="anyDirURI">
+    <p:option name="output-dir" required="true" cx:type="xs:anyURI" cx:as="xs:string">
         <p:documentation>
             The directory to store the generated files in.
         </p:documentation>

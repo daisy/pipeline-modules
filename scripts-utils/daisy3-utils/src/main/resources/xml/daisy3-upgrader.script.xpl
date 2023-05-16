@@ -9,15 +9,18 @@
 	<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 		<h1 px:role="name">DAISY 3 Upgrader</h1>
 		<p px:role="desc">Upgrades a DAISY 3 publication from version 1.1.0 (Z39.86-2002) to version 2005 (Z39.86-2005).</p>
-		<dl px:role="author">
-			<dt>Name:</dt>
-			<dd px:role="name">Bert Frees</dd>
-			<dt>E-mail:</dt>
-			<dd><a px:role="contact" href="mailto:bertfrees@gmail.com">bertfrees@gmail.com</a></dd>
-		</dl>
 		<a px:role="homepage" href="http://daisy.github.io/pipeline/Get-Help/User-Guide/Scripts/daisy3-upgrader/">
 			Online documentation
 		</a>
+		<address>
+			Authors:
+			<dl px:role="author">
+				<dt>Name:</dt>
+				<dd px:role="name">Bert Frees</dd>
+				<dt>E-mail:</dt>
+				<dd><a px:role="contact" href="mailto:bertfrees@gmail.com">bertfrees@gmail.com</a></dd>
+			</dl>
+		</address>
 	</p:documentation>
 
 	<p:input port="source" px:media-type="application/oebps-package+xml">

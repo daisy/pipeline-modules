@@ -27,13 +27,11 @@ You may alternatively use the "mimetype" document if your input is a unzipped/"e
     </p:option>
 
     <p:option name="validation" select="'off'">
-        <!-- defined in common-options.xpl -->
+        <!-- defined in ../../../../../../common-options.xpl -->
     </p:option>
 
     <p:option name="temp-dir" required="true" px:output="temp" px:type="anyDirURI">
-        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h2 px:role="name">Temporary directory</h2>
-        </p:documentation>
+        <!-- directory used for temporary files -->
     </p:option>
 
     <p:option name="output-dir" required="true" px:output="result" px:type="anyDirURI">
@@ -43,7 +41,7 @@ You may alternatively use the "mimetype" document if your input is a unzipped/"e
     </p:option>
 
     <p:output port="validation-report" sequence="true">
-        <!-- defined in common-options.xpl -->
+        <!-- defined in ../../../../../../common-options.xpl -->
         <p:pipe step="load" port="validation-report"/>
     </p:output>
 

@@ -13,27 +13,18 @@
         <a px:role="homepage" href="http://daisy.github.io/pipeline/Get-Help/User-Guide/Scripts/dtbook-validator/">
             Online documentation
         </a>
-        <div px:role="author maintainer">
-            <p px:role="name">Marisa DeMeglio</p>
-            <a px:role="contact" href="mailto:marisa.demeglio@gmail.com">marisa.demeglio@gmail.com</a>
-            <p px:role="organization">DAISY Consortium</p>
-        </div>
+        <address>
+            Authors:
+            <dl px:role="author">
+                <dt>Name:</dt>
+                <dd px:role="name">Marisa DeMeglio</dd>
+                <dt>E-mail:</dt>
+                <dd><a href="mailto:marisa.demeglio@gmail.com">marisa.demeglio@gmail.com</a></dd>
+                <dt>Organization:</dt>
+                <dd px:role="organization">DAISY Consortium</dd>
+            </dl>
+        </address>
     </p:documentation>
-
-    <!-- ***************************************************** -->
-    <!-- INPUTS / OUTPUTS / OPTIONS -->
-    <!-- ***************************************************** -->
-
-    <!-- NOTE: the "input" here is given by an option string "input-dtbook" -->
-
-
-    <!--<p:output port="result" primary="true">
-        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h1 px:role="name">result</h1>
-            <p px:role="desc">A copy of the input document; may include PSVI annotations.</p>
-        </p:documentation>
-        <p:pipe step="validate-dtbook" port="result"/>
-     </p:output>-->
 
     <p:output port="report" sequence="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -53,12 +44,7 @@
     </p:output>
 
     <p:output port="validation-status" px:media-type="application/vnd.pipeline.status+xml">
-        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h1 px:role="name">Validation status</h1>
-            <p px:role="desc" xml:space="preserve">An XML document describing, briefly, whether the validation was successful.
-
-[More details on the file format](http://daisy.github.io/pipeline/StatusXML).</p>
-        </p:documentation>
+        <!-- whether the validation was successful -->
         <p:pipe step="validate-dtbook" port="validation-status"/>
     </p:output>
 

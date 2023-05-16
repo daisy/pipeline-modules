@@ -5,8 +5,8 @@
                 type="px:daisy3-to-daisy202" version="1.0" name="main">
 
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-        <h1 px:role="name">DAISY 3 to DAISY 2.02</h1>
-        <p px:role="desc">Transforms an audio-only DAISY 3 DTB into an audio-only DAISY 2.02
+        <h1>DAISY 3 to DAISY 2.02</h1>
+        <p>Transforms an audio-only DAISY 3 DTB into an audio-only DAISY 2.02
             DTB.</p>
     </p:documentation>
 

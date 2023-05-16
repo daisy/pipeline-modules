@@ -8,16 +8,20 @@
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
         <h1 px:role="name">DAISY 3 to EPUB 3</h1>
         <p px:role="desc">Transforms a DAISY 3 publication into an EPUB 3 publication.</p>
-        <dl px:role="author maintainer">
-            <dt>Name:</dt>
-            <dd px:role="name">Romain Deltour</dd>
-            <dt>E-mail:</dt>
-            <dd><a px:role="contact" href="mailto:rdeltour@gmail.com">rdeltout@gmail.com</a></dd>
-            <dt>Organization:</dt>
-            <dd px:role="organization">DAISY</dd>
-        </dl>
-        <p><a px:role="homepage" href="http://daisy.github.io/pipeline/Get-Help/User-Guide/Scripts/daisy3-to-epub3/"
-                >Online documentation</a></p>
+        <a px:role="homepage" href="http://daisy.github.io/pipeline/Get-Help/User-Guide/Scripts/daisy3-to-epub3/">
+            Online documentation
+        </a>
+        <address>
+            Authors:
+            <dl px:role="author">
+                <dt>Name:</dt>
+                <dd px:role="name">Romain Deltour</dd>
+                <dt>E-mail:</dt>
+                <dd><a px:role="contact" href="mailto:rdeltour@gmail.com">rdeltour@gmail.com</a></dd>
+                <dt>Organization:</dt>
+                <dd px:role="organization">DAISY Consortium</dd>
+            </dl>
+        </address>
     </p:documentation>
 
 
@@ -39,10 +43,7 @@
         </p:documentation>
     </p:option>
     <p:option name="temp-dir" required="true" px:output="temp" px:type="anyDirURI">
-        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h2 px:role="name">Temporary directory</h2>
-            <p px:role="desc">Directory used for temporary files.</p>
-        </p:documentation>
+        <!-- directory used for temporary files -->
     </p:option>
     <p:option name="mediaoverlays" required="false" select="'true'" px:type="boolean">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -59,7 +60,7 @@
     </p:option>
     
     <p:option xmlns:_="dtbook" name="_:chunk-size" select="'-1'">
-        <!-- defined in common-options.xpl -->
+        <!-- defined in ../../../../../../common-options.xpl -->
     </p:option>
     
     <!--<p:option name="compatibility-mode" required="false" select="'true'" px:type="boolean">

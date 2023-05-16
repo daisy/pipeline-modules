@@ -13,13 +13,19 @@
                 exclude-inline-prefixes="#all">
     
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-        <h1 px:role="name">DTBook Validator</h1>
-        <p px:role="desc">Validates DTBook documents. Supports inclusion of MathML.</p>
-        <div px:role="author maintainer">
-            <p px:role="name">Marisa DeMeglio</p>
-            <a px:role="contact" href="mailto:marisa.demeglio@gmail.com">marisa.demeglio@gmail.com</a>
-            <p px:role="organization">DAISY Consortium</p>
-        </div>
+        <h1>DTBook Validator</h1>
+        <p>Validates DTBook documents. Supports inclusion of MathML.</p>
+        <address>
+            Authors:
+            <dl px:role="author">
+                <dt>Name:</dt>
+                <dd px:role="name">Marisa DeMeglio</dd>
+                <dt>E-mail:</dt>
+                <dd><a href="mailto:marisa.demeglio@gmail.com">marisa.demeglio@gmail.com</a></dd>
+                <dt>Organization:</dt>
+                <dd px:role="organization">DAISY Consortium</dd>
+            </dl>
+        </address>
     </p:documentation>
     
     <!-- ***************************************************** -->
@@ -33,32 +39,32 @@
     
     <p:output port="result" primary="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h1 px:role="name">Copy of input document</h1>
-            <p px:role="desc">A copy of the input document; may include PSVI annotations.</p>
+            <h1>Copy of input document</h1>
+            <p>A copy of the input document; may include PSVI annotations.</p>
         </p:documentation>
         <p:pipe step="if-dtbook-wellformed" port="result"/>
     </p:output>
     
     <p:output port="xml-report" sequence="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h1 px:role="name">XML Reports</h1>
-            <p px:role="desc">Raw output from all types of validation used (RelaxNG, Schematron, custom).</p>
+            <h1>XML Reports</h1>
+            <p>Raw output from all types of validation used (RelaxNG, Schematron, custom).</p>
         </p:documentation>
         <p:pipe step="if-dtbook-wellformed" port="xml-report"/>
     </p:output>
     
     <p:output port="html-report" px:media-type="application/vnd.pipeline.report+xml">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h1 px:role="name">HTML Report</h1>
-            <p px:role="desc">An HTML-formatted version of the validation report.</p>
+            <h1>HTML Report</h1>
+            <p>An HTML-formatted version of the validation report.</p>
         </p:documentation>
         <p:pipe step="html-report" port="result"/>
     </p:output>
     
     <p:output port="validation-status" px:media-type="application/vnd.pipeline.status+xml">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h1 px:role="name">Validation status</h1>
-            <p px:role="desc">Validation status (http://daisy.github.io/pipeline/StatusXML).</p>
+            <h1>Validation status</h1>
+            <p>Validation status (http://daisy.github.io/pipeline/StatusXML).</p>
         </p:documentation>
         <p:pipe step="validation-status" port="result"/>
     </p:output>

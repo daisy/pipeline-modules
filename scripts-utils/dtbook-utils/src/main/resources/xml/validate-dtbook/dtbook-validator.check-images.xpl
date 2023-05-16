@@ -12,8 +12,8 @@
                 exclude-inline-prefixes="#all">
     
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-        <h1 px:role="name">Helper step for DTBook Validator</h1>
-        <p px:role="desc">Checks to see if referenced images exist on disk.</p>
+        <h1>Helper step for DTBook Validator</h1>
+        <p>Checks to see if referenced images exist on disk.</p>
     </p:documentation>
     
     <!-- ***************************************************** -->
@@ -22,15 +22,13 @@
     
     <p:input port="source" primary="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h1 px:role="name">source</h1>
-            <p px:role="desc">A valid DTBook document.</p>
+            <p>A valid DTBook document.</p>
         </p:documentation>
     </p:input>
     
     <p:output port="result" sequence="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h1 px:role="name">result</h1>
-            <p px:role="desc">List of missing images, or an empty sequence if nothing is missing.</p>
+            <p>List of missing images, or an empty sequence if nothing is missing.</p>
         </p:documentation>
         <p:pipe port="report" step="check-images-exist"/>
     </p:output>

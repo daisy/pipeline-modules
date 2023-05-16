@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step version="1.0" name="check-files-wellformed" type="px:check-files-wellformed"
-    xmlns:p="http://www.w3.org/ns/xproc" xmlns:c="http://www.w3.org/ns/xproc-step"
-    xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-    xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:d="http://www.daisy.org/ns/pipeline/data"
-    xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp" exclude-inline-prefixes="#all">
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
+                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
+                xmlns:d="http://www.daisy.org/ns/pipeline/data"
+                exclude-inline-prefixes="#all"
+                type="px:check-files-wellformed">
 
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-        <h1 px:role="name">Check that files exist and are well-formed XML</h1>
-        <p px:role="desc">Given a list of files, ensure that each exists and is well-formed XML.</p>
+        <h1>Check that files exist and are well-formed XML</h1>
+        <p>Given a list of files, ensure that each exists and is well-formed XML.</p>
     </p:documentation>
 
     <!-- ***************************************************** -->
@@ -17,24 +17,21 @@
 
     <p:input port="source" primary="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h1 px:role="name">source</h1>
-            <p px:role="desc">A list of files, formatted as a FileSet
+            <p>A list of files, formatted as a FileSet
                 (http://code.google.com/p/daisy-pipeline/wiki/FileSetUtils).</p>
         </p:documentation>
     </p:input>
 
     <p:output port="result">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h1 px:role="name">result</h1>
-            <p px:role="desc">List of well-formed files, formatted as a DAISY Pipeline FileSet.</p>
+            <p>List of well-formed files, formatted as a DAISY Pipeline FileSet.</p>
         </p:documentation>
         <p:pipe port="result" step="wrap-fileset"/>
     </p:output>
 
     <p:output port="report">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h1 px:role="name">result</h1>
-            <p px:role="desc">List of malformed files, formatted as &lt;d:error&gt; elements, or an
+            <p>List of malformed files, formatted as &lt;d:error&gt; elements, or an
                 empty d:errors element if nothing is missing.</p>
         </p:documentation>
         <p:pipe port="result" step="process-errors"/>
@@ -42,8 +39,7 @@
 
     <p:output port="validation-status" px:media-type="application/vnd.pipeline.status+xml">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h1 px:role="name">validation-status</h1>
-            <p px:role="desc">Validation status (http://code.google.com/p/daisy-pipeline/wiki/ValidationStatusXML) of the file check.</p>
+            <p>Validation status (http://daisy.github.io/pipeline/StatusXML) of the file check.</p>
         </p:documentation>
         <p:pipe step="format-validation-status" port="result"/>
     </p:output>

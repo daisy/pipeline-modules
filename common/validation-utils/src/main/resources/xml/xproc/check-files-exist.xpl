@@ -9,8 +9,8 @@
                 type="px:check-files-exist">
     
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-        <h1 px:role="name">Check that files exist on disk</h1>
-        <p px:role="desc">Given a list of files, ensure that each exists on disk.</p>
+        <h1>Check that files exist on disk</h1>
+        <p>Given a list of files, ensure that each exists on disk.</p>
     </p:documentation>
     
     <!-- ***************************************************** -->
@@ -19,31 +19,27 @@
     
     <p:input port="source" primary="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h1 px:role="name">source</h1>
-            <p px:role="desc">A list of files, formatted as a FileSet (http://code.google.com/p/daisy-pipeline/wiki/FileSetUtils).</p>
+            <p>A list of files, formatted as a FileSet (http://code.google.com/p/daisy-pipeline/wiki/FileSetUtils).</p>
         </p:documentation>
     </p:input>
     
     <p:output port="result" primary="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h1 px:role="name">result</h1>
-            <p px:role="desc">List of existing files, formatted as a DAISY Pipeline FileSet.</p>
+            <p>List of existing files, formatted as a DAISY Pipeline FileSet.</p>
         </p:documentation>
         <p:pipe port="result" step="wrap-fileset"/>
     </p:output>
     
     <p:output port="report">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h1 px:role="name">result</h1>
-            <p px:role="desc">List of missing files, formatted as &lt;d:error&gt; elements, or an empty d:errors element if nothing is missing.</p>
+            <p>List of missing files, formatted as &lt;d:error&gt; elements, or an empty d:errors element if nothing is missing.</p>
         </p:documentation>
         <p:pipe port="result" step="wrap-errors"/>
     </p:output>
     
     <p:output port="validation-status" px:media-type="application/vnd.pipeline.status+xml">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h1 px:role="name">validation-status</h1>
-            <p px:role="desc">Validation status (http://code.google.com/p/daisy-pipeline/wiki/ValidationStatusXML) of the file check.</p>
+            <p>Validation status (http://daisy.github.io/pipeline/StatusXML) of the file check.</p>
         </p:documentation>
         <p:pipe step="format-validation-status" port="result"/>
     </p:output>

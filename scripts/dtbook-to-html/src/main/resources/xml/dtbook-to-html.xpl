@@ -39,9 +39,7 @@
     </p:option>
 
     <p:option name="temp-dir" required="true" px:output="temp" px:type="anyDirURI">
-        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h2 px:role="name">Temporary directory</h2>
-        <p px:role="desc">Directory for storing temporary files during conversion.</p></p:documentation>
+        <!-- directory used for temporary files -->
     </p:option>
 
     <p:option name="assert-valid" required="false" px:type="boolean" select="'true'">
@@ -53,7 +51,7 @@
     </p:option>
 
     <p:option xmlns:_="dtbook" name="_:chunk-size" select="'-1'">
-        <!-- defined in common-options.xpl -->
+        <!-- defined in ../../../../../common-options.xpl -->
     </p:option>
 
     <p:import href="http://www.daisy.org/pipeline/modules/dtbook-utils/library.xpl">

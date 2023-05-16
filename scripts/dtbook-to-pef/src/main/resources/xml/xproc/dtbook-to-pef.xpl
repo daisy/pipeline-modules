@@ -12,38 +12,36 @@
         <a px:role="homepage" href="http://daisy.github.io/pipeline/Get-Help/User-Guide/Scripts/dtbook-to-pef/">
             Online documentation
         </a>
-        <dl px:role="author">
-            <dt>Name:</dt>
-            <dd px:role="name">Bert Frees</dd>
-            <dt>Organization:</dt>
-            <dd px:role="organization" href="http://www.sbs-online.ch/">SBS</dd>
-            <dt>E-mail:</dt>
-            <dd><a px:role="contact" href="mailto:bertfrees@gmail.com">bertfrees@gmail.com</a></dd>
-        </dl>
-        <dl px:role="author">
-            <dt>Name:</dt>
-            <dd px:role="name">Jostein Austvik Jacobsen</dd>
-            <dt>Organization:</dt>
-            <dd px:role="organization" href="http://www.nlb.no/">NLB</dd>
-            <dt>E-mail:</dt>
-            <dd><a px:role="contact" href="mailto:josteinaj@gmail.com">josteinaj@gmail.com</a></dd>
-        </dl>
+        <address>
+            Authors:
+            <dl px:role="author">
+                <dt>Name:</dt>
+                <dd px:role="name">Bert Frees</dd>
+                <dt>E-mail:</dt>
+                <dd><a px:role="contact" href="mailto:bertfrees@gmail.com">bertfrees@gmail.com</a></dd>
+                <dt>Organization:</dt>
+                <dd px:role="organization" href="http://www.sbs-online.ch/">SBS</dd>
+            </dl>
+            <dl px:role="author">
+                <dt>Name:</dt>
+                <dd px:role="name">Jostein Austvik Jacobsen</dd>
+                <dt>E-mail:</dt>
+                <dd><a px:role="contact" href="mailto:josteinaj@gmail.com">josteinaj@gmail.com</a></dd>
+                <dt>Organization:</dt>
+                <dd px:role="organization" href="http://www.nlb.no/">NLB</dd>
+            </dl>
+        </address>
     </p:documentation>
 
-    <p:input port="source" primary="true" px:name="source" px:media-type="application/x-dtbook+xml">
+    <p:input port="source" primary="true" px:media-type="application/x-dtbook+xml">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h2 px:role="name">Input DTBook</h2>
         </p:documentation>
     </p:input>
     
     <p:output port="status" px:media-type="application/vnd.pipeline.status+xml">
-        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h2 px:role="name">Status</h2>
-            <p px:role="desc" xml:space="preserve">Whether or not the conversion was successful.
-
-When `include-obfl` is set to true, the conversion may fail but still output a document on the
-"obfl" port.</p>
-        </p:documentation>
+        <!-- when `include-obfl` is set to true, the conversion may fail but still output a document
+             on the "obfl" port -->
         <p:pipe step="convert" port="status"/>
     </p:output>
     
@@ -62,6 +60,7 @@ sheet modules) are available for use in Sass style sheets:
         </p:documentation>
     </p:option>
 
+    <!-- defined in ../../../../../../common-options.xpl -->
     <p:option name="stylesheet-parameters"/>
     <p:option name="braille-code"/>
     <p:option name="transform"/>
@@ -95,7 +94,10 @@ sheet modules) are available for use in Sass style sheets:
     <p:option name="pef-output-dir"/>
     <p:option name="preview-output-dir"/>
     <p:option name="obfl-output-dir"/>
-    <p:option name="temp-dir"/>
+    
+    <p:option name="temp-dir" required="true" px:output="temp" px:type="anyDirURI">
+        <!-- directory used for temporary files -->
+    </p:option>
     
     <!-- ======= -->
     <!-- Imports -->
@@ -113,11 +115,6 @@ sheet modules) are available for use in Sass style sheets:
         <p:documentation>
             px:delete-parameters
             px:parse-query
-        </p:documentation>
-    </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
-        <p:documentation>
-            px:tempdir
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/dtbook-utils/library.xpl">
@@ -157,18 +154,10 @@ sheet modules) are available for use in Sass style sheets:
     </px:parse-query>
     <p:sink/>
     
-    <!-- =============== -->
-    <!-- CREATE TEMP DIR -->
-    <!-- =============== -->
-    <px:tempdir name="temp-dir" px:progress=".01">
-        <p:with-option name="href" select="if ($temp-dir!='') then $temp-dir else $output-dir"/>
-    </px:tempdir>
-    <p:sink/>
-    
     <!-- ======= -->
     <!-- LOAD -->
     <!-- ======= -->
-    <px:dtbook-load name="load">
+    <px:dtbook-load name="load" px:progress=".01">
         <p:input port="source">
             <p:pipe step="main" port="source"/>
         </p:input>
@@ -181,9 +170,7 @@ sheet modules) are available for use in Sass style sheets:
         <p:input port="source.in-memory">
             <p:pipe step="load" port="in-memory.out"/>
         </p:input>
-        <p:with-option name="temp-dir" select="string(/c:result)">
-            <p:pipe step="temp-dir" port="result"/>
-        </p:with-option>
+        <p:with-option name="temp-dir" select="$temp-dir"/>
         <p:with-option name="stylesheet" select="$stylesheet"/>
         <p:with-option name="transform"
                        select="concat($braille-code,($transform,'(translator:liblouis)(formatter:dotify)')[not(.='')][1])"/>
