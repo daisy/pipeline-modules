@@ -87,7 +87,8 @@
                 <x:document type="errors"/>
             </x:context>
             <x:expect label="there should be errors" type="count" min="1"/>
-            <x:expect label="the script should fail with a 'XC0053' error" type="xpath" test="//c:error[@code='ERR:XC0053']"/>
+            <x:expect label="the script should fail with a 'XC0053' error" type="xpath"
+                      test="exists(//c:error[resolve-QName(@code,.)=QName('http://www.w3.org/ns/xproc-error','err:XC0053')])"/>
         </x:scenario>
         <x:scenario label="false">
             <x:call>
