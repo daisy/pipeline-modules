@@ -121,7 +121,7 @@
 
 	<px:dtbook-to-epub3 name="convert">
 	  <p:input port="source.in-memory">
-	    <p:pipe step="load" port="in-memory.out"/>
+	    <p:pipe step="load" port="result.in-memory"/>
 	  </p:input>
 	  <p:input port="tts-config">
 	    <p:pipe step="dtbook-to-epub3" port="tts-config"/>

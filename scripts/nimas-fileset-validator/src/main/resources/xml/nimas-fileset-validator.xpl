@@ -115,7 +115,7 @@
 
     <px:nimas-fileset-validator name="validate-nimas-fileset">
         <p:with-option name="mathml-version" select="$mathml-version"/>
-        <p:with-option name="check-images" select="$check-images"/>
+        <p:with-option name="check-images" select="$check-images='true'"/>
         <p:with-option name="base-uri" select="$source"/>
     </px:nimas-fileset-validator>
 

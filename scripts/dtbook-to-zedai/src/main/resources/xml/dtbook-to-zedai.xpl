@@ -92,7 +92,7 @@
 
     <px:dtbook-to-zedai name="convert">
         <p:input port="source.in-memory">
-            <p:pipe step="load" port="in-memory.out"/>
+            <p:pipe step="load" port="result.in-memory"/>
         </p:input>
         <p:with-option name="output-dir" select="$output-dir"/>
         <p:with-option name="zedai-filename" select="$zedai-filename"/>

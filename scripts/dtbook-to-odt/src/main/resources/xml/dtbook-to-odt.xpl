@@ -143,10 +143,10 @@ See [Templating](http://daisy.github.io/pipeline/Get-Help/User-Guide/Scripts/dtb
                 <p:document href="content.xsl"/>
             </p:input>
             <p:input port="fileset.in">
-                <p:pipe step="dtbook" port="fileset.out"/>
+                <p:pipe step="dtbook" port="result.fileset"/>
             </p:input>
             <p:input port="in-memory.in">
-                <p:pipe step="dtbook" port="in-memory.out"/>
+                <p:pipe step="dtbook" port="result.in-memory"/>
             </p:input>
             <p:input port="meta">
                 <p:inline>

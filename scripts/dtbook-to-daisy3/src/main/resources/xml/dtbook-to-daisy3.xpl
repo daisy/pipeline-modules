@@ -106,10 +106,10 @@ reading systems can't handle the word tags.</p>
 
   <px:dtbook-to-daisy3 name="convert" px:progress="1">
     <p:input port="fileset.in">
-      <p:pipe step="load" port="fileset.out"/>
+      <p:pipe step="load" port="result.fileset"/>
     </p:input>
     <p:input port="in-memory.in">
-      <p:pipe step="load" port="in-memory.out"/>
+      <p:pipe step="load" port="result.in-memory"/>
     </p:input>
     <p:input port="tts-config">
       <p:pipe step="main" port="tts-config"/>

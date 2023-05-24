@@ -168,7 +168,7 @@ sheet modules) are available for use in Sass style sheets:
     <!-- ======= -->
     <px:dtbook-to-pef name="convert" px:message="Transforming from DTBook to PEF" px:progress=".92">
         <p:input port="source.in-memory">
-            <p:pipe step="load" port="in-memory.out"/>
+            <p:pipe step="load" port="result.in-memory"/>
         </p:input>
         <p:with-option name="temp-dir" select="$temp-dir"/>
         <p:with-option name="stylesheet" select="$stylesheet"/>

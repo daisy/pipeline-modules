@@ -97,7 +97,7 @@
 
         <px:dtbook-to-html name="convert">
             <p:input port="source.in-memory">
-                <p:pipe step="load" port="in-memory.out"/>
+                <p:pipe step="load" port="result.in-memory"/>
             </p:input>
             <p:with-option name="language" select="$language"/>
             <p:with-option name="assert-valid" select="$assert-valid"/>

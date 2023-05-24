@@ -69,9 +69,21 @@
         <p:pipe step="validation-status" port="result"/>
     </p:output>
     
-    <p:option name="mathml-version" select="'3.0'"/>
-    <p:option name="check-images" select="'false'" cx:as="xs:string"/>
-    <p:option name="nimas" select="'false'" cx:as="xs:string"/>
+    <p:option name="mathml-version" select="'3.0'">
+        <p:documentation>
+            <p>Version of MathML in the DTBook file</p>
+        </p:documentation>
+    </p:option>
+    <p:option name="check-images" select="false()" cx:as="xs:boolean">
+        <p:documentation>
+            <p>Check to see that referenced images exist on disk</p>
+        </p:documentation>
+    </p:option>
+    <p:option name="nimas" select="false()" cx:as="xs:boolean">
+        <p:documentation>
+            <p>Validate against NIMAS 1.1</p>
+        </p:documentation>
+    </p:option>
     
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
         <p:documentation>
@@ -223,7 +235,7 @@
                 </p:group>
                 
                 <p:choose name="choose-schematron">
-                    <p:when test="$nimas = 'true'">
+                    <p:when test="$nimas">
                         <p:output port="result"/>
                         <p:identity name="use-nimas-schematron">
                             <p:input port="source">
@@ -256,7 +268,7 @@
                 
                 <!-- check images -->
                 <p:choose name="check-images-exist">
-                    <p:when test="$check-images = 'true'">
+                    <p:when test="$check-images">
                         <p:output port="result"/>
                         <pxi:dtbook-validator.check-images>
                             <p:input port="source">

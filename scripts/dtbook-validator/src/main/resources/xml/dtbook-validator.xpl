@@ -137,8 +137,8 @@
     
     <px:dtbook-validate name="validate-dtbook">
         <p:with-option name="mathml-version" select="$mathml-version"/>
-        <p:with-option name="check-images" select="$check-images"/>
-        <p:with-option name="nimas" select="$nimas"/>
+        <p:with-option name="check-images" select="$check-images='true'"/>
+        <p:with-option name="nimas" select="$nimas='true'"/>
     </px:dtbook-validate>
     
     <pxi:dtbook-validator.store>

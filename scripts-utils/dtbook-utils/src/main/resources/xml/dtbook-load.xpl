@@ -13,8 +13,8 @@
         </p:documentation>
     </p:input>
 
-    <p:output port="fileset.out" primary="true"/>
-    <p:output port="in-memory.out" sequence="true">
+    <p:output port="result.fileset" primary="true"/>
+    <p:output port="result.in-memory" sequence="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>Fileset containing all the DTBook files and any resources they reference (images
             etc.). Only contains resources that actually exist on disk. The DTBooks are loaded into
