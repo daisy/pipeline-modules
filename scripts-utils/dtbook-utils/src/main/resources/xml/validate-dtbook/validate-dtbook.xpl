@@ -73,7 +73,7 @@
         <p:pipe step="validation-status" port="result"/>
     </p:output>
     
-    <p:option name="mathml-version" select="'3.0'">
+    <p:option name="mathml-version" select="'3.0'" cx:type="3.0|2.0">
         <p:documentation>
             <p>Version of MathML in the DTBook file</p>
         </p:documentation>
@@ -173,6 +173,7 @@
                 
                 <p:variable name="dtbook-version" select="*/@version"/>
                 <p:variable name="filename" select="tokenize($base-uri, '/')[last()]"/>
+                <!-- note that it is not possible to detect the MathML version -->
                 <p:variable name="mathml" select="if (count(//m:math) > 0) then 'mathml' else ''"/>
                 <p:variable name="document-type" select="if (count(//m:math) > 0)
                                                          then concat('DTBook ', $dtbook-version, ' with MathML ', $mathml-version)

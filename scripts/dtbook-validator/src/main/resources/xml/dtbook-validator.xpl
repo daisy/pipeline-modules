@@ -66,21 +66,8 @@
         </p:documentation>
     </p:option>
 
-    <p:option name="mathml-version" required="false" select="'3.0'">
-        <p:pipeinfo>
-            <px:type>
-                <choice>
-                    <value>3.0</value>
-                    <value>2.0</value>
-                    <value>1.01</value>
-                    <value>1.0</value>
-                </choice>
-            </px:type>
-        </p:pipeinfo>
-        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h2 px:role="name">MathML version</h2>
-            <p px:role="desc">Version of MathML in the DTBook file.</p>
-        </p:documentation>
+    <p:option name="mathml-version" select="'3.0'">
+        <!-- defined in ../../../../../common-options.xpl -->
     </p:option>
 
     <p:option name="check-images" required="false" px:type="boolean" select="'false'">

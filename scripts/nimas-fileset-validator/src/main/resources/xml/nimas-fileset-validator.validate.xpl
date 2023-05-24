@@ -55,7 +55,7 @@
         <p:pipe step="validation-status" port="result"/>
     </p:output>
 
-    <p:option name="mathml-version"/>
+    <p:option name="mathml-version" cx:type="3.0|2.0"/>
     <p:option name="check-images" cx:as="xs:boolean"/>
     <p:option name="base-uri"/>
 

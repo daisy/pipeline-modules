@@ -21,7 +21,7 @@
         </p:documentation>
     </p:option>
 
-    <p:option name="mathml-version" select="'3.0'">
+    <p:option name="mathml-version" select="'3.0'" cx:type="3.0|2.0">
         <p:documentation>
             <p>Version of MathML in the DTBook file</p>
         </p:documentation>
