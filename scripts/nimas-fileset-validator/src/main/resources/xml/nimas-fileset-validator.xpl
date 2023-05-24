@@ -30,8 +30,6 @@
     <!-- INPUTS / OUTPUTS / OPTIONS -->
     <!-- ***************************************************** -->
 
-    <!-- NOTE: the "input" here is given by an option string "input-opf" -->
-
     <p:output port="html-report" primary="true" px:media-type="application/vnd.pipeline.report+xml">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h1 px:role="name">Validation report</h1>
@@ -63,10 +61,10 @@
 
     <!-- we are using a string option instead of an XML input source because
         the wellformedness of the document cannot be taken for granted -->
-    <p:option name="input-opf" required="true" px:type="anyFileURI" px:media-type="application/oebps-package+xml">
+    <p:option name="source" required="true" px:type="anyFileURI" px:media-type="application/oebps-package+xml">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h2 px:role="name">Package Document</h2>
-            <p px:role="desc">The input package document (*.opf).</p>
+            <h2 px:role="name">Input NIMAS fileset</h2>
+            <p px:role="desc">The package document (*.opf) of the input NIMAS fileset.</p>
         </p:documentation>
     </p:option>
 
@@ -92,11 +90,6 @@
         </p:documentation>
     </p:option>
 
-    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
-        <p:documentation>
-            px:message
-        </p:documentation>
-    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
         <p:documentation>
             px:fileset-add-entry
@@ -113,29 +106,19 @@
         </p:documentation>
     </p:import>
 
-    <px:message>
-        <p:with-option name="message" select="concat('Nimas fileset validator: ', $input-opf)"/>
-        <p:input port="source">
-            <p:empty/>
-        </p:input>
-    </px:message>
-    <p:sink/>
-
     <px:fileset-add-entry media-type="application/oebps-package+xml">
-        <p:with-option name="href" select="$input-opf"/>
+        <p:with-option name="href" select="$source"/>
         <p:input port="source.fileset">
-            <p:inline>
-                <d:fileset/>
-            </p:inline>
+            <p:inline><d:fileset/></p:inline>
         </p:input>
     </px:fileset-add-entry>
-    
+
     <px:nimas-fileset-validator name="validate-nimas-fileset">
         <p:with-option name="mathml-version" select="$mathml-version"/>
         <p:with-option name="check-images" select="$check-images"/>
-        <p:with-option name="base-uri" select="$input-opf"/>
+        <p:with-option name="base-uri" select="$source"/>
     </px:nimas-fileset-validator>
-    
+
     <pxi:nimas-fileset-validator.store>
         <p:input port="html-report">
             <p:pipe step="validate-nimas-fileset" port="html-report"/>
