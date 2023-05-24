@@ -11,6 +11,7 @@
 	    epub3-to-daisy202
 	    epub3-to-daisy3
 	    daisy3-to-epub3
+	    dtbook-to-epub3
 	    dtbook-to-html
 	    dtbook-to-epub3
 	    dtbook-to-zedai
@@ -39,10 +40,12 @@
 	    epub2-to-epub3
 	    epub3-to-daisy202
 	    epub3-to-daisy3
+	    dtbook-to-html
+	    dtbook-to-zedai
 	-->
 	<p:output port="validation-report" sequence="true" px:media-type="application/vnd.pipeline.report+xml">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			<h2 px:role="name">Input validation report</h2>
+			<h2 px:role="name">Input validation reports</h2>
 		</p:documentation>
 	</p:output>
 

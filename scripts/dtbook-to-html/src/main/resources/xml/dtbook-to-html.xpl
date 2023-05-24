@@ -37,6 +37,16 @@
         <!-- defined in ../../../../../common-options.xpl -->
     </p:option>
 
+    <p:output port="validation-report" sequence="true">
+        <!-- defined in ../../../../../common-options.xpl -->
+        <p:pipe step="load" port="validation-report"/>
+    </p:output>
+
+    <p:output port="status" px:media-type="application/vnd.pipeline.status+xml">
+        <!-- whether the conversion was aborted due to validation errors -->
+        <p:pipe step="result" port="status"/>
+    </p:output>
+
     <p:option name="output-dir" required="true" px:output="result" px:type="anyDirURI">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h2 px:role="name">HTML</h2>
@@ -73,45 +83,86 @@
         </p:documentation>
     </cx:import>
 
-    <px:dtbook-load name="load"/>
+    <px:dtbook-load name="load">
+        <p:with-option name="validation" select="not($validation='off')"/>
+        <!-- assume MathML 3.0 -->
+    </px:dtbook-load>
     <p:sink/>
 
-    <!-- get the HTML filename from the first DTBook -->
-    <p:split-sequence test="position()=1" initial-only="true">
+    <p:identity>
         <p:input port="source">
-            <p:pipe step="main" port="source"/>
+            <p:pipe step="load" port="validation-status"/>
         </p:input>
-    </p:split-sequence>
-    <p:group>
-    <!--<p:variable name="encoded-title" select="encode-for-uri(replace(//dtbook:meta[@name='dc:Title']/@content,'[/\\?%*:|&quot;&lt;&gt;]',''))"/>-->
-    <!--<p:variable name="encoded-title" select="'book'"/>-->
-        <p:variable name="encoded-title"
-                    select="replace(replace(base-uri(/),'^.*/([^/]+)$','$1'),'\.[^\.]*$','')"/>
-        <p:variable name="output-dir-uri" select="pf:normalize-uri(concat($output-dir,'/'))"/>
-        <p:variable name="html-file-uri" select="concat($output-dir-uri,$encoded-title,'.epub')"/>
-        <p:sink/>
+    </p:identity>
+    <p:choose>
+        <p:when test="/d:validation-status[@result='error']">
+            <p:choose>
+                <p:when test="$validation='abort'">
+                    <p:identity px:message="The input contains an invalid DTBook file. See validation report for more info."
+                                px:message-severity="ERROR"/>
+                </p:when>
+                <p:otherwise>
+                    <p:identity px:message="The input contains an invalid DTBook file. See validation report for more info."
+                                px:message-severity="WARN"/>
+                </p:otherwise>
+            </p:choose>
+        </p:when>
+        <p:otherwise>
+            <p:identity/>
+        </p:otherwise>
+    </p:choose>
+    <p:choose name="result">
+        <p:when test="/d:validation-status[@result='error'] and $validation='abort'">
+            <p:output port="status"/>
+            <p:identity/>
+        </p:when>
+        <p:otherwise>
+            <p:output port="status"/>
 
-        <px:dtbook-to-html name="convert">
-            <p:input port="source.fileset">
-                <p:pipe step="load" port="result.fileset"/>
-            </p:input>
-            <p:input port="source.in-memory">
-                <p:pipe step="load" port="result.in-memory"/>
-            </p:input>
-            <p:with-option name="language" select="$language"/>
-            <p:with-option name="validation" select="$validation"/>
-            <p:with-option name="chunk-size" xmlns:_="dtbook" select="$_:chunk-size"/>
-            <p:with-option name="output-dir" select="$output-dir-uri"/>
-            <p:with-option name="temp-dir" select="pf:normalize-uri(concat($temp-dir,'/'))"/>
-            <p:with-option name="filename" select="$encoded-title"/>
-        </px:dtbook-to-html>
+            <!-- get the HTML filename from the first DTBook -->
+            <p:sink/>
+            <p:split-sequence test="position()=1" initial-only="true">
+                <p:input port="source">
+                    <p:pipe step="main" port="source"/>
+                </p:input>
+            </p:split-sequence>
+            <p:group>
+            <!--<p:variable name="encoded-title" select="encode-for-uri(replace(//dtbook:meta[@name='dc:Title']/@content,'[/\\?%*:|&quot;&lt;&gt;]',''))"/>-->
+            <!--<p:variable name="encoded-title" select="'book'"/>-->
+                <p:variable name="encoded-title"
+                            select="replace(replace(base-uri(/),'^.*/([^/]+)$','$1'),'\.[^\.]*$','')"/>
+                <p:variable name="output-dir-uri" select="pf:normalize-uri(concat($output-dir,'/'))"/>
+                <p:variable name="html-file-uri" select="concat($output-dir-uri,$encoded-title,'.epub')"/>
+                <p:sink/>
 
-        <px:fileset-store name="store">
-            <p:input port="in-memory.in">
-                <p:pipe step="convert" port="result.in-memory"/>
-            </p:input>
-        </px:fileset-store>
+                <px:dtbook-to-html name="convert">
+                    <p:input port="source.fileset">
+                        <p:pipe step="load" port="result.fileset"/>
+                    </p:input>
+                    <p:input port="source.in-memory">
+                        <p:pipe step="load" port="result.in-memory"/>
+                    </p:input>
+                    <p:with-option name="language" select="$language"/>
+                    <p:with-option name="validation" select="$validation"/>
+                    <p:with-option name="chunk-size" xmlns:_="dtbook" select="$_:chunk-size"/>
+                    <p:with-option name="output-dir" select="$output-dir-uri"/>
+                    <p:with-option name="temp-dir" select="pf:normalize-uri(concat($temp-dir,'/'))"/>
+                    <p:with-option name="filename" select="$encoded-title"/>
+                </px:dtbook-to-html>
 
-    </p:group>
+                <px:fileset-store name="store">
+                    <p:input port="in-memory.in">
+                        <p:pipe step="convert" port="result.in-memory"/>
+                    </p:input>
+                </px:fileset-store>
+
+                <p:identity cx:depends-on="store">
+                    <p:input port="source">
+                        <p:inline><d:validation-status result="ok"/></p:inline>
+                    </p:input>
+                </p:identity>
+            </p:group>
+        </p:otherwise>
+    </p:choose>
 
 </p:declare-step>

@@ -87,7 +87,7 @@
             them (report), or to ignore any validation issues (off).
         </p:documentation>
     </p:option>
-    <p:option name="copy-external-resources" select="'true'" cx:as="xs:boolean">
+    <p:option name="copy-external-resources" cx:as="xs:boolean" select="true()">
         <p:documentation>
             Whether or not to include any referenced external resources like images and CSS-files in the output.
         </p:documentation>
@@ -202,18 +202,24 @@
     <!-- =============================================================== -->
     <!-- VALIDATE -->
     <!-- =============================================================== -->
-    <p:documentation>Validate the DTBook input</p:documentation>
-    <p:group name="validate-dtbook" px:message="Validating DTBook" px:progress="3/23">
-        <p:output port="result" sequence="true"/>
+    <p:documentation>Validate the DTBook input (after the upgrade)</p:documentation>
+    <p:group px:progress="3/23">
         <p:choose name="validate" px:progress="1">
             <p:xpath-context>
                 <p:empty/>
             </p:xpath-context>
-            <p:when test="$validation=('abort','report')" px:message="Validating">
+            <p:when test="$validation=('abort','report')" px:message="Validating DTBook">
                 <p:for-each px:progress="1">
                     <px:css-speech-clean px:progress="1/3">
                         <p:documentation>Remove the Aural CSS attributes before validation</p:documentation>
                     </px:css-speech-clean>
+                    <!--
+                        Note that we could also use px:dtbook-validate and output a HTML report
+                        instead of reporting issues as log messages or raise an XProc error. This
+                        would complicate the code a bit however and it is not really needed to do a
+                        full validation if the calling step has already performed validation of the
+                        input, which ideally is the case.
+                    -->
                     <px:validate-with-relax-ng-and-report px:progress="2/3">
                         <p:input port="schema">
                             <p:pipe port="result" step="dtbook-schema"/>
@@ -233,9 +239,10 @@
             </p:input>
         </p:identity>
     </p:group>
+    <p:identity name="validate-dtbook"/>
     <p:sink/>
     <p:documentation>Schema selector for DTBook validation</p:documentation>
-    <px:dtbook-validator.select-schema name="dtbook-schema" dtbook-version="2005-3" mathml-version="2.0"/>
+    <px:dtbook-validator.select-schema name="dtbook-schema" dtbook-version="2005-3" mathml-version="2.0" cx:pure="true"/>
     <p:sink/>
 
     <!-- =============================================================== -->
