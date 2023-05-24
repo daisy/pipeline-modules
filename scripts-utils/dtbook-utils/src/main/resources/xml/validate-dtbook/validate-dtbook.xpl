@@ -34,6 +34,10 @@
     
     <p:input port="source.fileset" primary="true"/>
     <p:input port="source.in-memory" sequence="true">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Single DTBook file to validate</p>
+            <p>Should not include referenced resources</p>
+        </p:documentation>
         <p:empty/>
     </p:input>
     
@@ -131,16 +135,16 @@
     <!-- VALIDATION STEPS -->
     <!-- ***************************************************** -->
     
-    <!--check that the package document is well-formed XML -->
-    <px:message message="DTBook validator: Checking that DTBook document exists and is well-formed"/>
-    <px:check-files-wellformed name="check-dtbook-wellformed"/>
+    <px:check-files-wellformed px:message="DTBook validator: Checking that DTBook document exists and is well-formed"
+                               name="check-dtbook-wellformed">
+        <!-- FIXME: don't ignore source.in-memory (px:check-files-wellformed assumes files exist on disk) -->
+    </px:check-files-wellformed>
     
     <p:identity>
         <p:input port="source">
             <p:pipe step="check-dtbook-wellformed" port="validation-status"/>
         </p:input>
     </p:identity>
-    <px:message message="DTBook validator: Done checking that DTBook document exists and is well-formed"/>
 
     <p:choose name="if-dtbook-wellformed">
         

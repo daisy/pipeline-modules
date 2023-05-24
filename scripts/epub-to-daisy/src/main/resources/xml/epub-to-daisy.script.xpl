@@ -105,7 +105,7 @@ This will remove any existing media overlays in the EPUB.</p>
 
 	<px:epub-load name="load" px:message="Loading EPUB" px:progress="1/20">
 		<p:with-option name="href" select="$source"/>
-		<p:with-option name="validation" select="$validation"/>
+		<p:with-option name="validation" select="not($validation='off')"/>
 		<p:with-option name="temp-dir" select="$temp-dir"/>
 	</px:epub-load>
 	<p:sink/>
@@ -115,8 +115,25 @@ This will remove any existing media overlays in the EPUB.</p>
 			<p:pipe step="load" port="validation-status"/>
 		</p:input>
 	</p:identity>
-	<p:choose name="status" px:progress="19/20">
+	<p:choose>
 		<p:when test="/d:validation-status[@result='error']">
+			<p:choose>
+				<p:when test="$validation='abort'">
+					<p:identity px:message="The EPUB input is invalid. See validation report for more info."
+								px:message-severity="ERROR"/>
+				</p:when>
+				<p:otherwise>
+					<p:identity px:message="The EPUB input is invalid. See validation report for more info."
+								px:message-severity="WARN"/>
+				</p:otherwise>
+			</p:choose>
+		</p:when>
+		<p:otherwise>
+			<p:identity/>
+		</p:otherwise>
+	</p:choose>
+	<p:choose name="status" px:progress="19/20">
+		<p:when test="/d:validation-status[@result='error'] and $validation='abort'">
 			<p:output port="result"/>
 			<p:identity/>
 		</p:when>
@@ -214,7 +231,7 @@ This will remove any existing media overlays in the EPUB.</p>
 
 			<p:identity cx:depends-on="delete-temp-files">
 				<p:input port="source">
-					<p:pipe step="convert" port="status"/>
+					<p:inline><d:validation-status result="ok"/></p:inline>
 				</p:input>
 			</p:identity>
 		</p:otherwise>

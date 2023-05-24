@@ -17,22 +17,22 @@
 
     <p:input port="source" primary="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <p>A list of files, formatted as a FileSet
-                (http://code.google.com/p/daisy-pipeline/wiki/FileSetUtils).</p>
+            <p>Input fileset</p>
+            <p>Files are assumed to exist on disk</p>
         </p:documentation>
     </p:input>
 
     <p:output port="result">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <p>List of well-formed files, formatted as a DAISY Pipeline FileSet.</p>
+            <p>Output fileset which contains the well-formed files from <code>source</code>.</p>
         </p:documentation>
         <p:pipe port="result" step="wrap-fileset"/>
     </p:output>
 
     <p:output port="report">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <p>List of malformed files, formatted as &lt;d:error&gt; elements, or an
-                empty d:errors element if nothing is missing.</p>
+            <p>List of malformed files, formatted as <code>d:error</code> elements, or an empty
+            <code>d:errors</code> element if nothing is missing.</p>
         </p:documentation>
         <p:pipe port="result" step="process-errors"/>
     </p:output>
@@ -43,22 +43,34 @@
         </p:documentation>
         <p:pipe step="format-validation-status" port="result"/>
     </p:output>
-    
-    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
-        <p:documentation>Utilities for representing a fileset.</p:documentation>
-    </p:import>
 
-    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
-        <p:documentation>For manipulating files.</p:documentation>
+    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
+        <p:documentation>
+            px:fileset-add-entry
+            px:fileset-create
+            px:fileset-join
+        </p:documentation>
     </p:import>
-    
-    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl"/>
-    
-    <p:import href="check-files-exist.xpl"/>
-    
-    <p:import href="create-validation-report-error-for-file.xpl"/>
-    
-    <p:import href="validation-status.xpl"/>
+    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
+        <p:documentation>
+            px:message
+        </p:documentation>
+    </p:import>
+    <p:import href="check-files-exist.xpl">
+        <p:documentation>
+            px:check-files-exist
+        </p:documentation>
+    </p:import>
+    <p:import href="create-validation-report-error-for-file.xpl">
+        <p:documentation>
+            pxi:create-validation-report-error-for-file
+        </p:documentation>
+    </p:import>
+    <p:import href="validation-status.xpl">
+        <p:documentation>
+            px:validation-status
+        </p:documentation>
+    </p:import>
 
     <p:variable name="base" select="/*/@xml:base"/>
     

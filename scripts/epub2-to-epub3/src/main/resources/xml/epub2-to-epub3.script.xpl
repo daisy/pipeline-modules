@@ -64,7 +64,7 @@ You may alternatively use the "mimetype" document if your input is a unzipped/"e
 
 	<px:epub-load version="2" name="load" px:message="Loading EPUB 2" px:progress="1/10">
 		<p:with-option name="href" select="$source"/>
-		<p:with-option name="validation" select="$validation"/>
+		<p:with-option name="validation" select="not($validation='off')"/>
 		<p:with-option name="temp-dir" select="$temp-dir"/>
 	</px:epub-load>
 	<p:sink/>
@@ -74,8 +74,25 @@ You may alternatively use the "mimetype" document if your input is a unzipped/"e
 			<p:pipe step="load" port="validation-status"/>
 		</p:input>
 	</p:identity>
-	<p:choose name="status" px:progress="9/10">
+	<p:choose>
 		<p:when test="/d:validation-status[@result='error']">
+			<p:choose>
+				<p:when test="$validation='abort'">
+					<p:identity px:message="The EPUB input is invalid. See validation report for more info."
+								px:message-severity="ERROR"/>
+				</p:when>
+				<p:otherwise>
+					<p:identity px:message="The EPUB input is invalid. See validation report for more info."
+								px:message-severity="WARN"/>
+				</p:otherwise>
+			</p:choose>
+		</p:when>
+		<p:otherwise>
+			<p:identity/>
+		</p:otherwise>
+	</p:choose>
+	<p:choose name="status" px:progress="9/10">
+		<p:when test="/d:validation-status[@result='error'] and $validation='abort'">
 			<p:output port="result"/>
 			<p:identity/>
 		</p:when>
@@ -103,7 +120,7 @@ You may alternatively use the "mimetype" document if your input is a unzipped/"e
 
 			<p:identity cx:depends-on="store">
 				<p:input port="source">
-					<p:pipe step="load" port="validation-status"/>
+					<p:inline><d:validation-status result="ok"/></p:inline>
 				</p:input>
 			</p:identity>
 		</p:otherwise>
