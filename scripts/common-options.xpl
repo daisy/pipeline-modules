@@ -10,6 +10,9 @@
 	    epub2-to-epub3
 	    epub3-to-daisy202
 	    epub3-to-daisy3
+	    daisy3-to-epub3
+	    dtbook-to-html
+	    dtbook-to-epub3
 	    dtbook-to-zedai
 	-->
 	<p:option name="validation" required="false" select="'off'">

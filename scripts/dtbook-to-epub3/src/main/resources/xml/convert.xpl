@@ -23,7 +23,12 @@
 	<p:input port="tts-config"/>
 
 	<p:option name="language" required="true"/>
-	<p:option name="assert-valid" required="true" cx:as="xs:string"/>
+	<p:option name="validation" cx:type="off|report|abort" select="'off'">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p>Whether to stop processing and raise an error on validation issues (abort), only
+			report them (report), or to ignore any validation issues (off).</p>
+		</p:documentation>
+	</p:option>
 	<p:option name="audio" required="true" cx:as="xs:string"/>
 	<p:option name="audio-file-type" select="'audio/mpeg'">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -96,7 +101,7 @@
 		<p:with-option name="output-dir" select="concat($output-dir,'zedai/')"/>
 		<p:with-option name="zedai-filename" select="concat($output-name,'.xml')"/>
 		<p:with-option name="lang" select="$language"/>
-		<p:with-option name="validation" select="if ($assert-valid='true') then 'abort' else 'report'"/>
+		<p:with-option name="validation" select="$validation"/>
 	</px:dtbook-to-zedai>
 
 	<!--TODO better handle core media type filtering-->

@@ -51,7 +51,7 @@
         </x:expect>
     </x:scenario>
     
-    <x:scenario label="assert-valid">
+    <x:scenario label="validation">
         <x:call step="px:dtbook-to-epub3.script">
             <x:input port="source">
                 <x:document type="inline">
@@ -77,11 +77,11 @@
                 </x:document>
             </x:input>
         </x:call>
-        <x:scenario label="true (default)">
+        <x:scenario label="abort (default)">
             <x:call>
-                <x:option name="assert-valid" select="'true'"/>
-                <x:option name="output-dir" select="resolve-uri('assert-valid-true/output-dir/',$temp-dir)"/>
-                <x:option name="temp-dir" select="resolve-uri('assert-valid-true/temp-dir/',$temp-dir)"/>
+                <x:option name="validation" select="'abort'"/>
+                <x:option name="output-dir" select="resolve-uri('validation-abort/output-dir/',$temp-dir)"/>
+                <x:option name="temp-dir" select="resolve-uri('validation-abort/temp-dir/',$temp-dir)"/>
             </x:call>
             <x:context label="the error">
                 <x:document type="errors"/>
@@ -90,11 +90,11 @@
             <x:expect label="the script should fail with a 'XC0053' error" type="xpath"
                       test="exists(//c:error[resolve-QName(@code,.)=QName('http://www.w3.org/ns/xproc-error','err:XC0053')])"/>
         </x:scenario>
-        <x:scenario label="false">
+        <x:scenario label="report">
             <x:call>
-                <x:option name="assert-valid" select="'false'"/>
-                <x:option name="output-dir" select="resolve-uri('assert-valid-false/output-dir/',$temp-dir)"/>
-                <x:option name="temp-dir" select="resolve-uri('assert-valid-false/temp-dir/',$temp-dir)"/>
+                <x:option name="validation" select="'report'"/>
+                <x:option name="output-dir" select="resolve-uri('validation-report/output-dir/',$temp-dir)"/>
+                <x:option name="temp-dir" select="resolve-uri('validation-report/temp-dir/',$temp-dir)"/>
             </x:call>
             <x:context label="the status">
                 <x:document type="port" port="validation-status"/>
@@ -105,7 +105,7 @@
                 </x:document>
             </x:expect>
             <x:context label="the output directory">
-                <x:document type="directory" base-uri="temp-dir" href="assert-valid-false/output-dir/" recursive="true"/>
+                <x:document type="directory" base-uri="temp-dir" href="validation-report/output-dir/" recursive="true"/>
             </x:context>
             <x:expect label="the script should succeed" type="compare" >
                 <x:document type="inline">
@@ -139,7 +139,7 @@
                     </dtbook>
                 </x:document>
             </x:input>
-            <x:option name="assert-valid" select="'false'"/>
+            <x:option name="validation" select="'report'"/>
             <x:option name="output-dir" select="resolve-uri('issue-94/output-dir/',$temp-dir)"/>
             <x:option name="temp-dir" select="resolve-uri('issue-94/temp-dir/',$temp-dir)"/>
         </x:call>
@@ -168,7 +168,7 @@
             <x:input port="source">
                 <x:document type="file" href="../resources/dtbook110.xml"/>
             </x:input>
-            <x:option name="assert-valid" select="'true'"/>
+            <x:option name="validation" select="'abort'"/>
             <x:option name="output-dir" select="resolve-uri('dtbook110/output-dir/',$temp-dir)"/>
             <x:option name="temp-dir" select="resolve-uri('dtbook110/temp-dir/',$temp-dir)"/>
         </x:call>

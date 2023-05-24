@@ -52,11 +52,8 @@
         <!-- directory used for temporary files -->
     </p:option>
 
-    <p:option name="assert-valid" required="false" px:type="boolean" select="'true'">
-        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h2 px:role="name">Assert validity</h2>
-            <p px:role="desc">Whether to stop processing and raise an error on validation issues.</p>
-        </p:documentation>
+    <p:option name="validation" select="'abort'">
+      <!-- defined in ../../../../../common-options.xpl -->
     </p:option>
 
     <p:input port="tts-config">
@@ -129,7 +126,7 @@
 	  <p:with-option name="audio" select="$audio"/>
 	  <p:with-option name="audio-file-type" select="$audio-file-type"/>
 	  <p:with-option name="language" select="$language"/>
-	  <p:with-option name="assert-valid" select="$assert-valid"/>
+	  <p:with-option name="validation" select="$validation"/>
 	  <p:with-option name="chunk-size" xmlns:_="dtbook" select="$_:chunk-size"/>
 	  <p:with-option name="output-name" select="$output-name"/>
 	  <p:with-option name="output-dir" select="$output-dir-uri"/>

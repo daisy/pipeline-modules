@@ -81,7 +81,7 @@
             Language code of the input document.
         </p:documentation>
     </p:option>
-    <p:option name="validation" required="false" select="'abort'">
+    <p:option name="validation" cx:type="off|report|abort" select="'abort'">
         <p:documentation>
             Whether to stop processing and raise an error on validation issues (abort), only report
             them (report), or to ignore any validation issues (off).
