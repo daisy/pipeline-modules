@@ -2,15 +2,35 @@
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:cx="http://xmlcalabash.com/ns/extensions"
                 xmlns:c="http://www.w3.org/ns/xproc-step"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 type="px:report-errors"
                 name="report-errors">
 
+    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+        <p>Wrapper step for <code>cx:report-errors</code> that treats an empty value
+        <code>code</code> value as an absent value.</p>
+    </p:documentation>
+
     <p:input port="source" primary="true"/>
-    <p:input port="report" sequence="true"/>
-    <p:output port="result" sequence="true"/>
-    <p:option name="code" select="''"/>
-    <p:option name="code-prefix"/>
-    <p:option name="code-namespace"/>
+    <p:input port="report" sequence="true">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Zero or more <a
+            href="https://www.w3.org/TR/xproc/#cv.errors"><code>c:errors</code></a> documents.</p>
+            <p>The errors are sent as one or more warnings to the error listener.</p>
+        </p:documentation>
+    </p:input>
+    <p:output port="result" sequence="true">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Copy of <code>source</code></p>
+        </p:documentation>
+    </p:output>
+    <p:option name="code" cx:type="xs:string" select="''"> <!-- xs:NCName -->
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>If specified and not empty the step raises an error with this code.</p>
+        </p:documentation>
+    </p:option>
+    <p:option name="code-prefix" cx:type="xs:NCName"/>
+    <p:option name="code-namespace" cx:type="xs:anyURI"/>
 
     <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl">
         <p:documentation>
@@ -18,14 +38,13 @@
         </p:documentation>
     </p:import>
 
-    <!--We count the report docs to simply pipe the identity if there are no errors (used in the choose/when) -->
+    <!-- count the report docs to simply pipe the identity if there are no errors -->
     <p:count name="count" limit="1">
         <p:input port="source">
             <p:pipe step="report-errors" port="report"/>
         </p:input>
     </p:count>
     <p:sink/>
-    <!--We the repipe the primary source port-->
     <p:identity>
         <p:input port="source">
             <p:pipe port="source" step="report-errors"/>
