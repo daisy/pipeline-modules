@@ -2,6 +2,7 @@
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
+                xmlns:pe="http://www.daisy.org/ns/pipeline/errors"
                 xmlns:c="http://www.w3.org/ns/xproc-step"
                 xmlns:cx="http://xmlcalabash.com/ns/extensions"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -179,6 +180,14 @@
                                                          then concat('DTBook ', $dtbook-version, ' with MathML ', $mathml-version)
                                                          else concat('DTBook ', $dtbook-version)"/>
                 
+                <px:assert error-code="pe:DTB001" message="DTBook is missing required 'version' attribute">
+                    <p:with-option name="test" select="exists(*/@version)"/>
+                </px:assert>
+                <px:assert error-code="pe:DTB001"
+                           message="DTBook version must be one of '2005-1', '2005-2', '2005-3' or '1.1.0', but got '$1'">
+                    <p:with-option name="test" select="$dtbook-version=('2005-1','2005-2','2005-3','1.1.0')"/>
+                    <p:with-option name="param1" select="$dtbook-version"/>
+                </px:assert>
                 <px:message>
                     <p:with-option name="message" select="concat('DTBook Validator: Validating document: ', $base-uri)"/>
                 </px:message>
