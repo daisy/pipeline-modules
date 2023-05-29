@@ -513,7 +513,28 @@
     <!-- VALIDATE FINAL OUTPUT -->
     <!-- =============================================================== -->
     <p:documentation>Validate the final ZedAI output.</p:documentation>
-    <px:zedai-validate name="validate-zedai" px:message="Validating ZedAI" px:progress="2/23"/>
+    <p:choose name="validate-zedai" px:progress="2/23">
+        <p:when test="$validation=('abort','report')" px:message="Validating ZedAI">
+            <p:output port="result"/>
+            <p:identity name="zedai"/>
+            <px:css-speech-clean px:progress="1/3">
+                <p:documentation>Remove the Aural CSS attributes before validation</p:documentation>
+            </px:css-speech-clean>
+            <px:zedai-validate px:progress="2/3" name="validate">
+                <p:with-option name="report-method" select="if ($validation='abort') then 'error' else 'log'"/>
+            </px:zedai-validate>
+            <p:sink/>
+            <p:identity cx:depends-on="validate">
+                <p:input port="source">
+                    <p:pipe step="zedai" port="result"/>
+                </p:input>
+            </p:identity>
+        </p:when>
+        <p:otherwise>
+            <p:output port="result"/>
+            <p:identity/>
+        </p:otherwise>
+    </p:choose>
     <p:sink/>
 
 
