@@ -27,15 +27,13 @@
         <p:pipe port="result" step="error"/>
     </p:output>
     
-    <p:option name="code" select="''" cx:as="xs:string">     <!-- QName -->
+    <p:option name="code" required="false" cx:as="xs:QName">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             Must be set if there is a document on the "error" port. Must not be set if there is no
             document on the "error" port.
         </p:documentation>
     </p:option>
-    <p:option name="code-prefix" select="''"/>                <!-- NCName -->
-    <p:option name="code-namespace" select="''"/>             <!-- anyURI -->
-    <p:option name="message" select="''" cx:as="xs:string">
+    <p:option name="message" required="false" cx:as="xs:string">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             Description of the error that occured. $1, $2 etc will be replaced with the contents of
             optios "param1", "param2", etc. Must be set if there is a document on the "error"
@@ -77,14 +75,14 @@
         </p:when>
         <p:when test="number(/*)=1">
             <p:choose>
-                <p:when test="$message!=''">
+                <p:when test="p:value-available('message')">
                     <p:error code="XXX">
                         <p:input port="source">
                             <p:inline><message>"message" option must not be set if there is a document on the "error" port.</message></p:inline>
                         </p:input>
                     </p:error>
                 </p:when>
-                <p:when test="$code!=''">
+                <p:when test="p:value-available('code')">
                     <p:error code="XXX">
                         <p:input port="source">
                             <p:inline><message>"code" option must not be set if there is a document on the "error" port.</message></p:inline>
@@ -100,14 +98,14 @@
                 </p:otherwise>
             </p:choose>
         </p:when>
-        <p:when test="$message=''">
+        <p:when test="not(p:value-available('message'))">
             <p:error code="XXX">
                 <p:input port="source">
                     <p:inline><message>"message" option must be set</message></p:inline>
                 </p:input>
             </p:error>
         </p:when>
-        <p:when test="$code=''">
+        <p:when test="not(p:value-available('code'))">
             <p:error code="XXX">
                 <p:input port="source">
                     <p:inline><message>"code" option must be set</message></p:inline>
@@ -115,8 +113,6 @@
             </p:error>
         </p:when>
         <p:otherwise>
-            <p:variable name="code-localName" select="if (contains($code,':')) then substring-after($code,':') else $code"/>
-            <p:variable name="prefix" select="concat(substring-before($code,':'),$code-prefix)"/>
             <p:string-replace match="/*/text()" name="message">
                 <p:input port="source">
                     <p:inline><message>MESSAGE</message></p:inline>
@@ -136,44 +132,13 @@
                                                 '\$9',replace($param9,'\$','\\\$')),
                                                 '&quot;')"/>
             </p:string-replace>
-            <p:choose>
-                <p:when test="not($code-namespace='') and not($prefix='')">
-                    <p:error>
-                        <p:input port="source">
-                            <p:pipe port="result" step="message"/>
-                        </p:input>
-                        <p:with-option name="code" select="$code-localName"/>
-                        <p:with-option name="code-namespace" select="$code-namespace"/>
-                        <p:with-option name="code-prefix" select="$prefix"/>
-                    </p:error>
-                </p:when>
-                <p:when test="not($code-namespace='')">
-                    <p:error>
-                        <p:input port="source">
-                            <p:pipe port="result" step="message"/>
-                        </p:input>
-                        <p:with-option name="code" select="$code-localName"/>
-                        <p:with-option name="code-namespace" select="$code-namespace"/>
-                    </p:error>
-                </p:when>
-                <p:when test="not($prefix='')">
-                    <p:error>
-                        <p:input port="source">
-                            <p:pipe port="result" step="message"/>
-                        </p:input>
-                        <p:with-option name="code" select="$code-localName"/>
-                        <p:with-option name="code-prefix" select="$prefix"/>
-                    </p:error>
-                </p:when>
-                <p:otherwise>
-                    <p:error>
-                        <p:input port="source">
-                            <p:pipe port="result" step="message"/>
-                        </p:input>
-                        <p:with-option name="code" select="$code-localName"/>
-                    </p:error>
-                </p:otherwise>
-            </p:choose>
+            <p:sink/>
+            <p:error>
+                <p:input port="source">
+                    <p:pipe port="result" step="message"/>
+                </p:input>
+                <p:with-option name="code" select="$code"/>
+            </p:error>
         </p:otherwise>
     </p:choose>
     <p:identity name="error"/>
