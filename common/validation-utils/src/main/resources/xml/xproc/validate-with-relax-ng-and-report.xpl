@@ -2,7 +2,9 @@
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                xmlns:c="http://www.w3.org/ns/xproc-step"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:err="http://www.w3.org/ns/xproc-error"
                 xmlns:l="http://xproc.org/library"
                 type="px:validate-with-relax-ng-and-report"
                 name="validate-with-relax-ng-and-report">
@@ -24,6 +26,11 @@
             px:report-errors
         </p:documentation>
     </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
+        <p:documentation>
+            px:error
+        </p:documentation>
+    </p:import>
 
     <l:relax-ng-report name="validate">
         <p:input port="source">
@@ -36,11 +43,27 @@
         <p:with-option name="dtd-id-idref-warnings" select="$dtd-id-idref-warnings"/>
     </l:relax-ng-report>
 
-    <px:report-errors code-namespace="http://www.w3.org/ns/xproc-error">
-        <p:input port="report">
+    <p:choose>
+        <p:variable name="failed" cx:as="xs:boolean" select="exists(collection()//c:error)">
             <p:pipe step="validate" port="report"/>
-        </p:input>
-        <p:with-option name="code" select="if ($assert-valid='true') then 'XC0053' else ''" />
-    </px:report-errors>
+        </p:variable>
+        <p:when test="$failed and $assert-valid='true'">
+            <px:report-errors method="error">
+                <p:input port="report">
+                    <p:pipe step="validate" port="report"/>
+                </p:input>
+            </px:report-errors>
+        </p:when>
+        <p:when test="$failed">
+            <px:report-errors method="log">
+                <p:input port="report">
+                    <p:pipe step="validate" port="report"/>
+                </p:input>
+            </px:report-errors>
+        </p:when>
+        <p:otherwise>
+            <p:identity/>
+        </p:otherwise>
+    </p:choose>
 
 </p:declare-step>

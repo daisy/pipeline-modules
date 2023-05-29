@@ -16,28 +16,37 @@
         </pre>
     </p:documentation>
     
+    <p:input port="source" primary="true" sequence="true">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Documents on this port will be ignored.</p>
+        </p:documentation>
+        <p:empty/>
+    </p:input>
     <p:input port="error" primary="false" sequence="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <p>If a <code>c:errors</code> document is supplied on this port, the errors will be
-            reported and the last error will be raised.</p>
+            <p>If one or more <code>c:errors</code> documents are supplied on this port, the errors
+            will be reported and the last error will be raised.</p>
         </p:documentation>
         <p:empty/>
     </p:input>
     <p:output port="result" sequence="true">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Nothing can ever appear on this port since the step will always fail.</p>
+        </p:documentation>
         <p:pipe port="result" step="error"/>
     </p:output>
     
     <p:option name="code" required="false" cx:as="xs:QName">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            Must be set if there is a document on the "error" port. Must not be set if there is no
-            document on the "error" port.
+            Must be set if there are no documents on the "error" port. Must not be set if there are
+            documents on the "error" port.
         </p:documentation>
     </p:option>
     <p:option name="message" required="false" cx:as="xs:string">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             Description of the error that occured. $1, $2 etc will be replaced with the contents of
             optios "param1", "param2", etc. Must be set if there is a document on the "error"
-            port. Must not be set if there is no document on the "error" port.
+            port. Must not be set if there are documents on the "error" port.
         </p:documentation>
     </p:option>
     <p:option name="param1" select="''" cx:as="xs:string"/>
@@ -52,9 +61,9 @@
     <!-- in the unlikely event that you need more parameters you'll have to format the message string yourself -->
     
     <p:declare-step type="pxi:error">
-        <p:input port="error" sequence="false">
+        <p:input port="error" sequence="true">
             <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-                <p>A <code>c:errors</code> document.</p>
+                <p>One or more <code>c:errors</code> documents.</p>
             </p:documentation>
         </p:input>
         <p:output port="result" sequence="true"/>
@@ -66,26 +75,19 @@
         </p:input>
     </p:count>
     <p:choose>
-        <p:when test="number(/*)&gt;1">
-            <p:error code="XXX">
-                <p:input port="source">
-                    <p:inline><message>Not more than one document allowed on the "error" port.</message></p:inline>
-                </p:input>
-            </p:error>
-        </p:when>
-        <p:when test="number(/*)=1">
+        <p:when test="number(/*)&gt;=1">
             <p:choose>
                 <p:when test="p:value-available('message')">
                     <p:error code="XXX">
                         <p:input port="source">
-                            <p:inline><message>"message" option must not be set if there is a document on the "error" port.</message></p:inline>
+                            <p:inline><message>"message" option must not be set if there are documents on the "error" port.</message></p:inline>
                         </p:input>
                     </p:error>
                 </p:when>
                 <p:when test="p:value-available('code')">
                     <p:error code="XXX">
                         <p:input port="source">
-                            <p:inline><message>"code" option must not be set if there is a document on the "error" port.</message></p:inline>
+                            <p:inline><message>"code" option must not be set if there are documents on the "error" port.</message></p:inline>
                         </p:input>
                     </p:error>
                 </p:when>

@@ -52,8 +52,6 @@
         <p:documentation>Extracts embedded Schematron rules from a RELAX NG schema (not in compact syntax).</p:documentation>
     </p:import>
     
-    <p:import href="report-errors.xpl">
-        <p:documentation>Wrapper step for cx:report-errors that treats an empty value code value as an absent value.</p:documentation>
-    </p:import>
+    <p:import href="report-errors.xpl"/>
     
 </p:library>
