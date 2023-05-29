@@ -7,6 +7,7 @@
                 xmlns:z="http://www.daisy.org/ns/z3998/authoring/"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:c="http://www.w3.org/ns/xproc-step"
+                xmlns:l="http://xproc.org/library"
                 xmlns:cx="http://xmlcalabash.com/ns/extensions"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 type="px:dtbook-to-zedai" name="main"
@@ -139,7 +140,8 @@
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/validation-utils/library.xpl">
         <p:documentation>
-            px:validate-with-relax-ng-and-report
+            l:relax-ng-report
+            px:report-errors
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/css-speech/library.xpl">
@@ -204,12 +206,12 @@
     <!-- =============================================================== -->
     <p:documentation>Validate the DTBook input (after the upgrade)</p:documentation>
     <p:group px:progress="3/23">
-        <p:choose name="validate" px:progress="1">
+        <p:choose px:progress="1">
             <p:xpath-context>
                 <p:empty/>
             </p:xpath-context>
             <p:when test="$validation=('abort','report')" px:message="Validating DTBook">
-                <p:for-each px:progress="1">
+                <p:for-each name="validate-each" px:progress="1">
                     <px:css-speech-clean px:progress="1/3">
                         <p:documentation>Remove the Aural CSS attributes before validation</p:documentation>
                     </px:css-speech-clean>
@@ -220,24 +222,29 @@
                         full validation if the calling step has already performed validation of the
                         input, which ideally is the case.
                     -->
-                    <px:validate-with-relax-ng-and-report px:progress="2/3">
+                    <l:relax-ng-report name="validate" px:progress="1/3">
                         <p:input port="schema">
                             <p:pipe port="result" step="dtbook-schema"/>
                         </p:input>
-                        <p:with-option name="assert-valid" select="$validation='abort'"/>
-                    </px:validate-with-relax-ng-and-report>
+                    </l:relax-ng-report>
+                    <px:report-errors px:progress="1/3">
+                        <p:input port="report">
+                            <p:pipe step="validate" port="report"/>
+                        </p:input>
+                        <p:with-option name="method" select="if ($validation='abort') then 'error' else 'log'"/>
+                    </px:report-errors>
                 </p:for-each>
+                <p:sink/>
+                <p:identity cx:depends-on="validate-each">
+                    <p:input port="source">
+                        <p:pipe step="upgrade-dtbook" port="result"/>
+                    </p:input>
+                </p:identity>
             </p:when>
             <p:otherwise>
                 <p:identity/>
             </p:otherwise>
         </p:choose>
-        <p:sink/>
-        <p:identity cx:depends-on="validate">
-            <p:input port="source">
-                <p:pipe step="upgrade-dtbook" port="result"/>
-            </p:input>
-        </p:identity>
     </p:group>
     <p:identity name="validate-dtbook"/>
     <p:sink/>
@@ -273,13 +280,18 @@
                     <px:css-speech-clean px:progress="1/3">
                         <p:documentation>Remove the Aural CSS attributes before validation</p:documentation>
                     </px:css-speech-clean>
-                    <px:validate-with-relax-ng-and-report name="validate" px:progress="2/3" assert-valid="true">
+                    <l:relax-ng-report name="validate" px:progress="1/3">
                         <p:input port="schema">
                             <p:pipe port="result" step="dtbook-schema"/>
                         </p:input>
-                    </px:validate-with-relax-ng-and-report>
+                    </l:relax-ng-report>
+                    <px:report-errors method="error" name="report" px:progress="1/3">
+                        <p:input port="report">
+                            <p:pipe step="validate" port="report"/>
+                        </p:input>
+                    </px:report-errors>
                     <p:sink/>
-                    <p:identity cx:depends-on="validate">
+                    <p:identity cx:depends-on="report">
                         <p:input port="source">
                             <p:pipe step="merge" port="result"/>
                         </p:input>
