@@ -77,18 +77,14 @@
         </p:documentation>
     </p:option>
 
-    <p:option name="nimas" required="false" px:type="boolean" select="'false'">
+    <p:option name="nimas" select="'false'">
+        <!-- defined in ../../../../../common-options.xpl -->
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h2 px:role="name">Validate against NIMAS 1.1</h2>
             <p px:role="desc">Validate using NIMAS 1.1 rules for DTBook.</p>
         </p:documentation>
     </p:option>
     
-    <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
-        <p:documentation>
-            px:message
-        </p:documentation>
-    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
         <p:documentation>
             px:fileset-add-entry
@@ -105,15 +101,7 @@
         </p:documentation>
     </p:import>
     
-    <px:message>
-        <p:with-option name="message" select="concat('DTBook validator: ', $input-dtbook)"/>
-        <p:input port="source">
-            <p:empty/>
-        </p:input>
-    </px:message>
-    <p:sink/>
-    
-    <px:fileset-add-entry media-type="application/x-dtbook+xml">
+    <px:fileset-add-entry media-type="application/x-dtbook+xml" px:message="DTBook validator: {$input-dtbook}">
         <p:with-option name="href" select="$input-dtbook"/>
         <p:input port="source.fileset">
             <p:inline>

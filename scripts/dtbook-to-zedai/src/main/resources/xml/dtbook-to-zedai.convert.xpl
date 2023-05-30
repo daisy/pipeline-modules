@@ -106,6 +106,11 @@
             Whether the input is a valid DTBook.
         </p:documentation>
     </p:option>
+    <p:option name="nimas" cx:as="xs:boolean" select="false()">
+        <p:documentation>
+            Whether the input is NIMAS.
+        </p:documentation>
+    </p:option>
 
     <p:output port="validation-report" sequence="true">
         <p:documentation>
@@ -457,38 +462,52 @@
     <!-- METADATA -->
     <!-- =============================================================== -->
     <p:documentation>Generate MODS metadata</p:documentation>
-    <px:dtbook-to-mods-meta px:progress="2/23" px:message="Generating MODS metadata">
-        <p:input port="source">
-            <p:pipe step="choose-to-merge-dtbook-files" port="result"/>
-        </p:input>
-    </px:dtbook-to-mods-meta>
-    <p:choose>
-        <p:when test="$validation='abort' or ($validation='report' and $dtbook-is-valid)">
-            <!-- DTBook is valid, so we expect the resulting MODS document to be valid too,
-                 otherwise we made a coding error -->
-            <p:try>
-                <p:group>
-                    <px:validate-mods/>
-                </p:group>
-                <p:catch name="catch">
-                    <px:log-error severity="DEBUG">
-                        <p:input port="error">
-                            <p:pipe step="catch" port="error"/>
-                        </p:input>
-                    </px:log-error>
-                    <px:error code="BUG" message="An unexpected error happened. Please contact maintainer."/>
-                </p:catch>
-            </p:try>
+    <p:choose px:progress="2/23">
+        <!-- not when input is NIMAS because there will be no head element and MODS document would
+             be empty (and therefore invalid) -->
+        <p:when test="$nimas">
+            <p:identity>
+                <p:input port="source">
+                    <p:empty/>
+                </p:input>
+            </p:identity>
         </p:when>
         <p:otherwise>
-            <!-- reporting validation issues in intermediary documents is not helpful for user -->
-            <p:identity/>
+            <px:dtbook-to-mods-meta px:progress="1/2" px:message="Generating MODS metadata">
+                <p:input port="source">
+                    <p:pipe step="choose-to-merge-dtbook-files" port="result"/>
+                </p:input>
+            </px:dtbook-to-mods-meta>
+            <p:choose px:progress="1/2">
+                <p:when test="$validation='abort' or ($validation='report' and $dtbook-is-valid)">
+                    <!-- DTBook is valid, so we expect the resulting MODS document to be valid too,
+                         otherwise we made a coding error -->
+                    <p:try>
+                        <p:group>
+                            <px:validate-mods/>
+                        </p:group>
+                        <p:catch name="catch">
+                            <px:log-error severity="DEBUG">
+                                <p:input port="error">
+                                    <p:pipe step="catch" port="error"/>
+                                </p:input>
+                            </px:log-error>
+                            <px:error code="BUG" message="An unexpected error happened. Please contact maintainer."/>
+                        </p:catch>
+                    </p:try>
+                </p:when>
+                <p:otherwise>
+                    <!-- reporting validation issues in intermediary documents is not helpful for user -->
+                    <p:identity/>
+                </p:otherwise>
+            </p:choose>
+            <px:set-base-uri>
+                <p:with-option name="base-uri" select="$mods-file"/>
+            </px:set-base-uri>
+            <p:add-xml-base/>
         </p:otherwise>
     </p:choose>
-    <px:set-base-uri>
-        <p:with-option name="base-uri" select="$mods-file"/>
-    </px:set-base-uri>
-    <p:add-xml-base name="generate-mods-metadata"/>
+    <p:identity name="mods-metadata"/>
     <p:sink/>
 
     <p:documentation>Generate ZedAI metadata</p:documentation>
@@ -498,7 +517,7 @@
         </p:input>
     </px:dtbook-to-zedai-meta>
 
-    <p:group name="insert-zedai-meta">
+    <p:group>
         <p:output port="result"/>
         <p:documentation>Insert metadata into the head of ZedAI</p:documentation>
         <p:insert match="/z:document/z:head" position="last-child">
@@ -513,32 +532,38 @@
         <p:uuid match="/z:document/z:head//z:meta[@property='dc:identifier']/@content"/>
     </p:group>
 
-    <p:documentation>Create a meta element for the MODS file reference</p:documentation>
-    <p:string-replace match="//z:meta/@resource | //z:meta/@about" name="create-mods-ref-meta">
-        <p:input port="source">
-            <p:inline>
-                <meta rel="z3998:meta-record" resource="@@"
-                    xmlns="http://www.daisy.org/ns/z3998/authoring/">
-                    <meta property="z3998:meta-record-type" about="@@" content="z3998:mods"
-                        xmlns="http://www.daisy.org/ns/z3998/authoring/"/>
-                    <meta property="z3998:meta-record-version" about="@@" content="3.3"
-                        xmlns="http://www.daisy.org/ns/z3998/authoring/"/>
-                </meta>
-            </p:inline>
-        </p:input>
-        <p:with-option name="replace" select="concat('&quot;',$mods-filename,'&quot;')"/>
-    </p:string-replace>
-
-    <p:documentation>Insert the MODS file reference metadata into the head of
-        ZedAI</p:documentation>
-    <p:insert match="//z:head" position="first-child">
-        <p:input port="source">
-            <p:pipe port="result" step="insert-zedai-meta"/>
-        </p:input>
-        <p:input port="insertion">
-            <p:pipe port="result" step="create-mods-ref-meta"/>
-        </p:input>
-    </p:insert>
+    <p:documentation>Create a meta element for the MODS file reference and insert it into the head
+    of the ZedAI</p:documentation>
+    <p:choose>
+        <p:when test="$nimas">
+            <!-- no MODS file was generated -->
+            <p:identity/>
+        </p:when>
+        <p:otherwise>
+            <p:identity name="zedai"/>
+            <p:sink/>
+            <p:string-replace match="//z:meta/@resource | //z:meta/@about" name="mods-ref-meta">
+                <p:input port="source">
+                    <p:inline>
+                        <meta rel="z3998:meta-record" resource="@@" xmlns="http://www.daisy.org/ns/z3998/authoring/">
+                            <meta property="z3998:meta-record-type" about="@@" content="z3998:mods" xmlns="http://www.daisy.org/ns/z3998/authoring/"/>
+                            <meta property="z3998:meta-record-version" about="@@" content="3.3" xmlns="http://www.daisy.org/ns/z3998/authoring/"/>
+                        </meta>
+                    </p:inline>
+                </p:input>
+                <p:with-option name="replace" select="concat('&quot;',$mods-filename,'&quot;')"/>
+            </p:string-replace>
+            <p:sink/>
+            <p:insert match="//z:head" position="first-child">
+                <p:input port="source">
+                    <p:pipe step="zedai" port="result"/>
+                </p:input>
+                <p:input port="insertion">
+                    <p:pipe step="mods-ref-meta" port="result"/>
+                </p:input>
+            </p:insert>
+        </p:otherwise>
+    </p:choose>
 
     <!-- unwrap the meta list that was wrapped with tmp:wrapper -->
     <p:unwrap name="unwrap-meta-list" match="//z:head/tmp:wrapper"/>
@@ -715,15 +740,30 @@
                 </p:identity>
             </p:otherwise>
         </p:choose>
+        <p:sink/>
 
         <p:documentation>Add the MODS document to the fileset.</p:documentation>
-        <px:fileset-create>
-            <p:with-option name="base" select="$output-dir-with-slash"/>
-        </px:fileset-create>
-        <px:fileset-add-entry name="result.fileset.mods">
-            <p:with-option name="href" select="$mods-file"/>
-            <p:with-option name="media-type" select="'application/mods+xml'"/>
-        </px:fileset-add-entry>
+        <p:choose>
+            <p:when test="$nimas">
+                <!-- no MODS file was generated -->
+                <p:identity>
+                    <p:input port="source">
+                        <p:empty/>
+                    </p:input>
+                </p:identity>
+            </p:when>
+            <p:otherwise>
+                <px:fileset-create>
+                    <p:with-option name="base" select="$output-dir-with-slash"/>
+                </px:fileset-create>
+                <px:fileset-add-entry>
+                    <p:with-option name="href" select="$mods-file"/>
+                    <p:with-option name="media-type" select="'application/mods+xml'"/>
+                </px:fileset-add-entry>
+            </p:otherwise>
+        </p:choose>
+        <p:identity name="result.fileset.mods"/>
+        <p:sink/>
 
         <px:fileset-join>
             <p:documentation>This normalizes the fileset</p:documentation>
@@ -731,7 +771,7 @@
                 <p:pipe port="result.fileset" step="result.fileset.zedai"/>
                 <p:pipe port="result" step="result.fileset.resources"/>
                 <p:pipe port="result" step="result.fileset.generated-css"/>
-                <p:pipe port="result.fileset" step="result.fileset.mods"/>
+                <p:pipe step="result.fileset.mods" port="result"/>
             </p:input>
         </px:fileset-join>
         <p:documentation>Determine the media type of files</p:documentation>
@@ -750,7 +790,7 @@
         <p:iteration-source>
             <p:pipe port="result" step="result.zedai"/>
             <p:pipe port="result" step="generate-css"/>
-            <p:pipe step="generate-mods-metadata" port="result"/>
+            <p:pipe step="mods-metadata" port="result"/>
         </p:iteration-source>
         <p:variable name="in-memory-base" select="pf:normalize-uri(resolve-uri(base-uri(/*)))"/>
         <p:variable name="fileset-base" select="base-uri(/*)">

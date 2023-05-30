@@ -64,6 +64,10 @@
            (incomplete) EPUB 3 publication-->
     </p:output>
 
+    <p:option name="nimas" select="'false'">
+      <!-- defined in ../../../../../common-options.xpl -->
+    </p:option>
+
     <p:input port="tts-config">
       <!-- defined in ../../../../../common-options.xpl -->
       <p:inline><d:config/></p:inline>
@@ -107,6 +111,7 @@
 	<p:pipe step="main" port="source"/>
       </p:input>
       <p:with-option name="validation" select="not($validation='off')"/>
+      <p:with-option name="nimas" select="$nimas='true'"/>
       <!-- assume MathML 3.0 -->
     </px:dtbook-load>
 
@@ -180,6 +185,7 @@
 	    <p:with-option name="language" select="$language"/>
 	    <p:with-option name="validation" select="$validation"/>
 	    <p:with-option name="dtbook-is-valid" select="$dtbook-is-valid"/>
+	    <p:with-option name="nimas" select="$nimas='true'"/>
 	    <p:with-option name="chunk-size" xmlns:_="dtbook" select="$_:chunk-size"/>
 	    <p:with-option name="output-name" select="$output-name"/>
 	    <p:with-option name="output-dir" select="$output-dir-uri"/>

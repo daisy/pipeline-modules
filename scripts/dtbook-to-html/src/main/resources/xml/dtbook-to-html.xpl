@@ -34,6 +34,10 @@
         </p:documentation>
     </p:option>
 
+    <p:option name="nimas" select="'false'">
+        <!-- defined in ../../../../../common-options.xpl -->
+    </p:option>
+
     <p:option name="validation" select="'abort'">
         <!-- defined in ../../../../../common-options.xpl -->
     </p:option>
@@ -86,6 +90,7 @@
 
     <px:dtbook-load name="load" px:progress=".1" px:message="Loading DTBook">
         <p:with-option name="validation" select="not($validation='off')"/>
+        <p:with-option name="nimas" select="$nimas='true'"/>
         <!-- assume MathML 3.0 -->
     </px:dtbook-load>
     <p:sink/>
@@ -148,6 +153,7 @@
                     <p:with-option name="language" select="$language"/>
                     <p:with-option name="validation" select="$validation"/>
                     <p:with-option name="dtbook-is-valid" select="$dtbook-is-valid"/>
+                    <p:with-option name="nimas" select="$nimas='true'"/>
                     <p:with-option name="chunk-size" xmlns:_="dtbook" select="$_:chunk-size"/>
                     <p:with-option name="output-dir" select="$output-dir-uri"/>
                     <p:with-option name="temp-dir" select="pf:normalize-uri(concat($temp-dir,'/'))"/>

@@ -37,6 +37,11 @@
 			<p>Whether the input is a valid DTBook.</p>
 		</p:documentation>
 	</p:option>
+	<p:option name="nimas" cx:as="xs:boolean" select="false()">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p>Whether the input is NIMAS.</p>
+		</p:documentation>
+	</p:option>
 	<p:option name="chunk" required="false" select="'false'"/>
 	<p:option name="chunk-size" required="false" select="'-1'"/>
 	<p:option name="filename" required="true"/>
@@ -72,6 +77,7 @@
 		<p:with-option name="output-validation" select="if ($validation='abort') then 'abort'
 		                                                else if ($validation='report' and $dtbook-is-valid) then 'abort'
 		                                                else 'off'"/>
+		<p:with-option name="nimas" select="$nimas"/>
 	</px:dtbook-to-zedai>
 
 	<px:zedai-to-html name="to-html" px:message="Converting ZedAI to XHTML 5" px:progress="1/2">

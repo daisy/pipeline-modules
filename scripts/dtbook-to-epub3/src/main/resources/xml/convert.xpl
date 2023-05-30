@@ -34,6 +34,11 @@
 			<p>Whether the input is a valid DTBook.</p>
 		</p:documentation>
 	</p:option>
+	<p:option name="nimas" cx:as="xs:boolean" select="false()">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p>Whether the input is NIMAS.</p>
+		</p:documentation>
+	</p:option>
 	<p:option name="audio" required="true" cx:as="xs:string"/>
 	<p:option name="audio-file-type" select="'audio/mpeg'">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -112,6 +117,7 @@
 		<p:with-option name="output-validation" select="if ($validation='abort') then 'abort'
 		                                                else if ($validation='report' and $dtbook-is-valid) then 'abort'
 		                                                else 'off'"/>
+		<p:with-option name="nimas" select="$nimas"/>
 	</px:dtbook-to-zedai>
 
 	<!--TODO better handle core media type filtering-->

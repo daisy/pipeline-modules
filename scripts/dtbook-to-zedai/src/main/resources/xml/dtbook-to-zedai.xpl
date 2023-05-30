@@ -51,6 +51,9 @@
     <p:option name="validation" select="'abort'">
         <!-- defined in ../../../../../common-options.xpl -->
     </p:option>
+    <p:option name="nimas" select="'false'">
+        <!-- defined in ../../../../../common-options.xpl -->
+    </p:option>
     <p:output port="validation-report" sequence="true">
         <!-- defined in ../../../../../common-options.xpl -->
         <p:pipe step="load" port="validation-report"/>
@@ -103,6 +106,7 @@
 
     <px:dtbook-load name="load">
         <p:with-option name="validation" select="not($validation='off')"/>
+        <p:with-option name="nimas" select="$nimas='true'"/>
         <!-- assume MathML 3.0 -->
     </px:dtbook-load>
     <p:sink/>
@@ -161,6 +165,7 @@
                 <p:with-option name="validation" select="$validation"/>
                 <p:with-option name="dtbook-is-valid" select="$dtbook-is-valid"/>
                 <p:with-option name="output-validation" select="($validation[.='off'],'report')[1]"/>
+                <p:with-option name="nimas" select="$nimas='true'"/>
                 <p:with-option name="copy-external-resources" select="$copy-external-resources='true'"/>
             </px:dtbook-to-zedai>
 
