@@ -6,7 +6,9 @@
                 xmlns:c="http://www.w3.org/ns/xproc-step"
                 xmlns:cx="http://xmlcalabash.com/ns/extensions"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp"
+                xmlns:svrl="http://purl.oclc.org/dsdl/svrl"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:l="http://xproc.org/library"
                 xmlns:m="http://www.w3.org/1998/Math/MathML"
@@ -50,6 +52,23 @@
         <p:pipe step="if-dtbook-wellformed" port="result"/>
     </p:output>
     
+    <p:option name="report-method" cx:type="port|log|error" select="'port'">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Select the method used for reporting validation issues:</p>
+            <dl>
+                <dt>port</dt>
+                <dd>Issues are reported only on the xml-report and html-report output ports.</dd>
+                <dt>log</dt>
+                <dd>In addition to the xml-report and html-report output ports, issues are also
+                reported through warning messages.</dd>
+                <dt>error</dt>
+                <dd>Issues are reported through error messages and also trigger an XProc
+                error. (Note that an error is always thrown when a DTBook has an unexpected
+                version.)</dd>
+            </dl>
+        </p:documentation>
+    </p:option>
+    
     <p:output port="xml-report" sequence="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h1>XML Reports</h1>
@@ -61,7 +80,7 @@
     <p:output port="html-report" px:media-type="application/vnd.pipeline.report+xml">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h1>HTML Report</h1>
-            <p>An HTML-formatted version of the validation report.</p>
+            <p>A single HTML-formatted version of the validation report.</p>
         </p:documentation>
         <p:pipe step="html-report" port="result"/>
     </p:output>
@@ -103,6 +122,8 @@
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/validation-utils/library.xpl">
         <p:documentation>
+            l:relax-ng-report
+            px:report-errors
             px:check-files-wellformed
             px:combine-validation-reports
             px:validation-status
@@ -213,9 +234,10 @@
                             <p:pipe step="load-dtbook-doc" port="result"/>
                         </p:input>
                     </l:relax-ng-report>
+                    <p:sink/>
                     
                     <!-- see if there was a report generated -->
-                    <p:count name="count-relaxng-report" limit="1">
+                    <p:count limit="1">
                         <p:documentation>RelaxNG validation doesn't always produce a report, so this serves as a
                             test to see if there was a document produced.</p:documentation>
                         <p:input port="source">
@@ -223,22 +245,36 @@
                         </p:input>
                     </p:count>
                     
+                    <!-- possibly report errors as warning messages -->
+                    <p:choose>
+                        <p:when test="/c:result=0">
+                            <p:identity/>
+                        </p:when>
+                        <p:when test="$report-method=('log','error')">
+                            <px:report-errors>
+                                <p:input port="report">
+                                    <p:pipe step="run-relaxng-validation" port="report"/>
+                                </p:input>
+                                <p:with-option name="method" select="$report-method"/>
+                            </px:report-errors>
+                        </p:when>
+                        <p:otherwise>
+                            <p:identity/>
+                        </p:otherwise>
+                    </p:choose>
+                    
                     <!-- if there were no errors, relaxng validation comes up empty. we need to have something to pass around, hence this step -->
                     <p:choose name="get-relaxng-report">
-                        <p:xpath-context>
-                            <p:pipe port="result" step="count-relaxng-report"/>
-                        </p:xpath-context>
-                        <!-- if there was no relaxng report, then put an empty errors list document as output -->
-                        <p:when test="/c:result = '0'">
+                        <p:when test="/c:result=0">
+                            <p:sink/>
                             <p:identity>
                                 <p:input port="source">
-                                    <p:inline>
-                                        <c:errors/>
-                                    </p:inline>
+                                    <p:inline><c:errors/></p:inline>
                                 </p:input>
                             </p:identity>
                         </p:when>
                         <p:otherwise>
+                            <p:sink/>
                             <p:identity>
                                 <p:input port="source">
                                     <p:pipe port="report" step="run-relaxng-validation"/>
@@ -247,61 +283,164 @@
                         </p:otherwise>
                     </p:choose>
                 </p:group>
+                <p:sink/>
                 
-                <p:choose name="choose-schematron">
-                    <p:when test="$nimas">
-                        <p:output port="result"/>
-                        <p:identity name="use-nimas-schematron">
-                            <p:input port="source">
-                                <p:document href="http://www.daisy.org/pipeline/modules/dtbook-utils/schema/dtbook.mathml.nimas.sch"/>
-                            </p:input>
-                        </p:identity>
-                    </p:when>
-                    <p:otherwise>
-                        <p:output port="result"/>
-                        <p:identity name="use-default-schematron">
-                            <p:input port="source">
-                                <p:document href="http://www.daisy.org/pipeline/modules/dtbook-utils/schema/dtbook.mathml.sch"/>
-                            </p:input>
-                        </p:identity>
-                    </p:otherwise>
-                </p:choose>
                 <!-- validate with schematron -->
-                <p:validate-with-schematron assert-valid="false" name="validate-against-schematron">
-                    <p:input port="schema">
-                        <p:pipe port="result" step="choose-schematron"/>
-                    </p:input>
-                    <p:input port="source">
-                        <p:pipe step="load-dtbook-doc" port="result"/>
-                    </p:input>
-                    <p:input port="parameters">
-                        <p:empty/>
-                    </p:input>
-                </p:validate-with-schematron>
+                <p:group name="validate-against-schematron">
+                    <p:output port="report" sequence="true"/>
+                    <p:choose name="choose-schematron">
+                        <p:when test="$nimas">
+                            <p:output port="result"/>
+                            <p:identity name="use-nimas-schematron">
+                                <p:input port="source">
+                                    <p:document href="http://www.daisy.org/pipeline/modules/dtbook-utils/schema/dtbook.mathml.nimas.sch"/>
+                                </p:input>
+                            </p:identity>
+                        </p:when>
+                        <p:otherwise>
+                            <p:output port="result"/>
+                            <p:identity name="use-default-schematron">
+                                <p:input port="source">
+                                    <p:document href="http://www.daisy.org/pipeline/modules/dtbook-utils/schema/dtbook.mathml.sch"/>
+                                </p:input>
+                            </p:identity>
+                        </p:otherwise>
+                    </p:choose>
+                    <p:sink/>
+                    <p:validate-with-schematron assert-valid="false" name="run-schematron-validation">
+                        <p:input port="schema">
+                            <p:pipe port="result" step="choose-schematron"/>
+                        </p:input>
+                        <p:input port="source">
+                            <p:pipe step="load-dtbook-doc" port="result"/>
+                        </p:input>
+                        <p:input port="parameters">
+                            <p:empty/>
+                        </p:input>
+                    </p:validate-with-schematron>
+                    <p:sink/>
+                    <p:identity>
+                        <p:input port="source">
+                            <p:pipe step="run-schematron-validation" port="report"/>
+                        </p:input>
+                    </p:identity>
+                    
+                    <!-- possibly report errors as warning messages -->
+                    <p:choose>
+                        <p:xpath-context>
+                            <p:empty/>
+                        </p:xpath-context>
+                        <p:when test="$report-method=('log','error')">
+                            <p:variable name="errors" select="collection()//(svrl:failed-assert|svrl:successful-report)"/>
+                            <p:choose>
+                                <p:xpath-context>
+                                    <p:empty/>
+                                </p:xpath-context>
+                                <p:when test="count($errors)=0">
+                                    <p:identity/>
+                                </p:when>
+                                <p:otherwise>
+                                    <p:sink/>
+                                    <p:xslt template-name="main" name="errors">
+                                        <p:input port="stylesheet">
+                                            <p:inline>
+                                                <xsl:stylesheet version="2.0" xpath-default-namespace="http://purl.oclc.org/dsdl/svrl">
+                                                    <xsl:param name="errors" as="element()*"/>
+                                                    <xsl:template name="main">
+                                                        <c:errors>
+                                                            <xsl:for-each select="$errors">
+                                                                <c:error>
+                                                                    <xsl:sequence select="normalize-space(string(text))"/>
+                                                                </c:error>
+                                                            </xsl:for-each>
+                                                        </c:errors>
+                                                    </xsl:template>
+                                                </xsl:stylesheet>
+                                            </p:inline>
+                                        </p:input>
+                                        <p:with-param port="parameters" name="errors" select="$errors"/>
+                                        <p:input port="source">
+                                            <p:empty/>
+                                        </p:input>
+                                    </p:xslt>
+                                    <px:report-errors>
+                                        <p:input port="report">
+                                            <p:pipe step="errors" port="result"/>
+                                        </p:input>
+                                        <p:with-option name="method" select="$report-method"/>
+                                    </px:report-errors>
+                                </p:otherwise>
+                            </p:choose>
+                        </p:when>
+                        <p:otherwise>
+                            <p:identity/>
+                        </p:otherwise>
+                    </p:choose>
+                </p:group>
                 <p:sink/>
                 
                 <!-- check images -->
-                <p:choose name="check-images-exist">
-                    <p:when test="$check-images">
-                        <p:output port="result"/>
-                        <pxi:dtbook-validator.check-images>
-                            <p:input port="source">
-                                <p:pipe step="load-dtbook-doc" port="result"/>
-                            </p:input>
-                        </pxi:dtbook-validator.check-images>
-                    </p:when>
-                    <p:otherwise>
-                        <p:output port="result"/>
-                        <p:identity>
-                            <p:input port="source">
-                                <!-- generate an empty document -->
-                                <p:inline>
-                                    <d:errors/>
-                                </p:inline>
-                            </p:input>
-                        </p:identity>
-                    </p:otherwise>
-                </p:choose>
+                <p:group name="check-images-exist">
+                    <p:output port="result"/>
+                    <p:choose>
+                        <p:when test="$check-images">
+                            <pxi:dtbook-validator.check-images name="run-images-check">
+                                <p:input port="source">
+                                    <p:pipe step="load-dtbook-doc" port="result"/>
+                                </p:input>
+                            </pxi:dtbook-validator.check-images>
+                            
+                            <!-- possibly report errors as warning messages -->
+                            <p:choose>
+                                <p:when test="$report-method=('log','error')">
+                                    <p:xslt name="errors">
+                                        <p:input port="stylesheet">
+                                            <p:inline>
+                                                <xsl:stylesheet version="2.0" xpath-default-namespace="http://www.daisy.org/ns/pipeline/data">
+                                                    <xsl:template match="/*">
+                                                        <c:errors>
+                                                            <xsl:for-each select="error">
+                                                                <c:error>
+                                                                    <xsl:value-of select="normalize-space(string(desc))"/>
+                                                                    <xsl:text>: </xsl:text>
+                                                                    <xsl:value-of select="normalize-space(string(file))"/>
+                                                                </c:error>
+                                                            </xsl:for-each>
+                                                        </c:errors>
+                                                    </xsl:template>
+                                                </xsl:stylesheet>
+                                            </p:inline>
+                                        </p:input>
+                                        <p:input port="parameters">
+                                            <p:empty/>
+                                        </p:input>
+                                    </p:xslt>
+                                    <p:sink/>
+                                    <px:report-errors>
+                                        <p:input port="source">
+                                            <p:pipe step="run-images-check" port="result"/>
+                                        </p:input>
+                                        <p:input port="report">
+                                            <p:pipe step="errors" port="result"/>
+                                        </p:input>
+                                        <p:with-option name="method" select="$report-method"/>
+                                    </px:report-errors>
+                                </p:when>
+                                <p:otherwise>
+                                    <p:identity/>
+                                </p:otherwise>
+                            </p:choose>
+                        </p:when>
+                        <p:otherwise>
+                            <p:identity>
+                                <p:input port="source">
+                                    <!-- generate an empty document -->
+                                    <p:inline><d:errors/></p:inline>
+                                </p:input>
+                            </p:identity>
+                        </p:otherwise>
+                    </p:choose>
+                </p:group>
                 <p:sink/>
                 
                 <!-- combine reports-->
@@ -324,25 +463,65 @@
         <p:otherwise>
             <p:output port="result">
                 <!-- we have to put something on this port... -->
-                <p:inline>
-                    <tmp:error/>
-                </p:inline>
+                <p:inline><tmp:error/></p:inline>
             </p:output>
             <p:output port="xml-report" primary="true"/>
-            <px:message message="DTBook Validator: DTBook document is missing or not well-formed">
+            <p:identity>
                 <p:input port="source">
-                    <p:inline>
-                        <p:empty/>
-                    </p:inline>
+                    <p:pipe step="check-dtbook-wellformed" port="report"/>
                 </p:input>
-            </px:message>
+            </p:identity>
+            
+            <!-- possibly report errors as warning messages -->
+            <p:choose>
+                <p:when test="$report-method=('log','error')">
+                    <p:xslt name="errors">
+                        <p:input port="stylesheet">
+                            <p:inline>
+                                <xsl:stylesheet version="2.0" xpath-default-namespace="http://www.daisy.org/ns/pipeline/data">
+                                    <xsl:template match="/*">
+                                        <c:errors>
+                                            <xsl:for-each select="error">
+                                                <c:error>
+                                                    <xsl:value-of select="normalize-space(string(desc))"/>
+                                                    <xsl:text>: </xsl:text>
+                                                    <xsl:value-of select="normalize-space(string(file))"/>
+                                                </c:error>
+                                            </xsl:for-each>
+                                        </c:errors>
+                                    </xsl:template>
+                                </xsl:stylesheet>
+                            </p:inline>
+                        </p:input>
+                        <p:input port="parameters">
+                            <p:empty/>
+                        </p:input>
+                    </p:xslt>
+                    <p:sink/>
+                    <px:report-errors>
+                        <p:input port="source">
+                            <p:pipe step="check-dtbook-wellformed" port="report"/>
+                        </p:input>
+                        <p:input port="report">
+                            <p:pipe step="errors" port="result"/>
+                        </p:input>
+                        <p:with-option name="method" select="$report-method"/>
+                    </px:report-errors>
+                </p:when>
+                <p:otherwise>
+                    <p:identity/>
+                </p:otherwise>
+            </p:choose>
+            <px:message message="DTBook Validator: DTBook document is missing or not well-formed"/>
+            <p:identity name="check-dtbook-wellformed-report"/>
             <p:sink/>
+            
             <px:combine-validation-reports>
                 <p:with-option name="document-name" select="tokenize($base-uri, '/')[last()]"/>
                 <p:with-option name="document-type" select="'N/A'"/>
                 <p:with-option name="document-path" select="$base-uri"/>
                 <p:input port="source">
-                    <p:pipe port="report" step="check-dtbook-wellformed"/>
+                    <p:pipe step="check-dtbook-wellformed-report" port="result"/>
                 </p:input>
             </px:combine-validation-reports>
         </p:otherwise>
