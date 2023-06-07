@@ -110,6 +110,13 @@
             <p>Validate against NIMAS 1.1</p>
         </p:documentation>
     </p:option>
+    <p:option name="skip-schematron" select="false()" cx:as="xs:boolean">
+        <p:documentation>
+            <p>Skip Schematron validation</p>
+            <p>Should not be set when <code>nimas</code> is also set as NIMAS validation happens
+            with Schematron.</p>
+        </p:documentation>
+    </p:option>
     
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
         <p:documentation>
@@ -293,92 +300,105 @@
                 <!-- validate with schematron -->
                 <p:group name="validate-against-schematron">
                     <p:output port="report" sequence="true"/>
-                    <p:choose name="choose-schematron">
-                        <p:when test="$nimas">
-                            <p:output port="result"/>
-                            <p:identity name="use-nimas-schematron">
+                    <p:choose>
+                        <p:when test="$skip-schematron">
+                            <p:output port="report" sequence="true"/>
+                            <p:identity>
                                 <p:input port="source">
-                                    <p:document href="http://www.daisy.org/pipeline/modules/dtbook-utils/schema/dtbook.mathml.nimas.sch"/>
+                                    <p:empty/>
                                 </p:input>
                             </p:identity>
                         </p:when>
                         <p:otherwise>
-                            <p:output port="result"/>
-                            <p:identity name="use-default-schematron">
+                            <p:output port="report" sequence="true"/>
+                            <p:choose name="choose-schematron">
+                                <p:when test="$nimas">
+                                    <p:output port="result"/>
+                                    <p:identity name="use-nimas-schematron">
+                                        <p:input port="source">
+                                            <p:document href="http://www.daisy.org/pipeline/modules/dtbook-utils/schema/dtbook.mathml.nimas.sch"/>
+                                        </p:input>
+                                    </p:identity>
+                                </p:when>
+                                <p:otherwise>
+                                    <p:output port="result"/>
+                                    <p:identity name="use-default-schematron">
+                                        <p:input port="source">
+                                            <p:document href="http://www.daisy.org/pipeline/modules/dtbook-utils/schema/dtbook.mathml.sch"/>
+                                        </p:input>
+                                    </p:identity>
+                                </p:otherwise>
+                            </p:choose>
+                            <p:sink/>
+                            <p:validate-with-schematron assert-valid="false" name="run-schematron-validation">
+                                <p:input port="schema">
+                                    <p:pipe port="result" step="choose-schematron"/>
+                                </p:input>
                                 <p:input port="source">
-                                    <p:document href="http://www.daisy.org/pipeline/modules/dtbook-utils/schema/dtbook.mathml.sch"/>
+                                    <p:pipe step="load-dtbook-doc" port="result"/>
+                                </p:input>
+                                <p:input port="parameters">
+                                    <p:empty/>
+                                </p:input>
+                            </p:validate-with-schematron>
+                            <p:sink/>
+                            <p:identity>
+                                <p:input port="source">
+                                    <p:pipe step="run-schematron-validation" port="report"/>
                                 </p:input>
                             </p:identity>
-                        </p:otherwise>
-                    </p:choose>
-                    <p:sink/>
-                    <p:validate-with-schematron assert-valid="false" name="run-schematron-validation">
-                        <p:input port="schema">
-                            <p:pipe port="result" step="choose-schematron"/>
-                        </p:input>
-                        <p:input port="source">
-                            <p:pipe step="load-dtbook-doc" port="result"/>
-                        </p:input>
-                        <p:input port="parameters">
-                            <p:empty/>
-                        </p:input>
-                    </p:validate-with-schematron>
-                    <p:sink/>
-                    <p:identity>
-                        <p:input port="source">
-                            <p:pipe step="run-schematron-validation" port="report"/>
-                        </p:input>
-                    </p:identity>
-                    
-                    <!-- possibly report errors as warning messages -->
-                    <p:choose>
-                        <p:xpath-context>
-                            <p:empty/>
-                        </p:xpath-context>
-                        <p:when test="$report-method=('log','error')">
-                            <p:variable name="errors" select="collection()//(svrl:failed-assert|svrl:successful-report)"/>
+                            
+                            <!-- possibly report errors as warning messages -->
                             <p:choose>
                                 <p:xpath-context>
                                     <p:empty/>
                                 </p:xpath-context>
-                                <p:when test="count($errors)=0">
-                                    <p:identity/>
+                                <p:when test="$report-method=('log','error')">
+                                    <p:variable name="errors" select="collection()//(svrl:failed-assert|svrl:successful-report)"/>
+                                    <p:choose>
+                                        <p:xpath-context>
+                                            <p:empty/>
+                                        </p:xpath-context>
+                                        <p:when test="count($errors)=0">
+                                            <p:identity/>
+                                        </p:when>
+                                        <p:otherwise>
+                                            <p:sink/>
+                                            <p:xslt template-name="main" name="errors">
+                                                <p:input port="stylesheet">
+                                                    <p:inline>
+                                                        <xsl:stylesheet version="2.0" xpath-default-namespace="http://purl.oclc.org/dsdl/svrl">
+                                                            <xsl:param name="errors" as="element()*"/>
+                                                            <xsl:template name="main">
+                                                                <c:errors>
+                                                                    <xsl:for-each select="$errors">
+                                                                        <c:error>
+                                                                            <xsl:sequence select="normalize-space(string(text))"/>
+                                                                        </c:error>
+                                                                    </xsl:for-each>
+                                                                </c:errors>
+                                                            </xsl:template>
+                                                        </xsl:stylesheet>
+                                                    </p:inline>
+                                                </p:input>
+                                                <p:with-param port="parameters" name="errors" select="$errors"/>
+                                                <p:input port="source">
+                                                    <p:empty/>
+                                                </p:input>
+                                            </p:xslt>
+                                            <px:report-errors>
+                                                <p:input port="report">
+                                                    <p:pipe step="errors" port="result"/>
+                                                </p:input>
+                                                <p:with-option name="method" select="$report-method"/>
+                                            </px:report-errors>
+                                        </p:otherwise>
+                                    </p:choose>
                                 </p:when>
                                 <p:otherwise>
-                                    <p:sink/>
-                                    <p:xslt template-name="main" name="errors">
-                                        <p:input port="stylesheet">
-                                            <p:inline>
-                                                <xsl:stylesheet version="2.0" xpath-default-namespace="http://purl.oclc.org/dsdl/svrl">
-                                                    <xsl:param name="errors" as="element()*"/>
-                                                    <xsl:template name="main">
-                                                        <c:errors>
-                                                            <xsl:for-each select="$errors">
-                                                                <c:error>
-                                                                    <xsl:sequence select="normalize-space(string(text))"/>
-                                                                </c:error>
-                                                            </xsl:for-each>
-                                                        </c:errors>
-                                                    </xsl:template>
-                                                </xsl:stylesheet>
-                                            </p:inline>
-                                        </p:input>
-                                        <p:with-param port="parameters" name="errors" select="$errors"/>
-                                        <p:input port="source">
-                                            <p:empty/>
-                                        </p:input>
-                                    </p:xslt>
-                                    <px:report-errors>
-                                        <p:input port="report">
-                                            <p:pipe step="errors" port="result"/>
-                                        </p:input>
-                                        <p:with-option name="method" select="$report-method"/>
-                                    </px:report-errors>
+                                    <p:identity/>
                                 </p:otherwise>
                             </p:choose>
-                        </p:when>
-                        <p:otherwise>
-                            <p:identity/>
                         </p:otherwise>
                     </p:choose>
                 </p:group>

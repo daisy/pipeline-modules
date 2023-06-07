@@ -162,6 +162,20 @@
                 </x:document>
             </x:expect>
         </x:scenario>
+        <x:scenario label="skip-schematron">
+            <x:call>
+                <x:option name="report-method" select="'error'"/>
+                <x:option name="skip-schematron" select="true()"/>
+            </x:call>
+            <x:context label="the validation-status port">
+                <x:document type="port" port="validation-status"/>
+            </x:context>
+            <x:expect label="the validation should succeed" type="compare">
+                <x:document type="inline">
+                    <d:validation-status result="ok"/>
+                </x:document>
+            </x:expect>
+        </x:scenario>
     </x:scenario>
 
 </x:description>
