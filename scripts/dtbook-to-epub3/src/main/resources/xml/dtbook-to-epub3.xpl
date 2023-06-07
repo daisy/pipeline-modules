@@ -102,7 +102,7 @@
       </p:documentation>
     </cx:import>
 
-    <px:dtbook-load name="load">
+    <px:dtbook-load name="load" px:progress=".1" px:message="Loading DTBook">
       <p:input port="source">
 	<p:pipe step="main" port="source"/>
       </p:input>
@@ -132,7 +132,7 @@
 	<p:identity/>
       </p:otherwise>
     </p:choose>
-    <p:choose name="result">
+    <p:choose name="result" px:progress=".9">
       <p:when test="/d:validation-status[@result='error'] and $validation='abort'">
 	<p:output port="status" primary="true"/>
         <p:output port="tts-log" sequence="true">
@@ -155,7 +155,7 @@
 	    <p:pipe step="main" port="source"/>
 	  </p:input>
 	</p:split-sequence>
-	<p:group name="convert-and-store">
+	<p:group name="convert-and-store" px:progress="1">
           <p:output port="status" primary="true"/>
 	  <p:output port="tts-log" sequence="true">
 	    <p:pipe step="convert" port="tts-log"/>
@@ -165,7 +165,7 @@
 	  <p:variable name="epub-file-uri" select="concat($output-dir-uri,$output-name,'.epub')"/>
 	  <p:sink/>
 
-	  <px:dtbook-to-epub3 name="convert">
+	  <px:dtbook-to-epub3 name="convert" px:progress="8/9">
 	    <p:input port="source.fileset">
 	      <p:pipe step="load" port="result.fileset"/>
 	    </p:input>
@@ -186,7 +186,7 @@
 	    <p:with-option name="temp-dir" select="$temp-dir"/>
 	  </px:dtbook-to-epub3>
 
-	  <px:epub3-store name="store">
+	  <px:epub3-store name="store" px:progress="1/9" px:message="Storing EPUB 3">
 	    <p:input port="in-memory.in">
 	      <p:pipe step="convert" port="result.in-memory"/>
 	    </p:input>

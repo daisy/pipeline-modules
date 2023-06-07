@@ -68,7 +68,7 @@
 	</p:import>
 
 	<!-- CSS inlining -->
-	<p:choose>
+	<p:choose px:progress=".1">
 		<p:when test="$audio = 'true'">
 			<px:css-speech-cascade content-type="application/x-dtbook+xml" name="cascade">
 				<p:input port="source.in-memory">
@@ -96,7 +96,7 @@
 	<p:identity name="dtbook-with-css"/>
 	<p:sink/>
 	
-	<px:dtbook-to-zedai name="dtbook-to-zedai">
+	<px:dtbook-to-zedai name="dtbook-to-zedai" px:message="Converting DTBook to ZedAI" px:progress="4/10">
 		<p:input port="source.fileset">
 			<p:pipe step="main" port="source.fileset"/>
 		</p:input>
@@ -121,7 +121,7 @@
 	                                         'image/svg+xml','application/pls+xml',
 	                                         'audio/mpeg','audio/mp4','text/javascript'))]"/>
 
-	<px:zedai-to-epub3 name="zedai-to-epub3" process-css="false">
+	<px:zedai-to-epub3 name="zedai-to-epub3" process-css="false" px:message="Converting ZedAI to EPUB 3" px:progress="5/10">
 		<p:input port="in-memory.in">
 			<p:pipe step="dtbook-to-zedai" port="result.in-memory"/>
 		</p:input>

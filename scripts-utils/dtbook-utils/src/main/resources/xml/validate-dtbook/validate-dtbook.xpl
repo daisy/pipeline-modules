@@ -177,7 +177,7 @@
     <!-- ***************************************************** -->
     
     <px:fileset-filter media-types="application/x-dtbook+xml"/>
-    <px:check-files-wellformed px:message="DTBook validator: Checking that DTBook document exists and is well-formed"
+    <px:check-files-wellformed px:message="Checking that DTBook document exists and is well-formed"
                                name="check-dtbook-wellformed">
         <p:input port="source.in-memory">
             <p:pipe step="main" port="source.in-memory"/>
@@ -241,9 +241,7 @@
                     <p:with-option name="test" select="$dtbook-version=('2005-1','2005-2','2005-3','1.1.0')"/>
                     <p:with-option name="param1" select="$dtbook-version"/>
                 </px:assert>
-                <px:message>
-                    <p:with-option name="message" select="concat('DTBook Validator: Validating document: ', $base-uri)"/>
-                </px:message>
+                <p:identity px:message="Validating document: {$base-uri}"/>
                 
                 <!-- fetch the appropriate RNG schema -->
                 <px:dtbook-validator.select-schema name="select-rng-schema">
@@ -558,7 +556,7 @@
                     <p:identity/>
                 </p:otherwise>
             </p:choose>
-            <px:message message="DTBook Validator: DTBook document is missing or not well-formed"/>
+            <px:message message="DTBook document is missing or not well-formed"/>
             <p:identity name="check-dtbook-wellformed-report"/>
             <p:sink/>
             

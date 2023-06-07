@@ -189,7 +189,7 @@
             </p:output>
             <p:sink/>
         </p:when>
-        <p:otherwise>
+        <p:otherwise px:message="Validating DTBook">
             <p:output port="status" primary="true"/>
             <p:output port="report" sequence="true">
                 <p:pipe step="each" port="report"/>

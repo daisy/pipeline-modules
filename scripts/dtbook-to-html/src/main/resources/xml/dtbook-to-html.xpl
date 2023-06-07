@@ -84,7 +84,7 @@
         </p:documentation>
     </cx:import>
 
-    <px:dtbook-load name="load">
+    <px:dtbook-load name="load" px:progress=".1" px:message="Loading DTBook">
         <p:with-option name="validation" select="not($validation='off')"/>
         <!-- assume MathML 3.0 -->
     </px:dtbook-load>
@@ -112,7 +112,7 @@
             <p:identity/>
         </p:otherwise>
     </p:choose>
-    <p:choose name="result">
+    <p:choose name="result" px:progress=".9">
         <p:when test="/d:validation-status[@result='error'] and $validation='abort'">
             <p:output port="status"/>
             <p:identity/>
@@ -129,7 +129,7 @@
                     <p:pipe step="main" port="source"/>
                 </p:input>
             </p:split-sequence>
-            <p:group>
+            <p:group px:progress="1">
             <!--<p:variable name="encoded-title" select="encode-for-uri(replace(//dtbook:meta[@name='dc:Title']/@content,'[/\\?%*:|&quot;&lt;&gt;]',''))"/>-->
             <!--<p:variable name="encoded-title" select="'book'"/>-->
                 <p:variable name="encoded-title"
@@ -138,7 +138,7 @@
                 <p:variable name="html-file-uri" select="concat($output-dir-uri,$encoded-title,'.epub')"/>
                 <p:sink/>
 
-                <px:dtbook-to-html name="convert">
+                <px:dtbook-to-html name="convert" px:progress="8/9">
                     <p:input port="source.fileset">
                         <p:pipe step="load" port="result.fileset"/>
                     </p:input>
@@ -154,7 +154,7 @@
                     <p:with-option name="filename" select="$encoded-title"/>
                 </px:dtbook-to-html>
 
-                <px:fileset-store name="store">
+                <px:fileset-store name="store" px:progress="1/9" px:message="Storing HTML">
                     <p:input port="in-memory.in">
                         <p:pipe step="convert" port="result.in-memory"/>
                     </p:input>

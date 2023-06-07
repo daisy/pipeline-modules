@@ -356,7 +356,7 @@
     <!-- =============================================================== -->
 
     <p:documentation>Convert DTBook 2005-3 to ZedAI</p:documentation>
-    <pxi:dtbook2005-3-to-zedai name="transform-to-zedai" px:progress="5/23"/>
+    <pxi:dtbook2005-3-to-zedai name="transform-to-zedai" px:progress="5/23" px:message="Converting DTBook 2005-3 to ZedAI"/>
 
     <!-- =============================================================== -->
     <!-- CSS -->
