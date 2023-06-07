@@ -48,8 +48,8 @@
     
     <p:output port="result" primary="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h1>Copy of input document</h1>
-            <p>A copy of the input document; may include PSVI annotations.</p>
+            <h1>The DTBook document, or a dummy <code>tmp:error</code> document if the input does
+            not contain a DTBook or it is not well-formed.</h1>
         </p:documentation>
         <p:pipe step="if-dtbook-wellformed" port="result"/>
     </p:output>
@@ -117,6 +117,12 @@
             with Schematron.</p>
         </p:documentation>
     </p:option>
+    <p:option name="allow-aural-css-attributes" select="false()" cx:as="xs:boolean">
+        <p:documentation>
+            <p>Whether the input contains aural CSS attributes (attributes with namespace
+            "http://www.daisy.org/ns/pipeline/tts").</p>
+        </p:documentation>
+    </p:option>
     
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
         <p:documentation>
@@ -137,6 +143,11 @@
             px:combine-validation-reports
             px:validation-status
             px:validation-report-to-html
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/css-speech/library.xpl">
+        <p:documentation>
+            px:css-speech-clean
         </p:documentation>
     </p:import>
     <p:import href="dtbook-validator.check-images.xpl">
@@ -185,7 +196,7 @@
         <p:when test="d:validation-status/@result = 'ok'">
 
             <p:output port="result">
-                <p:pipe step="wellformed-dtbook" port="result"/>
+                <p:pipe step="load-dtbook-doc" port="result"/>
             </p:output>
             <p:output port="xml-report" primary="true"/>
             
@@ -199,10 +210,19 @@
                 </p:input>
             </px:fileset-load>
             
-            <p:group name="wellformed-dtbook">
-                <p:output port="result">
-                    <p:pipe step="validate-against-relaxng" port="copy-of-document"/>
-                </p:output>
+            <p:choose>
+                <p:when test="$allow-aural-css-attributes">
+                    <px:css-speech-clean>
+                        <p:documentation>Remove aural CSS attributes before validation</p:documentation>
+                    </px:css-speech-clean>
+                </p:when>
+                <p:otherwise>
+                    <p:identity/>
+                </p:otherwise>
+            </p:choose>
+
+            <p:identity name="wellformed-dtbook"/>
+            <p:group>
                 <p:output port="xml-report" primary="true"/>
                 
                 <p:variable name="dtbook-version" select="*/@version"/>
@@ -234,16 +254,14 @@
                 
                 <p:group name="validate-against-relaxng">
                     <p:output port="result" primary="true"/>
-                    <p:output port="copy-of-document">
-                        <p:pipe port="result" step="run-relaxng-validation"/>
-                    </p:output>
+                    
                     <!-- validate with RNG -->
                     <l:relax-ng-report name="run-relaxng-validation" assert-valid="false">
                         <p:input port="schema">
                             <p:pipe port="result" step="select-rng-schema"/>
                         </p:input>
                         <p:input port="source">
-                            <p:pipe step="load-dtbook-doc" port="result"/>
+                            <p:pipe step="wellformed-dtbook" port="result"/>
                         </p:input>
                     </l:relax-ng-report>
                     <p:sink/>
@@ -335,7 +353,7 @@
                                     <p:pipe port="result" step="choose-schematron"/>
                                 </p:input>
                                 <p:input port="source">
-                                    <p:pipe step="load-dtbook-doc" port="result"/>
+                                    <p:pipe step="wellformed-dtbook" port="result"/>
                                 </p:input>
                                 <p:input port="parameters">
                                     <p:empty/>
