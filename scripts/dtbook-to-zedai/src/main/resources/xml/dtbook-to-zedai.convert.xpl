@@ -145,11 +145,6 @@
             px:mediatype-detect
         </p:documentation>
     </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/css-speech/library.xpl">
-        <p:documentation>
-            px:css-speech-clean
-        </p:documentation>
-    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
         <p:documentation>
             px:set-base-uri
@@ -561,13 +556,9 @@
             <!-- DTBook is valid, so we expect the resulting ZedAI document to be valid too,
                  otherwise we made a coding error -->
             <p:output port="result"/>
-            <p:identity name="zedai"/>
-            <px:css-speech-clean px:progress="1/3">
-                <p:documentation>Remove the Aural CSS attributes before validation</p:documentation>
-            </px:css-speech-clean>
-            <p:try px:progress="2/3" name="validate">
+            <p:try px:progress="1">
                 <p:group>
-                    <px:zedai-validate report-method="error" px:progress="1"/>
+                    <px:zedai-validate allow-aural-css-attributes="true" report-method="error" px:progress="1"/>
                 </p:group>
                 <p:catch name="catch">
                     <px:log-error severity="DEBUG">
@@ -578,26 +569,10 @@
                     <px:error code="BUG" message="An unexpected error happened. Please contact maintainer."/>
                 </p:catch>
             </p:try>
-            <p:sink/>
-            <p:identity cx:depends-on="validate">
-                <p:input port="source">
-                    <p:pipe step="zedai" port="result"/>
-                </p:input>
-            </p:identity>
         </p:when>
         <p:when test="$validation='report'" px:message="Validating ZedAI">
             <p:output port="result"/>
-            <p:identity name="zedai"/>
-            <px:css-speech-clean px:progress="1/3">
-                <p:documentation>Remove the Aural CSS attributes before validation</p:documentation>
-            </px:css-speech-clean>
-            <px:zedai-validate report-method="log" px:progress="2/3" name="validate"/>
-            <p:sink/>
-            <p:identity cx:depends-on="validate">
-                <p:input port="source">
-                    <p:pipe step="zedai" port="result"/>
-                </p:input>
-            </p:identity>
+            <px:zedai-validate allow-aural-css-attributes="true" report-method="log" px:progress="1"/>
         </p:when>
         <p:otherwise>
             <p:output port="result"/>
