@@ -25,9 +25,9 @@
     <p:pipe step="load" port="result"/>
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
       <p>The filtered and loaded fileset.</p>
-      <p>All files are loaded into memory, unless if the "load-if-not-in-memory" option is set, then
-      the "result" port will only contain documents that were already present in the "in-memory"
-      input.</p>
+      <p>Files are loaded into memory, unless a file can not be loaded and the
+      "fail-on-not-found" option is not set, or a file is not already loaded in memory and the
+      "load-if-not-in-memory" option is set to <code>false</code>.</p>
       <p>The fileset ("xml:base" and "href" attributes and base URIs of documents) is normalized.</p>
       <p>"original-href" attributes are removed from the manifest.</p>
     </p:documentation>
@@ -290,21 +290,9 @@
 
                   <!-- Force XML -->
                   <p:when test="$method='xml'">
-                    <p:try>
-                      <p:group>
-                        <p:load>
+                      <p:load>
                           <p:with-option name="href" select="$href-maybe-in-zip"/>
-                        </p:load>
-                      </p:group>
-                      <p:catch>
-                        <px:message severity="WARN">
-                          <p:input port="source">
-                            <p:empty/>
-                          </p:input>
-                          <p:with-option name="message" select="concat('unable to load ',$href,' as XML')"/>
-                        </px:message>
-                      </p:catch>
-                    </p:try>
+                      </p:load>
                   </p:when>
 
                   <!-- Force text -->

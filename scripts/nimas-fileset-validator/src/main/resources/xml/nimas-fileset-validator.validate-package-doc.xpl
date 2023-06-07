@@ -176,12 +176,7 @@
             </p:input>
         </pxi:nimas-fileset-validator.fileset-filter>
         <px:check-files-exist name="check-pdfs-exist"/>
-        <!-- we're only using the report port-->
-        <p:sink>
-            <p:input port="source">
-                <p:pipe port="result" step="check-pdfs-exist"/>
-            </p:input>
-        </p:sink>
+        <p:sink/>
     </p:group>
     <p:sink/>
     

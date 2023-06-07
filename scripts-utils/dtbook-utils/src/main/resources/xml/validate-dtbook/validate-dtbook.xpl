@@ -38,8 +38,10 @@
     <p:input port="source.fileset" primary="true"/>
     <p:input port="source.in-memory" sequence="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <p>Single DTBook file to validate</p>
-            <p>Should not include referenced resources</p>
+            <p>Input fileset</p>
+            <p>Should contain a single DTBook file.</p>
+            <p>May contain referenced images, but if it doesn't and images are stored on disk the
+            validator will find them too.</p>
         </p:documentation>
         <p:empty/>
     </p:input>
@@ -151,15 +153,17 @@
     <px:fileset-rebase>
         <p:with-option name="new-base" select="$base-uri"/>
     </px:fileset-rebase>
-    <p:identity name="source.fileset"/>
     
     <!-- ***************************************************** -->
     <!-- VALIDATION STEPS -->
     <!-- ***************************************************** -->
     
+    <px:fileset-filter media-types="application/x-dtbook+xml"/>
     <px:check-files-wellformed px:message="DTBook validator: Checking that DTBook document exists and is well-formed"
                                name="check-dtbook-wellformed">
-        <!-- FIXME: don't ignore source.in-memory (px:check-files-wellformed assumes files exist on disk) -->
+        <p:input port="source.in-memory">
+            <p:pipe step="main" port="source.in-memory"/>
+        </p:input>
     </px:check-files-wellformed>
     
     <p:identity>
@@ -180,10 +184,11 @@
             
             <px:fileset-load media-types="application/x-dtbook+xml" name="load-dtbook-doc">
                 <p:input port="fileset">
-                    <p:pipe step="source.fileset" port="result"/>
+                    <p:pipe step="main" port="source.fileset"/>
                 </p:input>
                 <p:input port="in-memory">
                     <p:pipe step="main" port="source.in-memory"/>
+                    <p:pipe step="check-dtbook-wellformed" port="result.in-memory"/>
                 </p:input>
             </px:fileset-load>
             
@@ -385,8 +390,11 @@
                     <p:choose>
                         <p:when test="$check-images">
                             <pxi:dtbook-validator.check-images name="run-images-check">
-                                <p:input port="source">
-                                    <p:pipe step="load-dtbook-doc" port="result"/>
+                                <p:input port="source.fileset">
+                                    <p:pipe step="load-dtbook-doc" port="unfiltered.fileset"/>
+                                </p:input>
+                                <p:input port="source.in-memory">
+                                    <p:pipe step="load-dtbook-doc" port="unfiltered.in-memory"/>
                                 </p:input>
                             </pxi:dtbook-validator.check-images>
                             
