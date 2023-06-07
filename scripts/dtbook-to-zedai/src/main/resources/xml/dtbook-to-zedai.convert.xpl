@@ -85,12 +85,18 @@
     <p:option name="validation" cx:type="off|report|abort" select="'abort'">
         <p:documentation>
             Whether to stop processing and raise an error on validation issues (abort), only report
-            them (report), or to ignore any validation issues (off).
+            them (report), or to ignore any validation issues (off). If validation is enabled and
+            the input DTBook is valid, processing will stop on any invalid intermediary result.
         </p:documentation>
     </p:option>
     <p:option name="copy-external-resources" cx:as="xs:boolean" select="true()">
         <p:documentation>
             Whether or not to include any referenced external resources like images and CSS-files in the output.
+        </p:documentation>
+    </p:option>
+    <p:option name="dtbook-is-valid" cx:as="xs:boolean" select="true()">
+        <p:documentation>
+            Whether the input is a valid DTBook.
         </p:documentation>
     </p:option>
 
@@ -111,10 +117,10 @@
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/dtbook-utils/library.xpl">
         <p:documentation>
+            px:dtbook-validate
             px:dtbook-to-mods-meta
             px:dtbook-upgrade
             px:dtbook-merge
-            px:dtbook-validator.select-schema
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/zedai-utils/library.xpl">
@@ -136,12 +142,6 @@
     <p:import href="http://www.daisy.org/pipeline/modules/mediatype-utils/library.xpl">
         <p:documentation>
             px:mediatype-detect
-        </p:documentation>
-    </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/validation-utils/library.xpl">
-        <p:documentation>
-            l:relax-ng-report
-            px:report-errors
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/css-speech/library.xpl">
@@ -205,69 +205,79 @@
     <!-- VALIDATE -->
     <!-- =============================================================== -->
     <p:documentation>Validate the DTBook input (after the upgrade)</p:documentation>
-    <p:group px:progress="3/23">
-        <p:choose px:progress="1">
-            <p:xpath-context>
-                <p:empty/>
-            </p:xpath-context>
-            <p:when test="$validation=('abort','report')" px:message="Validating DTBook">
-                <p:for-each name="validate-each" px:progress="1">
-                    <px:css-speech-clean px:progress="1/3">
-                        <p:documentation>Remove the Aural CSS attributes before validation</p:documentation>
-                    </px:css-speech-clean>
-                    <!--
-                        Note that we could also use px:dtbook-validate and output a HTML report
-                        instead of reporting issues as log messages or raise an XProc error. This
-                        would complicate the code a bit however and it is not really needed to do a
-                        full validation if the calling step has already performed validation of the
-                        input, which ideally is the case.
-                    -->
-                    <l:relax-ng-report name="validate" px:progress="1/3">
-                        <p:input port="schema">
-                            <p:pipe port="result" step="dtbook-schema"/>
-                        </p:input>
-                    </l:relax-ng-report>
-                    <px:report-errors px:progress="1/3">
-                        <p:input port="report">
-                            <p:pipe step="validate" port="report"/>
-                        </p:input>
-                        <p:with-option name="method" select="if ($validation='abort') then 'error' else 'log'"/>
-                    </px:report-errors>
-                </p:for-each>
+    <p:choose px:progress="3/23">
+        <p:xpath-context>
+            <p:empty/>
+        </p:xpath-context>
+        <p:when test="$validation='abort' or ($validation='report' and $dtbook-is-valid)" px:message="Validating DTBook">
+            <p:for-each name="each" px:progress="1">
+                <px:css-speech-clean px:progress="1/3">
+                    <p:documentation>Remove the Aural CSS attributes before validation</p:documentation>
+                </px:css-speech-clean>
+                <p:identity name="dtbook"/>
                 <p:sink/>
-                <p:identity cx:depends-on="validate-each">
-                    <p:input port="source">
-                        <p:pipe step="upgrade-dtbook" port="result"/>
+                <px:fileset-add-entry media-type="application/x-dtbook+xml" name="dtbook-fileset">
+                    <p:input port="entry">
+                        <p:pipe step="dtbook" port="result"/>
                     </p:input>
-                </p:identity>
-            </p:when>
-            <p:otherwise>
-                <p:identity/>
-            </p:otherwise>
-        </p:choose>
-    </p:group>
+                </px:fileset-add-entry>
+                <p:choose px:progress="2/3">
+                    <p:when test="$dtbook-is-valid">
+                        <!-- input DTBooks are valid, so we expect the upgraded DTBook to be valid
+                             too, otherwise we made a coding error -->
+                        <p:try px:progress="1">
+                            <p:group>
+                                <px:dtbook-validate skip-schematron="true" report-method="error" px:progress="1">
+                                    <p:input port="source.in-memory">
+                                        <p:pipe step="dtbook-fileset" port="result.in-memory"/>
+                                    </p:input>
+                                </px:dtbook-validate>
+                            </p:group>
+                            <p:catch name="catch">
+                                <px:log-error severity="DEBUG">
+                                    <p:input port="error">
+                                        <p:pipe step="catch" port="error"/>
+                                    </p:input>
+                                </px:log-error>
+                                <px:error code="BUG" message="An unexpected error happened. Please contact maintainer."/>
+                            </p:catch>
+                        </p:try>
+                    </p:when>
+                    <p:otherwise>
+                        <px:dtbook-validate skip-schematron="true" report-method="error" px:progress="1">
+                            <p:input port="source.in-memory">
+                                <p:pipe step="dtbook-fileset" port="result.in-memory"/>
+                            </p:input>
+                        </px:dtbook-validate>
+                    </p:otherwise>
+                </p:choose>
+            </p:for-each>
+            <p:sink/>
+            <p:identity cx:depends-on="each">
+                <p:input port="source">
+                    <p:pipe step="upgrade-dtbook" port="result"/>
+                </p:input>
+            </p:identity>
+        </p:when>
+        <p:otherwise>
+            <p:identity/>
+        </p:otherwise>
+    </p:choose>
     <p:identity name="validate-dtbook"/>
-    <p:sink/>
-    <p:documentation>Schema selector for DTBook validation</p:documentation>
-    <px:dtbook-validator.select-schema name="dtbook-schema" dtbook-version="2005-3" mathml-version="2.0" cx:pure="true"/>
-    <p:sink/>
 
     <!-- =============================================================== -->
     <!-- MERGE -->
     <!-- =============================================================== -->
     <p:documentation>If there is more than one input DTBook document, merge them into a single
         document.</p:documentation>
-    <p:count name="num-input-documents" limit="2">
-        <p:input port="source">
-            <p:pipe port="result" step="validate-dtbook"/>
-        </p:input>
-    </p:count>
+    <p:count name="num-input-documents" limit="2"/>
     <p:choose name="choose-to-merge-dtbook-files" px:progress="2/23">
         <p:when test=".//c:result[. > 1]" px:message="Merging DTBook files">
             <p:output port="result" primary="true"/>
             <p:output port="mapping">
                 <p:pipe step="merge" port="mapping"/>
             </p:output>
+            <p:sink/>
             <px:dtbook-merge name="merge" px:progress="0.75">
                 <p:input port="source">
                     <p:pipe port="result" step="validate-dtbook"/>
@@ -275,27 +285,44 @@
                 <p:with-option name="output-base-uri" select="$zedai-file"/>
             </px:dtbook-merge>
             <p:choose px:progress="0.25" px:message="Validating">
-                <p:when test="$validation='abort'" px:message="Validating">
-                    <!-- input DTBooks are valid, so we expect the merged DTBook to be valid too -->
+                <p:when test="$validation='abort' or ($validation='report' and $dtbook-is-valid)" px:message="Validating">
                     <px:css-speech-clean px:progress="1/3">
-                        <p:documentation>Remove the Aural CSS attributes before validation</p:documentation>
+                        <p:documentation>Remove the aural CSS attributes before validation (for
+                        dtbook-to-epub3)</p:documentation>
                     </px:css-speech-clean>
-                    <l:relax-ng-report name="validate" px:progress="1/3">
-                        <p:input port="schema">
-                            <p:pipe port="result" step="dtbook-schema"/>
-                        </p:input>
-                    </l:relax-ng-report>
-                    <px:report-errors method="error" name="report" px:progress="1/3">
-                        <p:input port="report">
-                            <p:pipe step="validate" port="report"/>
-                        </p:input>
-                    </px:report-errors>
+                    <p:identity name="dtbook"/>
                     <p:sink/>
-                    <p:identity cx:depends-on="report">
-                        <p:input port="source">
-                            <p:pipe step="merge" port="result"/>
+                    <px:fileset-add-entry media-type="application/x-dtbook+xml" name="dtbook-fileset">
+                        <p:input port="entry">
+                            <p:pipe step="dtbook" port="result"/>
                         </p:input>
-                    </p:identity>
+                    </px:fileset-add-entry>
+                    <!-- input DTBooks are valid, so we expect the merged DTBook to be valid too,
+                         otherwise we made a coding error -->
+                    <p:try px:progress="2/3">
+                        <p:group>
+                            <px:dtbook-validate skip-schematron="true" report-method="error"
+                                                name="validate" px:progress="1">
+                                <p:input port="source.in-memory">
+                                    <p:pipe step="dtbook-fileset" port="result.in-memory"/>
+                                </p:input>
+                            </px:dtbook-validate>
+                            <p:sink/>
+                            <p:identity cx:depends-on="validate">
+                                <p:input port="source">
+                                    <p:pipe step="merge" port="result"/>
+                                </p:input>
+                            </p:identity>
+                        </p:group>
+                        <p:catch name="catch">
+                            <px:log-error severity="DEBUG">
+                                <p:input port="error">
+                                    <p:pipe step="catch" port="error"/>
+                                </p:input>
+                            </px:log-error>
+                            <px:error code="BUG" message="An unexpected error happened. Please contact maintainer."/>
+                        </p:catch>
+                    </p:try>
                 </p:when>
                 <p:otherwise>
                     <!-- reporting validation issues in intermediary documents is not helpful for user -->
@@ -438,9 +465,22 @@
         </p:input>
     </px:dtbook-to-mods-meta>
     <p:choose>
-        <p:when test="$validation='abort'">
-            <!-- DTBook is valid, so we expect the resulting MODS document to be valid too -->
-            <px:validate-mods/>
+        <p:when test="$validation='abort' or ($validation='report' and $dtbook-is-valid)">
+            <!-- DTBook is valid, so we expect the resulting MODS document to be valid too,
+                 otherwise we made a coding error -->
+            <p:try>
+                <p:group>
+                    <px:validate-mods/>
+                </p:group>
+                <p:catch name="catch">
+                    <px:log-error severity="DEBUG">
+                        <p:input port="error">
+                            <p:pipe step="catch" port="error"/>
+                        </p:input>
+                    </px:log-error>
+                    <px:error code="BUG" message="An unexpected error happened. Please contact maintainer."/>
+                </p:catch>
+            </p:try>
         </p:when>
         <p:otherwise>
             <!-- reporting validation issues in intermediary documents is not helpful for user -->
@@ -533,15 +573,41 @@
     <!-- =============================================================== -->
     <p:documentation>Validate the final ZedAI output.</p:documentation>
     <p:choose name="validate-zedai" px:progress="2/23">
-        <p:when test="$validation=('abort','report')" px:message="Validating ZedAI">
+        <p:when test="$validation='abort'" px:message="Validating ZedAI">
+            <!-- DTBook is valid, so we expect the resulting ZedAI document to be valid too,
+                 otherwise we made a coding error -->
             <p:output port="result"/>
             <p:identity name="zedai"/>
             <px:css-speech-clean px:progress="1/3">
                 <p:documentation>Remove the Aural CSS attributes before validation</p:documentation>
             </px:css-speech-clean>
-            <px:zedai-validate px:progress="2/3" name="validate">
-                <p:with-option name="report-method" select="if ($validation='abort') then 'error' else 'log'"/>
-            </px:zedai-validate>
+            <p:try px:progress="2/3" name="validate">
+                <p:group>
+                    <px:zedai-validate report-method="error" px:progress="1"/>
+                </p:group>
+                <p:catch name="catch">
+                    <px:log-error severity="DEBUG">
+                        <p:input port="error">
+                            <p:pipe step="catch" port="error"/>
+                        </p:input>
+                    </px:log-error>
+                    <px:error code="BUG" message="An unexpected error happened. Please contact maintainer."/>
+                </p:catch>
+            </p:try>
+            <p:sink/>
+            <p:identity cx:depends-on="validate">
+                <p:input port="source">
+                    <p:pipe step="zedai" port="result"/>
+                </p:input>
+            </p:identity>
+        </p:when>
+        <p:when test="$validation='report'" px:message="Validating ZedAI">
+            <p:output port="result"/>
+            <p:identity name="zedai"/>
+            <px:css-speech-clean px:progress="1/3">
+                <p:documentation>Remove the Aural CSS attributes before validation</p:documentation>
+            </px:css-speech-clean>
+            <px:zedai-validate report-method="log" px:progress="2/3" name="validate"/>
             <p:sink/>
             <p:identity cx:depends-on="validate">
                 <p:input port="source">

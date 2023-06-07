@@ -5,6 +5,7 @@
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:c="http://www.w3.org/ns/xproc-step"
                 xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 type="px:dtbook-to-html.script" name="main"
                 px:input-filesets="dtbook"
                 px:output-filesets="html"
@@ -119,6 +120,8 @@
         <p:otherwise>
             <p:output port="status"/>
 
+            <p:variable name="dtbook-is-valid" cx:as="xs:boolean"
+                        select="not($validation='off') and exists(/d:validation-status[@result='ok'])"/>
             <!-- get the HTML filename from the first DTBook -->
             <p:sink/>
             <p:split-sequence test="position()=1" initial-only="true">
@@ -144,6 +147,7 @@
                     </p:input>
                     <p:with-option name="language" select="$language"/>
                     <p:with-option name="validation" select="$validation"/>
+                    <p:with-option name="dtbook-is-valid" select="$dtbook-is-valid"/>
                     <p:with-option name="chunk-size" xmlns:_="dtbook" select="$_:chunk-size"/>
                     <p:with-option name="output-dir" select="$output-dir-uri"/>
                     <p:with-option name="temp-dir" select="pf:normalize-uri(concat($temp-dir,'/'))"/>

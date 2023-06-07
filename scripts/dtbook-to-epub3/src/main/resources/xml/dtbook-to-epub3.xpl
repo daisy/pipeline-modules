@@ -5,6 +5,7 @@
                 xmlns:cx="http://xmlcalabash.com/ns/extensions"
                 xmlns:c="http://www.w3.org/ns/xproc-step"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 name="main" type="px:dtbook-to-epub3.script"
                 px:input-filesets="dtbook"
                 px:output-filesets="epub3"
@@ -144,6 +145,8 @@
 	<p:output port="tts-log" sequence="true">
 	  <p:pipe step="convert-and-store" port="tts-log"/>
 	</p:output>
+	<p:variable name="dtbook-is-valid" cx:as="xs:boolean"
+		    select="not($validation='off') and exists(/d:validation-status[@result='ok'])"/>
 
 	<!-- get the EPUB filename from the first DTBook -->
 	<p:sink/>
@@ -176,6 +179,7 @@
 	    <p:with-option name="audio-file-type" select="$audio-file-type"/>
 	    <p:with-option name="language" select="$language"/>
 	    <p:with-option name="validation" select="$validation"/>
+	    <p:with-option name="dtbook-is-valid" select="$dtbook-is-valid"/>
 	    <p:with-option name="chunk-size" xmlns:_="dtbook" select="$_:chunk-size"/>
 	    <p:with-option name="output-name" select="$output-name"/>
 	    <p:with-option name="output-dir" select="$output-dir-uri"/>

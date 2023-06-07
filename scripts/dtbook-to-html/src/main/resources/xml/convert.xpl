@@ -2,6 +2,7 @@
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 type="px:dtbook-to-html"
                 name="main">
 	
@@ -31,6 +32,11 @@
 
 	<p:option name="language" required="false" select="''"/>
 	<p:option name="validation" cx:type="off|report|abort" select="'off'"/>
+	<p:option name="dtbook-is-valid" cx:as="xs:boolean" select="true()">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p>Whether the input is a valid DTBook.</p>
+		</p:documentation>
+	</p:option>
 	<p:option name="chunk" required="false" select="'false'"/>
 	<p:option name="chunk-size" required="false" select="'-1'"/>
 	<p:option name="filename" required="true"/>
@@ -61,6 +67,7 @@
 		<p:with-option name="zedai-filename" select="concat($filename,'.xml')"/>
 		<p:with-option name="lang" select="$language"/>
 		<p:with-option name="validation" select="$validation"/>
+		<p:with-option name="dtbook-is-valid" select="$dtbook-is-valid"/>
 	</px:dtbook-to-zedai>
 
 	<px:zedai-to-html name="to-html" px:message="Converting ZedAI to XHTML 5" px:progress="1/2">

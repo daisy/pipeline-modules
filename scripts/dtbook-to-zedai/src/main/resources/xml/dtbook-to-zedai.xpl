@@ -4,6 +4,7 @@
                 xmlns:cx="http://xmlcalabash.com/ns/extensions"
                 xmlns:c="http://www.w3.org/ns/xproc-step"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 type="px:dtbook-to-zedai.script"
                 px:input-filesets="dtbook"
                 px:output-filesets="zedai"
@@ -134,6 +135,8 @@
         </p:when>
         <p:otherwise>
             <p:output port="status"/>
+            <p:variable name="dtbook-is-valid" cx:as="xs:boolean"
+                        select="not($validation='off') and exists(/d:validation-status[@result='ok'])"/>
             <p:sink/>
 
             <px:dtbook-to-zedai name="convert">
@@ -149,6 +152,7 @@
                 <p:with-option name="css-filename" select="$css-filename"/>
                 <p:with-option name="lang" select="$lang"/>
                 <p:with-option name="validation" select="$validation"/>
+                <p:with-option name="dtbook-is-valid" select="$dtbook-is-valid"/>
                 <p:with-option name="copy-external-resources" select="$copy-external-resources='true'"/>
             </px:dtbook-to-zedai>
 

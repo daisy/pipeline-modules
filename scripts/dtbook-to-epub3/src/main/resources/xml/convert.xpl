@@ -29,6 +29,11 @@
 			report them (report), or to ignore any validation issues (off).</p>
 		</p:documentation>
 	</p:option>
+	<p:option name="dtbook-is-valid" cx:as="xs:boolean" select="true()">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p>Whether the input is a valid DTBook.</p>
+		</p:documentation>
+	</p:option>
 	<p:option name="audio" required="true" cx:as="xs:string"/>
 	<p:option name="audio-file-type" select="'audio/mpeg'">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -102,6 +107,7 @@
 		<p:with-option name="zedai-filename" select="concat($output-name,'.xml')"/>
 		<p:with-option name="lang" select="$language"/>
 		<p:with-option name="validation" select="$validation"/>
+		<p:with-option name="dtbook-is-valid" select="$dtbook-is-valid"/>
 	</px:dtbook-to-zedai>
 
 	<!--TODO better handle core media type filtering-->
