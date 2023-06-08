@@ -90,6 +90,12 @@
             the input DTBook is valid, processing will stop on any invalid intermediary result.
         </p:documentation>
     </p:option>
+    <p:option name="output-validation" cx:type="off|report|abort" select="$validation">
+        <p:documentation>
+            Determines whether to validate the ZedAI output and what to do on validation
+            errors. When not specified, follows the <code>validation</code> option.
+        </p:documentation>
+    </p:option>
     <p:option name="copy-external-resources" cx:as="xs:boolean" select="true()">
         <p:documentation>
             Whether or not to include any referenced external resources like images and CSS-files in the output.
@@ -100,6 +106,19 @@
             Whether the input is a valid DTBook.
         </p:documentation>
     </p:option>
+
+    <p:output port="validation-report" sequence="true">
+        <p:documentation>
+            HTML-formatted report of the ZedAI validation. Empty if validation is disabled.
+        </p:documentation>
+        <p:pipe step="validate-zedai" port="report"/>
+    </p:output>
+    <p:output port="validation-status" sequence="true">
+        <p:documentation>
+            Status of the ZedAI validation.
+        </p:documentation>
+        <p:pipe step="validate-zedai" port="status"/>
+    </p:output>
 
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
         <p:documentation>
@@ -552,15 +571,35 @@
     <!-- =============================================================== -->
     <p:documentation>Validate the final ZedAI output.</p:documentation>
     <p:choose name="validate-zedai" px:progress="2/23">
-        <p:when test="$validation='abort'" px:message="Validating ZedAI">
+        <p:when test="$output-validation='abort'" px:message="Validating ZedAI">
             <!-- DTBook is valid, so we expect the resulting ZedAI document to be valid too,
                  otherwise we made a coding error -->
-            <p:output port="result"/>
-            <p:try px:progress="1">
+            <p:output port="result" primary="true"/>
+            <p:output port="status">
+                <p:pipe step="try" port="status"/>
+            </p:output>
+            <p:output port="report" sequence="true">
+                <p:pipe step="try" port="report"/>
+            </p:output>
+            <p:try px:progress="1" name="try">
                 <p:group>
-                    <px:zedai-validate allow-aural-css-attributes="true" report-method="error" px:progress="1"/>
+                    <p:output port="result" primary="true"/>
+                    <p:output port="status">
+                        <p:pipe step="validate" port="validation-status"/>
+                    </p:output>
+                    <p:output port="report" sequence="true">
+                        <p:pipe step="validate" port="html-report"/>
+                    </p:output>
+                    <px:zedai-validate allow-aural-css-attributes="true" report-method="error" px:progress="1" name="validate"/>
                 </p:group>
                 <p:catch name="catch">
+                    <p:output port="result" primary="true"/>
+                    <p:output port="status">
+                        <p:inline><irrelevant/></p:inline>
+                    </p:output>
+                    <p:output port="report" sequence="true">
+                        <p:empty/>
+                    </p:output>
                     <px:log-error severity="DEBUG">
                         <p:input port="error">
                             <p:pipe step="catch" port="error"/>
@@ -570,12 +609,24 @@
                 </p:catch>
             </p:try>
         </p:when>
-        <p:when test="$validation='report'" px:message="Validating ZedAI">
-            <p:output port="result"/>
-            <px:zedai-validate allow-aural-css-attributes="true" report-method="log" px:progress="1"/>
+        <p:when test="$output-validation='report'" px:message="Validating ZedAI">
+            <p:output port="result" primary="true"/>
+            <p:output port="status">
+                <p:pipe step="validate" port="validation-status"/>
+            </p:output>
+            <p:output port="report" sequence="true">
+                <p:pipe step="validate" port="html-report"/>
+            </p:output>
+            <px:zedai-validate allow-aural-css-attributes="true" px:progress="1" report-method="port" name="validate"/>
         </p:when>
         <p:otherwise>
-            <p:output port="result"/>
+            <p:output port="result" primary="true"/>
+            <p:output port="status">
+                <p:inline><d:validation-status result="ok"/></p:inline>
+            </p:output>
+            <p:output port="report" sequence="true">
+                <p:empty/>
+            </p:output>
             <p:identity/>
         </p:otherwise>
     </p:choose>

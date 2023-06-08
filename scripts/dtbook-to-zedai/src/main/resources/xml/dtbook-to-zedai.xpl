@@ -54,9 +54,10 @@
     <p:output port="validation-report" sequence="true">
         <!-- defined in ../../../../../common-options.xpl -->
         <p:pipe step="load" port="validation-report"/>
+        <p:pipe step="result" port="validation-report"/>
     </p:output>
     <p:output port="status" px:media-type="application/vnd.pipeline.status+xml">
-        <!-- whether the conversion was aborted due to validation errors -->
+        <!-- whether the input and/or output has validation errors -->
         <p:pipe step="result" port="status"/>
     </p:output>
     <p:option name="mods-filename" required="false" px:type="string" select="'zedai-mods.xml'">
@@ -130,11 +131,17 @@
     </p:choose>
     <p:choose name="result">
         <p:when test="/d:validation-status[@result='error'] and $validation='abort'">
-            <p:output port="status"/>
+            <p:output port="status" primary="true"/>
+            <p:output port="validation-report" sequence="true">
+                <p:empty/>
+            </p:output>
             <p:identity/>
         </p:when>
         <p:otherwise>
-            <p:output port="status"/>
+            <p:output port="status" primary="true"/>
+            <p:output port="validation-report" sequence="true">
+                <p:pipe step="convert" port="validation-report"/>
+            </p:output>
             <p:variable name="dtbook-is-valid" cx:as="xs:boolean"
                         select="not($validation='off') and exists(/d:validation-status[@result='ok'])"/>
             <p:sink/>
@@ -153,6 +160,7 @@
                 <p:with-option name="lang" select="$lang"/>
                 <p:with-option name="validation" select="$validation"/>
                 <p:with-option name="dtbook-is-valid" select="$dtbook-is-valid"/>
+                <p:with-option name="output-validation" select="($validation[.='off'],'report')[1]"/>
                 <p:with-option name="copy-external-resources" select="$copy-external-resources='true'"/>
             </px:dtbook-to-zedai>
 
@@ -164,7 +172,7 @@
 
             <p:identity cx:depends-on="store">
                 <p:input port="source">
-                    <p:inline><d:validation-status result="ok"/></p:inline>
+                    <p:pipe step="convert" port="validation-status"/>
                 </p:input>
             </p:identity>
         </p:otherwise>

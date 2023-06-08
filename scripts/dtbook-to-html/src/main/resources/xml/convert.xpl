@@ -68,6 +68,10 @@
 		<p:with-option name="lang" select="$language"/>
 		<p:with-option name="validation" select="$validation"/>
 		<p:with-option name="dtbook-is-valid" select="$dtbook-is-valid"/>
+		<!-- reporting validation issues in intermediary documents is not helpful for user -->
+		<p:with-option name="output-validation" select="if ($validation='abort') then 'abort'
+		                                                else if ($validation='report' and $dtbook-is-valid) then 'abort'
+		                                                else 'off'"/>
 	</px:dtbook-to-zedai>
 
 	<px:zedai-to-html name="to-html" px:message="Converting ZedAI to XHTML 5" px:progress="1/2">

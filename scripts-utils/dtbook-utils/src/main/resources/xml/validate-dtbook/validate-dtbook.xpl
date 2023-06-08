@@ -71,7 +71,7 @@
         </p:documentation>
     </p:option>
     
-    <p:output port="xml-report" sequence="true">
+    <p:output port="xml-report">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h1>XML Reports</h1>
             <p>Raw output from all types of validation used (RelaxNG, Schematron, custom).</p>
