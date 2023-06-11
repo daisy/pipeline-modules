@@ -46,7 +46,7 @@
     </p:output>
     <p:output port="result.in-memory" sequence="true">
         <p:documentation>The ZedAI and MODS metadata documents.</p:documentation>
-        <p:pipe port="result" step="result.in-memory"/>
+        <p:pipe step="result.in-memory" port="result.in-memory"/>
     </p:output>
 
     <p:output port="mapping">
@@ -162,6 +162,7 @@
             px:fileset-join
             px:fileset-intersect
             px:fileset-copy
+            px:fileset-filter-in-memory
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/mediatype-utils/library.xpl">
@@ -179,11 +180,6 @@
             px:validate-mods
         </p:documentation>
     </p:import>
-    <cx:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl" type="application/xslt+xml">
-		<p:documentation>
-			pf:normalize-uri
-		</p:documentation>
-	</cx:import>
 
 
     <p:variable name="output-dir-with-slash"
@@ -591,6 +587,12 @@
         </p:otherwise>
     </p:choose>
 
+    <p:documentation>Set new base URI</p:documentation>
+    <px:set-base-uri>
+        <p:with-option name="base-uri" select="$zedai-file"/>
+    </px:set-base-uri>
+    <p:add-xml-base name="result.zedai"/>
+
     <!-- =============================================================== -->
     <!-- VALIDATE FINAL OUTPUT -->
     <!-- =============================================================== -->
@@ -657,7 +659,6 @@
     </p:choose>
     <p:sink/>
 
-
     <!-- =============================================================== -->
     <!-- COMPILE RESULT FILESET -->
     <!-- =============================================================== -->
@@ -709,9 +710,7 @@
                     <p:input port="source"><p:empty/></p:input>
                 </p:identity>
             </p:otherwise>
-
         </p:choose>
-
 
         <p:documentation>If CSS was generated: Add it to the fileset.</p:documentation>
         <p:choose name="result.fileset.generated-css">
@@ -778,43 +777,13 @@
         <px:mediatype-detect/>
     </p:group>
 
-    <px:set-base-uri>
-        <p:input port="source">
+    <px:fileset-filter-in-memory name="result.in-memory">
+        <p:input port="source.in-memory">
             <p:pipe step="validate-zedai" port="result"/>
-        </p:input>
-        <p:with-option name="base-uri" select="$zedai-file"/>
-    </px:set-base-uri>
-    <p:add-xml-base name="result.zedai"/>
-    <p:for-each name="result.in-memory">
-        <p:output port="result" sequence="true"/>
-        <p:iteration-source>
-            <p:pipe port="result" step="result.zedai"/>
             <p:pipe port="result" step="generate-css"/>
             <p:pipe step="mods-metadata" port="result"/>
-        </p:iteration-source>
-        <p:variable name="in-memory-base" select="pf:normalize-uri(resolve-uri(base-uri(/*)))"/>
-        <p:variable name="fileset-base" select="base-uri(/*)">
-            <!-- fileset is normalized -->
-            <p:pipe port="result" step="result.fileset"/>
-        </p:variable>
-        <p:choose>
-            <p:xpath-context>
-                <p:pipe port="result" step="result.fileset"/>
-            </p:xpath-context>
-            <p:when test="//d:file[resolve-uri(@href,$fileset-base) = $in-memory-base]">
-                <!-- document is in the fileset; keep it -->
-                <p:identity/>
-            </p:when>
-            <p:otherwise>
-                <!-- document is not in the fileset; discard it -->
-                <p:sink/>
-                <p:identity>
-                    <p:input port="source">
-                        <p:empty/>
-                    </p:input>
-                </p:identity>
-            </p:otherwise>
-        </p:choose>
-    </p:for-each>
+        </p:input>
+    </px:fileset-filter-in-memory>
+    <p:sink/>
 
 </p:declare-step>
