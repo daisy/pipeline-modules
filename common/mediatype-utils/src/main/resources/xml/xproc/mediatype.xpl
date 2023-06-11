@@ -134,7 +134,7 @@
                                     </p:input>
                                 </px:fileset-filter>
                                 <p:add-attribute match="/*" attribute-name="method" attribute-value="xml"/>
-                                <px:fileset-load name="file-from-disk" load-if-not-in-memory="true">
+                                <px:fileset-load name="file-from-disk">
                                     <p:input port="in-memory">
                                         <p:pipe port="in-memory" step="main"/>
                                     </p:input>
