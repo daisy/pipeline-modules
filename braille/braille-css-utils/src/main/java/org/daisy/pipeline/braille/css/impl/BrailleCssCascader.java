@@ -1,5 +1,8 @@
 package org.daisy.pipeline.braille.css.impl;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,6 +37,7 @@ import cz.vutbr.web.css.StyleSheet;
 import cz.vutbr.web.css.SupportedCSS;
 import cz.vutbr.web.css.Term;
 import cz.vutbr.web.css.TermIdent;
+import cz.vutbr.web.css.TermURI;
 import cz.vutbr.web.csskit.antlr.CSSParserFactory;
 import cz.vutbr.web.csskit.RuleFactoryImpl;
 import cz.vutbr.web.domassign.DeclarationTransformer;
@@ -50,6 +54,7 @@ import org.daisy.braille.css.RuleVolumeArea;
 import org.daisy.braille.css.SelectorImpl.PseudoElementImpl;
 import org.daisy.braille.css.SimpleInlineStyle;
 import org.daisy.braille.css.SupportedBrailleCSS;
+import org.daisy.common.file.URLs;
 import org.daisy.common.transform.XMLTransformer;
 import org.daisy.pipeline.braille.css.SupportedPrintCSS;
 import org.daisy.pipeline.braille.css.impl.BrailleCssSerializer;
@@ -453,8 +458,31 @@ public class BrailleCssCascader implements CssCascader {
 		String name = rule.getName();
 		if (name != null) builder.append(' ').append(name);
 		builder.append(" { ");
-		for (Declaration decl : rule)
+		for (Declaration decl : rule) {
+			if (decl.size() == 1 && decl.get(0) instanceof TermURI) {
+				TermURI term = (TermURI)decl.get(0);
+				URI uri = URLs.asURI(term.getValue());
+				if (!uri.isAbsolute() && !uri.getSchemeSpecificPart().startsWith("/")) {
+					// relative resource: make absolute and convert to "volatile-file" URI to bypass
+					// caching in AbstractTransformProvider
+					if (term.getBase() != null)
+						uri = URLs.resolve(URLs.asURI(term.getBase()), uri);
+					try {
+						new File(uri);
+						try {
+							uri = new URI("volatile-file", uri.getSchemeSpecificPart(), uri.getFragment());
+						} catch (URISyntaxException e) {
+							throw new IllegalStateException(e); // should not happen
+						}
+					} catch (IllegalArgumentException e) {
+						// not a file URI
+					}
+				}
+				builder.append(decl.getProperty()).append(": ").append("url(\"" + uri + "\")").append("; ");
+				continue;
+			}
 			insertDeclaration(builder, decl);
+		}
 		builder.append("} ");
 	}
 
