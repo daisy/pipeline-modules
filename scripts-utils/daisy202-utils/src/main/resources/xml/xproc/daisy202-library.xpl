@@ -27,5 +27,6 @@
     <p:import href="rename-files.xpl"/>
     <p:import href="update-links.xpl"/>
     <p:import href="fix-audio-file-order.xpl"/>
+    <p:import href="audio-transcode.xpl"/>
 
 </p:library>

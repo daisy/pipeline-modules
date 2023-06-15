@@ -26,7 +26,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>audio-common</artifactId>
-        <version>5.0.4-SNAPSHOT</version>
+        <version>5.1.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
@@ -220,7 +220,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>daisy202-utils</artifactId>
-        <version>1.4.2-SNAPSHOT</version>
+        <version>1.5.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>

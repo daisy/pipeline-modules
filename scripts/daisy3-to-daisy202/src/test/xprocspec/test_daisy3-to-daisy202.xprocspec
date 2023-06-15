@@ -61,6 +61,7 @@
 			<x:input port="in-memory.in"/>
 			<x:option name="date" select="'2020-03-03'"/>
 			<x:option name="output-dir" select="resolve-uri('result/')"/>
+			<x:option name="temp-dir" select="resolve-uri('Chimpanzee/',$temp-dir)"/>
 		</x:call>
 		<x:context label="the fileset.out port">
 			<x:document type="port" port="fileset.out"/>

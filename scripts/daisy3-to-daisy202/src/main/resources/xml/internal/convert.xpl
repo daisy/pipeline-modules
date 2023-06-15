@@ -2,6 +2,8 @@
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal/daisy3-to-daisy202"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 type="px:daisy3-to-daisy202" version="1.0" name="main">
 
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -18,11 +20,9 @@
     <p:input port="fileset.in" primary="true"/>
     <p:input port="in-memory.in" sequence="true"/>
 
-    <p:output port="fileset.out" primary="true">
-        <p:pipe port="result" step="result-fileset"/>
-    </p:output>
+    <p:output port="fileset.out" primary="true"/>
     <p:output port="in-memory.out" sequence="true">
-        <p:pipe port="result" step="result-docs"/>
+        <p:pipe step="ensure-core-media" port="in-memory"/>
     </p:output>
 
     <p:option name="date" select="''">
@@ -34,6 +34,18 @@
     </p:option>
 
     <p:option name="output-dir" required="true"/>
+
+    <p:option name="temp-dir" required="true" cx:as="xs:anyURI">
+        <p:documentation>
+            <p>Empty directory dedicated to this step.</p>
+        </p:documentation>
+    </p:option>
+
+    <p:option name="ensure-core-media" cx:as="xs:boolean" select="false()">
+        <p:documentation>
+            <p>Ensure that the output DAISY 2.02 uses allowed file formats only.</p>
+        </p:documentation>
+    </p:option>
 
     <p:serialization port="fileset.out" indent="true"/>
     <p:serialization port="in-memory.out" indent="true"/>
@@ -64,6 +76,11 @@
     <p:import href="http://www.daisy.org/pipeline/modules/daisy3-utils/library.xpl">
         <p:documentation>
             px:daisy3-upgrade
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/daisy202-utils/library.xpl">
+        <p:documentation>
+            px:daisy202-audio-transcode
         </p:documentation>
     </p:import>
     <p:import href="convert-smils.xpl">
@@ -201,11 +218,42 @@
             <p:pipe step="smils" port="result.fileset"/>
         </p:input>
     </px:fileset-join>
+    <p:sink/>
     <p:identity name="result-docs">
         <p:input port="source">
             <p:pipe step="ncc" port="in-memory"/>
             <p:pipe step="smils" port="result.in-memory"/>
         </p:input>
     </p:identity>
+    <p:sink/>
+
+    <p:choose name="ensure-core-media">
+        <p:when test="$ensure-core-media">
+            <p:output port="fileset" primary="true"/>
+            <p:output port="in-memory" sequence="true">
+                <p:pipe step="transcode" port="result.in-memory"/>
+            </p:output>
+            <px:daisy202-audio-transcode new-audio-file-type="audio/mpeg" name="transcode">
+                <p:input port="source.fileset">
+                    <p:pipe port="result" step="result-fileset"/>
+                </p:input>
+                <p:input port="source.in-memory">
+                    <p:pipe step="result-docs" port="result"/>
+                </p:input>
+                <p:with-option name="temp-dir" select="$temp-dir"/>
+            </px:daisy202-audio-transcode>
+        </p:when>
+        <p:otherwise>
+            <p:output port="fileset" primary="true"/>
+            <p:output port="in-memory" sequence="true">
+                <p:pipe step="result-docs" port="result"/>
+            </p:output>
+            <p:identity>
+                <p:input port="source">
+                    <p:pipe port="result" step="result-fileset"/>
+                </p:input>
+            </p:identity>
+        </p:otherwise>
+    </p:choose>
 
 </p:declare-step>
