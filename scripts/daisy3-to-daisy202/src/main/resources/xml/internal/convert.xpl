@@ -61,6 +61,11 @@
             px:set-base-uri
         </p:documentation>
     </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/daisy3-utils/library.xpl">
+        <p:documentation>
+            px:daisy3-upgrade
+        </p:documentation>
+    </p:import>
     <p:import href="convert-smils.xpl">
         <p:documentation>
             pxi:daisy3-to-daisy202-smils
@@ -73,11 +78,20 @@
     </p:import>
 
     <!--=========================================================================-->
+    <!-- UPGRADE to 2005 STANDARD IF NEEDED                                      -->
+    <!--=========================================================================-->
+    <px:daisy3-upgrade name="upgrade">
+        <p:input port="source.in-memory">
+            <p:pipe port="in-memory.in" step="main"/>
+        </p:input>
+    </px:daisy3-upgrade>
+    
+    <!--=========================================================================-->
     <!-- LOAD THE DAISY 3 FILESET                                                -->
     <!--=========================================================================-->
     <px:fileset-load media-types="application/oebps-package+xml" name="opf">
         <p:input port="in-memory">
-            <p:pipe port="in-memory.in" step="main"/>
+            <p:pipe step="upgrade" port="result.in-memory"/>
         </p:input>
     </px:fileset-load>
 
@@ -88,7 +102,7 @@
     -->
     <px:fileset-rebase>
         <p:input port="source">
-            <p:pipe step="main" port="fileset.in"/>
+            <p:pipe step="upgrade" port="result.fileset"/>
         </p:input>
         <p:with-option name="new-base" select="resolve-uri('.',base-uri(/*))">
             <p:pipe step="opf" port="result"/>
@@ -125,7 +139,7 @@
                 <p:pipe step="fileset.in" port="result"/>
             </p:input>
             <p:input port="in-memory">
-                <p:pipe step="main" port="in-memory.in"/>
+                <p:pipe step="upgrade" port="result.in-memory"/>
             </p:input>
         </px:fileset-load>
         <px:assert error-code="XXXX" test-count-min="1" test-count-max="1" name="ncx"
@@ -168,7 +182,7 @@
             <p:pipe step="fileset.in" port="result"/>
         </p:input>
         <p:input port="source.in-memory">
-            <p:pipe step="main" port="in-memory.in"/>
+            <p:pipe step="upgrade" port="result.in-memory"/>
         </p:input>
         <p:with-option name="input-dir" select="base-uri(/*)">
             <p:pipe step="fileset.in" port="result"/>
