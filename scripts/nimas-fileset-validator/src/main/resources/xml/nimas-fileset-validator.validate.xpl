@@ -2,6 +2,8 @@
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:pkg="http://openebook.org/namespaces/oeb-package/1.0/"
                 type="px:nimas-fileset-validator" name="main"
@@ -53,8 +55,8 @@
         <p:pipe step="validation-status" port="result"/>
     </p:output>
 
-    <p:option name="mathml-version"/>
-    <p:option name="check-images"/>
+    <p:option name="mathml-version" cx:type="3.0|2.0"/>
+    <p:option name="check-images" cx:as="xs:boolean"/>
     <p:option name="base-uri"/>
 
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
@@ -165,7 +167,7 @@
                     <px:dtbook-validate name="validate-dtbook">
                         <p:with-option name="check-images" select="$check-images"/>
                         <p:with-option name="mathml-version" select="$mathml-version"/>
-                        <p:with-option name="nimas" select="'true'"/>
+                        <p:with-option name="nimas" select="true()"/>
                     </px:dtbook-validate>
 
                     <!-- add the report path -->

@@ -95,7 +95,7 @@
 		
 		<px:dtbook-to-rtf>
 			<p:input port="source.in-memory">
-				<p:pipe step="load" port="in-memory.out"/>
+				<p:pipe step="load" port="result.in-memory"/>
 			</p:input>
 			<p:with-option name="include-table-of-content" select="$include-table-of-content"/>
 			<p:with-option name="include-page-number" select="$include-page-number"/>

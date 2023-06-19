@@ -27,13 +27,13 @@
         </p:documentation>
     </p:output>
     
-    <p:option name="dtbook-version" required="true" cx:as="xs:string">
+    <p:option name="dtbook-version" required="true" cx:as="xs:string" cx:type="2005-3|2005-2|2005-1|1.1.0">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <p>Version of MathML in the DTBook file.</p>
+            <p>DTBook version.</p>
         </p:documentation>
     </p:option>
     
-    <p:option name="mathml-version" required="false" cx:as="xs:string">
+    <p:option name="mathml-version" required="false" cx:as="xs:string" cx:type="3.0|2.0">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>Version of MathML in the DTBook file.</p>
         </p:documentation>
@@ -85,9 +85,8 @@
                 </p:input>
             </p:identity>
         </p:when>
-        <!-- default to dtbook 2005-3 -->
-        <!-- We could also consider generating an error that the version was not detectable. -->
         <p:otherwise>
+            <!-- default to dtbook 2005-3 with mathml 3.0 (can not happen) -->
             <p:identity>
                 <p:input port="source">
                     <p:document href="./schema/rng/dtbook-2005-3.mathml-3.integration.rng"/>

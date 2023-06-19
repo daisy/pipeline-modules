@@ -11,7 +11,7 @@
   </parent>
 
   <artifactId>dtbook-utils</artifactId>
-  <version>3.1.1-SNAPSHOT</version>
+  <version>4.0.0-SNAPSHOT</version>
   <packaging>bundle</packaging>
 
   <name>DAISY Pipeline 2 module :: DTBook Utils</name>
@@ -58,6 +58,11 @@
     <dependency>
       <groupId>org.daisy.pipeline.modules</groupId>
       <artifactId>mathml-utils</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.daisy.pipeline.modules</groupId>
+      <artifactId>css-speech</artifactId>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

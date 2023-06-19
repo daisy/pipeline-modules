@@ -10,6 +10,10 @@
 	    epub2-to-epub3
 	    epub3-to-daisy202
 	    epub3-to-daisy3
+	    daisy3-to-epub3
+	    dtbook-to-epub3
+	    dtbook-to-html
+	    dtbook-to-epub3
 	    dtbook-to-zedai
 	-->
 	<p:option name="validation" required="false" select="'off'">
@@ -36,12 +40,48 @@
 	    epub2-to-epub3
 	    epub3-to-daisy202
 	    epub3-to-daisy3
+	    dtbook-to-html
+	    dtbook-to-zedai
 	-->
 	<p:output port="validation-report" sequence="true" px:media-type="application/vnd.pipeline.report+xml">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			<h2 px:role="name">Input validation report</h2>
+			<h2 px:role="name">Validation reports</h2>
 		</p:documentation>
 	</p:output>
+
+	<!--
+	    dtbook-validator
+	    nimas-fileset-validator
+	-->
+	<p:option name="mathml-version" required="false" select="'3.0'" px:type="string">
+		<p:pipeinfo>
+			<px:type>
+				<choice>
+					<value>3.0</value>
+					<value>2.0</value>
+					<!-- <value>1.01</value> -->
+					<!-- <value>1.0</value> -->
+				</choice>
+			</px:type>
+		</p:pipeinfo>
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<h2 px:role="name">MathML version</h2>
+			<p px:role="desc">Version of MathML in the DTBook file(s).</p>
+		</p:documentation>
+	</p:option>
+
+	<!--
+		dtbook-validator
+		dtbook-to-epub3
+		dtbook-to-html
+		dtbook-to-zedai
+	-->
+	<p:option name="nimas" required="false" px:type="boolean" select="'false'">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<h2 px:role="name">NIMAS input</h2>
+			<p px:role="desc">Whether the input DTBook is a NIMAS 1.1-conformant XML content file.</p>
+		</p:documentation>
+	</p:option>
 
 	<!--
 	    epub-to-daisy

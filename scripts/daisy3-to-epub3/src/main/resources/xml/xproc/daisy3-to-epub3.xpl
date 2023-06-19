@@ -52,13 +52,9 @@
                 (true or false).</p>
         </p:documentation>
     </p:option>
-    <p:option name="assert-valid" required="false" px:type="boolean" select="'false'">
-        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h2 px:role="name">Assert validity</h2>
-            <p px:role="desc">Whether to stop processing and raise an error on validation issues.</p>
-        </p:documentation>
+    <p:option name="validation" select="'off'">
+        <!-- defined in ../../../../../../common-options.xpl -->
     </p:option>
-    
     <p:option xmlns:_="dtbook" name="_:chunk-size" select="'-1'">
         <!-- defined in ../../../../../../common-options.xpl -->
     </p:option>
@@ -107,7 +103,7 @@
             <p:pipe step="load" port="result.in-memory"/>
         </p:input>
         <p:with-option name="mediaoverlays" select="$mediaoverlays"/>
-        <p:with-option name="assert-valid" select="$assert-valid"/>
+        <p:with-option name="validation" select="$validation"/>
         <p:with-option name="chunk-size" xmlns:_="dtbook" select="$_:chunk-size"/>
         <p:with-option name="temp-dir" select="$temp-dir"/>
     </px:daisy3-to-epub3>

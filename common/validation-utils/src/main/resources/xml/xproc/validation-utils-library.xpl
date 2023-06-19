@@ -44,12 +44,10 @@
         <p:documentation>Performs RELAX NG validation, returning two results: the source document (validated, if validation succeeds) and a report of the validation errors (if any).</p:documentation>
     </p:import>
     
-    <p:import href="validate-with-relax-ng-and-report.xpl">
-        <p:documentation>Performs RELAX NG validation, and if there are validation errors, sends them to the error listener as warnings. If 'assert-valid' is true, also raises an error.</p:documentation>
-    </p:import>
-    
     <p:import href="relax-ng-to-schematron.xpl">
         <p:documentation>Extracts embedded Schematron rules from a RELAX NG schema (not in compact syntax).</p:documentation>
     </p:import>
+    
+    <p:import href="report-errors.xpl"/>
     
 </p:library>
