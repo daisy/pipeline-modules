@@ -74,9 +74,11 @@
 		<p:with-option name="validation" select="$validation"/>
 		<p:with-option name="dtbook-is-valid" select="$dtbook-is-valid"/>
 		<!-- reporting validation issues in intermediary documents is not helpful for user -->
-		<p:with-option name="output-validation" select="if ($validation='abort') then 'abort'
-		                                                else if ($validation='report' and $dtbook-is-valid) then 'abort'
-		                                                else 'off'"/>
+		<!-- FIXME: for now we even completely disabled output validation because px:dtbook-to-zedai
+		     is not perfect, but the issues in the ZedAI do not necessarily result in bad HTML -->
+		<p:with-option name="output-validation" select="'off'"/> <!--if ($validation='abort') then 'abort'
+		                                                             else if ($validation='report' and $dtbook-is-valid) then 'abort'
+		                                                             else 'off'-->
 		<p:with-option name="nimas" select="$nimas"/>
 	</px:dtbook-to-zedai>
 
