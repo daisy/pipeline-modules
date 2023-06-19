@@ -518,7 +518,7 @@
       <dependency>
         <groupId>org.daisy.libs</groupId>
         <artifactId>jstyleparser</artifactId>
-        <version>1.20-p20-SNAPSHOT</version>
+        <version>1.20-p20</version>
       </dependency>
       <dependency>
         <groupId>org.unbescape</groupId>
@@ -531,7 +531,7 @@
       <dependency>
         <groupId>org.daisy.braille</groupId>
         <artifactId>braille-css</artifactId>
-        <version>1.22.0-SNAPSHOT</version>
+        <version>1.22.0</version>
       </dependency>
       <!--
           for css-utils, braille-common and braille-css-utils
