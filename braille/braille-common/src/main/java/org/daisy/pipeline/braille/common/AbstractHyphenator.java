@@ -43,8 +43,8 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 
 			/**
 			 * Whether the length of the array returned by {@link
-			 * #getHyphenationOpportunities()} is based on the number of code points in
-			 * the input or the number of characters.
+			 * #getHyphenationOpportunities(String)} is based on the number of code points in the
+			 * input or the number of characters.
 			 */
 			protected abstract boolean isCodePointAware();
 
