@@ -209,7 +209,7 @@ files are MP2, MP3 and WAVE. Audio files in other formats are transcoded to MP3.
 	    zedai-to-pef
 	    epub3-to-epub3
 	-->
-	<p:option name="stylesheet" required="false" px:type="xs:anyURI" select="''" px:sequence="true" px:separator=" "
+	<p:option name="stylesheet" required="false" px:type="anyURI" select="''" px:sequence="true" px:separator=" "
 	          px:media-type="text/css application/xslt+xml">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Style sheets</h2>
