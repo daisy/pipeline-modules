@@ -62,6 +62,12 @@ sheet modules) are available for use in Sass style sheets:
     <p:option name="include-preview"/>
     <p:option name="include-pef"/>
     <p:option name="include-obfl"/>
+    <p:option name="include-css" px:type="boolean" select="'false'">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <h2 px:role="name">Include HTML with inline CSS</h2>
+            <p px:role="desc" xml:space="preserve">Whether or not the include the intermediary HTML with all CSS styles inlined (for debugging).</p>
+        </p:documentation>
+    </p:option>
     <p:option name="output-file-format"/>
     <p:option name="preview-table"/>
     <p:option name="page-width"/>
@@ -89,6 +95,12 @@ sheet modules) are available for use in Sass style sheets:
     <p:option name="pef-output-dir"/>
     <p:option name="preview-output-dir"/>
     <p:option name="obfl-output-dir"/>
+    <p:option name="css-output-dir" px:output="result" px:type="anyDirURI" px:media-type="application/xhtml+xml" select="''">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <h2 px:role="name">HTML with inline CSS</h2>
+            <p px:role="desc">The intermediary HTML file with inline CSS.</p>
+        </p:documentation>
+    </p:option>
     
     <p:option name="temp-dir" required="true" px:output="temp" px:type="anyDirURI">
         <!-- directory used for temporary files -->
@@ -137,10 +149,12 @@ sheet modules) are available for use in Sass style sheets:
                                            include-pef
                                            include-preview
                                            include-obfl
+                                           include-css
                                            output-dir
                                            pef-output-dir
                                            preview-output-dir
                                            obfl-output-dir
+                                           css-output-dir
                                            temp-dir">
         <p:input port="source">
             <p:pipe port="result" step="in-scope-names"/>
@@ -184,21 +198,26 @@ sheet modules) are available for use in Sass style sheets:
     <!-- ========= -->
     <!-- STORE PEF -->
     <!-- ========= -->
-    <px:html-to-pef.store px:message="Storing results" px:progress=".05">
+    <px:html-to-pef.store px:progress=".05">
         <p:input port="obfl">
             <p:pipe step="convert" port="obfl"/>
         </p:input>
         <p:input port="html">
             <p:pipe step="html" port="result.in-memory"/>
         </p:input>
+        <p:input port="css">
+            <p:pipe step="convert" port="css"/>
+        </p:input>
         <p:with-option name="include-pef" select="$include-pef"/>
         <p:with-option name="include-preview" select="$include-preview"/>
+        <p:with-option name="include-css" select="$include-css"/>
         <p:with-option name="output-file-format" select="$output-file-format"/>
         <p:with-option name="preview-table" select="$preview-table"/>
         <p:with-option name="output-dir" select="$output-dir"/>
         <p:with-option name="pef-output-dir" select="$pef-output-dir"/>
         <p:with-option name="preview-output-dir" select="$preview-output-dir"/>
         <p:with-option name="obfl-output-dir" select="$obfl-output-dir"/>
+        <p:with-option name="css-output-dir" select="$css-output-dir"/>
     </px:html-to-pef.store>
     
 </p:declare-step>

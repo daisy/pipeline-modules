@@ -394,7 +394,7 @@ If left blank, the locale information in the input document will be used to sele
 	    epub3-to-pef
 	-->
 	<p:option name="include-obfl" required="false" px:type="boolean" select="'false'">
-		<p:documentation>
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Include OBFL</h2>
 			<p px:role="desc" xml:space="preserve">Whether or not the keep the intermediary OBFL file (for debugging).</p>
 		</p:documentation>
@@ -405,7 +405,7 @@ If left blank, the locale information in the input document will be used to sele
 	    html-to-pef
 	    epub3-to-pef
 	-->
-	<p:option name="obfl-output-dir" required="false" px:output="result" px:type="anyDirURI" px:media-type="text/html" select="''">
+	<p:option name="obfl-output-dir" required="false" px:output="result" px:type="anyDirURI" px:media-type="application/x-obfl+xml" select="''">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">OBFL</h2>
 			<p px:role="desc">The intermediary OBFL file.</p>
