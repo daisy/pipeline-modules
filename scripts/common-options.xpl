@@ -299,7 +299,7 @@ with the "Braille code" option this determines the transformer that is selected.
 	    epub3-to-pef
 	    zedai-to-pef
 	-->
-	<p:option name="output-dir" required="true" px:output="result" px:type="anyDirURI" px:media-type="text">
+	<p:option name="result" required="true" px:output="result" px:type="anyDirURI" px:media-type="text">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Output file</h2>
 			<p px:role="desc">The output braille file.</p>
@@ -355,7 +355,7 @@ If left blank, the locale information in the input document will be used to sele
 	    epub3-to-pef
 	    zedai-to-pef
 	-->
-	<p:option name="preview-output-dir" required="false" px:output="result" px:type="anyDirURI" px:media-type="text/html" select="''">
+	<p:option name="preview" required="false" px:output="result" px:type="anyDirURI" px:media-type="text/html" select="''">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Preview</h2>
 			<p px:role="desc">An HTML preview of the braille result.</p>
@@ -381,7 +381,7 @@ If left blank, the locale information in the input document will be used to sele
 	    epub3-to-pef
 	    zedai-to-pef
 	-->
-	<p:option name="pef-output-dir" required="false" px:output="result" px:type="anyDirURI" px:media-type="application/x-pef+xml" select="''">
+	<p:option name="pef" required="false" px:output="result" px:type="anyDirURI" px:media-type="application/x-pef+xml" select="''">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">PEF</h2>
 			<p px:role="desc">The intermediary PEF file.</p>
@@ -405,7 +405,7 @@ If left blank, the locale information in the input document will be used to sele
 	    html-to-pef
 	    epub3-to-pef
 	-->
-	<p:option name="obfl-output-dir" required="false" px:output="result" px:type="anyDirURI" px:media-type="application/x-obfl+xml" select="''">
+	<p:option name="obfl" required="false" px:output="result" px:type="anyDirURI" px:media-type="application/x-obfl+xml" select="''">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">OBFL</h2>
 			<p px:role="desc">The intermediary OBFL file.</p>

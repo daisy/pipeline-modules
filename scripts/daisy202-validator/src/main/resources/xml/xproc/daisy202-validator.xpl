@@ -22,7 +22,7 @@
         </address>
     </p:documentation>
 
-    <p:option name="ncc" required="true" px:type="anyFileURI" px:media-type="application/xhtml+xml text/html">
+    <p:option name="source" required="true" px:type="anyFileURI" px:media-type="application/xhtml+xml text/html">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h2 px:role="name">NCC</h2>
             <p px:role="desc">The NCC file in the DAISY 2.02 fileset</p>
@@ -52,12 +52,12 @@
     <p:import href="http://www.daisy.org/pipeline/modules/daisy202-utils/library.xpl"/>
 
     <px:daisy202-load name="load">
-        <p:with-option name="ncc" select="$ncc"/>
+        <p:with-option name="ncc" select="$source"/>
     </px:daisy202-load>
 
     <px:daisy202-validator name="validate">
         <p:with-option name="timeToleranceMs" select="$timeToleranceMs"/>
-        <p:with-option name="ncc" select="$ncc"/>
+        <p:with-option name="ncc" select="$source"/>
         <p:input port="in-memory.in">
             <p:pipe port="in-memory.out" step="load"/>
         </p:input>
