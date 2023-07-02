@@ -412,4 +412,49 @@ If left blank, the locale information in the input document will be used to sele
 		</p:documentation>
 	</p:option>
 
+	<!--
+	    daisy202-to-mp3
+	    daisy3-to-mp3
+	-->
+	<p:option name="player-type" select="'1'">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<h2 px:role="name">Player type</h2>
+			<p px:role="desc" xml:space="preserve">The type of MegaVoice Envoy device.</p>
+		</p:documentation>
+		<p:pipeinfo>
+			<px:type>
+				<choice xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
+					<value>1</value>
+					<a:documentation xml:lang="en">Type 1: This produces a folder structure that is four
+					levels deep. At the top level there can be up to 8 folders. Each of these
+					folders can have up to 20 sub-folders. The sub-folders can have up to 999
+					sub-sub-folders, each of which can contain up to 999 MP3
+					files.</a:documentation>
+					<value>2</value>
+					<a:documentation xml:lang="en">Type 2: This produces a folder structure that is two
+					levels deep. On the top level there can be up to 999 folders, and each of these
+					folders can have up to 999 MP3 files.</a:documentation>
+				</choice>
+			</px:type>
+		</p:pipeinfo>
+	</p:option>
+
+	<!--
+	    daisy202-to-mp3
+	    daisy3-to-mp3
+	-->
+	<p:option name="book-folder-level" px:type="integer" select="'1'">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<h2 px:role="name">Book folder level</h2>
+			<p px:role="desc" xml:space="preserve">The folder level corresponding with the book, expressed as a 0-based number.
+
+Value `0` means that top-level folders correspond with top-level sections of the book. Value `1`
+means that the book is contained in a single top-level folder (if it is not too big) with
+sub-folders that correspond with top-level sections of the book.
+
+Must be a non-negative integer value, less than or equal to 3 for type 1 players, and less than or
+equal to 1 for type 2 players.</p>
+		</p:documentation>
+	</p:option>
+
 </p:declare-step>
