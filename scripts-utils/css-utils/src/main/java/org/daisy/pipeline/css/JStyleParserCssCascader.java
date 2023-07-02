@@ -392,7 +392,7 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 											while (!match) {
 												while (preceding != null && !(preceding instanceof Element))
 													preceding = preceding.getPreviousSibling();
-												if (preceding != null)
+												if (preceding == null)
 													break;
 												match = s.matches((Element)preceding);
 												preceding = preceding.getPreviousSibling(); }}
