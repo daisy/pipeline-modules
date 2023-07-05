@@ -8,9 +8,7 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,11 +47,8 @@ public class OSXSpeechEngine extends TTSEngine {
 			throws SynthesisException, InterruptedException {
 		
 		String sentence; {
-			Map<String,Object> xsltParams = new HashMap<>(); {
-				xsltParams.put("voice", voice.name);
-			}
 			try {
-				sentence = transformSsmlNodeToString(ssml, ssmlTransformer, xsltParams);
+				sentence = transformSsmlNodeToString(ssml, ssmlTransformer, null);
 			} catch (IOException | SaxonApiException e) {
 				throw new SynthesisException(e);
 			}

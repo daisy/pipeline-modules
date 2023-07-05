@@ -8,8 +8,6 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
 
 import javax.sound.sampled.AudioInputStream;
@@ -50,11 +48,8 @@ public class QfrencyEngine extends TTSEngine {
 		File outFile = null;
 		String outPath = null;
 		String sentence; {
-			Map<String,Object> xsltParams = new HashMap<>(); {
-				xsltParams.put("voice", voice.name);
-			}
 			try {
-				sentence = transformSsmlNodeToString(ssml, ssmlTransformer, xsltParams);
+				sentence = transformSsmlNodeToString(ssml, ssmlTransformer, null);
 			} catch (IOException | SaxonApiException e) {
 				throw new SynthesisException(e);
 			}
