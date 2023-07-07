@@ -235,7 +235,7 @@ public class SSMLtoAudioTest {
 			        monitor, Proc, config, logs);
 
 			for (String text : ssml) {
-				ssmlToAudio.dispatchSSML(SSMLinXML(text));
+				ssmlToAudio.dispatchSSML(SSMLinXML(text), null);
 			}
 
 			AudioServices audioRegistry = new AudioServices();

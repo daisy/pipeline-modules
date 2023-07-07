@@ -314,21 +314,23 @@ public class SSMLtoAudio implements FormatSpecifications {
 	public void feedSSML(XdmNode doc) throws SynthesisException {
 		XdmSequenceIterator iter = doc.axisIterator(Axis.CHILD);
 		if (iter.hasNext()) {
-			traverse((XdmNode)iter.next());
+			traverse((XdmNode)iter.next(), null);
 		}
 		endSection();
 	}
 
-	private void traverse(XdmNode node) throws SynthesisException {
+	private void traverse(XdmNode node, String lang) throws SynthesisException {
 		if (SentenceTag.equals(node.getNodeName())) {
-			if (!dispatchSSML(node))
+			if (!dispatchSSML(node, lang))
 				mErrorCounter++;
 			if (++mSentenceCounter % MAX_SENTENCES_PER_SECTION == 0)
 				endSection();
 		} else {
+			String l = node.getAttributeValue(Sentence_attr_lang);
+			if (l != null) lang = l;
 			XdmSequenceIterator iter = node.axisIterator(Axis.CHILD);
 			while (iter.hasNext())
-				traverse((XdmNode)iter.next());
+				traverse((XdmNode)iter.next(), lang);
 		}
 	}
 
@@ -336,16 +338,18 @@ public class SSMLtoAudio implements FormatSpecifications {
 	 * The SSML is assumed to be pushed in document order.
 	 *
 	 * @param ssml The input SSML
+	 * @param lang The parent language
 	 * @return true when the SSML was successfully converted to speech, false when there was an error
 	 **/
 	// package private for tests
-	boolean dispatchSSML(XdmNode ssml) throws SynthesisException {
+	boolean dispatchSSML(XdmNode ssml, String lang) throws SynthesisException {
 		String voiceEngine = ssml.getAttributeValue(Sentence_attr_select1);
 		String voiceName = ssml.getAttributeValue(Sentence_attr_select2);
 		String gender = ssml.getAttributeValue(Sentence_attr_gender);
 		String age = ssml.getAttributeValue(Sentence_attr_age);
 		String id = ssml.getAttributeValue(Sentence_attr_id);
-		String lang = ssml.getAttributeValue(Sentence_attr_lang);
+		String l = ssml.getAttributeValue(Sentence_attr_lang);
+		if (l != null) lang = l;
 
 		TTSLog.Entry logEntry = mTTSlog.getOrCreateEntry(id);
 		logEntry.setSSML(ssml);
