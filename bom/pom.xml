@@ -570,7 +570,7 @@
       <dependency>
         <groupId>org.daisy.dotify</groupId>
         <artifactId>dotify.library</artifactId>
-        <version>1.0.6</version>
+        <version>1.0.7</version>
         <exclusions>
           <exclusion>
             <!--
