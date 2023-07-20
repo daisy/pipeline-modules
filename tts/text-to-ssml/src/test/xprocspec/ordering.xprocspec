@@ -8,18 +8,6 @@
 
   <x:scenario label="Regular sentence normalization">
     <x:call step="pxi:reorder-sentences">
-      <x:input port="ids-in-order">
-	<x:document type="inline">
-	  <tmp:ids>
-	    <tmp:id id="s1"/>
-	    <tmp:id id="s2"/>
-	    <tmp:id id="s3"/>
-	    <tmp:id id="s4"/>
-	    <tmp:id id="s5"/>
-	    <tmp:id id="s6"/>
-	  </tmp:ids>
-	</x:document>
-      </x:input>
       <x:input port="source">
 	<x:document type="inline">
 	  <ssml:speak>
@@ -37,6 +25,7 @@
 	  </ssml:speak>
 	</x:document>
       </x:input>
+      <x:option name="ids-in-order" select="('s1','s2','s3','s4','s5','s6')"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result"/>

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step type="px:text-to-ssml" version="1.0" name="main"
 		xmlns:p="http://www.w3.org/ns/xproc"
 		xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
@@ -114,17 +115,6 @@
     </p:input>
   </p:xslt>
 
-  <!-- Description: list the @id in document order. Requirements: (1) must be performed
-       before elements get separated.-->
-  <p:xslt name="get-original-order">
-    <p:input port="stylesheet">
-      <p:document href="../xslt/list-ids.xsl"/>
-    </p:input>
-    <p:input port="parameters">
-      <p:empty/>
-    </p:input>
-  </p:xslt>
-
   <!-- Description: flatten the document structure by keeping only the sentences, taking
        CSS into consideration. Requirements : (1) sentences have been transformed into
        SSML <s>, (2) it keeps intact the structure inside sentences so as to keep inner
@@ -232,9 +222,9 @@
       <p:pipe port="result" step="ssml-of-skippable"/>
       <p:pipe port="result" step="ssml-of-math"/>
     </p:input>
-    <p:input port="ids-in-order">
-      <p:pipe port="result" step="get-original-order"/>
-    </p:input>
+    <p:with-option name="ids-in-order" select="distinct-values(//ssml:s/descendant-or-self::*/@id/string(.))">
+      <p:pipe step="normalize" port="result"/>
+    </p:with-option>
   </pxi:reorder-sentences>
 
 </p:declare-step>
