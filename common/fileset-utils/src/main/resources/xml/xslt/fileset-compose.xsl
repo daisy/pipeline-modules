@@ -9,6 +9,8 @@
     <xsl:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xsl"/>
     <xsl:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl"/>
 
+    <xsl:param name="limit-scope" as="xs:boolean" select="false()"/>
+
     <xsl:template match="/d:fileset">
         <xsl:variable name="a" as="element(d:fileset)" select="."/>
         <xsl:variable name="b" as="element(d:fileset)" select="collection()[2]/*"/>
@@ -96,55 +98,57 @@
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:for-each>
-                <xsl:for-each select="$b-files">
-                    <xsl:variable name="b-file" as="map(*)" select="."/>
-                    <xsl:choose>
-                        <xsl:when test="some $a-file in $a-files
-                                        satisfies $a-file('href')=$b-file('original-href')">
-                            <!-- A file in B originates from a file in A. This has already been handled. -->
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <!-- Assuming that the file in B originates from an existing file. (Note that we could check
-                                 whether mapping A maps the referenced file to another file, but we're assuming it is
-                                 not the case.) -->
-                            <xsl:sequence select="$b-file"/>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:for-each>
-                <xsl:for-each select="$b-anchors">
-                    <xsl:variable name="b-anchor" as="map(*)" select="."/>
-                    <xsl:choose>
-                        <xsl:when test="some $a-anchor in $a-anchors
-                                        satisfies $a-anchor('href')=$b-anchor('original-href') and
-                                                  $a-anchor('id')=$b-anchor('original-id')">
-                            <!-- A fragment in B originates from a fragment in A. This has already been handled. -->
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <!-- Assuming that the fragment in B originates from an existing fragment. (Note that we
-                                 could check whether mapping A maps the referenced fragment to another fragment, but
-                                 we're assuming it is not the case.) -->
-                            <xsl:variable name="a-file" as="map(*)*"
-                                          select="$a-files[.('href')=$b-anchor('original-href')]"/>
-                            <xsl:choose>
-                                <xsl:when test="exists($a-file)">
-                                    <!-- A file in B could originate from multiple files in A. This means documents are
-                                         merged. Assuming that if none of the files list the fragment, the first contains
-                                         it (in other words the fragment is not deleted). -->
-                                    <xsl:variable name="a-file" as="map(*)" select="$a-file[1]"/>
-                                    <xsl:map>
-                                        <xsl:map-entry key="'href'" select="$b-anchor('href')"/>
-                                        <xsl:map-entry key="'id'" select="$b-anchor('id')"/>
-                                        <xsl:map-entry key="'original-href'" select="$a-file('original-href')"/>
-                                        <xsl:map-entry key="'original-id'" select="$b-anchor('original-id')"/>
-                                    </xsl:map>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <xsl:sequence select="$b-anchor"/>
-                                </xsl:otherwise>
-                            </xsl:choose>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:for-each>
+                <xsl:if test="not($limit-scope)">
+                    <xsl:for-each select="$b-files">
+                        <xsl:variable name="b-file" as="map(*)" select="."/>
+                        <xsl:choose>
+                            <xsl:when test="some $a-file in $a-files
+                                            satisfies $a-file('href')=$b-file('original-href')">
+                                <!-- A file in B originates from a file in A. This has already been handled. -->
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <!-- Assuming that the file in B originates from an existing file. (Note that we could check
+                                     whether mapping A maps the referenced file to another file, but we're assuming it is
+                                     not the case.) -->
+                                <xsl:sequence select="$b-file"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:for-each>
+                    <xsl:for-each select="$b-anchors">
+                        <xsl:variable name="b-anchor" as="map(*)" select="."/>
+                        <xsl:choose>
+                            <xsl:when test="some $a-anchor in $a-anchors
+                                            satisfies $a-anchor('href')=$b-anchor('original-href') and
+                                                      $a-anchor('id')=$b-anchor('original-id')">
+                                <!-- A fragment in B originates from a fragment in A. This has already been handled. -->
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <!-- Assuming that the fragment in B originates from an existing fragment. (Note that we
+                                     could check whether mapping A maps the referenced fragment to another fragment, but
+                                     we're assuming it is not the case.) -->
+                                <xsl:variable name="a-file" as="map(*)*"
+                                              select="$a-files[.('href')=$b-anchor('original-href')]"/>
+                                <xsl:choose>
+                                    <xsl:when test="exists($a-file)">
+                                        <!-- A file in B could originate from multiple files in A. This means documents are
+                                             merged. Assuming that if none of the files list the fragment, the first contains
+                                             it (in other words the fragment is not deleted). -->
+                                        <xsl:variable name="a-file" as="map(*)" select="$a-file[1]"/>
+                                        <xsl:map>
+                                            <xsl:map-entry key="'href'" select="$b-anchor('href')"/>
+                                            <xsl:map-entry key="'id'" select="$b-anchor('id')"/>
+                                            <xsl:map-entry key="'original-href'" select="$a-file('original-href')"/>
+                                            <xsl:map-entry key="'original-id'" select="$b-anchor('original-id')"/>
+                                        </xsl:map>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:sequence select="$b-anchor"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:for-each>
+                </xsl:if>
             </xsl:variable>
             <xsl:variable name="files-and-anchors" as="element()*"> <!-- element(d:file|d:anchor)* -->
                 <xsl:for-each select="$files-and-anchors">
