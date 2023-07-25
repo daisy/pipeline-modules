@@ -26,7 +26,6 @@
                 </x:document>
                 <x:document type="inline">
                     <d:fileset xml:base="file:/Users/me/out/">
-                        <d:file href="merged.html" original-href="file:/Users/me/in/part1.html"/>
                         <d:file href="merged.xml" original-href="file:/Users/me/in/part1.xml"/>
                         <d:file href="merged.xml" original-href="../in/part2.xml">
                             <d:anchor id="i" original-id="b"/>
@@ -34,7 +33,7 @@
                         <d:file href="merged.xml" original-href="../in/part3.xml"/>
                         <d:file href="../in/other.xml">
                             <d:anchor id="j" original-id="f"/>
-                            <d:anchor id="k" original-id="e"/>
+                            <d:anchor id="k"/>
                         </d:file>
                         <d:file href="other.xml" original-href="../in/other.xml">
                             <d:anchor id="g"/>
@@ -67,6 +66,7 @@
                     </d:file>
                     <d:file href="../in/other.xml">
                         <d:anchor id="j" original-id="e"/>
+                        <d:anchor id="k"/>
                     </d:file>
                     <d:file href="other.xml" original-href="file:/Users/me/in/other.xml">
                         <d:anchor id="g"/>
