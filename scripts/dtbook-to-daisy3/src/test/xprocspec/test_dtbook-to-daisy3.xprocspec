@@ -471,5 +471,46 @@
 			</x:document>
 		</x:expect>
 	</x:scenario>
+
+	<x:scenario label="minimal book with resources">
+		<x:call step="px:dtbook-to-daisy3">
+			<x:input port="fileset.in">
+				<x:document type="inline">
+					<d:fileset>
+						<d:file href="dtbook.xml" media-type="application/x-dtbook+xml"/>
+						<d:file href="image.png" media-type="image/png" original-href="../resources/samples/image.png"/>
+					</d:fileset>
+				</x:document>
+			</x:input>
+			<x:input port="in-memory.in">
+				<x:document type="inline" xml:base="dtbook.xml">
+					<dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/" version="2005-3" xml:lang="en">
+						<head>
+							<meta name="dtb:uid" content="uid"/>
+							<meta name="dc:Title" content="title"/>
+						</head>
+						<book>
+							<frontmatter>
+								<doctitle id="doctitle">title</doctitle>
+							</frontmatter>
+							<bodymatter>
+								<level1>
+									<h1 id="ch1">chapter</h1>
+									<p id="p1">
+										<img src="image.png"/>
+									</p>
+								</level1>
+							</bodymatter>
+						</book>
+					</dtbook>
+				</x:document>
+			</x:input>
+			<x:option name="audio" select="false()"/>
+			<x:option name="audio-only" select="false()"/>
+			<x:option name="date" select="'2020-02-27'"/>
+			<x:option name="output-fileset-base" select="resolve-uri('result/')"/>
+			<x:option name="word-detection" select="'false'"/>
+		</x:call>
+	</x:scenario>
 	
 </x:description>

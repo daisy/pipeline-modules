@@ -9,6 +9,5 @@
   <nextCatalog catalog="org:daisy:pipeline:modules:css-speech"/> <!-- to remove the CSS attributes -->
   <nextCatalog catalog="org:daisy:pipeline:modules:text-to-ssml"/>
   <nextCatalog catalog="org:daisy:pipeline:modules:tts-common"/>
-  <nextCatalog catalog="org:daisy:pipeline:modules:html-utils"/>
 
 </catalog>

@@ -5,8 +5,6 @@
   <p:input port="source" primary="true" sequence="true" px:media-type="application/ssml+xml">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
       <p>SSML documents.</p>
-      <p>It is assumed that content documents have been prepared so that ID attributes are unique
-      within the whole sequence of SSML documents.</p>
       <p>All <code>s</code> elements are expected to have a <code>xml:lang</code> attribute.</p>
     </p:documentation>
   </p:input>

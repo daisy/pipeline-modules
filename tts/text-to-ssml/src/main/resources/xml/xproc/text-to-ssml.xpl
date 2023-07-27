@@ -36,7 +36,8 @@
   </p:input>
 
   <p:output port="result" sequence="true" primary="true">
-    <p:documentation>The SSML output.</p:documentation>
+    <p:documentation>The SSML output. SSML documents have the same base URI as the
+    <code>content.in</code> document.</p:documentation>
   </p:output>
 
   <p:option name="word-element" required="true">

@@ -1,5 +1,7 @@
 package org.daisy.pipeline.tts;
 
+import java.net.URI;
+
 import net.sf.saxon.s9api.Axis;
 import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmNodeKind;
@@ -45,6 +47,10 @@ public class Sentence implements FormatSpecifications {
 
 	public String getID() {
 		return text.getAttributeValue(Sentence_attr_id);
+	}
+
+	public URI getBaseURI() {
+		return text.getBaseURI();
 	}
 
 	public static int computeSize(XdmNode node) {
