@@ -43,12 +43,12 @@
     </dependency>
     <dependency>
       <groupId>org.daisy.pipeline.modules</groupId>
-      <artifactId>text-to-ssml</artifactId>
+      <artifactId>tts-common</artifactId>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.daisy.pipeline.modules</groupId>
-      <artifactId>tts-common</artifactId>
+      <artifactId>mathml-to-ssml</artifactId>
       <scope>runtime</scope>
     </dependency>
     <!--

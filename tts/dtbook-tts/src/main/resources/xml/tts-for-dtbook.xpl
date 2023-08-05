@@ -6,6 +6,7 @@
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:dtb="http://www.daisy.org/z3986/2005/dtbook/"
                 xmlns:math="http://www.w3.org/1998/Math/MathML"
+                xmlns:ssml="http://www.w3.org/2001/10/synthesis"
                 type="px:tts-for-dtbook" name="main"
                 exclude-inline-prefixes="#all">
 
@@ -118,6 +119,11 @@
       px:fileset-update
     </p:documentation>
   </p:import>
+  <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
+    <p:documentation>
+      px:add-ids
+    </p:documentation>
+  </p:import>
 
   <p:choose name="process-css" px:progress="1/10">
     <p:when test="$audio='true' and $process-css='true'">
@@ -222,7 +228,7 @@
 	    <p:pipe step="break" port="sentence-ids"/>
 	  </p:input>
 	</px:isolate-skippable>
-	<px:dtbook-to-ssml name="ssml" px:message="SSML generation for DTBook" px:progress="1/5">
+	<px:dtbook-to-ssml px:message="SSML generation for DTBook" px:progress="1/5">
 	  <p:input port="sentence-ids">
 	    <p:pipe step="break" port="sentence-ids"/>
 	  </p:input>
@@ -236,6 +242,9 @@
 	    <p:pipe port="config" step="main"/>
 	  </p:input>
 	</px:dtbook-to-ssml>
+	<px:add-ids match="ssml:s" name="ssml">
+	  <p:documentation>px:ssml-to-audio requires that all sentences have an id attribute</p:documentation>
+	</px:add-ids>
 	<p:sink/>
 	<px:css-speech-clean px:progress="1/5">
 	  <p:input port="source">

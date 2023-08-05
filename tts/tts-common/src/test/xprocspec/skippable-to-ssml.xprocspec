@@ -22,7 +22,7 @@
 	<p:with-param name="style-ns" select="'http://www.daisy.org/ns/pipeline/tmp'"/>
 	<p:with-param name="lang" select="'en'"/>
 	<p:input port="stylesheet">
-	  <p:document href="../../main/resources/xml/xslt/skippable-to-ssml.xsl"/>
+	  <p:document href="../../main/resources/xml/xproc/skippable-to-ssml.xsl"/>
 	 </p:input>
       </p:xslt>
       <pxi:clean-text/>
@@ -116,15 +116,13 @@
     <x:context label="result">
       <x:document type="port" port="result"/>
     </x:context>
-    <x:expect label="skippable" type="compare" xfail="FIXME: check expected output">
+    <x:expect label="skippable" type="compare">
       <x:document type="inline">
 	<ssml:speak version="1.1">
-	  <ssml:s id="internal-holder-of-p1" tmp:speech-rate="10" xml:lang="xx">
+	  <ssml:s tmp:speech-rate="10" xml:lang="xx">
 	                               <pagenum id="p1">1</pagenum>
 	    <ssml:mark name="p1___p2"/><pagenum id="p2">2</pagenum>
-	  </ssml:s>
-	  <ssml:s tmp:volume="30" tmp:speech-rate="10" id="p3" xml:lang="xx">
-	    <pagenum id="p3">3</pagenum>
+	    <ssml:mark name="p2___p3"/><pagenum id="p3">3</pagenum>
 	  </ssml:s>
 	</ssml:speak>
       </x:document>
@@ -155,7 +153,7 @@
     <x:expect label="skippable" type="compare">
       <x:document type="inline">
 	<ssml:speak version="1.1">
-	  <ssml:s id="internal-holder-of-p1" xml:lang="xx" tmp:volume="30">
+	  <ssml:s xml:lang="xx" tmp:volume="30">
 	    <pagenum id="p1">1</pagenum><ssml:mark name="p1___p3"/>
 	    <pagenum id="p3">3</pagenum>
 	  </ssml:s>
@@ -218,7 +216,7 @@
     <x:expect label="skippable" type="compare">
       <x:document type="inline">
 	<ssml:speak version="1.1">
-	  <ssml:s id="internal-holder-of-p1" xml:lang="zzz">
+	  <ssml:s xml:lang="zzz">
 	                               <pagenum id="p1">1</pagenum>
 	    <ssml:mark name="p1___p2"/><pagenum id="p2">2</pagenum>
 	    <ssml:mark name="p2___p3"/><pagenum id="p3">3</pagenum>
@@ -230,7 +228,7 @@
 	    <ssml:mark name="p8___p9"/><pagenum id="p9">9</pagenum>
 	    <ssml:mark name="p9___p10"/><pagenum id="p10">10</pagenum>
 	  </ssml:s>
-	  <ssml:s id="internal-holder-of-p11" xml:lang="zzz">
+	  <ssml:s xml:lang="zzz">
 	                                 <pagenum id="p11">11</pagenum>
 	    <ssml:mark name="p11___p12"/><pagenum id="p12">12</pagenum>
 	  </ssml:s>

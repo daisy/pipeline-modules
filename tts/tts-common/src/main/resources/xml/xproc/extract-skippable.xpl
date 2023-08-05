@@ -49,7 +49,7 @@
 
   <p:xslt name="separate">
     <p:input port="stylesheet">
-      <p:document href="../xslt/extract-skippable.xsl"/>
+      <p:document href="extract-skippable.xsl"/>
     </p:input>
     <p:with-param port="parameters" name="sentence-ids" select="/">
       <p:pipe step="main" port="sentence-ids"/>

@@ -7,7 +7,7 @@
 		exclude-inline-prefixes="#all">
 
   <p:input port="source" sequence="true"/>
-  <p:output port="result" sequence="true"/>
+  <p:output port="result"/>
 
   <p:option name="ids-in-order" cx:as="xs:string*" required="true">
     <p:documentation>The sentence IDs in the desired order. The resulting SSML will start with these
@@ -16,7 +16,7 @@
 
   <p:xslt>
     <p:input port="stylesheet">
-      <p:document href="../xslt/reorder-sentences.xsl"/>
+      <p:document href="reorder-sentences.xsl"/>
     </p:input>
     <p:with-param port="parameters" name="ids-in-order" select="$ids-in-order"/>
   </p:xslt>

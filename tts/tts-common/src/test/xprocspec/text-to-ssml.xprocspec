@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
 	       xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-	       xmlns:dt="http://www.daisy.org/z3986/2005/dtbook/"
-	       xmlns="http://www.w3.org/2001/10/synthesis"
+	       xmlns:ssml="http://www.w3.org/2001/10/synthesis"
 	       xmlns:tmp="http://www.daisy.org/ns/pipeline/tts"
 	       xmlns:d="http://www.daisy.org/ns/pipeline/data"
 	       xmlns:m="http://www.w3.org/1998/Math/MathML"
+	       xmlns="http://www.w3.org/2001/10/synthesis"
                script="../../main/resources/xml/xproc/text-to-ssml.xpl">
-
-
-  <!-- TODO: XML comparisons should not take punctuation into account -->
 
   <x:scenario label="Full workflow">
     <x:call step="px:text-to-ssml">
@@ -50,10 +47,10 @@
     <x:scenario label="basic transformation">
       <x:call step="px:text-to-ssml">
 	<x:input port="content.in">
-	  <x:document type="inline">
-	    <dt:dtbook xml:lang="en">
-	      <dt:w>abc</dt:w><dt:sent id="s1"><dt:w>xzy</dt:w></dt:sent>
-	    </dt:dtbook>
+	  <x:document type="inline" xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+	    <dtbook xml:lang="en">
+	      <w>abc</w><sent id="s1"><w>xzy</w></sent>
+	    </dtbook>
 	  </x:document>
 	</x:input>
       </x:call>
@@ -72,16 +69,16 @@
     <x:scenario label="basic transformation with 1 skippable structure">
       <x:call step="px:text-to-ssml">
 	<x:input port="content.in">
-	  <x:document type="inline">
-	    <dt:dtbook xml:lang="en">
-	      <dt:sent id="s1">
-		<dt:span id="sp1"><dt:w>text1</dt:w></dt:span>
-		<dt:span>
-		  <dt:pagenum id="sk1">13</dt:pagenum>
-		</dt:span>
-		<dt:span id="sp2"><dt:w>text2</dt:w></dt:span>
-	      </dt:sent>
-	    </dt:dtbook>
+	  <x:document type="inline" xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+	    <dtbook xml:lang="en">
+	      <sent id="s1">
+		<span id="sp1"><w>text1</w></span>
+		<span>
+		  <pagenum id="sk1">13</pagenum>
+		</span>
+		<span id="sp2"><w>text2</w></span>
+	      </sent>
+	    </dtbook>
 	  </x:document>
 	</x:input>
       </x:call>
@@ -101,20 +98,20 @@
     <x:scenario label="basic transformation with 2 skippable structures">
       <x:call step="px:text-to-ssml">
 	<x:input port="content.in">
-	  <x:document type="inline">
-	    <dt:dtbook xml:lang="en">
-	      <dt:sent id="s1">
-		<dt:span id="sp1"><dt:w>text1</dt:w></dt:span>
-		<dt:span>
-		  <dt:pagenum id="sk1">13</dt:pagenum>
-		</dt:span>
-		<dt:span id="sp2"><dt:w>text2</dt:w></dt:span>
-		<dt:span>
-		  <dt:pagenum id="sk2">14</dt:pagenum>
-		</dt:span>
-		<dt:span id="sp3"><dt:w>text3</dt:w></dt:span>
-	      </dt:sent>
-	    </dt:dtbook>
+	  <x:document type="inline" xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+	    <dtbook xml:lang="en">
+	      <sent id="s1">
+		<span id="sp1"><w>text1</w></span>
+		<span>
+		  <pagenum id="sk1">13</pagenum>
+		</span>
+		<span id="sp2"><w>text2</w></span>
+		<span>
+		  <pagenum id="sk2">14</pagenum>
+		</span>
+		<span id="sp3"><w>text3</w></span>
+	      </sent>
+	    </dtbook>
 	  </x:document>
 	</x:input>
       </x:call>
@@ -125,7 +122,7 @@
 	<x:document type="inline">
 	  <speak version="1.1">
 	    <s id="s1" xml:lang="en"><token>text1</token> <mark name="sp1___sp2"/> <token>text2</token> <mark name="sp2___sp3"/> <token>text3</token></s>
-	    <s id="internal-holder-of-sk1" xml:lang="en">13 , <mark name="sk1___sk2"/> . 14 ,</s>
+	    <s xml:lang="en">13 , <mark name="sk1___sk2"/> . 14 ,</s>
 	  </speak>
 	</x:document>
       </x:expect>
@@ -134,10 +131,10 @@
     <x:scenario label="both sentence and skippable structure">
       <x:call step="px:text-to-ssml">
 	<x:input port="content.in">
-	  <x:document type="inline">
-	    <dt:dtbook xml:lang="en">
-	      <dt:pagenum id="s1"><dt:w>1</dt:w></dt:pagenum>
-	    </dt:dtbook>
+	  <x:document type="inline" xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+	    <dtbook xml:lang="en">
+	      <pagenum id="s1"><w>1</w></pagenum>
+	    </dtbook>
 	  </x:document>
 	</x:input>
 	<x:input port="skippable-ids">
@@ -164,12 +161,12 @@
     <x:scenario label="Language inheritance">
       <x:call step="px:text-to-ssml">
 	<x:input port="content.in">
-	  <x:document type="inline">
-	    <dt:dtbook xml:lang="en">
-	      <dt:level xml:lang="fr">
-		<dt:span id="s1"><dt:w>sentence</dt:w></dt:span>
-	      </dt:level>
-	    </dt:dtbook>
+	  <x:document type="inline" xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+	    <dtbook xml:lang="en">
+	      <level xml:lang="fr">
+		<span id="s1"><w>sentence</w></span>
+	      </level>
+	    </dtbook>
 	  </x:document>
 	</x:input>
       </x:call>
@@ -188,14 +185,14 @@
     <x:scenario label="CSS properties outside sentences">
       <x:call step="px:text-to-ssml">
 	<x:input port="content.in">
-	  <x:document type="inline">
-	    <dt:dtbook xml:lang="en" tmp:pitch="1">
-	      <dt:level tmp:volume="2" tmp:speech-rate="3">
-		<dt:span tmp:pitch="0">
-		  <dt:sent id="s1"><dt:w>sentence</dt:w></dt:sent>
-		</dt:span>
-	      </dt:level>
-	    </dt:dtbook>
+	  <x:document type="inline" xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+	    <dtbook xml:lang="en" tmp:pitch="1">
+	      <level tmp:volume="2" tmp:speech-rate="3">
+		<span tmp:pitch="0">
+		  <sent id="s1"><w>sentence</w></sent>
+		</span>
+	      </level>
+	    </dtbook>
 	  </x:document>
 	</x:input>
       </x:call>
@@ -223,15 +220,15 @@
     <x:scenario label="CSS inside sentence">
       <x:call step="px:text-to-ssml">
 	<x:input port="content.in">
-  	<x:document type="inline">
-  	  <dt:dtbook xml:lang="en">
-  	    <s id="s1">
-	      <dt:w>word1</dt:w>
-	      <dt:span tmp:speech-rate="0" tmp:volume="1">
-		<dt:span tmp:pitch="2" tmp:speech-rate="3"><dt:w>word2</dt:w></dt:span>
-	      </dt:span>
-	    </s>
-  	  </dt:dtbook>
+  	<x:document type="inline" xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+  	  <dtbook xml:lang="en">
+  	    <ssml:s id="s1">
+	      <w>word1</w>
+	      <span tmp:speech-rate="0" tmp:volume="1">
+		<span tmp:pitch="2" tmp:speech-rate="3"><w>word2</w></span>
+	      </span>
+	    </ssml:s>
+  	  </dtbook>
         </x:document>
 	</x:input>
       </x:call>
@@ -261,10 +258,10 @@
     <x:scenario label="CSS inside and outside sentence">
       <x:call step="px:text-to-ssml">
 	<x:input port="content.in">
-  	<x:document type="inline">
-  	  <dt:dtbook xml:lang="en" tmp:volume="1">
-  	    <s id="s1"><dt:w>word1</dt:w><dt:span><dt:span tmp:volume="2"><dt:w>word2</dt:w></dt:span></dt:span></s>
-  	  </dt:dtbook>
+  	<x:document type="inline" xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+  	  <dtbook xml:lang="en" tmp:volume="1">
+  	    <ssml:s id="s1"><w>word1</w><span><span tmp:volume="2"><w>word2</w></span></span></ssml:s>
+  	  </dtbook>
         </x:document>
 	</x:input>
       </x:call>
@@ -290,10 +287,10 @@
     <x:scenario label="CSS inside and outside sentence on standalone skippable elt V1">
       <x:call step="px:text-to-ssml">
 	<x:input port="content.in">
-  	<x:document type="inline">
-  	  <dt:dtbook xml:lang="en" tmp:voice-family="engine,name">
-  	    <s id="s1"><dt:span tmp:volume="2"><dt:pagenum id="sk1">1</dt:pagenum></dt:span></s>
-  	  </dt:dtbook>
+  	<x:document type="inline" xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+  	  <dtbook xml:lang="en" tmp:voice-family="engine,name">
+  	    <ssml:s id="s1"><span tmp:volume="2"><pagenum id="sk1">1</pagenum></span></ssml:s>
+  	  </dtbook>
         </x:document>
 	</x:input>
       </x:call>
@@ -314,10 +311,10 @@
     <x:scenario label="CSS inside and outside sentence on standalone skippable elt V2">
       <x:call step="px:text-to-ssml">
 	<x:input port="content.in">
-  	<x:document type="inline">
-  	  <dt:dtbook xml:lang="en" tmp:volume="2">
-  	    <s id="s1"><dt:span tmp:voice-family="engine,name"><dt:pagenum id="sk1">1</dt:pagenum></dt:span></s>
-  	  </dt:dtbook>
+  	<x:document type="inline" xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+  	  <dtbook xml:lang="en" tmp:volume="2">
+  	    <ssml:s id="s1"><span tmp:voice-family="engine,name"><pagenum id="sk1">1</pagenum></span></ssml:s>
+  	  </dtbook>
         </x:document>
 	</x:input>
       </x:call>
@@ -338,14 +335,14 @@
     <x:scenario label="CSS inside and outside sentence on separated skippable elt V1">
       <x:call step="px:text-to-ssml">
 	<x:input port="content.in">
-  	<x:document type="inline">
-  	  <dt:dtbook xml:lang="en" tmp:voice-family="engine,name">
-  	    <s id="s1">
-	      <dt:span id="left"><dt:w>left</dt:w></dt:span>
-	      <dt:span tmp:volume="2"><dt:pagenum id="sk1">1</dt:pagenum></dt:span>
-	      <dt:span id="right"><dt:w>right</dt:w></dt:span>
-	    </s>
-  	  </dt:dtbook>
+  	<x:document type="inline" xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+  	  <dtbook xml:lang="en" tmp:voice-family="engine,name">
+  	    <ssml:s id="s1">
+	      <span id="left"><w>left</w></span>
+	      <span tmp:volume="2"><pagenum id="sk1">1</pagenum></span>
+	      <span id="right"><w>right</w></span>
+	    </ssml:s>
+  	  </dtbook>
         </x:document>
 	</x:input>
       </x:call>
@@ -371,14 +368,14 @@
     <x:scenario label="CSS inside and outside sentence on separated skippable elt V2">
       <x:call step="px:text-to-ssml">
 	<x:input port="content.in">
-  	<x:document type="inline">
-  	  <dt:dtbook xml:lang="en" tmp:volume="2">
-  	    <s id="s1">
-	      <dt:span id="left"><dt:w>left</dt:w></dt:span>
-	      <dt:span tmp:voice-family="engine,name"><dt:pagenum id="sk1">1</dt:pagenum></dt:span>
-	      <dt:span id="right"><dt:w>right</dt:w></dt:span>
-	    </s>
-  	  </dt:dtbook>
+  	<x:document type="inline" xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+  	  <dtbook xml:lang="en" tmp:volume="2">
+  	    <ssml:s id="s1">
+	      <span id="left"><w>left</w></span>
+	      <span tmp:voice-family="engine,name"><pagenum id="sk1">1</pagenum></span>
+	      <span id="right"><w>right</w></span>
+	    </ssml:s>
+  	  </dtbook>
         </x:document>
 	</x:input>
       </x:call>
@@ -406,16 +403,16 @@
     <x:scenario label="CSS inside and outside sentence on two separated skippables elt">
       <x:call step="px:text-to-ssml">
 	<x:input port="content.in">
-  	<x:document type="inline">
-  	  <dt:dtbook xml:lang="en">
-  	    <s id="s1">
-	      <dt:span id="left"><dt:w>left</dt:w></dt:span>
-	      <dt:span tmp:voice-family="engine,name"><dt:pagenum id="sk1">1</dt:pagenum></dt:span>
-	      <dt:span id="middle"><dt:w>middle</dt:w></dt:span>
-	      <dt:span tmp:voice-family="engine,name"><dt:pagenum id="sk2">2</dt:pagenum></dt:span>
-	      <dt:span id="right"><dt:w>right</dt:w></dt:span>
-	    </s>
-  	  </dt:dtbook>
+  	<x:document type="inline" xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+  	  <dtbook xml:lang="en">
+  	    <ssml:s id="s1">
+	      <span id="left"><w>left</w></span>
+	      <span tmp:voice-family="engine,name"><pagenum id="sk1">1</pagenum></span>
+	      <span id="middle"><w>middle</w></span>
+	      <span tmp:voice-family="engine,name"><pagenum id="sk2">2</pagenum></span>
+	      <span id="right"><w>right</w></span>
+	    </ssml:s>
+  	  </dtbook>
         </x:document>
 	</x:input>
       </x:call>
@@ -432,7 +429,7 @@
 	      <mark name="middle___right"/>
 	      <token>right</token>
 	    </s>
-	    <s id="internal-holder-of-sk1" xml:lang="en" voice-selector1="engine" voice-selector2="name">
+	    <s xml:lang="en" voice-selector1="engine" voice-selector2="name">
 	      1, <mark name="sk1___sk2"/> . 2,
 	    </s>
 	  </speak>
@@ -443,10 +440,10 @@
     <x:scenario label="Pre-existing SSML prosody node">
       <x:call step="px:text-to-ssml">
 	<x:input port="content.in">
-  	<x:document type="inline">
-  	  <dt:dtbook xml:lang="en">
-  	    <s id="s1"><prosody volume="1"><dt:w>sentence</dt:w></prosody></s>
-  	  </dt:dtbook>
+  	<x:document type="inline" xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+  	  <dtbook xml:lang="en">
+  	    <ssml:s id="s1"><ssml:prosody volume="1"><w>sentence</w></ssml:prosody></ssml:s>
+  	  </dtbook>
         </x:document>
 	</x:input>
       </x:call>
@@ -469,10 +466,10 @@
   <!-- <x:scenario label="Pre-existent outside SSML"> -->
   <!--   <x:call step="pxi:text-to-ssml-wrapper"> -->
   <!--     <x:input port="content.in"> -->
-  <!-- 	<x:document type="inline"> -->
-  <!-- 	  <dt:dtbook xml:lang="en"> -->
-  <!-- 	    <prosody volume="1"><s id="s1">sentence</s></prosody> -->
-  <!-- 	  </dt:dtbook> -->
+  <!-- 	<x:document type="inline" xmlns="http://www.daisy.org/z3986/2005/dtbook/"> -->
+  <!-- 	  <dtbook xml:lang="en"> -->
+  <!-- 	    <ssml:prosody volume="1"><ssml:s id="s1">sentence</ssml:s></ssml:prosody> -->
+  <!-- 	  </dtbook> -->
   <!--       </x:document> -->
   <!--     </x:input> -->
   <!--   </x:call> -->
@@ -481,13 +478,11 @@
   <!--   </x:context> -->
   <!--   <x:expect label="result" type="compare"> -->
   <!--     <x:document type="inline"> -->
-  <!-- 	<all> -->
-  <!-- 	  <speak version="1.1"> -->
-  <!-- 	    <s id="s1" xml:lang="en"> -->
-  <!-- 	      <prosody volume="1">sentence</prosody> -->
-  <!-- 	    </s> -->
-  <!-- 	  </speak> -->
-  <!-- 	</all> -->
+  <!-- 	<speak version="1.1"> -->
+  <!-- 	  <s id="s1" xml:lang="en"> -->
+  <!-- 	    <prosody volume="1">sentence</prosody> -->
+  <!-- 	  </s> -->
+  <!-- 	</speak> -->
   <!--     </x:document> -->
   <!--   </x:expect> -->
   <!-- </x:scenario> -->
@@ -495,12 +490,12 @@
     <x:scenario label="Preexisting SSML tokens">
       <x:call step="px:text-to-ssml">
 	<x:input port="content.in">
-  	<x:document type="inline">
-  	  <dt:dtbook xml:lang="en">
-  	    <s id="s1" xml:lang="en">
-  	      <token>word1</token> <token>word2</token>
-  	    </s>
-  	  </dt:dtbook>
+  	<x:document type="inline" xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+  	  <dtbook xml:lang="en">
+  	    <ssml:s id="s1" xml:lang="en">
+  	      <ssml:token>word1</ssml:token> <ssml:token>word2</ssml:token>
+  	    </ssml:s>
+  	  </dtbook>
         </x:document>
 	</x:input>
       </x:call>
@@ -521,16 +516,16 @@
     <x:scenario label="Voice family">
       <x:call step="px:text-to-ssml">
 	<x:input port="content.in">
-  	<x:document type="inline">
-  	  <dt:dtbook xml:lang="en">
-  	    <dt:level>
-  	      <s tmp:voice-family="espeak" id="s1"><dt:w>sentence1</dt:w></s>
-  	      <s tmp:voice-family="att,alain16" id="s2"><dt:w>sentence2</dt:w></s>
-  	      <s tmp:voice-family="att,16" id="s3"><dt:w>sentence3</dt:w></s>
-  	      <s tmp:voice-family="16,male,att" id="s4"><dt:w>sentence4</dt:w></s>
-  	      <s tmp:voice-family="female,15" id="s5"><dt:w>sentence5</dt:w></s>
-  	    </dt:level>
-  	  </dt:dtbook>
+  	<x:document type="inline" xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+  	  <dtbook xml:lang="en">
+  	    <level>
+  	      <ssml:s tmp:voice-family="espeak" id="s1"><w>sentence1</w></ssml:s>
+  	      <ssml:s tmp:voice-family="att,alain16" id="s2"><w>sentence2</w></ssml:s>
+  	      <ssml:s tmp:voice-family="att,16" id="s3"><w>sentence3</w></ssml:s>
+  	      <ssml:s tmp:voice-family="16,male,att" id="s4"><w>sentence4</w></ssml:s>
+  	      <ssml:s tmp:voice-family="female,15" id="s5"><w>sentence5</w></ssml:s>
+  	    </level>
+  	  </dtbook>
         </x:document>
 	</x:input>
       </x:call>
@@ -554,14 +549,14 @@
     <x:scenario label="SSML say-as">
       <x:call step="px:text-to-ssml">
 	<x:input port="content.in">
-  	<x:document type="inline">
-  	  <dt:dtbook xml:lang="en">
-  	    <dt:level>
-  	      <s tmp:speak='spell-out' id="s1"><dt:w>sentence1</dt:w></s>
-  	      <s tmp:speak-numeral='digits' id="s2"><dt:w>sentence2</dt:w></s>
-  	      <s tmp:speak-numeral='continuous' id="s3"><dt:w>sentence3</dt:w></s>
-  	    </dt:level>
-  	  </dt:dtbook>
+  	<x:document type="inline" xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+  	  <dtbook xml:lang="en">
+  	    <level>
+  	      <ssml:s tmp:speak='spell-out' id="s1"><w>sentence1</w></ssml:s>
+  	      <ssml:s tmp:speak-numeral='digits' id="s2"><w>sentence2</w></ssml:s>
+  	      <ssml:s tmp:speak-numeral='continuous' id="s3"><w>sentence3</w></ssml:s>
+  	    </level>
+  	  </dtbook>
         </x:document>
 	</x:input>
       </x:call>
@@ -582,12 +577,12 @@
     <x:scenario label="CSS pause-before">
       <x:call step="px:text-to-ssml">
 	<x:input port="content.in">
-  	<x:document type="inline">
-  	  <dt:dtbook xml:lang="en">
-  	    <dt:level tmp:pause-before='10'>
-  	      <s id="s1"><dt:w>sentence</dt:w></s>
-  	    </dt:level>
-  	  </dt:dtbook>
+  	<x:document type="inline" xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+  	  <dtbook xml:lang="en">
+  	    <level tmp:pause-before='10'>
+  	      <ssml:s id="s1"><w>sentence</w></ssml:s>
+  	    </level>
+  	  </dtbook>
         </x:document>
       	</x:input>
       </x:call>
@@ -606,12 +601,12 @@
     <x:scenario label="CSS pause-after">
       <x:call step="px:text-to-ssml">
 	<x:input port="content.in">
-  	<x:document type="inline">
-  	  <dt:dtbook xml:lang="en">
-  	    <dt:level>
-  	      <s id="s1"><dt:span tmp:pause-after="10"><dt:w>sentence</dt:w></dt:span></s>
-  	    </dt:level>
-  	  </dt:dtbook>
+  	<x:document type="inline" xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+  	  <dtbook xml:lang="en">
+  	    <level>
+  	      <ssml:s id="s1"><span tmp:pause-after="10"><w>sentence</w></span></ssml:s>
+  	    </level>
+  	  </dtbook>
         </x:document>
 	</x:input>
       </x:call>
@@ -630,19 +625,19 @@
     <x:scenario label="CSS mixed cues and pauses">
       <x:call step="px:text-to-ssml">
 	<x:input port="content.in">
-  	<x:document type="inline">
-  	  <dt:dtbook xml:lang="en">
-  	    <dt:level tmp:pause-before="1" tmp:pause-after="2">
-  	      <dt:level tmp:cue-after="file:///foo/beep1.mp3"/>
-  	    </dt:level>
-  	    <dt:level tmp:pause-before="3" tmp:cue-before="file:/foo/beep2.mp3" tmp:pause-after="6">
-  	      <dt:level tmp:pause-before="4" tmp:pause-after="5">
-  	    	<s id="s1"><dt:w>sentence1</dt:w></s>
-  	      </dt:level>
-  	      <s id="s2"><dt:w>sentence2</dt:w></s>
-  	    </dt:level>
-  	    <dt:level tmp:cue-after="/foo/beep3.mp3" tmp:pause-after="7"/>
-  	  </dt:dtbook>
+  	<x:document type="inline" xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+  	  <dtbook xml:lang="en">
+  	    <level tmp:pause-before="1" tmp:pause-after="2">
+  	      <level tmp:cue-after="file:///foo/beep1.mp3"/>
+  	    </level>
+  	    <level tmp:pause-before="3" tmp:cue-before="file:/foo/beep2.mp3" tmp:pause-after="6">
+  	      <level tmp:pause-before="4" tmp:pause-after="5">
+  	    	<ssml:s id="s1"><w>sentence1</w></ssml:s>
+  	      </level>
+  	      <ssml:s id="s2"><w>sentence2</w></ssml:s>
+  	    </level>
+  	    <level tmp:cue-after="/foo/beep3.mp3" tmp:pause-after="7"/>
+  	  </dtbook>
         </x:document>
       	</x:input>
       </x:call>
@@ -674,11 +669,14 @@
     <x:scenario label="Standalone MathML">
       <x:call step="px:text-to-ssml">
 	<x:input port="content.in">
-	  <x:document type="inline">
-	    <dt:dtbook xml:lang="en">
-	      <m:math id="s1"><m:mi>x</m:mi></m:math>
-	      <dt:sent id="s2"><dt:w>regular</dt:w></dt:sent>
-	    </dt:dtbook>
+	  <x:document type="inline" xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+	    <dtbook xml:lang="en">
+	      <ssml:speak version="1.1" id="s1" xml:lang="en">
+		<ssml:say-as interpret-as="ordinal"> 12 </ssml:say-as>
+		root of  x  over  y
+	      </ssml:speak>
+	      <sent id="s2"><w>regular</w></sent>
+	    </dtbook>
 	  </x:document>
 	</x:input>
       </x:call>
@@ -688,7 +686,10 @@
       <x:expect label="result" type="compare">
 	<x:document type="inline">
 	  <speak version="1.1">
-	    <s id="s1" xml:lang="en"> x </s>
+	    <s id="s1" xml:lang="en">
+	      <ssml:say-as interpret-as="ordinal"> 12 </ssml:say-as>
+	      root of  x  over  y
+            </s>
 	    <s id="s2" xml:lang="en">
               <token>regular</token>
 	    </s>
@@ -700,15 +701,18 @@
     <x:scenario label="Skippable MathML">
       <x:call step="px:text-to-ssml">
 	<x:input port="content.in">
-	  <x:document type="inline">
-	    <dt:dtbook xml:lang="en">
-	      <dt:sent id="s1">
-		<dt:span id="sp1"><dt:w>before</dt:w></dt:span>
-		<m:math id="sk1"><m:mi>x</m:mi></m:math>
-		<dt:span id="sp2"><dt:w>after</dt:w></dt:span>
-	      </dt:sent>
-	      <dt:sent id="s2"><dt:w>regular</dt:w></dt:sent>
-	    </dt:dtbook>
+	  <x:document type="inline" xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+	    <dtbook xml:lang="en">
+	      <sent id="s1">
+		<span id="sp1"><w>before</w></span>
+		<ssml:speak version="1.1" id="sk1" xml:lang="en">
+		  <ssml:say-as interpret-as="ordinal"> 12 </ssml:say-as>
+		  root of  x  over  y
+		</ssml:speak>
+		<span id="sp2"><w>after</w></span>
+	      </sent>
+	      <sent id="s2"><w>regular</w></sent>
+	    </dtbook>
 	  </x:document>
 	</x:input>
       </x:call>
@@ -723,7 +727,10 @@
                <mark name="sp1___sp2"/>
                <token>after</token>
 	     </s>
-	     <s id="sk1" xml:lang="en"> x </s>
+	     <s id="sk1" xml:lang="en">
+	      <ssml:say-as interpret-as="ordinal"> 12 </ssml:say-as>
+	      root of  x  over  y
+	     </s>
 	     <s id="s2" xml:lang="en">
                <token>regular</token>
 	     </s>
@@ -731,7 +738,6 @@
 	</x:document>
       </x:expect>
     </x:scenario>
-
 
   </x:scenario>
 

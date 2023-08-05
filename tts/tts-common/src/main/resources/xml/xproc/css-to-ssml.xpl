@@ -12,7 +12,7 @@
 	<p:empty/>
       </p:input>
       <p:input port="stylesheet">
-	<p:document href="../xslt/css-to-ssml.xsl"/>
+	<p:document href="css-to-ssml.xsl"/>
       </p:input>
     </p:xslt>
   </p:for-each>

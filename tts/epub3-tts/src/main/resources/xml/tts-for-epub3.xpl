@@ -6,6 +6,7 @@
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:epub="http://www.idpf.org/2007/ops"
                 xmlns:tts="http://www.daisy.org/ns/pipeline/tts"
+                xmlns:ssml="http://www.w3.org/2001/10/synthesis"
                 exclude-inline-prefixes="#all"
                 type="px:tts-for-epub3" name="main">
 
@@ -139,6 +140,11 @@
       px:fileset-update
     </p:documentation>
   </p:import>
+  <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
+    <p:documentation>
+      px:add-ids
+    </p:documentation>
+  </p:import>
 
   <p:variable name="fileset-base" select="base-uri(/*)">
     <p:pipe step="main" port="source.fileset"/>
@@ -253,7 +259,7 @@
             <p:pipe step="break" port="sentence-ids"/>
           </p:input>
         </px:isolate-skippable>
-        <px:epub3-to-ssml name="ssml" px:progress="1/5" px:message="Generating SSML from HTML">
+        <px:epub3-to-ssml px:progress="1/5" px:message="Generating SSML from HTML">
           <p:input port="sentence-ids">
             <p:pipe step="break" port="sentence-ids"/>
           </p:input>
@@ -267,6 +273,9 @@
             <p:pipe port="config" step="main"/>
           </p:input>
         </px:epub3-to-ssml>
+        <px:add-ids match="ssml:s" name="ssml">
+          <p:documentation>px:ssml-to-audio requires that all sentences have an id attribute</p:documentation>
+        </px:add-ids>
         <p:sink/>
         <p:group px:progress="1/10">
           <p:documentation>

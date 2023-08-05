@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
 	       xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+	       xmlns:p="http://www.w3.org/ns/xproc"
 	       xmlns="http://www.daisy.org/z3986/2005/dtbook/"
 	       xmlns:ssml="http://www.w3.org/2001/10/synthesis"
 	       xmlns:xml="http://www.w3.org/XML/1998/namespace"
@@ -9,10 +10,7 @@
 	       xmlns:tmp="http://www.daisy.org/ns/pipeline/tts">
 
   <x:script>
-    <p:declare-step version="1.0" name="main"
-  		    xmlns:p="http://www.w3.org/ns/xproc"
-  		    type="pxi:normalize">
-
+    <p:declare-step version="1.0" type="pxi:normalize">
       <p:input port="source" primary="true"/>
       <p:output port="result" primary="true"/>
       <p:option name="word-attr" select="''" required="false"/>
@@ -22,10 +20,9 @@
 	<p:with-param name="word-attr" select="$word-attr"/>
 	<p:with-param name="word-attr-val" select="$word-attr-val"/>
   	<p:input port="stylesheet">
-  	  <p:document href="../../main/resources/xml/xslt/normalize.xsl"/>
+  	  <p:document href="../../main/resources/xml/xproc/normalize.xsl"/>
   	</p:input>
-	<p:input port="source">
-	  <p:pipe port="source" step="main"/>
+	<p:with-param port="parameters" name="sentence-ids" select="/">
 	  <p:inline>
 	    <d:sentences>
 	      <d:s id="s1"/>
@@ -35,7 +32,7 @@
 	      <d:s id="s5"/>
 	    </d:sentences>
 	  </p:inline>
-	</p:input>
+	</p:with-param>
       </p:xslt>
       <!-- It doesn't matter if token's attributes are kept or not: -->
       <p:delete match="ssml:token/@*[namespace-uri() != 'http://www.daisy.org/ns/pipeline/tts']"/>

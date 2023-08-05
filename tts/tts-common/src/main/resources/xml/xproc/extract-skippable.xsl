@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-		xmlns:ssml="http://www.w3.org/2001/10/synthesis"
 		xmlns:xs="http://www.w3.org/2001/XMLSchema"
+		xmlns:ssml="http://www.w3.org/2001/10/synthesis"
 		exclude-result-prefixes="#all"
 		version="2.0">
 
   <xsl:param name="sentence-ids" required="yes"/> <!-- xs:string* or document-node() -->
   <xsl:param name="skippable-ids" required="yes"/> <!-- xs:string* or document-node() -->
 
-  <!-- must have the same value as in the Java part -->
+  <!-- must have the same value as in ../../../java/org/daisy/pipeline/tts/calabash/impl/FormatSpecifications.java -->
   <xsl:variable name="mark-delimiter" select="'___'"/>
   <xsl:variable name="main-doc" select="collection()[1]"/>
   <xsl:variable name="sentence-ids-doc" as="document-node()">

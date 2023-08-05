@@ -78,10 +78,10 @@
     <xsl:value-of select="."/>
   </xsl:template>
 
-  <xsl:template match="*[namespace-uri()='http://www.w3.org/2001/10/synthesis']" mode="css-child">
+  <xsl:template match="ssml:*" mode="css-child">
     <xsl:copy>
       <xsl:copy-of select="@*"/>
-      <xsl:apply-templates select="node()" mode="css-child"/>
+      <xsl:apply-templates mode="#current"/>
     </xsl:copy>
   </xsl:template>
 
