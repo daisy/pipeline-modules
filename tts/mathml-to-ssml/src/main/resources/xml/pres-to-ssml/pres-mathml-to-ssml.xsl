@@ -57,7 +57,7 @@
 	    <xsl:apply-templates select="current()" mode="normalize"/>
 	  </xsl:variable>
 	  <ssml:s>
-	    <xsl:copy-of select="@*"/> <!-- @id and CSS -->
+	    <xsl:copy-of select="@*"/> <!-- including @id, @xml:lang and CSS -->
 
 	    <!-- likely to come from left annotations: -->
 	    <xsl:for-each select="m:*[local-name()!='text'][1]/preceding-sibling::m:text">

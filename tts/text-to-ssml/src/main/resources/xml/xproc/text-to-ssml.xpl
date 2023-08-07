@@ -125,9 +125,6 @@
   <p:xslt name="flatten">
     <p:with-param name="lang" select="$lang"/>
     <p:with-param name="style-ns" select="$style-ns"/>
-    <p:input port="source">
-      <p:pipe port="result" step="normalize"/>
-    </p:input>
     <p:input port="stylesheet">
       <p:document href="../xslt/flatten-structure.xsl"/>
     </p:input>
@@ -137,8 +134,8 @@
        document (including MathML). Requirements: (1) it keeps intact the structure inside
        sentences so as to keep inner CSS properties. -->
   <pxi:extract-skippable name="separate-skippable">
-    <p:input port="source">
-      <p:pipe port="result" step="flatten"/>
+    <p:input port="sentence-ids">
+      <p:pipe port="sentence-ids" step="main"/>
     </p:input>
     <p:input port="skippable-ids">
       <p:pipe port="skippable-ids" step="main"/>

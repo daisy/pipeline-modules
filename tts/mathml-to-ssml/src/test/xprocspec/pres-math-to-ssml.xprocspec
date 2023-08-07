@@ -2,8 +2,9 @@
 <x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
 	       xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
 	       xmlns:ssml="http://www.w3.org/2001/10/synthesis"
+	       xmlns:m="http://www.w3.org/1998/Math/MathML"
 	       xmlns="http://www.w3.org/1998/Math/MathML"
-               script="../../main/resources/xml/mathml-to-ssml.xpl">
+	       script="../../main/resources/xml/mathml-to-ssml.xpl">
 
   <x:scenario label="empty mathml">
     <x:call step="px:mathml-to-ssml">
@@ -24,7 +25,6 @@
       </x:document>
     </x:expect>
   </x:scenario>
-
 
   <x:scenario label="mtext only">
     <x:call step="px:mathml-to-ssml">
@@ -377,6 +377,50 @@
 	<ssml:speak version="1.1">
 	  <ssml:s xml:lang="zz" id="m1"/>
 	</ssml:speak>
+      </x:document>
+    </x:expect>
+  </x:scenario>
+
+  <x:scenario label="mathml without id">
+    <x:call step="px:mathml-to-ssml">
+      <x:input port="source">
+	<x:document type="inline">
+	  <m:math xml:lang="en">
+	    <m:mtext>text1</m:mtext>
+	    <m:mtext>text2</m:mtext>
+	  </m:math>
+	</x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="dtbook with ssml" type="compare">
+      <x:document type="inline">
+	<ssml:speak version="1.1"/>
+      </x:document>
+    </x:expect>
+  </x:scenario>
+
+  <x:scenario label="mathml inside dtbook">
+    <x:call step="px:mathml-to-ssml">
+      <x:input port="source">
+	<x:document type="inline">
+	  <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/" xml:lang="en">
+	    <m:math id="s1"><m:mi>x</m:mi></m:math>
+	    <sent id="s2"><w>regular</w></sent>
+	  </dtbook>
+	</x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="dtbook with ssml" type="compare">
+      <x:document type="inline">
+	<ssml:speak version="1.1">
+	  <ssml:s xml:lang="en" id="s1">x</ssml:s>
+    </ssml:speak>
       </x:document>
     </x:expect>
   </x:scenario>
