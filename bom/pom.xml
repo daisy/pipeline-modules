@@ -240,7 +240,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>epubcheck-adapter</artifactId>
-        <version>1.1.10</version>
+        <version>1.1.11-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
@@ -496,12 +496,32 @@
         <groupId>org.w3c</groupId>
         <artifactId>epubcheck</artifactId>
         <version>4.2.5</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.twelvemonkeys.imageio</groupId>
+            <artifactId>imageio-jpeg</artifactId>
+          </exclusion>
+          <!--
+              Not excluding jackson because it is required for running Pax-Exam tests of any module
+              that depends on epub-utils (even though we don't use JSON reporting), and specifying the
+              dependency in all tests is tedious and hard to maintain.
+          --><!--
+          <exclusion>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-asl</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+          </exclusion>-->
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-compress</artifactId>
         <version>1.20</version>
       </dependency>
+      <!-- for OSGi -->
       <dependency>
         <groupId>org.codehaus.jackson</groupId>
         <artifactId>jackson-core-asl</artifactId>
@@ -557,7 +577,7 @@
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-text</artifactId>
-        <version>1.8</version>
+        <version>1.10.0</version>
       </dependency>
       <dependency>
         <groupId>org.sharegov</groupId>
