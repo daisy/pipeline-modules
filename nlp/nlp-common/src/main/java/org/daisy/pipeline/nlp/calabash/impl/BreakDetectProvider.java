@@ -30,7 +30,7 @@ public class BreakDetectProvider implements XProcStepProvider {
 
 	@Reference(
 		name = "LexServiceRegistry",
-		unbind = "unsetLexServiceRegistry",
+		unbind = "-",
 		service = LexServiceRegistry.class,
 		cardinality = ReferenceCardinality.MANDATORY,
 		policy = ReferencePolicy.STATIC

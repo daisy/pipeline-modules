@@ -216,10 +216,10 @@ public class CssCascadeStep extends DefaultStep implements XProcStep {
 
 		@Reference(
 			name = "CssCascader",
-			unbind = "unbindCssCascader",
+			unbind = "-",
 			service = CssCascader.class,
 			cardinality = ReferenceCardinality.MULTIPLE,
-			policy = ReferencePolicy.DYNAMIC
+			policy = ReferencePolicy.STATIC
 		)
 		public void bindCssCascader(CssCascader inliner) {
 			this.inliners.add(inliner);

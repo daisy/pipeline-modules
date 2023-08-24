@@ -451,6 +451,7 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 		
 		@Reference(
 			name = "FormatterEngineFactoryService",
+			unbind = "-",
 			service = FormatterEngineFactoryService.class,
 			cardinality = ReferenceCardinality.MANDATORY,
 			policy = ReferencePolicy.STATIC
@@ -465,6 +466,7 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 		
 		@Reference(
 			name = "FormatterFactory",
+			unbind = "-",
 			service = FormatterFactory.class,
 			cardinality = ReferenceCardinality.MANDATORY,
 			policy = ReferencePolicy.STATIC
@@ -479,6 +481,7 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 		
 		@Reference(
 			name = "ObflParserFactoryService",
+			unbind = "-",
 			service = ObflParserFactoryService.class,
 			cardinality = ReferenceCardinality.MANDATORY,
 			policy = ReferencePolicy.STATIC
@@ -493,6 +496,7 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 		
 		@Reference(
 			name = "TextBorderFactoryService",
+			unbind = "-",
 			service = TextBorderFactoryService.class,
 			cardinality = ReferenceCardinality.MANDATORY,
 			policy = ReferencePolicy.STATIC
@@ -521,6 +525,7 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 
 		@Reference(
 			name = "TemporaryBrailleTranslatorProvider",
+			unbind = "-",
 			service = TemporaryBrailleTranslatorProvider.class,
 			cardinality = ReferenceCardinality.MANDATORY,
 			policy = ReferencePolicy.STATIC

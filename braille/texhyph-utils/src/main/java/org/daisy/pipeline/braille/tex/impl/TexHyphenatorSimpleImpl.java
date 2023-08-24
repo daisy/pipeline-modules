@@ -61,7 +61,7 @@ public class TexHyphenatorSimpleImpl extends AbstractTransformProvider<TexHyphen
 	
 	@Reference(
 		name = "TexHyphenatorTableRegistry",
-		unbind = "unbindTableRegistry",
+		unbind = "-",
 		service = TexHyphenatorTableRegistry.class,
 		cardinality = ReferenceCardinality.MANDATORY,
 		policy = ReferencePolicy.STATIC

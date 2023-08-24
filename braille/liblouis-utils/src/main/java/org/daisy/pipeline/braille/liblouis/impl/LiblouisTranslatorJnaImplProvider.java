@@ -117,7 +117,7 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 	
 	@Reference(
 		name = "LiblouisTableJnaImplProvider",
-		unbind = "unbindLiblouisTableJnaImplProvider",
+		unbind = "-",
 		service = LiblouisTableJnaImplProvider.class,
 		cardinality = ReferenceCardinality.MANDATORY,
 		policy = ReferencePolicy.STATIC

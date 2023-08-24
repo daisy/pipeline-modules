@@ -284,10 +284,10 @@ public class DotifyTranslatorImpl extends AbstractBrailleTranslator implements D
 		
 		@Reference(
 			name = "BrailleFilterFactoryService",
-			unbind = "unbindBrailleFilterFactoryService",
+			unbind = "-",
 			service = BrailleFilterFactoryService.class,
 			cardinality = ReferenceCardinality.MULTIPLE,
-			policy = ReferencePolicy.DYNAMIC
+			policy = ReferencePolicy.STATIC
 		)
 		protected void bindBrailleFilterFactoryService(BrailleFilterFactoryService service) {
 			if (!OSGiHelper.inOSGiContext())

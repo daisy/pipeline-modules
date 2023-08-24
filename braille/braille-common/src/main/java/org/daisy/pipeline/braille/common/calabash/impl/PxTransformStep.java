@@ -141,10 +141,10 @@ public class PxTransformStep extends DefaultStep implements XProcStep {
 		
 		@Reference(
 			name = "XProcTransformProvider",
-			unbind = "unbindXProcTransformProvider",
+			unbind = "-",
 			service = TransformProvider.class,
 			cardinality = ReferenceCardinality.MULTIPLE,
-			policy = ReferencePolicy.DYNAMIC
+			policy = ReferencePolicy.STATIC
 		)
 		@SuppressWarnings(
 			"unchecked" // safe cast to TransformProvider<XProcTransform>

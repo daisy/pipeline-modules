@@ -62,7 +62,7 @@ public class SynthesizeProvider implements XProcStepProvider {
 
 	@Reference(
 		name = "TTSRegistry",
-		unbind = "unsetTTSRegistry",
+		unbind = "-",
 		service = TTSRegistry.class,
 		cardinality = ReferenceCardinality.MANDATORY,
 		policy = ReferencePolicy.STATIC
@@ -77,10 +77,10 @@ public class SynthesizeProvider implements XProcStepProvider {
 
 	@Reference(
 		name = "AudioServices",
-		unbind = "unsetAudioServices",
+		unbind = "-",
 		service = AudioServices.class,
 		cardinality = ReferenceCardinality.OPTIONAL,
-		policy = ReferencePolicy.DYNAMIC
+		policy = ReferencePolicy.STATIC
 	)
 	protected void setAudioServices(AudioServices audioServices) {
 		mAudioServices = audioServices;
