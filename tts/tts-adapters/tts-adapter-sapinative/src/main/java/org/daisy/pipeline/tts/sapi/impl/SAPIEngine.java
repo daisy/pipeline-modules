@@ -226,7 +226,7 @@ public class SAPIEngine extends TTSEngine {
 								selected = Gender.MALE_CHILD;
 								break;
 							case "elderly" :
-								selected = Gender.MALE_ELDERY;
+								selected = Gender.MALE_ELDERLY;
 								break;
 							case "adult" : // default to adult
 							default:
@@ -242,7 +242,7 @@ public class SAPIEngine extends TTSEngine {
 								selected = Gender.FEMALE_CHILD;
 								break;
 							case "elderly" :
-								selected = Gender.FEMALE_ELDERY;
+								selected = Gender.FEMALE_ELDERLY;
 								break;
 							case "adult" : // default to adult
 							default:
