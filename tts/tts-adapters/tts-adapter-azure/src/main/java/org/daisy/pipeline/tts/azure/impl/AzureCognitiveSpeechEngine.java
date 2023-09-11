@@ -76,7 +76,7 @@ public class AzureCognitiveSpeechEngine extends TTSEngine {
 		String sentence; {
 			try {
 				Map<String,Object> params = new HashMap<>(); {
-					params.put("voice", voice.name);
+					params.put("voice", voice.getName());
 				}
 				sentence = transformSsmlNodeToString(ssml, ssmlTransformer, params);
 			} catch (IOException|SaxonApiException e) {

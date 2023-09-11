@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -38,7 +39,10 @@ import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.TTSTimeout;
 import org.daisy.pipeline.tts.TTSTimeout.ThreadFreeInterrupter;
 import org.daisy.pipeline.tts.Voice;
+import org.daisy.pipeline.tts.VoiceInfo;
+import org.daisy.pipeline.tts.VoiceInfo.Gender;
 import org.daisy.pipeline.tts.Voice.MarkSupport;
+import org.daisy.pipeline.tts.VoiceInfo.UnknownLanguage;
 import org.daisy.pipeline.tts.VoiceManager;
 import org.daisy.pipeline.tts.calabash.impl.EncodingThread.EncodingException;
 import org.daisy.pipeline.tts.calabash.impl.TTSLog.ErrorCode;
@@ -319,15 +323,21 @@ public class SSMLtoAudio implements FormatSpecifications {
 		endSection();
 	}
 
-	private void traverse(XdmNode node, String lang) throws SynthesisException {
+	private void traverse(XdmNode node, Locale lang) throws SynthesisException {
 		if (SentenceTag.equals(node.getNodeName())) {
 			if (!dispatchSSML(node, lang))
 				mErrorCounter++;
 			if (++mSentenceCounter % MAX_SENTENCES_PER_SECTION == 0)
 				endSection();
 		} else {
-			String l = node.getAttributeValue(Sentence_attr_lang);
-			if (l != null) lang = l;
+			String langAttr = node.getAttributeValue(Sentence_attr_lang);
+			if (langAttr != null) {
+				try {
+					lang = VoiceInfo.tagToLocale(langAttr);
+				} catch (UnknownLanguage e) {
+					lang = null;
+				}
+			}
 			XdmSequenceIterator iter = node.axisIterator(Axis.CHILD);
 			while (iter.hasNext())
 				traverse((XdmNode)iter.next(), lang);
@@ -342,34 +352,44 @@ public class SSMLtoAudio implements FormatSpecifications {
 	 * @return true when the SSML was successfully converted to speech, false when there was an error
 	 **/
 	// package private for tests
-	boolean dispatchSSML(XdmNode ssml, String lang) throws SynthesisException {
+	boolean dispatchSSML(XdmNode ssml, Locale lang) throws SynthesisException {
 		String voiceEngine = ssml.getAttributeValue(Sentence_attr_select1);
 		String voiceName = ssml.getAttributeValue(Sentence_attr_select2);
-		String gender = ssml.getAttributeValue(Sentence_attr_gender);
-		String age = ssml.getAttributeValue(Sentence_attr_age);
+		Gender gender; {
+			String attr = ssml.getAttributeValue(Sentence_attr_gender);
+			String ageAttr = ssml.getAttributeValue(Sentence_attr_age);
+			if (attr != null && ageAttr != null) {
+				try {
+					int age = Integer.parseInt(ageAttr);
+					if (age <= 16) {
+						gender = Gender.of(attr + "-child");
+					} else if (age >= 70) {
+						gender = Gender.of(attr + "-eldery");
+					} else {
+						gender = Gender.of(attr);
+					}
+				} catch (NumberFormatException e) {
+					gender = Gender.of(attr);
+				}
+			} else {
+				gender = Gender.of(attr);
+			}
+		}
+		{
+			String langAttr = ssml.getAttributeValue(Sentence_attr_lang);
+			if (langAttr != null) {
+				try {
+					lang = VoiceInfo.tagToLocale(langAttr);
+				} catch (UnknownLanguage e) {
+					lang = null;
+				}
+			}
+		}
 		String id = ssml.getAttributeValue(Sentence_attr_id);
-		String l = ssml.getAttributeValue(Sentence_attr_lang);
-		if (l != null) lang = l;
 
 		TTSLog.Entry logEntry = mTTSlog.getOrCreateEntry(id);
 		logEntry.setSSML(ssml);
-
-		if (age != null) {
-			try {
-				int age_i = Integer.parseInt(age);
-				if (age_i <= 16) {
-					gender += "-child";
-				} else if (age_i >= 70) {
-					gender += "-eldery";
-				}
-			} catch (NumberFormatException e) {
-				//ignore
-			}
-		}
-
-		boolean[] exactMatch = new boolean[1];
-		Voice voice = mVoiceManager.findAvailableVoice(voiceEngine, voiceName, lang, gender,
-		        exactMatch);
+		Voice voice = mVoiceManager.findAvailableVoice(voiceEngine, voiceName, lang, gender);
 		logEntry.setSelectedVoice(voice);
 		if (voice == null) {
 			String err = "could not find any installed voice matching with "
@@ -393,7 +413,7 @@ public class SSMLtoAudio implements FormatSpecifications {
 			return false;
 		}
 
-		if (!exactMatch[0]) {
+		if (!mVoiceManager.matches(voice, voiceEngine, voiceName, lang, gender)) {
 			logEntry.addError(new TTSLog.Error(TTSLog.ErrorCode.UNEXPECTED_VOICE,
 			        "no voice matches exactly with the requested characteristics"));
 		}

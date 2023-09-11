@@ -85,7 +85,7 @@ public class GoogleRestTTSEngine extends TTSEngine {
 		String name;
 
 		if (voice != null) {
-			name = voice.name;
+			name = voice.getName();
 			languageCode = voice.getLocale().get().toLanguageTag(); // assume locale is declared
 		} else {
 			// by default the voice is set to English
