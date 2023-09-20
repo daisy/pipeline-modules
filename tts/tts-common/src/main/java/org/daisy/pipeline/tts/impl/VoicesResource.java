@@ -3,6 +3,7 @@ package org.daisy.pipeline.tts.impl;
 import java.util.Collections;
 import java.util.Locale;
 
+import org.daisy.pipeline.tts.TTSLog;
 import org.daisy.pipeline.tts.TTSRegistry;
 import org.daisy.pipeline.tts.Voice;
 import org.daisy.pipeline.tts.VoiceInfo;
@@ -50,7 +51,7 @@ public class VoicesResource extends AuthenticatedResource {
 		langAttr = getQuery().getFirstValue("lang");
 		genderAttr = getQuery().getFirstValue("gender");
 		voiceManager = new VoiceManager(
-			ttsRegistry.getWorkingEngines(Collections.EMPTY_MAP, null, null),
+			ttsRegistry.getWorkingEngines(Collections.EMPTY_MAP, new TTSLog(logger), logger),
 			Collections.EMPTY_LIST);
 	}
 
