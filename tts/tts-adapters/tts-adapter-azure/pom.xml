@@ -38,7 +38,7 @@
 
   <properties>
     <expose-services>
-      org.daisy.pipeline.tts.azure.impl.AzureCognitiveSpeechTTSService
+      org.daisy.pipeline.tts.azure.impl.AzureCognitiveSpeechService
     </expose-services>
   </properties>
 
