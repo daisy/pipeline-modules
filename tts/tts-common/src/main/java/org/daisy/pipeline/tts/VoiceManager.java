@@ -259,7 +259,13 @@ public class VoiceManager {
 					if (vi1.voiceEngine.equals(vi2.voiceEngine) && vi1.voiceName.equals(vi2.voiceName))
 						return 0;
 					// highest priority first
-					return Float.valueOf(vi2.priority).compareTo(Float.valueOf(vi1.priority));
+					compare = Float.valueOf(vi2.priority).compareTo(Float.valueOf(vi1.priority));
+					if (compare != 0)
+						return compare;
+					compare = vi2.voiceEngine.compareTo(vi1.voiceEngine);
+					if (compare != 0)
+						return compare;
+					return vi2.voiceName.compareTo(vi1.voiceName);
 				}
 			}
 		);
