@@ -144,7 +144,7 @@ public class AzureCognitiveSpeechEngine extends TTSEngine {
 			// synthesized successfully
 			byte[] pcm = ByteStreams.toByteArray(new PullAudioOutputStreamAsInputStream(stream)); // raw PCM data
 			AudioInputStream audio = createAudioStream(audioFormat, pcm);
-			return new SynthesisResult(audio, marks.isEmpty() ? null : marks);
+			return new SynthesisResult(audio, marks);
 		} catch (InterruptedException e) {
 			throw e;
 		} catch (FatalError e) {
