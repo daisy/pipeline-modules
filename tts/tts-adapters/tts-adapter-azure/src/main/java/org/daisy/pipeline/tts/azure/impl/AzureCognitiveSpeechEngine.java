@@ -121,6 +121,10 @@ public class AzureCognitiveSpeechEngine extends TTSEngine {
 										throw new RecoverableError(
 											new SynthesisException(
 												"Synthesis failed: too many requests: " + cancellation.getErrorDetails()));
+									case BadRequest:
+										throw new SynthesisException(
+											"Synthesis failed: bad request: " + cancellation.getErrorDetails() + "\n"
+											+ "Sentence was: " + sentence);
 									default:
 										throw new SynthesisException(
 											"Synthesis failed: " + cancellation.getErrorCode() + ": " + cancellation.getErrorDetails());

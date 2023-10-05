@@ -80,7 +80,8 @@ public abstract class TTSEngine {
 	 * @param sentence is the sentence to synthesize, as an SSML node. The node
 	 *                 is expected to be an {@code s} element with an
 	 *                 {@code xml:lang} attribute. It is however advised that
-	 *                 implementations do not assume this is the case.
+	 *                 implementations do not assume this is the case. It can
+	 *                 also not be assumed that the node is a root element.
 	 * @param voice is the voice the synthesizer must use. It is guaranteed to
 	 *            be one of those returned by getAvailableVoices(). This
 	 *            parameter can't be null.
@@ -182,6 +183,9 @@ public abstract class TTSEngine {
 
 	/**
 	 * Transform an SSML node to a string using a given XSLT and parameter map
+	 *
+	 * If this method is called from {@link #synthesize}, the XSLT should not
+	 * assume that the SSML node is a root element.
 	 */
 	protected String transformSsmlNodeToString(XdmNode ssml, URL xslt, Map<String,Object> params)
 			throws IOException, SaxonApiException {
