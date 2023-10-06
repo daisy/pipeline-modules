@@ -32,6 +32,19 @@
 		<xsl:apply-templates mode="#current" select="node()"/>
 	</xsl:template>
 
+	<!-- rename mark to bookmark: not needed: regular SSML marks also supported -->
+	<!--
+	<xsl:template mode="copy" match="mark">
+		<bookmark>
+			<xsl:apply-templates mode="#current" select="@*|node()"/>
+		</bookmark>
+	</xsl:template>
+
+	<xsl:template mode="copy" match="mark/@name">
+		<xsl:attribute name="mark" select="string(.)"/>
+	</xsl:template>
+	-->
+
 	<!-- unwrap token -->
 	<xsl:template mode="copy" match="token">
 		<xsl:apply-templates mode="#current" select="node()"/>
