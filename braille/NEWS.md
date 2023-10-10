@@ -1,3 +1,10 @@
+v1.14.19
+========
+
+Changes
+-------
+- Option to include PDF version of the braille result showing ASCII braille
+
 v1.14.15
 ========
 
