@@ -1,6 +1,5 @@
 package org.daisy.pipeline.braille.liblouis.impl;
 
-import java.net.URI;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,7 +41,6 @@ import org.daisy.braille.css.SimpleInlineStyle;
 
 import org.daisy.pipeline.braille.common.AbstractBrailleTranslator;
 import org.daisy.pipeline.braille.common.AbstractBrailleTranslator.util.DefaultLineBreaker;
-import org.daisy.pipeline.braille.common.AbstractHyphenator.util.DefaultFullHyphenator;
 import org.daisy.pipeline.braille.common.AbstractHyphenator.util.NoHyphenator;
 import org.daisy.pipeline.braille.common.AbstractTransformProvider;
 import org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Iterables;
@@ -239,15 +237,6 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 					public Iterable<LiblouisTranslator> _apply(final LiblouisTableJnaImpl table) {
 						Iterable<LiblouisTranslator> translators = empty;
 						if (!"none".equals(hyphenator)) {
-							if ("liblouis".equals(hyphenator) || "auto".equals(hyphenator))
-								for (URI t : table.asURIs())
-									if (t.toString().endsWith(".dic")) {
-										translators = Iterables.of(
-											logCreate((LiblouisTranslator)new LiblouisTranslatorHyphenatorImpl(
-													table,
-													handleNonStandardHyphenation))
-										);
-										break; }
 							if (!"liblouis".equals("hyphenator")) {
 								MutableQuery hyphenatorQuery = mutableQuery();
 								if (!"auto".equals(hyphenator))
@@ -455,7 +444,7 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 					                             to); }
 				// style is mutated and may not be empty
 				Iterator<SimpleInlineStyle> style = Iterators.transform(styledTextCopy.iterator(), CSSStyledText::getStyle);
-				List<String> brailleWithPreservedWS = new ArrayList(); {
+				List<String> brailleWithPreservedWS = new ArrayList<>(); {
 					for (String s : braille) {
 						// the only property expected in the output is white-space
 						// ignore other properties
@@ -1556,22 +1545,6 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 		}
 	}
 	
-	private static class LiblouisTranslatorHyphenatorImpl extends LiblouisTranslatorImpl {
-		
-		private LiblouisTranslatorHyphenatorImpl(LiblouisTableJnaImpl table,
-			                                     int handleNonStandardHyphenation) {
-			super(table, handleNonStandardHyphenation);
-			fullHyphenator = new LiblouisTranslatorAsFullHyphenator(translator);
-		}
-		
-		@Override
-		public ToStringHelper toStringHelper() {
-			return MoreObjects.toStringHelper("o.d.p.b.liblouis.impl.LiblouisTranslatorJnaImplProvider$LiblouisTranslatorImpl")
-				.add("translator", translator)
-				.add("hyphenator", "self");
-		}
-	}
-	
 	private interface FullHyphenator extends Hyphenator.FullHyphenator {
 		public byte[] hyphenate(String text, Locale language);
 	}
@@ -1584,37 +1557,6 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 	
 	private static class CompoundWordHyphenator extends NoHyphenator implements FullHyphenator {
 
-		public byte[] hyphenate(String text, Locale language) {
-			if (text.isEmpty())
-				return null;
-			Tuple2<String,byte[]> t = extractHyphens(text, true, SHY, ZWSP);
-			if (t._1.isEmpty())
-				return null;
-			return transform(t._2, t._1, language);
-		}
-	}
-	
-	private static class LiblouisTranslatorAsFullHyphenator extends DefaultFullHyphenator implements FullHyphenator {
-		
-		private final Translator translator;
-		
-		private LiblouisTranslatorAsFullHyphenator(Translator translator) {
-			this.translator = translator;
-		}
-		
-		protected boolean isCodePointAware() { return true; }
-		protected boolean isLanguageAdaptive() { return false; }
-		
-		/**
-		 * @param language ignored
-		 */
-		protected byte[] getHyphenationOpportunities(String textWithoutHyphens, Locale language) throws RuntimeException {
-			try {
-				return translator.hyphenate(textWithoutHyphens); }
-			catch (TranslationException e) {
-				throw new RuntimeException(e); }
-		}
-		
 		public byte[] hyphenate(String text, Locale language) {
 			if (text.isEmpty())
 				return null;

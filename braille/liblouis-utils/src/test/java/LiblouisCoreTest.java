@@ -21,13 +21,9 @@ import org.daisy.pipeline.braille.common.BrailleTranslator.FromStyledTextToBrail
 import org.daisy.pipeline.braille.common.BrailleTranslator.LineBreakingFromStyledText;
 import org.daisy.pipeline.braille.common.BrailleTranslator.LineIterator;
 import org.daisy.pipeline.braille.common.CompoundBrailleTranslator;
-import org.daisy.pipeline.braille.common.Hyphenator;
-import org.daisy.pipeline.braille.common.Provider;
-import org.daisy.pipeline.braille.common.TransformProvider;
 import static org.daisy.pipeline.braille.common.Query.util.query;
 import static org.daisy.pipeline.braille.common.util.Files.asFile;
 import org.daisy.pipeline.braille.css.CSSStyledText;
-import org.daisy.pipeline.braille.liblouis.LiblouisHyphenator;
 import org.daisy.pipeline.braille.liblouis.LiblouisTable;
 import org.daisy.pipeline.braille.liblouis.LiblouisTableResolver;
 import org.daisy.pipeline.braille.liblouis.LiblouisTranslator;
@@ -39,7 +35,6 @@ import static org.daisy.pipeline.pax.exam.Options.thisPlatform;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import org.junit.ComparisonFailure;
 import org.junit.Test;
 
 import org.ops4j.pax.exam.Configuration;
@@ -59,9 +54,6 @@ public class LiblouisCoreTest extends AbstractTest {
 	
 	@Inject
 	public LiblouisTranslator.Provider provider;
-	
-	@Inject
-	public LiblouisHyphenator.Provider hyphenatorProvider;
 	
 	@Inject
 	public LiblouisTableResolver resolver;
@@ -284,51 +276,6 @@ public class LiblouisCoreTest extends AbstractTest {
 	}
 	
 	@Test
-	public void testHyphenate() {
-		assertEquals(text("foo\u00ADbar"),
-		             hyphenatorProvider.withContext(messageBus)
-		                 .get(query("(table:'foobar.uti,foobar.dic')")).iterator().next()
-		                 .asFullHyphenator()
-		                 .transform(styledText("foobar", "hyphens: auto")));
-	}
-	
-	@Test
-	public void testHyphenateCompoundWord() {
-		assertEquals(text("foo-\u200Bbar"),
-		             hyphenatorProvider.withContext(messageBus)
-		                 .get(query("(table:'foobar.uti,foobar.dic')")).iterator().next()
-		                 .asFullHyphenator()
-		                 .transform(styledText("foo-bar", "hyphens: auto")));
-	}
-	
-	@Test
-	public void testManualWordBreak() {
-		assertEquals(text("foo\u00ADbar foo\u00ADbar foob\u00ADar"),
-		             hyphenatorProvider.withContext(messageBus)
-		                 .get(query("(table:'foobar.uti,foobar.dic')")).iterator().next()
-		                 .asFullHyphenator()
-		                 .transform(styledText("foobar foo\u00ADbar foob\u00ADar", "hyphens: auto")));
-		assertEquals(braille("⠋⠕⠕\u00AD⠃⠁⠗ ⠋⠕⠕\u00AD⠃⠁⠗ ⠋⠕⠕⠃\u00AD⠁⠗"),
-		             provider.withContext(messageBus)
-		                     .get(query("(table:'foobar.uti,foobar.dic')")).iterator().next()
-		                     .fromStyledTextToBraille()
-		                     .transform(styledText("foobar foo\u00ADbar foob\u00ADar", "hyphens:auto")));
-		assertEquals(
-			"⠋⠕⠕⠤\n" +
-			"⠃⠁⠗\n" +
-			"⠋⠕⠕⠤\n" +
-			"⠃⠁⠗\n" +
-			"⠋⠕⠕⠃⠤\n" +
-			"⠁⠗",
-			fillLines(
-				provider.withContext(messageBus)
-		                .get(query("(table:'foobar.uti,foobar.dic')")).iterator().next()
-				        .lineBreakingFromStyledText()
-				        .transform(styledText("foobar foo\u00ADbar foob\u00ADar", "hyphens:auto")),
-				5));
-	}
-	
-	@Test
 	public void testHyphenateCharacter() {
 		LineBreakingFromStyledText translator = provider.withContext(messageBus)
 		                                                .get(query("(table:'foobar.ctb')(charset:'foobar.dis')")).iterator().next()
@@ -351,7 +298,7 @@ public class LiblouisCoreTest extends AbstractTest {
 	@Test
 	public void testTranslateAndHyphenateCompoundWord() {
 		FromStyledTextToBraille translator = provider.withContext(messageBus)
-		                                             .get(query("(table:'foobar.utb,foobar.dic')(hyphenator:auto)")).iterator().next()
+		                                             .get(query("(table:'foobar.utb')(hyphenator:mock)")).iterator().next()
 		                                             .fromStyledTextToBraille();
 		assertEquals(
 			braille("⠋⠕⠕⠤\u200B⠃⠁⠗"),
@@ -365,7 +312,7 @@ public class LiblouisCoreTest extends AbstractTest {
 			translator.transform(styledText("foo-bar", "hyphens:none")));
 		// and regardless of value of hyphenator feature
 		translator = provider.withContext(messageBus)
-		                     .get(query("(table:'foobar.utb,foobar.dic')(hyphenator:none)")).iterator().next()
+		                     .get(query("(table:'foobar.utb')(hyphenator:none)")).iterator().next()
 		                    .fromStyledTextToBraille();
 		assertEquals(
 			braille("⠋⠕⠕⠤\u200B⠃⠁⠗"),
@@ -411,7 +358,7 @@ public class LiblouisCoreTest extends AbstractTest {
 	@Test
 	public void testTranslateAndHyphenateSomeSegments() {
 		FromStyledTextToBraille translator = provider.withContext(messageBus)
-		                                             .get(query("(table:'foobar.uti,foobar.dic')")).iterator().next()
+		                                             .get(query("(table:'foobar.uti')(hyphenator:mock)")).iterator().next()
 		                                             .fromStyledTextToBraille();
 		assertEquals(braille("⠋⠕⠕\u00AD⠃⠁⠗ ","⠋⠕⠕⠃⠁⠗"),
 		             translator.transform(styledText("foobar ", "hyphens:auto",
@@ -502,7 +449,7 @@ public class LiblouisCoreTest extends AbstractTest {
 	@Test
 	public void testTranslateWithLetterSpacingAndHyphenation() {
 		FromStyledTextToBraille translator = provider.withContext(messageBus)
-		                                             .get(query("(table:'foobar.uti,foobar.dic')(charset:'foobar.dis')")).iterator().next()
+		                                             .get(query("(table:'foobar.uti')(hyphenator:mock)(charset:'foobar.dis')")).iterator().next()
 		                                             .fromStyledTextToBraille();
 		assertEquals(
 			braille("f o o\u00AD b a r"),
