@@ -2,16 +2,21 @@ package org.daisy.pipeline.braille.common;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.function.Supplier;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 
+import org.daisy.pipeline.braille.common.Query.MutableQuery;
+import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
 import static org.daisy.pipeline.braille.common.TransformProvider.util.dispatch;
 import static org.daisy.pipeline.braille.common.TransformProvider.util.logCreate;
 import org.daisy.pipeline.braille.common.TransformProvider.util.Memoize;
+import static org.daisy.pipeline.braille.common.util.Locales.parseLocale;
 import org.daisy.pipeline.braille.common.util.Strings;
 
 import org.osgi.service.component.annotations.Component;
@@ -38,11 +43,13 @@ public class BrailleTranslatorRegistry extends Memoize<BrailleTranslator>
 	}
 
 	private BrailleTranslatorRegistry(TransformProvider<BrailleTranslator> dispatch,
+	                                  HyphenatorRegistry hyphenatorRegistry,
 	                                  BrailleTranslatorRegistry from,
 	                                  Logger context) {
 		super(from);
 		this.providers = null;
 		this.dispatch = dispatch;
+		this.hyphenatorRegistry = hyphenatorRegistry;
 		this.context = context;
 		this.unmodifiable = true;
 	}
@@ -81,7 +88,97 @@ public class BrailleTranslatorRegistry extends Memoize<BrailleTranslator>
 	protected BrailleTranslatorRegistry _withContext(Logger context) {
 		if (this.context == context)
 			return this;
-		return new BrailleTranslatorRegistry(dispatch.withContext(context), this, context);
+		return new BrailleTranslatorRegistry(dispatch.withContext(context),
+		                                     hyphenatorRegistry.withContext(context),
+		                                     this,
+		                                     context);
+	}
+
+	private HyphenatorRegistry hyphenatorRegistry;
+
+	@Reference(
+		name = "HyphenatorRegistry",
+		unbind = "-",
+		service = HyphenatorRegistry.class,
+		cardinality = ReferenceCardinality.MANDATORY,
+		policy = ReferencePolicy.STATIC
+	)
+	/**
+	 * @throws UnsupportedOperationException if this object is an unmodifiable view of another
+	 * {@link BrailleTranslatorRegistry}.
+	 */
+	public void bindHyphenatorRegistry(HyphenatorRegistry registry) throws UnsupportedOperationException {
+		if (unmodifiable)
+			throw new UnsupportedOperationException("Unmodifiable");
+		hyphenatorRegistry = registry;
+		logger.debug("Binding hyphenator registry: " + registry);
+	}
+
+	/**
+	 * Select {@link BrailleTranslator}s with {@link Hyphenator} based on a single query.
+	 *
+	 * Only the {@code hyphenator} and {@code document-locale} features contribute to the hyphenator
+	 * selection.
+	 *
+	 * Like {@code #get(Query)}, returned objects are selectable based on their identifier.
+	 */
+	public Iterable<BrailleTranslator> getWithHyphenator(Query query) {
+		return getWithHyphenator(this, hyphenatorRegistry, query, context);
+	}
+
+	private static Iterable<BrailleTranslator> getWithHyphenator(Provider<Query,BrailleTranslator> translatorProvider,
+	                                                             Provider<Query,Hyphenator> hyphenatorProvider,
+	                                                             Query query,
+	                                                             Logger context) {
+		if (query.containsKey("id"))
+			return translatorProvider.get(query);
+		MutableQuery q = mutableQuery(query);
+
+		// select hyphenator
+		MutableQuery hyphenatorQuery = mutableQuery();
+		String hyphenator = q.containsKey("hyphenator")
+			? q.removeOnly("hyphenator").getValue().get()
+			: "auto";
+		if (!"auto".equals(hyphenator))
+			hyphenatorQuery.add("hyphenator", hyphenator);
+		String documentLocale; {
+			try {
+				documentLocale = q.containsKey("document-locale")
+					? parseLocale(q.getOnly("document-locale").getValue().get()).toLanguageTag()
+					: null; }
+			catch (IllegalArgumentException e) {
+				logger.error("Invalid locale", e);
+				return Collections.emptyList(); }
+		}
+		if (documentLocale != null)
+			hyphenatorQuery.add("document-locale", documentLocale);
+		Iterable<Hyphenator> hyphenators; {
+			Iterable<Hyphenator> h = hyphenatorProvider.get(hyphenatorQuery.asImmutable());
+			if (documentLocale != null && !"auto".equals(hyphenator)) {
+				// also search without locale because "hyphenator" feature might be an ID
+				hyphenatorQuery.removeAll("document-locale");
+				h = Iterables.concat(h, hyphenatorProvider.get(hyphenatorQuery.asImmutable())); }
+			hyphenators = h;
+		}
+
+		// select translator and bind hyphenator
+		Iterable<BrailleTranslator> translators = translatorProvider.get(q);
+		return Iterables.concat(
+			Iterables.concat(
+				Iterables.transform(
+					translators,
+					t -> Iterables.filter(
+						Iterables.transform(
+							hyphenators,
+							h -> {
+								try {
+									return logCreate(t.withHyphenator(h), context);
+								} catch (UnsupportedOperationException e) {
+									logger.debug("Could not set hyphenator: " + e.getMessage());
+									return null;
+								}}),
+						Predicates.notNull()))),
+			translators);
 	}
 
 	/**
@@ -108,7 +205,7 @@ public class BrailleTranslatorRegistry extends Memoize<BrailleTranslator>
 					Map<String,Supplier<BrailleTranslator>> subTranslators
 						= Maps.transformValues(
 							subQueries,
-							q -> () -> BrailleTranslatorRegistry.this.get(q).iterator().next());
+							q -> () -> BrailleTranslatorRegistry.this.getWithHyphenator(q).iterator().next());
 					return Iterables.transform(
 						get(mainQuery),
 						t -> logCreate(new CompoundBrailleTranslator(t, subTranslators), context));
@@ -116,6 +213,22 @@ public class BrailleTranslatorRegistry extends Memoize<BrailleTranslator>
 			}
 		}
 		return get(query);
+	}
+
+	/**
+	 * Select {@link BrailleTranslator}s with {@link Hyphenator} based on a single query and a CSS
+	 * style sheet possibly containing {@code @text-transform} rules.
+	 *
+	 * Contrary to {@link #get(Query)} and similar to {@link #get(Query, String, URI, boolean)},
+	 * this method is not memoized, and the returned objects may not be selectable based on their
+	 * identifier.
+	 */
+	public Iterable<BrailleTranslator> getWithHyphenator(Query query, String style, URI baseURI, boolean forceMainTranslator) {
+		return getWithHyphenator(
+			q -> get(q, style, baseURI, forceMainTranslator),
+			hyphenatorRegistry,
+			query,
+			context);
 	}
 
 	@Override

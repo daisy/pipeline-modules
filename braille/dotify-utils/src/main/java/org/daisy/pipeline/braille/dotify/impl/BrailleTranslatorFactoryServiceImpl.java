@@ -100,7 +100,7 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 			Query query = query(mode);
 			if (locale != null && !"und".equals(locale))
 				query = mutableQuery(query).add("document-locale", locale);
-			for (org.daisy.pipeline.braille.common.BrailleTranslator t : translatorRegistry.get(query))
+			for (org.daisy.pipeline.braille.common.BrailleTranslator t : translatorRegistry.getWithHyphenator(query))
 				try {
 					return new BrailleTranslatorFromBrailleTranslator(mode, t.lineBreakingFromStyledText()); }
 				catch (UnsupportedOperationException e) {}

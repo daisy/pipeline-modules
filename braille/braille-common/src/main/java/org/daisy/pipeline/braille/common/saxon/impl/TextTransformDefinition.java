@@ -105,7 +105,7 @@ public class TextTransformDefinition extends ExtensionFunctionDefinition {
 					else
 						for (int i = 0; i < text.size(); i++)
 							styledText.add(new CSSStyledText(text.get(i)));
-					for (BrailleTranslator t : translatorRegistry.get(query)) {
+					for (BrailleTranslator t : translatorRegistry.getWithHyphenator(query)) {
 						FromStyledTextToBraille fsttb;
 						try {
 							fsttb = t.fromStyledTextToBraille(); }

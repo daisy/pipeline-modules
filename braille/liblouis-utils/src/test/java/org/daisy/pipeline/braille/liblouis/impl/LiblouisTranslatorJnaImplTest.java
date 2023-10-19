@@ -100,7 +100,7 @@ public class LiblouisTranslatorJnaImplTest {
 		);
 		Translator liblouisTranslator = new Translator(table.getAbsolutePath());
 		LiblouisTranslatorImpl.LineBreaker.BrailleStreamImpl stream
-			= new LiblouisTranslatorImpl(
+			= new LiblouisTranslatorJnaImplProvider().new LiblouisTranslatorImpl(
 				new LiblouisTableJnaImplProvider().new LiblouisTableJnaImpl(
 					liblouisTranslator,
 					liblouisTranslator.asDisplayTable(),

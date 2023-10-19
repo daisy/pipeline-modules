@@ -114,7 +114,12 @@ public abstract class AbstractTransformProvider<T extends Transform> implements 
 		return fromId.get(id);
 	}
 	
-	private java.lang.Iterable<T> rememberId(final java.lang.Iterable<T> iterable) {
+	protected T rememberId(T t) {
+		fromId.put(t.getIdentifier(), t);
+		return t;
+	}
+	
+	protected java.lang.Iterable<T> rememberId(final java.lang.Iterable<T> iterable) {
 		return new java.lang.Iterable<T>() {
 			public Iterator<T> iterator() {
 				return new Iterator<T>() {
@@ -123,9 +128,7 @@ public abstract class AbstractTransformProvider<T extends Transform> implements 
 						return i.hasNext();
 					}
 					public T next() {
-						T t = i.next();
-						fromId.put(t.getIdentifier(), t);
-						return t;
+						return rememberId(i.next());
 					}
 					public void remove() {
 						i.remove();

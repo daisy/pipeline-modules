@@ -259,6 +259,10 @@ public class DefaultLineBreakerTest {
 			this.hyphenator = hyphenator;
 		}
 		
+		public TestTranslator _withHyphenator(Hyphenator hyphenator) {
+			return new TestTranslator(hyphenator);
+		}
+		
 		private final static Pattern WORD_SPLITTER = Pattern.compile("[\\x20\t\\n\\r\\u2800\\xA0]+");
 		private final static SimpleInlineStyle HYPHENS_AUTO = new SimpleInlineStyle("hyphens: auto");
 		

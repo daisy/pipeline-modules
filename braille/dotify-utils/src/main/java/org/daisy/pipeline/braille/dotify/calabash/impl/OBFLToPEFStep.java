@@ -208,11 +208,11 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 					String textTransformDefinitions = getOption(_css_text_transform_definitions, "");
 					try {
 						translator = (!"".equals(textTransformDefinitions)
-							? brailleTranslatorRegistry.get(mainQuery,
-							                                textTransformDefinitions,
-							                                obflNode.getBaseURI(),
-							                                false)
-							: brailleTranslatorRegistry.get(mainQuery)
+							? brailleTranslatorRegistry.getWithHyphenator(mainQuery,
+							                                              textTransformDefinitions,
+							                                              obflNode.getBaseURI(),
+							                                              false)
+							: brailleTranslatorRegistry.getWithHyphenator(mainQuery)
 						).iterator().next();
 					} catch (NoSuchElementException e) {
 						if (!"".equals(textTransformDefinitions))

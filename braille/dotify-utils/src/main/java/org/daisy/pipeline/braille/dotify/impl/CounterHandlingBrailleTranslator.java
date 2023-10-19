@@ -15,6 +15,7 @@ import org.daisy.braille.css.BrailleCSSProperty.TextTransform;
 import org.daisy.pipeline.braille.common.AbstractBrailleTranslator;
 import org.daisy.pipeline.braille.common.BrailleTranslator;
 import org.daisy.pipeline.braille.common.BrailleTranslator.LineBreakingFromStyledText;
+import org.daisy.pipeline.braille.common.Hyphenator;
 import org.daisy.pipeline.braille.css.CounterStyle;
 import org.daisy.pipeline.braille.css.CSSStyledText;
 
@@ -27,13 +28,31 @@ import org.daisy.pipeline.braille.css.CSSStyledText;
  */
 public class CounterHandlingBrailleTranslator extends AbstractBrailleTranslator implements LineBreakingFromStyledText {
 
-	private final LineBreakingFromStyledText backingTranslator;
+	private final BrailleTranslator backingTranslator;
+	private final LineBreakingFromStyledText backingLineBreakingTranslator;
 	private final Map<String,CounterStyle> customCounterStyles;
 
 	public CounterHandlingBrailleTranslator(BrailleTranslator backingTranslator,
 	                                        Map<String,CounterStyle> customCounterStyles) {
-		this.backingTranslator = backingTranslator.lineBreakingFromStyledText();
+		this.backingTranslator = backingTranslator;
+		this.backingLineBreakingTranslator = backingTranslator.lineBreakingFromStyledText();
 		this.customCounterStyles = customCounterStyles;
+	}
+
+	private CounterHandlingBrailleTranslator(CounterHandlingBrailleTranslator from, BrailleTranslator backingTranslator) {
+		super(from);
+		this.backingTranslator = backingTranslator;
+		this.backingLineBreakingTranslator = backingTranslator.lineBreakingFromStyledText();
+		this.customCounterStyles = from.customCounterStyles;
+	}
+
+	/**
+	 * @throws UnsupportedOperationException if {@code backingTranslator.withHyphenator()} throws
+	 *                                       UnsupportedOperationException
+	 */
+	@Override
+	public CounterHandlingBrailleTranslator _withHyphenator(Hyphenator hyphenator) throws UnsupportedOperationException {
+		return new CounterHandlingBrailleTranslator(this, backingTranslator.withHyphenator(hyphenator));
 	}
 
 	@Override
@@ -42,7 +61,7 @@ public class CounterHandlingBrailleTranslator extends AbstractBrailleTranslator 
 	}
 
 	public LineIterator transform(Iterable<CSSStyledText> styledText, int from, int to) {
-		return backingTranslator.transform(handleCounterStyles(styledText), from, to);
+		return backingLineBreakingTranslator.transform(handleCounterStyles(styledText), from, to);
 	}
 
 	private Iterable<CSSStyledText> handleCounterStyles(Iterable<CSSStyledText> styledText) {

@@ -27,13 +27,15 @@ import org.daisy.pipeline.braille.common.AbstractBrailleTranslator;
 import org.daisy.pipeline.braille.common.AbstractTransformProvider;
 import org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Function;
 import org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Iterables;
+import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Iterables.transform;
+import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.logCreate;
+import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.logSelect;
 import org.daisy.pipeline.braille.common.BrailleTranslator;
 import org.daisy.pipeline.braille.common.BrailleTranslatorProvider;
 import org.daisy.pipeline.braille.common.BrailleTranslatorRegistry;
 import org.daisy.pipeline.braille.common.calabash.CxEvalBasedTransformer;
-import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Iterables.transform;
-import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.logCreate;
-import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.logSelect;
+import org.daisy.pipeline.braille.common.Hyphenator;
+import org.daisy.pipeline.braille.common.HyphenatorRegistry;
 import org.daisy.pipeline.braille.common.Query;
 import org.daisy.pipeline.braille.common.Query.Feature;
 import org.daisy.pipeline.braille.common.Query.MutableQuery;
@@ -98,9 +100,8 @@ public interface CSSBlockTransform {
 			q.add("input", "text-css");
 			if (braille)
 				q.add("output", "braille");
-			Iterable<BrailleTranslator> translators = logSelect(q, translatorRegistry);
 			return transform(
-				translators,
+				logSelect(q, translatorRegistry.getWithHyphenator(q)),
 				new Function<BrailleTranslator,BrailleTranslator>() {
 					public BrailleTranslator _apply(BrailleTranslator translator) {
 						return __apply(
@@ -122,6 +123,7 @@ public interface CSSBlockTransform {
 			private final BrailleTranslator mainTranslator;
 			private final boolean forceMainTranslator;
 			private final Map<String,String> options;
+			private final String brailleCharset;
 			
 			/**
 			 * @param mainTranslator translator to be used for the parts of the document that do
@@ -136,6 +138,28 @@ public interface CSSBlockTransform {
 				this.mainTranslator = mainTranslator;
 				this.forceMainTranslator = forceMainTranslator;
 				mainQuery = query;
+				this.brailleCharset = brailleCharset;
+			}
+			
+			private Hyphenator hyphenator = null;
+			
+			private TransformImpl(TransformImpl from, BrailleTranslator mainTranslator) {
+				super(from);
+				this.mainQuery = from.mainQuery;
+				this.mainTranslator = mainTranslator;
+				this.forceMainTranslator = from.forceMainTranslator;
+				this.options = from.options;
+				this.brailleCharset = from.brailleCharset;
+			}
+			
+			/**
+			 * @throws UnsupportedOperationException if {@code mainTranslator.withHyphenator()} throws
+			 *                                       UnsupportedOperationException
+			 */
+			public TransformImpl _withHyphenator(Hyphenator hyphenator) throws UnsupportedOperationException {
+				TransformImpl t = new TransformImpl(this, mainTranslator.withHyphenator(hyphenator));
+				Provider.this.rememberId(t);
+				return t;
 			}
 			
 			@Override
@@ -155,7 +179,10 @@ public interface CSSBlockTransform {
 								String style = (((Document)doc).getDocumentElement()).getAttribute("style");
 								URI styleBaseURI = URLs.asURI(((Document)doc).getBaseURI());
 								BrailleTranslator compoundTranslator
-									= translatorRegistry.get(mainQuery, style, styleBaseURI, forceMainTranslator).iterator().next();
+									= translatorRegistry.getWithHyphenator(mainQuery, style, styleBaseURI, forceMainTranslator)
+									                    .iterator().next();
+								if (hyphenator != null)
+									compoundTranslator = compoundTranslator.withHyphenator(hyphenator);
 								Function0<Void> evictTempTranslator; {
 									if (compoundTranslator != mainTranslator)
 										// translatorRegistry.get() call above probably returned an object that was not cached
@@ -208,6 +235,17 @@ public interface CSSBlockTransform {
 		)
 		protected void bindBrailleTranslatorProvider(BrailleTranslatorProvider<?> provider) {
 			translatorRegistry.addProvider(provider);
+		}
+		
+		@Reference(
+			name = "HyphenatorRegistry",
+			unbind = "-",
+			service = HyphenatorRegistry.class,
+			cardinality = ReferenceCardinality.MANDATORY,
+			policy = ReferencePolicy.STATIC
+		)
+		protected void bindHyphenatorRegistry(HyphenatorRegistry registry) {
+			translatorRegistry.bindHyphenatorRegistry(registry);
 		}
 		
 		private BrailleTranslatorRegistry translatorRegistry = new BrailleTranslatorRegistry();

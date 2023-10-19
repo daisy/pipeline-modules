@@ -70,6 +70,10 @@ public class TextTransformParser {
 							// (silently) ignoring this feature because all braille translators
 							// used in the whole conversion must use the same output character set
 							continue;
+						} else if (key.equals("document-locale")) {
+							// document-locale is an internal feature and not supported in @text-transform rules
+							query = null;
+							break;
 						}
 						String value;
 						if (d.get(0) instanceof TermURI) {

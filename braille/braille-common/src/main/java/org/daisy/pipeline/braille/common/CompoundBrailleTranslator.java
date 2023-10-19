@@ -19,11 +19,15 @@ import org.daisy.pipeline.braille.css.CSSStyledText;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
 
 import cz.vutbr.web.css.CSSProperty;
 import cz.vutbr.web.css.Term;
 import cz.vutbr.web.css.TermIdent;
 import cz.vutbr.web.css.TermList;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*
  * Translator that dispatches to sub-translator based on text-transform values.
@@ -62,10 +66,30 @@ public class CompoundBrailleTranslator extends AbstractBrailleTranslator {
 					return false; }} );
 	}
 
+	protected CompoundBrailleTranslator(CompoundBrailleTranslator from) {
+		super(from);
+		this.translators = from.translators;
+		this.implementsFromStyledTextToBraille = from.implementsFromStyledTextToBraille;
+		this.implementsLineBreakingFromStyledText = from.implementsLineBreakingFromStyledText;
+	}
+
 	@Override
 	public ToStringHelper toStringHelper() {
 		return MoreObjects.toStringHelper("CompoundBrailleTranslator")
 			.add("translators", translators);
+	}
+
+	/**
+	 * @throws UnsupportedOperationException if the main translator or one of the sub-translators's
+	 *                                       {@code #withHyphenator()} method throws UnsupportedOperationException
+	 */
+	public CompoundBrailleTranslator _withHyphenator(Hyphenator hyphenator) {
+		Map<String,BrailleTranslator> translatorsWithHyphenator = new HashMap<>(); {
+			for (String k : translators.keySet())
+				translatorsWithHyphenator.put(k, translators.get(k).withHyphenator(hyphenator));
+		}
+		return new CompoundBrailleTranslator(translatorsWithHyphenator.remove("auto"),
+		                                     Maps.transformValues(translatorsWithHyphenator, x -> (() -> x)));
 	}
 
 	private static abstract class TransformImpl<T> {
@@ -345,4 +369,7 @@ public class CompoundBrailleTranslator extends AbstractBrailleTranslator {
 			throw new UnsupportedMetricException("Metric not supported: " + metric);
 		}
 	}
+
+	private static final Logger logger = LoggerFactory.getLogger(CompoundBrailleTranslator.class);
+
 }
