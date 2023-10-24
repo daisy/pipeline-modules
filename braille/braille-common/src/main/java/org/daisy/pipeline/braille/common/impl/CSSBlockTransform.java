@@ -8,7 +8,6 @@ import javax.xml.namespace.QName;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 
 import com.xmlcalabash.core.XProcRuntime;
 import com.xmlcalabash.runtime.XAtomicStep;
@@ -35,12 +34,10 @@ import org.daisy.pipeline.braille.common.calabash.CxEvalBasedTransformer;
 import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Iterables.transform;
 import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.logCreate;
 import static org.daisy.pipeline.braille.common.AbstractTransformProvider.util.logSelect;
-import org.daisy.pipeline.braille.common.CompoundBrailleTranslator;
 import org.daisy.pipeline.braille.common.Query;
 import org.daisy.pipeline.braille.common.Query.Feature;
 import org.daisy.pipeline.braille.common.Query.MutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
-import org.daisy.pipeline.braille.common.TextTransformParser;
 import org.daisy.pipeline.braille.common.TransformProvider;
 import org.daisy.pipeline.braille.common.util.Function0;
 import org.daisy.pipeline.braille.common.util.Functions;
@@ -150,30 +147,23 @@ public interface CSSBlockTransform {
 								if (!(source instanceof SaxonInputValue))
 									throw new IllegalArgumentException();
 								Mult<SaxonInputValue> mult = ((SaxonInputValue)source).mult(2);
+
 								// analyze the input
-								Map<String,Query> subTranslators
-									= readTextTransformRules(
-										mult.get().ensureSingleItem().asNodeIterator().next(),
-										mainQuery);
-								BrailleTranslator compoundTranslator;
+								Node doc = mult.get().ensureSingleItem().asNodeIterator().next();
+								if (!(doc instanceof Document))
+									throw new TransformerException(new IllegalArgumentException());
+								String style = (((Document)doc).getDocumentElement()).getAttribute("style");
+								URI styleBaseURI = URLs.asURI(((Document)doc).getBaseURI());
+								BrailleTranslator compoundTranslator
+									= translatorRegistry.get(mainQuery, style, styleBaseURI, forceMainTranslator).iterator().next();
 								Function0<Void> evictTempTranslator; {
-									if (subTranslators != null) {
-										BrailleTranslator defaultTranslator = mainTranslator;
-										Query defaultQuery = subTranslators.remove("auto");
-										if (!forceMainTranslator && defaultQuery != null && !defaultQuery.equals(mainQuery))
-											defaultTranslator = translatorRegistry.get(defaultQuery).iterator().next();
-										compoundTranslator = new CompoundBrailleTranslator(
-											defaultTranslator,
-											Maps.transformValues(
-												subTranslators,
-												q -> () -> translatorRegistry.get(q).iterator().next()));
-										compoundTranslator = TransformProvider.util.logCreate(compoundTranslator, logger);
+									if (compoundTranslator != mainTranslator)
+										// translatorRegistry.get() call above probably returned an object that was not cached
 										evictTempTranslator = Provider.this.provideTemporarily(compoundTranslator);
-									} else {
-										compoundTranslator = mainTranslator;
+									else
 										evictTempTranslator = Functions.noOp;
-									}
 								}
+
 								// run the transformation
 								new CxEvalBasedTransformer(
 									href,
@@ -204,14 +194,6 @@ public interface CSSBlockTransform {
 				return MoreObjects.toStringHelper("CSSBlockTransform$Provider$TransformImpl")
 					.add("translator", mainTranslator);
 			}
-		}
-		
-		private static Map<String,Query> readTextTransformRules(Node doc, Query baseQuery) {
-			if (!(doc instanceof Document))
-				throw new TransformerException(new IllegalArgumentException());
-			String style = (((Document)doc).getDocumentElement()).getAttribute("style");
-			URI baseURI = URLs.asURI(((Document)doc).getBaseURI());
-			return TextTransformParser.getBrailleTranslatorQueries(style, baseURI, baseQuery);
 		}
 		
 		// FIXME: should ideally bind BrailleTranslatorRegistry, but does not work because

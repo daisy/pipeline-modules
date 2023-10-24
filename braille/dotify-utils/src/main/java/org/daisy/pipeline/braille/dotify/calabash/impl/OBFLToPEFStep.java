@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.function.Supplier;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +13,6 @@ import java.util.NoSuchElementException;
 import javax.xml.transform.stream.StreamSource;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
 
 import com.xmlcalabash.core.XProcException;
 import com.xmlcalabash.core.XProcRuntime;
@@ -51,11 +49,9 @@ import org.daisy.dotify.api.writer.PagedMediaWriter;
 import org.daisy.dotify.api.writer.PagedMediaWriterConfigurationException;
 import org.daisy.pipeline.braille.common.BrailleTranslator;
 import org.daisy.pipeline.braille.common.BrailleTranslatorRegistry;
-import org.daisy.pipeline.braille.common.CompoundBrailleTranslator;
 import org.daisy.pipeline.braille.common.Query;
 import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.query;
-import org.daisy.pipeline.braille.common.TextTransformParser;
 import static org.daisy.pipeline.braille.common.TransformProvider.util.logCreate;
 import org.daisy.pipeline.braille.common.util.Function0;
 import org.daisy.pipeline.braille.common.util.Functions;
@@ -208,38 +204,26 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 				mode = mainQuery.toString();
 				if (locale != null && !"und".equals(locale))
 					mainQuery = mutableQuery(mainQuery).add("document-locale", locale);
-				BrailleTranslator mainTranslator;
-				try {
-					mainTranslator = brailleTranslatorRegistry.get(mainQuery).iterator().next();
-				} catch (NoSuchElementException e) {
-					throw new XProcException(
-						step.getNode(),
-						"No translator available for mode '" + mode + "' and locale '" + locale + "' "
-						+ "that supports style type " + styleType);
-				}
-				BrailleTranslator translator = mainTranslator;
-				String textTransformDefinitions = getOption(_css_text_transform_definitions, "");
-				if (!"".equals(textTransformDefinitions)) {
-					Map<String,Query> subQueries = TextTransformParser.getBrailleTranslatorQueries(textTransformDefinitions,
-					                                                                               obflNode.getBaseURI(),
-					                                                                               mainQuery);
-					if (subQueries != null && !subQueries.isEmpty()) {
-						BrailleTranslator defaultTranslator = mainTranslator;
-						Query defaultQuery = subQueries.remove("auto");
-						if (defaultQuery != null && !defaultQuery.equals(mainQuery))
-							try {
-								defaultTranslator = brailleTranslatorRegistry.get(defaultQuery).iterator().next();
-							} catch (NoSuchElementException e) {
-								throw new XProcException(
-									step.getNode(), "No translator available for " + defaultQuery + "");
-							}
-						if (defaultTranslator != mainTranslator || !subQueries.isEmpty()) {
-							Map<String,Supplier<BrailleTranslator>> subTranslators
-								= Maps.transformValues(
-									subQueries,
-									q -> () -> brailleTranslatorRegistry.get(q).iterator().next());
-							translator = new CompoundBrailleTranslator(defaultTranslator, subTranslators);
-						}
+				BrailleTranslator translator; {
+					String textTransformDefinitions = getOption(_css_text_transform_definitions, "");
+					try {
+						translator = (!"".equals(textTransformDefinitions)
+							? brailleTranslatorRegistry.get(mainQuery,
+							                                textTransformDefinitions,
+							                                obflNode.getBaseURI(),
+							                                false)
+							: brailleTranslatorRegistry.get(mainQuery)
+						).iterator().next();
+					} catch (NoSuchElementException e) {
+						if (!"".equals(textTransformDefinitions))
+							throw new XProcException(
+								"No translator available for style type '" + styleType + "', mode '" + mode
+								+ "', locale '" + locale + "' and CSS rules:\n" + textTransformDefinitions);
+						else
+							throw new XProcException(
+								step.getNode(),
+								"No translator available for style type '" + styleType + "', mode '" + mode
+								+ "' and locale '" + locale + "'");
 					}
 				}
 				String counterStyleDefinitions = getOption(_css_counter_style_definitions, "");
