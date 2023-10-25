@@ -84,6 +84,7 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 	private static final QName _identifier = new QName("identifier");
 	private static final QName _style_type = new QName("style-type");
 	private static final QName _css_text_transform_definitions = new QName("css-text-transform-definitions");
+	private static final QName _css_hyphenation_resource_definitions = new QName("css-hyphenation-resource-definitions");
 	private static final QName _css_counter_style_definitions = new QName("css-counter-style-definitions");
 	private static final QName _has_volume_transition = new QName("has-volume-transition");
 	
@@ -205,20 +206,23 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 				if (locale != null && !"und".equals(locale))
 					mainQuery = mutableQuery(mainQuery).add("document-locale", locale);
 				BrailleTranslator translator; {
-					String textTransformDefinitions = getOption(_css_text_transform_definitions, "");
+					String textTransformAndHyphenationResourceDefinitions
+						= getOption(_css_text_transform_definitions, "")
+						+ getOption(_css_hyphenation_resource_definitions, "");
 					try {
-						translator = (!"".equals(textTransformDefinitions)
+						translator = (!"".equals(textTransformAndHyphenationResourceDefinitions)
 							? brailleTranslatorRegistry.getWithHyphenator(mainQuery,
-							                                              textTransformDefinitions,
-							                                              obflNode.getBaseURI(),
+							                                              textTransformAndHyphenationResourceDefinitions,
+							                                              obflNode.getBaseURI(), // note that this is the empty string
+							                                                                     // if the OBFL came from pxi:css-to-obfl
 							                                              false)
 							: brailleTranslatorRegistry.getWithHyphenator(mainQuery)
 						).iterator().next();
 					} catch (NoSuchElementException e) {
-						if (!"".equals(textTransformDefinitions))
+						if (!"".equals(textTransformAndHyphenationResourceDefinitions))
 							throw new XProcException(
 								"No translator available for style type '" + styleType + "', mode '" + mode
-								+ "', locale '" + locale + "' and CSS rules:\n" + textTransformDefinitions);
+								+ "', locale '" + locale + "' and CSS rules:\n" + textTransformAndHyphenationResourceDefinitions);
 						else
 							throw new XProcException(
 								step.getNode(),

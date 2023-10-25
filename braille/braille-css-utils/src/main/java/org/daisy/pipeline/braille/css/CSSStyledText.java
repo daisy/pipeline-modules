@@ -87,6 +87,7 @@ public class CSSStyledText implements Cloneable {
 			return style.properties;
 	}
 	
+	// currently not used
 	public RuleTextTransform getDefaultTextTransformDefinition() {
 		if (style == null)
 			return null;
@@ -94,6 +95,7 @@ public class CSSStyledText implements Cloneable {
 			return style.defaultTextTransformDef;
 	}
 	
+	// currently not used
 	public RuleTextTransform getTextTransformDefinition(String name) {
 		if (style == null || style.textTransformDefs == null)
 			return null;

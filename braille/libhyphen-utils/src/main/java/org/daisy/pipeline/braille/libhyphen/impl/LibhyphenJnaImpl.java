@@ -133,9 +133,11 @@ public class LibhyphenJnaImpl extends AbstractTransformProvider<LibhyphenHyphena
 					return ret;
 				else
 					return intersection(_get(q), ret); }}
+		String tableKey;
 		String table; {
 			if (q.containsKey("libhyphen-table")) {
 				table = q.removeOnly("libhyphen-table").getValue().get();
+				tableKey = "libhyphen-table";
 				if (q.containsKey("hyphen-table")) {
 					logger.warn("A query with both 'libhyphen-table' and 'hyphen-table' never matches anything");
 					return empty; }
@@ -144,24 +146,18 @@ public class LibhyphenJnaImpl extends AbstractTransformProvider<LibhyphenHyphena
 					return empty; }
 			} else if (q.containsKey("hyphen-table")) {
 				table = q.removeOnly("hyphen-table").getValue().get();
+				tableKey = "hyphen-table";
 				if (q.containsKey("table")) {
 					logger.warn("A query with both 'hyphen-table' and 'table' never matches anything");
 					return empty; }
-			} else if (q.containsKey("table"))
+			} else if (q.containsKey("table")) {
 				table = q.removeOnly("table").getValue().get();
-			else
+				tableKey = "table";
+			} else {
 				table = null;
+				tableKey = null;
+			}
 		}
-		if (table != null) {
-			if (!q.isEmpty()) {
-				logger.warn("A query with both 'table' or '(lib)hyphen-table' and '"
-				            + q.iterator().next().getKey() + "' never matches anything");
-				return empty; }
-			return of(
-				new WithSideEffect<LibhyphenHyphenator,Logger>() {
-					public LibhyphenHyphenator _apply() {
-						LibhyphenTable t = __apply(libhyphenTableProvider.get(URLs.asURI(table)));
-						return __apply(logCreate(new LibhyphenHyphenatorImpl(t, null))); }}); }
 		Locale locale; {
 			String loc = "und";
 			if (q.containsKey("document-locale"))
@@ -172,6 +168,16 @@ public class LibhyphenJnaImpl extends AbstractTransformProvider<LibhyphenHyphena
 				logger.error("Invalid locale", e);
 				return empty; }
 		}
+		if (table != null) {
+			if (!q.isEmpty()) {
+				logger.warn("A query with both '" + tableKey + "' and '"
+				            + q.iterator().next().getKey() + "' never matches anything");
+				return empty; }
+			return of(
+				new WithSideEffect<LibhyphenHyphenator,Logger>() {
+					public LibhyphenHyphenator _apply() {
+						LibhyphenTable t = __apply(libhyphenTableProvider.get(URLs.asURI(table)));
+						return __apply(logCreate(new LibhyphenHyphenatorImpl(t, null))); }}); }
 		if (UND.equals(locale))
 			return of(
 				new WithSideEffect<LibhyphenHyphenator,Logger>() {

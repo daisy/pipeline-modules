@@ -41,7 +41,52 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 		private final static Pattern ON_SPACE_SPLITTER = Pattern.compile("\\s+");
 		private final static Pattern COMPOUND_WORD_HYPHEN = Pattern.compile("[\\p{L}\\p{N}]-(?=[\\p{L}\\p{N}])");
 
-		public static abstract class DefaultFullHyphenator implements FullHyphenator {
+		/**
+		 * {@link FullHyphenator} that dispatches to other hyphenators based on language.
+		 */
+		public static abstract class LanguageBasedDispatchingFullHyphenator implements FullHyphenator {
+
+			protected abstract Iterable<CSSStyledText> transform(Iterable<CSSStyledText> text, Locale language)
+				throws NonStandardHyphenationException;
+
+			public Iterable<CSSStyledText> transform(Iterable<CSSStyledText> text) throws NonStandardHyphenationException {
+				// chunk up in chunks of same language
+				Locale singleLang = null;
+				boolean mixedLang = false; {
+					boolean first = false;
+					for (CSSStyledText t : text)
+						if (first) {
+							singleLang = t.getLanguage();
+							first = false;
+						} else if (!Objects.equals(singleLang, t.getLanguage())) {
+							mixedLang = true;
+							break;
+						}
+				}
+				if (mixedLang) {
+					List<CSSStyledText> result = new ArrayList<>();
+					List<CSSStyledText> cur = null;
+					Locale curLang = null;
+					for (CSSStyledText t : text) {
+						Locale lang = t.getLanguage();
+						if (cur != null && !Objects.equals(curLang, lang)) {
+							for (CSSStyledText tt : transform(cur, curLang)) result.add(tt);
+							cur = null;
+						}
+						if (cur == null) cur = new ArrayList<>();
+						cur.add(t);
+						curLang = lang;
+					}
+					if (cur != null)
+						for (CSSStyledText tt : transform(cur, curLang)) result.add(tt);
+					return result;
+				} else {
+					return transform(text, singleLang);
+				}
+			}
+		}
+
+		public static abstract class DefaultFullHyphenator extends LanguageBasedDispatchingFullHyphenator {
 
 			/**
 			 * Whether the length of the array returned by {@link
@@ -70,47 +115,15 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 			private final static char US = '\u001F';
 			private final static Splitter SEGMENT_SPLITTER = Splitter.on(US);
 
+			@Override
 			public Iterable<CSSStyledText> transform(Iterable<CSSStyledText> text) throws NonStandardHyphenationException {
 				if (!isLanguageAdaptive())
 					return transform(text, null);
-				else {
-					// chunk up in chunks of same language
-					Locale singleLang = null;
-					boolean mixedLang = false; {
-						boolean first = false;
-						for (CSSStyledText t : text)
-							if (first) {
-								singleLang = t.getLanguage();
-								first = false;
-							} else if (!Objects.equals(singleLang, t.getLanguage())) {
-								mixedLang = true;
-								break;
-							}
-					}
-					if (mixedLang) {
-						List<CSSStyledText> result = new ArrayList<>();
-						List<CSSStyledText> cur = null;
-						Locale curLang = null;
-						for (CSSStyledText t : text) {
-							Locale lang = t.getLanguage();
-							if (cur != null && !Objects.equals(curLang, lang)) {
-								for (CSSStyledText tt : transform(cur, curLang)) result.add(tt);
-								cur = null;
-							}
-							if (cur == null) cur = new ArrayList<>();
-							cur.add(t);
-							curLang = lang;
-						}
-						if (cur != null)
-							for (CSSStyledText tt : transform(cur, curLang)) result.add(tt);
-						return result;
-					} else {
-						return transform(text, singleLang);
-					}
-				}
+				else
+					return super.transform(text);
 			}
 
-			private Iterable<CSSStyledText> transform(Iterable<CSSStyledText> text, Locale language) throws NonStandardHyphenationException {
+			protected Iterable<CSSStyledText> transform(Iterable<CSSStyledText> text, Locale language) throws NonStandardHyphenationException {
 				List<CSSStyledText> result = new ArrayList<>();
 				List<CSSProperty> hyphenate = new ArrayList<>();
 				boolean someHyphenate = false;

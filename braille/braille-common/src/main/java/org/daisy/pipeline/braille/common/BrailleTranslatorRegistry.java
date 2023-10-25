@@ -205,6 +205,8 @@ public class BrailleTranslatorRegistry extends Memoize<BrailleTranslator>
 					Map<String,Supplier<BrailleTranslator>> subTranslators
 						= Maps.transformValues(
 							subQueries,
+							// using getWithHyphenator() because @text-transform rules may contain "hyphenator"
+							// descriptor (though it should be deprecated)
 							q -> () -> BrailleTranslatorRegistry.this.getWithHyphenator(q).iterator().next());
 					return Iterables.transform(
 						get(mainQuery),
@@ -217,7 +219,8 @@ public class BrailleTranslatorRegistry extends Memoize<BrailleTranslator>
 
 	/**
 	 * Select {@link BrailleTranslator}s with {@link Hyphenator} based on a single query and a CSS
-	 * style sheet possibly containing {@code @text-transform} rules.
+	 * style sheet possibly containing {@code @text-transform} and {@code @hyphenation-resource}
+	 * rules.
 	 *
 	 * Contrary to {@link #get(Query)} and similar to {@link #get(Query, String, URI, boolean)},
 	 * this method is not memoized, and the returned objects may not be selectable based on their
@@ -226,7 +229,7 @@ public class BrailleTranslatorRegistry extends Memoize<BrailleTranslator>
 	public Iterable<BrailleTranslator> getWithHyphenator(Query query, String style, URI baseURI, boolean forceMainTranslator) {
 		return getWithHyphenator(
 			q -> get(q, style, baseURI, forceMainTranslator),
-			hyphenatorRegistry,
+			q -> hyphenatorRegistry.get(q, style, baseURI),
 			query,
 			context);
 	}

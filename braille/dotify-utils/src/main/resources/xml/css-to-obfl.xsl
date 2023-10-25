@@ -26,6 +26,7 @@
     <xsl:param name="volume-transition" as="xs:string?" required="no"/>
     <xsl:param name="default-text-transform" as="xs:string" required="yes"/>
     <xsl:param name="text-transforms" as="xs:string?" required="no"/>
+    <xsl:param name="hyphenation-resources" as="xs:string?" required="no"/>
     <xsl:param name="counter-styles" as="attribute(css:counter-style)?" required="no"/>
     <xsl:param name="page-and-volume-styles" as="element()*" required="no"/>
     
@@ -320,6 +321,18 @@
                         <xsl:value-of select="css:serialize-stylesheet($text-transform-rule,(),1,'    ')"/>
                         <xsl:text>&#xa;</xsl:text>
                     </dp2:css-text-transform-definitions>
+                </xsl:if>
+                <xsl:variable name="hyphenation-resource-rule" as="element(css:rule)?">
+                    <xsl:if test="exists($hyphenation-resources) and not($hyphenation-resources='')">
+                        <css:rule selector="@hyphenation-resource" style="{$hyphenation-resources}"/>
+                    </xsl:if>
+                </xsl:variable>
+                <xsl:if test="exists($hyphenation-resource-rule)">
+                    <dp2:css-hyphenation-resource-definitions>
+                        <xsl:text>&#xa;</xsl:text>
+                        <xsl:value-of select="css:serialize-stylesheet($hyphenation-resource-rule,(),1,'    ')"/>
+                        <xsl:text>&#xa;</xsl:text>
+                    </dp2:css-hyphenation-resource-definitions>
                 </xsl:if>
                 <xsl:variable name="counter-style-rule" as="element(css:rule)?">
                     <xsl:if test="exists($counter-styles) and not($counter-styles='')">

@@ -9,7 +9,7 @@
                xmlns:pef="http://www.daisy.org/ns/2008/pef">
   
   <x:script>
-    <p:declare-step type="dotify:format" version="1.0">
+    <p:declare-step type="dotify:format" name="main" version="1.0">
       <p:input port="source"/>
       <p:output port="result" primary="true">
         <p:pipe step="pef" port="result"/>
@@ -25,6 +25,7 @@
       <p:import href="../../main/resources/xml/css-to-obfl.xpl"/>
       <p:import href="../../main/resources/xml/obfl-normalize-space.xpl"/>
       <p:import href="http://www.daisy.org/pipeline/modules/braille/dotify-utils/library.xpl"/>
+      <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl"/>
       <pxi:css-to-obfl name="obfl" px:message="css-to-obfl" px:progress=".89"
                        duplex="true">
         <p:with-option name="document-locale" select="$document-locale"/>
@@ -35,6 +36,11 @@
       <pxi:obfl-normalize-space px:progress=".01"/>
       <p:try px:progress=".10">
         <p:group>
+          <px:set-base-uri>
+            <p:with-option name="base-uri" select="base-uri(/*)">
+              <p:pipe step="main" port="source"/>
+            </p:with-option>
+          </px:set-base-uri>
           <px:obfl-to-pef px:message="obfl-to-pef" px:progress="1">
             <p:with-param port="parameters" name="allow-text-overflow-trimming" select="$allow-text-overflow-trimming"/>
           </px:obfl-to-pef>
@@ -16844,14 +16850,17 @@
     </x:expect>
   </x:scenario>
   
-   <x:scenario label="test_141">
+  <x:scenario label="test_141">
     <x:documentation>
       Tests hyphenation during formatting.
     </x:documentation>
     <x:call step="dotify:format">
       <x:input port="source">
         <x:document type="inline">
-          <doc style="@page { size: 12 30; }">
+          <doc style="@page { size: 12 40; }
+                      @hyphenation-resource:lang(foo) {
+                        system: libhyphen;
+                        table: url(../resources/foo.dic) }">
             <p style="display: block; hyphens: none">
               xxxxxx foo-bar xxxxxx
             </p>
@@ -16864,6 +16873,9 @@
             <p style="display: block" xml:lang="und">
               xxxxxx foo-bar xxxxxx
             </p>
+            <p style="display: block" xml:lang="foo">
+              xxxxxx foo-bar xxxxxx
+            </p>
             <p style="display: block; hyphens: none">
               xxxxxx foo­bar xxxxxx
             </p>
@@ -16874,6 +16886,9 @@
               xxxxxx foo­bar xxxxxx
             </p>
             <p style="display: block" xml:lang="und">
+              xxxxxx foo­bar xxxxxx
+            </p>
+            <p style="display: block" xml:lang="foo">
               xxxxxx foo­bar xxxxxx
             </p>
             <p style="display: block; hyphens: none">
@@ -16886,6 +16901,9 @@
               xxxxxx foobar xxxxxx
             </p>
             <p style="display: block; hyphens: auto" xml:lang="und">
+              xxxxxx foobar xxxxxx
+            </p>
+            <p style="display: block; hyphens: auto" xml:lang="foo">
               xxxxxx foobar xxxxxx
             </p>
           </doc>
@@ -16902,8 +16920,14 @@
         <obfl xmlns="http://www.daisy.org/ns/2011/obfl" version="2011-1" xml:lang="en" hyphenate="false">
           <meta xmlns:dp2="http://www.daisy.org/ns/pipeline/">
             <dp2:style-type>text/css</dp2:style-type>
+            <dp2:css-hyphenation-resource-definitions>
+              @hyphenation-resource:lang(foo) {
+                system: libhyphen;
+                table: url("../resources/foo.dic")
+              }
+            </dp2:css-hyphenation-resource-definitions>
           </meta>
-          <layout-master name="a" page-width="12" page-height="30" duplex="true">
+          <layout-master name="a" page-width="12" page-height="40" duplex="true">
             <default-template>
               <header/>
               <footer/>
@@ -16922,6 +16946,9 @@
             <block xml:lang="und">
               xxxxxx foo-bar xxxxxx
             </block>
+            <block xml:lang="foo">
+              xxxxxx foo-bar xxxxxx
+            </block>
             <block>
               <style name="hyphens: none">xxxxxx foo­bar xxxxxx</style>
             </block>
@@ -16934,6 +16961,9 @@
             <block xml:lang="und">
               xxxxxx foo­bar xxxxxx
             </block>
+            <block xml:lang="foo">
+              xxxxxx foo­bar xxxxxx
+            </block>
             <block>
               <style name="hyphens: none">xxxxxx foobar xxxxxx</style>
             </block>
@@ -16944,6 +16974,9 @@
               xxxxxx foobar xxxxxx
             </block>
             <block xml:lang="und" hyphenate="true">
+              xxxxxx foobar xxxxxx
+            </block>
+            <block xml:lang="foo" hyphenate="true">
               xxxxxx foobar xxxxxx
             </block>
           </sequence>
@@ -16962,10 +16995,12 @@
             </meta>
           </head>
           <body>
-            <volume cols="12" rows="30" rowgap="0" duplex="true">
+            <volume cols="12" rows="40" rowgap="0" duplex="true">
               <section>
                 <page>
                   <!-- foo-bar -->
+                  <row>⠭⠭⠭⠭⠭⠭⠀⠋⠕⠕⠤</row>
+                  <row>⠃⠁⠗⠀⠭⠭⠭⠭⠭⠭</row>
                   <row>⠭⠭⠭⠭⠭⠭⠀⠋⠕⠕⠤</row>
                   <row>⠃⠁⠗⠀⠭⠭⠭⠭⠭⠭</row>
                   <row>⠭⠭⠭⠭⠭⠭⠀⠋⠕⠕⠤</row>
@@ -16984,6 +17019,8 @@
                   <row>⠃⠁⠗⠀⠭⠭⠭⠭⠭⠭</row>
                   <row>⠭⠭⠭⠭⠭⠭⠀⠋⠕⠕⠤</row>
                   <row>⠃⠁⠗⠀⠭⠭⠭⠭⠭⠭</row>
+                  <row>⠭⠭⠭⠭⠭⠭⠀⠋⠕⠕⠤</row>
+                  <row>⠃⠁⠗⠀⠭⠭⠭⠭⠭⠭</row>
                   <!-- foobar -->
                   <row>⠭⠭⠭⠭⠭⠭</row>
                   <row>⠋⠕⠕⠃⠁⠗</row>
@@ -16996,6 +17033,8 @@
                   <row>⠭⠭⠭⠭⠭⠭</row>
                   <row>⠋⠕⠕⠃⠁⠗</row>
                   <row>⠭⠭⠭⠭⠭⠭</row>
+                  <row>⠭⠭⠭⠭⠭⠭⠀⠋⠕⠕⠃⠤</row>
+                  <row>⠁⠗⠀⠭⠭⠭⠭⠭⠭</row>
                 </page>
               </section>
             </volume>

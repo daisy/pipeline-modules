@@ -202,12 +202,13 @@
 			<!--
 			    It does not make sense to translate @text-transform rules. Not dropping the rules
 			    because dependending on the restore-text-style parameter, text-transform values
-			    (other than none) may still be present in the output.
+			    (other than none) may still be present in the output. Same for @hyphenation-resource
+			    rules.
 			-->
-			<xsl:sequence select="$style[matches(@selector,'^@text-transform')]"/>
+			<xsl:sequence select="$style[matches(@selector,'^@(text-transform|hyphenation-resource)')]"/>
 			<xsl:apply-templates mode="translate-style" select="$style[@selector
 			                                                           and not(@selector=('&amp;::before','&amp;::after'))
-			                                                           and not(matches(@selector,'^@text-transform'))]"/>
+			                                                           and not(matches(@selector,'^@(text-transform|hyphenation-resource)'))]"/>
 		</xsl:variable>
 		<xsl:apply-templates mode="insert-style" select="$translated-style"/>
 	</xsl:template>
