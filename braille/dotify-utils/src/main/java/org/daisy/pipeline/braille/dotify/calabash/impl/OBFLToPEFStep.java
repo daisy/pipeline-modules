@@ -56,6 +56,7 @@ import org.daisy.pipeline.braille.common.Query;
 import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.query;
 import org.daisy.pipeline.braille.common.TextTransformParser;
+import static org.daisy.pipeline.braille.common.TransformProvider.util.logCreate;
 import org.daisy.pipeline.braille.common.util.Function0;
 import org.daisy.pipeline.braille.common.util.Functions;
 import org.daisy.pipeline.braille.css.CounterStyle;
@@ -248,6 +249,7 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 						Iterables.filter(new InlineStyle(counterStyleDefinitions), RuleCounterStyle.class));
 				// handle text-transform: -dotify-counter
 				translator = new CounterHandlingBrailleTranslator(translator, counterStyles);
+				translator = logCreate(translator, logger);
 				evictTempTranslator = temporaryBrailleTranslatorProvider.provideTemporarily(translator);
 				mode = mutableQuery().add("id", translator.getIdentifier()).toString();
 				locale = "und";
@@ -523,7 +525,7 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 			policy = ReferencePolicy.STATIC
 		)
 		protected void bindBrailleTranslatorRegistry(BrailleTranslatorRegistry registry) {
-			brailleTranslatorRegistry = registry;
+			brailleTranslatorRegistry = registry.withContext(logger);
 			logger.debug("Binding BrailleTranslator registry: {}", registry);
 		}
 

@@ -77,6 +77,7 @@ public interface CSSBlockTransform {
 		@Activate
 		protected void activate(final Map<?,?> properties) {
 			href = URLs.asURI(URLs.getResourceFromJAR("xml/block-translator.xpl", CSSBlockTransform.class));
+			translatorRegistry = translatorRegistry.withContext(logger);
 		}
 		
 		private final static Iterable<BrailleTranslator> empty = Iterables.<BrailleTranslator>empty();
@@ -115,7 +116,7 @@ public interface CSSBlockTransform {
 			
 		@Override
 		public ToStringHelper toStringHelper() {
-			return MoreObjects.toStringHelper("o.d.p.b.common.impl.CSSBlockTransform$Provider");
+			return MoreObjects.toStringHelper("CSSBlockTransform$Provider");
 		}
 		
 		private class TransformImpl extends AbstractBrailleTranslator implements XProcStepProvider {
@@ -166,6 +167,7 @@ public interface CSSBlockTransform {
 											Maps.transformValues(
 												subTranslators,
 												q -> () -> translatorRegistry.get(q).iterator().next()));
+										compoundTranslator = TransformProvider.util.logCreate(compoundTranslator, logger);
 										evictTempTranslator = Provider.this.provideTemporarily(compoundTranslator);
 									} else {
 										compoundTranslator = mainTranslator;
@@ -199,7 +201,7 @@ public interface CSSBlockTransform {
 			
 			@Override
 			public ToStringHelper toStringHelper() {
-				return MoreObjects.toStringHelper("o.d.p.b.common.impl.CSSBlockTransform$Provider$TransformImpl")
+				return MoreObjects.toStringHelper("CSSBlockTransform$Provider$TransformImpl")
 					.add("translator", mainTranslator);
 			}
 		}

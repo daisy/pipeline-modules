@@ -86,6 +86,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 
+import static org.slf4j.helpers.NOPLogger.NOP_LOGGER;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -208,17 +209,17 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 				documentLocale,
 				hyphenator,
 				handleNonStandardHyphenation));
-		if (translators.apply(null).iterator().hasNext()) {
+		if (translators.apply(NOP_LOGGER).iterator().hasNext()) {
 			// all translators use the same display table
 			// FIXME: display table has already been computed in the getSimpleTranslator() call above
-			DisplayTable displayTable = tableProvider.get(q).iterator().next().getDisplayTable();
+			DisplayTable displayTable = tableProvider.withContext(NOP_LOGGER).get(q).iterator().next().getDisplayTable();
 			BrailleTranslator unityTranslator = new UnityBrailleTranslator(
 				new LiblouisDisplayTableBrailleConverter(displayTable), false);
 			return Iterables.transform(
 				translators,
 				new Function<LiblouisTranslator,LiblouisTranslator>() {
 					public LiblouisTranslator _apply(LiblouisTranslator t) {
-						return new HandleTextTransformNone(t, unityTranslator); }});
+						return __apply(logCreate(new HandleTextTransformNone(t, unityTranslator))); }});
 		} else
 			return translators;
 	}
@@ -279,7 +280,7 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 	
 	@Override
 	public ToStringHelper toStringHelper() {
-		return MoreObjects.toStringHelper("o.d.p.b.liblouis.impl.LiblouisTranslatorJnaImplProvider");
+		return MoreObjects.toStringHelper("LiblouisTranslatorJnaImplProvider");
 	}
 	
 	static class LiblouisTranslatorImpl extends AbstractBrailleTranslator implements LiblouisTranslator {
@@ -1486,7 +1487,7 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 		
 		@Override
 		public ToStringHelper toStringHelper() {
-			return MoreObjects.toStringHelper("o.d.p.b.liblouis.impl.LiblouisTranslatorJnaImplProvider$LiblouisTranslatorImpl")
+			return MoreObjects.toStringHelper("LiblouisTranslatorJnaImplProvider$LiblouisTranslatorImpl")
 				.add("translator", translator)
 				.add("displayTable", displayTable)
 				.add("hyphenator", hyphenator);

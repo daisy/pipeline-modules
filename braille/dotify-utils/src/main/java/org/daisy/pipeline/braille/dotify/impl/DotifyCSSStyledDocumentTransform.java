@@ -48,6 +48,8 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 
+import static org.slf4j.helpers.NOPLogger.NOP_LOGGER;
+
 /**
  * @see <a href="../../../../../../../../../doc/">User documentation</a>.
  */
@@ -97,7 +99,7 @@ public interface DotifyCSSStyledDocumentTransform {
 						q.removeOnly("force-pre-translation");
 					}
 					Query textTransformQuery = mutableQuery(q).add("input", "text-css").add("output", "braille");
-					if (logSelect(textTransformQuery, translatorRegistry).apply(null).iterator().hasNext()) {
+					if (logSelect(textTransformQuery, translatorRegistry).apply(NOP_LOGGER).iterator().hasNext()) {
 						MutableQuery blockTransformQuery = null; {
 							// only pre-translate if an intermediary OBFL with braille content is requested
 							if (obfl && braille || forcePretranslation) {
@@ -217,7 +219,7 @@ public interface DotifyCSSStyledDocumentTransform {
 			
 			@Override
 			public ToStringHelper toStringHelper() {
-				return MoreObjects.toStringHelper("o.d.p.b.dotify.impl.DotifyCSSStyledDocumentTransform$Provider$TransformImpl")
+				return MoreObjects.toStringHelper("DotifyCSSStyledDocumentTransform$Provider$TransformImpl")
 					.add("output", output)
 					.add("textTransform", textTransformQuery);
 			}
@@ -251,7 +253,7 @@ public interface DotifyCSSStyledDocumentTransform {
 		
 		@Override
 		public ToStringHelper toStringHelper() {
-			return MoreObjects.toStringHelper(DotifyCSSStyledDocumentTransform.Provider.class.getName());
+			return MoreObjects.toStringHelper("DotifyCSSStyledDocumentTransform$Provider");
 		}
 	}
 }

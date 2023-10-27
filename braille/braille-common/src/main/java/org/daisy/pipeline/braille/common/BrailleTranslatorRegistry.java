@@ -22,11 +22,23 @@ public class BrailleTranslatorRegistry extends Memoize<BrailleTranslator>
                                        implements BrailleTranslatorProvider<BrailleTranslator> {
 
 	public BrailleTranslatorRegistry() {
-		super();
+		super(true); // memoize (id:...) lookups only
+		providers = new ArrayList<>();
+		dispatch = dispatch(providers);
+		unmodifiable = false;
 	}
 
-	private final List<TransformProvider<BrailleTranslator>> providers = new ArrayList<>();
-	private final TransformProvider<BrailleTranslator> dispatch = dispatch(providers);
+	private BrailleTranslatorRegistry(TransformProvider<BrailleTranslator> dispatch,
+	                                  BrailleTranslatorRegistry from) {
+		super(from);
+		this.providers = null;
+		this.dispatch = dispatch;
+		this.unmodifiable = true;
+	}
+
+	private final List<TransformProvider<BrailleTranslator>> providers;
+	private final TransformProvider<BrailleTranslator> dispatch;
+	private final boolean unmodifiable;
 
 	@Reference(
 		name = "BrailleTranslatorProvider",
@@ -35,7 +47,13 @@ public class BrailleTranslatorRegistry extends Memoize<BrailleTranslator>
 		cardinality = ReferenceCardinality.MULTIPLE,
 		policy = ReferencePolicy.STATIC
 	)
-	public void addProvider(BrailleTranslatorProvider p) {
+	/**
+	 * @throws UnsupportedOperationException if this object is an unmodifiable view of another
+	 * {@link BrailleTranslatorRegistry}.
+	 */
+	public void addProvider(BrailleTranslatorProvider p) throws UnsupportedOperationException {
+		if (unmodifiable)
+			throw new UnsupportedOperationException("Unmodifiable");
 		providers.add(p);
 	}
 
@@ -43,8 +61,13 @@ public class BrailleTranslatorRegistry extends Memoize<BrailleTranslator>
 		return dispatch.get(q);
 	}
 
-	public TransformProvider<BrailleTranslator> _withContext(Logger context) {
-		return dispatch.withContext(context);
+	@Override
+	public BrailleTranslatorRegistry withContext(Logger context) {
+		return (BrailleTranslatorRegistry)super.withContext(context);
+	}
+	
+	protected BrailleTranslatorRegistry _withContext(Logger context) {
+		return new BrailleTranslatorRegistry(dispatch.withContext(context), this);
 	}
 
 	@Override

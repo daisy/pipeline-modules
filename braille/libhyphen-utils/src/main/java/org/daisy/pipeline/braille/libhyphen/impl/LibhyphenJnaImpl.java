@@ -310,7 +310,7 @@ public class LibhyphenJnaImpl extends AbstractTransformProvider<LibhyphenHyphena
 		
 		@Override
 		public ToStringHelper toStringHelper() {
-			return MoreObjects.toStringHelper("o.d.p.b.libhyphen.impl.LibhyphenJnaImpl$LibhyphenHyphenatorImpl")
+			return MoreObjects.toStringHelper("LibhyphenJnaImpl$LibhyphenHyphenatorImpl")
 				.add("language", mainLanguage)
 				.add("table", asLibhyphenTable());
 		}
@@ -367,7 +367,7 @@ public class LibhyphenJnaImpl extends AbstractTransformProvider<LibhyphenHyphena
 
 	@Override
 	public ToStringHelper toStringHelper() {
-		return MoreObjects.toStringHelper(LibhyphenJnaImpl.class.getName());
+		return MoreObjects.toStringHelper("LibhyphenJnaImpl");
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(LibhyphenJnaImpl.class);

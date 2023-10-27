@@ -176,7 +176,7 @@ public class TexHyphenatorSimpleImpl extends AbstractTransformProvider<TexHyphen
 	
 	@Override
 	public ToStringHelper toStringHelper() {
-		return MoreObjects.toStringHelper(TexHyphenatorSimpleImpl.class.getName());
+		return MoreObjects.toStringHelper("TexHyphenatorSimpleImpl");
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(TexHyphenatorSimpleImpl.class);

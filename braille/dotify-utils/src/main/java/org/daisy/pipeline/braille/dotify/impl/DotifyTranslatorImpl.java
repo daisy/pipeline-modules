@@ -318,7 +318,7 @@ public class DotifyTranslatorImpl extends AbstractBrailleTranslator implements D
 		
 		@Override
 		public ToStringHelper toStringHelper() {
-			return MoreObjects.toStringHelper(DotifyTranslatorImpl.Provider.class.getName());
+			return MoreObjects.toStringHelper("DotifyTranslatorImpl$Provider");
 		}
 	}
 	

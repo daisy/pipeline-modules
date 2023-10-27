@@ -160,7 +160,7 @@ public class PxTransformStep extends DefaultStep implements XProcStep {
 		}
 		
 		private List<TransformProvider<Transform>> providers = new ArrayList<>();
-		private TransformProvider<Transform> provider = dispatch(providers);
+		private TransformProvider<Transform> provider = dispatch(providers).withContext(logger);
 		
 	}
 	

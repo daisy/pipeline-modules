@@ -49,7 +49,7 @@ public class TextTransformDefinition extends ExtensionFunctionDefinition {
 		policy = ReferencePolicy.STATIC
 	)
 	protected void bindBrailleTranslatorRegistry(BrailleTranslatorRegistry registry) {
-		translatorRegistry = registry;
+		translatorRegistry = registry.withContext(logger);
 		logger.debug("Binding BrailleTranslator registry: {}", registry);
 	}
 	

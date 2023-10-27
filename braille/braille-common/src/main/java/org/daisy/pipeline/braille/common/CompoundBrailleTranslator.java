@@ -16,6 +16,8 @@ import org.daisy.dotify.api.translator.UnsupportedMetricException;
 import org.daisy.pipeline.braille.common.Hyphenator.NonStandardHyphenationException;
 import org.daisy.pipeline.braille.css.CSSStyledText;
 
+import com.google.common.base.MoreObjects;
+import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.Iterables;
 
 import cz.vutbr.web.css.CSSProperty;
@@ -58,6 +60,12 @@ public class CompoundBrailleTranslator extends AbstractBrailleTranslator {
 					return true; }
 				catch (UnsupportedOperationException e) {
 					return false; }} );
+	}
+
+	@Override
+	public ToStringHelper toStringHelper() {
+		return MoreObjects.toStringHelper("CompoundBrailleTranslator")
+			.add("translators", translators);
 	}
 
 	private static abstract class TransformImpl<T> {

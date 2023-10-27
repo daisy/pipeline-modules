@@ -63,8 +63,14 @@ public interface Provider<Q,X> {
 		}
 		
 		public static abstract class Memoize<Q,X> extends Memoizing.util.AbstractMemoizing<Q,Iterable<X>> implements MemoizingProvider<Q,X> {
+			protected Memoize() {
+				super();
+			}
+			protected Memoize(Memoize<Q,X> shareCacheWith) {
+				super(shareCacheWith);
+			}
 			protected abstract Iterable<X> _get(Q query);
-			public final Iterable<X> get(Q query) {
+			public Iterable<X> get(Q query) {
 				return apply(query);
 			}
 			protected final Iterable<X> _apply(Q query) {

@@ -238,7 +238,7 @@ public class TexHyphenatorDotifyImpl extends AbstractTransformProvider<TexHyphen
 	
 	@Override
 	public ToStringHelper toStringHelper() {
-		return MoreObjects.toStringHelper(TexHyphenatorDotifyImpl.class.getName());
+		return MoreObjects.toStringHelper("TexHyphenatorDotifyImpl");
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(TexHyphenatorDotifyImpl.class);

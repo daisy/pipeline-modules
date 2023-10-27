@@ -26,11 +26,22 @@ import org.slf4j.Logger;
 public class HyphenatorRegistry extends Memoize<Hyphenator> implements HyphenatorProvider<Hyphenator> {
 
 	public HyphenatorRegistry() {
-		super();
+		super(true); // memoize (id:...) lookups only
+		providers = new ArrayList<>();
+		dispatch = dispatch(providers);
+		unmodifiable = false;
 	}
 
-	private final List<TransformProvider<Hyphenator>> providers = new ArrayList<>();
-	private final TransformProvider<Hyphenator> dispatch = dispatch(providers);
+	private HyphenatorRegistry(TransformProvider<Hyphenator> dispatch, HyphenatorRegistry from) {
+		super(from);
+		this.providers = null;
+		this.dispatch = dispatch;
+		this.unmodifiable = true;
+	}
+
+	private final List<TransformProvider<Hyphenator>> providers;
+	private final TransformProvider<Hyphenator> dispatch;
+	private final boolean unmodifiable;
 
 	@Reference(
 		name = "HyphenatorProvider",
@@ -39,7 +50,13 @@ public class HyphenatorRegistry extends Memoize<Hyphenator> implements Hyphenato
 		cardinality = ReferenceCardinality.MULTIPLE,
 		policy = ReferencePolicy.STATIC
 	)
+	/**
+	 * @throws UnsupportedOperationException if this object is an unmodifiable view of another
+	 * {@link BrailleTranslatorRegistry}.
+	 */
 	public void addProvider(HyphenatorProvider p) {
+		if (unmodifiable)
+			throw new UnsupportedOperationException("Unmodifiable");
 		providers.add(p);
 	}
 
@@ -57,8 +74,13 @@ public class HyphenatorRegistry extends Memoize<Hyphenator> implements Hyphenato
 
 	private final static Query FALLBACK_QUERY = query("(document-locale:und)");
 
-	public TransformProvider<Hyphenator> _withContext(Logger context) {
-		return dispatch.withContext(context);
+	@Override
+	public HyphenatorRegistry withContext(Logger context) {
+		return (HyphenatorRegistry)super.withContext(context);
+	}
+
+	protected HyphenatorRegistry _withContext(Logger context) {
+		return new HyphenatorRegistry(dispatch.withContext(context), this);
 	}
 
 	@Override

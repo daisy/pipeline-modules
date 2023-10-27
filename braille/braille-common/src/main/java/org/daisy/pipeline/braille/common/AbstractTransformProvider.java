@@ -23,6 +23,7 @@ import org.daisy.pipeline.braille.common.util.Function0;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// FIXME: could this class extend TransformProvider.util.Memoize?
 public abstract class AbstractTransformProvider<T extends Transform> implements TransformProvider<T> {
 	
 	private Map<Query,Iterable<T>> transformCache = new HashMap<Query,Iterable<T>>();
@@ -59,6 +60,9 @@ public abstract class AbstractTransformProvider<T extends Transform> implements 
 					catch (URISyntaxException e) {}}
 			if (!containsVolatileFileURIs) {
 				transformCache.put(query, i); }}
+
+		// note that we don't cache WithSideEffect objects because we don't want log messages to be
+		// repeated for (id:...) lookups
 		return rememberId(i.apply(context));
 	}
 	
@@ -168,9 +172,15 @@ public abstract class AbstractTransformProvider<T extends Transform> implements 
 		
 		public static <T extends Transform> Iterable<T> logSelect(final Query query,
 		                                                          final TransformProvider<T> provider) {
-			// not using provider.withContext() because memoizing only makes sense if sub-providers
-			// have no side-effects and provided transformers have no context
-			return logSelect(query, provider.withContext(null).get(query));
+			return Iterables.concat(
+				Iterables.of(
+					new WithSideEffect<Iterable<T>,Logger>() {
+						protected Iterable<T> _apply() throws NoSuchElementException {
+							return __apply(logger -> logSelect(query, provider.withContext(logger).get(query)));
+						}
+					}
+				)
+			);
 		}
 		
 		public static <T extends Transform> Iterable<T> logSelect(final Query query,
@@ -203,7 +213,7 @@ public abstract class AbstractTransformProvider<T extends Transform> implements 
 									t = i.next();
 								return new WithSideEffect<T,Logger>() {
 									public T _apply() {
-										__apply(info("Selected " + t + " for query " + query));
+										__apply(debug("Selected " + t + " for query " + query));
 										return t;
 									}
 								};
