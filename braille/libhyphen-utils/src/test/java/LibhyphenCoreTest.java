@@ -55,6 +55,16 @@ public class LibhyphenCoreTest extends AbstractTest {
 		assertEquals(text("foo\u00ADbar foob\u00ADar"), hyphenator.transform(styledText("foobar foob\u00ADar", "hyphens: auto")));
 	}
 	
+	@Test
+	public void testSurrogatePairs() {
+		FullHyphenator hyphenator= provider.withContext(messageBus)
+		                                   .get(query("(table:'standard.dic')"))
+		                                   .iterator().next()
+		                                   .asFullHyphenator();
+		assertEquals(text("\uD83D\uDE00\u00AD\uD83D\uDE00"), // \uD83D\uDE00 = U+1F600 grinning face
+		             hyphenator.transform(styledText("\uD83D\uDE00\u00AD\uD83D\uDE00", "hyphens: auto")));
+	}
+	
 	@Test(expected=RuntimeException.class)
 	public void testStandardHyphenationException() {
 		FullHyphenator hyphenator= provider.withContext(messageBus)
