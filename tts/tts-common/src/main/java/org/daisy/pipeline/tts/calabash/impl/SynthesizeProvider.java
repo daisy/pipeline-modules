@@ -1,9 +1,11 @@
 package org.daisy.pipeline.tts.calabash.impl;
 
 import java.util.concurrent.Semaphore;
+import java.util.Map;
 
 import org.daisy.common.xproc.calabash.XProcStep;
 import org.daisy.common.xproc.calabash.XProcStepProvider;
+import org.daisy.common.xproc.XProcMonitor;
 import org.daisy.pipeline.audio.AudioServices;
 import org.daisy.pipeline.tts.AudioFootprintMonitor;
 import org.daisy.pipeline.tts.TTSRegistry;
@@ -28,7 +30,7 @@ public class SynthesizeProvider implements XProcStepProvider {
 	private AudioFootprintMonitor mAudioFootprintMonitor;
 
 	@Override
-	public XProcStep newStep(XProcRuntime runtime, XAtomicStep step) {
+	public XProcStep newStep(XProcRuntime runtime, XAtomicStep step, XProcMonitor monitor, Map<String,String> properties) {
 		if (mStartSemaphore == null) {
 			mStartSemaphore = new Semaphore(3, true);
 		}
@@ -55,7 +57,7 @@ public class SynthesizeProvider implements XProcStepProvider {
 		//even if it is unregistered.
 
 		return new SynthesizeStep(runtime, step, mRegistry, mAudioServices, mStartSemaphore,
-		        mAudioFootprintMonitor);
+		                          mAudioFootprintMonitor, properties);
 	}
 
 	@Reference(

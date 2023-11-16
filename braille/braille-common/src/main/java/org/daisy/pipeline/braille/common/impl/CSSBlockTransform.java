@@ -1,7 +1,8 @@
 package org.daisy.pipeline.braille.common.impl;
 
-import java.util.Map;
 import java.net.URI;
+import java.util.Map;
+
 import javax.xml.namespace.QName;
 
 import com.google.common.base.MoreObjects;
@@ -22,7 +23,7 @@ import org.daisy.common.transform.XMLInputValue;
 import org.daisy.common.transform.XMLOutputValue;
 import org.daisy.common.xproc.calabash.XProcStep;
 import org.daisy.common.xproc.calabash.XProcStepProvider;
-
+import org.daisy.common.xproc.XProcMonitor;
 import org.daisy.pipeline.braille.common.AbstractBrailleTranslator;
 import org.daisy.pipeline.braille.common.AbstractTransformProvider;
 import org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Function;
@@ -140,7 +141,7 @@ public interface CSSBlockTransform {
 			}
 			
 			@Override
-			public XProcStep newStep(XProcRuntime runtime, XAtomicStep step) {
+			public XProcStep newStep(XProcRuntime runtime, XAtomicStep step, XProcMonitor monitor, Map<String,String> properties) {
 				return XProcStep.of(
 					new SingleInSingleOutXMLTransformer() {
 						public Runnable transform(XMLInputValue<?> source, XMLOutputValue<?> result, InputValue<?> params) {
@@ -180,7 +181,7 @@ public interface CSSBlockTransform {
 									            .put("text-transform",
 									                 mutableQuery().add("id", compoundTranslator.getIdentifier()).toString())
 									            .build()
-								).newStep(runtime, step).transform(
+								).newStep(runtime, step, monitor, properties).transform(
 									ImmutableMap.of(
 										new QName("source"), mult.get(),
 										new QName("parameters"), params),

@@ -30,6 +30,7 @@ import com.sun.net.httpserver.HttpServer;
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.XdmNode;
 
+import org.daisy.common.properties.Properties;
 import org.daisy.pipeline.audio.AudioUtils;
 import org.daisy.pipeline.tts.config.ConfigReader;
 import org.daisy.pipeline.tts.TTSEngine;
@@ -76,7 +77,8 @@ public class MockGoogle {
 			throw new UncheckedIOException(e);
 		}
 		// only taking into account system properties and properties defined in global TTS config file
-		Map<String,String> properties = new ConfigReader(saxonProcessor, new ConfigReader.Extension[]{}).getAllProperties();
+		new ConfigReader(saxonProcessor, new ConfigReader.Extension[]{});
+		Map<String,String> properties = Properties.getSnapshot();
 		for (TTSService tts : ttsRegistry.getServices())
 			if (!"google".equals(tts.getName()))
 				try {

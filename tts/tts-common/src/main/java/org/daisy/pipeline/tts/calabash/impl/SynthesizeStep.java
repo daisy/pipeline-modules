@@ -13,9 +13,21 @@ import java.util.concurrent.Semaphore;
 
 import javax.sound.sampled.AudioFileFormat;
 
+import com.google.common.collect.Iterables;
+import com.xmlcalabash.core.XProcException;
+import com.xmlcalabash.core.XProcRuntime;
+import com.xmlcalabash.io.ReadablePipe;
+import com.xmlcalabash.io.WritablePipe;
+import com.xmlcalabash.library.DefaultStep;
+import com.xmlcalabash.model.RuntimeValue;
+import com.xmlcalabash.runtime.XAtomicStep;
+import com.xmlcalabash.util.TreeWriter;
+
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
 
+import org.daisy.common.properties.Properties;
+import org.daisy.common.properties.Properties.Property;
 import org.daisy.common.xproc.calabash.XProcStep;
 import org.daisy.pipeline.audio.AudioClip;
 import org.daisy.pipeline.audio.AudioFileTypes;
@@ -29,22 +41,27 @@ import org.daisy.pipeline.tts.TTSRegistry;
 import org.daisy.pipeline.tts.TTSLog.ErrorCode;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 
-import com.google.common.collect.Iterables;
-import com.xmlcalabash.core.XProcException;
-import com.xmlcalabash.core.XProcRuntime;
-import com.xmlcalabash.io.ReadablePipe;
-import com.xmlcalabash.io.WritablePipe;
-import com.xmlcalabash.library.DefaultStep;
-import com.xmlcalabash.model.RuntimeValue;
-import com.xmlcalabash.runtime.XAtomicStep;
-import com.xmlcalabash.util.TreeWriter;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SynthesizeStep extends DefaultStep implements FormatSpecifications, XProcStep {
 
 	private static final Logger logger = LoggerFactory.getLogger(SynthesizeStep.class);
+	private static final Property ENABLE_LOG = Properties.getProperty("org.daisy.pipeline.tts.log",
+	                                                                  true,
+	                                                                  "Whether or not to make the TTS log available (deprecated)",
+	                                                                  false,
+	                                                                  null);
+	private static final Property AUDIO_TMPDIR = Properties.getProperty("org.daisy.pipeline.tts.audio.tmpdir",
+	                                                                    false,
+	                                                                    "Temporary directory used during speech synthesis",
+	                                                                    false,
+	                                                                    null);
+	private static final Property SENTENCES_PER_FILE = Properties.getProperty("org.daisy.pipeline.tts.sentences.per.file",
+	                                                                          true,
+	                                                                          "Maximum number of sentences per audio file",
+	                                                                          false,
+	                                                                          null);
 
 	/**
 	 * Encoding error
@@ -65,6 +82,7 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 	private String mTempDirOpt;
 	private boolean mIncludeLogOpt;
 	private AudioFileFormat.Type mAudioFileType;
+	private final Map<String,String> properties;
 
 	private static String convertDurationToString(Duration duration) {
 		long hours = duration.toHours();
@@ -79,8 +97,8 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 	}
 
 	public SynthesizeStep(XProcRuntime runtime, XAtomicStep step, TTSRegistry ttsRegistry,
-	        AudioServices audioServices, Semaphore startSemaphore,
-	        AudioFootprintMonitor audioFootprintMonitor) {
+	                      AudioServices audioServices, Semaphore startSemaphore,
+	                      AudioFootprintMonitor audioFootprintMonitor, Map<String,String> properties) {
 		super(runtime, step);
 		mStartSemaphore = startSemaphore;
 		mAudioFootprintMonitor = audioFootprintMonitor;
@@ -88,6 +106,7 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 		mRuntime = runtime;
 		mTTSRegistry = ttsRegistry;
 		mRandGenerator = new Random();
+		this.properties = properties;
 	}
 
 	public void setInput(String port, ReadablePipe pipe) {
@@ -148,12 +167,9 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 
 		boolean logEnabled = mIncludeLogOpt;
 		if (!logEnabled) {
-			String prop = "org.daisy.pipeline.tts.log";
-			String logEnabledProp = cr.getDynamicProperties().get(prop);
-			if (logEnabledProp == null)
-				logEnabledProp = cr.getStaticProperties().get(prop);
+			String logEnabledProp = ENABLE_LOG.getValue(properties);
 			if (logEnabledProp != null)
-				logger.warn("'" + prop + "' setting is deprecated. " +
+				logger.warn("'" + ENABLE_LOG.getName() + "' setting is deprecated. " +
 				            "It may become unavailable in future version of DAISY Pipeline.");;
 			logEnabled = "true".equalsIgnoreCase(logEnabledProp);
 		}
@@ -168,7 +184,7 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 				if (audioOutputDir.exists())
 					throw new RuntimeException("temp-dir option must be a non-existing directory: "+mTempDirOpt);
 			} else {
-				String tmpDir = cr.getAllProperties().get("org.daisy.pipeline.tts.audio.tmpdir");
+				String tmpDir = AUDIO_TMPDIR.getValue(properties);
 				if (tmpDir == null)
 					tmpDir = System.getProperty("java.io.tmpdir");
 				do {
@@ -182,19 +198,19 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 		audioOutputDir.mkdirs();
 		audioOutputDir.deleteOnExit();
 		int maxSentencesPerSection = 100; {
-			String prop = "org.daisy.pipeline.tts.sentences.per.file";
-			String v = cr.getDynamicProperties().get(prop);
+			String v = SENTENCES_PER_FILE.getValue(properties);
 			if (v != null) {
 				try {
 					maxSentencesPerSection = Integer.valueOf(v);
 				} catch (NumberFormatException e) {
-					throw new RuntimeException(v + " is not a valid a value for property " + prop);
+					throw new RuntimeException(v + " is not a valid a value for property " + SENTENCES_PER_FILE.getName());
 				}
 			}
 		}
 
 		SSMLtoAudio ssmltoaudio = new SSMLtoAudio(audioOutputDir, mAudioFileType, maxSentencesPerSection,
-		        mTTSRegistry, logger, mAudioFootprintMonitor, mRuntime.getProcessor(), configExt, log);
+		        mTTSRegistry, logger, mAudioFootprintMonitor, mRuntime.getProcessor(), properties,
+		        configExt, log);
 
 		Iterable<SoundFileLink> soundFragments = Collections.EMPTY_LIST;
 		try {

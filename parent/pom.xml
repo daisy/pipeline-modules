@@ -201,7 +201,7 @@
         <plugin>
           <groupId>org.daisy.maven</groupId>
           <artifactId>xproc-maven-plugin</artifactId>
-          <version>1.0.2</version>
+          <version>1.0.3</version>
           <dependencies>
             <!--
                 provided dependencies of xprocspec-runner
@@ -213,17 +213,17 @@
             <dependency>
               <groupId>org.daisy.pipeline</groupId>
               <artifactId>modules-registry</artifactId>
-              <version>4.1.0</version>
+              <version>4.1.1</version>
             </dependency>
             <dependency>
               <groupId>org.daisy.pipeline</groupId>
               <artifactId>calabash-adapter</artifactId>
-              <version>5.1.2</version>
+              <version>6.0.0</version>
             </dependency>
             <dependency>
               <groupId>org.daisy.libs</groupId>
               <artifactId>com.xmlcalabash</artifactId>
-              <version>1.1.20-p11-98</version>
+              <version>1.1.20-p14-98</version>
             </dependency>
             <dependency>
               <groupId>org.daisy.xprocspec</groupId>
@@ -427,7 +427,7 @@
       <dependency>
         <groupId>org.daisy.pipeline</groupId>
         <artifactId>framework-bom</artifactId>
-        <version>1.14.14</version>
+        <version>1.14.16</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -452,17 +452,17 @@
       <dependency>
         <groupId>org.daisy.pipeline.build</groupId>
         <artifactId>modules-test-helper</artifactId>
-        <version>2.2.3</version>
+        <version>2.2.4</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.maven</groupId>
         <artifactId>xproc-engine-daisy-pipeline</artifactId>
-        <version>1.14.5</version>
+        <version>1.14.6</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>tts-mocks</artifactId>
-        <version>1.0.2</version>
+        <version>1.0.3-SNAPSHOT</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

@@ -89,7 +89,7 @@ public class VoiceInfo {
 		this(voiceEngine, voiceName, tagToLocale(language), gender, priority);
 	}
 
-	VoiceInfo(String voiceEngine, String voiceName, Locale locale, Gender gender, float priority) {
+	public VoiceInfo(String voiceEngine, String voiceName, Locale locale, Gender gender, float priority) {
 		Preconditions.checkNotNull(gender);
 		Preconditions.checkNotNull(voiceName);
 		Preconditions.checkNotNull(voiceEngine);

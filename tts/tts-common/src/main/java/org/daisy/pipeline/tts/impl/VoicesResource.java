@@ -11,6 +11,7 @@ import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 
+import org.daisy.common.properties.Properties;
 import org.daisy.pipeline.tts.config.ConfigReader;
 import org.daisy.pipeline.tts.config.VoiceConfigExtension;
 import org.daisy.pipeline.tts.TTSLog;
@@ -107,7 +108,7 @@ public class VoicesResource extends AuthenticatedResource {
 				logger.debug("Parsed voice configuration:\n" + voiceConfigExt.getVoiceDeclarations());
 			}
 			voiceManager = new VoiceManager(
-				ttsRegistry.getWorkingEngines(cr.getAllProperties(), new TTSLog(logger), logger),
+				ttsRegistry.getWorkingEngines(Properties.getSnapshot(), new TTSLog(logger), logger),
 				voiceConfigExt.getVoiceDeclarations());
 		}
 		Iterable<Voice> availableVoices; {

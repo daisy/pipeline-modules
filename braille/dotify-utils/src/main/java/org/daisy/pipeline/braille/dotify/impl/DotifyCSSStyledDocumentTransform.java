@@ -1,10 +1,11 @@
 package org.daisy.pipeline.braille.dotify.impl;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.net.URI;
+
 import javax.xml.namespace.QName;
 
 import com.google.common.base.MoreObjects;
@@ -22,9 +23,8 @@ import org.daisy.common.transform.XMLInputValue;
 import org.daisy.common.transform.XMLOutputValue;
 import org.daisy.common.xproc.calabash.XProcStep;
 import org.daisy.common.xproc.calabash.XProcStepProvider;
-
+import org.daisy.common.xproc.XProcMonitor;
 import org.daisy.dotify.api.table.Table;
-
 import org.daisy.pipeline.braille.common.AbstractTransform;
 import org.daisy.pipeline.braille.common.AbstractTransformProvider;
 import org.daisy.pipeline.braille.common.AbstractTransformProvider.util.Iterables;
@@ -149,7 +149,7 @@ public interface DotifyCSSStyledDocumentTransform {
 			}
 			
 			@Override
-			public XProcStep newStep(XProcRuntime runtime, XAtomicStep step) {
+			public XProcStep newStep(XProcRuntime runtime, XAtomicStep step, XProcMonitor monitor, Map<String,String> properties) {
 				return XProcStep.of(
 					new SingleInSingleOutXMLTransformer() {
 						public Runnable transform(XMLInputValue<?> source, XMLOutputValue<?> result, InputValue<?> params) {
@@ -200,7 +200,7 @@ public interface DotifyCSSStyledDocumentTransform {
 									href,
 									null,
 									options
-								).newStep(runtime, step).transform(
+								).newStep(runtime, step, monitor, properties).transform(
 									ImmutableMap.of(
 										new QName("source"), source,
 										new QName("parameters"), paramsCopy),

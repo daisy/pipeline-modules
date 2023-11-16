@@ -31,10 +31,9 @@ import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.braille.css.InlineStyle;
 import org.daisy.braille.css.RuleCounterStyle;
-
 import org.daisy.common.xproc.calabash.XProcStep;
 import org.daisy.common.xproc.calabash.XProcStepProvider;
-
+import org.daisy.common.xproc.XProcMonitor;
 import org.daisy.dotify.api.engine.FormatterEngine;
 import org.daisy.dotify.api.engine.FormatterEngineFactoryService;
 import org.daisy.dotify.api.formatter.FormatterConfiguration;
@@ -50,7 +49,6 @@ import org.daisy.dotify.api.translator.TextBorderStyle;
 import org.daisy.dotify.api.writer.MetaDataItem;
 import org.daisy.dotify.api.writer.PagedMediaWriter;
 import org.daisy.dotify.api.writer.PagedMediaWriterConfigurationException;
-
 import org.daisy.pipeline.braille.common.BrailleTranslator;
 import org.daisy.pipeline.braille.common.BrailleTranslatorRegistry;
 import org.daisy.pipeline.braille.common.CompoundBrailleTranslator;
@@ -418,7 +416,7 @@ public class OBFLToPEFStep extends DefaultStep implements XProcStep {
 	public static class Provider implements XProcStepProvider  {
 		
 		@Override
-		public XProcStep newStep(XProcRuntime runtime, XAtomicStep step) {
+		public XProcStep newStep(XProcRuntime runtime, XAtomicStep step, XProcMonitor monitor, Map<String,String> properties) {
 			return new OBFLToPEFStep(runtime,
 			                         step,
 			                         formatterEngineFactoryService,

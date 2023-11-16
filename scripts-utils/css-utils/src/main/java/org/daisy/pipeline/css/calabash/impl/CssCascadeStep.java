@@ -36,6 +36,7 @@ import org.daisy.common.xproc.calabash.XMLCalabashOutputValue;
 import org.daisy.common.xproc.calabash.XMLCalabashParameterInputValue;
 import org.daisy.common.xproc.calabash.XProcStep;
 import org.daisy.common.xproc.calabash.XProcStepProvider;
+import org.daisy.common.xproc.XProcMonitor;
 import org.daisy.pipeline.css.CssCascader;
 import org.daisy.pipeline.css.Medium;
 import org.daisy.pipeline.css.sass.SassCompiler;
@@ -198,7 +199,7 @@ public class CssCascadeStep extends DefaultStep implements XProcStep {
 		private final List<CssCascader> inliners = new ArrayList<>();
 
 		@Override
-		public XProcStep newStep(XProcRuntime runtime, XAtomicStep step) {
+		public XProcStep newStep(XProcRuntime runtime, XAtomicStep step, XProcMonitor monitor, Map<String,String> properties) {
 			return new CssCascadeStep(runtime, step, inliners, resolver);
 		}
 
