@@ -554,7 +554,7 @@ public class SSMLtoAudioTest {
 		};
 
 		try {
-			runTest(service, (DynamicMarkHandler) service.engine, encoder, 2, 0);
+			runTest(service, (DynamicMarkHandler) service.engine, encoder, 1, 0);
 			Assert.fail("EncodingException expected");
 		} catch (EncodingException e) {}
 

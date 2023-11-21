@@ -391,16 +391,19 @@ public class SSMLtoAudio implements FormatSpecifications {
 		mTotalTextSize = 0;
 		int sectionCount = 0;
 		for (List<ContiguousText> sections : mOrganizedText.values()) {
-			//compute the sections' size: needed for displaying the progress,
-			//splitting the sections and sorting them
-			for (ContiguousText section : sections)
-				section.computeSize();
 
+			// compute the sections' size: needed for displaying the progress,
+			// splitting the sections and sorting them
 			for (ContiguousText section : sections) {
+				section.computeSize();
 				mTotalTextSize += section.getStringSize();
 			}
-			//split up the sections that are too big
-			int maxSize = (int) (mTotalTextSize / 15); //should it depend on the total size or be an absolute max?
+
+			// split up the sections that are too big
+			// FIXME: Explain what is "too big".
+			// FIXME: Code was disabled for now because it does not make sense to let the maximum
+			// size depend on the total size (and mTotalTextSize isn't even constant).
+			/*int maxSize = (int) (mTotalTextSize / 15);
 			List<ContiguousText> newSections = new ArrayList<ContiguousText>();
 			List<ContiguousText> toRemove = new ArrayList<ContiguousText>();
 			for (ContiguousText section : sections) {
@@ -409,15 +412,15 @@ public class SSMLtoAudio implements FormatSpecifications {
 					splitSection(section, maxSize, newSections);
 				}
 			}
-
 			sections.removeAll(toRemove);
-			sections.addAll(newSections);
+			sections.addAll(newSections);*/
 
-			//sort the sections according to their size in descending-order
+			// sort the sections according to their size in descending order
+			// FIXME: Explain why this is done.
 			Collections.sort(sections);
 
-			//keep sorted only the smallest sections (50% of total) so the biggest sections won't
-			//necessarily be processed at the same time, as that may consume too much memory.
+			// keep sorted only the smallest sections (50% of total) so the biggest sections won't
+			// necessarily be processed at the same time, as that may consume too much memory.
 			Collections.shuffle(sections.subList(0, sections.size() / 2));
 
 			sectionCount += sections.size();
