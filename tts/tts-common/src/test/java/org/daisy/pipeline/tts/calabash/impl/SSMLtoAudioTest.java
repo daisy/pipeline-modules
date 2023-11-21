@@ -233,7 +233,7 @@ public class SSMLtoAudioTest {
 			AudioFootprintMonitor monitor = new AudioFootprintMonitor();
 			TTSLog logs = new TTSLog();
 
-			SSMLtoAudio ssmlToAudio = new SSMLtoAudio(new File("/tmp/"), MP3, registry, Logger,
+			SSMLtoAudio ssmlToAudio = new SSMLtoAudio(new File("/tmp/"), MP3, 100, registry, Logger,
 			        monitor, Proc, config, logs);
 
 			for (String text : ssml) {
