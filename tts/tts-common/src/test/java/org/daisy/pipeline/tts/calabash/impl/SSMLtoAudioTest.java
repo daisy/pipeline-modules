@@ -47,7 +47,6 @@ import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.Voice;
 import org.daisy.pipeline.tts.VoiceInfo;
 import org.daisy.pipeline.tts.VoiceInfo.Gender;
-import org.daisy.pipeline.tts.VoiceInfo.UnknownLanguage;
 
 import org.junit.Test;
 
@@ -74,7 +73,7 @@ public class SSMLtoAudioTest {
 		public Collection<VoiceInfo> getVoiceDeclarations() {
 			try {
 				return Arrays.asList(new VoiceInfo(Engine, VoiceName, "en", Gender.MALE_ADULT, 1.0f));
-			} catch (UnknownLanguage e) {
+			} catch (IllegalArgumentException e) {
 				e.printStackTrace();
 				return null;
 			}

@@ -6,7 +6,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.IllformedLocaleException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -42,8 +44,6 @@ import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.Voice;
-import org.daisy.pipeline.tts.VoiceInfo.UnknownLanguage;
-import static org.daisy.pipeline.tts.VoiceInfo.tagToLocale;
 import org.daisy.pipeline.tts.VoiceInfo.Gender;
 
 import org.slf4j.Logger;
@@ -183,8 +183,9 @@ public class AzureCognitiveSpeechEngine extends TTSEngine {
 						}
 					}
 					try {
-						voices.add(new Voice(getProvider().getName(), name, tagToLocale(voice.getLocale()), gender));
-					} catch (UnknownLanguage e) {
+						voices.add(new Voice(getProvider().getName(), name,
+						                     (new Locale.Builder()).setLanguageTag(voice.getLocale().replace("_", "-")).build(), gender));
+					} catch (IllformedLocaleException e) {
 						logger.debug("Could not parse locale: " + voice.getLocale() + "; skipping " + name);
 					}
 				}

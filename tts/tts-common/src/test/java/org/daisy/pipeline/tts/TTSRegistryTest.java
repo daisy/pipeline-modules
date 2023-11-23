@@ -16,7 +16,6 @@ import net.sf.saxon.s9api.XdmNode;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.VoiceInfo.Gender;
-import org.daisy.pipeline.tts.VoiceInfo.UnknownLanguage;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -354,12 +353,6 @@ public class TTSRegistryTest {
 		Voice v = vv.next();
 		Assert.assertTrue(vm.matches(v, null, null, EN, MALE));
 		Assert.assertEquals("voice-a", v.getName());
-		Assert.assertTrue(vv.hasNext());
-		v = vv.next();
-		Assert.assertTrue(vm.matches(v, null, null, EN, MALE));
-		Assert.assertTrue(vv.hasNext());
-		v = vv.next();
-		Assert.assertTrue(vm.matches(v, null, null, EN, MALE));
 		Assert.assertFalse(vv.hasNext());
 		vv = vm.findAvailableVoices(null, null, EN_US, MALE).iterator();
 		Assert.assertTrue(vv.hasNext());
@@ -370,10 +363,6 @@ public class TTSRegistryTest {
 		v = vv.next();
 		Assert.assertTrue(vm.matches(v, null, null, EN_US, MALE));
 		Assert.assertEquals("voice-a", v.getName());
-		Assert.assertTrue(vv.hasNext());
-		v = vv.next();
-		Assert.assertTrue(vm.matches(v, null, null, EN_US, MALE));
-		Assert.assertEquals("voice-c", v.getName());
 		Assert.assertFalse(vv.hasNext());
 	}
 
@@ -396,16 +385,13 @@ public class TTSRegistryTest {
 		Assert.assertTrue(vv.hasNext());
 		Voice v = vv.next();
 		Assert.assertTrue(vm.matches(v, null, null, EN_IN, MALE));
-		// the higher priority "en" and "en-US" voices do not win
-		Assert.assertEquals("voice-c", v.getName());
-		Assert.assertTrue(vv.hasNext());
-		v = vv.next();
-		Assert.assertTrue(vm.matches(v, null, null, EN_IN, MALE));
-		Assert.assertEquals("voice-b", v.getName());
-		Assert.assertTrue(vv.hasNext());
-		v = vv.next();
-		Assert.assertTrue(vm.matches(v, null, null, EN_IN, MALE));
+		// the "en" voice wins because it has a higher priority
+		// the higher priority "en-US" voice is not a match
 		Assert.assertEquals("voice-a", v.getName());
+		Assert.assertTrue(vv.hasNext());
+		v = vv.next();
+		Assert.assertTrue(vm.matches(v, null, null, EN_IN, MALE));
+		Assert.assertEquals("voice-c", v.getName());
 		Assert.assertFalse(vv.hasNext());
 	}
 
@@ -548,7 +534,7 @@ public class TTSRegistryTest {
 	}
 
 	@Test
-	public void multiLangVoice() throws UnknownLanguage {
+	public void multiLangVoice() {
 		List<Voice> availableVoices = new ArrayList<>(); {
 			availableVoices.add(new Voice("vendor", "voice1"));
 		}
@@ -567,7 +553,7 @@ public class TTSRegistryTest {
 	}
 
 	@Test
-	public void multiLangVoicePriority() throws UnknownLanguage {
+	public void multiLangVoicePriority() {
 		List<Voice> availableVoices = new ArrayList<>(); {
 			availableVoices.add(new Voice("vendor", "voice1"));
 			availableVoices.add(new Voice("vendor", "wrongvoice"));
@@ -592,7 +578,7 @@ public class TTSRegistryTest {
 	}
 
 	@Test
-	public void caseInsensitivity() throws UnknownLanguage {
+	public void caseInsensitivity() {
 		List<Voice> availableVoices = new ArrayList<>(); {
 			availableVoices.add(new Voice("Vendor1", "Voice1"));
 		}

@@ -10,6 +10,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.HashMap;
+import java.util.IllformedLocaleException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -39,9 +40,7 @@ import org.daisy.pipeline.tts.TTSRegistry;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.TimedTTSExecutor;
 import org.daisy.pipeline.tts.Voice;
-import org.daisy.pipeline.tts.VoiceInfo;
 import org.daisy.pipeline.tts.VoiceInfo.Gender;
-import org.daisy.pipeline.tts.VoiceInfo.UnknownLanguage;
 import org.daisy.pipeline.tts.VoiceManager;
 
 import org.slf4j.Logger;
@@ -172,8 +171,8 @@ public class SSMLtoAudio implements FormatSpecifications {
 			String langAttr = node.getAttributeValue(Sentence_attr_lang);
 			if (langAttr != null) {
 				try {
-					lang = VoiceInfo.tagToLocale(langAttr);
-				} catch (UnknownLanguage e) {
+					lang = (new Locale.Builder()).setLanguageTag(langAttr).build();
+				} catch (IllformedLocaleException e) {
 					lang = null;
 				}
 			}
@@ -218,8 +217,8 @@ public class SSMLtoAudio implements FormatSpecifications {
 			String langAttr = ssml.getAttributeValue(Sentence_attr_lang);
 			if (langAttr != null) {
 				try {
-					lang = VoiceInfo.tagToLocale(langAttr);
-				} catch (UnknownLanguage e) {
+					lang = (new Locale.Builder()).setLanguageTag(langAttr).build();
+				} catch (IllformedLocaleException e) {
 					lang = null;
 				}
 			}

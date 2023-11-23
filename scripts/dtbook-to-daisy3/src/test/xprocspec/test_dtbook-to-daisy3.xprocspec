@@ -21,6 +21,7 @@
 				<x:document type="inline">
 					<config>
 						<voice engine="mock-tts" name="foo" lang="fr" gender="male-adult"/>
+						<voice engine="mock-tts" name="foo" lang="en" gender="male-adult"/>
 					</config>
 				</x:document>
 			</x:input>

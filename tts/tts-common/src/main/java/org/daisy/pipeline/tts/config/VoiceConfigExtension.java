@@ -10,7 +10,6 @@ import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.pipeline.tts.VoiceInfo;
 import org.daisy.pipeline.tts.VoiceInfo.Gender;
-import org.daisy.pipeline.tts.VoiceInfo.UnknownLanguage;
 import org.daisy.pipeline.tts.config.ConfigReader;
 
 import org.slf4j.Logger;
@@ -18,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public class VoiceConfigExtension implements ConfigReader.Extension {
 
-	private Logger Logger = LoggerFactory.getLogger(VoiceConfigExtension.class);
+	private static final Logger logger = LoggerFactory.getLogger(VoiceConfigExtension.class);
 
 	@Override
 	public boolean parseNode(XdmNode node, URI documentURI, ConfigReader parent) {
@@ -32,21 +31,22 @@ public class VoiceConfigExtension implements ConfigReader.Extension {
 			String priority = node.getAttributeValue(new QName(null, "priority"));
 			Gender gender = Gender.of(node.getAttributeValue(new QName(null, "gender")));
 			if (node.getAttributeValue(new QName(null, "marks")) != null) {
-				Logger.warn("mark attribute on voice is deprecated");
+				logger.warn("mark attribute on voice is deprecated");
 			}
 
 			if (priority == null)
 				priority = "5";
 			if (lang == null || vengine == null || vname == null || gender == null) {
-				Logger.warn("Config file invalid near " + node.toString());
+				logger.warn("Config file invalid near " + node.toString());
 			} else {
 				try {
 					mVoices.add(new VoiceInfo(vengine, vname, lang, gender, Float.valueOf(priority)));
 				} catch (NumberFormatException e) {
-					Logger.warn("Error while converting config file's priority " + priority
+					logger.warn("Error while converting config file's priority " + priority
 					        + " to float.");
-				} catch (UnknownLanguage e) {
-					Logger.warn("Unknown language in config file: " +lang);
+				} catch (IllegalArgumentException e) {
+					logger.warn("Invalid language in config file: " + lang);
+					logger.debug("Invalid language in config file: " + lang, e);
 				}
 			}
 			return true;
