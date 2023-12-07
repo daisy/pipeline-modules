@@ -26,9 +26,9 @@ import org.daisy.pipeline.audio.AudioServices;
 import org.daisy.pipeline.tts.AudioFootprintMonitor;
 import org.daisy.pipeline.tts.calabash.impl.EncodingThread.EncodingException;
 import org.daisy.pipeline.tts.config.VoiceConfigExtension;
+import org.daisy.pipeline.tts.DefaultSSMLMarkSplitter;
 import org.daisy.pipeline.tts.SSMLMarkSplitter;
 import org.daisy.pipeline.tts.Sentence;
-import org.daisy.pipeline.tts.StructuredSSMLSplitter;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSLog;
 import org.daisy.pipeline.tts.TTSLog.ErrorCode;
@@ -272,7 +272,9 @@ public class SSMLtoAudio implements FormatSpecifications {
 		MessageAppender activeBlock = MessageAppender.getActiveBlock(); // px:ssml-to-audio step
 
 		//SSML mark splitter shared by the threads:
-		SSMLMarkSplitter ssmlSplitter = new StructuredSSMLSplitter(mProc);
+		SSMLMarkSplitter ssmlSplitter = new DefaultSSMLMarkSplitter(mProc); // StructuredSSMLSplitter makes assumptions
+		                                                                    // that are not always met, e.g. marks may
+		                                                                    // be contained within a a prosody element
 
 		reorganizeSections();
 
