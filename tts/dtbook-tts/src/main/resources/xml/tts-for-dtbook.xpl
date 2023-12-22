@@ -25,7 +25,7 @@
   <p:output port="audio-map">
     <p:pipe port="audio-map" step="synthesize"/>
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-       <p>List of audio clips (see pipeline-mod-tts documentation).</p>
+       <p>List of audio clips mapped to unique IDs in the DTBook document set.</p>
     </p:documentation>
   </p:output>
 
@@ -36,16 +36,6 @@
       <p>The result fileset.</p>
       <p>DTBook documents are enriched with IDs, words and sentences. Inlined aural CSS is
       removed.</p>
-    </p:documentation>
-  </p:output>
-
-  <p:output port="sentence-ids" sequence="true">
-    <p:pipe port="sentence-ids" step="lexing"/>
-    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-      <p>Every document of this port is a list of nodes whose id attribute refers to elements of the
-      'content.out' documents. Grammatically speaking, the referred elements are sentences even if
-      the underlying XML elements are not meant to be so. Documents are listed in the same order as
-      in 'content.out'.</p>
     </p:documentation>
   </p:output>
 
@@ -104,6 +94,11 @@
       px:dtbook-to-ssml
     </p:documentation>
   </p:import>
+  <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
+    <p:documentation>
+      px:add-ids
+    </p:documentation>
+  </p:import>
   <p:import href="http://www.daisy.org/pipeline/modules/dtbook-break-detection/library.xpl">
     <p:documentation>
       px:dtbook-break-detect
@@ -126,6 +121,12 @@
     <p:documentation>
       px:fileset-load
       px:fileset-update
+      px:fileset-compose
+    </p:documentation>
+  </p:import>
+  <p:import href="http://www.daisy.org/pipeline/modules/dtbook-utils/library.xpl">
+    <p:documentation>
+      px:dtbook-update-links
     </p:documentation>
   </p:import>
 
@@ -165,23 +166,88 @@
        they can be attached to a smilref attribute that won't be the descendant of
        any audio clip. Otherwise we risk having pagenums without @smilref, which
        is not allowed by the specs. -->
-  <p:for-each name="lexing">
-    <p:output port="result" primary="true"/>
+  <p:group name="lexing">
+    <p:output port="result" sequence="true" primary="true"/>
     <p:output port="sentence-ids">
-      <p:pipe port="sentence-ids" step="break"/>
+      <p:pipe step="sentence-ids" port="result"/>
     </p:output>
     <p:output port="skippable-ids">
-      <p:pipe port="skippable-ids" step="isolate-skippable"/>
+      <p:pipe step="skippable-ids" port="result"/>
     </p:output>
-    <px:dtbook-break-detect name="break"/>
-    <px:isolate-skippable name="isolate-skippable"
-			  match="dtb:pagenum|dtb:noteref|dtb:annoref|dtb:linenum|math:math">
-      <p:input port="sentence-ids">
-	<p:pipe port="sentence-ids" step="break"/>
-      </p:input>
-      <p:with-option name="id-prefix" select="concat('i', p:iteration-position())"/>
-    </px:isolate-skippable>
-  </p:for-each>
+    <p:for-each name="for-each">
+      <p:output port="result" primary="true"/>
+      <p:output port="sentence-ids">
+	<p:pipe step="break" port="sentence-ids"/>
+      </p:output>
+      <p:output port="skippable-ids">
+	<p:pipe step="isolate-skippable" port="skippable-ids"/>
+      </p:output>
+      <px:dtbook-break-detect name="break"/>
+      <px:isolate-skippable name="isolate-skippable"
+			    match="dtb:pagenum|dtb:noteref|dtb:annoref|dtb:linenum|math:math">
+	<p:input port="sentence-ids">
+	  <p:pipe step="break" port="sentence-ids"/>
+	</p:input>
+      </px:isolate-skippable>
+    </p:for-each>
+    <px:add-ids name="fix-duplicate-ids">
+      <p:documentation>Fix duplicate IDs.</p:documentation>
+    </px:add-ids>
+    <p:sink/>
+    <p:group name="sentence-ids">
+      <p:documentation>Apply ID mapping to sentence IDs</p:documentation>
+      <p:output port="result"/>
+      <p:for-each>
+	<p:iteration-source>
+	  <p:pipe step="for-each" port="sentence-ids"/>
+	</p:iteration-source>
+	<p:rename match="d:sentences" new-name="d:file"/>
+	<p:rename match="d:sentence" new-name="d:anchor"/>
+	<p:label-elements match="/*" attribute="href" label="base-uri(.)"/>
+      </p:for-each>
+      <p:wrap-sequence wrapper="d:fileset" name="sentence-fileset"/>
+      <p:sink/>
+      <px:fileset-compose limit-scope="true">
+	<p:input port="source">
+	  <p:pipe step="sentence-fileset" port="result"/>
+	  <p:pipe step="fix-duplicate-ids" port="mapping"/>
+	</p:input>
+      </px:fileset-compose>
+    </p:group>
+    <p:sink/>
+    <p:group name="skippable-ids">
+      <p:documentation>Apply ID mapping to skippable IDs</p:documentation>
+      <p:output port="result"/>
+      <p:for-each>
+	<p:iteration-source>
+	  <p:pipe step="for-each" port="skippable-ids"/>
+	</p:iteration-source>
+	<p:rename match="d:skippables" new-name="d:file"/>
+	<p:rename match="d:skippable" new-name="d:anchor"/>
+	<p:label-elements match="/*" attribute="href" label="base-uri(.)"/>
+      </p:for-each>
+      <p:wrap-sequence wrapper="d:fileset" name="skippable-fileset"/>
+      <p:sink/>
+      <px:fileset-compose limit-scope="true">
+	<p:input port="source">
+	  <p:pipe step="skippable-fileset" port="result"/>
+	  <p:pipe step="fix-duplicate-ids" port="mapping"/>
+	</p:input>
+      </px:fileset-compose>
+    </p:group>
+    <p:sink/>
+    <p:for-each>
+      <p:documentation>Apply ID mapping to enriched DTBooks</p:documentation>
+      <p:iteration-source>
+	<p:pipe step="fix-duplicate-ids" port="result"/>
+      </p:iteration-source>
+      <px:dtbook-update-links>
+	<p:input port="mapping">
+	  <p:pipe step="fix-duplicate-ids" port="mapping"/>
+	</p:input>
+      </px:dtbook-update-links>
+    </p:for-each>
+  </p:group>
 
   <p:choose name="synthesize" px:progress="1">
     <p:when test="$audio = 'false'">
@@ -210,34 +276,16 @@
       <p:output port="log" sequence="true">
         <p:pipe step="to-audio" port="log"/>
       </p:output>
-      <p:for-each name="for-each.content">
-	<p:iteration-source>
-	  <p:pipe port="result" step="lexing"/>
-	</p:iteration-source>
-	<p:output port="ssml.out" primary="true" sequence="true">
+      <p:for-each>
+	<p:output port="ssml" primary="true" sequence="true">
 	  <p:pipe port="result" step="ssml-gen"/>
 	</p:output>
-	<p:split-sequence name="sentence-ids">
-	  <p:input port="source">
-	    <p:pipe port="sentence-ids" step="lexing"/>
-	  </p:input>
-	  <p:with-option name="test" select="concat('position()=', p:iteration-position())"/>
-	</p:split-sequence>
-	<p:split-sequence name="skippable-ids">
-	  <p:input port="source">
-	    <p:pipe port="skippable-ids" step="lexing"/>
-	  </p:input>
-	  <p:with-option name="test" select="concat('position()=', p:iteration-position())"/>
-	</p:split-sequence>
 	<px:dtbook-to-ssml name="ssml-gen" px:message="SSML generation for DTBook">
-	  <p:input port="content.in">
-	    <p:pipe port="current" step="for-each.content"/>
-	  </p:input>
 	  <p:input port="sentence-ids">
-	    <p:pipe port="matched" step="sentence-ids"/>
+	    <p:pipe step="lexing" port="sentence-ids"/>
 	  </p:input>
 	  <p:input port="skippable-ids">
-	    <p:pipe port="matched" step="skippable-ids"/>
+	    <p:pipe step="lexing" port="skippable-ids"/>
 	  </p:input>
 	  <p:input port="fileset.in">
 	    <p:pipe step="process-css" port="fileset"/>

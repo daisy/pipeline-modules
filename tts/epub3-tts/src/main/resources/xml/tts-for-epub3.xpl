@@ -28,8 +28,7 @@
   <p:output port="audio-map">
     <p:pipe port="audio-map" step="synthesize"/>
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-       <p>List of audio clips (see pipeline-mod-tts
-       documentation).</p>
+      <p>List of audio clips mapped to unique IDs in the HTML document set.</p>
     </p:documentation>
   </p:output>
 
@@ -40,18 +39,6 @@
        <p>The result fileset.</p>
        <p>HTML documents are enriched with IDs, words and sentences. Inlined aural CSS is
        removed.</p>
-    </p:documentation>
-  </p:output>
-
-  <p:output port="sentence-ids" sequence="true">
-    <p:pipe port="sentence-ids" step="synthesize"/>
-    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-      <p>Every document of this port is a list of nodes whose id
-      attribute refers to elements of the 'content.out'
-      documents. Grammatically speaking, the referred elements are
-      sentences even if the underlying XML elements are not meant to
-      be so. Documents are listed in the same order as in
-      'content.out'.</p>
     </p:documentation>
   </p:output>
 
@@ -116,13 +103,6 @@
     </p:documentation>
   </p:option>
 
-  <p:option name="anti-conflict-prefix" required="false"  select="''">
-    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-      <h2>Prefix for IDs</h2>
-      <p>The IDs will be prefixed so as to prevent conflicts.</p>
-    </p:documentation>
-  </p:option>
-
   <p:option name="temp-dir" select="''">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
       <p>Empty directory dedicated to this conversion. May be left empty in which case a temporary
@@ -157,6 +137,17 @@
     <p:documentation>
       px:fileset-load
       px:fileset-update
+      px:fileset-compose
+    </p:documentation>
+  </p:import>
+  <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
+    <p:documentation>
+      px:add-ids
+    </p:documentation>
+  </p:import>
+  <p:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xpl">
+    <p:documentation>
+      px:html-update-links
     </p:documentation>
   </p:import>
 
@@ -206,9 +197,6 @@
         </p:inline>
       </p:output>
       <p:output port="html" primary="true" sequence="true"/>
-      <p:output port="sentence-ids" sequence="true">
-        <p:empty/>
-      </p:output>
       <p:output port="status">
         <p:inline>
           <d:status result="ok"/>
@@ -228,15 +216,122 @@
       <p:output port="html" primary="true" sequence="true">
         <p:pipe step="loop" port="html"/>
       </p:output>
-      <p:output port="sentence-ids" sequence="true">
-        <p:pipe port="sentence-ids" step="loop"/>
-      </p:output>
       <p:output port="status">
         <p:pipe step="to-audio" port="status"/>
       </p:output>
       <p:output port="log" sequence="true">
         <p:pipe step="to-audio" port="log"/>
       </p:output>
+      <p:for-each>
+        <p:documentation>
+          Insert "speech-only" spans from @tts:before and @tts:after attributes
+        </p:documentation>
+        <p:insert match="*[@tts:before]" position="first-child">
+          <p:input port="insertion">
+            <p:inline><tts:before>[CONTENT]</tts:before></p:inline>
+          </p:input>
+        </p:insert>
+        <p:string-replace match="tts:before/text()" replace="parent::*/parent::*/@tts:before"/>
+        <p:insert match="*[@tts:after]" position="last-child">
+          <p:input port="insertion">
+            <p:inline><tts:after>[CONTENT]</tts:after></p:inline>
+          </p:input>
+        </p:insert>
+        <p:string-replace match="tts:after/text()" replace="parent::*/parent::*/@tts:after"/>
+        <p:add-attribute match="tts:before|tts:after"
+                         attribute-name="tts:speech-only" attribute-value=""/>
+        <p:rename match="tts:before|tts:after"
+                  new-name="span" new-namespace="http://www.w3.org/1999/xhtml"/>
+      </p:for-each>
+      <p:group name="lexing" px:progress="1/9">
+        <p:output port="result" sequence="true" primary="true"/>
+        <p:output port="sentence-ids">
+          <p:pipe step="sentence-ids" port="result"/>
+        </p:output>
+        <p:output port="skippable-ids">
+          <p:pipe step="skippable-ids" port="result"/>
+        </p:output>
+        <p:for-each name="for-each">
+          <p:output port="result" primary="true"/>
+          <p:output port="sentence-ids">
+            <p:pipe step="break" port="sentence-ids"/>
+          </p:output>
+          <p:output port="skippable-ids">
+            <p:pipe step="isolate-skippable" port="skippable-ids"/>
+          </p:output>
+          <px:html-break-detect name="break" px:progress="1/2" px:message="Performing sentence detection">
+            <p:with-option name="sentence-attr" select="if ($sentence-class!='') then 'class' else ''"/>
+            <p:with-option name="sentence-attr-val" select="$sentence-class"/>
+          </px:html-break-detect>
+          <px:isolate-skippable px:progress="1/2" name="isolate-skippable"
+                                match="*[@epub:type/tokenize(.,'\s+')=('pagebreak','noteref')]|
+                                       *[@role='doc-pagebreak']|
+                                       *[@role='doc-noteref']">
+            <!-- noterefs don't actually need to be skippable (only the notes), but they are isolated
+                 to not disturb the flow of the surrounding text -->
+            <p:input port="sentence-ids">
+              <p:pipe step="break" port="sentence-ids"/>
+            </p:input>
+          </px:isolate-skippable>
+        </p:for-each>
+        <px:add-ids name="fix-duplicate-ids">
+          <p:documentation>Fix duplicate IDs</p:documentation>
+        </px:add-ids>
+        <p:sink/>
+        <p:group name="sentence-ids">
+          <p:documentation>Apply ID mapping to sentence IDs</p:documentation>
+          <p:output port="result"/>
+          <p:for-each>
+            <p:iteration-source>
+              <p:pipe step="for-each" port="sentence-ids"/>
+            </p:iteration-source>
+            <p:rename match="d:sentences" new-name="d:file"/>
+            <p:rename match="d:sentence" new-name="d:anchor"/>
+            <p:label-elements match="/*" attribute="href" label="base-uri(.)"/>
+          </p:for-each>
+          <p:wrap-sequence wrapper="d:fileset" name="sentence-fileset"/>
+          <p:sink/>
+          <px:fileset-compose limit-scope="true">
+            <p:input port="source">
+              <p:pipe step="sentence-fileset" port="result"/>
+              <p:pipe step="fix-duplicate-ids" port="mapping"/>
+            </p:input>
+          </px:fileset-compose>
+        </p:group>
+        <p:sink/>
+        <p:group name="skippable-ids">
+          <p:documentation>Apply ID mapping to skippable IDs</p:documentation>
+          <p:output port="result"/>
+          <p:for-each>
+            <p:iteration-source>
+              <p:pipe step="for-each" port="skippable-ids"/>
+            </p:iteration-source>
+            <p:rename match="d:skippables" new-name="d:file"/>
+            <p:rename match="d:skippable" new-name="d:anchor"/>
+            <p:label-elements match="/*" attribute="href" label="base-uri(.)"/>
+          </p:for-each>
+          <p:wrap-sequence wrapper="d:fileset" name="skippable-fileset"/>
+          <p:sink/>
+          <px:fileset-compose limit-scope="true">
+            <p:input port="source">
+              <p:pipe step="skippable-fileset" port="result"/>
+              <p:pipe step="fix-duplicate-ids" port="mapping"/>
+            </p:input>
+          </px:fileset-compose>
+        </p:group>
+        <p:sink/>
+        <p:for-each>
+          <p:documentation>Apply ID mapping to enriched HTML</p:documentation>
+          <p:iteration-source>
+            <p:pipe step="fix-duplicate-ids" port="result"/>
+          </p:iteration-source>
+          <px:html-update-links>
+            <p:input port="mapping">
+              <p:pipe step="fix-duplicate-ids" port="mapping"/>
+            </p:input>
+          </px:html-update-links>
+        </p:for-each>
+      </p:group>
       <p:for-each name="loop" px:progress="1/9">
         <p:output port="ssml" primary="true" sequence="true">
           <p:pipe step="ssml" port="result"/>
@@ -244,52 +339,12 @@
         <p:output port="html">
           <p:pipe port="result" step="rm-words"/>
         </p:output>
-        <p:output port="sentence-ids">
-          <p:pipe port="sentence-ids" step="lexing"/>
-        </p:output>
-        <p:group>
-          <p:documentation>
-            Insert "speech-only" spans from @tts:before and @tts:after attributes
-          </p:documentation>
-          <p:insert match="*[@tts:before]" position="first-child">
-            <p:input port="insertion">
-              <p:inline><tts:before>[CONTENT]</tts:before></p:inline>
-            </p:input>
-          </p:insert>
-          <p:string-replace match="tts:before/text()" replace="parent::*/parent::*/@tts:before"/>
-          <p:insert match="*[@tts:after]" position="last-child">
-            <p:input port="insertion">
-              <p:inline><tts:after>[CONTENT]</tts:after></p:inline>
-            </p:input>
-          </p:insert>
-          <p:string-replace match="tts:after/text()" replace="parent::*/parent::*/@tts:after"/>
-          <p:add-attribute match="tts:before|tts:after"
-                           attribute-name="tts:speech-only" attribute-value=""/>
-          <p:rename match="tts:before|tts:after"
-                    new-name="span" new-namespace="http://www.w3.org/1999/xhtml"/>
-        </p:group>
-        <px:html-break-detect name="lexing" px:progress="1/2" px:message="Performing sentence detection">
-          <p:with-option name="id-prefix" select="concat($anti-conflict-prefix, p:iteration-position(), '-')"/>
-          <p:with-option name="sentence-attr" select="if ($sentence-class!='') then 'class' else ''"/>
-          <p:with-option name="sentence-attr-val" select="$sentence-class"/>
-        </px:html-break-detect>
-        <px:isolate-skippable name="isolate-skippable"
-                              match="*[@epub:type/tokenize(.,'\s+')=('pagebreak','noteref')]|
-                                     *[@role='doc-pagebreak']|
-                                     *[@role='doc-noteref']">
-          <!-- noterefs don't actually need to be skippable (only the notes), but they are isolated
-               to not disturb the flow of the surrounding text -->
+        <px:epub3-to-ssml name="ssml" px:progress="1" px:message="Generating SSML from HTML">
           <p:input port="sentence-ids">
             <p:pipe step="lexing" port="sentence-ids"/>
           </p:input>
-          <p:with-option name="id-prefix" select="concat('i', p:iteration-position())"/>
-        </px:isolate-skippable>
-        <px:epub3-to-ssml name="ssml" px:progress="1/2" px:message="Generating SSML from HTML">
-          <p:input port="sentence-ids">
-            <p:pipe port="sentence-ids" step="lexing"/>
-          </p:input>
           <p:input port="skippable-ids">
-            <p:pipe step="isolate-skippable" port="skippable-ids"/>
+            <p:pipe step="lexing" port="skippable-ids"/>
           </p:input>
           <p:input port="fileset.in">
             <p:pipe step="process-css" port="fileset"/>
@@ -298,13 +353,14 @@
             <p:pipe port="config" step="main"/>
           </p:input>
         </px:epub3-to-ssml>
+        <p:sink/>
         <p:group name="rm-css">
           <p:documentation>
             Unwrap elements with @tts:speech-only attribute and remove text content.
           </p:documentation>
           <p:delete match="*[@tts:speech-only]//text()">
             <p:input port="source">
-              <p:pipe step="isolate-skippable" port="result"/>
+              <p:pipe step="loop" port="current"/>
             </p:input>
           </p:delete>
           <p:unwrap match="*[@tts:speech-only][not(@id)]"/>
@@ -318,7 +374,7 @@
           </p:documentation>
         </px:html-unwrap-words>
       </p:for-each>
-      <px:ssml-to-audio name="to-audio" px:progress="8/9" px:message="Processing SSML">
+      <px:ssml-to-audio name="to-audio" px:progress="7/9" px:message="Processing SSML">
         <p:input port="config">
           <p:pipe port="config" step="main"/>
         </p:input>

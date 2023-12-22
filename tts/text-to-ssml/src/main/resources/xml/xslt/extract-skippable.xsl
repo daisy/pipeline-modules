@@ -80,11 +80,11 @@
     <!-- Secondary output port: -->
     <xsl:result-document href="skippable-only.xml">
       <ssml:speak version="1.1">
-	<xsl:for-each select="$skippable-ids/*/*">
-	  <xsl:variable name="in-doc" select="key('skippable', @id, collection()[1])"/>
+	<xsl:for-each select="$skippable-ids//*/@id">
+	  <xsl:variable name="in-doc" select="key('skippable',.,collection()[1])"/>
 	  <xsl:variable name="under-sent" select="$in-doc/ancestor-or-self::*[parent::ssml:s][1]"/>
 	  <xsl:if test="$under-sent">
-	    <ssml:s id="{concat('holder-of-', @id)}">
+	    <ssml:s id="{concat('holder-of-',.)}">
 	      <xsl:copy-of select="$under-sent/../@*[name() != 'id']"/> <!-- including CSS if any -->
 	      <xsl:copy-of select="$under-sent"/> <!-- here we must keep the @ids of the skippable elts (required for MathML) -->
 	      <!-- we are copying the whole tree because there might be annotations

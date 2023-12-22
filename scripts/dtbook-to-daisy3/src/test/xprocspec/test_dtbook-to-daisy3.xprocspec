@@ -275,13 +275,13 @@
 					<book>
 						<frontmatter>
 							<doctitle smilref="mo0.smil#sdoctitle" id="doctitle">
-								<sent smilref="mo0.smil#sst1" id="st1">title</sent>
+								<sent smilref="mo0.smil#sid_1" id="id_1">title</sent>
 							</doctitle>
 						</frontmatter>
 						<bodymatter>
 							<level1>
 								<h1 smilref="mo0.smil#sch1" id="ch1">
-									<sent smilref="mo0.smil#sst2" id="st2">chapter</sent>
+									<sent smilref="mo0.smil#sid_2" id="id_2">chapter</sent>
 								</h1>
 								<p smilref="mo0.smil#sp1" id="p1">
 									<m:math dtb:smilref="mo0.smil#sm1" id="m1" alttext="Math Formulae" altimg="math-formulae.png">
@@ -319,13 +319,13 @@
 					<body>
 						<seq id="root-seq">
 							<seq id="sdoctitle" class="doctitle">
-								<par id="sst1" class="sent">
-									<text src="dtbook.xml#st1"/>
+								<par id="sid_1" class="sent">
+									<text src="dtbook.xml#id_1"/>
 								</par>
 							</seq>
 							<seq id="sch1" class="h1">
-								<par id="sst2" class="sent">
-									<text src="dtbook.xml#st2"/>
+								<par id="sid_2" class="sent">
+									<text src="dtbook.xml#id_2"/>
 								</par>
 							</seq>
 							<seq id="sp1" class="p">
