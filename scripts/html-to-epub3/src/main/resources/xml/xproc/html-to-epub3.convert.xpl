@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
+                xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:html="http://www.w3.org/1999/xhtml"
                 type="px:html-to-epub3" name="main"
@@ -144,6 +146,11 @@
         </p:documentation>
     </p:import>
     <p:import href="html-to-opf-metadata.xpl"/>
+    <cx:import href="http://www.daisy.org/pipeline/modules/file-utils/uri-functions.xsl" type="application/xslt+xml">
+        <p:documentation>
+            pf:longest-common-uri
+        </p:documentation>
+    </cx:import>
 
     <p:variable name="content-dir" select="concat($output-dir,'EPUB/')">
         <p:empty/>
@@ -154,6 +161,13 @@
     <!--=========================================================================-->
 
     <p:documentation>Move to EPUB/ directory</p:documentation>
+    <!--
+        We don't flatten because we want to preserve relative file paths. Find the common directory
+        and preserve the directory structure within it.
+    -->
+    <px:fileset-rebase>
+        <p:with-option name="new-base" select="pf:longest-common-uri(//d:file/resolve-uri(@href,base-uri(.)))"/>
+    </px:fileset-rebase>
     <px:fileset-copy name="move">
         <p:input port="source.in-memory">
             <p:pipe step="main" port="input.in-memory"/>
