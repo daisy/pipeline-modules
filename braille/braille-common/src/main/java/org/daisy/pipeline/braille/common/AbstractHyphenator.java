@@ -19,7 +19,7 @@ import static org.daisy.pipeline.braille.common.util.Strings.extractHyphens;
 import static org.daisy.pipeline.braille.common.util.Strings.insertHyphens;
 import static org.daisy.pipeline.braille.common.util.Strings.join;
 import static org.daisy.pipeline.braille.common.util.Strings.splitInclDelimiter;
-import static org.daisy.pipeline.braille.common.util.Tuple2;
+import org.daisy.pipeline.braille.common.util.Tuple2;
 import org.daisy.pipeline.braille.css.CSSStyledText;
 
 public abstract class AbstractHyphenator extends AbstractTransform implements Hyphenator {
@@ -38,6 +38,8 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 	
 	public static abstract class util {
 		
+		private final static char SHY = '\u00AD';
+		private final static char ZWSP = '\u200B';
 		private final static Pattern ON_SPACE_SPLITTER = Pattern.compile("\\s+");
 		private final static Pattern COMPOUND_WORD_HYPHEN = Pattern.compile("[\\p{L}\\p{N}]-(?=[\\p{L}\\p{N}])");
 
@@ -88,6 +90,21 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 
 		public static abstract class DefaultFullHyphenator extends LanguageBasedDispatchingFullHyphenator {
 
+			private final boolean keepStyle;
+
+			protected DefaultFullHyphenator() {
+				this(false);
+			}
+
+			/**
+			 * @param keepStyle Whether to preserve {@code hyphens} properties in the output of
+			 *                  {@link #transform(Iterable<CSSStyledText>)}. This is useful when the
+			 *                  output of a hyphenator needs to be fed into a second hyphenator.
+			 */
+			protected DefaultFullHyphenator(boolean keepStyle) {
+				this.keepStyle = keepStyle;
+			}
+
 			/**
 			 * Whether the length of the array returned by {@link
 			 * #getHyphenationOpportunities(String)} is based on the number of code points in the
@@ -110,8 +127,6 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 			protected abstract byte[] getHyphenationOpportunities(String textWithoutHyphens, Locale language)
 				throws NonStandardHyphenationException;
 
-			private final static char SHY = '\u00AD';
-			private final static char ZWSP = '\u200B';
 			private final static char US = '\u001F';
 			private final static Splitter SEGMENT_SPLITTER = Splitter.on(US);
 
@@ -123,19 +138,69 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 					return super.transform(text);
 			}
 
+			/**
+			 * Optimized version of {@link #transform(Iterable<CSSStyledText>)} for cases where the
+			 * input has a single segment.
+			 */
+			public String transform(String text, SimpleInlineStyle style, Locale language)
+					throws NonStandardHyphenationException {
+				Tuple2<String,byte[]> t = extractHyphens(text, isCodePointAware(), SHY, ZWSP);
+				String textWithoutHyphens = t._1;
+				byte[] manualHyphens = t._2;
+				// insert zero-width space after hard hyphens ("-" followed and preceded by a letter
+				// or number)
+				byte[] hardHyphens; {
+					int len = textWithoutHyphens.length();
+					if (len > 1) {
+						hardHyphens = new byte[len - 1]; {
+							Matcher m = COMPOUND_WORD_HYPHEN.matcher(textWithoutHyphens);
+							while (m.find())
+								hardHyphens[m.start() + 1] = 4; }
+						if (isCodePointAware())
+							hardHyphens = extractHyphens(
+								insertHyphens(textWithoutHyphens, hardHyphens, false, null, null, ZWSP),
+								true, null, null, ZWSP)._2;
+					} else
+						hardHyphens = null;
+				}
+				if (hardHyphens != null) {
+					if (manualHyphens == null)
+						manualHyphens = hardHyphens;
+					else
+						for (int k = 0; k < hardHyphens.length - 1; k++)
+							manualHyphens[k] |= hardHyphens[k];
+				}
+				Hyphens hyphenate = style != null ? style.getProperty("hyphens") : null;
+				if (hyphenate == Hyphens.AUTO)
+					return insertHyphens(textWithoutHyphens,
+					                     transform(manualHyphens, textWithoutHyphens, language),
+					                     isCodePointAware(),
+					                     SHY, ZWSP, ZWSP)
+					       .replace("" + ZWSP + ZWSP, "" + ZWSP);
+				else if (hyphenate == null || hyphenate == Hyphens.MANUAL)
+					return insertHyphens(textWithoutHyphens, manualHyphens, isCodePointAware(), SHY, ZWSP, ZWSP)
+					       .replace("" + ZWSP + ZWSP, "" + ZWSP);
+				else // hyphenate == Hyphens.NONE
+				     // FIXME: better would be to only remove SHY and ZWSP within words, but the
+				     // issue with this is that what constitutes a "word" is language dependent
+				     // and finding words requires NLP
+					return insertHyphens(textWithoutHyphens, manualHyphens, isCodePointAware(), null, null, ZWSP);
+			}
+
 			protected Iterable<CSSStyledText> transform(Iterable<CSSStyledText> text, Locale language) throws NonStandardHyphenationException {
 				List<CSSStyledText> result = new ArrayList<>();
 				List<CSSProperty> hyphenate = new ArrayList<>();
 				boolean someHyphenate = false;
 				for (CSSStyledText t : text) {
-					t = t.clone();
+					if (!keepStyle)
+						t = t.clone();
 					SimpleInlineStyle style = t.getStyle();
 					CSSProperty h = style != null ? style.getProperty("hyphens") : null;
 					if (h == null) h = Hyphens.MANUAL;
 					hyphenate.add(h);
 					if (h == Hyphens.AUTO)
 						someHyphenate = true;
-					if (style != null)
+					if (!keepStyle && style != null)
 						style.removeProperty("hyphens");
 					result.add(t);
 				}
@@ -301,13 +366,34 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 		public static abstract class DefaultLineBreaker implements LineBreaker {
 			
 			/**
+			 * Break a sequence of non white space characters into two parts.
+			 *
+			 * This method is responsible for taking into account SHY or ZWSP within the input. SHY
+			 * or ZWSP within an actual word (morphological unit) should be used as break
+			 * opportunities without any additional hyphenation.
+			 *
 			 * This method should be overriden. The default behavior is that a word is only broken
-			 * after hard hyphens, or if the <code>force</code> argument is <code>true</code>. The
-			 * <code>language</code> argument is ignored.
+			 * at SHY and ZWSP and after hard hyphens, or if the <code>force</code> argument is
+			 * <code>true</code>. The <code>language</code> argument is ignored.
 			 */
-			protected Break breakWord(String word, Locale language, int limit, boolean force) {
+			protected Break breakWord(String word, Locale _language, int limit, boolean force) {
 				if (word.length() <= limit)
 					return new Break(word, limit, false);
+				// break at SHY or ZWSP
+				Tuple2<String,byte[]> t = extractHyphens(word, true, ZWSP, SHY);
+				word = t._1;
+				if (word.length() <= limit)
+					return new Break(word, limit, false);
+				byte[] manualHyphens = t._2;
+				for (int k = manualHyphens.length - 1; k >= 0; k--)
+					if (manualHyphens[k] != 0) {
+						int br = word.offsetByCodePoints(0, k + 1);
+						String next = word.substring(0, br);
+						if (next.length() <= limit) {
+							String remainder = word.substring(br);
+							return new Break(next + remainder, next.length(), manualHyphens[k] == 2);
+						}
+					}
 				// break after hard hyphens
 				Matcher m = COMPOUND_WORD_HYPHEN.matcher(word);
 				if (m.find()) {
@@ -376,6 +462,7 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 										available -= segment.length();
 										word = !word; }
 									else if (word && allowHyphens) {
+										// segment may contain SHY or ZWSP; breakWord() is responsible for correctly taking them into account
 										Break brokenWord = breakWord(segment, language, available, force && (available == limit));
 										line += brokenWord.firstLine();
 										lineHasHyphen = brokenWord.hyphen;

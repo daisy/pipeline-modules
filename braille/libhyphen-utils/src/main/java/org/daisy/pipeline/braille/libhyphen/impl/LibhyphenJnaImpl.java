@@ -277,6 +277,7 @@ public class LibhyphenJnaImpl extends AbstractTransformProvider<LibhyphenHyphena
 			}
 		};
 		
+		// FIXME: this LineBreaker does not consider SHY or ZWSP characters in the input
 		@Override
 		public LineBreaker asLineBreaker() {
 			return lineBreaker;

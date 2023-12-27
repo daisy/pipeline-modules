@@ -58,6 +58,7 @@ import org.daisy.pipeline.braille.common.Query;
 import org.daisy.pipeline.braille.common.Query.Feature;
 import org.daisy.pipeline.braille.common.Query.MutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
+import org.daisy.pipeline.braille.common.TransformationException;
 import org.daisy.pipeline.braille.common.TransformProvider;
 import org.daisy.pipeline.braille.common.UnityBrailleTranslator;
 import static org.daisy.pipeline.braille.common.util.Strings.extractHyphens;
@@ -325,17 +326,26 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 		
 		private FromStyledTextToBraille fromStyledTextToBraille;
 		
+		/**
+		 * @throw TransformationException if underlying hyphenator throws {@link
+		 *                                NonStandardHyphenationException}
+		 */
 		@Override
 		public FromStyledTextToBraille fromStyledTextToBraille() {
 			if (fromStyledTextToBraille == null)
 				fromStyledTextToBraille = new FromStyledTextToBraille() {
-					public java.lang.Iterable<String> transform(java.lang.Iterable<CSSStyledText> styledText, int from, int to) {
-						List<String> result = LiblouisTranslatorImpl.this.transform(styledText, false, false);
-						if (to < 0) to = result.size();
-						if (from > 0 || to < result.size())
-							return result.subList(from, to);
-						else
-							return result;
+					public java.lang.Iterable<String> transform(java.lang.Iterable<CSSStyledText> styledText, int from, int to)
+							throws TransformationException {
+						try {
+							List<String> result = LiblouisTranslatorImpl.this.transform(styledText, false, false);
+							if (to < 0) to = result.size();
+							if (from > 0 || to < result.size())
+								return result.subList(from, to);
+							else
+								return result;
+						} catch (NonStandardHyphenationException e) {
+							throw new TransformationException(e);
+						}
 					}
 					@Override
 					public String toString() {
@@ -1032,7 +1042,7 @@ public class LiblouisTranslatorJnaImplProvider extends AbstractTransformProvider
 		
 		private List<String> transform(java.lang.Iterable<CSSStyledText> styledText,
 		                               boolean forceBraille,
-		                               boolean failWhenNonStandardHyphenation) {
+		                               boolean failWhenNonStandardHyphenation) throws NonStandardHyphenationException {
 			try {
 				if (fullHyphenator == compoundWordHyphenator)
 					if (any(styledText, t -> {

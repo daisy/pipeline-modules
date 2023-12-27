@@ -8,7 +8,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.daisy.braille.css.SimpleInlineStyle;
-import static org.daisy.pipeline.braille.common.util.Strings.extractHyphens;
 import org.daisy.pipeline.braille.css.CSSStyledText;
 
 import org.junit.Test;
@@ -224,11 +223,11 @@ public class DefaultLineBreakerTest {
 			protected boolean isCodePointAware() { return false; }
 			protected boolean isLanguageAdaptive() { return false; }
 		
-			protected byte[] getHyphenationOpportunities(String text, Locale language) throws RuntimeException {
+			protected byte[] getHyphenationOpportunities(String text, Locale _language) throws NonStandardHyphenationException {
 				if (text.contains("busstopp"))
-					throw new RuntimeException("text contains non-standard break points");
+					throw new NonStandardHyphenationException();
 				else
-					return extractHyphens(text, false, SHY, ZWSP)._2;
+					return new byte[text.length() - 1];
 			}
 		};
 		
@@ -238,7 +237,7 @@ public class DefaultLineBreakerTest {
 		}
 		
 		private final LineBreaker lineBreaker = new AbstractHyphenator.util.DefaultLineBreaker() {
-			protected Break breakWord(String word, Locale language, int limit, boolean force) {
+			protected Break breakWord(String word, Locale _language, int limit, boolean force) {
 				if (limit >= 4 && word.equals("busstopp"))
 					return new Break("bussstopp", 4, true);
 				else if (limit >= word.length())

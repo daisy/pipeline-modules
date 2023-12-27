@@ -1,21 +1,29 @@
 package org.daisy.pipeline.braille.common;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.function.Supplier;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 
 import org.daisy.braille.css.LanguageRange;
+import org.daisy.common.file.URLs;
 import org.daisy.pipeline.braille.common.Query.MutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.query;
 import static org.daisy.pipeline.braille.common.TransformProvider.util.dispatch;
 import static org.daisy.pipeline.braille.common.TransformProvider.util.logCreate;
 import org.daisy.pipeline.braille.common.TransformProvider.util.Memoize;
+import org.daisy.pipeline.braille.common.util.Files;
 import org.daisy.pipeline.braille.common.util.Strings;
 
 import org.osgi.service.component.annotations.Component;
@@ -73,6 +81,40 @@ public class HyphenatorRegistry extends Memoize<Hyphenator> implements Hyphenato
 	}
 
 	public Iterable<Hyphenator> _get(Query q) {
+		if (q.containsKey("exception-words")) {
+			MutableQuery baseQuery = mutableQuery(q);
+			String exceptionsFilePath = baseQuery.removeOnly("exception-words").getValue().get();
+			FileReader exceptionsFile;
+			try {
+				URI u = URLs.asURI(exceptionsFilePath);
+				if ("volatile-file".equals(u.getScheme()))
+					// Note that file is compiled every time regardless of whether the scheme is
+					// "file" or "volatile-file" (see below).
+					try {
+						u = new URI("file", u.getSchemeSpecificPart(), u.getFragment());
+					} catch (Exception e) {
+						// should not happen
+						throw new IllegalStateException(e);
+					}
+				File f = Files.asFile(u);
+				if (!f.exists())
+					throw new FileNotFoundException("File does not exist: " + f);
+				exceptionsFile = new FileReader(f);
+			} catch (Exception e) {
+				context.debug("'exception-words' could not be resolved to a file'", e);
+				return Collections.emptyList();
+			}
+			return Iterables.transform(
+				_get(baseQuery),
+				// Note that the word list is compiled again every time unless a `(id:...)' query is given.
+				h -> {
+					try {
+						return logCreate(new HyphenatorWithExceptions(h, exceptionsFile), context);
+					} catch (IOException e) {
+						throw new NoSuchElementException(); // should not happen
+					}
+				});
+		}
 		if (q.containsKey("document-locale")) {
 			MutableQuery fallbackQuery = mutableQuery(q);
 			fallbackQuery.removeAll("document-locale");
