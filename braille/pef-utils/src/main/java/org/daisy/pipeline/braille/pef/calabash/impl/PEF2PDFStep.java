@@ -2,6 +2,7 @@ package org.daisy.pipeline.braille.pef.calabash.impl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -15,7 +16,6 @@ import java.util.Base64;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 import javax.xml.namespace.QName;
 import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
@@ -26,6 +26,9 @@ import javax.xml.transform.stream.StreamSource;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
+
+import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
+import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder.PageSizeUnits;
 
 import com.xmlcalabash.core.XProcException;
 import com.xmlcalabash.core.XProcRuntime;
@@ -40,7 +43,6 @@ import org.daisy.dotify.api.table.BrailleConverter;
 import org.daisy.dotify.api.table.Table;
 import org.daisy.pipeline.braille.pef.TableRegistry;
 import org.daisy.common.file.URLs;
-import org.daisy.common.shell.BinaryFinder;
 import org.daisy.common.shell.CommandRunner;
 import org.daisy.common.transform.InputValue;
 import org.daisy.common.transform.OutputValue;
@@ -56,7 +58,6 @@ import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.query;
 import static org.daisy.pipeline.file.FileUtils.cResultDocument;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -77,17 +78,14 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 	private static final URL font = URLs.getResourceFromJAR("odt2braille8.ttf", PEF2PDFStep.class);
 
 	private final TableRegistry tableRegistry;
-	private final File wkhtmltopdfExecutable;
 	private ReadablePipe source = null;
 	private WritablePipe result = null;
 
 	private PEF2PDFStep(XProcRuntime runtime,
 	                    XAtomicStep step,
-	                    TableRegistry tableRegistry,
-	                    File wkhtmltopdfExecutable) {
+	                    TableRegistry tableRegistry) {
 		super(runtime, step);
 		this.tableRegistry = tableRegistry;
-		this.wkhtmltopdfExecutable = wkhtmltopdfExecutable;
 	}
 
 	@Override
@@ -159,20 +157,9 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 	)
 	public static class Provider implements XProcStepProvider {
 
-		private File wkhtmltopdfExecutable;
-
-		@Activate
-		public void activate() {
-			Optional<String> f = BinaryFinder.find("wkhtmltopdf");
-			if (f.isPresent())
-				wkhtmltopdfExecutable = new File(f.get());
-			else
-				throw new RuntimeException("wkhtmltopdf was not found on your system");
-		}
-
 		@Override
 		public XProcStep newStep(XProcRuntime runtime, XAtomicStep step, XProcMonitor monitor, Map<String,String> properties) {
-			return new PEF2PDFStep(runtime, step, tableRegistry, wkhtmltopdfExecutable);
+			return new PEF2PDFStep(runtime, step, tableRegistry);
 		}
 
 		@Reference(
@@ -225,13 +212,15 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 			XMLInputValue<?> source = (XMLInputValue<?>)input.get(_SOURCE);
 			return () -> {
 				try {
-					XMLStreamReader pef = source.asXMLStreamReader();
+					org.daisy.common.stax.BaseURIAwareXMLStreamReader pef = source.asXMLStreamReader();
 					ByteArrayOutputStream htmlBytes = new ByteArrayOutputStream();
 					Writer html = new OutputStreamWriter(htmlBytes, StandardCharsets.UTF_8);
 					BrailleConverter bc = table.newBrailleConverter();
 					boolean tableMatchesBrailleCharset = false;
-					int maxPageWidth = 0; // in cells per line
-					int maxPageHeight = 0; // in lines
+					int maxColumns = 0; // in cells per line
+					int maxRows = 0; // in lines
+					int marginLeft = 10; // in mm
+					int marginTop = 10; // in mm
 					LinkedList<QName> elementStack = new LinkedList<>();
 					LinkedList<Boolean> duplexStack = new LinkedList<>();
 					LinkedList<Integer> colsStack = new LinkedList<>();
@@ -261,6 +250,12 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 											         // since Java 9 there is also InputStream.readAllBytes()
 											         + Base64.getEncoder().encodeToString(ByteStreams.toByteArray(font.openStream())) + ")\n" +
 											"	     format(\"truetype\");\n" +
+											"}\n" +
+											"@page {\n" +
+											String.format("	margin-left: %dmm;\n", marginLeft) +
+											String.format("	margin-top: %dmm;\n", marginTop) +
+											"	margin-right: 0mm;\n" +
+											"	margin-bottom: 0mm;\n" +
 											"}\n" +
 											"body {\n" +
 											"	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;\n" +
@@ -323,6 +318,7 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 											rowgapStack.push(getRowgap(pef, rowgapStack));
 											elementStack.push(elemName);
 											volumeCount++;
+											// FIXME: bookmarks supported by wkhtmltopdf but not by openhtmltopdf
 											html.write("		<div class=\"volume\">\n" +
 											           "			<h1 class=\"bookmark\">Volume " + volumeCount + "</h1>\n");
 											continue events;
@@ -340,12 +336,12 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 									} else {// VOLUME
 										if (PEF_SECTION.equals(elemName)) {
 											pagesInSection = 0;
-											int pageWidth = getCols(pef, colsStack);
-											if (pageWidth > maxPageWidth)
-												maxPageWidth = pageWidth;
-											int pageHeight = getRows(pef, rowsStack);
-											if (pageHeight > maxPageHeight)
-												maxPageHeight = pageHeight;
+											int cols = getCols(pef, colsStack);
+											if (cols > maxColumns)
+												maxColumns = cols;
+											int rows = getRows(pef, rowsStack);
+											if (rows > maxRows)
+												maxRows = rows;
 											duplexStack.push(getDuplex(pef, duplexStack));
 											rowgapStack.push(getRowgap(pef, rowgapStack));
 											elementStack.push(elemName);
@@ -423,40 +419,15 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 						}
 					html.flush();
 					pdf.getParentFile().mkdirs();
-					int marginLeft = 10;
-					int marginTop = 10;
-					String[] cmd = new String[] {
-						wkhtmltopdfExecutable.getAbsolutePath(),
-						"--margin-left",   String.format("%dmm", marginLeft),
-						"--margin-top",    String.format("%dmm", marginTop),
-						"--margin-bottom", "0mm",
-						"--margin-right",  "0mm",
-						"--page-width",    String.format("%dmm", (int)Math.ceil(4.2 * maxPageWidth) + 2 * marginLeft),
-						"--page-height",   String.format("%dmm", (int)Math.ceil(8.44 * maxPageHeight) + 2 * marginTop),
-						"-",
-						pdf.getCanonicalPath()
-					};
-					StringBuilder err = new StringBuilder();
-					try {
-						int rv = new CommandRunner(cmd)
-						             .feedInput(htmlBytes.toByteArray())
-						             .consumeError(
-						                 stderr -> {
-						                     try (Reader r = new InputStreamReader(stderr, StandardCharsets.UTF_8)) {
-						                         String s = CharStreams.toString(r);
-						                         if (s != null)
-							                         err.append(s);
-						                     }
-						                 }
-						             )
-						             .run();
-						if (rv != 0)
-							throw new RuntimeException("Command failed with exit code " + rv);
-						logger.debug("wkhtmltopdf output: " + err.toString());
-					} catch (Throwable e) {
-						if (err.length() > 0)
-							logger.error("wkhtmltopdf output: " + err.toString());
-						throw new RuntimeException("Command failed: " + cmd, e);
+					int pageWidth = (int)Math.ceil(4.2 * maxColumns) + 2 * marginLeft;
+					int pageHeight = (int)Math.ceil(8.44 * maxRows) + 2 * marginTop;
+					try (OutputStream os = new FileOutputStream(pdf)) {
+						new PdfRendererBuilder()
+							.withHtmlContent(new String(htmlBytes.toByteArray(), StandardCharsets.UTF_8),
+							                 pef.getBaseURI().toString())
+							.useDefaultPageSize(pageWidth, pageHeight, PageSizeUnits.MM)
+							.toStream(os)
+							.run();
 					}
 				} catch (Throwable e) {
 					throw new TransformerException(e);
