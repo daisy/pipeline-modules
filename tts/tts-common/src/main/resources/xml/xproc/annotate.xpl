@@ -27,7 +27,7 @@
 	  <p:pipe port="annotations" step="main"/>
 	</p:input>
 	<p:input port="stylesheet">
-	  <p:document href="../xslt/generate-annotating-stylesheet.xsl"/>
+	  <p:document href="generate-annotating-stylesheet.xsl"/>
 	</p:input>
 	<p:input port="parameters">
 	  <p:empty/>

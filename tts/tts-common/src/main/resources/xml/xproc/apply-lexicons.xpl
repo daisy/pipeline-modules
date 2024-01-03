@@ -102,7 +102,7 @@
       <p:pipe port="result" step="empty-lexicon"/>
     </p:input>
     <p:input port="stylesheet">
-      <p:document href="../xslt/reorganize-lexicons.xsl"/>
+      <p:document href="reorganize-lexicons.xsl"/>
     </p:input>
     <p:input port="parameters">
       <p:empty/>
@@ -115,7 +115,7 @@
       <p:pipe port="result" step="separate-regex-lexicons"/>
     </p:input>
     <p:input port="stylesheet">
-      <p:document href="../xslt/pls-to-ssml.xsl"/>
+      <p:document href="pls-to-ssml.xsl"/>
     </p:input>
     <p:input port="parameters">
       <p:empty/>
@@ -128,7 +128,7 @@
       <p:pipe port="secondary" step="separate-regex-lexicons"/>
     </p:input>
     <p:input port="stylesheet">
-      <p:document href="../xslt/regex-pls-to-ssml.xsl"/>
+      <p:document href="regex-pls-to-ssml.xsl"/>
     </p:input>
     <p:input port="parameters">
       <p:empty/>

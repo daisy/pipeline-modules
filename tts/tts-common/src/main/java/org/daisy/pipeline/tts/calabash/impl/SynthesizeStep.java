@@ -247,7 +247,7 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 				if (!clip.clipEnd.equals(clip.clipBegin)) { // empty clips are not useful and can eventually
 				                                            // lead to validation errors
 					tw.addStartElement(ClipTag);
-					tw.addAttribute(Audio_attr_id, link.getTextFragment());
+					tw.addAttribute(Audio_attr_textref, link.getTextFragment().toString());
 					tw.addAttribute(Audio_attr_clipBegin,
 					                convertDurationToString(clip.clipBegin));
 					tw.addAttribute(Audio_attr_clipEnd,
@@ -256,10 +256,10 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 					tw.addEndElement();
 				}
 				++num;
-				TTSLog.Entry entry = log.getOrCreateEntry(link.getTextFragment());
+				TTSLog.Entry entry = log.getOrCreateEntry(link.getTextFragment().toString());
 				entry.setClip(clip);
 			} else {
-				log.getOrCreateEntry(link.getTextFragment()).addError(
+				log.getOrCreateEntry(link.getTextFragment().toString()).addError(
 				        new TTSLog.Error(ErrorCode.AUDIO_MISSING,
 				                "not synthesized or not encoded"));
 			}

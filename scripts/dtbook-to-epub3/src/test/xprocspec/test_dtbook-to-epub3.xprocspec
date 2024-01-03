@@ -76,34 +76,34 @@
 					<body>
 						<nav epub:type="toc">
 							<h1>
-								<span id="st3-1">Table of contents</span>
+								<span id="id_1">Table of contents</span>
 							</h1>
 							<ol>
 								<li>
 									<a href="minimal-1.xhtml#id_1">
-										<span id="st3-2">Minimal DTBook</span>
+										<span id="id_2">Minimal DTBook</span>
 									</a>
 								</li>
 								<li>
 									<a href="minimal-2.xhtml#id_2">
-										<span id="st3-3">Chapter</span>
+										<span id="id_3">Chapter</span>
 									</a>
 								</li>
 							</ol>
 						</nav>
 						<nav epub:type="page-list" hidden="">
 							<h1>
-								<span id="st3-4">List of pages</span>
+								<span id="id_4">List of pages</span>
 							</h1>
 							<ol>
 								<li>
 									<a href="minimal-2.xhtml#page_1">
-										<span id="st3-5">1</span>
+										<span id="id_5">1</span>
 									</a>
 								</li>
 								<li>
 									<a href="minimal-2.xhtml#page_2">
-										<span id="st3-6">2</span>
+										<span id="id_6">2</span>
 									</a>
 								</li>
 							</ol>
@@ -120,27 +120,27 @@
 				<smil xmlns="http://www.w3.org/ns/SMIL" version="3.0">
 					<body>
 						<par>
-							<text src="../toc.xhtml#st3-1"/>
+							<text src="../toc.xhtml#id_1"/>
 							<audio src="../audio/part0002_00_000.wav" clipBegin="0:00:00.000" clipEnd="0:00:00.578"/>
 						</par>
 						<par>
-							<text src="../toc.xhtml#st3-2"/>
+							<text src="../toc.xhtml#id_2"/>
 							<audio src="../audio/part0002_00_000.wav" clipBegin="0:00:00.578" clipEnd="0:00:01.157"/>
 						</par>
 						<par>
-							<text src="../toc.xhtml#st3-3"/>
+							<text src="../toc.xhtml#id_3"/>
 							<audio src="../audio/part0002_00_000.wav" clipBegin="0:00:01.157" clipEnd="0:00:01.723"/>
 						</par>
 						<par>
-							<text src="../toc.xhtml#st3-4"/>
+							<text src="../toc.xhtml#id_4"/>
 							<audio src="../audio/part0002_00_000.wav" clipBegin="0:00:01.723" clipEnd="0:00:02.301"/>
 						</par>
 						<par>
-							<text src="../toc.xhtml#st3-5"/>
+							<text src="../toc.xhtml#id_5"/>
 							<audio src="../audio/part0002_00_000.wav" clipBegin="0:00:02.301" clipEnd="0:00:02.880"/>
 						</par>
 						<par>
-							<text src="../toc.xhtml#st3-6"/>
+							<text src="../toc.xhtml#id_6"/>
 							<audio src="../audio/part0002_00_000.wav" clipBegin="0:00:02.880" clipEnd="0:00:03.459"/>
 						</par>
 					</body>
@@ -158,12 +158,12 @@
 						<seq epub:textref="../minimal-1.xhtml#id_1">
 							<seq epub:textref="../minimal-1.xhtml#id_5" epub:type="title">
 								<par>
-									<text src="../minimal-1.xhtml#st1-1"/>
+									<text src="../minimal-1.xhtml#id_2"/>
 									<audio src="../audio/part0000_00_000.wav" clipBegin="0:00:00.000" clipEnd="0:00:00.578"/>
 								</par>
 							</seq>
 							<par>
-								<text src="../minimal-1.xhtml#st1-2"/>
+								<text src="../minimal-1.xhtml#id_3"/>
 								<audio src="../audio/part0000_00_000.wav" clipBegin="0:00:00.578" clipEnd="0:00:01.157"/>
 							</par>
 						</seq>
@@ -182,16 +182,16 @@
 						<seq epub:textref="../minimal-2.xhtml#id_2">
 							<seq epub:textref="../minimal-2.xhtml#id_7">
 								<par>
-									<text src="../minimal-2.xhtml#st2-1"/>
+									<text src="../minimal-2.xhtml#id_1"/>
 									<audio src="../audio/part0001_00_000.wav" clipBegin="0:00:00.000" clipEnd="0:00:00.565"/>
 								</par>
 							</seq>
 							<par>
-								<text src="../minimal-2.xhtml#st2-2"/>
+								<text src="../minimal-2.xhtml#id_3"/>
 								<audio src="../audio/part0001_00_000.wav" clipBegin="0:00:00.565" clipEnd="0:00:01.144"/>
 							</par>
 							<par>
-								<text src="../minimal-2.xhtml#st2-3"/>
+								<text src="../minimal-2.xhtml#id_4"/>
 								<audio src="../audio/part0001_00_000.wav" clipBegin="0:00:01.144" clipEnd="0:00:01.723"/>
 							</par>
 						</seq>

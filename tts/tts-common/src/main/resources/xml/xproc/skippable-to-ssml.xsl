@@ -30,8 +30,8 @@
 	      </ssml:s>
 	    </xsl:when>
 	    <xsl:otherwise>
-	      <ssml:s id="{concat('internal-holder-of-', ssml:get-skippable($packet[1])/@id)}">
-		<!-- Copy CSS and xml:lang: -->
+	      <ssml:s>
+		<!-- copy CSS and xml:lang -->
 		<xsl:copy-of select="$packet[1]/@* except @id except @*[local-name()=$voice-attr]"/>
 		<xsl:copy-of select="ssml:get-voice($packet[1])"/>
 

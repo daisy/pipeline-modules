@@ -748,7 +748,6 @@
                 <p:for-each name="sentence-detection" px:progress="1">
                     <p:output port="result"/>
                     <px:html-break-detect name="break-detect">
-                        <p:with-option name="id-prefix" select="concat(p:iteration-position(),'-')"/>
                         <p:with-option name="sentence-attr" select="if ($sentence-class!='') then 'class' else ''"/>
                         <p:with-option name="sentence-attr-val" select="$sentence-class"/>
                     </px:html-break-detect>
@@ -758,7 +757,6 @@
                         <p:input port="sentence-ids">
                             <p:pipe step="break-detect" port="sentence-ids"/>
                         </p:input>
-                        <p:with-option name="id-prefix" select="concat('i', p:iteration-position())"/>
                     </px:isolate-skippable>
                     <px:html-unwrap-words>
                         <!-- only keep the sentences, not the words -->
