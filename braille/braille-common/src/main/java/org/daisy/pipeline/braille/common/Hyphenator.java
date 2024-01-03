@@ -32,7 +32,7 @@ public interface Hyphenator extends Transform {
 	 * it may.
 	 *
 	 * If the {@link FullHyphenator} returned by {@link #asFullHyphenator()} throws a {@link
-	 * NonStandardHyphenationException}, the {@link asLineBreaker()} method must not throw a {@link
+	 * NonStandardHyphenationException}, the {@link #asLineBreaker()} method must not throw a {@link
 	 * UnsupportedOperationException}.
 	 */
 	public LineBreaker asLineBreaker() throws UnsupportedOperationException;
