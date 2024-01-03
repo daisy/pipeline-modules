@@ -37,6 +37,7 @@ import org.daisy.common.file.URLs;
 import org.daisy.braille.css.InlineStyle;
 import org.daisy.braille.css.InlineStyle.RuleMainBlock;
 import org.daisy.braille.css.InlineStyle.RuleRelativeBlock;
+import org.daisy.braille.css.LanguageRange;
 import org.daisy.braille.css.PropertyValue;
 import org.daisy.braille.css.SimpleInlineStyle;
 
@@ -228,6 +229,10 @@ public final class BrailleCssSerializer {
 				s += " "; }
 			s += toString(t); }
 		return s;
+	}
+
+	public static String serializeLanguageRanges(List<LanguageRange> languageRanges) {
+		return OutputUtil.appendList(new StringBuilder(), languageRanges, OutputUtil.SELECTOR_DELIM).toString();
 	}
 
 	/* = PRIVATE ========================================= */

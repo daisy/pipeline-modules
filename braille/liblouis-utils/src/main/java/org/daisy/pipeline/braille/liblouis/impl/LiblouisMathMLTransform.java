@@ -97,7 +97,7 @@ public interface LiblouisMathMLTransform {
 			
 			@Override
 			public ToStringHelper toStringHelper() {
-				return MoreObjects.toStringHelper("o.d.p.b.liblouis.impl.LiblouisMathMLTransform$Provider$TransformImpl")
+				return MoreObjects.toStringHelper("LiblouisMathMLTransform$Provider$TransformImpl")
 					.add("mathCode", code);
 			}
 		}
@@ -120,7 +120,7 @@ public interface LiblouisMathMLTransform {
 		
 		@Override
 		public ToStringHelper toStringHelper() {
-			return MoreObjects.toStringHelper(LiblouisMathMLTransform.Provider.class.getName());
+			return MoreObjects.toStringHelper("LiblouisMathMLTransform$Provider");
 		}
 	}
 }

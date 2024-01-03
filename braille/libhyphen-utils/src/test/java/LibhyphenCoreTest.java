@@ -84,19 +84,19 @@ public class LibhyphenCoreTest extends AbstractTest {
 		             "oo\n" +
 		             "ba\n" +
 		             "r",
-		             fillLines(hyphenator.transform("foobar"), 2, '-'));
+		             fillLines(hyphenator.transform("foobar", null), 2, '-'));
 		assertEquals("fu-\n" +
 		             "bar",
-		             fillLines(hyphenator.transform("foobar"), 3, '-'));
+		             fillLines(hyphenator.transform("foobar", null), 3, '-'));
 		assertEquals("foo-\n" +
 		             "bar",
-		             fillLines(hyphenator.transform("foo-bar"), 4, '-'));
+		             fillLines(hyphenator.transform("foo-bar", null), 4, '-'));
 		assertEquals("foo-\n" +
 		             "bar",
-		             fillLines(hyphenator.transform("foo-bar"), 5, '-'));
+		             fillLines(hyphenator.transform("foo-bar", null), 5, '-'));
 		assertEquals("foo-\n" +
 		             "bar",
-		             fillLines(hyphenator.transform("foo-bar"), 6, '-'));
+		             fillLines(hyphenator.transform("foo-bar", null), 6, '-'));
 	}
 	
 	private Iterable<CSSStyledText> styledText(String... textAndStyle) {

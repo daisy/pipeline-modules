@@ -47,6 +47,7 @@ import org.daisy.braille.css.BrailleCSSParserFactory;
 import org.daisy.braille.css.BrailleCSSProperty;
 import org.daisy.braille.css.BrailleCSSRuleFactory;
 import org.daisy.braille.css.RuleCounterStyle;
+import org.daisy.braille.css.RuleHyphenationResource;
 import org.daisy.braille.css.RuleTextTransform;
 import org.daisy.braille.css.RuleVolume;
 import org.daisy.braille.css.RuleVolumeArea;
@@ -135,6 +136,7 @@ public class BrailleCssCascader implements CssCascader {
 		private Map<String,Map<String,RulePage>> pageRules = null;
 		private Map<String,Map<String,RuleVolume>> volumeRules = null;
 		private Iterable<RuleTextTransform> textTransformRules = null;
+		private Iterable<RuleHyphenationResource> hyphenationResourceRules = null;
 		private Iterable<RuleCounterStyle> counterStyleRules = null;
 		private Iterable<AnyAtRule> otherAtRules = null;
 
@@ -174,6 +176,7 @@ public class BrailleCssCascader implements CssCascader {
 					}
 				}
 				textTransformRules = Iterables.filter(styleSheet, RuleTextTransform.class);
+				hyphenationResourceRules = Iterables.filter(styleSheet, RuleHyphenationResource.class);
 				counterStyleRules = Iterables.filter(styleSheet, RuleCounterStyle.class);
 				otherAtRules = Iterables.filter(styleSheet, AnyAtRule.class);
 			}
@@ -200,6 +203,8 @@ public class BrailleCssCascader implements CssCascader {
 						insertVolumeStyle(style, volumeRule, pageRules);
 					for (RuleTextTransform r : textTransformRules)
 						insertTextTransformDefinition(style, r);
+					for (RuleHyphenationResource r : hyphenationResourceRules)
+						insertHyphenationResourceDefinition(style, r);
 					for (RuleCounterStyle r : counterStyleRules)
 						insertCounterStyleDefinition(style, r);
 					for (AnyAtRule r : otherAtRules) {
@@ -451,6 +456,38 @@ public class BrailleCssCascader implements CssCascader {
 		builder.append("@text-transform");
 		String name = rule.getName();
 		if (name != null) builder.append(' ').append(name);
+		builder.append(" { ");
+		for (Declaration decl : rule) {
+			if (decl.size() == 1 && decl.get(0) instanceof TermURI) {
+				TermURI term = (TermURI)decl.get(0);
+				URI uri = URLs.asURI(term.getValue());
+				if (!uri.isAbsolute() && !uri.getSchemeSpecificPart().startsWith("/")) {
+					// relative resource: make absolute and convert to "volatile-file" URI to bypass
+					// caching in AbstractTransformProvider
+					if (term.getBase() != null)
+						uri = URLs.resolve(URLs.asURI(term.getBase()), uri);
+					try {
+						new File(uri);
+						try {
+							uri = new URI("volatile-file", uri.getSchemeSpecificPart(), uri.getFragment());
+						} catch (URISyntaxException e) {
+							throw new IllegalStateException(e); // should not happen
+						}
+					} catch (IllegalArgumentException e) {
+						// not a file URI
+					}
+				}
+				builder.append(decl.getProperty()).append(": ").append("url(\"" + uri + "\")").append("; ");
+				continue;
+			}
+			insertDeclaration(builder, decl);
+		}
+		builder.append("} ");
+	}
+
+	private static void insertHyphenationResourceDefinition(StringBuilder builder, RuleHyphenationResource rule) {
+		builder.append("@hyphenation-resource");
+		builder.append(":lang(").append(BrailleCssSerializer.serializeLanguageRanges(rule.getLanguageRanges())).append(")");
 		builder.append(" { ");
 		for (Declaration decl : rule) {
 			if (decl.size() == 1 && decl.get(0) instanceof TermURI) {
