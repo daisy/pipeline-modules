@@ -23,6 +23,8 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.xml.transform.stream.StreamSource;
 
+import com.google.common.collect.Collections2;
+
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -40,6 +42,7 @@ import org.daisy.pipeline.tts.TTSService;
 import org.daisy.pipeline.tts.Voice;
 import org.daisy.pipeline.tts.VoiceInfo;
 import org.daisy.pipeline.tts.VoiceInfo.Gender;
+import org.daisy.pipeline.tts.VoiceInfo.LanguageRange;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -85,7 +88,7 @@ public class MockGoogle {
 					TTSEngine engine = tts.newEngine(properties);
 					for (Voice v : engine.getAvailableVoices())
 						// only list voices with locale and gender because we don't want to read configuration files
-						if (v.getLocale().isPresent() && v.getGender().isPresent()) {
+						if (!v.getLocale().isEmpty() && v.getGender().isPresent()) {
 							voices.put(v.getName(), v);
 							engines.put(v.getName(), engine); }}
 				catch (Throwable e) {
@@ -99,7 +102,11 @@ public class MockGoogle {
 					try {
 						JSONArray jsonVoices = new JSONArray();
 						for (Voice voice : voices.values()) {
-							Locale locale = voice.getLocale().get();
+							Collection<String> locale = Collections2.filter(
+								Collections2.transform(voice.getLocale(), LanguageRange::toString),
+								x -> !x.contains("*")); // only language tags
+							if (locale.isEmpty())
+								continue; // languageCodes array must be present and not empty
 							String gender; {
 								switch (voice.getGender().get()) {
 								case MALE_ADULT:
@@ -118,8 +125,8 @@ public class MockGoogle {
 									break; }}
 							jsonVoices = jsonVoices.put(
 								new JSONObject().put("name", voice.getName())
-								                .put("languageCodes", new JSONArray(new String[]{locale.toLanguageTag()}))
-								                .put("ssmlGender", gender));
+								.put("languageCodes", new JSONArray(locale.toArray(new String[locale.size()])))
+								.put("ssmlGender", gender));
 						}
 						String response = new JSONObject().put("voices", jsonVoices).toString();
 						exchange.sendResponseHeaders(200, response.length());
