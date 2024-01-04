@@ -113,15 +113,9 @@ public class ConfigReader {
 			XdmNode node = (XdmNode) it.next();
 			QName qname = node.getNodeName();
 			if (qname != null) {
-				if ("property".equalsIgnoreCase(qname.getLocalName())) {
-					logger.warn("Ignoring property " + node.toString()
-					        + " inside TTS config file.\nPlease use a"
-					        + " system property or environment variable instead.");
-				} else {
-					boolean parsed = false;
-					for (int k = 0; !parsed && k < extensions.length; ++k) {
-						parsed = extensions[k].parseNode(node, docURI, this);
-					}
+				boolean parsed = false;
+				for (int k = 0; !parsed && k < extensions.length; ++k) {
+					parsed = extensions[k].parseNode(node, docURI, this);
 				}
 			}
 		}

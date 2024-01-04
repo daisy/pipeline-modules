@@ -7,6 +7,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Duration;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.Semaphore;
@@ -35,6 +36,7 @@ import org.daisy.pipeline.audio.AudioServices;
 import org.daisy.pipeline.tts.AudioFootprintMonitor;
 import org.daisy.pipeline.tts.calabash.impl.EncodingThread.EncodingException;
 import org.daisy.pipeline.tts.config.ConfigReader;
+import org.daisy.pipeline.tts.config.DynamicPropertiesExtension;
 import org.daisy.pipeline.tts.config.VoiceConfigExtension;
 import org.daisy.pipeline.tts.TTSLog;
 import org.daisy.pipeline.tts.TTSRegistry;
@@ -163,7 +165,14 @@ public class SynthesizeStep extends DefaultStep implements FormatSpecifications,
 		}
 
 		VoiceConfigExtension configExt = new VoiceConfigExtension();
-		ConfigReader cr = new ConfigReader(mRuntime.getProcessor(), config.read(), configExt);
+		DynamicPropertiesExtension propsExt = new DynamicPropertiesExtension();
+		new ConfigReader(mRuntime.getProcessor(), config.read(), configExt, propsExt);
+		Map<String,String> properties = this.properties;
+		Map<String,String> dynProperties = propsExt.getDynamicProperties();
+		if (dynProperties != null && !dynProperties.isEmpty()) {
+			properties = new HashMap<>(properties);
+			properties.putAll(dynProperties);
+		}
 
 		boolean logEnabled = mIncludeLogOpt;
 		if (!logEnabled) {
