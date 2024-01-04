@@ -6,11 +6,11 @@ div a {
     speech-rate: 20;
 }
 
-div>x{
+div>x {
     speech-rate: 30;
 }
 
-div+y{
+div+y {
     speech-rate: 40;
 }
 
@@ -34,12 +34,11 @@ simple3 {
 	pause: 10s
 }
 
-hyphens{
+hyphens {
     speech-rate: x-slow;
     cue-before: url('a_b-c.mp3');
 }
 
-
-*[type="prefixed"]{
+[*|type="prefixed"] {
     cue-before: url('prefixed.mp3');
 }

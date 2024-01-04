@@ -64,6 +64,7 @@ public class CssCascadeStep extends DefaultStep implements XProcStep {
 	private static final QName _type = new QName("type");
 	private static final QName _media = new QName("media");
 	private static final QName _attribute_name = new QName("attribute-name");
+	private static final QName _multiple_attributes = new QName("multiple-attributes");
 
 	private static final String DEFAULT_MEDIUM = "embossed";
 	private static final String DEFAULT_TYPES = "text/css text/x-scss";
@@ -126,6 +127,10 @@ public class CssCascadeStep extends DefaultStep implements XProcStep {
 			for (CssCascader inliner : inliners)
 				if (inliner.supportsMedium(medium)) {
 					QName attributeName = getOption(_attribute_name, DEFAULT_ATTRIBUTE_NAME);
+					boolean multipleAttrs = getOption(_multiple_attributes, false);
+					if (multipleAttrs && (attributeName.getNamespaceURI() == null || "".equals(attributeName.getNamespaceURI())))
+						throw new IllegalArgumentException(
+							"Namespace must be specified when cascading to multiple attributes per element");
 					inMemoryResolver.setContext(contextPipe);
 					inliner.newInstance(
 						medium,
@@ -135,7 +140,8 @@ public class CssCascadeStep extends DefaultStep implements XProcStep {
 							? new SassCompiler(cssURIResolver, Collections.unmodifiableMap(sassVariables))
 							: null,
 						new XSLT(runtime, step),
-						SaxonHelper.jaxpQName(attributeName)
+						SaxonHelper.jaxpQName(attributeName),
+						multipleAttrs
 					).transform(
 						new XMLCalabashInputValue(sourcePipe),
 						new XMLCalabashOutputValue(resultPipe, runtime)

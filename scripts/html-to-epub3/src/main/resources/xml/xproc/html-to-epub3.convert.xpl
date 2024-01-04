@@ -33,8 +33,7 @@
     <p:input port="tts-config">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>TTS configuration file</p>
-            <p>Configuration file that contains text-to-speech properties, links to aural CSS
-            stylesheets and links to PLS lexicons.</p>
+            <p>Configuration file with voice mappings, PLS lexicons and annotations.</p>
       </p:documentation>
       <p:inline><d:config/></p:inline>
     </p:input>

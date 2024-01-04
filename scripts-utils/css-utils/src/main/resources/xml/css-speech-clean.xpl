@@ -5,8 +5,8 @@
                 type="px:css-speech-clean"
                 exclude-inline-prefixes="#all">
 
-  <p:documentation>
-    Delete the attributes added by the CSS speech inlining step.
+  <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+    <p>Delete the attributes added by <code>px:css-speech-cascade</code>.</p>
   </p:documentation>
 
   <p:input port="source" primary="true"/>

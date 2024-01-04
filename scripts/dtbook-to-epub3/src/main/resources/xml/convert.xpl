@@ -56,7 +56,7 @@
 	<p:option name="output-dir" required="true"/>
 	<p:option name="temp-dir" required="true"/>
 	
-	<p:import href="http://www.daisy.org/pipeline/modules/css-speech/library.xpl">
+	<p:import href="http://www.daisy.org/pipeline/modules/css-utils/library.xpl">
 		<p:documentation>
 			px:css-speech-cascade
 		</p:documentation>
@@ -78,9 +78,6 @@
 			<px:css-speech-cascade content-type="application/x-dtbook+xml" name="cascade">
 				<p:input port="source.in-memory">
 					<p:pipe step="main" port="source.in-memory"/>
-				</p:input>
-				<p:input port="config">
-					<p:pipe step="main" port="tts-config"/>
 				</p:input>
 			</px:css-speech-cascade>
 			<p:sink/>

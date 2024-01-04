@@ -19,10 +19,8 @@
 
   <p:input port="config">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-      <h2>Text-To-Speech configuration file</h2>
-      <p>Configuration file that contains Text-To-Speech
-      properties, links to aural CSS stylesheets and links to PLS
-      lexicons.</p>
+      <h2>TTS configuration file</h2>
+      <p>Configuration file with voice mappings, PLS lexicons and annotations.</p>
     </p:documentation>
   </p:input>
 
@@ -128,7 +126,7 @@
       px:html-unwrap-words
     </p:documentation>
   </p:import>
-  <p:import href="http://www.daisy.org/pipeline/modules/css-speech/library.xpl">
+  <p:import href="http://www.daisy.org/pipeline/modules/css-utils/library.xpl">
     <p:documentation>
       px:css-speech-cascade
       px:css-speech-clean
@@ -159,9 +157,6 @@
       <px:css-speech-cascade content-type="application/xhtml+xml" name="cascade">
         <p:input port="source.in-memory">
           <p:pipe step="main" port="source.in-memory"/>
-        </p:input>
-        <p:input port="config">
-          <p:pipe step="main" port="config"/>
         </p:input>
       </px:css-speech-cascade>
     </p:when>

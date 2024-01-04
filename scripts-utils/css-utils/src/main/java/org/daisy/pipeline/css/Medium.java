@@ -13,6 +13,7 @@ public class Medium {
 
 	public enum Type {
 		EMBOSSED,
+		SPEECH,
 		PRINT;
 		public String toString() {
 			return super.toString().toLowerCase();
@@ -30,6 +31,7 @@ public class Medium {
 			this.width = width;
 			this.height = height;
 			break;
+		case SPEECH:
 		case PRINT:
 			if (width != null) {
 				throw new IllegalArgumentException("Unexpected 'width' argument for medium 'print'");

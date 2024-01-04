@@ -22,6 +22,7 @@ import javax.xml.transform.URIResolver;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 
 import cz.vutbr.web.css.CSSProperty;
@@ -94,7 +95,10 @@ public class BrailleCssCascader implements CssCascader {
 	                                  URIResolver uriResolver,
 	                                  CssPreProcessor preProcessor,
 	                                  XsltProcessor xsltProcessor,
-	                                  QName attributeName) {
+	                                  QName attributeName,
+	                                  boolean multipleAttrs) {
+		if (multipleAttrs)
+			throw new UnsupportedOperationException("Cascading to multiple attributes per element not supported");
 		switch (medium.getType()) {
 		case EMBOSSED:
 			return new Transformer(uriResolver, preProcessor, xsltProcessor, defaultStylesheet, medium, attributeName,
@@ -122,6 +126,7 @@ public class BrailleCssCascader implements CssCascader {
 
 	private static class Transformer extends JStyleParserCssCascader {
 
+		private final QName attributeName;
 		private final boolean isBrailleCss;
 
 		private Transformer(URIResolver resolver, CssPreProcessor preProcessor, XsltProcessor xsltProcessor,
@@ -130,6 +135,7 @@ public class BrailleCssCascader implements CssCascader {
 		                    SupportedCSS supportedCss, DeclarationTransformer declarationTransformer) {
 			super(resolver, preProcessor, xsltProcessor, defaultStyleSheet, medium, attributeName,
 			      parserFactory, ruleFactory, supportedCss, declarationTransformer);
+			this.attributeName = attributeName;
 			this.isBrailleCss = medium.getType() == Medium.Type.EMBOSSED;
 		}
 
@@ -140,7 +146,7 @@ public class BrailleCssCascader implements CssCascader {
 		private Iterable<RuleCounterStyle> counterStyleRules = null;
 		private Iterable<AnyAtRule> otherAtRules = null;
 
-		protected String serializeStyle(NodeData mainStyle, Map<PseudoElement,NodeData> pseudoStyles, Element context) {
+		protected Map<QName,String> serializeStyle(NodeData mainStyle, Map<PseudoElement,NodeData> pseudoStyles, Element context) {
 			if (isBrailleCss && pageRules == null) {
 				StyleSheet styleSheet = getParsedStyleSheet();
 				pageRules = new HashMap<String,Map<String,RulePage>>(); {
@@ -213,7 +219,7 @@ public class BrailleCssCascader implements CssCascader {
 							style.append("} "); }
 						insertAtRule(style, r); }}}
 			if (!style.toString().replaceAll("\\s+", "").isEmpty())
-				return style.toString().trim();
+				return ImmutableMap.of(attributeName, style.toString().trim());
 			else
 				return null;
 		}

@@ -26,9 +26,7 @@
   <p:input port="tts-config">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
       <h2>Text-To-Speech configuration file</h2>
-      <p>Configuration file that contains Text-To-Speech
-      properties, links to aural CSS stylesheets and links to PLS
-      lexicons.</p>
+      <p>Configuration file with voice mappings, PLS lexicons and annotations.</p>
     </p:documentation>
     <p:inline><d:config/></p:inline>
   </p:input>
