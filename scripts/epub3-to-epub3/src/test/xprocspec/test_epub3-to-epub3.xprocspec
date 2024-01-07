@@ -22,6 +22,7 @@
 						<d:file href="EPUB/cover.xhtml" media-type="application/xhtml+xml"/>
 						<d:file href="EPUB/front.xhtml" media-type="application/xhtml+xml"/>
 						<d:file href="EPUB/chapter.xhtml" media-type="application/xhtml+xml"/>
+						<d:file href="EPUB/aural.css" media-type="text/css"/>
 					</d:fileset>
 				</x:document>
 			</x:input>
@@ -52,6 +53,7 @@
 							<item id="cover" href="cover.xhtml" media-type="application/xhtml+xml"/>
 							<item id="front" href="front.xhtml" media-type="application/xhtml+xml"/>
 							<item id="chapter" href="chapter.xhtml" media-type="application/xhtml+xml"/>
+							<item id="css" href="aural.css" media-type="text/css"/>
 						</manifest>
 						<spine>
 							<itemref idref="cover"/>
@@ -59,6 +61,17 @@
 							<itemref idref="chapter"/>
 						</spine>
 					</package>
+				</x:document>
+				<x:document type="inline" xml:base="EPUB/aural.css">
+					<c:data content-type="text/plain">
+						@namespace epub url(http://www.idpf.org/2007/ops);
+						[epub|type~=pagebreak]::before {
+							content: 'page ';
+						}
+						[epub|type~=pagebreak]:empty[title]::before {
+							content: 'page ' attr(title);
+						}
+					</c:data>
 				</x:document>
 				<x:document type="inline" xml:base="EPUB/nav.xhtml">
 					<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -125,15 +138,7 @@
 							<meta name="dc:identifier" content="id"/>
 							<link rel="prev" href="cover.xhtml"/>
 							<link rel="next" href="chapter.xhtml"/>
-							<style type="text/css" media="speech">
-								@namespace epub url(http://www.idpf.org/2007/ops);
-								[epub|type~=pagebreak]::before {
-									content: 'page ';
-								}
-								[epub|type~=pagebreak]:empty[title]::before {
-									content: 'page ' attr(title);
-								}
-							</style>
+							<link rel="stylesheet" type="text/css" media="speech" href="aural.css"/>
 						</head>
 						<body id="front" epub:type="frontmatter">
 							<h1 id="h_1">Title</h1>
@@ -157,15 +162,7 @@
 							<title>minimal</title>
 							<meta name="dc:identifier" content="id"/>
 							<link rel="prev" href="front.xhtml"/>
-							<style type="text/css" media="speech">
-								@namespace epub url(http://www.idpf.org/2007/ops);
-								[epub|type~=pagebreak]::before {
-									content: 'page ';
-								}
-								[epub|type~=pagebreak]:empty[title]::before {
-									content: 'page ' attr(title);
-								}
-							</style>
+							<link rel="stylesheet" type="text/css" media="speech" href="aural.css"/>
 						</head>
 						<body id="chap_1" epub:type="bodymatter chapter">
 							<!-- Note that ssml:phoneme is also recognized as an inline element
@@ -227,6 +224,7 @@
 						<d:file href="result/EPUB/cover.xhtml" media-type="application/xhtml+xml"/>
 						<d:file href="result/EPUB/front.xhtml" media-type="application/xhtml+xml"/>
 						<d:file href="result/EPUB/chapter.xhtml" media-type="application/xhtml+xml"/>
+						<d:file href="result/EPUB/aural.css" media-type="text/css"/>
 						<d:file href="result/EPUB/mo/cover.smil" media-type="application/smil+xml" indent="true"/>
 						<d:file href="result/EPUB/mo/front.smil" media-type="application/smil+xml" indent="true"/>
 						<d:file href="result/EPUB/mo/chapter.smil" media-type="application/smil+xml" indent="true"/>
@@ -268,6 +266,7 @@
 							<item id="cover" href="cover.xhtml" media-type="application/xhtml+xml" media-overlay="item_1"/>
 							<item id="front" href="front.xhtml" media-type="application/xhtml+xml" media-overlay="item_2"/>
 							<item id="chapter" href="chapter.xhtml" media-type="application/xhtml+xml" media-overlay="item_3"/>
+							<item id="css" href="aural.css" media-type="text/css"/>
 							<item id="item_1" href="mo/cover.smil" media-type="application/smil+xml"/>
 							<item id="item_2" href="mo/front.smil" media-type="application/smil+xml"/>
 							<item id="item_3" href="mo/chapter.smil" media-type="application/smil+xml"/>
@@ -578,6 +577,7 @@
 						<d:file href="result/EPUB/cover.xhtml" media-type="application/xhtml+xml"/>
 						<d:file href="result/EPUB/front.xhtml" media-type="application/xhtml+xml"/>
 						<d:file href="result/EPUB/chapter.xhtml" media-type="application/xhtml+xml"/>
+						<d:file href="result/EPUB/aural.css" media-type="text/css"/>
 					</d:fileset>
 				</x:document>
 			</x:expect>
@@ -603,6 +603,7 @@
 							<item id="cover" href="cover.xhtml" media-type="application/xhtml+xml"/>
 							<item id="front" href="front.xhtml" media-type="application/xhtml+xml"/>
 							<item id="chapter" href="chapter.xhtml" media-type="application/xhtml+xml"/>
+							<item id="css" href="aural.css" media-type="text/css"/>
 						</manifest>
 						<spine>
 							<itemref idref="cover"/>
@@ -722,6 +723,7 @@
 						<d:file href="result/EPUB/cover.xhtml" media-type="application/xhtml+xml"/>
 						<d:file href="result/EPUB/front.xhtml" media-type="application/xhtml+xml"/>
 						<d:file href="result/EPUB/chapter.xhtml" media-type="application/xhtml+xml"/>
+						<d:file href="result/EPUB/aural.css" media-type="text/css"/>
 					</d:fileset>
 				</x:document>
 			</x:expect>
@@ -753,6 +755,7 @@
 							<item id="cover" href="cover.xhtml" media-type="application/xhtml+xml"/>
 							<item id="front" href="front.xhtml" media-type="application/xhtml+xml"/>
 							<item id="chapter" href="chapter.xhtml" media-type="application/xhtml+xml"/>
+							<item id="css" href="aural.css" media-type="text/css"/>
 						</manifest>
 						<spine>
 							<itemref idref="cover"/>

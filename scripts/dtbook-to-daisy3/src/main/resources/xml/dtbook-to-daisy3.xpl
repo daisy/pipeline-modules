@@ -118,10 +118,10 @@ reading systems can't handle the word tags.</p>
     <p:with-option name="output-fileset-base" select="/c:result/string()">
       <p:pipe step="output-dir-uri" port="normalized"/>
     </p:with-option>
-    <p:with-option name="audio" select="$audio"/>
-    <p:with-option name="audio-only" select="$with-text = 'false'"/>
+    <p:with-option name="audio" select="$audio='true'"/>
+    <p:with-option name="audio-only" select="$with-text='false'"/>
     <p:with-option name="audio-file-type" select="$audio-file-type"/>
-    <p:with-option name="word-detection" select="$word-detection"/>
+    <p:with-option name="word-detection" select="$word-detection='true'"/>
     <p:with-option name="include-tts-log" select="$include-tts-log"/>
   </px:dtbook-to-daisy3>
 

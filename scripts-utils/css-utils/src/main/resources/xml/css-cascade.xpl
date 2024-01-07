@@ -162,6 +162,33 @@
 	
 	<p:variable name="fileset-mode" cx:as="xs:boolean" select="exists(/d:fileset)"/>
 	
+	<!-- load CSS files to memory so that pxi:css-cascade can take them into account -->
+	<p:choose name="css">
+		<p:when test="$fileset-mode">
+			<p:output port="result" sequence="true"/>
+			<px:fileset-load>
+				<p:input port="in-memory">
+					<p:pipe step="main" port="source.in-memory"/>
+				</p:input>
+				<p:with-option name="media-types" select="$type"/>
+			</px:fileset-load>
+		</p:when>
+		<p:otherwise>
+			<p:output port="result" sequence="true"/>
+			<p:identity>
+				<p:input port="source">
+					<p:empty/>
+				</p:input>
+			</p:identity>
+		</p:otherwise>
+	</p:choose>
+	<p:sink/>
+	
+	<p:identity>
+		<p:input port="source">
+			<p:pipe step="main" port="source"/>
+		</p:input>
+	</p:identity>
 	<p:choose name="content">
 		<p:when test="$fileset-mode">
 			<p:output port="result" sequence="true" primary="true"/>
@@ -216,7 +243,7 @@
 				              or //@style">
 					<pxi:css-cascade px:progress="1">
 						<p:input port="context">
-							<p:pipe step="main" port="source.in-memory"/>
+							<p:pipe step="css" port="result"/>
 						</p:input>
 						<p:input port="parameters">
 							<p:pipe step="main" port="parameters"/>

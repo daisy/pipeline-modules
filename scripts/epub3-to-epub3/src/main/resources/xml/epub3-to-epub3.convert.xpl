@@ -648,6 +648,22 @@
                             <p:pipe step="fix-pagenum" port="in-memory"/>
                         </p:input>
                     </px:opf-spine-to-fileset>
+                    <!-- add CSS -->
+                    <p:group>
+                        <p:sink/>
+                        <px:fileset-filter name="css" media-types="text/css text/x-scss">
+                            <p:input port="source">
+                                <p:pipe step="fix-pagenum" port="fileset"/>
+                            </p:input>
+                        </px:fileset-filter>
+                        <p:sink/>
+                        <px:fileset-join>
+                            <p:input port="source">
+                                <p:pipe step="spine" port="result"/>
+                                <p:pipe step="css" port="result"/>
+                            </p:input>
+                        </px:fileset-join>
+                    </p:group>
                     <px:tts-for-epub3 name="do-tts" audio="true" px:progress="1">
                         <p:input port="source.in-memory">
                             <p:pipe step="fix-pagenum" port="in-memory"/>
