@@ -22,6 +22,12 @@
 
 	<p:input port="tts-config"/>
 
+	<p:option name="stylesheet" select="''">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p>CSS user style sheets as space separated list of absolute URIs.</p>
+		</p:documentation>
+	</p:option>
+
 	<p:option name="language" required="true"/>
 	<p:option name="validation" cx:type="off|report|abort" select="'off'">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -79,6 +85,7 @@
 				<p:input port="source.in-memory">
 					<p:pipe step="main" port="source.in-memory"/>
 				</p:input>
+				<p:with-option name="user-stylesheet" select="$stylesheet"/>
 			</px:css-speech-cascade>
 			<p:sink/>
 			<p:identity>

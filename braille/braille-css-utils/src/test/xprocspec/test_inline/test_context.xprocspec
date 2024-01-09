@@ -40,7 +40,7 @@
           </c:result>
         </x:document>
       </x:input>
-      <x:option name="default-stylesheet" select="resolve-uri('default.scss')"/>
+      <x:option name="user-stylesheet" select="resolve-uri('default.scss')"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result.in-memory" select="/*[ends-with(base-uri(.),'/doc.html')]"/>

@@ -60,7 +60,7 @@ public class CssCascadeStep extends DefaultStep implements XProcStep {
 	private final URIResolver cssURIResolver;
 	private final Iterable<CssCascader> inliners;
 
-	private static final QName _default_stylesheet = new QName("default-stylesheet");
+	private static final QName _user_stylesheet = new QName("user-stylesheet");
 	private static final QName _type = new QName("type");
 	private static final QName _media = new QName("media");
 	private static final QName _attribute_name = new QName("attribute-name");
@@ -134,7 +134,7 @@ public class CssCascadeStep extends DefaultStep implements XProcStep {
 					inMemoryResolver.setContext(contextPipe);
 					inliner.newInstance(
 						medium,
-						getOption(_default_stylesheet, ""),
+						getOption(_user_stylesheet, ""),
 						cssURIResolver,
 						enableSass
 							? new SassCompiler(cssURIResolver, Collections.unmodifiableMap(sassVariables))

@@ -18,6 +18,7 @@
 		<p:pipe step="update" port="result.in-memory"/>
 	</p:output>
 	<p:option name="content-type" required="false" select="'text/html application/xhtml+xml application/x-dtbook+xml'"/>
+	<p:option name="user-stylesheet" required="false" select="''"/>
 
 	<p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
 		<p:documentation>
@@ -44,6 +45,7 @@
 			<p:empty/>
 		</p:input>
 		<p:with-option name="content-type" select="$content-type"/>
+		<p:with-option name="user-stylesheet" select="$user-stylesheet"/>
 		<p:with-option name="attribute-name" select="QName('http://www.daisy.org/ns/pipeline/tts','tts:_')"/>
 	</px:css-cascade>
 

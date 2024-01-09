@@ -79,6 +79,12 @@
     </p:documentation>
   </p:option>
 
+  <p:option name="stylesheet" select="''">
+    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <p>CSS user style sheets as space separated list of absolute URIs.</p>
+    </p:documentation>
+  </p:option>
+
   <p:option name="sentence-class" required="false" select="''">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
       <p>Class attribute to mark sentences with.</p>
@@ -158,6 +164,7 @@
         <p:input port="source.in-memory">
           <p:pipe step="main" port="source.in-memory"/>
         </p:input>
+        <p:with-option name="user-stylesheet" select="$stylesheet"/>
       </px:css-speech-cascade>
     </p:when>
     <p:otherwise>

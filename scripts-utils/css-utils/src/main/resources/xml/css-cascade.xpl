@@ -30,7 +30,7 @@
 			embedded (using a <code>style</code> element) and/or inlined (using <code>style</code>
 			attributes).</p>
 			<p>Style sheets that are linked to from the source document, or included via the
-			'default-stylesheet' option, must either exist on disk, or must be part of the source
+			'user-stylesheet' option, must either exist on disk, or must be part of the source
 			fileset.</p>
 		</p:documentation>
 		<p:empty/>
@@ -84,7 +84,7 @@
 		</p:documentation>
 	</p:option>
 
-	<p:option name="default-stylesheet" required="false" select="''">
+	<p:option name="user-stylesheet" required="false" select="''">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>Space separated list of URIs, absolute or relative to source. Applied prior to all
 			other style sheets defined within the source.</p>
@@ -130,7 +130,7 @@
 		<p:input port="context" sequence="true">
 			<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 				<p>Style sheets that are linked to from the source document, or included via the
-				'default-stylesheet' option, must either exist on disk, or must be provided in
+				'user-stylesheet' option, must either exist on disk, or must be provided in
 				memory via this port. Style sheets on this port must be wrapped in &lt;c:result
 				content-type="text/plain"&gt; elements. Style sheet URIs are resolved by matching
 				against the context documents's base URIs.</p>
@@ -138,7 +138,7 @@
 		</p:input>
 		<p:input port="parameters" kind="parameter" primary="false"/>
 		<p:output port="result"/>
-		<p:option name="default-stylesheet"/>
+		<p:option name="user-stylesheet"/>
 		<p:option name="media"/>
 		<p:option name="type"/>
 		<p:option name="attribute-name"/>
@@ -229,7 +229,7 @@
 				</p:input>
 			</p:identity>
 			<p:choose px:progress="1">
-				<p:when test="$default-stylesheet!=''
+				<p:when test="$user-stylesheet!=''
 				              or exists($stylesheets-from-xml-stylesheet-instructions)
 				              or //*[local-name()='style']
 				                    [not(@media) or pf:media-query-matches(@media,$media)]
@@ -248,8 +248,8 @@
 						<p:input port="parameters">
 							<p:pipe step="main" port="parameters"/>
 						</p:input>
-						<p:with-option name="default-stylesheet"
-						               select="string-join(($default-stylesheet[not(.='')],$stylesheets-from-xml-stylesheet-instructions),' ')"/>
+						<p:with-option name="user-stylesheet"
+						               select="string-join(($user-stylesheet[not(.='')],$stylesheets-from-xml-stylesheet-instructions),' ')"/>
 						<p:with-option name="media" select="$media"/>
 						<p:with-option name="type" select="$type"/>
 						<p:with-option name="attribute-name" select="$attribute-name"/>

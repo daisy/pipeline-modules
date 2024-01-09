@@ -73,6 +73,10 @@
       <p:inline><d:config/></p:inline>
     </p:input>
 
+    <p:option xmlns:_="tts" name="_:stylesheet" select="''">
+      <!-- defined in ../../../../../common-options.xpl -->
+    </p:option>
+
     <p:option xmlns:_="dtbook" name="_:chunk-size" select="'-1'">
       <!-- defined in ../../../../../common-options.xpl -->
     </p:option>
@@ -165,7 +169,8 @@
 	  <p:output port="tts-log" sequence="true">
 	    <p:pipe step="convert" port="tts-log"/>
 	  </p:output>
-	  <p:variable name="output-name" select="replace(replace(base-uri(/),'^.*/([^/]+)$','$1'),'\.[^\.]*$','')"/>
+	  <p:variable name="dtbook-uri" select="base-uri(/)"/>
+	  <p:variable name="output-name" select="replace(replace($dtbook-uri,'^.*/([^/]+)$','$1'),'\.[^\.]*$','')"/>
 	  <p:variable name="output-dir-uri" select="pf:normalize-uri(concat($result,'/'))"/>
 	  <p:variable name="epub-file-uri" select="concat($output-dir-uri,$output-name,'.epub')"/>
 	  <p:sink/>
@@ -180,6 +185,10 @@
 	    <p:input port="tts-config">
 	      <p:pipe step="main" port="tts-config"/>
 	    </p:input>
+	    <p:with-option name="stylesheet" xmlns:_="tts" select="string-join(
+	                                                             for $s in tokenize($_:stylesheet,'\s+')[not(.='')] return
+	                                                               resolve-uri($s,$dtbook-uri),
+	                                                             ' ')"/>
 	    <p:with-option name="audio" select="$audio"/>
 	    <p:with-option name="audio-file-type" select="$audio-file-type"/>
 	    <p:with-option name="language" select="$language"/>

@@ -42,7 +42,11 @@
     <p:option name="tts" required="false" select="'default'" cx:as="xs:string"/>
     <p:option name="sentence-detection" required="false" select="'false'" cx:as="xs:string"/>
     <p:option name="braille-translator" select="''"/>
-    <p:option name="stylesheet" select="''"/>
+    <p:option name="stylesheet" select="''">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>CSS user style sheets as space separated list of absolute URIs.</p>
+        </p:documentation>
+    </p:option>
     <p:option name="apply-document-specific-stylesheets" select="'false'" cx:as="xs:string"/>
     <p:option name="set-default-rendition-to-braille" select="'false'" cx:as="xs:string"/>
     <p:option name="content-media-types" select="'application/xhtml+xml'">
@@ -671,6 +675,7 @@
                         <p:input port="config">
                             <p:pipe step="main" port="tts-config"/>
                         </p:input>
+                        <p:with-option name="stylesheet" select="$stylesheet"/>
                         <p:with-option name="audio-file-type" select="$tts-audio-file-type"/>
                         <p:with-option name="include-log" select="$include-tts-log"/>
                         <p:with-option name="temp-dir" select="if ($temp-dir='') then $temp-dir else concat($temp-dir,'tts/')"/>

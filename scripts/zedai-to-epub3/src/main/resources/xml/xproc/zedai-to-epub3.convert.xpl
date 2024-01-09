@@ -17,6 +17,12 @@
         </p:documentation>
     </p:input>
 
+    <p:option name="stylesheet" select="''">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>CSS user style sheets as space separated list of absolute URIs.</p>
+        </p:documentation>
+    </p:option>
+
     <p:output port="fileset.out" primary="true">
         <p:pipe step="html-to-epub3" port="fileset.out"/>
     </p:output>
@@ -142,6 +148,7 @@
                 <p:input port="source.in-memory">
                     <p:pipe step="zedai" port="result"/>
                 </p:input>
+                <p:with-option name="user-stylesheet" select="$stylesheet"/>
             </px:css-speech-cascade>
             <p:sink/>
             <p:identity>

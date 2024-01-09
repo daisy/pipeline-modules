@@ -37,7 +37,11 @@
       </p:documentation>
       <p:inline><d:config/></p:inline>
     </p:input>
-
+    <p:option name="stylesheet" select="''">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>CSS user style sheets as space separated list of absolute URIs.</p>
+        </p:documentation>
+    </p:option>
     <p:output port="fileset.out" primary="true"/>
     <p:output port="in-memory.out" sequence="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -337,6 +341,7 @@
       <p:input port="config">
           <p:pipe step="main" port="tts-config"/>
       </p:input>
+      <p:with-option name="stylesheet" select="$stylesheet"/>
       <p:with-option name="audio" select="$audio"/>
       <p:with-option name="audio-file-type" select="$audio-file-type"/>
       <p:with-option name="process-css" select="$process-css"/>

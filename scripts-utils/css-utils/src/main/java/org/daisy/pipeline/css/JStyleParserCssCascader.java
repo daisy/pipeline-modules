@@ -81,7 +81,7 @@ import org.w3c.dom.ProcessingInstruction;
 
 public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransformer {
 
-	private final String defaultStyleSheets;
+	private final String userStyleSheets;
 	private final MediaSpec medium;
 	private final QName removeInlineStyleAttribute;
 	private final CSSParserFactory parserFactory;
@@ -99,14 +99,14 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 	public JStyleParserCssCascader(URIResolver uriResolver,
 	                               CssPreProcessor preProcessor,
 	                               XsltProcessor xsltProcessor,
-	                               String defaultStyleSheets,
+	                               String userStyleSheets,
 	                               Medium medium,
 	                               QName removeInlineStyleAttribute,
 	                               CSSParserFactory parserFactory,
 	                               RuleFactory ruleFactory,
 	                               SupportedCSS supportedCSS,
 	                               DeclarationTransformer declarationTransformer) {
-		this.defaultStyleSheets = defaultStyleSheets;
+		this.userStyleSheets = userStyleSheets;
 		this.medium = medium.asMediaSpec();
 		this.removeInlineStyleAttribute = removeInlineStyleAttribute;
 		this.parserFactory = parserFactory;
@@ -282,10 +282,10 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 				}
 			};
 			StyleMap styleMap;
-			StyleSheet defaultStyleSheet; {
+			StyleSheet userStyleSheet; {
 				StyleSheet s = (StyleSheet)ruleFactory.createStyleSheet().unlock();
-				if (defaultStyleSheets != null) {
-					StringTokenizer t = new StringTokenizer(defaultStyleSheets);
+				if (userStyleSheets != null) {
+					StringTokenizer t = new StringTokenizer(userStyleSheets);
 					while (t.hasMoreTokens()) {
 						URL u = URLs.asURL(URLs.resolve(baseURI, URLs.asURI(t.nextToken())));
 						if (!cssReader.supportsMediaType(null, u))
@@ -294,10 +294,10 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 							s = parserFactory.append(new CSSSource(u, (Charset)null, (String)null), cssReader, s);
 					}
 				}
-				defaultStyleSheet = s;
+				userStyleSheet = s;
 			}
 			styleSheet = (StyleSheet)ruleFactory.createStyleSheet().unlock();
-			styleSheet.addAll(defaultStyleSheet);
+			styleSheet.addAll(userStyleSheet);
 			synchronized(JStyleParserCssCascader.class) {
 				// FIXME: CSSParserFactory injected in CSSAssignTraversal.<init> in CSSFactory.getUsedStyles
 				CSSFactory.registerCSSParserFactory(parserFactory);
@@ -345,7 +345,7 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 							public Optional<String> get(Element element, String property) {
 								if (style == null) {
 									StyleSheet s = (StyleSheet)ruleFactory.createStyleSheet().unlock();
-									s.addAll(defaultStyleSheet);
+									s.addAll(userStyleSheet);
 									synchronized(JStyleParserCssCascader.class) {
 										// FIXME: CSSParserFactory injected in CSSAssignTraversal.<init> in CSSFactory.getUsedStyles
 										CSSFactory.registerCSSParserFactory(parserFactory);
@@ -437,7 +437,7 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 				// We need to recompute the stylesheet because of any possible inline styles, which
 				// are attached to an element in the original document.
 				styleSheet = (StyleSheet)ruleFactory.createStyleSheet().unlock();
-				styleSheet.addAll(defaultStyleSheet);
+				styleSheet.addAll(userStyleSheet);
 				synchronized(JStyleParserCssCascader.class) {
 					// FIXME: CSSParserFactory injected in CSSAssignTraversal.<init> in CSSFactory.getUsedStyles
 					CSSFactory.registerCSSParserFactory(parserFactory);

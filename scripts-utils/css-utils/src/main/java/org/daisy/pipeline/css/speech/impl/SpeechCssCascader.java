@@ -59,7 +59,7 @@ public class SpeechCssCascader implements CssCascader {
 	}
 
 	public XMLTransformer newInstance(Medium medium,
-	                                  String defaultStylesheet,
+	                                  String userStylesheet,
 	                                  URIResolver uriResolver,
 	                                  CssPreProcessor preProcessor,
 	                                  XsltProcessor xsltProcessor,
@@ -69,7 +69,7 @@ public class SpeechCssCascader implements CssCascader {
 			throw new UnsupportedOperationException("Cascading to single attribute per element not supported");
 		switch (medium.getType()) {
 		case SPEECH:
-			return new Transformer(uriResolver, preProcessor, xsltProcessor, defaultStylesheet, medium, attributeName);
+			return new Transformer(uriResolver, preProcessor, xsltProcessor, userStylesheet, medium, attributeName);
 		default:
 			throw new IllegalArgumentException("medium not supported: " + medium);
 		}
@@ -92,8 +92,8 @@ public class SpeechCssCascader implements CssCascader {
 		private final String attributeNamespaceURI;
 
 		private Transformer(URIResolver resolver, CssPreProcessor preProcessor, XsltProcessor xsltProcessor,
-		                    String defaultStyleSheet, Medium medium, QName attributeNamespace) {
-			super(resolver, preProcessor, xsltProcessor, defaultStyleSheet, medium, null,
+		                    String userStyleSheet, Medium medium, QName attributeNamespace) {
+			super(resolver, preProcessor, xsltProcessor, userStyleSheet, medium, null,
 			      parserFactory, ruleFactory, speechCSS, declarationTransformer);
 			this.attributePrefix = attributeNamespace.getPrefix();
 			this.attributeNamespaceURI = attributeNamespace.getNamespaceURI();

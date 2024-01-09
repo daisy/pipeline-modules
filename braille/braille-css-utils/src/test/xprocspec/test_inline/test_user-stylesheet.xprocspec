@@ -16,7 +16,7 @@
           </document>
         </x:document>
       </x:input>
-      <x:option name="default-stylesheet" select="'../../resources/css/css_1.css'"/>
+      <x:option name="user-stylesheet" select="'../../resources/css/css_1.css'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result" select="//body"/>
@@ -43,7 +43,7 @@
           </document>
         </x:document>
       </x:input>
-      <x:option name="default-stylesheet" select="'../../resources/css/css_1.css ../../resources/css/css_2_resets_css_1.css'"/>
+      <x:option name="user-stylesheet" select="'../../resources/css/css_1.css ../../resources/css/css_2_resets_css_1.css'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result" select="//body"/>
@@ -75,7 +75,7 @@
           </document>
         </x:document>
       </x:input>
-      <x:option name="default-stylesheet" select="'../../resources/css/css_1.css'"/>
+      <x:option name="user-stylesheet" select="'../../resources/css/css_1.css'"/>
     </x:call>
     <x:context label="result">
       <x:document type="port" port="result" select="//body"/>
