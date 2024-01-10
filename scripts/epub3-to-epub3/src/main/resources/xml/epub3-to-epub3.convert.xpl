@@ -535,7 +535,7 @@
         </p:output>
         <!--
             Read navigation document and label page break elements with epub:type="pagebreak" if
-            missing (and also add title attribute if missing)
+            missing (and also add aria-label attribute if missing)
         -->
         <px:epub3-label-pagebreaks-from-nav name="label-pagebreaks-from-nav" px:progress="5/10">
             <p:input port="source.in-memory">

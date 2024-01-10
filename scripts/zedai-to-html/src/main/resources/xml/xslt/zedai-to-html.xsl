@@ -700,7 +700,10 @@
     </span>
   </xsl:template>
   <xsl:template match="pagebreak/@value" mode="#all">
-    <xsl:attribute name="title" select="."/>
+    <!-- include aria-label attribute and not title attribute because having both can be a source of
+         double speaking, and aria-label maps consistently to accessible name, whereas title can map
+         to either accessible description or accessible name -->
+    <!-- <xsl:attribute name="title" select="."/> -->
     <xsl:attribute name="aria-label" select="concat(' ',.,'. ')"/> <!-- append period and surround with extra
                                                                         spaces to help AT speaking the page
                                                                         number correctly -->

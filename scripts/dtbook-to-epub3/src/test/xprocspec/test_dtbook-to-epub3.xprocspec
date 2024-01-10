@@ -128,12 +128,12 @@
 							<ol>
 								<li>
 									<a href="minimal-2.xhtml#page_1">
-										<span id="id_5">1</span>
+										<span id="id_5">1.</span>
 									</a>
 								</li>
 								<li>
 									<a href="minimal-2.xhtml#page_2">
-										<span id="id_6">2</span>
+										<span id="id_6">2.</span>
 									</a>
 								</li>
 							</ol>
@@ -304,7 +304,7 @@
 					</head>
 					<body epub:type="bodymatter" id="id_6">
 						<section id="id_1">
-							<span title="1" epub:type="pagebreak" role="doc-pagebreak" aria-label=" 1. " id="page_1"/>
+							<span epub:type="pagebreak" role="doc-pagebreak" aria-label=" 1. " id="page_1"/>
 							<h3 id="id_7">Chapter</h3>
 							<p>Paragraph</p>
 						</section>
