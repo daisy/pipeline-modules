@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step version="1.0" type="css:delete-stylesheets"
-                xmlns:p="http://www.w3.org/ns/xproc"
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-                xmlns:css="http://www.daisy.org/ns/pipeline/braille-css"
                 exclude-inline-prefixes="#all"
+                type="px:css-detach"
                 name="main">
-	
+
 	<p:documentation>
-		Delete CSS/SASS style sheets.
+		Delete linked and embedded CSS/SASS style sheets.
 	</p:documentation>
 	
 	<p:input port="source">
@@ -31,7 +30,7 @@
 	<p:label-elements match="/*" attribute="xml:base" label="base-uri(/*)" replace="false"/>
 	<p:xslt>
 		<p:input port="stylesheet">
-			<p:document href="delete-stylesheets.xsl"/>
+			<p:document href="css-detach.xsl"/>
 		</p:input>
 		<p:input port="parameters">
 			<p:empty/>

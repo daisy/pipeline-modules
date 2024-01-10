@@ -4,4 +4,5 @@
     <p:import href="css-cascade.xpl"/>
     <p:import href="css-speech-cascade.xpl"/>
     <p:import href="css-speech-clean.xpl"/>
+    <p:import href="css-detach.xpl"/>
 </p:library>

@@ -135,9 +135,13 @@
             px:apply-stylesheets
         </p:documentation>
     </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/css-utils/library.xpl">
+        <p:documentation>
+            px:css-detach
+        </p:documentation>
+    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/braille/css-utils/library.xpl">
         <p:documentation>
-            css:delete-stylesheets
             css:extract
         </p:documentation>
     </p:import>
@@ -947,7 +951,7 @@
                             <p:delete match="@style"/>
                         </p:otherwise>
                     </p:choose>
-                    <css:delete-stylesheets/>
+                    <px:css-detach/>
                     <!-- media="braille" would be more appropriate, see https://github.com/braillespecs/braille-css/issues/1 -->
                     <px:apply-stylesheets type="text/css text/x-scss" media="embossed">
                         <p:with-option name="stylesheets" select="($stylesheet,$default-stylesheet)[not(.='')][1]"/>

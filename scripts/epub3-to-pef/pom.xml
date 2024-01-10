@@ -37,8 +37,8 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>org.daisy.pipeline.modules.braille</groupId>
-      <artifactId>braille-css-utils</artifactId>
+      <groupId>org.daisy.pipeline.modules</groupId>
+      <artifactId>css-utils</artifactId>
       <scope>runtime</scope>
     </dependency>
     <dependency>
