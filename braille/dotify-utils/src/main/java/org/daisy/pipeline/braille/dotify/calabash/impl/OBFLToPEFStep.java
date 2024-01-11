@@ -55,9 +55,9 @@ import static org.daisy.pipeline.braille.common.Query.util.query;
 import static org.daisy.pipeline.braille.common.TransformProvider.util.logCreate;
 import org.daisy.pipeline.braille.common.util.Function0;
 import org.daisy.pipeline.braille.common.util.Functions;
-import org.daisy.pipeline.braille.css.CounterStyle;
 import org.daisy.pipeline.braille.dotify.impl.CounterHandlingBrailleTranslator;
 import org.daisy.pipeline.braille.pef.TableRegistry;
+import org.daisy.pipeline.css.CounterStyle;
 
 import org.osgi.framework.FrameworkUtil;
 

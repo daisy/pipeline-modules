@@ -1,4 +1,4 @@
-package org.daisy.pipeline.braille.css;
+package org.daisy.pipeline.css;
 
 import java.util.ArrayList;
 import java.util.function.Supplier;
@@ -17,10 +17,10 @@ import cz.vutbr.web.css.TermIdent;
 import cz.vutbr.web.css.TermInteger;
 import cz.vutbr.web.css.TermString;
 
+// we use some classes from braille-css because they are not available in jStyleParser (but they are
+// not specific to braille CSS)
 import org.daisy.braille.css.InlineStyle;
 import org.daisy.braille.css.RuleCounterStyle;
-
-import org.daisy.pipeline.braille.css.impl.BrailleCssSerializer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,7 +128,7 @@ public class CounterStyle {
 	 * Create a CounterStyle from a <code>@counter-style</code> rule
 	 */
 	// FIXME: the "range" descriptor is not taken into account
-	// FIXME: the "text-transform" descriptor is not taken into account
+	// FIXME: the "text-transform" descriptor (from braille CSS) is not taken into account
 	private CounterStyle(RuleCounterStyle rule, Map<String,CounterStyle> fallbacks) throws IllegalArgumentException {
 		Declaration systemDecl = null;
 		Declaration symbolsDecl = null;
@@ -323,13 +323,13 @@ public class CounterStyle {
 
 	private static TermIdent readSingleIdent(String property, List<Term<?>> terms) throws IllegalArgumentException {
 		if (terms.size() != 1 || !(terms.get(0) instanceof TermIdent))
-			throw new IllegalArgumentException("Invalid " + property + ": " + BrailleCssSerializer.serializeTermList(terms));
+			throw new IllegalArgumentException("Invalid " + property + ": " + CssSerializer.serializeTermList(terms));
 		return (TermIdent)terms.get(0);
 	}
 
 	private static TermString readSingleString(String property, List<Term<?>> terms) throws IllegalArgumentException {
 		if (terms.size() != 1 || !(terms.get(0) instanceof TermString))
-			throw new IllegalArgumentException("Invalid " + property + ": " + BrailleCssSerializer.serializeTermList(terms));
+			throw new IllegalArgumentException("Invalid " + property + ": " + CssSerializer.serializeTermList(terms));
 		return (TermString)terms.get(0);
 	}
 
