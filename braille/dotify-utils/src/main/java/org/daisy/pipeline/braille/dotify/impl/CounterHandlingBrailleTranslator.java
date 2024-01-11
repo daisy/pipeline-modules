@@ -91,7 +91,7 @@ public class CounterHandlingBrailleTranslator extends AbstractBrailleTranslator 
 							Term<?> symbolsFunction = s.getValue("-dotify-counter-style");
 							if (symbolsFunction != null) {
 								try {
-									t = new CounterStyle(symbolsFunction).format(counterValue);
+									t = CounterStyle.fromSymbolsFunction(symbolsFunction).format(counterValue);
 								} catch (IllegalArgumentException e) {
 									// FIXME: show warning
 								}

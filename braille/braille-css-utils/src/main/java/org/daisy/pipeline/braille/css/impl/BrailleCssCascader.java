@@ -99,6 +99,8 @@ public class BrailleCssCascader implements CssCascader {
 	                                  boolean multipleAttrs) {
 		if (multipleAttrs)
 			throw new UnsupportedOperationException("Cascading to multiple attributes per element not supported");
+		if (attributeName == null)
+			throw new UnsupportedOperationException("A style attribute must be specified");
 		switch (medium.getType()) {
 		case EMBOSSED:
 			return new Transformer(uriResolver, preProcessor, xsltProcessor, userStylesheet, medium, attributeName,
@@ -119,7 +121,7 @@ public class BrailleCssCascader implements CssCascader {
 
 	// medium embossed
 	private static final SupportedCSS brailleCSS = new SupportedBrailleCSS(false, true);
-	private static DeclarationTransformer brailleDeclarationTransformer
+	private static final DeclarationTransformer brailleDeclarationTransformer
 		= new BrailleCSSDeclarationTransformer(brailleCSS);
 	private static final RuleFactory brailleRuleFactory = new BrailleCSSRuleFactory();
 	private static final CSSParserFactory brailleParserFactory = new BrailleCSSParserFactory();

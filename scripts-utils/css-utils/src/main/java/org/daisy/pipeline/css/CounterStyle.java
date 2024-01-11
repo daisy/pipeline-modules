@@ -25,6 +25,8 @@ import org.daisy.braille.css.RuleCounterStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.unbescape.css.CssEscape;
+
 public class CounterStyle {
 
 	private enum System {
@@ -80,48 +82,56 @@ public class CounterStyle {
 				"   additive-symbols: 1000 'M', 900 'CM', 500 'D', 400 'CD'," + "\n" +
 				"                     100 'C', 90 'XC', 50 'L', 40 'XL',"     + "\n" +
 				"                     10 'X', 9 'IX', 5 'V', 4 'IV', 1 'I';"  + "\n" +
+				"}"                                                           + "\n" +
+				"@counter-style disc {"                                       + "\n" +
+				"   system: cyclic;"                                          + "\n" +
+				"   symbols: '\\2022';"                                       + "\n" +
+				"   suffix: ' ';"                                             + "\n" +
 				"}"
 			), RuleCounterStyle.class));
 
+	// numeric
 	public final static CounterStyle DECIMAL = predefinedCounterStyles.get("decimal");
+	// alphabetic
 	public final static CounterStyle LOWER_ALPHA = predefinedCounterStyles.get("lower-alpha");
 	public final static CounterStyle UPPER_ALPHA = predefinedCounterStyles.get("upper-alpha");
 	public final static CounterStyle LOWER_ROMAN = predefinedCounterStyles.get("lower-roman");
 	public final static CounterStyle UPPER_ROMAN = predefinedCounterStyles.get("upper-roman");
+	// cyclic
+	public final static CounterStyle DISC = predefinedCounterStyles.get("disc");
 
 	private final System system;
 	private final List<String> symbols;
 	private final List<AdditiveTuple> additiveSymbols;
 	private final String negative;
 	private final Supplier<CounterStyle> fallback;
+	private final String prefix;
+	private final String suffix;
 
 	/**
 	 * Create a CounterStyle from a <code>symbols()</code> function
+	 *
+	 * @param term assumed to be a "symbols" function
 	 */
-	public CounterStyle(Term<?> term) throws IllegalArgumentException {
-		if (term instanceof TermFunction) {
-			TermFunction function = (TermFunction)term;
-			if (function.getFunctionName().equals("symbols")) {
-				System system;
-				List<Term<?>> symbols;
-				if (function.size() > 0 && function.get(0) instanceof TermIdent) {
-					system = readSystem((TermIdent)function.get(0));
-					if (system == System.ADDITIVE)
-						throw new IllegalArgumentException("system 'additive' not supported in symbols() function");
-					symbols = function.subList(1, function.size());
-				} else {
-					system = System.SYMBOLIC;
-					symbols = function;
-				}
-				this.symbols = readSymbols(symbols);
-				this.additiveSymbols = null;
-				this.system = system;
-				this.negative = "-";
-				this.fallback = () -> DECIMAL;
-				return;
-			}
+	private CounterStyle(TermFunction term) throws IllegalArgumentException {
+		System system;
+		List<Term<?>> symbols;
+		if (term.size() > 0 && term.get(0) instanceof TermIdent) {
+			system = readSystem((TermIdent)term.get(0));
+			if (system == System.ADDITIVE)
+				throw new IllegalArgumentException("system 'additive' not supported in symbols() function");
+			symbols = term.subList(1, term.size());
+		} else {
+			system = System.SYMBOLIC;
+			symbols = term;
 		}
-		throw new IllegalArgumentException("argument must be a symbols() function");
+		this.symbols = readSymbols(symbols);
+		this.additiveSymbols = null;
+		this.system = system;
+		this.negative = "-";
+		this.fallback = () -> DECIMAL;
+		this.prefix = "";
+		this.suffix = " ";
 	}
 
 	/**
@@ -135,6 +145,8 @@ public class CounterStyle {
 		Declaration additiveSymbolsDecl = null;
 		Declaration negativeDecl = null;
 		Declaration fallbackDecl = null;
+		Declaration prefixDecl = null;
+		Declaration suffixDecl = null;
 		for (Declaration d : rule) {
 			String prop = d.getProperty();
 			if ("system".equals(prop)) {
@@ -147,6 +159,10 @@ public class CounterStyle {
 				if (negativeDecl == null) negativeDecl = d;
 			} else if ("fallback".equals(prop)) {
 				if (fallbackDecl == null) fallbackDecl = d;
+			} else if ("prefix".equals(prop)) {
+				if (prefixDecl == null) prefixDecl = d;
+			} else if ("suffix".equals(prop)) {
+				if (suffixDecl == null) suffixDecl = d;
 			}
 		}
 		System system; {
@@ -200,6 +216,28 @@ public class CounterStyle {
 				ident = "decimal";
 			fallback = ident;
 		}
+		String prefix; {
+			prefix = null;
+			if (prefixDecl != null)
+				try {
+					prefix = readSingleString("prefix", prefixDecl).getValue();
+				} catch (IllegalArgumentException e) {
+					logger.warn(e.getMessage());
+				}
+			if (prefix == null)
+				prefix = "";
+		}
+		String suffix; {
+			suffix = null;
+			if (suffixDecl != null)
+				try {
+					suffix = readSingleString("suffix", suffixDecl).getValue();
+				} catch (IllegalArgumentException e) {
+					logger.warn(e.getMessage());
+				}
+			if (suffix == null)
+				suffix = ". "; // note that for braille CSS this should be the empty string
+		}
 		this.system = system;
 		this.symbols = symbols;
 		this.additiveSymbols = additiveSymbols;
@@ -214,6 +252,29 @@ public class CounterStyle {
 					return DECIMAL;
 			}
 		);
+		this.prefix = prefix;
+		this.suffix = suffix;
+	}
+
+	private static final Map<String,CounterStyle> fromSymbolsCache = new HashMap<>();
+
+	/**
+	 * Create a CounterStyle from a <code>symbols()</code> function
+	 */
+	public static CounterStyle fromSymbolsFunction(Term<?> term) throws IllegalArgumentException {
+		if (term instanceof TermFunction) {
+			TermFunction function = (TermFunction)term;
+			if (function.getFunctionName().equals("symbols")) {
+				String k = function.toString();
+				CounterStyle s = fromSymbolsCache.get(k);
+				if (s == null) {
+					s = new CounterStyle(function);
+					fromSymbolsCache.put(k, s);
+				}
+				return s;
+			}
+		}
+		throw new IllegalArgumentException("argument must be a symbols() function");
 	}
 
 	/**
@@ -264,6 +325,15 @@ public class CounterStyle {
 		return fallback.get().format(counterValue);
 	}
 
+	public String format(int counterValue, boolean withPrefixAndSuffix) {
+		// prefix and suffix always come from the specified counter-style, even if the actual
+		// representation is constructed by a fallback style
+		if (withPrefixAndSuffix)
+			return prefix + format(counterValue) + suffix;
+		else
+			return format(counterValue);
+	}
+
 	/* ============ private ========================================================= */
 
 	private static System readSystem(List<Term<?>> terms) throws IllegalArgumentException {
@@ -284,6 +354,8 @@ public class CounterStyle {
 		for (Term<?> t : terms) {
 			if (t instanceof TermString)
 				symbols.add(((TermString)t).getValue());
+			else if (t instanceof TermIdent)
+				symbols.add(CssEscape.unescapeCss(((TermIdent)t).getValue()));
 			else
 				throw new IllegalArgumentException("Invalid symbol: " + t);
 		}
