@@ -258,15 +258,14 @@ public class BrailleCssCascader implements CssCascader {
 		List<String> keys = new ArrayList<String>(nodeData.getPropertyNames());
 		keys.remove("page");
 		Collections.sort(keys);
-		for(String key : keys) {
-			builder.append(key).append(": ");
-			Term<?> value = nodeData.getValue(key, true);
+		for (String key : keys) {
+			Term<?> value = nodeData.getValue(key, false);
 			if (value != null)
-				builder.append(BrailleCssSerializer.toString(value));
+				builder.append(key).append(": ").append(BrailleCssSerializer.toString(value)).append("; ");
 			else {
-				CSSProperty prop = nodeData.getProperty(key);
-				builder.append(prop); }
-			builder.append("; "); }
+				CSSProperty prop = nodeData.getProperty(key, false);
+				if (prop != null) // can be null for unspecified inherited properties
+					builder.append(key).append(": ").append(prop).append("; "); }}
 	}
 
 	private static void pseudoElementToString(StringBuilder builder, PseudoElement elem) {

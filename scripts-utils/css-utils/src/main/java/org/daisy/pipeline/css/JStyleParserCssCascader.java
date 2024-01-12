@@ -444,7 +444,7 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 					styleSheet = CSSFactory.getUsedStyles(document, nodeLocator, medium, cssReader, styleSheet);
 				}
 			}
-			styleMap = new Analyzer(styleSheet, declarationTransformer, supportedCSS).evaluateDOM(document, medium, false);
+			styleMap = new Analyzer(styleSheet, declarationTransformer, supportedCSS).evaluateDOM(document, medium, true);
 			writer.setBaseURI(baseURI);
 			traverse(document, styleMap, writer);
 		} catch (TransformerException e) {
