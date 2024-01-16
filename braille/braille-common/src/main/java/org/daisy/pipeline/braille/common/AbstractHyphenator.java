@@ -98,8 +98,8 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 
 			/**
 			 * @param keepStyle Whether to preserve {@code hyphens} properties in the output of
-			 *                  {@link #transform(Iterable<CSSStyledText>)}. This is useful when the
-			 *                  output of a hyphenator needs to be fed into a second hyphenator.
+			 *                  {@link #transform(Iterable)}. This is useful when the output of a
+			 *                  hyphenator needs to be fed into a second hyphenator.
 			 */
 			protected DefaultFullHyphenator(boolean keepStyle) {
 				this.keepStyle = keepStyle;
@@ -107,13 +107,13 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 
 			/**
 			 * Whether the length of the array returned by {@link
-			 * #getHyphenationOpportunities(String)} is based on the number of code points in the
-			 * input or the number of characters.
+			 * #getHyphenationOpportunities(String, Locale)} is based on the number of code points
+			 * in the input or the number of characters.
 			 */
 			protected abstract boolean isCodePointAware();
 
 			/**
-			 * Whether {@link #getHyphenationOpportunities()} takes into account the
+			 * Whether {@link #getHyphenationOpportunities(String, Locale)} takes into account the
 			 * <code>language</code> argument.
 			 */
 			protected abstract boolean isLanguageAdaptive();
@@ -139,8 +139,8 @@ public abstract class AbstractHyphenator extends AbstractTransform implements Hy
 			}
 
 			/**
-			 * Optimized version of {@link #transform(Iterable<CSSStyledText>)} for cases where the
-			 * input has a single segment.
+			 * Optimized version of {@link #transform(Iterable)} for cases where the input has a
+			 * single segment.
 			 */
 			public String transform(String text, SimpleInlineStyle style, Locale language)
 					throws NonStandardHyphenationException {
