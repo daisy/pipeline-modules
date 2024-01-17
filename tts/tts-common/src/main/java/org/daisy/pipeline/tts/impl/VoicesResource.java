@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.IllformedLocaleException;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.xml.transform.sax.SAXSource;
 
@@ -15,6 +17,7 @@ import net.sf.saxon.s9api.XdmNode;
 
 import org.daisy.common.properties.Properties;
 import org.daisy.pipeline.tts.config.ConfigReader;
+import org.daisy.pipeline.tts.config.DynamicPropertiesExtension;
 import org.daisy.pipeline.tts.config.VoiceConfigExtension;
 import org.daisy.pipeline.tts.TTSLog;
 import org.daisy.pipeline.tts.TTSRegistry;
@@ -90,6 +93,7 @@ public class VoicesResource extends AuthenticatedResource {
 		}
 		VoiceManager voiceManager; {
 			VoiceConfigExtension voiceConfigExt = new VoiceConfigExtension();
+			DynamicPropertiesExtension propsExt = new DynamicPropertiesExtension();
 			XdmNode configXML = null; {
 				if (ttsConfig != null) {
 					try {
@@ -102,13 +106,19 @@ public class VoicesResource extends AuthenticatedResource {
 					}
 				}
 			}
-			ConfigReader cr = new ConfigReader(saxonProcessor, configXML, voiceConfigExt);
+			new ConfigReader(saxonProcessor, configXML, voiceConfigExt, propsExt);
 			if (configXML != null) {
 				logger.debug("Voice configuration XML:\n" + configXML);
 				logger.debug("Parsed voice configuration:\n" + voiceConfigExt.getVoiceDeclarations());
 			}
+			Map<String,String> properties = Properties.getSnapshot();
+			Map<String,String> dynProperties = propsExt.getDynamicProperties();
+			if (dynProperties != null && !dynProperties.isEmpty()) {
+				properties = new HashMap<>(properties);
+				properties.putAll(dynProperties);
+			}
 			voiceManager = new VoiceManager(
-				ttsRegistry.getWorkingEngines(Properties.getSnapshot(), new TTSLog(logger), logger),
+				ttsRegistry.getWorkingEngines(properties, new TTSLog(logger), logger),
 				voiceConfigExt.getVoiceDeclarations());
 		}
 		Iterable<Voice> availableVoices; {
