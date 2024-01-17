@@ -48,7 +48,7 @@
 		</x:context>
 		<x:expect label="the success rate should be 75%" type="compare">
 			<x:document type="inline">
-				<d:status result="error" success-rate="75%"/>
+				<d:status result="error" tts-success-rate="75%"/>
 			</x:document>
 		</x:expect>
 		<x:context label="the result port">

@@ -3,6 +3,7 @@
                 xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                xmlns:c="http://www.w3.org/ns/xproc-step"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:html="http://www.w3.org/1999/xhtml"
                 type="px:html-to-epub3" name="main"
@@ -42,7 +43,9 @@
             <p>CSS user style sheets as space separated list of absolute URIs.</p>
         </p:documentation>
     </p:option>
-    <p:output port="fileset.out" primary="true"/>
+    <p:output port="fileset.out" primary="true">
+        <p:pipe step="ocf" port="fileset"/>
+    </p:output>
     <p:output port="in-memory.out" sequence="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>The EPUB 3 publication (not zipped)</p>
@@ -50,7 +53,14 @@
         <p:pipe step="ocf" port="in-memory"/>
     </p:output>
     <p:output port="status" px:media-type="application/vnd.pipeline.status+xml">
-        <p:pipe step="tts" port="status"/>
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Status of the TTS step and EPUB validation.</p>
+            <p>A <code>result</code> attribute indicates whether both the TTS step and the EPUB
+            validation were successful ("ok"), or whether at least one of them failed ("error").</p>
+            <p>A <code>tts-success-rate</code> attribute contains the percentage of the input text
+            that got successfully converted to speech.</p>
+        </p:documentation>
+        <p:pipe step="status" port="result"/>
     </p:output>
     <p:output port="temp-audio-files">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -77,7 +87,13 @@
     <p:option name="temp-dir" select="''">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>Empty directory dedicated to this conversion. May be left empty in which
-            case a temporary directory will be automaticall created.</p>
+            case temporary directories will be automatically created where needed.</p>
+        </p:documentation>
+    </p:option>
+    <p:option name="output-validation" cx:type="off|report|abort" select="'off'">
+        <p:documentation>
+            Determines whether to validate the EPUB output and what to do on validation
+            errors. Defaults to 'off'.
         </p:documentation>
     </p:option>
     <p:option name="skip-cleanup" required="false" select="'false'">
@@ -115,6 +131,12 @@
             px:epub3-create-mediaoverlays
             px:epub3-create-package-doc
             px:epub3-ocf-finalize
+            px:epub-validate
+        </p:documentation>
+    </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
+        <p:documentation>
+            px:set-base-uri
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
@@ -125,6 +147,7 @@
             px:fileset-purge
             px:fileset-update
             px:fileset-filter-in-memory
+            px:fileset-add-entry
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xpl">
@@ -345,7 +368,7 @@
       <p:with-option name="audio" select="$audio"/>
       <p:with-option name="audio-file-type" select="$audio-file-type"/>
       <p:with-option name="process-css" select="$process-css"/>
-      <p:with-option name="temp-dir" select="$temp-dir"/>
+      <p:with-option name="temp-dir" select="if ($temp-dir='') then '' else concat($temp-dir,'tts/')"/>
     </px:tts-for-epub3>
 
     <!--=========================================================================-->
@@ -451,11 +474,12 @@
     <!--TODO clean file set for non-existing files ?-->
 
     <p:group name="ocf">
-        <p:output port="fileset" primary="true">
-            <p:pipe step="ocf-finalize" port="result"/>
-        </p:output>
+        <p:output port="fileset" primary="true"/>
         <p:output port="in-memory" sequence="true">
-            <p:pipe step="filter-in-memory" port="result.in-memory"/>
+            <p:pipe step="maybe-validate" port="in-memory"/>
+        </p:output>
+        <p:output port="validation-status">
+            <p:pipe step="maybe-validate" port="validation-status"/>
         </p:output>
         <px:epub3-ocf-finalize name="ocf-finalize"/>
         <p:documentation>
@@ -468,6 +492,93 @@
             </p:input>
         </px:fileset-filter-in-memory>
         <p:sink/>
+        <p:identity>
+            <p:input port="source">
+                <p:pipe step="ocf-finalize" port="result"/>
+            </p:input>
+        </p:identity>
+        <p:documentation>
+            Validation EPUB
+        </p:documentation>
+        <p:choose name="maybe-validate">
+            <p:when test="$output-validation='off'">
+                <p:output port="fileset" primary="true"/>
+                <p:output port="in-memory" sequence="true">
+                    <p:pipe step="filter-in-memory" port="result.in-memory"/>
+                </p:output>
+                <p:output port="validation-status">
+                    <p:inline><d:status result="ok"/></p:inline>
+                </p:output>
+                <p:identity/>
+            </p:when>
+            <p:otherwise px:message="Validating EPUB">
+                <p:output port="fileset" primary="true">
+                    <p:pipe step="store" port="fileset.out"/>
+                </p:output>
+                <p:output port="in-memory" sequence="true">
+                    <p:empty/>
+                </p:output>
+                <p:output port="validation-status">
+                    <p:pipe step="validate" port="validation-status"/>
+                </p:output>
+                <p:identity name="fileset"/>
+                <p:sink/>
+                <!-- add mimetype for px:epub-validate -->
+                <px:set-base-uri name="mimetype">
+                    <p:input port="source">
+                        <p:inline><c:data content-type="text/plain">application/epub+zip</c:data></p:inline>
+                    </p:input>
+                    <p:with-option name="base-uri" select="resolve-uri('../mimetype',$content-dir)"/>
+                </px:set-base-uri>
+                <p:sink/>
+                <px:fileset-add-entry first="true" media-type="text/plain" name="add-mimetype">
+                    <p:input port="source.fileset">
+                        <p:pipe step="fileset" port="result"/>
+                    </p:input>
+                    <p:input port="source.in-memory">
+                        <p:pipe step="filter-in-memory" port="result.in-memory"/>
+                    </p:input>
+                    <p:input port="entry">
+                        <p:pipe step="mimetype" port="result"/>
+                    </p:input>
+                    <p:with-param port="file-attributes" name="compression-method" select="'stored'"/>
+                </px:fileset-add-entry>
+                <!-- store expanded EPUB for px:epub-validate -->
+                <px:fileset-store name="store" px:message="Storing EPUB">
+                    <p:input port="in-memory.in">
+                        <p:pipe step="add-mimetype" port="result.in-memory"/>
+                    </p:input>
+                </px:fileset-store>
+                <px:epub-validate name="validate" version="3" cx:depends-on="store">
+                    <p:with-option name="epub" select="concat($content-dir,'package.opf')"/>
+                    <p:with-option name="temp-dir" select="if ($temp-dir='') then '' else concat($temp-dir,'validate-epub/')"/>
+                    <p:with-option name="report-method" select="if ($output-validation='report') then 'log' else 'error'"/>
+                </px:epub-validate>
+            </p:otherwise>
+        </p:choose>
     </p:group>
+    <p:sink/>
+
+    <p:group name="status">
+        <p:output port="result"/>
+        <p:identity>
+            <p:input port="source">
+                <p:pipe step="tts" port="status"/>
+            </p:input>
+        </p:identity>
+        <p:choose>
+            <p:when test="/*/@result='error'">
+                <p:identity/>
+            </p:when>
+            <p:otherwise>
+                <p:add-attribute match="/*" attribute-name="result">
+                    <p:with-option name="attribute-value" select="/*/@result">
+                        <p:pipe step="ocf" port="validation-status"/>
+                    </p:with-option>
+                </p:add-attribute>
+            </p:otherwise>
+        </p:choose>
+    </p:group>
+    <p:sink/>
 
 </p:declare-step>

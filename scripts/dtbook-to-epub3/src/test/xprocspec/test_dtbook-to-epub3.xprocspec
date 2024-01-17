@@ -63,7 +63,7 @@
 				</x:document>
 			</x:input>
 			<x:option name="language" select="''"/>
-			<x:option name="validation" select="'abort'"/>
+			<x:option name="validation" select="'off'"/>
 			<x:option name="dtbook-is-valid" select="true()"/>
 			<x:option name="audio" select="true()"/>
 			<x:option name="audio-file-type" select="'audio/x-wav'"/>
@@ -81,9 +81,9 @@
 					<d:file href="epub3/out/epub/EPUB/minimal-1.xhtml" media-type="application/xhtml+xml"/>
 					<d:file href="epub3/out/epub/EPUB/minimal-2.xhtml" media-type="application/xhtml+xml"/>
 					<d:file href="epub3/out/epub/EPUB/toc.xhtml" media-type="application/xhtml+xml"/>
-					<d:file href="epub3/out/epub/EPUB/audio/part0000_00_000.wav" original-href="epub3/temp/audio/part0000_00_000.wav" media-type="audio/x-wav"/>
-					<d:file href="epub3/out/epub/EPUB/audio/part0001_00_000.wav" original-href="epub3/temp/audio/part0001_00_000.wav" media-type="audio/x-wav"/>
-					<d:file href="epub3/out/epub/EPUB/audio/part0002_00_000.wav" original-href="epub3/temp/audio/part0002_00_000.wav" media-type="audio/x-wav"/>
+					<d:file href="epub3/out/epub/EPUB/audio/part0000_00_000.wav" original-href="epub3/temp/tts/audio/part0000_00_000.wav" media-type="audio/x-wav"/>
+					<d:file href="epub3/out/epub/EPUB/audio/part0001_00_000.wav" original-href="epub3/temp/tts/audio/part0001_00_000.wav" media-type="audio/x-wav"/>
+					<d:file href="epub3/out/epub/EPUB/audio/part0002_00_000.wav" original-href="epub3/temp/tts/audio/part0002_00_000.wav" media-type="audio/x-wav"/>
 					<d:file href="epub3/out/epub/EPUB/mo/toc.smil" media-type="application/smil+xml" indent="true"/>
 					<d:file href="epub3/out/epub/EPUB/mo/minimal-1.smil" media-type="application/smil+xml" indent="true"/>
 					<d:file href="epub3/out/epub/EPUB/mo/minimal-2.smil" media-type="application/smil+xml" indent="true"/>

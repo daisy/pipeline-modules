@@ -28,7 +28,7 @@
         href="http://daisy.github.io/pipeline/StatusXML">application/vnd.pipeline.status+xml</a>"
         format: a <code>d:status</code> element with a <code>result</code> attribute that
         has the value "ok" if there were no errors, or "error" when there was at least one
-        error. A <code>success-rate</code> attribute contains the percentage of the SSML
+        error. A <code>tts-success-rate</code> attribute contains the percentage of the SSML
         input that got successfully converted to speech.
       </p>
     </p:documentation>
