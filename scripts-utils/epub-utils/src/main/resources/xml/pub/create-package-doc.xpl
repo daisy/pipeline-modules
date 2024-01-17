@@ -125,7 +125,7 @@
             </ul>
         </p:documentation>
     </p:option>
-    <p:option name="reserved-prefixes" required="false" select="'dc: http://purl.org/dc/elements/1.1/'">
+    <p:option name="reserved-prefixes" required="false" select="''">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <p>
                 The <a

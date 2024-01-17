@@ -171,7 +171,11 @@
             px:tts-for-epub3
         </p:documentation>
     </p:import>
-    <p:import href="html-to-opf-metadata.xpl"/>
+    <p:import href="html-to-opf-metadata.xpl">
+        <p:documentation>
+            px:html-to-opf-metadata
+        </p:documentation>
+    </p:import>
     <cx:import href="http://www.daisy.org/pipeline/modules/file-utils/uri-functions.xsl" type="application/xslt+xml">
         <p:documentation>
             pf:longest-common-uri

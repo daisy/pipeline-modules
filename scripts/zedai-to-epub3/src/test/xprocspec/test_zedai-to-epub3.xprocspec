@@ -61,7 +61,9 @@
 		          step="x:epub3-compare-package-doc">
 			<x:document type="inline">
 				<package xmlns="http://www.idpf.org/2007/opf"
-				         prefix="dcterms: http://purl.org/dc/terms/" unique-identifier="pub-id2" version="3.0">
+				         prefix="dcterms: http://purl.org/dc/terms/ dc: http://purl.org/dc/elements/1.1/"
+				         unique-identifier="pub-id2"
+				         version="3.0">
 					<metadata>
 						<dc:title id="id_12">Alice's Adventures In Wonderland</dc:title>
 						<dc:identifier id="pub-id2">com.googlecode.zednext.alice</dc:identifier>
