@@ -358,7 +358,7 @@ If left blank, the braille will be stored in PEF format.</p>
 	<p:option name="preview-table" required="false" px:type="transform-query" select="''">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">ASCII braille table for HTML preview</h2>
-			<p px:role="desc" xml:space="preserve">The ASCII braille table used to render the HTML preview.
+			<p px:role="desc" xml:space="preserve">The ASCII braille table used to render the HTML and PDF previews.
 
 If left blank, the locale information in the input document will be used to select a suitable table.</p>
 		</p:documentation>
@@ -374,6 +374,28 @@ If left blank, the locale information in the input document will be used to sele
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Preview</h2>
 			<p px:role="desc">An HTML preview of the braille result.</p>
+		</p:documentation>
+	</p:option>
+
+	<!--
+	    html-to-pef
+	-->
+	<p:option name="include-pdf" required="false" px:type="boolean" select="'false'">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<h2 px:role="name">Include PDF</h2>
+			<p px:role="desc" xml:space="preserve">Whether or not to include a PDF version of the braille result showing ASCII braille.
+
+The `wkhtmltopdf` tool must be installed on the system for the PDF export to work.</p>
+		</p:documentation>
+	</p:option>
+
+	<!--
+	    html-to-pef
+	-->
+	<p:option name="pdf" required="false" px:output="result" px:type="anyDirURI" px:media-type="text/html" select="''">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<h2 px:role="name">PDF</h2>
+			<p px:role="desc">A PDF version of the braille showing ASCII braille.</p>
 		</p:documentation>
 	</p:option>
 

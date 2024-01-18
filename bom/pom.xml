@@ -18,6 +18,11 @@
   <name>DAISY Pipeline 2 :: Modules BoM</name>
   <description>Bill-of-Materials POM for all modules</description>
 
+  <properties>
+    <openhtmltopdf.version>1.0.10</openhtmltopdf.version>
+    <pdfbox.version>2.0.24</pdfbox.version>
+  </properties>
+
   <dependencyManagement>
     <dependencies>
       <!--
@@ -103,7 +108,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>pef-utils</artifactId>
-        <version>5.0.5</version>
+        <version>5.1.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
@@ -329,7 +334,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>dtbook-to-pef</artifactId>
-        <version>9.1.2</version>
+        <version>9.2.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
@@ -374,7 +379,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>epub3-to-pef</artifactId>
-        <version>6.0.3</version>
+        <version>6.1.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
@@ -394,7 +399,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>html-to-pef</artifactId>
-        <version>6.1.2</version>
+        <version>6.2.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
@@ -414,7 +419,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>zedai-to-pef</artifactId>
-        <version>6.0.5</version>
+        <version>6.1.0-SNAPSHOT</version>
       </dependency>
       
       <!--
@@ -633,6 +638,44 @@
         <groupId>com.googlecode.texhyphj</groupId>
         <artifactId>texhyphj</artifactId>
         <version>1.2</version>
+      </dependency>
+      <!--
+          for pef-utils
+      -->
+      <dependency>
+        <groupId>com.openhtmltopdf</groupId>
+        <artifactId>openhtmltopdf-pdfbox</artifactId>
+        <version>${openhtmltopdf.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.openhtmltopdf</groupId>
+        <artifactId>openhtmltopdf-core</artifactId>
+        <version>${openhtmltopdf.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.openhtmltopdf</groupId>
+        <artifactId>openhtmltopdf-slf4j</artifactId>
+        <version>${openhtmltopdf.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>de.rototor.pdfbox</groupId>
+        <artifactId>graphics2d</artifactId>
+        <version>0.32</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.pdfbox</groupId>
+        <artifactId>pdfbox</artifactId>
+        <version>${pdfbox.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.pdfbox</groupId>
+        <artifactId>xmpbox</artifactId>
+        <version>${pdfbox.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.pdfbox</groupId>
+        <artifactId>fontbox</artifactId>
+        <version>${pdfbox.version}</version>
       </dependency>
       <!--
           for tts-adapter-google
