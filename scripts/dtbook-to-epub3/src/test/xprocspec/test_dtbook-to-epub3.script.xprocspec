@@ -45,6 +45,7 @@
                     <c:file name="EPUB/minimal-2.xhtml"/>
                     <c:file name="EPUB/package.opf"/>
                     <c:file name="EPUB/toc.xhtml"/>
+                    <c:file name="EPUB/zedai-mods.xml"/>
                     <c:file name="META-INF/container.xml"/>
                     <c:file name="mimetype"/>
                 </c:zipfile>
@@ -304,6 +305,7 @@
                     <c:file name="EPUB/mo/toc.smil"/>
                     <c:file name="EPUB/package.opf"/>
                     <c:file name="EPUB/toc.xhtml"/>
+                    <c:file name="EPUB/zedai-mods.xml"/>
                     <c:file name="META-INF/container.xml"/>
                     <c:file name="mimetype"/>
                 </c:zipfile>

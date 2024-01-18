@@ -132,13 +132,6 @@
 		<p:with-option name="nimas" select="$nimas"/>
 	</px:dtbook-to-zedai>
 
-	<!--TODO better handle core media type filtering-->
-	<!--TODO copy/translate CSS ?-->
-	<p:delete match="d:file[not(@media-type=('application/z3998-auth+xml',
-	                                         'image/gif','image/jpeg','image/png',
-	                                         'image/svg+xml','application/pls+xml',
-	                                         'audio/mpeg','audio/mp4','text/javascript'))]"/>
-
 	<px:zedai-to-epub3 name="zedai-to-epub3" process-css="false" px:message="Converting ZedAI to EPUB 3" px:progress="5/10">
 		<p:input port="in-memory.in">
 			<p:pipe step="dtbook-to-zedai" port="result.in-memory"/>
