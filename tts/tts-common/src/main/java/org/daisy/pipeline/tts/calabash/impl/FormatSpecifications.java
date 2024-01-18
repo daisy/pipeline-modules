@@ -44,5 +44,5 @@ public interface FormatSpecifications {
 
 	public static final QName StatusRootTag = new QName(StatusNS, "status");
 	public static final QName Status_attr_result = new QName("", "result");
-	public static final QName Status_attr_success_rate = new QName("", "success-rate");
+	public static final QName Status_attr_success_rate = new QName("", "tts-success-rate");
 }

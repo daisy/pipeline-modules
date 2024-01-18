@@ -28,6 +28,7 @@
 			<x:document type="inline">
 				<d:fileset>
 					<d:file href="result/minimal.xhtml" media-type="application/xhtml+xml"/>
+					<d:file href="result/zedai-mods.xml" media-type="application/mods+xml"/>
 				</d:fileset>
 			</x:document>
 		</x:expect>
@@ -36,7 +37,7 @@
 		</x:context>
 		<x:expect label="the output HTML" type="compare">
 			<x:document type="inline">
-				<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+				<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 					<head>
 						<meta charset="UTF-8"/>
 						<title>Minimal DTBook</title>

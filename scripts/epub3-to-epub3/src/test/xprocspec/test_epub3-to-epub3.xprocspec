@@ -244,11 +244,11 @@
 			<x:expect label="package.opf" type="custom"
 			          href="http://www.daisy.org/pipeline/modules/epub-utils/library.xpl" step="x:epub3-compare-package-doc">
 				<x:document type="inline">
-					<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="pub-id2" xml:lang="en">
+					<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="pub-id3" xml:lang="en">
 						<metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
-							<dc:title id="title2">minimal</dc:title>
-							<dc:identifier id="pub-id2">id</dc:identifier>
-							<meta refines="#pub-id2" property="identifier-type" scheme="xsd:string">uuid</meta>
+							<dc:title id="title3">minimal</dc:title>
+							<dc:identifier id="pub-id3">id</dc:identifier>
+							<meta refines="#pub-id3" property="identifier-type" scheme="xsd:string">uuid</meta>
 							<dc:language>en</dc:language>
 							<meta property="dcterms:modified">2020-03-06T11:11:52Z</meta>
 							<meta name="dcterms:modified" content="2020-03-06T11:11:52Z"/>
@@ -257,6 +257,10 @@
 							<meta name="media:duration" content="0:00:22.014"/>
 							<meta property="schema:accessibilityFeature">captions</meta>
 							<meta name="schema:accessibilityFeature" content="captions"/>
+							<meta property="schema:accessibilityFeature">synchronizedAudioText</meta>
+							<meta name="schema:accessibilityFeature" content="synchronizedAudioText"/>
+							<meta property="schema:accessMode">auditory</meta>
+							<meta name="schema:accessMode" content="auditory"/>
 							<meta property="media:duration" refines="#item_1">0:00:01.223</meta>
 							<meta property="media:duration" refines="#item_2">0:00:08.561</meta>
 							<meta property="media:duration" refines="#item_3">0:00:12.230</meta>

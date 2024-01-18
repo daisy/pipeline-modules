@@ -33,7 +33,8 @@
     <xsl:param name="nodes" as="node()*"/>
     <!--TODO config: externalize the profile definition-->
     <xsl:variable name="lang" select="$nodes/ancestor::*/@xml:lang[1]"/>
-    <html xml:lang="{if ($lang) then $lang else 'en'}">
+    <xsl:variable name="lang" select="($lang,'en')[1]"/>
+    <html xml:lang="{$lang}" lang="{$lang}">
       <xsl:apply-templates select="$nodes/ancestor::*/@its:dir[1]"/>
       <head>
         <meta charset="UTF-8"/>

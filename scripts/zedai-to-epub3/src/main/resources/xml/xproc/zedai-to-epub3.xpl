@@ -23,10 +23,12 @@
         </p:documentation>
     </p:input>
 
-    <p:output port="validation-status" px:media-type="application/vnd.pipeline.status+xml">
+    <p:output port="status" px:media-type="application/vnd.pipeline.status+xml">
       <!-- when text-to-speech is enabled, the conversion may output a (incomplete) EPUB 3
            publication even if the text-to-speech process has errors -->
-      <p:pipe step="load-convert-store" port="validation-status"/>
+      <!-- a `tts-success-rate' attribute contains the percentage of the input text that got
+           successfully converted to speech -->
+      <p:pipe step="load-convert-store" port="status"/>
     </p:output>
 
     <p:option name="include-tts-log" select="'false'">
@@ -89,8 +91,8 @@
     <p:sink/>
 
     <p:group name="load-convert-store">
-        <p:output port="validation-status">
-          <p:pipe step="convert" port="validation-status"/>
+        <p:output port="status">
+          <p:pipe step="convert" port="status"/>
         </p:output>
         <p:output port="tts-log">
           <p:pipe step="convert" port="tts-log"/>

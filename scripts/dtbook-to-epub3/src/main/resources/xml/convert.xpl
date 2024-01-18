@@ -14,7 +14,7 @@
 		<p:pipe step="zedai-to-epub3" port="in-memory.out"/>
 	</p:output>
 	<p:output port="validation-status" px:media-type="application/vnd.pipeline.status+xml">
-		<p:pipe step="zedai-to-epub3" port="validation-status"/>
+		<p:pipe step="zedai-to-epub3" port="status"/>
 	</p:output>
 	<p:output port="tts-log" sequence="true">
 		<p:pipe step="zedai-to-epub3" port="tts-log"/>
@@ -33,6 +33,12 @@
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>Whether to stop processing and raise an error on validation issues (abort), only
 			report them (report), or to ignore any validation issues (off).</p>
+		</p:documentation>
+	</p:option>
+	<p:option name="output-validation" cx:type="off|report|abort" select="$validation">
+		<p:documentation>
+			Determines whether to validate the EPUB output and what to do on validation errors. When
+			not specified, follows the <code>validation</code> option.
 		</p:documentation>
 	</p:option>
 	<p:option name="dtbook-is-valid" cx:as="xs:boolean" select="true()">
@@ -126,13 +132,6 @@
 		<p:with-option name="nimas" select="$nimas"/>
 	</px:dtbook-to-zedai>
 
-	<!--TODO better handle core media type filtering-->
-	<!--TODO copy/translate CSS ?-->
-	<p:delete match="d:file[not(@media-type=('application/z3998-auth+xml',
-	                                         'image/gif','image/jpeg','image/png',
-	                                         'image/svg+xml','application/pls+xml',
-	                                         'audio/mpeg','audio/mp4','text/javascript'))]"/>
-
 	<px:zedai-to-epub3 name="zedai-to-epub3" process-css="false" px:message="Converting ZedAI to EPUB 3" px:progress="5/10">
 		<p:input port="in-memory.in">
 			<p:pipe step="dtbook-to-zedai" port="result.in-memory"/>
@@ -145,6 +144,7 @@
 		<p:with-option name="audio" select="$audio"/>
 		<p:with-option name="audio-file-type" select="$audio-file-type"/>
 		<p:with-option name="chunk-size" select="$chunk-size"/>
+		<p:with-option name="output-validation" select="$output-validation"/>
 	</px:zedai-to-epub3>
 	
 </p:declare-step>

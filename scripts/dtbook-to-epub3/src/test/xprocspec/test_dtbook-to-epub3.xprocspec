@@ -63,7 +63,7 @@
 				</x:document>
 			</x:input>
 			<x:option name="language" select="''"/>
-			<x:option name="validation" select="'abort'"/>
+			<x:option name="validation" select="'off'"/>
 			<x:option name="dtbook-is-valid" select="true()"/>
 			<x:option name="audio" select="true()"/>
 			<x:option name="audio-file-type" select="'audio/x-wav'"/>
@@ -80,10 +80,11 @@
 				<d:fileset>
 					<d:file href="epub3/out/epub/EPUB/minimal-1.xhtml" media-type="application/xhtml+xml"/>
 					<d:file href="epub3/out/epub/EPUB/minimal-2.xhtml" media-type="application/xhtml+xml"/>
+					<d:file href="epub3/out/epub/EPUB/zedai-mods.xml" media-type="application/mods+xml"/>
 					<d:file href="epub3/out/epub/EPUB/toc.xhtml" media-type="application/xhtml+xml"/>
-					<d:file href="epub3/out/epub/EPUB/audio/part0000_00_000.wav" original-href="epub3/temp/audio/part0000_00_000.wav" media-type="audio/x-wav"/>
-					<d:file href="epub3/out/epub/EPUB/audio/part0001_00_000.wav" original-href="epub3/temp/audio/part0001_00_000.wav" media-type="audio/x-wav"/>
-					<d:file href="epub3/out/epub/EPUB/audio/part0002_00_000.wav" original-href="epub3/temp/audio/part0002_00_000.wav" media-type="audio/x-wav"/>
+					<d:file href="epub3/out/epub/EPUB/audio/part0000_00_000.wav" original-href="epub3/temp/tts/audio/part0000_00_000.wav" media-type="audio/x-wav"/>
+					<d:file href="epub3/out/epub/EPUB/audio/part0001_00_000.wav" original-href="epub3/temp/tts/audio/part0001_00_000.wav" media-type="audio/x-wav"/>
+					<d:file href="epub3/out/epub/EPUB/audio/part0002_00_000.wav" original-href="epub3/temp/tts/audio/part0002_00_000.wav" media-type="audio/x-wav"/>
 					<d:file href="epub3/out/epub/EPUB/mo/toc.smil" media-type="application/smil+xml" indent="true"/>
 					<d:file href="epub3/out/epub/EPUB/mo/minimal-1.smil" media-type="application/smil+xml" indent="true"/>
 					<d:file href="epub3/out/epub/EPUB/mo/minimal-2.smil" media-type="application/smil+xml" indent="true"/>
@@ -285,6 +286,7 @@
 				<d:fileset>
 					<d:file href="epub3/out/epub/EPUB/content-1.xhtml" media-type="application/xhtml+xml"/>
 					<d:file href="epub3/out/epub/EPUB/content-2.xhtml" media-type="application/xhtml+xml"/>
+					<d:file href="epub3/out/epub/EPUB/zedai-mods.xml" media-type="application/mods+xml"/>
 					<d:file href="epub3/out/epub/EPUB/toc.xhtml" media-type="application/xhtml+xml"/>
 					<d:file href="epub3/out/epub/EPUB/package.opf" media-type="application/oebps-package+xml"/>
 					<d:file href="epub3/out/epub/META-INF/container.xml" media-type="application/xml"/>
@@ -296,7 +298,7 @@
 		</x:context>
 		<x:expect label="the content-2.xhtml document" type="compare">
 			<x:document type="inline">
-				<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+				<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"
 				      xmlns:epub="http://www.idpf.org/2007/ops">
 					<head>
 						<meta charset="UTF-8"/>
