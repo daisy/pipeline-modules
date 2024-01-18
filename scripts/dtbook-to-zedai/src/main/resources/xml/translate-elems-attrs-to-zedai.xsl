@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:xs="http://www.w3.org/2001/XMLSchema" version="2.0"
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:f="http://www.daisy.org/ns/pipeline/internal-functions"
                 xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
                 xmlns:dtb="http://www.daisy.org/z3986/2005/dtbook/"
@@ -16,6 +16,7 @@
 
     <xsl:import href="translate-mathml-to-zedai.xsl"/>
     <xsl:import href="http://www.daisy.org/pipeline/modules/common-utils/numeral-conversion.xsl"/>
+    <xsl:import href="http://www.daisy.org/pipeline/modules/common-utils/library.xsl"/>
     <xsl:include href="http://www.daisy.org/pipeline/modules/common-utils/generate-id.xsl"/>
 
     <doc xmlns="http://www.oxygenxml.com/ns/doc/xsl">
@@ -24,6 +25,7 @@
     </doc>
 
     <xsl:param name="css-filename"/>
+    <xsl:param name="lang" as="xs:string?"/>
 
     <xsl:key name="ids" match="*" use="@id"/>
 
@@ -105,11 +107,19 @@
             <!-- make sure xml:lang is set - if not, try to infer from:
               1. a dc:language metadata
               2. an xml:lang attribute on the book element
+              3. a provided language
               3. the default value 'en' -->
             <xsl:if test="empty(@xml:lang)">
-                <xsl:attribute name="xml:lang"
-                    select="(dtb:head/dtb:meta[lower-case(@name)='dc:language'][1]/@content,dtb:book/@xml:lang,'en')[1]"
-                />
+                <xsl:variable name="inferred-lang" as="xs:string?"
+                              select="(dtb:head/dtb:meta[lower-case(@name)='dc:language'][1]/@content,
+                                       dtb:book/@xml:lang,
+                                       $lang[normalize-space(.)])"/>
+                <xsl:if test="empty($inferred-lang)">
+                    <xsl:call-template name="pf:warn">
+                        <xsl:with-param name="msg" select="'required xml:lang attribute not found, and no ''lang'' option was passed to the converter.'"/>
+                    </xsl:call-template>
+                </xsl:if>
+                <xsl:attribute name="xml:lang" select="($inferred-lang,'en')[1]"/>
             </xsl:if>
             <xsl:call-template name="attrs"/>
             <xsl:apply-templates/>
