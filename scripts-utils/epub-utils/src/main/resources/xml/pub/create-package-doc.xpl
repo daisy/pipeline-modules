@@ -393,6 +393,7 @@
                           match="d:file" attribute="id" label="concat('item_',1+count(preceding-sibling::*))"/>
 
         <p:documentation>Create manifest from fileset</p:documentation>
+        <!-- FIXME: check which items are actually referenced from the publication -->
         <p:xslt name="fileset-to-manifest">
             <p:input port="stylesheet">
                 <p:document href="create-package-doc.fileset-to-manifest.xsl"/>

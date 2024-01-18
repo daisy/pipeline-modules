@@ -143,6 +143,14 @@
 			<p:delete match="/*/@prefix"/>
 		</p:otherwise>
 	</p:choose>
+
+	<!-- Resources must not be listed both as a "link" element in the package metadata and as a
+	     manifest item. For simplicity, we assume that when the metadata contains a link element,
+	     the resource is not referenced anywhere else and can therefore be safely removed from the
+	     manifest. Note that this is a very brittle solution though!
+	-->
+	<p:delete match="opf:manifest/opf:item[string(@href)=/*/opf:metadata/opf:link/@href/string(.)]"/>
+
 	<p:identity name="updated-package-doc"/>
 	<p:sink/>
 
