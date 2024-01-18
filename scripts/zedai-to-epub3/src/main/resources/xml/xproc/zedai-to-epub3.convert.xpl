@@ -123,6 +123,11 @@
             px:assert
         </p:documentation>
     </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/epub-utils/library.xpl">
+        <p:documentation>
+            px:epub3-safe-uris
+        </p:documentation>
+    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/css-utils/library.xpl">
         <p:documentation>
             px:css-speech-cascade
@@ -216,9 +221,16 @@
     <!-- CREATE EPUB                                                             -->
     <!--=========================================================================-->
 
+    <!-- skip-cleanup on px:html-to-epub3 skips not only HTML cleanup, but also px:epub3-safe-uris -->
+    <px:epub3-safe-uris name="safe-uris">
+        <p:input port="source.in-memory">
+            <p:pipe step="zedai-to-html" port="in-memory.out"/>
+        </p:input>
+    </px:epub3-safe-uris>
+
     <px:html-to-epub3 name="html-to-epub3" skip-cleanup="true" process-css="false">
         <p:input port="input.in-memory">
-            <p:pipe step="zedai-to-html" port="in-memory.out"/>
+            <p:pipe step="safe-uris" port="result.in-memory"/>
         </p:input>
         <p:input port="metadata">
             <p:pipe step="metadata" port="result"/>
