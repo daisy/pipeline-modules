@@ -298,7 +298,7 @@
 		</x:context>
 		<x:expect label="the content-2.xhtml document" type="compare">
 			<x:document type="inline">
-				<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+				<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"
 				      xmlns:epub="http://www.idpf.org/2007/ops">
 					<head>
 						<meta charset="UTF-8"/>

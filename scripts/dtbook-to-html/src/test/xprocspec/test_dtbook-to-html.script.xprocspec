@@ -27,7 +27,7 @@
 		<x:expect label="the output HTML"
 		          type="custom" href="http://www.daisy.org/xprocspec/custom-assertion-steps.xpl" step="x:compare-except-ids">
 			<x:document type="inline">
-				<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+				<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 					<head>
 						<meta charset="UTF-8"/>
 						<title>Minimal DTBook</title>
