@@ -2,7 +2,6 @@
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
-                xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
                 xmlns:tmp="http://www.daisy.org/ns/pipeline/tmp"
                 xmlns:z="http://www.daisy.org/ns/z3998/authoring/"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
@@ -351,6 +350,19 @@
             </p:template>
         </p:otherwise>
     </p:choose>
+
+    <!-- =============================================================== -->
+    <!-- FIX DTBOOK -->
+    <!-- =============================================================== -->
+    <p:documentation>Normalize lang attributes</p:documentation>
+    <p:xslt>
+        <p:input port="stylesheet">
+            <p:document href="fix-dtbook.xsl"/>
+        </p:input>
+        <p:input port="parameters">
+            <p:empty/>
+        </p:input>
+    </p:xslt>
 
     <!-- =============================================================== -->
     <!-- CREATE ZEDAI -->
