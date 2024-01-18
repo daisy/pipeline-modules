@@ -4,6 +4,7 @@
                 xmlns:f="http://www.daisy.org/ns/functions-internal"
                 xmlns:pf="http://www.daisy.org/ns/functions"
                 xmlns:diagram="http://www.daisy.org/ns/z3998/authoring/features/description/"
+                xmlns:rend="http://www.daisy.org/ns/z3998/authoring/features/rend/"
                 xmlns:m="http://www.w3.org/1998/Math/MathML"
                 xmlns:epub="http://www.idpf.org/2007/ops"
                 xmlns:its="http://www.w3.org/2005/11/its"
@@ -571,6 +572,29 @@
   </xsl:template>
   <xsl:template match="list[@type='ordered']/@start">
     <xsl:copy/>
+  </xsl:template>
+  <xsl:template match="list[@type='ordered']/@rend:prefix">
+    <!-- http://www.daisy.org/z3998/2012/auth/features/rend/1.0/z3998-rend.html#z3998.rend.list.ordered.prefix.attrib -->
+    <xsl:choose>
+      <xsl:when test="string(.)='decimal'">
+        <xsl:attribute name="type" select="'1'"/> <!-- default -->
+      </xsl:when>
+      <xsl:when test="string(.)='lower-alpha'">
+        <xsl:attribute name="type" select="'a'"/>
+      </xsl:when>
+      <xsl:when test="string(.)='upper-alpha'">
+        <xsl:attribute name="type" select="'A'"/>
+      </xsl:when>
+      <xsl:when test="string(.)='lower-roman'">
+        <xsl:attribute name="type" select="'i'"/>
+      </xsl:when>
+      <xsl:when test="string(.)='upper-roman'">
+        <xsl:attribute name="type" select="'I'"/>
+      </xsl:when>
+      <xsl:when test="string(.)=('decimal-leading-zero','lower-greek','upper-greek')">
+        <xsl:attribute name="style" select="concat('list-style-type: ',string(.))"/>
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
   <xsl:template match="item" mode="#all">
     <li>

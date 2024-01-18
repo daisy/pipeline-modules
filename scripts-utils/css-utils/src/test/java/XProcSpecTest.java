@@ -10,6 +10,8 @@ public class XProcSpecTest extends AbstractXSpecAndXProcSpecTest {
 			pipelineModule("fileset-utils"),
 			pipelineModule("mediatype-utils"),
 			"org.daisy.libs:jstyleparser:?",
+			"org.unbescape:unbescape:?",
+			"org.daisy.libs:braille-css:?",
 			"org.apache.servicemix.bundles:org.apache.servicemix.bundles.antlr-runtime:?",
 			"org.sharegov:mjson:?",
 			"org.daisy.libs:io.bit3.jsass:?",

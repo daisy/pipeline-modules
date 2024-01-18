@@ -16,8 +16,8 @@ import org.daisy.pipeline.braille.common.AbstractBrailleTranslator;
 import org.daisy.pipeline.braille.common.BrailleTranslator;
 import org.daisy.pipeline.braille.common.BrailleTranslator.LineBreakingFromStyledText;
 import org.daisy.pipeline.braille.common.Hyphenator;
-import org.daisy.pipeline.braille.css.CounterStyle;
 import org.daisy.pipeline.braille.css.CSSStyledText;
+import org.daisy.pipeline.css.CounterStyle;
 
 /**
  * {@link BrailleTranslator} that handles the <code>text-transform</code> value
@@ -91,7 +91,7 @@ public class CounterHandlingBrailleTranslator extends AbstractBrailleTranslator 
 							Term<?> symbolsFunction = s.getValue("-dotify-counter-style");
 							if (symbolsFunction != null) {
 								try {
-									t = new CounterStyle(symbolsFunction).format(counterValue);
+									t = CounterStyle.fromSymbolsFunction(symbolsFunction).format(counterValue);
 								} catch (IllegalArgumentException e) {
 									// FIXME: show warning
 								}

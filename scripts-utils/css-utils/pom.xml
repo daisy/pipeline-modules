@@ -20,6 +20,7 @@
         <expose-services>
             org.daisy.pipeline.modules.impl.Module_css_utils,
             org.daisy.pipeline.css.calabash.impl.CssCascadeStep$Provider,
+            org.daisy.pipeline.css.impl.DefaultCssCascader,
             org.daisy.pipeline.css.saxon.impl.MediaQueryMatchesDefinition,
             org.daisy.pipeline.css.speech.impl.SpeechCssCascader,
             org.daisy.pipeline.css.StyleAccessor$Provider
@@ -67,6 +68,14 @@
         <dependency>
             <groupId>org.daisy.libs</groupId>
             <artifactId>jstyleparser</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.unbescape</groupId>
+            <artifactId>unbescape</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.daisy.braille</groupId>
+            <artifactId>braille-css</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>

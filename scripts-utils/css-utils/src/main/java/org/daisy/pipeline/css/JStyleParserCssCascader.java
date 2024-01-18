@@ -444,7 +444,7 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 					styleSheet = CSSFactory.getUsedStyles(document, nodeLocator, medium, cssReader, styleSheet);
 				}
 			}
-			styleMap = new Analyzer(styleSheet, declarationTransformer, supportedCSS).evaluateDOM(document, medium, false);
+			styleMap = new Analyzer(styleSheet, declarationTransformer, supportedCSS).evaluateDOM(document, medium, true);
 			writer.setBaseURI(baseURI);
 			traverse(document, styleMap, writer);
 		} catch (TransformerException e) {
@@ -466,32 +466,14 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 		return styleSheet;
 	}
 
-	private void traverse(Node node, StyleMap styleMap, BaseURIAwareXMLStreamWriter writer) throws XMLStreamException {
+	protected void traverse(Node node, StyleMap styleMap, BaseURIAwareXMLStreamWriter writer) throws XMLStreamException {
 		if (node.getNodeType() == Node.DOCUMENT_NODE) {
 			writer.writeStartDocument();
 			for (Node child = node.getFirstChild(); child != null; child = child.getNextSibling())
 				traverse(child, styleMap, writer);
 			writer.writeEndDocument(); }
-		else if (node.getNodeType() == Node.ELEMENT_NODE) {
-			Element elem = (Element)node;
-			writeStartElement(writer, elem);
-			NamedNodeMap attributes = node.getAttributes();
-			for (int i = 0; i < attributes.getLength(); i++) {
-				Node attr = attributes.item(i);
-				if (removeInlineStyleAttribute == null || !nodeNameEquals(attr, removeInlineStyleAttribute))
-					writeAttribute(writer, attr); }
-			Map<PseudoElement,NodeData> pseudoStyles = new java.util.HashMap<>(); {
-				for (PseudoElement pseudo : styleMap.pseudoSet(elem))
-					pseudoStyles.put(pseudo, styleMap.get(elem, pseudo)); }
-			Map<QName,String> style = serializeStyle(
-				styleMap.get(elem),
-				pseudoStyles,
-				elem);
-			if (style != null)
-				writeAttributes(writer, style);
-			for (Node child = node.getFirstChild(); child != null; child = child.getNextSibling())
-				traverse(child, styleMap, writer);
-			writer.writeEndElement(); }
+		else if (node.getNodeType() == Node.ELEMENT_NODE)
+			processElement((Element)node, styleMap, writer);
 		else if (node.getNodeType() == Node.COMMENT_NODE)
 			writeComment(writer, node);
 		else if (node.getNodeType() == Node.TEXT_NODE)
@@ -502,7 +484,32 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 		else
 			throw new UnsupportedOperationException("Unexpected node type");
 	}
-	
+
+	protected void processElement(Element element, StyleMap styleMap, BaseURIAwareXMLStreamWriter writer) throws XMLStreamException {
+		writeStartElement(writer, element);
+		copyAttributes(element, writer);
+		Map<PseudoElement,NodeData> pseudoStyles = new HashMap<>(); {
+			for (PseudoElement pseudo : styleMap.pseudoSet(element))
+				pseudoStyles.put(pseudo, styleMap.get(element, pseudo)); }
+		Map<QName,String> style = serializeStyle(
+			styleMap.get(element),
+			pseudoStyles,
+			element);
+		if (style != null)
+			writeAttributes(writer, style);
+		for (Node child = element.getFirstChild(); child != null; child = child.getNextSibling())
+			traverse(child, styleMap, writer);
+		writer.writeEndElement();
+	}
+
+	protected void copyAttributes(Element element, BaseURIAwareXMLStreamWriter writer) throws XMLStreamException {
+		NamedNodeMap attributes = element.getAttributes();
+		for (int i = 0; i < attributes.getLength(); i++) {
+			Node attr = attributes.item(i);
+			if (removeInlineStyleAttribute == null || !nodeNameEquals(attr, removeInlineStyleAttribute))
+				writeAttribute(writer, attr); }
+	}
+
 	private static boolean nodeNameEquals(Node node, QName name) {
 		if (name == null)
 			return false;

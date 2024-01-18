@@ -99,6 +99,8 @@ public class BrailleCssCascader implements CssCascader {
 	                                  boolean multipleAttrs) {
 		if (multipleAttrs)
 			throw new UnsupportedOperationException("Cascading to multiple attributes per element not supported");
+		if (attributeName == null)
+			throw new UnsupportedOperationException("A style attribute must be specified");
 		switch (medium.getType()) {
 		case EMBOSSED:
 			return new Transformer(uriResolver, preProcessor, xsltProcessor, userStylesheet, medium, attributeName,
@@ -119,7 +121,7 @@ public class BrailleCssCascader implements CssCascader {
 
 	// medium embossed
 	private static final SupportedCSS brailleCSS = new SupportedBrailleCSS(false, true);
-	private static DeclarationTransformer brailleDeclarationTransformer
+	private static final DeclarationTransformer brailleDeclarationTransformer
 		= new BrailleCSSDeclarationTransformer(brailleCSS);
 	private static final RuleFactory brailleRuleFactory = new BrailleCSSRuleFactory();
 	private static final CSSParserFactory brailleParserFactory = new BrailleCSSParserFactory();
@@ -258,15 +260,14 @@ public class BrailleCssCascader implements CssCascader {
 		List<String> keys = new ArrayList<String>(nodeData.getPropertyNames());
 		keys.remove("page");
 		Collections.sort(keys);
-		for(String key : keys) {
-			builder.append(key).append(": ");
-			Term<?> value = nodeData.getValue(key, true);
+		for (String key : keys) {
+			Term<?> value = nodeData.getValue(key, false);
 			if (value != null)
-				builder.append(BrailleCssSerializer.toString(value));
+				builder.append(key).append(": ").append(BrailleCssSerializer.toString(value)).append("; ");
 			else {
-				CSSProperty prop = nodeData.getProperty(key);
-				builder.append(prop); }
-			builder.append("; "); }
+				CSSProperty prop = nodeData.getProperty(key, false);
+				if (prop != null) // can be null for unspecified inherited properties
+					builder.append(key).append(": ").append(prop).append("; "); }}
 	}
 
 	private static void pseudoElementToString(StringBuilder builder, PseudoElement elem) {

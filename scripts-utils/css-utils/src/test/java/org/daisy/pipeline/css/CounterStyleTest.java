@@ -1,4 +1,4 @@
-package org.daisy.pipeline.braille.css;
+package org.daisy.pipeline.css;
 
 import java.util.ArrayList;
 

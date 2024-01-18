@@ -107,7 +107,9 @@
 			the target medium is "embossed", CSS is interpreted according to the rules of <a
 			href="http://braillespecs.github.io/braille-css">braille CSS</a>. Supported media
 			features are '<a href="https://www.w3.org/TR/mediaqueries-4/#width">width</a>' and '<a
-			href="https://www.w3.org/TR/mediaqueries-4/#height">height</a>'.</p>
+			href="https://www.w3.org/TR/mediaqueries-4/#height">height</a>' In addition,
+			'<code>(counter-support: none)</code>' can be used to transform lists to preformatted
+			lists.</p>
 		</p:documentation>
 	</p:option>
 	
