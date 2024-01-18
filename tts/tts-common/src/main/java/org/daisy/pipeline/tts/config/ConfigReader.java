@@ -115,7 +115,14 @@ public class ConfigReader {
 			if (qname != null) {
 				boolean parsed = false;
 				for (int k = 0; !parsed && k < extensions.length; ++k) {
-					parsed = extensions[k].parseNode(node, docURI, this);
+					if ("css".equalsIgnoreCase(qname.getLocalName())) {
+						logger.warn("Ignoring 'css' element " + node.toString()
+						            + " inside TTS config file.\nPlease specify CSS style sheets"
+						            + " through the designated option or attach them to the input"
+						            + " document.");
+					} else {
+						parsed = extensions[k].parseNode(node, docURI, this);
+					}
 				}
 			}
 		}

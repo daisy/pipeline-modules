@@ -26,12 +26,16 @@
   <p:input port="tts-config">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
       <h2>Text-To-Speech configuration file</h2>
-      <p>Configuration file that contains Text-To-Speech
-      properties, links to aural CSS stylesheets and links to PLS
-      lexicons.</p>
+      <p>Configuration file with voice mappings, PLS lexicons and annotations.</p>
     </p:documentation>
     <p:inline><d:config/></p:inline>
   </p:input>
+
+  <p:option name="stylesheet" select="''">
+    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <p>CSS user style sheets as space separated list of absolute URIs.</p>
+    </p:documentation>
+  </p:option>
 
   <p:output port="in-memory.out" primary="true" sequence="true">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -107,14 +111,14 @@
     </p:documentation>
   </p:option>
 
-  <p:option name="audio" required="false" cx:type="xs:boolean" select="'true'" cx:as="xs:string">
+  <p:option name="audio" required="false" cx:as="xs:boolean" select="true()">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
       <h2>Enable text-to-speech</h2>
       <p>Whether to use a speech synthesizer to produce audio files.</p>
     </p:documentation>
   </p:option>
 
-  <p:option name="audio-only" required="false" cx:type="xs:boolean" select="'true'" cx:as="xs:string">
+  <p:option name="audio-only" required="false" cx:as="xs:boolean" select="true()">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
       <h2>Audio only</h2>
       <p>SMIL files are not attached to any DTBook</p>
@@ -132,7 +136,7 @@
     </p:documentation>
   </p:option>
 
-  <p:option name="word-detection" required="false" cx:type="xs:boolean" select="'true'" cx:as="xs:string">
+  <p:option name="word-detection" required="false" cx:as="xs:boolean" select="true()">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
       <p>Whether to detect and mark up words with <code>&lt;w&gt;</code> tags.</p>
     </p:documentation>
@@ -210,6 +214,9 @@
   <px:assert message="More than one DTBook found in fileset." error-code="PEZE00">
     <p:with-option name="test" select="count(/*/d:file[@media-type='application/x-dtbook+xml'])=1"/>
   </px:assert>
+  <px:fileset-rebase name="fileset.in">
+    <p:with-option name="new-base" select="/*/d:file[@media-type='application/x-dtbook+xml']/resolve-uri(@href,base-uri(/*))"/>
+  </px:fileset-rebase>
   <px:fileset-load media-types="application/x-dtbook+xml">
     <p:input port="in-memory">
       <p:pipe step="main" port="in-memory.in"/>
@@ -249,17 +256,39 @@
     </px:daisy3-prepare-dtbook>
 
     <!-- ===== PERFORM TTS ==== -->
+    <!-- input fileset may contain speech CSS -->
+    <p:sink/>
+    <px:fileset-filter media-types="text/css">
+      <p:input port="source">
+        <p:pipe step="fileset.in" port="result"/>
+      </p:input>
+    </px:fileset-filter>
+    <px:fileset-copy name="css">
+      <p:input port="source.in-memory">
+        <p:pipe step="main" port="in-memory.in"/>
+      </p:input>
+      <p:with-option name="target" select="$output-fileset-base"/>
+    </px:fileset-copy>
+    <p:sink/>
+    <px:fileset-join>
+      <p:input port="source">
+        <p:pipe step="prepare-dtbook" port="result.fileset"/>
+        <p:pipe step="css" port="result.fileset"/>
+      </p:input>
+    </px:fileset-join>
     <px:tts-for-dtbook process-css="true" name="tts" px:progress="1">
       <p:input port="source.in-memory">
         <p:pipe step="prepare-dtbook" port="result.in-memory"/>
+        <p:pipe step="css" port="result.in-memory"/>
       </p:input>
       <p:input port="config">
         <p:pipe step="main" port="tts-config"/>
       </p:input>
-      <p:with-option name="audio" select="$audio"/>
+      <p:with-option name="stylesheet" select="$stylesheet"/>
+      <p:with-option name="audio" select="if ($audio) then 'true' else 'false'"/>
       <p:with-option name="audio-file-type" select="$audio-file-type"/>
       <p:with-option name="include-log" select="$include-tts-log"/>
-      <p:with-option name="word-detection" select="$word-detection"/>
+      <p:with-option name="word-detection" select="if ($word-detection) then 'true' else 'false'"/>
       <p:with-option name="temp-dir" select="$temp-dir"/>
     </px:tts-for-dtbook>
     <px:fileset-load media-types="application/x-dtbook+xml" name="tts-enriched-dtbook">
@@ -311,7 +340,7 @@
       <p:with-option name="smil-dir" select="$output-fileset-base"/>
       <!-- <p:with-option name="smil-dir" select="concat($output-fileset-base, 'mo/')"/> -->
       <p:with-option name="uid" select="$uid"/>
-      <p:with-option name="audio-only" select="$audio-only"/>
+      <p:with-option name="audio-only" select="if ($audio-only) then 'true' else 'false'"/>
     </px:daisy3-create-smils>
     <p:sink/>
 
@@ -340,7 +369,7 @@
       <p:xpath-context>
         <p:pipe step="tts-enriched-dtbook" port="result"/>
       </p:xpath-context>
-      <p:when test="$audio-only='true' or not(exists(//m:math))">
+      <p:when test="$audio-only or not(exists(//m:math))">
         <p:output port="fileset" sequence="true"/>
         <p:identity>
           <p:input port="source">
@@ -383,31 +412,26 @@
       </p:input>
     </px:fileset-join>
     <p:choose>
-      <p:when test="$audio-only='true'">
+      <p:when test="$audio-only">
         <!-- remove DTBook -->
-        <px:fileset-filter not-media-types="application/x-dtbook+xml"/>
+        <px:fileset-filter not-media-types="application/x-dtbook+xml
+                                            text/css"/>
       </p:when>
       <p:otherwise>
         <p:identity name="fileset"/>
         <p:sink/>
         <!-- copy resource files -->
-        <px:fileset-rebase>
-          <!-- to make sure relative paths from DTBook to resource files remain the same -->
-          <p:input port="source">
-            <p:pipe step="main" port="fileset.in"/>
-          </p:input>
-          <p:with-option name="new-base" select="base-uri(/*)">
-            <p:pipe step="dtbook" port="result"/>
-          </p:with-option>
-        </px:fileset-rebase>
         <px:fileset-filter media-types="image/gif
                                         image/jpeg
                                         image/png
                                         image/svg+xml
                                         application/pls+xml
                                         audio/mpeg
-                                        audio/mp4
-                                        text/css"/>
+                                        audio/mp4">
+          <p:input port="source">
+            <p:pipe step="fileset.in" port="result"/>
+          </p:input>
+        </px:fileset-filter>
         <px:fileset-copy name="resources-fileset">
           <p:with-option name="target" select="$output-fileset-base"/>
         </px:fileset-copy>

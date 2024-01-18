@@ -55,7 +55,6 @@
     <!-- att-nar is excluded because it is platform-specific. -->
     <!-- tts-adapter-attnative is excluded because it depends on att-nar which cannot be publicly
          deployed according to the AT&T's license. -->
-    <module>tts/css-speech</module>
     <module>tts/dtbook-tts</module>
     <module>tts/epub3-tts</module>
     <module>tts/tts-common</module>

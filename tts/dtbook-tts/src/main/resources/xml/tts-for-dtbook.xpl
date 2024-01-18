@@ -12,14 +12,14 @@
 
   <p:input port="source.fileset" primary="true">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-      <p>The source fileset with Dtbook documents, lexicons and CSS stylesheets.</p>
+      <p>The source fileset with DTBook documents, lexicons and CSS style sheets.</p>
     </p:documentation>
   </p:input>
   <p:input port="source.in-memory" sequence="true"/>
 
   <p:input port="config">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-       <p>Configuration file with lexicons, voices declaration and various properties.</p>
+       <p>Configuration file with voice mappings, PLS lexicons and annotations.</p>
     </p:documentation>
   </p:input>
 
@@ -77,6 +77,12 @@
     </p:documentation>
   </p:option>
 
+  <p:option name="stylesheet" select="''">
+    <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <p>CSS user style sheets as space separated list of absolute URIs.</p>
+    </p:documentation>
+  </p:option>
+
   <p:option name="word-detection" required="false" select="'true'" cx:as="xs:string">
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
       <p>Whether to detect and mark up words with <code>&lt;w&gt;</code> tags.</p>
@@ -107,7 +113,7 @@
       px:isolate-skippable
     </p:documentation>
   </p:import>
-  <p:import href="http://www.daisy.org/pipeline/modules/css-speech/library.xpl">
+  <p:import href="http://www.daisy.org/pipeline/modules/css-utils/library.xpl">
     <p:documentation>
       px:css-speech-cascade
       px:css-speech-clean
@@ -135,9 +141,7 @@
         <p:input port="source.in-memory">
           <p:pipe step="main" port="source.in-memory"/>
         </p:input>
-        <p:input port="config">
-          <p:pipe step="main" port="config"/>
-        </p:input>
+        <p:with-option name="user-stylesheet" select="$stylesheet"/>
       </px:css-speech-cascade>
     </p:when>
     <p:otherwise>

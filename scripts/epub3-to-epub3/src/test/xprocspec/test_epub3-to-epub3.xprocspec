@@ -22,6 +22,7 @@
 						<d:file href="EPUB/cover.xhtml" media-type="application/xhtml+xml"/>
 						<d:file href="EPUB/front.xhtml" media-type="application/xhtml+xml"/>
 						<d:file href="EPUB/chapter.xhtml" media-type="application/xhtml+xml"/>
+						<d:file href="EPUB/aural.css" media-type="text/css"/>
 					</d:fileset>
 				</x:document>
 			</x:input>
@@ -52,6 +53,7 @@
 							<item id="cover" href="cover.xhtml" media-type="application/xhtml+xml"/>
 							<item id="front" href="front.xhtml" media-type="application/xhtml+xml"/>
 							<item id="chapter" href="chapter.xhtml" media-type="application/xhtml+xml"/>
+							<item id="css" href="aural.css" media-type="text/css"/>
 						</manifest>
 						<spine>
 							<itemref idref="cover"/>
@@ -59,6 +61,17 @@
 							<itemref idref="chapter"/>
 						</spine>
 					</package>
+				</x:document>
+				<x:document type="inline" xml:base="EPUB/aural.css">
+					<c:data content-type="text/plain">
+						@namespace epub url(http://www.idpf.org/2007/ops);
+						[epub|type~=pagebreak]::before {
+							content: 'page ';
+						}
+						[epub|type~=pagebreak]:empty[title]::before {
+							content: 'page ' attr(title);
+						}
+					</c:data>
 				</x:document>
 				<x:document type="inline" xml:base="EPUB/nav.xhtml">
 					<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -125,6 +138,7 @@
 							<meta name="dc:identifier" content="id"/>
 							<link rel="prev" href="cover.xhtml"/>
 							<link rel="next" href="chapter.xhtml"/>
+							<link rel="stylesheet" type="text/css" media="speech" href="aural.css"/>
 						</head>
 						<body id="front" epub:type="frontmatter">
 							<h1 id="h_1">Title</h1>
@@ -148,6 +162,7 @@
 							<title>minimal</title>
 							<meta name="dc:identifier" content="id"/>
 							<link rel="prev" href="front.xhtml"/>
+							<link rel="stylesheet" type="text/css" media="speech" href="aural.css"/>
 						</head>
 						<body id="chap_1" epub:type="bodymatter chapter">
 							<!-- Note that ssml:phoneme is also recognized as an inline element
@@ -190,15 +205,6 @@
 					<x:document type="inline">
 						<config>
 							<voice engine="mock-tts" name="foo" lang="en" gender="male-adult"/>
-							<css>
-								@namespace epub url(http://www.idpf.org/2007/ops);
-								[epub|type~=pagebreak]::before {
-									content: 'page ';
-								}
-								[epub|type~=pagebreak]:empty[title]::before {
-									content: 'page ' attr(title);
-								}
-							</css>
 						</config>
 					</x:document>
 				</x:input>
@@ -218,6 +224,7 @@
 						<d:file href="result/EPUB/cover.xhtml" media-type="application/xhtml+xml"/>
 						<d:file href="result/EPUB/front.xhtml" media-type="application/xhtml+xml"/>
 						<d:file href="result/EPUB/chapter.xhtml" media-type="application/xhtml+xml"/>
+						<d:file href="result/EPUB/aural.css" media-type="text/css"/>
 						<d:file href="result/EPUB/mo/cover.smil" media-type="application/smil+xml" indent="true"/>
 						<d:file href="result/EPUB/mo/front.smil" media-type="application/smil+xml" indent="true"/>
 						<d:file href="result/EPUB/mo/chapter.smil" media-type="application/smil+xml" indent="true"/>
@@ -259,6 +266,7 @@
 							<item id="cover" href="cover.xhtml" media-type="application/xhtml+xml" media-overlay="item_1"/>
 							<item id="front" href="front.xhtml" media-type="application/xhtml+xml" media-overlay="item_2"/>
 							<item id="chapter" href="chapter.xhtml" media-type="application/xhtml+xml" media-overlay="item_3"/>
+							<item id="css" href="aural.css" media-type="text/css"/>
 							<item id="item_1" href="mo/cover.smil" media-type="application/smil+xml"/>
 							<item id="item_2" href="mo/front.smil" media-type="application/smil+xml"/>
 							<item id="item_3" href="mo/chapter.smil" media-type="application/smil+xml"/>
@@ -328,95 +336,78 @@
 				</x:document>
 			</x:expect>
 			<x:context label="front.xhtml">
-				<x:document type="port" port="result.in-memory" select="/*[base-uri()=resolve-uri('result/EPUB/front.xhtml')]"/>
+				<x:document type="port" port="result.in-memory" select="/*[base-uri()=resolve-uri('result/EPUB/front.xhtml')]//html:body"/>
 			</x:context>
 			<x:expect label="front.xhtml" type="compare">
-				<x:document type="inline">
-					<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-						<head>
-							<meta charset="UTF-8"/>
-							<title>minimal</title>
-							<meta name="dc:identifier" content="id"/>
-							<link rel="prev" href="cover.xhtml"/>
-							<link rel="next" href="chapter.xhtml"/>
-						</head>
-						<body id="front" epub:type="frontmatter">
-							<h1 id="h_1">
-								<span id="id_1">Title</span>
+				<x:document type="inline" xmlns="http://www.w3.org/1999/xhtml">
+					<body id="front" epub:type="frontmatter">
+						<h1 id="h_1">
+							<span id="id_1">Title</span>
+						</h1>
+						<p>
+							<span id="id_2">...</span>
+						</p>
+						<section id="contents">
+							<h2 id="h_1_1">
+								<span id="id_3">List of contents</span>
+							</h2>
+							<table>...</table>
+							<div id="page_front_4" class="page-front" epub:type="pagebreak" title="iv">
+								<span id="id_4"/>
+							</div>
+						</section>
+						<section id="preface" aria-labelledby="aria_label_1">
+							<h1 id="aria_label_1">
+								<span id="id_5">Preface</span>
 							</h1>
 							<p>
-								<span id="id_2">...</span>
+								<span id="id_6">...</span>
 							</p>
-							<section id="contents">
-								<h2 id="h_1_1">
-									<span id="id_3">List of contents</span>
-								</h2>
-								<table>...</table>
-								<div id="page_front_4" class="page-front" epub:type="pagebreak" title="iv">
-									<span id="id_4"/>
-								</div>
-							</section>
-							<section id="preface" aria-labelledby="aria_label_1">
-								<h1 id="aria_label_1">
-									<span id="id_5">Preface</span>
-								</h1>
-								<p>
-									<span id="id_6">...</span>
-								</p>
-								<div id="page_front_5" class="page-front" epub:type="pagebreak" title="v">
-									<span id="id_7"/>
-								</div>
-							</section>
-						</body>
-					</html>
+							<div id="page_front_5" class="page-front" epub:type="pagebreak" title="v">
+								<span id="id_7"/>
+							</div>
+						</section>
+					</body>
 				</x:document>
 			</x:expect>
 			<x:context label="chapter.xhtml">
-				<x:document type="port" port="result.in-memory" select="/*[base-uri()=resolve-uri('result/EPUB/chapter.xhtml')]"/>
+				<x:document type="port" port="result.in-memory" select="/*[base-uri()=resolve-uri('result/EPUB/chapter.xhtml')]//html:body"/>
 			</x:context>
 			<x:expect label="chapter.xhtml" type="compare">
-				<x:document type="inline">
-					<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" ssml:alphabet="ipa">
-						<head>
-							<meta charset="UTF-8"/>
-							<title>minimal</title>
-							<meta name="dc:identifier" content="id"/>
-							<link rel="prev" href="front.xhtml"/>
-						</head>
-						<body id="chap_1" epub:type="bodymatter chapter">
-							<h1 id="h_1">
-								<span id="id_1">Chapter <span ssml:ph="wʌn">I</span>
-								<ssml:phoneme alphabet="ipa" ph="tuː">two</ssml:phoneme></span>
-							</h1>
-							<p>
-								<span id="id_2">
-									<span id="id_8">This paragraph contains</span>
-									<span epub:type="pagebreak" title="5" id="page_5" class="page-normal"/>
-									<span id="id_9">a page break.</span>
+				<x:document type="inline" xmlns="http://www.w3.org/1999/xhtml">
+					<body id="chap_1" epub:type="bodymatter chapter">
+						<h1 id="h_1">
+							<span id="id_1">Chapter <span ssml:ph="wʌn">I</span>
+							<ssml:phoneme alphabet="ipa" ph="tuː">two</ssml:phoneme></span>
+						</h1>
+						<p>
+							<span id="id_2">
+								<span id="id_8">This paragraph contains</span>
+								<span epub:type="pagebreak" title="5" id="page_5" class="page-normal"/>
+								<span id="id_9">a page break.</span>
+							</span>
+						</p>
+						<figcaption id="caption_1">
+							<strong>
+								<span id="id_3">
+									Illustration 1 A.
 								</span>
-							</p>
-							<figcaption id="caption_1">
-								<strong>
-									<span id="id_3">
-										Illustration 1 A.
-									</span>
-								</strong>
-								<span id="id_4">
-									This is an illustration.
-								</span>
-							</figcaption>
-							<p>
-								<span id="id_5">
-									<span id="id_10">This paragraph contains a note reference.</span>
-									<a id="id_7" epub:type="noteref" href="#note_1">*</a>
-									<span id="id_11"> This is the second sentence.</span>
-								</span>
-							</p>
-							<p id="note_1">
-								<span id="id_6">This is a note.</span>
-							</p>
-						</body>
-					</html>
+							</strong>
+							<span id="id_4">
+								This is an illustration.
+							</span>
+						</figcaption>
+						<p>
+							<span id="id_5">
+								<span id="id_10">This paragraph contains a note reference.</span>
+								<a id="id_7" epub:type="noteref" href="#note_1">*</a>
+								<span id="id_11"> This is the second sentence.</span>
+							</span>
+						</p>
+						<p id="note_1">
+							<span id="id_6">This is a note.</span>
+						</p>
+					</body>
 				</x:document>
 			</x:expect>
 			<x:context label="cover.smil">
@@ -586,6 +577,7 @@
 						<d:file href="result/EPUB/cover.xhtml" media-type="application/xhtml+xml"/>
 						<d:file href="result/EPUB/front.xhtml" media-type="application/xhtml+xml"/>
 						<d:file href="result/EPUB/chapter.xhtml" media-type="application/xhtml+xml"/>
+						<d:file href="result/EPUB/aural.css" media-type="text/css"/>
 					</d:fileset>
 				</x:document>
 			</x:expect>
@@ -611,6 +603,7 @@
 							<item id="cover" href="cover.xhtml" media-type="application/xhtml+xml"/>
 							<item id="front" href="front.xhtml" media-type="application/xhtml+xml"/>
 							<item id="chapter" href="chapter.xhtml" media-type="application/xhtml+xml"/>
+							<item id="css" href="aural.css" media-type="text/css"/>
 						</manifest>
 						<spine>
 							<itemref idref="cover"/>
@@ -654,51 +647,43 @@
 				</x:document>
 			</x:expect>
 			<x:context label="chapter.xhtml">
-				<x:document type="port" port="result.in-memory" select="/*[base-uri()=resolve-uri('result/EPUB/chapter.xhtml')]"/>
+				<x:document type="port" port="result.in-memory" select="/*[base-uri()=resolve-uri('result/EPUB/chapter.xhtml')]//html:body"/>
 			</x:context>
 			<x:expect label="chapter.xhtml" type="compare">
-				<x:document type="inline">
-					<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" ssml:alphabet="ipa">
-						<head>
-							<meta charset="UTF-8"/>
-							<title>minimal</title>
-							<meta name="dc:identifier" content="id"/>
-							<link rel="prev" href="front.xhtml"/>
-						</head>
-						<body id="chap_1" epub:type="bodymatter chapter">
-							<h1 id="h_1">
-								<span id="id_1" class="sentence">Chapter <span ssml:ph="wʌn">I</span>
-								<ssml:phoneme alphabet="ipa" ph="tuː">two</ssml:phoneme></span>
-							</h1>
-							<p>
-								<span id="id_2" class="sentence">
-									<span id="id_8">This paragraph contains</span>
-									<span epub:type="pagebreak" title="5" id="page_5" class="page-normal"/>
-									<span id="id_9">a page break.</span>
+				<x:document type="inline" xmlns="http://www.w3.org/1999/xhtml">
+					<body id="chap_1" epub:type="bodymatter chapter">
+						<h1 id="h_1">
+							<span id="id_1" class="sentence">Chapter <span ssml:ph="wʌn">I</span>
+							<ssml:phoneme alphabet="ipa" ph="tuː">two</ssml:phoneme></span>
+						</h1>
+						<p>
+							<span id="id_2" class="sentence">
+								<span id="id_8">This paragraph contains</span>
+								<span epub:type="pagebreak" title="5" id="page_5" class="page-normal"/>
+								<span id="id_9">a page break.</span>
+							</span>
+						</p>
+						<figcaption id="caption_1">
+							<strong>
+								<span id="id_3" class="sentence">
+									Illustration 1 A.
 								</span>
-							</p>
-							<figcaption id="caption_1">
-								<strong>
-									<span id="id_3" class="sentence">
-										Illustration 1 A.
-									</span>
-								</strong>
-								<span id="id_4" class="sentence">
-									This is an illustration.
-								</span>
-							</figcaption>
-							<p>
-								<span id="id_5" class="sentence">
-									<span id="id_10">This paragraph contains a note reference.</span>
-									<a id="id_7" epub:type="noteref" href="#note_1">*</a>
-									<span id="id_11"> This is the second sentence.</span>
-								</span>
-							</p>
-							<p id="note_1">
-								<span id="id_6" class="sentence">This is a note.</span>
-							</p>
-						</body>
-					</html>
+							</strong>
+							<span id="id_4" class="sentence">
+								This is an illustration.
+							</span>
+						</figcaption>
+						<p>
+							<span id="id_5" class="sentence">
+								<span id="id_10">This paragraph contains a note reference.</span>
+								<a id="id_7" epub:type="noteref" href="#note_1">*</a>
+								<span id="id_11"> This is the second sentence.</span>
+							</span>
+						</p>
+						<p id="note_1">
+							<span id="id_6" class="sentence">This is a note.</span>
+						</p>
+					</body>
 				</x:document>
 			</x:expect>
 		</x:scenario>
@@ -738,6 +723,7 @@
 						<d:file href="result/EPUB/cover.xhtml" media-type="application/xhtml+xml"/>
 						<d:file href="result/EPUB/front.xhtml" media-type="application/xhtml+xml"/>
 						<d:file href="result/EPUB/chapter.xhtml" media-type="application/xhtml+xml"/>
+						<d:file href="result/EPUB/aural.css" media-type="text/css"/>
 					</d:fileset>
 				</x:document>
 			</x:expect>
@@ -769,6 +755,7 @@
 							<item id="cover" href="cover.xhtml" media-type="application/xhtml+xml"/>
 							<item id="front" href="front.xhtml" media-type="application/xhtml+xml"/>
 							<item id="chapter" href="chapter.xhtml" media-type="application/xhtml+xml"/>
+							<item id="css" href="aural.css" media-type="text/css"/>
 						</manifest>
 						<spine>
 							<itemref idref="cover"/>

@@ -13,10 +13,15 @@
     <p:input port="tts-config">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h2>Text-To-Speech configuration file</h2>
-            <p>Configuration file that contains Text-To-Speech properties, links to
-            aural CSS stylesheets and links to PLS lexicons.</p>
+            <p>Configuration file with voice mappings, PLS lexicons and annotations.</p>
         </p:documentation>
     </p:input>
+
+    <p:option name="stylesheet" select="''">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>CSS user style sheets as space separated list of absolute URIs.</p>
+        </p:documentation>
+    </p:option>
 
     <p:output port="fileset.out" primary="true">
         <p:pipe step="html-to-epub3" port="fileset.out"/>
@@ -104,7 +109,7 @@
             px:assert
         </p:documentation>
     </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/css-speech/library.xpl">
+    <p:import href="http://www.daisy.org/pipeline/modules/css-utils/library.xpl">
         <p:documentation>
             px:css-speech-cascade
         </p:documentation>
@@ -143,9 +148,7 @@
                 <p:input port="source.in-memory">
                     <p:pipe step="zedai" port="result"/>
                 </p:input>
-                <p:input port="config">
-                    <p:pipe step="main" port="tts-config"/>
-                </p:input>
+                <p:with-option name="user-stylesheet" select="$stylesheet"/>
             </px:css-speech-cascade>
             <p:sink/>
             <p:identity>
