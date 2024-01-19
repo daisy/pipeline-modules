@@ -13,7 +13,7 @@
 	<p:output port="result.in-memory" sequence="true">
 		<p:pipe step="zedai-to-epub3" port="in-memory.out"/>
 	</p:output>
-	<p:output port="validation-status" px:media-type="application/vnd.pipeline.status+xml">
+	<p:output port="status" px:media-type="application/vnd.pipeline.status+xml">
 		<p:pipe step="zedai-to-epub3" port="status"/>
 	</p:output>
 	<p:output port="tts-log" sequence="true">
@@ -144,7 +144,9 @@
 		<p:with-option name="audio" select="$audio"/>
 		<p:with-option name="audio-file-type" select="$audio-file-type"/>
 		<p:with-option name="chunk-size" select="$chunk-size"/>
-		<p:with-option name="output-validation" select="$output-validation"/>
+		<p:with-option name="output-validation" select="if ($output-validation='abort')
+		                                                then 'report'
+		                                                else $output-validation"/>
 	</px:zedai-to-epub3>
 	
 </p:declare-step>

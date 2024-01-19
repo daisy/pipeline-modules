@@ -58,7 +58,7 @@
         <p:pipe step="load" port="validation-report"/>
     </p:output>
 
-    <p:output port="validation-status" px:media-type="application/vnd.pipeline.status+xml" primary="true">
+    <p:output port="status" px:media-type="application/vnd.pipeline.status+xml" primary="true">
       <!-- whether the conversion was aborted due to validation errors or text-to-speech errors -->
       <!-- when the conversion fails because of text-to-speech errors it may still output a
            (incomplete) EPUB 3 publication-->
@@ -165,7 +165,7 @@
 	  </p:input>
 	</p:split-sequence>
 	<p:group name="convert-and-store" px:progress="1">
-          <p:output port="status" primary="true"/>
+	  <p:output port="status" primary="true"/>
 	  <p:output port="tts-log" sequence="true">
 	    <p:pipe step="convert" port="tts-log"/>
 	  </p:output>
@@ -210,7 +210,7 @@
 
 	  <p:identity cx:depends-on="store">
 	    <p:input port="source">
-	      <p:pipe step="convert" port="validation-status"/>
+	      <p:pipe step="convert" port="status"/>
 	    </p:input>
 	  </p:identity>
 	</p:group>
