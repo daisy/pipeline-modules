@@ -196,6 +196,11 @@
                                 <c:errors>
                                     <xsl:for-each select="/*/reports/report/errors/error">
                                         <c:error>
+                                            <xsl:variable name="desc" select="normalize-space(string(desc))"/>
+                                            <xsl:variable name="code" select="replace($desc,'^([a-zA-Z0-9_-]+):.*$','$1')"/>
+                                            <xsl:if test="not($code='')">
+                                                <xsl:attribute name="code" select="concat('EPUBCHECK:',$code)"/>
+                                            </xsl:if>
                                             <xsl:if test="file">
                                                 <px:location>
                                                     <px:file>
@@ -204,7 +209,7 @@
                                                     </px:file>
                                                 </px:location>
                                             </xsl:if>
-                                            <xsl:value-of select="normalize-space(string(desc))"/>
+                                            <xsl:value-of select="replace($desc,'^([a-zA-Z0-9_-]+:\s+)','')"/>
                                         </c:error>
                                     </xsl:for-each>
                                 </c:errors>
