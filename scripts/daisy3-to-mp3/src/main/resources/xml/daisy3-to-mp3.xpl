@@ -33,19 +33,26 @@
 			automatically created.</p>
 		</p:documentation>
 	</p:option>
-	<p:option name="file-limit" select="[8,20,999,999]">
+	<p:option name="file-limit" select="[999,999]">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>An array of integers specifying the maximum number of files within each level of the
 			folder structure, beginning from the top level and ending with the innermost level. The
 			array must be at least one integer long (in which case the output is a flat list of
 			audio files).</p>
+			<p>Defaults to a folder structure that is two levels deep. At the top level there can be
+			up to 999 folders, each of which can contain up to 999 MP3 files.</p>
 		</p:documentation>
 	</p:option>
 	<p:option name="level-offset" cx:as="xs:integer" select="0">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>Offset between folder level and section level.</p>
-			<p>By default (offset 0) top-level folders correspond with level 1 sections.</p>
-			<p>Non-negative integer.</p>
+			<p>By default (offset 0) top-level folders correspond with top-level sections of the
+			book. An offset of <code>1</code> means that the book is contained in a single top-level
+			folder with MP3 files or sub-folders that correspond with top-level sections of the
+			book. If there are more top-level sections than the maximum number of files/folders that
+			a top-level folder can contain, the book is divided over multiple top-level folders.</p>
+			<p>Must be a non-negative integer value, smaller than the lenght of the
+			<code>file-limit</code> array.</p>
 		</p:documentation>
 	</p:option>
 
