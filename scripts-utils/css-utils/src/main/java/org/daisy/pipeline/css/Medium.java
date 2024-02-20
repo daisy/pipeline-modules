@@ -140,7 +140,7 @@ public class Medium {
 		return result;
 	}
 
-	public static Medium parse(String medium) {
+	public static Medium parse(String medium) throws IllegalArgumentException {
 		List<MediaQuery> q = CSSParserFactory.getInstance().parseMediaQuery(medium);
 		if (q.size() != 1)
 			throw new IllegalArgumentException("Unexpected medium: " + medium);
