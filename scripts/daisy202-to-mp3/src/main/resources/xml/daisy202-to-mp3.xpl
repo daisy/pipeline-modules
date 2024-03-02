@@ -2,6 +2,7 @@
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
+                xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:cx="http://xmlcalabash.com/ns/extensions"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:html="http://www.w3.org/1999/xhtml"
@@ -153,6 +154,15 @@
 		<p:with-param port="parameters" name="level-offset" select="$level-offset"/>
 		<p:with-option name="output-base-uri" select="pf:normalize-uri(concat($output-dir,'/'))"/>
 	</p:xslt>
+	<p:choose>
+		<p:when test="empty(//d:file/@href[not(starts-with(.,'volume%201/'))])">
+			<!-- drop the 'volume 1' prefix if there is only one volume -->
+			<p:label-elements attribute="href" label="substring-after(@href,'volume%201/')"/>
+		</p:when>
+		<p:otherwise>
+			<p:identity/>
+		</p:otherwise>
+	</p:choose>
 	<p:add-xml-base name="mapping"/>
 	<p:sink/>
 
