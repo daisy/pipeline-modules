@@ -359,6 +359,31 @@ public class AudioRearrangeStep extends DefaultStep implements XProcStep {
 						Optional<AudioEncoder> encoder = audioServices.newEncoder(resultFileType, new HashMap<String,String>());
 						if (!encoder.isPresent())
 							throw new RuntimeException("No encoder found for file type " + resultFileType);
+
+						// optimization: combine AudioClip that follow each other immediately
+						{
+							SortedMap<AudioClip,AudioClip> map = new TreeMap<>(desired.comparator());
+							AudioClip sourceClip = null;
+							AudioClip destinationClip = null;
+							for (Map.Entry<AudioClip,AudioClip> entry : desired.entrySet()) {
+								AudioClip s = entry.getValue();
+								AudioClip d = entry.getKey();
+								if (sourceClip != null
+								    && s.src.equals(sourceClip.src) && s.clipBegin.equals(sourceClip.clipEnd)
+								    && d.src.equals(destinationClip.src) && d.clipBegin.equals(destinationClip.clipEnd)) {
+									sourceClip = new AudioClip(sourceClip.src, sourceClip.clipBegin, s.clipEnd);
+									destinationClip = new AudioClip(destinationClip.src, destinationClip.clipBegin, d.clipEnd);
+								} else {
+									if (sourceClip != null)
+										map.put(destinationClip, sourceClip);
+									sourceClip = s;
+									destinationClip = d;
+								}
+							}
+							if (sourceClip != null)
+								map.put(destinationClip, sourceClip);
+							desired = map;
+						}
 						AudioClip prevSourceClip = null;
 						Fileset.File currentSourceFile = null;
 						PCMAudioFormat audioFormat = null;
