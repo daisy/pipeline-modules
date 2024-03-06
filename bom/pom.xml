@@ -36,7 +36,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>audio-encoder-lame</artifactId>
-        <version>3.0.8</version>
+        <version>3.0.9-SNAPSHOT</version>
       </dependency>
       
       <!--
