@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -202,7 +203,9 @@ public final class AudioUtils {
 			if (totalFrames < begin)
 				// could be a rounding error due to sampling: provide margin of one frame
 				if (totalFrames + 1 < begin)
-					throw new IllegalArgumentException();
+					throw new IllegalArgumentException(
+						"invalid split points: " + Arrays.toString(splitPoints)
+						+ " (total number of frames: " + totalFrames + ")");
 		}
 		int frameSize = format.getFrameSize();
 		return new Iterable<AudioInputStream>() {
