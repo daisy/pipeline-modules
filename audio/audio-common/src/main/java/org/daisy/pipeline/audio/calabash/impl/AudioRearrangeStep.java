@@ -362,6 +362,7 @@ public class AudioRearrangeStep extends DefaultStep implements XProcStep {
 						AudioClip prevSourceClip = null;
 						Fileset.File currentSourceFile = null;
 						PCMAudioFormat audioFormat = null;
+						URI audioFormatFromFile = null;
 						AudioInputStream currentSourcePCM = null;
 						long currentSourceElapsed = 0; // in frames
 						URI currentDestinationFile = null;
@@ -427,11 +428,17 @@ public class AudioRearrangeStep extends DefaultStep implements XProcStep {
 										new IOException("Audio file could not be read: " + currentSourceFile.href, e));
 								}
 								currentSourceElapsed = 0;
-								if (audioFormat == null)
+								if (audioFormat == null) {
 									audioFormat = PCMAudioFormat.of(currentSourcePCM.getFormat());
+									audioFormatFromFile = currentSourceFile.href;
+								}
 								else if (!audioFormat.matches(currentSourcePCM.getFormat()))
 									throw new TransformerException(
-										new RuntimeException("All input audio must have the same format"));
+										new RuntimeException(
+											String.format("All input audio must have the same format, but got %s (%s) and %s (%s)",
+											              audioFormat, audioFormatFromFile,
+											              currentSourcePCM.getFormat(),
+											              currentSourceFile.href)));
 							}
 							// convert clip begin/end times to frames
 							long sourceClipBegin = AudioUtils.getLengthInFrames(audioFormat, sourceClip.clipBegin);
