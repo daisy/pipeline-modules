@@ -138,6 +138,7 @@
     <liblouisutdml.liblouis.version>2.6.3</liblouisutdml.liblouis.version>
     <expose-services>
       org.daisy.pipeline.braille.liblouis.impl.LiblouisTablePath_default_liblouis_tables,
+      org.daisy.pipeline.braille.liblouis.impl.LiblouisTableDatatypeService,
       org.daisy.pipeline.braille.liblouis.impl.LiblouisTableJnaImplProvider,
       org.daisy.pipeline.braille.liblouis.impl.LiblouisTableRegistry,
       org.daisy.pipeline.braille.liblouis.impl.LiblouisTranslatorJnaImplProvider,

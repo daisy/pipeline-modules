@@ -17,8 +17,8 @@ import net.sf.saxon.Configuration;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 
-import org.daisy.common.xslt.ThreadUnsafeXslTransformer;
-import org.daisy.common.xslt.XslTransformCompiler;
+import org.daisy.common.saxon.xslt.ThreadUnsafeXslTransformer;
+import org.daisy.common.saxon.xslt.XslTransformCompiler;
 import org.daisy.pipeline.audio.AudioUtils;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
