@@ -549,6 +549,8 @@ public class AudioRearrangeStep extends DefaultStep implements XProcStep {
 							throw new TransformerException(e);
 						}
 					});
+				// this step may have filled the heap memory with a lot of data that can be cleaned up
+				System.gc();
 			};
 		}
 	}
