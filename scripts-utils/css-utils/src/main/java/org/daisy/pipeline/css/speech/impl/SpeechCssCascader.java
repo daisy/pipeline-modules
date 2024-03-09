@@ -12,6 +12,7 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 import javax.xml.transform.URIResolver;
 
+import cz.vutbr.web.css.CSSProperty;
 import cz.vutbr.web.css.CSSProperty.Content;
 import cz.vutbr.web.css.NodeData;
 import cz.vutbr.web.css.RuleFactory;
@@ -107,10 +108,13 @@ public class SpeechCssCascader implements CssCascader {
 						String s; {
 							Term<?> v = mainStyle.getValue(property, false);
 							if (v == null || v.getValue() == null) {
+								CSSProperty prop = mainStyle.getProperty(property, false);
+								if (prop == null) // can be null for unspecified inherited properties
+									continue;
 								// jStyleParser replaces '-' with '_'. Best workaround so far is to
 								// do the opposite: (voice-family and cue aside, there is no
 								// property values with '_' in Aural CSS)
-								s = mainStyle.getProperty(property, false).toString().replace("_", "-").toLowerCase();
+								s = prop.toString().replace("_", "-").toLowerCase();
 							} else if (v.getValue() instanceof List<?>) {
 								StringBuilder b = new StringBuilder();
 								Iterator<?> i = ((List<?>)v.getValue()).iterator();
