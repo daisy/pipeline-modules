@@ -339,6 +339,7 @@ public class TTSRegistryTest {
 			availableVoices.add(new Voice("vendor", "voice-a"));
 			availableVoices.add(new Voice("vendor", "voice-b"));
 			availableVoices.add(new Voice("vendor", "voice-c"));
+			availableVoices.add(new Voice("vendor", "voice-d", EN_IN, MALE));
 		}
 		List<VoiceInfo> voiceInfoFromConfig = new ArrayList<VoiceInfo>(); {
 			voiceInfoFromConfig.add(new VoiceInfo("vendor", "voice-a", EN, MALE, 0));
@@ -353,6 +354,10 @@ public class TTSRegistryTest {
 		Voice v = vv.next();
 		Assert.assertTrue(vm.matches(v, null, null, EN, MALE));
 		Assert.assertEquals("voice-a", v.getName());
+		Assert.assertTrue(vv.hasNext());
+		v = vv.next();
+		Assert.assertTrue(vm.matches(v, null, null, EN, MALE));
+		Assert.assertEquals("voice-d", v.getName());
 		Assert.assertFalse(vv.hasNext());
 		vv = vm.findAvailableVoices(null, null, EN_US, MALE).iterator();
 		Assert.assertTrue(vv.hasNext());
@@ -363,6 +368,10 @@ public class TTSRegistryTest {
 		v = vv.next();
 		Assert.assertTrue(vm.matches(v, null, null, EN_US, MALE));
 		Assert.assertEquals("voice-a", v.getName());
+		Assert.assertTrue(vv.hasNext());
+		v = vv.next();
+		Assert.assertTrue(vm.matches(v, null, null, EN_US, MALE));
+		Assert.assertEquals("voice-d", v.getName());
 		Assert.assertFalse(vv.hasNext());
 	}
 
