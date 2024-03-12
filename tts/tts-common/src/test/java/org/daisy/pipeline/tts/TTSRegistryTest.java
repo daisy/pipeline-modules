@@ -229,6 +229,33 @@ public class TTSRegistryTest {
 	}
 
 	@Test
+	public void withVendorAndNameAndLang() {
+		List<Voice> availableVoices = new ArrayList<>(); {
+			availableVoices.add(new Voice("vendor", "voice-a"));
+			availableVoices.add(new Voice("vendor", "voice-b"));
+			availableVoices.add(new Voice("vendor", "voice-c"));
+		}
+		List<VoiceInfo> voiceInfoFromConfig = new ArrayList<>(); {
+			voiceInfoFromConfig.add(new VoiceInfo("vendor", "voice-a", EN, MALE, 1));
+			voiceInfoFromConfig.add(new VoiceInfo("vendor", "voice-b", EN, MALE, 1));
+			voiceInfoFromConfig.add(new VoiceInfo("vendor", "voice-c", EN, MALE, 1));
+		}
+		VoiceManager vm = new VoiceManager(
+			singletonList(new SimplifiedProcessor(availableVoices)),
+			voiceInfoFromConfig);
+		Iterator<Voice> vv = vm.findAvailableVoices("vendor", "voice-b", EN, null).iterator();
+		Assert.assertTrue(vv.hasNext());
+		Voice v = vv.next();
+		Assert.assertEquals("voice-b", v.getName());
+		Assert.assertTrue(vm.matches(v, "vendor", "voice-b", EN, null));
+		Assert.assertTrue(vv.hasNext());
+		v = vv.next();
+		Assert.assertTrue(vv.hasNext());
+		v = vv.next();
+		Assert.assertFalse(vv.hasNext());
+	}
+
+	@Test
 	public void withVendorAndLangAndGender() {
 		List<Voice> availableVoices = new ArrayList<>(); {
 			availableVoices.add(new Voice("vendor2", "male-voice"));

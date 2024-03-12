@@ -324,7 +324,7 @@ public class VoiceManager {
 	}
 
 	public Iterable<Voice> findAvailableVoices(String voiceEngine, String voiceName, Locale lang, Gender gender) {
-		Set<Voice> voices = new LinkedHashSet<>();
+		Collection<Voice> voices = new LinkedHashSet<>();
 		if (lang == null && gender == null &&
 		    voiceEngine != null && !voiceEngine.isEmpty() && voiceName != null && !voiceName.isEmpty()) {
 			VoiceKey preferred = new VoiceKey(voiceEngine, voiceName);
@@ -389,6 +389,14 @@ public class VoiceManager {
 					if (!lang.equals(VoiceKey.MUL))
 						addExactMatches(voices, VoiceKey.MUL, VoiceKey.MUL, null, null);
 				}
+			}
+			if (voiceName != null) {
+				// reorder so that voices with requested name come first
+				// the relative order of two voices does not change if they have the same name, or
+				// if they both have a name that does not equal the requested name
+				voices = new ArrayList<>(voices);
+				Collections.sort((List<Voice>)voices,
+				                 Comparator.<Voice,Boolean>comparing(x -> !x.getName().equals(voiceName)));
 			}
 		}
 		return voices;
