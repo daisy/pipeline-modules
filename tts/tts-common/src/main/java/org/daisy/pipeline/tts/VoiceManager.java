@@ -323,11 +323,18 @@ public class VoiceManager {
 		return Iterables.getFirst(findAvailableVoices(voiceEngine, voiceName, lang, gender), null);
 	}
 
+	private final Map<VoiceKey,Iterable<Voice>> cache = new HashMap<>();
+
 	public Iterable<Voice> findAvailableVoices(String voiceEngine, String voiceName, Locale lang, Gender gender) {
+		VoiceKey cacheKey = new VoiceKey(voiceEngine, voiceName, lang, gender);
+		Iterable<Voice> fromCache = cache.get(cacheKey);
+		if (fromCache != null)
+			return fromCache;
 		Collection<Voice> voices = new LinkedHashSet<>();
 		if (lang == null && gender == null &&
 		    voiceEngine != null && !voiceEngine.isEmpty() && voiceName != null && !voiceName.isEmpty()) {
-			VoiceKey preferred = new VoiceKey(voiceEngine, voiceName);
+			VoiceKey preferred = new VoiceKey(voiceEngine, voiceName); // not necessarily equal to cacheKey
+			                                                           // because of case normalization
 			Voice primary = primaryVoices.get(preferred);
 			if (primary != null)
 				voices.add(primary);
@@ -399,6 +406,7 @@ public class VoiceManager {
 				                 Comparator.<Voice,Boolean>comparing(x -> !x.getName().equals(voiceName)));
 			}
 		}
+		cache.put(cacheKey, voices);
 		return voices;
 	}
 
@@ -421,7 +429,7 @@ public class VoiceManager {
 		if (lang == null && gender == null)
 			return true;
 		for (VoiceKey k : voiceIndex.keySet()) {
-			if (k.primaryLang != null && k.gender != null && k.engine != null)
+			if (k.lang != null && k.gender != null && k.engine != null)
 				if (gender == null || k.gender == NO_DEFINITE_GENDER || k.gender.equals(gender))
 					for (LanguageRangeVoiceTuple v : voiceIndex.get(k))
 						if (v.voice.equals(voice))
@@ -456,28 +464,51 @@ public class VoiceManager {
 
 		private final String engine;
 		private final String name;
-		private final Locale primaryLang; // primary language subtag or "mul"
+		/**
+		 * When used in {@code voiceIndex}, this is the primary language subtag or "mul". When used
+		 * in {@code cache}, this is the {@code lang} argument passed to the {@link
+		 * #findAvailableVoices} method.
+		 */
+		private final Locale lang;
 		private final Gender gender;
 
+		/**
+		 * For use in {@code voiceIndex}
+		 */
 		public VoiceKey(String engine, String name) {
 			this.engine = engine == null ? null : engine.toLowerCase();
 			this.name = name == null ? null : name.toLowerCase();
-			this.primaryLang = null;
+			this.lang = null;
 			this.gender = null;
 		}
 
+		/**
+		 * For use in {@code voiceIndex}
+		 *
+		 * @param primaryLang The primary language subtag or "mul"
+		 */
 		public VoiceKey(Locale primaryLang, Gender gender, String engine) {
-			this.primaryLang = primaryLang;
+			this.lang = primaryLang;
 			this.gender = gender;
 			this.engine = engine == null ? null : engine.toLowerCase();
 			this.name = null;
 		}
 
+		/**
+		 * For use in {@code cache}
+		 */
+		public VoiceKey(String engine, String name, Locale lang, Gender gender) {
+			this.engine = engine;
+			this.name = name;
+			this.lang = lang;
+			this.gender = gender;
+		}
+
 		@Override
 		public int hashCode() {
 			int res = 0;
-			if (this.primaryLang != null)
-				res ^=  this.primaryLang.hashCode();
+			if (this.lang != null)
+				res ^=  this.lang.hashCode();
 			if (this.gender != null)
 				res ^= this.gender.hashCode();
 			if (this.engine != null)
@@ -490,7 +521,7 @@ public class VoiceManager {
 		@Override
 		public boolean equals(Object other) {
 			VoiceKey o = (VoiceKey) other;
-			return (primaryLang == o.primaryLang || (primaryLang != null && primaryLang.equals(o.primaryLang)))
+			return (lang == o.lang || (lang != null && lang.equals(o.lang)))
 			        && (gender == o.gender || (gender != null && gender.equals(o.gender)))
 			        && (engine == o.engine || (engine != null && engine.equals(o.engine)))
 			        && (name == o.name || (name != null && name.equals(o.name)));
@@ -504,8 +535,8 @@ public class VoiceManager {
 				s.append("engine: " + engine);
 			if (name != null)
 				s.append(", name: " + name);
-			if (primaryLang != null)
-				s.append(", primaryLang: " + primaryLang);
+			if (lang != null)
+				s.append(", lang: " + lang);
 			if (gender != null)
 				s.append(", gender: " + gender);
 			if (s.length() > 1 && s.charAt(1) == ',')
