@@ -453,15 +453,13 @@ public class TTSRegistryTest {
 		Voice v = vv.next();
 		Assert.assertTrue(vm.matches(v, null, null, EN_US, MALE));
 		Assert.assertEquals("voice1", v.getName());
-		v = vm.findSecondaryVoice(v);
-		Assert.assertNotNull(v);
-		Assert.assertEquals("vendor2", v.getEngine());
-		Assert.assertTrue("voice2".equals(v.getName()) || "voice3".equals(v.getName()));
 		Assert.assertTrue(vv.hasNext());
 		v = vv.next();
+		Assert.assertTrue("voice2".equals(v.getName()) || "wrong-choice".equals(v.getName()));
 		Assert.assertTrue(vm.matches(v, null, null, EN_US, MALE));
 		Assert.assertTrue(vv.hasNext());
 		v = vv.next();
+		Assert.assertTrue("voice2".equals(v.getName()) || "wrong-choice".equals(v.getName()));
 		Assert.assertTrue(vm.matches(v, null, null, EN_US, MALE));
 		Assert.assertTrue(vv.hasNext());
 		v = vv.next();
@@ -530,9 +528,6 @@ public class TTSRegistryTest {
 		Voice v = vv.next();
 		Assert.assertTrue(vm.matches(v, "vendor1", null, EN_US, MALE));
 		Assert.assertEquals("voice1", v.getName());
-		v = vm.findSecondaryVoice(v);
-		Assert.assertNotNull(v);
-		Assert.assertEquals("voice2", v.getName());
 		Assert.assertTrue(vv.hasNext());
 		v = vv.next();
 		Assert.assertTrue(vm.matches(v, "vendor1", null, EN_US, MALE));
@@ -564,8 +559,6 @@ public class TTSRegistryTest {
 		Voice v = vv.next();
 		Assert.assertTrue(vm.matches(v, "vendor1", "voice1", null, null));
 		// fallback should never be the same as the primary voice
-		v = vm.findSecondaryVoice(v);
-		Assert.assertNull(v);
 		Assert.assertFalse(vv.hasNext());
 	}
 

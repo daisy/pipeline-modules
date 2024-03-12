@@ -295,13 +295,6 @@ public class VoiceManager {
 		ServerLogger.debug(sb.toString());
 	}
 
-	public Voice findSecondaryVoice(Voice v) {
-		Collection<Voice> vv = secondaryVoices.get(new VoiceKey(v.getEngine(), v.getName()));
-		if (vv != null)
-			return Iterables.getFirst(vv, null);
-		return null;
-	}
-
 	/**
 	 * @param voice is an available voice.
 	 * @return the best TTS Engine for @param voice. It can return an engine
