@@ -324,8 +324,7 @@ public class VoiceManager {
 		if (fromCache != null)
 			return fromCache;
 		Collection<Voice> voices = new LinkedHashSet<>();
-		if (lang == null && gender == null &&
-		    voiceEngine != null && !voiceEngine.isEmpty() && voiceName != null && !voiceName.isEmpty()) {
+		if (voiceEngine != null && !voiceEngine.isEmpty() && voiceName != null && !voiceName.isEmpty()) {
 			VoiceKey preferred = new VoiceKey(voiceEngine, voiceName); // not necessarily equal to cacheKey
 			                                                           // because of case normalization
 			Voice primary = primaryVoices.get(preferred);

@@ -253,6 +253,16 @@ public class TTSRegistryTest {
 		Assert.assertTrue(vv.hasNext());
 		v = vv.next();
 		Assert.assertFalse(vv.hasNext());
+		vv = vm.findAvailableVoices("vendor", "voice-b", FR, null).iterator();
+		Assert.assertTrue(vv.hasNext());
+		v = vv.next();
+		Assert.assertEquals("voice-b", v.getName());
+		Assert.assertFalse(vm.matches(v, "vendor", "voice-b", FR, null));
+		Assert.assertTrue(vv.hasNext());
+		v = vv.next();
+		Assert.assertTrue(vv.hasNext());
+		v = vv.next();
+		Assert.assertFalse(vv.hasNext());
 	}
 
 	@Test
