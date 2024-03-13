@@ -8,6 +8,8 @@ import org.antlr.runtime.ANTLRReaderStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 
+import org.apache.commons.text.StringEscapeUtils;
+
 import org.w3c.dom.Element;
 
 class DoxygenComment extends Comment {
@@ -27,7 +29,7 @@ class DoxygenComment extends Comment {
 		this.varName = Optional.ofNullable(varName);
 		this.type = Optional.ofNullable(type);
 		this.brief = Optional.ofNullable(brief);
-		this.body = body;
+		this.body = processMarkdown(body);
 		this.typeDef = Optional.ofNullable(typeDef);
 	}
 
@@ -58,5 +60,14 @@ class DoxygenComment extends Comment {
 		} catch (IOException e) {
 			throw new RuntimeException(e); // should not happen
 		}
+	}
+
+	/**
+	 * Rendering markdown is currently the responsibility to the client. However for convenience we
+	 * do a little bit of processing in the engine.
+	 */
+	private static String processMarkdown(String markdown) {
+		// replace HTML character entities
+		return StringEscapeUtils.unescapeHtml4(markdown);
 	}
 }
