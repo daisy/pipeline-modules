@@ -23,9 +23,21 @@ class SassVariable implements org.daisy.pipeline.css.sass.SassAnalyzer.SassVaria
 	private final String name;
 	private final String nicename;
 	private final String description;
-	private final String defaultValue;
+	private final String value;
+	private boolean isDefault = true;
 	private final DatatypeService type;
 
+	/**
+	 * Create a fixed variable.
+	 */
+	SassVariable(String name, String value) {
+		this(name, null, value, null);
+		isDefault = false;
+	}
+
+	/**
+	 * Create a writable variable (with a {@code !default} suffix).
+	 */
 	SassVariable(String name, Comment precedingComment, String defaultValue, DatatypeRegistry datatypes) {
 		this.name = name;
 		DoxygenComment doxygenComment; {
@@ -129,7 +141,7 @@ class SassVariable implements org.daisy.pipeline.css.sass.SassAnalyzer.SassVaria
 		}
 		this.nicename = nicename;
 		this.description = description;
-		this.defaultValue = defaultValue;
+		this.value = defaultValue;
 		this.type = type;
 	}
 
@@ -149,12 +161,22 @@ class SassVariable implements org.daisy.pipeline.css.sass.SassAnalyzer.SassVaria
 	}
 
 	@Override
-	public String getDefaultValue() {
-		return defaultValue;
+	public String getValue() {
+		return value;
+	}
+
+	@Override
+	public boolean isDefault() {
+		return isDefault;
 	}
 
 	@Override
 	public DatatypeService getType() {
 		return type;
+	}
+
+	@Override
+	public String toString() {
+		return "$" + name + ": " + value + (isDefault ? " !default" : "") + ";";
 	}
 }

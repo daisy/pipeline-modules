@@ -66,7 +66,19 @@ public class SassAnalyzerTest {
 			null
 		).getVariables().iterator();
 		SassVariable v = variables.next();
-		Assert.assertEquals("true", v.getDefaultValue());
+		Assert.assertEquals("true", v.getValue());
+		Assert.assertFalse(variables.hasNext());
+	}
+
+	@Test
+	public void testFixedVariable() throws Exception {
+		Iterator<SassVariable> variables = new SassAnalyzer(Medium.parse("screen"), null, null).analyze(
+			Collections.singletonList(new StreamSource(new StringReader("   $my-var: true;"))),
+			null
+		).getVariables().iterator();
+		SassVariable v = variables.next();
+		Assert.assertEquals("true", v.getValue());
+		Assert.assertFalse(v.isDefault());
 		Assert.assertFalse(variables.hasNext());
 	}
 

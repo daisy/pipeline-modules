@@ -46,11 +46,11 @@ variables returns [java.util.Collection<SassVariable> vars]
 }
     : ( c=comment { lastComment = c; }
       | (n=VAR_DECL v=variable_value (d=DEFAULT S?)? SEMICOLON) {
+            String name = n.getText().substring(1, n.getText().length() - 1).trim();
             if (d != null)
-                vars.add(new SassVariable(n.getText().substring(1, n.getText().length() - 1).trim(),
-                                          lastComment,
-                                          v,
-                                          analyzer.datatypes));
+                vars.add(new SassVariable(name, lastComment, v, analyzer.datatypes));
+            else
+                vars.add(new SassVariable(name, v));
         }
       // @import currently only supported at the top level
       | vars_from_import=import_rule {

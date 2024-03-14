@@ -37,7 +37,8 @@ public class SassAnalyzer {
 		public String getName();
 		public String getNiceName();
 		public String getDescription();
-		public String getDefaultValue();
+		public String getValue();
+		public boolean isDefault();
 		public DatatypeService getType();
 	}
 

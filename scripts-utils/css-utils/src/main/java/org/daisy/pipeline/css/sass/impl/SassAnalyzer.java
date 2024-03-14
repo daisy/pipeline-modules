@@ -10,7 +10,11 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -264,6 +268,20 @@ public class SassAnalyzer {
 		} catch (RecognitionException e) {
 			throw new RuntimeException("Error happened while parsing the SCSS", e);
 		}
+		// drop duplicates
+		Set<SassVariable> unique = new TreeSet<>(Comparator.comparing(SassVariable::getName));
+		Iterator<SassVariable> i = vars.iterator();
+		while (i.hasNext()) {
+			SassVariable v = i.next();
+			if (!v.isDefault())
+				if (!unique.add(v))
+					i.remove(); }
+		i = vars.iterator();
+		while (i.hasNext()) {
+			SassVariable v = i.next();
+			if (v.isDefault())
+				if (!unique.add(v))
+					i.remove(); }
 		return vars;
 	}
 

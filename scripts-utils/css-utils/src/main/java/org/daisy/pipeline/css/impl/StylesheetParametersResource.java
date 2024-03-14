@@ -255,16 +255,18 @@ public class StylesheetParametersResource extends AuthenticatedResource {
 					for (SassVariable v : new SassAnalyzer(medium, resolver, datatypeRegistry)
 						                      .analyze(userStylesheets, sourceDocument)
 					                          .getVariables()) {
-						Element parameterElem = parametersDoc.createElementNS(XmlUtils.NS_PIPELINE_DATA, "parameter");
-						parameterElem.setAttribute("name", v.getName());
-						parameterElem.setAttribute("nicename", v.getNiceName());
-						parameterElem.setAttribute("description", v.getDescription());
-						parameterElem.setAttribute("default", v.getDefaultValue());
-						parameterElem.setAttribute("type", v.getType().getId());
-						parameterElem.setAttribute("required", "false");
-						parameterElem.setAttribute("sequence", "false");
-						parameterElem.setAttribute("ordered", "false");
-						parametersElem.appendChild(parameterElem);
+						if (v.isDefault()) {
+							Element parameterElem = parametersDoc.createElementNS(XmlUtils.NS_PIPELINE_DATA, "parameter");
+							parameterElem.setAttribute("name", v.getName());
+							parameterElem.setAttribute("nicename", v.getNiceName());
+							parameterElem.setAttribute("description", v.getDescription());
+							parameterElem.setAttribute("default", v.getValue());
+							parameterElem.setAttribute("type", v.getType().getId());
+							parameterElem.setAttribute("required", "false");
+							parameterElem.setAttribute("sequence", "false");
+							parameterElem.setAttribute("ordered", "false");
+							parametersElem.appendChild(parameterElem);
+						}
 					}
 				} catch (IOException e) {
 					return badRequest(e);
