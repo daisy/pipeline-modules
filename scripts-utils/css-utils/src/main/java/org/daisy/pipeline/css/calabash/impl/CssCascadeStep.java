@@ -112,7 +112,9 @@ public class CssCascadeStep extends DefaultStep implements XProcStep {
 	@Override
 	public void reset() {
 		sourcePipe.resetReader();
+		contextPipe.resetReader();
 		resultPipe.resetWriter();
+		sassVariables.clear();
 	}
 
 	@Override

@@ -18,6 +18,7 @@ import java.util.TreeSet;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
@@ -190,20 +191,29 @@ public class SassAnalyzer {
 		}
 		if (sourceDocument != null) {
 			try {
+				Document doc;
 				URL base; {
-					String systemId = sourceDocument.getSystemId();
-					if (systemId == null || "".equals(systemId))
-						base = null;
-					else {
-						URI baseURI = URLs.asURI(systemId);
+					if (sourceDocument instanceof DOMSource && ((DOMSource)sourceDocument).getNode() instanceof Document) {
+						doc = (Document)((DOMSource)sourceDocument).getNode();
+						URI baseURI = URLs.asURI(doc.getBaseURI());
 						if (baseURI.isOpaque() || !baseURI.isAbsolute())
 							throw new IllegalArgumentException("not an absolute hierarchical base URI: " + baseURI);
 						base = URLs.asURL(baseURI);
+					} else {
+						DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+						factory.setNamespaceAware(true);
+						doc = factory.newDocumentBuilder().parse(SAXSource.sourceToInputSource(sourceDocument));
+						String systemId = sourceDocument.getSystemId();
+						if (systemId == null || "".equals(systemId))
+							base = null;
+						else {
+							URI baseURI = URLs.asURI(systemId);
+							if (baseURI.isOpaque() || !baseURI.isAbsolute())
+								throw new IllegalArgumentException("not an absolute hierarchical base URI: " + baseURI);
+							base = URLs.asURL(baseURI);
+						}
 					}
 				}
-				DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-				factory.setNamespaceAware(true);
-				Document doc = factory.newDocumentBuilder().parse(SAXSource.sourceToInputSource(sourceDocument));
 				new Traversal(doc) {
 					@Override
 					protected void processElement(Element e) {

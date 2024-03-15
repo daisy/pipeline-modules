@@ -230,7 +230,11 @@
         </p:with-option>
     </p:add-attribute>
     
-    <p:group px:message="Inlining global CSS" px:progress=".11">
+    <p:group name="html-with-css" px:message="Inlining global CSS" px:progress=".11">
+        <p:output port="result" primary="true"/>
+        <p:output port="parameters">
+            <p:pipe step="apply-stylesheets" port="result.parameters"/>
+        </p:output>
         <p:variable name="abs-stylesheet"
                     select="for $s in tokenize($stylesheet,'\s+')[not(.='')]
                             return resolve-uri($s,$epub)"/>
@@ -251,7 +255,7 @@
             <p:inline><_/></p:inline>
         </p:variable>
         <p:identity px:message="stylesheets: {$stylesheets-to-be-inlined}"/>
-        <px:apply-stylesheets px:progress="1">
+        <px:apply-stylesheets name="apply-stylesheets" px:progress="1">
             <p:with-option name="stylesheets" select="$stylesheets-to-be-inlined"/>
             <p:input port="parameters">
                 <p:pipe port="result" step="parameters"/>
@@ -263,7 +267,7 @@
                                      ') AND (height: ',
                                      (//c:param[@name='page-height' and not(@namespace[not(.='')])]/@value,25)[1],
                                      ')')">
-                <p:pipe port="result" step="parameters"/>
+                <p:pipe step="parameters" port="result"/>
             </p:with-option>
         </px:apply-stylesheets>
     </p:group>
@@ -304,7 +308,7 @@
                     <p:with-option name="query" select="$transform-query"/>
                     <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>
                     <p:input port="parameters">
-                        <p:pipe port="result" step="parameters"/>
+                        <p:pipe step="html-with-css" port="parameters"/>
                     </p:input>
                 </px:transform>
             </p:group>
@@ -321,7 +325,7 @@
                         <p:with-option name="query" select="$transform-query"/>
                         <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>
                         <p:input port="parameters">
-                            <p:pipe port="result" step="parameters"/>
+                            <p:pipe step="html-with-css" port="parameters"/>
                         </p:input>
                     </px:transform>
                 </p:group>
@@ -365,7 +369,7 @@
                 <p:with-option name="query" select="$transform-query"/>
                 <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>
                 <p:input port="parameters">
-                    <p:pipe port="result" step="parameters"/>
+                    <p:pipe step="html-with-css" port="parameters"/>
                 </p:input>
             </px:transform>
         </p:otherwise>
