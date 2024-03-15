@@ -81,7 +81,6 @@
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/braille/common-utils/library.xpl">
         <p:documentation>
-            px:merge-parameters
             px:apply-stylesheets
             px:transform
             px:parse-query
@@ -109,14 +108,14 @@
             px:fileset-add-entry
         </p:documentation>
     </p:import>
-    
-    <!-- Ensure that there's exactly one c:param-set -->
-    <px:merge-parameters name="parameters" px:progress=".01">
-        <p:input port="source">
+
+    <!-- Ensure that there's exactly one c:param-set. (In case of multiple parameters with the same
+         name, only the last occurence is kept.) -->
+    <p:parameters name="parameters" px:progress=".01">
+        <p:input port="parameters">
             <p:pipe step="main" port="parameters"/>
         </p:input>
-    </px:merge-parameters>
-    <p:sink/>
+    </p:parameters>
 
     <!-- Parse transform query to a c:param-set -->
     <px:parse-query name="parsed-transform-query">

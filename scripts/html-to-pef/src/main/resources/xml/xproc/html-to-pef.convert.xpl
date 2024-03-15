@@ -81,7 +81,6 @@
         <p:documentation>
             px:parse-query
             px:transform
-            px:merge-parameters
             px:apply-stylesheets
         </p:documentation>
     </p:import>
@@ -98,13 +97,13 @@
 
     <p:variable name="ERR_DOTIFY_002" cx:as="xs:QName" select="QName('http://www.daisy.org/ns/pipeline/errors','pe:DOTIFY002')"/>
 
-    <!-- Ensure that there's exactly one c:param-set -->
-    <px:merge-parameters name="parameters" px:progress=".01">
-        <p:input port="source">
+    <!-- Ensure that there's exactly one c:param-set. (In case of multiple parameters with the same
+         name, only the last occurence is kept.) -->
+    <p:parameters name="parameters" px:progress=".01">
+        <p:input port="parameters">
             <p:pipe step="main" port="parameters"/>
         </p:input>
-    </px:merge-parameters>
-    <p:sink/>
+    </p:parameters>
     
     <!-- Parse transform query to a c:param-set -->
     <px:parse-query name="parsed-transform-query">
