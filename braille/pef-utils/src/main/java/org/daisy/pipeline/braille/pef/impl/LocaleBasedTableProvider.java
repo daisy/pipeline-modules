@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -69,11 +70,22 @@ public class LocaleBasedTableProvider extends AbstractTableProvider {
 		for (org.daisy.dotify.api.table.TableProvider p : providers)
 			for (FactoryProperties fp : p.list())
 				if (fp.getIdentifier().equals(id)) {
-					TableProxy table = new TableProxy(fp, p);
-					for (Locale locale : locales)
+					TableProxy table = null;
+					for (Locale locale : locales) {
+						if (table == null)
+							table = new TableProxy(fp, p, locale);
 						tableFromLocale.put(locale, table);
+					}
 					break;
 				}
+	}
+
+	private Collection<FactoryProperties> properties = null;
+
+	Collection<FactoryProperties> list() {
+		if (properties == null)
+			properties = Collections.unmodifiableCollection(new HashSet<>(tableFromLocale.values()));
+		return properties;
 	}
 
 	/**
@@ -139,21 +151,46 @@ public class LocaleBasedTableProvider extends AbstractTableProvider {
 		providers.remove(provider);
 	}
 	
-	static class TableProxy {
+	static class TableProxy implements FactoryProperties {
 
 		private final org.daisy.dotify.api.table.TableProvider provider;
 		private final FactoryProperties properties;
+		private final Locale locale;
 		private Table table = null;
 
-		public TableProxy(FactoryProperties properties, org.daisy.dotify.api.table.TableProvider provider) {
+		public TableProxy(FactoryProperties properties, org.daisy.dotify.api.table.TableProvider provider, Locale locale) {
 			this.properties = properties;
 			this.provider = provider;
+			this.locale = locale;
 		}
 
 		public Table getTable() {
 			if (table == null)
 				table = provider.newFactory(properties.getIdentifier());
 			return table;
+		}
+
+		public Locale getLocale() {
+			return locale;
+		}
+
+		@Override
+		public String getIdentifier() {
+			return properties.getIdentifier();
+		}
+
+		@Override
+		public String getDisplayName() {
+			return "Default table for " + locale.getDisplayName();
+		}
+
+		@Override
+		public String getDescription() {
+			if (getIdentifier().startsWith("org_daisy") ||
+			    getIdentifier().startsWith("org.daisy"))
+				return null;
+			else
+				return properties.getDescription();
 		}
 	}
 	

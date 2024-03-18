@@ -48,6 +48,7 @@ public class BrailleUtilsTableCatalog implements TableProvider {
 		return empty;
 	}
 
+	// used in TableDatatypeService and unit test
 	Collection<FactoryProperties> list() {
 		return providers.stream().flatMap(p -> p.list().stream()).collect(Collectors.toList());
 	}
