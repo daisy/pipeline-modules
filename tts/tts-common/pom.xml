@@ -99,6 +99,7 @@
       org.daisy.pipeline.tts.calabash.impl.GetAnnotationsProvider,
       org.daisy.pipeline.tts.calabash.impl.GetLexiconsProvider,
       org.daisy.pipeline.tts.calabash.impl.SynthesizeProvider,
+      org.daisy.pipeline.tts.impl.DefaultLexiconProperty,
       org.daisy.pipeline.tts.impl.VoicesWebServiceExtension,
       org.daisy.pipeline.modules.impl.Module_tts_common
     </expose-services>

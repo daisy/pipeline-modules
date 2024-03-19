@@ -64,7 +64,7 @@
     <!-- defined in ../../../../../common-options.xpl -->
   </p:option>
 
-  <p:option name="lexicon">
+  <p:option name="lexicon" select="p:system-property('d:org.daisy.pipeline.tts.default-lexicon')">
     <!-- defined in ../../../../../common-options.xpl -->
   </p:option>
 
