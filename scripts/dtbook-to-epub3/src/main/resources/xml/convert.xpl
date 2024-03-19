@@ -24,7 +24,13 @@
 
 	<p:option name="stylesheet" select="''">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			<p>CSS user style sheets as space separated list of absolute URIs.</p>
+			<p>CSS style sheets as space separated list of absolute URIs.</p>
+		</p:documentation>
+	</p:option>
+
+	<p:option name="lexicon" cx:as="xs:anyURI*" select="()">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p>PLS lexicons as list of absolute URIs.</p>
 		</p:documentation>
 	</p:option>
 
@@ -143,6 +149,7 @@
 		<p:with-option name="temp-dir" select="concat($temp-dir,'epub3/temp/')"/>
 		<p:with-option name="audio" select="$audio"/>
 		<p:with-option name="audio-file-type" select="$audio-file-type"/>
+		<p:with-option name="lexicon" select="$lexicon"/>
 		<p:with-option name="chunk-size" select="$chunk-size"/>
 		<p:with-option name="output-validation" select="if ($output-validation='abort')
 		                                                then 'report'

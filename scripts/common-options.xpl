@@ -251,7 +251,6 @@ manual](http://sass-lang.com/documentation/file.SASS_REFERENCE.html).</p>
 	    dtbook-to-epub3
 	    zedai-to-epub3
 	    epub-to-daisy
-	    epub3-to-epub3
 	-->
 	<p:option xmlns:_="tts" name="_:stylesheet" required="false" px:type="anyURI" select="''" px:sequence="true" px:separator=" "
 	          px:media-type="text/css text/x-scss">
@@ -274,6 +273,28 @@ attributes](https://www.w3.org/TR/css-style-attr/)). Only author styles that app
 All style sheets are applied at once, but the order in which they are specified has an influence on
 the [cascading order](https://www.w3.org/TR/CSS2/cascade.html#cascading-order). Author styles take
 precedence over user styles.
+			</p>
+		</p:documentation>
+	</p:option>
+
+	<!--
+	    dtbook-to-daisy3
+	    dtbook-to-epub3
+	    zedai-to-epub3
+	    epub-to-daisy
+	    epub3-to-epub3
+	-->
+	<p:option name="lexicon" required="false" px:type="anyURI" select="''" px:sequence="true" px:separator=" "
+	          px:media-type="application/pls+xml">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<h2 px:role="name">Lexicons</h2>
+			<p px:role="desc" xml:space="preserve">A list of PLS lexicons to take into account.
+
+Must be a space separated list of URIs, absolute or relative to the input.
+
+Style sheets can also be attached to the source document, using an ['xml-stylesheet' processing
+instruction](https://www.w3.org/TR/xml-stylesheet) or a ['link'
+element](http://kb.daisy.org/publishing/docs/text-to-speech/pls.html#ex-07).
 			</p>
 		</p:documentation>
 	</p:option>

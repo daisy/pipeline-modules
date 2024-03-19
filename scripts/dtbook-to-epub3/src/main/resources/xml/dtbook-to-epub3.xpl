@@ -77,6 +77,10 @@
       <!-- defined in ../../../../../common-options.xpl -->
     </p:option>
 
+    <p:option name="lexicon">
+      <!-- defined in ../../../../../common-options.xpl -->
+    </p:option>
+
     <p:option xmlns:_="dtbook" name="_:chunk-size" select="'-1'">
       <!-- defined in ../../../../../common-options.xpl -->
     </p:option>
@@ -189,6 +193,8 @@
 	                                                             for $s in tokenize($_:stylesheet,'\s+')[not(.='')] return
 	                                                               resolve-uri($s,$dtbook-uri),
 	                                                             ' ')"/>
+	    <p:with-option name="lexicon" select="for $l in tokenize($lexicon,'\s+')[not(.='')] return
+	                                            resolve-uri($l,$dtbook-uri)"/>
 	    <p:with-option name="audio" select="$audio"/>
 	    <p:with-option name="audio-file-type" select="$audio-file-type"/>
 	    <p:with-option name="language" select="$language"/>
