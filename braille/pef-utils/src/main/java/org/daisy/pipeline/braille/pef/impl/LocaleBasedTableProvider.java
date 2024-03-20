@@ -1,12 +1,14 @@
 package org.daisy.pipeline.braille.pef.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
 import org.daisy.dotify.api.factory.FactoryProperties;
@@ -16,9 +18,12 @@ import org.daisy.pipeline.braille.common.Query;
 import org.daisy.pipeline.braille.common.Query.Feature;
 import org.daisy.pipeline.braille.common.Query.MutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
+import static org.daisy.pipeline.braille.common.util.Locales.parseLocale;
 import org.daisy.pipeline.braille.pef.AbstractTableProvider;
 import org.daisy.pipeline.braille.pef.TableProvider;
+import org.daisy.pipeline.common.NormalizeLang;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -40,12 +45,35 @@ import org.slf4j.LoggerFactory;
 public class LocaleBasedTableProvider extends AbstractTableProvider {
 	
 	private static Set<String> supportedFeatures = ImmutableSet.of("locale", "document-locale");
-	private static Map<String,String> tableFromLocale = new HashMap<String,String>();
+	private static Map<Locale,TableProxy> tableFromLocale = new HashMap<>();
 	
-	public LocaleBasedTableProvider() {
-		tableFromLocale.put("en", "org.daisy.braille.impl.table.DefaultTableProvider.TableType.EN_US");
-		tableFromLocale.put("de", "org_daisy.EmbosserTableProvider.TableType.DE_DE");
-		tableFromLocale.put("nl", "com_braillo.BrailloTableProvider.TableType.BRAILLO_6DOT_031_01");
+	@Activate
+	protected void init() {
+		putTable("org_daisy.EmbosserTableProvider.TableType.CS_CZ",                   parseLocale("cs"));
+		putTable("org_daisy.EmbosserTableProvider.TableType.DA_DK",                   parseLocale("da"));
+		putTable("org_daisy.EmbosserTableProvider.TableType.DE_DE",                   parseLocale("de"));
+		putTable("org.daisy.braille.impl.table.DefaultTableProvider.TableType.EN_US", parseLocale("en"));
+		putTable("org_daisy.EmbosserTableProvider.TableType.EN_GB",                   parseLocale("en-GB"));
+		putTable("org.daisy.braille.impl.table.DefaultTableProvider.TableType.EN_US", parseLocale("en-US"));
+		putTable("org_daisy.EmbosserTableProvider.TableType.ES_ES_TABLE_2",           parseLocale("es"));
+		putTable("org_daisy.EmbosserTableProvider.TableType.IT_IT_FIRENZE",           parseLocale("it"));
+		putTable("com_braillo.BrailloTableProvider.TableType.BRAILLO_6DOT_047_01",    parseLocale("nb"));
+		putTable("com_braillo.BrailloTableProvider.TableType.BRAILLO_6DOT_031_01",    parseLocale("nl"));
+		putTable("com_braillo.BrailloTableProvider.TableType.BRAILLO_6DOT_047_01",    parseLocale("no"),
+		                                                                              parseLocale("nn"),
+		                                                                              parseLocale("nb"));
+		putTable("com_braillo.BrailloTableProvider.TableType.BRAILLO_6DOT_046_01",    parseLocale("sv"));
+	}
+
+	private void putTable(String id, Locale... locales) {
+		for (org.daisy.dotify.api.table.TableProvider p : providers)
+			for (FactoryProperties fp : p.list())
+				if (fp.getIdentifier().equals(id)) {
+					TableProxy table = new TableProxy(fp, p);
+					for (Locale locale : locales)
+						tableFromLocale.put(locale, table);
+					break;
+				}
 	}
 
 	/**
@@ -61,21 +89,37 @@ public class LocaleBasedTableProvider extends AbstractTableProvider {
 				return empty; }
 		Iterable<Table> table = empty;
 		MutableQuery q = mutableQuery(query);
-		final String documentLocale = q.containsKey("document-locale")
-			? q.removeOnly("document-locale").getValue().get()
-			: null;
+		Locale documentLocale; {
+			try {
+				documentLocale = q.containsKey("document-locale")
+					? NormalizeLang.normalize(parseLocale(q.removeOnly("document-locale").getValue().get()))
+					: null; }
+			catch (IllegalArgumentException e) {
+				logger.error("Invalid locale", e);
+				documentLocale = null; }}
 		if (q.containsKey("locale")) {
-			String id = tableFromLocale.get(q.removeOnly("locale").getValue().get());
-			if (id != null && q.isEmpty())
-				table = get(id); }
+			Locale locale; {
+				try {
+					locale = NormalizeLang.normalize(parseLocale(q.removeOnly("locale").getValue().get())); }
+				catch (IllegalArgumentException e) {
+					logger.error("Invalid locale", e);
+					return empty; }}
+			if (q.isEmpty()) {
+				TableProxy t = tableFromLocale.get(locale);
+				if (t == null)
+					t = tableFromLocale.get(new Locale(locale.getLanguage()));
+				if (t != null)
+					table = Collections.singleton(t.getTable()); }}
 		else if (documentLocale != null && q.isEmpty()) {
-			String id = tableFromLocale.get(documentLocale);
-			if (id != null)
-				table = get(id); }
+			TableProxy t = tableFromLocale.get(documentLocale);
+			if (t == null)
+				t = tableFromLocale.get(new Locale(documentLocale.getLanguage()));
+			if (t != null)
+				table = Collections.singleton(t.getTable()); }
 		return table;
 	}
 	
-	private final static Iterable<Table> empty = Optional.<Table>absent().asSet();
+	private final static Iterable<Table> empty = Collections.<Table>emptyList();
 	
 	private final List<org.daisy.dotify.api.table.TableProvider> providers
 	= new ArrayList<org.daisy.dotify.api.table.TableProvider>();
@@ -95,14 +139,23 @@ public class LocaleBasedTableProvider extends AbstractTableProvider {
 		providers.remove(provider);
 	}
 	
-	private Iterable<Table> get(String id) {
-		for (org.daisy.dotify.api.table.TableProvider p : providers)
-			for (FactoryProperties fp : p.list())
-				if (fp.getIdentifier().equals(id))
-					return Optional.fromNullable(p.newFactory(id)).asSet();
-		return empty;
+	static class TableProxy {
+
+		private final org.daisy.dotify.api.table.TableProvider provider;
+		private final FactoryProperties properties;
+		private Table table = null;
+
+		public TableProxy(FactoryProperties properties, org.daisy.dotify.api.table.TableProvider provider) {
+			this.properties = properties;
+			this.provider = provider;
+		}
+
+		public Table getTable() {
+			if (table == null)
+				table = provider.newFactory(properties.getIdentifier());
+			return table;
+		}
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(LocaleBasedTableProvider.class);
-	
 }
