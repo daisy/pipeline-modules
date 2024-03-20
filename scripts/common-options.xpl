@@ -337,8 +337,9 @@ you can control that variable with the following parameters list: `(foo:true)`.<
 			<p px:role="desc" xml:space="preserve">Braille code to be used for braille transcription.
 
 If set, [braille transcription](http://daisy.github.io/pipeline/Get-Help/User-Guide/Braille/) is
-done with the selected braille code. If left empty, the braille code is determined by the document
-language and the "Transformer features" option.</p>
+done using the selected braille code. If left empty, the braille code is determined by the document
+language. Note that braille transcription can also be controlled through CSS `@text-transform`
+rules.</p>
 		</p:documentation>
 	</p:option>
 
