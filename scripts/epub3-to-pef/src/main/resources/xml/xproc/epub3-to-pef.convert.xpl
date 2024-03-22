@@ -177,7 +177,10 @@
                                              (//c:param[@name='page-width' and not(@namespace[not(.='')])]/@value,40)[1],
                                              ') AND (height: ',
                                              (//c:param[@name='page-height' and not(@namespace[not(.='')])]/@value,25)[1],
-                                             ')')">
+                                             ')',
+                                             if (//c:param[@name='duplex' and not(@namespace[not(.='')])]/@value='true')
+                                               then ' AND (duplex: 1)'
+                                               else ())">
                         <p:pipe step="parameters" port="result"/>
                     </p:with-option>
                     <p:input port="parameters">
@@ -266,7 +269,10 @@
                                      (//c:param[@name='page-width' and not(@namespace[not(.='')])]/@value,40)[1],
                                      ') AND (height: ',
                                      (//c:param[@name='page-height' and not(@namespace[not(.='')])]/@value,25)[1],
-                                     ')')">
+                                     ')',
+                                     if (//c:param[@name='duplex' and not(@namespace[not(.='')])]/@value='true')
+                                       then ' AND (duplex: 1)'
+                                       else ())">
                 <p:pipe step="parameters" port="result"/>
             </p:with-option>
         </px:apply-stylesheets>

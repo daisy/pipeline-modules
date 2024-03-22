@@ -174,7 +174,7 @@ public class Medium {
 				if (e.size() != 1)
 					throw new IllegalArgumentException("Unexpected value for medium feature: " + e);
 				Term<?> v = e.get(0);
-				if (!(v instanceof TermIdent))
+				if (!(v instanceof TermIdent || v instanceof TermInteger))
 					throw new IllegalArgumentException("Unexpected value for medium feature: " + e);
 				if (customFeatures == null)
 					customFeatures = new HashMap<>();
