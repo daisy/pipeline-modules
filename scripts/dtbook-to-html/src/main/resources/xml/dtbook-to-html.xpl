@@ -74,6 +74,7 @@
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
         <p:documentation>
+            px:fileset-add-entries
             px:fileset-store
         </p:documentation>
     </p:import>
@@ -88,7 +89,16 @@
         </p:documentation>
     </cx:import>
 
+    <p:sink/>
+    <px:fileset-add-entries media-type="application/x-dtbook+xml" name="dtbook">
+        <p:input port="entries">
+            <p:pipe step="main" port="source"/>
+        </p:input>
+    </px:fileset-add-entries>
     <px:dtbook-load name="load" px:progress=".1" px:message="Loading DTBook">
+        <p:input port="source.in-memory">
+            <p:pipe step="dtbook" port="result.in-memory"/>
+        </p:input>
         <p:with-option name="validation" select="not($validation='off')"/>
         <p:with-option name="nimas" select="$nimas='true'"/>
         <!-- assume MathML 3.0 -->

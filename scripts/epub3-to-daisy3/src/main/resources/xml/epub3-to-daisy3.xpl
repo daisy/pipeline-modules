@@ -473,7 +473,10 @@
             that these files are not referenced elsewhere.)
         -->
         <px:dtbook-load name="dtbook-fileset">
-            <p:input port="source">
+            <p:input port="source.fileset">
+                <p:pipe step="dtbook-and-resources" port="result.fileset"/>
+            </p:input>
+            <p:input port="source.in-memory">
                 <p:pipe step="daisy3-dtbook" port="result.in-memory"/>
             </p:input>
         </px:dtbook-load>
