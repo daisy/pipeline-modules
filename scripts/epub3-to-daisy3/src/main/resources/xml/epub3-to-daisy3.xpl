@@ -193,7 +193,7 @@
     <p:documentation>
         Create head element from OPF
     </p:documentation>
-    <p:group name="html-with-head" px:message="Converting metadata" px:progress="1/10">
+    <p:group name="html-with-head" px:message="Converting metadata">
         <p:output port="result"/>
         <px:opf-to-html-metadata name="head">
             <p:input port="source">
@@ -281,7 +281,7 @@
     <p:documentation>
         Convert EPUB 3 SMILs to d:audio-clips document
     </p:documentation>
-    <p:group name="audio">
+    <p:group name="audio" px:progress="1/10">
         <p:output port="fileset" primary="true"/>
         <p:output port="clips">
             <p:pipe step="clips" port="result"/>
