@@ -569,7 +569,11 @@
                 Convert DPUB-ARIA role="doc-pagebreak" to epub:type="pagebreak"
             -->
             <p:label-elements match="*[@role='doc-pagebreak']" attribute="epub:type" replace="true"
-                              label="string-join(distinct-values((@epub:type/tokenize(.,'\s+')[not(.='')],'pagebreak')),' ')"
+                              label="string-join(
+                                       distinct-values((
+                                         @epub:type/tokenize(.,'\s+')[not(.='')],
+                                         replace(@role,'^doc-',''))),
+                                       ' ')"
                               px:progress="1/2"/>
             <!--
                 Generate text for empty page numbers
