@@ -494,7 +494,7 @@
                             <!-- Not sure why this is needed. Omitted this triggers a base URI error
                                  in px:html-outline. Bug? -->
                         </p:add-xml-base>
-                        <p:filter select="//html:nav[tokenize(@epub:type,'\s+')='toc'][1]/html:ol"/>
+                        <p:filter select="//html:nav[tokenize(@epub:type,'\s+')='toc' or @role='doc-toc'][1]/html:ol"/>
                     </p:when>
                     <p:otherwise>
                         <p:identity>

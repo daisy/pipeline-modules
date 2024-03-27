@@ -356,7 +356,7 @@
 								<span id="id_3">List of contents</span>
 							</h2>
 							<table>...</table>
-							<div id="page_front_4" class="page-front" epub:type="pagebreak" title="iv">
+							<div id="page_front_4" class="page-front" epub:type="pagebreak" role="doc-pagebreak" title="iv">
 								<span id="id_4"/>
 							</div>
 						</section>
@@ -367,7 +367,7 @@
 							<p>
 								<span id="id_6">...</span>
 							</p>
-							<div id="page_front_5" class="page-front" epub:type="pagebreak" title="v">
+							<div id="page_front_5" class="page-front" epub:type="pagebreak" role="doc-pagebreak" title="v">
 								<span id="id_7"/>
 							</div>
 						</section>
@@ -387,7 +387,7 @@
 						<p>
 							<span id="id_2">
 								<span id="id_8">This paragraph contains</span>
-								<span epub:type="pagebreak" title="5" id="page_5" class="page-normal"/>
+								<span epub:type="pagebreak" role="doc-pagebreak" title="5" id="page_5" class="page-normal"/>
 								<span id="id_9">a page break.</span>
 							</span>
 						</p>
@@ -554,7 +554,7 @@
 			</x:context>
 			<x:expect label="front.xhtml" type="compare">
 				<x:document type="inline" xmlns="http://www.w3.org/1999/xhtml">
-					<div id="page_front_4" class="page-front" epub:type="pagebreak" title="iv"
+					<div id="page_front_4" class="page-front" epub:type="pagebreak" role="doc-pagebreak" title="iv"
 					     style="visibility: hidden">
 						<span id="id_4">iv</span>
 					</div>
@@ -663,7 +663,7 @@
 						<p>
 							<span id="id_2" class="sentence">
 								<span id="id_8">This paragraph contains</span>
-								<span epub:type="pagebreak" title="5" id="page_5" class="page-normal"/>
+								<span epub:type="pagebreak" role="doc-pagebreak" title="5" id="page_5" class="page-normal"/>
 								<span id="id_9">a page break.</span>
 							</span>
 						</p>
