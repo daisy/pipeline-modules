@@ -489,11 +489,10 @@
     </xsl:template>
 
     <xsl:template match="dtb:note">
-
         <note>
             <xsl:call-template name="attrs"/>
             <xsl:if test="@class=('footnote','endnote')">
-                <xsl:attribute name="role" select="@class"/>
+                <xsl:attribute name="role" select="if (@class='endnote') then 'rearnote' else @class"/>
             </xsl:if>
             <xsl:apply-templates/>
         </note>
