@@ -27,7 +27,7 @@
 		          type="custom" href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl" step="x:fileset-compare">
 			<x:document type="inline">
 				<d:fileset>
-					<d:file href="result/minimal.xhtml" media-type="application/xhtml+xml"/>
+					<d:file href="result/minimal.xhtml" media-type="application/xhtml+xml" doctype="&lt;!DOCTYPE html&gt;"/>
 					<d:file href="result/zedai-mods.xml" media-type="application/mods+xml"/>
 				</d:fileset>
 			</x:document>

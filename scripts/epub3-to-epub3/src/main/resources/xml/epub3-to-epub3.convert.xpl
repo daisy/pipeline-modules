@@ -1366,4 +1366,10 @@
     <p:add-attribute match="d:file[@media-type='application/oebps-package+xml']"
                      attribute-name="indent" attribute-value="true"/>
 
+    <!--
+        Set correct HTML doctype just in case
+    -->
+    <p:add-attribute match="d:file[@media-type='application/xhtml+xml']"
+                     attribute-name="doctype" attribute-value="&lt;!DOCTYPE html&gt;"/>
+
 </p:declare-step>

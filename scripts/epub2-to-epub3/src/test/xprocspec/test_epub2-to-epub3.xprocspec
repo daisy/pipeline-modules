@@ -182,10 +182,10 @@
 					<d:file href="result.epub!/META-INF/container.xml" media-type="application/xml"/>
 					<d:file href="result.epub!/EPUB/package.opf" media-type="application/oebps-package+xml"/>
 					<d:file href="result.epub!/EPUB/toc.ncx" media-type="application/x-dtbncx+xml"/>
-					<d:file href="result.epub!/EPUB/nav.xhtml" media-type="application/xhtml+xml"/>
-					<d:file href="result.epub!/EPUB/cover.xhtml" media-type="application/xhtml+xml"/>
-					<d:file href="result.epub!/EPUB/front.xhtml" media-type="application/xhtml+xml"/>
-					<d:file href="result.epub!/EPUB/chapter.xhtml" media-type="application/xhtml+xml"/>
+					<d:file href="result.epub!/EPUB/nav.xhtml" media-type="application/xhtml+xml" doctype="&lt;!DOCTYPE html&gt;"/>
+					<d:file href="result.epub!/EPUB/cover.xhtml" media-type="application/xhtml+xml" doctype="&lt;!DOCTYPE html&gt;"/>
+					<d:file href="result.epub!/EPUB/front.xhtml" media-type="application/xhtml+xml" doctype="&lt;!DOCTYPE html&gt;"/>
+					<d:file href="result.epub!/EPUB/chapter.xhtml" media-type="application/xhtml+xml" doctype="&lt;!DOCTYPE html&gt;"/>
 				</d:fileset>
 			</x:document>
 		</x:expect>

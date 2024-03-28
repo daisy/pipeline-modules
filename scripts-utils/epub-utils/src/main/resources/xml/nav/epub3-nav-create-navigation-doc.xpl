@@ -530,6 +530,7 @@
 				<p:input port="entry">
 					<p:pipe step="aggregate" port="result"/>
 				</p:input>
+				<p:with-param port="file-attributes" name="doctype" select="'&lt;!DOCTYPE html&gt;'"/>
 			</px:fileset-add-entry>
 			<px:fileset-filter-in-memory name="nav">
 				<p:input port="source.in-memory">

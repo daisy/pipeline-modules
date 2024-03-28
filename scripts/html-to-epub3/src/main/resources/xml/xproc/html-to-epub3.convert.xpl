@@ -275,9 +275,7 @@
                 </px:fileset-load>
                 <px:assert message="No XHTML documents found." test-count-min="1" error-code="PEZE00"/>
 
-                <p:for-each name="cleaned">
-                    <p:output port="result" sequence="true"/>
-
+                <p:for-each>
                     <p:documentation>Upgrade to XHTML 5</p:documentation>
                     <px:html-upgrade/>
 
@@ -304,7 +302,17 @@
                     <!--TODO: try to add sections where missing -->
 
                 </p:for-each>
+                <p:identity name="xhtml5.in-memory"/>
                 <p:sink/>
+
+                <p:documentation>Fix doctype</p:documentation>
+                <p:add-attribute match="d:file" attribute-name="doctype" attribute-value="&lt;!DOCTYPE html&gt;" name="xhtml5.fileset">
+                    <p:input port="source">
+                        <p:pipe step="html" port="result.fileset"/>
+                    </p:input>
+                </p:add-attribute>
+                <p:sink/>
+
                 <px:fileset-update name="update">
                     <p:input port="source.fileset">
                         <p:pipe step="safe-uris" port="result.fileset"/>
@@ -313,10 +321,10 @@
                         <p:pipe step="safe-uris" port="result.in-memory"/>
                     </p:input>
                     <p:input port="update.fileset">
-                        <p:pipe step="html" port="result.fileset"/>
+                        <p:pipe step="xhtml5.fileset" port="result"/>
                     </p:input>
                     <p:input port="update.in-memory">
-                        <p:pipe step="cleaned" port="result"/>
+                        <p:pipe step="xhtml5.in-memory" port="result"/>
                     </p:input>
                 </px:fileset-update>
             </p:group>
