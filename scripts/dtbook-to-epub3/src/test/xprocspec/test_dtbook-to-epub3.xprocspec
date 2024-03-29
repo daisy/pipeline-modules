@@ -257,6 +257,10 @@
 			<x:input port="source.in-memory">
 				<x:document type="inline" xml:base="content.xml">
 					<dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/" xml:lang="en" version="2005-3">
+						<head>
+							<meta name="dc:Source" content="foo"/>
+							<meta name="dc:Source" content="978-0-596-52068-7"/>
+						</head>
 						<book>
 							<bodymatter>
 								<level1>
@@ -314,6 +318,12 @@
 				</html>
 			</x:document>
 		</x:expect>
+		<x:context label="the package.opf document on the result.in-memort port">
+			<x:document type="port" port="result.in-memory" select="/*[ends-with(base-uri(),'/package.opf')]"/>
+		</x:context>
+		<x:expect label="the title of the package document" type="xpath"
+		          test="/opf:package/opf:metadata/opf:meta[@property='pageBreakSource']/string(.)"
+		          equals="'978-0-596-52068-7'"/>
 	</x:scenario>
 
 </x:description>

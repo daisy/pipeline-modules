@@ -589,9 +589,11 @@
 					<p:xpath-context>
 						<p:pipe step="package-doc" port="result"/>
 					</p:xpath-context>
-					<p:when test="//opf:metadata/opf:meta[@property='schema:accessibilityFeature']
-					                                     [string(.)=('tableOfContents','pageNavigation')]
-					                                     [not(@refines)]">
+					<p:when test="//opf:metadata/opf:meta[not(@refines)][@property='schema:accessibilityFeature']
+					                                                    [string(.)='tableOfContents'] and
+					              //opf:metadata/opf:meta[not(@refines)][@property='schema:accessibilityFeature']
+					                                                    [string(.)='pageNavigation'] and
+					              //opf:metadata/opf:meta[not(@refines)][@property='pageBreakSource']">
 						<p:output port="fileset" primary="true"/>
 						<p:output port="in-memory" sequence="true">
 							<p:pipe step="package-doc-with-nav-property" port="result.in-memory"/>
@@ -625,9 +627,9 @@
 							    would overwrite the existing metadata)
 							-->
 							<p:delete match="opf:metadata/*[
-							                   not(self::opf:meta[@property='schema:accessibilityFeature']
-							                                     [not(string(.)=('tableOfContents','pageNavigation'))]
-							                                     [not(@refines)])]">
+							                   not(self::opf:meta[not(@refines)]
+							                                     [@property='schema:accessibilityFeature']
+							                                     [not(string(.)=('tableOfContents','pageNavigation'))])]">
 								<p:input port="source" select="//opf:metadata">
 									<p:pipe step="package-doc" port="result"/>
 								</p:input>
@@ -661,6 +663,37 @@
 											</p:inline>
 										</p:input>
 									</p:insert>
+									<!--
+									    FIXME: If the page break source is not identified, we add <meta
+									    property="pageBreakSource">unknown</meta> in the absence of a better value. We
+									    don't know whether the pagination is not drawn from another source ("none"), or
+									    whether the metadata is missing. See:
+
+									    - http://kb.daisy.org/publishing/docs/navigation/pagesrc.html
+									    - https://www.w3.org/publishing/a11y/page-source-id/
+									-->
+									<p:choose>
+										<p:xpath-context>
+											<p:pipe step="package-doc" port="result"/>
+										</p:xpath-context>
+										<p:when test="not(//opf:metadata/opf:meta[not(@refines)]
+										                                         [@property='pageBreakSource'])">
+											<p:insert position="last-child"
+											          px:message-severity="WARN"
+											          px:message="{concat('A page list is present but no page break source identified. ',
+											                              'Set the &quot;pageBreakSource&quot; metadata to &quot;none&quot; ',
+											                              'if the page breaks are unique to the EPUB publication.')}">
+												<p:input port="insertion">
+													<p:inline exclude-inline-prefixes="#all" xmlns="http://www.idpf.org/2007/opf">
+														<meta property="pageBreakSource">unknown</meta>
+													</p:inline>
+												</p:input>
+											</p:insert>
+										</p:when>
+										<p:otherwise>
+											<p:identity/>
+										</p:otherwise>
+									</p:choose>
 								</p:when>
 								<p:otherwise>
 									<p:identity/>

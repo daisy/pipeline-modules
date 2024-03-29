@@ -209,6 +209,8 @@
 						<meta name="schema:accessibilityFeature" content="tableOfContents"/>
 						<meta property="schema:accessibilityFeature">pageNavigation</meta>
 						<meta name="schema:accessibilityFeature" content="pageNavigation"/>
+						<meta property="pageBreakSource">unknown</meta>
+						<meta name="pageBreakSource" content="unknown"/>
 					</metadata>
 					<manifest>
 						<item id="toc" href="toc.ncx" media-type="application/x-dtbncx+xml"/>

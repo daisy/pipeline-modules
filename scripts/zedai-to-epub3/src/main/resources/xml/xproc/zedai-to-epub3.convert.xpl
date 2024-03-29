@@ -29,6 +29,11 @@
             <p>PLS lexicons as list of absolute URIs.</p>
         </p:documentation>
     </p:option>
+    <p:option name="source-of-pagination" cx:as="xs:string?" select="()">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Identifier for the source of page breaks, to be included as metadata in the EPUB.</p>
+        </p:documentation>
+    </p:option>
 
     <p:output port="fileset.out" primary="true">
         <p:pipe step="html-to-epub3" port="fileset.out"/>
@@ -193,7 +198,9 @@
     <!--=========================================================================-->
 
     <p:documentation>Extract metadata from ZedAI</p:documentation>
-    <px:zedai-to-opf-metadata name="metadata"/>
+    <px:zedai-to-opf-metadata name="metadata">
+        <p:with-option name="source-of-pagination" select="$source-of-pagination"/>
+    </px:zedai-to-opf-metadata>
     <p:sink/>
 
     <!--=========================================================================-->
