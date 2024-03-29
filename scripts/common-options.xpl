@@ -50,6 +50,18 @@
 	</p:output>
 
 	<!--
+		dtbook-to-epub3
+		dtbook-to-html
+		dtbook-to-zedai
+	-->
+	<p:option name="language" required="false" px:type="string" select="''">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<h2 px:role="name">Language code</h2>
+			<p px:role="desc">Language code of the input document.</p>
+		</p:documentation>
+	</p:option>
+
+	<!--
 	    dtbook-validator
 	    nimas-fileset-validator
 	-->

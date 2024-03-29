@@ -34,7 +34,11 @@
 		</p:documentation>
 	</p:option>
 
-	<p:option name="language" required="true"/>
+	<p:option name="language" required="false" cx:type="xs:string" select="''">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p>Language code of the input document. Only used when DTBook has no xml:lang attribute.</p>
+		</p:documentation>
+	</p:option>
 	<p:option name="validation" cx:type="off|report|abort" select="'off'">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>Whether to stop processing and raise an error on validation issues (abort), only

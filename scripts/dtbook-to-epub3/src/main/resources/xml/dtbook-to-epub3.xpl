@@ -31,11 +31,8 @@
       <p:pipe step="result" port="tts-log"/>
     </p:output>
 
-    <p:option name="language" required="false" px:type="string" select="''">
-        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h2 px:role="name">Language code</h2>
-            <p px:role="desc">Language code of the input document.</p>
-        </p:documentation>
+    <p:option name="language" select="''">
+      <!-- defined in ../../../../../common-options.xpl -->
     </p:option>
 
     <p:option name="result" required="true" px:output="result" px:type="anyDirURI">
