@@ -196,6 +196,9 @@ public abstract class TTSEngine {
 	 *   href="https://www.w3.org/TR/CSS2/aural.html#propdef-speech-rate"
 	 *   ><code>speech-rate</code></a> property.</li>
 	 * </ul>
+	 *
+	 * All values, except for absolute numbers, are relative to the default rate, which
+	 * is determined by the {@code org.daisy.pipeline.tts.speech-rate} property.
 	 */
 	public boolean handlesSpeakingRate() {
 		return false;

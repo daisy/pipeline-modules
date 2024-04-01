@@ -9,6 +9,7 @@
 	<xsl:output omit-xml-declaration="yes"/>
 
 	<xsl:param name="voice" required="yes" as="xs:string"/>
+	<xsl:param name="speech-rate" as="xs:double" select="1.0"/>
 
 	<!--
 	    Format the SSML according to the Cognitive Speech service's rules:
@@ -36,7 +37,19 @@
 		<speak version="1.0">
 			<xsl:attribute name="xml:lang" select="$lang"/>
 			<voice name="{$voice}">
-				<xsl:apply-templates mode="copy" select="."/>
+				<xsl:choose>
+					<xsl:when test="$speech-rate!=1.0 and descendant::text()[normalize-space(.) and not(ancestor::prosody[@rate])]">
+						<prosody>
+							<xsl:attribute name="rate" select="format-number($speech-rate,'0.00')"/>
+							<xsl:apply-templates mode="copy" select=".">
+								<xsl:with-param name="rate" tunnel="yes" select="$speech-rate"/>
+							</xsl:apply-templates>
+						</prosody>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:apply-templates mode="copy" select="."/>
+					</xsl:otherwise>
+				</xsl:choose>
 				<break time="250ms"/>
 			</voice>
 		</speak>
@@ -52,9 +65,11 @@
 		<xsl:apply-templates mode="#current" select="node()"/>
 	</xsl:template>
 
-	<xsl:template mode="copy" match="prosody/@rate">
-		<xsl:variable name="rate" as="xs:string" select="normalize-space(string(.))"/>
-		<xsl:variable name="rate" as="xs:string">
+	<xsl:template mode="copy" match="prosody[@rate]">
+		<xsl:param name="rate" as="xs:double" tunnel="yes" select="1.0"/>
+		<xsl:variable name="parent-rate" as="xs:double" select="$rate"/>
+		<xsl:variable name="rate" as="xs:double">
+			<xsl:variable name="rate" as="xs:string" select="normalize-space(string(@rate))"/>
 			<xsl:choose>
 				<xsl:when test="matches($rate,'^[0-9]+$')">
 					<!--
@@ -63,7 +78,7 @@
 					    so divide by the "normal" rate of 200 words per minute (see
 					    https://www.w3.org/TR/CSS2/aural.html#voice-char-props).
 					-->
-					<xsl:sequence select="format-number(number($rate) div 200,'0.00')"/>
+					<xsl:sequence select="number($rate) div 200"/>
 				</xsl:when>
 				<xsl:when test="matches($rate,'^[0-9]+%$')">
 					<!--
@@ -71,14 +86,35 @@
 					    https://learn.microsoft.com/en-us/azure/ai-services/speech-service/speech-synthesis-markup-voice#adjust-prosody),
 					    so convert to number without percentage.
 					-->
-					<xsl:sequence select="format-number(number(substring($rate,1,string-length($rate)-1)) div 100,'0.00')"/>
+					<xsl:sequence select="$speech-rate * (number(substring($rate,1,string-length($rate)-1)) div 100)"/>
 				</xsl:when>
 				<xsl:otherwise>
-					<xsl:sequence select="$rate"/>
+					<xsl:sequence select="$speech-rate * (
+					                             if ($rate='x-slow')  then 0.4
+					                        else if ($rate='slow')    then 0.6
+					                        else if ($rate='fast')    then 1.5
+					                        else if ($rate='x-fast')  then 2.5
+					                        else                           1.0 (: medium, default, or illegal value :)
+					                      )"/>
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
-		<xsl:attribute name="{name(.)}" select="$rate"/>
+		<xsl:choose>
+			<xsl:when test="(@* except @rate) or $rate!=$parent-rate">
+				<xsl:element name="{local-name(.)}" namespace="{namespace-uri(.)}">
+					<xsl:if test="$rate!=$parent-rate">
+						<xsl:attribute name="rate" select="format-number($rate,'0.00')"/>
+					</xsl:if>
+					<xsl:apply-templates mode="#current" select="@* except @rate"/>
+					<xsl:apply-templates mode="#current">
+						<xsl:with-param name="rate" tunnel="yes" select="$rate"/>
+					</xsl:apply-templates>
+				</xsl:element>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:apply-templates mode="#current"/>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 
 	<!-- rename mark to bookmark: not needed: regular SSML marks also supported -->

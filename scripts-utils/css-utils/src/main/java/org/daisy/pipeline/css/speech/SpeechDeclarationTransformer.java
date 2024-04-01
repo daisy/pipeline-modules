@@ -1,4 +1,4 @@
-package org.daisy.pipeline.css.speech.impl;
+package org.daisy.pipeline.css.speech;
 
 import java.util.Map;
 
