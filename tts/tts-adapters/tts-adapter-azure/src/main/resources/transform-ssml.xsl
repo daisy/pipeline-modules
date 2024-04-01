@@ -33,20 +33,32 @@
 	</xsl:template>
 
 	<xsl:template mode="copy" match="prosody/@rate">
-		<xsl:choose>
-			<xsl:when test="matches(.,'^ *[0-9]+ *$')">
-				<!--
-					Azure interprets a numeric rate as a relative value (see
-					https://learn.microsoft.com/en-us/azure/ai-services/speech-service/speech-synthesis-markup-voice#adjust-prosody)
-					so divide by the "normal" rate of 200 words per minute (see
-					https://www.w3.org/TR/CSS2/aural.html#voice-char-props).
-				-->
-				<xsl:attribute name="{name(.)}" select="number(string(.)) div 200"/>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:next-match/>
-			</xsl:otherwise>
-		</xsl:choose>
+		<xsl:variable name="rate" as="xs:string" select="normalize-space(string(.))"/>
+		<xsl:variable name="rate" as="xs:string">
+			<xsl:choose>
+				<xsl:when test="matches($rate,'^[0-9]+$')">
+					<!--
+					    Azure interprets an absolute number as a relative value (see
+					    https://learn.microsoft.com/en-us/azure/ai-services/speech-service/speech-synthesis-markup-voice#adjust-prosody)
+					    so divide by the "normal" rate of 200 words per minute (see
+					    https://www.w3.org/TR/CSS2/aural.html#voice-char-props).
+					-->
+					<xsl:sequence select="format-number(number($rate) div 200,'0.00')"/>
+				</xsl:when>
+				<xsl:when test="matches($rate,'^[0-9]+%$')">
+					<!--
+					    Azure interprets a percentage as a relative change (see
+					    https://learn.microsoft.com/en-us/azure/ai-services/speech-service/speech-synthesis-markup-voice#adjust-prosody),
+					    so convert to number without percentage.
+					-->
+					<xsl:sequence select="format-number(number(substring($rate,1,string-length($rate)-1)) div 100,'0.00')"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:sequence select="$rate"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:attribute name="{name(.)}" select="$rate"/>
 	</xsl:template>
 
 	<!-- rename mark to bookmark: not needed: regular SSML marks also supported -->

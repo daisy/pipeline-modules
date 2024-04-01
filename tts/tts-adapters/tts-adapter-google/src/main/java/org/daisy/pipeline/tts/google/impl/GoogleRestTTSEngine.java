@@ -69,6 +69,11 @@ public class GoogleRestTTSEngine extends TTSEngine {
 	}
 
 	@Override
+	public boolean handlesSpeakingRate() {
+		return true;
+	}
+
+	@Override
 	public SynthesisResult synthesize(XdmNode ssml, Voice voice, TTSResource threadResources)
 			throws SynthesisException, InterruptedException {
 	

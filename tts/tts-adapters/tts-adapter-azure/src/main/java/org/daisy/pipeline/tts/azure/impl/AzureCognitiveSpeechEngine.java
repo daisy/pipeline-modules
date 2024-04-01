@@ -217,6 +217,11 @@ public class AzureCognitiveSpeechEngine extends TTSEngine {
 	}
 
 	@Override
+	public boolean handlesSpeakingRate() {
+		return true;
+	}
+
+	@Override
 	public int getOverallPriority() {
 		return priority;
 	}
