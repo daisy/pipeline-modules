@@ -82,7 +82,13 @@ public class SAPIEngine extends TTSEngine {
 	public AudioInputStream speak(String ssml, Voice voice, TTSResource resource, List<Integer> marks)
 			throws SynthesisException {
 
-		voice = mVoiceFormatConverter.get(voice.getName().toLowerCase());
+		String key = voice.getName().toLowerCase();
+		// To avoid using sapi when onecore is available
+		// the "desktop" suffix is removed from the hashmap keys for sapi languages
+		if (key.endsWith(" desktop")) {
+			key = key.substring(0,key.length() - " desktop".length());
+		}
+		voice = mVoiceFormatConverter.get(key);
 		NativeSynthesisResult res;
 		// Speak
 		if (voice.getEngine().equals("sapi") ){
