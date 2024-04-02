@@ -82,10 +82,15 @@ public class SAPIEngine extends TTSEngine {
 	public AudioInputStream speak(String ssml, Voice voice, TTSResource resource, List<Integer> marks)
 			throws SynthesisException {
 
-		voice = mVoiceFormatConverter.get(voice.getName().toLowerCase());
+		String key = voice.getName().toLowerCase();
+		// To avoid using a SAPI voice when a OneCore voice is available, the "desktop" suffix is
+		// removed from keys in getAvailableVoices(), so need to do the same here.
+		if (key.endsWith(" desktop"))
+			key = key.substring(0, key.length() - " desktop".length());
+		voice = mVoiceFormatConverter.get(key); // mVoiceFormatConverter was initialized in getAvailableVoices()
 		NativeSynthesisResult res;
 		// Speak
-		if (voice.getEngine().equals("sapi") ){
+		if (voice.getEngine().equals("sapi")) {
 			try {
 				res = SAPI.speak(voice.getEngine(), voice.getName(), ssml, (int)sapiAudioFormat.getSampleRate(), (short)sapiAudioFormat.getSampleSizeInBits());
 			} catch (RuntimeException e){
@@ -151,27 +156,27 @@ public class SAPIEngine extends TTSEngine {
 		if (mVoiceFormatConverter == null) {
 			mVoiceFormatConverter = new HashMap<>();
 			ArrayList<Voice> nativeVoices = new ArrayList<>();
-			if (this.sapiAudioFormat != null){
-				try{
+			if (this.sapiAudioFormat != null) {
+				try {
 					// first load sapi voices
 					nativeVoices.addAll(Arrays.asList(SAPI.getVoices()));
 				} catch (Exception e){
 					Logger.debug("Could not retrieve SAPI voices : " + e.getMessage());
 				}
 			}
-			if (this.onecoreIsReady){
-				try{
+			if (this.onecoreIsReady) {
+				try {
 					nativeVoices.addAll(Arrays.asList(Onecore.getVoices()));
 				} catch (IOException e) {
 					Logger.debug("Could not retrieve onecore voices : " + e.getMessage());
 				}
 			}
-			for (Voice v: nativeVoices) {
+			for (Voice v : nativeVoices) {
 				String key = v.getName().toLowerCase();
-				// Remove SAPI voices if a onecore version exists
-				if (key.endsWith(" desktop")) {
-					key = key.substring(0,key.length() - " desktop".length());
-				}
+				// To avoid using a SAPI voice when a OneCore voice is available, the "desktop"
+				// suffix needs to be removed
+				if (key.endsWith(" desktop"))
+					key = key.substring(0, key.length() - " desktop".length());
 				mVoiceFormatConverter.put(key, v);
 			}
 		}
