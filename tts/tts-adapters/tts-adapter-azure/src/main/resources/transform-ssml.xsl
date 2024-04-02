@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:s="http://www.w3.org/2001/10/synthesis"
                 xmlns="http://www.w3.org/2001/10/synthesis"
                 xpath-default-namespace="http://www.w3.org/2001/10/synthesis"
                 exclude-result-prefixes="#all">
@@ -14,13 +15,26 @@
 	    https://learn.microsoft.com/en-us/azure/cognitive-services/speech-service/speech-synthesis-markup-structure
 	-->
 
+	<xsl:template mode="#default copy" match="*" priority="1">
+		<!-- xml:lang will normally be present on <s> elements, but we don't assume this is always the case -->
+		<xsl:param name="lang" as="xs:string" tunnel="yes" select="((ancestor::*/@xml:lang)[last()],'und')[1]"/>
+		<xsl:next-match>
+			<xsl:with-param name="lang" tunnel="yes" select="(@xml:lang,$lang)[1]"/>
+			<xsl:with-param name="skip-lang-attr" tunnel="yes" select="@xml:lang[.=$lang]"/>
+		</xsl:next-match>
+	</xsl:template>
+
+	<xsl:template mode="#default copy" match="@xml:lang">
+		<xsl:param name="skip-lang-attr" as="xs:string" tunnel="yes" required="yes"/>
+		<xsl:if test="not($skip-lang-attr)">
+			<xsl:next-match/>
+		</xsl:if>
+	</xsl:template>
+
 	<xsl:template match="*">
+		<xsl:param name="lang" as="xs:string" tunnel="yes" required="yes"/>
 		<speak version="1.0">
-			<xsl:sequence select="/*/@xml:lang"/>
-			<!-- xml:lang will normally be present on <s> elements, but we don't assume this is always the case -->
-			<xsl:if test="not(/*/@xml:lang)">
-				<xsl:attribute name="xml:lang" select="'und'"/>
-			</xsl:if>
+			<xsl:attribute name="xml:lang" select="$lang"/>
 			<voice name="{$voice}">
 				<xsl:apply-templates mode="copy" select="."/>
 				<break time="250ms"/>
@@ -28,7 +42,13 @@
 		</speak>
 	</xsl:template>
 
+	<!-- unwrap speak -->
 	<xsl:template mode="copy" match="speak">
+		<xsl:apply-templates mode="#current" select="node()"/>
+	</xsl:template>
+
+	<!-- unwrap token -->
+	<xsl:template mode="copy" match="token">
 		<xsl:apply-templates mode="#current" select="node()"/>
 	</xsl:template>
 
@@ -74,13 +94,14 @@
 	</xsl:template>
 	-->
 
-	<!-- unwrap token -->
-	<xsl:template mode="copy" match="token">
-		<xsl:apply-templates mode="#current" select="node()"/>
+	<xsl:template mode="copy" match="s:*">
+		<xsl:element name="{local-name(.)}" namespace="{namespace-uri(.)}">
+			<xsl:apply-templates mode="#current" select="@*|node()"/>
+		</xsl:element>
 	</xsl:template>
 
 	<xsl:template mode="copy" match="@*|node()">
-		<xsl:copy>
+		<xsl:copy copy-namespaces="no">
 			<xsl:apply-templates mode="#current" select="@*|node()"/>
 		</xsl:copy>
 	</xsl:template>

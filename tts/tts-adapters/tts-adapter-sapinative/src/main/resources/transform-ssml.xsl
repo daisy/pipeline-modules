@@ -1,6 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:s="http://www.w3.org/2001/10/synthesis"
                 xmlns="http://www.w3.org/2001/10/synthesis"
+                xpath-default-namespace="http://www.w3.org/2001/10/synthesis"
                 exclude-result-prefixes="#all">
 
   <xsl:output indent="no" omit-xml-declaration="yes" exclude-result-prefixes="#all"/>
@@ -9,7 +12,7 @@
 
   <xsl:template match="*">
     <speak version="1.0">
-      <xsl:apply-templates select="if (local-name()='speak') then node() else ." mode="copy"/>
+      <xsl:apply-templates mode="copy" select="if (local-name()='speak') then node() else ."/>
       <break time="250ms"/>
       <xsl:if test="$ending-mark != ''">
         <mark name="{$ending-mark}"/>
@@ -17,28 +20,26 @@
     </speak>
   </xsl:template>
 
-  <xsl:template match="*" mode="copy">
+  <xsl:template mode="copy" match="*">
     <xsl:element name="{local-name()}">
-      <xsl:apply-templates select="@* | node()" mode="copy"/>
+      <xsl:apply-templates mode="#current" select="@*|node()"/>
     </xsl:element>
   </xsl:template>
 
-  <xsl:template match="@*" mode="copy">
-    <xsl:attribute name="{local-name()}">
-      <xsl:value-of select="."/>
-    </xsl:attribute>
+  <xsl:template mode="copy" match="@*">
+    <xsl:attribute name="{local-name()}" select="string(.)"/>
   </xsl:template>
 
-  <xsl:template match="text()" mode="copy">
+  <xsl:template mode="copy" match="text()">
     <xsl:copy />
   </xsl:template>
 
-  <xsl:template match="@xml:lang" mode="copy">
+  <xsl:template mode="copy" match="@xml:lang">
     <!-- not copied in order to prevent inconsistency with the current voice -->
   </xsl:template>
 
-  <xsl:template match="*[contains(local-name(),'token')]" mode="copy">
-    <!-- tokens are not copied because they are not SSML1.0-compliant and not SAPI-compliant-->
+  <xsl:template mode="copy" match="token">
+    <!-- tokens are unwrapped because they are not SSML1.0-compliant and not SAPI-compliant-->
     <xsl:apply-templates select="node()" mode="copy"/>
     <xsl:if test="following-sibling::*">
       <xsl:text> </xsl:text>
