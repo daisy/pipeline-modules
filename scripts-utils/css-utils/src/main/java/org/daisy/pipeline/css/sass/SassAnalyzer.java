@@ -27,7 +27,7 @@ public class SassAnalyzer {
 	 *
 	 * @param userStylesheets {@code Source} objects must have absolute hierarchical URI as system ID
 	 * @param sourceDocument {@code Source} object must have absolute hierarchical URI as system ID,
-	 *                       or object may be {@null}.
+	 *                       or object may be {@code null}.
 	 */
 	public Result analyze(Iterable<Source> userStylesheets, Source sourceDocument) throws IOException {
 		return new Result(analyzer.getVariableDeclarations(userStylesheets, sourceDocument));
