@@ -18,7 +18,8 @@
 			<p>Input fileset</p>
 			<p>May already include a (at most one) navigation document, in which case it should
 			either be marked with a <code>role</code> attribute with value <code>nav</code>, or it
-			should contain a <code>nav[@epub:type='toc']</code> element.</p>
+			should contain a <code>nav[@epub:type='toc']</code> or <code>nav[@role='doc-toc']</code>
+			element.</p>
 			<p>If the input fileset does not include a navigation document it is generated from the
 			content documents.</p>
 		</p:documentation>
@@ -228,18 +229,29 @@
 				<p:output port="in-memory">
 					<p:pipe step="filter" port="result.in-memory"/>
 				</p:output>
-				<p:split-sequence test="//html:nav[@epub:type='toc']" name="content-docs-with-toc">
+				<p:split-sequence test="//html:nav[@epub:type/tokenize(.,'\s+')='toc' or @role='doc-toc']">
 					<p:input port="source">
 						<p:pipe step="all-content-docs" port="result"/>
 					</p:input>
 				</p:split-sequence>
+				<p:for-each>
+					<p:label-elements match="html:nav[@role=('doc-toc')]" attribute="epub:type" replace="true"
+					                  label="string-join(
+					                           distinct-values((
+					                             @epub:type/tokenize(.,'\s+')[not(.='')],
+					                             replace(@role,'^doc-',''))),
+					                           ' ')"/>
+					<p:label-elements match="html:nav[@epub:type/tokenize(.,'\s+')='toc' and not(@role)]"
+					                  attribute="role" label="'doc-toc'"/>
+				</p:for-each>
+				<p:identity name="content-docs-with-toc"/>
 				<p:sink/>
 				<px:fileset-filter-in-memory name="filter">
 					<p:input port="source.fileset">
 						<p:pipe step="all-content-docs" port="result.fileset"/>
 					</p:input>
 					<p:input port="source.in-memory">
-						<p:pipe step="content-docs-with-toc" port="matched"/>
+						<p:pipe step="content-docs-with-toc" port="result"/>
 					</p:input>
 				</px:fileset-filter-in-memory>
 			</p:otherwise>
@@ -623,7 +635,7 @@
 								<p:xpath-context>
 									<p:pipe step="add-nav-doc" port="nav.in-memory"/>
 								</p:xpath-context>
-								<p:when test="//html:nav[@epub:type='toc']">
+								<p:when test="//html:nav[@epub:type/tokenize(.,'\s+')='toc']">
 									<p:insert position="last-child">
 										<p:input port="insertion">
 											<p:inline exclude-inline-prefixes="#all" xmlns="http://www.idpf.org/2007/opf">
@@ -640,7 +652,7 @@
 								<p:xpath-context>
 									<p:pipe step="add-nav-doc" port="nav.in-memory"/>
 								</p:xpath-context>
-								<p:when test="//html:nav[@epub:type='page-list']">
+								<p:when test="//html:nav[@epub:type/tokenize(.,'\s+')='page-list']">
 									<p:insert position="last-child">
 										<p:input port="insertion">
 											<p:inline exclude-inline-prefixes="#all" xmlns="http://www.idpf.org/2007/opf">

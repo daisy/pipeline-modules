@@ -494,7 +494,7 @@
                             <!-- Not sure why this is needed. Omitted this triggers a base URI error
                                  in px:html-outline. Bug? -->
                         </p:add-xml-base>
-                        <p:filter select="//html:nav[tokenize(@epub:type,'\s+')='toc'][1]/html:ol"/>
+                        <p:filter select="//html:nav[tokenize(@epub:type,'\s+')='toc' or @role='doc-toc'][1]/html:ol"/>
                     </p:when>
                     <p:otherwise>
                         <p:identity>
@@ -569,7 +569,11 @@
                 Convert DPUB-ARIA role="doc-pagebreak" to epub:type="pagebreak"
             -->
             <p:label-elements match="*[@role='doc-pagebreak']" attribute="epub:type" replace="true"
-                              label="string-join(distinct-values((@epub:type/tokenize(.,'\s+')[not(.='')],'pagebreak')),' ')"
+                              label="string-join(
+                                       distinct-values((
+                                         @epub:type/tokenize(.,'\s+')[not(.='')],
+                                         replace(@role,'^doc-',''))),
+                                       ' ')"
                               px:progress="1/2"/>
             <!--
                 Generate text for empty page numbers
