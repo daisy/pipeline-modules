@@ -64,6 +64,10 @@
     <!-- defined in ../../../../../common-options.xpl -->
   </p:option>
 
+  <p:option name="lexicon" select="p:system-property('d:org.daisy.pipeline.tts.default-lexicon')">
+    <!-- defined in ../../../../../common-options.xpl -->
+  </p:option>
+
   <p:option name="audio" select="'false'">
     <!-- defined in ../../../../../common-options.xpl -->
   </p:option>
@@ -123,6 +127,11 @@ reading systems can't handle the word tags.</p>
                                                              for $s in tokenize($_:stylesheet,'\s+')[not(.='')] return
                                                                resolve-uri($s,$output-fileset-base),
                                                              ' ')">
+      <p:pipe step="output-dir-uri" port="normalized"/>
+    </p:with-option>
+    <p:with-option name="lexicon" select="for $output-fileset-base in string(/c:result) return
+                                          for $l in tokenize($lexicon,'\s+')[not(.='')] return
+                                            resolve-uri($l,$output-fileset-base)">
       <p:pipe step="output-dir-uri" port="normalized"/>
     </p:with-option>
     <p:with-option name="publisher" select="$publisher"/>
