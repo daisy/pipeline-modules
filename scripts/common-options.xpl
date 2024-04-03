@@ -410,7 +410,7 @@ If left blank, the braille will be stored in PEF format.</p>
 	    epub3-to-pef
 	    zedai-to-pef
 	-->
-	<p:option name="preview-table" required="false" px:type="transform-query" select="''">
+	<p:option name="preview-table" required="false" px:type="preview-table" select="''">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">ASCII braille table for HTML preview</h2>
 			<p px:role="desc" xml:space="preserve">The ASCII braille table used to render the HTML and PDF previews.
