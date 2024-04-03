@@ -33,6 +33,7 @@ import org.daisy.common.file.URLs;
 import org.daisy.common.transform.XMLTransformer;
 import org.daisy.pipeline.css.CssCascader;
 import org.daisy.pipeline.css.CssPreProcessor;
+import org.daisy.pipeline.css.CssSerializer;
 import org.daisy.pipeline.css.JStyleParserCssCascader;
 import org.daisy.pipeline.css.Medium;
 import org.daisy.pipeline.css.XsltProcessor;
@@ -111,27 +112,9 @@ public class SpeechCssCascader implements CssCascader {
 								CSSProperty prop = mainStyle.getProperty(property, false);
 								if (prop == null) // can be null for unspecified inherited properties
 									continue;
-								// jStyleParser replaces '-' with '_'. Best workaround so far is to
-								// do the opposite: (voice-family and cue aside, there is no
-								// property values with '_' in Aural CSS)
-								s = prop.toString().replace("_", "-").toLowerCase();
-							} else if (v.getValue() instanceof List<?>) {
-								StringBuilder b = new StringBuilder();
-								Iterator<?> i = ((List<?>)v.getValue()).iterator();
-								b.append(i.next());
-								while (i.hasNext())
-									b.append("," + ((Term<?>)i.next()).getValue().toString());
-								s = b.toString();
-							} else if (v instanceof TermURI) {
-								URI uri = URLs.asURI(((TermURI)v).getValue());
-								if (!uri.isAbsolute() && !uri.getSchemeSpecificPart().startsWith("/")) {
-									// relative URI: try to make absolute
-									if (((TermURI)v).getBase() != null)
-										uri = URLs.resolve(URLs.asURI(((TermURI)v).getBase()), uri);
-								}
-								s = uri.toASCIIString();
+								s = prop.toString().replace('_', '-');
 							} else {
-								s = v.toString().replace("_", "-").toLowerCase();
+								s = serializeTerm(v);
 							}
 						}
 						if (style == null)
@@ -191,6 +174,21 @@ public class SpeechCssCascader implements CssCascader {
 				}
 			}
 			return style;
+		}
+
+		private static String serializeTerm(Term<?> term) {
+			if (term instanceof TermString)
+				return ((TermString)term).getValue();
+			else if (term instanceof TermURI) {
+				TermURI termURI = (TermURI)term;
+				URI uri = URLs.asURI(termURI.getValue());
+				if (termURI.getBase() != null)
+					uri = URLs.resolve(URLs.asURI(termURI.getBase()), uri);
+				return uri.toASCIIString();
+			} else if (term instanceof TermIdent)
+				return CssSerializer.toString(term).replace('_', '-');
+			else
+				return CssSerializer.toString(term, Transformer::serializeTerm);
 		}
 
 		protected String serializeValue(Term<?> value) {

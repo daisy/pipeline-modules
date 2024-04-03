@@ -13,7 +13,7 @@
 
   <xsl:function name="tts:normlist">
     <xsl:param name="li"/>
-    <xsl:value-of select="replace(translate($li, ' ',''), '[^-_0-9a-zA-Z]+', '|')"/>
+    <xsl:value-of select="replace(translate($li,' ',''), ',', '|')"/>
   </xsl:function>
 
   <xsl:template match="node()|@*">
