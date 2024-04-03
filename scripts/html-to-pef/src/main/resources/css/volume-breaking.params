@@ -7,8 +7,8 @@
             <h2 px:role="name">Volumes: Maximum number of sheets</h2>
             <p px:role="desc" xml:space="preserve">The maximum number of sheets in a volume.
 
-Makes the variable `$maximum-number-of-sheets` available in style sheets and includes the following
-rule by default:
+The following CSS rule is included by default (where `$maximum-number-of-sheets` is the value of
+this option):
 
 ~~~sass
 @volume {

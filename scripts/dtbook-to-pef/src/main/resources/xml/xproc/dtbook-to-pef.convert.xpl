@@ -71,7 +71,6 @@
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/braille/common-utils/library.xpl">
         <p:documentation>
-            px:merge-parameters
             px:apply-stylesheets
             px:transform
             px:parse-query
@@ -93,13 +92,13 @@
         </p:documentation>
     </p:import>
     
-    <!-- Ensure that there's exactly one c:param-set -->
-    <px:merge-parameters name="parameters">
-        <p:input port="source">
+    <!-- Ensure that there's exactly one c:param-set. (In case of multiple parameters with the same
+         name, only the last occurence is kept.) -->
+    <p:parameters name="parameters">
+        <p:input port="parameters">
             <p:pipe step="main" port="parameters"/>
         </p:input>
-    </px:merge-parameters>
-    <p:sink/>
+    </p:parameters>
     
     <!-- Parse transform query to a c:param-set -->
     <px:parse-query name="parsed-transform-query">
@@ -122,7 +121,11 @@
         <px:assert message="More than one DTBook found in fileset." test-count-max="1" error-code="PEZE00"/>
     </p:group>
     
-    <p:group px:message="Applying style sheets" px:progress=".08">
+    <p:group name="dtbook-with-css" px:message="Applying style sheets" px:progress=".08">
+        <p:output port="result" primary="true"/>
+        <p:output port="parameters">
+            <p:pipe step="apply-stylesheets" port="result.parameters"/>
+        </p:output>
         <p:variable name="first-css-stylesheet"
                     select="tokenize($stylesheet,'\s+')[matches(.,'\.s?css$')][1]"/>
         <p:variable name="first-css-stylesheet-index"
@@ -139,7 +142,7 @@
                               (tokenize($stylesheet,'\s+')[not(.='')])[position()&gt;=$first-css-stylesheet-index]),' ')">
             <p:inline><_/></p:inline>
         </p:variable>
-        <px:apply-stylesheets px:progress="1" px:message="{$stylesheets-to-be-inlined}" px:message-severity="DEBUG">
+        <px:apply-stylesheets name="apply-stylesheets" px:progress="1" px:message="{$stylesheets-to-be-inlined}" px:message-severity="DEBUG">
             <p:with-option name="stylesheets" select="$stylesheets-to-be-inlined"/>
             <p:with-option name="media"
                            select="concat(
@@ -148,10 +151,10 @@
                                      ') AND (height: ',
                                      (//c:param[@name='page-height' and not(@namespace[not(.='')])]/@value,25)[1],
                                      ')')">
-                <p:pipe port="result" step="parameters"/>
+                <p:pipe step="parameters" port="result"/>
             </p:with-option>
             <p:input port="parameters">
-                <p:pipe port="result" step="parameters"/>
+                <p:pipe step="parameters" port="result"/>
             </p:input>
         </px:apply-stylesheets>
     </p:group>
@@ -169,7 +172,7 @@
                 <px:transform px:progress="1">
                     <p:with-option name="query" select="concat('(input:mathml)',$locale-query)"/>
                     <p:input port="parameters">
-                        <p:pipe port="result" step="parameters"/>
+                        <p:pipe step="dtbook-with-css" port="parameters"/>
                     </p:input>
                     <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>
                 </px:transform>
@@ -198,7 +201,7 @@
                     <p:with-option name="query" select="$transform-query"/>
                     <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>
                     <p:input port="parameters">
-                        <p:pipe port="result" step="parameters"/>
+                        <p:pipe step="dtbook-with-css" port="parameters"/>
                     </p:input>
                 </px:transform>
             </p:group>
@@ -215,7 +218,7 @@
                         <p:with-option name="query" select="$transform-query"/>
                         <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>
                         <p:input port="parameters">
-                            <p:pipe port="result" step="parameters"/>
+                            <p:pipe step="dtbook-with-css" port="parameters"/>
                         </p:input>
                     </px:transform>
                 </p:group>
@@ -259,7 +262,7 @@
                 <p:with-option name="query" select="$transform-query"/>
                 <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>
                 <p:input port="parameters">
-                    <p:pipe port="result" step="parameters"/>
+                    <p:pipe step="dtbook-with-css" port="parameters"/>
                 </p:input>
             </px:transform>
         </p:otherwise>
