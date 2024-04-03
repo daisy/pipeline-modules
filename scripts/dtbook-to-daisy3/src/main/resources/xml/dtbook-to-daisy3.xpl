@@ -100,6 +100,7 @@ reading systems can't handle the word tags.</p>
   <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl"/>
   <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
     <p:documentation>
+      px:fileset-add-entry
       px:fileset-store
       px:fileset-delete
     </p:documentation>
@@ -109,8 +110,18 @@ reading systems can't handle the word tags.</p>
   <px:normalize-uri name="output-dir-uri">
     <p:with-option name="href" select="concat($output-dir,'/')"/>
   </px:normalize-uri>
+  <p:sink/>
   
-  <px:dtbook-load name="load"/>
+  <px:fileset-add-entry media-type="application/x-dtbook+xml" name="dtbook">
+      <p:input port="entry">
+          <p:pipe step="main" port="source"/>
+      </p:input>
+  </px:fileset-add-entry>
+  <px:dtbook-load name="load">
+      <p:input port="source.in-memory">
+          <p:pipe step="dtbook" port="result.in-memory"/>
+      </p:input>
+  </px:dtbook-load>
 
   <px:dtbook-to-daisy3 name="convert" px:progress="1">
     <p:input port="fileset.in">

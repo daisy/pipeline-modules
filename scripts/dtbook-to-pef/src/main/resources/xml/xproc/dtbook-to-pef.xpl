@@ -120,6 +120,11 @@ sheet modules) are available for use in Sass style sheets:
             px:dtbook-to-pef.store
         </p:documentation>
     </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl">
+        <p:documentation>
+            px:fileset-add-entry
+        </p:documentation>
+    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/braille/common-utils/library.xpl">
         <p:documentation>
             px:delete-parameters
@@ -166,9 +171,14 @@ sheet modules) are available for use in Sass style sheets:
     <!-- ======= -->
     <!-- LOAD -->
     <!-- ======= -->
-    <px:dtbook-load name="load" px:progress=".01">
-        <p:input port="source">
+    <px:fileset-add-entry media-type="application/x-dtbook+xml" name="dtbook">
+        <p:input port="entry">
             <p:pipe step="main" port="source"/>
+        </p:input>
+    </px:fileset-add-entry>
+    <px:dtbook-load name="load" px:progress=".01">
+        <p:input port="source.in-memory">
+            <p:pipe step="dtbook" port="result.in-memory"/>
         </p:input>
     </px:dtbook-load>
     
