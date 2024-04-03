@@ -39,6 +39,7 @@ public class SAPIEngine extends TTSEngine {
 	private final int mOverallPriority;
 	private final boolean onecoreIsReady;
 	private final AudioFormat sapiAudioFormat;
+	private final float speechRate;
 
 	private Map<String, Voice> mVoiceFormatConverter = null;
 
@@ -50,10 +51,11 @@ public class SAPIEngine extends TTSEngine {
 	 * @param sapiAudioFormat should be the audio format set by the SAPI initialization.<br/>
 	 *                        It should be null if SAPI could not be loaded and/or initialized.
 	 */
-	public SAPIEngine(SAPIService service, int priority, boolean onecoreIsReady, AudioFormat sapiAudioFormat) {
+	public SAPIEngine(SAPIService service, int priority, boolean onecoreIsReady, AudioFormat sapiAudioFormat, float speechRate) {
 		super(service);
 		this.onecoreIsReady = onecoreIsReady;
 		this.sapiAudioFormat = sapiAudioFormat;
+		this.speechRate = speechRate;
 		mOverallPriority = priority;
 	}
 
@@ -63,11 +65,17 @@ public class SAPIEngine extends TTSEngine {
 	}
 
 	@Override
+	public boolean handlesSpeakingRate() {
+		return true;
+	}
+
+	@Override
 	public SynthesisResult synthesize(XdmNode ssml, Voice voice, TTSResource resource)
 			throws SynthesisException {
 
 		Map<String,Object> xsltParams = new HashMap<>(); {
 			xsltParams.put("voice", voice.getName());
+			xsltParams.put("speech-rate", speechRate);
 		}
 		try {
 			List<Integer> marks = new ArrayList<>();

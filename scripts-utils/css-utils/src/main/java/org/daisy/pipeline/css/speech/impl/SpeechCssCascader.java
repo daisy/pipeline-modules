@@ -36,6 +36,7 @@ import org.daisy.pipeline.css.CssPreProcessor;
 import org.daisy.pipeline.css.CssSerializer;
 import org.daisy.pipeline.css.JStyleParserCssCascader;
 import org.daisy.pipeline.css.Medium;
+import org.daisy.pipeline.css.speech.SpeechDeclarationTransformer;
 import org.daisy.pipeline.css.XsltProcessor;
 
 import org.osgi.service.component.annotations.Component;
