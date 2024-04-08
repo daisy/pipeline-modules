@@ -172,7 +172,7 @@ public class SassAnalyzer {
 					base = null;
 				else {
 					URI baseURI = URLs.asURI(systemId);
-					if (baseURI.isOpaque() || !baseURI.isAbsolute())
+					if (isOpaque(baseURI) || !baseURI.isAbsolute())
 						throw new IllegalArgumentException("not an absolute hierarchical base URI: " + baseURI);
 					base = URLs.asURL(baseURI);
 				}
@@ -196,7 +196,7 @@ public class SassAnalyzer {
 					if (sourceDocument instanceof DOMSource && ((DOMSource)sourceDocument).getNode() instanceof Document) {
 						doc = (Document)((DOMSource)sourceDocument).getNode();
 						URI baseURI = URLs.asURI(doc.getBaseURI());
-						if (baseURI.isOpaque() || !baseURI.isAbsolute())
+						if (isOpaque(baseURI) || !baseURI.isAbsolute())
 							throw new IllegalArgumentException("not an absolute hierarchical base URI: " + baseURI);
 						base = URLs.asURL(baseURI);
 					} else {
@@ -208,7 +208,7 @@ public class SassAnalyzer {
 							base = null;
 						else {
 							URI baseURI = URLs.asURI(systemId);
-							if (baseURI.isOpaque() || !baseURI.isAbsolute())
+							if (isOpaque(baseURI) || !baseURI.isAbsolute())
 								throw new IllegalArgumentException("not an absolute hierarchical base URI: " + baseURI);
 							base = URLs.asURL(baseURI);
 						}
@@ -327,5 +327,12 @@ public class SassAnalyzer {
 				s.append("<!--").append(((CharacterData)child).getData()).append("-->");
 		}
 		return s.toString();
+	}
+
+	private static boolean isOpaque(URI uri) {
+		if (uri.toString().startsWith("jar:file:"))
+			return uri.isAbsolute() && !uri.getSchemeSpecificPart().substring(5).startsWith("/");
+		else
+			return uri.isOpaque();
 	}
 }
