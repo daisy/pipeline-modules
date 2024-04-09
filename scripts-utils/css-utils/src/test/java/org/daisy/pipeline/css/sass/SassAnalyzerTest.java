@@ -248,4 +248,25 @@ public class SassAnalyzerTest {
 		).getVariables().iterator();
 		Assert.assertFalse(variables.hasNext());
 	}
+
+	@Test
+	public void testVariableInsideMediaRule() throws Exception {
+		Iterator<SassVariable> variables = new SassAnalyzer(Medium.parse("embossed AND (duplex:1)"), null, null).analyze(
+			Collections.singletonList(new StreamSource(new StringReader("@media embossed {"                   + "\n" +
+			                                                            "    @media (duplex:1) {"             + "\n" +
+			                                                            "        $my-var: true !default;"     + "\n" +
+			                                                            "    }"                               + "\n" +
+			                                                            "    @media (duplex:0) {"             + "\n" +
+			                                                            "        $other-var: true !default;"  + "\n" +
+			                                                            "    }"                               + "\n" +
+			                                                            "}"                                   + "\n" +
+			                                                            "@media print {"                      + "\n" +
+			                                                            "	$third-var: true !default;"       + "\n" +
+			                                                            "}"))),
+			null
+		).getVariables().iterator();
+		SassVariable v = variables.next();
+		Assert.assertEquals("my-var", v.getName());
+		Assert.assertFalse(variables.hasNext());
+	}
 }

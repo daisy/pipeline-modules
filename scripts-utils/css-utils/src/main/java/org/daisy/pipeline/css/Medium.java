@@ -109,7 +109,7 @@ public class Medium {
 	}
 
 	public boolean matches(String mediaQuery) {
-		return asMediaSpec().matches(CSSParserFactory.getInstance().parseMediaQuery(mediaQuery));
+		return asMediaSpec().matches(CSSParserFactory.getInstance().parseMediaQuery(mediaQuery.trim()));
 	}
 
 	public String toString() {

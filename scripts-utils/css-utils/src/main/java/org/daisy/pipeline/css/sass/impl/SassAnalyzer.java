@@ -272,6 +272,7 @@ public class SassAnalyzer {
 				SassDocumentationParser parser = new SassDocumentationParser(tokens).init(
 					"text/x-scss".equals(source.mediaType) || (s.base != null && s.base.toString().endsWith(".scss")),
 					s.base != null ? URLs.asURI(s.base) : null,
+					medium,
 					this);
 				vars.addAll(parser.variables());
 			}
