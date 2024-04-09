@@ -22,6 +22,7 @@ public class Medium {
 
 	public enum Type {
 		EMBOSSED,
+		BRAILLE,
 		SPEECH,
 		SCREEN,
 		PRINT;
@@ -56,14 +57,15 @@ public class Medium {
 			this.width = width;
 			this.height = height;
 			break;
+		case BRAILLE:
 		case SPEECH:
 		case SCREEN:
 		case PRINT:
 			if (width != null) {
-				throw new IllegalArgumentException("Unexpected 'width' argument for medium 'print'");
+				throw new IllegalArgumentException("Unexpected 'width' argument for medium '" + type + "'");
 			}
 			if (height != null) {
-				throw new IllegalArgumentException("Unexpected 'height' argument for medium 'print'");
+				throw new IllegalArgumentException("Unexpected 'height' argument for medium '" + type + "'");
 			}
 			this.type = type;
 			this.width = this.height = null;
@@ -77,7 +79,7 @@ public class Medium {
 	}
 
 	/**
-	 * The media type: "embossed" or "print".
+	 * The media type: "embossed", "braille", "speech", "screen" or "print".
 	 */
 	public Type getType() {
 		return type;
