@@ -210,10 +210,15 @@ public class Medium {
 							if (knownFeatures.contains(f) || knownFeatures.contains(f.replaceAll("^(min|max)-", "")))
 								return super.matches(e);
 							else {
+								if (e.size() != 1)
+									return false;
+								Term<?> v = e.get(0);
+								if (!(v instanceof TermIdent || v instanceof TermInteger))
+									return false;
 								if (!customFeatures.isEmpty())
 									for (String ff : customFeatures.keySet())
 										if (ff.equals(f))
-											return customFeatures.get(ff).equals(getExpressionIdentifier(e));
+											return customFeatures.get(ff).equals(v.toString());
 								return false;
 							}
 						}
@@ -231,10 +236,15 @@ public class Medium {
 							if (knownFeatures.contains(f) || knownFeatures.contains(f.replaceAll("^(min|max)-", "")))
 								return super.matches(e);
 							else {
+								if (e.size() != 1)
+									return false;
+								Term<?> v = e.get(0);
+								if (!(v instanceof TermIdent || v instanceof TermInteger))
+									return false;
 								if (!customFeatures.isEmpty())
 									for (String ff : customFeatures.keySet())
 										if (ff.equals(f))
-											return customFeatures.get(ff).equals(getExpressionIdentifier(e));
+											return customFeatures.get(ff).equals(v.toString());
 								return false;
 							}
 						}
