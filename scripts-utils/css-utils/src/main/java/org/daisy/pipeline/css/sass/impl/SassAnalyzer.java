@@ -1,6 +1,7 @@
 package org.daisy.pipeline.css.sass.impl;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UncheckedIOException;
@@ -57,6 +58,7 @@ import org.w3c.dom.traversal.DocumentTraversal;
 import org.w3c.dom.traversal.NodeFilter;
 import org.w3c.dom.traversal.TreeWalker;
 
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class SassAnalyzer {
@@ -184,9 +186,21 @@ public class SassAnalyzer {
 					r = new InputStreamReader(ss.getInputStream(), StandardCharsets.UTF_8);
 				stylesheets.add(new CSSSource(CharStreams.toString(r), null, base, 0, 0));
 			} else {
-				if (base == null)
-					throw new IllegalArgumentException("empty base URI");
-				stylesheets.add(new CSSSource(base, StandardCharsets.UTF_8, null));
+				if (base == null) {
+					InputSource is = SAXSource.sourceToInputSource(s);
+					if (is == null)
+						throw new IllegalArgumentException("unexpected source");
+					Reader r = is.getCharacterStream();
+					if (r == null) {
+						InputStream bs = is.getByteStream();
+						if (bs != null)
+							r = new InputStreamReader(bs, StandardCharsets.UTF_8);
+						else
+							throw new IllegalArgumentException("unexpected source: no content and no base URI");
+					}
+					stylesheets.add(new CSSSource(CharStreams.toString(r), null, base, 0, 0));
+				} else
+					stylesheets.add(new CSSSource(base, StandardCharsets.UTF_8, null));
 			}
 		}
 		if (sourceDocument != null) {
