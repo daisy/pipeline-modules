@@ -53,6 +53,7 @@ variables returns [java.util.Collection<SassVariable> vars]
                 vars.add(new SassVariable(name, lastComment, v, analyzer.datatypes));
             else
                 vars.add(new SassVariable(name, v));
+            lastComment = null;
         }
       // @import currently only supported at the top level
       | vars_from_import=import_rule {
