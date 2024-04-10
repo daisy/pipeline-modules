@@ -92,41 +92,52 @@ import_rule returns [java.util.Collection<SassVariable> vars]
 @init {
     vars = new java.util.ArrayList<>();
     java.util.List<java.net.URI> imports = new java.util.ArrayList<>();
+    String media = null;
 }
     : (IMPORT
        S? u=import_uri { imports.add(u); }
        (S? COMMA S? u=import_uri { imports.add(u); })*
-       S? SEMICOLON) {
-           for (java.net.URI i : imports)
-               try {
-                   java.net.URL url; {
-                       try {
-                           if (base != null)
-                               i = org.daisy.common.file.URLs.resolve(base, i);
-                           url = org.daisy.common.file.URLs.asURL(i);
-                       } catch (RuntimeException e) {
-                           throw new java.io.IOException(e);
+       S? (m=media { media = m; })?
+       SEMICOLON) {
+           if (media == null || medium.matches(media))
+               for (java.net.URI i : imports)
+                   try {
+                       java.net.URL url; {
+                           try {
+                               if (base != null)
+                                   i = org.daisy.common.file.URLs.resolve(base, i);
+                               url = org.daisy.common.file.URLs.asURL(i);
+                           } catch (RuntimeException e) {
+                               throw new java.io.IOException(e);
+                           }
                        }
+                       vars.addAll(
+                           analyzer.getVariableDeclarations(
+                               new cz.vutbr.web.csskit.antlr.CSSSource(url,
+                                                                       java.nio.charset.StandardCharsets.UTF_8,
+                                                                       null)));
+                   } catch (java.io.IOException e) {
+                       logger.warn("Could not import stylesheet; skipping: " + i, e);
                    }
-                   vars.addAll(
-                       analyzer.getVariableDeclarations(
-                           new cz.vutbr.web.csskit.antlr.CSSSource(url,
-                                                                   java.nio.charset.StandardCharsets.UTF_8,
-                                                                   null)));
-               } catch (java.io.IOException e) {
-                   logger.warn("Could not import stylesheet; skipping: " + i, e);
-               }
        }
     ;
 
 media_rule returns [java.util.Collection<SassVariable> vars]
-@init {
-    StringBuilder media = new StringBuilder();
-}
-    : (MEDIA (t=~LCURLY { media.append(t.getText()); })+ LCURLY v=variables RCURLY) {
-          if (medium.matches(media.toString()))
+    : (MEDIA S? m=media LCURLY v=variables RCURLY) {
+          if (medium.matches(m))
               $vars = v;
       }
+    ;
+
+media returns [String media]
+@init {
+    StringBuilder s = new StringBuilder();
+}
+@after {
+    $media = s.toString().trim();
+}
+    : t=~(S|LCURLY|SEMICOLON|COMMA|STRING|URI) { s.append(t.getText()); }
+      (t=~(LCURLY|SEMICOLON) { s.append(t.getText()); })*
     ;
 
 import_uri returns [java.net.URI uri]
