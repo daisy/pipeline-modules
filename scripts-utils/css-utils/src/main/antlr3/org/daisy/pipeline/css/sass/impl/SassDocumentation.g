@@ -45,11 +45,12 @@ variables returns [java.util.Collection<SassVariable> vars]
 @init {
     Comment lastComment = null;
     vars = new java.util.ArrayList<>();
+    boolean isDefault = false;
 }
     : ( c=comment { lastComment = c; }
-      | (n=VAR_DECL v=variable_value (d=DEFAULT S?)? SEMICOLON) {
+      | (n=VAR_DECL { isDefault = false; } v=variable_value (DEFAULT { isDefault = true;} S?)? SEMICOLON) {
             String name = n.getText().substring(1, n.getText().length() - 1).trim();
-            if (d != null)
+            if (isDefault)
                 vars.add(new SassVariable(name, lastComment, v, analyzer.datatypes));
             else
                 vars.add(new SassVariable(name, v));
