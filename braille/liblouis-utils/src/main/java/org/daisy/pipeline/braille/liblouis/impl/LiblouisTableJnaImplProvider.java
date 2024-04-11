@@ -98,6 +98,10 @@ public class LiblouisTableJnaImplProvider extends AbstractTransformProvider<Libl
 			return toString();
 		}
 		
+		public String getDisplayName() {
+			return info != null ? info.get("display-name") : null;
+		}
+		
 		public Normalizer.Form getUnicodeNormalizationForm() {
 			if (info != null) {
 				String form = info.get("unicode-form");
@@ -107,7 +111,7 @@ public class LiblouisTableJnaImplProvider extends AbstractTransformProvider<Libl
 					} catch (IllegalArgumentException e) {}}
 			return null;
 		}
-		
+
 		@Override
 		public String toString() {
 			return MoreObjects.toStringHelper("LiblouisTableJnaImpl")

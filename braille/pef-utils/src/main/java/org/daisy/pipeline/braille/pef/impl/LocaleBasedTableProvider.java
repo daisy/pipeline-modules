@@ -82,7 +82,8 @@ public class LocaleBasedTableProvider extends AbstractTableProvider {
 
 	private Collection<FactoryProperties> properties = null;
 
-	Collection<FactoryProperties> list() {
+	@Override
+	public Collection<FactoryProperties> list() {
 		if (properties == null)
 			properties = Collections.unmodifiableCollection(new HashSet<>(tableFromLocale.values()));
 		return properties;
@@ -94,6 +95,7 @@ public class LocaleBasedTableProvider extends AbstractTableProvider {
 	 * - locale: A locale that is mapped to a specific table
 	 *     that is a sane default for that locale.
 	 */
+	@Override
 	protected Iterable<Table> _get(Query query) {
 		for (Feature feature : query)
 			if (!supportedFeatures.contains(feature.getKey())) {
