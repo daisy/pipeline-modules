@@ -182,8 +182,8 @@ public abstract class TTSEngine {
 	}
 
 	/**
-	 * Whether the TTS engine handles <a
-	 * href="https://www.w3.org/TR/speech-synthesis11/#S3.2.4><code>prosody</code></a>
+	 * Whether the TTS engine handles
+	 * <a href="https://www.w3.org/TR/speech-synthesis11/#S3.2.4"><code>prosody</code></a>
 	 * elements with a {@code rate} attribute. If this method returns {@code true}, the
 	 * engine is assumed to support all of the following values:
 	 *
@@ -192,9 +192,9 @@ public abstract class TTSEngine {
 	 *   <li>A non-negative percentage, which acts as a multiplier of the default
 	 *   rate.</li>
 	 *   <li>A number that represents speaking rate in words per minute. Note that this
-	 *   does not come from the SSML specification, but it is a value of the CSS <a
-	 *   href="https://www.w3.org/TR/CSS2/aural.html#propdef-speech-rate"
-	 *   ><code>speech-rate</code></a> property.</li>
+	 *   does not come from the SSML specification, but it is a value of the CSS
+	 *   <a href="https://www.w3.org/TR/CSS2/aural.html#propdef-speech-rate"><code>speech-rate</code></a>
+	 *   property.</li>
 	 * </ul>
 	 *
 	 * All values, except for absolute numbers, are relative to the default rate, which
