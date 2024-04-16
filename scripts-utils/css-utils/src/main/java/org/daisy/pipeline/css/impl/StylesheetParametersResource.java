@@ -1,5 +1,6 @@
 package org.daisy.pipeline.css.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.net.URLConnection;
 import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -148,7 +150,12 @@ public class StylesheetParametersResource extends AuthenticatedResource {
 						if ("file".equals(href.getScheme()) && !getConfiguration().isLocalFS())
 							throw new FileNotFoundException(
 								"WS does not allow local inputs but a href starting with 'file:' was found: " + href);
-						builder.withInput("stylesheet", href);
+						else if ("http".equals(href.getScheme()) || "https".equals(href.getScheme()))
+							builder.withInput("stylesheet",
+							                  new ByteArrayInputStream(
+								                  ("@import url(\"" + href + "\");").getBytes(StandardCharsets.UTF_8)));
+						else
+							builder.withInput("stylesheet", href);
 					} catch (IllegalArgumentException|FileNotFoundException e) {
 						return badRequest(e);
 					}
@@ -236,8 +243,11 @@ public class StylesheetParametersResource extends AuthenticatedResource {
 			);
 		try {
 			Function<Source,Source> handleZippedInput = s -> {
+				if (s.getSystemId() == null)
+					// this means we used a InputStream
+					return s;
 				URI u = URLs.asURI(s.getSystemId());
-				if (!"file".equals(u.getScheme()))
+				if (u.getScheme() == null)
 					// we know that u is a relative URI and that data contains the file
 					u = URLs.resolve(contextBase, u);
 				try {

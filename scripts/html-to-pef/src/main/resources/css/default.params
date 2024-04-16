@@ -16,7 +16,7 @@
             </px:type>
         </p:pipeinfo>
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h2 px:role="name">Translation/formatting of text: Hyphenation</h2>
+            <h2 px:role="name">Hyphenation</h2>
             <p px:role="desc" xml:space="preserve">Hyphenation policy.
 
 The following CSS rule is included by default (where `$hyphenation` is the value of this option):
@@ -47,7 +47,7 @@ more specific CSS rules. See the CSS specification for more info:
             </px:type>
         </p:pipeinfo>
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h2 px:role="name">Translation/formatting of text: Line spacing</h2>
+            <h2 px:role="name">Line spacing</h2>
             <p px:role="desc" xml:space="preserve">Single or double line spacing.
 
 The following CSS rule is included by default (where `$line-spacing` is the value of this option):

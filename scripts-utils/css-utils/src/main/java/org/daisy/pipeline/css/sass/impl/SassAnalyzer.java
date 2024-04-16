@@ -1,6 +1,7 @@
 package org.daisy.pipeline.css.sass.impl;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UncheckedIOException;
@@ -57,6 +58,7 @@ import org.w3c.dom.traversal.DocumentTraversal;
 import org.w3c.dom.traversal.NodeFilter;
 import org.w3c.dom.traversal.TreeWalker;
 
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class SassAnalyzer {
@@ -172,7 +174,7 @@ public class SassAnalyzer {
 					base = null;
 				else {
 					URI baseURI = URLs.asURI(systemId);
-					if (baseURI.isOpaque() || !baseURI.isAbsolute())
+					if (isOpaque(baseURI) || !baseURI.isAbsolute())
 						throw new IllegalArgumentException("not an absolute hierarchical base URI: " + baseURI);
 					base = URLs.asURL(baseURI);
 				}
@@ -184,9 +186,21 @@ public class SassAnalyzer {
 					r = new InputStreamReader(ss.getInputStream(), StandardCharsets.UTF_8);
 				stylesheets.add(new CSSSource(CharStreams.toString(r), null, base, 0, 0));
 			} else {
-				if (base == null)
-					throw new IllegalArgumentException("empty base URI");
-				stylesheets.add(new CSSSource(base, StandardCharsets.UTF_8, null));
+				if (base == null) {
+					InputSource is = SAXSource.sourceToInputSource(s);
+					if (is == null)
+						throw new IllegalArgumentException("unexpected source");
+					Reader r = is.getCharacterStream();
+					if (r == null) {
+						InputStream bs = is.getByteStream();
+						if (bs != null)
+							r = new InputStreamReader(bs, StandardCharsets.UTF_8);
+						else
+							throw new IllegalArgumentException("unexpected source: no content and no base URI");
+					}
+					stylesheets.add(new CSSSource(CharStreams.toString(r), null, base, 0, 0));
+				} else
+					stylesheets.add(new CSSSource(base, StandardCharsets.UTF_8, null));
 			}
 		}
 		if (sourceDocument != null) {
@@ -196,7 +210,7 @@ public class SassAnalyzer {
 					if (sourceDocument instanceof DOMSource && ((DOMSource)sourceDocument).getNode() instanceof Document) {
 						doc = (Document)((DOMSource)sourceDocument).getNode();
 						URI baseURI = URLs.asURI(doc.getBaseURI());
-						if (baseURI.isOpaque() || !baseURI.isAbsolute())
+						if (isOpaque(baseURI) || !baseURI.isAbsolute())
 							throw new IllegalArgumentException("not an absolute hierarchical base URI: " + baseURI);
 						base = URLs.asURL(baseURI);
 					} else {
@@ -208,7 +222,7 @@ public class SassAnalyzer {
 							base = null;
 						else {
 							URI baseURI = URLs.asURI(systemId);
-							if (baseURI.isOpaque() || !baseURI.isAbsolute())
+							if (isOpaque(baseURI) || !baseURI.isAbsolute())
 								throw new IllegalArgumentException("not an absolute hierarchical base URI: " + baseURI);
 							base = URLs.asURL(baseURI);
 						}
@@ -272,6 +286,7 @@ public class SassAnalyzer {
 				SassDocumentationParser parser = new SassDocumentationParser(tokens).init(
 					"text/x-scss".equals(source.mediaType) || (s.base != null && s.base.toString().endsWith(".scss")),
 					s.base != null ? URLs.asURI(s.base) : null,
+					medium,
 					this);
 				vars.addAll(parser.variables());
 			}
@@ -327,5 +342,12 @@ public class SassAnalyzer {
 				s.append("<!--").append(((CharacterData)child).getData()).append("-->");
 		}
 		return s.toString();
+	}
+
+	private static boolean isOpaque(URI uri) {
+		if (uri.toString().startsWith("jar:file:"))
+			return uri.isAbsolute() && !uri.getSchemeSpecificPart().substring(5).startsWith("/");
+		else
+			return uri.isOpaque();
 	}
 }

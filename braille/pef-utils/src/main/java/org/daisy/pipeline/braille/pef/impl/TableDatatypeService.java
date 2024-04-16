@@ -1,6 +1,7 @@
 package org.daisy.pipeline.braille.pef.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -9,7 +10,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.daisy.dotify.api.factory.FactoryProperties;
-import org.daisy.dotify.api.table.TableProvider;
+import org.daisy.pipeline.braille.pef.TableRegistry;
 import org.daisy.pipeline.datatypes.DatatypeService;
 import org.daisy.pipeline.datatypes.ValidationResult;
 
@@ -34,58 +35,61 @@ public class TableDatatypeService extends DatatypeService {
 		super("preview-table");
 	}
 
-	private Document xmlDefinition = null;
-	private List<String> enumerationValues = null;
-	// to expose all available tables we would use BrailleUtilsTableCatalog, but for now we only
-	// present a list of languages
-	private final LocaleBasedTableProvider catalog = new LocaleBasedTableProvider();
+	private TableRegistry registry;
 
 	@Reference(
-		name = "TableProvider",
+		name = "TableRegistry",
 		unbind = "-",
-		service = TableProvider.class,
-		cardinality = ReferenceCardinality.MULTIPLE,
+		service = TableRegistry.class,
+		cardinality = ReferenceCardinality.MANDATORY,
 		policy = ReferencePolicy.STATIC
 	)
-	public void addTableProvider(TableProvider provider) {
-		catalog.addTableProvider(provider);
+	public void setTableRegistry(TableRegistry registry) {
+		this.registry = registry;
 	}
 
 	public Document asDocument() throws Exception {
-		if (xmlDefinition == null)
-			createDatatype();
-		return xmlDefinition;
+		// re-computing datatype every time because tables may have been added to the list
+		return createDatatype(registry.list());
 	}
 
 	public ValidationResult validate(String content) {
-		if (enumerationValues == null)
-			try {
-				createDatatype();
-			} catch (Exception e) {
-				return ValidationResult.notValid("Failed to determine allowed values");
-			}
-		if (enumerationValues.contains(content))
-			return ValidationResult.valid();
-		else
-			return ValidationResult.notValid("'" + content + "' is not in the list of allowed values.");
+		try {
+			// re-computing datatype every time because tables may have been added to the list
+			if (enumerateValues(registry.list()).contains(content))
+				return ValidationResult.valid();
+			else
+				return ValidationResult.notValid("'" + content + "' is not in the list of allowed values.");
+		} catch (Exception e) {
+			return ValidationResult.notValid("Failed to determine allowed values");
+		}
 	}
 
-	private void createDatatype() throws ParserConfigurationException, DOMException {
+	private static final String defaultValue = "";
+
+	/**
+	 * List all options, starting with the default (empty string), followed by the given tables
+	 */
+	private static List<String> enumerateValues(Collection<FactoryProperties> tables) {
+		List<String> values = new ArrayList<>();
+		values.add(defaultValue);
+		for (FactoryProperties t : tables)
+			values.add("(id:\"" + t.getIdentifier() + "\")");
+		return values;
+	}
+
+	private static Document createDatatype(Collection<FactoryProperties> tables) throws ParserConfigurationException, DOMException {
 		Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
 		                                     .getDOMImplementation().createDocument(null, "choice", null);
-		List<String> values = new ArrayList<>();
 		Element choice = doc.getDocumentElement();
-		String defaultValue = "";
-		values.add(defaultValue);
 		choice.appendChild(doc.createElement("value"))
 		      .appendChild(doc.createTextNode(defaultValue));
 		choice.appendChild(doc.createElementNS("http://relaxng.org/ns/compatibility/annotations/1.0",
 		                                       "documentation"))
 		      .appendChild(doc.createTextNode("-"));
-		List<FactoryProperties> tables = new ArrayList<>();
-		catalog.init();
-		tables.addAll(catalog.list());
-		Collections.sort(tables,
+		// order tables by display name
+		List<FactoryProperties> sortedTables = new ArrayList<>(tables);
+		Collections.sort(sortedTables,
 		                 new Comparator<FactoryProperties>() {
 				@Override
 				public int compare(FactoryProperties o1, FactoryProperties o2) {
@@ -101,10 +105,8 @@ public class TableDatatypeService extends DatatypeService {
 					else
 						return s1.toLowerCase().compareTo(s2.toLowerCase()); }});
 		for (FactoryProperties table : tables) {
-			String value = "(id:\"" + table.getIdentifier() + "\")";
-			values.add(value);
 			choice.appendChild(doc.createElement("value"))
-			      .appendChild(doc.createTextNode(value));
+			      .appendChild(doc.createTextNode("(id:\"" + table.getIdentifier() + "\")"));
 			String desc = table.getDisplayName();
 			if (desc != null) {
 				if (table.getDescription() != null && !"".equals(table.getDescription()))
@@ -114,7 +116,6 @@ public class TableDatatypeService extends DatatypeService {
 				      .appendChild(doc.createTextNode(desc));
 			}
 		}
-		xmlDefinition = doc;
-		enumerationValues = values;
+		return doc;
 	}
 }

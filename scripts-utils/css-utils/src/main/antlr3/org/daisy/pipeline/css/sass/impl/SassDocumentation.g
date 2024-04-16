@@ -17,6 +17,7 @@ grammar SassDocumentation;
 
     private boolean isScss;
     private java.net.URI base;
+    private org.daisy.pipeline.css.Medium medium;
     private SassAnalyzer analyzer;
 
     private org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(getClass());
@@ -25,9 +26,10 @@ grammar SassDocumentation;
      * @param base for resolving imports
      * @param analyzer for handling imports
      */
-    public SassDocumentationParser init(boolean isScss, java.net.URI base, SassAnalyzer analyzer) {
+    public SassDocumentationParser init(boolean isScss, java.net.URI base, org.daisy.pipeline.css.Medium medium, SassAnalyzer analyzer) {
         this.isScss = isScss;
         this.base = base;
+        this.medium = medium;
         this.analyzer = analyzer;
         return this;
     }
@@ -43,22 +45,29 @@ variables returns [java.util.Collection<SassVariable> vars]
 @init {
     Comment lastComment = null;
     vars = new java.util.ArrayList<>();
+    boolean isDefault = false;
 }
     : ( c=comment { lastComment = c; }
-      | (n=VAR_DECL v=variable_value (d=DEFAULT S?)? SEMICOLON) {
+      | (n=VAR_DECL { isDefault = false; } v=variable_value (DEFAULT { isDefault = true;} S?)? SEMICOLON) {
             String name = n.getText().substring(1, n.getText().length() - 1).trim();
-            if (d != null)
+            if (isDefault)
                 vars.add(new SassVariable(name, lastComment, v, analyzer.datatypes));
             else
                 vars.add(new SassVariable(name, v));
+            lastComment = null;
         }
       // @import currently only supported at the top level
       | vars_from_import=import_rule {
             vars.addAll(vars_from_import);
             lastComment = null;
         }
+      | vars_inside_media=media_rule {
+            if (vars_inside_media != null)
+                vars.addAll(vars_inside_media);
+            lastComment = null;
+        }
       | rule_block { lastComment = null; }
-      | ~(COMMENT|VAR_DECL|IMPORT|LCURLY|S) { lastComment = null; }
+      | ~(COMMENT|VAR_DECL|IMPORT|MEDIA|LCURLY|RCURLY|S) { lastComment = null; }
       | S
       )*
     ;
@@ -84,31 +93,52 @@ import_rule returns [java.util.Collection<SassVariable> vars]
 @init {
     vars = new java.util.ArrayList<>();
     java.util.List<java.net.URI> imports = new java.util.ArrayList<>();
+    String media = null;
 }
     : (IMPORT
        S? u=import_uri { imports.add(u); }
        (S? COMMA S? u=import_uri { imports.add(u); })*
-       S? SEMICOLON) {
-           for (java.net.URI i : imports)
-               try {
-                   java.net.URL url; {
-                       try {
-                           if (base != null)
-                               i = org.daisy.common.file.URLs.resolve(base, i);
-                           url = org.daisy.common.file.URLs.asURL(i);
-                       } catch (RuntimeException e) {
-                           throw new java.io.IOException(e);
+       S? (m=media { media = m; })?
+       SEMICOLON) {
+           if (media == null || medium.matches(media))
+               for (java.net.URI i : imports)
+                   try {
+                       java.net.URL url; {
+                           try {
+                               if (base != null)
+                                   i = org.daisy.common.file.URLs.resolve(base, i);
+                               url = org.daisy.common.file.URLs.asURL(i);
+                           } catch (RuntimeException e) {
+                               throw new java.io.IOException(e);
+                           }
                        }
+                       vars.addAll(
+                           analyzer.getVariableDeclarations(
+                               new cz.vutbr.web.csskit.antlr.CSSSource(url,
+                                                                       java.nio.charset.StandardCharsets.UTF_8,
+                                                                       null)));
+                   } catch (java.io.IOException e) {
+                       logger.warn("Could not import stylesheet; skipping: " + i, e);
                    }
-                   vars.addAll(
-                       analyzer.getVariableDeclarations(
-                           new cz.vutbr.web.csskit.antlr.CSSSource(url,
-                                                                   java.nio.charset.StandardCharsets.UTF_8,
-                                                                   null)));
-               } catch (java.io.IOException e) {
-                   logger.warn("Could not import stylesheet; skipping: " + i, e);
-               }
        }
+    ;
+
+media_rule returns [java.util.Collection<SassVariable> vars]
+    : (MEDIA S? m=media LCURLY v=variables RCURLY) {
+          if (medium.matches(m))
+              $vars = v;
+      }
+    ;
+
+media returns [String media]
+@init {
+    StringBuilder s = new StringBuilder();
+}
+@after {
+    $media = s.toString().trim();
+}
+    : t=~(S|LCURLY|SEMICOLON|COMMA|STRING|URI) { s.append(t.getText()); }
+      (t=~(LCURLY|SEMICOLON) { s.append(t.getText()); })*
     ;
 
 import_uri returns [java.net.URI uri]
@@ -166,6 +196,7 @@ XML_COMMENT_CLOSE : '-->' ;
 AT
     : '@'
     ( ('import') => 'import' { $type = IMPORT; }
+    | ('media') => 'media' { $type = MEDIA; }
     )?
     ;
 
@@ -215,6 +246,7 @@ ANY : . ;
 
 fragment DEFAULT : ;
 fragment IMPORT : ;
+fragment MEDIA : ;
 fragment VAR_DECL : ;
 
 fragment
