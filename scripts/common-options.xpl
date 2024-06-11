@@ -315,15 +315,15 @@ element](http://kb.daisy.org/publishing/docs/text-to-speech/pls.html#ex-07).
 	    html-to-pef
 	    epub3-to-pef
 	-->
-	<p:option name="stylesheet-parameters" required="false" px:type="transform-query" select="''">
+	<p:option name="stylesheet-parameters" required="false" px:type="stylesheet-parameters" select="'()'">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Style sheet parameters</h2>
 			<p px:role="desc" xml:space="preserve">A list of parameters passed to the style sheets.
 
 Style sheets, whether they're user style sheets (specified with the "stylesheet" option) or author
 style sheets (associated with the source), may have parameters (Sass variables). The
-"stylesheet-parameters" option, which takes a list of parenthesis enclosed key-value pairs, can be
-used to set these variables.
+"stylesheet-parameters" option, which takes a comma-separated list of key-value pairs enclosed in
+parenthesis, can be used to set these variables.
 
 For example, if a style sheet uses the Sass variable "foo":
 

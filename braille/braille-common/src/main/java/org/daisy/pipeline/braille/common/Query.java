@@ -66,7 +66,7 @@ public interface Query extends Iterable<Query.Feature> {
 		
 		/* query() */
 		
-		public static Query query(String query) {
+		public static Query query(String query) throws IllegalArgumentException {
 			if (FEATURES_RE.matcher(query).matches()) {
 				MutableQuery mq = mutableQuery();
 				Matcher m = FEATURE_RE.matcher(query);
@@ -92,7 +92,7 @@ public interface Query extends Iterable<Query.Feature> {
 							throw new RuntimeException("Coding error"); }
 					mq.add(new FeatureImpl(key, Optional.ofNullable(value), isString)); }
 				return mq.asImmutable(); }
-			throw new RuntimeException("Could not parse query: " + query);
+			throw new IllegalArgumentException("Could not parse query: " + query);
 		}
 		
 		public static Query query(XMLStreamReader query) throws XMLStreamException {

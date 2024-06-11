@@ -46,7 +46,7 @@
 		</p:documentation>
 	</p:input>
 	
-	<p:option name="parameters" cx:as="xs:string" select="''">
+	<p:option name="parameters" cx:as="xs:string" select="'()'">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>This option may contain additional style sheet parameters in serialized form. The
 			parameters specified through this option and the ones specified through the "parameters"

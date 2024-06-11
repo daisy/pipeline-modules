@@ -41,6 +41,10 @@
         <!--
             Implemented in ../../java/org/daisy/pipeline/braille/common/calabash/impl/PxParseQueryStep.java
         -->
+        <!--
+            Note that we could also use px:css-parse-param-set, but this step raises a deprecation
+            warning when it receives a query.
+        -->
     </p:declare-step>
 
 </p:library>

@@ -69,7 +69,7 @@
     <!-- defined in ../../../../../common-options.xpl -->
   </p:option>
   
-  <!-- <p:option name="stylesheet-parameters" select="''"> -->
+  <!-- <p:option name="stylesheet-parameters" select="'()'"> -->
   <!--     <!-\- defined in ../../../../../common-options.xpl -\-> -->
   <!-- </p:option> -->
 
