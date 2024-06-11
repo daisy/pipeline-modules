@@ -84,6 +84,19 @@ public class SassAnalyzerTest {
 	}
 
 	@Test
+	public void testMapVariable() throws Exception {
+		Iterator<SassVariable> variables = new SassAnalyzer(SCREEN, null, null).analyze(
+			Collections.singletonList(new StreamSource(new StringReader("   $my-var: (foo: 1, bar: 2);"))),
+			null
+		).getVariables().iterator();
+		SassVariable v = variables.next();
+		Assert.assertEquals("(foo: 1, bar: 2)", v.getValue());
+		Assert.assertEquals("string", v.getType().getId());
+		Assert.assertFalse(v.isDefault());
+		Assert.assertFalse(variables.hasNext());
+	}
+
+	@Test
 	public void testRegularComment() throws Exception {
 		Iterator<SassVariable> variables = new SassAnalyzer(SCREEN, null, null).analyze(
 			Collections.singletonList(new StreamSource(new StringReader("   /*"                    + "\n" +
