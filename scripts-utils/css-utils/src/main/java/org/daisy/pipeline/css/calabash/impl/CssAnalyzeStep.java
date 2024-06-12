@@ -31,9 +31,11 @@ import com.xmlcalabash.library.DefaultStep;
 import com.xmlcalabash.model.RuntimeValue;
 import com.xmlcalabash.runtime.XAtomicStep;
 
+import net.sf.saxon.ma.map.MapItem;
 import net.sf.saxon.s9api.SaxonApiException;
 
 import org.daisy.common.file.URLs;
+import org.daisy.common.saxon.SaxonHelper;
 import static org.daisy.common.stax.XMLStreamWriterHelper.writeAttribute;
 import static org.daisy.common.stax.XMLStreamWriterHelper.writeStartElement;
 import org.daisy.common.xproc.calabash.XMLCalabashInputValue;
@@ -67,7 +69,6 @@ public class CssAnalyzeStep extends DefaultStep implements XProcStep {
 	private final InMemoryURIResolver inMemoryResolver;
 	private final URIResolver cssURIResolver;
 	private final UserAgentStylesheetRegistry userAgentStylesheets;
-	private final Map<String,String> params = new LinkedHashMap<>(); // use LinkedHashMap to get same order as insertion order
 
 	private final static QName c_param_set = new QName(XProcConstants.NS_XPROC_STEP, "param-set");
 	private final static QName c_param = new QName(XProcConstants.NS_XPROC_STEP, "param");
@@ -76,6 +77,7 @@ public class CssAnalyzeStep extends DefaultStep implements XProcStep {
 	private static final net.sf.saxon.s9api.QName _user_stylesheet = new net.sf.saxon.s9api.QName("user-stylesheet");
 	private static final net.sf.saxon.s9api.QName _include_user_agent_stylesheet
 		= new net.sf.saxon.s9api.QName("include-user-agent-stylesheet");
+	private static final net.sf.saxon.s9api.QName _parameters = new net.sf.saxon.s9api.QName("parameters");
 	private static final net.sf.saxon.s9api.QName _content_type = new net.sf.saxon.s9api.QName("content-type");
 	private static final net.sf.saxon.s9api.QName _media = new net.sf.saxon.s9api.QName("media");
 
@@ -103,31 +105,25 @@ public class CssAnalyzeStep extends DefaultStep implements XProcStep {
 	}
 
 	@Override
-	public void setParameter(String port, net.sf.saxon.s9api.QName name, RuntimeValue value) {
-		if ("parameters".equals(port))
-			if ("".equals(name.getNamespaceURI())) {
-				params.put(name.getLocalName(), value.getString());
-				return; }
-		super.setParameter(port, name, value);
-	}
-
-	@Override
-	public void setParameter(net.sf.saxon.s9api.QName name, RuntimeValue value) {
-		setParameter("parameters", name, value);
-	}
-
-	@Override
 	public void reset() {
 		sourcePipe.resetReader();
 		contextPipe.resetReader();
 		resultPipe.resetWriter();
-		params.clear();
 	}
 
 	@Override
 	public void run() throws SaxonApiException {
 		super.run();
 		try {
+			Map<String,String> params = new LinkedHashMap<>(); // use LinkedHashMap to get same order as insertion order
+			RuntimeValue paramOption = getOption(_parameters);
+			if (paramOption != null)
+				for (Map.Entry<String,Object> e
+				         : SaxonHelper.mapFromMapItem(
+				               (MapItem)SaxonHelper.getSingleItem(paramOption.getValue().getUnderlyingValue()),
+				               Object.class
+				           ).entrySet())
+					params.put(e.getKey(), "" + e.getValue());
 			List<Medium> media = Medium.parseMultiple(getOption(_media, DEFAULT_MEDIUM));
 			inMemoryResolver.setContext(contextPipe);
 			Node doc = new XMLCalabashInputValue(sourcePipe).ensureSingleItem().asNodeIterator().next();

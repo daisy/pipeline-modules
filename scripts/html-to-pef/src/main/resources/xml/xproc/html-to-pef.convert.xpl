@@ -10,6 +10,7 @@
                 xmlns:c="http://www.w3.org/ns/xproc-step"
                 xmlns:cx="http://xmlcalabash.com/ns/extensions"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:map="http://www.w3.org/2005/xpath-functions/map"
                 exclude-inline-prefixes="#all"
                 type="px:html-to-pef" name="main">
     
@@ -63,6 +64,7 @@
         </p:documentation>
     </p:option>
     <p:option name="stylesheet" select="''"/>
+    <p:option name="stylesheet-parameters" select="map{}"/> <!-- map(xs:string,item()) | xs:string -->
     <p:option name="transform" select="'(translator:liblouis)(formatter:dotify)'"/>
     <p:option name="include-obfl" select="'false'" cx:as="xs:string"/>
     
@@ -104,6 +106,11 @@
     <cx:import href="http://www.daisy.org/pipeline/modules/html-utils/library.xsl" type="application/xslt+xml">
         <p:documentation>
             pf:html-base-uri
+        </p:documentation>
+    </cx:import>
+    <cx:import href="http://www.daisy.org/pipeline/modules/css-utils/library.xsl" type="application/xslt+xml">
+        <p:documentation>
+            pf:css-parse-param-set
         </p:documentation>
     </cx:import>
 
@@ -163,15 +170,11 @@
     </p:declare-step>
 
     <p:variable name="ERR_DOTIFY_002" cx:as="xs:QName" select="QName('http://www.daisy.org/ns/pipeline/errors','pe:DOTIFY002')"/>
+    <p:variable name="parameter-map" select="pf:css-parse-param-set(($stylesheet-parameters,collection()))"> <!-- cx:as="map(xs:string,item())" -->
+        <!-- pf:css-parse-param-set takes first in case of duplicates -->
+        <p:pipe step="main" port="parameters"/>
+    </p:variable>
 
-    <!-- Ensure that there's exactly one c:param-set. (In case of multiple parameters with the same
-         name, only the last occurence is kept.) -->
-    <p:parameters name="parameters" px:progress=".01">
-        <p:input port="parameters">
-            <p:pipe step="main" port="parameters"/>
-        </p:input>
-    </p:parameters>
-    
     <!-- Parse transform query to a c:param-set -->
     <px:parse-query name="parsed-transform-query">
         <p:with-option name="query" select="$transform"/>
@@ -191,7 +194,7 @@
     <px:assert message="More than one XHTML documents found." test-count-max="1" error-code="PEZE00"/>
     <p:identity name="html"/>
     
-    <p:group name="html-with-css" px:message="Applying style sheets" px:progress=".11">
+    <p:group name="html-with-css" px:message="Applying style sheets" px:progress=".12">
         <p:output port="result" primary="true"/>
         <p:output port="parameters">
             <p:pipe step="css-cascade" port="result.parameters"/>
@@ -206,20 +209,17 @@
         </p:variable>
         <px:css-cascade name="css-cascade" px:progress="1" px:message="stylesheets: {$stylesheets-to-be-inlined}" px:message-severity="DEBUG">
             <p:with-option name="user-stylesheet" select="$stylesheets-to-be-inlined"/>
+            <p:with-option name="parameters" select="$parameter-map"/>
             <p:with-option name="media"
                            select="concat(
-                                     'embossed AND (width: ',
-                                     (//c:param[@name='page-width' and not(@namespace[not(.='')])]/@value,40)[1],
-                                     ') AND (height: ',
-                                     (//c:param[@name='page-height' and not(@namespace[not(.='')])]/@value,25)[1],
-                                     ')',
-                                     if (//c:param[@name='duplex' and not(@namespace[not(.='')])]/@value='true')
+                                     'embossed',
+                                     ' AND (width: ',($parameter-map('page-width'),40)[1],')',
+                                     ' AND (height: ',($parameter-map('page-height'),25)[1],')',
+                                     if ($parameter-map('duplex'))
                                        then ' AND (duplex: 1)'
-                                       else ())">
-                <p:pipe step="parameters" port="result"/>
-            </p:with-option>
+                                       else ())"/>
             <p:input port="parameters">
-                <p:pipe step="parameters" port="result"/>
+                <p:empty/>
             </p:input>
         </px:css-cascade>
     </p:group>

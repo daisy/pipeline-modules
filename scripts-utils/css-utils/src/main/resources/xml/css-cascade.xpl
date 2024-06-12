@@ -7,6 +7,7 @@
                 xmlns:c="http://www.w3.org/ns/xproc-step"
                 xmlns:cx="http://xmlcalabash.com/ns/extensions"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:map="http://www.w3.org/2005/xpath-functions/map"
                 exclude-inline-prefixes="#all"
                 type="px:css-cascade"
                 name="main">
@@ -46,11 +47,11 @@
 		</p:documentation>
 	</p:input>
 	
-	<p:option name="parameters" cx:as="xs:string" select="'()'">
+	<p:option name="parameters" select="map{}"> <!-- map(xs:string,item()) | xs:string -->
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			<p>This option may contain additional style sheet parameters in serialized form. The
-			parameters specified through this option and the ones specified through the "parameters"
-			port are merged.</p>
+			<p>This option may contain additional style sheet parameters, either as a map item, or
+			in serialized form (Sass map). The parameters specified through this option and the
+			ones specified through the "parameters" port are merged.</p>
 		</p:documentation>
 	</p:option>
 
@@ -164,10 +165,10 @@
 				against the context documents's base URIs.</p>
 			</p:documentation>
 		</p:input>
-		<p:input port="parameters" kind="parameter" primary="false"/>
 		<p:output port="result"/>
 		<p:option name="user-stylesheet"/>
 		<p:option name="include-user-agent-stylesheet"/>
+		<p:option name="parameters"/>
 		<p:option name="content-type"/>
 		<p:option name="media"/>
 		<p:option name="type"/>
@@ -189,10 +190,10 @@
 				against the context documents's base URIs.</p>
 			</p:documentation>
 		</p:input>
-		<p:input port="parameters" kind="parameter" primary="false"/>
 		<p:output port="result"/>
 		<p:option name="user-stylesheet"/>
 		<p:option name="include-user-agent-stylesheet"/>
+		<p:option name="parameters"/>
 		<p:option name="content-type"/>
 		<p:option name="media"/>
 		<!--
@@ -212,13 +213,17 @@
 			px:fileset-update
 		</p:documentation>
 	</p:import>
-	<p:import href="css-parse-param-set.xpl">
+	<cx:import href="library.xsl" type="application/xslt+xml">
 		<p:documentation>
-			px:css-parse-param-set
+			pf:css-parse-param-set
 		</p:documentation>
-	</p:import>
+	</cx:import>
 	
 	<p:variable name="fileset-mode" cx:as="xs:boolean" select="exists(/d:fileset)"/>
+	<p:variable name="parameter-map" select="pf:css-parse-param-set(($parameters,collection()))"> <!-- cx:as="map(xs:string,item())" -->
+		<!-- pf:css-parse-param-set takes first in case of duplicates -->
+		<p:pipe step="main" port="parameters"/>
+	</p:variable>
 	
 	<!-- load CSS files to memory so that pxi:css-cascade can take them into account -->
 	<p:choose name="css">
@@ -304,12 +309,10 @@
 						<p:input port="context">
 							<p:pipe step="css" port="result"/>
 						</p:input>
-						<p:input port="parameters">
-							<p:pipe step="parameters" port="result"/>
-						</p:input>
 						<p:with-option name="user-stylesheet"
 						               select="string-join(($user-stylesheet[not(.='')],$stylesheets-from-xml-stylesheet-instructions),' ')"/>
 						<p:with-option name="include-user-agent-stylesheet" select="$include-user-agent-stylesheet"/>
+						<p:with-option name="parameters" select="$parameter-map"/>
 						<p:with-option name="content-type" select="$content-type"/>
 						<p:with-option name="media" select="$media"/>
 						<p:with-option name="type" select="$type"/>
@@ -325,17 +328,6 @@
 	</p:for-each>
 	<p:sink/>
 	
-	<px:css-parse-param-set name="parse-parameters">
-		<p:with-option name="parameters" select="$parameters"/>
-	</px:css-parse-param-set>
-	<p:sink/>
-	<p:parameters name="parameters">
-		<p:input port="parameters">
-			<p:pipe step="main" port="parameters"/>
-			<p:pipe step="parse-parameters" port="result"/> <!-- last occurence of a parameter wins -->
-		</p:input>
-	</p:parameters>
-
 	<p:identity>
 		<p:input port="source">
 			<p:pipe step="main" port="source"/>
@@ -366,7 +358,8 @@
 				</p:input>
 			</p:identity>
 			<p:choose>
-				<p:when test="$user-stylesheet!=''
+				<p:when test="map:size($parameter-map)&gt;0
+				              or $user-stylesheet!=''
 				              or $include-user-agent-stylesheet
 				              or exists($stylesheets-from-xml-stylesheet-instructions)
 				              or //*[local-name()='style']
@@ -382,28 +375,24 @@
 						<p:input port="context">
 							<p:pipe step="css" port="result"/>
 						</p:input>
-						<p:input port="parameters">
-							<p:pipe step="parameters" port="result"/>
-						</p:input>
 						<p:with-option name="user-stylesheet"
 						               select="string-join(($user-stylesheet[not(.='')],
 						                                    $stylesheets-from-xml-stylesheet-instructions),' ')"/>
 						<p:with-option name="include-user-agent-stylesheet" select="$include-user-agent-stylesheet"/>
+						<p:with-option name="parameters" select="$parameter-map"/>
 						<p:with-option name="content-type" select="$content-type"/>
 						<p:with-option name="media" select="$media"/>
 					</pxi:css-analyze>
 				</p:when>
 				<p:otherwise>
-					<p:sink/>
-					<!-- ensure that there's exactly one c:param-set -->
-					<p:parameters name="param-set">
+					<p:parameters name="empty-param-set">
 						<p:input port="parameters">
-							<p:pipe step="parameters" port="result"/>
+							<p:empty/>
 						</p:input>
 					</p:parameters>
 					<p:identity>
 						<p:input port="source">
-							<p:pipe step="param-set" port="result"/>
+							<p:pipe step="empty-param-set" port="result"/>
 						</p:input>
 					</p:identity>
 				</p:otherwise>

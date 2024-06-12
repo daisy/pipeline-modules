@@ -24,6 +24,7 @@ import com.xmlcalabash.library.DefaultStep;
 import com.xmlcalabash.model.RuntimeValue;
 import com.xmlcalabash.runtime.XAtomicStep;
 
+import net.sf.saxon.ma.map.MapItem;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
 
@@ -57,7 +58,6 @@ public class CssCascadeStep extends DefaultStep implements XProcStep {
 	private ReadablePipe sourcePipe = null;
 	private ReadablePipe contextPipe = null;
 	private WritablePipe resultPipe = null;
-	private Map<String,String> sassVariables = new HashMap<>();
 	private final InMemoryURIResolver inMemoryResolver;
 	private final URIResolver cssURIResolver;
 	private final Iterable<CssCascader> inliners;
@@ -65,6 +65,7 @@ public class CssCascadeStep extends DefaultStep implements XProcStep {
 
 	private static final QName _user_stylesheet = new QName("user-stylesheet");
 	private static final QName _include_user_agent_stylesheet = new QName("include-user-agent-stylesheet");
+	private static final QName _parameters = new QName("parameters");
 	private static final QName _type = new QName("type");
 	private static final QName _content_type = new QName("content-type");
 	private static final QName _media = new QName("media");
@@ -102,27 +103,10 @@ public class CssCascadeStep extends DefaultStep implements XProcStep {
 	}
 
 	@Override
-	public void setParameter(String port, QName name, RuntimeValue value) {
-		if ("parameters".equals(port))
-			if ("".equals(name.getNamespaceURI())) {
-				sassVariables.put(name.getLocalName(), value.getString());
-				return; }
-		super.setParameter(port, name, value);
-	}
-
-	@Override
-	public void setParameter(QName name, RuntimeValue value) {
-		// Calabash calls this function and never setParameter(String port,
-		// ...) so I just have to assume that port is "parameters"
-		setParameter("parameters", name, value);
-	}
-
-	@Override
 	public void reset() {
 		sourcePipe.resetReader();
 		contextPipe.resetReader();
 		resultPipe.resetWriter();
-		sassVariables.clear();
 	}
 
 	@Override
@@ -149,6 +133,15 @@ public class CssCascadeStep extends DefaultStep implements XProcStep {
 			for (String s : Arrays.asList(getOption(_user_stylesheet, "").trim().split("\\s+")))
 				stylesheets.add(s);
 			stylesheets.add(getOption(_user_stylesheet, ""));
+			Map<String,String> sassVariables = new HashMap<>();
+			RuntimeValue paramOption = getOption(_parameters);
+			if (paramOption != null)
+				for (Map.Entry<String,Object> e
+				         : SaxonHelper.mapFromMapItem(
+				               (MapItem)SaxonHelper.getSingleItem(paramOption.getValue().getUnderlyingValue()),
+				               Object.class
+				           ).entrySet())
+					sassVariables.put(e.getKey(), "" + e.getValue());
 			for (CssCascader inliner : inliners)
 				if (inliner.supportsMedium(medium)) {
 					QName attributeName; {

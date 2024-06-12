@@ -129,11 +129,6 @@ even though the provided CSS is more specific.
             px:epub3-to-pef.store
         </p:documentation>
     </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/css-utils/library.xpl">
-        <p:documentation>
-            px:css-parse-param-set
-        </p:documentation>
-    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/braille/common-utils/library.xpl">
         <p:documentation>
             px:delete-parameters
@@ -174,10 +169,6 @@ even though the provided CSS is more specific.
         </p:input>
     </px:delete-parameters>
     <p:sink/>
-    <px:css-parse-param-set name="stylesheet-parameters">
-        <p:with-option name="parameters" select="$stylesheet-parameters"/>
-    </px:css-parse-param-set>
-    <p:sink/>
     
     <!-- ============================= -->
     <!-- LOAD EPUB 3 and PREAMBLE HTML -->
@@ -209,13 +200,13 @@ even though the provided CSS is more specific.
         </p:input>
         <p:with-option name="temp-dir" select="concat($temp-dir,'convert/')"/>
         <p:with-option name="stylesheet" select="$stylesheet"/>
+        <p:with-option name="stylesheet-parameters" select="$stylesheet-parameters"/>
         <p:with-option name="apply-document-specific-stylesheets" select="$apply-document-specific-stylesheets"/>
         <p:with-option name="transform"
                        select="concat($braille-code,($transform,'(translator:liblouis)(formatter:dotify)')[not(.='')][1])"/>
         <p:with-option name="include-obfl" select="$include-obfl"/>
         <p:input port="parameters">
-            <p:pipe port="result" step="stylesheet-parameters"/>
-            <p:pipe port="result" step="input-options"/> <!-- last occurence of a parameter wins -->
+            <p:pipe port="result" step="input-options"/>
         </p:input>
     </px:epub3-to-pef>
     <p:sink/>

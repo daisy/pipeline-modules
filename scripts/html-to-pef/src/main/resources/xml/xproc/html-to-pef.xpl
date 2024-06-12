@@ -123,11 +123,6 @@ sheet modules) are available for use in Sass style sheets:
         </p:documentation>
     </p:option>
 
-    <p:import href="http://www.daisy.org/pipeline/modules/css-utils/library.xpl">
-        <p:documentation>
-            px:css-parse-param-set
-        </p:documentation>
-    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/braille/common-utils/library.xpl">
         <p:documentation>
             px:delete-parameters
@@ -183,10 +178,6 @@ sheet modules) are available for use in Sass style sheets:
         </p:input>
     </px:delete-parameters>
     <p:sink/>
-    <px:css-parse-param-set name="stylesheet-parameters">
-        <p:with-option name="parameters" select="$stylesheet-parameters"/>
-    </px:css-parse-param-set>
-    <p:sink/>
     
     <!-- ========= -->
     <!-- LOAD HTML -->
@@ -213,12 +204,12 @@ sheet modules) are available for use in Sass style sheets:
         </p:input>
         <p:with-option name="temp-dir" select="concat($temp-dir,'convert/')"/>
         <p:with-option name="stylesheet" select="$stylesheet"/>
+        <p:with-option name="stylesheet-parameters" select="$stylesheet-parameters"/>
         <p:with-option name="transform"
                        select="concat($braille-code,($transform,'(translator:liblouis)(formatter:dotify)')[not(.='')][1])"/>
         <p:with-option name="include-obfl" select="$include-obfl"/>
         <p:input port="parameters">
-            <p:pipe port="result" step="stylesheet-parameters"/>
-            <p:pipe port="result" step="input-options"/> <!-- last occurence of a parameter wins -->
+            <p:pipe port="result" step="input-options"/>
         </p:input>
     </px:html-to-pef>
     

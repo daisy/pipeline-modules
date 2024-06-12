@@ -21,10 +21,10 @@
             org.daisy.pipeline.modules.impl.Module_css_utils,
             org.daisy.pipeline.css.calabash.impl.CssAnalyzeStep$Provider,
             org.daisy.pipeline.css.calabash.impl.CssCascadeStep$Provider,
-            org.daisy.pipeline.css.calabash.impl.CssParseParamSetStep$Provider,
             org.daisy.pipeline.css.impl.DefaultCssCascader,
             org.daisy.pipeline.css.impl.StylesheetParametersWebServiceExtension,
             org.daisy.pipeline.css.impl.StylesheetParametersDatatypeService,
+            org.daisy.pipeline.css.saxon.impl.CssParseParamSetFunctionProvider,
             org.daisy.pipeline.css.saxon.impl.MediaQueryMatchesDefinition,
             org.daisy.pipeline.css.speech.impl.SpeechCssCascader,
             org.daisy.pipeline.css.StyleAccessor$Provider,
@@ -57,6 +57,10 @@
         <dependency>
             <groupId>org.daisy.pipeline</groupId>
             <artifactId>framework-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.daisy.pipeline</groupId>
+            <artifactId>saxon-adapter</artifactId>
         </dependency>
         <dependency>
             <groupId>org.daisy.pipeline</groupId>
@@ -124,6 +128,16 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.daisy.maven</groupId>
+                <artifactId>xspec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>xspecTest</id>
+                        <phase>none</phase>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr3-maven-plugin</artifactId>

@@ -3,10 +3,12 @@
                 xmlns:p="http://www.w3.org/ns/xproc"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
+                xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:c="http://www.w3.org/ns/xproc-step"
                 xmlns:cx="http://xmlcalabash.com/ns/extensions"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:map="http://www.w3.org/2005/xpath-functions/map"
                 xmlns:pef="http://www.daisy.org/ns/2008/pef"
                 xmlns:math="http://www.w3.org/1998/Math/MathML"
                 exclude-inline-prefixes="#all"
@@ -64,6 +66,7 @@
         </p:documentation>
     </p:option>
     <p:option name="stylesheet" select="''"/>
+    <p:option name="stylesheet-parameters" select="map{}"/> <!-- map(xs:string,item()) | xs:string -->
     <p:option name="transform" select="'(translator:liblouis)(formatter:dotify)'"/>
     <p:option name="include-obfl" select="'false'" cx:as="xs:string"/>
     
@@ -102,14 +105,16 @@
             px:dtbook-to-opf-metadata
         </p:documentation>
     </p:import>
+    <cx:import href="http://www.daisy.org/pipeline/modules/css-utils/library.xsl" type="application/xslt+xml">
+        <p:documentation>
+            pf:css-parse-param-set
+        </p:documentation>
+    </cx:import>
     
-    <!-- Ensure that there's exactly one c:param-set. (In case of multiple parameters with the same
-         name, only the last occurence is kept.) -->
-    <p:parameters name="parameters">
-        <p:input port="parameters">
-            <p:pipe step="main" port="parameters"/>
-        </p:input>
-    </p:parameters>
+    <p:variable name="parameter-map" select="pf:css-parse-param-set(($stylesheet-parameters,collection()))"> <!-- cx:as="map(xs:string,item())" -->
+        <!-- pf:css-parse-param-set takes first in case of duplicates -->
+        <p:pipe step="main" port="parameters"/>
+    </p:variable>
     
     <!-- Parse transform query to a c:param-set -->
     <px:parse-query name="parsed-transform-query">
@@ -147,20 +152,17 @@
         </p:variable>
         <px:css-cascade name="css-cascade" px:progress="1" px:message="{$stylesheets-to-be-inlined}" px:message-severity="DEBUG">
             <p:with-option name="user-stylesheet" select="$stylesheets-to-be-inlined"/>
+            <p:with-option name="parameters" select="$parameter-map"/>
             <p:with-option name="media"
                            select="concat(
-                                     'embossed AND (width: ',
-                                     (//c:param[@name='page-width' and not(@namespace[not(.='')])]/@value,40)[1],
-                                     ') AND (height: ',
-                                     (//c:param[@name='page-height' and not(@namespace[not(.='')])]/@value,25)[1],
-                                     ')',
-                                     if (//c:param[@name='duplex' and not(@namespace[not(.='')])]/@value='true')
+                                     'embossed',
+                                     ' AND (width: ',($parameter-map('page-width'),40)[1],')',
+                                     ' AND (height: ',($parameter-map('page-height'),25)[1],')',
+                                     if ($parameter-map('duplex'))
                                        then ' AND (duplex: 1)'
-                                       else ())">
-                <p:pipe step="parameters" port="result"/>
-            </p:with-option>
+                                       else ())"/>
             <p:input port="parameters">
-                <p:pipe step="parameters" port="result"/>
+                <p:empty/>
             </p:input>
         </px:css-cascade>
     </p:group>
