@@ -80,11 +80,15 @@
             px:fileset-load
         </p:documentation>
     </p:import>
+    <p:import href="http://www.daisy.org/pipeline/modules/css-utils/library.xpl">
+        <p:documentation>
+            px:css-cascade
+        </p:documentation>
+    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/braille/common-utils/library.xpl">
         <p:documentation>
             px:parse-query
             px:transform
-            px:apply-stylesheets
         </p:documentation>
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/braille/pef-utils/library.xpl">
@@ -190,26 +194,18 @@
     <p:group name="html-with-css" px:message="Applying style sheets" px:progress=".11">
         <p:output port="result" primary="true"/>
         <p:output port="parameters">
-            <p:pipe step="apply-stylesheets" port="result.parameters"/>
+            <p:pipe step="css-cascade" port="result.parameters"/>
         </p:output>
-        <p:variable name="first-css-stylesheet"
-                    select="tokenize($stylesheet,'\s+')[matches(.,'\.s?css$')][1]"/>
-        <p:variable name="first-css-stylesheet-index"
-                    select="(if (exists($first-css-stylesheet))
-                               then index-of(tokenize($stylesheet,'\s+')[not(.='')], $first-css-stylesheet)
-                               else (),
-                             10000)[1]"/>
         <p:variable name="stylesheets-to-be-inlined"
                     select="string-join((
-                              (tokenize($stylesheet,'\s+')[not(.='')])[position()&lt;$first-css-stylesheet-index],
                               if ($default-stylesheet!='#default')
                                 then $default-stylesheet
                                 else resolve-uri('../../css/default.scss'),
-                              (tokenize($stylesheet,'\s+')[not(.='')])[position()&gt;=$first-css-stylesheet-index]),' ')">
+                              (tokenize($stylesheet,'\s+')[not(.='')])),' ')">
             <p:inline><_/></p:inline>
         </p:variable>
-        <px:apply-stylesheets name="apply-stylesheets" px:progress="1" px:message="stylesheets: {$stylesheets-to-be-inlined}" px:message-severity="DEBUG">
-            <p:with-option name="stylesheets" select="$stylesheets-to-be-inlined"/>
+        <px:css-cascade name="css-cascade" px:progress="1" px:message="stylesheets: {$stylesheets-to-be-inlined}" px:message-severity="DEBUG">
+            <p:with-option name="user-stylesheet" select="$stylesheets-to-be-inlined"/>
             <p:with-option name="media"
                            select="concat(
                                      'embossed AND (width: ',
@@ -225,7 +221,7 @@
             <p:input port="parameters">
                 <p:pipe step="parameters" port="result"/>
             </p:input>
-        </px:apply-stylesheets>
+        </px:css-cascade>
     </p:group>
     
     <!-- copy @lang attributes as @xml:lang -->

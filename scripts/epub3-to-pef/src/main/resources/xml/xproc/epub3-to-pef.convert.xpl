@@ -81,7 +81,6 @@
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/braille/common-utils/library.xpl">
         <p:documentation>
-            px:apply-stylesheets
             px:transform
             px:parse-query
         </p:documentation>
@@ -93,6 +92,7 @@
     </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/css-utils/library.xpl">
         <p:documentation>
+            px:css-cascade
             px:css-detach
         </p:documentation>
     </p:import>
@@ -170,7 +170,7 @@
                 <px:message>
                     <p:with-option name="message" select="concat('Inlining document-specific CSS for ',replace(base-uri(/*),'.*/',''),'')"/>
                 </px:message>
-                <px:apply-stylesheets px:progress="1">
+                <px:css-cascade px:progress="1">
                     <p:with-option name="media"
                                    select="concat(
                                              'embossed AND (width: ',
@@ -186,7 +186,7 @@
                     <p:input port="parameters">
                         <p:pipe step="parameters" port="result"/>
                     </p:input>
-                </px:apply-stylesheets>
+                </px:css-cascade>
             </p:when>
             <p:otherwise>
                 <p:delete match="@style"/>
@@ -236,30 +236,22 @@
     <p:group name="html-with-css" px:message="Inlining global CSS" px:progress=".11">
         <p:output port="result" primary="true"/>
         <p:output port="parameters">
-            <p:pipe step="apply-stylesheets" port="result.parameters"/>
+            <p:pipe step="css-cascade" port="result.parameters"/>
         </p:output>
         <p:variable name="abs-stylesheet"
                     select="for $s in tokenize($stylesheet,'\s+')[not(.='')]
                             return resolve-uri($s,$epub)"/>
-        <p:variable name="first-css-stylesheet"
-                    select="$abs-stylesheet[matches(.,'\.s?css$')][1]"/>
-        <p:variable name="first-css-stylesheet-index"
-                    select="(if (exists($first-css-stylesheet))
-                               then index-of($abs-stylesheet, $first-css-stylesheet)
-                               else (),
-                             10000)[1]"/>
         <p:variable name="stylesheets-to-be-inlined"
                     select="string-join((
-                              $abs-stylesheet[position()&lt;$first-css-stylesheet-index],
                               if ($default-stylesheet!='#default')
                                 then $default-stylesheet
                                 else resolve-uri('../../css/default.scss'),
-                              $abs-stylesheet[position()&gt;=$first-css-stylesheet-index]),' ')">
+                              $abs-stylesheet),' ')">
             <p:inline><_/></p:inline>
         </p:variable>
         <p:identity px:message="stylesheets: {$stylesheets-to-be-inlined}"/>
-        <px:apply-stylesheets name="apply-stylesheets" px:progress="1">
-            <p:with-option name="stylesheets" select="$stylesheets-to-be-inlined"/>
+        <px:css-cascade name="css-cascade" px:progress="1">
+            <p:with-option name="user-stylesheet" select="$stylesheets-to-be-inlined"/>
             <p:input port="parameters">
                 <p:pipe port="result" step="parameters"/>
             </p:input>
@@ -275,7 +267,7 @@
                                        else ())">
                 <p:pipe step="parameters" port="result"/>
             </p:with-option>
-        </px:apply-stylesheets>
+        </px:css-cascade>
     </p:group>
     
     <p:group px:message="Transforming MathML" px:progress=".10">

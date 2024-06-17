@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
                xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
-               script="../../main/resources/xml/apply-stylesheets.xpl">
+               script="http://www.daisy.org/pipeline/modules/css-utils/library.xpl">
 
-    <x:scenario label="processing instruction, stylesheet parameters">
-        <x:call step="px:apply-stylesheets">
+    <x:scenario label="xml-stylesheet PI, stylesheet parameters, css with @xslt rule">
+        <x:call step="px:css-cascade">
             <x:input port="source">
-                <x:document type="file" href="../resources/test_apply-stylesheets_1.xml"/>
+                <x:document type="file" href="1.xml"/>
             </x:input>
+            <x:option name="media" select="'embossed'"/>
             <x:param port="parameters" name="uppercase" select="'true'"/>
         </x:call>
         <x:context label="result">
@@ -20,48 +21,13 @@
         </x:expect>
     </x:scenario>
 
-    <x:scenario label="wrong order (scss before xslt)">
-        <x:call step="px:apply-stylesheets">
+    <x:scenario label="xml-stylesheet PI, link element, style element, style attributes, and user-stylesheet option">
+        <x:call step="px:css-cascade">
             <x:input port="source">
-                <x:document type="inline">
-                    <div>foobar</div>
-                </x:document>
+                <x:document type="file" href="2.xml"/>
             </x:input>
-            <x:option name="stylesheets" select="'../resources/stylesheet_2.scss ../resources/stylesheet_1.xsl'"/>
-        </x:call>
-        <x:context label="errors">
-            <x:document type="errors"/>
-        </x:context>
-        <x:expect type="count" label="there should be errors" min="1"/>
-        <x:expect type="xpath" label="the error BRL01 should be thrown" test="/*/*/@code" equals="'BRL01'"/>
-    </x:scenario>
-
-    <x:scenario label="first xslt and then scss, with stylesheet parameters">
-        <x:call step="px:apply-stylesheets">
-            <x:input port="source">
-                <x:document type="inline">
-                    <div>foobar</div>
-                </x:document>
-            </x:input>
-            <x:option name="stylesheets" select="'../resources/stylesheet_1.xsl ../resources/stylesheet_2.scss'"/>
-            <x:param port="parameters" name="uppercase" select="'true'"/>
-        </x:call>
-        <x:context label="result">
-            <x:document type="port" port="result"/>
-        </x:context>
-        <x:expect label="result" type="compare">
-            <x:document type="inline">
-                <div style="text-transform: uppercase;">FOOBAR</div>
-            </x:document>
-        </x:expect>
-    </x:scenario>
-
-    <x:scenario label="xml-stylesheet PI, link element, style element, style attributes, and stylesheets option">
-        <x:call step="px:apply-stylesheets">
-            <x:input port="source">
-                <x:document type="file" href="../resources/test_apply-stylesheets_2.xml"/>
-            </x:input>
-            <x:option name="stylesheets" select="resolve-uri('../resources/stylesheet_5.scss')"/>
+            <x:option name="media" select="'embossed'"/>
+            <x:option name="user-stylesheet" select="resolve-uri('stylesheet_5.scss')"/>
         </x:call>
         <x:scenario label="no filter">
             <x:call/>
@@ -141,36 +107,4 @@
         </x:scenario>
     </x:scenario>
 
-    <x:scenario label="css with @xslt rule">
-        <x:call step="px:apply-stylesheets">
-            <x:input port="source">
-                <x:document type="inline">
-                    <html>
-                        <head>
-                            <style media="embossed" type="text/x-scss">
-                                @xslt "../resources/stylesheet_1.xsl" {
-                                  uppercase: "#{$uppercase}";
-                                }
-                            </style>
-                        </head>
-                        <body>
-                            <h1>foobar</h1>
-                        </body>
-                    </html>
-                </x:document>
-            </x:input>
-            <x:param port="parameters" name="uppercase" select="'true'"/>
-        </x:call>
-        <x:context label="result">
-            <x:document type="port" port="result" select="//body"/>
-        </x:context>
-        <x:expect label="result" type="compare">
-            <x:document type="inline">
-                <body>
-                    <h1>FOOBAR</h1>
-                </body>
-            </x:document>
-        </x:expect>
-    </x:scenario>
-    
 </x:description>

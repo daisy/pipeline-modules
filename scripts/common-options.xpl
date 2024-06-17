@@ -226,9 +226,6 @@ files are MP2, MP3 and WAVE. Audio files in other formats are transcoded to MP3.
 			<h2 px:role="name">Style sheets</h2>
 			<p px:role="desc" xml:space="preserve">A list of CSS/Sass style sheets to take into account.
 
-DEPRECATION WARNING: XSLT style sheets are also supported, but this feature might be removed in the
-future. It is recommended to apply any XSLT style sheets during pre-processing of the document.
-
 Must be a space separated list of URIs, absolute or relative to the input.
 
 Style sheets specified through this option are called "[user style
@@ -241,15 +238,11 @@ element](https://www.w3.org/Style/styling-XML#Embedded)) and/or inlined (using '
 attributes](https://www.w3.org/TR/css-style-attr/)). Only author styles that apply to "embossed"
 media are taken into account.
 
-Style sheets are applied to the document in the following way: XSLT style sheets are applied before
-CSS/Sass style sheets. XSLT style sheets are applied one by one, first the user style sheets, then
-the author style sheets, in the order in which they are specified.
+All style sheets are applied at once, but the order in which they are specified has an influence on
+the [cascading order](https://www.w3.org/TR/CSS2/cascade.html#cascading-order). Author styles take
+precedence over user styles.
 
-All CSS/Sass style sheets are applied at once, but the order in which they are specified has an
-influence on the [cascading order](https://www.w3.org/TR/CSS2/cascade.html#cascading-order). Author
-styles take precedence over user styles.
-
-CSS/Sass style sheets are interpreted according to [braille
+Style sheets are interpreted according to [braille
 CSS](http://braillespecs.github.io/braille-css) rules.
 
 For info on how to use Sass (Syntactically Awesome StyleSheets) see the [Sass
