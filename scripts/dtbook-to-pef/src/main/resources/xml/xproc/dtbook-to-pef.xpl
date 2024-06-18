@@ -86,21 +86,9 @@ sheet modules) are available for use in Sass style sheets:
     <p:option name="page-height"/>
     <p:option name="duplex"/>
 
-    <!-- defined in ../../css/default.params -->
-    <p:option name="hyphenation"/>
-    <p:option name="line-spacing"/>
-
     <!-- defined in ../../css/dotify.params -->
     <p:option name="hyphenation-at-page-breaks"/>
     <p:option name="allow-text-overflow-trimming"/>
-
-    <!-- defined in ../../css/volume-breaking.params -->
-    <p:option name="maximum-number-of-sheets"/>
-    <p:option name="allow-volume-break-inside-leaf-section-factor"/>
-    <p:option name="prefer-volume-break-before-higher-level-factor"/>
-
-    <!-- defined in ../../css/notes.params -->
-    <p:option name="notes-placement"/>
 
     <!-- defined in ../../../../../../common-options.xpl -->
     <p:option name="result"/>
