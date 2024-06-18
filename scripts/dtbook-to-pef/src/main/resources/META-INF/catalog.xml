@@ -15,6 +15,9 @@
   <uri name="http://www.daisy.org/pipeline/modules/braille/dtbook-to-pef/library.xpl" uri="../xml/xproc/library.xpl"/>
   
   <!-- style sheets -->
+  <uri uri="../css/default.scss" px:content-type="user-agent-stylesheet"
+                                 px:stylesheet-for-content-type="application/x-dtbook+xml"
+                                 px:stylesheet-for-media="embossed"/>
   <uri name="http://www.daisy.org/pipeline/modules/braille/dtbook-to-pef/reset.css" uri="../css/reset.css"/>
   
   <!-- partials -->

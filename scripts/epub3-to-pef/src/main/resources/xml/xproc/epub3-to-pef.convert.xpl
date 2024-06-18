@@ -48,15 +48,6 @@
         </p:inline>
     </p:input>
     
-    <p:option name="default-stylesheet" required="false" select="'#default'">
-        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <p>The user agent's <a href="https://www.w3.org/TR/CSS2/cascade.html#cascade">default
-            style sheet</a>.</p>
-            <p>The idea of this option is that a custom "EPUB 3 to PEF" script could be written with
-            its own default style sheet (and its own set of options that correspond with the style
-            sheet parameters of this default style sheet).</p>
-        </p:documentation>
-    </p:option>
     <p:option name="stylesheet" select="''"/>
     <p:option name="stylesheet-parameters" select="map{}"/> <!-- map(xs:string,item()) | xs:string -->
     <p:option name="apply-document-specific-stylesheets" select="'false'" cx:as="xs:string"/>
@@ -234,39 +225,25 @@
         </p:with-option>
     </p:add-attribute>
     
-    <p:group name="html-with-css" px:message="Inlining global CSS" px:progress=".11">
-        <p:output port="result" primary="true"/>
-        <p:output port="parameters">
-            <p:pipe step="css-cascade" port="result.parameters"/>
-        </p:output>
-        <p:variable name="abs-stylesheet"
-                    select="for $s in tokenize($stylesheet,'\s+')[not(.='')]
-                            return resolve-uri($s,$epub)"/>
-        <p:variable name="stylesheets-to-be-inlined"
-                    select="string-join((
-                              if ($default-stylesheet!='#default')
-                                then $default-stylesheet
-                                else resolve-uri('../../css/default.scss'),
-                              $abs-stylesheet),' ')">
-            <p:inline><_/></p:inline>
-        </p:variable>
-        <p:identity px:message="stylesheets: {$stylesheets-to-be-inlined}"/>
-        <px:css-cascade name="css-cascade" px:progress="1">
-            <p:with-option name="user-stylesheet" select="$stylesheets-to-be-inlined"/>
-            <p:with-option name="parameters" select="$parameter-map"/>
-            <p:with-option name="media"
-                           select="concat(
-                                     'embossed',
-                                     ' AND (width: ',($parameter-map('page-width'),40)[1],')',
-                                     ' AND (height: ',($parameter-map('page-height'),25)[1],')',
-                                     if ($parameter-map('duplex'))
-                                       then ' AND (duplex: 1)'
-                                       else ())"/>
-            <p:input port="parameters">
-                <p:empty/>
-            </p:input>
-        </px:css-cascade>
-    </p:group>
+    <px:css-cascade name="html-with-css" px:message="Inlining global CSS" px:progress=".11"
+                    include-user-agent-stylesheet="true" content-type="application/xhtml+xml">
+        <p:with-option name="user-stylesheet" select="string-join(
+                                                        for $s in tokenize($stylesheet,'\s+')[not(.='')]
+                                                          return resolve-uri($s,$epub),
+                                                        ' ')"/>
+        <p:with-option name="parameters" select="$parameter-map"/>
+        <p:with-option name="media"
+                       select="concat(
+                                 'embossed',
+                                 ' AND (width: ',($parameter-map('page-width'),40)[1],')',
+                                 ' AND (height: ',($parameter-map('page-height'),25)[1],')',
+                                 if ($parameter-map('duplex'))
+                                   then ' AND (duplex: 1)'
+                                   else ())"/>
+        <p:input port="parameters">
+            <p:empty/>
+        </p:input>
+    </px:css-cascade>
     
     <p:group px:message="Transforming MathML" px:progress=".10">
         <p:variable name="lang" select="(/*/opf:metadata/dc:language[not(@refines)])[1]/text()">
@@ -304,7 +281,7 @@
                     <p:with-option name="query" select="$transform-query"/>
                     <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>
                     <p:input port="parameters">
-                        <p:pipe step="html-with-css" port="parameters"/>
+                        <p:pipe step="html-with-css" port="result.parameters"/>
                     </p:input>
                 </px:transform>
             </p:group>
@@ -321,7 +298,7 @@
                         <p:with-option name="query" select="$transform-query"/>
                         <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>
                         <p:input port="parameters">
-                            <p:pipe step="html-with-css" port="parameters"/>
+                            <p:pipe step="html-with-css" port="result.parameters"/>
                         </p:input>
                     </px:transform>
                 </p:group>
@@ -365,7 +342,7 @@
                 <p:with-option name="query" select="$transform-query"/>
                 <p:with-param port="parameters" name="temp-dir" select="$temp-dir"/>
                 <p:input port="parameters">
-                    <p:pipe step="html-with-css" port="parameters"/>
+                    <p:pipe step="html-with-css" port="result.parameters"/>
                 </p:input>
             </px:transform>
         </p:otherwise>

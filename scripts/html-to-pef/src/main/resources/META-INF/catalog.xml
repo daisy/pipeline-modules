@@ -15,9 +15,10 @@
   <uri name="http://www.daisy.org/pipeline/modules/braille/html-to-pef/library.xpl" uri="../xml/xproc/library.xpl"/>
   
   <!-- style sheets -->
+  <uri uri="../css/default.scss" px:content-type="user-agent-stylesheet"
+                                 px:stylesheet-for-content-type="application/xhtml+xml"
+                                 px:stylesheet-for-media="embossed"/>
   <uri name="http://www.daisy.org/pipeline/modules/braille/html-to-pef/reset.css" uri="../css/reset.css"/>
-  <!-- for epub3-to-pef -->
-  <uri name="http://www.daisy.org/pipeline/modules/braille/html-to-pef/default.scss" uri="../css/default.scss"/>
   
   <!-- partials -->
   <uri name="http://www.daisy.org/pipeline/modules/braille/html-to-pef/_generate-toc.scss" uri="../css/_generate-toc.scss"/>

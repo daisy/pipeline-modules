@@ -12,7 +12,7 @@
 
   <groupId>org.daisy.pipeline.modules.braille</groupId>
   <artifactId>html-to-pef</artifactId>
-  <version>7.1.0-SNAPSHOT</version>
+  <version>8.0.0-SNAPSHOT</version>
   <packaging>bundle</packaging>
 
   <name>DAISY Pipeline 2 module :: HTML to PEF</name>
@@ -22,6 +22,10 @@
     <dependency>
       <groupId>org.daisy.pipeline</groupId>
       <artifactId>framework-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.daisy.pipeline.modules</groupId>
+      <artifactId>css-utils</artifactId>
     </dependency>
     <!--
         runtime dependencies
@@ -39,11 +43,6 @@
     <dependency>
       <groupId>org.daisy.pipeline.modules</groupId>
       <artifactId>common-utils</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.daisy.pipeline.modules</groupId>
-      <artifactId>css-utils</artifactId>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -89,6 +88,7 @@
   <properties>
     <expose-services>
       org.daisy.pipeline.modules.impl.Module_html_to_pef,
+      org.daisy.pipeline.css.impl.UserAgentStylesheet_application_xhtml_xml_embossed,
       org.daisy.pipeline.script.impl.XProcScript_html_to_pef,
       org.daisy.pipeline.datatypes.impl.Datatype_px_html_to_pef_script_line_spacing,
       org.daisy.pipeline.datatypes.impl.Datatype_px_html_to_pef_script_notes_placement,
