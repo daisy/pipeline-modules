@@ -69,11 +69,7 @@
     <!-- defined in ../../../../../common-options.xpl -->
   </p:option>
   
-  <!-- <p:option name="stylesheet-parameters" select="'()'"> -->
-  <!--     <!-\- defined in ../../../../../common-options.xpl -\-> -->
-  <!-- </p:option> -->
-
-  <p:option name="speak-image-alt" select="'true'">
+  <p:option name="stylesheet-parameters" select="'()'">
       <!-- defined in ../../../../../common-options.xpl -->
   </p:option>
 
@@ -149,8 +145,7 @@ reading systems can't handle the word tags.</p>
                                                              ' ')">
       <p:pipe step="output-dir-uri" port="normalized"/>
     </p:with-option>
-    <!-- <p:with-option name="stylesheet-parameters" select="$stylesheet-parameters"/> -->
-    <p:with-option name="stylesheet-parameters" select="concat('(speak-image-alt:',$speak-image-alt,')')"/>
+    <p:with-option name="stylesheet-parameters" select="$stylesheet-parameters"/>
     <p:with-option name="lexicon" select="for $output-fileset-base in string(/c:result) return
                                           for $l in tokenize($lexicon,'\s+')[not(.='')] return
                                             resolve-uri($l,$output-fileset-base)">

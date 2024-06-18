@@ -247,11 +247,7 @@ manual](http://sass-lang.com/documentation/file.SASS_REFERENCE.html).
         </p:documentation>
     </p:option>
     
-    <!-- <p:option name="stylesheet-parameters" select="''"> -->
-    <!--     <!-\- defined in ../../../../../common-options.xpl -\-> -->
-    <!-- </p:option> -->
-
-    <p:option name="speak-image-alt" select="'true'">
+    <p:option name="stylesheet-parameters" select="''">
         <!-- defined in ../../../../../common-options.xpl -->
     </p:option>
     
@@ -355,8 +351,7 @@ elements that represent the sentences.</p>
                                                    for $s in tokenize($stylesheet,'\s+')[not(.='')] return
                                                      resolve-uri($s,$source),
                                                    ' ')"/>
-        <!-- <p:with-option name="stylesheet-parameters" select="$stylesheet-parameters"/> -->
-        <p:with-option name="stylesheet-parameters" select="concat('(speak-image-alt:',$speak-image-alt,')')"/>
+        <p:with-option name="stylesheet-parameters" select="$stylesheet-parameters"/>
         <p:with-option name="lexicon" select="for $l in tokenize($stylesheet,'\s+')[not(.='')] return
                                                 resolve-uri($l,$source)"/>
         <p:with-option name="apply-document-specific-stylesheets" select="$apply-document-specific-stylesheets"/>
