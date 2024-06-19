@@ -29,6 +29,7 @@ import cz.vutbr.web.csskit.RuleFactoryImpl;
 import cz.vutbr.web.domassign.DeclarationTransformer;
 import cz.vutbr.web.domassign.SupportedCSS21;
 
+import org.daisy.braille.css.BrailleCSSParserFactory;
 import org.daisy.common.file.URLs;
 import org.daisy.common.transform.XMLTransformer;
 import org.daisy.pipeline.css.CssCascader;
@@ -78,10 +79,11 @@ public class SpeechCssCascader implements CssCascader {
 		}
 	}
 
+	// using braille-css because :has() and :note() are not supported by jStyleParser
+	private static final CSSParserFactory parserFactory = new BrailleCSSParserFactory();
+	private static final RuleFactory ruleFactory = RuleFactoryImpl.getInstance();
 	private static final SupportedCSS speechCSS = SupportedCSS21.getInstance();
 	private static final DeclarationTransformer declarationTransformer = new SpeechDeclarationTransformer();
-	private static final RuleFactory ruleFactory = RuleFactoryImpl.getInstance();
-	private static final CSSParserFactory parserFactory = CSSParserFactory.getInstance();
 	private static final Set<String> speechCSSProperties = new HashSet<>(
 		Arrays.asList(
 			"voice-family", "stress", "richness", "cue", "cue-before", "cue-after", "pause",
