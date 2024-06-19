@@ -55,7 +55,7 @@
     </p:input>
     
     <p:option name="stylesheet" select="''"/>
-    <p:option name="stylesheet-parameters" select="map{}"/> <!-- map(xs:string,item()) | xs:string -->
+    <p:option name="stylesheet-parameters" select="map{}"/> <!-- (map(xs:string,item()) | xs:string)* -->
     <p:option name="transform" select="'(translator:liblouis)(formatter:dotify)'"/>
     <p:option name="include-obfl" select="'false'" cx:as="xs:string"/>
     

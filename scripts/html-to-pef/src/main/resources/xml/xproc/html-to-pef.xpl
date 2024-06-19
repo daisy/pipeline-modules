@@ -4,6 +4,8 @@
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:c="http://www.w3.org/ns/xproc-step"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:pef="http://www.daisy.org/ns/2008/pef"
                 exclude-inline-prefixes="#all"
                 name="main">
@@ -60,7 +62,7 @@ sheet modules) are available for use in Sass style sheets:
     </p:option>
     
     <!-- defined in ../../../../../../common-options.xpl -->
-    <p:option name="stylesheet-parameters"/>
+    <p:option name="stylesheet-parameters" cx:as="xs:string*"/>
     <p:option name="braille-code"/>
     <p:option name="transform"/>
     <p:option name="include-preview"/>

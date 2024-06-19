@@ -47,7 +47,7 @@
 		</p:documentation>
 	</p:input>
 	
-	<p:option name="parameters" select="map{}"> <!-- map(xs:string,item()) | xs:string -->
+	<p:option name="parameters" select="map{}"> <!-- (map(xs:string,item()) | xs:string)* -->
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<p>This option may contain additional style sheet parameters, either as a map item, or
 			in serialized form (Sass map). The parameters specified through this option and the

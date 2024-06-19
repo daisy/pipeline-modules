@@ -4,6 +4,7 @@
                 xmlns:dtbook="http://www.daisy.org/z3986/2005/dtbook/"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:c="http://www.w3.org/ns/xproc-step"
                 type="px:dtbook-to-daisy3.script" name="main"
                 px:input-filesets="dtbook"
@@ -69,7 +70,7 @@
     <!-- defined in ../../../../../common-options.xpl -->
   </p:option>
   
-  <p:option name="stylesheet-parameters" select="'()'">
+  <p:option name="stylesheet-parameters" cx:as="xs:string*" select="'()'">
       <!-- defined in ../../../../../common-options.xpl -->
   </p:option>
 
