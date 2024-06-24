@@ -293,7 +293,11 @@ public abstract class JStyleParserCssCascader extends SingleInSingleOutXMLTransf
 						if (!cssReader.supportsMediaType(null, u))
 							logger.warn("Style sheet type not supported: " + u);
 						else
-							s = parserFactory.append(new CSSSource(u, (Charset)null, (String)null), cssReader, s);
+							try {
+								s = parserFactory.append(new CSSSource(u, (Charset)null, (String)null), cssReader, s);
+							} catch (IOException e) {
+								logger.warn("Style sheet could not be parsed: " + u);
+							}
 					}
 				}
 				userAndUserAgentStyleSheet = s;
