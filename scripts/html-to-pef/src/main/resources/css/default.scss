@@ -60,6 +60,10 @@ br::before {
 	white-space: pre-line;
 }
 
+wbr::before {
+	content: "\200B";
+}
+
 /* xml:space */
 [xml|space=preserve] {
 	white-space: pre-wrap;
