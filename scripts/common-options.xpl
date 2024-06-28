@@ -296,10 +296,71 @@ precedence over user styles.
 
 Must be a space separated list of URIs, absolute or relative to the input.
 
-Style sheets can also be attached to the source document, using an ['xml-stylesheet' processing
-instruction](https://www.w3.org/TR/xml-stylesheet) or a ['link'
+Lexicons can also be attached to the source document, using a ['link'
 element](http://kb.daisy.org/publishing/docs/text-to-speech/pls.html#ex-07).
-			</p>
+
+PLS lexicons allow you to define custom pronunciations of words. It is
+meant to help TTS processors deal with ambiguous abbreviations and
+pronunciation of proper names. When a word is defined in a lexicon,
+the processor will use the provided pronunciation instead of the
+default rendering.
+
+The syntax of a PLS lexicon is defined in [Pronunciation Lexicon
+Specification (PLS) Version
+1.0](https://www.w3.org/TR/pronunciation-lexicon), extended with
+regular expression matching. To enable regular expression matching,
+add the "regex" attribute, as follows:
+
+~~~xml
+&lt;lexicon xmlns="http://www.w3.org/2005/01/pronunciation-lexicon" version="1.0"
+         alphabet="ipa" xml:lang="en"&gt;
+  &lt;lexeme regex="true"&gt;
+    &lt;grapheme&gt;([0-9]+)-([0-9]+)&lt;/grapheme&gt;
+    &lt;alias&gt;between $1 and $2&lt;/alias&gt;
+  &lt;/lexeme&gt;
+&lt;/lexicon&gt;
+~~~
+
+The regex feature works only with alias-based substitutions. The regex
+syntax used is that from [XQuery 1.0 and XPath
+2.0](https://www.w3.org/TR/xpath-functions/#regex-syntax).
+
+Whether or not the regex attribute is set to "true", the grapheme
+matching can be made more accurate by specifying the
+"positive-lookahead" and "negative-lookahead" attributes:
+
+~~~xml
+&lt;lexicon version="1.0" xmlns="http://www.w3.org/2005/01/pronunciation-lexicon"
+         alphabet="ipa" xml:lang="en"&gt;
+  &lt;lexeme&gt;
+    &lt;grapheme positive-lookahead="[ ]+is"&gt;SB&lt;/grapheme&gt;
+    &lt;alias&gt;somebody&lt;/alias&gt;
+  &lt;/lexeme&gt;
+  &lt;lexeme&gt;
+    &lt;grapheme&gt;SB&lt;/grapheme&gt;
+    &lt;alias&gt;should be&lt;/alias&gt;
+  &lt;/lexeme&gt;
+  &lt;lexeme xml:lang="fr"&gt;
+    &lt;grapheme positive-lookahead="[ ]+[cC]ity"&gt;boston&lt;/grapheme&gt;
+    &lt;phoneme&gt;bɔstøn&lt;/phoneme&gt;
+  &lt;/lexeme&gt;
+&lt;/lexicon&gt;
+~~~
+
+Graphemes with "positive-lookahead" will match if the beginning of
+what follows matches the "position-lookahead" pattern. Graphemes with
+"negative-lookahead" will match if the beginning of what follows does
+not match the "negative-lookahead" pattern. The lookaheads are
+case-sensitive while the grapheme contents are not.
+
+The lexemes are matched in this order:
+
+1. Graphemes with regex="false" come first, no matter if there is a lookahead or not;
+2. then come graphemes with regex="true" and no lookahead;
+3. then graphemes with regex="true" and one or two lookaheads.
+
+Within these categories, lexemes are matched in the same order as they
+appear in the lexicons.</p>
 		</p:documentation>
 	</p:option>
 
