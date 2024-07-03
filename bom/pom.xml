@@ -610,6 +610,10 @@
             <groupId>net.sf.saxon</groupId>
             <artifactId>Saxon-HE</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>org.liblouis</groupId>
+            <artifactId>liblouis-java</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <!--

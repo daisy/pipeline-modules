@@ -8,6 +8,7 @@ import javax.sound.sampled.AudioFormat;
 import org.daisy.common.properties.Properties;
 import org.daisy.common.properties.Properties.Property;
 import org.daisy.common.spi.ActivationException;
+import org.daisy.common.spi.annotations.LoadWith;
 import org.daisy.pipeline.tts.RoundRobinLoadBalancer;
 import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSService;
@@ -21,6 +22,7 @@ import org.osgi.service.component.annotations.Component;
 	name = "acapela-tts-service",
 	service = { TTSService.class }
 )
+@LoadWith(JNAClassLoader.class)
 public class AcapelaService implements TTSService {
 
 	private static Property ACAPELA_SAMPLERATE = null;
