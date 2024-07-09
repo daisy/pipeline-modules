@@ -1,0 +1,132 @@
+/*
+ * Tables
+ */
+
+@mixin table-matrix(
+    $transpose: false
+) {
+    @if $transpose == auto {
+        display: none;
+        &:-obfl-alternate-scenario(1) {
+            display: table;
+            render-table-by: row, column;
+            -obfl-scenario-cost: -obfl-evaluate("$total-height");
+        }
+        &:-obfl-alternate-scenario(2) {
+            display: table;
+            render-table-by: column, row;
+            -obfl-scenario-cost: -obfl-evaluate("(+ 0.01 $total-height)");
+        }
+    } @else if $transpose {
+        display: table;
+        render-table-by: column, row;
+    } @else {
+        display: table;
+        render-table-by: row, column;
+    }
+    -obfl-table-col-spacing: 2;
+    -obfl-preferred-empty-space: 0;
+}
+
+@mixin _table-nested-list($axis1, $axis2) {
+    display: block;
+    render-table-by: $axis1, $axis2;
+    &::table-by(#{$axis1}) {
+        @extend %outer-list !optional;
+        &::list-item {
+            @extend %outer-list-item !optional;
+        }
+    }
+    &::table-by(#{$axis2}) {
+        @extend %inner-list !optional;
+        &::list-item {
+            @extend %inner-list-item !optional;
+        }
+    }
+}
+
+@mixin table-nested-list(
+    $transpose: false,
+    $header-suffix: none,
+    $blank-cell-text: none
+) {
+    @if $transpose == auto {
+        display: none;
+        &:-obfl-alternate-scenario(1) {
+            @include _table-nested-list(row, column);
+            -obfl-scenario-cost: -obfl-evaluate("$total-height");
+        }
+        &:-obfl-alternate-scenario(2) {
+            @include _table-nested-list(column, row);
+            -obfl-scenario-cost: -obfl-evaluate("(+ 0.01 $total-height)");
+        }
+    } @else if $transpose {
+        @include _table-nested-list(column, row);
+    } @else {
+        @include _table-nested-list(row, column);
+    }
+    th::after {
+        content: $header-suffix;
+    }
+    td:blank::after {
+        content: $blank-cell-text;
+    }
+    // note that we don't need to use a content block to add stuff at
+    // the top level, but it makes for a slightly nicer syntax
+    @content;
+}
+
+@mixin table-optimal($cost1, $cost2, $costs...) {
+    display: none;
+    &:-obfl-alternate-scenario(1) {
+        @extend %layout1;
+        -obfl-scenario-cost: -obfl-evaluate($cost1);
+    }
+    &:-obfl-alternate-scenario(2) {
+        @extend %layout2;
+        -obfl-scenario-cost: -obfl-evaluate($cost2);
+    }
+    @for $i from 3 to length($costs) + 3 {
+        $cost: nth($costs, $i - 2);
+        &:-obfl-alternate-scenario(#{$i}) {
+            @extend %layout#{$i};
+            -obfl-scenario-cost: -obfl-evaluate($cost);
+        }
+    }
+}
+
+/**
+ * @var string $duplicate-tables-with-class
+ *
+ * @brief Duplicate tables
+ *
+ * Set this variable to a value other than `null` to duplicate tables
+ * with the given class. If the value is the empty string, all tables
+ * without a class attribute are duplicated.
+ *
+ * This feature is useful for trying out different table layouts before
+ * deciding which layout to use for which table.
+ */
+$duplicate-tables-with-class: null !default;
+
+/**
+ * @var string $classes-for-table-duplicates
+ *
+ * @brief Class names for table duplicates
+ *
+ * If table duplication is enabled, this variable determines how many
+ * copies are made and which classes are added. The value must be a
+ * space separated list of class names. As many copies are made as
+ * there are items in the list. The first class is added to the first
+ * copy, etc. At least two items are required. A `.` may be used to
+ * separate classes if multiple classes need to be added to a single
+ * copy.
+ */
+$classes-for-table-duplicates: "" !default;
+
+@if $duplicate-tables-with-class != null {
+    @xslt "tables.xsl" {
+        duplicate-tables-with-class: $duplicate-tables-with-class;
+        classes-for-table-duplicates: $classes-for-table-duplicates;
+    }
+}

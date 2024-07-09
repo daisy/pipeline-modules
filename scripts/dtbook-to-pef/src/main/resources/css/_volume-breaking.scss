@@ -1,0 +1,72 @@
+/**
+ * Volume breaking
+ */
+
+$maximum-number-of-sheets: 70 !default;
+
+@volume {
+	max-length: $maximum-number-of-sheets;
+}
+
+/**
+ * Amount with which volume breaks are allowed within "leaf sections", meaning that a
+ * volume is not broken right before a heading.
+ *
+ * A leaf section is a block of adjacent content with the same sectioning depth.
+ * Which means:
+ * - either; a level element with no child levels
+ * - or; the content in a level (<h1>, <p>, etc.), which may have level element siblings
+ *
+ * If a level contains other levels, then this style sheet wraps the normal content
+ * (<h1>, <p>, etc.) in the level in a <div class="leaf-section"> element.
+ *
+ * The value of $allow-volume-break-inside-leaf-section-factor can range from 1 to 10.
+ * Setting a higher value results in volumes that are more equal in size.
+ */
+$allow-volume-break-inside-leaf-section-factor: 10 !default;
+
+/**
+ * Amount with which preference is given to volume breaks before higher level sections
+ * (level1 is the highest level) in comparison to lower level sections.
+ *
+ * The value can range from 0 to ? and can be a non-integer. A value of 0 (the default) means
+ * no preference is given. A higher value results in volumes that are less equal in
+ * size. Depending on the value of $allow-volume-break-inside-leaf-section-factor,
+ * increasing $prefer-volume-break-before-higher-level-factor beyond a certain value does
+ * not have an effect anymore.
+ */
+$prefer-volume-break-before-higher-level-factor: 0 !default;
+
+$min-volume-keep-priority: min(10, max(1, round($allow-volume-break-inside-leaf-section-factor)));
+
+@if $min-volume-keep-priority < 10 {
+    
+    $duplex: true !default;
+    @xslt "volume-breaking.xsl" {
+        duplex: $duplex;
+        maximum-number-of-sheets: $maximum-number-of-sheets;
+        allow-volume-break-inside-leaf-section-factor: $allow-volume-break-inside-leaf-section-factor;
+        prefer-volume-break-before-higher-level-factor: $prefer-volume-break-before-higher-level-factor;
+    }
+    
+    @if $prefer-volume-break-before-higher-level-factor > 0 {
+        @for $level from 1 through 6 {
+            $volume-keep-priority: min(10, max($min-volume-keep-priority, round(10 - $level * $prefer-volume-break-before-higher-level-factor)));
+            @if $volume-keep-priority < 10 {
+                level#{$level} {
+                    volume-break-inside: -obfl-keep($volume-keep-priority);
+                }
+            }
+        }
+    }
+    
+    level1:not(:has(> level2, div.leaf-section)),
+    level2:not(:has(> level3, div.leaf-section)),
+    level3:not(:has(> level4, div.leaf-section)),
+    level4:not(:has(> level5, div.leaf-section)),
+    level5:not(:has(> level6, div.leaf-section)),
+    level6:not(:has(div.leaf-section)),
+    div.leaf-section {
+        volume-break-inside: -obfl-keep($min-volume-keep-priority);
+    }
+}

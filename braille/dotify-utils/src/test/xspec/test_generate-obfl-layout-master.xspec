@@ -1,0 +1,539 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<x:description xmlns:x="http://www.jenitennison.com/xslt/xspec"
+               xmlns:css="http://www.daisy.org/ns/pipeline/braille-css"
+               xmlns:obfl="http://www.daisy.org/ns/2011/obfl"
+               stylesheet="../../main/resources/xml/generate-obfl-layout-master.xsl">
+  
+  <x:param name="duplex" select="'true'"/>
+  <x:param name="page-width" select="'40'"/>
+  <x:param name="page-height" select="'25'"/>
+  <x:param name="braille-charset-table" select="''"/>
+  
+  <x:scenario label="test_01">
+    <x:call template="obfl:generate-layout-master">
+      <x:param name="page-stylesheet">
+        <css:rule selector="@page"/>
+      </x:param>
+      <x:param name="name" select="'x'"/>
+      <x:param name="default-page-counter-name" select="'page'"/>
+    </x:call>
+    <x:expect label="layout-master">
+      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="40" page-height="25" duplex="true">
+        <default-template>
+          <header/>
+          <footer/>
+        </default-template>
+      </layout-master>
+    </x:expect>
+  </x:scenario>
+  
+  <x:scenario label="test_02">
+    <x:call template="obfl:generate-layout-master">
+      <x:param name="page-stylesheet">
+        <css:rule selector="@page">
+          <css:rule>
+            <css:property name="size" value="15 15"/>
+          </css:rule>
+          <css:rule selector="@top-right">
+            <css:property name="content">
+              <css:counter name="page" style="lower-roman"/>
+            </css:property>
+          </css:rule>
+          <css:rule selector="@bottom-center">
+            <css:property name="content">
+              <css:string value="footer"/>
+            </css:property>
+          </css:rule>
+        </css:rule>
+      </x:param>
+      <x:param name="name" select="'x'"/>
+      <x:param name="default-page-counter-name" select="'page'"/>
+    </x:call>
+    <x:expect label="layout-master">
+      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="15" page-height="15" duplex="true">
+        <default-template>
+          <header>
+            <field>
+              <string value=""/>
+            </field>
+            <field>
+              <current-page number-format="lower-roman"/>
+            </field>
+          </header>
+          <footer>
+            <field>
+              <string value=""/>
+            </field>
+            <field>
+              <string value="footer"/>
+            </field>
+            <field>
+              <string value=""/>
+            </field>
+          </footer>
+        </default-template>
+      </layout-master>
+    </x:expect>
+  </x:scenario>
+  
+  <x:scenario label="test_03">
+    <x:call template="obfl:generate-layout-master">
+      <x:param name="page-stylesheet">
+        <css:rule selector="@page">
+          <css:rule>
+            <css:property name="size" value="15 15"/>
+          </css:rule>
+          <css:rule selector="&amp;:right">
+            <css:rule>
+              <css:property name="margin-top" value="1"/>
+            </css:rule>
+            <css:rule selector="@top-right">
+              <css:property name="content">
+                <css:counter name="page"/>
+              </css:property>
+            </css:rule>
+          </css:rule>
+          <css:rule selector="&amp;:left">
+            <css:rule>
+              <css:property name="margin-top" value="2"/>
+            </css:rule>
+            <css:rule selector="@top-left">
+              <css:property name="content">
+                <css:counter name="page"/>
+              </css:property>
+            </css:rule>
+          </css:rule>
+        </css:rule>
+      </x:param>
+      <x:param name="name" select="'x'"/>
+      <x:param name="default-page-counter-name" select="'page'"/>
+    </x:call>
+    <x:expect label="layout-master">
+      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="15" page-height="15" duplex="true">
+        <template use-when="(= (% $page 2) 1)">
+          <header>
+            <field>
+              <string value=""/>
+            </field>
+            <field>
+              <current-page number-format="default"/>
+            </field>
+          </header>
+          <footer/>
+        </template>
+        <template use-when="(= (% $page 2) 0)">
+          <header>
+            <field>
+              <current-page number-format="default"/>
+            </field>
+            <field>
+              <string value=""/>
+            </field>
+          </header>
+          <header>
+            <field>
+              <string value=""/>
+            </field>
+            <field>
+              <string value=""/>
+            </field>
+          </header>
+          <footer/>
+        </template>
+        <default-template>
+          <header/>
+          <footer/>
+        </default-template>
+      </layout-master>
+    </x:expect>
+  </x:scenario>
+  
+  <x:scenario label="test_04">
+    <x:call template="obfl:generate-layout-master">
+      <x:param name="page-stylesheet">
+        <css:rule selector="@page">
+          <css:rule>
+            <css:property name="size" value="15 5"/>
+            <css:property name="margin-bottom" value="1"/>
+          </css:rule>
+        </css:rule>
+      </x:param>
+      <x:param name="name" select="'x'"/>
+      <x:param name="default-page-counter-name" select="'page'"/>
+    </x:call>
+    <x:expect label="layout-master">
+      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="15" page-height="5" duplex="true">
+        <default-template>
+          <header/>
+          <footer>
+            <field>
+              <string value=""/>
+            </field>
+            <field>
+              <string value=""/>
+            </field>
+          </footer>
+        </default-template>
+      </layout-master>
+    </x:expect>
+  </x:scenario>
+  
+  <x:scenario label="test_05">
+    <x:call template="obfl:generate-layout-master">
+      <x:param name="page-stylesheet">
+        <css:rule selector="@page">
+          <css:rule>
+            <css:property name="size" value="15 5"/>
+            <css:property name="margin-bottom" value="2"/>
+          </css:rule>
+        </css:rule>
+      </x:param>
+      <x:param name="name" select="'x'"/>
+      <x:param name="default-page-counter-name" select="'page'"/>
+    </x:call>
+    <x:expect label="layout-master">
+      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="15" page-height="5" duplex="true">
+        <default-template>
+          <header/>
+          <footer>
+            <field>
+              <string value=""/>
+            </field>
+            <field>
+              <string value=""/>
+            </field>
+          </footer>
+          <footer>
+            <field>
+              <string value=""/>
+            </field>
+            <field>
+              <string value=""/>
+            </field>
+          </footer>
+        </default-template>
+      </layout-master>
+    </x:expect>
+  </x:scenario>
+  
+  <x:scenario label="test_06">
+    <x:call template="obfl:generate-layout-master">
+      <x:param name="page-stylesheet">
+        <css:rule selector="@page">
+          <css:rule selector="@bottom-left">
+            <css:property name="content">
+              <css:string value="⠆"/>
+            </css:property>
+          </css:rule>
+          <css:rule>
+            <css:property name="size" value="15 5"/>
+            <css:property name="margin-bottom" value="1"/>
+          </css:rule>
+        </css:rule>
+      </x:param>
+      <x:param name="name" select="'x'"/>
+      <x:param name="default-page-counter-name" select="'page'"/>
+    </x:call>
+    <x:expect label="layout-master">
+      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="15" page-height="5" duplex="true">
+        <default-template>
+          <header/>
+          <footer>
+            <field>
+              <string value="⠆"/>
+            </field>
+            <field>
+              <string value=""/>
+            </field>
+          </footer>
+        </default-template>
+      </layout-master>
+    </x:expect>
+  </x:scenario>
+  
+  <x:scenario label="test_07">
+    <x:call template="obfl:generate-layout-master">
+      <x:param name="page-stylesheet">
+        <css:rule selector="@page">
+          <css:rule selector="@bottom-left">
+            <css:property name="content">
+              <css:string value="⠆"/>
+            </css:property>
+          </css:rule>
+          <css:rule>
+            <css:property name="size" value="15 5"/>
+            <css:property name="margin-bottom" value="2"/>
+          </css:rule>
+        </css:rule>
+      </x:param>
+      <x:param name="name" select="'x'"/>
+      <x:param name="default-page-counter-name" select="'page'"/>
+    </x:call>
+    <x:expect label="layout-master">
+      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="15" page-height="5" duplex="true">
+        <default-template>
+          <header/>
+          <footer>
+            <field>
+              <string value=""/>
+            </field>
+            <field>
+              <string value=""/>
+            </field>
+          </footer>
+          <footer>
+            <field>
+              <string value="⠆"/>
+            </field>
+            <field>
+              <string value=""/>
+            </field>
+          </footer>
+        </default-template>
+      </layout-master>
+    </x:expect>
+  </x:scenario>
+  
+  <x:scenario label="test_08">
+    <x:call template="obfl:generate-layout-master">
+      <x:param name="page-stylesheet">
+        <css:rule selector="@page">
+          <css:rule selector="@bottom-left">
+            <css:property name="content">
+              <css:string value="⠆&#xa;⠆⠆"/>
+            </css:property>
+            <css:property name="white-space" value="pre-wrap"/>
+          </css:rule>
+          <css:rule>
+            <css:property name="size" value="15 5"/>
+            <css:property name="margin-bottom" value="2"/>
+          </css:rule>
+        </css:rule>
+      </x:param>
+      <x:param name="name" select="'x'"/>
+      <x:param name="default-page-counter-name" select="'page'"/>
+    </x:call>
+    <x:expect label="layout-master">
+      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="15" page-height="5" duplex="true">
+        <default-template>
+          <header/>
+          <footer>
+            <field>
+              <string value="⠆"/>
+            </field>
+            <field>
+              <string value=""/>
+            </field>
+          </footer>
+          <footer>
+            <field>
+              <string value="⠆⠆"/>
+            </field>
+            <field>
+              <string value=""/>
+            </field>
+          </footer>
+        </default-template>
+      </layout-master>
+    </x:expect>
+  </x:scenario>
+  
+  <x:scenario label="test_09">
+    <x:call template="obfl:generate-layout-master">
+      <x:param name="page-stylesheet">
+        <css:rule selector="@page">
+          <css:rule selector="@bottom-left">
+            <css:property name="content">
+              <css:string value="⠆&#xa;⠆⠆"/>
+            </css:property>
+            <css:property name="white-space" value="pre-wrap"/>
+          </css:rule>
+          <css:rule>
+            <css:property name="size" value="15 5"/>
+            <css:property name="margin-bottom" value="1"/>
+          </css:rule>
+        </css:rule>
+      </x:param>
+      <x:param name="name" select="'x'"/>
+      <x:param name="default-page-counter-name" select="'page'"/>
+    </x:call>
+    <x:expect label="layout-master">
+      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="15" page-height="5" duplex="true">
+        <default-template>
+          <header/>
+          <footer>
+            <field>
+              <string value="⠆"/>
+            </field>
+            <field>
+              <string value=""/>
+            </field>
+          </footer>
+          <footer>
+            <field>
+              <string value="⠆⠆"/>
+            </field>
+            <field>
+              <string value=""/>
+            </field>
+          </footer>
+        </default-template>
+      </layout-master>
+    </x:expect>
+  </x:scenario>
+  
+  <x:scenario label="test_10">
+    <x:call template="obfl:generate-layout-master">
+      <x:param name="page-stylesheet">
+        <css:rule selector="@page">
+          <css:rule>
+            <css:property name="size" value="28 28"/>
+          </css:rule>
+          <css:rule selector="&amp;:right">
+            <css:rule>
+              <css:property name="margin-bottom" value="1"/>
+            </css:rule>
+            <css:rule selector="@bottom-left">
+              <css:property name="content">
+                <css:string name="print-page" scope="spread-start-except-last"/>
+                <css:string name="slash-print-page" scope="spread-last"/>
+              </css:property>
+              <css:property name="text-transform" value="print-page"/>
+            </css:rule>
+            <css:rule selector="@bottom-center">
+              <css:property name="content">
+                <css:string name="running-footer" scope="spread-start"/>
+              </css:property>
+            </css:rule>
+            <css:rule selector="@bottom-right">
+              <css:property name="content">
+                <css:counter name="page"/>
+              </css:property>
+            </css:rule>
+          </css:rule>
+        </css:rule>
+      </x:param>
+      <x:param name="name" select="'x'"/>
+      <x:param name="default-page-counter-name" select="'page'"/>
+    </x:call>
+    <x:expect label="layout-master">
+      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="28" page-height="28" duplex="true">
+        <template use-when="(= (% $page 2) 1)">
+          <header/>
+          <footer>
+            <field>
+              <marker-reference marker="print-page/prev"
+                                direction="forward"
+                                scope="spread-content"
+                                start-offset="-1"
+                                text-style="text-transform: print-page"/>
+              <marker-reference marker="slash-print-page"
+                                direction="backward"
+                                scope="document"
+                                text-style="text-transform: print-page"/>
+            </field>
+            <field>
+              <compound-marker-reference>
+                <marker-reference marker="running-footer/prev"
+                                  direction="forward"
+                                  scope="spread-content"
+                                  start-offset="-1"/>
+                <marker-reference marker="running-footer"
+                                  direction="backward"
+                                  scope="document"/>
+              </compound-marker-reference>
+            </field>
+            <field>
+              <current-page number-format="default"/>
+            </field>
+          </footer>
+        </template>
+        <default-template>
+          <header/>
+          <footer/>
+        </default-template>
+      </layout-master>
+    </x:expect>
+  </x:scenario>
+  
+  <x:scenario label="test_11">
+    <x:call template="obfl:generate-layout-master">
+      <x:param name="page-stylesheet">
+        <css:rule selector="@page">
+          <css:rule>
+            <css:property name="size" value="15 15"/>
+          </css:rule>
+          <css:rule selector="@footnotes">
+            <css:property name="border-top-pattern" value="⠒"/>
+            <css:property name="max-height" value="10"/>
+            <css:property name="content">
+              <css:flow from="footnote"/>
+            </css:property>
+          </css:rule>
+        </css:rule>
+      </x:param>
+      <x:param name="name" select="'x'"/>
+      <x:param name="default-page-counter-name" select="'page'"/>
+    </x:call>
+    <x:expect label="layout-master">
+      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="15" page-height="15" duplex="true">
+        <default-template>
+          <header/>
+          <footer/>
+        </default-template>
+        <page-area align="bottom" max-height="10" collection="footnote">
+          <before><block translate="pre-translated-text-css"><leader pattern="⠒" position="100%" align="right" />⠒</block></before>
+        </page-area>
+      </layout-master>
+    </x:expect>
+  </x:scenario>
+
+  <x:scenario label="test_12">
+    <x:call template="obfl:generate-layout-master">
+      <x:param name="page-stylesheet">
+        <css:rule selector="@page">
+          <css:rule>
+            <css:property name="size" value="15 15"/>
+          </css:rule>
+          <css:rule selector="@footnotes">
+            <css:property name="border-top-pattern" value="⠒"/>
+            <css:property name="max-height" value="10"/>
+            <css:property name="content">
+              <css:flow from="footnote"/>
+            </css:property>
+          </css:rule>
+          <css:rule selector="&amp;:left">
+            <css:rule>
+              <css:property name="size" value="15 15"/>
+            </css:rule>
+            <css:rule selector="@footnotes">
+              <css:property name="border-top-pattern" value="⠒"/>
+              <css:property name="max-height" value="10"/>
+              <css:property name="content">
+                <css:flow from="footnote"/>
+              </css:property>
+            </css:rule>
+          </css:rule>
+        </css:rule>
+      </x:param>
+      <x:param name="name" select="'x'"/>
+      <x:param name="default-page-counter-name" select="'page'"/>
+    </x:call>
+    <x:expect label="layout-master">
+      <layout-master xmlns="http://www.daisy.org/ns/2011/obfl" name="x" page-width="15" page-height="15" duplex="true">
+        <template use-when="(= (% $page 2) 0)">
+          <header/>
+          <footer/>
+        </template>
+        <default-template>
+          <header/>
+          <footer/>
+        </default-template>
+        <page-area align="bottom" max-height="10" collection="footnote">
+          <before><block translate="pre-translated-text-css"><leader pattern="⠒" position="100%" align="right"/>⠒</block></before>
+        </page-area>
+      </layout-master>
+    </x:expect>
+  </x:scenario>
+  
+</x:description>

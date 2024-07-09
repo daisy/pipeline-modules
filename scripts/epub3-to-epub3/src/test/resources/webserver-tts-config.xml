@@ -1,0 +1,3 @@
+<config>
+	<voice engine="google" name="Alex" lang="en" gender="male-adult" priority="10"/>
+</config>

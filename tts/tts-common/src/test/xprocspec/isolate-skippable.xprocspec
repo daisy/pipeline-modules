@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
+	       xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+	       xmlns:d="http://www.daisy.org/ns/pipeline/data"
+	       xmlns:dtb="http://www.daisy.org/z3986/2005/dtbook/"
+	       xmlns:math="http://www.w3.org/1998/Math/MathML"
+	       xmlns="http://www.daisy.org/z3986/2005/dtbook/"
+	       script="../../main/resources/xml/xproc/isolate-skippable.xpl">
+
+  <x:scenario label="General scenario">
+    <x:call step="px:isolate-skippable">
+      <x:input port="sentence-ids">
+	<x:document type="inline">
+	  <d:sentences>
+	    <d:sentence id="sent1"/>
+	    <d:sentence id="sent2"/>
+	  </d:sentences>
+	</x:document>
+      </x:input>
+      <x:option name="match" select="'dtb:pagenum|dtb:noteref|dtb:annoref|dtb:linenum|math:math'"/>
+    </x:call>
+
+    <x:scenario label="2 levels">
+      <x:call>
+	<x:input port="source">
+	  <x:document type="inline">
+	    <book>
+	      <sent id="sent1">
+		<span id="span1" attr="attr-val">
+		  text1
+		  <noteref/>
+		  text2
+		</span>
+		text3
+	      </sent>
+	    </book>
+	  </x:document>
+      </x:input>
+      </x:call>
+      <x:context label="context">
+	<x:document type="port" port="result"/>
+	<x:document type="port" port="skippable-ids"/>
+      </x:context>
+      <x:expect label="result" type="compare">
+	<x:document type="inline">
+	  <book>
+	    <sent id="sent1">
+	      <span id="id_2">
+		<span id="span1" attr="attr-val">
+		  text1
+		</span>
+	      </span>
+	      <span attr="attr-val">
+		<noteref id="id_1"/>
+	      </span>
+	      <span id="id_3">
+		<span attr="attr-val">
+		  text2
+		</span>
+		text3
+	      </span>
+	    </sent>
+	  </book>
+	</x:document>
+	<x:document type="inline">
+	  <d:skippables>
+	    <d:skippable id="id_1"/>
+	  </d:skippables>
+	</x:document>
+      </x:expect>
+    </x:scenario>
+
+    <x:scenario label="No skippable">
+      <x:call>
+	<x:input port="source">
+	  <x:document type="inline">
+	    <book>
+	      <sent id="sent1">
+		<span id="span1">
+		  text1
+		</span>
+		text2
+	      </sent>
+	    </book>
+	  </x:document>
+	</x:input>
+      </x:call>
+      <x:context label="context">
+	<x:document type="port" port="result"/>
+	<x:document type="port" port="skippable-ids"/>
+      </x:context>
+      <x:expect label="result" type="compare">
+	<x:document type="inline">
+	  <book>
+	    <sent id="sent1">
+	      <span id="span1">
+		text1
+	      </span>
+	      text2
+	    </sent>
+	  </book>
+	</x:document>
+	<x:document type="inline">
+	  <d:skippables/>
+	</x:document>
+      </x:expect>
+    </x:scenario>
+
+    <x:scenario label="Simple">
+      <x:call>
+	<x:input port="source">
+	  <x:document type="inline">
+	    <book>
+	      <sent id="sent1">
+		text1
+		<noteref/>
+		text2
+	      </sent>
+	    </book>
+	  </x:document>
+	</x:input>
+      </x:call>
+      <x:context label="context">
+	<x:document type="port" port="result"/>
+	<x:document type="port" port="skippable-ids"/>
+      </x:context>
+      <x:expect label="result" type="compare">
+	<x:document type="inline">
+	  <book>
+	    <sent id="sent1">
+	      <span id="id_2">
+		text1
+	      </span>
+	      <noteref id="id_1"/>
+	      <span id="id_3">
+		text2
+	      </span>
+	    </sent>
+	  </book>
+	</x:document>
+	<x:document type="inline">
+	  <d:skippables>
+	    <d:skippable id="id_1"/>
+	  </d:skippables>
+	</x:document>
+      </x:expect>
+    </x:scenario>
+
+    <x:scenario label="Preexisting id">
+      <x:call>
+	<x:input port="source">
+	  <x:document type="inline">
+	    <book>
+	      <sent id="sent1">
+		text1
+		<noteref id="noteref-id"/>
+		text2
+	      </sent>
+	    </book>
+	  </x:document>
+	</x:input>
+      </x:call>
+      <x:context label="context">
+	<x:document type="port" port="result"/>
+	<x:document type="port" port="skippable-ids"/>
+      </x:context>
+      <x:expect label="result" type="compare">
+	<x:document type="inline">
+	  <book>
+	    <sent id="sent1">
+	      <span id="id_1">
+		text1
+	      </span>
+	      <noteref id="noteref-id"/>
+	      <span id="id_2">
+		text2
+	      </span>
+	    </sent>
+	  </book>
+	</x:document>
+	<x:document type="inline">
+	  <d:skippables>
+	    <d:skippable id="noteref-id"/>
+	  </d:skippables>
+	</x:document>
+      </x:expect>
+    </x:scenario>
+
+    <x:scenario label="Pagenum">
+      <x:call>
+	<x:input port="source">
+	  <x:document type="inline">
+	    <book>
+	      <sent id="sent1">
+		text1
+		<pagenum>42</pagenum>
+		text2
+	      </sent>
+	    </book>
+	  </x:document>
+	</x:input>
+      </x:call>
+      <x:context label="context">
+	<x:document type="port" port="result"/>
+	<x:document type="port" port="skippable-ids"/>
+      </x:context>
+      <x:expect label="result" type="compare">
+	<x:document type="inline">
+	  <book>
+	    <sent id="sent1">
+	      <span id="id_2">
+		text1
+	      </span>
+	      <pagenum id="id_1">42</pagenum>
+	      <span id="id_3">
+		text2
+	      </span>
+	    </sent>
+	  </book>
+	</x:document>
+	<x:document type="inline">
+	  <d:skippables>
+	    <d:skippable id="id_1"/>
+	  </d:skippables>
+	</x:document>
+      </x:expect>
+    </x:scenario>
+
+    <x:scenario label="Pagenum with words">
+      <x:call>
+	<x:input port="source">
+	  <x:document type="inline">
+	    <book>
+	      <sent id="sent1">
+		<w>w1</w> <w>w2</w>
+		<pagenum>42</pagenum>
+		<w>w3</w> <w>w4</w>
+	      </sent>
+	    </book>
+	  </x:document>
+	</x:input>
+      </x:call>
+      <x:context label="context">
+	<x:document type="port" port="result"/>
+	<x:document type="port" port="skippable-ids"/>
+      </x:context>
+      <x:expect label="result" type="compare">
+	<x:document type="inline">
+          <book>
+	    <sent id="sent1">
+	      <span id="id_2">
+		<w>w1</w>
+		<w>w2</w>
+	      </span>
+	      <pagenum id="id_1">42</pagenum>
+	      <span id="id_3">
+		<w>w3</w>
+		<w>w4</w>
+	      </span>
+	    </sent>
+	  </book>
+	</x:document>
+	<x:document type="inline">
+	  <d:skippables>
+	    <d:skippable id="id_1"/>
+	  </d:skippables>
+	</x:document>
+      </x:expect>
+    </x:scenario>
+
+    <x:scenario label="Skippable sentence">
+      <x:call>
+	<x:input port="source">
+	  <x:document type="inline">
+	    <book>
+	      <pagenum id="sent1">1</pagenum>
+	    </book>
+	</x:document>
+	</x:input>
+      </x:call>
+      <x:context label="context">
+	<x:document type="port" port="result"/>
+	<x:document type="port" port="skippable-ids"/>
+      </x:context>
+      <x:expect label="result" type="compare">
+	<x:document type="inline">
+	  <book>
+	    <pagenum id="sent1">1</pagenum>
+	  </book>
+	</x:document>
+	<x:document type="inline">
+	  <d:skippables>
+	    <d:skippable id="sent1"/>
+	  </d:skippables>
+	</x:document>
+      </x:expect>
+    </x:scenario>
+
+    <x:scenario label="Adjacent skippable elements">
+      <x:call>
+	<x:input port="source">
+	  <x:document type="inline">
+	    <sent id="sent1">
+	      text1
+	      <pagenum>42</pagenum>
+	      <pagenum>43</pagenum>
+	      text2
+	    </sent>
+	</x:document>
+	</x:input>
+      </x:call>
+      <x:context label="context">
+	<x:document type="port" port="result"/>
+	<x:document type="port" port="skippable-ids"/>
+      </x:context>
+      <x:expect label="result" type="compare">
+	<x:document type="inline">
+	  <sent id="sent1">
+	    <span id="id_3">
+	      text1
+	    </span>
+	    <pagenum id="id_1">42</pagenum>
+	    <span id="id_4"/>
+	    <pagenum id="id_2">43</pagenum>
+	    <span id="id_5">
+	      text2
+	    </span>
+	  </sent>
+	</x:document>
+	<x:document type="inline">
+	  <d:skippables>
+	    <d:skippable id="id_1"/>
+	    <d:skippable id="id_2"/>
+	  </d:skippables>
+	</x:document>
+      </x:expect>
+    </x:scenario>
+
+  </x:scenario>
+
+</x:description>

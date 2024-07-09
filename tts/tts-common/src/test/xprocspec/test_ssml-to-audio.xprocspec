@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
+               xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+               xmlns:ssml="http://www.w3.org/2001/10/synthesis"
+               xmlns:c="http://www.w3.org/ns/xproc-step"
+               xmlns:d="http://www.daisy.org/ns/pipeline/data"
+               script="../../main/resources/xml/xproc/library.xpl">
+
+	<x:scenario label="synthesize with mock engine">
+		<x:documentation>
+			The sentences with xml:lang="en" are spoken with voice "mock-en", which proves that the
+			org.daisy.pipeline.tts.config property (supplied in the pom) works. The sentences with
+			xml:lang="nl" cause an error because the "mock-nl" voice does not exist, which proves
+			that the "config" port works.
+		</x:documentation>
+		<x:call step="px:ssml-to-audio">
+			<x:input port="source">
+				<x:document type="inline">
+					<speak version="1.1" xmlns="http://www.w3.org/2001/10/synthesis">
+						<s id="A" xml:lang="en">
+							sentence A
+						</s>
+						<s id="B" xml:lang="en">
+							sentence B
+						</s>
+						<s id="C" xml:lang="nl">
+							sentence C
+						</s>
+						<s id="D" xml:lang="en">
+							sentence D
+						</s>
+					</speak>
+				</x:document>
+			</x:input>
+			<x:input port="config">
+				<x:document type="inline">
+					<config>
+						<!-- from ../resources/tts-default-config.xml: -->
+						<!-- <voice engine="mock-tts" name="mock-en" lang="en" gender="male-adult"/> -->
+						<voice engine="mock-tts" name="mock-nl" lang="nl" gender="male-adult"/>
+					</config>
+				</x:document>
+			</x:input>
+			<x:option name="include-log" select="'true'"/> <!-- log can be found in "log" output -->
+		</x:call>
+		<x:context label="the status port">
+			<x:document type="port" port="status"/>
+		</x:context>
+		<x:expect label="the success rate should be 75%" type="compare">
+			<x:document type="inline">
+				<d:status result="error" tts-success-rate="75%"/>
+			</x:document>
+		</x:expect>
+		<x:context label="the result port">
+			<x:document type="port" port="result"/>
+		</x:context>
+		<x:expect label="there should be 3 audio clips"
+		          type="xpath" test="count(/d:audio-clips/d:clip)" equals="3"/>
+		<x:expect label="one for A" type="xpath" test="/d:audio-clips/d:clip[ends-with(@textref,'#A')]"/>
+		<x:expect label="one for B" type="xpath" test="/d:audio-clips/d:clip[ends-with(@textref,'#B')]"/>
+		<x:expect label="one for D" type="xpath" test="/d:audio-clips/d:clip[ends-with(@textref,'#D')]"/>
+		<!--
+		<x:context label="the log port">
+			<x:document type="port" port="log"/>
+		</x:context>
+		<x:expect label="the log port" type="compare">
+			<x:document type="inline">
+				<log/>
+			</x:document>
+		</x:expect>
+		-->
+	</x:scenario>
+	
+	<x:scenario label="audio-file-type option">
+		<x:call step="px:ssml-to-audio">
+			<x:input port="source">
+				<x:document type="inline">
+					<speak version="1.1" xmlns="http://www.w3.org/2001/10/synthesis">
+						<s id="A" xml:lang="en">sentence</s>
+					</speak>
+				</x:document>
+			</x:input>
+			<x:input port="config"/>
+			<x:option name="audio-file-type" select="'audio/x-wav'"/>
+			<x:option name="temp-dir" select="resolve-uri('audio-file-type/',$temp-dir)"/>
+		</x:call>
+		<x:context label="the result port">
+			<x:document type="port" port="result"/>
+		</x:context>
+		<x:expect label="there should be 1 audio clip"
+		          type="xpath" test="count(/d:audio-clips/d:clip)" equals="1"/>
+		<x:expect label="the audio clip should link to a .wav file"
+		          type="xpath" test="/d:audio-clips/d:clip[ends-with(@src,'.wav')]"/>
+	</x:scenario>
+	
+	<x:scenario label="encoding error">
+		<x:call step="px:ssml-to-audio">
+			<x:input port="source">
+				<x:document type="inline">
+					<speak version="1.1" xmlns="http://www.w3.org/2001/10/synthesis">
+						<s id="A" xml:lang="en">
+							this sentence is long so that it will trigger an encoding error
+						</s>
+					</speak>
+				</x:document>
+			</x:input>
+			<x:input port="config">
+				<x:document type="inline">
+					<config>
+						<voice engine="mock-tts" name="mock-en" lang="en" gender="male-adult"/>
+					</config>
+				</x:document>
+			</x:input>
+			<x:option name="include-log" select="'true'"/> <!-- log can be found in "log" output -->
+		</x:call>
+		<x:context label="the error">
+			<x:document type="errors"/>
+		</x:context>
+		<x:expect label="there should be errors" type="count" min="1"/>
+		<x:expect label="an encoding error is thrown" type="xpath"
+		          test="exists(/c:errors/c:error[resolve-QName(@code,.)=QName('http://www.daisy.org/ns/pipeline/errors','pe:TTS001')])"/>
+	</x:scenario>
+	
+</x:description>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" xmlns:px="http://www.daisy.org/ns/pipeline">
+  
+  <!-- scripts -->
+  <uri name="http://www.daisy.org/pipeline/modules/braille/dtbook-to-pef/dtbook-to-pef.xpl" uri="../xml/xproc/dtbook-to-pef.xpl"
+       px:content-type="script" px:id="dtbook-to-pef"
+       px:extends="../../../../../common-options.xpl
+                   ../css/default.params
+                   ../css/page-layout.params
+                   ../css/page-breaking.params
+                   ../css/volume-breaking.params
+                   ../css/notes.params
+                   ../css/dotify.params"/>
+  
+  <!-- xproc library -->
+  <uri name="http://www.daisy.org/pipeline/modules/braille/dtbook-to-pef/library.xpl" uri="../xml/xproc/library.xpl"/>
+  
+  <!-- style sheets -->
+  <uri name="http://www.daisy.org/pipeline/modules/braille/dtbook-to-pef/reset.css" uri="../css/reset.css"/>
+  
+  <!-- partials -->
+  <uri name="http://www.daisy.org/pipeline/modules/braille/dtbook-to-pef/_generate-toc.scss" uri="../css/_generate-toc.scss"/>
+  <uri name="http://www.daisy.org/pipeline/modules/braille/dtbook-to-pef/_tables.scss" uri="../css/_tables.scss"/>
+  <uri name="http://www.daisy.org/pipeline/modules/braille/dtbook-to-pef/_definition-lists.scss" uri="../css/_definition-lists.scss"/>
+  <uri name="http://www.daisy.org/pipeline/modules/braille/dtbook-to-pef/_legacy.scss" uri="../css/_legacy.scss"/>
+  
+  <!-- dependencies -->
+  <nextCatalog catalog="org:daisy:pipeline:modules:braille:common"/>
+  <nextCatalog catalog="org:daisy:pipeline:modules:braille:pef-utils"/>
+  <nextCatalog catalog="org:daisy:pipeline:modules:common-utils"/>
+  <nextCatalog catalog="org:daisy:pipeline:modules:file-utils"/>
+  <nextCatalog catalog="org:daisy:pipeline:modules:fileset-utils"/>
+  <nextCatalog catalog="org:daisy:pipeline:modules:dtbook-utils"/>
+  <nextCatalog catalog="org:daisy:pipeline:modules:metadata-utils"/>
+  <nextCatalog catalog="org:daisy:pipeline:modules:dtbook-to-epub3"/>
+  
+</catalog>

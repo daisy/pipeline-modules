@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
+               xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+               xmlns:d="http://www.daisy.org/ns/pipeline/data"
+               xmlns:opf="http://www.idpf.org/2007/opf"
+               xmlns:dc="http://purl.org/dc/elements/1.1/"
+               xmlns:html="http://www.w3.org/1999/xhtml"
+               xmlns:epub="http://www.idpf.org/2007/ops"
+               script="../../main/resources/xml/xproc/zedai-to-epub3.convert.xpl">
+
+	<x:scenario label="alice">
+		<x:call step="px:zedai-to-epub3">
+			<x:input port="fileset.in">
+				<x:document type="inline">
+					<d:fileset>
+						<d:file href="../resources/resources/images/alice01a.png" media-type="image/png"/>
+						<d:file href="../resources/resources/images/alice02a.png" media-type="image/png"/>
+						<d:file href="../resources/resources/images/alice03a.png" media-type="image/png"/>
+						<d:file href="../resources/resources/images/alice04a.png" media-type="image/png"/>
+						<d:file href="../resources/resources/images/alice05a.png" media-type="image/png"/>
+						<d:file href="../resources/resources/images/alice06a.png" media-type="image/png"/>
+						<d:file href="../resources/resources/images/alice07a.png" media-type="image/png"/>
+						<d:file href="../resources/resources/images/alice08a.png" media-type="image/png"/>
+						<d:file href="../resources/resources/images/alice10a.png" media-type="image/png"/>
+						<d:file href="../resources/resources/images/alice09a.png" media-type="image/png"/>
+						<d:file href="../resources/resources/alice.xml" media-type="application/z3998-auth+xml"/>
+					</d:fileset>
+				</x:document>
+			</x:input>
+			<x:input port="in-memory.in">
+				<x:document type="file" href="../resources/resources/alice.xml"/>
+			</x:input>
+			<x:input port="tts-config">
+				<x:document type="inline">
+					<d:config/>
+				</x:document>
+			</x:input>
+			<x:option name="output-dir" select="resolve-uri('temp-dir/')"/>
+		</x:call>
+		<x:context label="the fileset.out port">
+			<x:document type="port" port="fileset.out"/>
+		</x:context>
+		<x:expect label="the result.fileset port"
+		          type="custom" href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl" step="x:fileset-compare">
+			<x:document type="inline">
+				<d:fileset>
+					<d:file href="temp-dir/epub/EPUB/alice-1.xhtml" media-type="application/xhtml+xml" doctype="&lt;!DOCTYPE html&gt;"/>
+					<d:file href="temp-dir/epub/EPUB/alice-2.xhtml" media-type="application/xhtml+xml" doctype="&lt;!DOCTYPE html&gt;"/>
+					<d:file href="temp-dir/epub/EPUB/alice-3.xhtml" media-type="application/xhtml+xml" doctype="&lt;!DOCTYPE html&gt;"/>
+					<d:file href="temp-dir/epub/EPUB/alice-4.xhtml" media-type="application/xhtml+xml" doctype="&lt;!DOCTYPE html&gt;"/>
+					<d:file href="temp-dir/epub/EPUB/package.opf" media-type="application/oebps-package+xml"/>
+					<d:file href="temp-dir/epub/META-INF/container.xml" media-type="application/xml"/>
+				</d:fileset>
+			</x:document>
+		</x:expect>
+		<x:context label="the package document">
+			<x:document type="port" port="in-memory.out"
+			            select="/*[base-uri()=resolve-uri('temp-dir/epub/EPUB/package.opf',$test-base-uri)]"/>
+		</x:context>
+		<x:expect label="the package document" type="custom" href="http://www.daisy.org/pipeline/modules/epub-utils/library.xpl"
+		          step="x:epub3-compare-package-doc">
+			<x:document type="inline">
+				<package xmlns="http://www.idpf.org/2007/opf"
+				         prefix="dcterms: http://purl.org/dc/terms/ schema: http://schema.org/ dc: http://purl.org/dc/elements/1.1/"
+				         unique-identifier="pub-id22"
+				         xml:lang="en"
+				         version="3.0">
+					<metadata>
+						<dc:title id="id_122">Alice's Adventures In Wonderland</dc:title>
+						<dc:identifier id="pub-id22">com.googlecode.zednext.alice</dc:identifier>
+						<dc:language>en</dc:language>
+						<meta property="dcterms:modified">2020-03-25T18:01:20Z</meta>
+						<dc:format id="format222">EPUB3</dc:format>
+						<meta property="schema:accessibilityFeature">tableOfContents</meta>
+						<meta property="dc:publisher">CSU</meta>
+						<meta property="dc:date">2010-03-27T15:50:05Z</meta>
+						<meta property="dc:creator">Lewis Carroll</meta>
+						<meta property="schema:accessMode">textual</meta>
+						<meta property="schema:accessibilityHazard">unknown</meta>
+					</metadata>
+					<manifest>
+						<item href="alice-1.xhtml" media-type="application/xhtml+xml" id="item_1" properties="nav"/>
+						<item href="alice-2.xhtml" media-type="application/xhtml+xml" id="item_2"/>
+						<item href="alice-3.xhtml" media-type="application/xhtml+xml" id="item_3"/>
+						<item href="alice-4.xhtml" media-type="application/xhtml+xml" id="item_4"/>
+					</manifest>
+					<spine>
+						<itemref idref="item_1" id="itemref_1"/>
+						<itemref idref="item_2" id="itemref_2"/>
+						<itemref idref="item_3" id="itemref_3"/>
+						<itemref idref="item_4" id="itemref_4"/>
+					</spine>
+				</package>
+			</x:document>
+		</x:expect>
+		<x:context label="the toc in the alice-1.xhtml file">
+			<x:document type="port" port="in-memory.out"
+			            select="/*[base-uri()=resolve-uri('temp-dir/epub/EPUB/alice-1.xhtml',$test-base-uri)]
+			                    //html:nav[@epub:type='toc']"/>
+		</x:context>
+		<x:expect label="the toc in the alice-1.xhtml file" type="compare">
+			<x:document type="inline">
+				<nav xmlns="http://www.w3.org/1999/xhtml" id="id_17" epub:type="toc">
+					<h3 id="id_18">Contents</h3>
+					<ul>
+						<li>
+							I. Down the Rabbit-Hole <a href="alice-2.xhtml#p1">1</a>
+						</li>
+						<li>
+							II. The Pool of Tears <a href="alice-3.xhtml#p15">15</a>
+						</li>
+						<li>
+							III. A Caucus-Race and a Long Tale <a href="alice-4.xhtml#p29">29</a>
+						</li>
+					</ul>
+				</nav>
+			</x:document>
+		</x:expect>
+	</x:scenario>
+	
+</x:description>

@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
+               xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+               xmlns:c="http://www.w3.org/ns/xproc-step"
+               xmlns:d="http://www.daisy.org/ns/pipeline/data"
+               xmlns:html="http://www.w3.org/1999/xhtml"
+               script="../../main/resources/xml/internal/convert.xpl">
+	
+	<x:scenario label="Chimpanzee">
+		<x:call step="px:daisy3-to-daisy202">
+			<x:input port="fileset.in">
+				<x:document type="inline">
+					<d:fileset>
+						<d:file href="../resources/Chimpanzee/0001.smil" media-type="application/smil+xml" media-version="dtb-2005-2"/>
+						<d:file href="../resources/Chimpanzee/0002.smil" media-type="application/smil+xml" media-version="dtb-2005-2"/>
+						<d:file href="../resources/Chimpanzee/0003.smil" media-type="application/smil+xml" media-version="dtb-2005-2"/>
+						<d:file href="../resources/Chimpanzee/0004.smil" media-type="application/smil+xml" media-version="dtb-2005-2"/>
+						<d:file href="../resources/Chimpanzee/0005.smil" media-type="application/smil+xml" media-version="dtb-2005-2"/>
+						<d:file href="../resources/Chimpanzee/0006.smil" media-type="application/smil+xml" media-version="dtb-2005-2"/>
+						<d:file href="../resources/Chimpanzee/0007.smil" media-type="application/smil+xml" media-version="dtb-2005-2"/>
+						<d:file href="../resources/Chimpanzee/0008.smil" media-type="application/smil+xml" media-version="dtb-2005-2"/>
+						<d:file href="../resources/Chimpanzee/0009.smil" media-type="application/smil+xml" media-version="dtb-2005-2"/>
+						<d:file href="../resources/Chimpanzee/0010.smil" media-type="application/smil+xml" media-version="dtb-2005-2"/>
+						<d:file href="../resources/Chimpanzee/0011.smil" media-type="application/smil+xml" media-version="dtb-2005-2"/>
+						<d:file href="../resources/Chimpanzee/0012.smil" media-type="application/smil+xml" media-version="dtb-2005-2"/>
+						<d:file href="../resources/Chimpanzee/0013.smil" media-type="application/smil+xml" media-version="dtb-2005-2"/>
+						<d:file href="../resources/Chimpanzee/0014.smil" media-type="application/smil+xml" media-version="dtb-2005-2"/>
+						<d:file href="../resources/Chimpanzee/0015.smil" media-type="application/smil+xml" media-version="dtb-2005-2"/>
+						<d:file href="../resources/Chimpanzee/0016.smil" media-type="application/smil+xml" media-version="dtb-2005-2"/>
+						<d:file href="../resources/Chimpanzee/0017.smil" media-type="application/smil+xml" media-version="dtb-2005-2"/>
+						<d:file href="../resources/Chimpanzee/0018.smil" media-type="application/smil+xml" media-version="dtb-2005-2"/>
+						<d:file href="../resources/Chimpanzee/0019.smil" media-type="application/smil+xml" media-version="dtb-2005-2"/>
+						<d:file href="../resources/Chimpanzee/0020.smil" media-type="application/smil+xml" media-version="dtb-2005-2"/>
+						<d:file href="../resources/Chimpanzee/navigation.ncx" media-type="application/x-dtbncx+xml" media-version="2005-1"/>
+						<d:file href="../resources/Chimpanzee/package.opf" media-type="application/oebps-package+xml" media-version="1.2"/>
+						<d:file href="../resources/Chimpanzee/aud001.mp3" media-type="audio/mpeg"/>
+						<d:file href="../resources/Chimpanzee/aud002.mp3" media-type="audio/mpeg"/>
+						<d:file href="../resources/Chimpanzee/aud003.mp3" media-type="audio/mpeg"/>
+						<d:file href="../resources/Chimpanzee/aud004.mp3" media-type="audio/mpeg"/>
+						<d:file href="../resources/Chimpanzee/aud005.mp3" media-type="audio/mpeg"/>
+						<d:file href="../resources/Chimpanzee/aud006.mp3" media-type="audio/mpeg"/>
+						<d:file href="../resources/Chimpanzee/aud007.mp3" media-type="audio/mpeg"/>
+						<d:file href="../resources/Chimpanzee/aud008.mp3" media-type="audio/mpeg"/>
+						<d:file href="../resources/Chimpanzee/aud009.mp3" media-type="audio/mpeg"/>
+						<d:file href="../resources/Chimpanzee/aud010.mp3" media-type="audio/mpeg"/>
+						<d:file href="../resources/Chimpanzee/aud011.mp3" media-type="audio/mpeg"/>
+						<d:file href="../resources/Chimpanzee/aud012.mp3" media-type="audio/mpeg"/>
+						<d:file href="../resources/Chimpanzee/aud013.mp3" media-type="audio/mpeg"/>
+						<d:file href="../resources/Chimpanzee/aud014.mp3" media-type="audio/mpeg"/>
+						<d:file href="../resources/Chimpanzee/aud015.mp3" media-type="audio/mpeg"/>
+						<d:file href="../resources/Chimpanzee/aud016.mp3" media-type="audio/mpeg"/>
+						<d:file href="../resources/Chimpanzee/aud017.mp3" media-type="audio/mpeg"/>
+						<d:file href="../resources/Chimpanzee/aud018.mp3" media-type="audio/mpeg"/>
+						<d:file href="../resources/Chimpanzee/aud019.mp3" media-type="audio/mpeg"/>
+						<d:file href="../resources/Chimpanzee/aud020.mp3" media-type="audio/mpeg"/>
+						<d:file href="../resources/Chimpanzee/tpbnarrator.res" media-type="application/x-dtbresource+xml" media-version="2005-1"/>
+						<d:file href="../resources/Chimpanzee/tpbnarrator_res.mp3" media-type="audio/mpeg"/>
+					</d:fileset>
+				</x:document>
+			</x:input>
+			<x:input port="in-memory.in"/>
+			<x:option name="date" select="'2020-03-03'"/>
+			<x:option name="output-dir" select="resolve-uri('result/')"/>
+			<x:option name="temp-dir" select="resolve-uri('Chimpanzee/',$temp-dir)"/>
+		</x:call>
+		<x:context label="the fileset.out port">
+			<x:document type="port" port="fileset.out"/>
+		</x:context>
+		<x:expect label="the fileset.out port"
+		          type="custom" href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl" step="x:fileset-compare">
+			<x:document type="inline">
+				<d:fileset>
+					<d:file href="result/ncc.html" media-type="application/xhtml+xml"/>
+					<d:file href="result/aud001.mp3" original-href="../resources/Chimpanzee/aud001.mp3" media-type="audio/mpeg"/>
+					<d:file href="result/0001.smil" media-type="application/smil+xml" media-version="1.0"
+					        doctype-public="-//W3C//DTD SMIL 1.0//EN'" doctype-system="http://www.w3.org/TR/REC-smil/SMIL10.dtd"/>
+					<d:file href="result/aud002.mp3" original-href="../resources/Chimpanzee/aud002.mp3" media-type="audio/mpeg"/>
+					<d:file href="result/0002.smil" media-type="application/smil+xml" media-version="1.0"
+					        doctype-public="-//W3C//DTD SMIL 1.0//EN'" doctype-system="http://www.w3.org/TR/REC-smil/SMIL10.dtd"/>
+					<d:file href="result/aud003.mp3" original-href="../resources/Chimpanzee/aud003.mp3" media-type="audio/mpeg"/>
+					<d:file href="result/0003.smil" media-type="application/smil+xml" media-version="1.0"
+					        doctype-public="-//W3C//DTD SMIL 1.0//EN'" doctype-system="http://www.w3.org/TR/REC-smil/SMIL10.dtd"/>
+					<d:file href="result/aud004.mp3" original-href="../resources/Chimpanzee/aud004.mp3" media-type="audio/mpeg"/>
+					<d:file href="result/0004.smil" media-type="application/smil+xml" media-version="1.0"
+					        doctype-public="-//W3C//DTD SMIL 1.0//EN'" doctype-system="http://www.w3.org/TR/REC-smil/SMIL10.dtd"/>
+					<d:file href="result/aud005.mp3" original-href="../resources/Chimpanzee/aud005.mp3" media-type="audio/mpeg"/>
+					<d:file href="result/0005.smil" media-type="application/smil+xml" media-version="1.0"
+					        doctype-public="-//W3C//DTD SMIL 1.0//EN'" doctype-system="http://www.w3.org/TR/REC-smil/SMIL10.dtd"/>
+					<d:file href="result/aud006.mp3" original-href="../resources/Chimpanzee/aud006.mp3" media-type="audio/mpeg"/>
+					<d:file href="result/0006.smil" media-type="application/smil+xml" media-version="1.0"
+					        doctype-public="-//W3C//DTD SMIL 1.0//EN'" doctype-system="http://www.w3.org/TR/REC-smil/SMIL10.dtd"/>
+					<d:file href="result/aud007.mp3" original-href="../resources/Chimpanzee/aud007.mp3" media-type="audio/mpeg"/>
+					<d:file href="result/0007.smil" media-type="application/smil+xml" media-version="1.0"
+					        doctype-public="-//W3C//DTD SMIL 1.0//EN'" doctype-system="http://www.w3.org/TR/REC-smil/SMIL10.dtd"/>
+					<d:file href="result/aud008.mp3" original-href="../resources/Chimpanzee/aud008.mp3" media-type="audio/mpeg"/>
+					<d:file href="result/0008.smil" media-type="application/smil+xml" media-version="1.0"
+					        doctype-public="-//W3C//DTD SMIL 1.0//EN'" doctype-system="http://www.w3.org/TR/REC-smil/SMIL10.dtd"/>
+					<d:file href="result/aud009.mp3" original-href="../resources/Chimpanzee/aud009.mp3" media-type="audio/mpeg"/>
+					<d:file href="result/0009.smil" media-type="application/smil+xml" media-version="1.0"
+					        doctype-public="-//W3C//DTD SMIL 1.0//EN'" doctype-system="http://www.w3.org/TR/REC-smil/SMIL10.dtd"/>
+					<d:file href="result/aud010.mp3" original-href="../resources/Chimpanzee/aud010.mp3" media-type="audio/mpeg"/>
+					<d:file href="result/0010.smil" media-type="application/smil+xml" media-version="1.0"
+					        doctype-public="-//W3C//DTD SMIL 1.0//EN'" doctype-system="http://www.w3.org/TR/REC-smil/SMIL10.dtd"/>
+					<d:file href="result/aud011.mp3" original-href="../resources/Chimpanzee/aud011.mp3" media-type="audio/mpeg"/>
+					<d:file href="result/0011.smil" media-type="application/smil+xml" media-version="1.0"
+					        doctype-public="-//W3C//DTD SMIL 1.0//EN'" doctype-system="http://www.w3.org/TR/REC-smil/SMIL10.dtd"/>
+					<d:file href="result/aud012.mp3" original-href="../resources/Chimpanzee/aud012.mp3" media-type="audio/mpeg"/>
+					<d:file href="result/0012.smil" media-type="application/smil+xml" media-version="1.0"
+					        doctype-public="-//W3C//DTD SMIL 1.0//EN'" doctype-system="http://www.w3.org/TR/REC-smil/SMIL10.dtd"/>
+					<d:file href="result/aud013.mp3" original-href="../resources/Chimpanzee/aud013.mp3" media-type="audio/mpeg"/>
+					<d:file href="result/0013.smil" media-type="application/smil+xml" media-version="1.0"
+					        doctype-public="-//W3C//DTD SMIL 1.0//EN'" doctype-system="http://www.w3.org/TR/REC-smil/SMIL10.dtd"/>
+					<d:file href="result/aud014.mp3" original-href="../resources/Chimpanzee/aud014.mp3" media-type="audio/mpeg"/>
+					<d:file href="result/0014.smil" media-type="application/smil+xml" media-version="1.0"
+					        doctype-public="-//W3C//DTD SMIL 1.0//EN'" doctype-system="http://www.w3.org/TR/REC-smil/SMIL10.dtd"/>
+					<d:file href="result/aud015.mp3" original-href="../resources/Chimpanzee/aud015.mp3" media-type="audio/mpeg"/>
+					<d:file href="result/0015.smil" media-type="application/smil+xml" media-version="1.0"
+					        doctype-public="-//W3C//DTD SMIL 1.0//EN'" doctype-system="http://www.w3.org/TR/REC-smil/SMIL10.dtd"/>
+					<d:file href="result/aud016.mp3" original-href="../resources/Chimpanzee/aud016.mp3" media-type="audio/mpeg"/>
+					<d:file href="result/0016.smil" media-type="application/smil+xml" media-version="1.0"
+					        doctype-public="-//W3C//DTD SMIL 1.0//EN'" doctype-system="http://www.w3.org/TR/REC-smil/SMIL10.dtd"/>
+					<d:file href="result/aud017.mp3" original-href="../resources/Chimpanzee/aud017.mp3" media-type="audio/mpeg"/>
+					<d:file href="result/0017.smil" media-type="application/smil+xml" media-version="1.0"
+					        doctype-public="-//W3C//DTD SMIL 1.0//EN'" doctype-system="http://www.w3.org/TR/REC-smil/SMIL10.dtd"/>
+					<d:file href="result/aud018.mp3" original-href="../resources/Chimpanzee/aud018.mp3" media-type="audio/mpeg"/>
+					<d:file href="result/0018.smil" media-type="application/smil+xml" media-version="1.0"
+					        doctype-public="-//W3C//DTD SMIL 1.0//EN'" doctype-system="http://www.w3.org/TR/REC-smil/SMIL10.dtd"/>
+					<d:file href="result/aud019.mp3" original-href="../resources/Chimpanzee/aud019.mp3" media-type="audio/mpeg"/>
+					<d:file href="result/0019.smil" media-type="application/smil+xml" media-version="1.0"
+					        doctype-public="-//W3C//DTD SMIL 1.0//EN'" doctype-system="http://www.w3.org/TR/REC-smil/SMIL10.dtd"/>
+					<d:file href="result/aud020.mp3" original-href="../resources/Chimpanzee/aud020.mp3" media-type="audio/mpeg"/>
+					<d:file href="result/0020.smil" media-type="application/smil+xml" media-version="1.0"
+					        doctype-public="-//W3C//DTD SMIL 1.0//EN'" doctype-system="http://www.w3.org/TR/REC-smil/SMIL10.dtd"/>
+				</d:fileset>
+			</x:document>
+		</x:expect>
+		<x:context label="a SMIL file">
+			<x:document type="port" port="in-memory.out" select="/*[base-uri()=resolve-uri('result/0001.smil')]"/>
+		</x:context>
+		<x:expect label="a SMIL file" type="compare">
+			<x:document type="inline">
+				<smil xmlns="">
+					<head>
+						<meta name="dc:format" content="Daisy 2.02"/>
+						<meta name="ncc:generator" content="DAISY Pipeline 2"/>
+						<meta name="dc:identifier" content="ghBOOK1211212736"/>
+						<meta name="ncc:totalElapsedTime" content="00:00:00"/>
+						<meta name="ncc:timeInThisSmil" content="00:00:02.4829932"/>
+						<layout>
+							<region id="txtView"/>
+						</layout>
+					</head>
+					<body>
+						<seq dur="00:00:02.4829932">
+							<par endsync="last" id="sm_3" system-required="pagenumber-on">
+								<text id="id_2" src="ncc.html#ncx_2"/>
+								<audio id="id_3" src="aud001.mp3" clip-begin="00:00:00" clip-end="00:00:02.4829932"/>
+							</par>
+						</seq>
+					</body>
+				</smil>
+			</x:document>
+		</x:expect>
+		<x:context label="another SMIL file">
+			<x:document type="port" port="in-memory.out" select="/*[base-uri()=resolve-uri('result/0002.smil')]"/>
+		</x:context>
+		<x:expect label="another SMIL file" type="compare">
+			<x:document type="inline">
+				<smil xmlns="">
+					<head>
+						<meta name="dc:format" content="Daisy 2.02"/>
+						<meta name="ncc:generator" content="DAISY Pipeline 2"/>
+						<meta name="dc:identifier" content="ghBOOK1211212736"/>
+						<meta name="ncc:totalElapsedTime" content="00:00:02.4829932"/>
+						<meta name="ncc:timeInThisSmil" content="00:01:16.7849887"/>
+						<layout>
+							<region id="txtView"/>
+						</layout>
+					</head>
+					<body>
+						<seq dur="00:01:16.7849887">
+							<par endsync="last" id="sm_5">
+								<text id="id_2" src="ncc.html#ncx_3"/>
+								<audio id="id_3" src="aud002.mp3" clip-begin="00:00:00" clip-end="00:00:02.3460091"/>
+							</par>
+							<par endsync="last" id="sm_6">
+								<text id="id_4" src="ncc.html#ncx_3"/>
+								<audio id="id_5" src="aud002.mp3" clip-begin="00:00:02.3460091" clip-end="00:00:05.3929932"/>
+							</par>
+							<par endsync="last" id="sm_7">
+								<text id="id_6" src="ncc.html#ncx_3"/>
+								<audio id="id_7" src="aud002.mp3" clip-begin="00:00:05.3929932" clip-end="00:00:08.5849887"/>
+							</par>
+							<par endsync="last" system-required="pagenumber-on" id="sm_9">
+								<text id="id_9" src="ncc.html#ncx_4"/>
+								<audio id="id_10" src="aud002.mp3" clip-begin="00:00:08.5849887" clip-end="00:00:11.1179819"/>
+							</par>
+							<par endsync="last" id="sm_10">
+								<text id="id_11" src="ncc.html#ncx_3"/>
+								<audio id="id_12" src="aud002.mp3" clip-begin="00:00:11.1179819" clip-end="00:00:20.1039909"/>
+							</par>
+							<par endsync="last" id="sm_11">
+								<text id="id_13" src="ncc.html#ncx_3"/>
+								<audio id="id_14" src="aud002.mp3" clip-begin="00:00:20.1039909" clip-end="00:00:33.7299773"/>
+							</par>
+							<par endsync="last" id="sm_12">
+								<text id="id_15" src="ncc.html#ncx_3"/>
+								<audio id="id_16" src="aud002.mp3" clip-begin="00:00:33.7299773" clip-end="00:00:44.2579819"/>
+							</par>
+							<par endsync="last" id="sm_13">
+								<text id="id_17" src="ncc.html#ncx_3"/>
+								<audio id="id_18" src="aud002.mp3" clip-begin="00:00:44.2579819" clip-end="00:00:50.4649887"/>
+							</par>
+							<par endsync="last" id="sm_14">
+								<text id="id_19" src="ncc.html#ncx_3"/>
+								<audio id="id_20" src="aud002.mp3" clip-begin="00:00:50.4649887" clip-end="00:00:53.5409751"/>
+							</par>
+							<par endsync="last" id="sm_15">
+								<text id="id_21" src="ncc.html#ncx_3"/>
+								<audio id="id_22" src="aud002.mp3" clip-begin="00:00:53.5409751" clip-end="00:00:57.4579819"/>
+							</par>
+							<par endsync="last" id="sm_16">
+								<text id="id_23" src="ncc.html#ncx_3"/>
+								<audio id="id_24" src="aud002.mp3" clip-begin="00:00:57.4579819" clip-end="00:01:03.4769841"/>
+							</par>
+							<par endsync="last" id="sm_17">
+								<text id="id_25" src="ncc.html#ncx_3"/>
+								<audio id="id_26" src="aud002.mp3" clip-begin="00:01:03.4769841" clip-end="00:01:07.3589796"/>
+							</par>
+							<par endsync="last" id="sm_18">
+								<text id="id_27" src="ncc.html#ncx_3"/>
+								<audio id="id_28" src="aud002.mp3" clip-begin="00:01:07.3589796" clip-end="00:01:11.9359864"/>
+							</par>
+							<par endsync="last" id="sm_19">
+								<text id="id_29" src="ncc.html#ncx_3"/>
+								<audio id="id_30" src="aud002.mp3" clip-begin="00:01:11.9359864" clip-end="00:01:16.7849887"/>
+							</par>
+						</seq>
+					</body>
+				</smil>
+			</x:document>
+		</x:expect>
+		<x:context label="the NCC file">
+			<x:document type="port" port="in-memory.out" select="/*[base-uri()=resolve-uri('result/ncc.html')]"/>
+		</x:context>
+		<x:expect label="the NCC title" type="xpath" test="/html:html/html:head/html:meta[@name='dc:title']/@content" equals="'Chimpanzees'"/>
+		<x:expect label="the NCC file" type="compare">
+			<x:document type="inline">
+				<html xmlns="http://www.w3.org/1999/xhtml">
+					<head>
+						<title>Chimpanzees</title>
+						<meta name="dc:identifier" content="ghBOOK1211212736"/>
+						<meta name="dc:title" content="Chimpanzees"/>
+						<meta name="dc:creator" content="Julie Murray"/>
+						<meta name="dc:description" content="Introduces the habitat and characteristics of chimpanzees, and briefly describes Jane Goodall's work with them."/>
+						<meta name="dc:language" content="EN-US"/>
+						<meta name="dc:publisher" content="gh LLC."/>
+						<meta name="dc:subject" content="Chimpanzee"/>
+						<meta name="ncc:totalTime" content="00:14:49.7939004"/>
+						<meta name="ncc:multimediaType" content="audioNcc"/>
+						<meta name="prod:multimediaContent" content="audio"/>
+						<meta name="ncc:producer" content="gh, LLC."/>
+						<meta name="ncc:sourceDate" content="2002-01-01"/>
+						<meta name="ncc:sourcePublisher" content="ABDO Publishing Company"/>
+						<meta name="ncc:sourceTitle" content="Chimpanzees"/>
+						<meta name="ncc:narrator" content="Rachana Singh"/>
+						<meta name="ncc:revision" content="1"/>
+						<meta name="ncc:revisionDate" content="2015-01-23"/>
+						<meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+						<meta name="ncc:charset" content="utf-8"/>
+						<meta name="dc:format" content="Daisy 2.02"/>
+						<meta name="dc:date" content="2020-03-03"/>
+						<meta name="ncc:generator" content="DAISY Pipeline 2"/>
+						<meta name="ncc:depth" content=""/>
+						<meta name="ncc:pageFront" content="0"/>
+						<meta name="ncc:pageNormal" content="24"/>
+						<meta name="ncc:pageSpecial" content="0"/>
+						<meta name="ncc:prodNotes" content="0"/>
+						<meta name="ncc:footnotes" content="0"/>
+						<meta name="ncc:sidebars" content="0"/>
+						<meta name="ncc:maxPageNormal" content="24"/>
+						<meta name="ncc:producedDate" content="2020-03-03"/>
+						<meta name="ncc:tocItems" content="44"/>
+					</head>
+					<body>
+						<h1 class="title" id="ncx_2">
+							<a href="0001.smil#sm_3">Chimpanzees</a>
+						</h1>
+						<span class="page-normal" id="ncx_1">
+							<a href="0001.smil#sm_3">1</a>
+						</span>
+						<h1 id="ncx_3">
+							<a href="0002.smil#sm_5">Chimpanzees</a>
+						</h1>
+						<span class="page-normal" id="ncx_4">
+							<a href="0002.smil#sm_9">2</a>
+						</span>
+						<h1 id="ncx_5">
+							<a href="0003.smil#sm_21">Library of Congress Cataloging-in-Publication Data</a>
+						</h1>
+						<span class="page-normal" id="ncx_6">
+							<a href="0003.smil#sm_34">3</a>
+						</span>
+						<h1 id="ncx_7">
+							<a href="0004.smil#sm_36">Contents</a>
+						</h1>
+						<span class="page-normal" id="ncx_8">
+							<a href="0004.smil#sm_60">4</a>
+						</span>
+						<h1 id="ncx_9">
+							<a href="0005.smil#sm_62">Great Apes</a>
+						</h1>
+						<span class="page-normal" id="ncx_10">
+							<a href="0005.smil#sm_70">5</a>
+						</span>
+						<span class="page-normal" id="ncx_11">
+							<a href="0005.smil#sm_72">6</a>
+						</span>
+						<h1 id="ncx_12">
+							<a href="0006.smil#sm_74">Chimpanzees And People</a>
+						</h1>
+						<span class="page-normal" id="ncx_13">
+							<a href="0006.smil#sm_85">7</a>
+						</span>
+						<span class="page-normal" id="ncx_14">
+							<a href="0006.smil#sm_90">8</a>
+						</span>
+						<h1 id="ncx_15">
+							<a href="0007.smil#sm_92">Talking To Chimps</a>
+						</h1>
+						<span class="page-normal" id="ncx_16">
+							<a href="0007.smil#sm_97">9</a>
+						</span>
+						<h1 id="ncx_17">
+							<a href="0008.smil#sm_99">What They Look Like</a>
+						</h1>
+						<span class="page-normal" id="ncx_18">
+							<a href="0008.smil#sm_104">10</a>
+						</span>
+						<span class="page-normal" id="ncx_19">
+							<a href="0008.smil#sm_111">11</a>
+						</span>
+						<h1 id="ncx_20">
+							<a href="0009.smil#sm_113">The Chimpanzee's Home</a>
+						</h1>
+						<span class="page-normal" id="ncx_21">
+							<a href="0009.smil#sm_117">12</a>
+						</span>
+						<span class="page-normal" id="ncx_22">
+							<a href="0009.smil#sm_123">13</a>
+						</span>
+						<span class="page-normal" id="ncx_23">
+							<a href="0009.smil#sm_128">14</a>
+						</span>
+						<h1 id="ncx_24">
+							<a href="0010.smil#sm_130">Everyday Life</a>
+						</h1>
+						<span class="page-normal" id="ncx_25">
+							<a href="0010.smil#sm_138">15</a>
+						</span>
+						<span class="page-normal" id="ncx_26">
+							<a href="0010.smil#sm_145">16</a>
+						</span>
+						<h1 id="ncx_27">
+							<a href="0011.smil#sm_147">Chimp Communities</a>
+						</h1>
+						<span class="page-normal" id="ncx_28">
+							<a href="0011.smil#sm_152">17</a>
+						</span>
+						<span class="page-normal" id="ncx_29">
+							<a href="0011.smil#sm_157">18</a>
+						</span>
+						<h1 id="ncx_30">
+							<a href="0012.smil#sm_159">Baby Chimps</a>
+						</h1>
+						<span class="page-normal" id="ncx_31">
+							<a href="0012.smil#sm_167">19</a>
+						</span>
+						<span class="page-normal" id="ncx_32">
+							<a href="0012.smil#sm_169">20</a>
+						</span>
+						<h1 id="ncx_33">
+							<a href="0013.smil#sm_171">Jane Goodall</a>
+						</h1>
+						<span class="page-normal" id="ncx_34">
+							<a href="0013.smil#sm_179">21</a>
+						</span>
+						<span class="page-normal" id="ncx_35">
+							<a href="0013.smil#sm_181">22</a>
+						</span>
+						<h1 id="ncx_36">
+							<a href="0014.smil#sm_183">Important Words</a>
+						</h1>
+						<span class="page-normal" id="ncx_37">
+							<a href="0014.smil#sm_193">23</a>
+						</span>
+						<h1 id="ncx_38">
+							<a href="0015.smil#sm_195">Web Sites</a>
+						</h1>
+						<h2 id="ncx_39">
+							<a href="0016.smil#sm_197">All about Chimpanzees</a>
+						</h2>
+						<h2 id="ncx_40">
+							<a href="0017.smil#sm_201">African Primates at Home</a>
+						</h2>
+						<h2 id="ncx_41">
+							<a href="0018.smil#sm_205">Animal Bytes: Chimpanzee</a>
+						</h2>
+						<span class="page-normal" id="ncx_42">
+							<a href="0018.smil#sm_208">24</a>
+						</span>
+						<h1 id="ncx_43">
+							<a href="0019.smil#sm_210">Index</a>
+						</h1>
+						<h1 id="ncx_44">
+							<a href="0020.smil#sm_233">Questions</a>
+						</h1>
+					</body>
+				</html>
+			</x:document>
+		</x:expect>
+	</x:scenario>
+	
+</x:description>

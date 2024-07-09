@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
+               xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+               xmlns:d="http://www.daisy.org/ns/pipeline/data"
+               script="../../main/resources/xml/dtbook-to-html.xpl">
+
+	<x:scenario label="minimal">
+		<x:call step="px:dtbook-to-html.script">
+			<x:input port="source">
+				<x:document type="file" href="../resources/minimal.xml"/>
+			</x:input>
+			<x:option name="validation" select="'abort'"/>
+			<x:option name="result" select="resolve-uri('minimal/output-dir/',$temp-dir)"/>
+			<x:option name="temp-dir" select="resolve-uri('minimal/temp-dir/',$temp-dir)"/>
+		</x:call>
+		<x:context label="the status">
+			<x:document type="port" port="status"/>
+		</x:context>
+		<x:expect label="the output HTML" type="compare">
+			<x:document type="inline">
+				<d:validation-status result="ok"/>
+			</x:document>
+		</x:expect>
+		<x:context label="the output HTML">
+			<x:document type="file" base-uri="temp-dir" href="minimal/output-dir/minimal.xhtml"/>
+		</x:context>
+		<x:expect label="the output HTML"
+		          type="custom" href="http://www.daisy.org/xprocspec/custom-assertion-steps.xpl" step="x:compare-except-ids">
+			<x:document type="inline">
+				<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+					<head>
+						<meta charset="UTF-8"/>
+						<title>Minimal DTBook</title>
+					</head>
+					<body id="id_4">
+						<section id="id_5" xmlns:epub="http://www.idpf.org/2007/ops" epub:type="frontmatter">
+							<section id="id_1">
+								<h3 id="id_6" epub:type="title">Minimal DTBook</h3>
+								<p>Bert</p>
+							</section>
+						</section>
+						<section id="id_7" xmlns:epub="http://www.idpf.org/2007/ops" epub:type="bodymatter">
+							<section id="id_2">
+								<span epub:type="pagebreak" role="doc-pagebreak" aria-label=" 1. " id="page_1"/>
+								<h3 id="id_8">Chapter</h3>
+								<p>Paragraph</p>
+								<span epub:type="pagebreak" role="doc-pagebreak" aria-label=" 2. " id="page_2"/>
+								<p>Another paragraph</p>
+								<p>Paragraph with a <a rel="note" href="#endnote_1" epub:type="noteref" role="doc-noteref" class="endnote">noteref</a>.</p>
+							</section>
+							<section id="id_3">
+								<h3 id="id_9">Endnotes</h3>
+								<aside id="endnote_1" epub:type="endnote" role="doc-endnote" class="endnote">
+									<p>A note</p>
+								</aside>
+							</section>
+						</section>
+				</body></html>
+			</x:document>
+		</x:expect>
+	</x:scenario>
+
+</x:description>

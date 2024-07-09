@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
+               xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+               xmlns:d="http://www.daisy.org/ns/pipeline/data"
+               script="../../main/resources/xml/xproc/zedai-to-html.convert.xpl">
+
+	<x:scenario label="alice">
+		<x:call step="px:zedai-to-html">
+			<x:input port="fileset.in">
+				<x:document type="inline">
+					<d:fileset>
+						<d:file href="../resources/resources/alice.xml" media-type="application/z3998-auth+xml"/>
+					</d:fileset>
+				</x:document>
+			</x:input>
+			<x:input port="in-memory.in">
+				<x:document type="file" href="../resources/resources/alice.xml"/>
+			</x:input>
+			<x:option name="output-dir" select="resolve-uri('output-dir/')"/>
+		</x:call>
+		<x:scenario label="without chunking">
+			<x:call>
+				<x:option name="chunk" select="false()"/>
+			</x:call>
+			<x:context label="the fileset.out port">
+				<x:document type="port" port="fileset.out"/>
+			</x:context>
+			<x:expect label="the fileset.out port"
+			          type="custom" href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl" step="x:fileset-compare">
+				<x:document type="inline">
+					<d:fileset>
+						<d:file href="output-dir/alice.xhtml" media-type="application/xhtml+xml" doctype="&lt;!DOCTYPE html&gt;"/>
+					</d:fileset>
+				</x:document>
+			</x:expect>
+			<x:context label="the in-memory.out port">
+				<x:document type="port" port="in-memory.out"/>
+			</x:context>
+			<x:expect label="there should be one document" type="count" min="1" max="1"/>
+			<x:expect label="the base uri" type="xpath"
+			          test="base-uri(/*)" equals="resolve-uri('output-dir/alice.xhtml')"/>
+			<x:context label="the mapping port">
+				<x:document type="port" port="mapping"/>
+			</x:context>
+			<x:expect label="the mapping port"
+			          type="custom" href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl" step="x:fileset-compare">
+				<x:document type="inline">
+					<d:fileset>
+						<d:file href="output-dir/alice.xhtml" original-href="../resources/resources/alice.xml"/>
+					</d:fileset>
+				</x:document>
+			</x:expect>
+		</x:scenario>
+		<x:scenario label="with chunking">
+			<x:call>
+				<x:option name="chunk" select="true()"/>
+			</x:call>
+			<x:context label="the fileset.out port">
+				<x:document type="port" port="fileset.out"/>
+			</x:context>
+			<x:expect label="the fileset.out port"
+			          type="custom" href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl" step="x:fileset-compare">
+				<x:document type="inline">
+					<d:fileset>
+						<d:file href="output-dir/alice-1.xhtml" media-type="application/xhtml+xml" doctype="&lt;!DOCTYPE html&gt;"/>
+						<d:file href="output-dir/alice-2.xhtml" media-type="application/xhtml+xml" doctype="&lt;!DOCTYPE html&gt;"/>
+						<d:file href="output-dir/alice-3.xhtml" media-type="application/xhtml+xml" doctype="&lt;!DOCTYPE html&gt;"/>
+						<d:file href="output-dir/alice-4.xhtml" media-type="application/xhtml+xml" doctype="&lt;!DOCTYPE html&gt;"/>
+					</d:fileset>
+				</x:document>
+			</x:expect>
+			<x:context label="the in-memory.out port">
+				<x:document type="port" port="in-memory.out"/>
+			</x:context>
+			<x:expect label="there should be 4 documents" type="count" min="4" max="4"/>
+			<x:context label="the mapping port">
+				<x:document type="port" port="mapping"/>
+			</x:context>
+			<x:expect label="the mapping port"
+			          type="custom" href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl" step="x:fileset-compare">
+				<x:document type="inline">
+					<d:fileset xmlns:d="http://www.daisy.org/ns/pipeline/data">
+						<d:file href="output-dir/alice-1.xhtml" original-href="../resources/resources/alice.xml">
+							<d:anchor id="id_5"/>
+							<d:anchor id="id_4"/>
+							<d:anchor id="id_7"/>
+							<d:anchor id="id_6"/>
+							<d:anchor id="id_9"/>
+							<d:anchor id="id_8"/>
+							<d:anchor id="id_13"/>
+							<d:anchor id="id_14"/>
+							<d:anchor id="id_11"/>
+							<d:anchor id="id_12"/>
+							<d:anchor id="id_10"/>
+							<d:anchor id="id_17"/>
+							<d:anchor id="id_18"/>
+							<d:anchor id="id_3"/>
+							<d:anchor id="id_15"/>
+							<d:anchor id="id_2"/>
+							<d:anchor id="id_16"/>
+							<d:anchor id="img_1"/>
+						</d:file>
+						<d:file href="output-dir/alice-2.xhtml" original-href="../resources/resources/alice.xml">
+							<d:anchor id="id_24"/>
+							<d:anchor id="id_25"/>
+							<d:anchor id="id_22"/>
+							<d:anchor id="p14"/>
+							<d:anchor id="id_23"/>
+							<d:anchor id="p13"/>
+							<d:anchor id="id_20"/>
+							<d:anchor id="id_21"/>
+							<d:anchor id="id_28"/>
+							<d:anchor id="id_29"/>
+							<d:anchor id="id_26"/>
+							<d:anchor id="id_27"/>
+							<d:anchor id="p1"/>
+							<d:anchor id="img_4"/>
+							<d:anchor id="img_2"/>
+							<d:anchor id="img_3"/>
+							<d:anchor id="id_33"/>
+							<d:anchor id="id_34"/>
+							<d:anchor id="id_31"/>
+							<d:anchor id="id_32"/>
+							<d:anchor id="id_30"/>
+						</d:file>
+						<d:file href="output-dir/alice-3.xhtml" original-href="../resources/resources/alice.xml">
+							<d:anchor id="p16"/>
+							<d:anchor id="p15"/>
+							<d:anchor id="p18"/>
+							<d:anchor id="p17"/>
+							<d:anchor id="p19"/>
+							<d:anchor id="p21"/>
+							<d:anchor id="p20"/>
+							<d:anchor id="p23"/>
+							<d:anchor id="p22"/>
+							<d:anchor id="p25"/>
+							<d:anchor id="p24"/>
+							<d:anchor id="p27"/>
+							<d:anchor id="p26"/>
+							<d:anchor id="img_6"/>
+							<d:anchor id="img_7"/>
+							<d:anchor id="img_5"/>
+							<d:anchor id="img_8"/>
+							<d:anchor id="id_35"/>
+							<d:anchor id="id_36"/>
+							<d:anchor id="id_37"/>
+						</d:file>
+						<d:file href="output-dir/alice-4.xhtml" original-href="../resources/resources/alice.xml">
+							<d:anchor id="p29"/>
+							<d:anchor id="id_19"/>
+							<d:anchor id="id_1"/>
+							<d:anchor id="img_10"/>
+							<d:anchor id="img_9"/>
+							<d:anchor id="p32"/>
+							<d:anchor id="p31"/>
+							<d:anchor id="p34"/>
+							<d:anchor id="p33"/>
+							<d:anchor id="p36"/>
+							<d:anchor id="p35"/>
+							<d:anchor id="p38"/>
+							<d:anchor id="p37"/>
+							<d:anchor id="id_40"/>
+							<d:anchor id="p39"/>
+							<d:anchor id="p40"/>
+							<d:anchor id="id_39"/>
+							<d:anchor id="id_38"/>
+						</d:file>
+					</d:fileset>
+				</x:document>
+			</x:expect>
+		</x:scenario>
+	</x:scenario>
+	
+</x:description>

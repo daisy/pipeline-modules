@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+
+  <uri name="http://www.daisy.org/pipeline/modules/epub3-tts/library.xpl" uri="../xml/library.xpl"/>
+
+  <nextCatalog catalog="org:daisy:pipeline:modules:common-utils"/>
+  <nextCatalog catalog="org:daisy:pipeline:modules:fileset-utils"/>
+  <nextCatalog catalog="org:daisy:pipeline:modules:html-break-detection"/>
+  <nextCatalog catalog="org:daisy:pipeline:modules:css-utils"/> <!-- to remove the CSS attributes -->
+  <nextCatalog catalog="org:daisy:pipeline:modules:tts-common"/>
+  <nextCatalog catalog="org:daisy:pipeline:modules:mathml-to-ssml"/>
+
+</catalog>

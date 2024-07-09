@@ -1,0 +1,10 @@
+#+locale: foo
+#+contraction:no
+#+unicode-form:nfc
+include foobar.uti
+
+lowercase á 12356
+
+base uppercase Á á
+
+noback correct "\y1f600" "grin"

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
+               xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+               xmlns:d="http://www.daisy.org/ns/pipeline/data"
+               script="../../main/resources/xml/convert.xpl">
+
+	<x:scenario label="minimal">
+		<x:call step="px:dtbook-to-html">
+			<x:input port="source.fileset">
+				<x:document type="inline">
+					<d:fileset>
+						<d:file href="../resources/minimal.xml" media-type="application/x-dtbook+xml"/>
+					</d:fileset>
+				</x:document>
+			</x:input>
+			<x:input port="source.in-memory"/>
+			<x:option name="language" select="'language'"/>
+			<x:option name="validation" select="'abort'"/>
+			<x:option name="filename" select="'minimal'"/>
+			<x:option name="output-dir" select="resolve-uri('result/')"/>
+			<x:option name="temp-dir" select="resolve-uri('minimal/',$temp-dir)"/>
+		</x:call>
+		<x:context label="the result.fileset port">
+			<x:document type="port" port="result.fileset"/>
+		</x:context>
+		<x:expect label="the result.fileset port"
+		          type="custom" href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl" step="x:fileset-compare">
+			<x:document type="inline">
+				<d:fileset>
+					<d:file href="result/minimal.xhtml" media-type="application/xhtml+xml" doctype="&lt;!DOCTYPE html&gt;"/>
+					<d:file href="result/zedai-mods.xml" media-type="application/mods+xml"/>
+				</d:fileset>
+			</x:document>
+		</x:expect>
+		<x:context label="the result HTML">
+			<x:document type="port" port="result.in-memory" select="/*[base-uri()=resolve-uri('result/minimal.xhtml')]"/>
+		</x:context>
+		<x:expect label="the output HTML" type="compare">
+			<x:document type="inline">
+				<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+					<head>
+						<meta charset="UTF-8"/>
+						<title>Minimal DTBook</title>
+					</head>
+					<body id="id_4">
+						<section id="id_5" xmlns:epub="http://www.idpf.org/2007/ops" epub:type="frontmatter">
+							<section id="id_1">
+								<h3 id="id_6" epub:type="title">Minimal DTBook</h3>
+								<p>Bert</p>
+							</section>
+						</section>
+						<section id="id_7" xmlns:epub="http://www.idpf.org/2007/ops" epub:type="bodymatter">
+							<section id="id_2">
+								<span epub:type="pagebreak" role="doc-pagebreak" aria-label=" 1. " id="page_1"/>
+								<h3 id="id_8">Chapter</h3>
+								<p>Paragraph</p>
+								<span epub:type="pagebreak" role="doc-pagebreak" aria-label=" 2. "  id="page_2"/>
+								<p>Another paragraph</p>
+								<p>Paragraph with a <a rel="note" href="#endnote_1" epub:type="noteref" role="doc-noteref" class="endnote">noteref</a>.</p>
+							</section>
+							<section id="id_3">
+								<h3 id="id_9">Endnotes</h3>
+								<aside id="endnote_1" epub:type="endnote" role="doc-endnote" class="endnote">
+									<p>A note</p>
+								</aside>
+							</section>
+						</section>
+					</body>
+				</html>
+			</x:document>
+		</x:expect>
+		<x:context label="the mapping port">
+			<x:document type="port" port="mapping"/>
+		</x:context>
+		<x:expect label="the mapping port"
+		          type="custom" href="http://www.daisy.org/pipeline/modules/fileset-utils/library.xpl" step="x:fileset-compare">
+			<x:document type="inline">
+				<d:fileset>
+					<d:file href="result/minimal.xhtml" original-href="../resources/minimal.xml"/>
+				</d:fileset>
+			</x:document>
+		</x:expect>
+	</x:scenario>
+	
+</x:description>
