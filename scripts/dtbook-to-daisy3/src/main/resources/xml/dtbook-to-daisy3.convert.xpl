@@ -264,9 +264,9 @@
     </px:daisy3-prepare-dtbook>
 
     <!-- ===== PERFORM TTS ==== -->
-    <!-- input fileset may contain speech CSS -->
+    <!-- input fileset may contain speech CSS and PLS lexicons -->
     <p:sink/>
-    <px:fileset-filter media-types="text/css">
+    <px:fileset-filter media-types="text/css application/pls+xml">
       <p:input port="source">
         <p:pipe step="fileset.in" port="result"/>
       </p:input>
