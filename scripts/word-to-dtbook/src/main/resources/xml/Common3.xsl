@@ -189,7 +189,7 @@
 			<xsl:for-each select="$footnotesXml//w:footnotes/w:footnote">
 				<!--Checking if Id returned from C# is equal to the footnote Id in footnotes.xml file-->
 				<xsl:if test="number(@w:id)=$checkid">
-					<xsl:message terminate="no">progress:Insert footnote <xsl:value-of select="$checkid"/></xsl:message>
+					<!-- <xsl:message terminate="no">progress:Insert footnote <xsl:value-of select="$checkid"/></xsl:message> -->
 					<!--Creating note element and it's attribute values-->
 					<note id="{concat('footnote-',$checkid)}" class="Footnote">
 						<xsl:sequence select="d:sink(d:PushLevel($myObj, $level + 1))"/>

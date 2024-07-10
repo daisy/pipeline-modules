@@ -2,7 +2,7 @@
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="1.0"
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:cx="http://xmlcalabash.com/ns/extensions"
-				xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 type="px:word-to-dtbook.script" name="main">
 
 	<p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -53,7 +53,7 @@
 			<p px:role="desc">Subject(s) to be added as dc:Subject metadata</p>
 		</p:documentation>
 	</p:option>
-	<p:option name="acceptRevisions" select="'true'" px:type="boolean">
+	<p:option name="accept-revisions" select="true()" cx:as="xs:boolean">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Accept revisions</h2>
 			<p px:role="desc">If the document has revisions that are not accepted, consider them as accepted for the conversion.</p>
@@ -67,7 +67,7 @@
 	                                    'wdMainTextStory':[]
 	                                    }" />-->
 	<!-- cx:as="map(xs:string,xs:string*)" -->
-	<p:option name="MasterSub" px:hidden="true" select="'false'" px:type="boolean" />
+	<p:option name="MasterSub" px:hidden="true" select="false()" cx:as="xs:boolean" />
 	<!-- from settings  -->
 	<p:option name="pagination" select="'Custom'">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -85,7 +85,7 @@
 			</px:type>
 		</p:pipeinfo>
 	</p:option>
-	<p:option name="ImageSizeOption" select="'original'">
+	<p:option name="image-size" select="'original'">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Image resizing</h2>
 		</p:documentation>
@@ -102,18 +102,18 @@
 			</px:type>
 		</p:pipeinfo>
 	</p:option>
-	<p:option name="DPI" select="96" cx:as="xs:integer">
+	<p:option name="dpi" select="96" cx:as="xs:integer">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Image resampling value</h2>
 			<p px:role="desc">Image resampling targeted resolution in dpi (dot-per-inch)</p>
 		</p:documentation>
 	</p:option>
-	<p:option name="CharacterStyles" select="'false'" px:type="boolean">
+	<p:option name="character-styles" select="false()" px:type="xs:boolean">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Translate character styles</h2>
 		</p:documentation>
 	</p:option>
-	<p:option name="FootnotesPosition" select="'end'">
+	<p:option name="footnotes-position" select="'end'">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Footnotes position</h2>
 			<p px:role="desc">Footnotes position in content</p>
@@ -131,14 +131,14 @@
 			</px:type>
 		</p:pipeinfo>
 	</p:option>
-	<p:option name="FootnotesLevel" select="0" cx:as="xs:integer">
+	<p:option name="footnotes-level" select="0" cx:as="xs:integer">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Footnotes insertion level</h2>
 			<p px:role="desc">Lowest level into which notes are inserted in content.
 			0 means the footnotes will be inserted as close as possible of its first call.</p>
 		</p:documentation>
 	</p:option>
-	<p:option name="FootnotesNumbering" cx:as="xs:string" select="'none'">
+	<p:option name="footnotes-numbering" cx:as="xs:string" select="'none'">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Footnotes numbering</h2>
 			<p px:role="desc">Customize footnotes numbering</p>
@@ -156,19 +156,19 @@
 			</px:type>
 		</p:pipeinfo>
 	</p:option>
-	<p:option name="FootnotesStartValue" cx:as="xs:integer" select="1">
+	<p:option name="footnotes-start-value" cx:as="xs:integer" select="1">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Footnotes starting value</h2>
 			<p px:role="desc">If footnotes numbering is required, start the notes numbering process from this value</p>
 		</p:documentation>
 	</p:option>
-	<p:option name="FootnotesNumberingPrefix" cx:as="xs:string?" select="''">
+	<p:option name="footnotes-numbering-prefix" select="''"> <!-- cx:as="xs:string?" -->
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Footnotes number prefix</h2>
 			<p px:role="desc">Add a prefix before the note's number if numbering is requested.</p>
 		</p:documentation>
 	</p:option>
-	<p:option name="FootnotesNumberingSuffix" cx:as="xs:string?" select="''">
+	<p:option name="footnotes-numbering-suffix" select="''"> <!-- cx:as="xs:string?" -->
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Footnotes number suffix</h2>
 			<p px:role="desc">Add a text between the note's number and the note's content.</p>
@@ -181,7 +181,7 @@
 	<!-- hidden option to allow saveasdaisy to deactivate shapes extraction
 	     This is to avoid word being blocked by one or more dialog managed by the addin.
 	 -->
-	<p:option name="extractShapes" cx:as="xs:boolean" select="false()">
+	<p:option name="extract-shapes" cx:as="xs:boolean" select="false()">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Extract vector shapes (Experimental)</h2>
 			<p px:role="desc">Try to export inline shapes like diagrams or charts during conversion using Microsoft Word.
@@ -205,21 +205,21 @@
 		<p:with-param name="publisher" select="$publisher"/>
 		<p:with-param name="uid" select="$uid"/>
 		<p:with-param name="subject" select="$subject"/>
-		<p:with-param name="acceptRevisions" select="$acceptRevisions = 'true'"/>
+		<p:with-param name="acceptRevisions" select="$accept-revisions"/>
 		<p:with-param name="version" select="$version"/>
 		<p:with-param name="pagination" select="$pagination"/>
-		<p:with-param name="MasterSub" select="$MasterSub='true'"/>
-		<p:with-param name="ImageSizeOption" select="$ImageSizeOption"/>
-		<p:with-param name="DPI" select="$DPI"/>
-		<p:with-param name="CharacterStyles" select="$CharacterStyles='true'"/>
-		<p:with-param name="FootnotesPosition" select="$FootnotesPosition"/>
-		<p:with-param name="FootnotesLevel" select="$FootnotesLevel"/>
-		<p:with-param name="FootnotesNumbering" select="$FootnotesNumbering"/>
-		<p:with-param name="FootnotesStartValue" select="$FootnotesStartValue"/>
-		<p:with-param name="FootnotesNumberingPrefix" select="$FootnotesNumberingPrefix"/>
-		<p:with-param name="FootnotesNumberingSuffix" select="$FootnotesNumberingSuffix"/>
+		<p:with-param name="MasterSub" select="$MasterSub"/>
+		<p:with-param name="ImageSizeOption" select="$image-size"/>
+		<p:with-param name="DPI" select="$dpi"/>
+		<p:with-param name="CharacterStyles" select="$character-styles"/>
+		<p:with-param name="FootnotesPosition" select="$footnotes-position"/>
+		<p:with-param name="FootnotesLevel" select="$footnotes-level"/>
+		<p:with-param name="FootnotesNumbering" select="$footnotes-numbering"/>
+		<p:with-param name="FootnotesStartValue" select="$footnotes-start-value"/>
+		<p:with-param name="FootnotesNumberingPrefix" select="$footnotes-numbering-prefix"/>
+		<p:with-param name="FootnotesNumberingSuffix" select="$footnotes-numbering-suffix"/>
 		<p:with-param name="disableDateGeneration" select="$disableDateGeneration"/>
-		<p:with-param name="extractShapes" select="$extractShapes"/>
+		<p:with-param name="extractShapes" select="$extract-shapes"/>
 	</p:xslt>
 	<p:store name="store-xml">
 		<p:with-option name="href" select="concat(

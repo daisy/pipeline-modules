@@ -116,7 +116,7 @@
 				<lang val="{@*:val}" />
 			</xsl:for-each>
 		</xsl:variable>
-		<xsl:message terminate="no">progress:Document languages <xsl:value-of select="count($paragraphLanguages/*:lang)" /></xsl:message>
+		<!-- <xsl:message terminate="no">progress:Document languages <xsl:value-of select="count($paragraphLanguages/*:lang)" /></xsl:message> -->
 		<!-- Count languages -->
 		<xsl:variable name="uniqLanguages">
 			<xsl:for-each select="$paragraphLanguages/*:lang">
@@ -290,7 +290,7 @@
 				<xsl:if test="count($documentXml//m:*) &gt; 0">
 					<xsl:namespace name="mml" select="'http://www.w3.org/1998/Math/MathML'" />
 				</xsl:if>
-				<xsl:message terminate="no">progress:Parsing document languages</xsl:message>
+				<!-- <xsl:message terminate="no">progress:Parsing document languages</xsl:message> -->
 				
 				<xsl:attribute name="xml:lang">
 					<xsl:value-of select="$documentLanguages/*:lang[1]/@*:val"/>
@@ -394,7 +394,7 @@
 				<!--Starting Book Element-->
 				<book showin="blp">
 					<xsl:if test="not($MasterSub)">
-						<xsl:message terminate="no">progress:Checking for page styles</xsl:message>
+						<!-- <xsl:message terminate="no">progress:Checking for page styles</xsl:message> -->
 						<xsl:for-each select="$documentXml//w:document/w:body/node()">
 							<xsl:if test="self::w:p">
 								<xsl:for-each select="w:pPr/w:pStyle[substring(@w:val,1,11)='Frontmatter']">
@@ -425,9 +425,9 @@
 							</xsl:message>
 						</xsl:if>
 					</xsl:if>
-					<xsl:message terminate="no">progress:Starting conversion of <xsl:value-of select="count($documentXml//w:body/*)"/> elements</xsl:message>
+					<!-- <xsl:message terminate="no">progress:Starting conversion of <xsl:value-of select="count($documentXml//w:body/*)"/> elements</xsl:message> -->
 					<!-- Calling Frontmatter template and passing parameters Title and Creator for doctitle and docpublisher-->
-					<xsl:message terminate="no">progress:Building the frontmatter</xsl:message>
+					<!-- <xsl:message terminate="no">progress:Building the frontmatter</xsl:message> -->
 					<frontmatter>
 						<doctitle>
 							<xsl:choose>
@@ -458,7 +458,7 @@
 							count($documentXml//w:document/w:body/w:p[position() &gt; 1]/w:pPr/w:pStyle[substring(@w:val,1,10)='Bodymatter'])=1
 							or count($documentXml//w:document/w:body/w:p/w:r[position() &gt; 1]/w:rPr/w:rStyle[substring(@w:val,1,10)='Bodymatter'])=1
 								">
-							<xsl:message terminate="no">progress:Adding frontmatter content found in the document</xsl:message>
+							<!-- <xsl:message terminate="no">progress:Adding frontmatter content found in the document</xsl:message> -->
 							<xsl:call-template name="Matter">
 								<xsl:with-param name="acceptRevisions" select="$acceptRevisions"/>
 								<xsl:with-param name="version" select="$version"/>
@@ -475,7 +475,7 @@
 							</xsl:call-template>
 						</xsl:if>
 					</frontmatter>
-					<xsl:message terminate="no">progress:Building the bodymatter</xsl:message>
+					<!-- <xsl:message terminate="no">progress:Building the bodymatter</xsl:message> -->
 					<!--Calling Bodymatter template-->
 					<bodymatter id="bodymatter_0001">
 						<xsl:call-template name="Matter">
@@ -508,7 +508,7 @@
 										or ./w:endnoteReference
 									]
 								)  &gt; 0">
-								<xsl:message terminate="no">progress:Inserting endnotes in the rearmatter</xsl:message>
+								<!-- <xsl:message terminate="no">progress:Inserting endnotes in the rearmatter</xsl:message> -->
 								<level1>
 									<!--Checking if any elements should be translated to the rearmatter-->
 									<!--Otherwise Traversing through document.xml file and passing the Endnote id to the Note template.-->
@@ -557,7 +557,7 @@
 									</xsl:for-each>
 								</level1>
 							</xsl:if>
-							<xsl:message terminate="no">progress:Adding any rearmatter content found in the document</xsl:message>
+							<!-- <xsl:message terminate="no">progress:Adding any rearmatter content found in the document</xsl:message> -->
 							<xsl:call-template name="Matter">
 								<xsl:with-param name="acceptRevisions" select="$acceptRevisions"/>
 								<xsl:with-param name="version" select="$version"/>

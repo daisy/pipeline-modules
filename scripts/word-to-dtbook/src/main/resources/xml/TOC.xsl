@@ -23,7 +23,7 @@
   <!--template for frontmatter elements-->
   <xsl:template name="TableOfContents">
     <xsl:param name="pagination" as="xs:string"/>
-    <xsl:message terminate="no">progress:Handling table of content</xsl:message>
+    <!-- <xsl:message terminate="no">progress:Handling table of content</xsl:message> -->
 
       <!--checking for Table of content Element-->
       <xsl:for-each select="$documentXml//w:document/w:body/node()">

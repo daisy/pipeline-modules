@@ -128,7 +128,7 @@
 			</xsl:if>
 			<!-- If the node parsing context match the wanted matter context (i.e. node context is Bodymatter and requested matter type is Bodymatter ) -->
 			<xsl:if test="d:GetCurrentMatterType($myObj)=$matterType">
-				<xsl:message terminate="no">progress:Converting element <xsl:value-of select="name()"/> - <xsl:value-of select="position()"/> / <xsl:value-of select="$ElementCountToConvert"/></xsl:message>
+				<!-- <xsl:message terminate="no">progress:Converting element <xsl:value-of select="name()"/> - <xsl:value-of select="position()"/> / <xsl:value-of select="$ElementCountToConvert"/></xsl:message> -->
 				<xsl:choose>
 					<!--Checking for Paragraph element-->
 					<xsl:when test="(
@@ -623,7 +623,7 @@
 
 			<xsl:if test="self::w:subDoc">
 				<xsl:if test="$mastersubpara">
-					<xsl:message terminate="no">progress:Found subdocument reference</xsl:message>
+					<!-- <xsl:message terminate="no">progress:Found subdocument reference</xsl:message> -->
 					<xsl:variable name="temp" as="xs:string" select="concat('&lt;subdoc rId=&quot;',@r:id,'&quot;&gt;&lt;/subdoc&gt;')"/>
 					<xsl:sequence select="d:sink(d:PushMasterSubdoc($myObj,$temp))"/> <!-- empty -->
 					<xsl:sequence select="d:sink(d:MasterSubSetFlag($myObj))"/> <!-- empty -->
