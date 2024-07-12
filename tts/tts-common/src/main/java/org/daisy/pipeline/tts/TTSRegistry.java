@@ -79,7 +79,7 @@ public class TTSRegistry {
 
 	/**
 	 * List all available TTS services, including the disabled ones (in which case {@link
-	 * TTSService#newEngine} will throw a {@link TTSService.ServiceDisabledException),
+	 * TTSService#newEngine} will throw a {@link TTSService.ServiceDisabledException}),
 	 * and the services that may not allocate a working {@link TTSEngine} for other
 	 * reasons (because of missing configuration, because the list of available voices
 	 * can not be retrieved, because the engine failed a test, etc.).
