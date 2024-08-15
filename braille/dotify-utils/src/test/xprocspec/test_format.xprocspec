@@ -1390,7 +1390,6 @@
                 ⠿⠿⠿⠿
               </block>
               <block break-before="page"
-                     align="center"
                      border-top-style="solid"
                      border-top-align="inner"
                      border-bottom-style="solid"
@@ -1496,8 +1495,7 @@
             </default-template>
           </layout-master>
           <sequence master="body">
-            <block align="center"
-                   margin-left="1"
+            <block margin-left="1"
                    margin-right="1"
                    margin-top="1"
                    margin-bottom="1"
