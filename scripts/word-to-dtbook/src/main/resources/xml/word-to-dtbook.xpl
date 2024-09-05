@@ -69,7 +69,7 @@
 	<!-- cx:as="map(xs:string,xs:string*)" -->
 	<p:option name="MasterSub" px:hidden="true" select="false()" cx:as="xs:boolean" />
 	<!-- from settings  -->
-	<p:option name="pagination" select="'Custom'">
+	<p:option name="pagination" select="'custom'">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Pagination mode</h2>
 			<p px:role="desc">Define how page numbers are computed and inserted in the result</p>
@@ -77,9 +77,9 @@
 		<p:pipeinfo>
 			<px:type>
 				<choice xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-					<value>Custom</value>
+					<value>custom</value>
 					<a:documentation xml:lang="en">Use numbers tagged with the style 'PageNumberDAISY' in the document</a:documentation>
-					<value>Automatic</value>
+					<value>automatic</value>
 					<a:documentation xml:lang="en">Use Word page breaks to compute and insert page numbers in content</a:documentation>
 				</choice>
 			</px:type>
