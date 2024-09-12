@@ -56,13 +56,19 @@ public class VoiceManager {
 	 */
 	private final Map<VoiceKey,Collection<LanguageRangeVoiceTuple>> voiceIndex;
 
+	/**
+	 * Map from voice IDs to voices.
+	 */
+	private final Map<String,Voice> voiceForID;
+
 	public VoiceManager(Collection<TTSEngine> engines, Collection<VoiceInfo> voiceInfoFromConfig) {
 		engineNames = new HashSet<>();
 		for (TTSEngine e : engines)
 			engineNames.add(e.getProvider().getName().toLowerCase());
 
 		// create a map of the best services for each available voice
-		bestEngines = new LinkedHashMap<Voice,TTSEngine>(); { // LinkedHashMap: iteration order = insertion order
+		bestEngines = new LinkedHashMap<Voice,TTSEngine>(); // LinkedHashMap: iteration order = insertion order
+		voiceForID = new HashMap<>(); {
 			TTSTimeout timeout = new TTSTimeout();
 			int timeoutSecs = 30;
 			// sort engines by engine priority, so that voice info from engines (see below) is sorted by engine priority
@@ -74,9 +80,12 @@ public class VoiceManager {
 				try {
 					Collection<Voice> voices = tts.getAvailableVoices();
 					if (voices != null)
-						for (Voice v : voices)
+						for (Voice v : voices) {
 							if (!bestEngines.containsKey(v))
 								bestEngines.put(v, tts);
+							if (!voiceForID.containsKey(v.getID()))
+								voiceForID.put(v.getID(), v);
+						}
 				} catch (SynthesisException e) {
 					ServerLogger.error("error while retrieving the voices of "
 					                   + tts.getProvider().getName());
@@ -310,6 +319,13 @@ public class VoiceManager {
 	 */
 	public TTSEngine getTTS(Voice voice) {
 		return bestEngines.get(voice);
+	}
+
+	/**
+	 * @return {@code null} if there is no voice with the given ID.
+	 */
+	public Voice getVoiceForID(String id) {
+		return voiceForID.get(id);
 	}
 
 	/**
