@@ -23,12 +23,12 @@ pronunciations, speech pitch, speech rates, speech levels, etc.) is
 controlled with TTS configuration files, CSS style sheets and PLS
 lexicons.
 
-TTS configuration files may either be specified "statically", through
-the `org.daisy.pipeline.tts.config` user property, or "dynamically"
-through an optional script input.
+TTS configuration files may either be specified through the
+`org.daisy.pipeline.tts.config` user property, or through an optional
+script input.
 
 `org.daisy.pipeline.tts.config`
-: File to load TTS configurations from at start-up
+: File to load TTS configuration from
 : Defaults to the file "tts-default-config.xml" located in the "etc/"
   directory in the base directory of the Pipeline installation, or
   "/etc/opt/daisy-pipeline2/tts-default-config.xml" on Debian/Ubuntu.

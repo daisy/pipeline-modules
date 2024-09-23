@@ -106,12 +106,12 @@ public class VoicesResource extends AuthenticatedResource {
 					}
 				}
 			}
-			new ConfigReader(saxonProcessor, configXML, voiceConfigExt, propsExt);
+			Map<String,String> properties = Properties.getSnapshot();
+			new ConfigReader(saxonProcessor, configXML, properties, voiceConfigExt, propsExt);
 			if (configXML != null) {
 				logger.debug("Voice configuration XML:\n" + configXML);
 				logger.debug("Parsed voice configuration:\n" + voiceConfigExt.getVoiceDeclarations());
 			}
-			Map<String,String> properties = Properties.getSnapshot();
 			Map<String,String> dynProperties = propsExt.getDynamicProperties();
 			if (dynProperties != null && !dynProperties.isEmpty()) {
 				properties = new HashMap<>(properties);
