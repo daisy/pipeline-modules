@@ -19,6 +19,10 @@ import java.util.TreeSet;
 
 import com.google.common.collect.Iterables;
 
+import cz.vutbr.web.css.Term;
+
+import org.daisy.pipeline.css.speech.VoiceFamilyList;
+import org.daisy.pipeline.css.speech.VoiceFamilyList.VoiceFamily;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.VoiceInfo.Gender;
 import org.daisy.pipeline.tts.VoiceInfo.LanguageRange;
@@ -31,6 +35,7 @@ public class VoiceManager {
 
 	private Logger ServerLogger = LoggerFactory.getLogger(VoiceManager.class);
 
+	private final Set<String> engineNames;
 	/**
 	 * Map of the best services for each available voice, given that two different services can serve the same voice
 	 */
@@ -52,6 +57,9 @@ public class VoiceManager {
 	private final Map<VoiceKey,Collection<LanguageRangeVoiceTuple>> voiceIndex;
 
 	public VoiceManager(Collection<TTSEngine> engines, Collection<VoiceInfo> voiceInfoFromConfig) {
+		engineNames = new HashSet<>();
+		for (TTSEngine e : engines)
+			engineNames.add(e.getProvider().getName().toLowerCase());
 
 		// create a map of the best services for each available voice
 		bestEngines = new LinkedHashMap<Voice,TTSEngine>(); { // LinkedHashMap: iteration order = insertion order
@@ -316,6 +324,41 @@ public class VoiceManager {
 		return Iterables.getFirst(findAvailableVoices(voiceEngine, voiceName, lang, gender), null);
 	}
 
+	public Iterable<Voice> findAvailableVoices(Locale lang, VoiceFamilyList voiceFamily) {
+		if (voiceFamily == null)
+			return findAvailableVoices(null, null, lang, null);
+		Collection<Voice> voices = new LinkedHashSet<>();
+		Collection<Voice> nonExactMatches = new LinkedHashSet<>();
+		for (Term<?> term : voiceFamily) {
+			VoiceFamily f = (VoiceFamily)term;
+			String engineName = null;
+			String voiceName = null;
+			Gender gender = null;
+			if (f.getFamilyName().isPresent()) {
+				String name = f.getFamilyName().get();
+				if (engineNames.contains(name.toLowerCase()))
+					engineName = name;
+				else
+					voiceName = name;
+			}
+			if (f.getGender().isPresent())
+				gender = Gender.of(f.getGender().get(), f.getAge());
+			boolean exact = true;
+			Integer variant = f.getVariant().orElse(null);
+			int k = 0;
+			for (Voice v : findAvailableVoices(engineName, voiceName, lang, gender)) {
+				k++;
+				if ((exact = exact && matches(v, engineName, voiceName, lang, gender))
+				    && (variant == null || k == variant))
+					voices.add(v);
+				else
+					nonExactMatches.add(v);
+			}
+		}
+		voices.addAll(nonExactMatches);
+		return voices;
+	}
+
 	private final Map<VoiceKey,Iterable<Voice>> cache = new HashMap<>();
 
 	public Iterable<Voice> findAvailableVoices(String voiceEngine, String voiceName, Locale lang, Gender gender) {
@@ -429,6 +472,28 @@ public class VoiceManager {
 								return true;
 		}
 		return false;
+	}
+
+	public boolean matches(Voice voice, Locale lang, VoiceFamilyList voiceFamily) {
+		if (voiceFamily == null)
+			return matches(voice, null, null, lang, null);
+		for (Term<?> term : voiceFamily)
+			if (matches(voice, lang, (VoiceFamily)term))
+				return true;
+		return false;
+	}
+
+	private boolean matches(Voice voice, Locale lang, VoiceFamily voiceFamily) {
+		if (voiceFamily == null)
+			return matches(voice, null, null, lang, null);
+		if (voiceFamily.getFamilyName().isPresent()) {
+			String name = voiceFamily.getFamilyName().get();
+			if (engineNames.contains(name.toLowerCase()))
+				return matches(voice, name, null, lang, null);
+			else
+				return matches(voice, null, name, lang, null);
+		} else
+			return matches(voice, null, null, lang, Gender.of(voiceFamily.getGender().get()));
 	}
 
 	private static String getStack(Throwable t) {
