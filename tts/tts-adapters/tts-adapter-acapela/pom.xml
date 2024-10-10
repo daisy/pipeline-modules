@@ -98,6 +98,7 @@
             <Import-Package>
               net.sf.saxon.*;version="${saxon.versionRange}",
               !org.daisy.common.spi,
+              !org.daisy.common.spi.annotations,
               *
             </Import-Package>
             <Include-Resource>
