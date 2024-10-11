@@ -125,7 +125,7 @@ public class Voice {
 	/**
 	 * A unique ID.
 	 *
-	 * This method is consistent with {@link #equals()}: it returns the same ID for equal voices,
+	 * This method is consistent with {@link #equals}: it returns the same ID for equal voices,
 	 * and returns distinct IDs for distinct voices.
 	 */
 	public String getID() {
