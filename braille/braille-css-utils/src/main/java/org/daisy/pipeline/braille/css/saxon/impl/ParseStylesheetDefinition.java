@@ -74,7 +74,7 @@ public class ParseStylesheetDefinition extends ReflexiveExtensionFunctionProvide
 						styleCtxt = Context.TEXT_TRANSFORM;
 					} else if ("counter-style".equals(name)) {
 						styleCtxt = Context.COUNTER_STYLE;
-					} else if (parser.isSupportedCSSProperty(name) || name.startsWith("-")) {
+					} else if (parser.isSupportedCSSProperty(name)) {
 						// assuming that context is a (pseudo-)element
 						// assuming that the value is not "inherit"
 						// not assuming that attr() and content() values have already been evaluated (although normally they will)
