@@ -31,7 +31,7 @@
             <xsl:variable name="properties" as="item()*" select="s:iterate($style)[s:property(.)=$property-names]"/>
             <xsl:variable name="rest-style" as="item()?"
                           select="s:remove($style,for $s in $properties return s:property($s))"/>
-            <xsl:sequence select="css:style-attribute(s:toString($rest-style,$parent-rest-style))"/>
+            <xsl:sequence select="css:style-attribute(css:serialize-stylesheet($rest-style,$parent-rest-style))"/>
             <!--
                 make attributes
             -->

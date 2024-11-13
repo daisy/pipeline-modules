@@ -39,7 +39,7 @@
                                                                           .=('&amp;::list-item',
                                                                              '&amp;::list-header')]]"/>
                     <xsl:if test="exists($rest-style)">
-                        <xsl:sequence select="css:style-attribute(s:merge($rest-style))"/>
+                        <xsl:sequence select="css:style-attribute($rest-style)"/>
                     </xsl:if>
                 </xsl:otherwise>
             </xsl:choose>

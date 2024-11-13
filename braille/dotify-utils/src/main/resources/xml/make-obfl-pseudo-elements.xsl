@@ -122,7 +122,7 @@
                             </xsl:when>
                             <xsl:otherwise>
                                 <!-- merge @style and @css:_obfl-alternate-scenario* -->
-                                <xsl:sequence select="css:style-attribute(s:merge(for $s in $style return css:parse-stylesheet($s)))"/>
+                                <xsl:sequence select="css:style-attribute(for $s in $style return css:parse-stylesheet($s))"/>
                             </xsl:otherwise>
                         </xsl:choose>
                         <!-- skip all css:* attributes except property attributes but including css:flow
