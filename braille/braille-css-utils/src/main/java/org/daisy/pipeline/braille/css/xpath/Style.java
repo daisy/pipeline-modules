@@ -42,7 +42,7 @@ public abstract class Style {
 		if (style.isPresent())
 			return style.get().toString(relativeTo.orElse(Stylesheet.EMPTY));
 		else if (relativeTo.isPresent())
-			return Stylesheet.EMPTY.toString(relativeTo.get());
+			return ((Style)Stylesheet.EMPTY).toString(relativeTo.get());
 		else
 			return "";
 	}
@@ -80,7 +80,7 @@ public abstract class Style {
 		if (style.isPresent())
 			style.get().toAttributes(relativeTo.orElse(Stylesheet.EMPTY), writer);
 		else if (relativeTo.isPresent())
-			Stylesheet.EMPTY.toAttributes(relativeTo.get(), writer);
+			((Style)Stylesheet.EMPTY).toAttributes(relativeTo.get(), writer);
 	}
 
 	protected void toAttributes(Style relativeTo, XMLStreamWriter writer) throws XMLStreamException {
@@ -192,7 +192,7 @@ public abstract class Style {
 		if (style.isPresent())
 			return style.get().put(key, s);
 		else if (s.isPresent())
-			return Stylesheet.EMPTY.put(key, s);
+			return ((Style)Stylesheet.EMPTY).put(key, s);
 		else
 			return Optional.empty();
 	}
@@ -218,7 +218,7 @@ public abstract class Style {
 			else if (s instanceof Stylesheet)
 				head = (Stylesheet)s;
 			else if (s instanceof Declaration)
-				head = new Stylesheet(BrailleCssStyle.of(((Declaration)s).declaration));
+				head = Stylesheet.of(BrailleCssStyle.of(((Declaration)s).declaration));
 			else if (!(s instanceof Value))
 				throw new IllegalStateException(); // coding error
 			else if (!(((Value)s).value instanceof ContentList))
@@ -258,7 +258,7 @@ public abstract class Style {
 					objects.add(((Value)s).value);
 			}
 			Iterator<Object> it = objects.iterator();
-			return Optional.of(new Stylesheet(((BrailleCssStyle)it.next()).add(it)));
+			return Optional.of(Stylesheet.of(((BrailleCssStyle)it.next()).add(it)));
 		} else { // head instanceof Value
 			List<Term<?>> content = new ArrayList<>();
 			BrailleCssParser parser = null;
