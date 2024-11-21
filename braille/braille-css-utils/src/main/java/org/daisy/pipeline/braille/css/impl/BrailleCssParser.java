@@ -199,11 +199,37 @@ public abstract class BrailleCssParser implements TextStyleParser {
 		}
 	}
 
+	/**
+	 * Concretizes "inherit" even if the parent style is null or empty.
+	 */
+	public SimpleInlineStyle parseSimpleInlineStyle(String style,
+	                                                Element context,
+	                                                SimpleInlineStyle parent,
+	                                                boolean mutable) {
+		BrailleCssStyle s = parseInlineStyle(
+			style, Context.ELEMENT, parent != null ? BrailleCssStyle.of(parent) : null);
+		// evaluate attr() and content() values in content and string-set properties
+		if (context != null)
+			s = s.evaluate(context);
+		try {
+			return s.asSimpleInlineStyle(mutable);
+		} catch (UnsupportedOperationException e) {
+			throw new IllegalArgumentException(e);
+		}
+	}
+
 	@Override // TextStyleParser
 	public SimpleInlineStyle parse(String style) {
 		if (style == null) style = "";
 		// clone because we make SimpleInlineStyle available and SimpleInlineStyle is mutable (and we want it to be)
 		return parseSimpleInlineStyle(style, null, true);
+	}
+
+	@Override // TextStyleParser
+	public SimpleInlineStyle parse(String style, SimpleInlineStyle parent) {
+		if (style == null) style = "";
+		// clone because we make SimpleInlineStyle available and SimpleInlineStyle is mutable (and we want it to be)
+		return parseSimpleInlineStyle(style, null, parent, true);
 	}
 
 	private final Map<String,Declaration> declCache = CacheBuilder.newBuilder()

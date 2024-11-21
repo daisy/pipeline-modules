@@ -206,12 +206,8 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 			throw new RuntimeException("Coding error");
 		SimpleInlineStyle style = null; {
 			String s = attributes != null ? attributes.getDictionaryIdentifier() : null;
-			if (s != null || parentStyle != null) {
-				// FIXME: extend caching of parsed CSS to support parentStyle!
-				style = cssParser.parse(s != null ? s : "");
-				if (parentStyle != null)
-					style = style.inheritFrom(parentStyle).concretize();
-			}
+			if (s != null || parentStyle != null)
+				style = cssParser.parse(s != null ? s : "", parentStyle);
 			if (hyphenating) {
 				if (style == null)
 					style = HYPHENS_AUTO;
@@ -265,12 +261,9 @@ public class BrailleTranslatorFactoryServiceImpl implements BrailleTranslatorFac
 			throw new RuntimeException("Coding error");
 		SimpleInlineStyle style; {
 			String s = attributes != null ? attributes.getName().orElse(null) : null;
-			if (s != null || parentStyle != null) {
-				// FIXME: extend caching of parsed CSS to support parentStyle!
-				style = cssParser.parse(s != null ? s : "");
-				if (parentStyle != null)
-					style = style.inheritFrom(parentStyle).concretize();
-			} else
+			if (s != null || parentStyle != null)
+				style = cssParser.parse(s != null ? s : "", parentStyle);
+			else
 				style = null;
 		}
 		if (attributes != null && attributes.hasChildren())
