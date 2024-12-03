@@ -247,7 +247,7 @@ manual](http://sass-lang.com/documentation/file.SASS_REFERENCE.html).
         </p:documentation>
     </p:option>
     
-    <p:option name="stylesheet-parameters" select="''">
+    <p:option name="stylesheet-parameters" select="'()'">
         <!-- defined in ../../../../../common-options.xpl -->
     </p:option>
     
