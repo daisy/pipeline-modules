@@ -460,7 +460,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>tts-adapter-espeak</artifactId>
-        <version>3.0.14</version>
+        <version>3.0.15-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
