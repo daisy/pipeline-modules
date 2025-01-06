@@ -7,7 +7,7 @@
     <groupId>org.daisy</groupId>
     <artifactId>daisy</artifactId>
     <version>4</version>
-    <relativePath />
+    <relativePath/>
   </parent>
 
   <groupId>org.daisy.pipeline.modules</groupId>
@@ -44,14 +44,14 @@
     <module>scripts-utils/odf-utils</module>
     <module>scripts-utils/zedai-utils</module>
     <module>nlp/nlp-common</module>
-    <module>nlp/lexers/ruled-lexer</module>
-    <module>nlp/lexers/light-lexer</module>
-    <module>nlp/lexers/omnilang-lexer</module>
-    <module>nlp/zedai-break-detection</module>
+    <!--<module>nlp/lexers/ruled-lexer</module>-->
+    <!--<module>nlp/lexers/light-lexer</module>-->
+    <!--<module>nlp/lexers/omnilang-lexer</module>-->
+    <!--<module>nlp/zedai-break-detection</module>-->
     <module>nlp/html-break-detection</module>
     <module>nlp/dtbook-break-detection</module>
     <module>audio/audio-common</module>
-    <module>audio/audio-encoder-lame</module>
+    <!--<module>audio/audio-encoder-lame</module>-->
     <!-- att-nar is excluded because it is platform-specific. -->
     <!-- tts-adapter-attnative is excluded because it depends on att-nar which cannot be publicly
          deployed according to the AT&T's license. -->
@@ -60,13 +60,13 @@
     <module>tts/tts-common</module>
     <module>tts/tts-adapters/tts-adapter-espeak</module>
     <module>tts/tts-adapters/tts-adapter-acapela</module>
-    <module>tts/tts-adapters/tts-adapter-osx</module>
-    <module>tts/tts-adapters/tts-adapter-sapinative</module>
-    <module>tts/tts-adapters/tts-adapter-qfrency</module>
-    <module>tts/tts-adapters/tts-adapter-google</module>
-    <module>tts/tts-adapters/tts-adapter-cereproc</module>
-    <module>tts/tts-adapters/tts-adapter-azure</module>
-    <module>tts/tts-mocks</module>
+    <!--<module>tts/tts-adapters/tts-adapter-osx</module>-->
+    <!--<module>tts/tts-adapters/tts-adapter-sapinative</module>-->
+    <!--<module>tts/tts-adapters/tts-adapter-qfrency</module>-->
+    <!--<module>tts/tts-adapters/tts-adapter-google</module>-->
+    <!--<module>tts/tts-adapters/tts-adapter-cereproc</module>-->
+    <!--<module>tts/tts-adapters/tts-adapter-azure</module>-->
+    <!--<module>tts/tts-mocks</module>-->
     <module>tts/mathml-to-ssml</module>
     <module>braille/braille-common</module>
     <module>braille/braille-css-utils</module>
@@ -74,8 +74,8 @@
     <module>braille/obfl-utils</module>
     <module>braille/liblouis-utils</module>
     <module>braille/dotify-utils</module>
-    <module>braille/libhyphen-utils</module>
-    <module>braille/texhyph-utils</module>
+    <!--<module>braille/libhyphen-utils</module>-->
+    <!--<module>braille/texhyph-utils</module>-->
     <module>scripts/daisy202-to-epub3</module>
     <module>scripts/daisy202-validator</module>
     <module>scripts/daisy202-to-daisy3</module>
