@@ -1,6 +1,7 @@
 package org.daisy.pipeline.tts.config;
 
 import java.io.File;
+import java.io.StringReader;
 import java.net.URI;
 import java.net.URL;
 import java.util.Map;
@@ -26,11 +27,11 @@ import org.xml.sax.InputSource;
 public class ConfigReader {
 
 	private static final Logger logger = LoggerFactory.getLogger(ConfigReader.class);
-	private static final Property CONFIG_PATH = Properties.getProperty("org.daisy.pipeline.tts.config",
-	                                                                   true,
-	                                                                   "File to load TTS configuration from",
-	                                                                   false,
-	                                                                   null);
+	private static final Property TTS_CONFIG = Properties.getProperty("org.daisy.pipeline.tts.config",
+	                                                                  true,
+	                                                                  "TTS configuration (XML or file path)",
+	                                                                  false,
+	                                                                  null);
 
 	public interface Extension {
 		/**
@@ -53,11 +54,25 @@ public class ConfigReader {
 
 	public ConfigReader(Processor saxonproc, XdmNode doc, Map<String,String> properties, Extension... extensions) {
 		this.saxonproc = saxonproc;
-		String configPath = properties != null ? CONFIG_PATH.getValue(properties) : CONFIG_PATH.getValue();
-		if (configPath != null && !"".equals(configPath)) {
-			XdmNode content = parseXML(configPath);
-			if (content != null)
-				read(content, extensions);
+		String config = properties != null ? TTS_CONFIG.getValue(properties) : TTS_CONFIG.getValue();
+		if (config != null && !"".equals(config)) {
+			XdmNode content = null; {
+				// check if it is a file path
+				if (config.startsWith("file:") || new File(config).exists())
+					content = parseXML(config);
+				else
+					// check if it is XML
+					try {
+						content = saxonproc.newDocumentBuilder().build(
+							new SAXSource(new InputSource(new StringReader(config))));
+					} catch (Exception e) {
+						logger.debug(
+							"failed to read TTS configuration: not a file path and not valid XML: "
+							+ config);
+					}
+				if (content != null)
+					read(content, extensions);
+			}
 		}
 		if (doc != null) {
 			read(doc, extensions);
