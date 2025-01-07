@@ -98,6 +98,7 @@
       org.daisy.pipeline.tts.calabash.impl.GetAnnotationsProvider,
       org.daisy.pipeline.tts.calabash.impl.GetLexiconsProvider,
       org.daisy.pipeline.tts.calabash.impl.SynthesizeProvider,
+      org.daisy.pipeline.tts.config.ConfigReader$TTSConfigProperty,
       org.daisy.pipeline.tts.impl.DefaultLexiconProperty,
       org.daisy.pipeline.tts.impl.TTSEnginesWebServiceExtension,
       org.daisy.pipeline.tts.impl.VoicesWebServiceExtension,

@@ -19,6 +19,8 @@ import org.daisy.common.file.URLs;
 import org.daisy.common.properties.Properties;
 import org.daisy.common.properties.Properties.Property;
 
+import org.osgi.service.component.annotations.Component;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,11 +29,6 @@ import org.xml.sax.InputSource;
 public class ConfigReader {
 
 	private static final Logger logger = LoggerFactory.getLogger(ConfigReader.class);
-	private static final Property TTS_CONFIG = Properties.getProperty("org.daisy.pipeline.tts.config",
-	                                                                  true,
-	                                                                  "TTS configuration (XML or file path)",
-	                                                                  false,
-	                                                                  null);
 
 	public interface Extension {
 		/**
@@ -54,7 +51,7 @@ public class ConfigReader {
 
 	public ConfigReader(Processor saxonproc, XdmNode doc, Map<String,String> properties, Extension... extensions) {
 		this.saxonproc = saxonproc;
-		String config = properties != null ? TTS_CONFIG.getValue(properties) : TTS_CONFIG.getValue();
+		String config = properties != null ? TTSConfigProperty.getValue(properties) : TTSConfigProperty.getValue();
 		if (config != null && !"".equals(config)) {
 			XdmNode content = null; {
 				// check if it is a file path
@@ -157,5 +154,31 @@ public class ConfigReader {
 				}
 			}
 		}
+	}
+
+	// this is to make sure that the "org.daisy.pipeline.tts.config" property is
+	// exposed from the start, before the first ConfigReader object is created
+	@Component(
+		name = "tts-config-property",
+		immediate = true
+	)
+	protected static class TTSConfigProperty {
+
+		private static final Property PROPERTY = Properties.getProperty("org.daisy.pipeline.tts.config",
+		                                                                true,
+		                                                                "TTS configuration (XML or file path)",
+		                                                                false,
+		                                                                null);
+
+		protected TTSConfigProperty() {}
+
+		public static String getValue() {
+			return PROPERTY.getValue();
+		}
+
+		public static String getValue(Map<String,String> snapshot) {
+			return PROPERTY.getValue(snapshot);
+		}
+
 	}
 }
