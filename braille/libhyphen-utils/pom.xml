@@ -12,7 +12,7 @@
 
   <groupId>org.daisy.pipeline.modules.braille</groupId>
   <artifactId>libhyphen-utils</artifactId>
-  <version>3.3.1-SNAPSHOT</version>
+  <version>3.4.0-SNAPSHOT</version>
   <packaging>bundle</packaging>
 
   <name>DP2 Braille Modules :: libhyphen-utils</name>
@@ -34,6 +34,12 @@
         <groupId>no.nlb</groupId>
         <artifactId>spell-no-patterns</artifactId>
         <version>1.1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>fi.celia</groupId>
+        <artifactId>celia-hyphenation-tables</artifactId>
+        <!-- this is a snapshot because Celia currently has no one who can make a proper release -->
+        <version>1.5.1-SNAPSHOT</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -472,6 +478,25 @@
                   </includes>
                 </configuration>
               </execution>
+              <execution>
+                <id>unpack-celia-tables</id>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <outputDirectory>${project.build.directory}/generated-resources/tables</outputDirectory>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>fi.celia</groupId>
+                      <artifactId>celia-hyphenation-tables</artifactId>
+                    </artifactItem>
+                  </artifactItems>
+                  <includes>
+                    hyph/hyph-fi.dic
+                  </includes>
+                </configuration>
+              </execution>
             </executions>
           </plugin>
           <plugin>
@@ -508,14 +533,29 @@
 
   <repositories>
     <repository>
-      <!-- FIXME: this only works if you have a personal access token (with "read:packages" scope) in your settings.xml -->
-      <id>github</id>
+      <!-- FIXME: this only works if you have a personal access token (with "read:packages" scope) in your settings.xml
+           see https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry
+      -->
+      <id>github-nlb</id>
       <url>https://maven.pkg.github.com/nlbdev/spell-no</url>
       <releases>
         <enabled>true</enabled>
       </releases>
       <snapshots>
         <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <!-- FIXME: this only works if you have a personal access token (with "read:packages" scope) in your settings.xml
+           see https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry
+      -->
+      <id>github-celia</id>
+      <url>https://maven.pkg.github.com/celiafi/celia-hyphenation-tables</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
       </snapshots>
     </repository>
   </repositories>
