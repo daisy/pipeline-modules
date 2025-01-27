@@ -39,7 +39,7 @@
         <groupId>fi.celia</groupId>
         <artifactId>celia-hyphenation-tables</artifactId>
         <!-- this is a snapshot because Celia currently has no one who can make a proper release -->
-        <version>1.5.1-SNAPSHOT</version>
+        <version>1.5.1</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
