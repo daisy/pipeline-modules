@@ -599,9 +599,7 @@
 						<xsl:value-of select="concat(' xml:lang=&quot;',$paragraphLanguage,'&quot;')"/>
 					</xsl:if>
 				</xsl:variable>
-				<xsl:if test="($pagination='custom' and not(w:r/w:rPr/w:rStyle[@w:val='PageNumberDAISY'])) or (not($pagination='custom'))">
-					<xsl:value-of disable-output-escaping="yes" select="concat('&lt;','p',$LangAttribute,'&gt;')"/>
-				</xsl:if>
+				<xsl:value-of disable-output-escaping="yes" select="concat('&lt;','p',$LangAttribute,'&gt;')"/>
 			</xsl:if>
 
 			<!--Adding Note index-->
@@ -1066,17 +1064,15 @@
 		<!--closing paragraph tag-->
 		<xsl:if test="not($flag='0') and not(d:AbbrAcrFlag($myObj)=1) and not($flagNote='hyper')">
 			<xsl:if test="not(d:GetTestRun($myObj)&gt;='1') and (d:GetCodeFlag($myObj)='0') and (not(d:Getlinenumflag($myObj)=0))">
-				<xsl:if test="($pagination='custom' and not(w:r/w:rPr/w:rStyle[@w:val='PageNumberDAISY'])) or (not($pagination='custom'))">
-					<xsl:call-template name="CloseLevel">
-						<xsl:with-param name="CurrentLevel" select="-1"/>
-						<xsl:with-param name="verfoot" select="$version"/>
-						<xsl:with-param name="characterStyle" select="$charparahandlerStyle"/>
-						<xsl:with-param name="sOperators" select="$sOperators"/>
-						<xsl:with-param name="sMinuses" select="$sMinuses"/>
-						<xsl:with-param name="sNumbers" select="$sNumbers"/>
-						<xsl:with-param name="sZeros" select="$sZeros"/>
-					</xsl:call-template>
-				</xsl:if>
+				<xsl:call-template name="CloseLevel">
+					<xsl:with-param name="CurrentLevel" select="-1"/>
+					<xsl:with-param name="verfoot" select="$version"/>
+					<xsl:with-param name="characterStyle" select="$charparahandlerStyle"/>
+					<xsl:with-param name="sOperators" select="$sOperators"/>
+					<xsl:with-param name="sMinuses" select="$sMinuses"/>
+					<xsl:with-param name="sNumbers" select="$sNumbers"/>
+					<xsl:with-param name="sZeros" select="$sZeros"/>
+				</xsl:call-template>
 				<xsl:if test="(d:ListMasterSubFlag($myObj)=1) and $mastersubpara">
 					<xsl:variable name="curLevel" as="xs:integer" select="d:PeekLevel($myObj)"/>
 					<xsl:value-of disable-output-escaping="yes" select="d:ClosingMasterSub($myObj,$curLevel)"/>
