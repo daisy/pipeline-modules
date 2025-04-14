@@ -1119,7 +1119,7 @@
 		<xsl:param name="sZeros" as="xs:string"/>
 
 		<!--Checking for line breaks-->
-		<xsl:if test="((w:br/@w:type='textWrapping') or (w:br)) and (not(w:br/@w:type='page'))">
+		<xsl:if test="((w:br/@w:type='textWrapping') or (w:br)) and (not(w:br/@w:type='page')) and not(w:rPr/w:rStyle/@w:val='PageNumberDAISY')">
 			<br/>
 		</xsl:if>
 		<!--Checking for tabs-->
