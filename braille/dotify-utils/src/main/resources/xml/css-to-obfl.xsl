@@ -199,8 +199,8 @@
     <xsl:template name="renderers">
         <xml-processor name="take-nth">
             <!--
-                FIXME: without the "bogus" attributes, Dotify currently does not preserve the in
-                scope namespace declarations
+                FIXME: without the "bogus" attributes, pxi:obfl-normalize-space currently does not preserve the
+                in scope namespace declarations
             -->
             <_xsl:stylesheet version="2.0"
                              d:bogus=""
@@ -2876,9 +2876,6 @@
         <xsl:variable name="hyphens" as="xs:string" select="($pending-hyphens,$hyphens)[1]"/>
         <xsl:choose>
             <xsl:when test="$white-space=('pre-wrap','pre-line') and matches($text,'\n')">
-                <!--
-                    not using style element because Dotify collapses spaces in OBFL
-                -->
                 <xsl:analyze-string select="$text" regex="\n">
                     <xsl:matching-substring>
                         <xsl:text>&#x200B;</xsl:text> <!-- to make sure there are no leading br elements in a block because those would be ignored -->
@@ -2892,6 +2889,19 @@
                 </xsl:analyze-string>
             </xsl:when>
             <xsl:otherwise>
+                <xsl:variable name="text" as="xs:string">
+                    <xsl:choose>
+                        <!--
+                            For 'hyphens:none' all SHY and ZWSP characters are removed from the text in advance.
+                        -->
+                        <xsl:when test="$hyphens='none'">
+                            <xsl:sequence select="replace($text,'[&#x00AD;&#x200B;]','')"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:sequence select="$text"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:variable>
                 <xsl:variable name="text" as="xs:string*">
                     <xsl:choose>
                         <!--
@@ -2926,12 +2936,6 @@
                         <xsl:if test="$pending-braille-charset[not(.=$braille-charset)]">
                             <xsl:sequence select="concat('braille-charset: ',$pending-braille-charset)"/>
                         </xsl:if>
-                    </xsl:if>
-                    <!--
-                        hyphens handled through hyphenate attribute but not OBFL counterpart for value 'none'
-                    -->
-                    <xsl:if test="$hyphens='none'">
-                        <xsl:sequence select="concat('hyphens: ',$hyphens)"/>
                     </xsl:if>
                     <xsl:if test="$pending-hyphenate-character[not(.=$hyphenate-character)]">
                       <xsl:sequence select="concat('hyphenate-character: ',$pending-hyphenate-character)"/>
