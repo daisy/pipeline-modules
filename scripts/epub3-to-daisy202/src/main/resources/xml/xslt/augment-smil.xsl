@@ -163,8 +163,8 @@
                                         <!--
                                             Test whether the segments make up the whole heading or page number
                                         -->
-                                        <xsl:when test="replace(string-join($segments/string(.),''),'[\s\p{Z}]+','')
-                                                        =replace(string(.),'[\s\p{Z}]+','')">
+                                        <xsl:when test="replace(string-join($segments/string(.),''),'[\s\p{Z}\p{P}]+','')
+                                                        =replace(string(.),'[\s\p{Z}\p{P}]+','')">
                                             <xsl:variable name="smil-segments" as="element()*"
                                                           select="for $s in $segments return
                                                                   for $id in $s/concat(pf:normalize-uri(pf:html-base-uri(.)),'#',@id) return
