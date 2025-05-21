@@ -430,7 +430,22 @@
 		<xsl:param name="imgOpt" as="xs:string"/>
 		<xsl:param name="dpi" as="xs:float?"/>
 		<xsl:param name="characterStyle" as="xs:boolean"/>
-		<xsl:variable name="alttext" as="xs:string?" select="w:drawing/wp:inline/wp:docPr/@descr"/>
+		<xsl:variable name="alttext" as="xs:string?">
+			<xsl:choose>
+				<xsl:when test="w:drawing/wp:inline/wp:docPr/@descr">
+					<xsl:sequence select="w:drawing/wp:inline/wp:docPr/@descr"/>
+				</xsl:when>
+				<xsl:when test="w:drawing/wp:inline/a:graphic/a:graphicData/pic:pic/pic:nvPicPr/pic:cNvPr/@descr">
+					<xsl:sequence select="w:drawing/wp:inline/a:graphic/a:graphicData/pic:pic/pic:nvPicPr/pic:cNvPr/@descr"/>
+				</xsl:when>
+				<xsl:when test="w:drawing/wp:anchor/a:graphic/a:graphicData/pic:pic/pic:nvPicPr/pic:cNvPr/@descr">
+					<xsl:sequence select="w:drawing/wp:anchor/a:graphic/a:graphicData/pic:pic/pic:nvPicPr/pic:cNvPr/@descr"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="''"/> <!-- Not sure if this alt text needs to be pre-filled or not (like with a 'No description provided' text)-->
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
 		<!--Variable holds the value of Image Id-->
 		<xsl:variable name="Img_Id" as="xs:string?">
 			<xsl:choose>
@@ -464,7 +479,6 @@
 					<xsl:sequence select="''"/>
 				</xsl:otherwise>
 			</xsl:choose>
-			
 		</xsl:variable>
 		<!--Variable holds the value of Image Id concatenated with some random number generated for Image Id-->
 		<xsl:variable name="imageId" as="xs:string">
@@ -545,7 +559,7 @@
 				</xsl:variable>
 				<xsl:value-of disable-output-escaping="yes" select="concat('&lt;bdo dir= &quot;rtl&quot; xml:lang=&quot;',$imgBd,'&quot;&gt;')"/>
 			</xsl:if>
-			<xsl:variable name="imageTest" as="xs:string">
+			<xsl:variable name="imageSrc" as="xs:string">
 				<xsl:choose>
 					<xsl:when test="contains($Img_Id,'rId') and ($imgOpt='resize')">
 						<xsl:sequence select ="d:Image($myObj,$Img_Id,$imageName)"/>
@@ -565,42 +579,16 @@
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:variable>
-			<xsl:variable name="checkImage" as="xs:string" select="d:CheckImage($myObj,$imageTest)"/>
+			<xsl:variable name="checkImage" as="xs:string" select="d:CheckImage($myObj,$imageSrc)"/>
 			<xsl:choose>
 				<xsl:when test="$checkImage='1'">
 					<!--Creating Imagegroup element-->
 					<imggroup>
-						<img>
-							<!--attribute that holds the value of the Image ID-->
-							<xsl:attribute name="id" select="$imageId"/>
-							<!--attribute that holds the filename of the image returned for d:Image()-->
-							<xsl:choose>
-								<xsl:when test="$imgOpt='resize' and contains($Img_Id,'rId')">
-									<xsl:attribute name="src" select="$imageTest"/>
-									<!--attribute that holds the alternate text for the image-->
-									<xsl:attribute name="alt" select="$alttext"/>
-									<xsl:attribute name="width" select="round(($imageWidth) div (9525))"/> <!-- assuming 96 dpi -->
-									<xsl:attribute name="height" select="round(($imageHeight) div (9525))"/> <!-- assuming 96 dpi -->
-								</xsl:when>
-								<xsl:when test="$imgOpt='resample'  and contains($Img_Id,'rId')">
-									<xsl:attribute name="src" select="$imageTest"/>
-									<!--attribute that holds the alternate text for the image-->
-									<xsl:attribute name="alt" select="$alttext"/>
-								</xsl:when>
-								<xsl:otherwise>
-									<xsl:attribute name="src">
-										<xsl:choose>
-											<xsl:when test="contains($Img_Id,'rId')">
-												<xsl:sequence select="$imageTest"/>
-											</xsl:when>
-											<xsl:otherwise>
-												<xsl:sequence select="$imageTest"/>
-											</xsl:otherwise>
-										</xsl:choose>
-									</xsl:attribute>
-									<xsl:attribute name="alt" select="$alttext"/>
-								</xsl:otherwise>
-							</xsl:choose>
+						<img src="{$imageSrc}" alt="{$alttext}" id="{$imageId}">
+							<xsl:if test="$imgOpt='resize'">
+								<xsl:attribute name="width" select="round(($imageWidth) div (9525))"/> <!-- assuming 96 dpi -->
+								<xsl:attribute name="height" select="round(($imageHeight) div (9525))"/> <!-- assuming 96 dpi -->
+							</xsl:if>
 						</img>
 						<!--Handling Image-CaptionDAISY custom paragraph style applied above an image-->
 						<xsl:if test="(../preceding-sibling::node()[1]/w:pPr/w:pStyle/@w:val='Image-CaptionDAISY') or (../w:pPr/w:pStyle/@w:val='Caption') or (../w:pPr/w:pStyle/@w:val='Image-CaptionDAISY')">
@@ -683,7 +671,7 @@
 								Image <xsl:sequence select="$imageId" />
 							</xsl:otherwise>
 						</xsl:choose>
-						:
+						<xsl:text>: </xsl:text>
 						<xsl:choose>
 							<xsl:when test="exists($alttext)">
 								<xsl:value-of select="$alttext" />
