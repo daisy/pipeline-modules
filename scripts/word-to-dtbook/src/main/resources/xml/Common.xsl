@@ -525,8 +525,7 @@
 				I'm replacing it by custom styles for now
 				-->
 			<xsl:for-each select="w:r/w:pict//v:textbox/w:txbxContent">
-				<sidebar>
-					<xsl:attribute    name="render">required</xsl:attribute>
+				<sidebar render="required">
 					<xsl:for-each select="./node()">
 						<xsl:choose>
 							<!--Checking for Headings in sidebar-->
@@ -1174,8 +1173,7 @@
 							<xsl:with-param name="node" select="'body'"/>
 						</xsl:call-template>
 						<!--producer note for blank pages-->
-						<prodnote>
-							<xsl:attribute name="render">optional</xsl:attribute>
+						<prodnote render="optional">
 							<xsl:value-of select="'Blank Page'"/>
 						</prodnote>
 						<xsl:if test="$flag='3'">
@@ -1337,25 +1335,21 @@
 
 						<xsl:choose>
 							<xsl:when test="$Math_DSMT4=''">
+								<xsl:variable name="alttext">
+									<xsl:choose>
+										<xsl:when test="w:object/v:shape/@alt">
+											<xsl:value-of select="w:object/v:shape/@alt"/>
+										</xsl:when>
+										<xsl:otherwise>
+											<xsl:value-of select="'Math Equation'"/>
+											<!--Hardcoding value 'Math Equation'if user donot provide alt text for Math Equations-->
+										</xsl:otherwise>
+									</xsl:choose>
+								</xsl:variable>
+								<!--Creating variable mathimage for storing r:id value from document.xml-->
+								<xsl:variable name="Math_rid" as="xs:string" select="w:object/v:shape/v:imagedata/@r:id"/>
 								<imggroup>
-									<img>
-										<!--Creating variable mathimage for storing r:id value from document.xml-->
-										<xsl:variable name="Math_rid" as="xs:string" select="w:object/v:shape/v:imagedata/@r:id"/>
-										<xsl:choose>
-											<!--Checking for alt Text-->
-											<xsl:when test="w:object/v:shape/@alt">
-												<xsl:sequence select="w:object/v:shape/@alt"/>
-											</xsl:when>
-											<xsl:otherwise>
-												<!--Hardcoding value 'Math Equation'if user donot provide alt text for Math Equations-->
-												<xsl:attribute name="alt" select="'Math Equation'"/>
-											</xsl:otherwise>
-										</xsl:choose>
-										<xsl:attribute name="src">
-											<!--Calling MathImage function-->
-											<xsl:value-of select="d:MathImage($myObj,$Math_rid)"/>
-										</xsl:attribute>
-									</img>
+									<img alt="{$alttext}" src="{d:MathImage($myObj,$Math_rid)}" />
 								</imggroup>
 							</xsl:when>
 							<xsl:otherwise>
@@ -1366,23 +1360,18 @@
 					<!--Checking condition for MathEquations in word 2003/xp-->
 					<xsl:when test="contains(w:object/o:OLEObject/@ProgID,'Equation')and not(w:object/o:OLEObject[@ProgID='Equation.DSMT4'])">
 						<xsl:variable name="mathimage" as="xs:string" select="w:object/v:shape/v:imagedata/@r:id"/>
+						<xsl:variable name="alt">
+							<xsl:choose>
+								<xsl:when test="w:object/v:shape/@alt">
+									<xsl:value-of select="w:object/v:shape/@alt"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select="'Math Equation'"/>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:variable>
 						<imggroup>
-							<img>
-								<!--<xsl:value-of select="$mathimage"/>-->
-								<xsl:attribute name="alt">
-									<xsl:choose>
-										<xsl:when test="w:object/v:shape/@alt">
-											<xsl:value-of select="w:object/v:shape/@alt"/>
-										</xsl:when>
-										<xsl:otherwise>
-											<xsl:value-of select="'Math Equation'"/>
-										</xsl:otherwise>
-									</xsl:choose>
-								</xsl:attribute>
-								<xsl:attribute name="src">
-									<xsl:value-of select="d:MathImage($myObj,$mathimage)"/>
-								</xsl:attribute>
-							</img>
+							<img alt="{$alt}" src="{d:MathImage($myObj,$mathimage)}"/>
 						</imggroup>
 					</xsl:when>
 					<xsl:otherwise>
@@ -2299,7 +2288,7 @@
 			<!--Checking for List in Blockquote-->
 			<xsl:when test="w:pPr/w:pStyle[substring(@w:val,1,5)='Block']">
 				<xsl:if test="count(preceding-sibling::node()[1]/w:pPr/w:pStyle[substring(@w:val,1,5)='Block'])=0">
-					<xsl:value-of disable-output-escaping="yes" select="'&lt;blockquote &gt;'"/>
+					<xsl:value-of disable-output-escaping="yes" select="'&lt;blockquote&gt;'"/>
 				</xsl:if>
 				<xsl:choose>
 					<!--Checking for 'Blockquote-AuthorDAISY' style-->
@@ -2538,7 +2527,8 @@
 
 			<!--Checking for Sidebarheader* custom style-->
 			<xsl:when test="(starts-with(w:pPr/w:pStyle/@w:val,'Sidebarheader') and ends-with(w:pPr/w:pStyle/@w:val, 'DAISY')) and not(parent::w:tc)">
-				<hd><xsl:call-template name="ParaHandler">
+				<hd>
+					<xsl:call-template name="ParaHandler">
 						<xsl:with-param name="flag" select="'0'"/>
 						<xsl:with-param name="version" select="$version"/>
 						<xsl:with-param name="pagination" select="$pagination"/>
@@ -2546,7 +2536,8 @@
 						<xsl:with-param name="dpiPara" select="$dpiStyle"/>
 						<xsl:with-param name="txt" select="$txt"/>
 						<xsl:with-param name="charparahandlerStyle" select="$characterStyle"/>
-					</xsl:call-template></hd>
+					</xsl:call-template>
+				</hd>
 			</xsl:when>
 			<!--Checking for Bridgehead custom style-->
 			<xsl:when test="(w:pPr/w:pStyle/@w:val='BridgeheadDAISY') and not(parent::w:tc)">
