@@ -11,6 +11,9 @@
     <xsl:param name="sNumbers"/>
     <xsl:param name="sZeros"/>
     <mml:math>
+      <xsl:if test="ancestor-or-self::m:oMathPara">
+        <xsl:attribute name="display">block</xsl:attribute>
+      </xsl:if>
       <xsl:apply-templates select="*">
         <xsl:with-param name="sOperators" select="$sOperators"/>
         <xsl:with-param name="sMinuses" select="$sMinuses"/>
@@ -787,19 +790,17 @@
         </xsl:apply-templates>
       </xsl:when>
 
-      <!-- Otherwise, create an mstyle and set the script level -->
+      <!-- Otherwise, create an mrow
+           NP 2026 01 27 : mstyle are discouraged in MathML core -->
       <xsl:otherwise>
-        <mml:mstyle>
-          <!--<xsl:attribute name="dtbook:scriptlevel">
-            <xsl:value-of select="m:argPr[last()]/m:scrLvl/@m:val" />
-          </xsl:attribute>-->
+        <mml:mrow>
           <xsl:apply-templates select="*">
             <xsl:with-param name="sOperators" select="$sOperators"/>
             <xsl:with-param name="sMinuses" select="$sMinuses"/>
             <xsl:with-param name="sNumbers" select="$sNumbers" />
             <xsl:with-param name="sZeros" select="$sZeros"/>
           </xsl:apply-templates>
-        </mml:mstyle>
+        </mml:mrow>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -853,40 +854,16 @@
     <xsl:param name="sMinuses"/>
     <xsl:param name="sNumbers"/>
     <xsl:param name="sZeros"/>
-    <mml:mfenced>
-      <!-- open: default is ( for both OMML and MathML -->
-      <xsl:if test="m:dPr[1]/m:begChr/@m:val and not(m:dPr[1]/m:begChr/@m:val ='(')">
-        <!--<xsl:attribute name="dtbook:open">
-          <xsl:value-of select="m:dPr[1]/m:begChr/@m:val" />
-        </xsl:attribute>-->
-      </xsl:if>
-
-      <!-- close: default is ) for both OMML and MathML -->
-      <xsl:if test="m:dPr[1]/m:endChr/@m:val and not(m:dPr[1]/m:endChr/@m:val =')')">
-        <!--<xsl:attribute name="dtbook:close">
-          <xsl:value-of select="m:dPr[1]/m:endChr/@m:val" />
-        </xsl:attribute>-->
-      </xsl:if>
-
-      <!-- separator: the default is ',' for MathML, and '|' for OMML -->
+    <mml:mrow>
+    <!-- Open delimiter -->
+    <mml:mo>
       <xsl:choose>
-        <!-- Matches MathML default. Write nothing -->
-        <xsl:when test="m:dPr[1]/m:sepChr/@m:val = ','" />
-
-        <!-- OMML default: | -->
-        <xsl:when test="not(m:dPr[1]/m:sepChr/@m:val)">
-          <!--<xsl:attribute name="dtbook:separators">
-            <xsl:value-of select="'|'" />
-          </xsl:attribute>-->
+        <xsl:when test="m:dPr[1]/m:begChr/@m:val">
+          <xsl:value-of select="m:dPr[1]/m:begChr/@m:val" />
         </xsl:when>
-
-        <xsl:otherwise>
-          <!--<xsl:attribute name="dtbook:separators">
-            <xsl:value-of select="m:dPr[1]/m:sepChr/@m:val" />
-          </xsl:attribute>-->
-        </xsl:otherwise>
+        <xsl:otherwise>(</xsl:otherwise>
       </xsl:choose>
-
+    </mml:mo>
       <!-- now write all the children. Put each one into an mrow
           just in case it produces multiple runs, etc -->
       <xsl:for-each select="m:e">
@@ -898,8 +875,28 @@
             <xsl:with-param name="sZeros" select="$sZeros"/>
           </xsl:apply-templates>
         </mml:mrow>
+        <!-- Add separator if not last element -->
+        <xsl:if test="position() != last()">
+          <mml:mo>
+            <xsl:choose>
+              <xsl:when test="m:dPr[1]/m:sepChr/@m:val">
+                <xsl:value-of select="m:dPr[1]/m:sepChr/@m:val" />
+              </xsl:when>
+              <xsl:otherwise>,</xsl:otherwise>
+            </xsl:choose>
+          </mml:mo>
+        </xsl:if>
       </xsl:for-each>
-    </mml:mfenced>
+      <!-- Close delimiter -->
+      <mml:mo>
+        <xsl:choose>
+          <xsl:when test="m:dPr[1]/m:endChr/@m:val">
+            <xsl:value-of select="m:dPr[1]/m:endChr/@m:val" />
+          </xsl:when>
+          <xsl:otherwise>)</xsl:otherwise>
+        </xsl:choose>
+      </mml:mo>
+    </mml:mrow>
   </xsl:template>
 
   <xsl:template match="m:r">
@@ -1041,7 +1038,8 @@
                 </mml:mrow>
               </xsl:when>
               <xsl:otherwise>
-                <mml:mstyle>
+                <!-- NP 2026/01/27 : mstyle are discouraged in favor of mrow with style attribute (for now no style considered) -->
+                <mml:mrow>
                   <!--<xsl:attribute name="dtbook:scriptlevel">
                     <xsl:value-of select="m:argPr[last()]/m:scrLvl/@m:val" />
                   </xsl:attribute>-->
@@ -1053,7 +1051,7 @@
                     <xsl:with-param name="sNumbers" select="$sNumbers" />
                     <xsl:with-param name="sZeros" select="$sZeros"/>
                   </xsl:call-template>
-                </mml:mstyle>
+                </mml:mrow>
               </xsl:otherwise>
             </xsl:choose>
           </mml:mtd>
