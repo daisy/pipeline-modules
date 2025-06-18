@@ -351,7 +351,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>dtbook-to-zedai</artifactId>
-        <version>4.0.3</version>
+        <version>4.1.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
