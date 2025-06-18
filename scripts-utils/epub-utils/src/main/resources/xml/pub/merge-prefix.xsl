@@ -97,7 +97,7 @@
         <xsl:param name="implicit.out" as="element(f:vocab)*" tunnel="yes" required="yes"/>
         <xsl:param name="all" as="element()*" tunnel="yes" required="yes"/>
         <xsl:param name="unified" as="element(f:vocab)*" tunnel="yes" required="yes"/>
-        <xsl:variable name="attr" select="."/>
+        <xsl:variable name="attr" as="attribute()" select="."/>
         <xsl:variable name="normalized" as="xs:string*"
                       select="for $type in tokenize(., '\s+') return
                               f:expand-property($type,$attr,$implicit.in,$implicit.out,$all,$unified)/@name"/>
@@ -116,21 +116,36 @@
     -->
     <xsl:function name="f:expand-property" as="element(f:property)?">
         <xsl:param name="property" as="xs:string"/>
-        <xsl:param name="context" as="attribute()?"/>
+        <xsl:param name="context" as="attribute()"/>
         <xsl:param name="implicit.in" as="element(f:vocab)*"/>
         <xsl:param name="implicit.out" as="element(f:vocab)*"/>
         <xsl:param name="all" as="element()*"/>
         <xsl:param name="unified" as="element(f:vocab)*"/>
         <xsl:variable name="prefix" select="substring-before($property,':')" as="xs:string"/>
         <xsl:variable name="reference" select="replace($property,'(.+:)','')" as="xs:string"/>
+        <xsl:variable name="type-qname" select="QName('http://www.idpf.org/2007/ops','type')"/>
         <xsl:variable name="vocab" as="xs:string?"
                       select="($all[@id=generate-id(($context/ancestor::*[(@prefix|@epub:prefix) or not(parent::*)])[last()])]
                                    /f:vocab[@prefix=$prefix]/@uri,
-                               if ($prefix='') then $vocab-package-uri else ()
+                               if ($prefix='')
+                               then (
+                                      if ($context/parent::meta and name($context)='property')         then $vocab-package-meta-uri
+                                 else if ($context/parent::link and name($context)='rel')              then $vocab-package-link-uri
+                                 else if ($context/parent::item and name($context)='properties')       then $vocab-package-item-uri
+                                 else if ($context/parent::itemref and name($context)='property')      then $vocab-package-itemref-uri
+                                 else if ($context/parent::html:* and node-name($context)=$type-qname) then $vocab-structure-uri
+                                 else () (:should not happen:)
+                               )
+                               else ()
                               )[1]"/>
         <xsl:if test="exists($vocab)">
             <xsl:variable name="unified-prefix" as="xs:string?"
-                          select="(if ($vocab=$vocab-package-uri) then '' else (),
+                          select="(if (($vocab=$vocab-package-meta-uri    and $context/parent::meta and name($context)='property')    or
+                                       ($vocab=$vocab-package-link-uri    and $context/parent::link and name($context)='rel')         or
+                                       ($vocab=$vocab-package-item-uri    and $context/parent::item and name($context)='properties')  or
+                                       ($vocab=$vocab-package-itemref-uri and $context/parent::itemref and name($context)='property') or
+                                       ($vocab=$vocab-structure-uri       and $context/parent::html:* and node-name($context)=$type-qname))
+                                   then '' else (),
                                    $implicit.out[@uri=$vocab]/@prefix,
                                    $unified[@uri=$vocab]/@prefix
                                   )[1]"/>
@@ -186,7 +201,11 @@
         <xsl:param name="implicit.in" as="element(f:vocab)*"/>
         <xsl:param name="implicit.out" as="element(f:vocab)*"/>
         <xsl:for-each-group select="f:merge-prefix-decl($all,$implicit.in)
-                                    [not(@uri=($vocab-package-uri,
+                                    [not(@uri=($vocab-package-meta-uri,
+                                               $vocab-package-link-uri,
+                                               $vocab-package-item-uri,
+                                               $vocab-package-itemref-uri,
+                                               $vocab-structure-uri,
                                                $implicit.out/@uri))]"
                             group-by="@uri">
             <xsl:variable name="uri" select="current-grouping-key()"/>
