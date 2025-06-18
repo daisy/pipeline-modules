@@ -78,8 +78,8 @@
         
         see http://www.daisy.org/z3998/2012/vocab/structure
     -->
-    <xsl:variable name="vocab-z3998-uri" select="'http://www.daisy.org/z3998/2012/vocab/structure/#'"/>
-    <xsl:variable name="vocab-z3998"
+    <xsl:variable name="vocab-z3998-structure-uri" select="'http://www.daisy.org/z3998/2012/vocab/structure/#'"/>
+    <xsl:variable name="vocab-z3998-structure"
                   select="('abbreviations',              'email',                      'measure',                   'recipient',
                           'acknowledgments',             'email-message',              'mixed',                     'recto',
                           'acronym',                     'epigraph',                   'morpheme',                  'reference',
