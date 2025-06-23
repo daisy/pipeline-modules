@@ -165,7 +165,7 @@
             <xsl:call-template name="copy-attrs"/>
             <!-- if no ID, then give a new ID -->
             <xsl:if test="not(@id)">
-                <xsl:attribute name="xml:id" select="$citeID"/>
+                <xsl:attribute name="id" select="$citeID"/>
             </xsl:if>
 
             <xsl:for-each select="child::node()">
@@ -246,7 +246,7 @@
 
     <xsl:template name="copy-attrs">
         <xsl:if test="@id">
-            <xsl:attribute name="xml:id" select="@id"/>
+            <xsl:attribute name="id" select="@id"/>
         </xsl:if>
         <xsl:copy-of select="@xml:space"/>
         <xsl:copy-of select="@class"/>
