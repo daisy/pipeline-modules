@@ -132,9 +132,11 @@
     <xsl:template
         match="dtb:abbr/dtb:a | dtb:acronym/dtb:a | dtb:dt/dtb:a | dtb:sub/dtb:a | 
         dtb:sup/dtb:a | dtb:w/dtb:a">
-        <xsl:message>WARNING: 'href' attribute lost when transforming 'a' element into span. Source
-            element ID = <xsl:value-of select="@id"/>. HREF = <xsl:value-of select="@href"
-            /></xsl:message>
+        <xsl:if test="@href">
+            <xsl:message>WARNING: 'href' attribute lost when transforming 'a' element into span. Source
+                element ID = <xsl:value-of select="@id"/>. HREF = <xsl:value-of select="@href"
+                /></xsl:message>
+        </xsl:if>
         <xsl:call-template name="element2span"/>
     </xsl:template>
 
