@@ -191,6 +191,9 @@ public class GoogleRestTTSEngine extends TTSEngine {
 						JSONObject voice = voices.getJSONObject(i);
 						// assume "name" string is present
 						String name = voice.getString("name");
+						if (name.contains("Chirp"))
+							// Chirp and Chirp3 voices currently do not support SSML input
+							continue;
 						Gender gender; {
 							// assume "ssmlGender" string is present
 							String g = voice.getString("ssmlGender");
