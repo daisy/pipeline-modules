@@ -116,7 +116,7 @@ public class TTSEnginesResource extends AuthenticatedResource {
 				TTSEngine e = null;
 				Throwable error = null;
 				try {
-				    e = s.newEngine(properties);
+					e = s.newEngine(properties);
 					engineElem.setAttribute("status", "available");
 				} catch (ServiceDisabledException ex) {
 					logger.debug(name + " is disabled", ex);
@@ -142,7 +142,7 @@ public class TTSEnginesResource extends AuthenticatedResource {
 					String shortMessage = error.getMessage();
 					error = error.getCause();
 					String detailedMessage = error != null ? error.getMessage() : null;
-					if (shortMessage.endsWith(detailedMessage))
+					if (detailedMessage != null && shortMessage.endsWith(detailedMessage))
 						detailedMessage = null;
 					if (shortMessage.length() > 80) {
 						// Use the heuristic that if a message is longer than 80 characters, it is possible
