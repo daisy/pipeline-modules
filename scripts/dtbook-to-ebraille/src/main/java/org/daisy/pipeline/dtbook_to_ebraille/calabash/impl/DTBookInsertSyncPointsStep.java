@@ -93,9 +93,7 @@ public class DTBookInsertSyncPointsStep extends DefaultStep implements XProcStep
 	private static final QName DTB_A = new QName(XMLNS_DTB, "a");
 	private static final QName DTB_SPAN = new QName(XMLNS_DTB, "span");
 	private static final QName _CLASS = new QName("class");
-	private static final QName _ID = new QName("id");
 	private static final String SYNC_CLASS = "__tmp__sync__";
-	private static final String SYNC_ID = "__sync__%d__";
 
 	private static final Set<String> BLOCK_ELEMENTS = Sets.newHashSet(
 		"book",           "doctitle",      "dl",         "blockquote",
@@ -133,7 +131,6 @@ public class DTBookInsertSyncPointsStep extends DefaultStep implements XProcStep
 		}
 
 		public void transform(BaseURIAwareXMLStreamReader reader, BaseURIAwareXMLStreamWriter writer) throws TransformerException {
-			int syncCount = 0;
 			boolean newBlock = true;
 			LinkedList<QName> parentElement = new LinkedList<>();
 			try {
@@ -171,11 +168,11 @@ public class DTBookInsertSyncPointsStep extends DefaultStep implements XProcStep
 									// fixing, it should be fixed on the side of the HTML transformation, not here.)
 									String leadingSpace = text.replaceFirst("^(\\s+).*$", "$1");
 									writer.writeCharacters(leadingSpace);
-									if (insertSyncPoint(writer, ++syncCount, parentElement.get(0)))
+									if (insertSyncPoint(writer, parentElement.get(0)))
 										newBlock = false;
 									writer.writeCharacters(text.substring(leadingSpace.length()));
 								} else {
-									if (insertSyncPoint(writer, ++syncCount, parentElement.get(0)))
+									if (insertSyncPoint(writer, parentElement.get(0)))
 										newBlock = false;
 									writer.writeCharacters(text);
 								}
@@ -196,12 +193,12 @@ public class DTBookInsertSyncPointsStep extends DefaultStep implements XProcStep
 			}
 		}
 
-		private static boolean insertSyncPoint(XMLStreamWriter writer, int num, QName parent) throws XMLStreamException {
+		private static boolean insertSyncPoint(XMLStreamWriter writer, QName parent) throws XMLStreamException {
 			if (TEXT_ONLY_ELEMENTS.contains(parent.getLocalPart()))
 				return false;
 			XMLStreamWriterHelper.writeStartElement(writer, DTB_A.equals(parent) ? DTB_SPAN : DTB_A);
 			XMLStreamWriterHelper.writeAttribute(writer, _CLASS, SYNC_CLASS);
-			XMLStreamWriterHelper.writeAttribute(writer, _ID, String.format(SYNC_ID, num));
+			// note that an ID attribute is added in a subsequent step
 			writer.writeEndElement();
 			return true;
 		}

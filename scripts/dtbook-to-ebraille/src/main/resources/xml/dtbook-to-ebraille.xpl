@@ -169,6 +169,7 @@
 				<p:for-each>
 					<pxi:dtbook-insert-sync-points/>
 				</p:for-each>
+				<px:add-ids match="*[@class='__tmp__sync__']" prefix="__sync__"/>
 			</p:when>
 			<p:otherwise>
 				<p:identity/>
