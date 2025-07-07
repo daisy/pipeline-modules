@@ -6,8 +6,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.IllformedLocaleException;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import static java.util.stream.Collectors.toList;
@@ -127,10 +129,17 @@ public class AWSPollyTTSEngine extends TTSEngine {
 					voices.addAll(
 						awsVoicesDescription.get(engine).voices()
 							.stream()
-							.map(i -> new Voice(getProvider().getName(),
-							                    i.idAsString() + " (" + engine.toString() + ")",
-							                    new Locale(i.languageName()),
-							                    Gender.of(i.genderAsString().toLowerCase())))
+							.map(i -> {
+								try {
+									return new Voice(getProvider().getName(),
+									                 i.idAsString() + " (" + engine.toString() + ")",
+									                 (new Locale.Builder()).setLanguageTag(i.languageName().replace("_", "-")).build(),
+									                 Gender.of(i.genderAsString().toLowerCase()));
+								} catch (IllformedLocaleException e) {
+									return null;
+								}
+							})
+							.filter(Objects::nonNull)
 							.collect(toList())
 					);
 				}
