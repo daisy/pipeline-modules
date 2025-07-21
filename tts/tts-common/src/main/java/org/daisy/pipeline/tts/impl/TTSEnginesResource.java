@@ -89,7 +89,7 @@ public class TTSEnginesResource extends AuthenticatedResource {
 					} catch (IOException|SaxonApiException e) {
 						logger.error("bad request:", e);
 						setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-						return getErrorRepresentation(e.getMessage());
+						return getErrorRepresentation(e);
 					}
 				}
 			}
@@ -182,7 +182,7 @@ public class TTSEnginesResource extends AuthenticatedResource {
 				setStatus(Status.SUCCESS_OK);
 			} catch (Exception e) {
 				setStatus(Status.SERVER_ERROR_INTERNAL);
-				return getErrorRepresentation(e.getMessage());
+				return getErrorRepresentation(e);
 			}
 		}
 		logResponse(dom);

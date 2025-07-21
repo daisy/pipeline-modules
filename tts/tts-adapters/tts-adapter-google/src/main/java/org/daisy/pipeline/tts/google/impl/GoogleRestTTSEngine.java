@@ -29,8 +29,10 @@ import org.daisy.pipeline.tts.TTSEngine;
 import org.daisy.pipeline.tts.TTSRegistry.TTSResource;
 import org.daisy.pipeline.tts.TTSService.SynthesisException;
 import org.daisy.pipeline.tts.Voice;
+import org.daisy.pipeline.tts.Voice.MarkSupport;
 import org.daisy.pipeline.tts.VoiceInfo;
 import org.daisy.pipeline.tts.VoiceInfo.Gender;
+import org.daisy.pipeline.tts.VoiceInfo.LanguageRange;
 import org.daisy.pipeline.tts.rest.Request;
 import org.daisy.pipeline.tts.scheduler.ExponentialBackoffScheduler;
 import org.daisy.pipeline.tts.scheduler.FatalError;
@@ -81,11 +83,14 @@ public class GoogleRestTTSEngine extends TTSEngine {
 	@Override
 	public SynthesisResult synthesize(XdmNode ssml, Voice voice, TTSResource threadResources)
 			throws SynthesisException, InterruptedException {
-	
+
+		boolean ssmlSupported = !(voice != null && voice.getMarkSupport() == MarkSupport.MARK_NOT_SUPPORTED);
 		String sentence; {
 			try {
 				Map<String,Object> params = new HashMap<>(); {
 					params.put("speech-rate", speechRate);
+					if (!ssmlSupported)
+						params.put("mark-not-supported", true);
 				}
 				sentence = transformSsmlNodeToString(ssml, ssmlTransformer, params);
 			} catch (IOException | SaxonApiException e) {
@@ -112,13 +117,15 @@ public class GoogleRestTTSEngine extends TTSEngine {
 		}
 
 		try {
-			Request<JSONObject> speechRequest = mRequestBuilder.newRequest()
-				.withSampleRate((int)mAudioFormat.getSampleRate())
-				.withAction(GoogleRestAction.SPEECH)
-				.withLanguageCode(languageCode)
-				.withVoice(name)
-				.withText(sentence)
-				.build();
+			Request<JSONObject> speechRequest; {
+				GoogleRequestBuilder b = mRequestBuilder.newRequest()
+					.withSampleRate((int)mAudioFormat.getSampleRate())
+					.withAction(GoogleRestAction.SPEECH)
+					.withLanguageCode(languageCode)
+					.withVoice(name);
+				b = ssmlSupported ? b.withSsml(sentence) : b.withText(sentence);
+				speechRequest = b.build();
+			}
 			ArrayList<byte[]> result = new ArrayList<>();
 			mRequestScheduler.launch(() -> {
 				Response response = doRequest(speechRequest);
@@ -191,9 +198,6 @@ public class GoogleRestTTSEngine extends TTSEngine {
 						JSONObject voice = voices.getJSONObject(i);
 						// assume "name" string is present
 						String name = voice.getString("name");
-						if (name.contains("Chirp"))
-							// Chirp and Chirp3 voices currently do not support SSML input
-							continue;
 						Gender gender; {
 							// assume "ssmlGender" string is present
 							String g = voice.getString("ssmlGender");
@@ -206,19 +210,24 @@ public class GoogleRestTTSEngine extends TTSEngine {
 							}
 						}
 						if (gender != null) {
-							List<Locale> locale = new ArrayList<>(); {
+							List<LanguageRange> locale = new ArrayList<>(); {
 								JSONArray codes = voice.getJSONArray("languageCodes");
 								if (codes != null)
 									for (int j = 0; j < codes.length(); j++)
 										try {
-											locale.add((new Locale.Builder()).setLanguageTag(codes.getString(j).replace("_", "-")).build());
+											locale.add(
+												new LanguageRange(
+													(new Locale.Builder()).setLanguageTag(codes.getString(j).replace("_", "-"))
+													                      .build()));
 										} catch (IllformedLocaleException e) {
 											logger.debug("Could not parse locale: " + locale);
 										}
 							}
 							if (locale.isEmpty())
 								continue;
-							result.add(new Voice(getProvider().getName(), name, locale, gender));
+							result.add(new Voice(getProvider().getName(), name, locale, gender,
+							                     isChirpVoice(name) ? MarkSupport.MARK_NOT_SUPPORTED
+							                                        : MarkSupport.DEFAULT));
 						}
 					}
 				} catch (JSONException e) {
@@ -233,6 +242,10 @@ public class GoogleRestTTSEngine extends TTSEngine {
 			throw new SynthesisException(e);
 		}
 		return result;
+	}
+
+	private static boolean isChirpVoice(String name) {
+		return name.contains("-Chirp-") || name.contains("-Chirp3-");
 	}
 
 	@Override
