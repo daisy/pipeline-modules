@@ -12,7 +12,7 @@
 
   <groupId>org.daisy.pipeline.modules</groupId>
   <artifactId>modules-bom</artifactId>
-  <version>1.15.2</version>
+  <version>1.15.3-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>DAISY Pipeline 2 :: Modules BoM</name>
@@ -894,8 +894,4 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-
-  <scm>
-    <tag>v1.15.2</tag>
-  </scm>
 </project>
