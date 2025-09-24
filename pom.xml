@@ -42,6 +42,7 @@
     <module>dtbook-to-ebraille</module>
     <module>dtbook-to-epub3</module>
     <module>dtbook-to-html</module>
+    <module>dtbook-to-latex</module>
     <module>dtbook-to-odt</module>
     <module>dtbook-to-pef</module>
     <module>dtbook-to-rtf</module>
