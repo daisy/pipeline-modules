@@ -88,6 +88,7 @@
     <module>scripts/dtbook-to-ebraille</module>
     <module>scripts/dtbook-to-epub3</module>
     <module>scripts/dtbook-to-html</module>
+    <module>scripts/dtbook-to-latex</module>
     <module>scripts/dtbook-to-odt</module>
     <module>scripts/dtbook-to-pef</module>
     <module>scripts/dtbook-to-rtf</module>
