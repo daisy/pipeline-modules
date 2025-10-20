@@ -234,7 +234,7 @@
     <!-- CONVERT DIAGRAM TO HTML                                                 -->
     <!--=========================================================================-->
 
-    <px:diagram-to-html name="diagram-to-html">
+    <px:diagram-to-html name="diagram-to-html" px:progress=".05">
         <p:input port="source.in-memory">
             <p:pipe step="move" port="result.in-memory"/>
         </p:input>
@@ -244,7 +244,7 @@
     <!-- CLEANUP                                                                 -->
     <!--=========================================================================-->
 
-    <p:choose name="clean">
+    <p:choose name="clean" px:progress=".1">
         <p:when test="$skip-cleanup='true'">
             <p:output port="fileset" primary="true"/>
             <p:output port="in-memory" sequence="true">
@@ -375,7 +375,7 @@
     <p:sink/>
 
     <p:documentation>Generate the EPUB 3 navigation document</p:documentation>
-    <px:epub3-add-navigation-doc name="add-navigation-doc">
+    <px:epub3-add-navigation-doc name="add-navigation-doc" px:progress=".05">
         <p:input port="source.fileset">
             <p:pipe step="clean" port="fileset"/>
         </p:input>
@@ -394,7 +394,7 @@
     <!--=========================================================================-->
 
     <!-- FIXME: include resources such as lexicons in input -->
-    <px:tts-for-epub3 name="tts">
+    <px:tts-for-epub3 name="tts" px:progress=".6">
       <p:input port="source.in-memory">
           <p:pipe step="add-navigation-doc" port="result.in-memory"/>
       </p:input>
@@ -414,7 +414,7 @@
     <!--=========================================================================-->
 
     <p:documentation>Add SMIL and audio files</p:documentation>
-    <p:group name="add-mediaoverlays">
+    <p:group name="add-mediaoverlays" px:progress=".05">
         <p:output port="fileset" primary="true"/>
         <p:output port="in-memory" sequence="true">
             <p:pipe step="tts" port="result.in-memory"/>
@@ -459,11 +459,11 @@
             <p:pipe step="content-docs-except-nav-and-diagram" port="result"/>
         </p:input>
     </p:split-sequence>
-    <px:html-to-opf-metadata name="metadata"/>
+    <px:html-to-opf-metadata name="metadata" px:progress=".05"/>
     <p:sink/>
 
     <p:documentation>Generate the EPUB 3 package document</p:documentation>
-    <p:group name="add-package-doc">
+    <p:group name="add-package-doc" px:progress=".05">
         <p:output port="fileset" primary="true"/>
         <p:output port="in-memory" sequence="true">
             <p:pipe step="add-mediaoverlays" port="in-memory"/>
@@ -511,7 +511,7 @@
 
     <!--TODO clean file set for non-existing files ?-->
 
-    <p:group name="ocf">
+    <p:group name="ocf" px:progress=".05">
         <p:output port="fileset" primary="true"/>
         <p:output port="in-memory" sequence="true">
             <p:pipe step="maybe-validate" port="in-memory"/>
