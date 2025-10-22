@@ -53,7 +53,7 @@
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
         <artifactId>braille-css-utils</artifactId>
-        <version>4.2.0-SNAPSHOT</version>
+        <version>5.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules.braille</groupId>
@@ -576,7 +576,7 @@
       <dependency>
         <groupId>org.daisy.braille</groupId>
         <artifactId>braille-css</artifactId>
-        <version>1.26.1</version>
+        <version>1.27.0</version>
       </dependency>
       <!--
           for css-utils, braille-common and braille-css-utils
