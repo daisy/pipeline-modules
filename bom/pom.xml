@@ -162,16 +162,6 @@
       -->
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
-        <artifactId>dtbook-break-detection</artifactId>
-        <version>2.0.6</version>
-      </dependency>
-      <dependency>
-        <groupId>org.daisy.pipeline.modules</groupId>
-        <artifactId>html-break-detection</artifactId>
-        <version>1.4.2</version>
-      </dependency>
-      <dependency>
-        <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>nlp-common</artifactId>
         <version>3.0.4</version>
       </dependency>
@@ -190,11 +180,6 @@
         <artifactId>nlp-ruled-lexer</artifactId>
         <version>1.0.4</version>
       </dependency>
-      <!-- <dependency> -->
-      <!--   <groupId>org.daisy.pipeline.modules</groupId> -->
-      <!--   <artifactId>zedai-break-detection</artifactId> -->
-      <!--   <version>2.0.2-SNAPSHOT</version> -->
-      <!-- </dependency> -->
       
       <!--
           scripts-utils
