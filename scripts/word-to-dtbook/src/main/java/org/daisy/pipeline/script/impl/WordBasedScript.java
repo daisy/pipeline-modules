@@ -160,12 +160,7 @@ public abstract class WordBasedScript implements ScriptService<Script>, ScriptSe
 					"Transforms a Microsoft Office Word (.docx) document into "
 					+ (formatId.equals("mp3")
 					      ? "a folder structure with MP3 files suitable for playback on MegaVoice Envoy devices"
-					      : (formatName + " format")) + ".")
-				// FIXME: home page has yet to be created
-				.withHomepage(
-					"http://daisy.github.io/pipeline/Get-Help/User-Guide/Scripts/word-to-"
-					+ formatId + "/")
-				;
+					      : (formatName + " format")) + ".");
 			for (ScriptPort p : wordToDTBook.getInputPorts())
 				builder = builder.withInputPort(p.getName(), p);
 			for (ScriptOption o : wordToDTBook.getOptions()) {
