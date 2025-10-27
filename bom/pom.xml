@@ -246,11 +246,6 @@
       </dependency>
       <dependency>
         <groupId>org.daisy.pipeline.modules</groupId>
-        <artifactId>mathml-utils</artifactId>
-        <version>1.1.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.daisy.pipeline.modules</groupId>
         <artifactId>metadata-utils</artifactId>
         <version>2.0.2</version>
       </dependency>
