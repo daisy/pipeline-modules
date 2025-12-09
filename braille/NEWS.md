@@ -3,6 +3,7 @@ v1.15.4
 
 Changes
 -------
+- Update to Liblouis [3.36.0](https://github.com/liblouis/liblouis/releases/tag/v3.36.0)
 - Keep a leader together with the last word before it if there is no space in between
   (https://github.com/mtmse/dotify.library/issues/24)
 
