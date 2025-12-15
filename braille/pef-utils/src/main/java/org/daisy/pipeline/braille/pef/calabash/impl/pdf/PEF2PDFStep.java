@@ -13,15 +13,21 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
 import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.ByteStreams;
@@ -37,14 +43,18 @@ import com.xmlcalabash.io.WritablePipe;
 import com.xmlcalabash.library.DefaultStep;
 import com.xmlcalabash.runtime.XAtomicStep;
 
+import net.sf.saxon.dom.NodeOverNodeInfo;
 import net.sf.saxon.s9api.SaxonApiException;
+import net.sf.saxon.xpath.XPathFactoryImpl;
 
 import org.daisy.dotify.api.table.BrailleConverter;
 import org.daisy.dotify.api.table.Table;
 import org.daisy.pipeline.braille.pef.TableRegistry;
 import org.daisy.common.file.URLs;
 import org.daisy.common.shell.CommandRunner;
+import org.daisy.common.stax.BaseURIAwareXMLStreamReader;
 import org.daisy.common.transform.InputValue;
+import org.daisy.common.transform.Mult;
 import org.daisy.common.transform.OutputValue;
 import org.daisy.common.transform.TransformerException;
 import org.daisy.common.transform.XMLInputValue;
@@ -65,6 +75,8 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.w3c.dom.Node;
 
 public class PEF2PDFStep extends DefaultStep implements XProcStep {
 
@@ -221,12 +233,31 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 
 		@Override
 		public Runnable transform(Map<QName,InputValue<?>> input, Map<QName,OutputValue<?>> output) {
-			input = XMLTransformer.validateInput(input, ImmutableMap.of(_SOURCE, InputType.MANDATORY_NODE_SEQUENCE));
+			input = XMLTransformer.validateInput(input, ImmutableMap.of(_SOURCE, InputType.MANDATORY_NODE_SINGLE));
 			output = XMLTransformer.validateOutput(output, null);
-			XMLInputValue<?> source = (XMLInputValue<?>)input.get(_SOURCE);
+			Mult<? extends XMLInputValue<?>> source = ((XMLInputValue<?>)input.get(_SOURCE)).mult(2);
 			return () -> {
 				try {
-					org.daisy.common.stax.BaseURIAwareXMLStreamReader pef = source.asXMLStreamReader();
+					int totalVolumes = 0; {
+						Node node = source.get().asNodeIterator().next();
+						// we know it's a Saxon object because this is called from the XProcStep
+						XPath xpath = new XPathFactoryImpl(
+							((NodeOverNodeInfo)node).getUnderlyingNodeInfo().getConfiguration()
+						).newXPath();
+						xpath.setNamespaceContext(
+							new NamespaceContext() {
+								public String getNamespaceURI(String prefix) {
+									return "pef".equals(prefix) ? PEF_NS : null; }
+								public String getPrefix(String namespaceURI) {
+									return PEF_NS.equals(namespaceURI) ? "pef" : null; }
+								public Iterator<String> getPrefixes(String namespaceURI) {
+									return PEF_NS.equals(namespaceURI)
+										? Collections.singleton("pef").iterator()
+										: null; }});
+						totalVolumes = ((Double)xpath.evaluate("count(//pef:volume)", node, XPathConstants.NUMBER))
+							.intValue();
+					}
+					BaseURIAwareXMLStreamReader pef = source.get().asXMLStreamReader();
 					ByteArrayOutputStream htmlBytes = new ByteArrayOutputStream();
 					Writer html = new OutputStreamWriter(htmlBytes, StandardCharsets.UTF_8);
 					BrailleConverter bc = table.newBrailleConverter();
@@ -282,12 +313,7 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 											"	margin: 0;\n" +
 											"	font-size: 25px;\n" +
 											"}\n" +
-											"h1.bookmark {\n" +
-											"	position: absolute;\n" +
-											"	left: -1000mm;\n" +
-											"	font-size: 1px;\n" +
-											"}\n" +
-											".page {\n" +
+											".volume, .page {\n" +
 											"	page-break-before: always;\n" +
 											"}\n" +
 											".row {\n" +
@@ -312,6 +338,12 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 											"}\n" +
 											"		/*]]>*/\n" +
 											"		</style>\n" +
+											"		<bookmarks>\n");
+										for (int v = 1; v <= totalVolumes; v++)
+											html.write(
+												"			<bookmark name=\"Volume " + v + "\" href=\"#volume-" + v + "\"/>\n");
+										html.write(
+											"		</bookmarks>\n" +
 											"	</head>\n" +
 											"	<body>\n");
 										elementStack.push(elemName);
@@ -338,9 +370,7 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 											rowgapStack.push(getRowgap(pef, rowgapStack));
 											elementStack.push(elemName);
 											volumeCount++;
-											// FIXME: bookmarks supported by wkhtmltopdf but not by openhtmltopdf
-											html.write("		<div class=\"volume\">\n" +
-											           "			<h1 class=\"bookmark\">Volume " + volumeCount + "</h1>\n");
+											html.write("		<div class=\"volume\" id=\"volume-" + volumeCount + "\">\n");
 											continue events;
 										}
 									}
