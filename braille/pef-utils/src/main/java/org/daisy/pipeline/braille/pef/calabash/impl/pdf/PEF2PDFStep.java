@@ -313,17 +313,15 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 											"body {\n" +
 											"	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;\n" +
 											"	margin: 0;\n" +
-											"	font-size: 25px;\n" +
+											"	font-size: 31.25px;\n" +
 											"}\n" +
 											".volume, .page {\n" +
 											"	page-break-before: always;\n" +
 											"}\n" +
 											".row {\n" +
 											"    font-family: odt2braille, NotCourierSans;\n" +
-											"    letter-spacing: 0px;\n" +
 											"    white-space: pre;\n" +
 											"    letter-spacing: 0px;\n" +
-											"    font-size: 125%;\n" +
 											"    height: 1em;\n" +
 											"}\n" +
 											".row[rowgap=\"1\"] {\n" +
@@ -471,8 +469,11 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 						}
 					html.flush();
 					pdf.getParentFile().mkdirs();
-					int pageWidth = (int)Math.ceil(4.2 * maxColumns) + 2 * marginLeft;
-					int pageHeight = (int)Math.ceil(8.44 * maxRows) + 2 * marginTop;
+					// 8,27 mm corresponds with 31.25 px (96 dpi)
+					// 4,135 mm is the half of 8,27 mm: this ratio is termined by the font
+					int pageWidth = (int)Math.ceil(4.135 * maxColumns) + 2 * marginLeft;
+					// the 0,25% is a small extra, needed to fit everything on the page for some reason
+					int pageHeight = (int)Math.ceil((8.27 * 1.0025 * maxRows) + 2 * marginTop;
 					try (OutputStream os = new FileOutputStream(pdf)) {
 						new PdfRendererBuilder()
 							.withHtmlContent(new String(htmlBytes.toByteArray(), StandardCharsets.UTF_8),
