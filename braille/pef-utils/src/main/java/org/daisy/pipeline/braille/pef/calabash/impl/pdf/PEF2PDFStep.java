@@ -51,6 +51,7 @@ import org.daisy.dotify.api.table.BrailleConverter;
 import org.daisy.dotify.api.table.Table;
 import org.daisy.pipeline.braille.pef.TableRegistry;
 import org.daisy.common.file.URLs;
+import org.daisy.common.saxon.SaxonHelper;
 import org.daisy.common.shell.CommandRunner;
 import org.daisy.common.stax.BaseURIAwareXMLStreamReader;
 import org.daisy.common.transform.InputValue;
@@ -66,6 +67,8 @@ import org.daisy.common.xproc.XProcMonitor;
 import org.daisy.pipeline.braille.common.Query.MutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.query;
+import org.daisy.pipeline.braille.css.EmbossedMedium;
+import org.daisy.pipeline.css.Medium;
 import static org.daisy.pipeline.file.FileUtils.cResultDocument;
 
 import org.osgi.service.component.annotations.Component;
@@ -85,6 +88,7 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 	private static final QName _SOURCE = new QName("source");
 	private static final net.sf.saxon.s9api.QName _HREF = new net.sf.saxon.s9api.QName("href");
 	private static final net.sf.saxon.s9api.QName _TABLE = new net.sf.saxon.s9api.QName("table");
+	private static final net.sf.saxon.s9api.QName _MEDIUM = new net.sf.saxon.s9api.QName("medium");
 	private static final String DEFAULT_TABLE = "org.daisy.braille.impl.table.DefaultTableProvider.TableType.EN_US";
 
 	private static final URL font = URLs.getResourceFromJAR("odt2braille8.ttf", PEF2PDFStep.class);
@@ -165,8 +169,11 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 					}
 				}
 			}
+			Medium medium = SaxonHelper.objectFromItem(
+				SaxonHelper.getSingleItem(getOption(_MEDIUM).getValue().getUnderlyingValue()),
+				Medium.class);
 			logger.debug("Storing PEF to PDF using table: " + table);
-			new PEF2PDF(pdfFile, table).transform(
+			new PEF2PDF(pdfFile, table, medium).transform(
 				ImmutableMap.of(_SOURCE, XMLCalabashInputValue.of(source)),
 				ImmutableMap.of()
 			).run();
@@ -225,10 +232,12 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 
 		private final File pdf;
 		private final Table table;
+		private final Medium medium;
 
-		public PEF2PDF(File pdf, Table table) {
+		public PEF2PDF(File pdf, Table table, Medium medium) {
 			this.pdf = pdf;
 			this.table = table;
+			this.medium = medium;
 		}
 
 		@Override
@@ -264,10 +273,22 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 					boolean tableMatchesBrailleCharset = false;
 					int maxColumns = 0; // in cells per line
 					int maxRows = 0; // in lines
-					// margins are expected to be specified in @page rules, and therefore included in the PEF,
-					// so don't add any if we want the braille and print versions to match
-					int marginLeft = 0; // in mm
-					int marginTop = 0; // in mm
+					double cellHeight = 10;
+					double cellWidth = 6;
+					if (medium.getType() == Medium.Type.EMBOSSED && medium instanceof EmbossedMedium) {
+						EmbossedMedium embossedMedium = (EmbossedMedium)medium;
+						cellHeight = embossedMedium.getEm();
+						cellWidth = embossedMedium.getCh();
+					}
+					double fontSize = cellHeight;
+					double letterSpacing = 0;
+					if (cellHeight < 2 * cellWidth)
+						letterSpacing = cellWidth - cellHeight / 2;
+					double lineHeight = 1; // em
+					if (cellHeight > 2 * cellWidth) {
+						fontSize = 2 * cellWidth;
+						lineHeight = cellHeight / (2 * cellWidth);
+					}
 					LinkedList<QName> elementStack = new LinkedList<>();
 					LinkedList<Boolean> duplexStack = new LinkedList<>();
 					LinkedList<Integer> colsStack = new LinkedList<>();
@@ -305,15 +326,12 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 											"	     format(\"truetype\");\n" +
 											"}\n" +
 											"@page {\n" +
-											String.format("	margin-left: %dmm;\n", marginLeft) +
-											String.format("	margin-top: %dmm;\n", marginTop) +
-											"	margin-right: 0mm;\n" +
-											"	margin-bottom: 0mm;\n" +
+											"	margin: 0;\n" +
 											"}\n" +
 											"body {\n" +
 											"	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;\n" +
 											"	margin: 0;\n" +
-											"	font-size: 31.25px;\n" +
+											"	font-size: " + fontSize + "mm;\n" +
 											"}\n" +
 											".volume, .page {\n" +
 											"	page-break-before: always;\n" +
@@ -321,20 +339,20 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 											".row {\n" +
 											"    font-family: odt2braille, NotCourierSans;\n" +
 											"    white-space: pre;\n" +
-											"    letter-spacing: 0px;\n" +
-											"    height: 1em;\n" +
+											"    letter-spacing: " + letterSpacing + "mm;\n" +
+											"    height: " + lineHeight + "em;\n" +
 											"}\n" +
 											".row[rowgap=\"1\"] {\n" +
-											"    height: 1.25em;\n" +
+											"    height: " + (1.25 * lineHeight) + "em;\n" +
 											"}\n" +
 											".row[rowgap=\"2\"] {\n" +
-											"    height: 1.5em;\n" +
+											"    height: " + (1.5 * lineHeight) + "em;\n" +
 											"}\n" +
 											".row[rowgap=\"3\"] {\n" +
-											"    height: 1.75em;\n" +
+											"    height: " + (1.75 * lineHeight) + "em;\n" +
 											"}\n" +
 											".row[rowgap=\"4\"] {\n" +
-											"    height: 2em;\n" +
+											"    height: " + (2 * lineHeight) + "em;\n" +
 											"}\n" +
 											"		/*]]>*/\n" +
 											"		</style>\n" +
@@ -469,11 +487,9 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 						}
 					html.flush();
 					pdf.getParentFile().mkdirs();
-					// 8,27 mm corresponds with 31.25 px (96 dpi)
-					// 4,135 mm is the half of 8,27 mm: this ratio is termined by the font
-					int pageWidth = (int)Math.ceil(4.135 * maxColumns) + 2 * marginLeft;
-					// the 0,25% is a small extra, needed to fit everything on the page for some reason
-					int pageHeight = (int)Math.ceil((8.27 * 1.0025 * maxRows) + 2 * marginTop;
+					// for some reason a small extra of 0,5% is needed to fit everything on the page
+					int pageHeight = (int)Math.ceil(maxRows * cellHeight * 1.005);
+					int pageWidth = (int)Math.ceil(maxColumns * cellWidth * 1.005);
 					try (OutputStream os = new FileOutputStream(pdf)) {
 						new PdfRendererBuilder()
 							.withHtmlContent(new String(htmlBytes.toByteArray(), StandardCharsets.UTF_8),
