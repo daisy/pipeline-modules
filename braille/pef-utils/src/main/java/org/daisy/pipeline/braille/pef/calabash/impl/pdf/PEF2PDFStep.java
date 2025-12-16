@@ -264,8 +264,10 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 					boolean tableMatchesBrailleCharset = false;
 					int maxColumns = 0; // in cells per line
 					int maxRows = 0; // in lines
-					int marginLeft = 10; // in mm
-					int marginTop = 10; // in mm
+					// margins are expected to be specified in @page rules, and therefore included in the PEF,
+					// so don't add any if we want the braille and print versions to match
+					int marginLeft = 0; // in mm
+					int marginTop = 0; // in mm
 					LinkedList<QName> elementStack = new LinkedList<>();
 					LinkedList<Boolean> duplexStack = new LinkedList<>();
 					LinkedList<Integer> colsStack = new LinkedList<>();
