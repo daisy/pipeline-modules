@@ -517,6 +517,7 @@ If left blank, the locale information in the input document will be used to sele
 	</p:option>
 
 	<!--
+	    dtbook-to-pef
 	    html-to-pef
 	-->
 	<p:option name="pdf" required="false" px:output="result" px:type="anyDirURI" px:media-type="application/pdf" select="''">
@@ -526,6 +527,68 @@ If left blank, the locale information in the input document will be used to sele
 		</p:documentation>
 	</p:option>
 
+	<!--
+	    dtbook-to-pef
+	    html-to-pef
+	-->
+	<p:option name="pdf-offset-x" required="false" select="'0'">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<h2 px:role="name">PDF: horizontal offset</h2>
+			<p px:role="desc" xml:space="preserve">Tweak the position of content on the page horizontally.
+
+A positive offset results in a shift to the right, a negative offset results in a shift to the left.</p>
+		</p:documentation>
+		<p:pipeinfo>
+			<px:type>
+				<data type="string" xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
+					<a:documentation xml:lang="en" xml:space="preserve">A positive or negative length
+
+The syntax is as follows (described in terms of [CSS grammar](https://www.w3.org/TR/CSS21/grammar.html)):
+
+    length
+     : '0' | unary_operator number unit
+     ;
+    unit
+     : 'mm' | 'cm' | 'in' | 'px'
+     ;
+</a:documentation>
+					<param name="pattern">^0|[+-]?([0-9]*\.)?[0-9]+([eE][+-]?[0-9]+)?(mm|cm|in|px)?$</param>
+				</data>
+			</px:type>
+		</p:pipeinfo>
+	</p:option>
+	
+	<!--
+	    dtbook-to-pef
+	    html-to-pef
+	-->
+	<p:option name="pdf-offset-y" required="false" select="'0'">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<h2 px:role="name">PDF: vertical offset</h2>
+			<p px:role="desc" xml:space="preserve">Tweak the position of content on the page vertically.
+
+A positive offset results in a shift downwards, a negative offset results in a shift upwards.</p>
+		</p:documentation>
+		<p:pipeinfo>
+			<px:type>
+				<data type="string" xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
+					<a:documentation xml:lang="en" xml:space="preserve">A positive or negative length
+
+The syntax is as follows (described in terms of [CSS grammar](https://www.w3.org/TR/CSS21/grammar.html)):
+
+    length
+     : '0' | unary_operator number unit
+     ;
+    unit
+     : 'mm' | 'cm' | 'in' | 'px'
+     ;
+</a:documentation>
+					<param name="pattern">^0|[+-]?([0-9]*\.)?[0-9]+([eE][+-]?[0-9]+)?(mm|cm|in|px)?$</param>
+				</data>
+			</px:type>
+		</p:pipeinfo>
+	</p:option>
+	
 	<!--
 	    dtbook-to-pef
 	    html-to-pef

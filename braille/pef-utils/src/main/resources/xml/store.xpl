@@ -49,6 +49,16 @@
     <p:option name="preview-href" required="false" select="''"/> <!-- URI -->
     <p:option name="preview-table" required="false" select="''"/> <!-- query -->
     <p:option name="pdf-href" required="false" select="''"/> <!-- URI -->
+    <p:option name="pdf-offset-x" required="false" select="'0'">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Horizontal offset for the position of the content on the PDF page.</p>
+        </p:documentation>
+    </p:option>
+    <p:option name="pdf-offset-y" required="false" select="'0'">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Vertical offset for the position of the content on the PDF page.</p>
+        </p:documentation>
+    </p:option>
     
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
         <p:documentation>
@@ -86,6 +96,8 @@
         <p:option name="href" required="true"/>
         <p:option name="table" required="true"/>
         <p:option name="medium" required="true"/>
+        <p:option name="offset-x" required="true"/>
+        <p:option name="offset-y" required="true"/>
         <!--
             Implemented in ../../java/org/daisy/pipeline/braille/pef/calabash/impl/pdf/PEF2PDFStep.java
         -->
@@ -306,6 +318,8 @@
                                 <p:with-option name="href" select="$pdf-href"/>
                                 <p:with-option name="table" select="$preview-table"/>
                                 <p:with-option name="medium" select="$parsed-medium"/>
+                                <p:with-option name="offset-x" select="$pdf-offset-x"/>
+                                <p:with-option name="offset-y" select="$pdf-offset-y"/>
                             </pxi:pef2pdf>
                         </p:when>
                         <p:otherwise>
