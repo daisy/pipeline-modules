@@ -206,6 +206,8 @@ public class FileFormatCatalog implements MediumProvider {
 										public EmbossedMedium apply(Table table) {
 											FileFormat format = fs.get();
 											Boolean duplex = FileFormatBuilder.this.duplex;
+											Double cellWidth = null;
+											Double cellHeight = null;
 											if (duplex != null) {
 												if (format.supportsDuplex())
 													// try to enable/disable duplex
@@ -285,12 +287,26 @@ public class FileFormatCatalog implements MediumProvider {
 												String k = f.getKey();
 												if (k.startsWith("-daisy-"))
 													k = k.substring("-daisy-".length());
-												try {
-													format.setFeature(CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_CAMEL, k),
-													                  f.getValue());
-												} catch (IllegalArgumentException e) {
-													return null;
-												}
+												// setting a specific cell-width and cell-height is useful for PDF
+												// output, namely to align the PDF output with the output of an embosser
+												// that is not managed by Pipeline
+												if (format instanceof PEFFileFormat && ("cell-width".equals(k) || "cell-height".equals(k))) {
+													try {
+														Double d = parseLength(f.getValue(), k).toUnit(Unit.MM).getValue().doubleValue();
+														if ("cell-width".equals(k))
+															cellWidth = d;
+														else
+															cellHeight = d;
+													} catch (IllegalArgumentException|UnsupportedOperationException e) {
+														throw new IllegalArgumentException("Unsupported value for " + k + ": " + f.getValue(), e);
+													}
+												} else
+													try {
+														format.setFeature(CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_CAMEL, k),
+														                  f.getValue());
+													} catch (IllegalArgumentException e) {
+														return null;
+													}
 											}
 											// sheets-multiple-of-two and blank-last-page are handled in px:pef-store
 											Boolean blankLastPage = FileFormatBuilder.this.blankLastPage;
@@ -298,16 +314,13 @@ public class FileFormatCatalog implements MediumProvider {
 												blankLastPage = false;
 											if (format instanceof EmbosserAsFileFormat) {
 												Embosser embosser = ((EmbosserAsFileFormat)format).embosser;
-												Double cellWidth, cellHeight;
 												try {
 													cellWidth = getCellWidth(embosser);
 													cellHeight = getCellHeight(embosser);
 												} catch (IllegalArgumentException e) {
 													return null;
 												}
-												RelativeDimensionBase fontSize = new RelativeDimensionBase() {
-													public double getCh() { return cellWidth; }
-													public double getEm() { return cellHeight; }};
+												RelativeDimensionBase fontSize = new FontSize(cellHeight, cellWidth);
 												PageFormat pageFormat = null; {
 													// it is complicated to compute the page format from the printable area, so don't support it for now
 													if (width != null) {
@@ -387,11 +400,11 @@ public class FileFormatCatalog implements MediumProvider {
 													duplex, blankLastPage, false,
 													FileFormatBuilder.this);
 											} else {
-												double cellWidth = 6;
-												double cellHeight = 10;
-												RelativeDimensionBase fontSize = new RelativeDimensionBase() {
-													public double getCh() { return cellWidth; }
-													public double getEm() { return cellHeight; }};
+												if (cellWidth == null)
+													cellWidth = 6d;
+												if (cellHeight == null)
+													cellHeight = 10d;
+												RelativeDimensionBase fontSize = new FontSize(cellHeight, cellWidth);
 												if (width == null && pageWidth == null)
 													width = pageWidth = new Dimension(40, Unit.CH);
 												else if (width == null)
@@ -512,6 +525,20 @@ public class FileFormatCatalog implements MediumProvider {
 			}
 		}
 		return false;
+	}
+
+	private static class FontSize implements RelativeDimensionBase {
+		private final double height;
+		private final double width;
+		FontSize(double height, double width) {
+			this.height = height;
+			this.width = width;
+		}
+		@Override
+		public double getCh() { return width; }
+		@Override
+		public double getEm() { return height; }
+
 	}
 
 	private final static Iterable<EmbossedMedium> empty = Optional.<EmbossedMedium>absent().asSet();
