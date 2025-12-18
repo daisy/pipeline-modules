@@ -38,6 +38,7 @@
     <p:option name="pdf-offset-x" select="'0'"/>
     <p:option name="pdf-offset-y" select="'0'"/>
     <p:option name="pdf-scale-font" select="'100%'"/>
+    <p:option name="pdf-font-color" select="'#ffffff'"/>
     
     <p:import href="xml-to-pef.store.xpl">
         <p:documentation>
@@ -93,6 +94,7 @@
         <p:with-option name="pdf-offset-x" select="$pdf-offset-x"/>
         <p:with-option name="pdf-offset-y" select="$pdf-offset-y"/>
         <p:with-option name="pdf-scale-font" select="$pdf-scale-font"/>
+        <p:with-option name="pdf-font-color" select="$pdf-font-color"/>
         <p:with-option name="output-dir" select="$output-dir"/>
         <p:with-option name="pef-output-dir" select="$pef-output-dir"/>
         <p:with-option name="preview-output-dir" select="$preview-output-dir"/>

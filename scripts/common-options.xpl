@@ -613,6 +613,27 @@ Increase or decrease the font of the PDF by providing a scaling factor higher or
 	<!--
 	    dtbook-to-pef
 	    html-to-pef
+	-->
+	<p:option name="pdf-font-color" required="false" select="'#000000'">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<h2 px:role="name">PDF: font color</h2>
+			<p px:role="desc" xml:space="preserve">The font color of the PDF.
+
+Defaults to black.</p>
+		</p:documentation>
+		<p:pipeinfo>
+			<px:type>
+				<data type="string" xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
+					<a:documentation xml:lang="en" xml:space="preserve">An RGB hex color code</a:documentation>
+					<param name="pattern">^#([0-9a-f]{6}|[0-9A-F]{6}|[0-9a-f]{3}|[0-9A-F]{3})$</param>
+				</data>
+			</px:type>
+		</p:pipeinfo>
+	</p:option>
+	
+	<!--
+	    dtbook-to-pef
+	    html-to-pef
 	    epub3-to-pef
 	    zedai-to-pef
 	-->

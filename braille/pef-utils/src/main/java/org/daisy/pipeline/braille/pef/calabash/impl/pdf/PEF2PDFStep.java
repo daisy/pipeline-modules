@@ -93,6 +93,7 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 	private static final net.sf.saxon.s9api.QName _OFFSET_X = new net.sf.saxon.s9api.QName("offset-x");
 	private static final net.sf.saxon.s9api.QName _OFFSET_Y = new net.sf.saxon.s9api.QName("offset-y");
 	private static final net.sf.saxon.s9api.QName _SCALE_FONT = new net.sf.saxon.s9api.QName("scale-font");
+	private static final net.sf.saxon.s9api.QName _FONT_COLOR = new net.sf.saxon.s9api.QName("font-color");
 	private static final net.sf.saxon.s9api.QName _MEDIUM = new net.sf.saxon.s9api.QName("medium");
 	private static final String DEFAULT_TABLE = "org.daisy.braille.impl.table.DefaultTableProvider.TableType.EN_US";
 
@@ -182,8 +183,14 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 			double scaleFont = parseNumberOrPercentage(getOption(_SCALE_FONT).getString());
 			if (scaleFont <= 0)
 				throw new IllegalArgumentException("Font scaling factor must be a positive number, but got: " + scaleFont);
+			String fontColor = getOption(_FONT_COLOR).getString();
+			try {
+				fontColor = String.format("#%06x", ColorFactory.valueOf(fontColor).getRGB() & 0xffffff);
+			} catch (IllegalArgumentException e) {
+				throw new IllegalArgumentException("Can not parse font color: " + fontColor, e);
+			}
 			logger.debug("Storing PEF to PDF using table: " + table);
-			new PEF2PDF(pdfFile, table, medium, offsetX, offsetY, scaleFont).transform(
+			new PEF2PDF(pdfFile, table, medium, offsetX, offsetY, scaleFont, fontColor).transform(
 				ImmutableMap.of(_SOURCE, XMLCalabashInputValue.of(source)),
 				ImmutableMap.of()
 			).run();
@@ -244,14 +251,16 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 		private final double offsetX;
 		private final double offsetY;
 		private final double scaleFont;
+		private final String fontColor;
 
-		public PEF2PDF(File pdf, Table table, Medium medium, double offsetX, double offsetY, double scaleFont) {
+		public PEF2PDF(File pdf, Table table, Medium medium, double offsetX, double offsetY, double scaleFont, String fontColor) {
 			this.pdf = pdf;
 			this.table = table;
 			this.medium = medium;
 			this.offsetX = offsetX;
 			this.offsetY = offsetY;
 			this.scaleFont = scaleFont;
+			this.fontColor = fontColor;
 		}
 
 		@Override
@@ -351,6 +360,7 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 											"}\n" +
 											"body {\n" +
 											"	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;\n" +
+											"	color: " + fontColor + ";\n" +
 											"	margin: 0;\n" +
 											"	font-size: " + fontSize + "mm;\n" +
 											"}\n" +

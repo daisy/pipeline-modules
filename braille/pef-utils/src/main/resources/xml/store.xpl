@@ -64,6 +64,12 @@
             <p>Scaling factor for the font size of the PDF.</p>
         </p:documentation>
     </p:option>
+    <p:option name="pdf-font-color" required="false" select="'#000000'">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <p>Font color of the PDF.</p>
+            <p>Must be a RGB hex color code.</p>
+        </p:documentation>
+    </p:option>
     
     <p:import href="http://www.daisy.org/pipeline/modules/file-utils/library.xpl">
         <p:documentation>
@@ -104,6 +110,7 @@
         <p:option name="offset-x" required="true"/>
         <p:option name="offset-y" required="true"/>
         <p:option name="scale-font" required="true"/>
+        <p:option name="font-color" required="true"/>
         <!--
             Implemented in ../../java/org/daisy/pipeline/braille/pef/calabash/impl/pdf/PEF2PDFStep.java
         -->
@@ -327,6 +334,7 @@
                                 <p:with-option name="offset-x" select="$pdf-offset-x"/>
                                 <p:with-option name="offset-y" select="$pdf-offset-y"/>
                                 <p:with-option name="scale-font" select="$pdf-scale-font"/>
+                                <p:with-option name="font-color" select="$pdf-font-color"/>
                             </pxi:pef2pdf>
                         </p:when>
                         <p:otherwise>
