@@ -592,6 +592,27 @@ The syntax is as follows (described in terms of [CSS grammar](https://www.w3.org
 	<!--
 	    dtbook-to-pef
 	    html-to-pef
+	-->
+	<p:option name="pdf-scale-font" required="false" select="'100%'">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<h2 px:role="name">PDF: scale font</h2>
+			<p px:role="desc" xml:space="preserve">Tweak the size of the font.
+
+Increase or decrease the font of the PDF by providing a scaling factor higher or lower than 100%.</p>
+		</p:documentation>
+		<p:pipeinfo>
+			<px:type>
+				<data type="string" xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
+					<a:documentation xml:lang="en" xml:space="preserve">A percentage</a:documentation>
+					<param name="pattern">^[+]?([0-9]*\.)?[0-9]+%?$</param>
+				</data>
+			</px:type>
+		</p:pipeinfo>
+	</p:option>
+	
+	<!--
+	    dtbook-to-pef
+	    html-to-pef
 	    epub3-to-pef
 	    zedai-to-pef
 	-->

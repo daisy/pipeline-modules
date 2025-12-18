@@ -38,6 +38,7 @@
     <p:option name="preview-table" select="''"/>
     <p:option name="pdf-offset-x" select="'0'"/>
     <p:option name="pdf-offset-y" select="'0'"/>
+    <p:option name="pdf-scale-font" select="'100%'"/>
     
     <p:import href="http://www.daisy.org/pipeline/modules/braille/pef-utils/library.xpl">
         <p:documentation>
@@ -105,6 +106,7 @@
                     </p:with-option>
                     <p:with-option name="pdf-offset-x" select="$pdf-offset-x"/>
                     <p:with-option name="pdf-offset-y" select="$pdf-offset-y"/>
+                    <p:with-option name="pdf-scale-font" select="$pdf-scale-font"/>
                 </px:pef-store>
             </p:when>
             <p:otherwise>

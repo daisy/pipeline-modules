@@ -92,6 +92,7 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 	private static final net.sf.saxon.s9api.QName _TABLE = new net.sf.saxon.s9api.QName("table");
 	private static final net.sf.saxon.s9api.QName _OFFSET_X = new net.sf.saxon.s9api.QName("offset-x");
 	private static final net.sf.saxon.s9api.QName _OFFSET_Y = new net.sf.saxon.s9api.QName("offset-y");
+	private static final net.sf.saxon.s9api.QName _SCALE_FONT = new net.sf.saxon.s9api.QName("scale-font");
 	private static final net.sf.saxon.s9api.QName _MEDIUM = new net.sf.saxon.s9api.QName("medium");
 	private static final String DEFAULT_TABLE = "org.daisy.braille.impl.table.DefaultTableProvider.TableType.EN_US";
 
@@ -178,8 +179,11 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 				Medium.class);
 			double offsetX = Dimension.parse(getOption(_OFFSET_X).getString()).toUnit(Unit.MM).getValue().doubleValue();
 			double offsetY = Dimension.parse(getOption(_OFFSET_Y).getString()).toUnit(Unit.MM).getValue().doubleValue();
+			double scaleFont = parseNumberOrPercentage(getOption(_SCALE_FONT).getString());
+			if (scaleFont <= 0)
+				throw new IllegalArgumentException("Font scaling factor must be a positive number, but got: " + scaleFont);
 			logger.debug("Storing PEF to PDF using table: " + table);
-			new PEF2PDF(pdfFile, table, medium, offsetX, offsetY).transform(
+			new PEF2PDF(pdfFile, table, medium, offsetX, offsetY, scaleFont).transform(
 				ImmutableMap.of(_SOURCE, XMLCalabashInputValue.of(source)),
 				ImmutableMap.of()
 			).run();
@@ -239,13 +243,15 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 		private final Medium medium;
 		private final double offsetX;
 		private final double offsetY;
+		private final double scaleFont;
 
-		public PEF2PDF(File pdf, Table table, Medium medium, double offsetX, double offsetY) {
+		public PEF2PDF(File pdf, Table table, Medium medium, double offsetX, double offsetY, double scaleFont) {
 			this.pdf = pdf;
 			this.table = table;
 			this.medium = medium;
 			this.offsetX = offsetX;
 			this.offsetY = offsetY;
+			this.scaleFont = scaleFont;
 		}
 
 		@Override
@@ -301,6 +307,9 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 						fontSize = 2 * cellWidth;
 						lineHeight = cellHeight / (2 * cellWidth);
 					}
+					letterSpacing += (1 - scaleFont) * fontSize / 2;
+					fontSize *= scaleFont;
+					lineHeight /= scaleFont;
 					double pageHeight = maxRows * cellHeight; // mm
 					double pageWidth = maxColumns * cellWidth; // mm
 					LinkedList<QName> elementStack = new LinkedList<>();
@@ -534,6 +543,20 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 					return Integer.parseInt(pef.getAttributeValue(i)); // assume non-negative integer
 			return stack.getFirst(); // throws NoSuchElementException if stack is empty, which can not
 			                         // happen if PEF is valid
+		}
+	}
+
+	private static double parseNumberOrPercentage(String value) throws IllegalArgumentException {
+		boolean isPercentage = false;
+		if (value.endsWith("%")) {
+			value = value.substring(0, value.length() - 1);
+			isPercentage = true;
+		}
+		try {
+			double number = Double.valueOf(value);
+			return isPercentage ? number / 100 : number;
+		} catch (NumberFormatException e) {
+			throw new IllegalArgumentException("Can not parse percentage: " + value, e);
 		}
 	}
 }
