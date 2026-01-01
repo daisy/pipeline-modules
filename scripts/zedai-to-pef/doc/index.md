@@ -30,11 +30,11 @@ will force the document to be translated to French braille. Or, you might want t
 
     --transform "(liblouis-table:'en-us-g1.ctb')"
 
-If you are running DAISY Pipeline 2 in local mode, and you have your own liblouis tables installed somewhere, you can use them by specifying the full path:
+If you are running DAISY Pipeline in local mode, and you have your own liblouis tables installed somewhere, you can use them by specifying the full path:
 
     --transform "(liblouis-table:'file:/home/me/liblouis-tables/my_en-us.ctb')"
 
-Liblouis is the main translation engine used in DAISY Pipeline 2, but other libraries are available. The following translator is backed by [Dotify](https://code.google.com/p/dotify/), the braille translation library developed at MTM:
+Liblouis is the main translation engine used in DAISY Pipeline, but other libraries are available. The following translator is backed by [Dotify](https://code.google.com/p/dotify/), the braille translation library developed at MTM:
 
     --transform "(translator:dotify)"
 
