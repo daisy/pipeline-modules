@@ -105,7 +105,8 @@
       org.daisy.pipeline.datatypes.impl.Datatype_px_dtbook_to_pef_script_pdf_offset_x,
       org.daisy.pipeline.datatypes.impl.Datatype_px_dtbook_to_pef_script_pdf_offset_y,
       org.daisy.pipeline.datatypes.impl.Datatype_px_dtbook_to_pef_script_pdf_scale_font,
-      org.daisy.pipeline.datatypes.impl.Datatype_px_dtbook_to_pef_script_pdf_font_color
+      org.daisy.pipeline.datatypes.impl.Datatype_px_dtbook_to_pef_script_pdf_font_color,
+      org.daisy.pipeline.datatypes.impl.Datatype_px_dtbook_to_pef_script_formatting_standard
     </expose-services>
   </properties>
   

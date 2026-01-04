@@ -50,7 +50,34 @@
         <p:pipe step="convert-and-store" port="status"/>
     </p:output>
     
-    <p:option name="stylesheet">
+    <!-- defined in ../../../../../../common-options.xpl -->
+    <p:option name="braille-code"/>
+
+    <p:option name="formatting-standard">
+        <p:pipeinfo>
+            <px:type>
+                <choice xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
+                    <value></value>
+                    <a:documentation xml:lang="en">-</a:documentation>
+                    <value>https://raw.githubusercontent.com/daisy/braille-stylesheets/refs/heads/main/bana/bana.scss</value>
+                    <a:documentation xml:lang="en" xml:space="preserve">United States and Canada (BANA)
+
+The document is formatted according to the rules of the [Braille Authority of North America
+(BANA)](https://www.brailleauthority.org/). [UEB](https://iceb.org/) is used as the braille code for
+all text.
+
+Equivalent to specifying the value
+`https://raw.githubusercontent.com/daisy/braille-stylesheets/refs/heads/main/bana/bana.scss` for the
+"Custom style sheets" option.
+
+See the [online documentation](https://daisy.github.io/braille-stylesheets/bana/) for more information.
+</a:documentation>
+                </choice>
+            </px:type>
+        </p:pipeinfo>
+    </p:option>
+
+    <p:option name="_:stylesheet" xmlns:_="embossed">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
           <p px:role="desc" xml:space="preserve" px:inherit="prepend">
 
@@ -69,9 +96,7 @@ sheet modules) are available for use in Sass style sheets:
         </p:documentation>
     </p:option>
 
-    <!-- defined in ../../../../../../common-options.xpl -->
     <p:option name="stylesheet-parameters"/>
-    <p:option name="braille-code"/>
     <p:option name="transform"/>
     <p:option name="include-preview"/>
     <p:option name="include-pdf"/>
@@ -163,6 +188,7 @@ sheet modules) are available for use in Sass style sheets:
                           parameter-names="stylesheet
                                            stylesheet-parameters
                                            transform
+                                           formatting-standard
                                            braille-code
                                            output-file-format
                                            include-pef
@@ -223,7 +249,7 @@ sheet modules) are available for use in Sass style sheets:
                 <p:pipe step="load" port="result.in-memory"/>
             </p:input>
             <p:with-option name="temp-dir" select="$temp-dir"/>
-            <p:with-option name="stylesheet" select="$stylesheet"/>
+            <p:with-option name="stylesheet" select="string-join(($formatting-standard,$_:stylesheet),' ')" xmlns:_="embossed"/>
             <p:with-option name="stylesheet-parameters" select="$stylesheet-parameters"/>
             <p:with-option name="transform"
                            select="concat($braille-code,($transform,'(translator:liblouis)(formatter:dotify)')[not(.='')][1])"/>

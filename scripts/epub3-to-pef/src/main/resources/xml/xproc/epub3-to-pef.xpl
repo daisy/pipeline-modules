@@ -45,7 +45,34 @@ You may alternatively use the EPUB package document (the OPF-file) if your input
         <p:pipe step="convert-and-store" port="status"/>
     </p:output>
 
-    <p:option name="stylesheet">
+    <!-- defined in ../../../../../../common-options.xpl -->
+    <p:option name="braille-code"/>
+
+    <p:option name="formatting-standard">
+        <p:pipeinfo>
+            <px:type>
+                <choice xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
+                    <value></value>
+                    <a:documentation xml:lang="en">-</a:documentation>
+                    <value>https://raw.githubusercontent.com/daisy/braille-stylesheets/refs/heads/main/bana/bana.scss</value>
+                    <a:documentation xml:lang="en" xml:space="preserve">United States and Canada (BANA)
+
+The document is formatted according to the rules of the [Braille Authority of North America
+(BANA)](https://www.brailleauthority.org/). [UEB](https://iceb.org/) is used as the braille code for
+all text.
+
+Equivalent to specifying the value
+`https://raw.githubusercontent.com/daisy/braille-stylesheets/refs/heads/main/bana/bana.scss` for the
+"Custom style sheets" option.
+
+See the [online documentation](https://daisy.github.io/braille-stylesheets/bana/) for more information.
+</a:documentation>
+                </choice>
+            </px:type>
+        </p:pipeinfo>
+    </p:option>
+    
+    <p:option name="_:stylesheet" xmlns:_="embossed">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
           <p px:role="desc" xml:space="preserve" px:inherit="prepend">
 
@@ -82,7 +109,6 @@ even though the provided CSS is more specific.
     
     <!-- defined in ../../../../../../common-options.xpl -->
     <p:option name="stylesheet-parameters"/>
-    <p:option name="braille-code"/>
     <p:option name="transform"/>
     <p:option name="include-preview"/>
     <p:option name="include-pef"/>
@@ -167,6 +193,7 @@ even though the provided CSS is more specific.
                                            stylesheet-parameters
                                            apply-document-specific-stylesheets
                                            transform
+                                           formatting-standard
                                            braille-code
                                            output-file-format
                                            include-pef
@@ -230,7 +257,7 @@ even though the provided CSS is more specific.
                 <p:pipe port="in-memory.out" step="load"/>
             </p:input>
             <p:with-option name="temp-dir" select="concat($temp-dir,'convert/')"/>
-            <p:with-option name="stylesheet" select="$stylesheet"/>
+            <p:with-option name="stylesheet" select="string-join(($formatting-standard,$_:stylesheet),' ')" xmlns:_="embossed"/>
             <p:with-option name="stylesheet-parameters" select="$stylesheet-parameters"/>
             <p:with-option name="apply-document-specific-stylesheets" select="$apply-document-specific-stylesheets"/>
             <p:with-option name="transform"

@@ -219,10 +219,66 @@ files are MP2, MP3 and WAVE. Audio files in other formats are transcoded to MP3.
 	    dtbook-to-pef
 	    html-to-pef
 	    epub3-to-pef
-	    zedai-to-pef
-	    epub3-to-epub3
 	-->
-	<p:option name="stylesheet" required="false" px:type="anyURI" select="''" px:sequence="true" px:separator=" "
+	<p:option name="formatting-standard" select="''">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <h2 px:role="name">Formatting standard</h2>
+            <p px:role="desc" xml:space="preserve">Standard to be used for braille formatting.
+
+If set, [braille formatting](http://daisy.github.io/pipeline/Get-Help/User-Guide/Braille/) is done
+using the selected formatting standard. If left empty, the formatting of the document is determined
+entirely by custom styles.
+
+It is important to understand that when no formatting standard or custom style sheets are specified,
+the output will not be formatted (meaning everything will be aligned to the left, without blank
+lines, pages will be filled completely, and there will be no page numbering).
+
+Custom formatting rules may be specified using the "Custom style sheets" option, or in style sheets
+attached to the source document.</p>
+        </p:documentation>
+    </p:option>
+
+    <!--
+	    dtbook-to-pef
+	    html-to-pef
+	    epub3-to-pef
+	-->
+	<p:option xmlns:_="embossed" name="_:stylesheet" required="false" px:type="anyURI" select="''" px:sequence="true" px:separator=" "
+	          px:media-type="text/css text/x-scss">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<h2 px:role="name">Style sheets</h2>
+			<p px:role="desc" xml:space="preserve">CSS/Sass style sheets to take into account.
+
+Each style sheet must be specified as a URI, absolute or relative to the input.
+
+Style sheets specified through this option or through the "Formatting standard" option are called
+"[user style sheets](https://www.w3.org/TR/CSS2/cascade.html#cascade)". Style sheets can also be
+attached to the source document. These are referred to as "[author style
+sheets](https://www.w3.org/TR/CSS2/cascade.html#cascade)". They can be linked (using an
+['xml-stylesheet' processing instruction](https://www.w3.org/TR/xml-stylesheet) or a ['link'
+element](https://www.w3.org/Style/styling-XML#External)), embedded (using a ['style'
+element](https://www.w3.org/Style/styling-XML#Embedded)) and/or inlined (using '[style'
+attributes](https://www.w3.org/TR/css-style-attr/)). Only author styles that apply to "embossed"
+media are taken into account.
+
+All style sheets are applied at once, but the order in which they are specified has an influence on
+the [cascading order](https://www.w3.org/TR/CSS2/cascade.html#cascading-order). Author styles take
+precedence over user styles, and user style sheets specified through this option take precedence
+over the selected formatting standard.
+
+Style sheets are interpreted according to [braille
+CSS](http://braillespecs.github.io/braille-css) rules.
+
+For info on how to use Sass (Syntactically Awesome StyleSheets) see the [Sass
+manual](http://sass-lang.com/documentation/file.SASS_REFERENCE.html).</p>
+		</p:documentation>
+	</p:option>
+	
+	<!--
+	    epub3-to-epub3
+	    zedai-to-pef
+	-->
+	<p:option xmlns:_="braille" name="_:stylesheet" required="false" px:type="anyURI" select="''" px:sequence="true" px:separator=" "
 	          px:media-type="text/css text/x-scss">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Style sheets</h2>
@@ -242,7 +298,8 @@ media are taken into account.
 
 All style sheets are applied at once, but the order in which they are specified has an influence on
 the [cascading order](https://www.w3.org/TR/CSS2/cascade.html#cascading-order). Author styles take
-precedence over user styles.
+precedence over user styles, and user style sheets specified through this option take precedence
+over the selected formatting standard.
 
 Style sheets are interpreted according to [braille
 CSS](http://braillespecs.github.io/braille-css) rules.
@@ -251,7 +308,7 @@ For info on how to use Sass (Syntactically Awesome StyleSheets) see the [Sass
 manual](http://sass-lang.com/documentation/file.SASS_REFERENCE.html).</p>
 		</p:documentation>
 	</p:option>
-
+	
 	<!--
 	    dtbook-to-daisy3
 	    dtbook-to-epub3
@@ -380,10 +437,9 @@ appear in the lexicons.</p>
 			<h2 px:role="name">Style sheet parameters</h2>
 			<p px:role="desc" xml:space="preserve">A list of parameters passed to the style sheets.
 
-Style sheets, whether they're user style sheets (specified with the "Style sheets" option) or author
-style sheets (associated with the source), may have parameters (Sass variables). This option, which
-takes a comma-separated list of key-value pairs enclosed in parenthesis, can be used to set these
-variables.
+Style sheets, whether they're user style sheets (specified through options) or author style sheets
+(associated with the source), may have parameters (Sass variables). This option, which takes a
+comma-separated list of key-value pairs enclosed in parenthesis, can be used to set these variables.
 
 For example, if a style sheet uses the Sass variable "foo":
 
