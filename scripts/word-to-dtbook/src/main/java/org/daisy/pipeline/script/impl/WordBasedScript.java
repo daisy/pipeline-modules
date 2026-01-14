@@ -5,12 +5,11 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
-import javax.xml.transform.Source;
 
 import org.daisy.common.file.URLs;
 import org.daisy.common.messaging.Message;
@@ -240,7 +239,7 @@ public abstract class WordBasedScript implements ScriptService<Script>, ScriptSe
 		                  MessageAppender messages, JobResultSet.Builder resultBuilder,
 		                  File resultDir) throws IOException {
 			ScriptInput.Builder stepInput = new ScriptInput.Builder(input.getResources());
-			for (Source s : input.getInput("source"))
+			for (URI s : input.getInput("source"))
 				stepInput = stepInput.withInput("source", s);
 			stepInput = pickOptions(wordToDTBook, stepInput, input);
 			JobResultSet.Builder stepResultBuilder = new JobResultSet.Builder(wordToDTBook);
@@ -272,8 +271,8 @@ public abstract class WordBasedScript implements ScriptService<Script>, ScriptSe
 				JobResultSet stepResult = stepResultBuilder.build();
 				stepInput = new ScriptInput.Builder();
 				for (JobResult r : stepResult.getResults("result"))
-					if (isPrimaryFile(r.getPath().getName(), prevStepResultFormat))
-						stepInput = stepInput.withInput("source", r.getPath());
+					if (isPrimaryFile(r.getFile().getName(), prevStepResultFormat))
+						stepInput = stepInput.withInput("source", r.getFile());
 				stepInput = pickOptions(step, stepInput, input);
 				if ("mp3".equals(formatId))
 					// certain options must have a fixed value for mp3 output
