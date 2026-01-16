@@ -42,6 +42,7 @@
     <module>scripts-utils/mathcat-adapter</module>
     <module>scripts-utils/smil-utils</module>
     <module>scripts-utils/metadata-utils</module>
+    <module>scripts-utils/ocr-utils</module>
     <module>scripts-utils/odf-utils</module>
     <module>scripts-utils/zedai-utils</module>
     <module>nlp/nlp-common</module>
