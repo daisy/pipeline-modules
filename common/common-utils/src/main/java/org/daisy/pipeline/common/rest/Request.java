@@ -1,15 +1,25 @@
 package org.daisy.pipeline.common.rest;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.SecureRandom;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import com.google.common.io.ByteStreams;
+
+import org.daisy.common.file.Resource;
 
 /**
  * REST request to communicate with remote services (such as TTS services like Google and Amazon).
@@ -24,7 +34,10 @@ public class Request {
 			"CONNECT","OPTIONS","TRACE","PATCH");
 
 	private Map<String,String> headers = new HashMap<String,String>();
+	private String contentType = null;
 	private String content = null;
+	private ByteArrayOutputStream formData = null;
+	private String multipartBoundary = null;
 	private URL requestURL;
 	private String method = "GET";
 	private HttpURLConnection connection;
@@ -64,18 +77,79 @@ public class Request {
 	 * @param value value set for the field
 	 */
 	public Request addHeader(String name, String value) {
-		headers.put(name, value);
+		if ("Content-Type".equals(name)) {
+			if (contentType != null && !contentType.equals(value))
+				throw new IllegalStateException("content type already set to: " + contentType);
+			else
+				contentType = value;
+		} else
+			headers.put(name, value);
+		return this;
+	}
+
+	public Request setContentType(String contentType) {
+		return addHeader("Content-Type", contentType);
+	}
+
+	/**
+	 * Set the request body, to be sent through the request connection output stream
+	 *
+	 * @param content the content
+	 */
+	public Request setContent(String content) {
+		if (this.content != null || formData != null)
+			throw new IllegalStateException("content already set");
+		else
+			this.content = content;
 		return this;
 	}
 
 	/**
-	 * Set the request content, to be sent through the request connection output stream
+	 * Append form data to the multipart body of the request
 	 *
-	 * @param content content of the request
+	 * @param name         the name of the subpart
+	 * @param fileName     the optional file name associated with the subpart
+	 * @param contentType  the optional mimetype associated with the subpart
+	 * @param content      the content
 	 */
-	public Request setContent(String content) {
-		this.content = content;
+	public Request setFormDataContent(String name, String fileName, String contentType, InputStream content)
+			throws IOException {
+		if (this.content != null)
+			throw new IllegalStateException("content already set");
+		if (formData == null) {
+			formData = new ByteArrayOutputStream();
+			multipartBoundary = "Boundary-" + new SecureRandom().nextLong();
+			setContentType("multipart/form-data; boundary=" + multipartBoundary);
+		}
+		writeUTF8(formData, String.format("--%s\r\nContent-Disposition: form-data; name=\"%s\"", multipartBoundary, name));
+		if (fileName != null)
+			writeUTF8(formData, String.format("; filename=\"%s\"", fileName));
+		writeUTF8(formData, "\r\n");
+		if (contentType != null)
+			writeUTF8(formData, String.format("Content-Type: %s\r\n", contentType));
+		writeUTF8(formData, "\r\n");
+		transferTo(content, formData);
+		writeUTF8(formData, "\r\n");
 		return this;
+	}
+
+	public Request setFormDataContent(String name, String content) throws IOException {
+		return setFormDataContent(name, null, content);
+	}
+
+	public Request setFormDataContent(String name, String contentType, String content) throws IOException {
+		return setFormDataContent(name, null, contentType, new ByteArrayInputStream(content.getBytes("utf-8")));
+	}
+
+	public Request setFormDataContent(String name, String contentType, File content) throws IOException {
+		return setFormDataContent(name, content.getName(), contentType, new FileInputStream(content));
+	}
+
+	public Request setFormDataContent(String name, Resource content) throws IOException {
+		return setFormDataContent(name,
+		                          content.getPath().toASCIIString(),
+		                          content.getMediaType().orElse(null),
+		                          content.read());
 	}
 
 	/**
@@ -125,15 +199,21 @@ public class Request {
 		try {
 			connection = (HttpURLConnection)requestURL.openConnection();
 			connection.setRequestMethod(method);
+			if (contentType != null)
+				connection.setRequestProperty("Content-Type", contentType);
 			if (headers != null)
 				headers.forEach((String key, String value) -> {
 						connection.setRequestProperty(key, value);
 					});
-			if (content != null) {
+			if (content != null || formData != null) {
 				connection.setDoOutput(true);
 				try (OutputStream os = connection.getOutputStream()) {
-					byte[] input = content.getBytes("utf-8");
-					os.write(input, 0, input.length);
+					if (formData != null) {
+						writeUTF8(formData, String.format("--%s--\r\n", multipartBoundary));
+						formData.flush();
+						os.write(formData.toByteArray());
+					} else
+						writeUTF8(os, content);
 				}
 			} else {
 				connection.setDoOutput(false);
@@ -198,5 +278,21 @@ public class Request {
 			this.connection.disconnect();
 			this.connection = null;
 		}
+	}
+
+	private static void writeUTF8(OutputStream os, String content) throws IOException {
+		try {
+			byte[] input = content.getBytes("utf-8");
+			os.write(input, 0, input.length);
+		} catch (UnsupportedEncodingException e) {
+			throw new IllegalStateException("coding error");
+		}
+	}
+
+	/**
+	 * Note that this function is part of Java 9
+	 */
+	private static long transferTo(InputStream in, OutputStream out) throws IOException {
+		return ByteStreams.copy(in, out);
 	}
 }
