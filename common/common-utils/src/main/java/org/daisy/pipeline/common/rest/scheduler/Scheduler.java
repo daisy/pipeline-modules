@@ -1,4 +1,4 @@
-package org.daisy.pipeline.tts.scheduler;
+package org.daisy.pipeline.common.rest.scheduler;
 
 /**
  * Scheduler interface to launch schedulable actions.

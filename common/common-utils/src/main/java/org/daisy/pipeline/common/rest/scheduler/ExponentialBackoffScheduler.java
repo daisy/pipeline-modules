@@ -1,13 +1,8 @@
-package org.daisy.pipeline.tts.scheduler;
+package org.daisy.pipeline.common.rest.scheduler;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
-import org.daisy.pipeline.tts.scheduler.FatalError;
-import org.daisy.pipeline.tts.scheduler.RecoverableError;
-import org.daisy.pipeline.tts.scheduler.Schedulable;
-import org.daisy.pipeline.tts.scheduler.Scheduler;
 
 /**
  * Scheduler that increases the delay between actions launch, using a number of seconds equals to

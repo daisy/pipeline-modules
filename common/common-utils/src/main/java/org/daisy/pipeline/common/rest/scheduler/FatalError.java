@@ -1,4 +1,4 @@
-package org.daisy.pipeline.tts.scheduler;
+package org.daisy.pipeline.common.rest.scheduler;
 
 /**
  * Exception to be raised by Schedulable object when an error occurred and the object cannot be
