@@ -257,7 +257,6 @@ public abstract class WordBasedScript implements ScriptService<Script>, ScriptSe
 			                              stepResultBuilder,
 			                              stepResultDir);
 			}
-			Script prevStep = wordToDTBook;
 			String prevStepResultFormat = "dtbook";
 			int i = 0;
 			for (Script step : scriptChain) {
@@ -289,7 +288,9 @@ public abstract class WordBasedScript implements ScriptService<Script>, ScriptSe
 				stepResultBuilder = formatId.equals(stepResultFormat)
 					? resultBuilder // this is the last step
 					: new JobResultSet.Builder(step);
-				stepResultDir = new File(resultDir, step.getId());
+				stepResultDir = stepResultBuilder == resultBuilder
+					? resultDir
+					: new File(resultDir, step.getId());
 				mkdirs(stepResultDir);
 				try (MessageAppender stepMessages = messages != null
 				         ? messages.append(
@@ -304,7 +305,6 @@ public abstract class WordBasedScript implements ScriptService<Script>, ScriptSe
 					                  stepResultBuilder,
 					                  stepResultDir);
 				}
-				prevStep = step;
 				prevStepResultFormat = stepResultFormat;
 				i++;
 			}
