@@ -63,11 +63,27 @@
 
   <properties>
     <expose-services>
+      org.daisy.pipeline.ocr.impl.PDFToWordScriptProvider,
       org.daisy.pipeline.ocr.mistral.impl.MistralOCRService
     </expose-services>
   </properties>
 
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <excludes>
+          <exclude>maven.properties</exclude>
+        </excludes>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>maven.properties</include>
+        </includes>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
