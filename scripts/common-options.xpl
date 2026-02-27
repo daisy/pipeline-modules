@@ -54,7 +54,7 @@
 		dtbook-to-html
 		dtbook-to-zedai
 	-->
-	<p:option name="language" required="false" px:type="string" select="''">
+	<p:option name="language" required="false" px:type="string" select="''" px:reusable="false">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Language code</h2>
 			<p px:role="desc">Language code of the input document.</p>
@@ -89,7 +89,7 @@
 		dtbook-to-html
 		dtbook-to-zedai
 	-->
-	<p:option name="nimas" required="false" px:type="boolean" select="'false'">
+	<p:option name="nimas" required="false" px:type="boolean" select="'false'" px:reusable="false">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">NIMAS input</h2>
 			<p px:role="desc">Whether the input DTBook is a NIMAS 1.1-conformant XML content file.</p>
@@ -103,7 +103,7 @@
 	    dtbook-to-epub3
 	    zedai-to-epub3
 	-->
-	<p:input port="tts-config" px:media-type="application/vnd.pipeline.tts-config+xml">
+	<p:input port="tts-config" px:media-type="application/vnd.pipeline.tts-config+xml" px:reusable="true">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Text-to-speech configuration file</h2>
 			<p px:role="desc" xml:space="preserve">Configuration file for text-to-speech.
@@ -220,7 +220,7 @@ files are MP2, MP3 and WAVE. Audio files in other formats are transcoded to MP3.
 	    html-to-pef
 	    epub3-to-pef
 	-->
-	<p:option name="formatting-standard" select="''">
+	<p:option name="formatting-standard" select="''" px:reusable="false">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h2 px:role="name">Formatting standard</h2>
             <p px:role="desc" xml:space="preserve">Standard to be used for braille formatting.
@@ -244,7 +244,7 @@ attached to the source document.</p>
 	    epub3-to-pef
 	-->
 	<p:option xmlns:_="embossed" name="_:stylesheet" required="false" px:type="anyURI" select="''" px:sequence="true" px:separator=" "
-	          px:media-type="text/css text/x-scss">
+	          px:reusable="true" px:media-type="text/css text/x-scss">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Style sheets</h2>
 			<p px:role="desc" xml:space="preserve">CSS/Sass style sheets to take into account.
@@ -279,7 +279,7 @@ manual](http://sass-lang.com/documentation/file.SASS_REFERENCE.html).</p>
 	    zedai-to-pef
 	-->
 	<p:option xmlns:_="braille" name="_:stylesheet" required="false" px:type="anyURI" select="''" px:sequence="true" px:separator=" "
-	          px:media-type="text/css text/x-scss">
+	          px:reusable="true" px:media-type="text/css text/x-scss">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Style sheets</h2>
 			<p px:role="desc" xml:space="preserve">CSS/Sass style sheets to take into account.
@@ -316,7 +316,7 @@ manual](http://sass-lang.com/documentation/file.SASS_REFERENCE.html).</p>
 	    epub-to-daisy
 	-->
 	<p:option xmlns:_="tts" name="_:stylesheet" required="false" px:type="anyURI" select="''" px:sequence="true" px:separator=" "
-	          px:media-type="text/css text/x-scss">
+	          px:reusable="true" px:media-type="text/css text/x-scss">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Style sheets</h2>
 			<p px:role="desc" xml:space="preserve">CSS style sheets to take into account.
@@ -348,7 +348,7 @@ precedence over user styles.
 	    epub3-to-epub3
 	-->
 	<p:option name="lexicon" required="false" px:type="anyURI" select="''" px:sequence="true" px:separator=" "
-	          px:media-type="application/pls+xml">
+	          px:reusable="false" px:media-type="application/pls+xml">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Lexicons</h2>
 			<p px:role="desc" xml:space="preserve">PLS lexicons to take into account.
@@ -459,7 +459,7 @@ you can control that variable with the following parameters list: `(foo:true)`.<
 	    html-to-pef
 	    epub3-to-pef
 	-->
-	<p:option name="braille-code" px:type="liblouis-table-query" required="false" select="''">
+	<p:option name="braille-code" px:type="liblouis-table-query" required="false" select="''" px:reusable="false">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Braille code</h2>
 			<p px:role="desc" xml:space="preserve">Braille code to be used for braille transcription.

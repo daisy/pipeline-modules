@@ -32,7 +32,8 @@ You may alternatively use the EPUB package document (the OPF-file) if your input
         </p:documentation>
     </p:option>
     
-    <p:option name="preamble" required="false" select="''" px:type="anyFileURI" px:sequence="false" px:media-type="application/xhtml+xml text/html">
+    <p:option name="preamble" required="false" select="''" px:type="anyFileURI" px:sequence="false" px:media-type="application/xhtml+xml text/html"
+              px:reusable="true">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h2 px:role="name">Preamble HTML</h2>
             <p px:role="desc">An HTML file to be prepended to the EPUB spine.</p>

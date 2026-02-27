@@ -48,7 +48,7 @@
 		</p:documentation>
 	</p:option>
 
-	<p:option name="identifier" required="false" select="''">
+	<p:option name="identifier" required="false" select="''" px:reusable="false">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Identifier</h2>
 			<p px:role="desc" xml:space="preserve">A string that uniquely identifies the DAISY 3 DTB to be generated.
