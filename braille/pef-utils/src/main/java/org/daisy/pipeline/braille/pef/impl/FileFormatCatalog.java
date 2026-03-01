@@ -237,7 +237,7 @@ public class FileFormatCatalog implements MediumProvider {
 													} catch (IllegalArgumentException e) {
 														return null;
 													}
-												else
+												else if (saddleStitch == true)
 													return null;
 											else if (format instanceof EmbosserAsFileFormat)
 												try {
