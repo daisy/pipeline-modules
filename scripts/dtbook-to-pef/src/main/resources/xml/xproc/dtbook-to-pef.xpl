@@ -217,7 +217,7 @@ sheet modules) are available for use in Sass style sheets:
             <p:pipe step="main" port="source"/>
         </p:input>
     </px:fileset-add-entry>
-    <px:dtbook-load name="load" px:progress=".01">
+    <px:dtbook-load name="load" px:progress=".01" warn-on-missing-files="false">
         <p:input port="source.in-memory">
             <p:pipe step="dtbook" port="result.in-memory"/>
         </p:input>

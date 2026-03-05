@@ -223,7 +223,7 @@ sheet modules) are available for use in Sass style sheets:
             <p:pipe step="main" port="source"/>
         </p:input>
     </px:fileset-add-entry>
-    <px:html-load name="html" px:message="Loading HTML" px:progress=".04">
+    <px:html-load name="html" px:message="Loading HTML" px:progress=".04" warn-on-missing-files="false">
         <p:input port="source.in-memory">
             <p:pipe step="source" port="result.in-memory"/>
         </p:input>
