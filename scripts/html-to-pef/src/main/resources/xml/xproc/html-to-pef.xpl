@@ -112,10 +112,11 @@ sheet modules) are available for use in Sass style sheets:
     <p:option name="pdf-scale-font"/>
     <p:option name="pdf-font-color"/>
 
-    <!-- defined in ../../css/page-layout.params -->
+    <!-- defined in ../../css/medium.params -->
     <p:option name="page-width"/>
     <p:option name="page-height"/>
     <p:option name="duplex"/>
+    <p:option name="saddle-stitch"/>
 
     <!-- defined in ../../css/dotify.params -->
     <p:option name="hyphenation-at-page-breaks"/>
@@ -240,9 +241,10 @@ sheet modules) are available for use in Sass style sheets:
                               pf:css-parse-medium((
                                 ($output-file-format,'embossed AND (-daisy-format:pef)')[not(.='')][1],
                                 map:merge((
-                                  map:entry('width',$page-width),
-                                  map:entry('height',$page-height),
-                                  map:entry('-daisy-duplex',$duplex),
+                                  for $page-width in $page-width return map:entry('device-width',$page-width),
+                                  for $page-height in $page-height return map:entry('device-height',$page-height),
+                                  for $duplex in $duplex return map:entry('duplex',$duplex),
+                                  for $saddle-stitch in $saddle-stitch return map:entry('saddle-stitch',$saddle-stitch),
                                   map:entry('-daisy-document-locale',(/*/@xml:lang,/*/@lang,'und')[1]))))))">
             <p:pipe step="main" port="source"/>
         </p:variable>

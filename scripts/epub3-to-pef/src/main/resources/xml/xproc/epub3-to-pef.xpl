@@ -123,10 +123,11 @@ even though the provided CSS is more specific.
     <p:option name="output-file-format"/>
     <p:option name="preview-table"/>
 
-    <!-- defined in ../../../../../../html-to-pef/src/main/resources/css/page-layout.params -->
+    <!-- defined in ../../../../../../html-to-pef/src/main/resources/css/medium.params -->
     <p:option name="page-width"/>
     <p:option name="page-height"/>
     <p:option name="duplex"/>
+    <p:option name="saddle-stitch"/>
 
     <!-- defined in ../../../../../../html-to-pef/src/main/resources/css/dotify.params -->
     <p:option name="hyphenation-at-page-breaks"/>
@@ -237,9 +238,10 @@ even though the provided CSS is more specific.
                               pf:css-parse-medium((
                                 ($output-file-format,'embossed AND (-daisy-format:pef)')[not(.='')][1],
                                 map:merge((
-                                  map:entry('width',$page-width),
-                                  map:entry('height',$page-height),
-                                  map:entry('-daisy-duplex',$duplex),
+                                  for $page-width in $page-width return map:entry('device-width',$page-width),
+                                  for $page-height in $page-height return map:entry('device-height',$page-height),
+                                  for $duplex in $duplex return map:entry('duplex',$duplex),
+                                  for $saddle-stitch in $saddle-stitch return map:entry('saddle-stitch',$saddle-stitch),
                                   map:entry('-daisy-document-locale',(/*/opf:metadata/dc:language[not(@refines)])[1]/string(text())))))))">
             <p:pipe port="result" step="opf"/>
         </p:variable>
