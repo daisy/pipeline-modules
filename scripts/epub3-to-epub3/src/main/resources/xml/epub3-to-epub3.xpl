@@ -179,7 +179,10 @@ the navigation document.</p>
     <p:option name="braille" required="false" px:type="boolean" select="'false'">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h2 px:role="name">Translate to braille</h2>
-            <p px:role="desc">Whether to produce a braille rendition.</p>
+            <p px:role="desc" xml:space="preserve">Whether to produce a braille rendition.
+
+When this option is selected, a secondary rendition, containing the braille transcription of the text,
+will be added to the EPUB 3 publication.</p>
         </p:documentation>
     </p:option>
     
