@@ -458,6 +458,7 @@ you can control that variable with the following parameters list: `(foo:true)`.<
 	    dtbook-to-pef
 	    html-to-pef
 	    epub3-to-pef
+	    epub3-to-epub3
 	-->
 	<p:option name="braille-code" px:type="liblouis-table-query" required="false" select="''" px:reusable="false">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">

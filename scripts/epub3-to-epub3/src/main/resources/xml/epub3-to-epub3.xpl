@@ -217,9 +217,16 @@ marked up.</p>
         </p:documentation>
     </p:option>
 
+    <!-- defined in ../../../../../../common-options.xpl -->
+    <p:option name="braille-code" select="''"/>
+
     <p:option name="braille-translator" required="false" px:type="transform-query" select="'(translator:liblouis)'">
         <p:documentation>
-            <h2 px:role="name">Braille translator query</h2>
+            <p px:role="desc" xml:space="preserve">Features of the braille transformer.
+
+Features of the [braille transcription](http://daisy.github.io/pipeline/Get-Help/User-Guide/Braille/)
+for creating the braille rendition. Together with the "Braille code" option this determines the
+translator that is selected.</p>
         </p:documentation>
     </p:option>
     
@@ -352,7 +359,8 @@ elements that represent the sentences.</p>
         <p:input port="metadata">
             <p:pipe port="metadata" step="main"/>
         </p:input>
-        <p:with-option name="braille-translator" select="$braille-translator"/>
+        <p:with-option name="braille-translator"
+                       select="concat($braille-code,($braille-translator,'(translator:liblouis)')[not(.='')][1])"/>
         <p:with-option name="stylesheet" select="string-join(
                                                    for $s in tokenize($stylesheet,'\s+')[not(.='')] return
                                                      resolve-uri($s,$source),
