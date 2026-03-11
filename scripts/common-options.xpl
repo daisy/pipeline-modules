@@ -729,7 +729,12 @@ Defaults to black.</p>
 			<h2 px:role="name">Include OBFL</h2>
 			<p px:role="desc" xml:space="preserve">Whether or not the keep the intermediary OBFL file (for debugging).
 
-The OBFL may also be edited and transformed to the final braille document using the "OBFL to braille" script.</p>
+[OBFL (Open Braille Formatting Language)](https://mtmse.github.io/obfl/obfl-specification.html) is
+an internal data format used by DAISY Pipeline to represent an intermediary stage of the document
+being transformed (before it is formatted).
+
+The OBFL file may be used for debugging, or it may also be edited and re-transformed to the final
+braille document using the "OBFL to braille" script.</p>
 		</p:documentation>
 	</p:option>
 
