@@ -57,7 +57,9 @@
 	<p:option name="language" required="false" px:type="string" select="''" px:reusable="false">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Language code</h2>
-			<p px:role="desc">Language code of the input document.</p>
+			<p px:role="desc" xml:space="preserve">Language code of the input document.
+
+Must be an [RFC 5646](https://tools.ietf.org/html/rfc5646) language tag such as "zh" or "fr-CA".</p>
 		</p:documentation>
 	</p:option>
 
