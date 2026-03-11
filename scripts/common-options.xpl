@@ -522,7 +522,8 @@ suited for the U.S., set the option to `(-daisy-locale: en-US)`. To use the brai
 used in the Netherlands and store to a file with extension ".brl", set the option to
 `(-daisy-locale: nl) AND (-daisy-file-extension: \.brl)`.
 
-If left blank, the braille will be stored in PEF format.</p>
+If left blank, the braille will be stored in
+[PEF](https://braillespecs.github.io/pef/pef-specification.html) (Portable Embosser Format).</p>
 		</p:documentation>
 	</p:option>
 
@@ -702,7 +703,11 @@ Defaults to black.</p>
 	<p:option name="include-pef" required="false" px:type="boolean" select="'false'">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Include PEF</h2>
-			<p px:role="desc" xml:space="preserve">Whether or not to keep the intermediary PEF file (for debugging).</p>
+			<p px:role="desc" xml:space="preserve">Whether or not to keep the intermediary PEF file (for debugging).
+
+[PEF (Portable Embosser Format)](https://braillespecs.github.io/pef/pef-specification.html) is an
+internal data format used by DAISY Pipeline to represent the final formatted braille document,
+before it is converted to another embosser-ready format.</p>
 		</p:documentation>
 	</p:option>
 
