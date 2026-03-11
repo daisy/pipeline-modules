@@ -93,7 +93,11 @@ If the DTBook files have mathematical content, indicate with this option which v
 	<p:option name="nimas" required="false" px:type="boolean" select="'false'" px:reusable="false">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">NIMAS input</h2>
-			<p px:role="desc">Whether the input DTBook is a NIMAS 1.1-conformant XML content file.</p>
+			<p px:role="desc" xml:space="preserve">Whether the input DTBook is a NIMAS 1.1-conformant XML content file.
+
+A [NIMAS 1.1](https://aem.cast.org/nimas-nimac/nimas-technical-specification)-conformant XML file is
+a valid DTBook (DAISY/NISO Z39.86 2005) file, with the exception that the `head` element is required
+to be empty.</p>
 		</p:documentation>
 	</p:option>
 
