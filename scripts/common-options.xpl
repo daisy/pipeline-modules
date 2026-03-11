@@ -71,14 +71,15 @@
 				<choice>
 					<value>3.0</value>
 					<value>2.0</value>
-					<!-- <value>1.01</value> -->
-					<!-- <value>1.0</value> -->
 				</choice>
 			</px:type>
 		</p:pipeinfo>
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">MathML version</h2>
-			<p px:role="desc">Version of MathML in the DTBook file(s).</p>
+			<p px:role="desc" xml:space="preserve">Version of MathML in the DTBook file(s).
+
+If the DTBook files have mathematical content, indicate with this option which version of
+[MathML](https://en.wikipedia.org/wiki/MathML) is used to mark it up.</p>
 		</p:documentation>
 	</p:option>
 
