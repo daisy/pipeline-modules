@@ -147,13 +147,13 @@ public class SassCompiler implements CssPreProcessor {
 		if (env != null) {
 			for (String var : env.keySet()) {
 				String value = env.get(var);
-				if (!value.matches(scssNumberColorString)) {
+				if (value.startsWith("(") && value.endsWith(")"))
+					; // assume this is a map; don't quote anything
+				else if (!value.matches(scssNumberColorString)) {
 					// if value contains spaces or special characters that can mess up parsing; wrap it in single quotes
 					logger.debug("scss variable '"+var+"' contains special characters: "+value);
 					value = "'"+value.replace("\n", "\\A").replace("'","\\27")+"'";
 					logger.debug("scss variable '"+var+"' was quoted                 : "+value);
-				} else {
-					logger.debug("scss variable '"+var+"' contains no special characters: "+value);
 				}
 				scss.append("$").append(var).append(": ").append(value).append(";\n");
 			}
