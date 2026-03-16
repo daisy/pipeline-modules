@@ -86,9 +86,11 @@ the same as MathML, or included as-is.</p>
     <p:option name="images" required="false" select="'EMBED'">
         <p:pipeinfo>
             <px:type>
-                <choice>
+                <choice xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
                     <value>EMBED</value>
+                    <a:documentation xml:lang="en">Embed images in the OpenDocument package</a:documentation>
                     <value>LINK</value>
+                    <a:documentation xml:lang="en">Link to external image files</a:documentation>
                 </choice>
             </px:type>
         </p:pipeinfo>
