@@ -253,31 +253,36 @@ class PDFToWordScript implements ScriptService<Script> {
 						                                      .withText("Converting from HTML to DOCX")
 						                                      .withLevel(Level.INFO))
 						: null) {
+					File docx; {
+						String fileName = pdf.getPath().toString();
+						if (fileName.contains("/"))
+							fileName = fileName.substring(fileName.lastIndexOf("/") + 1);
+						if (fileName.contains("."))
+							fileName = fileName.substring(0, fileName.indexOf("."));
+						fileName += ".docx";
+						URI path = URI.create("result/" + fileName);
+						docx = new File(URLs.resolve(resultDir.toURI(), path));
+						docx.getParentFile().mkdirs();
+					}
 					if (
 						pandoc
 							.newCommand()
 							.withInputFormat(Pandoc.Format.HTML)
 							.withInput(html.readAsFile())
 							.withOutputFormat(Pandoc.Format.DOCX)
+							.withOutput(docx)
 							.runner()
 							.cd(htmlDir)
-							.consumeOutput(
-								stream -> {
-									String fileName = pdf.getPath().toString();
-									if (fileName.contains("/"))
-										fileName = fileName.substring(fileName.lastIndexOf("/") + 1);
-									if (fileName.contains("."))
-										fileName = fileName.substring(0, fileName.indexOf("."));
-									fileName += ".docx";
-									URI path = URI.create("result/" + fileName);
-									File file = new File(URLs.resolve(resultDir.toURI(), path));
-									file.getParentFile().mkdirs();
-									Resource r = Resource.load(stream, path, MIMETYPE_DOCX).copy(file).store();
-									resultBuilder.addResult("result", path, r.readAsFile(), r.getMediaType().get()); })
 							.run()
 						!= 0
 					)
 						return error(stepMessages, "Pandoc process failed. (Please see detailed log for more info.)");
+
+					Resource r = Resource.load(docx, MIMETYPE_DOCX);
+					resultBuilder.addResult("result",
+					                        r.getPath(resultDir.toURI()),
+					                        r.readAsFile(),
+					                        r.getMediaType().get());
 				} catch (Throwable e) {
 					logger.debug("Unexpected error happened during Pandoc invocation", e);
 					return error(messages, "Unexpected error happened during Pandoc invocation."
