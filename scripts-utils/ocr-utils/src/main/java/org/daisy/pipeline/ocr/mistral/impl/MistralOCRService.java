@@ -54,6 +54,7 @@ import org.daisy.common.properties.Properties;
 import org.daisy.common.properties.Properties.Property;
 import org.daisy.common.saxon.SaxonBuffer;
 import org.daisy.common.xproc.XProcEngine;
+import org.daisy.common.xproc.XProcErrorException;
 import org.daisy.common.xproc.XProcInput;
 import org.daisy.common.xproc.XProcOutput;
 import org.daisy.pipeline.common.rest.Request;
@@ -509,6 +510,9 @@ public class MistralOCRService implements OCRService {
 								                   "result",
 								                   () -> new StAXResult(buffer.asOutput().asXMLStreamWriter()))
 								               .build());
+					} catch (XProcErrorException e) {
+						logger.error("XProc error:\n" + e.toString());
+						throw new RuntimeException("XProc error happened. Please see detailed log for more info.", e);
 					}
 					buffer.done();
 					htmlFileset.addAll(Fileset.unmarshall(buffer.asInput().asXMLStreamReader()));
