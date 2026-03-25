@@ -12,12 +12,12 @@
                 xmlns:map="http://www.w3.org/2005/xpath-functions/map"
                 exclude-inline-prefixes="#all"
                 name="main"
-                px:input-filesets="epub3"
+                px:input-filesets="epub2 epub3"
                 px:output-filesets="pef">
 
     <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-	    <h1 px:role="name">EPUB 3 to braille</h1>
-        <p px:role="desc" xml:space="preserve">Transforms a EPUB 3 publication into an embosser ready braille document.</p>
+	    <h1 px:role="name">EPUB to braille</h1>
+        <p px:role="desc" xml:space="preserve">Transforms a EPUB publication into an embosser ready braille document.</p>
         <a px:role="homepage" href="http://daisy.github.io/pipeline/Get-Help/User-Guide/Scripts/epub3-to-pef/">
             Online documentation
         </a>
@@ -25,7 +25,7 @@
 
     <p:option name="source" required="true" px:type="anyFileURI" px:sequence="false" px:media-type="application/epub+zip application/oebps-package+xml">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
-            <h2 px:role="name">Input EPUB 3</h2>
+            <h2 px:role="name">Input EPUB</h2>
             <p px:role="desc" xml:space="preserve">The EPUB you want to convert to braille.
 
 You may alternatively use the EPUB package document (the OPF-file) if your input is a unzipped/"exploded" version of an EPUB.</p>
@@ -213,9 +213,9 @@ even though the provided CSS is more specific.
     </px:delete-parameters>
     <p:sink/>
     
-    <!-- ============================= -->
-    <!-- LOAD EPUB 3 and PREAMBLE HTML -->
-    <!-- ============================= -->
+    <!-- =========================== -->
+    <!-- LOAD EPUB and PREAMBLE HTML -->
+    <!-- =========================== -->
     <px:epub3-to-pef.load name="load" px:message="Loading EPUB" px:progress=".04">
         <p:with-option name="epub" select="$source"/>
         <p:with-option name="preamble" select="$preamble"/>
@@ -246,9 +246,9 @@ even though the provided CSS is more specific.
             <p:pipe port="result" step="opf"/>
         </p:variable>
         
-        <!-- ============= -->
-        <!-- EPUB 3 TO PEF -->
-        <!-- ============= -->
+        <!-- =========== -->
+        <!-- EPUB TO PEF -->
+        <!-- =========== -->
         <p:identity>
             <p:input port="source">
                 <p:pipe port="fileset.out" step="load"/>
