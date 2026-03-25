@@ -156,11 +156,6 @@ sheet modules) are available for use in Sass style sheets:
             px:fileset-add-entry
         </p:documentation>
     </p:import>
-    <p:import href="http://www.daisy.org/pipeline/modules/braille/common-utils/library.xpl">
-        <p:documentation>
-            px:delete-parameters
-        </p:documentation>
-    </p:import>
     <p:import href="http://www.daisy.org/pipeline/modules/dtbook-utils/library.xpl">
         <p:documentation>
             px:dtbook-load
@@ -177,41 +172,10 @@ sheet modules) are available for use in Sass style sheets:
         </p:documentation>
     </cx:import>
     
-    <!-- ================================================= -->
-    <!-- Create a <c:param-set/> of the options            -->
-    <!-- ================================================= -->
-    <!-- ...for easy piping so we won't have to explicitly -->
-    <!-- pass all the variables all the time.              -->
-    <!-- ================================================= -->
-    <p:in-scope-names name="in-scope-names"/>
-    <px:delete-parameters name="input-options" px:progress=".01"
-                          parameter-names="stylesheet
-                                           stylesheet-parameters
-                                           transform
-                                           formatting-standard
-                                           braille-code
-                                           output-file-format
-                                           include-pef
-                                           include-preview
-                                           include-pdf
-                                           include-obfl
-                                           include-css
-                                           result
-                                           pef
-                                           preview
-                                           pdf
-                                           obfl
-                                           css
-                                           temp-dir">
-        <p:input port="source">
-            <p:pipe port="result" step="in-scope-names"/>
-        </p:input>
-    </px:delete-parameters>
-    <p:sink/>
-    
     <!-- ======= -->
     <!-- LOAD -->
     <!-- ======= -->
+    <p:sink/>
     <px:fileset-add-entry media-type="application/x-dtbook+xml" name="dtbook">
         <p:input port="entry">
             <p:pipe step="main" port="source"/>
@@ -250,14 +214,19 @@ sheet modules) are available for use in Sass style sheets:
             </p:input>
             <p:with-option name="temp-dir" select="$temp-dir"/>
             <p:with-option name="stylesheet" select="string-join(($formatting-standard,$_:stylesheet),' ')" xmlns:_="embossed"/>
-            <p:with-option name="stylesheet-parameters" select="$stylesheet-parameters"/>
+            <p:with-option name="parameters" select="($stylesheet-parameters,
+                                                      map:merge((
+                                                        for $page-width in $page-width return map:entry('page-width',$page-width),
+                                                        for $page-height in $page-width return map:entry('page-height',$page-height),
+                                                        for $duplex in $duplex return map:entry('duplex',$duplex),
+                                                        for $saddle-stitch in $saddle-stitch return map:entry('saddle-stitch',$saddle-stitch),
+                                                        map:entry('hyphenation-at-page-breaks',$hyphenation-at-page-breaks),
+                                                        map:entry('allow-text-overflow-trimming',$allow-text-overflow-trimming))))"/>
             <p:with-option name="transform"
                            select="concat($braille-code,($transform,'(translator:liblouis)(formatter:dotify)')[not(.='')][1])"/>
             <p:with-option name="medium" select="$medium"/>
             <p:with-option name="include-obfl" select="$include-obfl"/>
-            <p:input port="parameters">
-                <p:pipe port="result" step="input-options"/>
-            </p:input>
+
         </px:dtbook-to-pef>
         
         <!-- ===== -->
