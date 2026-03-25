@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.Base64;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -66,13 +67,13 @@ public class SassCompiler implements CssPreProcessor {
 
 	private final Importer importer;
 	private final StreamSourceURIResolver resolver;
-	private final Map<String,String> env;
+	private final Map<String,Object> env;
 
 	/**
 	 * @param env SASS variables. The map is allowed to be mutated by the caller after the
 	 *            SassCompiler is created.
 	 */
-	public SassCompiler(final URIResolver resolver, Map<String,String> env) {
+	public SassCompiler(final URIResolver resolver, Map<String,Object> env) {
 		this.resolver = new StreamSourceURIResolver(resolver);
 		this.env = env;
 		importer = new Importer() {
@@ -146,7 +147,7 @@ public class SassCompiler implements CssPreProcessor {
 		StringBuilder scss = new StringBuilder();
 		if (env != null) {
 			for (String var : env.keySet()) {
-				String value = env.get(var);
+				String value = "" + env.get(var);
 				if (value.startsWith("(") && value.endsWith(")"))
 					; // assume this is a map; don't quote anything
 				else if (!value.matches(scssNumberColorString)) {
