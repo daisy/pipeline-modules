@@ -57,7 +57,9 @@
 	<p:option name="language" required="false" px:type="string" select="''" px:reusable="false">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Language code</h2>
-			<p px:role="desc">Language code of the input document.</p>
+			<p px:role="desc" xml:space="preserve">Language code of the input document.
+
+Must be an [RFC 5646](https://tools.ietf.org/html/rfc5646) language tag such as "zh" or "fr-CA".</p>
 		</p:documentation>
 	</p:option>
 
@@ -71,14 +73,15 @@
 				<choice>
 					<value>3.0</value>
 					<value>2.0</value>
-					<!-- <value>1.01</value> -->
-					<!-- <value>1.0</value> -->
 				</choice>
 			</px:type>
 		</p:pipeinfo>
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">MathML version</h2>
-			<p px:role="desc">Version of MathML in the DTBook file(s).</p>
+			<p px:role="desc" xml:space="preserve">Version of MathML in the DTBook file(s).
+
+If the DTBook files have mathematical content, indicate with this option which version of
+[MathML](https://en.wikipedia.org/wiki/MathML) is used to mark it up.</p>
 		</p:documentation>
 	</p:option>
 
@@ -92,7 +95,11 @@
 	<p:option name="nimas" required="false" px:type="boolean" select="'false'" px:reusable="false">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">NIMAS input</h2>
-			<p px:role="desc">Whether the input DTBook is a NIMAS 1.1-conformant XML content file.</p>
+			<p px:role="desc" xml:space="preserve">Whether the input DTBook is a NIMAS 1.1-conformant XML content file.
+
+A [NIMAS 1.1](https://aem.cast.org/nimas-nimac/nimas-technical-specification)-conformant XML file is
+a valid DTBook (DAISY/NISO Z39.86 2005) file, with the exception that the `head` element is required
+to be empty.</p>
 		</p:documentation>
 	</p:option>
 
@@ -458,6 +465,7 @@ you can control that variable with the following parameters list: `(foo:true)`.<
 	    dtbook-to-pef
 	    html-to-pef
 	    epub3-to-pef
+	    epub3-to-epub3
 	-->
 	<p:option name="braille-code" px:type="liblouis-table-query" required="false" select="''" px:reusable="false">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
@@ -516,7 +524,8 @@ suited for the U.S., set the option to `(-daisy-locale: en-US)`. To use the brai
 used in the Netherlands and store to a file with extension ".brl", set the option to
 `(-daisy-locale: nl) AND (-daisy-file-extension: \.brl)`.
 
-If left blank, the braille will be stored in PEF format.</p>
+If left blank, the braille will be stored in
+[PEF](https://braillespecs.github.io/pef/pef-specification.html) (Portable Embosser Format).</p>
 		</p:documentation>
 	</p:option>
 
@@ -696,7 +705,11 @@ Defaults to black.</p>
 	<p:option name="include-pef" required="false" px:type="boolean" select="'false'">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Include PEF</h2>
-			<p px:role="desc" xml:space="preserve">Whether or not to keep the intermediary PEF file (for debugging).</p>
+			<p px:role="desc" xml:space="preserve">Whether or not to keep the intermediary PEF file (for debugging).
+
+[PEF (Portable Embosser Format)](https://braillespecs.github.io/pef/pef-specification.html) is an
+internal data format used by DAISY Pipeline to represent the final formatted braille document,
+before it is converted to another embosser-ready format.</p>
 		</p:documentation>
 	</p:option>
 
@@ -723,7 +736,12 @@ Defaults to black.</p>
 			<h2 px:role="name">Include OBFL</h2>
 			<p px:role="desc" xml:space="preserve">Whether or not the keep the intermediary OBFL file (for debugging).
 
-The OBFL may also be edited and transformed to the final braille document using the "OBFL to braille" script.</p>
+[OBFL (Open Braille Formatting Language)](https://mtmse.github.io/obfl/obfl-specification.html) is
+an internal data format used by DAISY Pipeline to represent an intermediary stage of the document
+being transformed (before it is formatted).
+
+The OBFL file may be used for debugging, or it may also be edited and re-transformed to the final
+braille document using the "OBFL to braille" script.</p>
 		</p:documentation>
 	</p:option>
 

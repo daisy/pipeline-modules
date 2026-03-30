@@ -154,12 +154,12 @@ public abstract class WordBasedScript implements ScriptService<Script>, ScriptSe
 			builder = builder
 				.withInputFileset("docx")
 				.withOutputFileset(formatId)
-				.withShortName("Word to " + formatName + " (experimental)")
+				.withShortName("Word to " + formatName)
 				.withDescription(
 					"Transforms a Microsoft Office Word (.docx) document into "
 					+ (formatId.equals("mp3")
 					      ? "a folder structure with MP3 files suitable for playback on MegaVoice Envoy devices"
-					      : (formatName + " format")) + ".");
+					      : (formatName + " format")) + ".\n\n");
 			for (ScriptPort p : wordToDTBook.getInputPorts())
 				builder = builder.withInputPort(p.getName(), p);
 			for (ScriptOption o : wordToDTBook.getOptions()) {
