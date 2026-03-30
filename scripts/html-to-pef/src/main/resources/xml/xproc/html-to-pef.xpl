@@ -81,6 +81,10 @@ sheet modules) are available for use in Sass style sheets:
     </p:option>
     <p:option name="output-file-format"/>
     <p:option name="preview-table"/>
+    <p:option name="pdf-offset-x"/>
+    <p:option name="pdf-offset-y"/>
+    <p:option name="pdf-scale-font"/>
+    <p:option name="pdf-font-color"/>
 
     <!-- defined in ../../css/page-layout.params -->
     <p:option name="page-width"/>
@@ -254,6 +258,10 @@ sheet modules) are available for use in Sass style sheets:
             <p:with-option name="include-css" select="$include-css"/>
             <p:with-option name="medium" select="$medium"/>
             <p:with-option name="preview-table" select="$preview-table"/>
+            <p:with-option name="pdf-offset-x" select="$pdf-offset-x"/>
+            <p:with-option name="pdf-offset-y" select="$pdf-offset-y"/>
+            <p:with-option name="pdf-scale-font" select="$pdf-scale-font"/>
+            <p:with-option name="pdf-font-color" select="$pdf-font-color"/>
             <p:with-option name="output-dir" select="$result"/>
             <p:with-option name="pef-output-dir" select="$pef"/>
             <p:with-option name="preview-output-dir" select="$preview"/>

@@ -51,6 +51,7 @@ import org.daisy.dotify.api.table.BrailleConverter;
 import org.daisy.dotify.api.table.Table;
 import org.daisy.pipeline.braille.pef.TableRegistry;
 import org.daisy.common.file.URLs;
+import org.daisy.common.saxon.SaxonHelper;
 import org.daisy.common.shell.CommandRunner;
 import org.daisy.common.stax.BaseURIAwareXMLStreamReader;
 import org.daisy.common.transform.InputValue;
@@ -66,6 +67,10 @@ import org.daisy.common.xproc.XProcMonitor;
 import org.daisy.pipeline.braille.common.Query.MutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.mutableQuery;
 import static org.daisy.pipeline.braille.common.Query.util.query;
+import org.daisy.pipeline.braille.css.EmbossedMedium;
+import org.daisy.pipeline.css.Dimension;
+import org.daisy.pipeline.css.Dimension.Unit;
+import org.daisy.pipeline.css.Medium;
 import static org.daisy.pipeline.file.FileUtils.cResultDocument;
 
 import org.osgi.service.component.annotations.Component;
@@ -85,6 +90,11 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 	private static final QName _SOURCE = new QName("source");
 	private static final net.sf.saxon.s9api.QName _HREF = new net.sf.saxon.s9api.QName("href");
 	private static final net.sf.saxon.s9api.QName _TABLE = new net.sf.saxon.s9api.QName("table");
+	private static final net.sf.saxon.s9api.QName _OFFSET_X = new net.sf.saxon.s9api.QName("offset-x");
+	private static final net.sf.saxon.s9api.QName _OFFSET_Y = new net.sf.saxon.s9api.QName("offset-y");
+	private static final net.sf.saxon.s9api.QName _SCALE_FONT = new net.sf.saxon.s9api.QName("scale-font");
+	private static final net.sf.saxon.s9api.QName _FONT_COLOR = new net.sf.saxon.s9api.QName("font-color");
+	private static final net.sf.saxon.s9api.QName _MEDIUM = new net.sf.saxon.s9api.QName("medium");
 	private static final String DEFAULT_TABLE = "org.daisy.braille.impl.table.DefaultTableProvider.TableType.EN_US";
 
 	private static final URL font = URLs.getResourceFromJAR("odt2braille8.ttf", PEF2PDFStep.class);
@@ -165,8 +175,22 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 					}
 				}
 			}
+			Medium medium = SaxonHelper.objectFromItem(
+				SaxonHelper.getSingleItem(getOption(_MEDIUM).getValue().getUnderlyingValue()),
+				Medium.class);
+			double offsetX = Dimension.parse(getOption(_OFFSET_X).getString()).toUnit(Unit.MM).getValue().doubleValue();
+			double offsetY = Dimension.parse(getOption(_OFFSET_Y).getString()).toUnit(Unit.MM).getValue().doubleValue();
+			double scaleFont = parseNumberOrPercentage(getOption(_SCALE_FONT).getString());
+			if (scaleFont <= 0)
+				throw new IllegalArgumentException("Font scaling factor must be a positive number, but got: " + scaleFont);
+			String fontColor = getOption(_FONT_COLOR).getString();
+			try {
+				fontColor = String.format("#%06x", ColorFactory.valueOf(fontColor).getRGB() & 0xffffff);
+			} catch (IllegalArgumentException e) {
+				throw new IllegalArgumentException("Can not parse font color: " + fontColor, e);
+			}
 			logger.debug("Storing PEF to PDF using table: " + table);
-			new PEF2PDF(pdfFile, table).transform(
+			new PEF2PDF(pdfFile, table, medium, offsetX, offsetY, scaleFont, fontColor).transform(
 				ImmutableMap.of(_SOURCE, XMLCalabashInputValue.of(source)),
 				ImmutableMap.of()
 			).run();
@@ -215,8 +239,6 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 	private static final QName PEF_PAGE = new QName(PEF_NS, "page");
 	private static final QName PEF_ROW = new QName(PEF_NS, "row");
 	private static final QName _DUPLEX = new QName("duplex");
-	private static final QName _COLS = new QName("cols");
-	private static final QName _ROWS = new QName("rows");
 	private static final QName _ROWGAP = new QName("rowgap");
 	private static final QName DP2_ASCII = new QName(DP2_NS, "ascii");
 	private static final QName DP2_ASCII_BRAILLE_CHARSET = new QName(DP2_NS, "ascii-braille-charset");
@@ -225,10 +247,20 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 
 		private final File pdf;
 		private final Table table;
+		private final Medium medium;
+		private final double offsetX;
+		private final double offsetY;
+		private final double scaleFont;
+		private final String fontColor;
 
-		public PEF2PDF(File pdf, Table table) {
+		public PEF2PDF(File pdf, Table table, Medium medium, double offsetX, double offsetY, double scaleFont, String fontColor) {
 			this.pdf = pdf;
 			this.table = table;
+			this.medium = medium;
+			this.offsetX = offsetX;
+			this.offsetY = offsetY;
+			this.scaleFont = scaleFont;
+			this.fontColor = fontColor;
 		}
 
 		@Override
@@ -238,6 +270,8 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 			Mult<? extends XMLInputValue<?>> source = ((XMLInputValue<?>)input.get(_SOURCE)).mult(2);
 			return () -> {
 				try {
+					int maxColumns = 0; // cells per line
+					int maxRows = 0; // lines
 					int totalVolumes = 0; {
 						Node node = source.get().asNodeIterator().next();
 						// we know it's a Saxon object because this is called from the XProcStep
@@ -254,6 +288,10 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 									return PEF_NS.equals(namespaceURI)
 										? Collections.singleton("pef").iterator()
 										: null; }});
+						maxColumns = ((Double)xpath.evaluate("max(//pef:*/@cols/number(.))", node, XPathConstants.NUMBER))
+							.intValue();
+						maxRows = ((Double)xpath.evaluate("max(//pef:*/@rows/number(.))", node, XPathConstants.NUMBER))
+							.intValue();
 						totalVolumes = ((Double)xpath.evaluate("count(//pef:volume)", node, XPathConstants.NUMBER))
 							.intValue();
 					}
@@ -262,14 +300,29 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 					Writer html = new OutputStreamWriter(htmlBytes, StandardCharsets.UTF_8);
 					BrailleConverter bc = table.newBrailleConverter();
 					boolean tableMatchesBrailleCharset = false;
-					int maxColumns = 0; // in cells per line
-					int maxRows = 0; // in lines
-					int marginLeft = 10; // in mm
-					int marginTop = 10; // in mm
+					double cellHeight = 10;
+					double cellWidth = 6;
+					if (medium.getType() == Medium.Type.EMBOSSED && medium instanceof EmbossedMedium) {
+						EmbossedMedium embossedMedium = (EmbossedMedium)medium;
+						cellHeight = embossedMedium.getEm();
+						cellWidth = embossedMedium.getCh();
+					}
+					double fontSize = cellHeight;
+					double letterSpacing = 0;
+					if (cellHeight < 2 * cellWidth)
+						letterSpacing = cellWidth - cellHeight / 2;
+					double lineHeight = 1; // em
+					if (cellHeight > 2 * cellWidth) {
+						fontSize = 2 * cellWidth;
+						lineHeight = cellHeight / (2 * cellWidth);
+					}
+					letterSpacing += (1 - scaleFont) * fontSize / 2;
+					fontSize *= scaleFont;
+					lineHeight /= scaleFont;
+					double pageHeight = maxRows * cellHeight; // mm
+					double pageWidth = maxColumns * cellWidth; // mm
 					LinkedList<QName> elementStack = new LinkedList<>();
 					LinkedList<Boolean> duplexStack = new LinkedList<>();
-					LinkedList<Integer> colsStack = new LinkedList<>();
-					LinkedList<Integer> rowsStack = new LinkedList<>();
 					LinkedList<Integer> rowgapStack = new LinkedList<>();
 					int volumeCount = 0;
 					int pagesInSection = 0;
@@ -303,38 +356,45 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 											"	     format(\"truetype\");\n" +
 											"}\n" +
 											"@page {\n" +
-											String.format("	margin-left: %dmm;\n", marginLeft) +
-											String.format("	margin-top: %dmm;\n", marginTop) +
-											"	margin-right: 0mm;\n" +
-											"	margin-bottom: 0mm;\n" +
+											"	margin: 0;\n" +
 											"}\n" +
 											"body {\n" +
 											"	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;\n" +
+											"	color: " + fontColor + ";\n" +
 											"	margin: 0;\n" +
-											"	font-size: 25px;\n" +
+											"	font-size: " + fontSize + "mm;\n" +
 											"}\n" +
 											".volume, .page {\n" +
 											"	page-break-before: always;\n" +
 											"}\n" +
+											".page {\n" +
+											// Margins are expected to be specified in @page rules, and therefore included in
+											// the PEF, so don't add any if we want the braille and print versions to match.
+											// We do however support tweaking the position of the content by providing X/Y offset
+											// options.
+											"	margin-left: " + offsetX + "mm;\n" +
+											"	margin-top: " + offsetY + "mm;\n" +
+											"	height: " + (pageHeight - offsetY) + "mm;\n" +
+											"	width: " + (pageWidth - offsetX) + "mm;\n" +
+											"	overflow: hidden;\n" +
+											"}\n" +
 											".row {\n" +
 											"    font-family: odt2braille, NotCourierSans;\n" +
-											"    letter-spacing: 0px;\n" +
 											"    white-space: pre;\n" +
-											"    letter-spacing: 0px;\n" +
-											"    font-size: 125%;\n" +
-											"    height: 1em;\n" +
+											"    letter-spacing: " + letterSpacing + "mm;\n" +
+											"    height: " + lineHeight + "em;\n" +
 											"}\n" +
 											".row[rowgap=\"1\"] {\n" +
-											"    height: 1.25em;\n" +
+											"    height: " + (1.25 * lineHeight) + "em;\n" +
 											"}\n" +
 											".row[rowgap=\"2\"] {\n" +
-											"    height: 1.5em;\n" +
+											"    height: " + (1.5 * lineHeight) + "em;\n" +
 											"}\n" +
 											".row[rowgap=\"3\"] {\n" +
-											"    height: 1.75em;\n" +
+											"    height: " + (1.75 * lineHeight) + "em;\n" +
 											"}\n" +
 											".row[rowgap=\"4\"] {\n" +
-											"    height: 2em;\n" +
+											"    height: " + (2 * lineHeight) + "em;\n" +
 											"}\n" +
 											"		/*]]>*/\n" +
 											"		</style>\n" +
@@ -365,8 +425,6 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 									} else { // BODY
 										if (PEF_VOLUME.equals(elemName)) {
 											duplexStack.push(getDuplex(pef, duplexStack));
-											colsStack.push(getCols(pef, colsStack));
-											rowsStack.push(getRows(pef, rowsStack));
 											rowgapStack.push(getRowgap(pef, rowgapStack));
 											elementStack.push(elemName);
 											volumeCount++;
@@ -386,12 +444,6 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 									} else {// VOLUME
 										if (PEF_SECTION.equals(elemName)) {
 											pagesInSection = 0;
-											int cols = getCols(pef, colsStack);
-											if (cols > maxColumns)
-												maxColumns = cols;
-											int rows = getRows(pef, rowsStack);
-											if (rows > maxRows)
-												maxRows = rows;
 											duplexStack.push(getDuplex(pef, duplexStack));
 											rowgapStack.push(getRowgap(pef, rowgapStack));
 											elementStack.push(elemName);
@@ -452,8 +504,6 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 									rowgapStack.pop();
 								} else if (PEF_VOLUME.equals(elemName)) {
 									duplexStack.pop();
-									colsStack.pop();
-									rowsStack.pop();
 									rowgapStack.pop();
 									html.write("		</div>\n");
 								} else if (PEF_PEF.equals(elemName)) {
@@ -469,13 +519,15 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 						}
 					html.flush();
 					pdf.getParentFile().mkdirs();
-					int pageWidth = (int)Math.ceil(4.2 * maxColumns) + 2 * marginLeft;
-					int pageHeight = (int)Math.ceil(8.44 * maxRows) + 2 * marginTop;
 					try (OutputStream os = new FileOutputStream(pdf)) {
 						new PdfRendererBuilder()
 							.withHtmlContent(new String(htmlBytes.toByteArray(), StandardCharsets.UTF_8),
 							                 pef.getBaseURI().toString())
-							.useDefaultPageSize(pageWidth, pageHeight, PageSizeUnits.MM)
+							.useDefaultPageSize((int)Math.ceil(pageWidth),
+							                    // for some reason a small extra of 0,5% is
+							                    // needed to fit all the rows on the page
+							                    (int)Math.ceil(pageHeight * 1.005),
+							                    PageSizeUnits.MM)
 							.toStream(os)
 							.run();
 					}
@@ -495,28 +547,26 @@ public class PEF2PDFStep extends DefaultStep implements XProcStep {
 			                         // happen if PEF is valid
 		}
 
-		public int getCols(XMLStreamReader pef, LinkedList<Integer> stack) {
-			for (int i = 0; i < pef.getAttributeCount(); i++)
-				if (_COLS.equals(pef.getAttributeName(i)))
-					return Integer.parseInt(pef.getAttributeValue(i)); // assume positive integer
-			return stack.getFirst(); // throws NoSuchElementException if stack is empty, which can not
-			                         // happen if PEF is valid
-		}
-
-		public int getRows(XMLStreamReader pef, LinkedList<Integer> stack) {
-			for (int i = 0; i < pef.getAttributeCount(); i++)
-				if (_ROWS.equals(pef.getAttributeName(i)))
-					return Integer.parseInt(pef.getAttributeValue(i)); // assume positive integer
-			return stack.getFirst(); // throws NoSuchElementException if stack is empty, which can not
-			                         // happen if PEF is valid
-		}
-
 		public int getRowgap(XMLStreamReader pef, LinkedList<Integer> stack) {
 			for (int i = 0; i < pef.getAttributeCount(); i++)
 				if (_ROWGAP.equals(pef.getAttributeName(i)))
 					return Integer.parseInt(pef.getAttributeValue(i)); // assume non-negative integer
 			return stack.getFirst(); // throws NoSuchElementException if stack is empty, which can not
 			                         // happen if PEF is valid
+		}
+	}
+
+	private static double parseNumberOrPercentage(String value) throws IllegalArgumentException {
+		boolean isPercentage = false;
+		if (value.endsWith("%")) {
+			value = value.substring(0, value.length() - 1);
+			isPercentage = true;
+		}
+		try {
+			double number = Double.valueOf(value);
+			return isPercentage ? number / 100 : number;
+		} catch (NumberFormatException e) {
+			throw new IllegalArgumentException("Can not parse percentage: " + value, e);
 		}
 	}
 }
