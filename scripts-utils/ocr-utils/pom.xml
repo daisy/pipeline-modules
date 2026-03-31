@@ -94,6 +94,17 @@
           </systemPropertyVariables>
         </configuration>
       </plugin>
+      <!-- FIXME: disabled htmlize-sources for now because there are XProc files but no catalog.xml -->
+      <plugin>
+        <groupId>org.daisy.pipeline.build</groupId>
+        <artifactId>modules-build-helper</artifactId>
+        <executions>
+          <execution>
+            <id>htmlize-sources</id>
+            <phase>none</phase>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
