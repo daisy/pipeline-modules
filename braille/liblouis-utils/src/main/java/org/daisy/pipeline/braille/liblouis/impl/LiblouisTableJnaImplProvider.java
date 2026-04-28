@@ -199,7 +199,7 @@ public class LiblouisTableJnaImplProvider extends AbstractTransformProvider<Libl
 	protected void activate() {
 		logger.debug("Loading liblouis service");
 		try {
-			tempDir = normalize(createTempDirectory("pipeline-").toFile());
+			tempDir = normalize(createTempDirectory("pipeline-liblouis-").toFile());
 			tempDir.deleteOnExit();
 		} catch (Exception e) {
 			throw new RuntimeException("Could not create temporary directory", e);
