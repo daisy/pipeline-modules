@@ -34,11 +34,11 @@ public class AcapelaService implements TTSService {
 	@Activate
 	protected void activate() throws RuntimeException {
 		if (System.getProperty("os.name").toLowerCase().indexOf("win") >= 0)
-			failToActivate("This version of Acapela doesn't run on Windows");
+			throw new ActivationException("This version of Acapela doesn't run on Windows");
 		try {
 			Native.loadLibrary(NscubeLibrary.JNA_LIBRARY_NAME, NscubeLibrary.class);
 		} catch (Throwable e) {
-			failToActivate("Unable to load 'nscube' library", e);
+			throw new ActivationException("Unable to load 'nscube' library", e);
 		}
 		if (ACAPELA_SAMPLERATE == null)
 			ACAPELA_SAMPLERATE = Properties.getProperty("org.daisy.pipeline.tts.acapela.samplerate",
@@ -109,26 +109,5 @@ public class AcapelaService implements TTSService {
 			}
 		}
 		return Optional.empty();
-	}
-
-	private static void failToActivate(String message) throws RuntimeException {
-		failToActivate(message, null);
-	}
-
-    private static void failToActivate(String message, Throwable cause) throws RuntimeException {
-		try {
-			SPIHelper.failToActivate(message, cause);
-		} catch (NoClassDefFoundError e) {
-			// we are probably in OSGi context
-			throw new RuntimeException(message, cause);
-		}
-	}
-
-	// static nested class in order to delay class loading
-	private static class SPIHelper {
-		private SPIHelper() {}
-		public static void failToActivate(String message, Throwable cause) throws ActivationException {
-			throw new ActivationException(message, cause);
-		}
 	}
 }

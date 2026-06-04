@@ -114,21 +114,12 @@ public class UppercaseTransform extends AbstractBrailleTranslator implements Bra
 			} catch (NoSuchFileException e) {
 				String errorMessage = e.getMessage();
 				try {
-					SPIHelper.failToActivate(errorMessage);
+					throw new ActivationException(errorMessage);
 				} catch (NoClassDefFoundError ee) {
 					// we are probably in OSGi context
 					throw new RuntimeException(errorMessage);
 				}
 			}
-		}
-	}
-
-	// FIXME: move to utility class
-	// static nested class in order to delay class loading
-	private static class SPIHelper {
-		private SPIHelper() {}
-		public static void failToActivate(String message) throws ActivationException {
-			throw new ActivationException(message);
 		}
 	}
 }

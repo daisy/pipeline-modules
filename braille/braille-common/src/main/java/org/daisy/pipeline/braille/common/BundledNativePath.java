@@ -27,12 +27,7 @@ public class BundledNativePath extends StandardNativePath {
 			throw new IllegalArgumentException(OS_FAMILY + " property must not be empty"); }
 		if (OS.Family.valueOf(properties.get(OS_FAMILY).toString().toUpperCase()) != OS.getFamily()) {
 			String errorMessage = "does not work on " + OS.getFamily();
-			try {
-				SPIHelper.failToActivate(errorMessage);
-			} catch (NoClassDefFoundError e) {
-				// we are probably in OSGi context
-				throw new RuntimeException(errorMessage);
-			}
+			throw new ActivationException(errorMessage);
 		}
 		if (properties.get(BundledResourcePath.UNPACK) != null)
 			throw new IllegalArgumentException(BundledResourcePath.UNPACK + " property not supported");
@@ -65,13 +60,5 @@ public class BundledNativePath extends StandardNativePath {
 		if (getClass() != object.getClass())
 			return false;
 		return super.equals((BundledNativePath)object);
-	}
-
-	// static nested class in order to delay class loading
-	private static class SPIHelper {
-		private SPIHelper() {}
-		public static void failToActivate(String message) throws ActivationException {
-			throw new ActivationException(message);
-		}
 	}
 }

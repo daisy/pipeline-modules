@@ -38,7 +38,7 @@ public class QfrencyService implements TTSService {
 			if (epath.isPresent())
 				qfrencyPath = epath.get();
 			else
-				failToActivate("Cannot find qfrency's binary and property '" + QFRENCY_PATH.getName() + "' is not set");
+				throw new ActivationException("Cannot find qfrency's binary and property '" + QFRENCY_PATH.getName() + "' is not set");
 		}
 		if (QFRENCY_ADDRESS == null)
 			QFRENCY_ADDRESS = Properties.getProperty("org.daisy.pipeline.tts.qfrency.address",
@@ -73,26 +73,5 @@ public class QfrencyService implements TTSService {
 	@Override
 	public String getName() {
 		return "qfrency_cli";
-	}
-
-	private static void failToActivate(String message) throws RuntimeException {
-		failToActivate(message, null);
-	}
-
-    private static void failToActivate(String message, Throwable cause) throws RuntimeException {
-		try {
-			SPIHelper.failToActivate(message, cause);
-		} catch (NoClassDefFoundError e) {
-			// we are probably in OSGi context
-			throw new RuntimeException(message, cause);
-		}
-	}
-
-	// static nested class in order to delay class loading
-	private static class SPIHelper {
-		private SPIHelper() {}
-		public static void failToActivate(String message, Throwable cause) throws ActivationException {
-			throw new ActivationException(message, cause);
-		}
 	}
 }

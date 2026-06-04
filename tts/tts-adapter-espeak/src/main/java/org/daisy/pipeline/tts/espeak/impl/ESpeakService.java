@@ -45,7 +45,7 @@ public class ESpeakService implements TTSService {
 			}
 		}
 		if (eSpeakFile == null)
-			failToActivate("Cannot find eSpeak's binary using system property " + ESPEAK_PATH.getName());
+			throw new ActivationException("Cannot find eSpeak's binary using system property " + ESPEAK_PATH.getName());
 		if (ESPEAK_PRIORITY == null)
 			ESPEAK_PRIORITY = Properties.getProperty("org.daisy.pipeline.tts.espeak.priority",
 	 		                                         true,
@@ -75,26 +75,5 @@ public class ESpeakService implements TTSService {
 	@Override
 	public String getDisplayName() {
 		return "eSpeak";
-	}
-
-	private static void failToActivate(String message) throws RuntimeException {
-		failToActivate(message, null);
-	}
-
-    private static void failToActivate(String message, Throwable cause) throws RuntimeException {
-		try {
-			SPIHelper.failToActivate(message, cause);
-		} catch (NoClassDefFoundError e) {
-			// we are probably in OSGi context
-			throw new RuntimeException(message, cause);
-		}
-	}
-
-	// static nested class in order to delay class loading
-	private static class SPIHelper {
-		private SPIHelper() {}
-		public static void failToActivate(String message, Throwable cause) throws ActivationException {
-			throw new ActivationException(message, cause);
-		}
 	}
 }

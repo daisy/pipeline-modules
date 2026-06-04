@@ -45,7 +45,7 @@ public class SAPIService implements TTSService {
 	@Activate
 	protected void activate() {
 		if (!System.getProperty("os.name").toLowerCase().startsWith("windows"))
-			failToActivate("SAPI only works on Windows");
+			throw new ActivationException("SAPI only works on Windows");
 		if (SAPI_SAMPLERATE == null)
 			SAPI_SAMPLERATE = Properties.getProperty("org.daisy.pipeline.tts.sapi.samplerate",
 			                                         true,
@@ -219,26 +219,5 @@ public class SAPIService implements TTSService {
 			}
 		}
 		System.load(dllFile.getAbsolutePath());
-	}
-
-	private static void failToActivate(String message) throws RuntimeException {
-		failToActivate(message, null);
-	}
-
-	private static void failToActivate(String message, Throwable cause) throws RuntimeException {
-		try {
-			SPIHelper.failToActivate(message, cause);
-		} catch (NoClassDefFoundError e) {
-			// we are probably in OSGi context
-			throw new RuntimeException(message, cause);
-		}
-	}
-
-	// static nested class in order to delay class loading
-	private static class SPIHelper {
-		private SPIHelper() {}
-		public static void failToActivate(String message, Throwable cause) throws ActivationException {
-			throw new ActivationException(message, cause);
-		}
 	}
 }

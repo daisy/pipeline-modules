@@ -35,7 +35,7 @@ public abstract class CereProcService implements TTSService {
 	protected void activate() throws RuntimeException {
 	    client = new File(CEREPROC_CLIENT.getValue());
 		if (!client.exists())
-			failToActivate("No CereProc client installed at " + client);
+			throw new ActivationException("No CereProc client installed at " + client);
 		if (CEREPROC_SERVER == null)
 			CEREPROC_SERVER = Properties.getProperty("org.daisy.pipeline.tts.cereproc.server",
 			                                         false,
@@ -173,27 +173,6 @@ public abstract class CereProcService implements TTSService {
 			                          port,
 			                          client,
 			                          priority);
-		}
-	}
-
-	private static void failToActivate(String message) throws RuntimeException {
-		failToActivate(message, null);
-	}
-
-    private static void failToActivate(String message, Throwable cause) throws RuntimeException {
-		try {
-			SPIHelper.failToActivate(message, cause);
-		} catch (NoClassDefFoundError e) {
-			// we are probably in OSGi context
-			throw new RuntimeException(message, cause);
-		}
-	}
-
-	// static nested class in order to delay class loading
-	private static class SPIHelper {
-		private SPIHelper() {}
-		public static void failToActivate(String message, Throwable cause) throws ActivationException {
-			throw new ActivationException(message, cause);
 		}
 	}
 }
