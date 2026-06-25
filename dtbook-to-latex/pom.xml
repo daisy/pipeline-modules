@@ -16,6 +16,29 @@
 
   <name>DAISY Pipeline 2 module :: DTBook to LaTeX</name>
 
+  <developers>
+    <developer>
+      <id>linus.ericson</id>
+      <name>Linus Ericson</name>
+      <organization>MTM (Myndigheten för tillgängliga medier)</organization>
+      <organizationUrl>http://www.mtm.se/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>egli</id>
+      <name>Christian Egli</name>
+      <email>christian.egli@sbs.ch</email>
+      <organization>SBS - Schweizerische Bibliothek für Blinde, Seh- und Lesebehinderte</organization>
+      <organizationUrl>http://sbs.ch/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>UTC+01:00</timezone>
+    </developer>
+  </developers>
+
   <dependencies>
     <dependency>
       <groupId>org.daisy.pipeline</groupId>
