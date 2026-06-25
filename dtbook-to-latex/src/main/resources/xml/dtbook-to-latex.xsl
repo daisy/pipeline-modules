@@ -81,6 +81,8 @@
        Possible values are ignore and show -->
   <xsl:param name="image_visibility">show</xsl:param>
 
+  <xsl:param name="version">unknown</xsl:param>
+
   <xsl:variable name="number_of_volumes" select="count(//*['volume-split-point'=tokenize(@class, '\s+')])+1"/>
 
   <!--
@@ -233,7 +235,7 @@
 
    <xsl:template match="dtb:dtbook">
 	<xsl:text>% ***************************************&#10;</xsl:text>
-   	<xsl:text>% DAISY Pipeline 2 dtbook-to-latex v1.0.0&#10;</xsl:text>
+   	<xsl:value-of select="concat('% DAISY Pipeline 2 dtbook-to-latex v', $version, '&#10;')"/>
 	<xsl:text>% ***************************************&#10;</xsl:text>
    	<xsl:text>\documentclass[</xsl:text>
 	<xsl:value-of select="concat($fontsize, ',', $stocksize, ',')"/>

@@ -283,6 +283,7 @@ See the [babel documentation](http://www.ctan.org/get/macros/latex/required/babe
 		<p:with-param name="replace_em_with_quote" select="$replace-em-with-quote"/>
 		<p:with-param name="endnotes"             select="$endnotes"/>
 		<p:with-param name="image_visibility"     select="$image-visibility"/>
+		<p:with-param name="version"              select="'${project.version}'"/>
 	</p:xslt>
 
 	<p:store method="text">
