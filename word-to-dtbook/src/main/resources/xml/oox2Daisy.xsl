@@ -52,6 +52,7 @@
 	
 	<!-- For regression tests comparisons -->
 	<xsl:param name="disableDateGeneration" as="xs:boolean" select="false()" />
+	<xsl:param name="disableGeneratorGeneration" as="xs:boolean" select="false()" />
 	<xsl:param name="extractShapes" as="xs:boolean" select="true()" />
 
 	<!-- New object to interact with saxon-->
@@ -317,7 +318,9 @@
 							<meta name="dtb:uid" content="{$uid}"/>
 						</xsl:otherwise>
 					</xsl:choose>
-					<meta name="dtb:generator" content="DAISY Pipeline 2 word-to-dtbook 1.0.0"/>
+					<xsl:if test="not($disableGeneratorGeneration)">
+						<meta name="dtb:generator" content="DAISY Pipeline - Word to DTBook {d:GetProjectVersion()}"/>
+					</xsl:if>
 					<!--Choose block for checking whether user has entered the Title of the document or not-->
 					<xsl:choose>
 						<!--Taking Document Title value from core.xml-->

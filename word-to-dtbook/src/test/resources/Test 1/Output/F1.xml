@@ -3,7 +3,6 @@
 <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/" version="2005-3" xml:lang="en-US">
    <head>
       <meta name="dtb:uid" content="1"/>
-      <meta name="dtb:generator" content="DAISY Pipeline 2 word-to-dtbook 1.0.0"/>
       <meta name="dc:Title" content="Help"/>
       <meta name="dc:Creator" content="Balandin Vyacheslav"/>
       <meta name="dc:Publisher" content="Pruchkovskaya"/>

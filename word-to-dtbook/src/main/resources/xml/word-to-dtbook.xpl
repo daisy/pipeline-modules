@@ -190,6 +190,7 @@
 
 	<!-- hidden option for tests -->
 	<p:option name="disableDateGeneration" cx:as="xs:boolean" select="false()" px:hidden="true"/>
+	<p:option name="disableGeneratorGeneration" cx:as="xs:boolean" select="false()" px:hidden="true"/>
 
 	<!-- hidden option to allow saveasdaisy to deactivate shapes extraction
 	     This is to avoid word being blocked by one or more dialog managed by the addin.
@@ -332,6 +333,7 @@ if MathML is present in the document.</p>
 		<p:with-param name="FootnotesNumberingPrefix" select="$footnotes-numbering-prefix"/>
 		<p:with-param name="FootnotesNumberingSuffix" select="$footnotes-numbering-suffix"/>
 		<p:with-param name="disableDateGeneration" select="$disableDateGeneration"/>
+		<p:with-param name="disableGeneratorGeneration" select="$disableGeneratorGeneration"/>
 		<p:with-param name="extractShapes" select="$extract-shapes"/>
 	</p:xslt>
 	<p:group>
