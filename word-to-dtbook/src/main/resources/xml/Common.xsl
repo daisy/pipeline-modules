@@ -526,7 +526,7 @@
 			<xsl:if test="m:oMath">
 				<xsl:choose>
 					<!--Checking for BDO Element in MathEquation-->
-					<xsl:when test="../w:pPr/w:bidi">
+					<xsl:when test="../w:pPr/w:bidi[not(@w:val=('0','false','off'))]">
 						<xsl:value-of disable-output-escaping="yes" select="'&lt;bdo dir= &quot;rtl&quot;&gt;'"/>
 						<!--Calling Mathml Template for Math Equations-->
 						<xsl:call-template name="ooml2mml">
@@ -1661,7 +1661,7 @@
 		<xsl:param name="attributes" select="''" /> <!-- To handle hyperlinks -->
 		<xsl:param name="txt" as="xs:string" select="''"/>
 		<!-- Group of Bidirectionnal / rtl text -->
-		<xsl:variable name="isBidirectionnal" select="../w:pPr/w:bidi or w:rPr/w:rtl"/>
+		<xsl:variable name="isBidirectionnal" select="../w:pPr/w:bidi[not(@w:val=('0','false','off'))] or w:rPr/w:rtl"/>
 		<xsl:variable name="textLanguage">
 			<xsl:call-template name="GetRunLanguage">
 				<xsl:with-param name="runNode" select="." />
@@ -3403,7 +3403,7 @@
 				<xsl:if test="w:r/w:rPr/w:rStyle/@w:val='DefinitionTermDAISY'">
 					<dt>
 						<!--Checking if image is bidirectionally oriented-->
-						<xsl:if test="(w:pPr/w:bidi) or (w:r/w:rPr/w:rtl)">
+						<xsl:if test="(w:pPr/w:bidi[not(@w:val=('0','false','off'))]) or (w:r/w:rPr/w:rtl)">
 							<!--Variable holds the value which indicates that the image is bidirectionally oriented-->
 							<xsl:variable name="definitionlistBd" as="xs:string">
 								<xsl:call-template name="GetParagraphLanguage">
@@ -3413,7 +3413,7 @@
 							<xsl:value-of disable-output-escaping="yes" select="concat('&lt;bdo dir= &quot;rtl&quot; xml:lang=&quot;',$definitionlistBd,'&quot;&gt;')"/>
 						</xsl:if>
 						<xsl:value-of select="w:r/w:t"/>
-						<xsl:if test="(w:pPr/w:bidi) or (w:r/w:rPr/w:rtl)">
+						<xsl:if test="(w:pPr/w:bidi[not(@w:val=('0','false','off'))]) or (w:r/w:rPr/w:rtl)">
 							<xsl:value-of disable-output-escaping="yes" select="'&lt;/bdo&gt;'"/>
 						</xsl:if>
 					</dt>

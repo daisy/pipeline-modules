@@ -937,7 +937,7 @@
 							</xsl:call-template>
 						</xsl:attribute>
 					</xsl:if> -->
-					<xsl:if test="(preceding-sibling::node()[1]/w:r/w:rPr/w:rtl) or (preceding-sibling::node()[1]/w:pPr/w:bidi)">
+					<xsl:if test="(preceding-sibling::node()[1]/w:r/w:rPr/w:rtl) or (preceding-sibling::node()[1]/w:pPr/w:bidi[not(@w:val=('0','false','off'))])">
 						<xsl:variable name="varBdo" as="xs:string">
 							<xsl:call-template name="PictureLanguage">
 								<xsl:with-param name="CheckLang" select="'Table'"/>
@@ -1032,7 +1032,7 @@
 					<xsl:sequence select="d:sink(d:reSetcaptionFlag($myObj))"/> <!-- empty -->
 					<!-- NP 20240109 : close all inlines before closing paragraph -->
 					<xsl:call-template name="CloseAllStyleTag"/>
-					<xsl:if test="(preceding-sibling::w:p[1]/w:r/w:rPr/w:rtl) or (preceding-sibling::w:p[1]/w:pPr/w:bidi)">
+					<xsl:if test="(preceding-sibling::w:p[1]/w:r/w:rPr/w:rtl) or (preceding-sibling::w:p[1]/w:pPr/w:bidi[not(@w:val=('0','false','off'))])">
 						<xsl:value-of disable-output-escaping="yes" select="'&lt;/p&gt;'"/>
 					</xsl:if>
 				</caption>

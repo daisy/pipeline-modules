@@ -307,7 +307,7 @@
 						</xsl:attribute>
 					</xsl:if>
 					<!--Checking if image is bidirectionally oriented-->
-					<xsl:if test="($followingnodes[1]/w:pPr/w:bidi) or ($followingnodes[1]/w:r/w:rPr/w:rtl)">
+					<xsl:if test="($followingnodes[1]/w:pPr/w:bidi[not(@w:val=('0','false','off'))]) or ($followingnodes[1]/w:r/w:rPr/w:rtl)">
 						<!--Variable holds the value which indicates that the image is bidirectionally oriented-->
 						<xsl:variable name="Bd" as="xs:string">
 							<!--calling the PictureLanguage template-->
@@ -330,7 +330,7 @@
 						</xsl:if>
 					</xsl:for-each>
 					<!--Checking if image is bidirectionally oriented-->
-					<xsl:if test="$followingnodes[1]/w:pPr/w:bidi">
+					<xsl:if test="$followingnodes[1]/w:pPr/w:bidi[not(@w:val=('0','false','off'))]">
 						<xsl:value-of disable-output-escaping="yes" select="'&lt;/bdo&gt;'"/>
 						<xsl:value-of disable-output-escaping="yes" select="'&lt;/p&gt;'"/>
 					</xsl:if>
@@ -347,7 +347,7 @@
 				<xsl:sequence select="d:sink(d:AddCaptionsProdnotes($myObj))"/> <!-- empty -->
 				<xsl:value-of disable-output-escaping="yes" select="concat('&lt;prodnote render= &quot;optional&quot; imgref=&quot;',$imageId,'&quot;&gt;')"/>
 				<!--Checking if image is bidirectionally oriented-->
-				<xsl:if test="($followingnodes[1]/w:pPr/w:bidi) or ($followingnodes[1]/w:r/w:rPr/w:rtl)">
+				<xsl:if test="($followingnodes[1]/w:pPr/w:bidi[not(@w:val=('0','false','off'))]) or ($followingnodes[1]/w:r/w:rPr/w:rtl)">
 					<!--Variable holds the value which indicates that the image is bidirectionally oriented-->
 					<xsl:variable name="Bd" as="xs:string">
 						<!--calling the PictureLanguage template-->
@@ -367,7 +367,7 @@
 					</xsl:if>
 				</xsl:for-each>
 				<!--Checking if image is bidirectionally oriented-->
-				<xsl:if test="$followingnodes[1]/w:pPr/w:bidi">
+				<xsl:if test="$followingnodes[1]/w:pPr/w:bidi[not(@w:val=('0','false','off'))]">
 					<xsl:value-of disable-output-escaping="yes" select="'&lt;/bdo&gt;'"/>
 					<xsl:value-of disable-output-escaping="yes" select="'&lt;/p&gt;'"/>
 				</xsl:if>
@@ -384,7 +384,7 @@
 				<xsl:sequence select="d:sink(d:AddCaptionsProdnotes($myObj))"/> <!-- empty -->
 				<xsl:value-of disable-output-escaping="yes" select="concat('&lt;prodnote render=&quot;required&quot; imgref=&quot;', $imageId ,'&quot;&gt;')"/>
 				<!--Checking if image is bidirectionally oriented-->
-				<xsl:if test="($followingnodes[1]/w:pPr/w:bidi) or ($followingnodes[1]/w:r/w:rPr/w:rtl)">
+				<xsl:if test="($followingnodes[1]/w:pPr/w:bidi[not(@w:val=('0','false','off'))]) or ($followingnodes[1]/w:r/w:rPr/w:rtl)">
 					<!--Variable holds the value which indicates that the image is bidirectionally oriented-->
 					<xsl:variable name="Bd" as="xs:string">
 						<!--calling the PictureLanguage template-->
@@ -404,7 +404,7 @@
 					</xsl:if>
 				</xsl:for-each>
 				<!--Checking if image is bidirectionally oriented-->
-				<xsl:if test="$followingnodes[1]/w:pPr/w:bidi">
+				<xsl:if test="$followingnodes[1]/w:pPr/w:bidi[not(@w:val=('0','false','off'))]">
 					<xsl:value-of disable-output-escaping="yes" select="'&lt;/bdo&gt;'"/>
 					<xsl:value-of disable-output-escaping="yes" select="'&lt;/p&gt;'"/>
 				</xsl:if>
@@ -546,7 +546,7 @@
 		<!--Checking if Img_Id variable contains any Image Id-->
 		<xsl:if test="exists($Img_Id)">
 			<!--Checking if document is bidirectionally oriented-->
-			<xsl:if test="(../w:pPr/w:bidi) or (../w:pPr/w:jc/@w:val='right')">
+			<xsl:if test="(../w:pPr/w:bidi[not(@w:val=('0','false','off'))]) or (../w:pPr/w:jc/@w:val='right')">
 				<!--Variable holds the value which indicates that the image is bidirectionally oriented-->
 				<xsl:variable name="imgBd" as="xs:string">
 					<!--calling the PictureLanguage template-->
@@ -598,7 +598,7 @@
 										</xsl:call-template>
 									</xsl:attribute>
 								</xsl:if>
-								<xsl:if test="(../following-sibling::w:p[1]/w:pPr/w:bidi) or (../following-sibling::w:p[1]/w:r/w:rPr/w:rtl)">
+								<xsl:if test="(../following-sibling::w:p[1]/w:pPr/w:bidi[not(@w:val=('0','false','off'))]) or (../following-sibling::w:p[1]/w:r/w:rPr/w:rtl)">
 									<xsl:variable name="Bd" as="xs:string">
 										<xsl:call-template name="PictureLanguage">
 											<xsl:with-param name="CheckLang" select="'picture'"/>
@@ -637,7 +637,7 @@
 									</xsl:for-each>
 									<xsl:text> </xsl:text>
 								</xsl:if>
-								<xsl:if test="../following-sibling::w:p[1]/w:pPr/w:bidi">
+								<xsl:if test="../following-sibling::w:p[1]/w:pPr/w:bidi[not(@w:val=('0','false','off'))]">
 									<xsl:value-of disable-output-escaping="yes" select="'&lt;/bdo&gt;'"/>
 									<xsl:value-of disable-output-escaping="yes" select="'&lt;/p&gt;'"/>
 								</xsl:if>
@@ -654,7 +654,7 @@
 						</xsl:if>
 					</imggroup>
 					<!--Checking if document is bidirectionally oriented-->
-					<xsl:if test="(../w:pPr/w:bidi) or (../w:pPr/w:jc/@w:val='right')">
+					<xsl:if test="(../w:pPr/w:bidi[not(@w:val=('0','false','off'))]) or (../w:pPr/w:jc/@w:val='right')">
 						<xsl:value-of disable-output-escaping="yes" select="'&lt;/bdo&gt;'"/>
 					</xsl:if>
 				</xsl:when>
@@ -707,7 +707,7 @@
 						</xsl:attribute>
 					</xsl:if>
 					<!--Checking if image is bidirectionally oriented-->
-					<xsl:if test="($followingnodes[1]/w:pPr/w:bidi) or ($followingnodes[1]/w:r/w:rPr/w:rtl)">
+					<xsl:if test="($followingnodes[1]/w:pPr/w:bidi[not(@w:val=('0','false','off'))]) or ($followingnodes[1]/w:r/w:rPr/w:rtl)">
 						<!--Variable holds the value which indicates that the image is bidirectionally oriented-->
 						<xsl:variable name="Bd" as="xs:string">
 							<!--calling the PictureLanguage template-->
@@ -731,7 +731,7 @@
 						
 					</xsl:for-each>
 					<!--Checking for image is bidirectionally oriented-->
-					<xsl:if test="$followingnodes[1]/w:pPr/w:bidi">
+					<xsl:if test="$followingnodes[1]/w:pPr/w:bidi[not(@w:val=('0','false','off'))]">
 						<xsl:value-of disable-output-escaping="yes" select="'&lt;/bdo&gt;'"/>
 						<xsl:value-of disable-output-escaping="yes" select="'&lt;/p&gt;'"/>
 					</xsl:if>
@@ -748,7 +748,7 @@
 				<xsl:sequence select="d:sink(d:AddCaptionsProdnotes($myObj))"/> <!-- empty -->
 				<xsl:value-of disable-output-escaping="yes" select="concat('&lt;prodnote render=&quot;optional&quot; imgref=&quot;',$imageId,'&quot;&gt;')"/>
 				<!--Checking if image is bidirectionally oriented-->
-				<xsl:if test="($followingnodes[1]/w:pPr/w:bidi) or ($followingnodes[1]/w:r/w:rPr/w:rtl)">
+				<xsl:if test="($followingnodes[1]/w:pPr/w:bidi[not(@w:val=('0','false','off'))]) or ($followingnodes[1]/w:r/w:rPr/w:rtl)">
 					<!--Variable holds the value which indicates that the image is bidirectionally oriented-->
 					<xsl:variable name="Bd" as="xs:string">
 						<!--Calling the PictureLanguage template-->
@@ -768,7 +768,7 @@
 					</xsl:if>
 				</xsl:for-each>
 				<!--Checking if image is bidirectionally oriented-->
-				<xsl:if test="$followingnodes[1]/w:pPr/w:bidi">
+				<xsl:if test="$followingnodes[1]/w:pPr/w:bidi[not(@w:val=('0','false','off'))]">
 					<xsl:value-of disable-output-escaping="yes" select="'&lt;/bdo&gt;'"/>
 					<xsl:value-of disable-output-escaping="yes" select="'&lt;/p&gt;'"/>
 				</xsl:if>
@@ -785,7 +785,7 @@
 				<xsl:sequence select="d:sink(d:AddCaptionsProdnotes($myObj))"/> <!-- empty -->
 				<xsl:value-of disable-output-escaping="yes" select="concat('&lt;prodnote render=&quot;required&quot; imgref=&quot;',$imageId,'&quot;&gt;')"/>
 				<!--Getting the language id by calling the PictureLanguage template-->
-				<xsl:if test="($followingnodes[1]/w:pPr/w:bidi) or ($followingnodes[1]/w:r/w:rPr/w:rtl)">
+				<xsl:if test="($followingnodes[1]/w:pPr/w:bidi[not(@w:val=('0','false','off'))]) or ($followingnodes[1]/w:r/w:rPr/w:rtl)">
 					<!--attribute that holds language id-->
 					<xsl:variable name="Bd" as="xs:string">
 						<!--calling the PictureLanguage template-->
@@ -805,7 +805,7 @@
 					</xsl:if>
 				</xsl:for-each>
 				<!--Checking if image is bidirectionally oriented-->
-				<xsl:if test="$followingnodes[1]/w:pPr/w:bidi">
+				<xsl:if test="$followingnodes[1]/w:pPr/w:bidi[not(@w:val=('0','false','off'))]">
 					<xsl:value-of disable-output-escaping="yes" select="'&lt;/bdo&gt;'"/>
 					<xsl:value-of disable-output-escaping="yes" select="'&lt;/p&gt;'"/>
 				</xsl:if>
@@ -885,7 +885,7 @@
 								</xsl:attribute>
 							</xsl:if>
 							<!--Checking if image is bidirectionally oriented-->
-							<xsl:if test="../../w:r/w:pict/v:shape/v:textbox/w:txbxContent/w:p/w:pPr/w:bidi or (../../w:r/w:pict/v:shape/v:textbox/w:txbxContent/w:p/w:r/w:rPr/w:rtl)">
+							<xsl:if test="../../w:r/w:pict/v:shape/v:textbox/w:txbxContent/w:p/w:pPr/w:bidi[not(@w:val=('0','false','off'))] or (../../w:r/w:pict/v:shape/v:textbox/w:txbxContent/w:p/w:r/w:rPr/w:rtl)">
 								<xsl:variable name="Bd" as="xs:string">
 									<xsl:call-template name="PictureLanguage">
 										<xsl:with-param name="CheckLang" select="'imagegroup'"/>
@@ -895,7 +895,7 @@
 								<xsl:value-of disable-output-escaping="yes" select="concat('&lt;bdo dir= &quot;rtl&quot; xml:lang=&quot;',$Bd,'&quot;&gt;')"/>
 							</xsl:if>
 							<xsl:value-of select="$checkcaption"/>
-							<xsl:if test="../../w:r/w:pict/v:shape/v:textbox/w:txbxContent/w:p/w:pPr/w:bidi">
+							<xsl:if test="../../w:r/w:pict/v:shape/v:textbox/w:txbxContent/w:p/w:pPr/w:bidi[not(@w:val=('0','false','off'))]">
 								<xsl:value-of disable-output-escaping="yes" select="'&lt;/bdo&gt;'"/>
 								<xsl:value-of disable-output-escaping="yes" select="'&lt;/p&gt;'"/>
 							</xsl:if>
@@ -934,7 +934,7 @@
 		<!--Variable that holds the Image Id-->
 		<xsl:variable name="imageId" as="xs:string" select="concat(w:pict/v:shape/v:imagedata/@r:id,d:GenerateImageId($myObj))"/>
 		<!--Checking if image is bidirectionally oriented-->
-		<xsl:if test="(../w:pPr/w:bidi) or (../w:pPr/w:jc/@w:val='right')">
+		<xsl:if test="(../w:pPr/w:bidi[not(@w:val=('0','false','off'))]) or (../w:pPr/w:jc/@w:val='right')">
 			<xsl:variable name="imgBd" as="xs:string">
 				<xsl:call-template name="PictureLanguage">
 					<xsl:with-param name="CheckLang" select="'picture'"/>
@@ -963,7 +963,7 @@
 								</xsl:call-template>
 							</xsl:attribute>
 						</xsl:if>
-						<xsl:if test="(../following-sibling::w:p[1]/w:pPr/w:bidi) or (../following-sibling::w:p[1]/w:r/w:rPr/w:rtl)">
+						<xsl:if test="(../following-sibling::w:p[1]/w:pPr/w:bidi[not(@w:val=('0','false','off'))]) or (../following-sibling::w:p[1]/w:r/w:rPr/w:rtl)">
 							<xsl:variable name="Bd" as="xs:string">
 								<xsl:call-template name="PictureLanguage">
 									<xsl:with-param name="CheckLang" select="'picture'"/>
@@ -1002,7 +1002,7 @@
 							</xsl:for-each>
 							<xsl:text> </xsl:text>
 						</xsl:if>
-						<xsl:if test="../following-sibling::w:p[1]/w:pPr/w:bidi">
+						<xsl:if test="../following-sibling::w:p[1]/w:pPr/w:bidi[not(@w:val=('0','false','off'))]">
 							<xsl:value-of disable-output-escaping="yes" select="'&lt;/bdo&gt;'"/>
 							<xsl:value-of disable-output-escaping="yes" select="'&lt;/p&gt;'"/>
 						</xsl:if>
@@ -1020,7 +1020,7 @@
 				</xsl:if>
 			</imggroup>
 			<!--Checking if image is bidirectionally oriented-->
-			<xsl:if test="(../w:pPr/w:bidi) or (../w:pPr/w:jc/@w:val='right')">
+			<xsl:if test="(../w:pPr/w:bidi[not(@w:val=('0','false','off'))]) or (../w:pPr/w:jc/@w:val='right')">
 				<xsl:value-of disable-output-escaping="yes" select="'&lt;/bdo&gt;'"/>
 			</xsl:if>
 		</xsl:if>
@@ -1074,7 +1074,7 @@
 										</xsl:call-template>
 									</xsl:attribute>
 								</xsl:if>
-								<xsl:if test="(../following-sibling::w:p[1]/w:pPr/w:bidi) or (../following-sibling::w:p[1]/w:r/w:rPr/w:rtl)">
+								<xsl:if test="(../following-sibling::w:p[1]/w:pPr/w:bidi[not(@w:val=('0','false','off'))]) or (../following-sibling::w:p[1]/w:r/w:rPr/w:rtl)">
 									<xsl:variable name="Bd" as="xs:string">
 										<xsl:call-template name="PictureLanguage">
 											<xsl:with-param name="CheckLang" select="'picture'"/>
@@ -1112,7 +1112,7 @@
 									</xsl:for-each>
 									<xsl:text> </xsl:text>
 								</xsl:if>
-								<xsl:if test="../following-sibling::w:p[1]/w:pPr/w:bidi">
+								<xsl:if test="../following-sibling::w:p[1]/w:pPr/w:bidi[not(@w:val=('0','false','off'))]">
 									<xsl:value-of disable-output-escaping="yes" select="'&lt;/bdo&gt;'"/>
 									<xsl:value-of disable-output-escaping="yes" select="'&lt;/p&gt;'"/>
 								</xsl:if>
@@ -1126,7 +1126,7 @@
 						</xsl:call-template>
 
 					</imggroup>
-					<xsl:if test="(../w:pPr/w:bidi) or (../w:pPr/w:jc/@w:val='right')">
+					<xsl:if test="(../w:pPr/w:bidi[not(@w:val=('0','false','off'))]) or (../w:pPr/w:jc/@w:val='right')">
 						<xsl:value-of disable-output-escaping="yes" select="'&lt;/bdo&gt;'"/>
 					</xsl:if>
 					<xsl:if test="contains(w:object/o:OLEObject/@ProgID,'Excel') or contains(w:object/o:OLEObject/@ProgID,'Word') or contains(w:object/o:OLEObject/@ProgID,'PowerPoint')">
@@ -1189,7 +1189,7 @@
 									</xsl:call-template>
 								</xsl:attribute>
 							</xsl:if>
-							<xsl:if test="(../following-sibling::w:p[1]/w:pPr/w:bidi) or (../following-sibling::w:p[1]/w:r/w:rPr/w:rtl)">
+							<xsl:if test="(../following-sibling::w:p[1]/w:pPr/w:bidi[not(@w:val=('0','false','off'))]) or (../following-sibling::w:p[1]/w:r/w:rPr/w:rtl)">
 								<xsl:variable name="Bd" as="xs:string">
 									<xsl:call-template name="PictureLanguage">
 										<xsl:with-param name="CheckLang" select="'picture'"/>
@@ -1233,12 +1233,12 @@
 								</xsl:for-each>
 								<xsl:text> </xsl:text>
 							</xsl:if>
-							<xsl:if test="../following-sibling::w:p[1]/w:pPr/w:bidi">
+							<xsl:if test="../following-sibling::w:p[1]/w:pPr/w:bidi[not(@w:val=('0','false','off'))]">
 								<xsl:value-of disable-output-escaping="yes" select="'&lt;/bdo&gt;'"/>
 								<xsl:value-of disable-output-escaping="yes" select="'&lt;/p&gt;'"/>
 							</xsl:if>
 						</caption>
-						<xsl:if test="../following-sibling::w:p[1]/w:pPr/w:bidi">
+						<xsl:if test="../following-sibling::w:p[1]/w:pPr/w:bidi[not(@w:val=('0','false','off'))]">
 							<xsl:value-of disable-output-escaping="yes" select="'&lt;/bdo&gt;'"/>
 							<xsl:value-of disable-output-escaping="yes" select="'&lt;/p&gt;'"/>
 						</xsl:if>
@@ -1249,7 +1249,7 @@
 						<xsl:with-param name="characterStyle" select="$characterStyle"/>
 					</xsl:call-template>
 				</imggroup>
-				<xsl:if test="(../w:pPr/w:bidi) or (../w:pPr/w:jc/@w:val='right')">
+				<xsl:if test="(../w:pPr/w:bidi[not(@w:val=('0','false','off'))]) or (../w:pPr/w:jc/@w:val='right')">
 					<xsl:value-of disable-output-escaping="yes" select="'&lt;/bdo&gt;'"/>
 				</xsl:if>
 			</xsl:when>
