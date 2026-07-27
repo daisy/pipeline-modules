@@ -1908,6 +1908,21 @@
 		  -->
 		<xsl:call-template name="CloseEndedBlocks"/>
 
+		<!--Checking numbering.xml for the type of List-->
+		<xsl:variable name="numStyle" as="element(w:lvl)?">
+			<xsl:variable name="num" select="$numberingXml//w:numbering/w:num[@w:numId=$checknumId]"/>
+			<xsl:choose>
+				<xsl:when test="$num/w:lvlOverride[@w:ilvl=$checkilvl]/w:lvl">
+					<xsl:sequence select="$num/w:lvlOverride[@w:ilvl=$checkilvl]/w:lvl"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:variable name="abstrNum" as="xs:string" select="$num/w:abstractNumId/@w:val"/>
+					<xsl:variable name="abstrNum" select="$numberingXml//w:numbering/w:abstractNum[@w:abstractNumId=$abstrNum]"/>
+					<xsl:sequence select="$abstrNum/w:lvl[@w:ilvl=$checkilvl]"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+
 		<xsl:if test="(
 				string-length(preceding-sibling::node()[1]/w:pPr/w:numPr/w:ilvl/@w:val) = 0
 				or (
@@ -1916,9 +1931,7 @@
 				) or preceding-sibling::node()[1]/w:pPr/w:pStyle[substring(@w:val,1,7)='Heading']
 				or preceding-sibling::node()[1]/w:pPr/w:rPr/w:vanish
 			)">
-			<xsl:variable name="val" as="xs:string" select="$numberingXml//w:numbering/w:num[@w:numId=$checknumId]/w:abstractNumId/@w:val"/>
-			<!--Checking numbering.xml for the type of List-->
-			<xsl:variable    name="type" as="xs:string" select="$numberingXml//w:numbering/w:abstractNum[@w:abstractNumId=$val]/w:lvl[@w:ilvl=$checkilvl]/w:numFmt/@w:val"/>
+			<xsl:variable name="type" as="xs:string" select="$numStyle/w:numFmt/@w:val"/>
 			<!--Checking for Ordered List type-->
 			<xsl:choose>
 				<xsl:when test="$type='decimal'">
@@ -1930,7 +1943,7 @@
 				<!--Checking for Unordered list and Preformatted List type-->
 				<xsl:when test="$type='bullet'">
 					<xsl:choose>
-						<xsl:when test ="$numberingXml//w:numbering/w:abstractNum[@w:abstractNumId=$val]/w:lvl[@w:ilvl=$checkilvl]/w:lvlPicBulletId">
+						<xsl:when test="$numStyle/w:lvlPicBulletId">
 							<xsl:value-of disable-output-escaping="yes" select="'&lt;list type=&quot;pl&quot;&gt;'"/>
 						</xsl:when>
 						<xsl:otherwise>
@@ -1969,13 +1982,11 @@
 			<xsl:with-param name="close" select="$checkilvl"/>
 		</xsl:call-template>
 
-		<xsl:variable name="val" as="xs:string" select="$numberingXml//w:numbering/w:num[@w:numId=$checknumId]/w:abstractNumId/@w:val"/>
-		<!--Checking numbering.xml for the type of List-->
-		<xsl:variable    name="numFormat" as="xs:string" select="$numberingXml//w:numbering/w:abstractNum[@w:abstractNumId=$val]/w:lvl[@w:ilvl=$checkilvl]/w:numFmt/@w:val"/>
-		<xsl:variable    name="lvlText" as="xs:string" select="$numberingXml//w:numbering/w:abstractNum[@w:abstractNumId=$val]/w:lvl[@w:ilvl=$checkilvl]/w:lvlText/@w:val"/>
+		<xsl:variable name="numFormat" as="xs:string" select="$numStyle/w:numFmt/@w:val"/>
+		<xsl:variable name="lvlText" as="xs:string" select="$numStyle/w:lvlText/@w:val"/>
 
 		<xsl:call-template name="recStart">
-			<xsl:with-param name="abstLevel" select="$val"/>
+			<xsl:with-param name="numStyle" select="$numStyle"/>
 			<xsl:with-param name="level" select="$checkilvl"/>
 		</xsl:call-template>
 
