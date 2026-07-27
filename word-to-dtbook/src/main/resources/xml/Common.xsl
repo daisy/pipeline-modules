@@ -630,7 +630,8 @@
 			<!--checking sdt element for citation-->
 			<xsl:if test="self::w:sdt">
 				<!--Checking for Citation Element-->
-				<xsl:if test="w:sdtContent/w:fldSimple/w:r">
+				<xsl:if test="w:sdtContent/w:fldSimple/@w:instr or
+				              w:sdtContent/w:r/w:instrText">
 					<cite>
 						<!--Creating variable SupressAuthor for checking    value '\n'-->
 						<xsl:variable name="SupressAuthor" as="xs:boolean">
