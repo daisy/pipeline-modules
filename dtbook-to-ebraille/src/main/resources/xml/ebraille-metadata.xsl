@@ -113,7 +113,7 @@
 			</xsl:choose>
 			<xsl:if test="not(meta[@property='a11y:tactileGraphics'])">
 				<!-- this can only be true if the DTBook contains tactile graphics -->
-				<meta property="a11y:tactileGraphics">false</meta>
+				<meta property="a11y:tactileGraphics">none</meta>
 			</xsl:if>
 			<!--== Recommended metadata ==-->
 			<xsl:if test="not($dtbook-metadata//dtb:meta[lower-case(@name)='dc:source'])">
