@@ -526,7 +526,7 @@
 			<xsl:if test="m:oMath">
 				<xsl:choose>
 					<!--Checking for BDO Element in MathEquation-->
-					<xsl:when test="../w:pPr/w:bidi">
+					<xsl:when test="../w:pPr/w:bidi[not(@w:val=('0','false','off'))]">
 						<xsl:value-of disable-output-escaping="yes" select="'&lt;bdo dir= &quot;rtl&quot;&gt;'"/>
 						<!--Calling Mathml Template for Math Equations-->
 						<xsl:call-template name="ooml2mml">
@@ -630,7 +630,8 @@
 			<!--checking sdt element for citation-->
 			<xsl:if test="self::w:sdt">
 				<!--Checking for Citation Element-->
-				<xsl:if test="w:sdtContent/w:fldSimple/w:r">
+				<xsl:if test="w:sdtContent/w:fldSimple/@w:instr or
+				              w:sdtContent/w:r/w:instrText">
 					<cite>
 						<!--Creating variable SupressAuthor for checking    value '\n'-->
 						<xsl:variable name="SupressAuthor" as="xs:boolean">
@@ -1661,7 +1662,7 @@
 		<xsl:param name="attributes" select="''" /> <!-- To handle hyperlinks -->
 		<xsl:param name="txt" as="xs:string" select="''"/>
 		<!-- Group of Bidirectionnal / rtl text -->
-		<xsl:variable name="isBidirectionnal" select="../w:pPr/w:bidi or w:rPr/w:rtl"/>
+		<xsl:variable name="isBidirectionnal" select="../w:pPr/w:bidi[not(@w:val=('0','false','off'))] or w:rPr/w:rtl"/>
 		<xsl:variable name="textLanguage">
 			<xsl:call-template name="GetRunLanguage">
 				<xsl:with-param name="runNode" select="." />
@@ -1908,6 +1909,21 @@
 		  -->
 		<xsl:call-template name="CloseEndedBlocks"/>
 
+		<!--Checking numbering.xml for the type of List-->
+		<xsl:variable name="numStyle" as="element(w:lvl)?">
+			<xsl:variable name="num" select="$numberingXml//w:numbering/w:num[@w:numId=$checknumId]"/>
+			<xsl:choose>
+				<xsl:when test="$num/w:lvlOverride[@w:ilvl=$checkilvl]/w:lvl">
+					<xsl:sequence select="$num/w:lvlOverride[@w:ilvl=$checkilvl]/w:lvl"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:variable name="abstrNum" as="xs:string" select="$num/w:abstractNumId/@w:val"/>
+					<xsl:variable name="abstrNum" select="$numberingXml//w:numbering/w:abstractNum[@w:abstractNumId=$abstrNum]"/>
+					<xsl:sequence select="$abstrNum/w:lvl[@w:ilvl=$checkilvl]"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+
 		<xsl:if test="(
 				string-length(preceding-sibling::node()[1]/w:pPr/w:numPr/w:ilvl/@w:val) = 0
 				or (
@@ -1916,9 +1932,7 @@
 				) or preceding-sibling::node()[1]/w:pPr/w:pStyle[substring(@w:val,1,7)='Heading']
 				or preceding-sibling::node()[1]/w:pPr/w:rPr/w:vanish
 			)">
-			<xsl:variable name="val" as="xs:string" select="$numberingXml//w:numbering/w:num[@w:numId=$checknumId]/w:abstractNumId/@w:val"/>
-			<!--Checking numbering.xml for the type of List-->
-			<xsl:variable    name="type" as="xs:string" select="$numberingXml//w:numbering/w:abstractNum[@w:abstractNumId=$val]/w:lvl[@w:ilvl=$checkilvl]/w:numFmt/@w:val"/>
+			<xsl:variable name="type" as="xs:string" select="$numStyle/w:numFmt/@w:val"/>
 			<!--Checking for Ordered List type-->
 			<xsl:choose>
 				<xsl:when test="$type='decimal'">
@@ -1930,7 +1944,7 @@
 				<!--Checking for Unordered list and Preformatted List type-->
 				<xsl:when test="$type='bullet'">
 					<xsl:choose>
-						<xsl:when test ="$numberingXml//w:numbering/w:abstractNum[@w:abstractNumId=$val]/w:lvl[@w:ilvl=$checkilvl]/w:lvlPicBulletId">
+						<xsl:when test="$numStyle/w:lvlPicBulletId">
 							<xsl:value-of disable-output-escaping="yes" select="'&lt;list type=&quot;pl&quot;&gt;'"/>
 						</xsl:when>
 						<xsl:otherwise>
@@ -1969,13 +1983,11 @@
 			<xsl:with-param name="close" select="$checkilvl"/>
 		</xsl:call-template>
 
-		<xsl:variable name="val" as="xs:string" select="$numberingXml//w:numbering/w:num[@w:numId=$checknumId]/w:abstractNumId/@w:val"/>
-		<!--Checking numbering.xml for the type of List-->
-		<xsl:variable    name="numFormat" as="xs:string" select="$numberingXml//w:numbering/w:abstractNum[@w:abstractNumId=$val]/w:lvl[@w:ilvl=$checkilvl]/w:numFmt/@w:val"/>
-		<xsl:variable    name="lvlText" as="xs:string" select="$numberingXml//w:numbering/w:abstractNum[@w:abstractNumId=$val]/w:lvl[@w:ilvl=$checkilvl]/w:lvlText/@w:val"/>
+		<xsl:variable name="numFormat" as="xs:string" select="$numStyle/w:numFmt/@w:val"/>
+		<xsl:variable name="lvlText" as="xs:string" select="$numStyle/w:lvlText/@w:val"/>
 
 		<xsl:call-template name="recStart">
-			<xsl:with-param name="abstLevel" select="$val"/>
+			<xsl:with-param name="numStyle" select="$numStyle"/>
 			<xsl:with-param name="level" select="$checkilvl"/>
 		</xsl:call-template>
 
@@ -3403,7 +3415,7 @@
 				<xsl:if test="w:r/w:rPr/w:rStyle/@w:val='DefinitionTermDAISY'">
 					<dt>
 						<!--Checking if image is bidirectionally oriented-->
-						<xsl:if test="(w:pPr/w:bidi) or (w:r/w:rPr/w:rtl)">
+						<xsl:if test="(w:pPr/w:bidi[not(@w:val=('0','false','off'))]) or (w:r/w:rPr/w:rtl)">
 							<!--Variable holds the value which indicates that the image is bidirectionally oriented-->
 							<xsl:variable name="definitionlistBd" as="xs:string">
 								<xsl:call-template name="GetParagraphLanguage">
@@ -3413,7 +3425,7 @@
 							<xsl:value-of disable-output-escaping="yes" select="concat('&lt;bdo dir= &quot;rtl&quot; xml:lang=&quot;',$definitionlistBd,'&quot;&gt;')"/>
 						</xsl:if>
 						<xsl:value-of select="w:r/w:t"/>
-						<xsl:if test="(w:pPr/w:bidi) or (w:r/w:rPr/w:rtl)">
+						<xsl:if test="(w:pPr/w:bidi[not(@w:val=('0','false','off'))]) or (w:r/w:rPr/w:rtl)">
 							<xsl:value-of disable-output-escaping="yes" select="'&lt;/bdo&gt;'"/>
 						</xsl:if>
 					</dt>

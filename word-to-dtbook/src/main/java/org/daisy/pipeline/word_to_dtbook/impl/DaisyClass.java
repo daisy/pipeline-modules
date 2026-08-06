@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.Properties;
 
 import javax.imageio.ImageIO;
 import javax.xml.namespace.NamespaceContext;
@@ -38,6 +39,7 @@ import org.apache.poi.openxml4j.opc.PackagePart;
 import org.apache.poi.openxml4j.opc.PackageRelationship;
 import org.apache.poi.openxml4j.opc.TargetMode;
 
+import org.daisy.common.file.URLs;
 import org.daisy.common.xpath.saxon.ExtensionFunctionProvider;
 import org.daisy.common.xpath.saxon.ReflexiveExtensionFunctionProvider;
 
@@ -378,6 +380,20 @@ public class DaisyClass {
 
 	private static boolean IsOffice2007Or2010(String version) {
 		return version.equals(version2007) || version.equals(version2010);
+	}
+
+	/**
+	 * Get the version of the Word to DTBook module as defined in pom.xml
+	 */
+	public static String GetProjectVersion() {
+		Properties mavenProps = new Properties();
+		try (InputStream is = URLs.getResourceFromJAR("/maven.properties", DaisyClass.class)
+		                          .openStream()) {
+			mavenProps.load(is);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		return mavenProps.getProperty("version");
 	}
 
 	public static void sink(Object item) {}

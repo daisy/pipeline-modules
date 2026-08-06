@@ -24,7 +24,6 @@
 <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/" xmlns:mml="http://www.w3.org/1998/Math/MathML" version="2005-3" xml:lang="en-US">
    <head>
       <meta name="dtb:uid" content="11"/>
-      <meta name="dtb:generator" content="DAISY Pipeline 2 word-to-dtbook 1.0.0"/>
       <meta name="dc:Title" content="Default word sample for docx-to-dtbook tests"/>
       <meta name="dc:Creator" content="PAVIE Nicolas"/>
       <meta name="dc:Publisher" content="Daisy consortium"/>

@@ -725,12 +725,11 @@
 	</xsl:template>
 	
 	<xsl:template name="recStart">
-		<xsl:param name="abstLevel" as="xs:string"/>
+		<xsl:param name="numStyle" as="element(w:lvl)?"/>
 		<xsl:param name="level" as="xs:integer"/>
-		<xsl:variable name="levelNumberingScheme" select="$numberingXml//w:numbering/w:abstractNum[@w:abstractNumId=$abstLevel]/w:lvl[@w:ilvl=$level]" />
 		<xsl:choose>
-			<xsl:when test="$levelNumberingScheme/w:start/@w:val">
-				<xsl:sequence select="d:sink(d:StartString($myObj,$level,$levelNumberingScheme/w:start/@w:val))"/>
+			<xsl:when test="$numStyle/w:start/@w:val">
+				<xsl:sequence select="d:sink(d:StartString($myObj,$level,$numStyle/w:start/@w:val))"/>
 			</xsl:when>
 			<xsl:otherwise> <!-- Non incrementable lists -->
 				<xsl:sequence select="d:sink(d:StartString($myObj,$level,'0'))"/>
@@ -739,7 +738,7 @@
 		<xsl:if test="$level &gt; 0">
 			<xsl:variable name="dec" as="xs:integer" select="$level - 1"/>
 			<xsl:call-template name="recStart">
-				<xsl:with-param name="abstLevel" select="$abstLevel"/>
+				<xsl:with-param name="numStyle" select="$numStyle"/>
 				<xsl:with-param name="level" select="$dec"/>
 			</xsl:call-template>
 		</xsl:if>
@@ -937,7 +936,7 @@
 							</xsl:call-template>
 						</xsl:attribute>
 					</xsl:if> -->
-					<xsl:if test="(preceding-sibling::node()[1]/w:r/w:rPr/w:rtl) or (preceding-sibling::node()[1]/w:pPr/w:bidi)">
+					<xsl:if test="(preceding-sibling::node()[1]/w:r/w:rPr/w:rtl) or (preceding-sibling::node()[1]/w:pPr/w:bidi[not(@w:val=('0','false','off'))])">
 						<xsl:variable name="varBdo" as="xs:string">
 							<xsl:call-template name="PictureLanguage">
 								<xsl:with-param name="CheckLang" select="'Table'"/>
@@ -1032,7 +1031,7 @@
 					<xsl:sequence select="d:sink(d:reSetcaptionFlag($myObj))"/> <!-- empty -->
 					<!-- NP 20240109 : close all inlines before closing paragraph -->
 					<xsl:call-template name="CloseAllStyleTag"/>
-					<xsl:if test="(preceding-sibling::w:p[1]/w:r/w:rPr/w:rtl) or (preceding-sibling::w:p[1]/w:pPr/w:bidi)">
+					<xsl:if test="(preceding-sibling::w:p[1]/w:r/w:rPr/w:rtl) or (preceding-sibling::w:p[1]/w:pPr/w:bidi[not(@w:val=('0','false','off'))])">
 						<xsl:value-of disable-output-escaping="yes" select="'&lt;/p&gt;'"/>
 					</xsl:if>
 				</caption>

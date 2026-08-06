@@ -97,6 +97,8 @@
         <p:input port="stylesheet"><p:document href="xsl/tidy-add-lang.xsl"/></p:input>
         <p:with-param name="documentLanguage" select="$documentLanguage"/>
     </p:xslt>
+	<!-- Remove redundant @xml:lang -->
+	<p:delete match="@xml:lang[string(.)=../ancestor::*[@xml:lang][1]/string(@xml:lang)]"/>
     <p:choose>
         <p:when test="$externalizeWhitespace">
             <!--Externalizes leading and trailing whitespace from em, strong, sub, sup, pagenum, noteref.
