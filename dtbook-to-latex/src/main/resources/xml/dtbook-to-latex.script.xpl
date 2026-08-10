@@ -104,18 +104,25 @@ Requires the [ucharclasses package](http://ctan.org/tex-archive/macros/xetex/lat
 			<h2 px:role="name">Default language</h2>
 			<p px:role="desc" xml:space="preserve">Language for the babel package when no xml:lang attribute is present.
 
-See the [babel documentation](http://www.ctan.org/get/macros/latex/required/babel/babel.pdf) for all valid values.</p>
+See the [babel user guide](http://texdoc.net/pkg/babel) for all valid values.</p>
 		</p:documentation>
 		<p:pipeinfo>
 			<px:type>
-				<choice>
+				<choice xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
 					<value>english</value>
+					<a:documentation xml:lang="en">English</a:documentation>
 					<value>ngerman</value>
+					<a:documentation xml:lang="en">German (new/reformed orthography, post-1996)</a:documentation>
 					<value>USenglish</value>
+					<a:documentation xml:lang="en">English (American)</a:documentation>
 					<value>UKenglish</value>
+					<a:documentation xml:lang="en">English (British)</a:documentation>
 					<value>swedish</value>
+					<a:documentation xml:lang="en">Swedish</a:documentation>
 					<value>canadian</value>
+					<a:documentation xml:lang="en">English (Canadian)</a:documentation>
 					<value>french</value>
+					<a:documentation xml:lang="en">French</a:documentation>
 				</choice>
 			</px:type>
 		</p:pipeinfo>
@@ -128,13 +135,19 @@ See the [babel documentation](http://www.ctan.org/get/macros/latex/required/babe
 		</p:documentation>
 		<p:pipeinfo>
 			<px:type>
-				<choice>
+				<choice xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
 					<value>a3paper</value>
+					<a:documentation xml:lang="en">ISO 216 A3 paper size</a:documentation>
 					<value>a4paper</value>
+					<a:documentation xml:lang="en">ISO 216 A4 paper size</a:documentation>
 					<value>a5paper</value>
+					<a:documentation xml:lang="en">ISO 216 A5 paper size</a:documentation>
 					<value>letterpaper</value>
+					<a:documentation xml:lang="en">Letter paper size (11 in × 8.5 in)</a:documentation>
 					<value>legalpaper</value>
+					<a:documentation xml:lang="en">Legal paper size (14 in × 8.5 in)</a:documentation>
 					<value>executivepaper</value>
+					<a:documentation xml:lang="en">Legal paper size (10.5 in × 7.25 in)</a:documentation>
 				</choice>
 			</px:type>
 		</p:pipeinfo>
@@ -198,19 +211,13 @@ See the [babel documentation](http://www.ctan.org/get/macros/latex/required/babe
 		</p:documentation>
 	</p:option>
 
-	<p:option name="replace-em-with-quote" required="false" select="'false'">
+	<p:option name="replace-em-with-quote" required="false" px:type="boolean" select="'false'">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Replace emphasis with quotes</h2>
-			<p px:role="desc">Replace em elements with quoted text (emphasis can be hard to render in large print).</p>
+			<p px:role="desc" xml:space="preserve">Replace em elements with quoted text.
+
+Emphasis can be hard to render in large print.</p>
 		</p:documentation>
-		<p:pipeinfo>
-			<px:type>
-				<choice>
-					<value>true</value>
-					<value>false</value>
-				</choice>
-			</px:type>
-		</p:pipeinfo>
 	</p:option>
 
 	<p:option name="endnotes" required="false" select="'none'">
@@ -229,19 +236,11 @@ See the [babel documentation](http://www.ctan.org/get/macros/latex/required/babe
 		</p:pipeinfo>
 	</p:option>
 
-	<p:option name="image-visibility" required="false" select="'show'">
+	<p:option name="include-images" required="false" px:type="boolean" select="'true'">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
-			<h2 px:role="name">Image visibility</h2>
+			<h2 px:role="name">Include Images</h2>
 			<p px:role="desc">Whether to include or ignore images in the LaTeX output.</p>
 		</p:documentation>
-		<p:pipeinfo>
-			<px:type>
-				<choice>
-					<value>show</value>
-					<value>ignore</value>
-				</choice>
-			</px:type>
-		</p:pipeinfo>
 	</p:option>
 
 	<p:option name="result" px:output="result" px:type="anyDirURI" px:media-type="application/x-latex" required="true">
@@ -282,7 +281,7 @@ See the [babel documentation](http://www.ctan.org/get/macros/latex/required/babe
 		<p:with-param name="bottom_margin"        select="$bottom-margin"/>
 		<p:with-param name="replace_em_with_quote" select="$replace-em-with-quote"/>
 		<p:with-param name="endnotes"             select="$endnotes"/>
-		<p:with-param name="image_visibility"     select="$image-visibility"/>
+		<p:with-param name="include_images"       select="$include-images"/>
 		<p:with-param name="version"              select="'${project.version}'"/>
 	</p:xslt>
 

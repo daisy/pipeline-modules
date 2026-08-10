@@ -77,9 +77,8 @@
        Possible values are none, document and chapter -->
   <xsl:param name="endnotes">none</xsl:param> 
 
-  <!-- Ignore images or show them.
-       Possible values are ignore and show -->
-  <xsl:param name="image_visibility">show</xsl:param>
+  <!-- Include images or ignore them. -->
+  <xsl:param name="include_images">true</xsl:param>
 
   <xsl:param name="version">unknown</xsl:param>
 
@@ -973,7 +972,7 @@
 
    <xsl:template match="dtb:img">
      <xsl:choose>
-       <xsl:when test="$image_visibility='ignore'">
+       <xsl:when test="$include_images='false'">
 	 <!-- ignore the image -->
        </xsl:when>
        <xsl:otherwise>
@@ -990,7 +989,7 @@
 
    <xsl:template match="dtb:h1/dtb:img|dtb:h2/dtb:img|dtb:h3/dtb:img|dtb:h4/dtb:img|dtb:h5/dtb:img|dtb:h6/dtb:img">
      <xsl:choose>
-       <xsl:when test="$image_visibility='ignore'">
+       <xsl:when test="$include_images='false'">
 	 <!-- ignore the image -->
        </xsl:when>
        <xsl:otherwise>
@@ -1001,7 +1000,7 @@
 
    <xsl:template match="dtb:table//dtb:img|dtb:sidebar//dtb:img" priority="10">
      <xsl:choose>
-       <xsl:when test="$image_visibility='ignore'">
+       <xsl:when test="$include_images='false'">
 	 <!-- ignore the image -->
        </xsl:when>
        <xsl:otherwise>

@@ -80,7 +80,7 @@
       org.daisy.pipeline.datatypes.impl.Datatype_px_dtbook_to_latex_script_line_spacing,
       org.daisy.pipeline.datatypes.impl.Datatype_px_dtbook_to_latex_script_replace_em_with_quote,
       org.daisy.pipeline.datatypes.impl.Datatype_px_dtbook_to_latex_script_endnotes,
-      org.daisy.pipeline.datatypes.impl.Datatype_px_dtbook_to_latex_script_image_visibility
+      org.daisy.pipeline.datatypes.impl.Datatype_px_dtbook_to_latex_script_include_images
     </expose-services>
   </properties>
 
