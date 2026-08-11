@@ -562,7 +562,11 @@
             <configuration>
               <instructions>
                 <_dsannotations>${expose-services}</_dsannotations>
-                <Import-Package>!org.daisy.common.spi,*</Import-Package>
+                <Import-Package>
+                  !org.daisy.common.spi,
+                  !org.daisy.common.spi.annotations,
+                  *
+                </Import-Package>
               </instructions>
             </configuration>
           </plugin>
@@ -978,10 +982,10 @@
       <url>https://s3.eu-west-1.amazonaws.com/repo.maven.cyberduck.io/releases</url>
       <layout>default</layout>
       <releases>
-          <enabled>true</enabled>
+        <enabled>true</enabled>
       </releases>
       <snapshots>
-          <enabled>false</enabled>
+        <enabled>false</enabled>
       </snapshots>
     </repository>
   </repositories>

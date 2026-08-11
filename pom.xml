@@ -74,6 +74,7 @@
     <module>ocr-utils</module>
     <module>odf-utils</module>
     <module>pandoc-adapter</module>
+    <module>pipeline1-adapter</module>
     <module>pef-utils</module>
     <module>smil-utils</module>
     <module>tts-adapter-acapela</module>
