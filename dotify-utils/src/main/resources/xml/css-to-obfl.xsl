@@ -2719,7 +2719,7 @@
     
     <xsl:template mode="block td toc-entry"
                   match="css:box[@type='inline']/@css:id|
-                         css:box[@type='inline']/css:_/@css:id">
+                         css:box[@type='inline']/css:_//@css:id">
         <xsl:variable name="id" as="xs:string" select="."/>
         <xsl:if test="not(ancestor::*/@css:flow[not(.='normal')]) and $id=($page-number-references,$toc-entry-references)">
             <span id="{$id}"/>
