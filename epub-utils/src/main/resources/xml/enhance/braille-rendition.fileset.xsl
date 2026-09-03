@@ -3,38 +3,67 @@
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
-                xmlns:opf="http://www.idpf.org/2007/opf"
                 version="2.0">
 	
 	<xsl:include href="http://www.daisy.org/pipeline/modules/file-utils/library.xsl"/>
 	
-	<xsl:param name="braille-rendition.package-document.base" required="yes"/>
-	<xsl:param name="content-media-types" required="yes"/>
-	<xsl:variable name="_content-media-types" as="xs:string*" select="tokenize($content-media-types,'\s+')[not(.='')]"/>
+	<xsl:param name="epub-base" required="yes" as="xs:string"/>
+	<xsl:param name="ebraille-compatibility" required="yes" as="xs:string?"/>
+	<xsl:param name="delete-original-rendition" required="yes" as="xs:boolean"/>
+	<xsl:param name="content-media-types" required="yes" as="xs:string*"/>
 	
+	<xsl:variable name="original-base" as="xs:string"
+	              select="pf:longest-common-uri(
+	                        //d:file[not(@media-type='application/oebps-package+xml')
+	                                 and not($ebraille-compatibility and @role='nav')]
+	                         /resolve-uri(@href,base-uri(.)))"/>
+
+	<!--
+	    FIXME: assuming that the input does not have a "braille" folder yet
+	    (note that for eBraille output, the original default rendition, if not deleted, is moved to
+	    another folder, so in this case there can be no conflict as long as the input has only one
+	    rendition)
+	-->
+	<xsl:variable name="braille-base" as="xs:string"
+	              select="if ($ebraille-compatibility)
+	                      then resolve-uri('ebraille/',$epub-base)
+	                      else if ($delete-original-rendition)
+	                      then $epub-base
+	                      else resolve-uri('braille/',$epub-base)"/>
+
 	<xsl:template match="/">
 		<d:fileset>
-			<d:file href="{$braille-rendition.package-document.base}" original-href="{base-uri(/*)}"/>
-			<xsl:apply-templates select="//opf:manifest/opf:item"/>
+			<xsl:apply-templates select="//d:file"/>
 		</d:fileset>
 	</xsl:template>
 	
-	<xsl:template match="opf:manifest/opf:item">
+	<xsl:template match="d:fileset/d:file">
 		<xsl:choose>
-			<xsl:when test="@media-type=$_content-media-types">
-				<xsl:variable name="default-href" select="resolve-uri(@href,pf:base-uri(.))"/>
+			<xsl:when test="@media-type='application/oebps-package+xml'">
+				<xsl:variable name="original-href" select="resolve-uri(@href,pf:base-uri(.))"/>
+				<xsl:variable name="braille-href" select="if ($ebraille-compatibility)
+				                                          then resolve-uri('package.opf',$epub-base)
+				                                          else resolve-uri('package.opf',$braille-base)"/>
 				<xsl:element name="d:file">
-					<xsl:attribute name="href" select="replace($default-href,'^(.+)\.x?html|(.+)$','$1$2_braille.xhtml')"/>
-					<xsl:attribute name="original-href" select="$default-href"/>
+					<xsl:attribute name="href" select="$braille-href"/>
+					<xsl:attribute name="original-href" select="$original-href"/>
 				</xsl:element>
 			</xsl:when>
-			<xsl:when test="@media-type='application/smil+xml'">
-				<xsl:variable name="default-href" select="resolve-uri(@href,pf:base-uri(.))"/>
+			<xsl:otherwise>
+				<!--
+				    In case of $delete-original-rendition, this includes everything except the package document.
+				    Otherwise, this includes only content documents, and possibly SMIL files and an NCX.
+				-->
+				<xsl:variable name="original-href" select="resolve-uri(@href,pf:base-uri(.))"/>
+				<xsl:variable name="braille-href" select="if ($ebraille-compatibility and @role='nav')
+				                                          then resolve-uri('index.html',$epub-base)
+				                                          else resolve-uri(pf:relativize-uri($original-href,$original-base),
+				                                                           $braille-base)"/>
 				<xsl:element name="d:file">
-					<xsl:attribute name="href" select="replace($default-href,'^(.+)\.smil|(.+)$','$1$2_braille.smil')"/>
-					<xsl:attribute name="original-href" select="$default-href"/>
+					<xsl:attribute name="href" select="$braille-href"/>
+					<xsl:attribute name="original-href" select="$original-href"/>
 				</xsl:element>
-			</xsl:when>
+			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
 	

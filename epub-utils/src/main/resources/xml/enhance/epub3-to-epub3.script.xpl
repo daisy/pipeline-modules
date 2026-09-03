@@ -4,6 +4,7 @@
                 xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
                 xmlns:d="http://www.daisy.org/ns/pipeline/data"
                 xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 exclude-inline-prefixes="#all"
                 name="main"
                 px:input-filesets="epub3"
@@ -176,7 +177,7 @@ the navigation document.</p>
         </p:documentation>
     </p:option>
 
-    <p:option name="braille" required="false" px:type="boolean" select="'false'">
+    <p:option name="braille" required="false" cx:as="xs:boolean" select="false()">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h2 px:role="name">Translate to braille</h2>
             <p px:role="desc" xml:space="preserve">Whether to produce a braille rendition.
@@ -230,14 +231,15 @@ translator that is selected.</p>
         </p:documentation>
     </p:option>
     
-    <p:option name="stylesheet" select="''">
-        <!-- defined in ../../../../../common-options.xpl -->
+    <p:option name="stylesheet" required="false" px:type="anyURI" select="''" px:sequence="true" px:separator=" "
+              px:reusable="true" px:media-type="text/css text/x-scss">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h2 px:role="name">Style sheets</h2>
             <p px:role="desc" xml:space="preserve">A list of CSS/Sass style sheets to take into account.
 
-A list of CSS/Sass style sheets to take into account, both for braille transcription (if a braille
-rendition is requested), and for text-to-speech (if text-to-speech is enabled).
+A list of CSS/Sass style sheets to take into account, both for text-to-speech (if text-to-speech is
+enabled), and for braille transcription (if a braille rendition is requested). (Note that in order
+to support _formatting_ of the braille rendition, the "eBraille style sheets" option is provided.)
 
 Must be a space separated list of URIs, absolute or relative to the input.
 
@@ -270,10 +272,10 @@ manual](http://sass-lang.com/documentation/file.SASS_REFERENCE.html).
     <p:option name="apply-document-specific-stylesheets" px:type="boolean" select="'false'">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h2 px:role="name">Apply author CSS style sheets</h2>
-            <p px:role="desc" xml:space="preserve">If this option is enabled, any CSS style sheets attached to the EPUB's content documents for media "embossed" or "speech" will be taken into account.
+            <p px:role="desc" xml:space="preserve">If this option is enabled, any CSS style sheets attached to the EPUB's content documents for media "braille" or "speech" will be taken into account.
 
 The EPUB's content documents may contain CSS ([author style
-sheets](https://www.w3.org/TR/CSS2/cascade.html#cascade)) that apply to "embossed" or
+sheets](https://www.w3.org/TR/CSS2/cascade.html#cascade)) that apply to "braille" or
 "[speech](https://www.w3.org/TR/CSS2/aural.html)" media. Style sheets can be associated with an HTML
 file in several ways: linked (using an 'xml-stylesheet' processing instruction or a 'link' element),
 embedded (using a 'style' element) and/or inlined (using 'style' attributes).
@@ -290,7 +292,45 @@ provided CSS is more specific.
     <p:option name="set-default-rendition-to-braille" px:type="boolean" select="'false'">
         <p:documentation xmlns="http://www.w3.org/1999/xhtml">
             <h2 px:role="name">Set default rendition to braille.</h2>
-            <p px:role="desc">Make the generated braille rendition the default rendition.</p>
+            <p px:role="desc" xml:space="preserve">Make the generated braille rendition the default rendition.
+
+This option is implicitly set when the "eBraille compatibility" option is set.</p>
+        </p:documentation>
+    </p:option>
+    
+    <p:option name="ebraille-compatibility" select="'none'">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <h2 px:role="name">eBraille compatibility</h2>
+            <p px:role="desc">When a braille rendition is produced, ensure the output is a valid eBraille publication.</p>
+        </p:documentation>
+        <p:pipeinfo>
+            <px:type>
+                <choice xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
+                    <value>none</value>
+                    <a:documentation xml:lang="en">None</a:documentation>
+                    <value>soft</value>
+                    <a:documentation xml:lang="en" xml:space="preserve">Soft compatibility
+
+Be compatible with the eBraille standard as much as possible, while not breaking other features.</a:documentation>
+                    <value>strict</value>
+                    <a:documentation xml:lang="en">Strict compatibility</a:documentation>
+                </choice>
+            </px:type>
+        </p:pipeinfo>
+    </p:option>
+    
+    <p:option name="ebraille-stylesheet" required="false" px:type="anyURI" select="''" px:sequence="true" px:separator=" "
+              px:reusable="true" px:media-type="text/css text/x-scss">
+        <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+            <h2 px:role="name">eBraille style sheets</h2>
+            <p px:role="desc" xml:space="preserve">CSS style sheet(s) to be attached to the HTML documents of the eBraille publication.
+
+The style sheets are associated with each HTML file through `link` elements. No media query (`media`
+attribute) is specified on the `link` elements. If media queries are needed, they must be specified
+in the CSS itself, through `@media` and `@import` rules.
+
+The style sheets are included as-is, and should therefore conform to the [eBraille standard for
+CSS](https://daisy.github.io/ebraille/#html-css).</p>
         </p:documentation>
     </p:option>
     
@@ -355,7 +395,10 @@ elements that represent the sentences.</p>
             <p:pipe step="load" port="result.in-memory"/>
         </p:input>
         <p:with-option name="result-base"
-                       select="concat($result,'/',replace(replace($source,'(\.epub|/mimetype)$',''),'^.*/([^/]+)$','$1'),'.epub!/')"/>
+                       select="concat($result,'/',
+                                      replace(replace($source,'(\.epub|/mimetype)$',''),'^.*/([^/]+)$','$1'),
+                                      if ($braille and $ebraille-compatibility='strict') then '.ebrl' else '.epub',
+                                      '!/')"/>
         <p:input port="metadata">
             <p:pipe port="metadata" step="main"/>
         </p:input>
@@ -369,8 +412,10 @@ elements that represent the sentences.</p>
         <p:with-option name="lexicon" select="for $l in tokenize($lexicon,'\s+')[not(.='')] return
                                                 resolve-uri($l,$source)"/>
         <p:with-option name="apply-document-specific-stylesheets" select="$apply-document-specific-stylesheets"/>
-        <p:with-option name="set-default-rendition-to-braille" select="$set-default-rendition-to-braille"/>
         <p:with-option name="braille" select="$braille"/>
+        <p:with-option name="set-default-rendition-to-braille" select="$set-default-rendition-to-braille"/>
+        <p:with-option name="ebraille-compatibility" select="$ebraille-compatibility[not(.='none')]"/>
+        <p:with-option name="ebraille-stylesheet" select="tokenize($ebraille-stylesheet,'\s+')[not(.='')]"/>
         <p:with-option name="tts" select="$audio"/>
         <p:with-option name="sentence-detection" select="$sentence-detection"/>
         <p:with-option name="update-lang-attributes" select="$update-lang-attributes"/>
