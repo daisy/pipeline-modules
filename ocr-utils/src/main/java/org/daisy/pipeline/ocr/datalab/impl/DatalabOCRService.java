@@ -284,7 +284,7 @@ public class DatalabOCRService implements OCRService {
 											                         URI.create("index.md"),
 											                         "text/markdown");
 											JSONObject imageData = json.getJSONObject("images");
-											if (imageData != null)
+											if (imageData != null && imageData.length() > 0)
 												for (String id : JSONObject.getNames(imageData))
 													images.add(getImageFromBase64String(imageData.getString(id), URI.create(id), null));
 											break poll;
