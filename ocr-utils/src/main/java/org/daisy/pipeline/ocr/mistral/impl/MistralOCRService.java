@@ -15,14 +15,18 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
@@ -59,9 +63,11 @@ import org.daisy.common.xproc.XProcInput;
 import org.daisy.common.xproc.XProcOutput;
 import org.daisy.pipeline.common.rest.Request;
 import org.daisy.pipeline.common.rest.Response;
+import org.daisy.pipeline.datatypes.DatatypeService;
 import org.daisy.pipeline.fileset.Fileset;
 import org.daisy.pipeline.ocr.OCRProcessor;
 import org.daisy.pipeline.ocr.OCRService;
+import org.daisy.pipeline.script.ScriptOption;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -124,8 +130,30 @@ public class MistralOCRService implements OCRService {
 		return "AI-based online service";
 	}
 
+	private static final ScriptOption INCLUDE_PAGE_NUMBERS = new ScriptOption() {
+			@Override public String getName() { return "include-page-numbers"; }
+			@Override public String getNiceName() { return "Include page numbers"; }
+			@Override public String getDescription() { return "Whether or not to include print page break indicators"; }
+			@Override public boolean isRequired() { return false; }
+			@Override public String getDefault() { return "true"; }
+			@Override public DatatypeService getType() { return DatatypeService.XS_BOOLEAN; }
+			@Override public String getMediaType() { return null; }
+			@Override public boolean isSequence() { return false; }
+			@Override public boolean isOrdered() { return false; }
+			@Override public Role getRole() { return null; }
+			@Override public boolean isPrimary() { return false; }};
+
+	@Override
+	public Iterable<ScriptOption> getOptions() {
+		List<ScriptOption> options = new ArrayList<>();
+		options.add(INCLUDE_PAGE_NUMBERS);
+		return options;
+	}
+
 	private String cacheKey = null;
 	private List<OCRProcessor> modelsCache = null;
+	private static final Base64.Decoder base64Decoder = Base64.getDecoder();
+	private static final Pattern DATA_URL = Pattern.compile("data:(image/[^;]+);base64,(.+)=*");
 
 	@Override
 	public Collection<OCRProcessor> getAvailableProcessors(Map<String,String> properties)
@@ -226,6 +254,13 @@ public class MistralOCRService implements OCRService {
 			                                       : input.getPath().toString().endsWith(".pdf")))
 				throw new UnsupportedOperationException("Only supports PDF");
 
+			// options
+			boolean includePageNumbers = getBooleanOption(options, INCLUDE_PAGE_NUMBERS);
+
+			// other variables
+			boolean includeImageBase64 = true; // for some reason, extracting the images from the PDF based on the
+			                                   // bounding boxes is not reliable enough
+
 			// metadata
 			String title = null;
 			String author = null;
@@ -279,7 +314,7 @@ public class MistralOCRService implements OCRService {
 								                                   "The full literal text content of the image, as well-structured HTML."
 								                                   + " Must include only the exact text present within the image."
 								                                   + " Prefer lists over headings to convey structure."
-								                                   + " If the image contains to text, return an empty string.")
+								                                   + " If the image contains no text, return an empty string.")
 								                              .put("type", "string"))
 								         .put("functional_index",
 								              new JSONObject().put("title", "Functional_Index")
@@ -337,7 +372,7 @@ public class MistralOCRService implements OCRService {
 							.put("bbox_annotation_format",
 							     new JSONObject().put("type", "json_schema")
 							                     .put("json_schema", bboxAnnotationSchema))
-							.put("include_image_base64", false);
+							.put("include_image_base64", includeImageBase64);
 						if (title == null || author == null || language == null)
 							requestBody = requestBody.put("document_annotation_format",
 							                              new JSONObject().put("type", "json_schema")
@@ -363,6 +398,7 @@ public class MistralOCRService implements OCRService {
 					logger.debug(response.body);
 					Resource markdown = null;
 					List<Map<String,Rectangle2D>> imageBoxes = null;
+					List<Map<String,String>> imageData = null;
 					Map<String,String> imageShortDescriptions = null;
 					Map<String,String> imagesTextContent = null;
 					List<String> replaceImages = null;
@@ -390,6 +426,8 @@ public class MistralOCRService implements OCRService {
 						imagesTextContent = new HashMap<>();
 						replaceImages = new ArrayList<>();
 						imageBoxes = new ArrayList<>();
+						if (includeImageBase64)
+							imageData = new ArrayList<>();
 						for (int p = 0; p < pages.length(); p++) {
 							JSONObject pageJson = pages.getJSONObject(p);
 							String md = pageJson.getString("markdown");
@@ -398,6 +436,8 @@ public class MistralOCRService implements OCRService {
 							markdownPages.add(md);
 							JSONArray images = pageJson.getJSONArray("images");
 							imageBoxes.add(images.length() > 0 ? new HashMap<>() : null);
+							if (includeImageBase64)
+								imageData.add(images.length() > 0 ? new HashMap<>() : null);
 							for (int i = 0; i < images.length(); i++) {
 								JSONObject img = images.getJSONObject(i);
 								String id = img.getString("id");
@@ -423,11 +463,20 @@ public class MistralOCRService implements OCRService {
 								                                         topLeftY,
 								                                         bottomRightX - topLeftX,
 								                                         bottomRightY - topLeftY));
+								if (includeImageBase64) {
+									String data = img.getString("image_base64");
+									if (data == null)
+										throw new RuntimeException("missing image data");
+									imageData.get(imageData.size() - 1)
+									         .put(id, data);
+								}
 							}
 						}
 
 						// <hr> and not <br> because <br> is wrapped in <p>
-						String markdownContent = String.join("\n\n<hr role='doc-pagebreak'/>\n\n", markdownPages);
+						String markdownContent = String.join(
+							includePageNumbers ? "\n\n<hr role='doc-pagebreak'/>\n\n" : "\n\n",
+							markdownPages);
 						markdownContent = "_This document was converted from PDF using AI._\n\n" + markdownContent;
 						markdown = Resource.load(markdownContent.getBytes(StandardCharsets.UTF_8),
 						                         URI.create("index.md"),
@@ -445,25 +494,37 @@ public class MistralOCRService implements OCRService {
 								: null;
 							try (PDDocument pdf = PDDocument.load(input.read())) {
 								for (int p = 0; p < imageBoxes.size(); p++) {
-									PDPage page = pdf.getPage(p);
 									Map<String,Rectangle2D> boxes = imageBoxes.get(p);
 									if (boxes != null) {
-										// FIXME: extractRegion appears to be unreliable when it makes use of the source images
-										List<ImageInfo> pdfImages = null; //getImageInfo(page);
-										int pageIndex = p;
-										Supplier<BufferedImage> renderedPage = Suppliers.memoize(
-											() -> {
-												try {
-													return new PDFRenderer(pdf).renderImageWithDPI(pageIndex, IMAGE_DPI); }
-												catch (IOException e) {
-													throw new UncheckedIOException(e); }});
-										for (String id : boxes.keySet()) {
-											ByteArrayOutputStream imageData = new ByteArrayOutputStream();
-											ImageIO.write(extractRegion(page, renderedPage, pdfImages, boxes.get(id)),
-											              "png",
-											              imageData);
-											images.add(Resource.load(imageData.toByteArray(), URI.create(id), "image/png"));
+										for (String id : boxes.keySet())
 											imageWidths.put(id, (int)boxes.get(id).getWidth());
+										if (includeImageBase64) {
+											for (String id : boxes.keySet()) {
+												Matcher m = DATA_URL.matcher(imageData.get(p).get(id));
+												if (!m.matches())
+													throw new IllegalArgumentException("unexpected image data URL");
+												images.add(Resource.load(base64Decoder.decode(m.group(2)),
+												                         URI.create(id),
+												                         m.group(1)));
+											}
+										} else {
+											// FIXME: extractRegion appears to be unreliable when it makes use of the source images
+											PDPage page = pdf.getPage(p);
+											List<ImageInfo> pdfImages = null; //getImageInfo(page);
+											int pageIndex = p;
+											Supplier<BufferedImage> renderedPage = Suppliers.memoize(
+												() -> {
+													try {
+														return new PDFRenderer(pdf).renderImageWithDPI(pageIndex, IMAGE_DPI); }
+													catch (IOException e) {
+														throw new UncheckedIOException(e); }});
+											for (String id : boxes.keySet()) {
+												ByteArrayOutputStream data = new ByteArrayOutputStream();
+												ImageIO.write(extractRegion(page, renderedPage, pdfImages, boxes.get(id)),
+												              "png", // FIXME: should match file extension
+												              data);
+												images.add(Resource.load(data.toByteArray(), URI.create(id), "image/png"));
+											}
 										}
 									}
 									if (progress != null)
@@ -558,6 +619,26 @@ public class MistralOCRService implements OCRService {
 		}
 	}
 
+	private static Boolean getBooleanOption(Map<String,Iterable<String>> options, ScriptOption option) {
+		String v = getStringOption(options, option);
+		return "true".equals(v.toLowerCase()) || "1".equals(v);
+	}
+
+	private static String getStringOption(Map<String,Iterable<String>> options, ScriptOption option) {
+		String name = option.getName();
+		Iterable<String> value = options.get(name);
+		Iterator<String> i = value.iterator();
+		String v = option.getDefault();
+		if (i.hasNext()) {
+			v = i.next();
+			if (i.hasNext())
+				throw new IllegalArgumentException(
+						"did not expect more than one value for option" + name + ": " + value);
+		} else if (option.isRequired())
+			throw new IllegalArgumentException("did not expect empty value for option " + name);
+		return v;
+	}
+
 	private static Optional<Integer> getInteger(JSONObject json, String key) {
 		Object o = json.opt(key);
 		if (o == null)
@@ -649,6 +730,12 @@ public class MistralOCRService implements OCRService {
 					if (detail != null) {
 						message = message + ": " + detail;
 						cause = null;
+					} else {
+						detail = errorJson.getString("message");
+						if (detail != null) {
+							message = message + ": " + detail;
+							cause = null;
+						}
 					}
 				}
 			}
