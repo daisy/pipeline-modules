@@ -79,9 +79,19 @@
       <id>compile-only-system-dependencies</id>
       <url>file://${project.basedir}/src/main/resources/lib/</url>
     </repository>
-    <!-- disable repository for rococoa as it causes the build to fail -->
+    <!-- disable repositories that cause the build to fail -->
     <repository>
       <id>maven.cyberduck.io-release</id>
+      <url>-</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>eclipselink</id>
       <url>-</url>
       <releases>
         <enabled>false</enabled>
