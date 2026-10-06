@@ -64,6 +64,10 @@
               test="contains(string(/),'\cleartorecto&#10;\tableofcontents*')"/>
     <x:expect label="and before the foreword, as in the document" type="xpath"
               test="contains(substring-before(string(/),'the text of the foreword'),'\tableofcontents*')"/>
+    <x:expect label="the level that held the list is not a chapter of its own" type="xpath"
+              test="not(contains(string(/),'\chapter*{\ }'))"/>
+    <x:expect label="the bodymatter starts on a recto page" type="xpath"
+              test="contains(string(/),'\cleartorecto&#10;\mainmatter')"/>
   </x:scenario>
 
   <x:scenario label="a foreword before a table of contents">

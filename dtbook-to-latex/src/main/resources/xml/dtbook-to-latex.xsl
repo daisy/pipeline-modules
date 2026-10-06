@@ -832,11 +832,21 @@
 	<xsl:call-template name="cover"/>
 	<xsl:text>\cleartorecto&#10;</xsl:text>
 	<xsl:apply-templates/>
+	<!-- the bodymatter starts on a recto page, which does not happen by itself when the page
+	     style is compact, because that sets \openany -->
+	<xsl:text>\cleartorecto&#10;</xsl:text>
    </xsl:template>
 
    <!-- The list of contents in the frontmatter is not printed as a list, a table of contents is
         generated in its place. memoir prints a heading of its own in front of it, so the heading
         in the document is left out. -->
+   <!-- The level that holds the list of contents gets no heading of its own, not even the empty
+        one that a level1 without a heading would get: it is replaced by the generated table of
+        contents, which memoir gives a heading of its own. -->
+   <xsl:template match="dtb:frontmatter/dtb:level1[dtb:list[descendant::dtb:lic]]">
+     <xsl:apply-templates/>
+   </xsl:template>
+
    <xsl:template match="dtb:frontmatter/dtb:level1/dtb:list[descendant::dtb:lic]" priority="1">
      <xsl:text>\cleartorecto&#10;</xsl:text>
      <xsl:text>\tableofcontents*&#10;</xsl:text>
