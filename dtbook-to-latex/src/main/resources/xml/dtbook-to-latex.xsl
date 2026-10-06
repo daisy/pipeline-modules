@@ -816,6 +816,13 @@
      <xsl:apply-templates/>
    </xsl:template>
 
+   <!-- A colophon starts a page but is not a chapter: it gets no heading, not even the empty one
+        that a level1 without a heading would otherwise get. -->
+   <xsl:template match="dtb:level1[tokenize(@class,'\s+')='colophon']">
+     <xsl:text>\clearpage&#10;</xsl:text>
+     <xsl:apply-templates/>
+   </xsl:template>
+
    <!-- On a title page and on a colophon the last block is set at the foot of the page, which is
         where the publisher respectively the imprint belongs. The generated cover does the same. -->
    <xsl:template match="dtb:level1[tokenize(@class,'\s+')='titlepage']/dtb:level2/*[last()]

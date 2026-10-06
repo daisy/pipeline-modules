@@ -235,6 +235,10 @@
     <x:context label="result">
       <x:document type="port" port="result"/>
     </x:context>
+    <x:expect label="the colophon starts a page" type="xpath"
+              test="contains(substring-before(string(/),'the notice about the copyright'),'\clearpage')"/>
+    <x:expect label="but is not a chapter of its own" type="xpath"
+              test="not(contains(string(/),'\chapter*{\ }'))"/>
     <x:expect label="the imprint is set at the foot of the page" type="xpath"
               test="contains(substring-before(string(/),'the publisher'),'\vfill')"/>
     <x:expect label="the notice is not, the cover has a fill of its own" type="xpath"
