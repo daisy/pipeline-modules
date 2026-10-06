@@ -73,6 +73,49 @@ instead: the notes are then printed at the end of the chapter that references
 them, which spreads them over the whole book and lets the volumes be split
 normally.
 
+## Markup that is recognized by its class
+
+A few typographic conventions are not expressed by an element of their own but by a class on an
+element. These are rendered:
+
+| Markup | Rendered as |
+|---|---|
+| `p` with class `precedingemptyline` | a blank line in front of the paragraph |
+| `p` with class `precedingseparator` | three asterisks in front of the paragraph |
+| `span` with class `answer` | a rule to write an answer on |
+| `span` with class `answer_1` | a shorter rule, for a one word answer |
+| `span` with class `box` | a box to tick |
+
+The DTBook to EPUB 3 conversion generates `precedingemptyline` and `precedingseparator` from an
+`hr` element, so a book that was converted from EPUB 3 keeps its blank lines and its separators.
+
+The classes `answer`, `answer_1` and `box` come from the [Nordic Guidelines for the Production of
+Accessible EPUB 3](https://format.mtm.se/nordic_epub/2020-1/). The content of a `span` with one of
+these classes is not printed, only the rule or the box is.
+
+### Line numbers
+
+A line number is normally a `linenum` element at the start of a `line`, and is set in the left
+margin:
+
+~~~xml
+<linegroup>
+  <line><linenum>12</linenum> a numbered line of a poem</line>
+</linegroup>
+~~~
+
+For a book where whole chapters are numbered line by line, `line` and `linegroup` are often not
+usable, because the numbered lines carry paragraphs, blockquotes and the like. A `span` with class
+`linenum` can be used instead, anywhere in the text:
+
+~~~xml
+<p><span class="linenum">5</span> The line numbers of a prose text, where a line
+<span class="linenum">6</span> is not a line of a poem but a line of the original.</p>
+~~~
+
+A line number in the middle of a paragraph starts a new line, so that the number is set in the
+margin of the line it belongs to.
+
 ## See also
 
 * [memoir class documentation](http://texdoc.net/pkg/memoir)
