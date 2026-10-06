@@ -116,6 +116,26 @@ usable, because the numbered lines carry paragraphs, blockquotes and the like. A
 A line number in the middle of a paragraph starts a new line, so that the number is set in the
 margin of the line it belongs to.
 
+## Languages
+
+The conversion generates a few phrases of its own: the volume numbering on the cover of a book that
+is split into volumes, and the heading above the endnotes. They are written in the language of the
+document, which is taken from the `dc:Language` metadata, or from the `xml:lang` attribute of the
+`dtbook` element when there is no such metadata. The same language is given to the babel package,
+which takes care of everything else, such as the heading above the table of contents.
+
+English, German and Swiss German are provided. To add a language, add it to <a
+href="../src/main/resources/xml/i18n.xml" class="userdoc">`i18n.xml`</a>. The `%1` and `%2` in a
+phrase are replaced by the number of the volume and the number of volumes.
+
+Translations are looked up by language tag, and a tag falls back to the language without the
+region, which is why Swiss German only has to provide the strings that are spelled with "ss"
+instead of "ß" and gets the rest from German.
+
+The number of volumes is written out in words, which is why `i18n.xml` also holds the numbers from
+1 to 50. A language that has no words for the numbers gets the number itself, so "Large print book
+in 3 volumes" rather than a number word in the wrong language.
+
 ## See also
 
 * [memoir class documentation](http://texdoc.net/pkg/memoir)

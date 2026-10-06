@@ -42,7 +42,7 @@
     <x:expect label="it is a memoir document" type="xpath"
               test="contains(string(/),'\documentclass')"/>
     <x:expect label="it is a single volume book" type="xpath"
-              test="contains(string(/),'\numtoname{1} volume')"/>
+              test="contains(string(/),'Large print book in one volume')"/>
     <x:expect label="so there is no volume numbering on the cover" type="xpath"
               test="not(contains(string(/),'Volume 1 of'))"/>
   </x:scenario>
@@ -86,7 +86,7 @@
                   href="two-volumes/output-dir/test_dtbook-to-latex.script.tex"/>
     </x:context>
     <x:expect label="it is a two volume book" type="xpath"
-              test="contains(string(/),'\numtoname{2} volumes')"/>
+              test="contains(string(/),'Large print book in two volumes')"/>
     <x:expect label="the first volume is numbered on the cover" type="xpath"
               test="contains(string(/),'Volume 1 of 2')"/>
     <x:expect label="the second volume gets a cover of its own" type="xpath"
@@ -142,7 +142,7 @@
                   href="toc/output-dir/test_dtbook-to-latex.script.tex"/>
     </x:context>
     <x:expect label="it is a two volume book" type="xpath"
-              test="contains(string(/),'\numtoname{2} volumes')"/>
+              test="contains(string(/),'Large print book in two volumes')"/>
     <x:expect label="the second volume gets a cover of its own" type="xpath"
               test="contains(string(/),'Volume 2 of 2')"/>
     <x:expect label="and both volumes get a table of contents" type="xpath"
@@ -196,7 +196,7 @@
     <x:expect label="the notes are printed at the end of the document" type="xpath"
               test="contains(string(/),'\printpagenotes')"/>
     <x:expect label="the book is split into two volumes" type="xpath"
-              test="contains(string(/),'\numtoname{2} volumes')"/>
+              test="contains(string(/),'Large print book in two volumes')"/>
     <x:expect label="the note is still rendered where it is referenced" type="xpath"
               test="contains(string(/),'\pagenote{')"/>
   </x:scenario>
