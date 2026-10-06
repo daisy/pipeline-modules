@@ -60,6 +60,8 @@
               test="not(contains(string(/),'{Contents}'))"/>
     <x:expect label="the table of contents comes after the cover" type="xpath"
               test="contains(substring-before(string(/),'\tableofcontents*'),'Large print book in one volume')"/>
+    <x:expect label="and starts on a recto page of its own" type="xpath"
+              test="contains(string(/),'\cleartorecto&#10;\tableofcontents*')"/>
     <x:expect label="and before the foreword, as in the document" type="xpath"
               test="contains(substring-before(string(/),'the text of the foreword'),'\tableofcontents*')"/>
   </x:scenario>

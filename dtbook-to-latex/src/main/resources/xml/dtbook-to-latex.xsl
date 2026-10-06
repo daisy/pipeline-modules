@@ -766,6 +766,7 @@
      <!-- insert a toc in every volume. -->
      <xsl:if test="//dtb:frontmatter/dtb:level1/dtb:list[descendant::dtb:lic]">
        <xsl:text>\tableofcontents*&#10;</xsl:text>
+       <xsl:text>\cleartorecto&#10;</xsl:text>
      </xsl:if>
      <xsl:call-template name="restore_pagestyle"/>
      <xsl:text>\restorepagenumber&#10;</xsl:text>
@@ -837,6 +838,7 @@
         generated in its place. memoir prints a heading of its own in front of it, so the heading
         in the document is left out. -->
    <xsl:template match="dtb:frontmatter/dtb:level1/dtb:list[descendant::dtb:lic]" priority="1">
+     <xsl:text>\cleartorecto&#10;</xsl:text>
      <xsl:text>\tableofcontents*&#10;</xsl:text>
    </xsl:template>
 
