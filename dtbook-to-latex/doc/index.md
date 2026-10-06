@@ -73,6 +73,45 @@ instead: the notes are then printed at the end of the chapter that references
 them, which spreads them over the whole book and lets the volumes be split
 normally.
 
+## The front matter
+
+The conversion starts the book with a cover page of its own, and renders the front matter of the
+document after it, in the order in which it appears in the document. Where the document has a list
+of contents, that is, a `list` with `lic` elements inside a `level1` of the front matter, a
+generated table of contents takes its place. The heading in front of that list is left out, because
+memoir prints a heading of its own.
+
+The cover page shows the author and the title. They are taken from the `docauthor` and the
+`doctitle` of the document, which may contain markup, and from the `dc:Creator` and `dc:Title`
+metadata when the document has no `docauthor` or `doctitle`. The publisher is taken from the
+`dc:Publisher` metadata.
+
+### Title pages and colophons
+
+A `level1` with class `titlepage` is set as a title page rather than as a chapter: it gets no
+chapter heading of its own, and every `level2` inside it starts a page. The first one repeats the
+author and the title above its content. When the book is split into volumes, the title page is
+repeated in every volume.
+
+A `level1` with class `colophon` is an ordinary level that starts a page, which makes it the place
+for an imprint, a copyright notice or a word of thanks.
+
+On a title page and on a colophon the last block of the page is set at the foot of the page, which
+is where the publisher respectively the imprint belongs. That means the lines that belong at the
+foot want to be a *single* block. Use a `linegroup` for them, which also sets the lines tight
+instead of as separate paragraphs:
+
+~~~xml
+<level1 class="colophon">
+  <p>This large print book is an accessible copy of a work protected by copyright.</p>
+  <linegroup>
+    <line>Published by Example Books, Zurich</line>
+    <line>www.example.com</line>
+    <line>Example Books 2026</line>
+  </linegroup>
+</level1>
+~~~
+
 ## Markup that is recognized by its class
 
 A few typographic conventions are not expressed by an element of their own but by a class on an

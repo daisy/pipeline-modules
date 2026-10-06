@@ -679,10 +679,21 @@
      <xsl:param name="font_size" select="'\large'"/>
      <xsl:value-of select="concat('{', $font_size, ' ')"/>
      <xsl:variable name="author">
-       <xsl:for-each select="//dtb:meta[@name='dc:creator' or @name='dc:Creator']">
-	 <xsl:value-of select="my:quoteSpecialChars(string(@content))"/>
-	 <xsl:if test="not(position() = last())"><xsl:text>, </xsl:text></xsl:if>
-       </xsl:for-each>
+       <xsl:choose>
+	 <!-- the author as written in the document comes first, it may contain markup -->
+	 <xsl:when test="//dtb:docauthor[normalize-space(.)!='']">
+	   <xsl:for-each select="//dtb:docauthor">
+	     <xsl:apply-templates select="." mode="cover"/>
+	     <xsl:if test="not(position() = last())"><xsl:text>, </xsl:text></xsl:if>
+	   </xsl:for-each>
+	 </xsl:when>
+	 <xsl:otherwise>
+	   <xsl:for-each select="//dtb:meta[@name='dc:creator' or @name='dc:Creator']">
+	     <xsl:value-of select="my:quoteSpecialChars(string(@content))"/>
+	     <xsl:if test="not(position() = last())"><xsl:text>, </xsl:text></xsl:if>
+	   </xsl:for-each>
+	 </xsl:otherwise>
+       </xsl:choose>
      </xsl:variable>
      <xsl:sequence select="if (normalize-space($author) != '') then $author else '\ '"/>
      <xsl:text>}\\[1.5cm]&#10;</xsl:text>
@@ -691,12 +702,28 @@
    <xsl:template name="title">
      <xsl:param name="font_size" select="'\huge'"/>
      <xsl:text>\begin{Spacing}{1.75}&#10;</xsl:text>
-     <xsl:for-each select="//dtb:meta[@name='dc:title' or @name='dc:Title']">
-       <xsl:value-of select="concat('{', $font_size, ' ')"/>
-       <xsl:value-of select="my:quoteSpecialChars(string(@content))"/>
-       <xsl:text>}\\[0.5cm]&#10;</xsl:text>
-     </xsl:for-each>
+     <xsl:choose>
+       <!-- the title as written in the document comes first, it may contain markup -->
+       <xsl:when test="//dtb:doctitle[normalize-space(.)!='']">
+	 <xsl:for-each select="//dtb:doctitle">
+	   <xsl:value-of select="concat('{', $font_size, ' ')"/>
+	   <xsl:apply-templates select="." mode="cover"/>
+	   <xsl:text>}\\[0.5cm]&#10;</xsl:text>
+	 </xsl:for-each>
+       </xsl:when>
+       <xsl:otherwise>
+	 <xsl:for-each select="//dtb:meta[@name='dc:title' or @name='dc:Title']">
+	   <xsl:value-of select="concat('{', $font_size, ' ')"/>
+	   <xsl:value-of select="my:quoteSpecialChars(string(@content))"/>
+	   <xsl:text>}\\[0.5cm]&#10;</xsl:text>
+	 </xsl:for-each>
+       </xsl:otherwise>
+     </xsl:choose>
      <xsl:text>\end{Spacing}&#10;</xsl:text>
+   </xsl:template>
+
+   <xsl:template match="dtb:doctitle|dtb:docauthor" mode="cover">
+     <xsl:apply-templates/>
    </xsl:template>
 
    <xsl:template name="cover">
@@ -733,6 +760,8 @@
        <xsl:with-param name="current_volume_number" 
 		       select="count(preceding::dtb:div[@class='volume-split-point'])+2"/>
      </xsl:call-template>
+     <!-- repeat the title page in every volume -->
+     <xsl:apply-templates select="//dtb:level1[tokenize(@class,'\s+')='titlepage']"/>
      <xsl:text>\cleartorecto&#10;</xsl:text>
      <!-- insert a toc in every volume. -->
      <xsl:if test="//dtb:frontmatter/dtb:level1/dtb:list[descendant::dtb:lic]">
@@ -761,21 +790,57 @@
 	<xsl:text>\end{document}&#10;</xsl:text>
    </xsl:template>
 
+   <!-- A title page as it is marked up in the document. It is not a chapter of its own, and every
+        level2 inside it starts a page: the first one repeats the author and the title, the ones
+        after it, typically the imprint, start on a new page. -->
+   <xsl:template match="dtb:level1[tokenize(@class,'\s+')='titlepage']">
+     <xsl:apply-templates/>
+   </xsl:template>
+
+   <xsl:template match="dtb:level1[tokenize(@class,'\s+')='titlepage']/dtb:level2">
+     <xsl:choose>
+       <xsl:when test="not(preceding-sibling::dtb:level2)">
+	 <xsl:text>\cleartorecto&#10;</xsl:text>
+	 <xsl:call-template name="author">
+	   <xsl:with-param name="font_size" select="'\normalsize'"/>
+	 </xsl:call-template>
+	 <xsl:call-template name="title">
+	   <xsl:with-param name="font_size" select="'\Large'"/>
+	 </xsl:call-template>
+       </xsl:when>
+       <xsl:otherwise>
+	 <xsl:text>\clearpage&#10;</xsl:text>
+       </xsl:otherwise>
+     </xsl:choose>
+     <xsl:apply-templates/>
+   </xsl:template>
+
+   <!-- On a title page and on a colophon the last block is set at the foot of the page, which is
+        where the publisher respectively the imprint belongs. The generated cover does the same. -->
+   <xsl:template match="dtb:level1[tokenize(@class,'\s+')='titlepage']/dtb:level2/*[last()]
+		        |dtb:level1[tokenize(@class,'\s+')='colophon']/*[last()]">
+     <xsl:text>\vfill&#10;</xsl:text>
+     <xsl:next-match/>
+   </xsl:template>
+
+
    <xsl:template match="dtb:frontmatter">
 	<xsl:call-template name="set_frontmatter_pagestyle"/>
    	<xsl:text>\frontmatter&#10;</xsl:text>
    	<xsl:apply-templates select="//dtb:meta" mode="titlePage"/>
 	<xsl:call-template name="cover"/>
 	<xsl:text>\cleartorecto&#10;</xsl:text>
-	<xsl:if test="dtb:level1/dtb:list[descendant::dtb:lic]">
-		<xsl:text>\tableofcontents*&#10;</xsl:text>
-	</xsl:if>
 	<xsl:apply-templates/>
    </xsl:template>
 
+   <!-- The list of contents in the frontmatter is not printed as a list, a table of contents is
+        generated in its place. memoir prints a heading of its own in front of it, so the heading
+        in the document is left out. -->
    <xsl:template match="dtb:frontmatter/dtb:level1/dtb:list[descendant::dtb:lic]" priority="1">
-   	<xsl:message>skipping lic in frontmatter!</xsl:message>
+     <xsl:text>\tableofcontents*&#10;</xsl:text>
    </xsl:template>
+
+   <xsl:template match="dtb:frontmatter/dtb:level1[dtb:list[descendant::dtb:lic]]/dtb:h1" priority="2"/>
 
    <xsl:template match="dtb:meta[@name='dc:title' or @name='dc:Title']" mode="titlePage">
      <xsl:text>\title{</xsl:text>
