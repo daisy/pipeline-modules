@@ -236,6 +236,17 @@ Emphasis can be hard to render in large print.</p>
 		</p:pipeinfo>
 	</p:option>
 
+	<p:option name="words-per-volume" required="false" px:type="integer" select="'0'">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<h2 px:role="name">Words per volume</h2>
+			<p px:role="desc" xml:space="preserve">Split the book into volumes of approximately this many words.
+
+A cover page is inserted at the start of every volume. Set to 0 to produce a single volume.
+
+Volumes are split at paragraph boundaries. A split point is moved to the start or the end of an enclosing level, list, poem, blockquote or sidebar if it is close enough, so that these are not torn apart. Split points that are already present in the input document (elements with class "volume-split-point") are left alone and disable the automatic splitting.</p>
+		</p:documentation>
+	</p:option>
+
 	<p:option name="include-images" required="false" px:type="boolean" select="'true'">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Include Images</h2>
@@ -259,6 +270,34 @@ Emphasis can be hard to render in large print.</p>
 	<p:variable name="base-name" select="replace(replace(base-uri(/),'^.*/([^/]+)$','$1'),'\.[^\.]*$','')">
 		<p:documentation>File name without extension</p:documentation>
 	</p:variable>
+
+	<p:choose>
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<p>Mark where the volumes start, if the book is to be split into volumes.</p>
+		</p:documentation>
+		<p:when test="number($words-per-volume) &gt; 0">
+			<p:xslt>
+				<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+					<p>Move the notes to where they will be printed, so that the word
+					count reflects the printed order. Does nothing unless
+					endnotes='document'.</p>
+				</p:documentation>
+				<p:input port="stylesheet">
+					<p:document href="move-notes-to-end.xsl"/>
+				</p:input>
+				<p:with-param name="endnotes" select="$endnotes"/>
+			</p:xslt>
+			<p:xslt>
+				<p:input port="stylesheet">
+					<p:document href="insert-volume-split-points.xsl"/>
+				</p:input>
+				<p:with-param name="words_per_volume" select="$words-per-volume"/>
+			</p:xslt>
+		</p:when>
+		<p:otherwise>
+			<p:identity/>
+		</p:otherwise>
+	</p:choose>
 
 	<p:xslt>
 		<p:input port="stylesheet">
