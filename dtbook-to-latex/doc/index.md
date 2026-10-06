@@ -22,7 +22,8 @@ the [memoir](http://texdoc.net/pkg/memoir) class.
 A large print book quickly becomes too thick to bind as one volume, so the
 conversion can split the book into several volumes. Each volume starts on a
 recto page with a cover page of its own, which repeats the author and the title
-and says which volume it is ("Volume 2 of 3").
+and says which volume it is ("Volume 2 of 3"). If the book has a table of
+contents in its frontmatter, it is repeated at the start of every volume.
 
 Set the "Words per volume" option to the approximate number of words that fit
 in a volume. The conversion then walks through the book counting words and

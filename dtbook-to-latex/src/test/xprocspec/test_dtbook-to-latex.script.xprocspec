@@ -93,6 +93,62 @@
               test="contains(string(/),'Volume 2 of 2')"/>
   </x:scenario>
 
+  <x:scenario label="words-per-volume with a table of contents">
+    <x:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <p>Every volume gets a table of contents of its own, so the book below should hold two: one
+      in the frontmatter and one on the cover of the second volume.</p>
+    </x:documentation>
+    <x:call step="px:dtbook-to-latex.script">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en" xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+            <head>
+              <meta name="dc:title" content="A book"/>
+              <meta name="dc:creator" content="An author"/>
+            </head>
+            <book>
+              <frontmatter>
+                <doctitle>A book</doctitle>
+                <docauthor>An author</docauthor>
+                <level1>
+                  <h1>Contents</h1>
+                  <list>
+                    <li><lic>First chapter</lic></li>
+                    <li><lic>Second chapter</lic></li>
+                  </list>
+                </level1>
+              </frontmatter>
+              <bodymatter>
+                <level1>
+                  <h1>First chapter</h1>
+                  <p>one two three four five six seven eight nine ten</p>
+                  <p>one two three four five six seven eight nine ten</p>
+                </level1>
+                <level1>
+                  <h1>Second chapter</h1>
+                  <p>one two three four five six seven eight nine ten</p>
+                  <p>one two three four five six seven eight nine ten</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+      <x:option name="result" select="resolve-uri('toc/output-dir/',$temp-dir)"/>
+      <x:option name="words-per-volume" select="'20'"/>
+    </x:call>
+    <x:context label="the LaTeX file">
+      <x:document type="file" method="text" base-uri="temp-dir"
+                  href="toc/output-dir/test_dtbook-to-latex.script.tex"/>
+    </x:context>
+    <x:expect label="it is a two volume book" type="xpath"
+              test="contains(string(/),'\numtoname{2} volumes')"/>
+    <x:expect label="the second volume gets a cover of its own" type="xpath"
+              test="contains(string(/),'Volume 2 of 2')"/>
+    <x:expect label="and both volumes get a table of contents" type="xpath"
+              test="count(tokenize(string(/),'\\tableofcontents'))=3"/>
+  </x:scenario>
+
   <x:scenario label="words-per-volume with endnotes at the end of the document">
     <x:documentation xmlns="http://www.w3.org/1999/xhtml">
       <p>The note is printed at the end of the document, so its words should not count towards the

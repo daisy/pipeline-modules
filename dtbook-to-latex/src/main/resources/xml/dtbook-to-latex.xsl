@@ -708,8 +708,8 @@
 		       select="count(preceding::dtb:div[@class='volume-split-point'])+2"/>
      </xsl:call-template>
      <xsl:text>\cleartorecto&#10;</xsl:text>
-     <!-- insert a toc in every volume -->
-     <xsl:if test="dtb:level1/dtb:list[descendant::dtb:lic]">
+     <!-- insert a toc in every volume. -->
+     <xsl:if test="//dtb:frontmatter/dtb:level1/dtb:list[descendant::dtb:lic]">
        <xsl:text>\tableofcontents*&#10;</xsl:text>
      </xsl:if>
      <xsl:call-template name="restore_pagestyle"/>
