@@ -128,10 +128,50 @@
     <x:context label="result">
       <x:document type="port" port="result"/>
     </x:context>
-    <x:expect label="the book is a Grossdruck rather than a Großdruck" type="xpath"
+    <x:expect label="Swiss German is spelled with ss" type="xpath"
               test="contains(string(/),'Grossdruck in zwei Bänden')"/>
     <x:expect label="and the volume numbering falls back to German" type="xpath"
               test="contains(string(/),'Band 1 von 2')"/>
+  </x:scenario>
+
+  <x:scenario label="a producer whose house language is not the language of the book">
+    <x:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <p>The phrases are in the voice of whoever produces the book: a library in Zurich writes
+      "Grossdruck" on the cover of a book whose text is in the German of Germany.</p>
+    </x:documentation>
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="de">
+            <head>
+              <meta name="dc:title" content="Ein Buch"/>
+            </head>
+            <book>
+              <frontmatter>
+                <doctitle>Ein Buch</doctitle>
+              </frontmatter>
+              <bodymatter>
+                <level1>
+                  <h1>Überschrift</h1>
+                  <p>eins</p>
+                  <p class="volume-split-point">zwei</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+      <x:param port="parameters" name="producer_language" select="'de-CH'"/>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the phrases follow the producer" type="xpath"
+              test="contains(string(/),'Grossdruck in zwei Bänden')"/>
+    <x:expect label="and not the language of the book" type="xpath"
+              test="not(contains(string(/),'Großdruck'))"/>
+    <x:expect label="babel still follows the language of the book" type="xpath"
+              test="contains(string(/),'\usepackage[ngerman]{babel}')"/>
   </x:scenario>
 
   <x:scenario label="a single volume">

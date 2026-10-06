@@ -126,11 +126,15 @@ which takes care of everything else, such as the heading above the table of cont
 
 English, German and Swiss German are provided. To add a language, add it to <a
 href="../src/main/resources/xml/i18n.xml" class="userdoc">`i18n.xml`</a>. The `%1` and `%2` in a
-phrase are replaced by the number of the volume and the number of volumes.
+phrase are replaced by the number of the volume and the number of volumes. A translation is looked
+up by language tag and a tag falls back to the language without the region, which is why Swiss
+German only provides the strings that are spelled with "ss" rather than "ß".
 
-Translations are looked up by language tag, and a tag falls back to the language without the
-region, which is why Swiss German only has to provide the strings that are spelled with "ss"
-instead of "ß" and gets the rest from German.
+These phrases are not in the voice of the book but in the voice of whoever produces it: a library in
+Zurich writes "Grossdruck" on the cover of a book whose text is in the German of Germany. A producer
+whose house language differs from the language of the books can therefore set the "Language of the
+generated phrases" option (`producer-language`), and the language of the document goes on steering
+the hyphenation and the typographic conventions whatever that option says.
 
 The number of volumes is written out in words, which is why `i18n.xml` also holds the numbers from
 1 to 50. A language that has no words for the numbers gets the number itself, so "Large print book

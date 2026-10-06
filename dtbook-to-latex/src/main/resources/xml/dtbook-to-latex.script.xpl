@@ -236,6 +236,15 @@ Emphasis can be hard to render in large print.</p>
 		</p:pipeinfo>
 	</p:option>
 
+	<p:option name="producer-language" required="false" select="''" px:type="string">
+		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
+			<h2 px:role="name">Language of the generated phrases</h2>
+			<p px:role="desc" xml:space="preserve">Language of the words and phrases that the conversion generates itself, such as the volume numbering on the cover.
+
+These are not in the voice of the book but in the voice of whoever produces it, so a producer whose house language differs from the language of the books can set it here. Defaults to the language of the document, which keeps steering the hyphenation and the typographic conventions whatever this is set to.</p>
+		</p:documentation>
+	</p:option>
+
 	<p:option name="words-per-volume" required="false" px:type="integer" select="'0'">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Words per volume</h2>
@@ -321,6 +330,7 @@ Volumes are split at paragraph boundaries. A split point is moved to the start o
 		<p:with-param name="replace_em_with_quote" select="$replace-em-with-quote"/>
 		<p:with-param name="endnotes"             select="$endnotes"/>
 		<p:with-param name="include_images"       select="$include-images"/>
+		<p:with-param name="producer_language" select="$producer-language"/>
 		<p:with-param name="version"              select="'${project.version}'"/>
 	</p:xslt>
 
