@@ -837,9 +837,12 @@
      <xsl:apply-templates/>
    </xsl:template>
 
-   <!-- On a title page and on a colophon the last block is set at the foot of the page, which is
-        where the publisher respectively the imprint belongs. The generated cover does the same. -->
-   <xsl:template match="dtb:level1[tokenize(@class,'\s+')='titlepage']/dtb:level2/*[last()]
+   <!-- On the title page proper and on a colophon the last block is set at the foot of the page,
+        which is where the publisher respectively the imprint belongs. The generated cover does the
+        same. The pages after the title page, which the publisher fills with the copyright and the
+        like, are left to run on as they are written. -->
+   <xsl:template match="dtb:level1[tokenize(@class,'\s+')='titlepage']
+                        /dtb:level2[not(preceding-sibling::dtb:level2)]/*[last()]
 		        |dtb:level1[tokenize(@class,'\s+')='colophon']/*[last()]">
      <xsl:text>\vfill&#10;</xsl:text>
      <xsl:next-match/>

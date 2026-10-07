@@ -201,6 +201,8 @@
               test="count(tokenize(string(/),'the title of the book'))=3"/>
     <x:expect label="the last block of the page is set at the foot" type="xpath"
               test="contains(string(/),'\vfill&#10;the publisher of the original')"/>
+    <x:expect label="the pages after it run on as they are written" type="xpath"
+              test="not(contains(string(/),'\vfill&#10;the text of the imprint page'))"/>
     <x:expect label="the second page of the title page starts a new page" type="xpath"
               test="contains(substring-before(string(/),'the text of the imprint page'),'\clearpage')"/>
     <x:expect label="the title page is not a chapter of its own" type="xpath"
