@@ -22,8 +22,9 @@ the [memoir](http://texdoc.net/pkg/memoir) class.
 A large print book quickly becomes too thick to bind as one volume, so the
 conversion can split the book into several volumes. Each volume starts on a
 recto page with a cover page of its own, which repeats the author and the title
-and says which volume it is ("Volume 2 of 3"). If the book has a table of
-contents in its frontmatter, it is repeated at the start of every volume.
+and says which volume it is ("Volume 2 of 3"), followed by the title page and
+the imprint of the front matter. If the book has a table of contents in its
+frontmatter, that is repeated at the start of every volume as well.
 
 Set the "Words per volume" option to the number of words that fit in a volume.
 The number of volumes follows from the length of the book, and the words are
@@ -98,7 +99,10 @@ The first one repeats the author and the title above its content. When the book 
 volumes, the title page is repeated in every volume.
 
 A `level1` with class `colophon` is an ordinary level that starts a page, which makes it the place
-for an imprint, a copyright notice or a word of thanks.
+for an imprint, a copyright notice or a word of thanks. A colophon in the front matter is repeated
+in every volume along with the title page, because every volume is bound as a book of its own and
+carries the imprint of that book. A colophon in the rear matter belongs to the work as a whole and
+stays where it is.
 
 On the title page itself, that is in the first `level2`, and on a colophon the last block of the
 page is set at the foot of the page, which is where the publisher respectively the imprint belongs.

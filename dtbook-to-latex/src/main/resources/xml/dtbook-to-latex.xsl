@@ -762,8 +762,11 @@
        <xsl:with-param name="current_volume_number" 
 		       select="count(preceding::dtb:div[@class='volume-split-point'])+2"/>
      </xsl:call-template>
-     <!-- repeat the title page in every volume -->
-     <xsl:apply-templates select="//dtb:level1[tokenize(@class,'\s+')='titlepage']"/>
+     <!-- Repeat the title page in every volume, and the imprint of the front matter with it:
+          every volume is bound as a book of its own and carries the imprint of that book. A
+          colophon of the rear matter is the colophon of the whole work and stays where it is. -->
+     <xsl:apply-templates select="//dtb:frontmatter/dtb:level1[tokenize(@class,'\s+')='colophon']
+				  |//dtb:level1[tokenize(@class,'\s+')='titlepage']"/>
      <xsl:text>\cleartorecto&#10;</xsl:text>
      <!-- insert a toc in every volume. -->
      <xsl:if test="//dtb:frontmatter/dtb:level1/dtb:list[descendant::dtb:lic]">
