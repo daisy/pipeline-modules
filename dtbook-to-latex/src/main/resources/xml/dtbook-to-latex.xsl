@@ -675,9 +675,8 @@
    
    <xsl:template name="publisher">
      <xsl:for-each select="//dtb:meta[@name='dc:publisher' or @name='dc:Publisher']">
-       <xsl:text>{\large </xsl:text>
        <xsl:value-of select="my:quoteMetadata(string(@content))"/>
-       <xsl:text>}\\[0.5cm]&#10;</xsl:text>
+       <xsl:text>\\[0.5cm]&#10;</xsl:text>
      </xsl:for-each>
    </xsl:template>
    
