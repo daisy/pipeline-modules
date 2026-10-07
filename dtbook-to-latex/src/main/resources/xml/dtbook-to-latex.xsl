@@ -856,7 +856,6 @@
    <xsl:template match="dtb:frontmatter">
 	<xsl:call-template name="set_frontmatter_pagestyle"/>
    	<xsl:text>\frontmatter&#10;</xsl:text>
-   	<xsl:apply-templates select="//dtb:meta" mode="titlePage"/>
 	<xsl:call-template name="cover"/>
 	<xsl:text>\cleartorecto&#10;</xsl:text>
 	<xsl:apply-templates/>
@@ -881,24 +880,6 @@
    </xsl:template>
 
    <xsl:template match="dtb:frontmatter/dtb:level1[dtb:list[descendant::dtb:lic]]/dtb:h1" priority="2"/>
-
-   <xsl:template match="dtb:meta[@name='dc:title' or @name='dc:Title']" mode="titlePage">
-     <xsl:text>\title{</xsl:text>
-     <xsl:value-of select="my:quoteSpecialChars(string(@content))"/>
-     <xsl:text>}&#10;</xsl:text>
-   </xsl:template>
-
-   <xsl:template match="dtb:meta[@name='dc:creator' or @name='dc:Creator']" mode="titlePage">
-     <xsl:text>\author{</xsl:text>
-     <xsl:value-of select="my:quoteSpecialChars(string(@content))"/>
-     <xsl:text>}&#10;</xsl:text>
-   </xsl:template>
-
-   <xsl:template match="dtb:meta[@name='dc:date' or @name='dc:Date']" mode="titlePage">
-     <xsl:text>\date{</xsl:text>
-     <xsl:value-of select="my:quoteSpecialChars(string(@content))"/>
-     <xsl:text>}&#10;</xsl:text>
-   </xsl:template>
 
   <xsl:template match="dtb:level1">
     <!-- Insert an empty header if a level 1 has no h1 -->

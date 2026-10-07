@@ -132,8 +132,8 @@
               test="contains(string(/),'the title from the document')"/>
     <x:expect label="and the author of the document" type="xpath"
               test="contains(string(/),'the author from the document')"/>
-    <x:expect label="the metadata is only used for the LaTeX title and author" type="xpath"
-              test="contains(string(/),'\title{THE TITLE FROM THE METADATA}')
+    <x:expect label="the metadata only reaches the metadata of the PDF" type="xpath"
+              test="contains(string(/),'Title={THE TITLE FROM THE METADATA}')
                     and not(contains(string(/),'{\huge THE TITLE FROM THE METADATA}'))"/>
   </x:scenario>
 
