@@ -25,11 +25,12 @@ recto page with a cover page of its own, which repeats the author and the title
 and says which volume it is ("Volume 2 of 3"). If the book has a table of
 contents in its frontmatter, it is repeated at the start of every volume.
 
-Set the "Words per volume" option to the approximate number of words that fit
-in a volume. The conversion then walks through the book counting words and
-starts a new volume as soon as a volume is full. The last volume is whatever is
-left over, so the number of volumes follows from the length of the book: a
-higher value gives fewer and thicker volumes.
+Set the "Words per volume" option to the number of words that fit in a volume.
+The number of volumes follows from the length of the book, and the words are
+then spread evenly over that many volumes, so a volume usually holds fewer
+words than asked for: a book a little longer than one volume comes out as two
+halves rather than as a full volume and a stub. A higher value gives fewer and
+thicker volumes.
 
 Only the text that is actually printed is counted. The list of contents in the
 frontmatter is left out, for instance, because it is not printed as a list but

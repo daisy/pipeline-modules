@@ -239,9 +239,9 @@ Emphasis can be hard to render in large print.</p>
 	<p:option name="words-per-volume" required="false" px:type="integer" select="'0'">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Words per volume</h2>
-			<p px:role="desc" xml:space="preserve">Split the book into volumes of approximately this many words.
+			<p px:role="desc" xml:space="preserve">Split the book into volumes of at most this many words.
 
-A cover page is inserted at the start of every volume. Set to 0 to produce a single volume.
+The number of volumes follows from the length of the book, and the words are then spread evenly over them, so a volume typically holds fewer words than asked for: a book a little longer than one volume comes out as two halves rather than as a full volume and a stub. A cover page is inserted at the start of every volume. Set to 0 to produce a single volume.
 
 Volumes are split at paragraph boundaries. A split point is moved to the start or the end of an enclosing level, list, poem, blockquote or sidebar if it is close enough, so that these are not torn apart. Split points that are already present in the input document (elements with class "volume-split-point") are left alone and disable the automatic splitting.</p>
 		</p:documentation>

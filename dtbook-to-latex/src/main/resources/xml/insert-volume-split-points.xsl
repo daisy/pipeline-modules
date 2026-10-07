@@ -12,8 +12,11 @@
        every element with class 'volume-split-point'.
 
        The splitting is done as follows:
+       - Divide the words of the whole book by $words_per_volume to get the number of volumes, and
+         divide the words by that again to get the words that actually go in a volume, so that the
+         volumes come out equally thick.
        - Walk through all paragraphs while counting words, and mark a paragraph as a split point as
-         soon as the words since the last split point exceed $words_per_volume.
+         soon as the words since the last split point exceed that number.
        - Then, if a split point happens to be near the start or the end of an enclosing block
          (a level, list, poem, blockquote or sidebar), move it to the boundary of that block, so
          that the block is not torn apart. $allowed_stretch defines how much a volume may be
@@ -41,7 +44,8 @@
 
   <xsl:output method="xml" encoding="utf-8" indent="no"/>
 
-  <!-- Approximate number of words per volume. 0 means: do not split. -->
+  <!-- The most words that may go in a volume. The volumes are made equally thick, so they hold
+       this many words at most and typically fewer. 0 means: do not split. -->
   <xsl:param name="words_per_volume" select="0"/>
 
   <!-- How much a volume may be stretched or shortened in order to make a split point coincide with
@@ -121,14 +125,25 @@
     </xsl:choose>
   </xsl:function>
 
-  <xsl:variable name="words-per-volume" as="xs:double" select="number($words_per_volume)"/>
-
   <!-- A table of contents in the frontmatter is not printed as a list: dtbook-to-latex.xsl drops it
        and generates a table of contents instead. Its words are therefore not counted. -->
   <xsl:variable name="not-printed" select="//dtb:frontmatter/dtb:level1/dtb:list[descendant::dtb:lic]"/>
 
   <xsl:variable name="paragraphs"
 		select="(//dtb:p|//dtb:li|//dtb:line) except $not-printed//(dtb:p|dtb:li|dtb:line)"/>
+
+  <xsl:variable name="total-words" as="xs:double" select="sum(for $p in $paragraphs return f:wc($p))"/>
+
+  <!-- The number of volumes follows from the words that are to go in one, and the words are then
+       spread evenly over that many volumes. A book one paragraph longer than a volume is therefore
+       split into two halves rather than into a full volume and a stub. -->
+  <xsl:variable name="volumes" as="xs:integer"
+		select="if (number($words_per_volume) gt 0)
+			then xs:integer(ceiling($total-words div number($words_per_volume)))
+			else 0"/>
+
+  <xsl:variable name="words-per-volume" as="xs:double"
+		select="if ($volumes gt 0) then $total-words div $volumes else 0"/>
 
   <!-- Split points that are already in the document, e.g. inserted by hand -->
   <xsl:variable name="pre-marked" as="xs:boolean"
