@@ -227,6 +227,15 @@
                                   string($number))[1])"/>
   </xsl:function>
 
+  <!-- Quote a metadata string. A line break in the metadata is honoured, so that a
+       producer can decide where a long name is broken -->
+  <xsl:function name="my:quoteMetadata" as="xs:string">
+    <xsl:param name="text" as="xs:string"/>
+    <xsl:sequence select="string-join(for $line in tokenize($text,'\n')
+                                      return my:quoteSpecialChars($line),
+                                      '\\&#10;')"/>
+  </xsl:function>
+
   <!-- Escape characters that have a special meaning to LaTeX (see The
        Comprehensive LaTeX Symbol List,
        http://www.ctan.org/tex-archive/info/symbols/comprehensive/symbols-a4.pdf) -->
@@ -667,7 +676,7 @@
    <xsl:template name="publisher">
      <xsl:for-each select="//dtb:meta[@name='dc:publisher' or @name='dc:Publisher']">
        <xsl:text>{\large </xsl:text>
-       <xsl:value-of select="my:quoteSpecialChars(string(@content))"/>
+       <xsl:value-of select="my:quoteMetadata(string(@content))"/>
        <xsl:text>}\\[0.5cm]&#10;</xsl:text>
      </xsl:for-each>
    </xsl:template>
@@ -814,6 +823,18 @@
        </xsl:otherwise>
      </xsl:choose>
      <xsl:apply-templates/>
+   </xsl:template>
+
+   <!-- A title page and a colophon are display material: their lines are set with air between
+        them, rather than tight the way the lines of a poem are. -->
+   <xsl:template match="dtb:level1[tokenize(@class,'\s+')=('titlepage','colophon')]//dtb:line[normalize-space()]"
+		 priority="1">
+     <xsl:apply-templates/>
+     <!-- as in a linegroup, the last line carries no break, which LaTeX would have nothing to end -->
+     <xsl:if test="following-sibling::*">
+       <xsl:text>\\[0.75\onelineskip]</xsl:text>
+     </xsl:if>
+     <xsl:text>&#10;</xsl:text>
    </xsl:template>
 
    <!-- A colophon starts a page but is not a chapter: it gets no heading, not even the empty one
