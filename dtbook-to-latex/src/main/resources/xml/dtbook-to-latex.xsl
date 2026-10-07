@@ -681,9 +681,6 @@
      </xsl:for-each>
    </xsl:template>
    
-   <xsl:template name="imprint">
-   </xsl:template>
-
    <xsl:template name="author">
      <xsl:param name="font_size" select="'\large'"/>
      <xsl:value-of select="concat('{', $font_size, ' ')"/>
@@ -756,9 +753,6 @@
      
      <!-- Publisher -->
      <xsl:call-template name="publisher"/>
-
-     <!-- Imprint -->
-     <xsl:call-template name="imprint"/>
    </xsl:template>
 
    <xsl:template name="volumecover">
