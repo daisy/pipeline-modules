@@ -793,17 +793,17 @@
 	<xsl:text>\end{document}&#10;</xsl:text>
    </xsl:template>
 
-   <!-- A title page as it is marked up in the document. It is not a chapter of its own, and every
-        level2 inside it starts a page: the first one repeats the author and the title, the ones
-        after it, typically the imprint, start on a new page. -->
+   <!-- A title page as it is marked up in the document. It starts on a recto page and is not a
+        chapter of its own. The first level2 inside it repeats the author and the title; every
+        level2 after that, typically the imprint, starts a page of its own. -->
    <xsl:template match="dtb:level1[tokenize(@class,'\s+')='titlepage']">
+     <xsl:text>\cleartorecto&#10;</xsl:text>
      <xsl:apply-templates/>
    </xsl:template>
 
    <xsl:template match="dtb:level1[tokenize(@class,'\s+')='titlepage']/dtb:level2">
      <xsl:choose>
        <xsl:when test="not(preceding-sibling::dtb:level2)">
-	 <xsl:text>\cleartorecto&#10;</xsl:text>
 	 <xsl:call-template name="author">
 	   <xsl:with-param name="font_size" select="'\normalsize'"/>
 	 </xsl:call-template>
@@ -850,7 +850,7 @@
 	<xsl:call-template name="set_frontmatter_pagestyle"/>
    	<xsl:text>\frontmatter&#10;</xsl:text>
 	<xsl:call-template name="cover"/>
-	<xsl:text>\cleartorecto&#10;</xsl:text>
+	<!-- nothing breaks the page after the cover: every level1 of the front matter starts a page of its own. -->
 	<xsl:apply-templates/>
 	<!-- the bodymatter starts on a recto page, which does not happen by itself when the page
 	     style is compact, because that sets \openany -->
