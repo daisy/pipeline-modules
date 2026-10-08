@@ -8,7 +8,6 @@
 		xmlns:my="http://my-functions"
 		xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
 		xmlns:d="http://www.daisy.org/ns/pipeline/data"
-		extension-element-prefixes="my"
 		exclude-result-prefixes="dtb my pf d">
   
   <xsl:import href="http://www.daisy.org/pipeline/modules/common-utils/i18n.xsl"/>
