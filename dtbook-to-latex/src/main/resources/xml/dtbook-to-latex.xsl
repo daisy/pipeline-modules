@@ -4,7 +4,6 @@
 		xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
 		xmlns:dtb="http://www.daisy.org/z3986/2005/dtbook/"	
 		xmlns:xs="http://www.w3.org/2001/XMLSchema" 
-		xmlns:math="http://www.w3.org/1998/Math/MathML"
 		xmlns:my="http://my-functions"
 		xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
 		xmlns:d="http://www.daisy.org/ns/pipeline/data"
@@ -144,46 +143,22 @@
 
   <xsl:function name="my:is-block-element" as="xs:boolean">
     <xsl:param name="node" as="node()"/>
-    <xsl:apply-templates select="$node" mode="is-block-element"/>
+    <!-- samp and cite are blocks of their own unless they are in a paragraph, a list item or a
+         table cell -->
+    <xsl:sequence select="exists($node/self::dtb:*[local-name()=('h1','h2','h3','h4','h5','h6','p','list','li',
+                                                                 'author','byline','line','imggroup','blockquote')])
+                          or exists($node/(self::dtb:samp|self::dtb:cite)
+                                    [not(parent::dtb:p|parent::dtb:li|parent::dtb:td|parent::dtb:th)])"/>
   </xsl:function>
-
-  <xsl:template match="node()" as="xs:boolean" mode="is-block-element" priority="10">
-    <xsl:sequence select="false()"/>
-  </xsl:template>
-
-  <xsl:template match="dtb:*|math:*" as="xs:boolean" mode="is-block-element" priority="11">
-    <xsl:sequence select="false()"/>
-  </xsl:template>
-
-  <xsl:template match="dtb:samp|dtb:cite" as="xs:boolean" mode="is-block-element" priority="12">
-    <xsl:sequence select="if (parent::*[self::dtb:p|self::dtb:li|self::dtb:td|self::dtb:th]) then false() else true()"/>
-  </xsl:template>
-
-  <xsl:template match="dtb:h1|dtb:h2|dtb:h3|dtb:h4|dtb:h5|dtb:h6|dtb:p|dtb:list|dtb:li|dtb:author|dtb:byline|dtb:line|dtb:imggroup|dtb:blockquote" as="xs:boolean" mode="is-block-element" priority="12">
-    <xsl:sequence select="true()"/>
-  </xsl:template>
 
   <xsl:function name="my:has-preceding-non-empty-textnode-within-block" as="xs:boolean">
     <xsl:param name="context"/>
     <xsl:sequence select="some $t in ($context/preceding::text() intersect $context/ancestor-or-self::*[my:is-block-element(.)][1]//text()) satisfies normalize-space($t) != ''"/>
   </xsl:function>
 
-  <xsl:function name="my:is-level-element" as="xs:boolean">
-    <xsl:param name="node" as="node()"/>
-    <xsl:apply-templates select="$node" mode="is-level-element"/>
-  </xsl:function>
-
-  <xsl:template match="node()" as="xs:boolean" mode="is-level-element" priority="10">
-    <xsl:sequence select="false()"/>
-  </xsl:template>
-
-  <xsl:template match="dtb:level1|dtb:level2|dtb:level3|dtb:level4|dtb:level5|dtb:level6" as="xs:boolean" mode="is-level-element" priority="12">
-    <xsl:sequence select="true()"/>
-  </xsl:template>
-
   <xsl:function name="my:has-preceding-para-within-parent-level" as="xs:boolean">
     <xsl:param name="context"/>
-    <xsl:sequence select="exists($context/preceding::dtb:p intersect $context/ancestor::*[my:is-level-element(.)][1]//dtb:p)"/>
+    <xsl:sequence select="exists($context/preceding::dtb:p intersect $context/ancestor::dtb:*[matches(local-name(),'^level[1-6]$')][1]//dtb:p)"/>
   </xsl:function>
 
   <xsl:variable name="level_to_section_map">
