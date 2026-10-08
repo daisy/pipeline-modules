@@ -85,6 +85,39 @@
               test="contains(string(/),'\legend{Costs in \$ \&amp; \%}')"/>
   </x:scenario>
 
+  <x:scenario label="a table row that starts with a header cell">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <head><meta name="dc:Title" content="A book"/></head>
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>A chapter</h1>
+                  <table>
+                    <tr><th>Name</th><td>Ann</td><td>Bob</td></tr>
+                    <tr><th>Age</th><td colspan="2">42</td></tr>
+                    <tr><td>x</td><th colspan="2">Total</th></tr>
+                  </table>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the header and the data cells are separated" type="xpath"
+              test="contains(string(/),'\textbf{Name} &amp; Ann &amp; Bob\\')"/>
+    <x:expect label="also when a data cell spans columns" type="xpath"
+              test="contains(string(/),'\textbf{Age} &amp; \multicolumn{2}{l|}{42}\\')"/>
+    <x:expect label="and when a header cell follows a data cell" type="xpath"
+              test="contains(string(/),'x &amp; \multicolumn{2}{l|}{\textbf{Total}}\\')"/>
+  </x:scenario>
+
   <x:scenario label="a compound that is both long and hyphenated">
     <x:call step="pxi:dtbook-to-latex">
       <x:input port="source">

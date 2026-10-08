@@ -1488,38 +1488,18 @@
    	  <xsl:text>&#10;</xsl:text>
    </xsl:template>
 
-   <xsl:template match="dtb:th">
-   	<xsl:if test="preceding-sibling::dtb:th">
-   		<xsl:text> &amp; </xsl:text>
-   	</xsl:if>
-   	<xsl:text>\textbf{</xsl:text>
-   	<xsl:apply-templates/>
-   	<xsl:text>}</xsl:text>
-   </xsl:template>
-
-   <xsl:template match="dtb:td">
-     <xsl:if test="preceding-sibling::dtb:td">
+   <!-- a row may mix header and data cells, e.g. a th that heads the row -->
+   <xsl:template match="dtb:td|dtb:th">
+     <xsl:if test="preceding-sibling::dtb:td|preceding-sibling::dtb:th">
        <xsl:text> &amp; </xsl:text>
      </xsl:if>
-     <xsl:apply-templates/>
-   </xsl:template>
-
-   <xsl:template match="dtb:td[@colspan &gt; 1]">
-     <xsl:if test="preceding-sibling::dtb:td">
-       <xsl:text> &amp; </xsl:text>
+     <xsl:if test="@colspan &gt; 1">
+       <xsl:text>\multicolumn{</xsl:text><xsl:value-of select="@colspan"/><xsl:text>}{l|}{</xsl:text>
      </xsl:if>
-     <xsl:text>\multicolumn{</xsl:text><xsl:value-of select="@colspan"/><xsl:text>}{l|}{</xsl:text>
+     <xsl:if test="self::dtb:th"><xsl:text>\textbf{</xsl:text></xsl:if>
      <xsl:apply-templates/>
-     <xsl:text>}</xsl:text>
-   </xsl:template>
-
-   <xsl:template match="dtb:th[@colspan &gt; 1]">
-     <xsl:if test="preceding-sibling::dtb:th">
-       <xsl:text> &amp; </xsl:text>
-     </xsl:if>
-     <xsl:text>\multicolumn{</xsl:text><xsl:value-of select="@colspan"/><xsl:text>}{l|}{\textbf{</xsl:text>
-     <xsl:apply-templates/>
-     <xsl:text>}}</xsl:text>
+     <xsl:if test="self::dtb:th"><xsl:text>}</xsl:text></xsl:if>
+     <xsl:if test="@colspan &gt; 1"><xsl:text>}</xsl:text></xsl:if>
    </xsl:template>
 
    <xsl:template match="dtb:colgroup|dtb:col">
