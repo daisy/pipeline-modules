@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
+               xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
+               xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+
+  <x:documentation xmlns="http://www.w3.org/1999/xhtml">
+    <p>What the document says ends up in the LaTeX as it is written, without breaking the
+    LaTeX.</p>
+  </x:documentation>
+
+  <x:script>
+    <p:declare-step type="pxi:dtbook-to-latex" version="1.0"
+                    xmlns:p="http://www.w3.org/ns/xproc" name="main">
+      <p:input port="source" primary="true"/>
+      <p:input port="parameters" kind="parameter" primary="true"/>
+      <p:output port="result" primary="true"/>
+      <p:xslt>
+        <p:input port="stylesheet">
+          <p:document href="../../main/resources/xml/dtbook-to-latex.xsl"/>
+        </p:input>
+        <p:input port="parameters">
+          <p:pipe step="main" port="parameters"/>
+        </p:input>
+      </p:xslt>
+    </p:declare-step>
+  </x:script>
+
+  <x:scenario label="a compound that is both long and hyphenated">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="de">
+            <head><meta name="dc:Title" content="A book"/></head>
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>A chapter</h1>
+                  <p>Ein-sehr-langes-zusammengesetztes-Wort und Donaudampfschifffahrtsgesellschaftskapitänswitwenrentenversicherung-Antrag Ende.</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="a long compound can be broken after each of its hyphens" type="xpath"
+              test="contains(string(/),'Ein-\hspace{0pt}sehr-\hspace{0pt}langes-\hspace{0pt}zusammengesetztes-\hspace{0pt}Wort und ')"/>
+    <x:expect label="a word too long for a line can be broken anywhere" type="xpath"
+              test="contains(string(/),' Dona\-u\-d\-a\-m\-p\-f\-')"/>
+    <x:expect label="and after its hyphen too, if it is part of a compound" type="xpath"
+              test="contains(string(/),'\-e\-rung-\hspace{0pt}Antrag Ende.')"/>
+  </x:scenario>
+
+</x:description>

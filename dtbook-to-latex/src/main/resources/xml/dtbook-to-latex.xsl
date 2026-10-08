@@ -1792,59 +1792,39 @@
     </xsl:choose>
   </xsl:function>
 
-  <xsl:function name="my:string-replace" as="xs:string">
-    <xsl:param name="input" as="xs:string"/>
-    <xsl:param name="substring" as="xs:string"/>
-    <xsl:param name="replacement" as="xs:string"/>
-    <xsl:variable name="before" select="substring-before($input,$substring)"/>
-    <xsl:variable name="after" select="substring-after($input,$substring)"/>
-    <xsl:choose>
-      <xsl:when test="$input">
-	<xsl:sequence select="string-join(($before,$replacement,$after),'')"/>
-      </xsl:when>
-      <xsl:otherwise>
-	<xsl:sequence select="string-join(($before,$replacement,my:string-replace($after,$substring,$replacement)),'')"/>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:function>
-
-  <xsl:function name="my:hyphenate-long-words" as="xs:string">
-    <xsl:param name="wordSequence" as="xs:string*"/>
-    <xsl:param name="text" as="xs:string"/>
-    <xsl:variable name="word" select="$wordSequence[1]"/>
-    <xsl:variable name="rest" select="$wordSequence[position() gt 1]"/>
-    <xsl:choose>
-      <xsl:when test="empty($wordSequence)">
-	<xsl:sequence select="$text"/>
-      </xsl:when>
-      <xsl:otherwise>
-	<xsl:sequence select="my:hyphenate-long-words($rest, my:string-replace($text, $word, my:add-hyphenation-points($word)))"/>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:function>
-
-  <xsl:function name="my:hyphenate-dashed-words" as="xs:string">
-    <xsl:param name="wordSequence" as="xs:string*"/>
-    <xsl:param name="text" as="xs:string"/>
-    <xsl:variable name="word" select="$wordSequence[1]"/>
-    <xsl:variable name="rest" select="$wordSequence[position() gt 1]"/>
-    <xsl:choose>
-      <xsl:when test="empty($wordSequence)">
-	<xsl:sequence select="$text"/>
-      </xsl:when>
-      <xsl:otherwise>
-	<xsl:sequence select="my:hyphenate-dashed-words($rest, my:string-replace($text, $word, replace($word,'(\w)-(\w)','$1-\\hspace{0pt}$2')))"/>
-      </xsl:otherwise>
-    </xsl:choose>
+  <!-- Break a word that is too long for a line: a long run of word characters gets a break point
+       after every character, and a long compound gets one after each of its hyphens. -->
+  <xsl:function name="my:break-word" as="xs:string">
+    <xsl:param name="word" as="xs:string"/>
+    <xsl:variable name="parts" as="xs:string*">
+      <xsl:analyze-string select="$word" regex="\w+">
+	<xsl:matching-substring>
+	  <xsl:sequence select="if (string-length(.) > my:max-line-width())
+				then my:add-hyphenation-points(.) else ."/>
+	</xsl:matching-substring>
+	<xsl:non-matching-substring>
+	  <xsl:sequence select="."/>
+	</xsl:non-matching-substring>
+      </xsl:analyze-string>
+    </xsl:variable>
+    <xsl:sequence select="if (string-length($word) > 20 and contains($word, '-'))
+			  then replace(string-join($parts, ''), '(\w)-(\w)', '$1-\\hspace{0pt}$2')
+			  else string-join($parts, '')"/>
   </xsl:function>
 
   <xsl:template match="text()">
-    <xsl:variable name="sanitized" select="my:quoteSpecialChars(current())"/>
-    <xsl:variable name="long-words" select="tokenize($sanitized,'\W+')[string-length(.) > my:max-line-width()]"/>
-    <xsl:variable name="long-dashed-words" select="tokenize($sanitized,'(\p{Pc}|\p{Ps}|\p{Pe}|\p{Pi}|\p{Pf}|\p{Po}|\p{Z}|\p{C})+')[string-length(.) > 20][contains(.,'-')]"/>
-    <xsl:variable name="tmp" select="my:hyphenate-long-words($long-words, $sanitized)"/>
-    <xsl:value-of select="my:hyphenate-dashed-words($long-dashed-words, $tmp)"/>
-   </xsl:template>
+    <!-- a word is anything between punctuation (other than dashes), spaces and control
+         characters. Each word is rewritten where it stands, so no text can go missing. -->
+    <xsl:analyze-string select="my:quoteSpecialChars(.)"
+			regex="[^\p{{Pc}}\p{{Ps}}\p{{Pe}}\p{{Pi}}\p{{Pf}}\p{{Po}}\p{{Z}}\p{{C}}]+">
+      <xsl:matching-substring>
+	<xsl:value-of select="my:break-word(.)"/>
+      </xsl:matching-substring>
+      <xsl:non-matching-substring>
+	<xsl:value-of select="."/>
+      </xsl:non-matching-substring>
+    </xsl:analyze-string>
+  </xsl:template>
 
    <xsl:template match="text()" mode="textOnly">
      <xsl:value-of select="my:quoteSpecialChars(string(current()))"/>
