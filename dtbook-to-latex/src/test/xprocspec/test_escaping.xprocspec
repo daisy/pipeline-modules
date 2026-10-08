@@ -25,6 +25,30 @@
     </p:declare-step>
   </x:script>
 
+  <x:scenario label="a book with two authors in the metadata">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <head>
+              <meta name="dc:Title" content="A book"/>
+              <meta name="dc:Creator" content="Ann Author"/>
+              <meta name="dc:Creator" content="Bob Writer"/>
+            </head>
+            <book>
+              <bodymatter><level1><h1>A chapter</h1><p>text</p></level1></bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="both authors go in the PDF metadata" type="xpath"
+              test="contains(string(/),'Author={Ann Author, Bob Writer}')"/>
+  </x:scenario>
+
   <x:scenario label="a compound that is both long and hyphenated">
     <x:call step="pxi:dtbook-to-latex">
       <x:input port="source">

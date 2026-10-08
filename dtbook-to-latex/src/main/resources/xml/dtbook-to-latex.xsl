@@ -399,13 +399,13 @@
      <xsl:text>\usepackage{hyperref}&#10;</xsl:text>
      <xsl:text>\hypersetup{&#10;</xsl:text>
      <xsl:text>pdfinfo={&#10;</xsl:text>
-     <xsl:value-of select="concat('  Title={', my:quoteSpecialChars(//dtb:meta[@name='dc:title' or @name='dc:Title']/@content), '},&#10;')"/>
-     <xsl:value-of select="concat('  Author={', my:quoteSpecialChars(//dtb:meta[@name='dc:creator' or @name='dc:Creator']/@content), '},&#10;')"/>
-     <xsl:value-of select="concat('  Subject={', my:quoteSpecialChars(//dtb:meta[@name='dc:subject' or @name='dc:Subject']/@content), '},&#10;')"/>
-     <xsl:value-of select="concat('  Lang={', my:quoteSpecialChars(//dtb:meta[@name='dc:language' or @name='dc:Language']/@content), '},&#10;')"/>
-     <xsl:value-of select="concat('  Producer={', my:quoteSpecialChars(//dtb:meta[@name='dc:publisher' or @name='dc:Publisher']/@content), '},&#10;')"/>
-     <xsl:value-of select="concat('  Source={', my:quoteSpecialChars(//dtb:meta[@name='dc:source' or @name='dc:Source']/@content), '},&#10;')"/>
-     <xsl:value-of select="concat('  Identifier={', my:quoteSpecialChars(//dtb:meta[@name='dc:identifier' or @name='dc:Identifier']/@content), '},&#10;')"/>
+     <xsl:value-of select="concat('  Title={', my:quoteSpecialChars(string-join(//dtb:meta[@name='dc:title' or @name='dc:Title']/@content, ', ')), '},&#10;')"/>
+     <xsl:value-of select="concat('  Author={', my:quoteSpecialChars(string-join(//dtb:meta[@name='dc:creator' or @name='dc:Creator']/@content, ', ')), '},&#10;')"/>
+     <xsl:value-of select="concat('  Subject={', my:quoteSpecialChars(string-join(//dtb:meta[@name='dc:subject' or @name='dc:Subject']/@content, ', ')), '},&#10;')"/>
+     <xsl:value-of select="concat('  Lang={', my:quoteSpecialChars(string-join(//dtb:meta[@name='dc:language' or @name='dc:Language']/@content, ', ')), '},&#10;')"/>
+     <xsl:value-of select="concat('  Producer={', my:quoteSpecialChars(string-join(//dtb:meta[@name='dc:publisher' or @name='dc:Publisher']/@content, ', ')), '},&#10;')"/>
+     <xsl:value-of select="concat('  Source={', my:quoteSpecialChars(string-join(//dtb:meta[@name='dc:source' or @name='dc:Source']/@content, ', ')), '},&#10;')"/>
+     <xsl:value-of select="concat('  Identifier={', my:quoteSpecialChars(string-join(//dtb:meta[@name='dc:identifier' or @name='dc:Identifier']/@content, ', ')), '},&#10;')"/>
      <xsl:value-of select="concat('  Fontsize={', my:quoteSpecialChars($fontsize), '},&#10;')"/>
      <xsl:value-of select="concat('  Font={', my:quoteSpecialChars($font), '},&#10;')"/>
      <xsl:value-of select="concat('  Stocksize={', my:quoteSpecialChars($stocksize), '},&#10;')"/>
