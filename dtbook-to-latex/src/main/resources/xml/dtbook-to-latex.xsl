@@ -1427,7 +1427,7 @@
      <xsl:value-of select="string-join((for $col in 1 to $numcols return 'L'),'|')"/>
      <xsl:text>|} \hline&#10;</xsl:text>
      <!-- Make sure the table is in the right order and also handle tables without tbody -->
-     <xsl:apply-templates select="$normalized-table/dtb:table/dtb:thead, $normalized-table/dtb:table/dtb:tbody, $normalized-table/dtb:table/dtb:tfoot, $normalized-table/dtb:table/dtb:tr"/>
+     <xsl:apply-templates select="$normalized-table/dtb:table/dtb:thead, $normalized-table/dtb:table/dtb:tbody, $normalized-table/dtb:table/dtb:tr, $normalized-table/dtb:table/dtb:tfoot"/>
      <xsl:text>\end{tabulary}&#10;</xsl:text>
      <xsl:apply-templates select="dtb:caption"/>
      <xsl:text>\end{table}&#10;</xsl:text>

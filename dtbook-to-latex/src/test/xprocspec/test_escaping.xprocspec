@@ -169,4 +169,32 @@
               test="contains(string(/),'\chapter[R\&amp;D at 50\%]{R\&amp;D \emph{at} 50\%}')"/>
   </x:scenario>
 
+  <x:scenario label="a table with a footer and no tbody">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <head><meta name="dc:Title" content="A book"/></head>
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>A chapter</h1>
+                  <table>
+                    <tfoot><tr><td>the footer</td></tr></tfoot>
+                    <tr><td>the body</td></tr>
+                  </table>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the footer comes after the body" type="xpath"
+              test="contains(substring-after(string(/),'the body'),'the footer')"/>
+  </x:scenario>
+
 </x:description>
