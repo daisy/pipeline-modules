@@ -1307,7 +1307,7 @@
      </xsl:variable>
      <xsl:value-of select="$level_to_section_map/entry[@key=concat('level',$level)]"/>
      <xsl:text>[</xsl:text>
-     <xsl:value-of select="text()"/>
+     <xsl:value-of select="normalize-space(my:quoteSpecialChars(string()))"/>
      <xsl:text>]{</xsl:text>
      <xsl:apply-templates/>
      <xsl:text>}&#10;</xsl:text>

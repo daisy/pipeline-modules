@@ -147,4 +147,26 @@
               test="contains(string(/),'\-e\-rung-\hspace{0pt}Antrag Ende.')"/>
   </x:scenario>
 
+  <x:scenario label="a heading of an unnumbered level with characters that are special to LaTeX">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <head><meta name="dc:Title" content="A book"/></head>
+            <book>
+              <bodymatter>
+                <level><hd>R&amp;D <em>at</em> 50%</hd><p>text</p></level>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the entry in the table of contents is escaped and keeps the inline text" type="xpath"
+              test="contains(string(/),'\chapter[R\&amp;D at 50\%]{R\&amp;D \emph{at} 50\%}')"/>
+  </x:scenario>
+
 </x:description>
