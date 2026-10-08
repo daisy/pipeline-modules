@@ -1542,23 +1542,15 @@
    </xsl:template>
   
    <xsl:template match="dtb:em">
-     <xsl:choose>
-       <xsl:when test="$replace_em_with_quote = 'true'">
-	 <xsl:text>'</xsl:text>
-       </xsl:when>
-       <xsl:otherwise>
-	 <xsl:text>\emph{</xsl:text>
-       </xsl:otherwise>
-     </xsl:choose>
+     <xsl:text>\emph{</xsl:text>
      <xsl:apply-templates/>
-     <xsl:choose>
-       <xsl:when test="$replace_em_with_quote = 'true'">
-	 <xsl:text>'</xsl:text>
-       </xsl:when>
-       <xsl:otherwise>
-	 <xsl:text>}</xsl:text>		
-       </xsl:otherwise>
-     </xsl:choose>
+     <xsl:text>}</xsl:text>
+   </xsl:template>
+
+   <xsl:template match="dtb:em[$replace_em_with_quote = 'true']">
+     <xsl:text>'</xsl:text>
+     <xsl:apply-templates/>
+     <xsl:text>'</xsl:text>
    </xsl:template>
 
    <xsl:template match="dtb:strong">
