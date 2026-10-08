@@ -103,28 +103,23 @@
     </c:data>
   </xsl:template>
 
-  <xsl:function name="my:max-line-width" as="xs:integer">
-    <xsl:sequence select="if ($fontsize='17pt') then 40 else
-			  if ($fontsize='20pt') then 35 else
-			  if ($fontsize='25pt') then 30 else 40"/>
-  </xsl:function>
+  <!-- The most characters that fit on a line -->
+  <xsl:variable name="max-line-width" as="xs:integer"
+		select="if ($fontsize='20pt') then 35 else
+			if ($fontsize='25pt') then 30 else 40"/>
 
   <xsl:function name="my:includegraphics-command" as="xs:string">
     <xsl:param name="src" as="xs:string"/>
     <xsl:param name="with_caption" as="xs:boolean"/>
-    <xsl:variable name="magic-number" select="3"/>
-    <xsl:variable name="scale-factor">
-      <xsl:sequence select="if ($fontsize='14pt') then round-half-to-even(14 div 12, 1) else 
-			    if ($fontsize='17pt') then round-half-to-even(17 div 12, 1) else 
-			    if ($fontsize='20pt') then round-half-to-even(20 div 12, 1) else
-			    if ($fontsize='25pt') then round-half-to-even(25 div 12, 1) else 1"/>
-    </xsl:variable>
+    <!-- images are scaled with the font: three times its size relative to 12pt -->
+    <xsl:variable name="scale"
+		  select="round-half-to-even(xs:decimal(substring-before($fontsize,'pt')) div 12, 1) * 3"/>
     <!-- FIXME: The following code calculates the available height for an image. If there is
          a caption we assume that it will take up one line. This assumption can of course
          fail, but we basically have no way of knowing how many lines a caption will take
          from xslt (aside from crude guesses). -->
     <xsl:variable name="height" select="if ($with_caption) then '\textheightMinusCaption' else '\textheight'"/>
-    <xsl:sequence select="concat('\maxsizebox{\textwidth}{',$height,'}{\includegraphics[scale=',$scale-factor*$magic-number,']{',$src,'}}&#10;')"/>
+    <xsl:sequence select="concat('\maxsizebox{\textwidth}{',$height,'}{\includegraphics[scale=',$scale,']{',$src,'}}&#10;')"/>
   </xsl:function>
 
   <!-- Captions in plain LaTeX aren't very robust, i.e. a caption
@@ -1656,7 +1651,7 @@
     <xsl:variable name="parts" as="xs:string*">
       <xsl:analyze-string select="$word" regex="\w+">
 	<xsl:matching-substring>
-	  <xsl:sequence select="if (string-length(.) > my:max-line-width())
+	  <xsl:sequence select="if (string-length(.) > $max-line-width)
 				then my:add-hyphenation-points(.) else ."/>
 	</xsl:matching-substring>
 	<xsl:non-matching-substring>
