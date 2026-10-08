@@ -1123,13 +1123,11 @@
    </xsl:template>
 
    <xsl:template match="@*|node()" mode="volume-split">
-     <xsl:if test="contains(@class, 'volume-split-point')">
-       <xsl:if test="'volume-split-point'=tokenize(@class, '\s+')">
-         <xsl:element name="div" namespace="http://www.daisy.org/z3986/2005/dtbook/">
-           <xsl:attribute name="class" select="'volume-split-point'"/>
-           <xsl:element name="p" namespace="http://www.daisy.org/z3986/2005/dtbook/"/>
-         </xsl:element>
-       </xsl:if>
+     <xsl:if test="'volume-split-point'=tokenize(@class, '\s+')">
+       <xsl:element name="div" namespace="http://www.daisy.org/z3986/2005/dtbook/">
+         <xsl:attribute name="class" select="'volume-split-point'"/>
+         <xsl:element name="p" namespace="http://www.daisy.org/z3986/2005/dtbook/"/>
+       </xsl:element>
      </xsl:if>
      <xsl:copy>
        <xsl:apply-templates select="@*|node()" mode="volume-split"/>
