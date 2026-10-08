@@ -595,14 +595,18 @@
      http://www.ibm.com/developerworks/library/x-xsltip.html and
      http://www.ibm.com/developerworks/xml/library/x-tiplook.html -->
      <xsl:param name="iso639Code"/>
+     <xsl:variable name="language-code" select="lower-case($iso639Code)"/>
      <xsl:variable name="babelLang">
        <xsl:choose>
-   	 <xsl:when test="matches($iso639Code, 'sv(-.+)?')">swedish</xsl:when>
-   	 <xsl:when test="matches($iso639Code, 'en-[Uu][Ss]')">USenglish</xsl:when>
-   	 <xsl:when test="matches($iso639Code, 'en-[Uu][Kk]')">UKenglish</xsl:when>
-   	 <xsl:when test="matches($iso639Code, 'en(-.+)?')">english</xsl:when>
-   	 <xsl:when test="matches($iso639Code, 'de-1901')">german</xsl:when>
-   	 <xsl:when test="matches($iso639Code, 'de(-.+)?')">ngerman</xsl:when>
+	 <xsl:when test="matches($language-code, '^sv(-|$)')">swedish</xsl:when>
+	 <xsl:when test="matches($language-code, '^en-us(-|$)')">USenglish</xsl:when>
+	 <xsl:when test="matches($language-code, '^en-gb(-|$)')">UKenglish</xsl:when>
+	 <xsl:when test="matches($language-code, '^en-ca(-|$)')">canadian</xsl:when>
+	 <xsl:when test="matches($language-code, '^en(-|$)')">english</xsl:when>
+	 <xsl:when test="matches($language-code, '^de-(.+-)?1901(-|$)')">german</xsl:when>
+	 <xsl:when test="matches($language-code, '^de(-|$)')">ngerman</xsl:when>
+	 <xsl:when test="matches($language-code, '^fr(-|$)')">french</xsl:when>
+	 <xsl:when test="matches($language-code, '^it(-|$)')">italian</xsl:when>
 	 <xsl:otherwise>
 	   <xsl:message>
 	     ***** <xsl:value-of select="$iso639Code"/> not supported. Defaulting to '<xsl:value-of select="$defaultLanguage"/>' ******

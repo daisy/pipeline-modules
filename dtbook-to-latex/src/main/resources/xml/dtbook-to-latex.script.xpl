@@ -123,6 +123,8 @@ See the [babel user guide](http://texdoc.net/pkg/babel) for all valid values.</p
 					<a:documentation xml:lang="en">English (Canadian)</a:documentation>
 					<value>french</value>
 					<a:documentation xml:lang="en">French</a:documentation>
+					<value>italian</value>
+					<a:documentation xml:lang="en">Italian</a:documentation>
 				</choice>
 			</px:type>
 		</p:pipeinfo>
