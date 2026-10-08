@@ -788,13 +788,6 @@
      <xsl:text>\restorepagenumber&#10;</xsl:text>
    </xsl:template>
 
-   <xsl:template match="dtb:head">
-     <xsl:apply-templates/>
-   </xsl:template>
-
-   <!-- Ignore meta data and links -->
-   <xsl:template match="dtb:meta|dtb:link"/>
-
    <xsl:template match="dtb:book">
 	<xsl:text>\begin{document}&#10;</xsl:text>
 	<xsl:if test="$alignment='left'">
@@ -961,26 +954,11 @@
     </xsl:if>
   </xsl:template>
 
-   <xsl:template match="dtb:level5">
-   	<xsl:apply-templates/>
-   </xsl:template>
-
-   <xsl:template match="dtb:level6">
-   	<xsl:apply-templates/>
-   </xsl:template>
-
-   <xsl:template match="dtb:level">
-   	<xsl:apply-templates/>
-   </xsl:template>
-
-   <xsl:template match="dtb:doctitle">
-   </xsl:template>
-   
-   <xsl:template match="dtb:docauthor">
-   </xsl:template>
-   
-   <xsl:template match="dtb:covertitle">
-   </xsl:template>
+   <!-- Elements that are not rendered where they are: the title and the author go on the cover,
+        a note at the reference to it, a caption with its image or table, the heading of a list in
+        front of the list. Metadata, links and column definitions are not rendered at all. -->
+   <xsl:template match="dtb:meta|dtb:link|dtb:doctitle|dtb:docauthor|dtb:covertitle
+                        |dtb:note|dtb:annotation|dtb:caption|dtb:list/dtb:hd|dtb:colgroup|dtb:col"/>
 
    <xsl:template match="dtb:p">   
 	<xsl:apply-templates/>
@@ -1056,10 +1034,6 @@
      <xsl:text>*{</xsl:text>
      <xsl:apply-templates/>
      <xsl:text>}&#10;</xsl:text>   
-   </xsl:template>
-
-   <xsl:template match="dtb:list[not(@type)]">
-   	<xsl:apply-templates/>
    </xsl:template>
 
    <xsl:template match="dtb:lic">
@@ -1163,10 +1137,6 @@
      </xsl:choose>
    </xsl:template>
 
-   <xsl:template match="dtb:caption">
-     <!-- Ignore captions that aren't inside a table or not referenced -->
-   </xsl:template>
-
    <xsl:template match="dtb:caption" mode="referenced-caption">
      <xsl:variable name="caption" select="my:cleanCaptions(.)"/>
      <xsl:value-of select="concat('\legend{',$caption,'}&#10;')"/>
@@ -1242,10 +1212,6 @@
      <xsl:apply-templates/>
    </xsl:template>
 
-   <xsl:template match="dtb:author">	
-   	<xsl:apply-templates/>
-   </xsl:template>
-
    <!-- Treat authors inside levels, divs and blockquotes as if they were paragraphs -->
   <xsl:template match="dtb:author[parent::dtb:level|parent::dtb:level1|parent::dtb:level2|parent::dtb:level3|parent::dtb:level4|parent::dtb:level5|parent::dtb:level6|parent::dtb:div|parent::dtb:blockquote]">
     <xsl:apply-templates/>
@@ -1258,10 +1224,6 @@
    	<xsl:text>\end{quote}&#10;</xsl:text>
    </xsl:template>
 
-  <xsl:template match="dtb:byline">
-  	<xsl:apply-templates/>
-   </xsl:template>
-
    <!-- Treat bylines inside levels, divs and blockquotes as if they were paragraphs -->
   <xsl:template match="dtb:byline[parent::dtb:level|parent::dtb:level1|parent::dtb:level2|parent::dtb:level3|parent::dtb:level4|parent::dtb:level5|parent::dtb:level6|parent::dtb:div|parent::dtb:blockquote]">
     <xsl:apply-templates/>
@@ -1271,14 +1233,6 @@
    <xsl:template match="dtb:dateline">
      <xsl:apply-templates/>
      <xsl:text>&#10;&#10;</xsl:text>
-   </xsl:template>
-
-   <xsl:template match="dtb:epigraph">
-     <xsl:apply-templates/>
-   </xsl:template>
-
-   <xsl:template match="dtb:note|dtb:annotation">
-   	<!--<xsl:apply-templates/>-->
    </xsl:template>
 
    <xsl:template match="dtb:note|dtb:annotation" mode="footnotes">
@@ -1341,10 +1295,6 @@
 	<xsl:text>\paragraph{</xsl:text>
 	<xsl:apply-templates/>
 	<xsl:text>}&#10;</xsl:text>
-   </xsl:template>
-
-   <!-- Ignore heading inside lists as they already have been dealt with -->
-   <xsl:template match="dtb:list/dtb:hd">
    </xsl:template>
 
    <xsl:template match="dtb:list[@type='ol']">
@@ -1488,18 +1438,6 @@
      <xsl:value-of select="concat('\addcontentsline{lot}{table}{',$caption,'}&#10;')"/>
    </xsl:template>
    
-   <xsl:template match="dtb:tbody">
-   	<xsl:apply-templates/>
-   </xsl:template>
-
-   <xsl:template match="dtb:thead">
-   	<xsl:apply-templates/>   
-   </xsl:template>
-
-   <xsl:template match="dtb:tfoot">
-   	<xsl:apply-templates/>
-   </xsl:template>
-
    <xsl:template match="dtb:tr">
    	<xsl:apply-templates/>
    	  <xsl:text>\\ </xsl:text>
@@ -1523,10 +1461,6 @@
      <xsl:if test="@colspan &gt; 1"><xsl:text>}</xsl:text></xsl:if>
    </xsl:template>
 
-   <xsl:template match="dtb:colgroup|dtb:col">
-     <!-- ignore -->
-   </xsl:template>
-
    <xsl:template match="dtb:poem">
    	<xsl:text>\begin{verse}&#10;</xsl:text>
    	<xsl:apply-templates/>
@@ -1543,14 +1477,6 @@
      <xsl:text>\PoemTitle*[]{</xsl:text>
      <xsl:apply-templates/>
      <xsl:text>}&#10;</xsl:text>
-   </xsl:template>
-
-   <xsl:template match="dtb:cite/dtb:title">
-   	<xsl:apply-templates/>
-   </xsl:template>
-
-   <xsl:template match="dtb:cite">
-   	<xsl:apply-templates/>
    </xsl:template>
 
    <xsl:template match="dtb:q">
@@ -1637,9 +1563,6 @@
 	<xsl:apply-templates/>
    </xsl:template>
 
-   <xsl:template match="dtb:a">
-     <xsl:apply-templates/>
-   </xsl:template>
 
    <!-- Render external links as URLs. Only a link that holds nothing but text is a URL: a link
         around an image or other markup is rendered as its content, which would otherwise be lost. -->
@@ -1717,28 +1640,14 @@
 	<xsl:text>}</xsl:text>
    </xsl:template>
 
-   <xsl:template match="dtb:abbr">
-   	<xsl:apply-templates/>
-   </xsl:template>
-
-  <xsl:template match="dtb:acronym">
-   	<xsl:apply-templates/>
-   </xsl:template>
-
-  <xsl:template match="dtb:bdo">
-   	<xsl:apply-templates/>
-  </xsl:template>
-
-  <xsl:template match="dtb:dfn">
-   	<xsl:apply-templates/>
-   </xsl:template>
-
-  <xsl:template match="dtb:sent">
-   	<xsl:apply-templates/>
-   </xsl:template>
-
-  <xsl:template match="dtb:w">
-   	<xsl:apply-templates/>
+   <!-- Elements that are rendered as their content. Those of them that need more in some places
+        have templates of their own for those places, e.g. a span with a class, an author at the
+        level of a paragraph. FIXME: a span without a known class may carry a class that matters
+        (colour, typo, error, etc). -->
+   <xsl:template match="dtb:head|dtb:level|dtb:level5|dtb:level6|dtb:list[not(@type)]|dtb:thead|dtb:tbody|dtb:tfoot
+                        |dtb:author|dtb:byline|dtb:epigraph|dtb:cite|dtb:cite/dtb:title|dtb:a|dtb:span
+                        |dtb:abbr|dtb:acronym|dtb:bdo|dtb:dfn|dtb:sent|dtb:w">
+     <xsl:apply-templates/>
    </xsl:template>
 
    <xsl:template match="dtb:sup">
@@ -1765,12 +1674,6 @@
 
    <xsl:template match="dtb:span[tokenize(@class,'\s+')='box']">
      <xsl:text>$\vcenter{\hbox{\fboxsep=.4em \fboxrule=0.5mm\fcolorbox{black}{white}{\null}}}$</xsl:text>
-   </xsl:template>
-
-   <xsl:template match="dtb:span">
-     <!-- FIXME: What to do with span? It basically depends on the class -->
-     <!-- attribute which can be used for anything (colour, typo, error, etc) -->
-     <xsl:apply-templates/>
    </xsl:template>
 
    <!-- remove excessive space and insert non-breaking spaces inside abbrevs -->
