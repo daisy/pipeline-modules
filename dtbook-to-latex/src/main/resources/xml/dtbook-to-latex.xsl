@@ -1173,24 +1173,14 @@
      <xsl:if test="position() != last()"><xsl:text>&#10;&#10;</xsl:text></xsl:if>
    </xsl:template>
 
+   <!-- A sidebar floats and may be broken across pages, unless it is marked no-float. A nested
+        sidebar should obviously not float and cannot be breakable due to limitations of tcolorbox. -->
    <xsl:template match="dtb:sidebar">
-     <xsl:text>\begin{tcolorbox}[breakable,floatplacement=htp!]&#10;</xsl:text>
-     <xsl:text>\raggedright&#10;</xsl:text>
-     <xsl:apply-templates/>
-     <xsl:text>\end{tcolorbox}&#10;</xsl:text>
-   </xsl:template>
-
-   <xsl:template match="dtb:sidebar[@class='no-float']">
-     <xsl:text>\begin{tcolorbox}[breakable,nofloat]&#10;</xsl:text>
-     <xsl:text>\raggedright&#10;</xsl:text>
-     <xsl:apply-templates/>
-     <xsl:text>\end{tcolorbox}&#10;</xsl:text>
-   </xsl:template>
-
-   <xsl:template match="dtb:sidebar//dtb:sidebar">
-     <!-- a nested sidebar should obviously not float and cannot be
-          breakable due to limitations of tcolorbox -->
-     <xsl:text>\begin{tcolorbox}[nofloat]&#10;</xsl:text>
+     <xsl:value-of select="concat('\begin{tcolorbox}[',
+                                  if (ancestor::dtb:sidebar) then 'nofloat'
+                                  else if (@class='no-float') then 'breakable,nofloat'
+                                  else 'breakable,floatplacement=htp!',
+                                  ']&#10;')"/>
      <xsl:text>\raggedright&#10;</xsl:text>
      <xsl:apply-templates/>
      <xsl:text>\end{tcolorbox}&#10;</xsl:text>
