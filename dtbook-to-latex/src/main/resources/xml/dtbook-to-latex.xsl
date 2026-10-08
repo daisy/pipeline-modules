@@ -556,7 +556,7 @@
         <xsl:text>\vskip #1\onelineskip&#10;</xsl:text>
         <xsl:text>\@afterindentfalse&#10;</xsl:text>
 	<xsl:text>\@afterheading}&#10;</xsl:text>
-	<xsl:text>\makeatletter&#10;</xsl:text>
+	<xsl:text>\makeatother&#10;</xsl:text>
 
 	<xsl:if test="$line_spacing = 'onehalfspacing'">
 	  <xsl:text>\OnehalfSpacing&#10;</xsl:text>
