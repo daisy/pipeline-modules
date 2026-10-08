@@ -356,4 +356,47 @@
               test="count(//*[tokenize(@class,'\s+')='volume-split-point'])=1"/>
   </x:scenario>
 
+  <x:scenario label="a poem is not split, the split point goes to its nearer edge">
+    <x:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <p>The lines below are five words long. Sixty words make two volumes of thirty, so the
+      volume runs full at the fifth line, which is further from either edge of the poem than the
+      volume may be stretched. A line cannot be marked, so the split point goes to the end of the
+      poem, ten words away, rather than to its start, twenty words away.</p>
+    </x:documentation>
+    <x:call step="pxi:insert-volume-split-points">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook>
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>Heading</h1>
+                  <p id="p1">one two three four five six seven eight nine ten</p>
+                  <poem id="poem">
+                    <line id="l1">one two three four five</line>
+                    <line id="l2">one two three four five</line>
+                    <line id="l3">one two three four five</line>
+                    <line id="l4">one two three four five</line>
+                    <line id="l5">one two three four five</line>
+                    <line id="l6">one two three four five</line>
+                  </poem>
+                  <p id="p2">one two three four five six seven eight nine ten</p>
+                  <p id="p3">one two three four five six seven eight nine ten</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+      <x:param port="parameters" name="words_per_volume" select="40"/>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the paragraph after the poem starts a new volume" type="xpath"
+              test="tokenize(//dtb:p[@id='p2']/@class,'\s+')='volume-split-point'"/>
+    <x:expect label="and it is the only split point" type="xpath"
+              test="count(//*[tokenize(@class,'\s+')='volume-split-point'])=1"/>
+  </x:scenario>
+
 </x:description>

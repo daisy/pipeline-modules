@@ -67,6 +67,12 @@
     <xsl:sequence select="count(tokenize(normalize-space(string-join($own-text, '')), '\s+'))"/>
   </xsl:function>
 
+  <!-- Count the words of the given paragraphs -->
+  <xsl:function name="f:words" as="xs:double">
+    <xsl:param name="elements" as="element()*"/>
+    <xsl:sequence select="sum(for $p in $elements return f:wc($p))"/>
+  </xsl:function>
+
   <!-- Determine the paragraphs where a volume should be split, i.e. the paragraphs where the
        number of words since the last split point is greater than the wanted words per volume -->
   <xsl:function name="f:split" as="element()*">
@@ -99,14 +105,19 @@
     <xsl:variable name="blocks" select="$split-point/ancestor::dtb:*[local-name()=$block-names]"/>
     <xsl:choose>
       <xsl:when test="exists($blocks)">
+	<!-- the outermost block that starts only a few words before the split point -->
 	<xsl:variable name="move-before"
-		      select="($blocks[sum(for $p in (descendant::dtb:p intersect $split-point/preceding::*)
-					   return f:wc($p))
-				       &lt; $allowed-stretch-in-words])[1]"/>
+		      select="$blocks[f:words(descendant::* intersect $paragraphs
+					      intersect $split-point/preceding::*)
+				      lt $allowed-stretch-in-words][1]"/>
+	<!-- the outermost block that ends only a few words after the start of the split point. Its
+	     descendants count too: they are not on the following axis, and the split point may be a
+	     list item that holds paragraphs of its own. -->
 	<xsl:variable name="move-after"
-		      select="($blocks[sum(for $p in (descendant::dtb:p intersect ($split-point,$split-point/following::*))
-					   return f:wc($p))
-				       &lt; $allowed-stretch-in-words])[1]"/>
+		      select="$blocks[f:words(descendant::* intersect $paragraphs
+					      intersect ($split-point/descendant-or-self::*,
+							 $split-point/following::*))
+				      lt $allowed-stretch-in-words][1]"/>
 	<xsl:choose>
 	  <xsl:when test="exists($move-before) and exists($move-after)">
 	    <xsl:sequence select="if (count($move-before/ancestor::*) le count($move-after/ancestor::*))
@@ -123,6 +134,28 @@
 	    <xsl:sequence select="$split-point"/>
 	  </xsl:otherwise>
 	</xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+	<xsl:sequence select="$split-point"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:function>
+
+  <!-- A list, poem or linegroup is never split: only the elements in the template below can be
+       marked, and a volume cover in the middle of a list or poem would break its LaTeX environment.
+       A split point that ends up inside one is moved to whichever edge of the outermost one is
+       nearer, however far that is. -->
+  <xsl:function name="f:keep-whole" as="element()">
+    <xsl:param name="split-point" as="element()"/>
+    <xsl:variable name="unsplittable-block" select="($split-point/ancestor::dtb:*[local-name()=('list','poem','linegroup')])[1]"/>
+    <xsl:choose>
+      <xsl:when test="exists($unsplittable-block)">
+	<xsl:variable name="next" select="$unsplittable-block/following::dtb:*[local-name()=($block-names,'p')][1]"/>
+	<xsl:variable name="paragraphs-inside" select="$unsplittable-block//* intersect $paragraphs"/>
+	<xsl:variable name="words-before"
+		      select="f:words($paragraphs-inside intersect $split-point/preceding::*)"/>
+	<xsl:variable name="words-after" select="f:words($paragraphs-inside) - $words-before"/>
+	<xsl:sequence select="if (exists($next) and $words-after lt $words-before) then $next else $unsplittable-block"/>
       </xsl:when>
       <xsl:otherwise>
 	<xsl:sequence select="$split-point"/>
@@ -157,8 +190,8 @@
   <xsl:variable name="split-points" as="element()*"
 		select="if ($words-per-volume gt 0 and not($pre-marked))
 			then (for $split-point in f:split(0, $words-per-volume, $paragraphs)
-			      return f:closest-block($split-point,
-						     ceiling($words-per-volume * number($allowed_stretch))))
+			      return f:keep-whole(f:closest-block($split-point,
+								  ceiling($words-per-volume * number($allowed_stretch)))))
 			else ()"/>
 
   <xsl:template match="/">
