@@ -222,4 +222,29 @@
               test="contains(substring-after(string(/),'the body'),'the footer')"/>
   </x:scenario>
 
+  <x:scenario label="a list item that starts with a bracket">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <head><meta name="dc:Title" content="A book"/></head>
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>A chapter</h1>
+                  <list type="ul"><li>[sic] an item</li></list>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the bracket is not taken for the optional argument of the item" type="xpath"
+              test="contains(string(/),'\item \lbrack{}sic\rbrack{} an item')"/>
+  </x:scenario>
+
 </x:description>
