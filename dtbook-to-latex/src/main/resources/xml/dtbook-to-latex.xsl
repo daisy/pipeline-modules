@@ -1089,22 +1089,12 @@
      <xsl:value-of select="concat('\addcontentsline{lof}{figure}{',$caption,'}&#10;')"/>
    </xsl:template>
 
-   <xsl:template match="dtb:imggroup//dtb:prodnote" priority="100">
-     <xsl:choose>
-       <xsl:when test="exists(key('id',tokenize(translate(@imgref,'#',''),'\s+'))[self::dtb:img]|preceding-sibling::*[1][self::dtb:img])">
-	 <!-- if a prodnote inside an imggroup is associated with an image it is
-	      really an extended image description. -->
-	 <!-- Most likely the large print user rather wants to see the image not
-	      the description, so ignore the description. -->
-       </xsl:when>
-       <xsl:otherwise>
-	 <xsl:text>\begin{tcolorbox}[colback=black!10,floatplacement=h!]</xsl:text>
-	 <xsl:text>&#10;\raggedright&#10;</xsl:text>
-	 <xsl:apply-templates/>
-	 <xsl:text>\end{tcolorbox}&#10;</xsl:text>
-       </xsl:otherwise>
-     </xsl:choose>
-   </xsl:template>
+   <!-- A prodnote inside an imggroup that is associated with an image is really an extended
+        image description. Most likely the large print reader would rather see the image than the
+        description, so leave the description out. Any other prodnote is set as usual. -->
+   <xsl:template match="dtb:imggroup//dtb:prodnote[key('id',tokenize(translate(@imgref,'#',''),'\s+'))[self::dtb:img]
+                                                   or preceding-sibling::*[1][self::dtb:img]]"
+                 priority="100"/>
 
    <!-- What's the point of a div? Usually you want some visual clue
         that the content inside the div is special, hence the break
