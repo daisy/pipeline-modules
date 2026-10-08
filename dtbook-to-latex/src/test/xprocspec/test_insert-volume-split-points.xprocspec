@@ -399,4 +399,40 @@
               test="count(//*[tokenize(@class,'\s+')='volume-split-point'])=1"/>
   </x:scenario>
 
+  <x:scenario label="the paragraph that starts a volume counts toward that volume">
+    <x:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <p>Sixty words make three volumes of twenty, two paragraphs each.</p>
+    </x:documentation>
+    <x:call step="pxi:insert-volume-split-points">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook>
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>Heading</h1>
+                  <p id="p1">one two three four five six seven eight nine ten</p>
+                  <p id="p2">one two three four five six seven eight nine ten</p>
+                  <p id="p3">one two three four five six seven eight nine ten</p>
+                  <p id="p4">one two three four five six seven eight nine ten</p>
+                  <p id="p5">one two three four five six seven eight nine ten</p>
+                  <p id="p6">one two three four five six seven eight nine ten</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+      <x:param port="parameters" name="words_per_volume" select="20"/>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the third and the fifth paragraph start a new volume" type="xpath"
+              test="tokenize(//dtb:p[@id='p3']/@class,'\s+')='volume-split-point'
+                    and tokenize(//dtb:p[@id='p5']/@class,'\s+')='volume-split-point'"/>
+    <x:expect label="and they are the only split points" type="xpath"
+              test="count(//*[tokenize(@class,'\s+')='volume-split-point'])=2"/>
+  </x:scenario>
+
 </x:description>

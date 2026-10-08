@@ -89,7 +89,8 @@
            a split point here would not correspond to any real content boundary. -->
       <xsl:when test="$words-so-far ge $words-per-volume
 		      and not($head/ancestor::dtb:note or $head/ancestor::dtb:annotation)">
-	<xsl:sequence select="$head, f:split(0, $words-per-volume, $tail)"/>
+	<!-- the paragraph that starts the new volume is the first one counted in it -->
+	<xsl:sequence select="$head, f:split(f:wc($head), $words-per-volume, $tail)"/>
       </xsl:when>
       <xsl:otherwise>
 	<xsl:sequence select="f:split($words-so-far + f:wc($head), $words-per-volume, $tail)"/>
