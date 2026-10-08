@@ -289,4 +289,71 @@
               test="empty(//*[tokenize(@class,'\s+')='volume-split-point'])"/>
   </x:scenario>
 
+  <x:scenario label="a word split by inline markup is one word">
+    <x:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <p>The first paragraph holds ten words, each split by a sub. Thirty words make two volumes,
+      so the third paragraph starts the second one.</p>
+    </x:documentation>
+    <x:call step="pxi:insert-volume-split-points">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook>
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>Heading</h1>
+                  <p id="p1">H<sub>2</sub>O H<sub>2</sub>O H<sub>2</sub>O H<sub>2</sub>O H<sub>2</sub>O H<sub>2</sub>O H<sub>2</sub>O H<sub>2</sub>O H<sub>2</sub>O H<sub>2</sub>O</p>
+                  <p id="p2">one two three four five six seven eight nine ten</p>
+                  <p id="p3">one two three four five six seven eight nine ten</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+      <x:param port="parameters" name="words_per_volume" select="20"/>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the third paragraph starts a new volume" type="xpath"
+              test="tokenize(//dtb:p[@id='p3']/@class,'\s+')='volume-split-point'"/>
+    <x:expect label="and it is the only split point" type="xpath"
+              test="count(//*[tokenize(@class,'\s+')='volume-split-point'])=1"/>
+  </x:scenario>
+
+  <x:scenario label="the words of a list item are counted once">
+    <x:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <p>The paragraph inside the list item is part of the text of the item too, but its words
+      must not be counted twice: forty words make two volumes, not three.</p>
+    </x:documentation>
+    <x:call step="pxi:insert-volume-split-points">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook>
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>Heading</h1>
+                  <list type="ul"><li><p id="p1">one two three four five six seven eight nine ten</p></li></list>
+                  <p id="p2">one two three four five six seven eight nine ten</p>
+                  <p id="p3">one two three four five six seven eight nine ten</p>
+                  <p id="p4">one two three four five six seven eight nine ten</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+      <x:param port="parameters" name="words_per_volume" select="20"/>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the third paragraph starts a new volume" type="xpath"
+              test="tokenize(//dtb:p[@id='p3']/@class,'\s+')='volume-split-point'"/>
+    <x:expect label="and it is the only split point" type="xpath"
+              test="count(//*[tokenize(@class,'\s+')='volume-split-point'])=1"/>
+  </x:scenario>
+
 </x:description>

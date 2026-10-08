@@ -56,10 +56,15 @@
   <xsl:variable name="block-names" as="xs:string*"
 		select="('level1','level2','level3','linegroup','poem','sidebar','blockquote','list')"/>
 
-  <!-- Count the words in a given paragraph -->
+  <!-- Count the words of a given paragraph, leaving out those of the paragraphs nested inside it
+       (the p of a list item, the items of a nested list), which are counted on their own -->
   <xsl:function name="f:wc" as="xs:integer">
     <xsl:param name="para" as="element()"/>
-    <xsl:sequence select="count(tokenize(normalize-space(string($para)), '\s+'))"/>
+    <xsl:variable name="own-text"
+		  select="$para//text()[ancestor::*[self::dtb:p or self::dtb:li or self::dtb:line][1] is $para]"/>
+    <!-- the text is joined as it is, so that a word split by inline markup, such as
+         H<sub>2</sub>O, stays one word -->
+    <xsl:sequence select="count(tokenize(normalize-space(string-join($own-text, '')), '\s+'))"/>
   </xsl:function>
 
   <!-- Determine the paragraphs where a volume should be split, i.e. the paragraphs where the
