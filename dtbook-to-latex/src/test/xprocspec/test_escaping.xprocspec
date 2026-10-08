@@ -49,6 +49,42 @@
               test="contains(string(/),'Author={Ann Author, Bob Writer}')"/>
   </x:scenario>
 
+  <x:scenario label="captions with characters that are special to LaTeX">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <head><meta name="dc:Title" content="A book"/></head>
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>A chapter</h1>
+                  <table>
+                    <caption>50% &amp; more_of #1</caption>
+                    <tr><td>x</td></tr>
+                  </table>
+                  <imggroup>
+                    <img id="i" src="a.png" alt=""/>
+                    <caption imgref="i">Costs in $ &amp; %</caption>
+                  </imggroup>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the table caption is escaped" type="xpath"
+              test="contains(string(/),'\legend{50\% \&amp; more\_of \#1}')"/>
+    <x:expect label="and so is its entry in the list of tables" type="xpath"
+              test="contains(string(/),'\addcontentsline{lot}{table}{50\% \&amp; more\_of \#1}')"/>
+    <x:expect label="the image caption is escaped" type="xpath"
+              test="contains(string(/),'\legend{Costs in \$ \&amp; \%}')"/>
+  </x:scenario>
+
   <x:scenario label="a compound that is both long and hyphenated">
     <x:call step="pxi:dtbook-to-latex">
       <x:input port="source">

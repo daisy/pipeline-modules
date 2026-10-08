@@ -128,7 +128,7 @@
        and the caption (as a plain para) inside a minipage. -->
   <xsl:function name="my:cleanCaptions" as="xs:string">
     <xsl:param name="context" as="node()"/>
-    <xsl:value-of select="string($context)"/>
+    <xsl:sequence select="my:quoteSpecialChars(string($context))"/>
   </xsl:function>
 
   <!-- =========================== -->
