@@ -1791,8 +1791,13 @@
 	</xsl:non-matching-substring>
       </xsl:analyze-string>
     </xsl:variable>
+    <!-- A match takes the letter after the hyphen along, so in "Vitamin-B-Komplex" the hyphen
+         after the B finds no letter before it. A second pass breaks those; a hyphen that already
+         has a break is followed by a backslash and is not matched again. -->
+    <xsl:variable name="hyphen" select="'(\w)-(\w)'"/>
+    <xsl:variable name="break" select="'$1-\\hspace{0pt}$2'"/>
     <xsl:sequence select="if (string-length($word) > 20 and contains($word, '-'))
-			  then replace(string-join($parts, ''), '(\w)-(\w)', '$1-\\hspace{0pt}$2')
+			  then replace(replace(string-join($parts, ''), $hyphen, $break), $hyphen, $break)
 			  else string-join($parts, '')"/>
   </xsl:function>
 

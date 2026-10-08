@@ -147,6 +147,31 @@
               test="contains(string(/),'\-e\-rung-\hspace{0pt}Antrag Ende.')"/>
   </x:scenario>
 
+  <x:scenario label="a long compound with a part of a single letter">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="de">
+            <head><meta name="dc:Title" content="A book"/></head>
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>A chapter</h1>
+                  <p>Vitamin-B-Komplex-Mangel</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the compound can be broken after every one of its hyphens" type="xpath"
+              test="contains(string(/),'Vitamin-\hspace{0pt}B-\hspace{0pt}Komplex-\hspace{0pt}Mangel')"/>
+  </x:scenario>
+
   <x:scenario label="a heading of an unnumbered level with characters that are special to LaTeX">
     <x:call step="pxi:dtbook-to-latex">
       <x:input port="source">
