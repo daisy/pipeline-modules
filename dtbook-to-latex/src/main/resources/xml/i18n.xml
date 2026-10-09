@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<i18n xmlns="http://www.daisy.org/ns/pipeline/data">
+
+  <!--
+      The words and phrases that the conversion generates itself. They are looked up in the
+      language of the document, or in the language of the "producer-language" option when
+      that is set, and a language tag falls back to the language without the region, which is
+      why Swiss German only provides the strings that are spelled with "ss" rather than "ß".
+
+      The volume strings take the number of the volume and the total number of volumes,
+      written as %1 and %2. The singular of the German phrase carries no number because it is
+      in the dative ("in einem Band").
+  -->
+
+  <translation string="Volume %1 of %2">
+    <text xml:lang="en">Volume %1 of %2</text>
+    <text xml:lang="de">Band %1 von %2</text>
+  </translation>
+
+  <translation string="Large print book in %1 volume">
+    <text xml:lang="en">Large print book in %1 volume</text>
+    <text xml:lang="de">Großdruck in einem Band</text>
+    <text xml:lang="de-CH">Grossdruck in einem Band</text>
+  </translation>
+
+  <translation string="Large print book in %1 volumes">
+    <text xml:lang="en">Large print book in %1 volumes</text>
+    <text xml:lang="de">Großdruck in %1 Bänden</text>
+    <text xml:lang="de-CH">Grossdruck in %1 Bänden</text>
+  </translation>
+
+  <translation string="Notes">
+    <text xml:lang="en">Notes</text>
+    <text xml:lang="de">Anmerkungen</text>
+  </translation>
+
+  <!--
+      Numbers written out in words, for the number of volumes. A language without an entry
+      gets the digit. Swiss German again only overrides the numbers spelled with "ß".
+  -->
+
+  <translation string="1">
+    <text xml:lang="en">one</text>
+    <text xml:lang="de">eins</text>
+  </translation>
+  <translation string="2">
+    <text xml:lang="en">two</text>
+    <text xml:lang="de">zwei</text>
+  </translation>
+  <translation string="3">
+    <text xml:lang="en">three</text>
+    <text xml:lang="de">drei</text>
+  </translation>
+  <translation string="4">
+    <text xml:lang="en">four</text>
+    <text xml:lang="de">vier</text>
+  </translation>
+  <translation string="5">
+    <text xml:lang="en">five</text>
+    <text xml:lang="de">fünf</text>
+  </translation>
+  <translation string="6">
+    <text xml:lang="en">six</text>
+    <text xml:lang="de">sechs</text>
+  </translation>
+  <translation string="7">
+    <text xml:lang="en">seven</text>
+    <text xml:lang="de">sieben</text>
+  </translation>
+  <translation string="8">
+    <text xml:lang="en">eight</text>
+    <text xml:lang="de">acht</text>
+  </translation>
+  <translation string="9">
+    <text xml:lang="en">nine</text>
+    <text xml:lang="de">neun</text>
+  </translation>
+  <translation string="10">
+    <text xml:lang="en">ten</text>
+    <text xml:lang="de">zehn</text>
+  </translation>
+  <translation string="11">
+    <text xml:lang="en">eleven</text>
+    <text xml:lang="de">elf</text>
+  </translation>
+  <translation string="12">
+    <text xml:lang="en">twelve</text>
+    <text xml:lang="de">zwölf</text>
+  </translation>
+  <translation string="13">
+    <text xml:lang="en">thirteen</text>
+    <text xml:lang="de">dreizehn</text>
+  </translation>
+  <translation string="14">
+    <text xml:lang="en">fourteen</text>
+    <text xml:lang="de">vierzehn</text>
+  </translation>
+  <translation string="15">
+    <text xml:lang="en">fifteen</text>
+    <text xml:lang="de">fünfzehn</text>
+  </translation>
+  <translation string="16">
+    <text xml:lang="en">sixteen</text>
+    <text xml:lang="de">sechzehn</text>
+  </translation>
+  <translation string="17">
+    <text xml:lang="en">seventeen</text>
+    <text xml:lang="de">siebzehn</text>
+  </translation>
+  <translation string="18">
+    <text xml:lang="en">eighteen</text>
+    <text xml:lang="de">achtzehn</text>
+  </translation>
+  <translation string="19">
+    <text xml:lang="en">nineteen</text>
+    <text xml:lang="de">neunzehn</text>
+  </translation>
+  <translation string="20">
+    <text xml:lang="en">twenty</text>
+    <text xml:lang="de">zwanzig</text>
+  </translation>
+  <translation string="21">
+    <text xml:lang="en">twenty-one</text>
+    <text xml:lang="de">einundzwanzig</text>
+  </translation>
+  <translation string="22">
+    <text xml:lang="en">twenty-two</text>
+    <text xml:lang="de">zweiundzwanzig</text>
+  </translation>
+  <translation string="23">
+    <text xml:lang="en">twenty-three</text>
+    <text xml:lang="de">dreiundzwanzig</text>
+  </translation>
+  <translation string="24">
+    <text xml:lang="en">twenty-four</text>
+    <text xml:lang="de">vierundzwanzig</text>
+  </translation>
+  <translation string="25">
+    <text xml:lang="en">twenty-five</text>
+    <text xml:lang="de">fünfundzwanzig</text>
+  </translation>
+  <translation string="26">
+    <text xml:lang="en">twenty-six</text>
+    <text xml:lang="de">sechsundzwanzig</text>
+  </translation>
+  <translation string="27">
+    <text xml:lang="en">twenty-seven</text>
+    <text xml:lang="de">siebenundzwanzig</text>
+  </translation>
+  <translation string="28">
+    <text xml:lang="en">twenty-eight</text>
+    <text xml:lang="de">achtundzwanzig</text>
+  </translation>
+  <translation string="29">
+    <text xml:lang="en">twenty-nine</text>
+    <text xml:lang="de">neunundzwanzig</text>
+  </translation>
+  <translation string="30">
+    <text xml:lang="en">thirty</text>
+    <text xml:lang="de">dreißig</text>
+    <text xml:lang="de-CH">dreissig</text>
+  </translation>
+  <translation string="31">
+    <text xml:lang="en">thirty-one</text>
+    <text xml:lang="de">einunddreißig</text>
+    <text xml:lang="de-CH">einunddreissig</text>
+  </translation>
+  <translation string="32">
+    <text xml:lang="en">thirty-two</text>
+    <text xml:lang="de">zweiunddreißig</text>
+    <text xml:lang="de-CH">zweiunddreissig</text>
+  </translation>
+  <translation string="33">
+    <text xml:lang="en">thirty-three</text>
+    <text xml:lang="de">dreiunddreißig</text>
+    <text xml:lang="de-CH">dreiunddreissig</text>
+  </translation>
+  <translation string="34">
+    <text xml:lang="en">thirty-four</text>
+    <text xml:lang="de">vierunddreißig</text>
+    <text xml:lang="de-CH">vierunddreissig</text>
+  </translation>
+  <translation string="35">
+    <text xml:lang="en">thirty-five</text>
+    <text xml:lang="de">fünfunddreißig</text>
+    <text xml:lang="de-CH">fünfunddreissig</text>
+  </translation>
+  <translation string="36">
+    <text xml:lang="en">thirty-six</text>
+    <text xml:lang="de">sechsunddreißig</text>
+    <text xml:lang="de-CH">sechsunddreissig</text>
+  </translation>
+  <translation string="37">
+    <text xml:lang="en">thirty-seven</text>
+    <text xml:lang="de">siebenunddreißig</text>
+    <text xml:lang="de-CH">siebenunddreissig</text>
+  </translation>
+  <translation string="38">
+    <text xml:lang="en">thirty-eight</text>
+    <text xml:lang="de">achtunddreißig</text>
+    <text xml:lang="de-CH">achtunddreissig</text>
+  </translation>
+  <translation string="39">
+    <text xml:lang="en">thirty-nine</text>
+    <text xml:lang="de">neununddreißig</text>
+    <text xml:lang="de-CH">neununddreissig</text>
+  </translation>
+  <translation string="40">
+    <text xml:lang="en">forty</text>
+    <text xml:lang="de">vierzig</text>
+  </translation>
+  <translation string="41">
+    <text xml:lang="en">forty-one</text>
+    <text xml:lang="de">einundvierzig</text>
+  </translation>
+  <translation string="42">
+    <text xml:lang="en">forty-two</text>
+    <text xml:lang="de">zweiundvierzig</text>
+  </translation>
+  <translation string="43">
+    <text xml:lang="en">forty-three</text>
+    <text xml:lang="de">dreiundvierzig</text>
+  </translation>
+  <translation string="44">
+    <text xml:lang="en">forty-four</text>
+    <text xml:lang="de">vierundvierzig</text>
+  </translation>
+  <translation string="45">
+    <text xml:lang="en">forty-five</text>
+    <text xml:lang="de">fünfundvierzig</text>
+  </translation>
+  <translation string="46">
+    <text xml:lang="en">forty-six</text>
+    <text xml:lang="de">sechsundvierzig</text>
+  </translation>
+  <translation string="47">
+    <text xml:lang="en">forty-seven</text>
+    <text xml:lang="de">siebenundvierzig</text>
+  </translation>
+  <translation string="48">
+    <text xml:lang="en">forty-eight</text>
+    <text xml:lang="de">achtundvierzig</text>
+  </translation>
+  <translation string="49">
+    <text xml:lang="en">forty-nine</text>
+    <text xml:lang="de">neunundvierzig</text>
+  </translation>
+  <translation string="50">
+    <text xml:lang="en">fifty</text>
+    <text xml:lang="de">fünfzig</text>
+  </translation>
+</i18n>
