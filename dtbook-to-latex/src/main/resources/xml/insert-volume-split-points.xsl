@@ -56,10 +56,21 @@
   <xsl:variable name="block-names" as="xs:string*"
 		select="('level1','level2','level3','linegroup','poem','sidebar','blockquote','list')"/>
 
-  <!-- Count the words in a given paragraph -->
+  <!-- Count the words of a given paragraph, leaving out those of the paragraphs nested inside it
+       (the p of a list item, the items of a nested list), which are counted on their own -->
   <xsl:function name="f:wc" as="xs:integer">
     <xsl:param name="para" as="element()"/>
-    <xsl:sequence select="count(tokenize(normalize-space(string($para)), '\s+'))"/>
+    <xsl:variable name="own-text"
+		  select="$para//text()[ancestor::*[self::dtb:p or self::dtb:li or self::dtb:line][1] is $para]"/>
+    <!-- the text is joined as it is, so that a word split by inline markup, such as
+         H<sub>2</sub>O, stays one word -->
+    <xsl:sequence select="count(tokenize(normalize-space(string-join($own-text, '')), '\s+'))"/>
+  </xsl:function>
+
+  <!-- Count the words of the given paragraphs -->
+  <xsl:function name="f:words" as="xs:double">
+    <xsl:param name="elements" as="element()*"/>
+    <xsl:sequence select="sum(for $p in $elements return f:wc($p))"/>
   </xsl:function>
 
   <!-- Determine the paragraphs where a volume should be split, i.e. the paragraphs where the
@@ -78,7 +89,8 @@
            a split point here would not correspond to any real content boundary. -->
       <xsl:when test="$words-so-far ge $words-per-volume
 		      and not($head/ancestor::dtb:note or $head/ancestor::dtb:annotation)">
-	<xsl:sequence select="$head, f:split(0, $words-per-volume, $tail)"/>
+	<!-- the paragraph that starts the new volume is the first one counted in it -->
+	<xsl:sequence select="$head, f:split(f:wc($head), $words-per-volume, $tail)"/>
       </xsl:when>
       <xsl:otherwise>
 	<xsl:sequence select="f:split($words-so-far + f:wc($head), $words-per-volume, $tail)"/>
@@ -94,14 +106,19 @@
     <xsl:variable name="blocks" select="$split-point/ancestor::dtb:*[local-name()=$block-names]"/>
     <xsl:choose>
       <xsl:when test="exists($blocks)">
+	<!-- the outermost block that starts only a few words before the split point -->
 	<xsl:variable name="move-before"
-		      select="($blocks[sum(for $p in (descendant::dtb:p intersect $split-point/preceding::*)
-					   return f:wc($p))
-				       &lt; $allowed-stretch-in-words])[1]"/>
+		      select="$blocks[f:words(descendant::* intersect $paragraphs
+					      intersect $split-point/preceding::*)
+				      lt $allowed-stretch-in-words][1]"/>
+	<!-- the outermost block that ends only a few words after the start of the split point. Its
+	     descendants count too: they are not on the following axis, and the split point may be a
+	     list item that holds paragraphs of its own. -->
 	<xsl:variable name="move-after"
-		      select="($blocks[sum(for $p in (descendant::dtb:p intersect ($split-point,$split-point/following::*))
-					   return f:wc($p))
-				       &lt; $allowed-stretch-in-words])[1]"/>
+		      select="$blocks[f:words(descendant::* intersect $paragraphs
+					      intersect ($split-point/descendant-or-self::*,
+							 $split-point/following::*))
+				      lt $allowed-stretch-in-words][1]"/>
 	<xsl:choose>
 	  <xsl:when test="exists($move-before) and exists($move-after)">
 	    <xsl:sequence select="if (count($move-before/ancestor::*) le count($move-after/ancestor::*))
@@ -118,6 +135,28 @@
 	    <xsl:sequence select="$split-point"/>
 	  </xsl:otherwise>
 	</xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+	<xsl:sequence select="$split-point"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:function>
+
+  <!-- A list, poem or linegroup is never split: only the elements in the template below can be
+       marked, and a volume cover in the middle of a list or poem would break its LaTeX environment.
+       A split point that ends up inside one is moved to whichever edge of the outermost one is
+       nearer, however far that is. -->
+  <xsl:function name="f:keep-whole" as="element()">
+    <xsl:param name="split-point" as="element()"/>
+    <xsl:variable name="unsplittable-block" select="($split-point/ancestor::dtb:*[local-name()=('list','poem','linegroup')])[1]"/>
+    <xsl:choose>
+      <xsl:when test="exists($unsplittable-block)">
+	<xsl:variable name="next" select="$unsplittable-block/following::dtb:*[local-name()=($block-names,'p')][1]"/>
+	<xsl:variable name="paragraphs-inside" select="$unsplittable-block//* intersect $paragraphs"/>
+	<xsl:variable name="words-before"
+		      select="f:words($paragraphs-inside intersect $split-point/preceding::*)"/>
+	<xsl:variable name="words-after" select="f:words($paragraphs-inside) - $words-before"/>
+	<xsl:sequence select="if (exists($next) and $words-after lt $words-before) then $next else $unsplittable-block"/>
       </xsl:when>
       <xsl:otherwise>
 	<xsl:sequence select="$split-point"/>
@@ -152,8 +191,8 @@
   <xsl:variable name="split-points" as="element()*"
 		select="if ($words-per-volume gt 0 and not($pre-marked))
 			then (for $split-point in f:split(0, $words-per-volume, $paragraphs)
-			      return f:closest-block($split-point,
-						     ceiling($words-per-volume * number($allowed_stretch))))
+			      return f:keep-whole(f:closest-block($split-point,
+								  ceiling($words-per-volume * number($allowed_stretch)))))
 			else ()"/>
 
   <xsl:template match="/">

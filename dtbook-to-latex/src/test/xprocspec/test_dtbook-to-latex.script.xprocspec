@@ -128,7 +128,8 @@
         </x:document>
       </x:input>
       <x:option name="result" select="resolve-uri('imprint-per-volume/output-dir/',$temp-dir)"/>
-      <x:option name="words-per-volume" select="'20'"/>
+      <!-- the imprint counts too: 45 words, which at most 25 per volume make two volumes -->
+      <x:option name="words-per-volume" select="'25'"/>
     </x:call>
     <x:context label="the LaTeX file">
       <x:document type="file" method="text" base-uri="temp-dir"
