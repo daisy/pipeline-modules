@@ -1067,49 +1067,25 @@
                            |$img/following-sibling::*[1][self::dtb:caption][not(@imgref)]"/>
    </xsl:function>
 
+   <xsl:template match="dtb:img[$include_images='false']" priority="20"/>
+
    <xsl:template match="dtb:img">
-     <xsl:choose>
-       <xsl:when test="$include_images='false'">
-	 <!-- ignore the image -->
-       </xsl:when>
-       <xsl:otherwise>
-	 <xsl:variable name="captions" select="my:captions(.)"/>
-	 <xsl:text>\begin{figure}[htbp!]&#10;</xsl:text>
-	 <xsl:value-of select="my:includegraphics-command(@src, exists($captions))"/>
-	 <!-- a caption is associated with an image through an imgref attribute or a bit less formal
-              simply by following it immediately -->
-	 <xsl:apply-templates select="$captions" mode="referenced-caption" />
-	 <xsl:text>\end{figure}&#10;&#10;</xsl:text>
-       </xsl:otherwise>
-     </xsl:choose>
+     <xsl:variable name="captions" select="my:captions(.)"/>
+     <xsl:text>\begin{figure}[htbp!]&#10;</xsl:text>
+     <xsl:value-of select="my:includegraphics-command(@src, exists($captions))"/>
+     <xsl:apply-templates select="$captions" mode="referenced-caption"/>
+     <xsl:text>\end{figure}&#10;&#10;</xsl:text>
    </xsl:template>
 
    <xsl:template match="dtb:h1/dtb:img|dtb:h2/dtb:img|dtb:h3/dtb:img|dtb:h4/dtb:img|dtb:h5/dtb:img|dtb:h6/dtb:img">
-     <xsl:choose>
-       <xsl:when test="$include_images='false'">
-	 <!-- ignore the image -->
-       </xsl:when>
-       <xsl:otherwise>
-	 <xsl:value-of select="my:includegraphics-command(@src,false())"/>
-       </xsl:otherwise>
-     </xsl:choose>
+     <xsl:value-of select="my:includegraphics-command(@src,false())"/>
    </xsl:template>
 
+   <!-- images inside tables and sidebars do not float -->
    <xsl:template match="dtb:table//dtb:img|dtb:sidebar//dtb:img" priority="10">
-     <xsl:choose>
-       <xsl:when test="$include_images='false'">
-	 <!-- ignore the image -->
-       </xsl:when>
-       <xsl:otherwise>
-	 <xsl:variable name="captions" select="my:captions(.)"/>
-	 <!-- images inside tables and sidebars do not float -->
-	 <xsl:value-of select="my:includegraphics-command(@src, exists($captions))"/>
-	 <!-- a caption is associated with an image through an imgref attribute or a bit less formal
-              simply by following it immediately -->
-	 <xsl:apply-templates select="$captions" mode="referenced-caption">
-	 </xsl:apply-templates>
-       </xsl:otherwise>
-     </xsl:choose>
+     <xsl:variable name="captions" select="my:captions(.)"/>
+     <xsl:value-of select="my:includegraphics-command(@src, exists($captions))"/>
+     <xsl:apply-templates select="$captions" mode="referenced-caption"/>
    </xsl:template>
 
    <xsl:template match="dtb:caption" mode="referenced-caption">
