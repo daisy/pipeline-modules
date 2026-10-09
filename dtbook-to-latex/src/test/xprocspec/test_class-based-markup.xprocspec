@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
+               xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
+               xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+
+  <x:documentation xmlns="http://www.w3.org/1999/xhtml">
+    <p>Markup that is identified by a class attribute rather than by an element. These classes are
+    part of the DTBook class vocabulary that html-to-dtbook recognizes and generates, see
+    <code>html-to-dtbook/src/main/resources/xml/xslt/epub3-to-dtbook.xsl</code>.</p>
+  </x:documentation>
+
+  <x:script>
+    <p:declare-step type="pxi:dtbook-to-latex" version="1.0"
+                    xmlns:p="http://www.w3.org/ns/xproc" name="main">
+      <p:input port="source" primary="true"/>
+      <p:input port="parameters" kind="parameter" primary="true"/>
+      <p:output port="result" primary="true"/>
+      <p:xslt>
+        <p:input port="stylesheet">
+          <p:document href="../../main/resources/xml/dtbook-to-latex.xsl"/>
+        </p:input>
+        <p:input port="parameters">
+          <p:pipe step="main" port="parameters"/>
+        </p:input>
+      </p:xslt>
+    </p:declare-step>
+  </x:script>
+
+  <x:scenario label="a paragraph preceded by an empty line">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>Heading</h1>
+                  <p>an ordinary paragraph</p>
+                  <p class="precedingemptyline">a paragraph after an empty line</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="it gets a break in front of it" type="xpath"
+              test="contains(string(/),'\plainbreak{1.5}&#10;&#10;a paragraph after an empty line')"/>
+    <x:expect label="the ordinary paragraph does not" type="xpath"
+              test="not(contains(string(/),'\plainbreak{1.5}&#10;&#10;an ordinary paragraph'))"/>
+  </x:scenario>
+
+  <x:scenario label="a paragraph preceded by an empty line at the start of a blockquote">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>Heading</h1>
+                  <blockquote>
+                    <p class="precedingemptyline">the first line of the quote</p>
+                    <p class="precedingemptyline">a later line of the quote</p>
+                  </blockquote>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="gets no break, which would come out in front of the quote" type="xpath"
+              test="not(contains(string(/),'\plainbreak{1.5}&#10;&#10;the first line of the quote'))"/>
+    <x:expect label="but a later paragraph in the quote still does" type="xpath"
+              test="contains(string(/),'\plainbreak{1.5}&#10;&#10;a later line of the quote')"/>
+  </x:scenario>
+
+  <x:scenario label="a paragraph preceded by a separator">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>Heading</h1>
+                  <p>an ordinary paragraph</p>
+                  <p class="precedingseparator">a paragraph after a separator</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="it gets a fancy break in front of it" type="xpath"
+              test="contains(string(/),'\fancybreak{\vskip\onelineskip{\LARGE ***}\vskip\onelineskip}&#10;&#10;a paragraph after a separator')"/>
+  </x:scenario>
+
+  <x:scenario label="exercise answers and boxes">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>Heading</h1>
+                  <p>long: <span class="answer">LONGANSWER</span> short: <span class="answer_1">SHORTANSWER</span> tick: <span class="box">BOXCONTENT</span></p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="an answer is a rule to write on" type="xpath"
+              test="contains(string(/),'long: \rule[-2pt]{5em}{0.5mm}')"/>
+    <x:expect label="a short answer is a shorter rule" type="xpath"
+              test="contains(string(/),'short: \rule[-2pt]{1em}{0.5mm}')"/>
+    <x:expect label="a box is a box to tick" type="xpath"
+              test="contains(string(/),'tick: $\vcenter{\hbox{\fboxsep=.4em \fboxrule=0.5mm\fcolorbox{black}{white}{\null}}}$')"/>
+    <x:expect label="the content of the spans is dropped" type="xpath"
+              test="not(contains(string(/),'LONGANSWER') or contains(string(/),'SHORTANSWER') or contains(string(/),'BOXCONTENT'))"/>
+    <x:expect label="xcolor is loaded for the fcolorbox" type="xpath"
+              test="contains(string(/),'\usepackage{xcolor}')"/>
+  </x:scenario>
+
+  <x:scenario label="a line number in the middle of a paragraph">
+    <x:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <p>A proprietary SBS extension for books with long stretches of numbered lines, where
+      linegroup and line cannot be used because the lines carry paragraphs, blockquotes and the
+      like. The preamble already caters for it.</p>
+    </x:documentation>
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>Heading</h1>
+                  <p><span class="linenum">5</span> at the start of the paragraph<span class="linenum">7</span> in the middle of it</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="it is set in the margin and the whitespace after it is trimmed" type="xpath"
+              test="contains(string(/),'\sidepar[5]{5}at the start of the paragraph')"/>
+    <x:expect label="a line number in the middle starts a new line" type="xpath"
+              test="contains(string(/),'\\&#10;\sidepar[7]{7}in the middle of it')"/>
+    <x:expect label="but the one at the start of the paragraph does not" type="xpath"
+              test="not(contains(string(/),'\\&#10;\sidepar[5]{5}'))"/>
+    <x:expect label="the line numbers are set in the left margin" type="xpath"
+              test="contains(string(/),'\sideparmargin{left}')"/>
+  </x:scenario>
+
+  <x:scenario label="the linenum element keeps working">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>Heading</h1>
+                  <linegroup>
+                    <line><linenum>12</linenum> a numbered line</line>
+                  </linegroup>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="it is set in the margin and the whitespace after it is trimmed" type="xpath"
+              test="contains(string(/),'\sidepar[12]{12}a numbered line')"/>
+    <x:expect label="and it does not start a new line" type="xpath"
+              test="not(contains(string(/),'\\&#10;\sidepar[12]{12}'))"/>
+  </x:scenario>
+
+</x:description>
