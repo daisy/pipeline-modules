@@ -16,6 +16,14 @@
   <xsl:include href="table-utils.xsl"/>
 
   <xsl:output method="text" encoding="utf-8" indent="no"/>
+
+  <!-- images are looked up by their id -->
+  <xsl:key name="id" match="dtb:*[@id]" use="@id"/>
+
+  <!-- captions are looked up by the images they name in their imgref. Unlike the idref of a
+       noteref, which is a URI ("#n1"), imgref is a list of plain ids (IDREFS), but a "#" in front
+       of an id is tolerated. -->
+  <xsl:key name="caption" match="dtb:caption[@imgref]" use="tokenize(translate(@imgref,'#',''),'\s+')"/>
   <xsl:strip-space elements="*"/>
   <xsl:preserve-space elements="dtb:line dtb:address dtb:div dtb:title dtb:author dtb:note dtb:byline dtb:dateline 
 				dtb:a dtb:em dtb:strong dtb:dfn dtb:kbd dtb:code dtb:samp dtb:cite dtb:abbr dtb:acronym
@@ -1101,13 +1109,23 @@
      </xsl:choose>
    </xsl:template>
 
+   <!-- The captions of an image: a caption names the images it belongs to in its imgref attribute
+        or, a bit less formally, simply follows the image immediately. A caption that names several
+        images is the caption of the group and is set once, with the last of them. -->
+   <xsl:function name="my:captions" as="element()*">
+     <xsl:param name="img" as="element()"/>
+     <xsl:sequence select="key('caption',$img/@id,root($img))
+                             [$img is key('id',tokenize(translate(@imgref,'#',''),'\s+'))[self::dtb:img][last()]]
+                           |$img/following-sibling::*[1][self::dtb:caption][not(@imgref)]"/>
+   </xsl:function>
+
    <xsl:template match="dtb:img">
      <xsl:choose>
        <xsl:when test="$include_images='false'">
 	 <!-- ignore the image -->
        </xsl:when>
        <xsl:otherwise>
-	 <xsl:variable name="captions" select="//dtb:caption[@id=tokenize(translate(current()/@imgref,'#',''), '\s+')]|following-sibling::*[1][self::dtb:caption]"/>
+	 <xsl:variable name="captions" select="my:captions(.)"/>
 	 <xsl:text>\begin{figure}[htbp!]&#10;</xsl:text>
 	 <xsl:value-of select="my:includegraphics-command(@src, exists($captions))"/>
 	 <!-- a caption is associated with an image through an imgref attribute or a bit less formal
@@ -1135,7 +1153,7 @@
 	 <!-- ignore the image -->
        </xsl:when>
        <xsl:otherwise>
-	 <xsl:variable name="captions" select="//dtb:caption[@id=tokenize(translate(current()/@imgref,'#',''), '\s+')]|following-sibling::*[1][self::dtb:caption]"/>
+	 <xsl:variable name="captions" select="my:captions(.)"/>
 	 <!-- images inside tables and sidebars do not float -->
 	 <xsl:value-of select="my:includegraphics-command(@src, exists($captions))"/>
 	 <!-- a caption is associated with an image through an imgref attribute or a bit less formal

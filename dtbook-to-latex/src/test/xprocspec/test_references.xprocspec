@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
+               xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
+               xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+
+  <x:documentation xmlns="http://www.w3.org/1999/xhtml">
+    <p>Elements that refer to each other by their id are rendered together.</p>
+  </x:documentation>
+
+  <x:script>
+    <p:declare-step type="pxi:dtbook-to-latex" version="1.0"
+                    xmlns:p="http://www.w3.org/ns/xproc" name="main">
+      <p:input port="source" primary="true"/>
+      <p:input port="parameters" kind="parameter" primary="true"/>
+      <p:output port="result" primary="true"/>
+      <p:xslt>
+        <p:input port="stylesheet">
+          <p:document href="../../main/resources/xml/dtbook-to-latex.xsl"/>
+        </p:input>
+        <p:input port="parameters">
+          <p:pipe step="main" port="parameters"/>
+        </p:input>
+      </p:xslt>
+    </p:declare-step>
+  </x:script>
+
+  <x:scenario label="a caption that names its image but does not follow it">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <head><meta name="dc:Title" content="A book"/></head>
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>A chapter</h1>
+                  <imggroup>
+                    <img id="i1" src="a.png" alt=""/>
+                    <prodnote imgref="i1">a description of the image</prodnote>
+                    <caption imgref="i1">the caption</caption>
+                  </imggroup>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the caption is set under the image" type="xpath"
+              test="contains(string(/),'{a.png}}&#10;\legend{the caption}')"/>
+  </x:scenario>
+
+  <x:scenario label="a caption that names two images">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <head><meta name="dc:Title" content="A book"/></head>
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>A chapter</h1>
+                  <imggroup>
+                    <img id="i1" src="a.png" alt=""/>
+                    <img id="i2" src="b.png" alt=""/>
+                    <caption imgref="i1 i2">the caption of the group</caption>
+                  </imggroup>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the caption is set under the last of them" type="xpath"
+              test="contains(string(/),'{b.png}}&#10;\legend{the caption of the group}')"/>
+    <x:expect label="and only there" type="xpath"
+              test="count(tokenize(string(/),'\\legend\{'))=2"/>
+  </x:scenario>
+
+  <x:scenario label="a caption that follows one image but names another">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <head><meta name="dc:Title" content="A book"/></head>
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>A chapter</h1>
+                  <imggroup>
+                    <img id="i1" src="a.png" alt=""/>
+                    <img id="i2" src="b.png" alt=""/>
+                    <caption imgref="i1">the caption of the first image</caption>
+                  </imggroup>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the caption is set under the image it names" type="xpath"
+              test="contains(string(/),'{a.png}}&#10;\legend{the caption of the first image}')"/>
+    <x:expect label="and not under the image it follows" type="xpath"
+              test="count(tokenize(string(/),'\\legend\{'))=2"/>
+  </x:scenario>
+
+</x:description>
