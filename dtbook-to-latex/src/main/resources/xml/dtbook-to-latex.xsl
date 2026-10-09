@@ -15,7 +15,7 @@
 
   <xsl:output method="text" encoding="utf-8" indent="no"/>
 
-  <!-- images are looked up by their id -->
+  <!-- notes and images are looked up by their id -->
   <xsl:key name="id" match="dtb:*[@id]" use="@id"/>
 
   <!-- captions are looked up by the images they name in their imgref. Unlike the idref of a
@@ -1030,7 +1030,7 @@
 
    <xsl:template match="dtb:noteref|dtb:annoref">
      <xsl:variable name="refText">
-       <xsl:apply-templates select="//(dtb:note|dtb:annotation)[@id=translate(current()/@idref,'#','')]" mode="footnotes"/>
+       <xsl:apply-templates select="key('id',translate(@idref,'#',''))[self::dtb:note or self::dtb:annotation]" mode="footnotes"/>
      </xsl:variable>
      <xsl:if test="self::dtb:annoref">
        <!-- for annorefs we want to keep the content -->
@@ -1091,7 +1091,7 @@
 
    <xsl:template match="dtb:imggroup//dtb:prodnote" priority="100">
      <xsl:choose>
-       <xsl:when test="exists(//dtb:img[@id=tokenize(translate(current()/@imgref,'#',''),'\s+')]|preceding-sibling::*[1][self::dtb:img])">
+       <xsl:when test="exists(key('id',tokenize(translate(@imgref,'#',''),'\s+'))[self::dtb:img]|preceding-sibling::*[1][self::dtb:img])">
 	 <!-- if a prodnote inside an imggroup is associated with an image it is
 	      really an extended image description. -->
 	 <!-- Most likely the large print user rather wants to see the image not
