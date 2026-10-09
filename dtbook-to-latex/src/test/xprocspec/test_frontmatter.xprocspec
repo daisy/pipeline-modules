@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
+               xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
+               xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+
+  <x:documentation xmlns="http://www.w3.org/1999/xhtml">
+    <p>The frontmatter is rendered in the order of the document, so that the producer decides where
+    things go.</p>
+  </x:documentation>
+
+  <x:script>
+    <p:declare-step type="pxi:dtbook-to-latex" version="1.0"
+                    xmlns:p="http://www.w3.org/ns/xproc" name="main">
+      <p:input port="source" primary="true"/>
+      <p:input port="parameters" kind="parameter" primary="true"/>
+      <p:output port="result" primary="true"/>
+      <p:xslt>
+        <p:input port="stylesheet">
+          <p:document href="../../main/resources/xml/dtbook-to-latex.xsl"/>
+        </p:input>
+        <p:input port="parameters">
+          <p:pipe step="main" port="parameters"/>
+        </p:input>
+      </p:xslt>
+    </p:declare-step>
+  </x:script>
+
+  <x:scenario label="a table of contents before a foreword">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <head><meta name="dc:title" content="A book"/></head>
+            <book>
+              <frontmatter>
+                <doctitle>A book</doctitle>
+                <level1 class="toc">
+                  <h1>Contents</h1>
+                  <list><li><lic>A chapter</lic></li></list>
+                </level1>
+                <level1>
+                  <h1>Foreword</h1>
+                  <p>the text of the foreword</p>
+                </level1>
+              </frontmatter>
+              <bodymatter>
+                <level1><h1>A chapter</h1><p>the text of the chapter</p></level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the list of contents is replaced by a generated table of contents" type="xpath"
+              test="count(tokenize(string(/),'\\tableofcontents'))=2"/>
+    <x:expect label="the heading of the document is left out, memoir prints its own" type="xpath"
+              test="not(contains(string(/),'{Contents}'))"/>
+    <x:expect label="the table of contents comes after the cover" type="xpath"
+              test="contains(substring-before(string(/),'\tableofcontents*'),'Large print book in one volume')"/>
+    <x:expect label="and starts on a recto page of its own" type="xpath"
+              test="contains(string(/),'\cleartorecto&#10;\tableofcontents*')"/>
+    <x:expect label="and before the foreword, as in the document" type="xpath"
+              test="contains(substring-before(string(/),'the text of the foreword'),'\tableofcontents*')"/>
+    <x:expect label="the level that held the list is not a chapter of its own" type="xpath"
+              test="not(contains(string(/),'\chapter*{\ }'))"/>
+    <x:expect label="the bodymatter starts on a recto page" type="xpath"
+              test="contains(string(/),'\cleartorecto&#10;\mainmatter')"/>
+  </x:scenario>
+
+  <x:scenario label="a foreword before a table of contents">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <head><meta name="dc:title" content="A book"/></head>
+            <book>
+              <frontmatter>
+                <doctitle>A book</doctitle>
+                <level1>
+                  <h1>Foreword</h1>
+                  <p>the text of the foreword</p>
+                </level1>
+                <level1 class="toc">
+                  <h1>Contents</h1>
+                  <list><li><lic>A chapter</lic></li></list>
+                </level1>
+              </frontmatter>
+              <bodymatter>
+                <level1><h1>A chapter</h1><p>the text of the chapter</p></level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the table of contents comes after the foreword, as in the document" type="xpath"
+              test="contains(substring-before(string(/),'\tableofcontents*'),'the text of the foreword')"/>
+  </x:scenario>
+
+  <x:scenario label="the author and the title as written in the document">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <head>
+              <meta name="dc:title" content="THE TITLE FROM THE METADATA"/>
+              <meta name="dc:creator" content="THE AUTHOR FROM THE METADATA"/>
+            </head>
+            <book>
+              <frontmatter>
+                <doctitle>the title from the document</doctitle>
+                <docauthor>the author from the document</docauthor>
+              </frontmatter>
+              <bodymatter>
+                <level1><h1>A chapter</h1><p>text</p></level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the cover uses the title of the document" type="xpath"
+              test="contains(string(/),'the title from the document')"/>
+    <x:expect label="and the author of the document" type="xpath"
+              test="contains(string(/),'the author from the document')"/>
+    <x:expect label="the metadata only reaches the metadata of the PDF" type="xpath"
+              test="contains(string(/),'Title={THE TITLE FROM THE METADATA}')
+                    and not(contains(string(/),'{\huge THE TITLE FROM THE METADATA}'))"/>
+  </x:scenario>
+
+  <x:scenario label="without a doctitle the metadata is used">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <head>
+              <meta name="dc:title" content="the title from the metadata"/>
+              <meta name="dc:creator" content="the author from the metadata"/>
+            </head>
+            <book>
+              <frontmatter/>
+              <bodymatter>
+                <level1><h1>A chapter</h1><p>text</p></level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the cover falls back to the title in the metadata" type="xpath"
+              test="contains(string(/),'{\huge the title from the metadata}')"/>
+    <x:expect label="and to the author in the metadata" type="xpath"
+              test="contains(string(/),'{\large the author from the metadata}')"/>
+  </x:scenario>
+
+  <x:scenario label="a title page in the document">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <head><meta name="dc:title" content="A book"/></head>
+            <book>
+              <frontmatter>
+                <doctitle>the title of the book</doctitle>
+                <level1 class="titlepage">
+                  <level2>
+                    <p>the text of the title page</p>
+                    <p class="sourcePublisher">the publisher of the original</p>
+                  </level2>
+                  <level2>
+                    <p>the text of the imprint page</p>
+                  </level2>
+                </level1>
+              </frontmatter>
+              <bodymatter>
+                <level1><h1>A chapter</h1><p>text</p></level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the title page starts on a recto page" type="xpath"
+              test="contains(substring-before(string(/),'the text of the title page'),'\cleartorecto')"/>
+    <x:expect label="the title is repeated on the title page" type="xpath"
+              test="count(tokenize(string(/),'the title of the book'))=3"/>
+    <x:expect label="the last block of the page is set at the foot" type="xpath"
+              test="contains(string(/),'\vfill&#10;the publisher of the original')"/>
+    <x:expect label="the pages after it run on as they are written" type="xpath"
+              test="not(contains(string(/),'\vfill&#10;the text of the imprint page'))"/>
+    <x:expect label="the second page of the title page starts a new page" type="xpath"
+              test="contains(substring-before(string(/),'the text of the imprint page'),'\clearpage')"/>
+    <x:expect label="the title page is not a chapter of its own" type="xpath"
+              test="not(contains(string(/),'\chapter*{\ }'))"/>
+  </x:scenario>
+
+  <x:scenario label="a colophon in the document">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <head><meta name="dc:title" content="A book"/></head>
+            <book>
+              <frontmatter>
+                <doctitle>A book</doctitle>
+                <level1 class="colophon">
+                  <p>the notice about the copyright</p>
+                  <linegroup>
+                    <line>the publisher</line>
+                    <line>www.example.com</line>
+                  </linegroup>
+                </level1>
+              </frontmatter>
+              <bodymatter>
+                <level1><h1>A chapter</h1><p>text</p></level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the colophon starts a page" type="xpath"
+              test="contains(substring-before(string(/),'the notice about the copyright'),'\clearpage')"/>
+    <x:expect label="but is not a chapter of its own" type="xpath"
+              test="not(contains(string(/),'\chapter*{\ }'))"/>
+    <x:expect label="the imprint is set at the foot of the page" type="xpath"
+              test="contains(substring-before(string(/),'the publisher'),'\vfill')"/>
+    <x:expect label="the notice is not, the cover has a fill of its own" type="xpath"
+              test="not(contains(string(/),'\vfill&#10;the notice about the copyright'))"/>
+    <x:expect label="the lines are set with air between them" type="xpath"
+              test="contains(string(/),'the publisher\\[0.75\onelineskip]')"/>
+    <x:expect label="but the last one carries no break, which LaTeX could not end" type="xpath"
+              test="contains(string(/),'www.example.com&#10;')
+                    and not(contains(string(/),'www.example.com\\'))"/>
+  </x:scenario>
+
+  <x:scenario label="a line break in the metadata of the cover">
+    <x:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <p>A name that is too long for one line reads better broken where the producer wants it than
+      wherever it happens to fit. The metadata cannot carry markup, so the break is a character.</p>
+    </x:documentation>
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <head>
+              <meta name="dc:title" content="A book"/>
+              <meta name="dc:publisher" content="A Library for Readers&#10;with a Print Disability"/>
+            </head>
+            <book>
+              <frontmatter><doctitle>A book</doctitle></frontmatter>
+              <bodymatter>
+                <level1><h1>A chapter</h1><p>text</p></level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the cover breaks the name where the metadata says" type="xpath"
+              test="contains(string(/),'A Library for Readers\\&#10;with a Print Disability')"/>
+  </x:scenario>
+
+  <x:scenario label="a colophon that holds nothing but the imprint">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <head><meta name="dc:title" content="A book"/></head>
+            <book>
+              <frontmatter>
+                <doctitle>A book</doctitle>
+                <level1 class="colophon">
+                  <p>the imprint</p>
+                </level1>
+              </frontmatter>
+              <bodymatter>
+                <level1><h1>A chapter</h1><p>text</p></level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="a block that is alone on the page is set at the foot as well" type="xpath"
+              test="contains(string(/),'\vfill&#10;the imprint')"/>
+  </x:scenario>
+
+  <x:scenario label="the title page is repeated in every volume">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <head><meta name="dc:title" content="A book"/></head>
+            <book>
+              <frontmatter>
+                <doctitle>A book</doctitle>
+                <level1 class="titlepage">
+                  <level2>
+                    <p>the text of the title page</p>
+                  </level2>
+                </level1>
+              </frontmatter>
+              <bodymatter>
+                <level1>
+                  <h1>A chapter</h1>
+                  <p>the first volume</p>
+                  <p class="volume-split-point">the second volume</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the title page appears in the frontmatter and in the second volume" type="xpath"
+              test="count(tokenize(string(/),'the text of the title page'))=3"/>
+    <x:expect label="the second one comes after the cover of the second volume" type="xpath"
+              test="contains(substring-before(string(/),'the second volume'),'Volume 2 of 2')"/>
+  </x:scenario>
+
+</x:description>

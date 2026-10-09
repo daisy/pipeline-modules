@@ -227,6 +227,15 @@
                                   string($number))[1])"/>
   </xsl:function>
 
+  <!-- Quote a metadata string. A line break in the metadata is honoured, so that a
+       producer can decide where a long name is broken -->
+  <xsl:function name="my:quoteMetadata" as="xs:string">
+    <xsl:param name="text" as="xs:string"/>
+    <xsl:sequence select="string-join(for $line in tokenize($text,'\n')
+                                      return my:quoteSpecialChars($line),
+                                      '\\&#10;')"/>
+  </xsl:function>
+
   <!-- Escape characters that have a special meaning to LaTeX (see The
        Comprehensive LaTeX Symbol List,
        http://www.ctan.org/tex-archive/info/symbols/comprehensive/symbols-a4.pdf) -->
@@ -666,23 +675,30 @@
    
    <xsl:template name="publisher">
      <xsl:for-each select="//dtb:meta[@name='dc:publisher' or @name='dc:Publisher']">
-       <xsl:text>{\large </xsl:text>
-       <xsl:value-of select="my:quoteSpecialChars(string(@content))"/>
-       <xsl:text>}\\[0.5cm]&#10;</xsl:text>
+       <xsl:value-of select="my:quoteMetadata(string(@content))"/>
+       <xsl:text>\\[0.5cm]&#10;</xsl:text>
      </xsl:for-each>
    </xsl:template>
    
-   <xsl:template name="imprint">
-   </xsl:template>
-
    <xsl:template name="author">
      <xsl:param name="font_size" select="'\large'"/>
      <xsl:value-of select="concat('{', $font_size, ' ')"/>
      <xsl:variable name="author">
-       <xsl:for-each select="//dtb:meta[@name='dc:creator' or @name='dc:Creator']">
-	 <xsl:value-of select="my:quoteSpecialChars(string(@content))"/>
-	 <xsl:if test="not(position() = last())"><xsl:text>, </xsl:text></xsl:if>
-       </xsl:for-each>
+       <xsl:choose>
+	 <!-- the author as written in the document comes first, it may contain markup -->
+	 <xsl:when test="//dtb:docauthor[normalize-space(.)!='']">
+	   <xsl:for-each select="//dtb:docauthor">
+	     <xsl:apply-templates select="." mode="cover"/>
+	     <xsl:if test="not(position() = last())"><xsl:text>, </xsl:text></xsl:if>
+	   </xsl:for-each>
+	 </xsl:when>
+	 <xsl:otherwise>
+	   <xsl:for-each select="//dtb:meta[@name='dc:creator' or @name='dc:Creator']">
+	     <xsl:value-of select="my:quoteSpecialChars(string(@content))"/>
+	     <xsl:if test="not(position() = last())"><xsl:text>, </xsl:text></xsl:if>
+	   </xsl:for-each>
+	 </xsl:otherwise>
+       </xsl:choose>
      </xsl:variable>
      <xsl:sequence select="if (normalize-space($author) != '') then $author else '\ '"/>
      <xsl:text>}\\[1.5cm]&#10;</xsl:text>
@@ -691,12 +707,28 @@
    <xsl:template name="title">
      <xsl:param name="font_size" select="'\huge'"/>
      <xsl:text>\begin{Spacing}{1.75}&#10;</xsl:text>
-     <xsl:for-each select="//dtb:meta[@name='dc:title' or @name='dc:Title']">
-       <xsl:value-of select="concat('{', $font_size, ' ')"/>
-       <xsl:value-of select="my:quoteSpecialChars(string(@content))"/>
-       <xsl:text>}\\[0.5cm]&#10;</xsl:text>
-     </xsl:for-each>
+     <xsl:choose>
+       <!-- the title as written in the document comes first, it may contain markup -->
+       <xsl:when test="//dtb:doctitle[normalize-space(.)!='']">
+	 <xsl:for-each select="//dtb:doctitle">
+	   <xsl:value-of select="concat('{', $font_size, ' ')"/>
+	   <xsl:apply-templates select="." mode="cover"/>
+	   <xsl:text>}\\[0.5cm]&#10;</xsl:text>
+	 </xsl:for-each>
+       </xsl:when>
+       <xsl:otherwise>
+	 <xsl:for-each select="//dtb:meta[@name='dc:title' or @name='dc:Title']">
+	   <xsl:value-of select="concat('{', $font_size, ' ')"/>
+	   <xsl:value-of select="my:quoteSpecialChars(string(@content))"/>
+	   <xsl:text>}\\[0.5cm]&#10;</xsl:text>
+	 </xsl:for-each>
+       </xsl:otherwise>
+     </xsl:choose>
      <xsl:text>\end{Spacing}&#10;</xsl:text>
+   </xsl:template>
+
+   <xsl:template match="dtb:doctitle|dtb:docauthor" mode="cover">
+     <xsl:apply-templates/>
    </xsl:template>
 
    <xsl:template name="cover">
@@ -720,9 +752,6 @@
      
      <!-- Publisher -->
      <xsl:call-template name="publisher"/>
-
-     <!-- Imprint -->
-     <xsl:call-template name="imprint"/>
    </xsl:template>
 
    <xsl:template name="volumecover">
@@ -733,10 +762,16 @@
        <xsl:with-param name="current_volume_number" 
 		       select="count(preceding::dtb:div[@class='volume-split-point'])+2"/>
      </xsl:call-template>
+     <!-- Repeat the title page in every volume, and the imprint of the front matter with it:
+          every volume is bound as a book of its own and carries the imprint of that book. A
+          colophon of the rear matter is the colophon of the whole work and stays where it is. -->
+     <xsl:apply-templates select="//dtb:frontmatter/dtb:level1[tokenize(@class,'\s+')='colophon']
+				  |//dtb:level1[tokenize(@class,'\s+')='titlepage']"/>
      <xsl:text>\cleartorecto&#10;</xsl:text>
      <!-- insert a toc in every volume. -->
      <xsl:if test="//dtb:frontmatter/dtb:level1/dtb:list[descendant::dtb:lic]">
        <xsl:text>\tableofcontents*&#10;</xsl:text>
+       <xsl:text>\cleartorecto&#10;</xsl:text>
      </xsl:if>
      <xsl:call-template name="restore_pagestyle"/>
      <xsl:text>\restorepagenumber&#10;</xsl:text>
@@ -761,39 +796,89 @@
 	<xsl:text>\end{document}&#10;</xsl:text>
    </xsl:template>
 
+   <!-- A title page as it is marked up in the document. It starts on a recto page and is not a
+        chapter of its own. The first level2 inside it repeats the author and the title; every
+        level2 after that, typically the imprint, starts a page of its own. -->
+   <xsl:template match="dtb:level1[tokenize(@class,'\s+')='titlepage']">
+     <xsl:text>\cleartorecto&#10;</xsl:text>
+     <xsl:apply-templates/>
+   </xsl:template>
+
+   <xsl:template match="dtb:level1[tokenize(@class,'\s+')='titlepage']/dtb:level2">
+     <xsl:choose>
+       <xsl:when test="not(preceding-sibling::dtb:level2)">
+	 <xsl:call-template name="author">
+	   <xsl:with-param name="font_size" select="'\normalsize'"/>
+	 </xsl:call-template>
+	 <xsl:call-template name="title">
+	   <xsl:with-param name="font_size" select="'\Large'"/>
+	 </xsl:call-template>
+       </xsl:when>
+       <xsl:otherwise>
+	 <xsl:text>\clearpage&#10;</xsl:text>
+       </xsl:otherwise>
+     </xsl:choose>
+     <xsl:apply-templates/>
+   </xsl:template>
+
+   <!-- A title page and a colophon are display material: their lines are set with air between
+        them, rather than tight the way the lines of a poem are. -->
+   <xsl:template match="dtb:level1[tokenize(@class,'\s+')=('titlepage','colophon')]//dtb:line[normalize-space()]"
+		 priority="1">
+     <xsl:apply-templates/>
+     <!-- as in a linegroup, the last line carries no break, which LaTeX would have nothing to end -->
+     <xsl:if test="following-sibling::*">
+       <xsl:text>\\[0.75\onelineskip]</xsl:text>
+     </xsl:if>
+     <xsl:text>&#10;</xsl:text>
+   </xsl:template>
+
+   <!-- A colophon starts a page but is not a chapter: it gets no heading, not even the empty one
+        that a level1 without a heading would otherwise get. -->
+   <xsl:template match="dtb:level1[tokenize(@class,'\s+')='colophon']">
+     <xsl:text>\clearpage&#10;</xsl:text>
+     <xsl:apply-templates/>
+   </xsl:template>
+
+   <!-- On the title page proper and on a colophon the last block is set at the foot of the page,
+        which is where the publisher respectively the imprint belongs. The generated cover does the
+        same. The pages after the title page, which the publisher fills with the copyright and the
+        like, are left to run on as they are written. -->
+   <xsl:template match="dtb:level1[tokenize(@class,'\s+')='titlepage']
+                        /dtb:level2[not(preceding-sibling::dtb:level2)]/*[last()]
+		        |dtb:level1[tokenize(@class,'\s+')='colophon']/*[last()]">
+     <xsl:text>\vfill&#10;</xsl:text>
+     <xsl:next-match/>
+   </xsl:template>
+
+
    <xsl:template match="dtb:frontmatter">
 	<xsl:call-template name="set_frontmatter_pagestyle"/>
    	<xsl:text>\frontmatter&#10;</xsl:text>
-   	<xsl:apply-templates select="//dtb:meta" mode="titlePage"/>
 	<xsl:call-template name="cover"/>
-	<xsl:text>\cleartorecto&#10;</xsl:text>
-	<xsl:if test="dtb:level1/dtb:list[descendant::dtb:lic]">
-		<xsl:text>\tableofcontents*&#10;</xsl:text>
-	</xsl:if>
+	<!-- nothing breaks the page after the cover: every level1 of the front matter starts a page of its own. -->
 	<xsl:apply-templates/>
+	<!-- the bodymatter starts on a recto page, which does not happen by itself when the page
+	     style is compact, because that sets \openany -->
+	<xsl:text>\cleartorecto&#10;</xsl:text>
+   </xsl:template>
+
+   <!-- The list of contents in the frontmatter is not printed as a list, a table of contents is
+        generated in its place. memoir prints a heading of its own in front of it, so the heading
+        in the document is left out. -->
+   <!-- The level that holds the list of contents gets no heading of its own, not even the empty
+        one that a level1 without a heading would get: it is replaced by the generated table of
+        contents, which memoir gives a heading of its own. -->
+   <xsl:template match="dtb:frontmatter/dtb:level1[dtb:list[descendant::dtb:lic]]">
+     <xsl:apply-templates/>
    </xsl:template>
 
    <xsl:template match="dtb:frontmatter/dtb:level1/dtb:list[descendant::dtb:lic]" priority="1">
-   	<xsl:message>skipping lic in frontmatter!</xsl:message>
+     <xsl:text>\cleartorecto&#10;</xsl:text>
+     <xsl:text>\tableofcontents*&#10;</xsl:text>
    </xsl:template>
 
-   <xsl:template match="dtb:meta[@name='dc:title' or @name='dc:Title']" mode="titlePage">
-     <xsl:text>\title{</xsl:text>
-     <xsl:value-of select="my:quoteSpecialChars(string(@content))"/>
-     <xsl:text>}&#10;</xsl:text>
-   </xsl:template>
-
-   <xsl:template match="dtb:meta[@name='dc:creator' or @name='dc:Creator']" mode="titlePage">
-     <xsl:text>\author{</xsl:text>
-     <xsl:value-of select="my:quoteSpecialChars(string(@content))"/>
-     <xsl:text>}&#10;</xsl:text>
-   </xsl:template>
-
-   <xsl:template match="dtb:meta[@name='dc:date' or @name='dc:Date']" mode="titlePage">
-     <xsl:text>\date{</xsl:text>
-     <xsl:value-of select="my:quoteSpecialChars(string(@content))"/>
-     <xsl:text>}&#10;</xsl:text>
-   </xsl:template>
+   <xsl:template match="dtb:frontmatter/dtb:level1[dtb:list[descendant::dtb:lic]]/dtb:h1" priority="2"/>
 
   <xsl:template match="dtb:level1">
     <!-- Insert an empty header if a level 1 has no h1 -->

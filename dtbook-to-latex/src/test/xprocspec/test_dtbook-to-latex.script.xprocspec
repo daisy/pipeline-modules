@@ -93,6 +93,53 @@
               test="contains(string(/),'Volume 2 of 2')"/>
   </x:scenario>
 
+  <x:scenario label="words-per-volume with an imprint">
+    <x:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <p>Every volume is bound as a book of its own, so the imprint of the front matter is
+      repeated in every one of them.</p>
+    </x:documentation>
+    <x:call step="px:dtbook-to-latex.script">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en" xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+            <head>
+              <meta name="dc:title" content="A book"/>
+              <meta name="dc:creator" content="An author"/>
+            </head>
+            <book>
+              <frontmatter>
+                <doctitle>A book</doctitle>
+                <docauthor>An author</docauthor>
+                <level1 class="colophon">
+                  <p>the imprint of this book</p>
+                </level1>
+              </frontmatter>
+              <bodymatter>
+                <level1>
+                  <h1>Heading</h1>
+                  <p>one two three four five six seven eight nine ten</p>
+                  <p>one two three four five six seven eight nine ten</p>
+                  <p>one two three four five six seven eight nine ten</p>
+                  <p>one two three four five six seven eight nine ten</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+      <x:option name="result" select="resolve-uri('imprint-per-volume/output-dir/',$temp-dir)"/>
+      <x:option name="words-per-volume" select="'20'"/>
+    </x:call>
+    <x:context label="the LaTeX file">
+      <x:document type="file" method="text" base-uri="temp-dir"
+                  href="imprint-per-volume/output-dir/test_dtbook-to-latex.script.tex"/>
+    </x:context>
+    <x:expect label="the book is split into two volumes" type="xpath"
+              test="contains(string(/),'Volume 2 of 2')"/>
+    <x:expect label="the imprint is printed in both of them" type="xpath"
+              test="count(tokenize(string(/),'the imprint of this book'))=3"/>
+  </x:scenario>
+
   <x:scenario label="words-per-volume with a table of contents">
     <x:documentation xmlns="http://www.w3.org/1999/xhtml">
       <p>Every volume gets a table of contents of its own, so the book below should hold two: one

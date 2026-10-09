@@ -22,8 +22,9 @@ the [memoir](http://texdoc.net/pkg/memoir) class.
 A large print book quickly becomes too thick to bind as one volume, so the
 conversion can split the book into several volumes. Each volume starts on a
 recto page with a cover page of its own, which repeats the author and the title
-and says which volume it is ("Volume 2 of 3"). If the book has a table of
-contents in its frontmatter, it is repeated at the start of every volume.
+and says which volume it is ("Volume 2 of 3"), followed by the title page and
+the imprint of the front matter. If the book has a table of contents in its
+frontmatter, that is repeated at the start of every volume as well.
 
 Set the "Words per volume" option to the number of words that fit in a volume.
 The number of volumes follows from the length of the book, and the words are
@@ -73,20 +74,72 @@ instead: the notes are then printed at the end of the chapter that references
 them, which spreads them over the whole book and lets the volumes be split
 normally.
 
+## The front matter
+
+The conversion starts the book with a cover page of its own, and renders the front matter of the
+document after it, in the order in which it appears in the document. Where the document has a list
+of contents, that is, a `list` with `lic` elements inside a `level1` of the front matter, a
+generated table of contents takes its place. The heading in front of that list is left out, because
+memoir prints a heading of its own.
+
+The cover page shows the author and the title. They are taken from the `docauthor` and the
+`doctitle` of the document, which may contain markup, and from the `dc:Creator` and `dc:Title`
+metadata when the document has no `docauthor` or `doctitle`. The publisher is taken from the
+`dc:Publisher` metadata.
+
+A name that is too long for one line reads better broken where it makes sense than wherever it
+happens to fit. In the `docauthor` and the `doctitle` that is a `br` element; in the metadata, which
+cannot carry markup, a line break in the value itself is honoured.
+
+### Title pages and colophons
+
+A `level1` with class `titlepage` is set as a title page rather than as a chapter: it gets no
+chapter heading of its own, it starts on a recto page, and every `level2` inside it starts a page.
+The first one repeats the author and the title above its content. When the book is split into
+volumes, the title page is repeated in every volume.
+
+A `level1` with class `colophon` is an ordinary level that starts a page, which makes it the place
+for an imprint, a copyright notice or a word of thanks. A colophon in the front matter is repeated
+in every volume along with the title page, because every volume is bound as a book of its own and
+carries the imprint of that book. A colophon in the rear matter belongs to the work as a whole and
+stays where it is.
+
+On the title page itself, that is in the first `level2`, and on a colophon the last block of the
+page is set at the foot of the page, which is where the publisher respectively the imprint belongs.
+That means the lines that belong at the foot want to be a *single* block, so use a `linegroup` for
+them. The pages after the first one of a title page, where a publisher puts the copyright, the
+address and the ISBN, run on as they are written.
+
+A title page and a colophon are display material: the lines of a `linegroup` are set with a little
+air between them rather than tight the way the lines of a poem are. A break *within* a line, a `br`
+element, stays tight, so a name too long for one line still reads as one name rather than as two
+items.
+
+~~~xml
+<level1 class="colophon">
+  <p>This large print book is an accessible copy of a work protected by copyright.</p>
+  <linegroup>
+    <line>Published by Example Books, Zurich</line>
+    <line>www.example.com</line>
+    <line>Example Books 2026</line>
+  </linegroup>
+</level1>
+~~~
+
 ## Markup that is recognized by its class
 
 A few typographic conventions are not expressed by an element of their own but by a class on an
 element. These are rendered:
 
-| Markup | Rendered as |
-|---|---|
-| `p` with class `precedingemptyline` | a blank line in front of the paragraph |
+| Markup                              | Rendered as                               |
+|-------------------------------------|-------------------------------------------|
+| `p` with class `precedingemptyline` | a blank line in front of the paragraph    |
 | `p` with class `precedingseparator` | three asterisks in front of the paragraph |
-| `span` with class `answer` | a rule to write an answer on |
-| `span` with class `answer_1` | a shorter rule, for a one word answer |
-| `span` with class `box` | a box to tick |
+| `span` with class `answer`          | a rule to write an answer on              |
+| `span` with class `answer_1`        | a shorter rule, for a one word answer     |
+| `span` with class `box`             | a box to tick                             |
 
-The DTBook to EPUB 3 conversion generates `precedingemptyline` and `precedingseparator` from an
+The EPUB 3 to DTBook conversion generates `precedingemptyline` and `precedingseparator` from an
 `hr` element, so a book that was converted from EPUB 3 keeps its blank lines and its separators.
 
 The classes `answer`, `answer_1` and `box` come from the [Nordic Guidelines for the Production of
@@ -119,22 +172,22 @@ margin of the line it belongs to.
 ## Languages
 
 The conversion generates a few phrases of its own: the volume numbering on the cover of a book that
-is split into volumes, and the heading above the endnotes. They are written in the language of the
-document, which is taken from the `dc:Language` metadata, or from the `xml:lang` attribute of the
-`dtbook` element when there is no such metadata. The same language is given to the babel package,
-which takes care of everything else, such as the heading above the table of contents.
+is split into volumes, and the heading above the endnotes. By default they are written in the
+language of the document, which is taken from the `dc:Language` metadata, or from the `xml:lang`
+attribute of the `dtbook` element when there is no such metadata. The same language is given to the
+babel package, which takes care of everything else, such as the heading above the table of contents.
 
-English, German and Swiss German are provided. To add a language, add it to <a
+English, German and Swiss German phrases are provided. To add a language, add it to <a
 href="../src/main/resources/xml/i18n.xml" class="userdoc">`i18n.xml`</a>. The `%1` and `%2` in a
 phrase are replaced by the number of the volume and the number of volumes. A translation is looked
-up by language tag and a tag falls back to the language without the region, which is why Swiss
-German only provides the strings that are spelled with "ss" rather than "ß".
+up by language tag and a tag falls back to the language without the region.
 
-These phrases are not in the voice of the book but in the voice of whoever produces it: a library in
-Zurich writes "Grossdruck" on the cover of a book whose text is in the German of Germany. A producer
-whose house language differs from the language of the books can therefore set the "Language of the
-generated phrases" option (`producer-language`), and the language of the document goes on steering
-the hyphenation and the typographic conventions whatever that option says.
+In some cases you might want these phrases not in the language of the book but in the language of
+whoever produces it: a library in Zürich writes "Grossdruck" (Swiss German spelling) on the cover of
+a book whose text is in the German of Germany. A producer whose house language differs from the
+language of the books can therefore set the "Language of the generated phrases" option
+(`producer-language`), and the language of the document goes on steering the hyphenation and the
+typographic conventions whatever that option says.
 
 The number of volumes is written out in words, which is why `i18n.xml` also holds the numbers from
 1 to 50. A language that has no words for the numbers gets the number itself, so "Large print book
