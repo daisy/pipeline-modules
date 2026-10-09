@@ -16,6 +16,14 @@
   <xsl:include href="table-utils.xsl"/>
 
   <xsl:output method="text" encoding="utf-8" indent="no"/>
+
+  <!-- images are looked up by their id -->
+  <xsl:key name="id" match="dtb:*[@id]" use="@id"/>
+
+  <!-- captions are looked up by the images they name in their imgref. Unlike the idref of a
+       noteref, which is a URI ("#n1"), imgref is a list of plain ids (IDREFS), but a "#" in front
+       of an id is tolerated. -->
+  <xsl:key name="caption" match="dtb:caption[@imgref]" use="tokenize(translate(@imgref,'#',''),'\s+')"/>
   <xsl:strip-space elements="*"/>
   <xsl:preserve-space elements="dtb:line dtb:address dtb:div dtb:title dtb:author dtb:note dtb:byline dtb:dateline 
 				dtb:a dtb:em dtb:strong dtb:dfn dtb:kbd dtb:code dtb:samp dtb:cite dtb:abbr dtb:acronym
@@ -128,7 +136,7 @@
        and the caption (as a plain para) inside a minipage. -->
   <xsl:function name="my:cleanCaptions" as="xs:string">
     <xsl:param name="context" as="node()"/>
-    <xsl:value-of select="string($context)"/>
+    <xsl:sequence select="my:quoteSpecialChars(string($context))"/>
   </xsl:function>
 
   <!-- =========================== -->
@@ -399,13 +407,13 @@
      <xsl:text>\usepackage{hyperref}&#10;</xsl:text>
      <xsl:text>\hypersetup{&#10;</xsl:text>
      <xsl:text>pdfinfo={&#10;</xsl:text>
-     <xsl:value-of select="concat('  Title={', my:quoteSpecialChars(//dtb:meta[@name='dc:title' or @name='dc:Title']/@content), '},&#10;')"/>
-     <xsl:value-of select="concat('  Author={', my:quoteSpecialChars(//dtb:meta[@name='dc:creator' or @name='dc:Creator']/@content), '},&#10;')"/>
-     <xsl:value-of select="concat('  Subject={', my:quoteSpecialChars(//dtb:meta[@name='dc:subject' or @name='dc:Subject']/@content), '},&#10;')"/>
-     <xsl:value-of select="concat('  Lang={', my:quoteSpecialChars(//dtb:meta[@name='dc:language' or @name='dc:Language']/@content), '},&#10;')"/>
-     <xsl:value-of select="concat('  Producer={', my:quoteSpecialChars(//dtb:meta[@name='dc:publisher' or @name='dc:Publisher']/@content), '},&#10;')"/>
-     <xsl:value-of select="concat('  Source={', my:quoteSpecialChars(//dtb:meta[@name='dc:source' or @name='dc:Source']/@content), '},&#10;')"/>
-     <xsl:value-of select="concat('  Identifier={', my:quoteSpecialChars(//dtb:meta[@name='dc:identifier' or @name='dc:Identifier']/@content), '},&#10;')"/>
+     <xsl:value-of select="concat('  Title={', my:quoteSpecialChars(string-join(//dtb:meta[@name='dc:title' or @name='dc:Title']/@content, ', ')), '},&#10;')"/>
+     <xsl:value-of select="concat('  Author={', my:quoteSpecialChars(string-join(//dtb:meta[@name='dc:creator' or @name='dc:Creator']/@content, ', ')), '},&#10;')"/>
+     <xsl:value-of select="concat('  Subject={', my:quoteSpecialChars(string-join(//dtb:meta[@name='dc:subject' or @name='dc:Subject']/@content, ', ')), '},&#10;')"/>
+     <xsl:value-of select="concat('  Lang={', my:quoteSpecialChars(string-join(//dtb:meta[@name='dc:language' or @name='dc:Language']/@content, ', ')), '},&#10;')"/>
+     <xsl:value-of select="concat('  Producer={', my:quoteSpecialChars(string-join(//dtb:meta[@name='dc:publisher' or @name='dc:Publisher']/@content, ', ')), '},&#10;')"/>
+     <xsl:value-of select="concat('  Source={', my:quoteSpecialChars(string-join(//dtb:meta[@name='dc:source' or @name='dc:Source']/@content, ', ')), '},&#10;')"/>
+     <xsl:value-of select="concat('  Identifier={', my:quoteSpecialChars(string-join(//dtb:meta[@name='dc:identifier' or @name='dc:Identifier']/@content, ', ')), '},&#10;')"/>
      <xsl:value-of select="concat('  Fontsize={', my:quoteSpecialChars($fontsize), '},&#10;')"/>
      <xsl:value-of select="concat('  Font={', my:quoteSpecialChars($font), '},&#10;')"/>
      <xsl:value-of select="concat('  Stocksize={', my:quoteSpecialChars($stocksize), '},&#10;')"/>
@@ -556,7 +564,7 @@
         <xsl:text>\vskip #1\onelineskip&#10;</xsl:text>
         <xsl:text>\@afterindentfalse&#10;</xsl:text>
 	<xsl:text>\@afterheading}&#10;</xsl:text>
-	<xsl:text>\makeatletter&#10;</xsl:text>
+	<xsl:text>\makeatother&#10;</xsl:text>
 
 	<xsl:if test="$line_spacing = 'onehalfspacing'">
 	  <xsl:text>\OnehalfSpacing&#10;</xsl:text>
@@ -595,14 +603,18 @@
      http://www.ibm.com/developerworks/library/x-xsltip.html and
      http://www.ibm.com/developerworks/xml/library/x-tiplook.html -->
      <xsl:param name="iso639Code"/>
+     <xsl:variable name="language-code" select="lower-case($iso639Code)"/>
      <xsl:variable name="babelLang">
        <xsl:choose>
-   	 <xsl:when test="matches($iso639Code, 'sv(-.+)?')">swedish</xsl:when>
-   	 <xsl:when test="matches($iso639Code, 'en-[Uu][Ss]')">USenglish</xsl:when>
-   	 <xsl:when test="matches($iso639Code, 'en-[Uu][Kk]')">UKenglish</xsl:when>
-   	 <xsl:when test="matches($iso639Code, 'en(-.+)?')">english</xsl:when>
-   	 <xsl:when test="matches($iso639Code, 'de-1901')">german</xsl:when>
-   	 <xsl:when test="matches($iso639Code, 'de(-.+)?')">ngerman</xsl:when>
+	 <xsl:when test="matches($language-code, '^sv(-|$)')">swedish</xsl:when>
+	 <xsl:when test="matches($language-code, '^en-us(-|$)')">USenglish</xsl:when>
+	 <xsl:when test="matches($language-code, '^en-gb(-|$)')">UKenglish</xsl:when>
+	 <xsl:when test="matches($language-code, '^en-ca(-|$)')">canadian</xsl:when>
+	 <xsl:when test="matches($language-code, '^en(-|$)')">english</xsl:when>
+	 <xsl:when test="matches($language-code, '^de-(.+-)?1901(-|$)')">german</xsl:when>
+	 <xsl:when test="matches($language-code, '^de(-|$)')">ngerman</xsl:when>
+	 <xsl:when test="matches($language-code, '^fr(-|$)')">french</xsl:when>
+	 <xsl:when test="matches($language-code, '^it(-|$)')">italian</xsl:when>
 	 <xsl:otherwise>
 	   <xsl:message>
 	     ***** <xsl:value-of select="$iso639Code"/> not supported. Defaulting to '<xsl:value-of select="$defaultLanguage"/>' ******
@@ -1097,13 +1109,23 @@
      </xsl:choose>
    </xsl:template>
 
+   <!-- The captions of an image: a caption names the images it belongs to in its imgref attribute
+        or, a bit less formally, simply follows the image immediately. A caption that names several
+        images is the caption of the group and is set once, with the last of them. -->
+   <xsl:function name="my:captions" as="element()*">
+     <xsl:param name="img" as="element()"/>
+     <xsl:sequence select="key('caption',$img/@id,root($img))
+                             [$img is key('id',tokenize(translate(@imgref,'#',''),'\s+'))[self::dtb:img][last()]]
+                           |$img/following-sibling::*[1][self::dtb:caption][not(@imgref)]"/>
+   </xsl:function>
+
    <xsl:template match="dtb:img">
      <xsl:choose>
        <xsl:when test="$include_images='false'">
 	 <!-- ignore the image -->
        </xsl:when>
        <xsl:otherwise>
-	 <xsl:variable name="captions" select="//dtb:caption[@id=tokenize(translate(current()/@imgref,'#',''), '\s+')]|following-sibling::*[1][self::dtb:caption]"/>
+	 <xsl:variable name="captions" select="my:captions(.)"/>
 	 <xsl:text>\begin{figure}[htbp!]&#10;</xsl:text>
 	 <xsl:value-of select="my:includegraphics-command(@src, exists($captions))"/>
 	 <!-- a caption is associated with an image through an imgref attribute or a bit less formal
@@ -1131,7 +1153,7 @@
 	 <!-- ignore the image -->
        </xsl:when>
        <xsl:otherwise>
-	 <xsl:variable name="captions" select="//dtb:caption[@id=tokenize(translate(current()/@imgref,'#',''), '\s+')]|following-sibling::*[1][self::dtb:caption]"/>
+	 <xsl:variable name="captions" select="my:captions(.)"/>
 	 <!-- images inside tables and sidebars do not float -->
 	 <xsl:value-of select="my:includegraphics-command(@src, exists($captions))"/>
 	 <!-- a caption is associated with an image through an imgref attribute or a bit less formal
@@ -1307,7 +1329,7 @@
      </xsl:variable>
      <xsl:value-of select="$level_to_section_map/entry[@key=concat('level',$level)]"/>
      <xsl:text>[</xsl:text>
-     <xsl:value-of select="text()"/>
+     <xsl:value-of select="normalize-space(my:quoteSpecialChars(string()))"/>
      <xsl:text>]{</xsl:text>
      <xsl:apply-templates/>
      <xsl:text>}&#10;</xsl:text>
@@ -1427,7 +1449,7 @@
      <xsl:value-of select="string-join((for $col in 1 to $numcols return 'L'),'|')"/>
      <xsl:text>|} \hline&#10;</xsl:text>
      <!-- Make sure the table is in the right order and also handle tables without tbody -->
-     <xsl:apply-templates select="$normalized-table/dtb:table/dtb:thead, $normalized-table/dtb:table/dtb:tbody, $normalized-table/dtb:table/dtb:tfoot, $normalized-table/dtb:table/dtb:tr"/>
+     <xsl:apply-templates select="$normalized-table/dtb:table/dtb:thead, $normalized-table/dtb:table/dtb:tbody, $normalized-table/dtb:table/dtb:tr, $normalized-table/dtb:table/dtb:tfoot"/>
      <xsl:text>\end{tabulary}&#10;</xsl:text>
      <xsl:apply-templates select="dtb:caption"/>
      <xsl:text>\end{table}&#10;</xsl:text>
@@ -1488,38 +1510,18 @@
    	  <xsl:text>&#10;</xsl:text>
    </xsl:template>
 
-   <xsl:template match="dtb:th">
-   	<xsl:if test="preceding-sibling::dtb:th">
-   		<xsl:text> &amp; </xsl:text>
-   	</xsl:if>
-   	<xsl:text>\textbf{</xsl:text>
-   	<xsl:apply-templates/>
-   	<xsl:text>}</xsl:text>
-   </xsl:template>
-
-   <xsl:template match="dtb:td">
-     <xsl:if test="preceding-sibling::dtb:td">
+   <!-- a row may mix header and data cells, e.g. a th that heads the row -->
+   <xsl:template match="dtb:td|dtb:th">
+     <xsl:if test="preceding-sibling::dtb:td|preceding-sibling::dtb:th">
        <xsl:text> &amp; </xsl:text>
      </xsl:if>
-     <xsl:apply-templates/>
-   </xsl:template>
-
-   <xsl:template match="dtb:td[@colspan &gt; 1]">
-     <xsl:if test="preceding-sibling::dtb:td">
-       <xsl:text> &amp; </xsl:text>
+     <xsl:if test="@colspan &gt; 1">
+       <xsl:text>\multicolumn{</xsl:text><xsl:value-of select="@colspan"/><xsl:text>}{l|}{</xsl:text>
      </xsl:if>
-     <xsl:text>\multicolumn{</xsl:text><xsl:value-of select="@colspan"/><xsl:text>}{l|}{</xsl:text>
+     <xsl:if test="self::dtb:th"><xsl:text>\textbf{</xsl:text></xsl:if>
      <xsl:apply-templates/>
-     <xsl:text>}</xsl:text>
-   </xsl:template>
-
-   <xsl:template match="dtb:th[@colspan &gt; 1]">
-     <xsl:if test="preceding-sibling::dtb:th">
-       <xsl:text> &amp; </xsl:text>
-     </xsl:if>
-     <xsl:text>\multicolumn{</xsl:text><xsl:value-of select="@colspan"/><xsl:text>}{l|}{\textbf{</xsl:text>
-     <xsl:apply-templates/>
-     <xsl:text>}}</xsl:text>
+     <xsl:if test="self::dtb:th"><xsl:text>}</xsl:text></xsl:if>
+     <xsl:if test="@colspan &gt; 1"><xsl:text>}</xsl:text></xsl:if>
    </xsl:template>
 
    <xsl:template match="dtb:colgroup|dtb:col">
@@ -1640,8 +1642,9 @@
      <xsl:apply-templates/>
    </xsl:template>
 
-   <!-- Render external links as URLs -->
-   <xsl:template match="dtb:a[@external='true']">
+   <!-- Render external links as URLs. Only a link that holds nothing but text is a URL: a link
+        around an image or other markup is rendered as its content, which would otherwise be lost. -->
+   <xsl:template match="dtb:a[@external='true'][not(*)]">
      <!-- Drop { and } as they might lead to unbalanced braces which the url packacke really doesn't
           like. Also drop '\' if it happens to be the last character. Escape the rest so LaTeX doesn't fall over -->
      <xsl:text>\url{</xsl:text><xsl:value-of select="my:quoteSpecialChars(replace(normalize-space(replace(string(), '(\{|\})', '')), '\\$', ''))"/><xsl:text>}</xsl:text>
@@ -1653,10 +1656,11 @@
      <xsl:value-of select="concat('\pageref{',substring(@href,2),'}')"/>
    </xsl:template>
 
-   <xsl:template match="dtb:a[@id != '']">
-     <!-- create a label so we can later add a reference to it -->
+   <!-- create a label so we can later add a reference to it, and then render the link as it is
+        rendered without an id: an external link as a URL, a page reference as a reference -->
+   <xsl:template match="dtb:a[@id != '']" priority="1">
      <xsl:value-of select="concat('\label{',@id,'}&#10;')"/>
-     <xsl:apply-templates/>
+     <xsl:next-match/>
    </xsl:template>
 
   <xsl:function name="my:is-pagenum-anchor" as="xs:boolean">
@@ -1792,59 +1796,44 @@
     </xsl:choose>
   </xsl:function>
 
-  <xsl:function name="my:string-replace" as="xs:string">
-    <xsl:param name="input" as="xs:string"/>
-    <xsl:param name="substring" as="xs:string"/>
-    <xsl:param name="replacement" as="xs:string"/>
-    <xsl:variable name="before" select="substring-before($input,$substring)"/>
-    <xsl:variable name="after" select="substring-after($input,$substring)"/>
-    <xsl:choose>
-      <xsl:when test="$input">
-	<xsl:sequence select="string-join(($before,$replacement,$after),'')"/>
-      </xsl:when>
-      <xsl:otherwise>
-	<xsl:sequence select="string-join(($before,$replacement,my:string-replace($after,$substring,$replacement)),'')"/>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:function>
-
-  <xsl:function name="my:hyphenate-long-words" as="xs:string">
-    <xsl:param name="wordSequence" as="xs:string*"/>
-    <xsl:param name="text" as="xs:string"/>
-    <xsl:variable name="word" select="$wordSequence[1]"/>
-    <xsl:variable name="rest" select="$wordSequence[position() gt 1]"/>
-    <xsl:choose>
-      <xsl:when test="empty($wordSequence)">
-	<xsl:sequence select="$text"/>
-      </xsl:when>
-      <xsl:otherwise>
-	<xsl:sequence select="my:hyphenate-long-words($rest, my:string-replace($text, $word, my:add-hyphenation-points($word)))"/>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:function>
-
-  <xsl:function name="my:hyphenate-dashed-words" as="xs:string">
-    <xsl:param name="wordSequence" as="xs:string*"/>
-    <xsl:param name="text" as="xs:string"/>
-    <xsl:variable name="word" select="$wordSequence[1]"/>
-    <xsl:variable name="rest" select="$wordSequence[position() gt 1]"/>
-    <xsl:choose>
-      <xsl:when test="empty($wordSequence)">
-	<xsl:sequence select="$text"/>
-      </xsl:when>
-      <xsl:otherwise>
-	<xsl:sequence select="my:hyphenate-dashed-words($rest, my:string-replace($text, $word, replace($word,'(\w)-(\w)','$1-\\hspace{0pt}$2')))"/>
-      </xsl:otherwise>
-    </xsl:choose>
+  <!-- Break a word that is too long for a line: a long run of word characters gets a break point
+       after every character, and a long compound gets one after each of its hyphens. -->
+  <xsl:function name="my:break-word" as="xs:string">
+    <xsl:param name="word" as="xs:string"/>
+    <xsl:variable name="parts" as="xs:string*">
+      <xsl:analyze-string select="$word" regex="\w+">
+	<xsl:matching-substring>
+	  <xsl:sequence select="if (string-length(.) > my:max-line-width())
+				then my:add-hyphenation-points(.) else ."/>
+	</xsl:matching-substring>
+	<xsl:non-matching-substring>
+	  <xsl:sequence select="."/>
+	</xsl:non-matching-substring>
+      </xsl:analyze-string>
+    </xsl:variable>
+    <!-- A match takes the letter after the hyphen along, so in "Vitamin-B-Komplex" the hyphen
+         after the B finds no letter before it. A second pass breaks those; a hyphen that already
+         has a break is followed by a backslash and is not matched again. -->
+    <xsl:variable name="hyphen" select="'(\w)-(\w)'"/>
+    <xsl:variable name="break" select="'$1-\\hspace{0pt}$2'"/>
+    <xsl:sequence select="if (string-length($word) > 20 and contains($word, '-'))
+			  then replace(replace(string-join($parts, ''), $hyphen, $break), $hyphen, $break)
+			  else string-join($parts, '')"/>
   </xsl:function>
 
   <xsl:template match="text()">
-    <xsl:variable name="sanitized" select="my:quoteSpecialChars(current())"/>
-    <xsl:variable name="long-words" select="tokenize($sanitized,'\W+')[string-length(.) > my:max-line-width()]"/>
-    <xsl:variable name="long-dashed-words" select="tokenize($sanitized,'(\p{Pc}|\p{Ps}|\p{Pe}|\p{Pi}|\p{Pf}|\p{Po}|\p{Z}|\p{C})+')[string-length(.) > 20][contains(.,'-')]"/>
-    <xsl:variable name="tmp" select="my:hyphenate-long-words($long-words, $sanitized)"/>
-    <xsl:value-of select="my:hyphenate-dashed-words($long-dashed-words, $tmp)"/>
-   </xsl:template>
+    <!-- a word is anything between punctuation (other than dashes), spaces and control
+         characters. Each word is rewritten where it stands, so no text can go missing. -->
+    <xsl:analyze-string select="my:quoteSpecialChars(.)"
+			regex="[^\p{{Pc}}\p{{Ps}}\p{{Pe}}\p{{Pi}}\p{{Pf}}\p{{Po}}\p{{Z}}\p{{C}}]+">
+      <xsl:matching-substring>
+	<xsl:value-of select="my:break-word(.)"/>
+      </xsl:matching-substring>
+      <xsl:non-matching-substring>
+	<xsl:value-of select="."/>
+      </xsl:non-matching-substring>
+    </xsl:analyze-string>
+  </xsl:template>
 
    <xsl:template match="text()" mode="textOnly">
      <xsl:value-of select="my:quoteSpecialChars(string(current()))"/>

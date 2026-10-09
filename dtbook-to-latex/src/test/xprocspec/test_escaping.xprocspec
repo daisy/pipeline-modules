@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
+               xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
+               xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+
+  <x:documentation xmlns="http://www.w3.org/1999/xhtml">
+    <p>What the document says ends up in the LaTeX as it is written, without breaking the
+    LaTeX.</p>
+  </x:documentation>
+
+  <x:script>
+    <p:declare-step type="pxi:dtbook-to-latex" version="1.0"
+                    xmlns:p="http://www.w3.org/ns/xproc" name="main">
+      <p:input port="source" primary="true"/>
+      <p:input port="parameters" kind="parameter" primary="true"/>
+      <p:output port="result" primary="true"/>
+      <p:xslt>
+        <p:input port="stylesheet">
+          <p:document href="../../main/resources/xml/dtbook-to-latex.xsl"/>
+        </p:input>
+        <p:input port="parameters">
+          <p:pipe step="main" port="parameters"/>
+        </p:input>
+      </p:xslt>
+    </p:declare-step>
+  </x:script>
+
+  <x:scenario label="a book with two authors in the metadata">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <head>
+              <meta name="dc:Title" content="A book"/>
+              <meta name="dc:Creator" content="Ann Author"/>
+              <meta name="dc:Creator" content="Bob Writer"/>
+            </head>
+            <book>
+              <bodymatter><level1><h1>A chapter</h1><p>text</p></level1></bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="both authors go in the PDF metadata" type="xpath"
+              test="contains(string(/),'Author={Ann Author, Bob Writer}')"/>
+  </x:scenario>
+
+  <x:scenario label="captions with characters that are special to LaTeX">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <head><meta name="dc:Title" content="A book"/></head>
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>A chapter</h1>
+                  <table>
+                    <caption>50% &amp; more_of #1</caption>
+                    <tr><td>x</td></tr>
+                  </table>
+                  <imggroup>
+                    <img id="i" src="a.png" alt=""/>
+                    <caption imgref="i">Costs in $ &amp; %</caption>
+                  </imggroup>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the table caption is escaped" type="xpath"
+              test="contains(string(/),'\legend{50\% \&amp; more\_of \#1}')"/>
+    <x:expect label="and so is its entry in the list of tables" type="xpath"
+              test="contains(string(/),'\addcontentsline{lot}{table}{50\% \&amp; more\_of \#1}')"/>
+    <x:expect label="the image caption is escaped" type="xpath"
+              test="contains(string(/),'\legend{Costs in \$ \&amp; \%}')"/>
+  </x:scenario>
+
+  <x:scenario label="a table row that starts with a header cell">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <head><meta name="dc:Title" content="A book"/></head>
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>A chapter</h1>
+                  <table>
+                    <tr><th>Name</th><td>Ann</td><td>Bob</td></tr>
+                    <tr><th>Age</th><td colspan="2">42</td></tr>
+                    <tr><td>x</td><th colspan="2">Total</th></tr>
+                  </table>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the header and the data cells are separated" type="xpath"
+              test="contains(string(/),'\textbf{Name} &amp; Ann &amp; Bob\\')"/>
+    <x:expect label="also when a data cell spans columns" type="xpath"
+              test="contains(string(/),'\textbf{Age} &amp; \multicolumn{2}{l|}{42}\\')"/>
+    <x:expect label="and when a header cell follows a data cell" type="xpath"
+              test="contains(string(/),'x &amp; \multicolumn{2}{l|}{\textbf{Total}}\\')"/>
+  </x:scenario>
+
+  <x:scenario label="a compound that is both long and hyphenated">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="de">
+            <head><meta name="dc:Title" content="A book"/></head>
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>A chapter</h1>
+                  <p>Ein-sehr-langes-zusammengesetztes-Wort und Donaudampfschifffahrtsgesellschaftskapitänswitwenrentenversicherung-Antrag Ende.</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="a long compound can be broken after each of its hyphens" type="xpath"
+              test="contains(string(/),'Ein-\hspace{0pt}sehr-\hspace{0pt}langes-\hspace{0pt}zusammengesetztes-\hspace{0pt}Wort und ')"/>
+    <x:expect label="a word too long for a line can be broken anywhere" type="xpath"
+              test="contains(string(/),' Dona\-u\-d\-a\-m\-p\-f\-')"/>
+    <x:expect label="and after its hyphen too, if it is part of a compound" type="xpath"
+              test="contains(string(/),'\-e\-rung-\hspace{0pt}Antrag Ende.')"/>
+  </x:scenario>
+
+  <x:scenario label="a long compound with a part of a single letter">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="de">
+            <head><meta name="dc:Title" content="A book"/></head>
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>A chapter</h1>
+                  <p>Vitamin-B-Komplex-Mangel</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the compound can be broken after every one of its hyphens" type="xpath"
+              test="contains(string(/),'Vitamin-\hspace{0pt}B-\hspace{0pt}Komplex-\hspace{0pt}Mangel')"/>
+  </x:scenario>
+
+  <x:scenario label="a heading of an unnumbered level with characters that are special to LaTeX">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <head><meta name="dc:Title" content="A book"/></head>
+            <book>
+              <bodymatter>
+                <level><hd>R&amp;D <em>at</em> 50%</hd><p>text</p></level>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the entry in the table of contents is escaped and keeps the inline text" type="xpath"
+              test="contains(string(/),'\chapter[R\&amp;D at 50\%]{R\&amp;D \emph{at} 50\%}')"/>
+  </x:scenario>
+
+  <x:scenario label="a table with a footer and no tbody">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <head><meta name="dc:Title" content="A book"/></head>
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>A chapter</h1>
+                  <table>
+                    <tfoot><tr><td>the footer</td></tr></tfoot>
+                    <tr><td>the body</td></tr>
+                  </table>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the footer comes after the body" type="xpath"
+              test="contains(substring-after(string(/),'the body'),'the footer')"/>
+  </x:scenario>
+
+</x:description>
