@@ -1642,8 +1642,9 @@
      <xsl:apply-templates/>
    </xsl:template>
 
-   <!-- Render external links as URLs -->
-   <xsl:template match="dtb:a[@external='true']">
+   <!-- Render external links as URLs. Only a link that holds nothing but text is a URL: a link
+        around an image or other markup is rendered as its content, which would otherwise be lost. -->
+   <xsl:template match="dtb:a[@external='true'][not(*)]">
      <!-- Drop { and } as they might lead to unbalanced braces which the url packacke really doesn't
           like. Also drop '\' if it happens to be the last character. Escape the rest so LaTeX doesn't fall over -->
      <xsl:text>\url{</xsl:text><xsl:value-of select="my:quoteSpecialChars(replace(normalize-space(replace(string(), '(\{|\})', '')), '\\$', ''))"/><xsl:text>}</xsl:text>
@@ -1655,10 +1656,11 @@
      <xsl:value-of select="concat('\pageref{',substring(@href,2),'}')"/>
    </xsl:template>
 
-   <xsl:template match="dtb:a[@id != '']">
-     <!-- create a label so we can later add a reference to it -->
+   <!-- create a label so we can later add a reference to it, and then render the link as it is
+        rendered without an id: an external link as a URL, a page reference as a reference -->
+   <xsl:template match="dtb:a[@id != '']" priority="1">
      <xsl:value-of select="concat('\label{',@id,'}&#10;')"/>
-     <xsl:apply-templates/>
+     <xsl:next-match/>
    </xsl:template>
 
   <xsl:function name="my:is-pagenum-anchor" as="xs:boolean">

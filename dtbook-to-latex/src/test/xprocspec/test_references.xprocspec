@@ -115,4 +115,85 @@
               test="count(tokenize(string(/),'\\legend\{'))=2"/>
   </x:scenario>
 
+  <x:scenario label="an external link with an id">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <head><meta name="dc:Title" content="A book"/></head>
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>A chapter</h1>
+                  <p>See <a id="l1" href="http://www.example.org" external="true">www.example.org</a>.</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="it gets a label" type="xpath"
+              test="contains(string(/),'\label{l1}')"/>
+    <x:expect label="and is set as a URL" type="xpath"
+              test="contains(string(/),'\url{www.example.org}')"/>
+  </x:scenario>
+
+  <x:scenario label="a page reference with an id">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <head><meta name="dc:Title" content="A book"/></head>
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>A chapter</h1>
+                  <p>See page <a id="r1" class="pageref" href="#p12">12</a>.</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="it gets a label" type="xpath"
+              test="contains(string(/),'\label{r1}')"/>
+    <x:expect label="and refers to the page" type="xpath"
+              test="contains(string(/),'\pageref{p12}')"/>
+  </x:scenario>
+
+  <x:scenario label="an external link around an image">
+    <x:call step="pxi:dtbook-to-latex">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en">
+            <head><meta name="dc:Title" content="A book"/></head>
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>A chapter</h1>
+                  <a id="l2" href="http://www.example.org" external="true"><img src="a.png" alt=""/></a>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the image is kept" type="xpath"
+              test="contains(string(/),'{a.png}}')"/>
+    <x:expect label="and the link is not set as a URL" type="xpath"
+              test="not(contains(string(/),'\url{'))"/>
+  </x:scenario>
+
 </x:description>
