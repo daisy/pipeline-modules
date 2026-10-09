@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
+               xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
+               xmlns:dtb="http://www.daisy.org/z3986/2005/dtbook/"
+               xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+
+  <x:script>
+    <p:declare-step type="pxi:move-notes-to-end" version="1.0"
+                    xmlns:p="http://www.w3.org/ns/xproc" name="main">
+      <p:input port="source" primary="true"/>
+      <p:input port="parameters" kind="parameter" primary="true"/>
+      <p:output port="result" primary="true"/>
+      <p:xslt>
+        <p:input port="stylesheet">
+          <p:document href="../../main/resources/xml/move-notes-to-end.xsl"/>
+        </p:input>
+        <p:input port="parameters">
+          <p:pipe step="main" port="parameters"/>
+        </p:input>
+      </p:xslt>
+    </p:declare-step>
+  </x:script>
+
+  <x:scenario label="notes are moved to the end of the last level1">
+    <x:call step="pxi:move-notes-to-end">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook>
+            <book>
+              <bodymatter>
+                <level1 id="first">
+                  <h1>First</h1>
+                  <p>text<noteref idref="#n1">1</noteref></p>
+                  <note id="n1">
+                    <p>the first note</p>
+                  </note>
+                </level1>
+                <level1 id="second">
+                  <h1>Second</h1>
+                  <p>more text<noteref idref="#n2">2</noteref></p>
+                  <note id="n2">
+                    <p>the second note</p>
+                  </note>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+      <x:param port="parameters" name="endnotes" select="'document'"/>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="no note is left in the first level1" type="xpath"
+              test="empty(//dtb:level1[@id='first']//dtb:note)"/>
+    <x:expect label="both notes are at the end of the last level1" type="xpath"
+              test="string-join(//dtb:level1[@id='second']/dtb:note/@id,' ')='n1 n2'"/>
+    <x:expect label="and they are the very last children" type="xpath"
+              test="exists(//dtb:level1[@id='second']/*[last()][self::dtb:note][@id='n2'])"/>
+    <x:expect label="the noterefs are untouched" type="xpath"
+              test="count(//dtb:noteref)=2"/>
+  </x:scenario>
+
+  <x:scenario label="annotations are moved as well">
+    <x:call step="pxi:move-notes-to-end">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook>
+            <book>
+              <bodymatter>
+                <level1 id="first">
+                  <h1>First</h1>
+                  <p><annoref idref="#a1">see</annoref>text</p>
+                  <annotation id="a1">
+                    <p>the annotation</p>
+                  </annotation>
+                </level1>
+                <level1 id="second">
+                  <h1>Second</h1>
+                  <p>more text</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+      <x:param port="parameters" name="endnotes" select="'document'"/>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the annotation is moved out of the first level1" type="xpath"
+              test="empty(//dtb:level1[@id='first']//dtb:annotation)"/>
+    <x:expect label="and is now in the last level1" type="xpath"
+              test="exists(//dtb:level1[@id='second']/dtb:annotation[@id='a1'])"/>
+  </x:scenario>
+
+  <x:scenario label="notes are moved to the last unnumbered level as well">
+    <x:call step="pxi:move-notes-to-end">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook>
+            <book>
+              <bodymatter>
+                <level id="first">
+                  <hd>First</hd>
+                  <p>text<noteref idref="#n1">1</noteref></p>
+                  <note id="n1">
+                    <p>the note</p>
+                  </note>
+                </level>
+                <level id="second">
+                  <hd>Second</hd>
+                  <p>more text</p>
+                </level>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+      <x:param port="parameters" name="endnotes" select="'document'"/>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the note is moved to the last level" type="xpath"
+              test="exists(//dtb:level[@id='second']/dtb:note[@id='n1'])"/>
+    <x:expect label="and is gone from the first one" type="xpath"
+              test="empty(//dtb:level[@id='first']//dtb:note)"/>
+  </x:scenario>
+
+  <x:scenario label="notes are kept when there is no level to move them to">
+    <x:call step="pxi:move-notes-to-end">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook>
+            <book>
+              <bodymatter>
+                <p>text<noteref idref="#n1">1</noteref></p>
+                <note id="n1">
+                  <p>the note</p>
+                </note>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+      <x:param port="parameters" name="endnotes" select="'document'"/>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the note is still there" type="xpath"
+              test="count(//dtb:note[@id='n1'])=1"/>
+  </x:scenario>
+
+  <x:scenario label="the document is left untouched for footnotes">
+    <x:call step="pxi:move-notes-to-end">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook>
+            <book>
+              <bodymatter>
+                <level1 id="first">
+                  <h1>First</h1>
+                  <p>text<noteref idref="#n1">1</noteref></p>
+                  <note id="n1">
+                    <p>the note</p>
+                  </note>
+                </level1>
+                <level1 id="second">
+                  <h1>Second</h1>
+                  <p>more text</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+      <x:param port="parameters" name="endnotes" select="'none'"/>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the note stays where it is" type="xpath"
+              test="exists(//dtb:level1[@id='first']/dtb:note[@id='n1'])"/>
+    <x:expect label="and is not copied to the last level1" type="xpath"
+              test="empty(//dtb:level1[@id='second']//dtb:note)"/>
+  </x:scenario>
+
+  <x:scenario label="the document is left untouched for notes at the end of the chapter">
+    <x:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <p>With endnotes='chapter' the notes are printed at the end of their own level1, which is
+      close enough to where they sit, so they are deliberately left alone.</p>
+    </x:documentation>
+    <x:call step="pxi:move-notes-to-end">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook>
+            <book>
+              <bodymatter>
+                <level1 id="first">
+                  <h1>First</h1>
+                  <p>text<noteref idref="#n1">1</noteref></p>
+                  <note id="n1">
+                    <p>the note</p>
+                  </note>
+                </level1>
+                <level1 id="second">
+                  <h1>Second</h1>
+                  <p>more text</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+      <x:param port="parameters" name="endnotes" select="'chapter'"/>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the note stays in its own chapter" type="xpath"
+              test="exists(//dtb:level1[@id='first']/dtb:note[@id='n1'])"/>
+    <x:expect label="and is not moved to the last level1" type="xpath"
+              test="empty(//dtb:level1[@id='second']//dtb:note)"/>
+  </x:scenario>
+
+</x:description>

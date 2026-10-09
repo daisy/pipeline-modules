@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
+               xmlns:px="http://www.daisy.org/ns/pipeline/xproc"
+               xmlns:c="http://www.w3.org/ns/xproc-step"
+               script="http://www.daisy.org/pipeline/modules/dtbook-to-latex/dtbook-to-latex.script.xpl">
+
+  <x:scenario label="minimal">
+    <x:call step="px:dtbook-to-latex.script">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en" xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+            <head>
+              <meta name="dc:title" content="A book"/>
+              <meta name="dc:creator" content="An author"/>
+            </head>
+            <book>
+              <frontmatter>
+                <doctitle>A book</doctitle>
+                <docauthor>An author</docauthor>
+              </frontmatter>
+              <bodymatter>
+                <level1>
+                  <h1>Heading</h1>
+                  <p>Bla bla bla bla</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+      <x:option name="result" select="resolve-uri('minimal/output-dir/',$temp-dir)"/>
+    </x:call>
+    <x:context label="the output directory">
+      <x:document type="directory" base-uri="temp-dir" href="minimal/output-dir/"/>
+    </x:context>
+    <x:expect label="the output directory should contain the LaTeX file" type="xpath"
+              test="/c:directory/c:file[@name='test_dtbook-to-latex.script.tex']"/>
+    <x:context label="the LaTeX file">
+      <x:document type="file" method="text" base-uri="temp-dir"
+                  href="minimal/output-dir/test_dtbook-to-latex.script.tex"/>
+    </x:context>
+    <x:expect label="it is a memoir document" type="xpath"
+              test="contains(string(/),'\documentclass')"/>
+    <x:expect label="it is a single volume book" type="xpath"
+              test="contains(string(/),'\numtoname{1} volume')"/>
+    <x:expect label="so there is no volume numbering on the cover" type="xpath"
+              test="not(contains(string(/),'Volume 1 of'))"/>
+  </x:scenario>
+
+  <x:scenario label="words-per-volume">
+    <x:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <p>Every paragraph is ten words long and the volumes are twenty words long, so the book is
+      split into two volumes.</p>
+    </x:documentation>
+    <x:call step="px:dtbook-to-latex.script">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en" xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+            <head>
+              <meta name="dc:title" content="A book"/>
+              <meta name="dc:creator" content="An author"/>
+            </head>
+            <book>
+              <frontmatter>
+                <doctitle>A book</doctitle>
+                <docauthor>An author</docauthor>
+              </frontmatter>
+              <bodymatter>
+                <level1>
+                  <h1>Heading</h1>
+                  <p>one two three four five six seven eight nine ten</p>
+                  <p>one two three four five six seven eight nine ten</p>
+                  <p>one two three four five six seven eight nine ten</p>
+                  <p>one two three four five six seven eight nine ten</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+      <x:option name="result" select="resolve-uri('two-volumes/output-dir/',$temp-dir)"/>
+      <x:option name="words-per-volume" select="'20'"/>
+    </x:call>
+    <x:context label="the LaTeX file">
+      <x:document type="file" method="text" base-uri="temp-dir"
+                  href="two-volumes/output-dir/test_dtbook-to-latex.script.tex"/>
+    </x:context>
+    <x:expect label="it is a two volume book" type="xpath"
+              test="contains(string(/),'\numtoname{2} volumes')"/>
+    <x:expect label="the first volume is numbered on the cover" type="xpath"
+              test="contains(string(/),'Volume 1 of 2')"/>
+    <x:expect label="the second volume gets a cover of its own" type="xpath"
+              test="contains(string(/),'Volume 2 of 2')"/>
+  </x:scenario>
+
+  <x:scenario label="words-per-volume with a table of contents">
+    <x:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <p>Every volume gets a table of contents of its own, so the book below should hold two: one
+      in the frontmatter and one on the cover of the second volume.</p>
+    </x:documentation>
+    <x:call step="px:dtbook-to-latex.script">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en" xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+            <head>
+              <meta name="dc:title" content="A book"/>
+              <meta name="dc:creator" content="An author"/>
+            </head>
+            <book>
+              <frontmatter>
+                <doctitle>A book</doctitle>
+                <docauthor>An author</docauthor>
+                <level1>
+                  <h1>Contents</h1>
+                  <list>
+                    <li><lic>First chapter</lic></li>
+                    <li><lic>Second chapter</lic></li>
+                  </list>
+                </level1>
+              </frontmatter>
+              <bodymatter>
+                <level1>
+                  <h1>First chapter</h1>
+                  <p>one two three four five six seven eight nine ten</p>
+                  <p>one two three four five six seven eight nine ten</p>
+                </level1>
+                <level1>
+                  <h1>Second chapter</h1>
+                  <p>one two three four five six seven eight nine ten</p>
+                  <p>one two three four five six seven eight nine ten</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+      <x:option name="result" select="resolve-uri('toc/output-dir/',$temp-dir)"/>
+      <x:option name="words-per-volume" select="'20'"/>
+    </x:call>
+    <x:context label="the LaTeX file">
+      <x:document type="file" method="text" base-uri="temp-dir"
+                  href="toc/output-dir/test_dtbook-to-latex.script.tex"/>
+    </x:context>
+    <x:expect label="it is a two volume book" type="xpath"
+              test="contains(string(/),'\numtoname{2} volumes')"/>
+    <x:expect label="the second volume gets a cover of its own" type="xpath"
+              test="contains(string(/),'Volume 2 of 2')"/>
+    <x:expect label="and both volumes get a table of contents" type="xpath"
+              test="count(tokenize(string(/),'\\tableofcontents'))=3"/>
+  </x:scenario>
+
+  <x:scenario label="words-per-volume with endnotes at the end of the document">
+    <x:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <p>The note is printed at the end of the document, so its words should not count towards the
+      volume that references it. Without moving the note out of the way first, the volume would be
+      split at the second paragraph instead of the third.</p>
+    </x:documentation>
+    <x:call step="px:dtbook-to-latex.script">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook version="2005-3" xml:lang="en" xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+            <head>
+              <meta name="dc:title" content="A book"/>
+              <meta name="dc:creator" content="An author"/>
+            </head>
+            <book>
+              <frontmatter>
+                <doctitle>A book</doctitle>
+                <docauthor>An author</docauthor>
+              </frontmatter>
+              <bodymatter>
+                <level1>
+                  <h1>Heading</h1>
+                  <p>one two three four five six seven eight nine ten<noteref idref="#n1">1</noteref></p>
+                  <note id="n1">
+                    <p>a note that is so long that it would fill a volume all by itself if its
+                    words were counted where the note happens to sit in the document instead of
+                    where the note is printed</p>
+                  </note>
+                  <p>one two three four five six seven eight nine ten</p>
+                  <p>one two three four five six seven eight nine ten</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+      <x:option name="result" select="resolve-uri('endnotes/output-dir/',$temp-dir)"/>
+      <x:option name="words-per-volume" select="'20'"/>
+      <x:option name="endnotes" select="'document'"/>
+    </x:call>
+    <x:context label="the LaTeX file">
+      <x:document type="file" method="text" base-uri="temp-dir"
+                  href="endnotes/output-dir/test_dtbook-to-latex.script.tex"/>
+    </x:context>
+    <x:expect label="the notes are printed at the end of the document" type="xpath"
+              test="contains(string(/),'\printpagenotes')"/>
+    <x:expect label="the book is split into two volumes" type="xpath"
+              test="contains(string(/),'\numtoname{2} volumes')"/>
+    <x:expect label="the note is still rendered where it is referenced" type="xpath"
+              test="contains(string(/),'\pagenote{')"/>
+  </x:scenario>
+
+</x:description>

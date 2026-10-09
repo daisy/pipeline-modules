@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<x:description xmlns:x="http://www.daisy.org/ns/xprocspec"
+               xmlns:pxi="http://www.daisy.org/ns/pipeline/xproc/internal"
+               xmlns:dtb="http://www.daisy.org/z3986/2005/dtbook/"
+               xmlns="http://www.daisy.org/z3986/2005/dtbook/">
+
+  <x:script>
+    <p:declare-step type="pxi:insert-volume-split-points" version="1.0"
+                    xmlns:p="http://www.w3.org/ns/xproc" name="main">
+      <p:input port="source" primary="true"/>
+      <p:input port="parameters" kind="parameter" primary="true"/>
+      <p:output port="result" primary="true"/>
+      <p:xslt>
+        <p:input port="stylesheet">
+          <p:document href="../../main/resources/xml/insert-volume-split-points.xsl"/>
+        </p:input>
+        <p:input port="parameters">
+          <p:pipe step="main" port="parameters"/>
+        </p:input>
+      </p:xslt>
+    </p:declare-step>
+  </x:script>
+
+  <!-- Every paragraph below is exactly ten words long, unless noted otherwise, and the volumes are
+       twenty words long, so that a split point is expected at the third paragraph. -->
+
+  <x:scenario label="a split point is inserted once the volume is full">
+    <x:call step="pxi:insert-volume-split-points">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook>
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>Heading</h1>
+                  <p id="p1">one two three four five six seven eight nine ten</p>
+                  <p id="p2">one two three four five six seven eight nine ten</p>
+                  <p id="p3">one two three four five six seven eight nine ten</p>
+                  <p id="p4">one two three four five six seven eight nine ten</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+      <x:param port="parameters" name="words_per_volume" select="20"/>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the third paragraph starts a new volume" type="xpath"
+              test="tokenize(//dtb:p[@id='p3']/@class,'\s+')='volume-split-point'"/>
+    <x:expect label="and it is the only split point" type="xpath"
+              test="count(//*[tokenize(@class,'\s+')='volume-split-point'])=1"/>
+  </x:scenario>
+
+  <x:scenario label="the volumes are made equally thick">
+    <x:call step="pxi:insert-volume-split-points">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook>
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>Heading</h1>
+                  <p id="p1">one two three four five six seven eight nine ten</p>
+                  <p id="p2">one two three four five six seven eight nine ten</p>
+                  <p id="p3">one two three four five six seven eight nine ten</p>
+                  <p id="p4">one two three four five six seven eight nine ten</p>
+                  <p id="p5">one two three four five six seven eight nine ten</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+      <x:param port="parameters" name="words_per_volume" select="40"/>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the fifty words go in two volumes of twenty five words rather than in one full volume and a stub" type="xpath"
+              test="tokenize(//dtb:p[@id='p4']/@class,'\s+')='volume-split-point'"/>
+    <x:expect label="and the volume does not run full before that" type="xpath"
+              test="count(//*[tokenize(@class,'\s+')='volume-split-point'])=1"/>
+  </x:scenario>
+
+  <x:scenario label="a split point close to a level1 is moved to that level1">
+    <x:call step="pxi:insert-volume-split-points">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook>
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>First</h1>
+                  <p id="p1">one two three four five six seven eight nine ten</p>
+                  <p id="p2">one two three four five six seven eight nine ten</p>
+                  <p id="p3">tail</p>
+                </level1>
+                <level1 id="second">
+                  <h1>Second</h1>
+                  <p id="p4">one two three four five six seven eight nine ten</p>
+                  <p id="p5">one two three four five six seven eight nine ten</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+      <x:param port="parameters" name="words_per_volume" select="20"/>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the second level1 starts a new volume" type="xpath"
+              test="tokenize(//dtb:level1[@id='second']/@class,'\s+')='volume-split-point'"/>
+    <x:expect label="the paragraph where the volume ran full is not a split point" type="xpath"
+              test="not(tokenize(//dtb:p[@id='p3']/@class,'\s+')='volume-split-point')"/>
+    <x:expect label="and there is only one split point" type="xpath"
+              test="count(//*[tokenize(@class,'\s+')='volume-split-point'])=1"/>
+  </x:scenario>
+
+  <x:scenario label="a split point is never inserted inside a note">
+    <x:call step="pxi:insert-volume-split-points">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook>
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>Heading</h1>
+                  <!-- twenty five words, so the volume is already full when the note is reached -->
+                  <p id="p1">one two three four five six seven eight nine ten eleven twelve
+                  thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty twentyone
+                  twentytwo twentythree twentyfour twentyfive<noteref idref="#n1">1</noteref></p>
+                  <note id="n1">
+                    <p id="pn">one two three four five six seven eight nine ten</p>
+                  </note>
+                  <p id="p2">one two three four five six seven eight nine ten</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+      <x:param port="parameters" name="words_per_volume" select="20"/>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the paragraph inside the note is not a split point" type="xpath"
+              test="not(tokenize(//dtb:p[@id='pn']/@class,'\s+')='volume-split-point')"/>
+    <x:expect label="the first paragraph after the note is a split point instead" type="xpath"
+              test="tokenize(//dtb:p[@id='p2']/@class,'\s+')='volume-split-point'"/>
+    <x:expect label="and it is the only split point" type="xpath"
+              test="count(//*[tokenize(@class,'\s+')='volume-split-point'])=1"/>
+  </x:scenario>
+
+  <x:scenario label="a document that already has split points is left alone">
+    <x:call step="pxi:insert-volume-split-points">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook>
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>Heading</h1>
+                  <p id="p1">one two three four five six seven eight nine ten</p>
+                  <p id="p2" class="volume-split-point">one two three four five six seven eight nine ten</p>
+                  <p id="p3">one two three four five six seven eight nine ten</p>
+                  <p id="p4">one two three four five six seven eight nine ten</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+      <x:param port="parameters" name="words_per_volume" select="20"/>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the split point that was already there is kept" type="xpath"
+              test="tokenize(//dtb:p[@id='p2']/@class,'\s+')='volume-split-point'"/>
+    <x:expect label="and no others are added" type="xpath"
+              test="count(//*[tokenize(@class,'\s+')='volume-split-point'])=1"/>
+  </x:scenario>
+
+  <x:scenario label="an existing class attribute is kept">
+    <x:call step="pxi:insert-volume-split-points">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook>
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>Heading</h1>
+                  <p id="p1">one two three four five six seven eight nine ten</p>
+                  <p id="p2">one two three four five six seven eight nine ten</p>
+                  <p id="p3" class="precedingemptyline">one two three four five six seven eight nine ten</p>
+                  <p id="p4">one two three four five six seven eight nine ten</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+      <x:param port="parameters" name="words_per_volume" select="20"/>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the split point class is added to the class that was already there" type="xpath"
+              test="//dtb:p[@id='p3']/@class='precedingemptyline volume-split-point'"/>
+  </x:scenario>
+
+  <x:scenario label="a table of contents in the frontmatter is not counted">
+    <x:documentation xmlns="http://www.w3.org/1999/xhtml">
+      <p>The list of contents is replaced by a generated table of contents, so its thirty words are
+      not printed and must not fill up the first volume. If they were counted, the first volume
+      would already be full within the frontmatter.</p>
+    </x:documentation>
+    <x:call step="pxi:insert-volume-split-points">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook>
+            <book>
+              <frontmatter>
+                <doctitle>A book</doctitle>
+                <level1>
+                  <h1>Contents</h1>
+                  <list>
+                    <li><lic>one two three four five six seven eight nine ten</lic></li>
+                    <li><lic>one two three four five six seven eight nine ten</lic></li>
+                    <li><lic>one two three four five six seven eight nine ten</lic></li>
+                  </list>
+                </level1>
+              </frontmatter>
+              <bodymatter>
+                <level1>
+                  <h1>Heading</h1>
+                  <p id="p1">one two three four five six seven eight nine ten</p>
+                  <p id="p2">one two three four five six seven eight nine ten</p>
+                  <p id="p3">one two three four five six seven eight nine ten</p>
+                  <p id="p4">one two three four five six seven eight nine ten</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+      <x:param port="parameters" name="words_per_volume" select="20"/>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the frontmatter holds no split point" type="xpath"
+              test="empty(//dtb:frontmatter//*[tokenize(@class,'\s+')='volume-split-point'])"/>
+    <x:expect label="the third paragraph of the body starts a new volume" type="xpath"
+              test="tokenize(//dtb:p[@id='p3']/@class,'\s+')='volume-split-point'"/>
+    <x:expect label="and it is the only split point" type="xpath"
+              test="count(//*[tokenize(@class,'\s+')='volume-split-point'])=1"/>
+  </x:scenario>
+
+  <x:scenario label="without a words per volume no split points are inserted">
+    <x:call step="pxi:insert-volume-split-points">
+      <x:input port="source">
+        <x:document type="inline">
+          <dtbook>
+            <book>
+              <bodymatter>
+                <level1>
+                  <h1>Heading</h1>
+                  <p id="p1">one two three four five six seven eight nine ten</p>
+                  <p id="p2">one two three four five six seven eight nine ten</p>
+                  <p id="p3">one two three four five six seven eight nine ten</p>
+                </level1>
+              </bodymatter>
+            </book>
+          </dtbook>
+        </x:document>
+      </x:input>
+    </x:call>
+    <x:context label="result">
+      <x:document type="port" port="result"/>
+    </x:context>
+    <x:expect label="the document has no split points" type="xpath"
+              test="empty(//*[tokenize(@class,'\s+')='volume-split-point'])"/>
+  </x:scenario>
+
+</x:description>
