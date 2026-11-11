@@ -45,9 +45,9 @@
 	                prefer-break-after="/html:html/html:body/html:section/html:section|
 	                                     /html:html/html:body/html:section/html:section[tokenize(@epub:type,'\s+')='bodymatter']/html:section"
 	                always-break-before="/html:html/html:body/html:section|
-	                                     /html:html/html:body/html:section[tokenize(@epub:type,'\s+')='bodymatter']/html:section"
+	                                     /html:html/html:body/html:section[tokenize(@epub:type,'\s+')=('frontmatter','bodymatter','backmatter')]/html:section"
 	                always-break-after="/html:html/html:body/html:section|
-	                                    /html:html/html:body/html:section[tokenize(@epub:type,'\s+')='bodymatter']/html:section">
+	                                    /html:html/html:body/html:section[tokenize(@epub:type,'\s+')=('frontmatter','bodymatter','backmatter')]/html:section">
 		<p:with-option name="max-chunk-size" select="$max-chunk-size"/>
 	</px:xml-chunker>
 	

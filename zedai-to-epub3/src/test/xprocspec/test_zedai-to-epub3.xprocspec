@@ -49,6 +49,10 @@
 					<d:file href="output-dir/EPUB/alice-2.xhtml" media-type="application/xhtml+xml" doctype="&lt;!DOCTYPE html&gt;"/>
 					<d:file href="output-dir/EPUB/alice-3.xhtml" media-type="application/xhtml+xml" doctype="&lt;!DOCTYPE html&gt;"/>
 					<d:file href="output-dir/EPUB/alice-4.xhtml" media-type="application/xhtml+xml" doctype="&lt;!DOCTYPE html&gt;"/>
+					<d:file href="output-dir/EPUB/alice-5.xhtml" media-type="application/xhtml+xml" doctype="&lt;!DOCTYPE html&gt;"/>
+					<d:file href="output-dir/EPUB/alice-6.xhtml" media-type="application/xhtml+xml" doctype="&lt;!DOCTYPE html&gt;"/>
+					<d:file href="output-dir/EPUB/alice-7.xhtml" media-type="application/xhtml+xml" doctype="&lt;!DOCTYPE html&gt;"/>
+					<d:file href="output-dir/EPUB/alice-8.xhtml" media-type="application/xhtml+xml" doctype="&lt;!DOCTYPE html&gt;"/>
 					<d:file href="output-dir/EPUB/package.opf" media-type="application/oebps-package+xml"/>
 					<d:file href="output-dir/META-INF/container.xml" media-type="application/xml"/>
 				</d:fileset>
@@ -81,38 +85,46 @@
 						<meta property="schema:accessibilityHazard">unknown</meta>
 					</metadata>
 					<manifest>
-						<item href="alice-1.xhtml" media-type="application/xhtml+xml" id="item_1" properties="nav"/>
+						<item href="alice-1.xhtml" media-type="application/xhtml+xml" id="item_1"/>
 						<item href="alice-2.xhtml" media-type="application/xhtml+xml" id="item_2"/>
 						<item href="alice-3.xhtml" media-type="application/xhtml+xml" id="item_3"/>
 						<item href="alice-4.xhtml" media-type="application/xhtml+xml" id="item_4"/>
+						<item href="alice-5.xhtml" media-type="application/xhtml+xml" id="item_5" properties="nav"/>
+						<item href="alice-6.xhtml" media-type="application/xhtml+xml" id="item_6"/>
+						<item href="alice-7.xhtml" media-type="application/xhtml+xml" id="item_7"/>
+						<item href="alice-8.xhtml" media-type="application/xhtml+xml" id="item_8"/>
 					</manifest>
 					<spine>
 						<itemref idref="item_1" id="itemref_1"/>
 						<itemref idref="item_2" id="itemref_2"/>
 						<itemref idref="item_3" id="itemref_3"/>
 						<itemref idref="item_4" id="itemref_4"/>
+						<itemref idref="item_5" id="itemref_5"/>
+						<itemref idref="item_6" id="itemref_6"/>
+						<itemref idref="item_7" id="itemref_7"/>
+						<itemref idref="item_8" id="itemref_8"/>
 					</spine>
 				</package>
 			</x:document>
 		</x:expect>
-		<x:context label="the toc in the alice-1.xhtml file">
+		<x:context label="the toc in the alice-5.xhtml file">
 			<x:document type="port" port="in-memory.out"
-			            select="/*[base-uri()=resolve-uri('output-dir/EPUB/alice-1.xhtml',$test-base-uri)]
+			            select="/*[base-uri()=resolve-uri('output-dir/EPUB/alice-5.xhtml',$test-base-uri)]
 			                    //html:nav[@epub:type='toc']"/>
 		</x:context>
-		<x:expect label="the toc in the alice-1.xhtml file" type="compare">
+		<x:expect label="the toc in the alice-5.xhtml file" type="compare">
 			<x:document type="inline">
 				<nav xmlns="http://www.w3.org/1999/xhtml" id="id_17" epub:type="toc">
 					<h3 id="id_18">Contents</h3>
 					<ul>
 						<li>
-							I. Down the Rabbit-Hole <a href="alice-2.xhtml#p1">1</a>
+							I. Down the Rabbit-Hole <a href="alice-6.xhtml#p1">1</a>
 						</li>
 						<li>
-							II. The Pool of Tears <a href="alice-3.xhtml#p15">15</a>
+							II. The Pool of Tears <a href="alice-7.xhtml#p15">15</a>
 						</li>
 						<li>
-							III. A Caucus-Race and a Long Tale <a href="alice-4.xhtml#p29">29</a>
+							III. A Caucus-Race and a Long Tale <a href="alice-8.xhtml#p29">29</a>
 						</li>
 					</ul>
 				</nav>

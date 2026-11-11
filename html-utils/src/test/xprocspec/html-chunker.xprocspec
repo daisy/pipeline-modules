@@ -23,6 +23,10 @@
                                 <p/>
                                 <section/>
                             </section>
+                            <section epub:type="backmatter">
+                                <section/>
+                                <section/>
+                            </section>
                         </body>
                     </html>
                 </x:document>
@@ -31,11 +35,17 @@
         <x:context label="the chunks">
             <x:document type="port" port="result"/>
         </x:context>
-        <x:expect label="frontmatter in one chunk, each bodymatter subsections in its own chunk" type="compare">
+        <x:expect label="each subsection of each matter in its own chunk" type="compare">
             <x:document type="inline">
                 <html>
                     <body epub:type="frontmatter">
                         <section/>
+                    </body>
+                </html>
+            </x:document>
+            <x:document type="inline">
+                <html>
+                    <body epub:type="frontmatter">
                         <section/>
                     </body>
                 </html>
@@ -58,6 +68,20 @@
             <x:document type="inline">
                 <html>
                     <body epub:type="bodymatter">
+                        <section/>
+                    </body>
+                </html>
+            </x:document>
+            <x:document type="inline">
+                <html>
+                    <body epub:type="backmatter">
+                        <section/>
+                    </body>
+                </html>
+            </x:document>
+            <x:document type="inline">
+                <html>
+                    <body epub:type="backmatter">
                         <section/>
                     </body>
                 </html>

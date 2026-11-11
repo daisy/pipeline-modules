@@ -66,13 +66,17 @@
 						<d:file href="output-dir/alice-2.xhtml" media-type="application/xhtml+xml" doctype="&lt;!DOCTYPE html&gt;"/>
 						<d:file href="output-dir/alice-3.xhtml" media-type="application/xhtml+xml" doctype="&lt;!DOCTYPE html&gt;"/>
 						<d:file href="output-dir/alice-4.xhtml" media-type="application/xhtml+xml" doctype="&lt;!DOCTYPE html&gt;"/>
+						<d:file href="output-dir/alice-5.xhtml" media-type="application/xhtml+xml" doctype="&lt;!DOCTYPE html&gt;"/>
+						<d:file href="output-dir/alice-6.xhtml" media-type="application/xhtml+xml" doctype="&lt;!DOCTYPE html&gt;"/>
+						<d:file href="output-dir/alice-7.xhtml" media-type="application/xhtml+xml" doctype="&lt;!DOCTYPE html&gt;"/>
+						<d:file href="output-dir/alice-8.xhtml" media-type="application/xhtml+xml" doctype="&lt;!DOCTYPE html&gt;"/>
 					</d:fileset>
 				</x:document>
 			</x:expect>
 			<x:context label="the in-memory.out port">
 				<x:document type="port" port="in-memory.out"/>
 			</x:context>
-			<x:expect label="there should be 4 documents" type="count" min="4" max="4"/>
+			<x:expect label="there should be 8 documents" type="count" min="8" max="8"/>
 			<x:context label="the mapping port">
 				<x:document type="port" port="mapping"/>
 			</x:context>
@@ -83,24 +87,32 @@
 						<d:file href="output-dir/alice-1.xhtml" original-href="../resources/resources/alice.xml">
 							<d:anchor id="id_5"/>
 							<d:anchor id="id_4"/>
+							<d:anchor id="id_3"/>
+						</d:file>
+						<d:file href="output-dir/alice-2.xhtml" original-href="../resources/resources/alice.xml">
 							<d:anchor id="id_7"/>
 							<d:anchor id="id_6"/>
 							<d:anchor id="id_9"/>
 							<d:anchor id="id_8"/>
-							<d:anchor id="id_13"/>
-							<d:anchor id="id_14"/>
+							<d:anchor id="img_1"/>
+						</d:file>
+						<d:file href="output-dir/alice-3.xhtml" original-href="../resources/resources/alice.xml">
 							<d:anchor id="id_11"/>
 							<d:anchor id="id_12"/>
 							<d:anchor id="id_10"/>
+						</d:file>
+						<d:file href="output-dir/alice-4.xhtml" original-href="../resources/resources/alice.xml">
+							<d:anchor id="id_13"/>
+							<d:anchor id="id_14"/>
+							<d:anchor id="id_15"/>
+							<d:anchor id="id_16"/>
+						</d:file>
+						<d:file href="output-dir/alice-5.xhtml" original-href="../resources/resources/alice.xml">
 							<d:anchor id="id_17"/>
 							<d:anchor id="id_18"/>
-							<d:anchor id="id_3"/>
-							<d:anchor id="id_15"/>
 							<d:anchor id="id_2"/>
-							<d:anchor id="id_16"/>
-							<d:anchor id="img_1"/>
 						</d:file>
-						<d:file href="output-dir/alice-2.xhtml" original-href="../resources/resources/alice.xml">
+						<d:file href="output-dir/alice-6.xhtml" original-href="../resources/resources/alice.xml">
 							<d:anchor id="id_24"/>
 							<d:anchor id="id_25"/>
 							<d:anchor id="id_22"/>
@@ -123,7 +135,7 @@
 							<d:anchor id="id_32"/>
 							<d:anchor id="id_30"/>
 						</d:file>
-						<d:file href="output-dir/alice-3.xhtml" original-href="../resources/resources/alice.xml">
+						<d:file href="output-dir/alice-7.xhtml" original-href="../resources/resources/alice.xml">
 							<d:anchor id="p16"/>
 							<d:anchor id="p15"/>
 							<d:anchor id="p18"/>
@@ -145,7 +157,7 @@
 							<d:anchor id="id_36"/>
 							<d:anchor id="id_37"/>
 						</d:file>
-						<d:file href="output-dir/alice-4.xhtml" original-href="../resources/resources/alice.xml">
+						<d:file href="output-dir/alice-8.xhtml" original-href="../resources/resources/alice.xml">
 							<d:anchor id="p29"/>
 							<d:anchor id="id_19"/>
 							<d:anchor id="id_1"/>
