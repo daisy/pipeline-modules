@@ -88,6 +88,9 @@
 				                        $braille-code,
 				                        sum(($collect($braille-code),string-length(normalize-space(.)))))"/>
 			</xsl:when>
+			<xsl:otherwise>
+				<xsl:sequence select="$collect"/>
+			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
 
