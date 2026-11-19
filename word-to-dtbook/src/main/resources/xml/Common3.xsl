@@ -15,8 +15,9 @@
 	xmlns:dgm="http://schemas.openxmlformats.org/drawingml/2006/diagram"
 	xmlns:o="urn:schemas-microsoft-com:office:office"
 	xmlns:d="org.daisy.pipeline.word_to_dtbook.impl.DaisyClass"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns="http://www.daisy.org/z3986/2005/dtbook/"
-	exclude-result-prefixes="w pic wp dcterms xsi cp dc a r v dcmitype d o xsl dgm xs">
+	exclude-result-prefixes="w pic wp dcterms xsi cp dc a r v dcmitype d o xsl dgm xs mc">
 	
 	<xsl:variable name="styles" select="$stylesXml//w:styles" />
 	
@@ -396,16 +397,19 @@
 		<xsl:param name="imgOpt" as="xs:string"/>
 		<xsl:param name="dpi" as="xs:float?"/>
 		<xsl:param name="characterStyle" as="xs:boolean"/>
+
+		<xsl:variable name="drawingNode" select="w:drawing | mc:AlternateContent/mc:Choice/w:drawing"/>
+
 		<xsl:variable name="alttext" as="xs:string?">
 			<xsl:choose>
-				<xsl:when test="w:drawing/wp:inline/wp:docPr/@descr">
-					<xsl:sequence select="w:drawing/wp:inline/wp:docPr/@descr"/>
+				<xsl:when test="$drawingNode/wp:inline/wp:docPr/@descr">
+					<xsl:sequence select="$drawingNode/wp:inline/wp:docPr/@descr"/>
 				</xsl:when>
-				<xsl:when test="w:drawing/wp:inline/a:graphic/a:graphicData/pic:pic/pic:nvPicPr/pic:cNvPr/@descr">
-					<xsl:sequence select="w:drawing/wp:inline/a:graphic/a:graphicData/pic:pic/pic:nvPicPr/pic:cNvPr/@descr"/>
+				<xsl:when test="$drawingNode/wp:inline/a:graphic/a:graphicData/pic:pic/pic:nvPicPr/pic:cNvPr/@descr">
+					<xsl:sequence select="$drawingNode/wp:inline/a:graphic/a:graphicData/pic:pic/pic:nvPicPr/pic:cNvPr/@descr"/>
 				</xsl:when>
-				<xsl:when test="w:drawing/wp:anchor/a:graphic/a:graphicData/pic:pic/pic:nvPicPr/pic:cNvPr/@descr">
-					<xsl:sequence select="w:drawing/wp:anchor/a:graphic/a:graphicData/pic:pic/pic:nvPicPr/pic:cNvPr/@descr"/>
+				<xsl:when test="$drawingNode/wp:anchor/a:graphic/a:graphicData/pic:pic/pic:nvPicPr/pic:cNvPr/@descr">
+					<xsl:sequence select="$drawingNode/wp:anchor/a:graphic/a:graphicData/pic:pic/pic:nvPicPr/pic:cNvPr/@descr"/>
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:value-of select="''"/> <!-- Not sure if this alt text needs to be pre-filled or not (like with a 'No description provided' text)-->
@@ -415,31 +419,32 @@
 		<!--Variable holds the value of Image Id-->
 		<xsl:variable name="Img_Id" as="xs:string?">
 			<xsl:choose>
-				<xsl:when  test="w:drawing/wp:inline/a:graphic/a:graphicData/pic:pic/pic:blipFill/a:blip/@r:embed">
-					<xsl:sequence select="w:drawing/wp:inline/a:graphic/a:graphicData/pic:pic/pic:blipFill/a:blip/@r:embed"/>
+				<!-- @r:embeder usually uses a rId value, that points to an image declared in "word/_rels/document.xml.rels" -->
+				<xsl:when  test="$drawingNode/wp:inline/a:graphic/a:graphicData/pic:pic/pic:blipFill/a:blip/@r:embed">
+					<xsl:sequence select="$drawingNode/wp:inline/a:graphic/a:graphicData/pic:pic/pic:blipFill/a:blip/@r:embed"/>
 				</xsl:when>
-				<xsl:when test="w:drawing/wp:anchor/a:graphic/a:graphicData/pic:pic/pic:blipFill/a:blip/@r:embed">
-					<xsl:sequence select="w:drawing/wp:anchor/a:graphic/a:graphicData/pic:pic/pic:blipFill/a:blip/@r:embed"/>
+				<xsl:when test="$drawingNode/wp:anchor/a:graphic/a:graphicData/pic:pic/pic:blipFill/a:blip/@r:embed">
+					<xsl:sequence select="$drawingNode/wp:anchor/a:graphic/a:graphicData/pic:pic/pic:blipFill/a:blip/@r:embed"/>
 				</xsl:when>
-				<xsl:when test="w:drawing/wp:inline/wp:docPr/@id">
-					<xsl:sequence select="w:drawing/wp:inline/wp:docPr/@id"/>
+				<xsl:when test="$drawingNode/wp:inline/wp:docPr/@id">
+					<xsl:sequence select="$drawingNode/wp:inline/wp:docPr/@id"/>
 				</xsl:when>
-				<xsl:when test="w:drawing/wp:anchor/wp:docPr/@id">
-					<xsl:sequence select="w:drawing/wp:anchor/wp:docPr/@id"/>
+				<xsl:when test="$drawingNode/wp:anchor/wp:docPr/@id">
+					<xsl:sequence select="$drawingNode/wp:anchor/wp:docPr/@id"/>
 				</xsl:when>
 			</xsl:choose>
 		</xsl:variable>
 		<!--Variable holds the filename of the image-->
 		<xsl:variable name="imageName" as="xs:string">
 			<xsl:choose>
-				<xsl:when  test="w:drawing/wp:inline/a:graphic/a:graphicData/pic:pic/pic:nvPicPr/pic:cNvPr/@name">
-					<xsl:sequence select="w:drawing/wp:inline/a:graphic/a:graphicData/pic:pic/pic:nvPicPr/pic:cNvPr/@name"/>
+				<xsl:when  test="$drawingNode/wp:inline/a:graphic/a:graphicData/pic:pic/pic:nvPicPr/pic:cNvPr/@name">
+					<xsl:sequence select="$drawingNode/wp:inline/a:graphic/a:graphicData/pic:pic/pic:nvPicPr/pic:cNvPr/@name"/>
 				</xsl:when>
-				<xsl:when test="w:drawing/wp:anchor/a:graphic/a:graphicData/pic:pic/pic:nvPicPr/pic:cNvPr/@name">
-					<xsl:sequence select="w:drawing/wp:anchor/a:graphic/a:graphicData/pic:pic/pic:nvPicPr/pic:cNvPr/@name"/>
+				<xsl:when test="$drawingNode/wp:anchor/a:graphic/a:graphicData/pic:pic/pic:nvPicPr/pic:cNvPr/@name">
+					<xsl:sequence select="$drawingNode/wp:anchor/a:graphic/a:graphicData/pic:pic/pic:nvPicPr/pic:cNvPr/@name"/>
 				</xsl:when>
-				<xsl:when test="w:drawing/wp:inline/wp:docPr/@name">
-					<xsl:sequence select="w:drawing/wp:inline/wp:docPr/@name"/>
+				<xsl:when test="$drawingNode/wp:inline/wp:docPr/@name">
+					<xsl:sequence select="$drawingNode/wp:inline/wp:docPr/@name"/>
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:sequence select="''"/>
@@ -447,21 +452,25 @@
 			</xsl:choose>
 		</xsl:variable>
 		<!--Variable holds the value of Image Id concatenated with some random number generated for Image Id-->
+		<!-- New computation of shapes : 
+		 	anchored and inline shapes are exported indistinguishably ordered by their appearance in the document
+		-->
+		<xsl:variable name="drawingIndex" select="count(preceding::w:drawing) + 1"/>
 		<xsl:variable name="imageId" as="xs:string">
 			<xsl:choose>
-				<xsl:when  test="w:drawing/wp:inline/a:graphic/a:graphicData/pic:pic/pic:blipFill/a:blip/@r:embed">
+				<!-- Inline image -->
+				<xsl:when  test="$drawingNode/wp:inline/a:graphic/a:graphicData/pic:pic/pic:blipFill/a:blip/@r:embed">
 					<xsl:sequence select="concat($Img_Id,d:GenerateImageId($myObj))"/>
 				</xsl:when>
-				<xsl:when test="w:drawing/wp:anchor/a:graphic/a:graphicData/pic:pic/pic:blipFill/a:blip/@r:embed">
+				<!-- Anchored image -->
+				<xsl:when test="$drawingNode/wp:anchor/a:graphic/a:graphicData/pic:pic/pic:blipFill/a:blip/@r:embed">
 					<xsl:sequence select="concat($Img_Id,d:GenerateImageId($myObj))"/>
 				</xsl:when>
-				<!--For chart and diagram, an inline/docPr/id is usually defined in the drawing and is used for ID resolution in export-->
-				<xsl:when test="w:drawing/wp:inline/a:graphic/a:graphicData/@uri='http://schemas.openxmlformats.org/drawingml/2006/diagram'
-							or w:drawing/wp:inline/a:graphic/a:graphicData/@uri='http://schemas.openxmlformats.org/drawingml/2006/chart'">
-					<xsl:sequence select="d:CheckShapeId($myObj,concat('Shape',w:drawing/wp:inline/wp:docPr/@id))"/>
+				<xsl:when test="$drawingNode/wp:inline">
+					<xsl:sequence select="d:CheckShapeId($myObj,concat('Shape', $drawingIndex))"/>
 				</xsl:when>
-				<xsl:when test="w:drawing/wp:inline/wp:docPr/@id">
-					<xsl:sequence select="d:CheckShapeId($myObj,w:drawing/wp:inline/wp:docPr/@id)"/>
+				<xsl:when test="$drawingNode/wp:anchor">
+					<xsl:sequence select="d:CheckShapeId($myObj,concat('Shape', $drawingIndex))"/>
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:sequence select="''"/>
@@ -476,17 +485,17 @@
 		-->
 		<xsl:variable name="imageWidth" as="xs:double">
 			<xsl:choose>
-				<xsl:when  test="w:drawing/wp:inline/wp:extent">
-					<xsl:sequence select="w:drawing/wp:inline/wp:extent/@cx"/>
+				<xsl:when  test="$drawingNode/wp:inline/wp:extent">
+					<xsl:sequence select="$drawingNode/wp:inline/wp:extent/@cx"/>
 				</xsl:when>
-				<xsl:when test="w:drawing/wp:anchor/wp:extent">
-					<xsl:sequence select="w:drawing/wp:anchor/wp:extent/@cx"/>
+				<xsl:when test="$drawingNode/wp:anchor/wp:extent">
+					<xsl:sequence select="$drawingNode/wp:anchor/wp:extent/@cx"/>
 				</xsl:when>
-				<xsl:when test="w:drawing/wp:inline/wp:extent">
-					<xsl:sequence select="w:drawing/wp:inline/wp:extent/@cx"/>
+				<xsl:when test="$drawingNode/wp:inline/wp:extent">
+					<xsl:sequence select="$drawingNode/wp:inline/wp:extent/@cx"/>
 				</xsl:when>
-				<xsl:when test="w:drawing/wp:anchor/wp:extent">
-					<xsl:sequence select="w:drawing/wp:anchor/wp:extent/@cx"/>
+				<xsl:when test="$drawingNode/wp:anchor/wp:extent">
+					<xsl:sequence select="$drawingNode/wp:anchor/wp:extent/@cx"/>
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:sequence select="number(())"/> <!-- NaN -->
@@ -495,17 +504,17 @@
 		</xsl:variable>
 		<xsl:variable name="imageHeight" as="xs:double">
 			<xsl:choose>
-				<xsl:when  test="w:drawing/wp:inline/wp:extent">
-					<xsl:sequence select="w:drawing/wp:inline/wp:extent/@cy"/>
+				<xsl:when  test="$drawingNode/wp:inline/wp:extent">
+					<xsl:sequence select="$drawingNode/wp:inline/wp:extent/@cy"/>
 				</xsl:when>
-				<xsl:when test="w:drawing/wp:anchor/wp:extent">
-					<xsl:sequence select="w:drawing/wp:anchor/wp:extent/@cy"/>
+				<xsl:when test="$drawingNode/wp:anchor/wp:extent">
+					<xsl:sequence select="$drawingNode/wp:anchor/wp:extent/@cy"/>
 				</xsl:when>
-				<xsl:when test="w:drawing/wp:inline/wp:extent">
-					<xsl:sequence select="w:drawing/wp:inline/wp:extent/@cy"/>
+				<xsl:when test="$drawingNode/wp:inline/wp:extent">
+					<xsl:sequence select="$drawingNode/wp:inline/wp:extent/@cy"/>
 				</xsl:when>
-				<xsl:when test="w:drawing/wp:anchor/wp:extent">
-					<xsl:sequence select="w:drawing/wp:anchor/wp:extent/@cy"/>
+				<xsl:when test="$drawingNode/wp:anchor/wp:extent">
+					<xsl:sequence select="$drawingNode/wp:anchor/wp:extent/@cy"/>
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:sequence select="number(())"/> <!-- NaN -->

@@ -24,20 +24,30 @@
 <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/" xmlns:mml="http://www.w3.org/1998/Math/MathML" version="2005-3" xml:lang="en-US">
    <head>
       <meta name="dtb:uid" content="11"/>
+      <meta name="dc:Identifier" content="11"/>
       <meta name="dc:Title" content="Default word sample for docx-to-dtbook tests"/>
       <meta name="dc:Creator" content="PAVIE Nicolas"/>
       <meta name="dc:Publisher" content="Daisy consortium"/>
-      <meta name="dc:Subject" content="sample; subject;"/>
+      <meta name="dc:Subject" content="sample"/>
+      <meta name="dc:Subject" content="subject"/>
       <meta name="dc:Description" content="This is a sample document used to test if various errors are fixed."/>
-      <meta name="dc:Identifier" content="11"/>
       <meta name="dc:Language" content="en-US"/>
       <meta name="dc:Language" content="fr-FR"/>
       <meta name="dc:Language" content="sv-SE"/>
       <meta name="dc:Contributor" content="Test contributor"/>
       <meta name="dc:SourceDate" content="11/3/2025 12:00:00 AM"/>
       <meta name="dc:Rights" content="No copyright provided"/>
-      <meta name="dc:Source" content="No pagnination source provided"/>
+      <meta name="a11y:pageBreakSource" content="No pagnination source provided"/>
       <meta name="schema:accessibilitySummary" content="Summary of accessibility functions not provided in the sample. To be computed later."/>
+      <meta name="schema:accessibilityFeature" content="structuralNavigation"/>
+      <meta name="schema:accessibilityFeature" content="displayTransformability"/>
+      <meta name="schema:accessibilityFeature" content="readingOrder"/>
+      <meta name="schema:accessibilityFeature" content="unlocked"/>
+      <meta name="schema:accessibilityFeature" content="MathML"/>
+      <meta name="schema:accessMode" content="textual"/>
+      <meta name="schema:accessMode" content="visual"/>
+      <meta name="schema:accessModeSufficient" content="textual"/>
+      <meta name="schema:accessibilityHazard" content="none"/>
    </head>
    <book showin="blp">
       <frontmatter>
@@ -59,19 +69,19 @@
          <p xml:lang="fr-FR">a sidebar required</p></sidebar><poem xml:lang="fr-FR"><linegroup xml:lang="fr-FR"><line>This is a simple poem.</line>
          <line>With 2 lines of texte.</line></linegroup></poem><p>A paragraphe</p><sidebar render="optional" xml:lang="fr-FR"><p xml:lang="fr-FR">A sidebar</p></sidebar><bridgehead xml:lang="fr-FR">Followed by a bridgehead</bridgehead><p>A separation paragrpahe.</p><sidebar render="optional" xml:lang="fr-FR"><p xml:lang="fr-FR">This is a sidebar as last element</p></sidebar><p>Testing blockquotes:</p><blockquote xml:lang="fr-FR"><p xml:lang="fr-FR">This is a simple quote for testing</p>
          <author>N.P.</author></blockquote><list type="ul"><li><p xml:lang="sv-SE">With a list following for a bugfix evaluation</p></li><li><p xml:lang="sv-SE">blablabla</p></li></list><p xml:lang="fr-FR">Testing epigraphs :</p><epigraph xml:lang="fr-FR"><p xml:lang="fr-FR">This is a simple epigraph test that i’m writing.</p><p>In creating, the only hard thing’s to begin : a grass blade’s no easier to make than an oak.</p><p xml:lang="sv-SE"/><author>James Russel Lowel, A Fable for Critics.</author></epigraph></level2><level2><h2>  Manually inserted breaks</h2><p xml:lang="fr-FR"/><p>This is a first text<noteref idref="#footnote-2" class="Footnote">2</noteref> followed by a page break :</p><p>This is a second text followed by a continous section break:</p><p>This is a third text<noteref idref="#endnote-1" class="Endnote">1</noteref> followed by a section page break : </p><p>This is a text followed by a section break to pair page : </p><p>This is a text followed by a section break to impair page </p><p xml:lang="fr-FR"/><note id="footnote-2" class="Footnote"><p> This a seconde sample texte with an <a href="https://daisy.org/?s=SaveAsDAISY&amp;test-of-text" external="true">hyperlink</a> to a page</p></note></level2></level1><level1><h1>  Eléments and objects</h1><level2><h2>  Images</h2><p>This an isolated image :</p><p><imggroup>
-            <img src="default_sample_for_dtbook_conversion-Image%201.jpg" alt="The daisy consortium logo" id="rId91"/>
+            <img src="default_sample_for_dtbook_conversion-image1.jpg" alt="The daisy consortium logo" id="rId91"/>
             <caption imgref="rId91">The daisy consortium logo</caption>
          </imggroup></p><p>This is an inlined <imggroup>
-            <img src="default_sample_for_dtbook_conversion-Image%202.jpg" alt="The daisy consortium logo" id="rId102"/>
+            <img src="default_sample_for_dtbook_conversion-image2.jpg" alt="The daisy consortium logo" id="rId102"/>
             <caption imgref="rId102" xml:lang="en-US">The daisy consortium logo </caption>
          </imggroup>  images.</p><p>Here is <imggroup>
-            <img src="default_sample_for_dtbook_conversion-Image%203.jpg" alt="The daisy consortium logo" id="rId113"/>
+            <img src="default_sample_for_dtbook_conversion-image3.jpg" alt="The daisy consortium logo" id="rId113"/>
          </imggroup>and <imggroup>
-            <img src="default_sample_for_dtbook_conversion-Image%204.jpg" alt="The daisy consortium logo" id="rId124"/>
-         </imggroup>image.</p><p>This is an integrated shape (with caption):</p><p/><p/><p>This is a « SmartArt » insertion with caption</p><p><span>Diagramme 8: This a simple process illustration with 3 text box from left to right separated by arrows pointing to the right :
+            <img src="default_sample_for_dtbook_conversion-image4.jpg" alt="The daisy consortium logo" id="rId124"/>
+         </imggroup>image.</p><p>This is an integrated shape (with caption):</p><p><span>Rectangle 5: This is a simple blue box shape</span></p><p><span>Zone de texte 7: </span></p><p>This is a « SmartArt » insertion with caption</p><p><span>Diagramme 8: This a simple process illustration with 3 text box from left to right separated by arrows pointing to the right :
 - sample
 - Analysis
-- text </span></p><p>Smart art example 1</p><p>Trying a chart</p><p><span>Graphique 3: Simple chart for conversion tests</span></p><p xml:lang="fr-FR"/><p>Trying image groups with languages</p><p xml:lang="fr-FR"/></level2><level2><h2>  Equations</h2><p>This a test<noteref idref="#endnote-2" class="Endnote">2</noteref> with an basic equation</p><p xml:lang="fr-FR"><mml:math xmlns:dtbook="http://www.daisy.org/z3986/2005/dtbook/" display="block">
+- text </span></p><p>Smart art example 1</p><p>Trying a chart</p><p><span>Graphique 3: Simple chart for conversion tests</span></p><p xml:lang="fr-FR"/><p><span>: </span>Trying image groups with languages</p><p xml:lang="fr-FR"/></level2><level2><h2>  Equations</h2><p>This a test<noteref idref="#endnote-2" class="Endnote">2</noteref> with an basic equation</p><p xml:lang="fr-FR"><mml:math xmlns:dtbook="http://www.daisy.org/z3986/2005/dtbook/" display="block">
             <mml:msup>
                <mml:mrow>
                   <mml:mrow>

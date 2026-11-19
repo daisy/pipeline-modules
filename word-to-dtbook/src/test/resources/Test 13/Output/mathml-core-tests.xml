@@ -1,44 +1,50 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE dtbook PUBLIC '-//NISO//DTD dtbook 2005-3//EN' 'http://www.daisy.org/z3986/2005/dtbook-2005-3.dtd'[
-	<!ENTITY % MATHML.prefixed "INCLUDE" >
-	<!ENTITY % MATHML.prefix "mml">
-	<!ENTITY % Schema.prefix "sch">
-	<!ENTITY % XLINK.prefix "xlp">
-	<!ENTITY % MATHML.Common.attrib
-		"xlink:href    CDATA       #IMPLIED
-		xlink:type     CDATA       #IMPLIED
-		class          CDATA       #IMPLIED
-		style          CDATA       #IMPLIED
-		id             ID          #IMPLIED
-		xref           IDREF       #IMPLIED
-		other          CDATA       #IMPLIED
-		xmlns:dtbook   CDATA       #FIXED
-			'http://www.daisy.org/z3986/2005/dtbook/'
-		dtbook:smilref CDATA       #IMPLIED">
-	<!ENTITY % mathML2 PUBLIC '-//W3C//DTD MathML 2.0//EN' 'http://www.w3.org/Math/DTD/mathml2/mathml2.dtd'>
-	%mathML2;
-	<!ENTITY % externalFlow "| mml:math">
-	<!ENTITY % externalNamespaces "xmlns:mml CDATA #FIXED
-		'http://www.w3.org/1998/Math/MathML'" >
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dtbook PUBLIC '-//NISO//DTD dtbook 2005-3//EN' 'http://www.daisy.org/z3986/2005/dtbook-2005-3.dtd' [
+    <!ENTITY % MATHML.prefixed "INCLUDE" >
+    <!ENTITY % MATHML.prefix "mml">
+    <!ENTITY % Schema.prefix "sch">
+    <!ENTITY % XLINK.prefix "xlp">
+    <!ENTITY % MATHML.Common.attrib
+        "xlink:href    CDATA       #IMPLIED
+        xlink:type     CDATA       #IMPLIED
+        class          CDATA       #IMPLIED
+        style          CDATA       #IMPLIED
+        id             ID          #IMPLIED
+        xref           IDREF       #IMPLIED
+        other          CDATA       #IMPLIED
+        xmlns:dtbook   CDATA       #FIXED
+            'http://www.daisy.org/z3986/2005/dtbook/'
+        dtbook:smilref CDATA       #IMPLIED">
+    <!ENTITY % mathML2 PUBLIC '-//W3C//DTD MathML 2.0//EN' 'http://www.w3.org/Math/DTD/mathml2/mathml2.dtd'>
+    %mathML2;
+    <!ENTITY % externalFlow "| mml:math">
+    <!ENTITY % externalNamespaces "xmlns:mml CDATA #FIXED
+              'http://www.w3.org/1998/Math/MathML'" >
 ] >
-<dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/"
-        xmlns:mml="http://www.w3.org/1998/Math/MathML"
-        version="2005-3"
-        xml:lang="en-US">
+<dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/" xmlns:mml="http://www.w3.org/1998/Math/MathML" version="2005-3" xml:lang="en-US">
    <head>
       <meta name="dtb:uid" content="13"/>
+      <meta name="dc:Identifier" content="13"/>
       <meta name="dc:Title" content="Date issue"/>
       <meta name="dc:Creator" content="Nicolas Pavie"/>
       <meta name="dc:Publisher" content="Association Valentin Haüy"/>
-      <meta name="dc:Identifier" content="13"/>
       <meta name="dc:Language" content="en-US"/>
       <meta name="dc:Language" content="fr-FR"/>
+      <meta name="schema:accessibilityFeature" content="structuralNavigation"/>
+      <meta name="schema:accessibilityFeature" content="displayTransformability"/>
+      <meta name="schema:accessibilityFeature" content="readingOrder"/>
+      <meta name="schema:accessibilityFeature" content="unlocked"/>
+      <meta name="schema:accessibilityFeature" content="MathML"/>
+      <meta name="schema:accessMode" content="textual"/>
+      <meta name="schema:accessModeSufficient" content="textual"/>
+      <meta name="schema:accessibilityHazard" content="none"/>
    </head>
    <book showin="blp">
       <frontmatter>
          <doctitle>Date issue</doctitle>
          <docauthor>Nicolas Pavie</docauthor>
       </frontmatter>
-      <bodymatter id="bodymatter_0001"><level1><h1>  MathML conversion test files</h1><p xml:lang="fr-FR"></p><p>Equation 1</p><p xml:lang="fr-FR"><mml:math display="block">
+      <bodymatter id="bodymatter_0001"><level1><h1>  MathML conversion test files</h1><p xml:lang="fr-FR"/><p>Equation 1</p><p xml:lang="fr-FR"><mml:math xmlns:dtbook="http://www.daisy.org/z3986/2005/dtbook/" display="block">
             <mml:msup>
                <mml:mrow>
                   <mml:mi>e</mml:mi>
@@ -92,7 +98,7 @@
             <mml:mi>  </mml:mi>
             <mml:mo>-</mml:mo>
             <mml:mi>∞&lt;x&lt;∞</mml:mi>
-         </mml:math></p><p>Equation 2</p><p xml:lang="fr-FR"><mml:math display="block">
+         </mml:math></p><p>Equation 2</p><p xml:lang="fr-FR"><mml:math xmlns:dtbook="http://www.daisy.org/z3986/2005/dtbook/" display="block">
             <mml:msup>
                <mml:mrow>
                   <mml:mrow>
@@ -143,7 +149,7 @@
                </mml:mrow>
             </mml:mfrac>
             <mml:mi>+…</mml:mi>
-         </mml:math></p><p>Equation 3</p><p xml:lang="fr-FR"><mml:math display="block">
+         </mml:math></p><p>Equation 3</p><p xml:lang="fr-FR"><mml:math xmlns:dtbook="http://www.daisy.org/z3986/2005/dtbook/" display="block">
             <mml:msup>
                <mml:mrow>
                   <mml:mrow>
@@ -203,7 +209,7 @@
                   </mml:mrow>
                </mml:msup>
             </mml:mrow>
-         </mml:math></p><p>Equation 4</p><p xml:lang="fr-FR"><mml:math display="block">
+         </mml:math></p><p>Equation 4</p><p xml:lang="fr-FR"><mml:math xmlns:dtbook="http://www.daisy.org/z3986/2005/dtbook/" display="block">
             <mml:mi>x</mml:mi>
             <mml:mi>=</mml:mi>
             <mml:mfrac>
@@ -233,7 +239,7 @@
                   <mml:mi>a</mml:mi>
                </mml:mrow>
             </mml:mfrac>
-         </mml:math></p><p>Equation 5</p><p xml:lang="fr-FR"><mml:math display="block">
+         </mml:math></p><p>Equation 5</p><p xml:lang="fr-FR"><mml:math xmlns:dtbook="http://www.daisy.org/z3986/2005/dtbook/" display="block">
             <mml:mrow>
                <mml:mrow>
                   <mml:mi>sin</mml:mi>
@@ -292,7 +298,7 @@
                   <mml:mo>)</mml:mo>
                </mml:mrow>
             </mml:mrow>
-         </mml:math></p><p>Equation 6</p><p xml:lang="fr-FR"><mml:math display="block">
+         </mml:math></p><p>Equation 6</p><p xml:lang="fr-FR"><mml:math xmlns:dtbook="http://www.daisy.org/z3986/2005/dtbook/" display="block">
             <mml:mrow>
                <mml:mrow>
                   <mml:mi>cos</mml:mi>
@@ -353,7 +359,7 @@
                   <mml:mo>)</mml:mo>
                </mml:mrow>
             </mml:mrow>
-         </mml:math></p><p>Equation 7</p><p xml:lang="fr-FR"><mml:math display="block">
+         </mml:math></p><p>Equation 7</p><p xml:lang="fr-FR"><mml:math xmlns:dtbook="http://www.daisy.org/z3986/2005/dtbook/" display="block">
             <mml:mi>f</mml:mi>
             <mml:mrow>
                <mml:mo>(</mml:mo>
@@ -434,7 +440,7 @@
                   <mml:mo>)</mml:mo>
                </mml:mrow>
             </mml:mrow>
-         </mml:math></p><p>Equation 8</p><p xml:lang="fr-FR"><mml:math display="block">
+         </mml:math></p><p>Equation 8</p><p xml:lang="fr-FR"><mml:math xmlns:dtbook="http://www.daisy.org/z3986/2005/dtbook/" display="block">
             <mml:mi>A=π</mml:mi>
             <mml:msup>
                <mml:mrow>
@@ -444,7 +450,7 @@
                   <mml:mi>2</mml:mi>
                </mml:mrow>
             </mml:msup>
-         </mml:math></p><p>Equation 9</p><p xml:lang="fr-FR"><mml:math display="block">
+         </mml:math></p><p>Equation 9</p><p xml:lang="fr-FR"><mml:math xmlns:dtbook="http://www.daisy.org/z3986/2005/dtbook/" display="block">
             <mml:mrow>
                <mml:mo>(</mml:mo>
                <mml:mrow>
@@ -486,7 +492,7 @@
                </mml:mrow>
                <mml:mo>)</mml:mo>
             </mml:mrow>
-         </mml:math></p><p>Equation 10</p><p xml:lang="fr-FR"><mml:math display="block">
+         </mml:math></p><p>Equation 10</p><p xml:lang="fr-FR"><mml:math xmlns:dtbook="http://www.daisy.org/z3986/2005/dtbook/" display="block">
             <mml:mrow>
                <mml:mo>[</mml:mo>
                <mml:mrow>
@@ -511,7 +517,7 @@
                </mml:mrow>
                <mml:mo>]</mml:mo>
             </mml:mrow>
-         </mml:math></p><p>Equation 11</p><p xml:lang="fr-FR"><mml:math display="block">
+         </mml:math></p><p>Equation 11</p><p xml:lang="fr-FR"><mml:math xmlns:dtbook="http://www.daisy.org/z3986/2005/dtbook/" display="block">
             <mml:mrow>
                <mml:mo>(</mml:mo>
                <mml:mrow>
@@ -544,7 +550,7 @@
                </mml:mrow>
                <mml:mo/>
             </mml:mrow>
-         </mml:math></p><p>Equation 12</p><p xml:lang="fr-FR"><mml:math display="block">
+         </mml:math></p><p>Equation 12</p><p xml:lang="fr-FR"><mml:math xmlns:dtbook="http://www.daisy.org/z3986/2005/dtbook/" display="block">
             <mml:mrow>
                <mml:mo/>
                <mml:mrow>
@@ -577,6 +583,6 @@
                </mml:mrow>
                <mml:mo>]</mml:mo>
             </mml:mrow>
-         </mml:math></p><p xml:lang="fr-FR"></p></level1></bodymatter>
+         </mml:math></p><p xml:lang="fr-FR"/></level1></bodymatter>
    </book>
 </dtbook>

@@ -55,7 +55,7 @@
 	<p:option name="uid" select="''" px:reusable="false">
 		<p:documentation xmlns="http://www.w3.org/1999/xhtml">
 			<h2 px:role="name">Document identifier</h2>
-			<p px:role="desc">Identifier to be added as dtb:uid metadata</p>
+			<p px:role="desc">Identifier to be added as dc:Identifier metadata</p>
 		</p:documentation>
 	</p:option>
 	<p:option name="subject" select="''" px:reusable="false">

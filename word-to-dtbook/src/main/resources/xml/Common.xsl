@@ -17,7 +17,8 @@
 				xmlns:d="org.daisy.pipeline.word_to_dtbook.impl.DaisyClass"
 				xmlns="http://www.daisy.org/z3986/2005/dtbook/"
 				xmlns:pf="http://www.daisy.org/ns/pipeline/functions"
-				exclude-result-prefixes="w pic wp dcterms xsi cp dc a r v dcmitype d xsl m o xs pf">
+				xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+				exclude-result-prefixes="w pic wp dcterms xsi cp dc a r v dcmitype d xsl m o xs pf mc">
 	<xsl:include href="http://www.daisy.org/pipeline/modules/common-utils/library.xsl"/>
 	<!--Parameter citation-->
 	<xsl:param name="Cite_style" as="xs:string" select="d:Citation($myObj)"/>
@@ -1047,7 +1048,7 @@
 			</xsl:when>
 
 			<!--checking for images in word2007 version-->
-			<xsl:when test="w:drawing">
+			<xsl:when test="w:drawing | mc:AlternateContent/mc:Choice/w:drawing">
 				<xsl:call-template name="PictureHandler">
 					<xsl:with-param name="imgOpt" select="$imgOptionPara"/>
 					<xsl:with-param name="dpi" select="$dpiPara"/>

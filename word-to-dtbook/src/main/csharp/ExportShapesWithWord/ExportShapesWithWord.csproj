@@ -82,10 +82,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ShapesExporter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ClipboardExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
