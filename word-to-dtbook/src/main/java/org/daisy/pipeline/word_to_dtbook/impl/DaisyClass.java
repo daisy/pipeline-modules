@@ -569,41 +569,38 @@ public class DaisyClass {
 		}
 	}
 
-	/**
-	 * - In the input document name (inputName), replace all spaces by underscore
-	 * - If the output is set to the %APPDATA%/SaveAsDaisy folder and if a png image ending by the "id"
-	 *   parameter exists in it, copy it to the "output_pipeline" folder
-	 * - If the output is not the temporary folder and if a png image ending by the "id" parameter
-	 *   exists in %APPDATA%/SaveAsDAISY, move the image to the output folder
-	 */
-	public String CheckShapeId(String id) throws IOException {
-		String fileName = inputName + "-" + id + ".png";
-		shapeIsExported = false;
-		File expectedShapeFile = new File(outputFilename, fileName);
-		if(!expectedShapeFile.exists()){
-			// Check for files exported by the SaveAsDAISY Addin
-			File shapesDirectory = System.getProperty("os.name").startsWith("Windows")
+	private static File shapesDirectory = System.getProperty("os.name").startsWith("Windows")
 					? new File(new File(System.getenv("APPDATA")), "SaveAsDAISY")
 					: new File("/shapes");
-			File shapeFile = new File(shapesDirectory, fileName);
-			if (shapeFile.exists()) {
+	private static File tempPath = System.getProperty("os.name").startsWith("Windows")
+					? new File(new File(System.getenv("APPDATA")), "Local/Temp")
+					: new File("/tmp");
+
+	/**
+	 * Check if the a file corresponding the shape id has been already exported and copies back the image in the output folder
+	 * @param id The shape id to check and copy if necessary. This id is made from docPr/@id prefixed by "Shape" (for anchored shapes) or "InlineShape" (for inlined shapes)
+	 */
+	public String CheckShapeId(String id) throws IOException {
+		String shapefileName = inputName + "-" + id + ".png";
+		shapeIsExported = false;
+		File shapeFile = new File(shapesDirectory, shapefileName);
+		File tempShapeFile = new File(tempPath, shapefileName);
+		File expectedShapeFile = new File(outputFilename, shapefileName);
+		if (!expectedShapeFile.exists()) {
+			if(shapeFile.exists()){
 				shapeIsExported = true;
 				Files.copy(shapeFile.toPath(), expectedShapeFile.toPath());
 				shapeFile.delete();
-			} else {
-				File tempPath = System.getProperty("os.name").startsWith("Windows")
-						? new File(new File(System.getenv("APPDATA")), "Local/Temp")
-						: new File("/tmp");
-				shapeFile = new File(tempPath, fileName);
-				if (shapeFile.exists()) {
-					shapeIsExported = true;
-					Files.copy(shapeFile.toPath(), expectedShapeFile.toPath());
-					shapeFile.delete();
-				}
+			} else if(tempShapeFile.exists()){
+				shapeIsExported = true;
+				Files.copy(tempShapeFile.toPath(), expectedShapeFile.toPath());
+				tempShapeFile.delete();
 			}
+		} else { // shapes pre extracted in output
+			shapeIsExported = true;
 		}
 		if(!shapeIsExported){
-			LOGGER.warn(fileName + " shape was not exported - manual conversion to an image is required");
+			LOGGER.warn("shape " + id + " was not exported - manual conversion to an image is required");
 		}
 		id = id.replace(" ", "_");
 		return id;
@@ -735,36 +732,13 @@ public class DaisyClass {
 			PackageRelationship imgRelationship = mainPartxml.getRelationship(inNum);
 			PackagePart imgPartxml = mainPartxml.getRelatedPart(imgRelationship);
 			ImageIO.read(imgPartxml.getInputStream());
-			/* Checking if full filename (along with extn) of the image exists */
-			if (imageName.lastIndexOf('.') >= 0) {
-				String strImgName = imageName;
-				String retimg2007Name = ImageExt(
-					inNum,
-					new File(outputFilename, inputName + "-" + strImgName),
-					inputName + "-" + strImgName);
-				return ImageProcessing.UriEscape(retimg2007Name);
-			}
-			/* Checking if full filename (along with extn) of the image does not exist */
-			else if (!imageName.isEmpty()) {
-				String strImgName = imgPartxml.getPartName().getURI().toString()
-					                          .substring(imgPartxml.getPartName().getURI().toString().lastIndexOf('.') + 1);
-				String img2007Name = imageName + "." + strImgName;
-				String retimg2007Name = ImageExt(
-					inNum,
-					new File(outputFilename, inputName + "-" + img2007Name),
-					inputName + "-" + img2007Name);
-				return ImageProcessing.UriEscape(retimg2007Name);
-			}
-			/* Checking if entire filename of the image doesn't exist */
-			else {
-				String strImgName = imgPartxml.getPartName().getURI().toString()
+			String strImgName = imgPartxml.getPartName().getURI().toString()
 					                          .substring(imgPartxml.getPartName().getURI().toString().lastIndexOf('/') + 1);
-				String retimg2007Name = ImageExt(
-					inNum,
-					new File(outputFilename, inputName + "-" + strImgName),
-					inputName + "-" + strImgName);
-				return ImageProcessing.UriEscape(retimg2007Name);
-			}
+			String retimg2007Name = ExportImage(
+				inNum,
+				new File(outputFilename, inputName + "-" + strImgName),
+				inputName + "-" + strImgName);
+			return ImageProcessing.UriEscape(retimg2007Name);
 		} catch (Throwable e) {
 			return "translation.oox2Daisy.ImageContent";
 		}
@@ -793,8 +767,14 @@ public class DaisyClass {
 
 	/**
 	 * Function to Copy image to the Output/destination folder
+	 * @param inNum The relationship ID of the image in the Word document.
+	 * @param pathName The destination path where the image should be copied.
+	 * @param imageName The name of the image file.
+	 * @return The relative path of the exported image file (to be used as src attribute value)
+	 * @throws IOException If an I/O error occurs.
+	 * @throws InvalidFormatException If the image format is invalid.
 	 */
-	private String ImageExt(String inNum, File pathName, String imageName)
+	private String ExportImage(String inNum, File pathName, String imageName)
 			throws IOException, InvalidFormatException {
 		PackageRelationship relationship = null;
 		for (PackageRelationship searchRelation : pack().getRelationshipsByType(wordRelationshipType)) {
