@@ -2727,15 +2727,7 @@ public class DaisyClass {
 		}
 		return strImgName;
 	}
-
-	public String DocPropSubject() throws InvalidFormatException {
-		return pack().getPackageProperties().getSubjectProperty().orElse("");
-	}
-
-	public String DocPropDescription() throws InvalidFormatException {
-		return pack().getPackageProperties().getDescriptionProperty().orElse("");
-	}
-
+	
 	/**
 	 * Function used to set the Abbreviations/Acronyms flag
 	 */
