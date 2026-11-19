@@ -3,12 +3,20 @@
 <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/" version="2005-3" xml:lang="en-US">
    <head>
       <meta name="dtb:uid" content="1"/>
+      <meta name="dc:Identifier" content="1"/>
       <meta name="dc:Title" content="Help"/>
       <meta name="dc:Creator" content="Balandin Vyacheslav"/>
       <meta name="dc:Publisher" content="Pruchkovskaya"/>
-      <meta name="dc:Identifier" content="1"/>
       <meta name="dc:Language" content="en-US"/>
       <meta name="dc:Language" content="en-GB"/>
+      <meta name="schema:accessibilityFeature" content="structuralNavigation"/>
+      <meta name="schema:accessibilityFeature" content="displayTransformability"/>
+      <meta name="schema:accessibilityFeature" content="readingOrder"/>
+      <meta name="schema:accessibilityFeature" content="unlocked"/>
+      <meta name="schema:accessMode" content="textual"/>
+      <meta name="schema:accessMode" content="visual"/>
+      <meta name="schema:accessModeSufficient" content="textual,visual"/>
+      <meta name="schema:accessibilityHazard" content="none"/>
    </head>
    <book showin="blp">
       <frontmatter>
@@ -54,7 +62,7 @@
             <tbody>
                <tr>
                   <td><p xml:lang="en-GB"><imggroup>
-                        <img src="F1-42-21112966.jpg" alt="" id="rId61"/>
+                        <img src="F1-image1.jpg" alt="" id="rId61"/>
                      </imggroup></p></td>
                   <td><p/><p/><p><strong>Many years from now people were trying hard to spread first automobiles all over the world, they were glorifying numerous advantages of having a car. Times have changes and today newspapers and magazines claim that cars have more cons than pros. They pollute the environment, they contribute to global warming, they deprive people from physical activity and they move us away from nature. More and more people dedicate all their efforts to banish cars from big cities.</strong></p><p/></td>
                </tr>

@@ -1,15 +1,21 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE dtbook PUBLIC '-//NISO//DTD dtbook 2005-3//EN' 'http://www.daisy.org/z3986/2005/dtbook-2005-3.dtd' >
-<dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/"
-        version="2005-3"
-        xml:lang="en-US">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dtbook PUBLIC '-//NISO//DTD dtbook 2005-3//EN' 'http://www.daisy.org/z3986/2005/dtbook-2005-3.dtd' [] >
+<dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/" version="2005-3" xml:lang="en-US">
    <head>
       <meta name="dtb:uid" content="2"/>
+      <meta name="dc:Identifier" content="2"/>
       <meta name="dc:Title" content="Document"/>
       <meta name="dc:Creator" content="Balandin Vyacheslav"/>
       <meta name="dc:Publisher" content="Pruchkovskaya"/>
-      <meta name="dc:Identifier" content="2"/>
       <meta name="dc:Language" content="en-US"/>
       <meta name="dc:Language" content="ru-RU"/>
+      <meta name="schema:accessibilityFeature" content="structuralNavigation"/>
+      <meta name="schema:accessibilityFeature" content="displayTransformability"/>
+      <meta name="schema:accessibilityFeature" content="readingOrder"/>
+      <meta name="schema:accessibilityFeature" content="unlocked"/>
+      <meta name="schema:accessMode" content="textual"/>
+      <meta name="schema:accessModeSufficient" content="textual"/>
+      <meta name="schema:accessibilityHazard" content="none"/>
    </head>
    <book showin="blp">
       <frontmatter>
@@ -26,32 +32,32 @@
                <tr>
                   <td><p xml:lang="ru-RU">2009-01-01</p></td>
                   <td><p xml:lang="ru-RU">Last_name N.</p></td>
-                  <td><p></p></td>
+                  <td><p/></td>
                </tr>
                <tr>
-                  <td><p></p></td>
-                  <td><p></p></td>
-                  <td><p></p></td>
+                  <td><p/></td>
+                  <td><p/></td>
+                  <td><p/></td>
                </tr>
             </tbody>
-         </table><p></p><p></p></level1><level1><h1>1. Section 1</h1><level2><h2 xml:lang="ru-RU">1.1. Subsection 1.1</h2><p></p><p>Table</p><table border="1">
+         </table><p/><p/></level1><level1><h1>1. Section 1</h1><level2><h2 xml:lang="ru-RU">1.1. Subsection 1.1</h2><p/><p>Table</p><table border="1">
             <tbody>
                <tr>
-                  <td><p></p></td>
-                  <td><p></p></td>
-                  <td><p></p></td>
+                  <td><p/></td>
+                  <td><p/></td>
+                  <td><p/></td>
                </tr>
                <tr>
-                  <td><p></p></td>
-                  <td><p></p></td>
-                  <td><p></p></td>
+                  <td><p/></td>
+                  <td><p/></td>
+                  <td><p/></td>
                </tr>
                <tr>
-                  <td><p></p></td>
-                  <td><p></p></td>
-                  <td><p></p></td>
+                  <td><p/></td>
+                  <td><p/></td>
+                  <td><p/></td>
                </tr>
             </tbody>
-         </table><p></p><p></p></level2></level1><level1><h1>2. Section 2</h1><p></p><p></p><p></p><p></p><p></p></level1></bodymatter>
+         </table><p/><p/></level2></level1><level1><h1>2. Section 2</h1><p/><p/><p/><p/><p/></level1></bodymatter>
    </book>
 </dtbook>

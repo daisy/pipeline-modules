@@ -3,11 +3,18 @@
 <dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/" version="2005-3" xml:lang="en-US">
    <head>
       <meta name="dtb:uid" content="12"/>
+      <meta name="dc:Identifier" content="12"/>
       <meta name="dc:Title" content="Date issue"/>
       <meta name="dc:Creator" content="Nicolas Pavie"/>
       <meta name="dc:Publisher" content="Association Valentin Haüy"/>
-      <meta name="dc:Identifier" content="12"/>
       <meta name="dc:Language" content="en-US"/>
+      <meta name="schema:accessibilityFeature" content="structuralNavigation"/>
+      <meta name="schema:accessibilityFeature" content="displayTransformability"/>
+      <meta name="schema:accessibilityFeature" content="readingOrder"/>
+      <meta name="schema:accessibilityFeature" content="unlocked"/>
+      <meta name="schema:accessMode" content="textual"/>
+      <meta name="schema:accessModeSufficient" content="textual"/>
+      <meta name="schema:accessibilityHazard" content="none"/>
    </head>
    <book showin="blp">
       <frontmatter>

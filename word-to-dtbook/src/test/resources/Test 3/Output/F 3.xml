@@ -1,16 +1,22 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE dtbook PUBLIC '-//NISO//DTD dtbook 2005-3//EN' 'http://www.daisy.org/z3986/2005/dtbook-2005-3.dtd' >
-<dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/"
-        version="2005-3"
-        xml:lang="en-US">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dtbook PUBLIC '-//NISO//DTD dtbook 2005-3//EN' 'http://www.daisy.org/z3986/2005/dtbook-2005-3.dtd' [] >
+<dtbook xmlns="http://www.daisy.org/z3986/2005/dtbook/" version="2005-3" xml:lang="en-US">
    <head>
       <meta name="dtb:uid" content="3"/>
+      <meta name="dc:Identifier" content="3"/>
       <meta name="dc:Title" content="Testing"/>
       <meta name="dc:Creator" content="Balandin Vyacheslav"/>
       <meta name="dc:Publisher" content="Pruchkovskaya"/>
-      <meta name="dc:Identifier" content="3"/>
       <meta name="dc:Language" content="en-US"/>
       <meta name="dc:Language" content="ru-RU"/>
       <meta name="dc:Language" content="en-GB"/>
+      <meta name="schema:accessibilityFeature" content="structuralNavigation"/>
+      <meta name="schema:accessibilityFeature" content="displayTransformability"/>
+      <meta name="schema:accessibilityFeature" content="readingOrder"/>
+      <meta name="schema:accessibilityFeature" content="unlocked"/>
+      <meta name="schema:accessMode" content="textual"/>
+      <meta name="schema:accessModeSufficient" content="textual"/>
+      <meta name="schema:accessibilityHazard" content="none"/>
    </head>
    <book showin="blp">
       <frontmatter>
@@ -30,7 +36,7 @@
                   <td><p>Created</p></td>
                </tr>
             </tbody>
-         </table></level1><level1><h1>1. Scope</h1><p>The testing has been made for Product Content Cue. Some bugs were reported to developers. Here there is summary of work.</p></level1><level1><h1>2. List of Testing Scenario</h1><p>List of description Testing Scenario</p><level2><h2>2.1. Testing functionality of each tab</h2><level3><h3>2.1.1. Setting Tab</h3><p></p><table border="1">
+         </table></level1><level1><h1>1. Scope</h1><p>The testing has been made for Product Content Cue. Some bugs were reported to developers. Here there is summary of work.</p></level1><level1><h1>2. List of Testing Scenario</h1><p>List of description Testing Scenario</p><level2><h2>2.1. Testing functionality of each tab</h2><level3><h3>2.1.1. Setting Tab</h3><p/><table border="1">
             <col align="center"/>
             <tbody>
                <tr>
@@ -106,7 +112,7 @@
                   <td><p>Functions </p></td>
                </tr>
             </tbody>
-         </table></level3><level3><h3 xml:lang="ru-RU">2.1.2. Metadata Tab</h3><p></p><table border="1">
+         </table></level3><level3><h3 xml:lang="ru-RU">2.1.2. Metadata Tab</h3><p/><table border="1">
             <col align="center"/>
             <tbody>
                <tr>
@@ -222,7 +228,7 @@
                   <td><p>Functions </p></td>
                </tr>
             </tbody>
-         </table></level3><level3><h3 xml:lang="ru-RU">2.1.3. Log Tab</h3><p></p><table border="1">
+         </table></level3><level3><h3 xml:lang="ru-RU">2.1.3. Log Tab</h3><p/><table border="1">
             <col align="center"/>
             <tbody>
                <tr>
@@ -242,7 +248,7 @@
                   <td><p>Functions </p></td>
                </tr>
             </tbody>
-         </table></level3></level2><level2><h2>2.2. Testing of Main menu</h2><p></p><table border="1">
+         </table></level3></level2><level2><h2>2.2. Testing of Main menu</h2><p/><table border="1">
             <col align="center"/>
             <tbody>
                <tr>
@@ -302,12 +308,12 @@
                   <td><p>Functions </p></td>
                </tr>
             </tbody>
-         </table></level2><level2><h2 xml:lang="ru-RU">2.3. Verifying Function scenarios requirement according to specification</h2><p></p><table border="1">
+         </table></level2><level2><h2 xml:lang="ru-RU">2.3. Verifying Function scenarios requirement according to specification</h2><p/><table border="1">
             <col align="center"/>
             <tbody>
                <tr>
-                  <td><p><em >Database description</em></p></td>
-                  <td><p><em >Conformance specification</em></p></td>
+                  <td><p><em>Database description</em></p></td>
+                  <td><p><em>Conformance specification</em></p></td>
                </tr>
                <tr>
                   <td><p>1. The tool will allow the user to select the source of the documents from a file share via the GUI.</p></td>
@@ -370,12 +376,12 @@
                   <td><p>Conforms</p></td>
                </tr>
             </tbody>
-         </table></level2><level2><h2>2.4. Verifying Non Function requirement according to specification</h2><p></p><table border="1">
+         </table></level2><level2><h2>2.4. Verifying Non Function requirement according to specification</h2><p/><table border="1">
             <col align="center"/>
             <tbody>
                <tr>
-                  <td><p><em >Database description</em></p></td>
-                  <td><p><em >Conformance specification</em></p></td>
+                  <td><p><em>Database description</em></p></td>
+                  <td><p><em>Conformance specification</em></p></td>
                </tr>
                <tr>
                   <td><p>• The tool must work on x64 (64bit) platforms</p></td>
@@ -402,28 +408,28 @@
                   <td><p>Conforms</p></td>
                </tr>
             </tbody>
-         </table></level2></level1><level1><h1 xml:lang="ru-RU">3. Stress Tests</h1><p></p><table border="1">
+         </table></level2></level1><level1><h1 xml:lang="ru-RU">3. Stress Tests</h1><p/><table border="1">
             <col align="center"/>
             <tbody>
                <tr>
-                  <td><p><em >Database description</em></p></td>
-                  <td><p><em >Conformance specification</em></p></td>
+                  <td><p><em>Database description</em></p></td>
+                  <td><p><em>Conformance specification</em></p></td>
                </tr>
                <tr>
                   <td><p>Prepare library of 300 files for loading. They should be different types (user common types as .doc, .pdf, .jpg and so on. Prepare 10 files of different types with size greater than 50 MB.</p></td>
                   <td><p>The action of system conforms to specification</p></td>
                </tr>
             </tbody>
-         </table></level1><level1><h1 xml:lang="ru-RU">4. Smoke/Acceptance Test</h1><p></p><table border="1">
+         </table></level1><level1><h1 xml:lang="ru-RU">4. Smoke/Acceptance Test</h1><p/><table border="1">
             <col align="right"/>
             <tbody>
                <tr>
-                  <td><p><em >№</em></p></td>
-                  <td><p><em >Database description</em></p></td>
-                  <td><p><em >Precedent conditions</em></p></td>
-                  <td><p><em >Operation</em></p></td>
-                  <td><p><em >Expectation</em></p></td>
-                  <td><p><em >Actual result</em></p></td>
+                  <td><p><em>№</em></p></td>
+                  <td><p><em>Database description</em></p></td>
+                  <td><p><em>Precedent conditions</em></p></td>
+                  <td><p><em>Operation</em></p></td>
+                  <td><p><em>Expectation</em></p></td>
+                  <td><p><em>Actual result</em></p></td>
                </tr>
                <tr>
                   <td><p>1</p></td>
@@ -610,6 +616,6 @@
                   <td><p> Should  conform to specification</p></td>
                </tr>
             </tbody>
-         </table><p></p><p></p></level1><level1><h1>5. Conclusion</h1><p></p><p>Consequently of testing a system was detected next mistakes: 1) the view of Main menu and Metadata are not correct; 2) the button ‘Save settings’ is not correct; 3) <span xml:lang="en-GB">not message about hierarchy of folder; 4) </span>not ‘warning’ in the Mapping grid when loaded files with size greater than 50 MB. All mistakes were removed. </p><p>The Product Content Cue is ready for construction QA-analysis.</p><p></p><p></p><p></p></level1></bodymatter>
+         </table><p/><p/></level1><level1><h1>5. Conclusion</h1><p/><p>Consequently of testing a system was detected next mistakes: 1) the view of Main menu and Metadata are not correct; 2) the button ‘Save settings’ is not correct; 3) <span xml:lang="en-GB">not message about hierarchy of folder; 4) </span>not ‘warning’ in the Mapping grid when loaded files with size greater than 50 MB. All mistakes were removed. </p><p>The Product Content Cue is ready for construction QA-analysis.</p><p/><p/><p/></level1></bodymatter>
    </book>
 </dtbook>
